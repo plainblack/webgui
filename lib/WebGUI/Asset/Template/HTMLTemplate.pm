@@ -16,6 +16,7 @@ package WebGUI::Asset::Template::HTMLTemplate;
 
 use strict;
 use base 'WebGUI::Asset::Template::Parser';
+use WebGUI::Exception;
 use HTML::Template;
 
 
@@ -37,7 +38,7 @@ sub getName {
 
 =head2 process ( template, vars )
 
-Evaluate a template replacing template commands for HTML. 
+Evaluate a template replacing template commands for HTML.
 
 =head3 template
 
@@ -50,28 +51,25 @@ A hash reference containing template variables and loops.
 =cut
 
 sub process {
-	my $self = shift;
-	my $template = shift;
-	my $vars = $self->addSessionVars(shift);
-  	my $t;
-        eval {
-                $t = HTML::Template->new(
-			scalarref=>\$template,
-                	global_vars=>1,
-                	loop_context_vars=>1,
-                	die_on_bad_params=>0,
-                	no_includes=>1,
-                	strict=>0
-			);
-        };
-        unless ($@) {
-                $t->param(%{$vars});
-                return $t->output;
-        } else {
-                $self->session->errorHandler->error("Error in template. ".$@);
-                return WebGUI::International->new($self->session, 'Asset_Template')->get('template error').$@;
-        }
+    my $self = shift;
+    my $template = shift;
+    my $vars = $self->addSessionVars(shift);
+    my $t;
+    eval {
+        $t = HTML::Template->new(
+            scalarref=>\$template,
+            global_vars=>1,
+            loop_context_vars=>1,
+            die_on_bad_params=>0,
+            no_includes=>1,
+            strict=>0
+        );
+    };
+    if ($@) {
+        WebGUI::Error::Template->throw( error => $@ );
+    }
+    $t->param(%{$vars});
+    return $t->output;
 }
-
 
 1;

@@ -87,6 +87,7 @@ sub process {
 	# stuff to do if we're on a page with an asset
 	if ($asset) {
 		
+        my $inAssetManager = $session->form->get('op') eq 'assetManager';
 		# clipboard
 		my $clipboardItems = $session->asset->getAssetsInClipboard(1);
 		if (scalar (@$clipboardItems)) {
@@ -118,6 +119,7 @@ sub process {
 
 		# assets
 		my %assetList = %{$config->get('assets')};
+        my $proceed   = $inAssetManager ? ';proceed=manageAssets' : '';
 		foreach my $assetClass (keys %assetList) {
 			my $dummy = WebGUI::Asset->newByPropertyHashRef($session,{dummy=>1, className=>$assetClass});
             next unless defined $dummy;
@@ -126,7 +128,7 @@ sub process {
 			next unless exists $categories{$assetList{$assetClass}{category}};
 			$categories{$assetList{$assetClass}{category}}{items}{$dummy->getTitle} = {
 				icon	=> $dummy->getIcon(1),
-				url		=> $asset->getUrl("func=add;class=".$dummy->get('className')),
+				url		=> $asset->getUrl("func=add;class=".$dummy->get('className').$proceed),
 				};
 		}
 

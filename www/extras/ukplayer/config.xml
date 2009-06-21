@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<content_url>/extras/ukplayer/content.xml</content_url>
+	<content_url>content.xml</content_url>
 	
 	<width>400</width>
 	<height>300</height>

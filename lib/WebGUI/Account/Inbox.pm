@@ -873,7 +873,7 @@ sub www_inviteUserSave {
     my @toList = split /[;,]/, $to;
     for my $inviteeEmail (@toList) {
         unless ( $inviteeEmail =~ WebGUI::Utility::emailRegex ) {
-            return $self->www_inviteUser( $i18n->get('invalid email') );
+            return $self->www_inviteUser( sprintf $i18n->get('invalid email'), $inviteeEmail );
         }
 
         # User existance check.
@@ -1129,7 +1129,8 @@ sub www_sendMessage {
         my $activeFriendCount = 0;
         #Append this users friends to the template
         my @friendsLoop = ();
-        foreach my $friendId (keys %{$friends}) {
+        my @friendIds = keys %{ $friends };
+        foreach my $friendId (@friendIds) {
             my $friend     = WebGUI::User->new($session,$friendId);
             #This friend has private messages turned off
             my $disabled   = "disabled";
@@ -1162,9 +1163,17 @@ sub www_sendMessage {
         }
 
         #You can't send new messages if you don't have any friends to send to
-        unless($activeFriendCount) {
+        unless(@friendIds) {
             my $i18n  = WebGUI::International->new($session,'Account_Inbox');
             $errorMsg = $i18n->get("no friends error");
+            $var->{'isInbox'} = "true";
+            return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
+        }
+
+        #You can't send new messages if you don't have any friends to send to
+        unless($activeFriendCount) {
+            my $i18n  = WebGUI::International->new($session,'Account_Inbox');
+            $errorMsg = $i18n->get("no messagable friends error");
             $var->{'isInbox'} = "true";
             return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
         }

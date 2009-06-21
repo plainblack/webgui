@@ -951,6 +951,10 @@ sub getSortBy {
     my $self = shift;
     my $scratchSortBy = $self->getId."_sortBy";
     my $sortBy = $self->session->scratch->get($scratchSortBy) || $self->getValue("sortBy");
+    # XXX: This should be fixed in an upgrade and in the definition, NOT HERE
+    if ( $sortBy eq "rating" ) {
+        $sortBy = "threadRating";
+    }
     return $sortBy;
 }
 

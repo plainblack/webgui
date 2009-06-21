@@ -48,6 +48,7 @@ function switchToAdminConsole () {
         
         // force reflow to fix IE7
         document.body.style.border = document.body.style.border;
+        document.body.className = document.body.className;
 }
  
 function toggleAdminConsole () {

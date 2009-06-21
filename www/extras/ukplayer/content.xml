@@ -4,22 +4,22 @@
 		<slide>
 			<width>400</width>
 			<height>300</height>
-			<title><![CDATA[<b>Slide</b> One]]></title>
-			<description><![CDATA[ This is the United Knowledge Player for <u>WebGUI</u>!]]></description>
-			<image_source>/extras/ukplayer/dummycontent/explain.jpg</image_source>
+			<title><![CDATA[Slide One]]></title>
+			<description><![CDATA[This is the United Knowledge Player for WebGUI!]]></description>
+			<image_source>dummycontent/explain.jpg</image_source>
 			<duration>5</duration>
-			<thumb_source>/extras/ukplayer/dummycontent/explain.jpg</thumb_source>
-			<sound_source>/extras/ukplayer/dummycontent/transporter.mp3</sound_source>
+			<thumb_source>dummycontent/explain.jpg</thumb_source>
+			<sound_source></sound_source>
 		</slide>
 		<slide>
 			<width>400</width>
 			<height>300</height>
-			<title><![CDATA[<b>Slide</b> Two]]></title>
-			<description><![CDATA[ This is the United Knowledge Player for <u>WebGUI</u>!]]></description>
-			<image_source>/extras/ukplayer/dummycontent/united-knowledge-logo.jpg</image_source>
+			<title><![CDATA[Slide Two]]></title>
+			<description><![CDATA[This is the United Knowledge Player for WebGUI!]]></description>
+			<image_source>dummycontent/united-knowledge-logo.jpg</image_source>
 			<duration>5</duration>
-			<thumb_source>/extras/ukplayer/dummycontent/united-knowledge-logo.jpg</thumb_source>
-			<sound_source>/extras/ukplayer/dummycontent/transporter.mp3</sound_source>
+			<thumb_source>dummycontent/united-knowledge-logo.jpg</thumb_source>
+			<sound_source></sound_source>
 		</slide>
 	</slides>
 </content>

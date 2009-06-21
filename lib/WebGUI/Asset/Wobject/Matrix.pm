@@ -770,7 +770,9 @@ sub view {
             assetData.title as productName,
             assetData.url,
             rating.listingId, 
-            rating.meanValue, 
+            rating.meanValue,
+            rating.medianValue,
+            rating.countValue, 
             asset.parentId 
         from 
             MatrixListing_ratingSummary as rating 
@@ -1236,12 +1238,15 @@ An array of listingIds that should be shown in the compare list datatable.
 sub www_getCompareListData {
 
     my $self        = shift;
-    my @listingIds  = @_;
+    my $listingIds  = shift;
     my $session     = $self->session;
     my $i18n        = WebGUI::International->new($session,'Asset_Matrix');
-    my (@results,@columnDefs);
+    my (@results,@columnDefs,@listingIds);
 
-    unless (scalar(@listingIds)) {
+    if ($listingIds) {
+        @listingIds = @{$listingIds};
+    }
+    else{
         @listingIds = $self->session->form->checkList("listingId");
     }
     my @responseFields = ("attributeId", "name", "description","fieldType", "checked");

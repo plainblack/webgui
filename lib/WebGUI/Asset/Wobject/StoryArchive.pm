@@ -116,6 +116,13 @@ sub definition {
             namespace    => 'Story',
             defaultValue => '3QpYtHrq_jmAk1FNutQM5A',
         },
+        photoWidth => {
+            tab          => 'display',
+            fieldType    => 'integer',
+            label        => $i18n->get('photo width'),
+            hoverHelp    => $i18n->get('photo width help'),
+            defaultValue => '300',
+        },
         editStoryTemplateId => {
             tab          => 'display',
             fieldType    => 'template',

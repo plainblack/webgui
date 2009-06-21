@@ -17,6 +17,7 @@ package WebGUI::Asset::Template::HTMLTemplateExpr;
 use strict;
 use base 'WebGUI::Asset::Template::Parser';
 use HTML::Template::Expr;
+use WebGUI::Exception;
 
 
 #-------------------------------------------------------------------
@@ -77,25 +78,23 @@ A hash reference containing template variables and loops.
 # about the template that has the error. Finding an "ERROR: Error in template" 
 # in the error log is not very helpful...
 sub process {
-	my $class = shift;
-	my $template = shift;
-	my $vars = $class->addSessionVars(shift);
- 	my $t;
-        eval {
-                $t = HTML::Template::Expr->new(scalarref=>\$template,
-                global_vars=>1,
-                loop_context_vars=>1,
-                die_on_bad_params=>0,
-                no_includes=>1,
-                strict=>0);
-        };
-        unless ($@) {
-                $t->param(%{_rewriteVars($vars)});
-                return $t->output;
-        } else {
-                $class->session->errorHandler->error("Error in template. ".$@);
-                return WebGUI::International->new($class->session,'Asset_Template')->get('template error').$@;
-        }	
+    my $class = shift;
+    my $template = shift;
+    my $vars = $class->addSessionVars(shift);
+    my $t;
+    eval {
+        $t = HTML::Template::Expr->new(scalarref=>\$template,
+        global_vars=>1,
+        loop_context_vars=>1,
+        die_on_bad_params=>0,
+        no_includes=>1,
+        strict=>0);
+    };
+    if ($@) {
+        WebGUI::Error::Template->throw( error => $@ );
+    }
+    $t->param(%{_rewriteVars($vars)});
+    return $t->output;
 }
 
 1;

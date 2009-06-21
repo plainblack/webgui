@@ -1,19 +1,19 @@
 .qbtd {
 	height: 20px;
-	background-image: url(/extras/wobject/WobjectProxy/hline.gif);
+	background-image: url(hline.gif);
 	padding-left: 5px;
 	padding-right: 5px;
 }
 
 .qbtdleft {
 	height: 20px;
-	background-image: url(/extras/wobject/WobjectProxy/hline.gif);
+	background-image: url(hline.gif);
 	padding-right: 5px;
 }
 
 .qbtdright {
 	height: 20px;
-	background-image: url(/extras/wobject/WobjectProxy/vline.gif);
+	background-image: url(vline.gif);
 	background-repeat: repeat-y;
 	align: right;
 }

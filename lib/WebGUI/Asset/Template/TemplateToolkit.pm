@@ -71,25 +71,22 @@ A hash reference containing template variables and loops.
 # about the template that has the error. Finding an "ERROR: Error in template" 
 # in the error log is not very helpful...
 sub process {
-	my $self = shift;
-	my $template = shift;
-	my $vars = $self->addSessionVars(shift);
-	my ($t,$output);
-        eval {
-                $t = Template->new( {
-                INTERPOLATE  => 1,               # expand "$var" in plain text
-                POST_CHOMP   => 1,               # cleanup whitespace 
-                EVAL_PERL    => 0,               # evaluate Perl code blocks
-        	});
-                $t->process( \$template, _rewriteVars($vars),\$output) || $self->session->errorHandler->error($t->error());
-        };
-        unless($@){
-                return $output;
-        } else {
-                $self->session->errorHandler->error("Error in template. ".$@);
-                return WebGUI::International->new($self->session,'Asset_Template')->get('template error').$@;
-        }
-
+    my $self = shift;
+    my $template = shift;
+    my $vars = $self->addSessionVars(shift);
+    my ($t,$output);
+    eval {
+        $t = Template->new({
+            INTERPOLATE  => 1,               # expand "$var" in plain text
+            POST_CHOMP   => 1,               # cleanup whitespace 
+            EVAL_PERL    => 0,               # evaluate Perl code blocks
+        });
+        $t->process( \$template, _rewriteVars($vars),\$output) || $self->session->errorHandler->error($t->error());
+    };
+    if ($@) {
+        WebGUI::Error::Template->throw( error => $@ );
+    }
+    return $output;
 }
 
 1;

@@ -516,7 +516,7 @@ sub unescape {
 =head2 urlize ( string )
 
 Returns a url that is safe for WebGUI pages.  Strings are lower-cased, run through
-$self->makeCompliant and then have any trailing slashes removed.
+$self->makeCompliant and then have any relative segments and trailing slashes removed.
 
 =head3 string
 
@@ -525,12 +525,17 @@ The string to urlize.
 =cut
 
 sub urlize {
-	my $self = shift;
-	my ($value);
-        $value = lc(shift);		#lower cases whole string
-	$value = $self->makeCompliant($value);
-	$value =~ s/\/$//;
-        return $value;
+    my $self = shift;
+    my ($value);
+    $value = lc(shift);		#lower cases whole string
+    $value = $self->makeCompliant($value);
+
+    # remove /./ or /../
+    $value =~ s{(^|/)(?:\.\.?/)*}{$1}g;
+
+    # remove trailing slashes
+    $value =~ s/\/$//;
+    return $value;
 }
 
 

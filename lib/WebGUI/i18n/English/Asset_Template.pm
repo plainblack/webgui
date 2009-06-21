@@ -33,9 +33,9 @@ our $I18N = {
 	},
 
 	'template error' => {
-		message => q|There is a syntax error in this template. Please correct.|,
+		message => q|There is a syntax error in this template, %s, %s. Please correct.|,
 		context => q|Error when executing template|,
-		lastUpdated => 1107391368,
+		lastUpdated => 1244476530,
 	},
 
         'namespace description' => {

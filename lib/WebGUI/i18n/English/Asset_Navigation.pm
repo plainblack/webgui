@@ -248,8 +248,8 @@ the Navigation Template to determine who can see them in the menu.</p>
 	},
 
 	'page_loop' => {
-		message => q|A loop containing pages in nested, hierarchical order.  Every property of each page is available.  A handfull of them are listed below.  Please consult the template variables for each Asset type for a full list.|,
-		lastUpdated => 1221602778,
+		message => q|A loop containing pages in nested, hierarchical order.  Every property of each asset is available, with the name <b>page.<i>propertyName</i></b>, where <i>propertyName</i> should be replaced with the name of the property you want to use, like className, or assetSize.  A handfull of them are listed below.  Please consult the template variables for each Asset type for a full list.|,
+		lastUpdated => 1244495609,
 	},
 
 	'page.assetId' => {

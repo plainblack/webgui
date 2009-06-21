@@ -21,15 +21,16 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 88;
+plan tests => 90;
 
 my ( $s, $t1 );
 
-eval 'use TAP::Parser; use TAP::Parser::Aggregator';
+my $tp = use_ok('TAP::Parser');
+my $tpa = use_ok('TAP::Parser::Aggregator');
 
 SKIP: {
 
-skip "Unable to load TAP::Parser and TAP::Parser::Aggregator", 1 if $@;
+skip "Unable to load TAP::Parser and TAP::Parser::Aggregator", 88 unless $tp && $tpa;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -682,8 +683,6 @@ try_it( $t1, $spec, { tap => <<END_TAP, fail => 1 } );
 not ok 1 - S1Q0 answer number 1 property recordedAnswer not defined
 # got: ''
 END_TAP
-
-use TAP::Parser;
 
 sub try_it {
     my ( $test, $spec, $opts ) = @_;

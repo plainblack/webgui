@@ -5,12 +5,12 @@ our $I18N = {
 
     'mark as read label' => {
         message     => q{Mark as Read},
-        lastUpdated => 12411788761,
+        lastUpdated => 1241178876,
     },
 
     'mark as unread label' => {
         message     => q{Mark as Unread},
-        lastUpdated => 12411788761,
+        lastUpdated => 1241178876,
     },
 
     'title' => {
@@ -340,6 +340,11 @@ our $I18N = {
         lastUpdated => 1181019679,
     },
 
+    'no messagable friends error' => {
+        message => q{None of your friends allow private messaging.},
+        lastUpdated => 1244494607,
+    },
+
     'no friends hover' => {
         message => q{You must have active friends in the system if you wish to send new private messages without having to first locate their profile},
         lastUpdated => 1181019679,
@@ -470,10 +475,15 @@ our $I18N = {
         lastUpdated => 1181409056,
     },
 
-    'missing message' => {
-        message     => q|Your invitation must have a message.|,
-        lastUpdated => 1181409432,
-    },
+    'invalid email' => {
+		message => q|Invalid email address entered: %s.|,
+		lastUpdated => 1181409056,
+	},
+
+	'missing message' => {
+		message     => q|Your invitiation must have a message.|,
+		lastUpdated => 1181409432,
+	},
 
     'missing subject' => {
         message     => q|Your invitation must have a subject.|,
@@ -484,6 +494,11 @@ our $I18N = {
         message     => q|The email address you entered is already registered to <a href="%s">%s</a> on this site.|,
         lastUpdated => 1227715272,
     },
+
+    'currently invited' => {
+		message     => q|The email address you entered, %s, has an outstanding invitation on this site.|,
+		lastUpdated => 1227715272,
+	},
 
     'no email' => {
         message     => q{The invitation cannot be sent because you do not have an email address set in your profile.},

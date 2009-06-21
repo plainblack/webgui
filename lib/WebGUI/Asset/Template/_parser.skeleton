@@ -16,6 +16,7 @@ package WebGUI::Asset::Template::SomeTemplateType;
 
 use strict;
 use base 'WebGUI::Asset::Template::Parser';
+use WebGUI::Exception;
 
 
 #-------------------------------------------------------------------
@@ -52,7 +53,12 @@ sub process {
 	my $self = shift;
 	my $template = shift;
 	my $vars = $self->addSessionVars(shift);
-	...
+    eval {
+
+    }
+    if ($@) {
+        WebGUI::Error::Template->throw( error => $@ );
+    }
 }
 
 

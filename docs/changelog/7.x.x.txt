@@ -1,3 +1,22 @@
+7.7.10
+ - Made a change to LDAP auth that adds an OR to that query so that it also searches for a row with fieldData REGEXP '^uid=(value-from-ldap-directory-server),'. (Wes Morgan)
+ - fixed #10481: i18n outdated message saving
+ - fixed #10491: Side by Side template metadata extra headers CSS
+ - fixed: getNextThread/getPreviousThread won't sort by thread rating
+ - fixed: #10485: User not returned to asset manager after adding content to /impor
+ - fixed: #10262: Default Inbox View Template: Mismatch in HTML for upper and lower page navigation 
+ - fixed rfe #10474: Improve error message for template errors
+ - removed hardcoding of administer.js and survey.css hardcoded extras paths.
+ - fixed: Error message when you try to send a message from the Inbox, but none of your friends allow private messaging.
+ - fixed: Images uploaded to a Story should all be the same width so the YUI carousel does not break.
+ - fixed: assets can have urls with /./ or /../ in them, making them inaccessible
+ - fixed: Icons don't show on first view of admin panel in IE
+ - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
+ - fixed #9953: Matrix 2.0 - Not enough tests
+ - fixed #10121: Q and A template doesn't work with default Forum Rich Editor
+ - fixed #10486: Hardcoded extras in files in www/extras
+ - fixed: LDAP authentication does not check for failed passwords.  (Rob Harhen <rharhen@gmail.com>)
+
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
  - fixed #10211: Regex quantifiers like ? and + broke search engine

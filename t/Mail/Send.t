@@ -17,25 +17,13 @@ use lib "$FindBin::Bin/../lib";
 use JSON qw( from_json to_json );
 use Test::More;
 use Test::Deep;
-use File::Spec;
 use Data::Dumper;
 use MIME::Parser;
-use IO::Select;
 use Encode qw/decode/;
 
 use WebGUI::Test;
 
 use WebGUI::Mail::Send;
-
-# Load Net::SMTP::Server
-my $hasServer; # This is true if we have a Net::SMTP::Server module
-BEGIN {
-    eval {
-        require Net::SMTP::Server;
-        require Net::SMTP::Server::Client;
-    };
-    $hasServer = 1 unless $@;
-}
 
 $| = 1;
 
@@ -47,25 +35,9 @@ my $mail;       # The WebGUI::Mail::Send object
 my $mime;       # for getMimeEntity
 
 # See if we have an SMTP server to use
-my $smtpdPid;
-my $smtpdStream;
-my $smtpdSelect;
-
-my $SMTP_HOST        = 'localhost';
-my $SMTP_PORT        = '54921';
-if ($hasServer) {
-    my $smtpd    = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
-    $smtpdPid = open $smtpdStream, '-|', $^X, $smtpd, $SMTP_HOST, $SMTP_PORT
-        or die "Could not open pipe to SMTPD: $!";
-
-    $smtpdSelect = IO::Select->new;
-    $smtpdSelect->add($smtpdStream);
-
-    $session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
-
-    WebGUI::Test->originalConfig('emailToLog');
-    $session->config->set( 'emailToLog', 0 );
-}
+my $hasServer   = 0;
+eval { WebGUI::Test->prepareMailServer; $hasServer = 1 };
+if ( $@ ) { diag( "Can't prepare mail server: $@" ) }
 
 #----------------------------------------------------------------------------
 # Tests
@@ -175,7 +147,8 @@ SKIP: {
         } );
     $mail->addText( 'His judgement cometh and that right soon.' );
 
-    my $received = sendToServer( $mail );
+    $mail->send;
+    my $received = WebGUI::Test->getMail;
 
     if (!$received) {
         skip "Cannot test emailOverride: No response received from smtpd", $numtests;
@@ -209,7 +182,8 @@ SKIP: {
         } );
     $mail->addText( "I understand you're a man who knows how to get things." );
 
-    my $received = sendToServer( $mail );
+    $mail->send;
+    my $received = WebGUI::Test->getMail;
 
     if (!$received) {
         skip "Cannot test messageIds: No response received from smtpd", $numtests;
@@ -232,7 +206,8 @@ SKIP: {
         } );
     $mail->addText( "What say you there, fuzzy-britches? Feel like talking?" );
 
-    $received = sendToServer( $mail );
+    $mail->send;
+    $received = WebGUI::Test->getMail;
 
     $parsed_message = $parser->parse_data($received->{contents});
     $head           = $parsed_message->head;
@@ -248,7 +223,8 @@ SKIP: {
         } );
     $mail->addText( "Dear Warden, You were right. Salvation lies within." );
 
-    $received = sendToServer( $mail );
+    $mail->send;
+    $received = WebGUI::Test->getMail;
 
     $parsed_message = $parser->parse_data($received->{contents});
     $head           = $parsed_message->head;
@@ -264,7 +240,8 @@ SKIP: {
         } );
     $mail->addText( "Neither are they. You have to be human first. They don't qualify." );
 
-    $received = sendToServer( $mail );
+    $mail->send;
+    $received = WebGUI::Test->getMail;
 
     $parsed_message = $parser->parse_data($received->{contents});
     $head           = $parsed_message->head;
@@ -318,7 +295,8 @@ SKIP: {
     );
     $mail->addText( 'sent via email' );
 
-    my $received = sendToServer( $mail ) ;
+    $mail->send;
+    my $received = WebGUI::Test->getMail;
 
     # Test the mail
     is($received->{to}->[0], '<ellis_boyd_redding@shawshank.gov>', 'send, toUser with email address');
@@ -334,7 +312,8 @@ SKIP: {
     );
     $mail->addText( 'sent via SMS' );
 
-    my $received = sendToServer( $mail ) ;
+    $mail->send;
+    my $received = WebGUI::Test->getMail;
 
     # Test the mail
     is($received->{to}->[0], '<55555@textme.com>', 'send, toUser with SMS address');
@@ -350,7 +329,8 @@ SKIP: {
     );
     $mail->addText( 'sent via SMS' );
 
-    my $received = sendToServer( $mail ) ;
+    $mail->send;
+    my $received = WebGUI::Test->getMail;
 
     # Test the mail
     cmp_bag(
@@ -406,45 +386,6 @@ cmp_bag(
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    if ($smtpdPid) {
-        kill INT => $smtpdPid;
-    }
-    if ($smtpdStream) {
-        close $smtpdStream;
-        # we killed it, so there will be an error.  Prevent that from setting the exit value.
-        $? = 0;
-    }
     $session->db->write('delete from mailQueue');
-}
-
-#----------------------------------------------------------------------------
-# sendToServer ( mail )
-# Spawns a server (using t/smtpd.pl), sends the mail, and grabs it from the 
-# child
-# The child process builds a Net::SMTP::Server and listens for the parent to
-# send the mail. The entire result is returned as a hash reference with the 
-# following keys:
-#
-# to            - who the mail was to
-# from          - who the mail was from
-# contents      - The complete contents of the message, suitable to be parsed
-#                 by a MIME::Entity parser
-sub sendToServer {
-    my $mail        = shift;
-    my $status = $mail->send;
-    my $json;
-    if ($status && $smtpdSelect->can_read(5)) {
-        $json = <$smtpdStream>;
-    }
-    elsif ($status) {
-        $json = ' { "error" : "unable to read from smptd.pl" } ';
-    }
-    else {
-        $json = ' { "error": "mail not sent" } ';
-    }
-    if (!$json) {
-        $json = ' { "error": "error in getting mail" } ';
-    }
-    return from_json( $json );
 }
 
