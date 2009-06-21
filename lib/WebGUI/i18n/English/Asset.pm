@@ -217,13 +217,55 @@ our $I18N = {
 	'restore' => {
 		message => q|Restore|,
 		lastUpdated => 0,
-		context => q|Used in asset context menus.|
+		context => q|Used in asset context menus.|,
 	},
 
 	'promote' => {
 		message => q|Promote|,
 		lastUpdated => 0,
-		context => q|Used in asset context menus.|
+		context => q|Used in asset context menus.|,
+	},
+
+	'promote %s' => {
+		message => q|promote %s|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|,
+	},
+
+	'Set Rank' => {
+		message => q|Set Rank|,
+		lastUpdated => 0,
+		context => q|Set, to assign.  Rank, meaning order.|,
+	},
+
+	'moving %s aside' => {
+		message => q|moving %s aside|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
+	'moving %s back' => {
+		message => q|moving %s back|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
+	'moving %s' => {
+		message => q|moving %s|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
+	'swap first' => {
+		message => q|swap first|,
+		lastUpdated => 0,
+		context => q|swap, to exchange places|,
+	},
+
+	'swap second' => {
+		message => q|swap second|,
+		lastUpdated => 0,
+		context => q|swap, to exchange places|,
 	},
 
 	'promote help' => {
@@ -240,6 +282,12 @@ our $I18N = {
 	'demote help' => {
 		message => q|Move this Asset down one spot on the page.|,
 		lastUpdated => 0,
+	},
+
+	'demote %s' => {
+		message => q|demote %s|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|,
 	},
 
 	'cut' => {
@@ -264,6 +312,41 @@ our $I18N = {
 		message => q|copy|,
 		lastUpdated => 1221540088,
 		context => q|Same as Copy, but lower case.|
+	},
+
+	'Paste' => {
+		message => q|Paste|,
+		lastUpdated => 1245342798,
+		context => q|To remove an item from the clipboard, and put it on the current page.|
+	},
+
+	'Paste Assets' => {
+		message => q|Paste Assets|,
+		lastUpdated => 1245342798,
+	},
+
+	'pasting %s' => {
+		message => q|pasting %s|,
+		lastUpdated => 1245343280,
+		context => q|short for "I am pasting this asset onto the page."|
+	},
+
+	'indexing %s' => {
+		message => q|indexing %s|,
+		lastUpdated => 1245343280,
+		context => q|short for "I am adding this asset to the search index"|
+	},
+
+	'skipping %s' => {
+		message => q|skipping %s|,
+		lastUpdated => 1245343280,
+		context => q|To skip, to move over, to not process|
+	},
+
+	'editing %s' => {
+		message => q|editing %s|,
+		lastUpdated => 1245343280,
+		context => q|To edit or change|
 	},
 
 	'this asset only' => {

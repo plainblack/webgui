@@ -20,6 +20,7 @@ use Test::More;
 use Test::Deep;
 use JSON;
 use HTML::Form;
+use Data::Dumper;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -149,7 +150,7 @@ cmp_deeply(
     'addShipper croaks without options to build a object with',
 );
 
-$driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}});
+$driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}, groupToUse=>7});
 isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured FlatRate driver');
 
 #######################################################################
@@ -159,9 +160,10 @@ isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured F
 #######################################################################
 
 my $shippers;
-$driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>0, label=>q{Tommy's cut-rate shipping}});
+$driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>0, label=>q{Tommy's cut-rate shipping}, groupToUse=>7});
 
 $shippers = $ship->getShippers();
+
 is(scalar @{$shippers}, 3, 'getShippers: got both shippers, even though one is not enabled');
 
 my @shipperNames = map { $_->get("label") } @{ $shippers };

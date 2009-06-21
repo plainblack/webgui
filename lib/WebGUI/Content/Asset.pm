@@ -98,7 +98,7 @@ sub handler {
             if ($mimeType eq 'text/css') {
                 $session->output->print("\n/* Page generated in $t seconds. */\n");
             } 
-            elsif ($mimeType eq 'text/html') {
+            elsif ($mimeType =~ m{text/html}) {
                 $session->output->print("\nPage generated in $t seconds.\n");
             } 
             else {

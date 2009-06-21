@@ -243,9 +243,11 @@ sub new {
 
 =head2 render ( application.workarea [,application.title] )
 
-Prepares internationalization of variables. Returns a Style-processed AdminConsole.
+Returns content wrapped inside of the Admin console template and style.
 
 =head3 application.workarea
+
+The main content to display to the user.
 
 =head3 application.title
 

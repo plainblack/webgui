@@ -138,14 +138,20 @@ Swaps lineage with sister below. Returns 1 if there is a sister to swap. Otherwi
 
 This will update the lineage of $self, but not the sister.
 
+=head3 outputSub
+
+A reference to a subroutine that output messages should be sent to.  Typically this would
+go to ProgressBar.
+
 =cut
 
 sub demote {
-	my $self = shift;
+	my $self      = shift;
+    my $outputSub = shift || sub {};
 	my ($sisterLineage) = $self->session->db->quickArray("select min(lineage) from asset 
 		where parentId=? and state='published' and lineage>?",[$self->get('parentId'), $self->get('lineage')]);
 	if (defined $sisterLineage) {
-		$self->swapRank($sisterLineage);
+		$self->swapRank($sisterLineage, undef, $outputSub);
 		$self->{_properties}{lineage} = $sisterLineage;
 		return 1;
 	}
@@ -789,20 +795,26 @@ sub newByLineage {
 
 #-------------------------------------------------------------------
 
-=head2 promote ( )
+=head2 promote ( [ $outputSub ] )
 
 Keeps the same rank of lineage, swaps with sister above. Returns 1 if there is a sister to swap. Otherwise returns 0.
 
 This will update the lineage of $self, but not the sister.
 
+=head3 outputSub
+
+A reference to a subroutine that output messages should be sent to.  Typically this would
+go to ProgressBar.
+
 =cut
 
 sub promote {
-	my $self = shift;
+	my $self      = shift;
+    my $outputSub = shift || sub {};
 	my ($sisterLineage) = $self->session->db->quickArray("select max(lineage) from asset 
 		where parentId=? and state='published' and lineage<?",[$self->get("parentId"), $self->get("lineage")]);
 	if (defined $sisterLineage) {
-		$self->swapRank($sisterLineage);
+		$self->swapRank($sisterLineage, undef, $outputSub);
 		$self->{_properties}{lineage} = $sisterLineage;
 		return 1;
 	}
@@ -846,7 +858,7 @@ sub setParent {
 
 #-------------------------------------------------------------------
 
-=head2 setRank ( newRank )
+=head2 setRank ( newRank, [ $outputSub ] )
 
 Returns 1. Changes rank of Asset.
 
@@ -854,11 +866,17 @@ Returns 1. Changes rank of Asset.
 
 Value of new Rank.
 
+=head3 outputSub
+
+A reference to a subroutine that output messages should be sent to.  Typically this would
+go to ProgressBar, and it must handle doing sprintf'ed i18n calls.
+
 =cut
 
 sub setRank {
-	my $self = shift;
-	my $newRank = shift;
+	my $self      = shift;
+	my $newRank   = shift;
+    my $outputSub = shift || sub {};
 	my $currentRank = $self->getRank;
 	return 1 if ($newRank == $currentRank); # do nothing if we're moving to ourself
 	my $parentLineage = $self->getParentLineage;
@@ -869,13 +887,16 @@ sub setRank {
 	my $temp = substr($self->session->id->generate(),0,6);
 	my $previous = $self->get("lineage");
 	$self->session->db->beginTransaction;
+    $outputSub->('moving %s aside', $self->getTitle);
 	$self->cascadeLineage($temp);
 	foreach my $sibling (@{$siblings}) {
 		if (isBetween($sibling->getRank, $newRank, $currentRank)) {
+            $outputSub->('moving %s', $sibling->getTitle);
 			$sibling->cascadeLineage($previous);
 			$previous = $sibling->get("lineage");
 		}
 	}
+    $outputSub->('moving %s back', $self->getTitle);
 	$self->cascadeLineage($previous,$temp);
 	$self->{_properties}{lineage} = $previous;
 	$self->session->db->commit;
@@ -898,13 +919,16 @@ no in the objects.
 =cut
 
 sub swapRank {
-	my $self = shift;
-	my $second = shift;
-	my $first = shift || $self->get("lineage");
+	my $self      = shift;
+	my $second    = shift;
+	my $first     = shift || $self->get("lineage");
+    my $outputSub = shift || sub {};
 	my $temp = substr($self->session->id->generate(),0,6); # need a temp in order to do the swap
 	$self->session->db->beginTransaction;
+    $outputSub->('swap first');  ##Note, i18n call passed in from caller-1
 	$self->cascadeLineage($temp,$first);
 	$self->cascadeLineage($first,$second);
+    $outputSub->('swap second');
 	$self->cascadeLineage($second,$temp);
 	$self->session->db->commit;
 	$self->updateHistory("swapped lineage between ".$first." and ".$second);
@@ -921,10 +945,15 @@ Demotes self and returns www_view method of getContainer of self if canEdit, oth
 =cut
 
 sub www_demote {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->demote;
-	return $self->session->asset($self->getContainer)->www_view; 
+    my $self    = shift;
+    my $session = $self->session;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $pb      = WebGUI::ProgressBar->new($session);
+    $pb->start($i18n->get('demote'), $session->url->extras('adminConsole/assets.gif'));
+    $pb->update(sprintf $i18n->get('demote %s'), $self->getTitle);
+    $self->demote(sub{ $pb->update($i18n->get(shift))});
+    $pb->finish($self->getContainer->getUrl);
 }
 
 
@@ -937,10 +966,15 @@ Returns www_view method of getContainer of self. Promotes self. If canEdit is Fa
 =cut
 
 sub www_promote {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->promote;
-	return $self->session->asset($self->getContainer)->www_view;
+    my $self    = shift;
+    my $session = $self->session;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $pb      = WebGUI::ProgressBar->new($session);
+    $pb->start($i18n->get('promote'), $session->url->extras('adminConsole/assets.gif'));
+    $pb->update(sprintf $i18n->get('promote %s'), $self->getTitle);
+    $self->promote(sub{ $pb->update($i18n->get(shift))});
+    $pb->finish($self->getContainer->getUrl);
 }
 
 

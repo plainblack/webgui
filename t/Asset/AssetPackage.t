@@ -23,12 +23,16 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::MockObject;
-plan tests => 6;
+plan tests => 10;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 my $root = WebGUI::Asset->getRoot($session);
+
+is(scalar @{ $root->getPackageList }, 0, 'WebGUI does not ship with packages');
+
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($versionTag);
 $versionTag->set({name=>"Asset Package test"});
 
 my $folder = $root->addChild({
@@ -63,6 +67,8 @@ is(scalar @{ $targetFolderChildren }, 0, 'target folder has no children');
 
 $versionTag->commit;
 
+sleep 2;
+
 $targetFolder->www_deployPackage();
 
 $targetFolderChildren = $targetFolder->getLineage(["children"], {returnObjects => 1,});
@@ -71,24 +77,26 @@ is(scalar @{ $targetFolderChildren }, 1, 'target folder now has 1 child');
 my $deployedFolder = $targetFolderChildren->[0];
 
 is($deployedFolder->get('title'), 'folder', 'deployed folder has correct title');
+ok(! $deployedFolder->get('isPackage'), 'and is not a package');
 
 my $deployedFolderChildren;
 $deployedFolderChildren = $deployedFolder->getLineage(["children"], {returnObjects => 1,});
 is(scalar @{ $deployedFolderChildren }, 1, 'deployed package folder still has 1 child');
 isa_ok($deployedFolderChildren->[0] , 'WebGUI::Asset::Snippet', 'deployed child is a Snippet');
 
+##Unset isPackage in this versionTag for the next tests
+$folder->addRevision({isPackage => 0});
+
 my $newVersionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($newVersionTag);
 $newVersionTag->commit;
+
+my $newFolder = WebGUI::Asset->new($session, $folder->getId);
+ok(! $newFolder->get('isPackage'), 'Disabled isPackage in original folder asset');
+is(scalar @{ $root->getPackageList }, 0, 'getPackageList does not pick up old versions of assets that used to be packages');
 
 TODO: {
     local $TODO = "Tests to make later";
     ok(0, 'Check package deployment with 2-level package and look for new style templates propagating down the tree');
 }
 
-END {
-    foreach my $tag($versionTag, $newVersionTag) {
-        if (defined $tag and ref $tag eq 'WebGUI::VersionTag') {
-            $tag->rollback;
-        }
-    }
-}

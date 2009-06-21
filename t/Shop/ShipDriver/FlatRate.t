@@ -116,6 +116,12 @@ cmp_deeply(
                 hoverHelp => ignore(),
                 defaultValue => 1,
             },
+            groupToUse => {
+                fieldType => 'group',
+                label => ignore(),
+                hoverHelp => ignore(),
+                defaultValue => 7,
+            },
         }
     } ],
     'Definition returns an array of hashrefs',
@@ -167,7 +173,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 11, 'getEditForm: the form has 11 controls');
+is (scalar @inputs, 13, 'getEditForm: the form has 13 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -206,6 +212,14 @@ cmp_deeply(
         {
             name => 'enabled',
             type => 'radio',
+        },
+        {
+            name => 'groupToUse',
+            type => 'option',
+        },
+        {
+            name => '__groupToUse_isIn',
+            type => 'hidden',
         },
         {
             name => 'flatFee',

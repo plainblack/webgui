@@ -80,38 +80,27 @@ sub exportPackage {
 
 =head2 getPackageList ( )
 
-Returns an array of hashes containing title, assetId, and className for all assets defined as packages.
+Returns an array of all assets that the user can view and edit that are packages.  The array
+is sorted by the title of the assets.
 
 =cut
 
 sub getPackageList {
-	my $self = shift;
-	my $sql = "
-		select 
-			asset.assetId, 
-			assetData.revisionDate,
-			asset.className,
-			assetData.title
-		from 
-			asset 
-		left join 
-			assetData on asset.assetId=assetData.assetId 
-		where 
-			assetData.isPackage=1
-			and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and
-				(assetData.status='approved'";
-			$sql .= " or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")) if ($self->session->scratch->get("versionTag"));
-			$sql .= ")) and asset.state='published'";
-    my $sth = $self->session->db->read($sql);
-    # MySQL sorts this very slowly, so we do it ourselves
+    my $self = shift;
+    my $session = $self->session;
+    my $db = $session->db;
+    my @packageIds = $db->buildArray("select distinct assetId from assetData where isPackage=1");
     my @assets;
-    while (my ($id, $date, $class, $title) = $sth->array) {
-        my $asset = WebGUI::Asset->new($self->session, $id, $class, $date);
-        push(@assets, [$title, $asset]) if ($asset->get("isPackage"));
+    ID: foreach my $id (@packageIds) {
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        next ID unless defined $asset;
+        next ID unless $asset->get('isPackage');
+        next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
+        push @assets, [$asset->getTitle, $asset];
     }
-    $sth->finish;
     @assets = map { $_->[1] } sort { $a->[0] cmp $b->[0] } @assets;
     return \@assets;
+
 }
 
 
@@ -306,8 +295,14 @@ sub www_deployPackage {
 			$deployedTreeMaster->update({isPackage=>0, styleTemplateId=>$self->get("styleTemplateId")});
 		}
 	}
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return undef;
+    };
 	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getUrl('op=assetManager'));
+		$self->session->http->setRedirect($self->getManagerUrl);
 	} else {
 		$self->session->http->setRedirect($self->getUrl());
 	}

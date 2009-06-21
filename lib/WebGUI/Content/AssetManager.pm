@@ -334,17 +334,17 @@ sub www_manage {
     ### Do Action
     my @assetIds    = $session->form->get( 'assetId' );
 
-    if ( $session->form->get( 'action_update' ) ) {
-        for my $assetId ( @assetIds ) {
-            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-            next unless $asset;
-            my $rank        = $session->form->get( $assetId . '_rank' );
-            next unless $rank; # There's no such thing as zero
-
-            $asset->setRank( $rank );
-        }
-    }
-    elsif ( $session->form->get( 'action_delete' ) ) {
+#    if ( $session->form->get( 'action_update' ) ) {
+#        for my $assetId ( @assetIds ) {
+#            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+#            next unless $asset;
+#            my $rank        = $session->form->get( $assetId . '_rank' );
+#            next unless $rank; # There's no such thing as zero
+#
+#            $asset->setRank( $rank );
+#        }
+#    }
+    if ( $session->form->get( 'action_delete' ) ) {
         for my $assetId ( @assetIds ) {
             my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
             next unless $asset;
@@ -447,7 +447,7 @@ ENDHTML
                     . q{<div id="dataTableContainer">}
                     . q{</div>} 
                     . q{<p class="actions">} . $i18n->get( 'with selected' )
-                    . q{<input type="submit" name="action_update" value="} . $i18n->get( "update" ) . q{" />}
+                    . q{<input type="submit" name="action_update" value="} . $i18n->get( "update" ) . q{" onclick="this.form.method.value='setRanks'; this.form.submit();" />}
                     . q{<input type="submit" name="action_delete" value="} . $i18n->get( "delete" ) . q{" onclick="return confirm('} . $i18n->get( 43 ) . q{')" />}
                     . q{<input type="submit" name="action_cut" value="} . $i18n->get( 'cut' ) . q{" />}
                     . q{<input type="submit" name="action_copy" value="} . $i18n->get( "Copy" ) . q{" />}
@@ -464,19 +464,25 @@ ENDHTML
 
     tie my %options, 'Tie::IxHash';
     my $hasClips = 0;
+    my $clipNum  = 0;
     foreach my $asset (@{$currentAsset->getAssetsInClipboard(1)}) {
             $options{$asset->getId} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="border: 0px;" /> '.$asset->getTitle;
             $hasClips = 1;
+            $clipNum++;
     }
     if ($hasClips) {
             $output .= '<div class="functionPane"><fieldset><legend>'.$i18n->get(1082).'</legend>'
                     .WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
                     .WebGUI::Form::hidden($session,{name=>"func",value=>"pasteList"})
-                    .WebGUI::Form::checkbox($session,{extras=>'onclick="toggleClipboardSelectAll(this.form);"'})
-                    .' '.$i18n->get("select all").'<br />'
+                    .WebGUI::Form::hidden($session,{name=>"proceed",value=>"manageAssets"})
+                    .( $clipNum > 1
+                        ? WebGUI::Form::checkbox($session,{extras=>'onclick="toggleClipboardSelectAll(this.form);"'}).' '.$i18n->get("select all").'<br />'
+                        : ''
+                     )
+                    
                     .WebGUI::Form::checkList($session,{name=>"assetId",vertical=>1,options=>\%options})
                     .'<br />'
-                    .WebGUI::Form::submit($session,{value=>"Paste"})
+                    .WebGUI::Form::submit($session,{value=>$i18n->get('Paste')})
                     .WebGUI::Form::formFooter($session)
                     .' </fieldset></div> '
                     .'<script type="text/javascript">
@@ -767,5 +773,42 @@ sub www_search {
 
     return $ac->render( $output );
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_setRanks ( )
+
+Utility method for the AssetManager.  Reorders 1 pagefull of assets via rank.
+
+If the current user cannot edit the current asset, it returns the insufficient privileges page.
+
+Returns the user to the manage assets screen.
+
+=cut
+
+sub www_setRanks {
+    my $session = shift;
+    return $session->privilege->insufficient() unless $session->asset->canEdit;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $form    = $session->form;
+
+    $pb->start($i18n->get('Set Rank'), $session->url->extras('adminConsole/assets.gif'));
+    my @assetIds    = $form->get( 'assetId' );
+    ASSET: for my $assetId ( @assetIds ) {
+        my $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        next ASSET unless $asset;
+        my $rank   = $form->get( $assetId . '_rank' );
+        next ASSET unless $rank; # There's no such thing as zero
+
+        $asset->setRank( $rank, sub { $pb->update(sprintf $i18n->get(shift), shift); } );
+    }
+
+    $pb->finish($session->asset->getManagerUrl);
+    return "redirect";
+    #return $www_manageAssets();
+}
+
+
 
 1;

@@ -165,9 +165,9 @@ our $I18N = {
     },
     'extra info' => {
         message =>
-            q|Remember to set both &quot;Payment Data Transfer&quot; and &quot;Auto Return&quot; <b>ON</b> in the Website Payments section of your PayPal Profile.<br />
+            q|Remember to set both &quot;Payment Data Transfer&quot; and &quot;Auto Return&quot; <b>ON</b> in the <a href="https://www.paypal.com/us/cgi-bin/webscr?cmd=_profile-website-payments">Website Payments</a> section of your PayPal Profile.<br />
 Additionally, set the &quot;Return URL&quot; to:|,
-        lastUpdated => 0,
+        lastUpdated => 1245364211,
         context     => q|An informational message that's shown in the configuration form of this plugin.|
     },
 };

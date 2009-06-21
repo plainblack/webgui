@@ -239,13 +239,13 @@ sub www_manage {
     my %options         = map { $_ => $_ } @{ $plugins };
 
     my $pluginSwitcher  =
-        '<fieldset><legend>Active tax plugin</legend>'
+        '<fieldset><legend>'.$i18n->get('Active tax plugin') . '</legend>'
         . WebGUI::Form::formHeader( $session )
         . WebGUI::Form::hidden(     $session, { name => 'shop',      value => 'tax' } )
         . WebGUI::Form::hidden(     $session, { name => 'method',    value => 'setActivePlugin' } )
-        . 'Active Tax Plugin '
+        . $i18n->get('Active tax plugin') . ' ' 
         . WebGUI::Form::selectBox(  $session, { name => 'className', value => $activePlugin, options => \%options } )
-        . WebGUI::Form::submit(     $session, { value => 'Switch' } )
+        . WebGUI::Form::submit(     $session, { value => $i18n->get('Switch') } )
         . WebGUI::Form::formFooter( $session )
         . '</fieldset>'
         ;
@@ -282,27 +282,26 @@ sub www_setActivePlugin {
 
     return $session->privilege->insufficient unless $admin->canManage;
 
-    my $message = 
-        'Changing the active tax plugin will change the way tax is calulated on <b>all</b> products you sell. ' 
-        . 'Are you really sure you want to switch?';
+    my $i18n    = WebGUI::International->new( $session, 'Tax' );
+    my $message = $i18n->get('Stern tax warning'); 
 
     my $proceedForm = 
         WebGUI::Form::formHeader( $session )
         . WebGUI::Form::hidden( $session, { name => 'shop',      value => 'tax' } )
         . WebGUI::Form::hidden( $session, { name => 'method',    value => 'setActivePluginConfirm' } )
         . WebGUI::Form::hidden( $session, { name => 'className', value => $session->form->process('className') } )
-        . WebGUI::Form::submit( $session, { value => 'Proceed' } )
+        . WebGUI::Form::submit( $session, { value => $i18n->get('Proceed') } )
         . WebGUI::Form::formFooter( $session );
         
     my $cancelForm = 
         WebGUI::Form::formHeader( $session )
         . WebGUI::Form::hidden( $session, { name => 'shop',    value => 'tax' } )
         . WebGUI::Form::hidden( $session, { name => 'method',    value => 'manage' } )
-        . WebGUI::Form::submit( $session, { value => 'Cancel', extras => 'class="backwardButton"' } )
+        . WebGUI::Form::submit( $session, { value => $i18n->get('cancel','WebGUI'), extras => 'class="backwardButton"' } )
         . WebGUI::Form::formFooter( $session );
 
     my $output = $message . $proceedForm . $cancelForm;
-    return $admin->getAdminConsole->render( $output, 'Switch tax plugin' );
+    return $admin->getAdminConsole->render( $output, $i18n->get('Switch tax plugin') );
 }
 
 #-------------------------------------------------------------------

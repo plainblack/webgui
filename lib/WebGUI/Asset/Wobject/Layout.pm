@@ -379,7 +379,7 @@ sub www_view {
             $cache->set($out, 60);
             $session->stow->delete("cacheFixOverride");
         }
-        # keep those ads rotating
+        # keep those ads rotating even though the output is cached
         while ($out =~ /(\[AD\:([^\]]+)\])/gs) {
             my $code = $1;
             my $adSpace = WebGUI::AdSpace->newByName($session, $2);

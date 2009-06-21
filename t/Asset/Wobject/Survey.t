@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 29;
+my $tests = 42;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -65,58 +65,61 @@ $survey->persistSurveyJSON;
 $session->user( { user => $user } );
 
 my $responseId = $survey->responseId;
-my $s = WebGUI::Asset::Wobject::Survey->newByResponseId($session, $responseId);
-is($s->getId, $survey->getId, 'newByResponseId returns same Survey');
-is($s->get('maxResponsesPerUser'), 1, 'maxResponsesPerUser defaults to 1');
-ok($s->canTakeSurvey, '..which means user can take survey');
+{
+    my $s = WebGUI::Asset::Wobject::Survey->newByResponseId($session, $responseId);
+    is($s->getId, $survey->getId, 'newByResponseId returns same Survey');
+}
+is($survey->get('maxResponsesPerUser'), 1, 'maxResponsesPerUser defaults to 1');
+ok($survey->canTakeSurvey, '..which means user can take survey');
+is($survey->get('revisionDate'), $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 'Current revisionDate used');
 
 # Complete Survey
-$s->surveyEnd();
+$survey->surveyEnd();
 
 # Uncache canTake
-delete $s->{canTake};
-delete $s->{responseId};
-ok(!$s->canTakeSurvey, 'Cannot take survey a second time (maxResponsesPerUser=1)');
-cmp_deeply($s->responseId, undef, '..and similarly cannot get responseId');
+delete $survey->{canTake};
+delete $survey->{responseId};
+ok(!$survey->canTakeSurvey, 'Cannot take survey a second time (maxResponsesPerUser=1)');
+cmp_deeply($survey->responseId, undef, '..and similarly cannot get responseId');
 
 # Change maxResponsesPerUser to 2
-$s->update({maxResponsesPerUser => 2});
-delete $s->{canTake};
-ok($s->canTakeSurvey, '..but can take when maxResponsesPerUser increased to 2');
-ok($s->responseId, '..and similarly can get responseId');
+$survey->update({maxResponsesPerUser => 2});
+delete $survey->{canTake};
+ok($survey->canTakeSurvey, '..but can take when maxResponsesPerUser increased to 2');
+ok($survey->responseId, '..and similarly can get responseId');
 
 # Change maxResponsesPerUser to 0
-$s->update({maxResponsesPerUser => 0});
-delete $s->{canTake};
-delete $s->{responseId};
-ok($s->canTakeSurvey, '..and also when maxResponsesPerUser set to 0 (unlimited)');
-ok($s->responseId, '..(and similarly for responseId)');
+$survey->update({maxResponsesPerUser => 0});
+delete $survey->{canTake};
+delete $survey->{responseId};
+ok($survey->canTakeSurvey, '..and also when maxResponsesPerUser set to 0 (unlimited)');
+ok($survey->responseId, '..(and similarly for responseId)');
 
 # Start a new response as another user
-$s->update({maxResponsesPerUser => 1});
-is($s->takenCount( { userId => 1 } ), 0, 'Visitor has no responses');
+$survey->update({maxResponsesPerUser => 1});
+is($survey->takenCount( { userId => 1 } ), 0, 'Visitor has no responses');
 my $u = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->usersToDelete($u);
-is($s->takenCount( { userId => $u->userId } ), 0, 'New user has no responses');
-delete $s->{canTake};
-delete $s->{responseId};
+is($survey->takenCount( { userId => $u->userId } ), 0, 'New user has no responses');
+delete $survey->{canTake};
+delete $survey->{responseId};
 $session->user( { userId => $u->userId } );
-ok($s->canTakeSurvey, 'Separate counts for separate users');
-ok($s->responseId, '..(and similarly for responseId)');
+ok($survey->canTakeSurvey, 'Separate counts for separate users');
+ok($survey->responseId, '..(and similarly for responseId)');
 # Put things back to normal..
-delete $s->{canTake};
-delete $s->{responseId};
+delete $survey->{canTake};
+delete $survey->{responseId};
 $session->user( { user => $user } );
 
 # Restart the survey
-$s->update({maxResponsesPerUser => 0});
-$s->submitQuestions({
+$survey->update({maxResponsesPerUser => 0});
+$survey->submitQuestions({
     '0-0-0'        => 'this text ignored',
     '0-1-0'        => 'this text ignored',
 });
 
 cmp_deeply(
-    $s->responseJSON->responses,
+    $survey->responseJSON->responses,
     superhashof(
         {   '0-1-0' => {
                 'time'     => num( time, 5 ),
@@ -132,18 +135,18 @@ cmp_deeply(
 );
 
 # Test Restart
-$s->surveyEnd( { restart => 1 } );
-cmp_deeply($s->responseJSON->responses, {}, 'restart removes the in-progress response');
-ok($responseId ne $s->responseId, '..and uses a new responseId');
+$survey->surveyEnd( { restart => 1 } );
+cmp_deeply($survey->responseJSON->responses, {}, 'restart removes the in-progress response');
+ok($responseId ne $survey->responseId, '..and uses a new responseId');
 
-# Test out exitUrl with an explicit
+# Test out exitUrl with an explicit url
 use JSON;
-my $surveyEnd = $s->surveyEnd( { exitUrl => 'home' } );
+my $surveyEnd = $survey->surveyEnd( { exitUrl => 'home' } );
 cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/home' }, 'exitUrl works (it adds a slash for us)');
 
 # Test out exitUrl using survey instance exitURL property
-$s->update({ exitURL => 'getting_started'});
-$surveyEnd = $s->surveyEnd( { exitUrl => undef } );
+$survey->update({ exitURL => 'getting_started'});
+$surveyEnd = $survey->surveyEnd( { exitUrl => undef } );
 cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started' }, 'exitUrl works (it adds a slash for us)');
 
 # www_jumpTo
@@ -170,9 +173,65 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     }
 }
 
-
+# Response Revisioning
+{
+    # Delete existing responses
+    $session->db->write('delete from Survey_response where assetId = ?', [$survey->getId]);
+    delete $survey->{responseId};
+    delete $survey->{surveyJSON};
+    
+    my $surveyId = $survey->getId;
+    my $revisionDate = WebGUI::Asset->getCurrentRevisionDate($session, $surveyId);
+    ok($revisionDate, 'Revision Date initially defined');
+    
+    # Modify Survey structure, new revision not created
+    $survey->submitObjectEdit({ id =>  "0", text => "new text"});
+    is($survey->surveyJSON->section([0])->{text}, 'new text', 'Survey updated');
+    is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision unchanged');
+    
+    # Push revisionDate into the past because we can't have 2 revision dates with the same epoch (this is very hacky)
+    $revisionDate--;
+    $session->stow->deleteAll();
+    WebGUI::Cache->new($session)->flush;
+    $session->db->write('update Survey set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
+    $session->db->write('update assetData set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
+    $session->db->write('update wobject set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
+    
+    $survey = WebGUI::Asset->new($session, $surveyId);
+    isa_ok($survey, 'WebGUI::Asset::Wobject::Survey', 'Got back survey after monkeying with revisionDate');
+    is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision date pushed back');
+    
+    # Create new response
+    my $responseId = $survey->responseId;
+    is(
+        $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 
+        $revisionDate, 
+        'Pushed back revisionDate used for new response'
+    );
+    
+    # Make another change, causing new revision to be automatically created
+    $survey->submitObjectEdit({ id =>  "0", text => "newer text"});
+    
+    my $newerSurvey = WebGUI::Asset->new($session, $surveyId); # retrieve newer revision
+    isa_ok($newerSurvey, 'WebGUI::Asset::Wobject::Survey', 'After change, re-retrieved Survey instance');
+    is($newerSurvey->getId, $surveyId, '..which is the same survey');
+    is($newerSurvey->surveyJSON->section([0])->{text}, 'newer text', '..with updated text');
+    ok($newerSurvey->get('revisionDate') > $revisionDate, '..and newer revisionDate');
+    
+    # Create another response (this one will use the new revision)
+    my $newUser = WebGUI::User->new( $session, 'new' );
+    WebGUI::Test->usersToDelete($newUser);
+    $session->user({ user => $newUser });
+    my $newResponseId = $survey->responseId;
+    is($newerSurvey->responseJSON->nextResponseSection()->{text}, 'newer text', 'New response uses the new text');
+    
+    # And the punch line..
+    is($survey->responseJSON->nextResponseSection()->{text}, 'new text', '..wheras the original response uses the original text');
+    
+}
 }
 
+# Test visualization
 eval 'use GraphViz';
 
 SKIP: {
@@ -189,6 +248,7 @@ like($storage->getFileContentsAsScalar($filename), qr{
 }xs, 'Generated graph looks roughly okay');
 
 }
+
 
 #----------------------------------------------------------------------------
 # Cleanup

@@ -50,7 +50,6 @@ use strict;
 use JSON;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
-
 use Clone qw/clone/;
 use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
 
@@ -67,8 +66,10 @@ WebGUI::Session object
 
 =head3 $json (optional)
 
-A JSON string used to construct a new Perl object. The string should represent 
-a JSON hash made up of "survey" and "sections" keys.
+A json-encoded serialized surveyJSON object. Typically this will have just been retrieved from the 
+database, have been previously generated from another surveyJSON object using L<freeze>.
+
+See L<freeze> for more information on what the serialized object should look like.
 
 =cut
 
@@ -78,15 +79,27 @@ sub new {
 
     # Load json object if given..
     my $jsonData = $json ? from_json($json) : {};
-
-    # Create skeleton object..
+    
+    # When the a new empty surveyJSON object is created (as opposed to being re-initialised from existing json), 
+    # we create a snapshot of the *current* default values for new Sections, Questions and Answers. 
+    # This snapshot (the mold) is used by L<compress> and L<uncompress> to reduce redundancy in the json-encoded 
+    # surveyJSON object that gets serialized to the database. This compression is mostly transparent since it
+    # happens only at serialisation/instantiation time.
+    my $sections = $jsonData->{sections} || [];
     my $self = {
         _session  => $session,
-        _sections => $jsonData->{sections} || [],
-        _survey   => $jsonData->{survey} || {},
+        _mold    => $jsonData->{mold}
+            || {
+            answer   => $class->newAnswer,
+            question => $class->newQuestion,
+            section  => $class->newSection,
+            },
     };
 
     bless $self, $class;
+
+    # Uncompress the survey configuration and store it in the new object
+    $self->{_sections} = $self->uncompress($sections);
 
     #Load question types
     $self->loadTypes();
@@ -177,17 +190,18 @@ sub multipleChoiceTypes {
 =head2 freeze
 
 Serialize this Perl object into a JSON string. The serialized object is made up of the survey and sections 
-components of this object.
+components of this object, as well as the "mold" which is used .
 
 =cut
 
 sub freeze {
     my $self = shift;
     return to_json(
-        {   sections => $self->sections,
-            survey   => $self->{_survey},
+        {   sections => $self->compress(),
+            mold    => $self->{_mold},
         }
     );
+    
 }
 
 =head2 newObject ( $address )
@@ -585,6 +599,99 @@ sub getAnswerEditVars {
     $var{displayed_id} = aIndex($address) + 1;
 
     return \%var;
+}
+
+=head2 compress
+
+Returns a copy of L<sections> with all redundancy (relative to L<mold>) removed.
+That is, any section/question/answer property that matches the mold is removed from
+the array object that is returned.
+
+This is handy for shinking down the L<sections> hash as much as possible prior
+to json-encoding and storing in the db (see L<freeze>).
+
+=cut
+
+sub compress {
+    my $self = shift;
+    
+    # Get the Section, Question and Answer molds that will be used to remove redundancy
+    my ($smold, $qmold, $amold) = @{$self->mold}{'section', 'question', 'answer'};
+    
+    # Iterate over all objects, only adding them to our new object if they differ from the mold
+    # Properties are assumed to be simple scalars only (strings and numbers). The only except to
+    # this is the 'questions' arrayref in sections and the 'answers' arrayref in questions.
+    my @sections;
+    for my $s (@{$self->sections}) {
+        my $newS = {};
+        for my $q (@{$s->{questions} || []}) {
+            my $newQ = {};
+            for my $a (@{$q->{answers} || []}) {
+                my $newA = {};
+                while (my($key, $value) = each %$a) {
+                    next if ref $value;
+                    $newA->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $amold->{$key});
+                }
+                push @{$newQ->{answers}}, $newA;
+            }
+            while (my($key, $value) = each %$q) {
+                next if ref $value;
+                $newQ->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $qmold->{$key});
+            }
+            push @{$newS->{questions}}, $newQ;
+        }
+        while (my($key, $value) = each %$s) {
+            next if ref $value;
+            $newS->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $smold->{$key});
+        }
+        push @sections, $newS;
+    }
+    return \@sections;
+}
+
+=head2 uncompress ($sections)
+
+Modifies the supplied arrayref of sections, adding back in all redundancy that has been 
+removed by a previous call to L<compress>. Typically this is done immediately after
+retrieving serialised surveyJSON from the db (see L<db>).
+
+Any L<mold> property missing from the supplied list of section/question/answers is added,
+and then the modified arrayref is returned.
+
+=head3 sections
+
+An arrayref of sections that you want to uncompress. Typically retrieved from the database.
+
+=cut
+
+sub uncompress {
+    my $self    = shift;
+    my $sections = shift;
+    
+    return if !$sections;
+    
+    # Get the Section, Question and Answer molds
+    my ($smold, $qmold, $amold) = @{$self->mold}{'section', 'question', 'answer'};
+    
+    # Iterate over all objects, adding back in the missing properties
+    for my $s (@{$sections || []}) {
+        for my $q (@{$s->{questions} || []}) {
+            for my $a (@{$q->{answers} || []}) {
+                while (my($key, $value) = each %$amold) {
+                    $a->{$key} = $value unless exists $a->{$key};
+                }
+            }
+            while (my($key, $value) = each %$qmold) {
+                $q->{$key} = $value unless exists $q->{$key};
+            }
+        }
+        while (my($key, $value) = each %$smold) {
+            $s->{$key} = $value unless exists $s->{$key};
+        }
+    }
+    
+    # Return the modified arrayref
+    return $sections;
 }
 
 =head2 update ( $address, $properties )
@@ -1084,6 +1191,18 @@ Returns a reference to all the sections in this object.
 sub sections {
     my $self = shift;
     return $self->{_sections};
+}
+
+=head2 mold
+
+Accessor for the mold property. See L<compress> and L<uncompress> for more info on
+what this property is used for.
+
+=cut
+
+sub mold {
+    my $self = shift;
+    return $self->{_mold};
 }
 
 =head2 lastSectionIndex

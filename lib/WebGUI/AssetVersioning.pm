@@ -431,10 +431,11 @@ Sets the versioning lock to "on" so that this piece of content may not be edited
 =cut
 
 sub setVersionLock {
-	my $self = shift;
-	$self->session->db->write("update asset set isLockedBy=? where assetId=?", [$self->session->user->userId, $self->getId]);
-	$self->updateHistory("locked");
-	$self->purgeCache;
+    my $self = shift;
+    $self->session->db->write("update asset set isLockedBy=? where assetId=?", [$self->session->user->userId, $self->getId]);
+    $self->{_properties}{isLockedBy} = $self->session->user->userId;
+    $self->updateHistory("locked");
+    $self->purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -453,6 +454,7 @@ sub setVersionTag {
 	my $self = shift;
     my $tagId = shift;
     $self->session->db->write("update assetData set tagId=? where assetId=? and tagId = ?", [$tagId, $self->getId,$self->get('tagId')]);
+        $self->{_properties}{tagId} = $tagId;
 	$self->updateHistory("changed version tag to $tagId");
 	$self->purgeCache;
 }
@@ -482,10 +484,11 @@ Sets the versioning lock to "off" so that this piece of content may be edited on
 =cut
 
 sub unsetVersionLock {
-	my $self = shift;
-	$self->session->db->write("update asset set isLockedBy=NULL where assetId=".$self->session->db->quote($self->getId));
-	$self->updateHistory("unlocked");
-	$self->purgeCache;
+    my $self = shift;
+    $self->session->db->write("update asset set isLockedBy=NULL where assetId=".$self->session->db->quote($self->getId));
+    $self->{_properties}{isLockedBy} = undef;
+    $self->updateHistory("unlocked");
+    $self->purgeCache;
 }
 
 

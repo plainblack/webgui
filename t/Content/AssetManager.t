@@ -26,6 +26,7 @@ use WebGUI::Content::AssetManager;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+$session->http->{_http}->{noHeader} = 1;  ##Workaround for cookie processing
 
 # Create a folder with some stuff to test the AssetManager
 my $folder = WebGUI::Asset->getImportNode( $session )->addChild( {
@@ -61,12 +62,14 @@ $session->user({ userId => 3 });
 $session->request->uri( $folder->get('url') ); # haha!
 $session->request->setup_body( {
     op                              => 'assetManager',
+    method                          => 'setRanks',
     "action_update"                 => 1, # button
     assetId                         => [ $snippet_one->getId, $snippet_two->getId, $article->getId ], # checkboxes
     $snippet_one->getId . '_rank'   => 3, # rank box
     $snippet_two->getId . '_rank'   => 1, # rank box
     $article->getId . '_rank'       => 2, # rank box
 } );
+
 WebGUI::Content::AssetManager::handler( $session );
 
 cmp_deeply( 

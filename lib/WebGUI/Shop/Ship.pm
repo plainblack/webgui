@@ -104,6 +104,7 @@ sub getOptions {
             $self->session->log->warn($e->error);
             next SHIPPER;
         }
+        next SHIPPER unless $shipper->canUse;
         $options{$shipper->getId} = {
             label => $shipper->get("label"),
             price => $price,
@@ -151,8 +152,10 @@ sub getShippers {
     my @drivers = ();
     my $sth = $self->session->db->prepare('select shipperId from shipper');
     $sth->execute();
-    while (my $driver = $sth->hashRef()) {
-        push @drivers, $self->getShipper($driver->{shipperId});
+    SHIPPER: while (my $driver = $sth->hashRef()) {
+        my $shipper = $self->getShipper($driver->{shipperId});
+        next SHIPPER unless $shipper->canUse;
+        push @drivers, $shipper;
     }
     $sth->finish;
     return \@drivers;

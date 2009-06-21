@@ -36,6 +36,7 @@ use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Keyword;
+use WebGUI::ProgressBar;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
@@ -1263,6 +1264,21 @@ sub getIsa {
 
 #-------------------------------------------------------------------
 
+=head2 getManagerUrl ( )
+
+Returns the URL for the asset manager.
+
+=cut
+
+sub getManagerUrl {
+	my $self = shift;
+	return $self->getUrl( 'op=assetManager' );
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 getMedia ( session )
 
 Constructor. Returns the media folder.
@@ -1330,6 +1346,32 @@ sub getNotFound {
 	return WebGUI::Asset->newByDynamicClass($session, $session->setting->get("notFoundPage"));
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getPrototypeList ( )
+
+Returns an array of all assets that the user can view and edit that are prototypes.
+
+=cut
+
+sub getPrototypeList {
+    my $self    = shift;
+    my $session = $self->session;
+    my $db      = $session->db;
+    my @prototypeIds = $db->buildArray("select distinct assetId from assetData where isPrototype=1");
+    my $userUiLevel = $session->user->profileField('uiLevel');
+    my @assets;
+    ID: foreach my $id (@prototypeIds) {
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        next ID unless defined $asset;
+        next ID unless $asset->get('isPrototype');
+        next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
+        push @assets, $asset;
+    }
+    return \@assets;
+
+}
 
 #-------------------------------------------------------------------
 
@@ -1509,7 +1551,7 @@ sub getToolbar {
     if ($userUiLevel >= $uiLevels->{"manage"}) {
         $output
             .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>';
+            . $self->getManagerUrl . '">' . $i18n->get("manage") . '</a></li>';
     }
     $output .= '</ul></div></div>' . $toolbar . '</div>';
     $self->{_toolbar} = $output;
@@ -2693,7 +2735,7 @@ sub www_changeUrlConfirm {
 	}
 
 	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getUrl('op=assetManager'));
+		$self->session->http->setRedirect($self->getManagerUrl);
 	} else {
 		$self->session->http->setRedirect($self->getUrl());
 	}
@@ -2823,7 +2865,7 @@ compatibility)
 
 sub www_manageAssets {
     my $self = shift;
-    $self->session->http->setRedirect( $self->getUrl( 'op=assetManager' ) );
+    $self->session->http->setRedirect( $self->getManagerUrl );
     return "redirect";
 }
 

@@ -1,3 +1,28 @@
+7.7.11
+ - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)
+ - fixed: deploying a package doesn't commit version tag with autocommit on
+ - fixed rfe #76: group delete causes problems
+ - fixed #10526: icalInterval in Calendar.pm
+ - fixed: displaying performance profile data only to an allowed IP address.
+ - fixed #10528: Thingy css error
+ - fixed: Performance improvements with getting the list of asset packages.
+ - fixed: Performance improvements with getting the list of content prototypes.
+ - fixed bug in Thingy where the style template would not be processed after
+   editing a Thing and the 'return after edit' setting was set to 'Thing 
+   Default' ( Martin Kamerbeek / Oqapi )
+ - fixed: In the Asset Manager, if you pasted an asset if returned you to the page instead the manager.
+ - fixed: In the Asset Manager, only display a Select All button if there is more than one asset.
+ - fixed: Add a progress indicator for long running functions so the user knows something is happening.
+ - fixed: In the Asset Manager, if you pasted an package or prototype if returned you to the page instead the manager.
+ - fixed #10551: paypal (link to section of paypal website to enter in WebGUI information)
+ - fixed #10550: shipping plugins have no privileges
+ - fixed: Add progress bars for paste and edit branch.
+ - fixed: Add progress bars for promote and demote.
+ - fixed: Add progress bars for set rank in the Asset Manager.
+ - fixed: SurveyJSON database bloating
+ - fixed #10548: Macro RandomAssetProxy failure to be random
+ - fixed #10542: AssetVersioning: versionTag/isLockedBy updating
+
 7.7.10
  - Made a change to LDAP auth that adds an OR to that query so that it also searches for a row with fieldData REGEXP '^uid=(value-from-ldap-directory-server),'. (Wes Morgan)
  - fixed #10481: i18n outdated message saving
