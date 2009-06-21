@@ -1301,7 +1301,7 @@ sub view {
     my $self    = shift;
     my $var     = $self->getMenuVars;
     
-    my $responseDetails = $self->getResponseDetails;
+    my $responseDetails = $self->getResponseDetails || {};
 
     # Add lastResponse template vars
     for my $tv qw(endDate complete restart timeout timeoutRestart) {
@@ -1390,7 +1390,7 @@ sub getResponseDetails {
     
     if (!$responseId) {
         $self->session->log->debug("ResponseId not found");
-        return {};
+        return;
     }
     
     my ( $completeCode, $endDate, $rJSON, $ruserId, $rusername ) = $self->session->db->quickArray(
@@ -1667,7 +1667,8 @@ sub www_showFeedback {
         return $self->session->privilege->insufficient();
     }
     
-    my $out = $self->getResponseDetails( { responseId => $responseId } )->{templateText};
+    my $rd = $self->getResponseDetails( { responseId => $responseId } ) || {};
+    my $out = $rd->{templateText};
     return $self->session->style->process( $out, $self->get('styleTemplateId') );
 }
 
@@ -2061,15 +2062,15 @@ and thus should not count towards tally)
 
 The following options are supported
 
-=head4 userId
+=head4 userId (optional)
 
-The userId to count responses for (required)
+The userId to count responses for. Defaults to the current user
 
-=head4 ipAddress
+=head4 ipAddress (optional)
 
-An IP address to filter responses by (optional)
+An IP address to filter responses by
 
-=head4 isComplete
+=head4 isComplete  (optional)
 
 A complete code to use to filter responses by (optional, defaults to 1)
 
@@ -2077,8 +2078,10 @@ A complete code to use to filter responses by (optional, defaults to 1)
 
 sub takenCount {
     my $self = shift;
-    my %opts = validate(@_, { userId => 1, ipAddress => 0, isComplete => 0 });
+    my %opts = validate(@_, { userId => 0, ipAddress => 0, isComplete => 0 });
     my $isComplete = defined $opts{isComplete} ? $opts{isComplete} : 1;
+    
+    $opts{userId} ||= $self->session->user->userId;
     
     my $sql = 'select count(*) from Survey_response where';
     $sql .= ' assetId = ' . $self->session->db->quote($self->getId);
@@ -2117,10 +2120,10 @@ sub canTakeSurvey {
     my $takenCount          = 0;
 
     if ( $userId == 1 ) {
-        $takenCount = $self->takenCount( { userId => $userId, ipAddress => $ip });
+        $takenCount = $self->takenCount( { ipAddress => $ip });
     }
     else {
-        $takenCount = $self->takenCount( { userId => $userId });
+        $takenCount = $self->takenCount;
     }
 
     # A maxResponsesPerUser value of 0 implies unlimited
