@@ -579,13 +579,14 @@ variable: LIST_MOREUTILS_PP
             no warnings 'all';                  # silence perl
             $was_successful = eval("($parsed_combined_expression)");
         }
+        my $error = $EVAL_ERROR; # Make a copy of the error before we proceed..
         if ( my $e = Exception::Class->caught() ) {
             $self->resetEvaluationInfo();
             $e->rethrow() if ref $e;            # Re-throw Exception::Class errors for other code to catch
         }
-        if ($EVAL_ERROR) {
+        if ($error) {
             WebGUI::Error::Flux::InvalidCombinedExpression->throw(
-                error                    => $EVAL_ERROR,
+                error                    => $error,
                 combinedExpression       => $combined_expression,
                 parsedCombinedExpression => $parsed_combined_expression,
             );
