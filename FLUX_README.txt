@@ -5,9 +5,9 @@ Currently, History and the PrevNext macro also live in this branch.
 = Installation =
 To enable flux for a site, simply run the sbin/flux.pl script.
 
-Some examples
- perl flux.pl --configFile=dev.localhost.localdomain.conf
  wgd util sbin/flux.pl --demo
+ wreservice.pl --restart modperl spectre
+ wgd test t/Flux -r
 
 This basically involves adding some extra db tables, modifying your webgui config file etc.. 
 (check out the source for full details).

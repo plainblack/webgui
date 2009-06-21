@@ -354,7 +354,7 @@ sub new {
     # Retreive row from db..
     my $rule = $session->db->quickHashRef( 'select * from fluxRule where fluxRuleId=?', [$ruleId] );
     if ( !exists $rule->{fluxRuleId} || $rule->{fluxRuleId} eq q{} ) {
-        WebGUI::Error::ObjectNotFound->throw( error => 'No such Flux Rule.', id => $ruleId );
+        WebGUI::Error::ObjectNotFound->throw( error => "No such Flux Rule: $ruleId", id => $ruleId );
     }
 
     # Register Class::InsideOut object..
