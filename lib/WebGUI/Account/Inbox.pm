@@ -839,10 +839,6 @@ sub www_inviteUserSave {
     my $user         = $session->user;
     my $i18n         = WebGUI::International->new($session,"Account_Inbox");
 
-    #Must have a person to send email to
-    my $to = $form->get('to');
-    return $self->www_inviteUser($i18n->get('missing email')) unless $to;
-
     #Must have a subject
     my $defaultSubject = $setting->get("inboxInviteUserSubject");
     WebGUI::Macro::process($session,\$defaultSubject);
@@ -861,51 +857,84 @@ sub www_inviteUserSave {
                        ;    
     return $self->www_inviteUser($i18n->get('missing message')) unless $message;
 
-
-    #User existance check.
-    my $existingUser = WebGUI::User->newByEmail($session,$to);
-    if (defined $existingUser) {
-        my $existingProfile = $existingUser->getProfileUrl;
-        my $existingUser    = $existingUser->username;
-        my $errorMsg = sprintf($i18n->get('already a member'),$existingProfile,$existingUser);
-        return $self->www_inviteUser($errorMsg);
-    }
-
     #Profile Email address check
     my $email = $session->user->profileField('email');
     unless ($email) {
         return $self->www_inviteUser($i18n->get('no email'));
     }
 
+    #Must have a person to send email to
+    my $to = $form->get('to');
+    $to =~ s/\s+//g;
+    return $self->www_inviteUser($i18n->get('missing email')) unless $to;
+
+    # Test all email addresses before sending any
+    my $db     = $session->db;
+    my @toList = split /[;,]/, $to;
+    for my $inviteeEmail (@toList) {
+        unless ( $inviteeEmail =~ WebGUI::Utility::emailRegex ) {
+            return $self->www_inviteUser( $i18n->get('invalid email') );
+        }
+
+        # User existance check.
+        my $existingUser = WebGUI::User->newByEmail( $session, $inviteeEmail );
+        if ( defined $existingUser ) {
+            my $existingProfile = $existingUser->getProfileUrl;
+            my $existingUser    = $existingUser->username;
+            my $errorMsg        = sprintf( $i18n->get('already a member'), $existingProfile, $existingUser );
+            return $self->www_inviteUser($errorMsg);
+        }
+
+        # Outstanding Invitation check
+        my $sth = $db->read( "SELECT email FROM userInvitations WHERE email=?", [$inviteeEmail] );
+        my ($emailStored) = $sth->array;
+        if ($emailStored) {
+            my $errorMsg = sprintf( $i18n->get('currently invited'), $inviteeEmail );
+            return $self->www_inviteUser($errorMsg);
+        }
+    } ## end for my $inviteeEmail (@toList)
+
+    # We think the email addresses are good now.
+    # Create a separate record for each invitee
+    #
+    for my $inviteeEmail (@toList) {
+        my $var = {};
+
+        ##Create the invitation url for each individual invitation
+        my $inviteId = $session->id->generate();
+        $var->{'url'}
+            = $session->url->append( $session->url->getSiteURL, 'op=auth;method=createAccount;code=' . $inviteId );
+
+        ##Create the invitation record.
+        my $now = WebGUI::DateTime->new( $session, DateTime->now->set_time_zone('UTC')->epoch )->toMysqlDate;
+        my $hash = {
+            userId      => $user->userId,
+            dateSent    => $now,
+            email       => $inviteeEmail,
+            dateCreated => $now,
+        };
+        $session->db->setRow( 'userInvitations', 'inviteId', $hash, $inviteId );
+
+        my $invitation = WebGUI::Mail::Send->create(
+            $session, {
+                to      => $to,
+                from    => $email,
+                subject => $subject,
+            }
+        );
+
+        ## No sneaky attack paths...
+        $var->{'message'} = WebGUI::HTML::html2text( WebGUI::HTML::filter($message) );
+
+        my $emailBody = $self->processTemplate( $var, $self->getInviteUserMessageTemplateId );
+
+        $invitation->addText($emailBody);
+
+        $invitation->send;
+
+    } ## end for my $inviteeEmail (@toList)
+
     my $var = {};
-    ##No sneaky attack paths...
-    $var->{'message'} = WebGUI::HTML::html2text(WebGUI::HTML::filter($message));
-
-    ##Create the invitation url.
-    my $inviteId  = $session->id->generate();
-    $var->{'url'} = $session->url->append(
-        $session->url->getSiteURL,'op=auth;method=createAccount;code='.$inviteId
-    );
-
-    my $emailBody  = $self->processTemplate($var,$self->getInviteUserMessageTemplateId);
-
-    ##Create the invitation record.
-    my $hash = {
-        userId   => $user->userId,
-        dateSent => WebGUI::DateTime->new($session, time)->toMysqlDate,
-        email    => $to,
-    };
-    $session->db->setRow('userInvitations','inviteId',$hash,$inviteId);
-
-    my $invitation = WebGUI::Mail::Send->create($session, {
-        to      => $to,
-        from    => $email,
-        subject => $subject,
-    });
-    $invitation->addText($emailBody);
-    $invitation->send;
-
-    $var = {};
     $self->appendCommonVars($var);
     return $self->processTemplate($var,$self->getInviteUserConfirmTemplateId);
 }

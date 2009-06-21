@@ -504,6 +504,7 @@ sub definition {
                     extraHeadTagsPacked => {
                         fieldType       => 'hidden',
                         defaultValue    => undef,
+                        noFormPost      => 1,
                     },
                     usePackedHeadTags => {
                         tab             => "meta",
@@ -943,11 +944,17 @@ sub getEditForm {
 			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
 		}
 	}
-	if ($session->form->process("proceed")) {
+	if (my $proceed = $session->form->process("proceed")) {
 		$tabform->hidden({
 			name=>"proceed",
-			value=>$self->session->form->process("proceed")
-			});
+			value=>$proceed,
+        });
+        if (my $returnUrl = $session->form->process('returnUrl')) {
+            $tabform->hidden({
+                name=>"returnUrl",
+                value=>$returnUrl,
+            });
+        }
 	}
 	
 	# create tabs
@@ -1013,7 +1020,7 @@ sub getEditForm {
 		my $meta = $self->getMetaDataFields();
 		foreach my $field (keys %$meta) {
 			my $fieldType = $meta->{$field}{fieldType} || "text";
-			my $options = WebGUI::Operation::Shared::secureEval($session,$meta->{$field}{possibleValues});
+			my $options = $meta->{$field}{possibleValues};
 			# Add a "Select..." option on top of a select list to prevent from
 			# saving the value on top of the list when no choice is made.
 			if("\l$fieldType" eq "selectBox") {
@@ -2024,7 +2031,6 @@ sub outputWidgetMarkup {
         $content = $self->session->style->process($content,$styleTemplateId); 
     }
     WebGUI::Macro::process($session, \$content);
-    $session->log->warn($content);
     my ($headTags, $body) = WebGUI::HTML::splitHeadBody($content);
     $body = $content;
     my $jsonContent     = to_json( { "asset$hexId" => { content => $body } } );
@@ -2248,23 +2254,30 @@ sub processTemplate {
 
 #-------------------------------------------------------------------
 
-=head2 processStyle ( html )
+=head2 processStyle ( $output, $noHeadTags )
 
-Returns some HTML wrappered in a style. Should be overridden by subclasses, because
+Returns the output wrappered in a style. Should be overridden by subclasses, because
 this one actually doesn't do anything other than return the html back to you and
 adds the Asset's extraHeadTags into the raw head tags.
 
-=head3 html
+=head3 $output
 
 The content to wrap up.
+
+=head3 $options
+
+Options that alter how the method behaves.
+
+=head4 noHeadTags
+
+If this options is true, then this method will not set the extraHeadTags
 
 =cut
 
 sub processStyle {
-	my ($self, $output) = @_;
-    my $session = $self->session;
-    my $style   = $session->style;
-    $style->setRawHeadTags($self->getExtraHeadTags);
+	my ($self, $output, $options) = @_;
+    my $style   = $self->session->style;
+    $style->setRawHeadTags($self->getExtraHeadTags) unless $options->{noHeadTags};
     if ($self->get('synopsis')) {
         $style->setMeta({
             name    => 'Description',
@@ -2776,15 +2789,20 @@ sub www_editSave {
     }
 
     # Handle "proceed" form parameter
-    if ($self->session->form->process("proceed") eq "manageAssets") {
+    my $proceed = $self->session->form->process('proceed');
+    if ($proceed eq "manageAssets") {
         $self->session->asset($object->getParent);
         return $self->session->asset->www_manageAssets;
     }
-    elsif ($self->session->form->process("proceed") eq "viewParent") {
+    elsif ($proceed eq "viewParent") {
         $self->session->asset($object->getParent);
         return $self->session->asset->www_view;
     }
-    elsif ($self->session->form->process("proceed") ne "") {
+    elsif ($proceed eq "goBackToPage" && $self->session->form->process('returnUrl')) {
+        $self->session->http->setRedirect($self->session->form->process("returnUrl"));
+        return undef;
+    }
+    elsif ($proceed ne "") {
         my $method = "www_".$self->session->form->process("proceed");
         $self->session->asset($object);
         return $self->session->asset->$method();

@@ -124,6 +124,13 @@ sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateId"),
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare;
     $self->{_viewTemplate} = $template;
 }
@@ -174,17 +181,30 @@ sub viewTemplateVariables {
     });
     my $storyIds = $p->getPageData();
     $var->{story_loop} = [];
+
+    my $icon          = $session->icon;
+    my $userUiLevel   = $session->user->profileField("uiLevel");
+    my $uiLevels      = $session->config->get('assetToolbarUiLevel');
+    my $i18n          = WebGUI::International->new($session);
+
     ##Only build objects for the assets that we need
     STORY: foreach my $storyId (@{ $storyIds }) {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
         next STORY unless $story;
-        push @{$var->{story_loop}}, {
+        my $storyVars = {
             url           => ( $exporting
                                ? $story->getUrl
                                : $session->url->append($self->getUrl, 'func=viewStory;assetId='.$storyId->{assetId}) ),
             title         => $story->getTitle,
             creationDate  => $story->get('creationDate'),
+        };
+        if ($story->canEdit && $userUiLevel >= $uiLevels->{delete} && !$exporting) {
+            $storyVars->{deleteIcon} = $icon->delete('func=delete', $story->get('url'), $i18n->get(43));
         }
+        if ($story->canEdit && $userUiLevel >= $uiLevels->{edit}   && !$exporting) {
+            $storyVars->{editIcon}   = $icon->edit('func=edit', $story->get('url'));
+        }
+        push @{$var->{story_loop}}, $storyVars;
     }
 
     if ($self->{_standAlone}) {

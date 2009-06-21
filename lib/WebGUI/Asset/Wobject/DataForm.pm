@@ -951,6 +951,13 @@ sub prepareViewList {
     my $self = shift;
     my $templateId = $self->get('listTemplateId');
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $templateId,
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewListTemplate} = $template;
 }
@@ -967,6 +974,13 @@ sub prepareViewForm {
     $self->session->style->setScript($self->session->url->extras('tabs/tabs.js'), {"type"=>"text/javascript"});
     my $templateId = $self->get('templateId');
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $templateId,
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewFormTemplate} = $template;
 }
@@ -1599,7 +1613,7 @@ sub www_process {
     if (@errors) {
         $var->{error_loop} = \@errors;
         $self->prepareViewForm;
-        return $self->processStyle($self->viewForm($var, $entry));
+        return $self->processStyle($self->viewForm($var, $entry), { noHeadTags => 1 });
     }
 
     # Send email

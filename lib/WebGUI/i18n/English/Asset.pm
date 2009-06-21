@@ -578,15 +578,16 @@ you wish to appear, one per line.<br />
 <br />If you want a different label for a value, the possible values list has to be
 formatted as follows:
 <pre>
-&#123;
-   "key1"=>"value1",
-   "key2"=>"value2",
-   "key3"=>"value3"
-   ...
-&#125;
+label1\|value1
+label2\|value2
+label3\|value3
+value4
+...
 </pre>
-Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/value pairs|,
-        lastUpdated => 1213247476,
+With a \| character separating the label and value. Do not put spaces before or after the \|.  Also, note
+that you can mix lines with different labels with lines with the same label.<br />
+If you are building a selectBox, a Select entry will automatically be added to the list of options.|,
+        lastUpdated => 1243611956,
     },
 
 	'metadata edit property' => {

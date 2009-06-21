@@ -335,6 +335,13 @@ sub prepareView {
     my $self    = shift;
     $self->SUPER::prepareView();
     my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateIdView") );
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateIdView"),
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare;
     $self->{_viewTemplate} = $template;
 }

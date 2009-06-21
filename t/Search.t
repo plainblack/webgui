@@ -48,7 +48,7 @@ ok(  $search->_isStopword('the'),            '_isStopword: "the" is a stopword')
 ok(  $search->_isStopword('all*'),           '_isStopword: regex metacharacter * does not crash the search');
 ok(  $search->_isStopword('anybody+'),       '_isStopword: regex metacharacter + does not crash the search');
 ok(  $search->_isStopword('maybe?'),         '_isStopword: regex metacharacter ? does not crash the search');
-ok(! $search->_isStopword('private.+'),      '_isStopword: regex metacharacter ? does not crash the search');
+ok(! $search->_isStopword('private.+'),      '_isStopword: regex metacharacters .+ do not crash the search');
 
 #----------------------------------------------------------------------------
 # Cleanup

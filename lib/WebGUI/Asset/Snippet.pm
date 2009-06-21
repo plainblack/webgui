@@ -77,6 +77,7 @@ sub definition {
             snippetPacked => {
                 fieldType => "hidden",
                 defaultValue => undef,
+                noFormPost   => 1,
             },
             usePacked => {
                 tab             => 'properties',

@@ -20,6 +20,7 @@ use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 use WebGUI::Macro;
 use HTML::Entities qw(encode_entities);
+use Data::Dumper;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -90,7 +91,7 @@ sub _drawQueryBuilder {
 		});
 		# The value select field
 		my $valFieldName = "val_field".$i;
-        my $options = WebGUI::Operation::Shared::secureEval($session,$fields->{$field}{possibleValues});
+        my $options = $fields->{$field}{possibleValues};
 		my $valueField = WebGUI::Form::dynamicField($session,
 			fieldType=>$fieldType,
 			name=>$valFieldName,
@@ -212,6 +213,15 @@ sub discernUserId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 duplicate
+
+Extend the base method to duplicate shortcut overrides.
+
+See also Asset::duplicate.
+
+=cut
+
 sub duplicate {
     my $self = shift;
     my $newAsset = $self->SUPER::duplicate(@_);
@@ -300,7 +310,7 @@ sub getEditForm {
 	$tabform->addTab('overrides',$i18n->get('Overrides'));
 	$tabform->getTab('overrides')->raw('<tr><td>' . $self->getOverridesList . '</td></tr>');
 	if ($self->isDashlet) {
-		$tabform->addTab('preferences',$i18n->get('Preferences'));
+		$tabform->addTab('preferences',$i18n->get('Preferences'), 9);
 		$tabform->getTab('preferences')->raw($self->getFieldsList);
 		$tabform->getTab("properties")->yesNo(
 			-value=>$self->getValue("showReloadIcon"),
@@ -314,36 +324,24 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
-
-=head2 getExtraHeadTags (  )
-
-Returns the extraHeadTags stored in the asset.  Called in $self->session->style->generateAdditionalHeadTags if this asset is the $self->session->asset.  Also called in WebGUI::Asset::Wobject::Layout for its child assets.  Overriden to also add tags from shortcutted asset.
-
-=cut
-
-sub getExtraHeadTags {
-	my $self = shift;
-	my $output = $self->get("extraHeadTags")."\n";
-	my $shortcut = $self->getShortcut;
-	$output .= $self->getShortcut->get("extraHeadTags") if defined $shortcut;
-	return $output;
-}
-
-#-------------------------------------------------------------------
 sub getFieldsList {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
-	my $output = '<a href="'.$self->getUrl('op=editProfileSettings').'" class="formLink">'.$i18n->get('Manage Profile Fields').'</a><br /><br />';
+	my $self    = shift;
+    my $session = $self->session;
+	my $i18n    = WebGUI::International->new($session, "Asset_Shortcut");
+	my $output  = '<a href="'.$self->getUrl('op=editProfileSettings').'" class="formLink">'.$i18n->get('Manage Profile Fields').'</a><br /><br />';
 	my %fieldNames;
 	tie %fieldNames, 'Tie::IxHash';
-	foreach my $field (@{WebGUI::ProfileField->getFields($self->session)}) {
+    use Data::Dumper;
+	foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
 		my $fieldId = $field->getId;
 		next if $fieldId =~ /contentPositions/;
+        $session->log->warn($fieldId);
 		$fieldNames{$fieldId} = $field->getLabel.' ['.$fieldId.']';
 	}
 	$output .= '<table cellspacing="0" cellpadding="3" border="1"><tr><td><table cellspacing="0" cellpadding="3" border="0">';
-	my @prefFieldsToShow = split("\n",$self->getValue("prefFieldsToShow"));
-	$output .= WebGUI::Form::CheckList->new($self->session,
+	my @prefFieldsToShow = $self->getPrefFieldsToShow;
+    $session->log->warn('fieldsToShow: '.Dumper \@prefFieldsToShow);
+	my $list = WebGUI::Form::CheckList->new($session,
 		-name=>"prefFieldsToShow",
 		-value=>\@prefFieldsToShow,
 		-options=>\%fieldNames,
@@ -351,10 +349,13 @@ sub getFieldsList {
 		-hoverHelp=>$i18n->get('pref fields to show description'),
 		-vertical=>1,
 		-uiLevel=>9
-	)->toHtmlWithWrapper;
+	);
+    $session->log->warn($list->get('uiLevel'));
+    $session->log->warn($list->passUiLevelCheck);
+	$output .= $list->toHtmlWithWrapper;
 	$output .= '</table></td><td><table cellspacing="0" cellpadding="3" border="0">';
-	my @prefFieldsToImport = split("\n",$self->getValue("prefFieldsToImport"));
-	$output .= WebGUI::Form::CheckList->new($self->session,
+	my @prefFieldsToImport = $self->getPrefFieldsToImport;
+	$output .= WebGUI::Form::CheckList->new($session,
 		-name=>"prefFieldsToImport",
 		-value=>\@prefFieldsToImport,
 		-options=>\%fieldNames,
@@ -401,7 +402,7 @@ sub getOverridesList {
 			$output .= encode_entities($overrides{overrides}{$prop}{newValue}, '<>&"^');
 			$output .= '</td><td>';
 			$output .= $overrides{overrides}{$prop}{parsedValue};
-			$output .= '</td></tr>';
+			$output .= "</td></tr>\n";
 		}
 	}
 	$output .= '</table>';
@@ -409,6 +410,14 @@ sub getOverridesList {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _overridesCacheTag
+
+Overrides are cached by this shortcut's assetId, the session user userId, and whether or not
+admin mode is on.
+
+=cut
+
 sub _overridesCacheTag {
 	my $self = shift;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
@@ -416,54 +425,74 @@ sub _overridesCacheTag {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getOverrides
+
+Return overrides for the original asset.  If this is a dashlet (child of a Dashboard), then
+overrides can pick up values from the user's profile.
+
+Overrides are cached, unless you are in admin mode.  The cache is invalidated if it has
+expired, or if the user's profile field has changed.
+
+=cut
+
 sub getOverrides {
-	my $self = shift;
-	my $i = 0;
-	my $cache = WebGUI::Cache->new($self->session,$self->_overridesCacheTag);
+	my $self    = shift;
+    my $session = $self->session;
+	my $cache   = WebGUI::Cache->new($self->session,$self->_overridesCacheTag);
+    my $u       = WebGUI::User->new($self->session, $self->discernUserId);
+
 	my $overridesRef = $cache->get;
-	unless ($overridesRef->{cacheNotExpired}) {
-		my %overrides;
-		my $orig = $self->getShortcutOriginal;
-		if (defined $orig) {
-			unless ( exists $orig->{_propertyDefinitions}) {
-			my %properties;
-				foreach my $definition (@{$orig->definition($self->session)}) {
-					%properties = (%properties, %{$definition->{properties}});
-				}
-				$orig->{_propertyDefinitions} = \%properties;
-			}
-			$overrides{cacheNotExpired} = 1;
-			my $sth = $self->session->db->read("select fieldName, newValue from Shortcut_overrides where assetId=? order by fieldName",[$self->getId]);
-			while (my ($fieldName, $newValue) = $sth->array) {
-				$overrides{overrides}{$fieldName}{fieldType} = $orig->{_propertyDefinitions}{$fieldName}{fieldType};
-				$overrides{overrides}{$fieldName}{origValue} = $orig->get($fieldName);
-				$overrides{overrides}{$fieldName}{newValue} = $newValue;
-				$overrides{overrides}{$fieldName}{parsedValue} = $newValue;
-			}
-			$sth->finish;
-		} else {
-			$self->session->errorHandler->warn("Original asset could not be instanciated by shortcut ".$self->getId);
-		}
-		if ($self->isDashlet) {
-			my $u = WebGUI::User->new($self->session, $self->discernUserId);
-			my @userPrefs = $self->getPrefFieldsToImport;
-			foreach my $fieldId (@userPrefs) {
-				my $field = WebGUI::ProfileField->new($self->session,$fieldId);
-				next unless $field;
-				my $fieldName = $field->getId;
-				my $fieldValue = $u->profileField($field->getId);
-				$overrides{userPrefs}{$fieldName}{value} = $fieldValue;
-				$overrides{userPrefs}{$fieldName}{parsedValue} = $fieldValue;
-				#  'myTemplateId is ##userPref:myTemplateId##', for example.
-				foreach my $overr (keys %{$overrides{overrides}}) {
-					$overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
-				}
-			}
-		}
-		$cache->set(\%overrides, 60*60);
-		$overridesRef = \%overrides;
-	}
-	return %$overridesRef;
+    ##If admin mode is not on, and the cache is valid, and not expired, and the user object was not updated,
+    ##return the cached value.
+    if ( ! $session->var->isAdminOn
+        && $overridesRef
+        && $overridesRef->{cacheNotExpired}
+        && $overridesRef->{userLastUpdated} >= $u->get('lastUpdated')) {
+        return %{ $overridesRef };
+    }
+    my %overrides;
+    my $orig = $self->getShortcutOriginal;
+    if (defined $orig) {
+        unless ( exists $orig->{_propertyDefinitions}) {
+        my %properties;
+            foreach my $definition (@{$orig->definition($self->session)}) {
+                %properties = (%properties, %{$definition->{properties}});
+            }
+            $orig->{_propertyDefinitions} = \%properties;
+        }
+        $overrides{cacheNotExpired} = 1;
+        my $sth = $self->session->db->read("select fieldName, newValue from Shortcut_overrides where assetId=? order by fieldName",[$self->getId]);
+        while (my ($fieldName, $newValue) = $sth->array) {
+            $overrides{overrides}{$fieldName}{fieldType}   = $orig->{_propertyDefinitions}{$fieldName}{fieldType};
+            $overrides{overrides}{$fieldName}{origValue}   = $orig->get($fieldName);
+            $overrides{overrides}{$fieldName}{newValue}    = $newValue;
+            $overrides{overrides}{$fieldName}{parsedValue} = $newValue;
+        }
+        $sth->finish;
+    }
+    else {
+        $self->session->errorHandler->warn("Original asset could not be instanciated by shortcut ".$self->getId);
+    }
+    if ($self->isDashlet) {
+        my @userPrefs = $self->getPrefFieldsToImport;
+        foreach my $fieldId (@userPrefs) {
+            my $field = WebGUI::ProfileField->new($self->session,$fieldId);
+            next unless $field;
+            my $fieldName  = $field->getId;
+            my $fieldValue = $u->profileField($field->getId);
+            $overrides{userPrefs}{$fieldName}{value}       = $fieldValue;
+            $overrides{userPrefs}{$fieldName}{parsedValue} = $fieldValue;
+            #  'myTemplateId is ##userPref:myTemplateId##', for example.
+            foreach my $overr (keys %{$overrides{overrides}}) {
+                $overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
+            }
+        }
+    }
+    $overrides{userLastUpdated} = $session->user->get('lastUpdated');
+    $cache->set(\%overrides, 60*60);
+    $overridesRef = \%overrides;
+	return %{ $overridesRef };
 }
 
 #-------------------------------------------------------------------
@@ -660,14 +689,16 @@ sub isDashlet {
 sub notLinked {
 	my $self = shift;
 	$self->session->errorHandler->warn("Shortcut ".$self->getId." is linked to an asset ".$self->get("shortcutToAssetId").", which no longer exists.");
-	return "The asset this shortcut is linked to no longer exists. You need to delete this shortcut.";
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Shortcut');
+	return $i18n->get('no longer exists');
 }
 
 #-------------------------------------------------------------------
 
 =head2 prepareView ( )
 
-See WebGUI::Asset::prepareView() for details.
+See WebGUI::Asset::prepareView() for details.  Extends the base class to call prepareView
+on the Asset that is shortcutted.
 
 =cut
 
@@ -683,6 +714,14 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
+See WebGUI::Asset::processPropertiesFromFormPost () for details.  Extends the base class to delete
+the scratch variables, and to uncache the overrides.
+
+=cut
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -720,6 +759,14 @@ sub setOverride {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purge ( )
+
+See Asset::purge for details.  Extends the base method to delete this Shortcut's
+overrides.
+
+=cut
+
 sub purge {
     my $self = shift;
     $self->session->db->write(<<'END_SQL', [$self->getId]);
@@ -789,20 +836,27 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
-	my $self = shift;
-	return 'You are no longer logged in' if $self->session->user->isVisitor;
-	return 'You are not allowed to personalize this Dashboard.' unless $self->getParent->canPersonalize;
+	my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session);
+	return $i18n->get('not logged in') if $session->user->isVisitor;
+	return $i18n->get('cannot personalize') unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;
 	my $f = WebGUI::HTMLForm->new($self->session,extras=>' onsubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
 	$f->raw('<table cellspacing="0" cellpadding="3" border="0">');
-	$f->hidden(  
-		-name => 'func', 
-		-value => 'saveUserPrefs'
-	);
-	foreach my $fieldId (@fielden) {
-		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
-		next unless $field;
+    my $allowedToSave = ( ! $session->var->isAdminOn && $self->getParent->canPersonalize )
+                     || (   $session->var->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
+    if ($allowedToSave) {
+        $f->hidden(  
+            -name => 'func', 
+            -value => 'saveUserPrefs'
+        );
+    }
+	my $u = WebGUI::User->new($session, $self->discernUserId);
+	FIELD: foreach my $fieldId (@fielden) {
+		my $field = WebGUI::ProfileField->new($session,$fieldId);
+		next FIELD unless $field;
 		my $params = {};
 		if (lc($field->get("fieldType")) eq 'textarea') {
 			$params->{rows} = 4;
@@ -811,11 +865,16 @@ sub www_getUserPrefsForm {
 		if (lc($field->get("fieldType")) eq 'text') {
 			$params->{size} = 20;
 		}
-		$f->raw($field->formField($params,1));
+        if (! $allowedToSave) {
+            $params->{extras} = ' disabled ';
+        }
+		$f->raw($field->formField($params,1, $u));
 	}
-	$f->submit({extras=>'className="nothing"'});
+    if ($allowedToSave) {
+        $f->submit({extras=>'className="nothing"'});
+    }
 	$f->raw('</table>');
-	my $tags = $self->session->style->generateAdditionalHeadTags();
+	my $tags = $session->style->generateAdditionalHeadTags();
 	$output .= $tags.$f->print;
 
 	return $output;
@@ -847,16 +906,29 @@ sub www_deleteOverride {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_saveUserPrefs
+
+Updates the user's profile from the inline form displayed on the dashlet.  Only users
+who are allowed to personalize the Dashboard, or who are in admin mode and are in groupIdAdminUser
+are allowed to call this method.  The last restriction is due to the following:
+When admin mode is turned on, the form displays the profile fields for Visitor.  Saving
+the form would allow someone who is not a User Admin to alter Visitor's profile.
+
+=cut
+
 sub www_saveUserPrefs {
-	my $self = shift;
-	return '' unless $self->getParent->canPersonalize;
+	my $self    = shift;
+    my $session = $self->session;
+	return '' unless $self->getParent->canPersonalize
+                  || ( $session->var->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
 	my @fellowFields = $self->getPrefFieldsToShow;
 	my %data = ();
 	$self->uncacheOverrides;
-	my $i18n = WebGUI::International->new($self->session);
-	my $u = WebGUI::User->new($self->session, $self->discernUserId);
-	foreach my $fieldId ($self->session->form->param) {
-		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
+	my $i18n = WebGUI::International->new($session);
+	my $u = WebGUI::User->new($session, $self->discernUserId);
+	foreach my $fieldId ($session->form->param) {
+		my $field = WebGUI::ProfileField->new($session,$fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;
         if ($field->getId eq 'email' && $field->isDuplicate($data{$field->getId})) {
@@ -985,8 +1057,9 @@ sub www_view {
         if ($shortcut->isa('WebGUI::Asset::Wobject')) {
                 $self->session->http->setLastModified($self->getContentLastModified);
                 $self->session->http->sendHeader;
-                my $style = $shortcut->processStyle($self->getSeparator);
-                my ($head, $foot) = split($self->getSeparator,$style);
+                ##Tell processStyle not to set the h
+                my $style = $shortcut->processStyle($shortcut->getSeparator, { noHeadTags => 1 });
+                my ($head, $foot) = split($shortcut->getSeparator,$style);
                 $self->session->output->print($head, 1);
                 $self->session->output->print($self->view);
                 $self->session->output->print($foot, 1);

@@ -19,6 +19,8 @@ use WebGUI::Utility;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
+use WebGUI::Form::Country;
+use Text::CSV_XS;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
@@ -440,7 +442,7 @@ sub graph {
     
     my $session = $self->session;
 
-    eval 'use GraphViz';
+    eval { require GraphViz };
     if ($@) {
         return;
     }
@@ -695,7 +697,7 @@ sub www_graph {
     
     my $ac   = $self->getAdminConsole;
     
-    eval 'use GraphViz';
+    eval { require GraphViz };
     if ($@) {
         return $ac->render('Survey Visualization requires the GraphViz module', $i18n->get('survey visualization'));
     }
@@ -1192,6 +1194,13 @@ sub prepareView {
         $templateId = $self->session->form->process('overrideTemplateId');
     }
     my $template = WebGUI::Asset::Template->new( $self->session, $templateId );
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $templateId,
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare;
     $self->{_viewTemplate} = $template;
     return;
@@ -1303,7 +1312,7 @@ sub getResponseDetails {
     my $self = shift;
     my %opts = validate(@_, { userId => 0, responseId => 0, templateId => 0, isComplete => 0} );
     my $responseId = $opts{responseId};
-    my $userId = $opts{userId} || $self->session->user->userId;
+    my $userId     = $opts{userId}     || $self->session->user->userId;
     my $templateId = $opts{templateId} || $self->get('feedbackTemplateId') || 'nWNVoMLrMo059mDRmfOp9g';
     my $isComplete = $opts{isComplete};
     
@@ -1319,32 +1328,44 @@ sub getResponseDetails {
         return {};
     }
     
-    my ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) 
-        = $self->session->db->quickArray('select isComplete, endDate, responseJSON from Survey_response where Survey_responseId = ?', [ $responseId ]);
-    
+    my ( $completeCode, $endDate, $rJSON, $ruserId, $rusername ) = $self->session->db->quickArray(
+        'select isComplete, endDate, responseJSON, userId, username from Survey_response where Survey_responseId = ?',
+        [$responseId]
+    );
+
+    my $endDateEpoch = $endDate;
+    $endDate = $endDate && WebGUI::DateTime->new( $self->session, $endDate )->toUserTimeZone;
+
     # Process the feedback text
     my $feedback;
     my $tags = {};
     if ($rJSON) {
         $rJSON = from_json($rJSON) || {};
-        
+
         # All tags become template vars
         $tags = $rJSON->{tags} || {};
-        $tags->{complete} = $lastResponseCompleteCode == 1;
-        $tags->{restart} = $lastResponseCompleteCode == 2;
-        $tags->{timeout} = $lastResponseCompleteCode == 3;
-        $tags->{timeoutRestart} = $lastResponseCompleteCode == 4;
-        $tags->{endDate} = $lastResponseEndDate && WebGUI::DateTime->new($self->session, $lastResponseEndDate)->toUserTimeZone;
-        $feedback = $self->processTemplate($tags, $templateId);
+        $tags->{complete}       = $completeCode == 1;
+        $tags->{restart}        = $completeCode == 2;
+        $tags->{timeout}        = $completeCode == 3;
+        $tags->{timeoutRestart} = $completeCode == 4;
+        $tags->{endDate}        = $endDate;
+        $tags->{endDateEpoch}   = $endDateEpoch;
+        $tags->{userId}         = $ruserId;
+        $tags->{username}       = $rusername;
     }
     return {
-        completeCode => $lastResponseCompleteCode,
-        templateText => $feedback,
         templateVars => $tags,
-        endDate => $tags->{endDate},
-        complete => $tags->{complete},
-        restart => $tags->{restart},
-        timeout => $tags->{timeout},
+        templateText => $self->processTemplate( $tags, $templateId ),
+
+        completeCode => $completeCode,
+        endDate      => $endDate,
+        endDateEpoch => $endDateEpoch,
+        userId       => $ruserId,
+        username     => $rusername,
+
+        complete       => $tags->{complete},
+        restart        => $tags->{restart},
+        timeout        => $tags->{timeout},
         timeoutRestart => $tags->{timeoutRestart},
     };
 }
@@ -1552,13 +1573,19 @@ sub www_showFeedback {
     # Only continue if we were given a responseId
     return if !$responseId;
     
-    my $userId = $self->session->db->quickScalar('select userId from Survey_response where Survey_responseId = ?', [ $responseId ]);
+    my $responseUserId 
+        = $self->session->db->quickScalar('select userId from Survey_response where Survey_responseId = ?', [ $responseId ]);
     
     # Only continue if responseId gave us a legit userId
-    return if !$userId;
+    return if !$responseUserId;
     
-    # Only continue if user owns the response
-    return if $userId ne $self->session->user->userId;
+    my $responseUser = WebGUI::User->new($self->session, $responseUserId);
+    return if !$responseUser;
+    
+    # Only continue if user owns the response (or user is allowed to view reports)
+    if ($responseUserId ne $self->session->user->userId && !$responseUser->isInGroup( $self->get('groupToViewReports') )) {
+        return $self->session->privilege->insufficient();
+    }
     
     my $out = $self->getResponseDetails( { responseId => $responseId } )->{templateText};
     return $self->session->style->process( $out, $self->get('styleTemplateId') );
@@ -1779,7 +1806,6 @@ sub prepareShowSurveyTemplate {
         }
         elsif ( $country{ $q->{questionType} } ) {
             $q->{country} = 1;
-            use WebGUI::Form::Country;
             my @countries = map +{ 'country' => $_ }, WebGUI::Form::Country::getCountries();
             foreach my $a(@{$q->{answers}}){
                 $a->{countries} = [ {'country' => ''}, @countries ];
@@ -1919,25 +1945,41 @@ sub responseId {
     return $self->{responseId};
 }
 
-=head2 takenCount
+=head2 takenCount ( $options )
 
 Counts the number of existing responses
 N.B. only counts responses with completeCode of 1 
 (others codes indicate abnormal completion such as restart
 and thus should not count towards tally)
 
+=head3 options
+
+The following options are supported
+
+=head4 userId
+
+The userId to count responses for (required)
+
+=head4 ipAddress
+
+An IP address to filter responses by (optional)
+
+=head4 isComplete
+
+A complete code to use to filter responses by (optional, defaults to 1)
+
 =cut
 
 sub takenCount {
     my $self = shift;
-    my %opts = validate(@_, { userId => 0, anonId => 0, ipAddress => 0, isComplete => 0 });
+    my %opts = validate(@_, { userId => 1, ipAddress => 0, isComplete => 0 });
     my $isComplete = defined $opts{isComplete} ? $opts{isComplete} : 1;
     
     my $sql = 'select count(*) from Survey_response where';
     $sql .= ' assetId = ' . $self->session->db->quote($self->getId);
     $sql .= ' and isComplete = ' . $self->session->db->quote($isComplete);
-    for my $o qw(userId anonId ipAddress) {
-        if (my $o_value = $opts{o}) {
+    for my $o qw(userId ipAddress) {
+        if (my $o_value = $opts{$o}) {
             $sql .= " and $o = " . $self->session->db->quote($o_value);
         }
     }
@@ -2238,7 +2280,6 @@ END_HTML
             }
         }
         
-        use Text::CSV_XS;
         my $csv = Text::CSV_XS->new( { binary => 1 } );
         my @lines = map {$csv->combine(@$_); $csv->string} @rows;
         my $output = join "\n", @lines;
@@ -2322,7 +2363,7 @@ sub loadTempReportTable {
                     'insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
                         $self->getId(),    $ref->{Survey_responseId}, $count++,           $q->{section},
                         $q->{sectionName}, $q->{question},            $q->{questionName}, $q->{questionComment},
-                        $a->{id},          $a->{value},               $a->{comment},      $a->{time},
+                        $a->{id},          $a->{value},               $a->{verbatim},      $a->{time},
                         $a->{isCorrect},   $a->{value},               undef
                     ]
                 );
@@ -2637,7 +2678,7 @@ sub www_runTest {
     my $i18n = WebGUI::International->new($session, 'Asset_Survey');
     my $ac = $self->getAdminConsole;
     
-    eval 'use TAP::Parser';
+    eval { require TAP::Parser };
     if ($@) {
         $self->session->log->warn($TAP_PARSER_MISSING);
         return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
@@ -2669,7 +2710,7 @@ all interesting TAP::Parser and TAP::Parser::Result properties) and the template
 sub parseTap {
     my ($self, $tap) = @_;
     
-    eval 'use TAP::Parser';
+    eval { require TAP::Parser };
     if ($@) {
         $self->session->log->warn($TAP_PARSER_MISSING);
         return;
@@ -2766,12 +2807,12 @@ sub www_runTests {
 
     
     my @parsers;
-    eval 'use TAP::Parser';
+    eval { require TAP::Parser };
     if ($@) {
         $self->session->log->warn($TAP_PARSER_MISSING);
         return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
     }
-    eval 'use TAP::Parser::Aggregator';
+    eval { require TAP::Parser::Aggregator };
     if ($@) {
         $self->session->log->warn($TAP_PARSER_MISSING);
         return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));

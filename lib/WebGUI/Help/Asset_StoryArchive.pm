@@ -27,9 +27,11 @@ our $HELP = {
                     { 'name' => 'epochDate' },
                     { 'name' => 'story_loop',
                       'variables' => [
-                        { 'name' => 'url' },
-                        { 'name' => 'title' },
-                        { 'name' => 'creationDate' },
+                        { name => 'url' },
+                        { name => 'title' },
+                        { name => 'creationDate' },
+                        { name => 'deleteIcon' },
+                        { name => 'editIcon' },
                       ],
                     },
                 ]

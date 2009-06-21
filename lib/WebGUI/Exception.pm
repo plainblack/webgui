@@ -44,6 +44,11 @@ use Exception::Class (
         description     => "The object you were trying to retrieve does not exist.",
         fields          => ["id"],
         },
+    'WebGUI::Error::ObjectNotFound::Template' => {
+        isa             => 'WebGUI::Error',
+        description     => "The template an asset was trying to retrieve does not exist.",
+        fields          => [qw/templateId assetId/],
+        },
     'WebGUI::Error::InvalidFile' => {
         isa             => 'WebGUI::Error',
         description     => "The file you have provided has errors.",

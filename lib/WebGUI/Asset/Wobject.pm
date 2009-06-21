@@ -377,28 +377,16 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
-=head2 processStyle ( output )
+=head2 processStyle ( )
 
-Returns output parsed under the current style.  Sets the Asset's extra head tags
-into the raw head tags, too.
-
-=head3 output
-
-An HTML blob to be parsed into the current style.
+Returns output parsed under the current style.  See also Asset::processStyle.
 
 =cut
 
 sub processStyle {
-	my ($self, $output) = @_;
-    my $session = $self->session;
-    my $style   = $session->style;
-    $style->setRawHeadTags($self->getExtraHeadTags);
-    if ($self->get('synopsis')) {
-        $style->setMeta({
-            name    => 'Description',
-            content => $self->get('synopsis'),
-        });
-    }
+	my ($self, $output, $options) = @_;
+    $output   = $self->SUPER::processStyle($output, $options);
+    my $style = $self->session->style;
     if ($style->useMobileStyle) {
         return $style->process($output,$self->get("mobileStyleTemplateId"));
     }
@@ -569,7 +557,7 @@ sub www_view {
         });
     }
 	$self->prepareView;
-	my $style = $self->processStyle($self->getSeparator);
+	my $style = $self->processStyle($self->getSeparator, { noHeadTags => 1 });
 	my ($head, $foot) = split($self->getSeparator,$style);
 	$self->session->output->print($head, 1);
 	$self->session->output->print($self->view);

@@ -101,6 +101,13 @@ sub prepareView {
 	#} else {
 	   $template = WebGUI::Asset::Template->new($self->session, $self->get("userViewTemplateId"));
 	#}
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("userViewTemplateId"),
+            assetId    => $self->getId,
+        );
+    }
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }

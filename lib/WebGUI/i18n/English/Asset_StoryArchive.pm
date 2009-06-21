@@ -213,6 +213,18 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'deleteIcon' => {
+        message => q|An icon to delete this story.  If the user is not allowed to delete the icon, or their UI level is set too low, this variable will be empty.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'editIcon' => {
+        message => q|An icon to edit this story.  If the user is not allowed to edit the icon, or their UI level is set too low, this variable will be empty.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
     'add a story' => {
         message => q|Add a Story.|,
         context => q|label for the URL to add a story to the archive.|,

@@ -471,7 +471,7 @@ our $I18N = {
     },
 
     'missing message' => {
-        message     => q|Your invitiation must have a message.|,
+        message     => q|Your invitation must have a message.|,
         lastUpdated => 1181409432,
     },
 

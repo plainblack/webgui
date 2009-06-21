@@ -279,7 +279,7 @@ sub _test {
         if (!defined $spec) {
             $self->session->log->debug("Spec undefined, assuming that means ignore answer value");
         } 
-        elsif ( $questionType eq 'Text' || $questionType eq 'Number' || $questionType eq 'Slider' ) {
+        elsif ( $questionType eq 'Text' || $questionType eq 'Number' || $questionType eq 'Slider' || $questionType eq 'Tagged') {
             # Assume spec is raw value to record in the single answer
             $responses->{"$address->[0]-$address->[1]-0"} = $spec;
         } elsif ( $questionType eq 'Year Month' ) {
@@ -670,7 +670,8 @@ END_WHY
                 return fail($testCount, $name, "Tag not found: $tagKey");
             }
             my $currentTagValue = $currentTags->{$tagKey};
-            if ($currentTagValue != $tagValue) {
+           
+            if (!eq_deeply($currentTagValue, $tagValue)) {
                 $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
                 return fail($testCount, $name, <<END_WHY);
 Compared tag '$tagKey'
@@ -686,7 +687,7 @@ END_WHY
         my $currentTags = $rJSON->tags;
         while (my ($tagKey, $tagValue) = each %$tagged) {
             my $currentTagValue = $currentTags->{$tagKey};
-            if ($currentTagValue != $tagValue) {
+            if (!eq_deeply($currentTagValue, $tagValue)) {
                 $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
                 return fail($testCount, $name, <<END_WHY);
 Compared tag '$tagKey'

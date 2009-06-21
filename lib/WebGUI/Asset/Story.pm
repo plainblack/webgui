@@ -428,11 +428,7 @@ sub getEditForm {
     foreach my $photoIndex (1..$numberOfPhotos) {
         my $photo = $photoData->[$photoIndex-1];
         push @{ $var->{ photo_form_loop } }, {
-            imgUploadForm  => WebGUI::Form::image($session, {
-                                 name           => 'photo'.$photoIndex,
-                                 maxAttachments => 1,
-                                 value          => $photo->{storageId},
-                              }),
+            imgUploadForm  => $self->getPhotoUploadForm($photoIndex, $photo->{storageId}),
             imgCaptionForm => WebGUI::Form::text($session, {
                                  name  => 'imgCaption'.$photoIndex,
                                  value => $photo->{caption},
@@ -511,6 +507,48 @@ sub getPhotoData {
 
 #-------------------------------------------------------------------
 
+=head2 getPhotoUploadForm ( $index, $storageId )
+
+Render a simple file form control that displays the current image if it is
+uploaded.
+
+=head3 $index
+
+The index of a piece of Photo collateral.  An upload form for that index
+will be generated.
+
+=head3 $storageId
+
+The storage location for that piece of Photo collateral, to display an
+existing image if it exists.
+
+=cut
+
+sub getPhotoUploadForm {
+	my $self      = shift;
+    my $session   = $self->session;
+    my $index     = shift;
+    my $storageId = shift;
+
+    my $html      = '';
+    my $storage   = WebGUI::Storage->get($session, $storageId);
+    my $filename  = $storage->getFiles->[0];
+
+    if ($filename) {
+        $html .= WebGUI::Form::readOnly($session, {
+            value => '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($filename).'"><img src="'.$storage->getThumbnailUrl($filename).'" alt="'.$filename.'" style="border-style:none;vertical-align:middle;" /> '.$filename.'</a></p>',
+        })
+    }
+
+    $html .= WebGUI::Form::file($session, {
+        name => 'newPhoto' . $index,
+        maxAttachments => 1,
+    });
+    return $html;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRssData (  )
 
 Returns RSS data for this Story.  The date of the RSS item is the lastModified
@@ -582,8 +620,18 @@ sub processPropertiesFromFormPost {
             splice @{ $photoData }, $photoIndex-1, 1;
             next PHOTO;
         }
+        ##Process new uploads
+        if (my $uploadId = $form->process('newPhoto'.$photoIndex,'File')) {
+            my $upload   = WebGUI::Storage->get($session, $uploadId);
+            my $storage  = WebGUI::Storage->get($session, $storageId);
+            $storage->clear;
+            my $filename = $upload->getFiles->[0];
+            $storage->addFileFromFilesystem($upload->getPath($filename));
+            $storage->generateThumbnail($filename);
+            $upload->delete;
+        }
         my $newPhoto = {
-            storageId => $form->process('photo'     .$photoIndex, 'image', $storageId),
+            storageId => $storageId,
             caption   => $form->process('imgCaption'.$photoIndex, 'text'),
             alt       => $form->process('imgAlt'    .$photoIndex, 'text'),
             title     => $form->process('imgTitle'  .$photoIndex, 'text'),

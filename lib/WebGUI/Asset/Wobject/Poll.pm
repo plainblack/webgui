@@ -327,11 +327,18 @@ See WebGUI::Asset::prepareView() for details.
 =cut
 
 sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateId"),
+            assetId    => $self->getId,
+        );
+    }
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_viewTemplate} = $template;
 }
 
 
@@ -382,13 +389,32 @@ sub setGraphConfig {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setVote ($answer, $userId, $ip)
+
+Accumulates a vote into the database so that it can be counted.
+
+=head3 $answer
+
+The answer selected by the user.
+
+=head3 $userid
+
+The userId of the person who voted.
+
+=head3 $ip
+
+The IP address of the user who voted.
+
+=cut
+
 sub setVote {
-	my $self = shift;
-	my $answer = shift;
-	my $userId = shift;
-	my $ip = shift;
-       	$self->session->db->write("insert into Poll_answer (assetId, answer, userId, ipAddress) values (".$self->session->db->quote($self->getId).", 
-		".$self->session->db->quote($answer).", ".$self->session->db->quote($userId).", '$ip')");
+    my $self = shift;
+    my $answer = shift;
+    my $userId = shift;
+    my $ip = shift;
+    $self->session->db->write("insert into Poll_answer (assetId, answer, userId, ipAddress) values (?,?,?,?)",
+        [$self->getId, $answer, $userId, $ip] );
 }
 
 #----------------------------------------------------------------------------

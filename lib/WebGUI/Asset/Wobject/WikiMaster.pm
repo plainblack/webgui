@@ -379,6 +379,13 @@ sub prepareView {
 	$self->next::method;
 	$self->{_frontPageTemplate} =
 	    WebGUI::Asset::Template->new($self->session, $self->get('frontPageTemplateId'));
+    if (!$self->{_frontPageTemplate}) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get('frontPageTemplateId'),
+            assetId    => $self->getId,
+        );
+    }
 	$self->{_frontPageTemplate}->prepare;
 }
 

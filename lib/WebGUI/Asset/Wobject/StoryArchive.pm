@@ -414,6 +414,13 @@ sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateId"),
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare;
     $self->{_viewTemplate} = $template;
 }
@@ -481,7 +488,8 @@ sub viewTemplateVariables {
     my $query           = $session->form->get('query'); 
     my $exporting       = $session->scratch->get('isExporting');
     my $p;
-    my $var = $self->get();
+    my $i18n = WebGUI::International->new($session);
+    my $var  = $self->get();
     if ($mode eq 'keyword') {
         $var->{mode} = 'keyword';
         my $wordList = WebGUI::Keyword::string2list($keywords);
@@ -524,9 +532,15 @@ sub viewTemplateVariables {
         ##Pagination variables aren't useful in export mode
         $p->appendTemplateVars($var);
     }
+
     $var->{date_loop} = [];
     my $lastStoryDate = '';
-    my $datePointer = undef;
+    my $datePointer   = undef;
+
+    my $icon          = $session->icon;
+    my $userUiLevel   = $session->user->profileField("uiLevel");
+    my $uiLevels      = $session->config->get('assetToolbarUiLevel');
+
     ##Only build objects for the assets that we need
     STORY: foreach my $storyId (@{ $storyIds }) {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
@@ -541,11 +555,18 @@ sub viewTemplateVariables {
             $datePointer->{story_loop} = [];
             $lastStoryDate = $storyDate;
         }
-        push @{$datePointer->{story_loop}}, {
+        my $storyVars = {
             url           => $story->getUrl,
             title         => $story->getTitle,
             creationDate  => $creationDate,
+        };
+        if ($story->canEdit && $userUiLevel >= $uiLevels->{delete} && !$exporting) {
+            $storyVars->{deleteIcon} = $icon->delete('func=delete', $story->get('url'), $i18n->get(43));
         }
+        if ($story->canEdit && $userUiLevel >= $uiLevels->{edit}   && !$exporting) {
+            $storyVars->{editIcon}   = $icon->edit('func=edit', $story->get('url'));
+        }
+        push @{$datePointer->{story_loop}}, $storyVars;
     }
 
     $var->{canPostStories} = $self->canPostStories;
@@ -565,11 +586,10 @@ sub viewTemplateVariables {
     }
     $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud($cloudOptions);
     if (! $exporting) {
-        my $i18n = WebGUI::International->new($session, 'Asset');
         $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
                              . WebGUI::Form::hidden($session, { name   => 'func',   value => 'view' });
         $var->{searchFooter} = WebGUI::Form::formFooter($session);
-        $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search')});
+        $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search','Asset')});
         $var->{searchForm}   = WebGUI::Form::text($session,   { name => 'query',    value => $query});
     }
     return $var;

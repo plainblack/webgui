@@ -25,6 +25,8 @@ our $HELP = {
                 { name => 'url' },
                 { name => 'title' },
                 { name => 'creationDate' },
+                { name => 'deleteIcon' },
+                { name => 'editIcon' },
               ],
             },
             { name => 'topStoryTitle'        },

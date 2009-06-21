@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 18; # increment this value for each test you create
+use Test::More tests => 21; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Matrix;
@@ -50,6 +50,8 @@ foreach my $newSetting (keys %{$newMatrixSettings}) {
     	is ($matrix->get($newSetting), $newMatrixSettings->{$newSetting}, "updated $newSetting is ".$newMatrixSettings->{$newSetting});
     }
 }
+
+is ($matrix->getCompareColor('4'),'#aaffaa',"Getting compareColorYes");
 
 cmp_deeply (
     $matrix->getCategories,
@@ -106,6 +108,14 @@ is($matrixListing->getAutoCommitWorkflowId,undef,"The matrix listings getAutoCom
 
 is($matrixListing->hasRated,'0',"The matrix listings hasRated method returns correct value.");
 
+$matrixListing->www_click;
+
+is($matrixListing->get('clicks'),'1','Clicks were incremented');
+
+$matrixListing->www_view;
+
+is($matrixListing->get('views'),'1','Views were incremented');
+
 # Test getListings
 
 my $expectedAssetId = $matrixListing->getId;
@@ -115,9 +125,9 @@ my $listings = $matrix->getListings;
 cmp_deeply(
         $listings,
         [{
-            views=>"0",
+            views=>"1",
             lastUpdated=>$matrixListing->get('lastUpdated'),
-            clicks=>"0",
+            clicks=>"1",
             compares=>"0",
             assetId=>$expectedAssetId,
             url=>$session->url->gateway($matrixListing->get('url')),
@@ -136,9 +146,9 @@ $listings = JSON->new->decode($listingsEncoded);
 cmp_deeply(
         $listings,
         [{
-            views=>"0",
+            views=>"1",
             lastUpdated=>$matrixListing->get('lastUpdated'),
-            clicks=>"0",
+            clicks=>"1",
             compares=>"0",
             assetId=>$expectedAssetId,
             url=>$session->url->gateway($matrixListing->get('url')),
@@ -161,9 +171,9 @@ cmp_deeply(
         $compareFormData,
         {ResultSet=>{
             Result=>[{
-                    views=>"0",
+                    views=>"1",
                     lastUpdated=>$matrixListing->get('lastUpdated'),
-                    clicks=>"0",
+                    clicks=>"1",
                     compares=>"0",
                     assetId=>$expectedAssetId,
                     url=>'/'.$matrixListing->get('url'),
@@ -186,7 +196,7 @@ cmp_deeply(
         {
         alphanumeric_sortButton=>"<span id='sortByName'><button type='button'>Sort by name</button></span><br />",
         bestViews_url=>'/'.$matrixListing->get('url'),
-        bestViews_count=>0,
+        bestViews_count=>1,
         bestViews_name=>$matrixListing->get('title'),
         bestViews_sortButton=>"<span id='sortByViews'><button type='button'>Sort by views</button></span><br />",
         bestCompares_url=>'/'.$matrixListing->get('url'),
@@ -194,7 +204,7 @@ cmp_deeply(
         bestCompares_name=>$matrixListing->get('title'),
         bestCompares_sortButton=>"<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />",
         bestClicks_url=>'/'.$matrixListing->get('url'),
-        bestClicks_count=>0,
+        bestClicks_count=>1,
         bestClicks_name=>$matrixListing->get('title'),
         bestClicks_sortButton=>"<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />",
         last_updated_loop=>[{

@@ -1001,6 +1001,13 @@ sub prepareViewListAlbums {
     my $self        = shift;
     my $template 
         = WebGUI::Asset::Template->new($self->session, $self->get("templateIdListAlbums"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateIdListAlbums"),
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
 }

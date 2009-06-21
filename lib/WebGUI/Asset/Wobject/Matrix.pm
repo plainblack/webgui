@@ -575,12 +575,19 @@ See WebGUI::Asset::prepareView() for details.
 =cut
 
 sub prepareView {
-	my $self = shift;
+    my $self = shift;
 
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
-	$self->{_viewTemplate} = $template;
+    $self->SUPER::prepareView();
+    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateId"),
+            assetId    => $self->getId,
+        );
+    }
+    $template->prepare;
+    $self->{_viewTemplate} = $template;
 
     return undef;
 }
@@ -635,8 +642,6 @@ sub view {
     'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'), {type =>
     'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
-    'text/javascript'});
     
     my ($varStatistics,$varStatisticsEncoded);
 	my $var = $self->get;
@@ -646,7 +651,7 @@ sub view {
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
     $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
     $var->{search_url}              = $self->getUrl('func=search');
-    $var->{compareForm_url}         = $self->getUrl();
+    $var->{matrix_url}              = $self->getUrl();
 
     my $maxComparisons;
     if($self->session->user->isVisitor){
@@ -658,10 +663,7 @@ sub view {
     else{
         $maxComparisons = $self->get('maxComparisonsPrivileged');
     }
-    $var->{javascript} = "<script type='text/javascript'>\n".
-        "var maxComparisons = ".$maxComparisons.";\n".
-        "var matrixUrl = '".$self->getUrl."';\n".
-        "</script>";
+    $var->{maxComparisons} = $maxComparisons;
    
     if ($self->canEdit){
         # Get all the MatrixListings that are still pending.
@@ -880,8 +882,6 @@ sub www_compare {
     {type =>'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/container/container-min.js'),
     {type =>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixCompareList.js'), {type =>
-    'text/javascript'});
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         {type =>'text/css', rel=>'stylesheet'});
     $self->session->style->setScript($self->session->url->extras('hoverhelp.js'), {type =>
@@ -905,13 +905,12 @@ sub www_compare {
         $listingId_safe =~ s/-/_____/g;
         push(@responseFields, $listingId_safe, $listingId_safe."_compareColor");
     }
-    
-    $var->{javascript} = "<script type='text/javascript'>\n".
-        'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
-        'var responseFields = new Array("attributeId", "name", "description","fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
-        "var maxComparisons = ".$maxComparisons.";\n".
-        "var matrixUrl = '".$self->getUrl."';\n".
-        "</script>";
+
+    $var->{maxComparisons}  = $maxComparisons;
+    $var->{matrixUrl}       = $self->getUrl;
+    $var->{listingIds}      = join(", ",map {'"'.$_.'"'} @listingIds);
+    $var->{responseFields}  = '"attributeId", "name", "description","fieldType", "checked", '
+                              .join(", ",map{'"'.$_.'"'} @responseFields);
 
     return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));
 }
@@ -1170,7 +1169,8 @@ sub www_getCompareFormData {
 
     my @results;
     if($form->process("search")){
-        while (my $result = $self->getListings) {
+        if ($searchParamList){
+            foreach my $result (@{$self->getListings}) {
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
                             select value, fieldType, attributeId from Matrix_attribute
                             left join MatrixListing_attribute as listing using(attributeId)
@@ -1192,8 +1192,16 @@ sub www_getCompareFormData {
                             $result->{checked} = 'checked';
                         }
                 }
-            $result->{assetId}  =~ s/-/_____/g;
-            push @results, $result;
+                $result->{assetId}  =~ s/-/_____/g;
+                push @results, $result;
+            }
+        }
+        else{   
+            foreach my $result (@{$self->getListings}) {
+                $result->{checked} = 'checked';
+                $result->{assetId}  =~ s/-/_____/g;
+                push @results, $result;
+            }
         }
     }else{
         foreach my $result (@{$self->getListings}) {
@@ -1382,8 +1390,6 @@ sub www_search {
     {type =>'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
     {type =>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixSearch.js'), {type =>
-    'text/javascript'});
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         {type =>'text/css', rel=>'stylesheet'});
 

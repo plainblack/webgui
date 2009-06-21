@@ -589,14 +589,14 @@ sub definition {
 			},
 		filterCode =>{
 			fieldType=>"filterContent",
-			defaultValue=>'javascript',
+			defaultValue=>'most',
 			tab=>'security',
 			label=>$i18n->get('filter code'),
 			hoverHelp=>$i18n->get('filter code description'),
 			},
 		replyFilterCode =>{
 			fieldType=>"filterContent",
-			defaultValue=>'javascript',
+			defaultValue=>'most',
 			tab=>'security',
 			label=>$i18n->get('reply filter code'),
 			hoverHelp=>$i18n->get('reply filter code description'),
@@ -1178,11 +1178,18 @@ See WebGUI::Asset::prepareView() for details.
 =cut
 
 sub prepareView {
-	my $self = shift;
-	$self->next::method;
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId")) or die "no good: ".$self->get("collaborationTemplateId");
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->next::method;
+    my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("collaborationTemplateId"),
+            assetId    => $self->getId,
+        );
+    }
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_viewTemplate} = $template;
 }
 
 
