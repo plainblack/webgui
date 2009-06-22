@@ -22,7 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::Asset::Wobject::Survey;
 
 my $toVersion = '7.7.12';
 my $quiet; # this line required
@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+surveyCleanUp($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,38 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub surveyCleanUp {
+    my $session = shift;
+    print "\tRemoving extra properties that may have crept into surveyJSON... " unless $quiet;
+    
+    my $sth = $session->db->read('select assetId, revisionDate from Survey');
+    
+    while (my ($assetId, $revision) = $sth->array) {
+        my $survey = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Survey', $revision);
+        
+        # Remove recursive properties that snuck into the mold
+        if (my $mold = $survey->surveyJSON->mold) {
+            $mold->{question}{answers} = [];
+            $mold->{section}{questions} = [];
+        }
+        
+        # Remove keys that should never have been added to sections/questions/answers
+        for my $s (@{$survey->surveyJSON->sections}) {
+            for my $q (@{$s->{questions} || []}) {
+                for my $a (@{$q->{answers} || []}) {
+                    delete $a->{$_} for qw(delete copy removetype addtype func);
+                }
+                delete $q->{$_} for qw(delete copy removetype addtype func);
+            }
+            delete $s->{$_} for qw(delete copy removetype addtype func);
+        }
+        $survey->persistSurveyJSON;
+    }
+    
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
