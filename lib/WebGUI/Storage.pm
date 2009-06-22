@@ -1477,7 +1477,7 @@ sub rotate {
 
 =head2 resize ( filename [, width, height ] )
 
-Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaleed proportionately to the non-omitted one.
+Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaled proportionately to the non-omitted one.
 
 =head3 filename
 
