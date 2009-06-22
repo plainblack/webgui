@@ -1,5 +1,6 @@
 7.7.12
  - Updated auth to allow sending back of non-text/html mime types.
+ - fixed #10564: edit branch progress bar goes kablooey
 
 7.7.11
  - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)

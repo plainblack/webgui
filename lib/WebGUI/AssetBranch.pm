@@ -223,6 +223,7 @@ sub www_editBranch {
                         $options = "|" . $i18n->get("Select") . "\n" . $options;
                     }
                     $tabform->getTab("meta")->dynamicField(
+                        fieldType       => $fieldType,
                         name            => "metadata_".$meta->{$field}{fieldId},
                         label           => $meta->{$field}{fieldName},
                         uiLevel         => 5,
@@ -316,8 +317,8 @@ sub www_editBranchSave {
         else {
             $revision = $descendant;
         }
-        foreach my $form ($form->param) {
-            if ($form =~ /^metadata_(.*)$/) {
+        foreach my $param ($form->param) {
+            if ($param =~ /^metadata_(.*)$/) {
                 my $fieldName = $1;
                 if ($form->yesNo("change_metadata_".$fieldName)) {
                     $revision->updateMetaData($fieldName,$form->process($form));
