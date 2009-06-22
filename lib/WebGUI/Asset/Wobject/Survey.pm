@@ -993,7 +993,6 @@ sub deleteObject {
     # Each object checks the ref and then either updates or passes it to the correct child. 
     # New objects will have an index of -1.
     my $message = $self->surveyJSON_remove($address);
-    $self->session->log->debug(Dumper($self->surveyJSON->{_sections}));
 
     # The parent address of the deleted object is returned.
     if ( @{$address} == 1 ) {
