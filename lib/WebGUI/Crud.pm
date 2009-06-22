@@ -192,6 +192,26 @@ sub create {
 
 #-------------------------------------------------------------------
 
+=head2 crud_createOrUpdate ( session )
+
+A detection class method used to affirm creation or update of the database table using the crud_definition(). Returns 1 on successful completion.
+
+=head3 session
+
+A reference to a WebGUI::Session.
+
+=cut
+
+sub crud_createOrUpdateTable {
+    my ( $class, $session ) = @_;
+    my $tableName   = $class->crud_getTableName($session);
+    my $tableExists = $session->db->dbh->do("show tables like '$tableName'");
+
+    return ( $tableExists ne '0E0' ? $class->crud_updateTable($session) : $class->crud_createTable($session) );
+}
+
+#-------------------------------------------------------------------
+
 =head2 crud_createTable ( session )
 
 A management class method used to create the database table using the crud_definition(). Returns 1 on successful completion. 
