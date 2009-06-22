@@ -214,6 +214,7 @@ sub www_editBranch {
                         $options = "|" . $i18n->get("Select") . "\n" . $options;
                     }
                     $tabform->getTab("meta")->dynamicField(
+                        fieldType       => $fieldType,
                         name            => "metadata_".$meta->{$field}{fieldId},
                         label           => $meta->{$field}{fieldName},
                         uiLevel         => 5,
