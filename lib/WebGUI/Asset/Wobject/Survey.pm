@@ -828,9 +828,7 @@ sub www_submitObjectEdit {
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
-    my $params = $self->session->form->paramsHashRef();
-    
-    return $self->submitObjectEdit($params);
+    return $self->submitObjectEdit( $self->session->form->paramsHashRef );
 }
 
 #-------------------------------------------------------------------
@@ -989,6 +987,8 @@ See L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>
 
 sub deleteObject {
     my ( $self, $address ) = @_;
+    
+    $self->session->log->debug("Deleting object: " . join '-', @$address);
 
     # Each object checks the ref and then either updates or passes it to the correct child. 
     # New objects will have an index of -1.
@@ -1054,13 +1054,15 @@ sub www_dragDrop {
     my @bid = split /-/, $p->{before}->{id};
 
     my $target = $self->surveyJSON->getObject( \@tid );
-    $self->surveyJSON_remove( \@tid, 1 );
+    $self->surveyJSON->remove( \@tid, 1 );
     my $address = [0];
     if ( @tid == 1 ) {
-
+        
         #sections can only be inserted after another section so chop off the question and answer portion of
         $#bid = 0;
         $bid[0] = -1 if ( !defined $bid[0] );
+        
+        $self->session->log->debug("Moving section $bid[0] to $tid[0]");
 
         #If target is being moved down, then before has just moved up do to the target being deleted
         $bid[0]-- if($tid[0] < $bid[0]);
@@ -1924,7 +1926,6 @@ sub persistSurveyJSON {
 
     my $data = $self->surveyJSON->freeze();
     $self->update({surveyJSON=>$data});
-#    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
 
     return;
 }
