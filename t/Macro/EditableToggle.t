@@ -23,6 +23,7 @@ my $session = WebGUI::Test->session;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 my ($versionTag, $asset, @users) = setupTest($session, $homeAsset);
+WebGUI::Test->usersToDelete(@users);
 
 my $i18n = WebGUI::International->new($session,'Macro_EditableToggle');
 
@@ -255,6 +256,7 @@ sub setupTest {
 	my ($session, $defaultNode) = @_;
 	$session->user({userId=>3});
 	my $editGroup = WebGUI::Group->new($session, "new");
+    WebGUI::Test->groupsToDelete($editGroup);
 	my $tao = WebGUI::Group->find($session, "Turn Admin On");
 	##Create an asset with specific editing privileges
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -282,8 +284,5 @@ sub setupTest {
 END { ##Clean-up after yourself, always
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
-	}
-	foreach my $dude (@users) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
 }

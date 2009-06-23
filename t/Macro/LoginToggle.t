@@ -189,6 +189,7 @@ sub setupTest {
 	my ($session, $defaultNode) = @_;
 	$session->user({userId=>3});
 	my $editGroup = WebGUI::Group->new($session, "new");
+    WebGUI::Test->groupsToDelete($editGroup);
 	my $tao = WebGUI::Group->find($session, "Turn Admin On");
 	##Create an asset with specific editing privileges
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
