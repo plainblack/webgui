@@ -2757,7 +2757,7 @@ sub www_editSave {
     $object->updateHistory("edited");
 
     # we handle auto commit assets here in case they didn't handle it themselves
-    if ($object->getAutoCommitWorkflowId && $self->hasBeenCommitted) {
+    if ($object->getAutoCommitWorkflowId) {
         $object->requestAutoCommit;
     }
     # else, try to to auto commit
