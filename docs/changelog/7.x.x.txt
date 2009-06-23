@@ -15,6 +15,7 @@
  - fixed #10542: AssetVersioning: versionTag/isLockedBy updating
  - fixed: Making Edit Branch forms for list-type metadata.
  - fixed #10557: create new user - becomes new user
+ - Enabled better month and year navigation in the YUI date picker. (Tom Beharrell)
 
 7.6.27
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
