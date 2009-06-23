@@ -81,7 +81,7 @@ WebGUI::Test->storagesToDelete($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 42;
+my $tests = 44;
 plan tests => 1
             + $tests
             + $canEditMaker->plan
@@ -103,8 +103,13 @@ skip "Unable to load module $class", $tests unless $loaded;
 ok(! WebGUI::Asset::Story->validParent($session), 'validParent: no session asset');
 $session->asset($defaultNode);
 ok(! WebGUI::Asset::Story->validParent($session), 'validParent: wrong type of asset');
+$session->asset(WebGUI::Asset->getRoot($session));
+ok(! WebGUI::Asset::Story->validParent($session), 'validParent: Any old folder is not valid');
 $session->asset($archive);
 ok(  WebGUI::Asset::Story->validParent($session), 'validParent: StoryArchive is valid');
+my $todayFolder = $archive->getFolder();
+$session->asset($todayFolder);
+ok(  WebGUI::Asset::Story->validParent($session), 'validParent: Folder below story archive is valid');
 
 ############################################################
 #

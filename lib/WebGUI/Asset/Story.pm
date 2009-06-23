@@ -606,6 +606,9 @@ sub processPropertiesFromFormPost {
     my $self = shift;
     my $session = $self->session;
     $self->next::method;
+    my $archive = delete $self->{_parent};  ##Force a new lookup.
+    $session->log->warn($self->getParent->get('className'));
+    $session->log->warn($self->getParent->getParent->get('className'));
     my $form    = $session->form;
     ##Handle old data first, to avoid iterating across a newly added photo.
     my $photoData      = $self->getPhotoData;
@@ -620,14 +623,17 @@ sub processPropertiesFromFormPost {
             splice @{ $photoData }, $photoIndex-1, 1;
             next PHOTO;
         }
-        ##Process new uploads
+        ##Process uploads that replace existing photos
         if (my $uploadId = $form->process('newPhoto'.$photoIndex,'File')) {
             my $upload   = WebGUI::Storage->get($session, $uploadId);
             my $storage  = WebGUI::Storage->get($session, $storageId);
             $storage->clear;
             my $filename = $upload->getFiles->[0];
             $storage->addFileFromFilesystem($upload->getPath($filename));
-            $storage->generateThumbnail($filename);
+            my ($width, $height) = $storage->getSizeInPixels($filename);
+            if ($width > $self->getArchive->get('photoWidth')) {
+                $storage->resize($filename, $self->getArchive->get('photoWidth'));
+            }
             $upload->delete;
         }
         my $newPhoto = {
@@ -658,6 +664,7 @@ sub processPropertiesFromFormPost {
         };
     }
     $self->setPhotoData($photoData);
+    $self->{_parent} = $archive;  ##Restore archive, for URL and other calculations
 }
 
 
@@ -833,7 +840,10 @@ This is a class method.
 sub validParent {
     my $class   = shift;
     my $session = shift;
-    return $session->asset && $session->asset->isa('WebGUI::Asset::Wobject::StoryArchive');
+    return $session->asset
+        && (   $session->asset->isa('WebGUI::Asset::Wobject::StoryArchive')
+           || ($session->asset->isa('WebGUI::Asset::Wobject::Folder') && $session->asset->getParent->isa('WebGUI::Asset::Wobject::StoryArchive') )
+           );
 }
 
 #-------------------------------------------------------------------
