@@ -234,18 +234,19 @@ sub toHtml {
         $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->url->extras('yui/build/calendar/calendar-min.js'),{ type=>'text/javascript' });
-        my $firstDow = $self->session->user->profileField("firstDayOfWeek");
-        $self->session->style->setRawHeadTags("<script type=\"text/javascript\">var webguiFirstDayOfWeek = $firstDow</script>");
+        #my $firstDow = $self->session->user->profileField("firstDayOfWeek");
+        #$self->session->style->setRawHeadTags("<script type=\"text/javascript\">var webguiFirstDayOfWeek = $firstDow</script>");
         $self->session->style->setScript($self->session->url->extras('yui-webgui/build/datepicker/datepicker.js'),{ type=>'text/javascript' });
 
-        return WebGUI::Form::Text->new($self->session,
-                name=>$self->get("name"),
-                value=>$value,
-                size=>$self->get("size"),
-                extras=>$self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this);"',
-                id=>$self->get('id'),
-                maxlength=>$self->get("maxlength")
-                )->toHtml;
+        my $field = WebGUI::Form::Text->new($self->session,
+                name      => $self->get("name"),
+                value     => $value,
+                size      => $self->get("size"),
+                extras    => $self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this);"',
+                id        => $self->get('id'),
+                maxlength => $self->get("maxlength"),
+        );
+        return $field->toHtml;
 }
 
 #-------------------------------------------------------------------

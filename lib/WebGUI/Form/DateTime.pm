@@ -236,8 +236,6 @@ sub toHtml {
         $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->url->extras('yui/build/calendar/calendar-min.js'),{ type=>'text/javascript' });
-        my $firstDow = $self->session->user->profileField("firstDayOfWeek");
-        $self->session->style->setRawHeadTags("<script type=\"text/javascript\">window.webguiFirstDayOfWeek = $firstDow</script>");
         $self->session->style->setScript($self->session->url->extras('yui-webgui/build/datepicker/datepicker.js'),{ type=>'text/javascript' });
 
         return WebGUI::Form::Text->new($self->session,
