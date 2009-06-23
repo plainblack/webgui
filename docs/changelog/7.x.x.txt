@@ -14,6 +14,7 @@
  - fixed #10548: Macro RandomAssetProxy failure to be random
  - fixed #10542: AssetVersioning: versionTag/isLockedBy updating
  - fixed: Making Edit Branch forms for list-type metadata.
+ - fixed #10557: create new user - becomes new user
 
 7.6.27
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
