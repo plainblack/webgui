@@ -3,6 +3,7 @@
  - fixed #10564: edit branch progress bar goes kablooey
  - fixed #10565: Survey: add question doing double-create
  - fixed Photo resizing bugs with the Story asset.
+ - Enabled better month and year navigation in the YUI date picker. (Tom Beharrell)
 
 7.7.11
  - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)

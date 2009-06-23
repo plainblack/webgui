@@ -19,7 +19,8 @@ YAHOO.WebGUI.Form.DatePicker = {
             DATE_RANGE_DELIMITER: '/',
             MDY_YEAR_POSITION: 1,
             MDY_MONTH_POSITION: 2,
-            MDY_DAY_POSITION: 3
+            MDY_DAY_POSITION: 3,
+            NAVIGATOR: true
         };
         if (window.webguiFirstDayOfWeek) {
             config.START_WEEKDAY = window.webguiFirstDayOfWeek;
