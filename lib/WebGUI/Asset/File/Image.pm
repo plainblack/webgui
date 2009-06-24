@@ -494,7 +494,6 @@ sub annotate_js {
 
         # next if 3 == $i;
 
-        warn('next');
         $domMe .= qq(
                 <style type="text/css">
                     div#tooltip$i { position: absolute; border:1px solid; }
