@@ -1,4 +1,5 @@
 7.6.29
+ - fixed #10549: EMS import
 
 7.6.28
  - fixed: deploying a package doesn't commit version tag with autocommit on
