@@ -35,12 +35,20 @@ sub evaluate {
     push @constraints, { 'assetId = ?'        => $assetId } if $assetId;
 
     if ($afterAllHistoryEventId) {
+        
         my $table = WebGUI::History->crud_getTableName( $self->session );
-        my $latest
+        
+        # Use Sequence Number rather than dateCreated - works better for tests that create >1 event in 1 sec
+        # Must have a sequenceNumber greater than highest sequenceNumber for afterAllHistoryEventId event (for user)
+        my ($sequenceNumber)
             = $self->session->db->quickScalar(
-            "select max(dateCreated) from $table where historyEventId = ? and userId = ?",
-            [ $historyEventId, $userId ] );
-        push( @constraints, { 'dateCreated > ?' => $latest } ) if $latest;
+            "select max(sequenceNumber) from $table where historyEventId = ? and userId = ?",
+            [ $afterAllHistoryEventId, $userId ] );
+            
+        if ($sequenceNumber) {
+            $self->session->log->debug("Adding sequenceNumber constraint: $sequenceNumber for event $afterAllHistoryEventId userId $userId");
+            push( @constraints, { 'sequenceNumber > ?' => $sequenceNumber } );
+        }
     }
 
     my @ids = @{ WebGUI::History->getAllIds(
