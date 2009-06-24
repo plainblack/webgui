@@ -1298,6 +1298,72 @@ Couldn't open %-s because %-s <br />
         context     => q{Description of asset property},
     },
 
+    'Error getting asset with assetId %s' => {
+        message     => q{Error getting asset with assetId %s},
+        lastUpdated => 0,
+        context     => q{Generic error when an asset cannot be looked up by assetId},
+    },
+
+    'You cannot edit the asset %s, skipping purge' => {
+        message     => q{You cannot edit the asset %s, skipping purge},
+        lastUpdated => 0,
+        context     => q{Generic error when an asset cannot be deleted},
+    },
+
+    'Purging %s' => {
+        message     => q{Purging %s},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Trying to delete system page %s.  Aborting purge' => {
+        message     => q{Trying to delete system page %s.  Aborting purge},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Undefined child' => {
+        message     => q{Trying to delete system page %s.  Aborting purge},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Purging shortcuts' => {
+        message     => q{Purging shortcuts},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Deleting exported files' => {
+        message     => q{Deleting exported files},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Deleting keywords' => {
+        message     => q{Deleting keywords},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Clearing search index' => {
+        message     => q{Clearing search index},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Clearing cache' => {
+        message     => q{Clearing cache},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Clearing asset tables' => {
+        message     => q{Clearing asset tables},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
 };
 
 1;

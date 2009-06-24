@@ -579,25 +579,39 @@ sub requestCommit {
 
 #-------------------------------------------------------------------
 
-=head2 rollback ( )
+=head2 rollback ( [ $options ] )
 
 Eliminates all revisions of all assets created under a specific version tag. Also removes the version tag.
+
+=head3 options
+
+A hashref of options for this method
+
+=head4 outputSub
+
+A subroutine for reporting the status of the rollback.  Typically used by WebGUI::ProgressBar
 
 =cut
 
 sub rollback {
-	my $self = shift;
-	my $tagId = $self->getId;
+	my $self      = shift;
+    my $session   = $self->session;
+    my $options   = shift || {};
+    my $outputSub = exists $options->{outputSub} ? $options->{outputSub} : sub {};
+	my $tagId     = $self->getId;
 	if ($tagId eq "pbversion0000000000001") {
-		$self->session->errorHandler->warn("You cannot rollback a tag that is required for the system to operate.");	
+		$session->errorHandler->warn("You cannot rollback a tag that is required for the system to operate.");	
 		return 0;
 	}
-	my $sth = $self->session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ? order by asset.lineage desc, assetData.revisionDate desc", [ $tagId ]);
-	while (my ($class, $id, $revisionDate) = $sth->array) {
-		my $revision = WebGUI::Asset->new($self->session,$id, $class, $revisionDate);
+	my $sth = $session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ? order by asset.lineage desc, assetData.revisionDate desc", [ $tagId ]);
+    my $i18n    = WebGUI::International->new($session, 'VersionTag');
+	REVISION: while (my ($class, $id, $revisionDate) = $sth->array) {
+		my $revision = WebGUI::Asset->new($session,$id, $class, $revisionDate);
+        next REVISION unless $revision;
+        $outputSub->(sprintf $i18n->get('Rolling back %s'), $revision->getTitle);
 		$revision->purgeRevision;
 	}
-	$self->session->db->write("delete from assetVersionTag where tagId=?", [$tagId]);
+	$session->db->write("delete from assetVersionTag where tagId=?", [$tagId]);
 	$self->clearWorking;
 	return 1;
 }

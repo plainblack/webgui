@@ -7,6 +7,8 @@
  - fixed: Add the user's first day of week data to getWebguiProperties and get rid of some inline javascript in the Data and DateTime forms.
  - fixed #10544: AssetVersioning: child assets versions under uncommitted parent
  - fixed #10549: EMS import
+ - fixed #10561: pb: purge
+ - fixed #10563: pb: rollback version tag
 
 7.7.11
  - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)

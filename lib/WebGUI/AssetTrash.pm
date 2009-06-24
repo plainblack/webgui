@@ -119,15 +119,22 @@ A hash refernece containing options that change the behavior of this method.
 
 A boolean that, if true, will skip dealing with exported files.
 
+=head4 outputSub
+
+A subroutine used to report the status of the purge, most likely used by WebGUI::ProgressBar->update.
+
 =cut
 
 sub purge {
-	my $self = shift;
-	my $options = shift;
-    my $session = $self->session;
+	my $self      = shift;
+	my $options   = shift;
+    my $session   = $self->session;
+    my $outputSub = $options->{outputSub} || sub {};
+    my $i18n      = WebGUI::International->new($session, 'Asset');
 
     # can't delete if it's one of these things
 	if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage") || $self->get("isSystem")) {
+        $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting purge'), $self->getTitle);
         $session->errorHandler->security("delete a system protected page (".$self->getId.")");
         return 0;
     }
@@ -143,26 +150,30 @@ sub purge {
         if (defined $kid) {
             unless ($kid->purge) {
                 $self->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
+                $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting purge'), $self->getTitle);
                 return 0;
             }
         }
         else {
+            $outputSub->($i18n->get('Undefined child'));
 			$session->errorHandler->error("getLineage returned an undefined object in the AssetTrash->purge method.  Unable to purge asset.");
         }
 	}
 
     # Delete shortcuts to this asset
     # Also publish any shortcuts to this asset that are in the trash
+    $outputSub->($i18n->get('Purging shortcuts'));
     my $shortcuts 
         = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { 
             returnObjects   => 1,
         });
     for my $shortcut ( @$shortcuts ) {
-        $shortcut->purge;
+        $shortcut->purge({ outputSub => $outputSub, });
     }
 
     # gotta delete stuff we've exported
 	unless ($options->{skipExported}) {
+        $outputSub->($i18n->get('Deleting exported files'));
 		$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('purgeWorkflow'), 1);
 	}
 
@@ -170,16 +181,20 @@ sub purge {
     my $tagId = $self->get("tagId");
 
     # clean up keywords
+    $outputSub->($i18n->get('Deleting keywords'));
     WebGUI::Keyword->new($session)->deleteKeywordsForAsset($self);
 
     # clean up search engine
+    $outputSub->($i18n->get('Clearing search index'));
     WebGUI::Search::Index->new($self)->delete;
 
     # clean up cache
+    $outputSub->($i18n->get('Clearing cache'));
 	WebGUI::Cache->new($session)->deleteChunk(["asset",$self->getId]);
 	$self->purgeCache;
 
     # delete stuff out of the asset tables
+    $outputSub->($i18n->get('Clearing asset tables'));
 	$session->db->beginTransaction;
 	$session->db->write("delete from metaData_values where assetId = ?",[$self->getId]);
 	foreach my $definition (@{$self->definition($session)}) {
@@ -382,16 +397,27 @@ Purges a piece of content, including all it's revisions, from the system permane
 =cut
 
 sub www_purgeList {
-        my $self = shift;
-        foreach my $id ($self->session->form->param("assetId")) {
-                my $asset = WebGUI::Asset->newPending($self->session,$id);
-                $asset->purge if $asset->canEdit;
+    my $self    = shift;
+    my $session = $self->session;
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    $pb->start($i18n->get('purge'), $session->url->extras('adminConsole/assets.gif'));
+
+    ASSETID: foreach my $id ($session->form->param("assetId")) {
+        my $asset = eval { WebGUI::Asset->newPending($session,$id); };
+        if ($@) {
+            $pb->update(sprintf $i18n->get('Error getting asset with assetId %s'), $id);
+            next ASSETID;
         }
-        if ($self->session->form->process("proceed") ne "") {
-                my $method = "www_".$self->session->form->process("proceed");
-                return $self->$method();
+        if (! $asset->canEdit) {
+            $pb->update(sprintf $i18n->get('You cannot edit the asset %s, skipping purge'), $asset->getTitle);
         }
-        return $self->www_manageTrash();
+        else {
+            $asset->purge({outputSub => sub { $pb->update(@_); } });
+        }
+    }
+    my $method = ($session->form->process("proceed")) ? $session->form->process('proceed') : 'manageTrash';
+    $pb->finish($self->getUrl('func='.$method));
 }
 
 #-------------------------------------------------------------------

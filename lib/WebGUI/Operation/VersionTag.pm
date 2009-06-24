@@ -850,14 +850,16 @@ sub www_rollbackVersionTag {
 	return $session->privilege->adminOnly() unless canView($session);
 	my $tagId = $session->form->process("tagId");
 	return $session->privilege->vitalComponent() if ($tagId eq "pbversion0000000000001");
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $i18n    = WebGUI::International->new($session, 'VersionTag');
+    $pb->start($i18n->get('rollback version tag'), $session->url->extras('adminConsole/versionTags.gif'));
 	if ($tagId) {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		$tag->rollback if defined $tag;
+		$tag->rollback({ outputSub => sub { $pb->update(@_) }, }) if defined $tag;
 	}
-	if ($session->form->process("proceed") eq "manageCommittedVersions") {
-		return www_manageCommittedVersions($session);
-	}
-	return www_manageVersions($session);
+	my $method = $session->form->process("proceed");
+    $method    = $method eq "manageCommittedVersions" ? $method : 'manageVersions';
+    $pb->finish(WebGUI::Asset->getDefault($session)->getUrl('op='.$method));
 }
 
 

@@ -477,6 +477,12 @@ our $I18N = {
         context     => q{Explanation of Permission Denied message},
     },
 
+    "Rolling back %s" => {
+        message     => q{Rolling back %s},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
 };
 
 1;
