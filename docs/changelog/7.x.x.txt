@@ -6,6 +6,7 @@
  - Enabled better month and year navigation in the YUI date picker. (Tom Beharrell)
  - fixed: Add the user's first day of week data to getWebguiProperties and get rid of some inline javascript in the Data and DateTime forms.
  - fixed #10544: AssetVersioning: child assets versions under uncommitted parent
+ - fixed #10549: EMS import
 
 7.7.11
  - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)

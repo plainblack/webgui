@@ -33,7 +33,7 @@ use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Workflow::Instance;
 use Tie::IxHash;
-
+use Data::Dumper;
 
 
 #-------------------------------------------------------------------
@@ -1552,7 +1552,7 @@ $|=1;
 	my $first = 1;
 	if (open my $file, "<", $storage->getPath($filename)) {
 		$out->print("Processing file...\n",1);
-		while (my $line = <$file>) {
+		ROW: while (my $line = <$file>) {
 			if ($first) {
 				$first = 0;
 				if ($ignoreFirst) {
@@ -1581,11 +1581,20 @@ $|=1;
 					next unless isIn($field->{name}, @import);
             		$out->print("\tAdding field ".$field->{label}."\n",1);
 					my $type = $field->{type};
+                    ##Force the use of Form::DateTime and MySQL Format
+                    if ($field->{name} eq 'startDate') {
+                        $type = 'dateTime';
+                        $field->{defaultValue} = '1999-05-24 17:30:00';
+                    }
 					my $value = $validate->$type({
 							name			=> $field->{name},
 							defaultValue	=> $field->{defaultValue},
 							options			=> $field->{options},
 							},$row[$i]);
+                    if ($field->{name} eq 'startDate' && !$value) {
+                        $out->print('Skipping event on line '.$line.' due to bad date format');
+                        next ROW;
+                    }
 					if ($field->{isMeta}) {
 						$metadata->{$field->{label}} = $value;
 					}
