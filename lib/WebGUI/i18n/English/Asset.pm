@@ -1304,10 +1304,10 @@ Couldn't open %-s because %-s <br />
         context     => q{Generic error when an asset cannot be looked up by assetId},
     },
 
-    'You cannot edit the asset %s, skipping purge' => {
-        message     => q{You cannot edit the asset %s, skipping purge},
+    'You cannot edit the asset %s, skipping' => {
+        message     => q{You cannot edit the asset %s, skipping},
         lastUpdated => 0,
-        context     => q{Generic error when an asset cannot be deleted},
+        context     => q{Generic error when an asset cannot be edited},
     },
 
     'Purging %s' => {
@@ -1316,8 +1316,8 @@ Couldn't open %-s because %-s <br />
         context     => q{},
     },
 
-    'Trying to delete system page %s.  Aborting purge' => {
-        message     => q{Trying to delete system page %s.  Aborting purge},
+    'Trying to delete system page %s.  Aborting' => {
+        message     => q{Trying to delete system page %s.  Aborting},
         lastUpdated => 0,
         context     => q{},
     },

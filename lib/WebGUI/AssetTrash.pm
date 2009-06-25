@@ -134,7 +134,7 @@ sub purge {
 
     # can't delete if it's one of these things
 	if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage") || $self->get("isSystem")) {
-        $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting purge'), $self->getTitle);
+        $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
         $session->errorHandler->security("delete a system protected page (".$self->getId.")");
         return 0;
     }
@@ -174,7 +174,7 @@ sub purge {
     # gotta delete stuff we've exported
 	unless ($options->{skipExported}) {
         $outputSub->($i18n->get('Deleting exported files'));
-		$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('purgeWorkflow'), 1);
+		$self->_invokeWorkflowOnExportedFiles($session->setting->get('purgeWorkflow'), 1);
 	}
 
     # gonna need this at the end
@@ -218,36 +218,59 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 trash ( )
+=head2 trash ( $options )
 
 Removes asset from lineage, places it in trash state. The "gap" in the 
 lineage is changed in state to trash-limbo.
 
+=head3 $options
+
+An optional hashref of options
+
+=head4 outputSub
+
+A subroutine used to report the status of the purge, most likely used by WebGUI::ProgressBar->update.
+
 =cut
 
 sub trash {
-    my $self = shift;
-    return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get('isSystem'));
+    my $self      = shift;
+	my $options   = shift;
+    my $session   = $self->session;
+    my $outputSub = $options->{outputSub} || sub {};
+    my $i18n      = WebGUI::International->new($session, 'Asset');
+
+    if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage") || $self->get('isSystem')) {
+        $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
+        $session->errorHandler->security("delete a system protected page (".$self->getId.")");
+        return undef;
+    }
+
+    $outputSub->($i18n->get('Deleting exported files'));
     foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
-        $asset->_invokeWorkflowOnExportedFiles($self->session->setting->get('trashWorkflow'), 1);
+        $asset->_invokeWorkflowOnExportedFiles($session->setting->get('trashWorkflow'), 1);
     }
 
     # Trash any shortcuts to this asset
     my $shortcuts 
-        = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { returnObjects => 1});
+        = WebGUI::Asset::Shortcut->getShortcutsForAssetId($session, $self->getId, { returnObjects => 1});
+    $outputSub->($i18n->get('Purging shortcuts'));
     for my $shortcut ( @$shortcuts ) {
-        $shortcut->trash;
+        $shortcut->trash({ outputSub => $outputSub, });
     }
 
     # Raw database work is more efficient than $asset->update
-    my $db = $self->session->db;
+    my $db = $session->db;
     $db->beginTransaction;
     my $sth = $db->read("select assetId from asset where lineage like ?",[$self->get("lineage").'%']);
+    $outputSub->($i18n->get('Clearing search index'));
     while (my ($id) = $sth->array) {
         $db->write("delete from assetIndex where assetId=?",[$id]);
     }
+
+    $outputSub->($i18n->get('Clearing asset tables'));
     $db->write("update asset set state='trash-limbo' where lineage like ?",[$self->get("lineage").'%']);
-    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$self->session->user->userId, $self->session->datetime->time(), $self->getId]);
+    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$session->user->userId, $session->datetime->time(), $self->getId]);
     $db->commit;
 
     # Update ourselves since we didn't use update()
@@ -303,18 +326,28 @@ Moves list of assets to trash, returns www_manageAssets() method of self if canE
 =cut
 
 sub www_deleteList {
-	my $self = shift;
-	foreach my $assetId ($self->session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newPending($self->session,$assetId);
-		if ($asset->canEdit && $asset->canEditIfLocked) {
-			$asset->trash;
-		}
-	}
-	if ($self->session->form->process("proceed") ne "") {
-                my $method = "www_".$self->session->form->process("proceed");
-                return $self->$method();
+	my $self     = shift;
+    my $session  = $self->session;
+    my $pb       = WebGUI::ProgressBar->new($session);
+    my $i18n     = WebGUI::International->new($session, 'Asset');
+    my $form     = $session->form;
+    my @assetIds = $form->param('assetId');
+    $pb->start($i18n->get('Delete Assets'), $session->url->extras('adminConsole/assets.gif'));
+	ASSETID: foreach my $assetId (@assetIds) {
+        my $asset = eval { WebGUI::Asset->newPending($session,$assetId); };
+        if ($@) {
+            $pb->update(sprintf $i18n->get('Error getting asset with assetId %s'), $assetId);
+            next ASSETID;
         }
-	return $self->www_manageAssets();
+		if (! ($asset->canEdit && $asset->canEditIfLocked) ) {
+            $pb->update(sprintf $i18n->get('You cannot edit the asset %s, skipping'), $asset->getTitle);
+		}
+        else {
+			$asset->trash({outputSub => sub { $pb->update(@_); } });
+        }
+	}
+    my $method = ($session->form->process("proceed")) ? $session->form->process('proceed') : 'manageTrash';
+    $pb->finish($self->getUrl('func='.$method));
 }
 
 
@@ -410,7 +443,7 @@ sub www_purgeList {
             next ASSETID;
         }
         if (! $asset->canEdit) {
-            $pb->update(sprintf $i18n->get('You cannot edit the asset %s, skipping purge'), $asset->getTitle);
+            $pb->update(sprintf $i18n->get('You cannot edit the asset %s, skipping'), $asset->getTitle);
         }
         else {
             $asset->purge({outputSub => sub { $pb->update(@_); } });

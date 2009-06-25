@@ -9,6 +9,7 @@
  - fixed #10549: EMS import
  - fixed #10561: pb: purge
  - fixed #10563: pb: rollback version tag
+ - fixed #10562: pb: delete
 
 7.7.11
  - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)
