@@ -334,37 +334,6 @@ sub www_manage {
     ### Do Action
     my @assetIds    = $session->form->get( 'assetId' );
 
-    if ( $session->form->get( 'action_delete' ) ) {
-        for my $assetId ( @assetIds ) {
-            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-            next unless $asset;
-            $asset->trash;
-        }
-    }
-    elsif ( $session->form->get( 'action_cut' ) ) {
-        for my $assetId ( @assetIds ) {
-            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-            next unless $asset;
-            $asset->cut;
-        }
-    }
-    elsif ( $session->form->get( 'action_copy' ) ) {
-        for my $assetId ( @assetIds ) {
-            # Copy == Duplicate + Cut
-            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId);
-            my $newAsset    = $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
-            $newAsset->update( { title => $newAsset->getTitle . ' (copy)' } );
-            $newAsset->cut;
-        }
-    }
-    elsif ( $session->form->get( 'action_duplicate' ) ) {
-        for my $assetId ( @assetIds ) {
-            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-            next unless $asset;
-            $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
-        }
-    }
-
     # Handle autocommit workflows
     if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
         allowComments   => 1,
@@ -428,24 +397,25 @@ ENDHTML
     $output .= '</ol>';
     
     ### The page of assets
-    $output         .= q{<div>}
-                    . q{<form method="post" enctype="multipart/form-data">}
-                    . q{<input type="hidden" name="op"      value="assetManager" />}
-                    . q{<input type="hidden" name="method"  value="manage" />}
-                    . q{<div id="dataTableContainer">}
-                    . q{</div>} 
-                    . q{<p class="actions">} . $i18n->get( 'with selected' )
-                    . q{<input type="submit" name="action_update" value="} . $i18n->get( "update" ) . q{" onclick="this.form.method.value='setRanks'; this.form.submit();" />}
-                    . q{<input type="submit" name="action_delete" value="} . $i18n->get( "delete" ) . q{" onclick="return confirm('} . $i18n->get( 43 ) . q{')" />}
-                    . q{<input type="submit" name="action_cut" value="} . $i18n->get( 'cut' ) . q{" />}
-                    . q{<input type="submit" name="action_copy" value="} . $i18n->get( "Copy" ) . q{" />}
-                    . q{<input type="submit" name="action_duplicate" value="} . $i18n->get( "duplicate" ) . q{" />}
-                    . q{</p>}
-                    . q{</form>}
-                    . q{<div id="pagination"> } 
-                    . q{</div>}
-                    . q{</div>}
-                    ;
+    $output         .= sprintf <<EOHTML, $session->asset->getUrl, $i18n->get( 'with selected' ), $i18n->get( "update" ), $i18n->get( "delete" ), $i18n->get( '43' ), $i18n->get( 'cut' ), $i18n->get( "Copy" ), $i18n->get( "duplicate" );
+<div>
+<form method="post" enctype="multipart/form-data" action="%s">
+<input type="hidden" name="func"    value="manageAssets" />
+<input type="hidden" name="proceed" value="manageAssets" />
+<div id="dataTableContainer">
+</div>
+<p class="actions"> %s 
+<input type="submit" name="action_update" value="%s" onclick="this.form.func.value='setRanks'; this.form.submit();" />
+<input type="submit" name="action_delete" value="%s" onclick="if( confirm('%s')){ alert('true'); this.form.func.value='deleteList'; alert(this.form.func.value); this.form.submit(); }{ return false; }" />
+<input type="submit" name="action_cut" value="%s" onclick="this.form.func.value='cutList'; this.form.submit();"/>
+<input type="submit" name="action_copy" value="%s"  onclick="this.form.func.value='copyList'; this.form.submit();"/>
+<input type="submit" name="action_duplicate" value="%s"  onclick="this.form.func.value='duplicateList'; this.form.submit();"/>
+</p>
+</form>
+<div id="pagination">
+</div>
+</div>
+EOHTML
     
     ### Clearing div
     $output         .= q{<div style="clear: both;">&nbsp;</div>};
@@ -761,42 +731,6 @@ sub www_search {
 
     return $ac->render( $output );
 }
-
-#-------------------------------------------------------------------
-
-=head2 www_setRanks ( )
-
-Utility method for the AssetManager.  Reorders 1 pagefull of assets via rank.
-
-If the current user cannot edit the current asset, it returns the insufficient privileges page.
-
-Returns the user to the manage assets screen.
-
-=cut
-
-sub www_setRanks {
-    my $session = shift;
-    return $session->privilege->insufficient() unless $session->asset->canEdit;
-    my $i18n    = WebGUI::International->new($session, 'Asset');
-    my $pb      = WebGUI::ProgressBar->new($session);
-    my $form    = $session->form;
-
-    $pb->start($i18n->get('Set Rank'), $session->url->extras('adminConsole/assets.gif'));
-    my @assetIds    = $form->get( 'assetId' );
-    ASSET: for my $assetId ( @assetIds ) {
-        my $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-        next ASSET unless $asset;
-        my $rank   = $form->get( $assetId . '_rank' );
-        next ASSET unless $rank; # There's no such thing as zero
-
-        $asset->setRank( $rank, sub { $pb->update(sprintf $i18n->get(shift), shift); } );
-    }
-
-    $pb->finish($session->asset->getManagerUrl);
-    return "redirect";
-    #return $www_manageAssets();
-}
-
 
 
 1;

@@ -1015,6 +1015,43 @@ sub www_setRank {
 	return $self->getParent->www_manageAssets();
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_setRanks ( )
+
+Utility method for the AssetManager.  Reorders 1 pagefull of assets via rank.
+
+If the current user cannot edit the current asset, it returns the insufficient privileges page.
+
+Returns the user to the manage assets screen.
+
+=cut
+
+sub www_setRanks {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $session->asset->canEdit;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $form    = $session->form;
+
+    $pb->start($i18n->get('Set Rank'), $session->url->extras('adminConsole/assets.gif'));
+    my @assetIds    = $form->get( 'assetId' );
+    ASSET: for my $assetId ( @assetIds ) {
+        my $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        next ASSET unless $asset;
+        my $rank   = $form->get( $assetId . '_rank' );
+        next ASSET unless $rank; # There's no such thing as zero
+
+        $asset->setRank( $rank, sub { $pb->update(sprintf $i18n->get(shift), shift); } );
+    }
+
+    $pb->finish($session->asset->getManagerUrl);
+    return "redirect";
+    #return $www_manageAssets();
+}
+
+
 
 1;
 
