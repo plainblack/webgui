@@ -406,7 +406,7 @@ ENDHTML
 </div>
 <p class="actions"> %s 
 <input type="submit" name="action_update" value="%s" onclick="this.form.func.value='setRanks'; this.form.submit();" />
-<input type="submit" name="action_delete" value="%s" onclick="if( confirm('%s')){ alert('true'); this.form.func.value='deleteList'; alert(this.form.func.value); this.form.submit(); }{ return false; }" />
+<input type="submit" name="action_delete" value="%s" onclick="if( confirm('%s')){ this.form.func.value='deleteList'; this.form.submit(); }{ return false; }" />
 <input type="submit" name="action_cut" value="%s" onclick="this.form.func.value='cutList'; this.form.submit();"/>
 <input type="submit" name="action_copy" value="%s"  onclick="this.form.func.value='copyList'; this.form.submit();"/>
 <input type="submit" name="action_duplicate" value="%s"  onclick="this.form.func.value='duplicateList'; this.form.submit();"/>
