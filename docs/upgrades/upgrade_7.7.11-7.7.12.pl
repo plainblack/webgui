@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 surveyCleanUp($session);
+addUTCMacro($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addUTCMacro {
+    my $session = shift;
+    print "\tAdd ConvertUTCToTZ Macro to config files... " unless $quiet;
+    # and here's our code
+    $session->config->addToHash('macros', 'ConvertUTCToTZ', 'ConvertUTCToTZ' );
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub surveyCleanUp {
