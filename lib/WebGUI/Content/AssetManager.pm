@@ -334,16 +334,6 @@ sub www_manage {
     ### Do Action
     my @assetIds    = $session->form->get( 'assetId' );
 
-#    if ( $session->form->get( 'action_update' ) ) {
-#        for my $assetId ( @assetIds ) {
-#            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-#            next unless $asset;
-#            my $rank        = $session->form->get( $assetId . '_rank' );
-#            next unless $rank; # There's no such thing as zero
-#
-#            $asset->setRank( $rank );
-#        }
-#    }
     if ( $session->form->get( 'action_delete' ) ) {
         for my $assetId ( @assetIds ) {
             my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
@@ -407,13 +397,11 @@ sub www_manage {
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
 
-    my $extras      = $session->url->extras;
     $session->style->setRawHeadTags( <<ENDHTML );
     <link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.6.0/build/logger/assets/skins/sam/logger.css">
     <script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/logger/logger-min.js"></script> 
 
-<script type="text/javascript">
-        WebGUI.AssetManager.extrasUrl   = '$extras';
+    <script type="text/javascript">
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
 ENDHTML
@@ -442,8 +430,8 @@ ENDHTML
     ### The page of assets
     $output         .= q{<div>}
                     . q{<form method="post" enctype="multipart/form-data">}
-                    . q{<input type="hidden" name="op" value="assetManager" />}
-                    . q{<input type="hidden" name="method" value="manage" />}
+                    . q{<input type="hidden" name="op"      value="assetManager" />}
+                    . q{<input type="hidden" name="method"  value="manage" />}
                     . q{<div id="dataTableContainer">}
                     . q{</div>} 
                     . q{<p class="actions">} . $i18n->get( 'with selected' )
