@@ -20,6 +20,7 @@ use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 use WebGUI::Form::Country;
+use WebGUI::VersionTag;
 use Text::CSV_XS;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
@@ -671,7 +672,8 @@ sub www_editSurvey {
     
     return $self->session->privilege->insufficient()
         if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
-
+    
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
     return $self->processTemplate( {}, $self->get('surveyEditTemplateId') );
 }
 
@@ -751,6 +753,22 @@ sub www_graph {
     return $ac->render($f->print . $output, $i18n->get('survey visualization'));
 }
 
+=head2 hasResponses
+
+Returns true if this Survey instance revision has any responses (started, finished or otherwise)
+associated with it
+
+=cut
+
+sub hasResponses {
+    my $self = shift;
+    my $session = $self->session;
+    
+    return $self->session->db->quickScalar(
+        'select count(*) from Survey_response where assetId = ? and revisionDate = ?',
+        [ $self->getId, $self->get('revisionDate') ] ) > 0;
+}
+
 #-------------------------------------------------------------------
 
 =head2 submitObjectEdit ( $params )
@@ -771,22 +789,31 @@ these special actions will be carried out by delegating to e.g. L<deleteObject>,
 sub submitObjectEdit {
     my $self = shift;
     my $params = shift || {};
+    my $session = $self->session;
 
     # Id is made up of at most: sectionIndex-questionIndex-answerIndex
     my @address = split /-/, $params->{id};
 
-    # We will create a new revision if any responses exist for the current revision
-    my $responses
-        = $self->session->db->quickScalar(
-        'select count(*) from Survey_response where assetId = ? and revisionDate = ?',
-        [ $self->getId, $self->get('revisionDate') ] );
-
     # Get a reference to the Survey instance that we want to perform updates on
     my $survey = $self;
-    if ($responses) {
-        $self->session->log->debug( "Creating a new revision, $responses responses exist for the current revision "
+    
+    # We will create a new revision if any responses exist for the current revision
+    if ($self->hasResponses) {
+        $self->session->log->debug( "Creating a new revision, responses exist for the current revision: "
                 . $self->get('revisionDate') );
+        
+        # New revision should be created and then committed automatically
+        my $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'noCreate');
+        my $newVersionTag = WebGUI::VersionTag->create($session, { workflowId => 'pbworkflow00000000003', });
+        $newVersionTag->setWorking;
+        
+        # Create the new revision
         $survey = $self->addRevision;
+        
+        $newVersionTag->commit();
+        
+        #Restore the old one, if it exists
+        $oldVersionTag->setWorking() if $oldVersionTag;
     }
 
     # See if any special actions were requested..
@@ -828,6 +855,9 @@ sub www_submitObjectEdit {
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
+    return $self->session->privilege->locked()
+        unless $self->canEditIfLocked;
+    
     return $self->submitObjectEdit( $self->session->form->paramsHashRef );
 }
 
