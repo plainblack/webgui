@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.29
+--------------------------------------------------------------------
+   * Due to changes in the userSession database table, you must upgrade
+     to 7.6.29 before upgrading beyond this version.
 
 7.6.26
 --------------------------------------------------------------------

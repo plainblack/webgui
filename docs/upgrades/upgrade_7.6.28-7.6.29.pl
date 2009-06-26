@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addSessionTokenId($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,18 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addSessionTokenId {
+    my $session = shift;
+    print "\tAdding CSRF token to session, if needed... " unless $quiet;
+    my $sth = $session->db->read('describe userSession tokenId');
+    if (! defined $sth->hashRef) {
+        $session->db->write(q|ALTER TABLE userSession ADD COLUMN tokenId CHAR(22)|);
+    }
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
