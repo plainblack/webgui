@@ -1,4 +1,5 @@
 7.7.13
+ - fixed #10574: Creating Calendar Entry
 
 7.7.12
  - Updated auth to allow sending back of non-text/html mime types.

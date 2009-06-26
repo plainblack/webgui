@@ -2,6 +2,7 @@ YAHOO.namespace('WebGUI.Form');
 YAHOO.WebGUI.Form.DatePicker = {
     init: function() {
         this.time = {};
+        this.codeSelect = false;
         var container = document.createElement('div');
         YAHOO.util.Dom.setStyle(container, 'font-size', '9pt');
         YAHOO.util.Dom.setStyle(container, 'position', 'absolute');
@@ -143,9 +144,11 @@ YAHOO.WebGUI.Form.DatePicker = {
                 this.min = '00';
             if (!this.sec)
                 this.sec = '00';
-            this.hourEl.value = this.hour;
-            this.minuteEl.value = this.min;
-            this.secEl.value = this.sec;
+            if (this.useTime) {
+                this.hourEl.value = this.hour;
+                this.minuteEl.value = this.min;
+                this.secEl.value = this.sec;
+            }
             this.calendar.select(date);
             var selectedDates = this.calendar.getSelectedDates();
             if (selectedDates.length > 0) {
