@@ -39,7 +39,7 @@ These methods are available from this class:
 
 =head2 addMetaDataField ( )
 
-Adds a field to the metadata system.
+Adds a new field to the metadata system, or edit an existing one.
 
 =head3 fieldId
 
