@@ -8,6 +8,11 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+7.7.13
+--------------------------------------------------------------------
+   * Due to changes in the userSession database table, you must upgrade
+     to 7.7.13 before upgrading to 7.7.14 or beyond.
+
 7.7.8
 --------------------------------------------------------------------
    * A basic behavior of the Inbox has been changed.  If a message is
