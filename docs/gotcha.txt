@@ -13,6 +13,12 @@ save you many hours of grief.
    * Due to changes in the userSession database table, you must upgrade
      to 7.7.13 before upgrading to 7.7.14 or beyond.
 
+   * WebGUI has allowed metadata possible values to be processed differently
+     by Posts than from other Assets.  This causes problems when metadata is
+     shared between Posts and other Assets.  To rememdy this, all metadata
+     possible values are being moved into the standard "pipe format", and
+     the Post will no longer process data in the other format.
+
 7.7.8
 --------------------------------------------------------------------
    * A basic behavior of the Inbox has been changed.  If a message is
@@ -125,7 +131,9 @@ save you many hours of grief.
      Tags field.  Extra Head Tags are now added for all templates and
      assets included on a page, except for Style templates, which do
      not have Extra Head Tags.  Existing Extra Head Tags for Style
-     templates have been removed.
+     templates will be lost.  If your current Style template uses
+     the Head Block please put any content from there directly into your
+     style template inside the <head></head> tags.
 
    * Web Services Client is no longer part of the official distribution of
      WebGUI, but is still available to be maintained by third-parties. However,

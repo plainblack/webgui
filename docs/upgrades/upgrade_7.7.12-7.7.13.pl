@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addSessionTokenId($session);
+correctPostMetaData($session);
 
 finish($session); # this line required
 
@@ -46,7 +47,6 @@ finish($session); # this line required
 #}
 
 #----------------------------------------------------------------------------
-# Describe what our function does
 sub addSessionTokenId {
     my $session = shift;
     print "\tAdding CSRF token to userSession, if needed... " unless $quiet;
@@ -55,6 +55,28 @@ sub addSessionTokenId {
         $session->db->write(q|ALTER TABLE userSession ADD COLUMN tokenId CHAR(22)|);
     }
     # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub correctPostMetaData {
+    my $session = shift;
+    my $root = WebGUI::Asset->getRoot($session);
+    print "\tPutting metadata associated with posts into the standard metadata possibleValues format... " unless $quiet;
+    # and here's our code
+    my $meta = $root->getMetaDataFields();
+    FIELD: foreach my $field (keys %{ $meta }) {
+        next FIELD unless $meta->{$field}->{possibleValues} && $meta->{$field}->{possibleValues} =~ m/\}/;
+        my $values = WebGUI::Operation::Shared::secureEval($session, $meta->{$field}->{possibleValues});
+        next FIELD unless ref $values eq 'HASH';
+        my $newValues = '';
+        while (my ($key, $value) = each %{ $values }) {
+            $newValues .= join '|', $key, $value;
+            $newValues .= "\n";
+        }
+        print "\n\t\tUpdating ".$meta->{$field}->{fieldName};
+        $root->addMetaDataField(@{ $meta->{$field} }{ qw/fieldId fieldName defaultValue description fieldType/ }, $newValues);
+    }
     print "DONE!\n" unless $quiet;
 }
 
