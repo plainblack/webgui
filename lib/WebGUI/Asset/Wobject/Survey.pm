@@ -2828,6 +2828,10 @@ sub www_runTest {
     my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $testId)
         or return $self->www_editTestSuite('Unable to find test');
     
+    # Remove any in-progress reponses for current user
+    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ? and isComplete = 0',
+        [ $self->getId, $self->session->user->userId() ] );
+    
     my $result = $test->run or return $self->www_editTestSuite('Unable to run test');
     
     my $tap = $result->{tap} or return $self->www_editTestSuite('Unable to determine test result');
