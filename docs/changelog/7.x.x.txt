@@ -1,3 +1,5 @@
+7.6.30
+
 7.6.29
  - fixed #10549: EMS import
  - fixed #10574: Creating Calendar Entry
