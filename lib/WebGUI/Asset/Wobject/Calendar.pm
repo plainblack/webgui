@@ -671,11 +671,22 @@ TODO: Allow WebGUI::DateTime objects to be passed as the parameters.
 
 This is the main API method to get events from a calendar, so it must be flexible.
 
-C<options> is a hash reference with the following keys:
+=head3 startDate
 
- order                  - The order to return the events. Will default to the
-                        sortEventsBy asset property. Valid values are:
-                        'time', 'sequenceNumber'
+A date with optional time in MySQL format.
+
+=head3 endDate
+
+A date with optional time in MySQL format.
+
+=head3 options
+
+A hash reference with any the following keys and values:
+
+=head4 order
+
+The order to return the events. Will default to the sortEventsBy asset property.
+Valid values are: 'time', 'sequenceNumber'
 
 =cut
 
@@ -698,21 +709,23 @@ sub getEventsIn {
     
     # Create objects and adjust for timezone
     
+    warn "start: $start\n";
+    warn "end: $end\n";
     my ($startDate,$startTime)    = split / /, $start;
     my ($endDate,$endTime)        = split / /, $end;
     
     #use Data::Dumper;
     #$self->session->errorHandler->warn( Dumper [caller(1), caller(2), caller(3)] );
-    my $startTz  = WebGUI::DateTime->new($self->session, mysql => $start, time_zone => $tz)
-                    ->set_time_zone("UTC")->toMysql;
-    my $endTz    = WebGUI::DateTime->new($self->session, mysql => $end, time_zone => $tz)
-                    ->set_time_zone("UTC")->toMysql;
+    my $startTz  = WebGUI::DateTime->new($self->session, mysql => $start, time_zone => $tz)->set_time_zone("UTC")->toMysql;
+    my $endTz    = WebGUI::DateTime->new($self->session, mysql => $end, time_zone => $tz)->set_time_zone("UTC")->toMysql;
+    warn $startTz;
+    warn $endTz;
     
     my $where    
         = qq{ 
                 ( 
-                    Event.startTime IS NULL 
-                    && Event.endTime IS NULL 
+                       Event.startTime IS NULL 
+                    && Event.endTime   IS NULL 
                     && 
                         !(
                             Event.startDate >= '$endDate' 
@@ -720,7 +733,7 @@ sub getEventsIn {
                         )
                 ) 
                 || ( 
-                    CONCAT(Event.startDate,' ',Event.startTime) >= '$startTz' 
+                       CONCAT(Event.startDate,' ',Event.startTime) >= '$startTz' 
                     && CONCAT(Event.startDate,' ',Event.startTime) < '$endTz'
                 )
         };
@@ -1738,7 +1751,7 @@ sub wrapIcal {
     $text       =~ s/([,;\\])/\\$1/g;
     $text       =~ s/\n/\\n/g;
     
-    my @text    = ($text =~ m/.{0,75}/g);
+    my @text    = ($text =~ m/.{1,75}/g);
     return join "\r\n ",@text;
 }
 

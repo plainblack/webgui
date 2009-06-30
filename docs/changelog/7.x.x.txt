@@ -1,6 +1,7 @@
 7.7.13
  - fixed #10574: Creating Calendar Entry
  - fixed #10522: Metadata value & label problem
+ - fixed #10594: iCal title display error.
 
 7.7.12
  - Updated auth to allow sending back of non-text/html mime types.

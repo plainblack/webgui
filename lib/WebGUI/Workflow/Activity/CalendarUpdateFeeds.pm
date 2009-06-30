@@ -121,7 +121,6 @@ sub execute {
                     [$session->getId,$feed->{assetId},"SPECTRE"]);
             }
             #/KLUDGE
-            #warn "FEED URL: ".$feed->{url} ."\n";
 
             ## Somebody point me to a DECENT iCalendar parser...
             # Text::vFile perhaps?
@@ -148,10 +147,10 @@ sub execute {
 
             my $active      = 0;    # Parser on/off
             my %current_event   = ();
-            my $current_entry   = "";
             my %events;
             my $line_number     = 0;
-            for my $line (split /[\r\n]+/,$data) {
+            $data =~ s/[ \t]?[\r\n]+[ \t]+/ /msg; #Process line continuations
+            LINE: for my $line (split /[\r\n]+/,$data) {
                 chomp $line;
                 $line_number++;
                 next unless $line =~ /\w/;
@@ -160,6 +159,7 @@ sub execute {
                 
                 if ($line =~ /^BEGIN:VEVENT$/i) {
                     $active = 1;
+                    next LINE;
                 }
                 elsif ($line =~ /^END:VEVENT$/i) {
                     $active = 0;
@@ -169,15 +169,12 @@ sub execute {
                     $events{$uid} = {%current_event};
                     $self->session->log->info( "Found event $uid from feed " . $feed->{feedId} );
                     %current_event  = ();
-                }
-                elsif ($line =~ /^ /) {
-                    # Add to entry data
-                    $current_entry .= substr $line, 1;
+                    next LINE;
                 }
                 else {
                     # Flush old entry
                     # KEY;ATTRIBUTE=VALUE;ATTRIBUTE=VALUE:KEYVALUE
-                    my ($key_attrs,$value) = split /:/,$current_entry,2;
+                    my ($key_attrs,$value) = split /:/,$line,2;
                     my @attrs   = $key_attrs ? (split /;/, $key_attrs) : ();
                     my $key     = shift @attrs;
                     my %attrs;
@@ -186,13 +183,7 @@ sub execute {
                         $attrs{lc $attr_key} = $attr_value;
                     }
                     
-                    # Unescape value
-                    
-                    
                     $current_event{lc $key} = [\%attrs,$value];
-                    
-                    # Start new entry
-                    $current_entry  = $line;
                 }
             }
             
@@ -330,23 +321,24 @@ sub execute {
                 }
                 
                 # If there are X-WebGUI-* fields
-                for my $key (grep /^X-WEBGUI-/, keys %{$events{$id}}) {
+                for my $key (grep /^x-webgui-/, keys %{$events{$id}}) {
                     my $property_name   = $key;
-                    $property_name  =~ s/^X-WEBGUI-//;
+                    $property_name  =~ s/^x-webgui-//;
+                    $property_name  = lc $property_name;
                     
-                    if (lc $property_name eq "groupidedit")
+                    if ($property_name eq "groupidedit")
                     {
                         $properties->{groupIdEdit} = $events{$id}->{$key}->[1];
                     }
-                    elsif (lc $property_name eq "groupidview")
+                    elsif ($property_name eq "groupidview")
                     {
                         $properties->{groupIdView} = $events{$id}->{$key}->[1];
                     }
-                    elsif (lc $property_name eq "url")
+                    elsif ($property_name eq "url")
                     {
                         $properties->{url} = $events{$id}->{$key}->[1];
                     }
-                    elsif (lc $property_name eq "menutitle")
+                    elsif ($property_name eq "menutitle")
                     {
                         $properties->{menuTitle} = $events{$id}->{$key}->[1];
                     }
@@ -538,7 +530,7 @@ sub _icalToMySQL {
 
 sub _unwrapIcalText {
     my $text = shift;
-    $text =~ s/\\([.;\\])/$1/g;
+    $text =~ s/\\([,;\\])/$1/g;
     return $text;
 }
 
