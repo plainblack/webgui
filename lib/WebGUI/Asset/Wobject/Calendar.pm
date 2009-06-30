@@ -709,8 +709,6 @@ sub getEventsIn {
     
     # Create objects and adjust for timezone
     
-    warn "start: $start\n";
-    warn "end: $end\n";
     my ($startDate,$startTime)    = split / /, $start;
     my ($endDate,$endTime)        = split / /, $end;
     
@@ -718,8 +716,6 @@ sub getEventsIn {
     #$self->session->errorHandler->warn( Dumper [caller(1), caller(2), caller(3)] );
     my $startTz  = WebGUI::DateTime->new($self->session, mysql => $start, time_zone => $tz)->set_time_zone("UTC")->toMysql;
     my $endTz    = WebGUI::DateTime->new($self->session, mysql => $end, time_zone => $tz)->set_time_zone("UTC")->toMysql;
-    warn $startTz;
-    warn $endTz;
     
     my $where    
         = qq{ 
