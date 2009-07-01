@@ -14,12 +14,44 @@ use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to test the creation of Calendar Wobjects.
 
+my @icalWrapTests = (
+    {
+        in      => 'Text is passed through with no problems',
+        out     => 'Text is passed through with no problems',
+        comment => 'Text passed through with no problems',
+    },
+    {
+        in      => ',Escape more than one, multiple, commas,',
+        out     => '\,Escape more than one\, multiple\, commas\,',
+        comment => 'escape commas',
+    },
+    {
+        in      => ';Escape more than one; multiple; semicolons;',
+        out     => '\;Escape more than one\; multiple\; semicolons\;',
+        comment => 'escape semicolons',
+    },
+    {
+        in      => "lots\nand\nlots\nof\nnewlines\n",
+        out     => 'lots\\nand\\nlots\\nof\\nnewlines\\n',
+        comment => 'escape newlines',
+    },
+    {
+                   #         1         2         3         4         5         6         7   V
+                   #12345678901234567890123456789012345678901234567890123456789012345678901234567890
+        in      => "There's not a day goes by I don't feel regret. Not because I'm in here, or because you think I should. I look back on the way I was then: a young, stupid kid who committed that terrible crime. I want to talk to him.",
+        out     => "There's not a day goes by I don't feel regret. Not because I'm in here\\,\r\n or because you think I should. I look back on the way I was then: a\r\n young\\, stupid kid who committed that terrible crime. I want to talk to\r\n him.",
+        comment => 'basic wrapping',
+    },
+);
+
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 5; # increment this value for each test you create
+use Test::More;
 use Test::Deep;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
+
+plan tests => 5 + scalar @icalWrapTests;
 
 my $session = WebGUI::Test->session;
 
@@ -74,6 +106,20 @@ cmp_deeply(
     },
     'Variables returned by appendTemplateVarsDateTime'
 );
+
+################################################################
+#
+# wrapIcal
+#
+################################################################
+
+#Any old calendar will do for these tests.
+
+foreach my $test (@icalWrapTests) {
+    my ($in, $out, $comment) = @{ $test }{ qw/in out comment/ };
+    my $wrapOut = $cal->wrapIcal($in);
+    is ($wrapOut, $out, $comment);
+}
 
 TODO: {
         local $TODO = "Tests to make later";

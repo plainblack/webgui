@@ -1,4 +1,5 @@
 7.6.30
+ - fixed #10602: Calendar feed importing extra characters.
 
 7.6.29
  - fixed #10549: EMS import

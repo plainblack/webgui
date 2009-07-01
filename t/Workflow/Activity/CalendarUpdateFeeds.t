@@ -25,7 +25,7 @@ if (!$ENV{WEBGUI_LIVE}) {
     plan skip_all => 'No website available';
 }
 else {
-    plan tests => 10; # increment this value for each test you create
+    plan tests => 14; # increment this value for each test you create
 }
 
 my $session = WebGUI::Test->session;
@@ -54,7 +54,7 @@ my $party = $sender->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'WebGUI 100th Anniversary',
     menuTitle   => 'Anniversary',
-    description => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum', ##Set at longer than 72 characters to test for line wrapping
+    description => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum', ##Set at longer than 72 characters to test for line wrapping, and character escaping
     url         => 'webgui_anniversary',
     startDate   => $dt->toDatabaseDate, ##Times and dates have to be entered in UTC
     endDate     => $dt->toDatabaseDate,
@@ -108,7 +108,29 @@ is($anniversary->get('groupIdEdit'),   $party->get('groupIdEdit'), '... groupIdE
 is($anniversary->get('url'),           $party->get('url').'2',     '... url (accounting for duplicate)');
 is($anniversary->get('description'),   $party->get('description'), '... description, checks for line wrapping');
 
+$party->update({description => "one line\nsecond line"});
+
+my $instance2 = WebGUI::Workflow::Instance->create($session,
+    {
+        workflowId              => $workflow->getId,
+        skipSpectreNotification => 1,
+    }
+);
+
+$retVal = $instance2->run();
+is($retVal, 'complete', 'cleanup: 2nd activity complete');
+$retVal = $instance2->run();
+is($retVal, 'done', 'cleanup: 2nd activity is done');
+$instance1->delete;
+
+$newEvents = $receiver->getLineage(['children'], { returnObjects => 1, });
+
+is(scalar @{ $newEvents }, 1, 'reimport does not create new children');
+$anniversary = pop @{ $newEvents };
+is($anniversary->get('description'),   $party->get('description'), '... description, checks for line unwrapping');
+
 END {
     $instance1 && $instance1->delete('skipNotify');
+    $instance2 && $instance2->delete('skipNotify');
     $workflow  && $workflow->delete;
 }
