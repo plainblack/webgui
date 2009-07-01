@@ -2140,8 +2140,9 @@ sub canTakeSurvey {
     my $self = shift;
 
     return $self->{canTake} if ( defined $self->{canTake} );
-
-    if ( !$self->session->user->isInGroup( $self->get('groupToTakeSurvey') ) ) {
+    
+    # Immediately reject if not in groupToTakeSurvey or groupToEditSurvey
+    if ( !$self->session->user->isInGroup( $self->get('groupToTakeSurvey') ) && !$self->session->user->isInGroup( $self->get('groupToEditSurvey') ) ) {
         return 0;
     }
 
