@@ -528,9 +528,17 @@ sub _icalToMySQL {
     )->toMysql;
 }
 
+=head2 _unwrapIcalText
+
+This really just unescapes iCal text, handling commas, semi-colons, backslashes
+and newlines
+
+=cut
+
 sub _unwrapIcalText {
     my $text = shift;
     $text =~ s/\\([,;\\])/$1/g;
+    $text =~ s/\\n/\n/g;
     return $text;
 }
 

@@ -25,6 +25,7 @@ use base 'WebGUI::Asset::Wobject';
 
 use DateTime;
 use JSON;
+use Text::Wrap;
 
 =head1 NAME
 
@@ -1741,14 +1742,16 @@ that ; , \ and newlines should be escaped by prepending them with a \.
 sub wrapIcal {
     my $self    = shift;
     my $text    = shift;
-    
-    return $text unless length $text >= 75;
-    
+
     $text       =~ s/([,;\\])/\\$1/g;
     $text       =~ s/\n/\\n/g;
-    
-    my @text    = ($text =~ m/.{1,75}/g);
-    return join "\r\n ",@text;
+
+    {
+        local $Text::Wrap::separator = "\r\n";
+        local $Text::Wrap::columns   = 74;
+        $text = Text::Wrap::wrap('', ' ', $text);
+    }
+    return $text;
 }
 
 #----------------------------------------------------------------------------
