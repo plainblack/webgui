@@ -1489,15 +1489,16 @@ sub processPropertiesFromFormPost {
     ### Verify the form was filled out correctly...
     my @errors;
     # If the start date is after the end date
+    my $i18n = WebGUI::International->new($session, 'Asset_Event');
     if ($self->get("startDate") gt $self->get("endDate")) {
-        push @errors, "The event end date must be after the event start date.";
+        push @errors, $i18n->get("The event end date must be after the event start date.");
     }
 
     # If the dates are the same and the start time is after the end time
     if ($self->get("startDate") eq $self->get("endDate")
         && $self->get("startTime") gt $self->get("endTime")
        ) {
-        push @errors, "The event end time must be after the event start time.";
+        push @errors, $i18n->get("The event end time must be after the event start time.");
     }
     
     if (@errors) {

@@ -3,6 +3,7 @@
  - fixed #10522: Metadata value & label problem
  - fixed #10594: iCal title display error.
  - fixed #10602: Calendar feed importing extra characters.
+ - fixed: Internationalize Event edit form error messages.
 
 7.7.12
  - Updated auth to allow sending back of non-text/html mime types.
