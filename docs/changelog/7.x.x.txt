@@ -1,5 +1,6 @@
 7.6.30
  - fixed #10602: Calendar feed importing extra characters.
+ - fixed: Internationalize Event edit form error messages.
 
 7.6.29
  - fixed #10549: EMS import
