@@ -29,7 +29,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 103; # increment this value for each test you create
+my $numTests = 107; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -150,7 +150,13 @@ $storage1 = WebGUI::Storage->create($session);
 
 isa_ok( $storage1, "WebGUI::Storage");
 ok($session->id->valid($storage1->getId), 'create returns valid sessionIds');
-is($storage1->getHexId, $session->id->toHex($storage1->getId), 'getHexId, returns the hexadecimal value of the GUID');
+ok($storage1->getHexId, 'getHexId returns something');
+is($storage1->getHexId, $session->id->toHex($storage1->getId), '... returns the hexadecimal value of the GUID');
+
+{
+    my $otherStorage = WebGUI::Storage->get($session, $storage1->getId);
+    is($otherStorage->getHexId, $storage1->getHexId, '... works with get');
+}
 
 is( $storage1->getErrorCount, 0, "No errors during object creation");
 
@@ -286,15 +292,17 @@ ok(-e $hackedStore->getPath('fileToHack'), 'deleteFile did not delete the file i
 
 ####################################################
 #
-# createTemp
+# createTemp, getHexId
 #
 ####################################################
 
 my $tempStor = WebGUI::Storage->createTemp($session);
 
 isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object");
-is (substr($tempStor->getPathFrag, 0, 5), 'temp/', 'createTemp puts stuff in the temp directory');
-ok (-e $tempStor->getPath(), 'createTemp: directory was created');
+is (substr($tempStor->getPathFrag, 0, 5), 'temp/', '... puts stuff in the temp directory');
+ok (-e $tempStor->getPath(), '... directory was created');
+ok($tempStor->getHexId, '... getHexId returns something');
+is($tempStor->getHexId, $session->id->toHex($tempStor->getId), '... returns the hexadecimal value of the GUID');
 
 ####################################################
 #

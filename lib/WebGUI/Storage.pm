@@ -617,7 +617,7 @@ sub createTemp {
 	my $path    = $session->id->toHex($id);
 
 	$path =~ m/^(.{2})/;
-	my $self = {_session=>$session, _id => $id, _Hexid => $path, _pathParts => ['temp', $1, $path], _errors => []};
+	my $self = {_session=>$session, _id => $id, _hexId => $path, _pathParts => ['temp', $1, $path], _errors => []};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
 	return $self;
