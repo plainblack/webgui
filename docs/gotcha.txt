@@ -10,9 +10,6 @@ save you many hours of grief.
 
 7.7.13
 --------------------------------------------------------------------
-   * Due to changes in the userSession database table, you must upgrade
-     to 7.7.13 before upgrading to 7.7.14 or beyond.
-
    * WebGUI has allowed metadata possible values to be processed differently
      by Posts than from other Assets.  This causes problems when metadata is
      shared between Posts and other Assets.  To rememdy this, all metadata
