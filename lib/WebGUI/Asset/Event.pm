@@ -391,6 +391,28 @@ sub getDateTimeEnd {
     }
 }
 
+####################################################################
+
+=head2 getDateTimeEndNI
+
+Since the iCal standard is that ending dates are non-inclusive (they
+do not include the second at the end of the time period), this method
+provide a copy of the DateTime object that is 1 second earlier than
+the set ending time.
+
+It's just one line of DateTime code to adjust this on any object, but
+this is encapsulated here to make sure that the same amount of time
+is used EVERYWHERE.
+
+=cut
+
+sub getDateTimeEndNI {
+    my $self = shift;
+    my $dt   = $self->getDateTimeEnd;
+    $dt->subtract(seconds => 1);
+    return $dt;
+}
+
 
 
 
@@ -1277,7 +1299,8 @@ sub getTemplateVars {
     $var{ "startDateEpoch"      } = $dtStart->epoch;
     
     # End date/time
-    my $dtEnd = $self->getDateTimeEnd;
+    my $dtEnd   = $self->getDateTimeEnd;
+    my $dtEndNI = $self->getDateTimeEndNI;
     
     $var{ "endDateSecond"       } = sprintf "%02d", $dtEnd->second;
     $var{ "endDateMinute"       } = sprintf "%02d", $dtEnd->minute;

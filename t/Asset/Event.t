@@ -19,7 +19,7 @@ use WebGUI::Asset::Event;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 9;
+plan tests => 10;
 
 my $session = WebGUI::Test->session;
 
@@ -81,3 +81,5 @@ is($event3->isAllDay, 1, 'isAllDay is zero since it has no start or end time, ev
 %templateVars = $event3->getTemplateVars();
 is($templateVars{dateSpan}, 'Wednesday, August 16 &bull; Thursday, August 17 ', 'getTemplateVars: dateSpan with no times, across two days');
 is($templateVars{isOneDay}, 0, 'getTemplateVars: isOneDay with different start and end dates');
+
+cmp_ok($event3->getDateTimeEnd, '>', $event3->getDateTimeEndNI, 'getDateTimeEndNI is less than getDateTimeEnd');
