@@ -524,7 +524,7 @@ sub run {
             # Get the responseId of the most recently completed survey response for the user
             my $userId = $opts->{userId} || $session->user->userId;
             my $mostRecentlyCompletedResponseId = $session->db->quickScalar(
-                "select Survey_responseId from Survey_response where userId = ? and assetId = ? and isComplete = 1",
+                "select Survey_responseId from Survey_response where userId = ? and assetId = ? and isComplete = 1 order by endDate desc limit 1",
                 [ $userId, $assetId ]
             );
 
