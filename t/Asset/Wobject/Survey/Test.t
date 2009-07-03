@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 90;
+plan tests => 94;
 
 my ( $s, $t1 );
 
@@ -705,6 +705,26 @@ sub try_it {
     }
     ok( !$parser->has_problems == !$opts->{fail}, ( $opts->{fail} ? "Fails" : "Passes" ) . ' as expected' );
 }
+
+###################
+# get_differences #
+###################
+is(WebGUI::Asset::Wobject::Survey::Test::get_differences('a', 'b'), <<END_CMP, 'scalar differences');
+   got : 'a'
+expect : 'b'
+END_CMP
+
+is(WebGUI::Asset::Wobject::Survey::Test::get_differences('a'), <<END_CMP, 'undef differences');
+   got : 'a'
+expect : ''
+END_CMP
+
+is(WebGUI::Asset::Wobject::Survey::Test::get_differences([0..10], [0..9]), 'Array lengths differ', 'array differences');
+is(WebGUI::Asset::Wobject::Survey::Test::get_differences({a => 1}, {a => 2}), <<END_CMP, 'hash differences');
+Hashes differ on element: a
+   got : '1'
+expect : '2'
+END_CMP
 }
 
 #----------------------------------------------------------------------------

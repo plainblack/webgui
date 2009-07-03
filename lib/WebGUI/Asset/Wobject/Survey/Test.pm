@@ -5,6 +5,7 @@ use base qw/WebGUI::Crud/;
 use WebGUI::International;
 use Test::Deep::NoTest;
 use JSON::PP;
+use Data::Dumper;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
@@ -654,7 +655,7 @@ END_WHY
     }
     
     # Check tagged, if asked
-    
+    local $Data::Dumper::Sortkeys = 1;
     # Since tags are often boolean flags, allow them to optionally be specified as an array
     if ($tagged && ref $tagged eq 'ARRAY') {
         my $currentTags = $rJSON->tags;
@@ -670,14 +671,13 @@ END_WHY
                 return fail($testCount, $name, "Tag not found: $tagKey");
             }
             my $currentTagValue = $currentTags->{$tagKey};
-           
+            
             if (!eq_deeply($currentTagValue, $tagValue)) {
-                $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
-                return fail($testCount, $name, <<END_WHY);
-Compared tag '$tagKey'
-   got : '$currentTagValue'
-expect : '$tagValue'
-END_WHY
+                my $reason = "Compared tag: $tagKey\n" . get_differences($currentTagValue, $tagValue);
+                $reason .= "\nIn..\ngot: " . Dumper($currentTagValue);
+                $reason .= "\nexpect: " . Dumper($tagValue);
+                $self->session->log->debug("Incorrect tag value: $reason");
+                return fail($testCount, $name, $reason);
             }
         }
     }
@@ -688,12 +688,11 @@ END_WHY
         while (my ($tagKey, $tagValue) = each %$tagged) {
             my $currentTagValue = $currentTags->{$tagKey};
             if (!eq_deeply($currentTagValue, $tagValue)) {
-                $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
-                return fail($testCount, $name, <<END_WHY);
-Compared tag '$tagKey'
-   got : '$currentTagValue'
-expect : '$tagValue'
-END_WHY
+                my $reason = "Compared tag: $tagKey\n" . get_differences($currentTagValue, $tagValue);
+                $reason .= "\nIn..\ngot: " . Dumper($currentTagValue);
+                $reason .= "\nexpect: " . Dumper($tagValue);
+                $self->session->log->debug("Incorrect tag value: $reason");
+                return fail($testCount, $name, $reason);
             }
         }
     }
@@ -715,6 +714,47 @@ END_WHY
     }
     
     return pass($testCount, $name);
+}
+
+=head2 get_differences
+
+Once L<Test::Deep::NoTest> > 0.1 is in the WRE, this sub can be replaced with
+L<cmp_deeply> and L<deep_diag>.
+
+=cut
+
+sub get_differences {
+    my ($a, $b) = @_;
+    
+    if (!ref $a && !ref $b) {
+        return <<END_WHY;
+   got : '$a'
+expect : '$b'
+END_WHY
+    }
+    if (ref $a ne ref $b) {
+        return ref $a . ' does not match ' . ref $b;
+    }
+    if (ref $a eq 'ARRAY') {
+        return "Array lengths differ" if @$a != @$b;
+        for my $i (0 .. $#$a) {
+            if (!eq_deeply($a->[$i], $b->[$i])) {
+                return "Array item at index $i differs\n" . get_differences($a->[$i], $b->[$i]);
+            }
+        }
+    }
+    if (ref $a eq 'HASH') {
+        for my $key (keys %$a, keys %$b) {
+            if (!eq_deeply($a->{$key}, $b->{$key})) {
+                return <<END_WHY
+Hashes differ on element: $key
+   got : '$a->{$key}'
+expect : '$b->{$key}'
+END_WHY
+            }
+        }
+    }
+    
 }
 
 sub pass {
