@@ -255,7 +255,8 @@ sub getAddToCartForm {
     my $i18n = WebGUI::International->new($session, 'Asset_Product');
     my %variants = ();
     tie %variants, 'Tie::IxHash';
-    foreach my $collateral ( @{ $self->getAllCollateral('variantsJSON')} ) {
+    COLLATERAL: foreach my $collateral ( @{ $self->getAllCollateral('variantsJSON')} ) {
+        next COLLATERAL unless $collateral->{quantity} > 0;
         $variants{$collateral->{variantId}} = join ", ", $collateral->{shortdesc}, sprintf('%.2f',$collateral->{price});
     }
     return
