@@ -460,7 +460,7 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 viewTemplateVars ( $mode )
+=head2 viewTemplateVariables ( $mode )
 
 Make template variables for the view template.
 

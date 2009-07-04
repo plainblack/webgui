@@ -179,7 +179,7 @@ sub getStyleTemplateId {
 
 =head2 www_managePurchases ( )
 
-The main view page for editing the user's profile.
+Provides a list of all the users transactions, with links to view more details for each one.
 
 =cut
 
@@ -208,6 +208,14 @@ sub www_managePurchases {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manageTaxData ( )
+
+A wrapper for TaxDriver->getUserScreen, allowing the user to enter configuration
+data for himself.
+
+=cut
+
 sub www_manageTaxData {
     my $self    = shift;
     my $session = $self->session;
