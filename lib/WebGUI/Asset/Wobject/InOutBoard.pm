@@ -52,94 +52,66 @@ sub _fetchDepartments {
 
 #-------------------------------------------------------------------
 sub definition {
-	my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_InOutBoard");
-        push(@{$definition}, {
-                tableName=>'InOutBoard',
-                className=>'WebGUI::Asset::Wobject::InOutBoard',
-                assetName=>$i18n->get('assetName'),
-		icon=>'iob.gif',
-                properties=>{
-			statusList => {
-				defaultValue => $i18n->get(10)."\n"
-						.$i18n->get(11)."\n",
-				fieldType=>"textarea"
-				},
-			reportViewerGroup => {
-				defaultValue => 3,
-				fieldType => "group"
-				},
-		    inOutGroup => {
-				defaultValue => 2,
-				fieldType => "group"
-				},
-			inOutTemplateId => {
-				fieldType=>"template",
-			        defaultValue => 'IOB0000000000000000001'
-			        },
-			reportTemplateId => {
-				fieldType=>"template",
-			        defaultValue => 'IOB0000000000000000002'
-			        },
-			paginateAfter => {
-				fieldType=>"integer",
-				defaultValue => 50
-				},
-  			}
-                });
-        return $class->SUPER::definition($session, $definition);
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my $i18n = WebGUI::International->new($session,"Asset_InOutBoard");
+    push(@{$definition}, {
+        tableName => 'InOutBoard',
+        className => 'WebGUI::Asset::Wobject::InOutBoard',
+        assetName => $i18n->get('assetName'),
+        icon      => 'iob.gif',
+        autoGenerateForms => 1,
+        properties   => {
+            statusList => {
+                tab          => 'properties',
+                defaultValue => $i18n->get(10)."\n".$i18n->get(11)."\n",
+                fieldType    => "textarea",
+                label        => $i18n->get(1),
+                hoverHelp    => $i18n->get('1 description'),
+                subtext      => $i18n->get(2),
+            },
+            reportViewerGroup => {
+                tab          => 'security',
+                defaultValue => 3,
+                fieldType    => "group",
+                label        => $i18n->get(3),
+                hoverHelp    => $i18n->get("3 description"),
+            },
+            inOutGroup => {
+                tab          => 'security',
+                defaultValue => 2,
+                fieldType    => "group",
+                label        => $i18n->get('inOutGroup'),
+                hoverHelp    => $i18n->get('inOutGroup description'),
+            },
+            inOutTemplateId => {
+                tab          => 'display',
+                fieldType    => "template",
+                namespace    => "InOutBoard",
+                label        => $i18n->get("In Out Template"),
+                hoverHelp    => $i18n->get("In Out Template description"),
+                defaultValue => 'IOB0000000000000000001',
+            },
+            reportTemplateId => {
+                tab          => 'display',
+                fieldType    => "template",
+                defaultValue => 'IOB0000000000000000002',
+                label        => $i18n->get(13),
+                hoverHelp    => $i18n->get("13 description"),
+                namespace    => "InOutBoard/Report"
+            },
+            paginateAfter => {
+                tab          => 'display',
+                fieldType    => "integer",
+                defaultValue => 50,
+                label        => $i18n->get(12),
+                hoverHelp    => $i18n->get('12 description'),
+            },
+        }
+    });
+    return $class->SUPER::definition($session, $definition);
 }
-
-
-#-------------------------------------------------------------------
-sub getEditForm {
-        my $self = shift;
-        my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
-	$tabform->getTab("properties")->textarea(
-		-name=>"statusList",
-		-label=>$i18n->get(1),
-		-hoverHelp=>$i18n->get('1 description'),
-		-value=>$self->getValue("statusList"),
-		-subtext=>$i18n->get(2),
-		);
-	$tabform->getTab("display")->integer(
-		-name=>"paginateAfter",
-		-label=>$i18n->get(12),
-		-hoverHelp=>$i18n->get('12 description'),
-		-value=>$self->getValue("paginateAfter"),
-		);
-	$tabform->getTab("display")->template (
-	    -name => "inOutTemplateId",
-	    -value => $self->getValue("inOutTemplateId"),
-	    -label => $i18n->get("In Out Template"),
-	    -hoverHelp => $i18n->get("In Out Template description"),
-	    -namespace => "InOutBoard"
-	    );
-	$tabform->getTab("display")->template (
-	    -name => "reportTemplateId",
-	    -value => $self->getValue("reportTemplateId"),
-	    -label => $i18n->get(13),
-	    -hoverHelp => $i18n->get("13 description"),
-	    -namespace => "InOutBoard/Report"
-	    );
-	$tabform->getTab("security")->group(
-		-name=>"reportViewerGroup",
-		-value=>[$self->getValue("reportViewerGroup")],
-		-label=>$i18n->get(3),
-		-hoverHelp=>$i18n->get("3 description"),
-		);
-   $tabform->getTab("security")->group(
-		-name=>"inOutGroup",
-		-value=>[$self->getValue("inOutGroup")],
-		-label=>$i18n->get('inOutGroup'),
-		-hoverHelp=>$i18n->get('inOutGroup description'),
-		);
-    return $tabform;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -166,6 +138,14 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Render the viewing screen, which displays In/Out status and a form to change
+status.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my %var;
@@ -296,14 +276,14 @@ order by department, lastName, firstName";
 }
 
 #-------------------------------------------------------------------
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
-}
 
-#-------------------------------------------------------------------
+=head2 www_selectDelegates 
+
+Form where a user can select delegates, other users who are allowed to change
+their status.
+
+=cut
+
 sub www_selectDelegates {
 	my $self = shift;
 	my %userNames = ();
@@ -356,6 +336,13 @@ sub www_selectDelegates {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_selectDelegatesEditSave 
+
+Process the selectDeletages form.
+
+=cut
+
 sub www_selectDelegatesEditSave {
 	my $self = shift;
 	my @delegates = $self->session->form->selectList("delegates");
@@ -369,6 +356,13 @@ sub www_selectDelegatesEditSave {
 	return "";
 }
 #-------------------------------------------------------------------
+
+=head2 www_setStatus 
+
+Process the form from the view method to set status for a user.
+
+=cut
+
 sub www_setStatus {
 	my $self = shift;
 	#$self->session->errorHandler->warn("delegateId: ". $self->session->form->process("delegate")."\n" );
@@ -394,6 +388,14 @@ sub www_setStatus {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_viewReport 
+
+Builds a templated form for doing drill-down reports, along with displaying results from
+the report.
+
+=cut
+
 sub www_viewReport {
 	my $self = shift;
 	return "" unless ($self->session->user->isInGroup($self->getValue("reportViewerGroup")));
