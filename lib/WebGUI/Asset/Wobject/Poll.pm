@@ -168,6 +168,13 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 duplicate 
+
+Extend the base method to handle copying Poll answer data.
+
+=cut
+
 sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(@_);
@@ -197,6 +204,16 @@ sub freezeGraphConfig {
 
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm 
+
+Extend the base class to handle the answers and graphing plugins.
+
+=cut
+
+##TODO: Pull out all form elements which can come from the definition sub
+##and only have hand code in here.
+
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm; 
@@ -343,6 +360,13 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost 
+
+Extend the base method to handle the answers and the Graphing plugin.
+
+=cut
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -365,6 +389,13 @@ sub processPropertiesFromFormPost {
 
 
 #-------------------------------------------------------------------
+
+=head2 purge 
+
+Extend the base method to handle Poll answers.
+
+=cut
+
 sub purge {
 	my $self = shift;
 	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId));
@@ -434,6 +465,14 @@ sub thawGraphConfig {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Generate the poll results with graph if configured to do so.  Display the form
+for the user to vote.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my (%var, $answer, @answers, $showPoll, $f, @dataset, @labels);
@@ -502,6 +541,14 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_vote 
+
+Web method for the user to add their vote.  If so configured, gives karma
+to the user.
+
+=cut
+
 sub www_vote {
 	my $self = shift;
 	my $u;
