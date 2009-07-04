@@ -206,14 +206,18 @@ sub getConfiguredTitle {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm ( )
+
+Extends the base class to add Tax information for the Sku, in a new tab.
+
+=cut
+
 sub getEditForm {
     my $self    = shift;
     my $session = $self->session;
 
     my $tabform = $self->SUPER::getEditForm;
-    
-    # Let the tax system add the form fields that are required by the active tax plugin for configuring the sku tax.
-    # WebGUI::Shop::Tax->new( $session )->appendSkuForm( $self->getId, $tabform->getTab('shop') );
 
     my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
     my $definition  = $taxDriver->skuFormDefinition;
@@ -328,6 +332,18 @@ sub getRecurInterval {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getTaxConfiguration ( $namespace )
+
+Returns the tax configuration data for the Shop from the JSON blob for this Sku.
+
+=head3 $namespace
+
+The class name of a tax driver.  Configuration data for that driver will be
+returned.
+
+=cut
+
 sub getTaxConfiguration {
     my $self        = shift;
     my $namespace   = shift;
@@ -338,7 +354,7 @@ sub getTaxConfiguration {
         return undef;
     }
 
-    return $configs->{ $namespace }
+    return $configs->{ $namespace };
 }
 
 #-------------------------------------------------------------------
@@ -570,6 +586,13 @@ sub onRemoveFromCart {
 }
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
+Extends the base class to process the tax data.
+
+=cut
+
 sub processPropertiesFromFormPost {
     my $self = shift;
 
