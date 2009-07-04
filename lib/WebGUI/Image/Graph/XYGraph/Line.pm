@@ -160,7 +160,7 @@ sub getFirstAnchorLocation {
 
 #-------------------------------------------------------------------
 
-=head2 processDataset
+=head2 processDataSet
 
 Processes the dataset. Used by drawGraph.
 

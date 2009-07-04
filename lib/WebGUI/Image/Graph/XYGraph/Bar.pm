@@ -150,7 +150,7 @@ sub drawGraph {
 
 #-------------------------------------------------------------------
 
-=head2 drawSideBySide ( bars, location, barWidth )
+=head2 drawSideBySideBar ( bars, location, barWidth )
 
 Draws the bars in side by side mode. Meaning that per datsetindex the bars
 representing a single dataset are grouped.
@@ -186,7 +186,7 @@ sub drawSideBySideBar {
 
 #-------------------------------------------------------------------
 
-=head2 drawStacked ( bars, location, barWidth )
+=head2 drawStackedBar ( bars, location, barWidth )
 
 Draws the bars in side by side mode. Meaning that per datset-index the bars
 representing a single dataset are stacked on top of each other.
@@ -327,7 +327,7 @@ sub getFirstAnchorLocation {
 
 #-------------------------------------------------------------------
 
-=head2 processDataset
+=head2 processDataSet
 
 Processes the dataset. Used by drawGraph.
 
