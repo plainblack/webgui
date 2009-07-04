@@ -368,12 +368,6 @@ sub moveCollateralUp {
 	$self->session->db->commit;
 }
 
-#-------------------------------------------------------------------
-sub processPropertiesFromFormPost {
-	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
-}
-
 
 #-------------------------------------------------------------------
 

@@ -865,7 +865,7 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 viewTemplateVars ( $var )
+=head2 viewTemplateVariables ( $var )
 
 Add template variables to the existing template variables.  This includes asset level variables.
 
