@@ -757,6 +757,14 @@ END_WHY
     
 }
 
+#-------------------------------------------------------------------
+
+=head2 pass 
+
+Output TAP for a passing test.
+
+=cut
+
 sub pass {
     my ($testCount, $name, $extra) = @_;
     my $out = $name ? "ok $testCount - $name" : "ok $testCount";
@@ -766,6 +774,14 @@ sub pass {
     }
     return $out;
 }
+
+#-------------------------------------------------------------------
+
+=head2 fail 
+
+Output TAP for a failing test, along with diagnostics.
+
+=cut
 
 sub fail {
     my ($testCount, $name, $extra) = @_;

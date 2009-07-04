@@ -677,6 +677,15 @@ sub www_editSurvey {
     return $self->processTemplate( {}, $self->get('surveyEditTemplateId') );
 }
 
+#-------------------------------------------------------------------
+
+=head2 getAdminConsole 
+
+Extends the base class to add in survey controls like edit, view graph, run tests, and
+test suite.
+
+=cut
+
 sub getAdminConsole {
     my $self = shift;
     my $ac = $self->SUPER::getAdminConsole;
@@ -2360,6 +2369,13 @@ sub www_exportTransposedResults {
 
 #-------------------------------------------------------------------
 
+=head2 www_exportStructure 
+
+Exports the surveyJSON as either HTML or a downloadable CSV file, based on the
+C<format> form variable.
+
+=cut
+
 sub www_exportStructure {
     my $self = shift;
 
@@ -2543,7 +2559,7 @@ sub www_editDefaultQuestions{
 
 #-------------------------------------------------------------------
 
-=head2 www_downloadDefaulQuestions
+=head2 www_downloadDefaultQuestionTypes
 
 Sends the user a json file of the default question types, which can be imported to other WebGUI instances.
 
