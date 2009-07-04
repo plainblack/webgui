@@ -38,7 +38,6 @@ Provides a mechanism to upload files to WebGUI.
 
 use WebGUI::Asset::FilePile;
 
-
 =head1 METHODS
 
 These methods are available from this class:
@@ -46,6 +45,13 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
+=head2 edit 
+
+Hand draw a form where users can upload multiple files at a time.
+
+=cut
+
 sub edit {
 	my $self = shift;
 	my $tabform = WebGUI::TabForm->new($self->session,);
@@ -139,6 +145,13 @@ sub edit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 editSave 
+
+Upload files and create assets for each one.
+
+=cut
+
 sub editSave {
 	my $self = shift;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
@@ -208,6 +221,13 @@ sub editSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getIcon 
+
+Override the master class since FilePile does not use a definition subroutine.
+
+=cut
+
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
@@ -229,12 +249,19 @@ Returns the displayable name of this asset.
 sub getName {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-        return $i18n->get('assetName',"Asset_FilePile");
+    return $i18n->get('assetName',"Asset_FilePile");
 } 
 
 
 
 #-------------------------------------------------------------------
+
+=head2 www_edit 
+
+This method dispatches to edit, and editSave based on the form variable C<doit>
+
+=cut
+
 sub www_edit {
 	my $self = shift;
 	unless ($self->session->form->process("doit")) {

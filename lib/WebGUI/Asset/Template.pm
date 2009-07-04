@@ -609,6 +609,12 @@ sub process {
 
 #-------------------------------------------------------------------
 
+=head2 processPropertiesFromFormPost 
+
+Extends the master class to handle template parsers, namespaces and template attachments.
+
+=cut
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -767,6 +773,14 @@ sub update {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_edit 
+
+Hand draw this form so that a warning can be displayed to the user when editing a
+default template.
+
+=cut
+
 sub www_edit {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -816,6 +830,14 @@ ENDHTML
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_goBackToPage 
+
+If set, redirect the user to the URL set by the form variable C<returnUrl>.  Otherwise, it returns
+the user back to the site.
+
+=cut
+
 sub www_goBackToPage {
 	my $self = shift;
 	$self->session->http->setRedirect($self->session->form->get("returnUrl")) if ($self->session->form->get("returnUrl"));
@@ -870,6 +892,14 @@ sub www_editDuplicate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manage 
+
+If trying to use the assetManager on this asset, push them back to managing the
+template's parent instead.
+
+=cut
+
 sub www_manage {
 	my $self = shift;
 	#takes the user to the folder containing this template.
@@ -878,6 +908,13 @@ sub www_manage {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_styleWizard 
+
+Edit form for building style templates in a WYSIWIG fashion.
+
+=cut
+
 sub www_styleWizard {
 	my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -1125,6 +1162,14 @@ sub www_styleWizard {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_view 
+
+Override the default behavior.  When a template is viewed, it redirects you
+to viewing the template's container instead.
+
+=cut
+
 sub www_view {
 	my $self = shift;
 	return $self->session->asset($self->getContainer)->www_view;
