@@ -62,7 +62,7 @@ sub handlesRecurring {
 
 #-------------------------------------------------------------------
 
-=head2 canCheckOutCart ( )
+=head2 canCheckoutCart ( )
 
 Returns whether the cart can be checked out by this plugin.
 
@@ -140,6 +140,13 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getButton 
+
+Extends the base class to add a user configurable button image.
+
+=cut
+
 sub getButton {
     my $self    = shift;
     my $session = $self->session;
@@ -305,6 +312,13 @@ sub processTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_cancelTransaction 
+
+Cancels the transaction defined by the C<invoice> form variable.
+
+=cut
+
 sub www_cancelTransaction {
     my $self    = shift;
     my $session = $self->session;
@@ -328,6 +342,13 @@ sub www_cancelTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_completeTransaction 
+
+Finishes the transaction for this driver.
+
+=cut
+
 sub www_completeTransaction {
     my $self    = shift;
     my $session = $self->session;
@@ -435,6 +456,13 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_pay 
+
+Web facing wrapper method for C<processTransaction>.
+
+=cut
+
 sub www_pay {
     my $self    = shift;
     my $session = $self->session;
