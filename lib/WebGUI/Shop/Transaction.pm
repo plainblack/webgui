@@ -395,6 +395,12 @@ sub getTransactionIdsForUser {
 
 #-------------------------------------------------------------------
 
+=head2 getTransactionVars 
+
+Returns a set of template variables for the current transaction.
+
+=cut
+
 sub getTransactionVars {
     my $self = shift;
     my $url  = $self->session->url;

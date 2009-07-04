@@ -192,7 +192,7 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 crud_createOrUpdate ( session )
+=head2 crud_createOrUpdateTable ( session )
 
 A detection class method used to affirm creation or update of the database table using the crud_definition(). Returns 1 on successful completion.
 
