@@ -12,7 +12,7 @@ use base qw{ WebGUI::Shop::PayDriver };
 
 #-------------------------------------------------------------------
 
-=head2 canCheckOutCart ( )
+=head2 canCheckoutCart ( )
 
 Returns whether the cart can be checked out by this plugin.
 
@@ -332,7 +332,7 @@ sub www_getCredentials {
 
 #-------------------------------------------------------------------
 
-=head2 checkPostBackSHA ( )
+=head2 checkPostbackSHA ( )
 
 Processes the postback data Ogone sends after a payment/cancelation. Figures out which transaction the data belongs
 to and checks whether the data isn't tampered with by comparing SHA hashes.

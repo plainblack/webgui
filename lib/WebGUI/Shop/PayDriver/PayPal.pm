@@ -33,7 +33,7 @@ These methods are available from this class:
 
 =cut
 
-=head2 getPayPaySandboxUrl
+=head2 getPayPalSandboxUrl
 
 Returns the URL for the PayPal sandbox
 
