@@ -395,9 +395,18 @@ sub www_deleteGroup {
 
 #-------------------------------------------------------------------
 
+=head2 www_deleteGroupGrouping 
+
+Web facing method for deleting a group from a group.  Returns adminOnly unless
+the current user canEdit this group.  The group GUID to be deleted is passed in
+via the form variable C<delete>.  Returns the user to the manageGroupsInGroup screen.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_deleteGroupGrouping {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -439,9 +448,18 @@ sub www_deleteGrouping {
 
 #-------------------------------------------------------------------
 
+=head2 www_editGroup 
+
+Renders a form to add or edit groups.  Returns adminOnly unless the
+current user canEdit this group.  The group GUID is passed in via
+the form variable C<gid>.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_editGroup {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -621,9 +639,20 @@ sub www_editGroup {
 
 #-------------------------------------------------------------------
 
+=head2 www_editGroupSave 
+
+Process the editGroup form.  Returns adminOnly unless the current
+user canEdit this group.  The GUID of the group is passed in via the
+form variable C<gid>.
+
+Returns the user to the list of groups.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_editGroupSave {
     my $session = shift;
     my $gid = $session->form->process("gid");
@@ -667,9 +696,19 @@ sub www_editGroupSave {
 
 #-------------------------------------------------------------------
 
+=head2 www_editGrouping 
+
+Renders a form for the properties of a user being in a group, namely
+their expire date and whether or not they are an admin for this
+group.  The userId and groupId are passed in via the C<uid> and C<gid>
+form variables, respectively.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_editGrouping {
     my $session = shift;
     my $uid = $session->form->process('uid');
@@ -721,9 +760,18 @@ sub www_editGrouping {
 
 #-------------------------------------------------------------------
 
+=head2 www_editGroupingSave 
+
+Process the editGrouping form.  Returns adminOnly unless the current
+user can edit this group.  Returns the user to the manageUsersInGroup
+screen.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_editGroupingSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -735,9 +783,17 @@ sub www_editGroupingSave {
 
 #-------------------------------------------------------------------
 
+=head2 www_emailGroup 
+
+Render a form where an email can be sent to all members of a group.
+Returns adminOnly unless the current user canEdit this group.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_emailGroup {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -784,9 +840,17 @@ sub www_emailGroup {
 
 #-------------------------------------------------------------------
 
+=head2 www_emailGroupSend 
+
+Processes the emailGroup form.  Returns adminOnly unless the current
+user canEdit this group.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_emailGroupSend {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -800,9 +864,18 @@ sub www_emailGroupSend {
 
 #-------------------------------------------------------------------
 
+=head2 www_listGroups 
+
+Render a paginated list of all groups.  If more than 250 groups exist,
+then it will show only a search form.  The list of groups will only
+show that groups that a user canEdit.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_listGroups {
 	my $session = shift;
 	my $i18n = WebGUI::International->new($session);
@@ -867,9 +940,17 @@ sub www_listGroups {
 
 #-------------------------------------------------------------------
 
+=head2 www_manageGroupsInGroup 
+
+Render a list of all groups in this group, by hierarchy and a form
+for adding and removing groups.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_manageGroupsInGroup {
 	my $session = shift;
     my $i18n = WebGUI::International->new($session);
@@ -916,9 +997,18 @@ sub www_manageGroupsInGroup {
 
 #-------------------------------------------------------------------
 
+=head2 www_manageUsersInGroup
+
+Renders a form that displays all users in this group, as well as a
+list of users that can be added to this group.  Returns adminOnly
+unless the current user canEdit this group.
+
 =head3 $session
 
 A WebGUI::Session object
+
+=cut
+
 sub www_manageUsersInGroup {
 	my $session = shift;
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -999,7 +1089,5 @@ sub www_manageUsersInGroup {
 	$output .= $f->print;
         return _submenu($session,$output,'88');
 }
-
-
 
 1;
