@@ -950,6 +950,14 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_getUserPrefsForm 
+
+Returns a form displaying all user profile fields to show to the user, that they
+are allowed to edit.
+
+=cut
+
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self    = shift;
@@ -997,6 +1005,14 @@ sub www_getUserPrefsForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manageOverrides 
+
+Web facing method for getOverridesList.  Returns insufficient unless the current
+user canEdit this Shortcut.
+
+=cut
+
 sub www_manageOverrides {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -1005,6 +1021,14 @@ sub www_manageOverrides {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_purgeOverrideCache 
+
+Web facing method for purgeOverrideCache.  Returns insufficient unless the current
+user canEdit this Shortcut.  Returns the user to the manageOverrides screen.
+
+=cut
+
 sub www_purgeOverrideCache {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -1013,6 +1037,14 @@ sub www_purgeOverrideCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteOverride 
+
+Delete an override by fieldName, as set by the form variable C<fieldName>.  Then it
+uncaches the overrides and returns the user to the manageOverrides screen.
+
+=cut
+
 sub www_deleteOverride {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -1059,6 +1091,14 @@ sub www_saveUserPrefs {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_getNewTitle 
+
+Returns the title of the shortcut, with overrides applied.  If the user cannot
+personalize the Dashboard, returns ''.
+
+=cut
+
 sub www_getNewTitle {
 	my $self = shift;
 	return '' unless $self->getParent->canPersonalize;
@@ -1067,6 +1107,14 @@ sub www_getNewTitle {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editOverride 
+
+Renders a form for overrides to be entered.  The override to be edited is
+set by the form variable C<fieldName>.
+
+=cut
+
 sub www_editOverride {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -1139,6 +1187,13 @@ sub www_editOverride {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_saveOverride 
+
+Process the editOverride form.
+
+=cut
+
 sub www_saveOverride {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -1160,6 +1215,13 @@ sub www_saveOverride {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_view 
+
+Render the shortcut in standalone mode.
+
+=cut
+
 sub www_view {
         my $self = shift;
         my $check = $self->checkView;
