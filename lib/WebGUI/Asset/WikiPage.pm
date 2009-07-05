@@ -71,7 +71,7 @@ sub canAdd {
 Returns true if the current user can administer the wiki containing this WikiPage, or
 if the current user can edit wiki pages and is trying to add or edit pages, or the page
 is not protected.
- 
+
 =cut
 
 sub canEdit {
