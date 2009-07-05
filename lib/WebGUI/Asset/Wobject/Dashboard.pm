@@ -22,6 +22,15 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 
 #-------------------------------------------------------------------
+
+=head2 canManage 
+
+Determines if the current user can manage this dashboard.  Returns 0
+if the user is visitor.  Otherwise, it checks to see if the user is
+in the dashboard's adminsGroup.
+
+=cut
+
 sub canManage {
 	my $self = shift;
 	return 0 if $self->session->user->isVisitor;
@@ -29,6 +38,15 @@ sub canManage {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canPersonalize 
+
+Determines if the current user can personalize this dashboard.  Returns
+0 if the user is visitor.  Otherwise, it checks to see if the user is
+in this dashboard's userGroup.
+
+=cut
+
 sub canPersonalize {
 	my $self = shift;
 	return 0 if $self->session->user->isVisitor;
@@ -96,12 +114,28 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 discernUserId 
+
+This utility method is used to determine if the user should be shown the view of the
+Dashboard that Visitor would see, or their own.
+
+=cut
+
 sub discernUserId {
 	my $self = shift;
 	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->userId;
 }
 
 #-------------------------------------------------------------------
+
+=head2 getContentPositions 
+
+Gets the locations of content in the dashboard.  If the user has not customized this,
+then return default locations.
+
+=cut
+
 sub getContentPositions {
 	my $self = shift;
 	my $dummy = $self->initialize unless $self->get("isInitialized");
@@ -111,6 +145,13 @@ sub getContentPositions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getContentPositionsId 
+
+Return the unique contentPostitions ID for this Dashboard.
+
+=cut
+
 sub getContentPositionsId {
     my $self = shift;
     my $id = "contentPositions".$self->getId;
@@ -135,6 +176,13 @@ sub getContentPositionsDefault {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm 
+
+Extend the base method to display lists of assets to hide or show.
+
+=cut
+
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
@@ -160,6 +208,13 @@ sub getEditForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 initialize 
+
+Add the unique profile field that holds content positions for this dashboard.
+
+=cut
+
 sub initialize {
 	my $self = shift;
 	my $userPrefField = WebGUI::ProfileField->create($self->session,$self->getContentPositionsId,{
@@ -174,6 +229,14 @@ sub initialize {
 }
 
 #-------------------------------------------------------------------
+
+=head2 isManaging 
+
+Returns true if the current user canManage this dashboard, and they have admin mode
+turned on.
+
+=cut
+
 sub isManaging {
 	my $self = shift;
 	return 1 if ($self->canManage && $self->session->var->isAdminOn());
@@ -181,6 +244,13 @@ sub isManaging {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView 
+
+Extends the base method to set the extraHeadTags for all children, and to prepare
+their templates.
+
+=cut
 
 sub prepareView {
 	my $self = shift;
@@ -197,6 +267,13 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost 
+
+Extends the base method to handle assetsToHide.
+
+=cut
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -210,6 +287,14 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purge 
+
+Extends the base method to handle deleting the profile field for storing content positions
+for this dashboard.
+
+=cut
+
 sub purge {
     my $self = shift;
     my $userPrefField = WebGUI::ProfileField->new($self->session,$self->getContentPositionsId);
@@ -221,6 +306,13 @@ sub purge {
 
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Render the dashboard.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my %vars = %{$self->get()};
@@ -327,6 +419,13 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_setContentPositions 
+
+Web method for saving the positions of dashlets in the dashboard.
+
+=cut
+
 sub www_setContentPositions {
 	my $self = shift;
 	return 'Visitors cannot save settings' if($self->session->user->isVisitor);
