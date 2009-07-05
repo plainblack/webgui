@@ -366,7 +366,7 @@ sub renameField {
     elsif ( exists $entryData{ $newField } ) {
         WebGUI::Error::InvalidParam->throw(error=>'cannot rename field over existing field');
     }
-    $entryData->{$newField} = delete $entryData{$newField};
+    $entryData->{$newField} = delete $entryData{$oldField};
     return $newField;
 }
 
