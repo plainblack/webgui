@@ -23,14 +23,28 @@ use WebGUI::Utility;
 our @ISA = qw(WebGUI::Asset::Post);
 
 #-------------------------------------------------------------------
+
+=head2 addRevision 
+
+Extend the base method to handle creating a subscription group for this Thread.
+
+=cut
+
 sub addRevision {
-        my $self = shift;
-        my $newSelf = $self->SUPER::addRevision(@_);
-	$newSelf->createSubscriptionGroup;
-        return $newSelf;
+    my $self = shift;
+    my $newSelf = $self->SUPER::addRevision(@_);
+    $newSelf->createSubscriptionGroup;
+    return $newSelf;
 }
 
 #-------------------------------------------------------------------
+
+=head2 archive 
+
+Archives all posts under this thread.
+
+=cut
+
 sub archive {
 	my $self = shift;
 	foreach my $post (@{$self->getPosts}) {
@@ -39,6 +53,14 @@ sub archive {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canAdd ($session)
+
+A class method.  Returns true if the current user in in the group canStartThreadGroupId
+in the default asset, which better be a Collaboration System.
+
+=cut
+
 sub canAdd {
     my $class   = shift;
     my $session = shift;
