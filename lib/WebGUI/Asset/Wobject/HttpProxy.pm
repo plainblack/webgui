@@ -27,6 +27,23 @@ use Apache2::Upload;
 our @ISA = qw(WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
+
+=head2 appendToUrl ($url, $paramSet)
+
+Append some parameters to a URL, similar to $session->url->append.  This method
+also will either append with an ampersand or a semi-colon, based on the useAmersand
+asset property.
+
+=head3 $url
+
+The URL to use as a base.
+
+=head3 $paramSet
+
+A string of parameters to add to the URL.
+
+=cut
+
 sub appendToUrl {
 	my $self = shift;
         my $url = shift;
@@ -179,12 +196,26 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getContentLastModified 
+
+Override the base method to say that the asset content is never cached.
+
+=cut
+
 sub getContentLastModified {
     return time;
 }
 
 
 #-------------------------------------------------------------------
+
+=head2 getCookieJar 
+
+Return a WebGUI::Storage object to hold cookie data.
+
+=cut
+
 sub getCookieJar {
 	my $self = shift;
 	my $storage;
@@ -252,6 +283,13 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Main screen for the HttpProxy.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my %var; 
@@ -449,6 +487,12 @@ sub view {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_view 
+
+Override the base method to handle non-HTML mime types.
+
+=cut
 
 sub www_view {
     my $self = shift;

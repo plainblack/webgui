@@ -83,6 +83,11 @@ sub new {
   	$self;
 }
 
+
+=head2 filter 
+
+=cut
+
 sub filter {
   	my $self=shift;
   	$self->parse($self->{Content}); # Make paths absolute and let them return to us
@@ -96,32 +101,78 @@ sub filter {
 
 
 
+
+=head2 output ( $text )
+
+Appends $text to the filtered output.
+
+=cut
+
 sub output { 
 	$_[0]->{Filtered} .= $_[1]; 
 }
 
+=head2 declaration ($text)
+
+Adds $text as an HTML declaration
+
+=cut
 
 sub declaration { 
 	$_[0]->output("<!$_[1]>") 
 }
 
 
+
+=head2 comment ($text)
+
+Adds $text as an HTML comment
+
+=cut
+
 sub comment { 
 	$_[0]->output("<!--$_[1]-->") 
 }
+
+
+=head2 text ($text)
+
+Adds $text as direct text
+
+=cut
 
 sub text { 
 	$_[0]->output($_[1]) 
 }
 
+=head2 end ($text)
+
+Adds $text as a closing HTML tag.
+
+=cut
 
 sub end { 
 	$_[0]->output("</$_[1]>") 
 }
 
+
+=head2 session 
+
+Returns a copy of the session variable.
+
+=cut
+
 sub session { 
 	return $_[0]->{_session};
 }
+
+
+=head2 start 
+
+Override the method from the master class to handle recursing through the content and
+rewriting URLs.
+
+=cut
 
 sub start {
   	my $self = shift;
