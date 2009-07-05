@@ -152,7 +152,7 @@ END {
     my $Test = Test::Builder->new;
     GROUP: foreach my $group (@groupsToDelete) {
         my $groupId = $group->getId;
-        next GROUP if any { $groupId eq $_ } qw/1 2 3 4 6 7 8 11 12 13 14 pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 /;
+        next GROUP if WebGUI::Group->vitalGroup($groupId);
         my $newGroup = WebGUI::Group->new($SESSION, $groupId);
         $newGroup->delete if $newGroup;
     }

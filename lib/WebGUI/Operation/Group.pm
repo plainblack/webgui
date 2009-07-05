@@ -108,11 +108,36 @@ sub canView {
 }
 
 #-------------------------------------------------------------------
+
+=head2 doGroupSearch ($session, $op, $returnPaginator, $groupFilter)
+
+Do a search of group names and descriptions for the keyword set in the
+form variable C<groupSearchKeyword>.
+
+=head3 $session
+
+A WebGUI::Session object
+
+=head3 $op
+
+A URL query fragment to use with the paginator.
+
+=head3 $returnPaginator
+
+If set to true, then this function will return a WebGUI::Paginator
+object.
+
+=head3 $groupFilter
+
+An array reference of groupIds to exclude from the search.
+
+=cut
+
 sub doGroupSearch {
-	my $session = shift;
-	my $op = shift;
+	my $session         = shift;
+	my $op              = shift;
         my $returnPaginator = shift;
-        my $groupFilter = shift;
+        my $groupFilter     = shift || [];
         push(@{$groupFilter},0);
         my $keyword = $session->scratch->get("groupSearchKeyword");
         if ($session->scratch->get("groupSearchModifier") eq "startsWith") {
@@ -137,6 +162,26 @@ sub doGroupSearch {
 
 
 #-------------------------------------------------------------------
+
+=head2 getGroupSearchForm ($session, $op, $params)
+
+Build and render a form for doing group searching.
+
+=head3 $session
+
+A WebGUI::Session object
+
+=head3 $op
+
+The operation that this form should call when submitted.
+
+=head3 $params
+
+A hashref of hidden form parameters and values to add to the form.
+
+
+=cut
+
 sub getGroupSearchForm {
 	my $session = shift;
 	my $op = shift;
@@ -188,6 +233,29 @@ sub getGroupSearchForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 walkGroups ($session, $parentId, $indent)
+
+Recursively find all groups which are members of this group.  Each
+group is rendered with an indent, a delete from grouping icon and
+an edit icon.
+
+Returns the HTML.
+
+=head3 $session
+
+A WebGUI::Session object
+
+=head3 $parentId
+
+The GUID of the group to display the children of.
+
+=head3 $indent
+
+A snippet of HTML to indent a group, to show hierarchy.
+
+=cut
+
 sub walkGroups {
 	my $session = shift;
         my $parentId = shift;
@@ -206,6 +274,20 @@ sub walkGroups {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addGroupsToGroupSave 
+
+Process the addGroupsToGroup form.  Returns adminOnly unless the
+current user canEdit this group.  Group GUIDs are passed in via the
+form variable C<groups>.  Returns the user to the manageGroupsInGroup
+screen.
+
+=head3 $session
+
+A WebGUI::Session object
+
+=cut
+
 sub www_addGroupsToGroupSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -216,6 +298,20 @@ sub www_addGroupsToGroupSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addUsersToGroupSave 
+
+Process the addUsersToGroup form.  Returns adminOnly unless the
+current user canEdit this group.  User GUIDs are passed in via the
+form variable C<users>.  Returns the user to the manageUsersInGroup
+screen.
+
+=head3 $session
+
+A WebGUI::Session object
+
+=cut
+
 sub www_addUsersToGroupSave {
 	my $session = shift;
         return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -226,22 +322,48 @@ sub www_addUsersToGroupSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_autoAddToGroup 
+
+Web facing method for users to automatically add themselves to a group.
+Returns insufficient if the user is Visitor.  If the group exists and
+has autoAdd set, adds the current user to the group.
+
+=head3 $session
+
+A WebGUI::Session object
+
+=cut
+
 sub www_autoAddToGroup {
 	my $session = shift;
         return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->userId ne 1);
 	my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
-	if ($group->autoAdd) {
+	if ($group && $group->autoAdd) {
 		$group->addUsers([$session->user->userId],[$session->form->process("groupId")]);
 	}
 	return "";
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_autoDeleteFromGroup 
+
+Web facing method for users to automatically remove themselves from a group.
+Returns insufficient if the user is Visitor.  If the group exists and
+has autoDelete set, deletes the current user from the group.
+
+=head3 $session
+
+A WebGUI::Session object
+
+=cut
+
 sub www_autoDeleteFromGroup {
 	my $session = shift;
         return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->userId ne 1);
 	my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
-	if ($group->autoDelete) {
+	if ($group && $group->autoDelete) {
 		$group->deleteUsers([$session->user->userId],[$session->form->process("groupId")]);
 	}
 	return "";
@@ -255,18 +377,27 @@ Delete's the group specified by id, in the form variable gid.  Groups 1-17
 are reserved for WebGUI internal groups and are not allowed to be deleted.
 Returns you to www_listGroups when done.
 
+=head3 $session
+
+A WebGUI::Session object
+
 =cut
 
 sub www_deleteGroup {
     my $session = shift;
-    return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
-    return $session->privilege->vitalComponent() if (isIn($session->form->process("gid"), qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
-    my $g = WebGUI::Group->new($session,$session->form->process("gid"));
+    my $gid = $session->form->process("gid");
+    return $session->privilege->adminOnly() unless (canEditGroup($session, $gid));
+    return $session->privilege->vitalComponent() if WebGUI::Group->vitalGroup($gid);
+    my $g = WebGUI::Group->new($session,$gid);
     $g->delete;
     return www_listGroups($session);
 }
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_deleteGroupGrouping {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -283,6 +414,10 @@ Deletes a set of users from a set of groups.
 The user and group lists are expected to
 be found in form fields names uid and gid, respectively.  Visitors are not allowed to
 perform this operation.
+
+=head3 $session
+
+A WebGUI::Session object
 
 =cut
 
@@ -303,6 +438,10 @@ sub www_deleteGrouping {
                                                                                                                                                        
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_editGroup {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -481,6 +620,10 @@ sub www_editGroup {
 }
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_editGroupSave {
     my $session = shift;
     my $gid = $session->form->process("gid");
@@ -523,6 +666,10 @@ sub www_editGroupSave {
 }
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_editGrouping {
     my $session = shift;
     my $uid = $session->form->process('uid');
@@ -573,6 +720,10 @@ sub www_editGrouping {
 }
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_editGroupingSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -583,6 +734,10 @@ sub www_editGroupingSave {
 }
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_emailGroup {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -628,6 +783,10 @@ sub www_emailGroup {
 }
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_emailGroupSend {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
@@ -640,6 +799,10 @@ sub www_emailGroupSend {
 }
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_listGroups {
 	my $session = shift;
 	my $i18n = WebGUI::International->new($session);
@@ -703,6 +866,10 @@ sub www_listGroups {
 
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_manageGroupsInGroup {
 	my $session = shift;
     my $i18n = WebGUI::International->new($session);
@@ -748,6 +915,10 @@ sub www_manageGroupsInGroup {
 }
 
 #-------------------------------------------------------------------
+
+=head3 $session
+
+A WebGUI::Session object
 sub www_manageUsersInGroup {
 	my $session = shift;
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
