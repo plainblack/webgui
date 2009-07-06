@@ -1350,7 +1350,7 @@ sub crop {
 
 #-------------------------------------------------------------------
 
-=head2 annotate ( filename [ text ] )
+=head2 annotate ( filename, $asset, $form )
 
 Adds annotation text to the image.
 
@@ -1358,9 +1358,13 @@ Adds annotation text to the image.
 
 The name of the file to annotate.
 
-=head3 text
+=head3 asset
 
-Text to add.
+The WebGUI Asset containing this image.
+
+=head3 $form
+
+A Session::Form object, used to fetch form data.
 
 =cut
 
