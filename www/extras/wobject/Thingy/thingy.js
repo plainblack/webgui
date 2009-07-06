@@ -161,8 +161,8 @@ function editListItem(url,fieldId) {
 		function optionalFields() {
 			initOptionalFields("edit_"+fieldId+"_Dialog",fieldId);
 		}
-		editFieldDialog = new YAHOO.widget.Dialog("edit_"+fieldId+"_Dialog", { width:"460px", visible:false, draggable:true, close:true, fixedcenter:true, zIndex:11001, height: "420px",
-		autofillheight:false,
+		editFieldDialog = new YAHOO.widget.Dialog("edit_"+fieldId+"_Dialog", { width:"460px", visible:false, draggable:true, close:true, fixedcenter:true, zIndex:11001, height: "430px",
+		autofillheight:null,
 		buttons : [ { text:"Submit", handler:handleSubmit, isDefault:true }, 
 				{ text:"Cancel", handler:handleCancel } ]
 		} );
@@ -289,8 +289,8 @@ function initAddFieldDialog() {
 	};
 
 	var addFieldDialog = new YAHOO.widget.Dialog("addDialog", { width:"460px", visible:false,
-	draggable:true, close:true, fixedcenter:true, zIndex:11002, height: "420px",
-	autofillheight:false,
+	draggable:true, close:true, fixedcenter:true, zIndex:11002, height: "430px",
+	autofillheight:null,
 	buttons : [ { text:"Submit", handler:handleSubmit, isDefault:true }, 
 			{ text:"Cancel", handler:handleCancel } ]
 	} );
