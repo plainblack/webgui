@@ -3,6 +3,7 @@
  - fixed: Have just 1 list of protected groups.  Use that everywhere.
  - fixed #10488: Map.gif is missing for Map wobject
  - fixed #10553: WebGUI vulnerable to CSRF attacks
+ - fixed #10607: snippets empty
 
 7.7.13
  - fixed #10574: Creating Calendar Entry

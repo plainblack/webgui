@@ -46,6 +46,18 @@ These subroutines are available from this package:
 
 The Apache request handler for this package.
 
+This handler takes care of certain special tokens returns by a sub-handler.
+
+=head3 chunked
+
+This indicates that the handler has already returned the output to Apache.  Commonly
+used in Assets to get head tags back to the user to speed up the rendering process.
+
+=head3 empty
+
+This token indicates that the asset is legitimatally empty.  Returns nothing
+to the user, instead of displaying the Page Not Found page.
+
 =cut
 
 sub handler {
@@ -66,6 +78,12 @@ sub handler {
             }
             else {
                 if ($output eq "chunked") {
+                    if ($session->errorHandler->canShowDebug()) {
+                        $session->output->print($session->errorHandler->showDebug(),1);
+                    }
+                    last;
+                }
+                if ($output eq "empty") {
                     if ($session->errorHandler->canShowDebug()) {
                         $session->output->print($session->errorHandler->showDebug(),1);
                     }
