@@ -576,7 +576,7 @@ Allows an administrator to assume another user.
 
 sub www_becomeUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session);
+	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
 	return undef unless WebGUI::User->validUserId($session, $session->form->process("uid"));
 	$session->var->end($session->var->get("sessionId"));
 	$session->user({userId=>$session->form->process("uid")});
@@ -595,7 +595,7 @@ after this.
 
 sub www_deleteUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session);
+	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
 	my ($u);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 	   return WebGUI::AdminConsole->new($session,"users")->render($session->privilege->vitalComponent());
@@ -607,6 +607,13 @@ sub www_deleteUser {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editUser ( )
+
+Provides a form for editing a user, or adding a new user.
+
+=cut
+
 sub www_editUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless canAdd($session);
@@ -626,6 +633,7 @@ sub www_editUser {
 	my $username = ($u->isVisitor && $uid ne "1") ? '' : $u->username;
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
     	$tabform->hidden({name=>"uid",value=>$uid});
+        $tabform->csrfToken();
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
 	$tabform->getTab("account")->readOnly(value=>$uid,label=>$i18n->get(378));
     	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
@@ -735,6 +743,14 @@ sub www_editUser {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editUserSave ( )
+
+Process the editUser form data.  Returns adminOnly unless the user has privileges
+to add/edit users and the submitted form passes the validToken check.
+
+=cut
+
 sub www_editUserSave {
 	my $session = shift;
 	my $postedUserId = $session->form->process("uid"); #userId posted from www_editUser form
@@ -749,7 +765,7 @@ sub www_editUserSave {
 		$isSecondary = (canAdd($session) && $postedUserId eq "new");
 	}
 
-	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary);
+	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary) && $session->form->validToken;
 
 	# Check to see if 
 	# 1) the userId associated with the posted username matches the posted userId (we're editing an account)
@@ -833,6 +849,14 @@ sub www_editUserSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editUserKarma ( )
+
+Provides a form for directly editing the karma for a user.  Returns adminOnly
+unless the current user can manage users.
+
+=cut
+
 sub www_editUserKarma {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless canEdit($session);
@@ -848,6 +872,7 @@ sub www_editUserKarma {
 		-name => "uid",
 		-value => $session->form->process("uid"),
         );
+    $f->csrfToken();
 	$f->integer(
 		-name => "amount",
 		-label => $i18n->get(556),
@@ -869,9 +894,18 @@ sub www_editUserKarma {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editUserKarmaSave ( )
+
+Processes the form submitted  by www_editUserKarma.  Returns adminOnly
+unless the current user can manage users and the submitted from passes
+the validToken check.
+
+=cut
+
 sub www_editUserKarmaSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session);
+	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
         my ($u);
         $u = WebGUI::User->new($session,$session->form->process("uid"));
         $u->karma($session->form->process("amount"),$session->user->username." (".$session->user->userId.")",$session->form->process("description"));
@@ -910,6 +944,15 @@ sub www_formUsers {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_listUsers ( )
+
+Provides a paginated list of all users, and controls for adding a new user.  If the
+current user is only allowed to add users, then it sends them directly to www_editUser.
+If the current user is not allowed to edit or create users, it returns adminOnly.
+
+=cut
+
 sub www_listUsers {
 	my $session = shift;
 
