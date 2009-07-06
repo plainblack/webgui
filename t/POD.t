@@ -29,8 +29,9 @@ plan tests => $moduleCount;
 use Data::Dumper;
 foreach my $package (sort @modules) {
 	my $pc = Pod::Coverage->new(
-        package=>$package,
-        also_private => [ qr/definition/ ],
+        package       => $package,
+        also_private  => [ qr/definition/ ],
+        nonwhitespace => ($ENV{POD_COVERAGE} == 3 ? 1 : 0),
     );
     my $coverage   = $pc->coverage > $threshold;
     my $goodReason = $pc->why_unrated() eq 'no public symbols defined';
@@ -39,6 +40,7 @@ foreach my $package (sort @modules) {
         ok($coverage, sprintf "%s has %d%% POD coverage", $package, $pc->coverage*100);
         if (!$coverage && $ENV{POD_COVERAGE}) {
             diag Dumper [$pc->naked];
+            diag $pc->why_unrated;
         }
     }
 }
