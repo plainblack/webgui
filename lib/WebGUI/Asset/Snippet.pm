@@ -213,7 +213,7 @@ sub view {
     unless ($noCache) {
 		WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
 	}
-       	return $output;
+    return $output;
 }
 
 #-------------------------------------------------------------------
@@ -234,12 +234,16 @@ A web accessible version of the view method.
 =cut
 
 sub www_view {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canView;
-	my $mimeType=$self->getValue('mimeType');
-	$self->session->http->setMimeType($mimeType || 'text/html');
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
-	return $self->view(1);
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+    my $mimeType=$self->getValue('mimeType');
+    $self->session->http->setMimeType($mimeType || 'text/html');
+    $self->session->http->setCacheControl($self->get("cacheTimeout"));
+    my $output = $self->view(1);
+    if (!defined $output) {
+        $output = 'empty';
+    }
+    return $output;
 }
 
 
