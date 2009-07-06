@@ -875,7 +875,6 @@ sub getEditForm {
 		name=>"func",
 		value=>"editSave"
 		});
-	$tabform->csrfToken();
 	my $assetId;
 	my $class;
 	if ($self->getId eq "new") {

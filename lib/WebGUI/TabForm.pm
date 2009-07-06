@@ -104,20 +104,6 @@ sub addTab {
 
 #-------------------------------------------------------------------
 
-=head2 csrfToken ( )
-
-Adds the WebGUI CSRF token to the form.  Really a wrapper for WebGUI::Form::CsrfToken.
-
-=cut
-
-sub csrfToken {
-	my $self = shift;
-	$self->{_hidden} .= WebGUI::Form::CsrfToken($self->session);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 formHeader ( hashRef )
 
 Replaces the default form header with a new definition.

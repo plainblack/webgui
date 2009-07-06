@@ -475,7 +475,6 @@ sub www_editGroup {
 		-name => "op",
 		-value => "editGroupSave",
 	);
-    $f->csrfToken();
         $f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")
@@ -718,7 +717,6 @@ sub www_editGrouping {
     my $i18n = WebGUI::International->new($session);
     my $f = WebGUI::HTMLForm->new($session);
     $f->submit;
-    $f->csrfToken();
     $f->hidden(
         -name => "op",
         -value => "editGroupingSave"
@@ -806,7 +804,6 @@ sub www_emailGroup {
 		-name => "op",
 		-value => "emailGroupSend"
 	);
-	$f->csrfToken();
 	$f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")
@@ -960,7 +957,6 @@ sub www_manageGroupsInGroup {
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 
     my $f = WebGUI::HTMLForm->new($session);
-    $f->csrfToken();
 	$f->submit;
         $f->hidden(
 		-name => "op",
@@ -1017,7 +1013,6 @@ sub www_manageUsersInGroup {
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
 	my $output = WebGUI::Form::formHeader($session,)
-		.WebGUI::Form::csrfToken($session,{})
 		.WebGUI::Form::hidden($session,{
 			name=>"gid",
 			value=>$session->form->process("gid")
@@ -1053,7 +1048,6 @@ sub www_manageUsersInGroup {
 	return _submenu($session,$output) unless ($session->form->process("doit") || $userCount < 250 || $session->form->process("pn") > 1);
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;
-    $f->csrfToken();
 	$f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")

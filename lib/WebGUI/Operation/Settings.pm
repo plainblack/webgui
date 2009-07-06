@@ -607,7 +607,6 @@ sub www_editSettings {
 		name        => "op",
 		value       => "saveSettings"
     });
-    $tabform->csrfToken();
 
 	my $definitions = definition($session, $i18n);
 	foreach my $definition (@{$definitions}) {

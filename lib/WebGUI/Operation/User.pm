@@ -633,7 +633,6 @@ sub www_editUser {
 	my $username = ($u->isVisitor && $uid ne "1") ? '' : $u->username;
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
     	$tabform->hidden({name=>"uid",value=>$uid});
-        $tabform->csrfToken();
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
 	$tabform->getTab("account")->readOnly(value=>$uid,label=>$i18n->get(378));
     	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
@@ -872,7 +871,6 @@ sub www_editUserKarma {
 		-name => "uid",
 		-value => $session->form->process("uid"),
         );
-    $f->csrfToken();
 	$f->integer(
 		-name => "amount",
 		-label => $i18n->get(556),

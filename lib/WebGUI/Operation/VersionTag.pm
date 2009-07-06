@@ -217,7 +217,6 @@ sub www_editVersionTag {
 		-value=>"editVersionTagSave"
 		);
 	my $value = $tag->getId if defined $tag;
-    $f->csrfToken();
 	$f->hidden(
 		-name=>"tagId",
 		-value=>$value,
@@ -324,7 +323,6 @@ sub www_commitVersionTag {
     # Commit comments form
     my $f = WebGUI::HTMLForm->new($session);
     $f->submit;
-    $f->csrfToken();
     $f->readOnly(
         label     => $i18n->get("version tag name"),
         hoverHelp => $i18n->get("version tag name description commit"),
@@ -719,7 +717,6 @@ sub www_manageRevisionsInTag {
             if (defined $instance) {
                     my $form = WebGUI::HTMLForm->new($session);
                     $form->submit;
-                    $form->csrfToken;
                     $form->hidden(
                             name=>"tagId",
                             value=>$tagId
@@ -773,7 +770,6 @@ sub www_manageRevisionsInTag {
         .= WebGUI::Form::formHeader( $session, {} )
         . WebGUI::Form::hidden( $session, { name => 'op', value=> 'manageRevisionsInTag' } )
         . WebGUI::Form::hidden( $session, { name => 'tagId', value => $tag->getId } )
-        . WebGUI::Form::csrfToken( $session )
         . '<table width="100%" class="content">'
         . '<tr>'
         . '<td colspan="5">'
