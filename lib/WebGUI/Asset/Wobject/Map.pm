@@ -123,7 +123,7 @@ sub definition {
     );
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),
-        icon              => 'Map.gif',
+        icon              => 'maps.png',
         autoGenerateForms => 1,
         tableName         => 'Map',
         className         => 'WebGUI::Asset::Wobject::Map',
