@@ -378,6 +378,23 @@ sub get_output {
 
 #----------------------------------------------------------------------------
 
+=head2 method ( [ $method ] )
+
+Getter/setter for the HTTP request method.
+
+=cut
+
+sub method {
+    my ($self, $newMethod) = @_;
+    my $method = $self->{method};
+    if (defined $newMethod) {
+        $self->{method} = $newMethod;
+    }
+    return $method;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 print ( @values )
 
 Fake print method for the PseudoRequest object.  It caches everything printed

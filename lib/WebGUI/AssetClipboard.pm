@@ -254,15 +254,24 @@ sub www_copy {
 
 =head2 www_copyList ( )
 
-Copies to clipboard assets in a list, then returns self calling method www_manageAssets(), if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
+
+Checks to see if the current user canEdit the parent containting the assets that
+are being copied.  If that's not true, or if the CSRF token is missing, then
+return insufficient privileges.
+
+Copies the list of assets in the C<assetId> form variable, checking each one for edit privileges.
+
+Returns the user to either the screen set by the C<proceed> form variable, or to
+the Asset Manager.
 
 =cut
 
 sub www_copyList {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	foreach my $assetId ($self->session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
+	my $self    = shift;
+    my $session = $self->session;
+	return $self->session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
+	foreach my $assetId ($session->form->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate({skipAutoCommitWorkflows => 1});
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
@@ -270,7 +279,7 @@ sub www_copyList {
 		}
 	}
 	if ($self->session->form->process("proceed") ne "") {
-                my $method = "www_".$self->session->form->process("proceed");
+                my $method = "www_".$session->form->process("proceed");
                 return $self->$method();
         }
 	return $self->www_manageAssets();
@@ -344,21 +353,30 @@ sub www_cut {
 
 =head2 www_cutList ( )
 
-Cuts assets in a list (removes to clipboard), then returns self calling method www_manageAssets(), if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
+Checks to see if the current user canEdit the parent containting the assets that
+are being cut.  If that's not true, or if the CSRF token is missing, then
+return insufficient privileges.
+
+Cuts the list of assets in the C<assetId> form variable, checking each one for edit privileges
+and to see if it's a system asset.
+
+Returns the user to either the screen set by the C<proceed> form variable, or to
+the Asset Manager.
 
 =cut
 
 sub www_cutList {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	foreach my $assetId ($self->session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
+    my $session = $self->session;
+	return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
+	foreach my $assetId ($session->form->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
 		if ($asset->canEdit && !$asset->get('isSystem')) {
 			$asset->cut;
 		}
 	}
-	if ($self->session->form->process("proceed") ne "") {
-                my $method = "www_".$self->session->form->process("proceed");
+	if ($session->form->process("proceed") ne "") {
+                my $method = "www_".$session->form->process("proceed");
                 return $self->$method();
         }
 	return $self->www_manageAssets();
@@ -368,22 +386,31 @@ sub www_cutList {
 
 =head2 www_duplicateList ( )
 
-Creates a bunch of duplicate assets under the same parent.
+Checks to see if the current user canEdit the parent containting the assets that
+are being duplicated.  If that's not true, or if the CSRF token is missing, then
+return insufficient privileges.
+
+Duplicates (copy and paste immediately) the list of assets in the C<assetId>
+form variable, checking each one for edit privileges.
+
+Returns the user to either the screen set by the C<proceed> form variable, or to
+the Asset Manager.
 
 =cut
 
 sub www_duplicateList {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	foreach my $assetId ($self->session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
+	my $self    = shift;
+	my $session = $self->session;
+	return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
+	foreach my $assetId ($session->form->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
 		}
 	}
-	if ($self->session->form->process("proceed") ne "") {
-                my $method = "www_".$self->session->form->process("proceed");
+	if ($session->form->process("proceed") ne "") {
+                my $method = "www_".$session->form->process("proceed");
                 return $self->$method();
         }
 	return $self->www_manageAssets();
@@ -506,15 +533,21 @@ sub www_paste {
 
 =head2 www_pasteList ( )
 
-Pastes a selection of assets. If canEdit is False, returns an insufficient privileges page.
-Returns the user to the manageAssets screen. 
+Checks to see if the current user canEdit the parent containting the assets that
+are being pasted.  If that's not true, or if the CSRF token is missing, then
+return insufficient privileges.
+
+Pastes the list of assets in the C<assetId> form variable, checking each one for edit privileges.
+
+Returns the user to either the screen set by the C<proceed> form variable, or to
+the Asset Manager.
 
 =cut
 
 sub www_pasteList {
 	my $self    = shift;
     my $session = $self->session;
-	return $session->privilege->insufficient() unless $self->canEdit;
+	return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
     my $form    = $session->form;
     my $pb      = WebGUI::ProgressBar->new($session);
     ##Need to store the list of assetIds for the status subroutine

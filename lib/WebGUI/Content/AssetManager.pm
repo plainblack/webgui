@@ -397,9 +397,10 @@ ENDHTML
     $output .= '</ol>';
     
     ### The page of assets
-    $output         .= sprintf <<EOHTML, $session->asset->getUrl, $i18n->get( 'with selected' ), $i18n->get( "update" ), $i18n->get( "delete" ), $i18n->get( '43' ), $i18n->get( 'cut' ), $i18n->get( "Copy" ), $i18n->get( "duplicate" );
+    $output         .= sprintf <<EOHTML, $session->asset->getUrl, WebGUI::Form::CsrfToken->new($session)->toHtml, $i18n->get( 'with selected' ), $i18n->get( "update" ), $i18n->get( "delete" ), $i18n->get( '43' ), $i18n->get( 'cut' ), $i18n->get( "Copy" ), $i18n->get( "duplicate" );
 <div>
 <form method="post" enctype="multipart/form-data" action="%s">
+%s
 <input type="hidden" name="func"    value="manageAssets" />
 <input type="hidden" name="proceed" value="manageAssets" />
 <div id="dataTableContainer">

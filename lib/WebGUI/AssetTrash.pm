@@ -321,7 +321,11 @@ sub www_delete {
 
 =head2 www_deleteList
 
-Moves list of assets to trash, returns www_manageAssets() method of self if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
+Checks to see if a valid CSRF token was received.  If not, then it returns insufficient privilege.
+
+Moves list of assets to trash, checking each to see if the user canEdit,
+and canEditIfLocked.  Returns the user to manageTrash, or to the screen set
+by the form variable C<proceeed>.
 
 =cut
 
@@ -333,6 +337,7 @@ sub www_deleteList {
     my $form     = $session->form;
     my @assetIds = $form->param('assetId');
     $pb->start($i18n->get('Delete Assets'), $session->url->extras('adminConsole/assets.gif'));
+	return $self->session->privilege->insufficient() unless $session->form->validToken;
 	ASSETID: foreach my $assetId (@assetIds) {
         my $asset = eval { WebGUI::Asset->newPending($session,$assetId); };
         if ($@) {
@@ -404,6 +409,7 @@ sub www_manageTrash {
 	$output .= '
             assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
             assetManager.AddButton("'.$i18n->get("purge").'","purgeList","manageTrash");
+            assetManager.AddFormHidden({ name:"webguiCsrfToken", value:"'.$self->session->scratch->get('webguiCsrfToken').'"});
             assetManager.Write();        
             var assetListSelectAllToggle = false;
             function toggleAssetListSelectAll(form) {
@@ -427,11 +433,14 @@ sub www_manageTrash {
 
 Purges a piece of content, including all it's revisions, from the system permanently.
 
+Returns insufficient privileges unless the submitted form passes the validToken check.
+
 =cut
 
 sub www_purgeList {
     my $self    = shift;
     my $session = $self->session;
+    return $session->privilege->insufficient() unless $session->form->validToken;
     my $pb      = WebGUI::ProgressBar->new($session);
     my $i18n    = WebGUI::International->new($session, 'Asset');
     $pb->start($i18n->get('purge'), $session->url->extras('adminConsole/assets.gif'));

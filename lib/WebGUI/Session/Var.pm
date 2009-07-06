@@ -194,6 +194,7 @@ sub new {
 			$self->{_var}{expires} = $session->datetime->time() + $session->setting->get("sessionTimeout");
 			$self->session->{_sessionId} = $self->{_var}{sessionId};
 			$session->db->setRow("userSession","sessionId",$self->{_var});
+            return $self;
 		}
         else {  ##Start a new default session with the requested, non-existant id.
 			$self->start(1,$sessionId);
@@ -222,7 +223,7 @@ sub session {
 =head2 start ( [ userId, sessionId ] )
 
 Start a new user session. Returns the user session id.  The session variable's sessionId
-is set to the var object's session id.
+is set to the var object's session id.  Also sets the user's CSRF token.
 
 =head3 userId
 
@@ -251,6 +252,7 @@ sub start {
 	$self->{_var}{sessionId} = $sessionId;
 	$self->session->db->setRow("userSession","sessionId",$self->{_var},$sessionId);
 	$self->session->{_sessionId} = $sessionId;
+    $self->session->scratch->set('webguiCsrfToken', $self->session->id->generate);
 }
 
 #-------------------------------------------------------------------

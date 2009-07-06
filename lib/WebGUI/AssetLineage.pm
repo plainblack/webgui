@@ -1020,8 +1020,10 @@ sub www_setRank {
 =head2 www_setRanks ( )
 
 Utility method for the AssetManager.  Reorders 1 pagefull of assets via rank.
+AssetIds are passed in via the C<assetId> form variable.
 
-If the current user cannot edit the current asset, it returns the insufficient privileges page.
+If the current user cannot edit the current asset, or if a valid CSRF token
+is not submitted with the form, it returns the insufficient privileges page.
 
 Returns the user to the manage assets screen.
 
@@ -1030,7 +1032,7 @@ Returns the user to the manage assets screen.
 sub www_setRanks {
     my $self    = shift;
     my $session = $self->session;
-    return $session->privilege->insufficient() unless $session->asset->canEdit;
+    return $session->privilege->insufficient() unless $session->asset->canEdit && $session->form->validToken;
     my $i18n    = WebGUI::International->new($session, 'Asset');
     my $pb      = WebGUI::ProgressBar->new($session);
     my $form    = $session->form;

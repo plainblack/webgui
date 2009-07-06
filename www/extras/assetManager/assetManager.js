@@ -16,16 +16,18 @@ function AssetManager() {
 	this.dosort=true;
 	this.tablecontainsforms=false;
 	// Methods
-	this.AddLine = AssetManager_AddLine;
-	this.AddColumn = AssetManager_AddColumn;
-	this.AddButton = AssetManager_AddButton;
-	this.Write = AssetManager_Write;
-	this.SortRows = AssetManager_SortRows;
+	this.AddLine         = AssetManager_AddLine;
+	this.AddColumn       = AssetManager_AddColumn;
+	this.AddButton       = AssetManager_AddButton;
+	this.Write           = AssetManager_Write;
+	this.SortRows        = AssetManager_SortRows;
 	this.AddLineSortData = AssetManager_AddLineSortData;
+    this.AddFormHidden   = AssetManager_AddFormHidden;
 	// Structure
-	this.Columns = new Array();
-	this.Lines = new Array();
-	this.Buttons = new Array();
+	this.Columns    = new Array();
+	this.Lines      = new Array();
+	this.Buttons    = new Array();
+    this.FormHidden = new Array();
 
 	
 	//***************Properties used for dragging
@@ -62,6 +64,12 @@ function AssetManager() {
 
 }
 
+// Add a hidden input field to the form
+function AssetManager_AddFormHidden( hiddenObj ) {
+	var index = this.FormHidden.length;
+    this.FormHidden[index] = hiddenObj;
+}
+
 // Add a line to the grid
 function AssetManager_AddLine() {
 	var index = this.Lines.length;
@@ -71,7 +79,7 @@ function AssetManager_AddLine() {
 		this.Lines[index][i].text = arguments[i];
 		this.Lines[index][i].data = arguments[i];
 	}
-	}
+}
 
 // Add a button to the form
 function AssetManager_AddButton(label,func,proceed) {
@@ -161,6 +169,10 @@ function AssetManager_Write() {
 	for (var j=0; j<this.Buttons.length; j++) {
 		document.write('<input type="button" onclick="this.form.func.value=\''+this.Buttons[j].func+'\';this.form.proceed.value=\''+this.Buttons[j].proceed+'\';this.form.submit();" value="'+this.Buttons[j].label+'" />');
 	}
+    for (var j=0; j < this.FormHidden.length; j++) {
+        var myHidden = this.FormHidden[j];
+        document.write('<input type="hidden" name="'+ myHidden.name+'" value="'+ myHidden.value+'" />');
+    }
 	document.write('</form>');
 }
 	

@@ -154,7 +154,7 @@ sub www_approveVersionTag {
     my $tag         = WebGUI::VersionTag->new( $session, $session->form->param("tagId") );
 
     return $session->privilege->insufficient 
-        unless canApproveVersionTag( $session, $tag );
+        unless canApproveVersionTag( $session, $tag ) && $session->form->validToken;
     
     my $instance    = $tag->getWorkflowInstance;
     my $activity    = $instance->getNextActivity;
@@ -217,6 +217,7 @@ sub www_editVersionTag {
 		-value=>"editVersionTagSave"
 		);
 	my $value = $tag->getId if defined $tag;
+    $f->csrfToken();
 	$f->hidden(
 		-name=>"tagId",
 		-value=>$value,
@@ -271,7 +272,7 @@ A reference to the current session.
 
 sub www_editVersionTagSave {
 	my $session = shift;
-        return $session->session->privilege->insufficient() unless canView($session);
+    return $session->session->privilege->insufficient() unless canView($session) && $session->form->validToken;
 	if ($session->form->param("tagId") eq "new") {
 		my $tag = WebGUI::VersionTag->create($session, {
 			name=>$session->form->process("name","text", "Untitled"),
@@ -323,6 +324,7 @@ sub www_commitVersionTag {
     # Commit comments form
     my $f = WebGUI::HTMLForm->new($session);
     $f->submit;
+    $f->csrfToken();
     $f->readOnly(
         label     => $i18n->get("version tag name"),
         hoverHelp => $i18n->get("version tag name description commit"),
@@ -419,7 +421,7 @@ sub www_commitVersionTagConfirm {
 	my $tagId = $session->form->param("tagId");
 	if ($tagId) {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
+		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse")) && $session->form->validToken) {
 			my $i18n = WebGUI::International->new($session, "VersionTag");
 			
             my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
@@ -653,8 +655,9 @@ sub www_manageRevisionsInTag {
     $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
 
     # Process any actions
-    my $action = lc $session->form->get('action');
-    if ( $action eq "purge" ) {
+    my $action     = lc $session->form->get('action');
+    my $validToken = $session->form->validToken;
+    if ( $action eq "purge" && $validToken) {
         # Purge these revisions
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
@@ -669,7 +672,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $action eq "move to:" ) {
+    elsif ( $action eq "move to:" && $validToken) {
         # Get the new version tag
         my $moveToTagId = $session->form->get('moveToTagId');
         my $moveToTag;
@@ -697,7 +700,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $action eq "update version tag" ) {
+    elsif ( $action eq "update version tag" && $validToken) {
         my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
         my $endTime   = WebGUI::DateTime->new($session,$session->form->process("endTime","dateTime"))->toDatabase;
         
@@ -716,6 +719,7 @@ sub www_manageRevisionsInTag {
             if (defined $instance) {
                     my $form = WebGUI::HTMLForm->new($session);
                     $form->submit;
+                    $form->csrfToken;
                     $form->hidden(
                             name=>"tagId",
                             value=>$tagId
@@ -769,6 +773,7 @@ sub www_manageRevisionsInTag {
         .= WebGUI::Form::formHeader( $session, {} )
         . WebGUI::Form::hidden( $session, { name => 'op', value=> 'manageRevisionsInTag' } )
         . WebGUI::Form::hidden( $session, { name => 'tagId', value => $tag->getId } )
+        . WebGUI::Form::csrfToken( $session )
         . '<table width="100%" class="content">'
         . '<tr>'
         . '<td colspan="5">'

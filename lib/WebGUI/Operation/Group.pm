@@ -290,7 +290,7 @@ A WebGUI::Session object
 
 sub www_addGroupsToGroupSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")) && $session->form->validToken);
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	my @groups = $session->form->group('groups');
 	$group->addGroups(\@groups);
@@ -314,7 +314,7 @@ A WebGUI::Session object
 
 sub www_addUsersToGroupSave {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
+        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")) && $session->form->validToken);
         my @users = $session->form->selectList('users');
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	$group->addUsers(\@users);
@@ -419,10 +419,9 @@ sub www_deleteGroupGrouping {
 
 =head2 www_deleteGrouping ( )
 
-Deletes a set of users from a set of groups.  
-The user and group lists are expected to
-be found in form fields names uid and gid, respectively.  Visitors are not allowed to
-perform this operation.
+Deletes a set of users from a set of groups.  The user and group lists are expected
+to be found in form fields names uid and gid, respectively.  Visitors are not
+allowed to perform this operation.
 
 =head3 $session
 
@@ -432,7 +431,7 @@ A WebGUI::Session object
 
 sub www_deleteGrouping {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
+        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")) && $session->form->validToken);
         if (($session->user->userId eq $session->form->process("uid") || $session->form->process("uid") eq '3') && $session->form->process("gid") eq '3') {
                 return $session->privilege->vitalComponent();
         }
@@ -476,6 +475,7 @@ sub www_editGroup {
 		-name => "op",
 		-value => "editGroupSave",
 	);
+    $f->csrfToken();
         $f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")
@@ -657,7 +657,7 @@ sub www_editGroupSave {
     my $session = shift;
     my $gid = $session->form->process("gid");
     return $session->privilege->adminOnly
-        unless canEditGroup($session, $gid);
+        unless canEditGroup($session, $gid) && $session->form->validToken;
     my $g = WebGUI::Group->new($session, $gid);
     # We don't want them to use an existing name.  If needed, we'll add a number to the name to keep it unique.
     my $groupName = $session->form->process("groupName");
@@ -718,6 +718,7 @@ sub www_editGrouping {
     my $i18n = WebGUI::International->new($session);
     my $f = WebGUI::HTMLForm->new($session);
     $f->submit;
+    $f->csrfToken();
     $f->hidden(
         -name => "op",
         -value => "editGroupingSave"
@@ -774,7 +775,7 @@ A WebGUI::Session object
 
 sub www_editGroupingSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")) && $session->form->validToken);
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
         $group->userGroupExpireDate($session->form->process("uid"),$session->datetime->setToEpoch($session->form->process("expireDate")));
         $group->userIsAdmin($session->form->process("uid"),$session->form->process("groupAdmin"));
@@ -805,6 +806,7 @@ sub www_emailGroup {
 		-name => "op",
 		-value => "emailGroupSend"
 	);
+	$f->csrfToken();
 	$f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")
@@ -853,7 +855,7 @@ A WebGUI::Session object
 
 sub www_emailGroupSend {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")) && $session->form->validToken);
 	my $mail = WebGUI::Mail::Send->create($session, {toGroup=>$session->form->process("gid"),subject=>$session->form->process("subject"),from=>$session->form->process("from")});
 	$mail->addHtml($session->form->process("message","HTMLArea"));
 	$mail->addFooter;
@@ -958,6 +960,7 @@ sub www_manageGroupsInGroup {
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 
     my $f = WebGUI::HTMLForm->new($session);
+    $f->csrfToken();
 	$f->submit;
         $f->hidden(
 		-name => "op",
@@ -1014,6 +1017,7 @@ sub www_manageUsersInGroup {
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
 	my $output = WebGUI::Form::formHeader($session,)
+		.WebGUI::Form::csrfToken($session,{})
 		.WebGUI::Form::hidden($session,{
 			name=>"gid",
 			value=>$session->form->process("gid")
@@ -1036,7 +1040,6 @@ sub www_manageUsersInGroup {
 				name=>"uid",
 				value=>$row->{userId}
 				})
-                        .$session->icon->delete('op=deleteGrouping;uid='.$row->{userId}.';gid='.$session->form->process("gid"))
                         .$session->icon->edit('op=editGrouping;uid='.$row->{userId}.';gid='.$session->form->process("gid"))
                         .'</td>';
                 $output .= '<td class="tableData"><a href="'.$session->url->page('op=editUser;uid='.$row->{userId}).'">'.$row->{username}.'</a></td>';
@@ -1050,6 +1053,7 @@ sub www_manageUsersInGroup {
 	return _submenu($session,$output) unless ($session->form->process("doit") || $userCount < 250 || $session->form->process("pn") > 1);
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;
+    $f->csrfToken();
 	$f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")

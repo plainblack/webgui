@@ -4475,6 +4475,12 @@ Users may override this setting in their profile.
         lastUpdated => 0,
     },
 
+    'csrfToken' => {
+        message => 'CSRF Token',
+        lastUpdated => 0,
+        context => 'CSRF = Cross Site Request Forgery, token is a piece of identification',
+    },
+
 };
 
 1;

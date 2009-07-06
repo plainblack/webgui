@@ -607,6 +607,7 @@ sub www_editSettings {
 		name        => "op",
 		value       => "saveSettings"
     });
+    $tabform->csrfToken();
 
 	my $definitions = definition($session, $i18n);
 	foreach my $definition (@{$definitions}) {
@@ -671,7 +672,7 @@ is in group Admin (3).  Returns the user to the Edit Settings screen, www_editSe
 
 sub www_saveSettings {
     my $session     = shift;
-    return $session->privilege->adminOnly() unless ($session->user->isAdmin);
+    return $session->privilege->adminOnly() unless ($session->user->isAdmin && $session->form->validToken);
     my $i18n        = WebGUI::International->new($session, "WebGUI");
     my $setting     = $session->setting;
     my $form        = $session->form;
