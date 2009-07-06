@@ -1164,6 +1164,14 @@ sub canView {
     return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 prepareViewList 
+
+Like prepareView, but for the list view of the template.
+
+=cut
+
 sub prepareViewList {
     my $self = shift;
     my $templateId = $self->get('listTemplateId');
@@ -1179,11 +1187,27 @@ sub prepareViewList {
     $self->{_viewListTemplate} = $template;
 }
 
+#-------------------------------------------------------------------
+
+=head2 viewList 
+
+Renders the list view of the DataForm.
+
+=cut
+
 sub viewList {
     my $self    = shift;
     my $var     = $self->getTemplateVars;
     return $self->processTemplate($self->getListTemplateVars($var), undef, $self->{_viewListTemplate});
 }
+
+#-------------------------------------------------------------------
+
+=head2 prepareViewForm 
+
+Prepare the template for the form mode of the template.
+
+=cut
 
 sub prepareViewForm {
     my $self = shift;
@@ -1204,6 +1228,23 @@ sub prepareViewForm {
 
 #-------------------------------------------------------------------
 
+=head2 viewForm ($passedVars, $entry)
+
+Render the template for viewing the form of the DataForm.
+
+=head3 $passedVars
+
+A hash ref of template variables.  If passed in, the default record template
+variables will not be fetched.
+
+=head3 $entry
+
+A DataForm::Entry collateral object.  If not passed in, then it will try to look up
+an entry via the form variable C<entryId>.  If the user cannot edit the DataForm,
+then they cannot edit data that has already been entered.
+
+=cut
+
 sub viewForm {
     my $self        = shift;
     my $passedVars  = shift;
@@ -1217,11 +1258,26 @@ sub viewForm {
     return $self->processTemplate($var, undef, $self->{_viewFormTemplate});
 }
 
+#-------------------------------------------------------------------
+
+=head2 entryClass 
+
+Returns a string, the classname for entry collateral.
+
+=cut
+
 sub entryClass {
     return 'WebGUI::AssetCollateral::DataForm::Entry';
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteAllEntriesConfirm 
+
+Web facing method for deleting all data entered into the DataForm.
+
+=cut
+
 sub www_deleteAllEntriesConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1242,6 +1298,15 @@ sub www_deleteAllEntriesConfirm {
 #}
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteEntry 
+
+Web facing method for deleting one entry from the DataForm, identified
+by the form variable C<entryId>.  Returns insufficient unless the
+current user canEdit the DataForm.  Returns the user to www_view.
+
+=cut
+
 sub www_deleteEntry {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1254,6 +1319,18 @@ sub www_deleteEntry {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteFieldConfirm 
+
+Web facing method for deleting one field from the DataForm, identified
+by the form variable C<fieldName>.  This operation is revisioned.
+
+Returns insufficient unless the current user canEdit the DataForm.
+
+Returns the user to www_view.
+
+=cut
+
 sub www_deleteFieldConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1266,6 +1343,18 @@ sub www_deleteFieldConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteTabConfirm
+
+Web facing method for deleting one tab from the DataForm, identified
+by the form variable C<tabId>.  This operation is revisioned.
+
+Returns insufficient unless the current user canEdit the DataForm.
+
+Returns the user to www_view.
+
+=cut
+
 sub www_deleteTabConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1278,6 +1367,15 @@ sub www_deleteTabConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editField 
+
+Renders a form to edit a field, identified by the form variable C<fieldName>.
+
+Returns insufficient unless the current user canEdit the DataForm.
+
+=cut
+
 sub www_editField {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1418,6 +1516,14 @@ sub www_editField {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editFieldSave 
+
+Process the editField form.  Returns insufficient unless the current
+user canEdit the DataForm.
+
+=cut
+
 sub www_editFieldSave {
     my $self = shift;
     my $session = $self->session;
@@ -1485,6 +1591,24 @@ sub www_editFieldSave {
     return $newSelf->www_view;
 }
 
+#-------------------------------------------------------------------
+
+=head2 createField ($fieldName, $field)
+
+Create a new field in the DataForm.  Returns 1 if the creation
+was successful
+
+=head3 $fieldName
+
+The name of the field to create.  Returns 0 if a field with the
+same name already exists.
+
+=head3 $field
+
+A hash ref of field data, added to the field configuration for this field.
+
+=cut
+
 sub createField {
     my $self = shift;
     my $fieldName = shift;
@@ -1500,6 +1624,23 @@ sub createField {
     $self->_saveFieldConfig;
     return 1;
 }
+
+#-------------------------------------------------------------------
+
+=head2 setField ($fieldName, $field)
+
+Updates a field in the DataForm.  Returns 1 if the update was successful
+
+=head3 $fieldName
+
+The name of the field to update.  Returns 0 if a field with the
+same name does not exist.
+
+=head3 $field
+
+A hash ref of field data, added to the field configuration for this field.
+
+=cut
 
 sub setField {
     my $self = shift;
@@ -1518,6 +1659,15 @@ sub setField {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editTab 
+
+Renders a web form for adding new tabs, or editing existing tabs.  Returns
+insufficient unless the current user canEdit this DataForm.  The GUID of
+the tab is looked for in the form variable C<tabId>.
+
+=cut
+
 sub www_editTab {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1565,6 +1715,14 @@ sub www_editTab {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editTabSave 
+
+Process the editTab form.  Returns insufficient unless the current user canEdit
+this DataForm.
+
+=cut
+
 sub www_editTabSave {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1596,6 +1754,14 @@ sub www_editTabSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_exportTab 
+
+Exports all the data entered into the DataForm in CSV format.  Returns
+insufficient unless the current user canEdit this DataForm.
+
+=cut
+
 sub www_exportTab {
     my $self = shift;
     my $session = $self->session;
@@ -1639,6 +1805,17 @@ sub www_exportTab {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveFieldDown 
+
+Web facing method to move a field one position down.  The field is identified
+by the form variable C<fieldName>.  Returns insufficient unless the current user canEdit
+this DataForm.
+
+This operation is revisioned.
+
+=cut
+
 sub www_moveFieldDown {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1651,6 +1828,16 @@ sub www_moveFieldDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 moveFieldDown ($fieldName)
+
+Shifts the field one position down in the field order.
+
+=head3 $fieldName
+
+The name of the field to move.
+
+=cut
 
 sub moveFieldDown {
     my $self = shift;
@@ -1675,6 +1862,17 @@ sub moveFieldDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveFieldUp 
+
+Web facing method to move a field one position up.  The field is identified
+by the form variable C<fieldName>.  Returns insufficient unless the current user canEdit
+this DataForm.
+
+This operation is revisioned.
+
+=cut
+
 sub www_moveFieldUp {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1687,6 +1885,16 @@ sub www_moveFieldUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 moveFieldUp ($fieldName)
+
+Shifts the field one position up in the field order.
+
+=head3 $fieldName
+
+The name of the field to move.
+
+=cut
 
 sub moveFieldUp {
     my $self = shift;
@@ -1712,6 +1920,17 @@ sub moveFieldUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveTabRight 
+
+Web facing method to move a tab one position to the right.  The tab is identified
+by the form variable C<tabId>.  Returns insufficient unless the current user canEdit
+this DataForm.
+
+This operation is revisioned.
+
+=cut
+
 sub www_moveTabRight {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1725,6 +1944,16 @@ sub www_moveTabRight {
 
 
 #-------------------------------------------------------------------
+
+=head2 moveTabRight ($tabId)
+
+Shifts the tab one position to the right in the tab order.
+
+=head3 $tabId
+
+The GUID of the tab to move.
+
+=cut
 
 sub moveTabRight {
     my $self = shift;
@@ -1744,6 +1973,17 @@ sub moveTabRight {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveTabLeft 
+
+Web facing method to move a tab one position to the left.  The tab is identified
+by the form variable C<tabId>.  Returns insufficient unless the current user canEdit
+this DataForm.
+
+This operation is revisioned.
+
+=cut
+
 sub www_moveTabLeft {
     my $self = shift;
     return $self->session->privilege->insufficient
@@ -1756,6 +1996,17 @@ sub www_moveTabLeft {
 }
 
 #-------------------------------------------------------------------
+
+=head2 moveTabLeft ($tabId)
+
+Shifts the tab one position to the left in the tab order.
+
+=head3 $tabId
+
+The GUID of the tab to move.
+
+=cut
+
 sub moveTabLeft {
     my $self = shift;
     my $tabId = shift;
@@ -1775,6 +2026,14 @@ sub moveTabLeft {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_process 
+
+Process the form for a user entering new data.  Returns insufficient unless
+the current user canView the DataForm.
+
+=cut
+
 sub www_process {
     my $self = shift;
     return $self->session->privilege->insufficient
