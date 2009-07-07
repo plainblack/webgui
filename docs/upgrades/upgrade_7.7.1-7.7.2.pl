@@ -144,6 +144,8 @@ sub removeRssCapableAsset {
     }
     else {
         print "\t\tNot used, removing.\n" unless $quiet;
+        $session->db->write(q|DELETE FROM assetData WHERE assetId IN (SELECT assetId FROM ASSET WHERE className="WebGUI::Asset::RssFromParent")|);
+        $session->db->write(q|DELETE FROM asset WHERE className = "WebGUI::Asset::RssFromParent"|);
         $session->db->write("DROP TABLE RSSCapable");
         $session->db->write("DROP TABLE RSSFromParent");
         my $rssCapableTemplates = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], {

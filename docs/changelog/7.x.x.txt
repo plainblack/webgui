@@ -5,6 +5,7 @@
  - fixed #10553: WebGUI vulnerable to CSRF attacks
  - fixed #10607: snippets empty
  - fixed #10601: Edit field in Thing: no submit button
+ - fixed #10560: 7.7.2 upgrade script leaves rssFromParent assets behind (Wes Morgan)
 
 7.7.13
  - fixed #10574: Creating Calendar Entry
