@@ -434,6 +434,7 @@ sub splitTag {
 
     while (my $token = $p->get_tag($tag)) {
         my $text = $p->get_trimmed_text("/$tag");
+        utf8::upgrade($text);  ##PATCH to work around HTML::Entities and DBD::mysql
         next if $text =~ /^([[:space:]]|[[:^print:]])*$/;    # skip whitespace
         push @result, $text;          # add the text between the tags to the result array
         last if @result == $count;    # if we have a full count then quit

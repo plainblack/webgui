@@ -26,7 +26,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 5; # increment this value for each test you create
+use Test::More tests => 9; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Post::Thread;
@@ -115,13 +115,27 @@ ok($post->canEdit(), "User in groupToEditPost group can edit post after the time
 $session->user({userId => $groupIdEditUser->userId});
 ok($post->canEdit(), "User in groupIdEditUserGroup group can edit post after the timeout");
 
+# getSynopsisAndContent
+
+my ($synopsis, $content) = $post->getSynopsisAndContent('', q|Brandheiße Neuigkeiten rund um's Klettern für euch aus der Region |);
+is($synopsis, q|Brandheiße Neuigkeiten rund um's Klettern für euch aus der Region |, 'getSynopsisAndContent: UTF8 characters okay');
+
+$post->update({synopsis => $synopsis});
+
+##There is a bug in DBD::mysql with not properly encoding 8-bit characters.  Also, HTML::Entities produces
+##8-bit utf8 (not strict) characters.  So we write a quick test to make sure our patch in splitTag works correctly.
+my $dbPost = WebGUI::Asset->newByDynamicClass($session, $post->getId);
+like($dbPost->get('synopsis'), qr/Brandhei.e Neuigkeiten rund um's Klettern f.r euch aus der Region /, 'patch test for DBD::Mysql and HTML::Entities');
+
+($synopsis, $content) = $post->getSynopsisAndContent('', q|less than &lt; greater than &gt;|);
+is($synopsis, q|less than &lt; greater than &gt;|, '... HTML escaped characters okay');
+
+($synopsis, $content) = $post->getSynopsisAndContent('', q|<p>less than &lt; greater than &gt;</p>|);
+is($synopsis, q|less than < greater than >|, '... HTML entities decoded by HTML::splitTag');
+
 TODO: {
     local $TODO = "Tests to make later";
 	ok(0, 'Whole lot more work to do here');
 }
-
-END {
-}
-
 
 # vim: syntax=perl filetype=perl
