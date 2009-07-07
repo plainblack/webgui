@@ -7,11 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.30
+--------------------------------------------------------------------
+   * It was mistakenly reported that 7.6.29 would be a stop version for
+     upgrades.  This is incorrect.  7.6.29 is not a stop version.
+
 7.6.29
 --------------------------------------------------------------------
-   * Due to changes in the userSession database table, you must upgrade
-     to 7.6.29 before upgrading beyond this version.
-
    * WebGUI has allowed metadata possible values to be processed differently
      by Posts than from other Assets.  This causes problems when metadata is
      shared between Posts and other Assets.  To rememdy this, all metadata

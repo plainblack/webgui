@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+dropSessionTokenId($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,16 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub dropSessionTokenId {
+    my $session = shift;
+    print "\tRemoving CSRF token from session database table, if needed... " unless $quiet;
+    # and here's our code
+    $session->db->write(q|ALTER TABLE userSession drop COLUMN tokenId|);
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
