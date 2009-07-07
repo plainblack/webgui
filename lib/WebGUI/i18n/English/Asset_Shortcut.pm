@@ -394,8 +394,8 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 	},
 
 	'not logged in' => {
-		message => q|The asset this shortcut is linked to no longer exists. You need to delete this shortcut.|,
-		lastUpdated => 1244131773,
+		message => q|You must be logged in to personalize the Dashboard.|,
+		lastUpdated => 1246981615,
 	},
 
 	'cannot personalize' => {
