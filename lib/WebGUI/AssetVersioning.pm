@@ -536,7 +536,7 @@ Sets the versioning lock to "off" so that this piece of content may be edited on
 
 sub unsetVersionLock {
     my $self = shift;
-    $self->session->db->write("update asset set isLockedBy=NULL where assetId=".$self->session->db->quote($self->getId));
+    $self->session->db->write("update asset set isLockedBy=NULL where assetId=?",[$self->getId]);
     $self->{_properties}{isLockedBy} = undef;
     $self->updateHistory("unlocked");
     $self->purgeCache;

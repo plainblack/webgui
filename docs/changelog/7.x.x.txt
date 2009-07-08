@@ -8,6 +8,7 @@
  - fixed #10560: 7.7.2 upgrade script leaves rssFromParent assets behind (Wes Morgan)
  - fixed #10612: strange i18n, with regard to label
  - fixed #9935: German characters in Collaboration System
+ - fixed #10610: editing a page and editing goes away
 
 7.7.13
  - fixed #10574: Creating Calendar Entry

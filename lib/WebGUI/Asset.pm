@@ -2728,7 +2728,7 @@ sub www_editSave {
     }
     my $object;
     if ($isNewAsset) {
-        $object = $self->addChild({className=>$self->session->form->process("class","className")});	
+        $object = $self->addChild({className=>$session->form->process("class","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
         $object->{_properties}{url} = undef;
@@ -2738,15 +2738,15 @@ sub www_editSave {
             $object = $self->addRevision;
         } 
         else {
-            return $self->session->asset($self->getContainer)->www_view;
+            return $session->asset($self->getContainer)->www_view;
         }
     }
 
     # Process properties from form post
     my $errors = $object->processPropertiesFromFormPost;
     if (ref $errors eq 'ARRAY') {
-        $self->session->stow->set('editFormErrors', $errors);
-        if ($self->session->form->process('assetId') eq 'new') {
+        $session->stow->set('editFormErrors', $errors);
+        if ($session->form->process('assetId') eq 'new') {
             $object->purge;
             return $self->www_add();
         } else {
@@ -2762,16 +2762,27 @@ sub www_editSave {
         $object->requestAutoCommit;
     }
     # else, try to to auto commit
-    elsif(WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
-        override        => scalar $self->session->form->process('saveAndCommit'),
-        allowComments   => 1,
-        returnUrl       => $self->getUrl,
-    }) eq 'redirect') {
-        return undef;
+    else {
+        my $commitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+            override        => scalar $session->form->process('saveAndCommit'),
+            allowComments   => 1,
+            returnUrl       => $self->getUrl,
+        });
+        $session->log->warn('editSave commitStatus: '. $commitStatus);
+        if ($commitStatus eq 'redirect') {
+            ##Redirect set by tag.  Return nothing to send the user over to the redirect.
+            return undef;
+        }
+        elsif ($commitStatus eq 'commit') {
+            ##Commit was successful.  Update the local object cache so that it will no longer
+            ##register as locked.
+            $self->{_properties}{isLockedBy} = $object->{_properties}{isLockedBy} = undef;
+            $session->log->warn('Cleared isLockedBy');
+        }
     }
 
     # Handle "saveAndReturn" button
-    if ( $self->session->form->process( "saveAndReturn" ) ne "" ) {
+    if ( $session->form->process( "saveAndReturn" ) ne "" ) {
         return $object->www_edit;
     }
 
@@ -2795,8 +2806,8 @@ sub www_editSave {
         return $self->session->asset->$method();
     }
 
-    $self->session->asset($object->getContainer);
-    return $self->session->asset->www_view;
+    $session->asset($object->getContainer);
+    return $session->asset->www_view;
 }
 
 
