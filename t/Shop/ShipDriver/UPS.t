@@ -206,7 +206,7 @@ $properties = $driver->get();
 $properties->{sourceCountry} = 'United States';
 $driver->update($properties);
 eval { $driver->calculate() };
-$e = Exception::Class->caught();
+$e = WebGUI::Error->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no userId');
 cmp_deeply(
     $e,
@@ -346,7 +346,7 @@ $properties->{licenseNo}     = $license;
 $properties->{sourceZip}     = '97123';
 $properties->{sourceCountry} = 'United States';
 $properties->{shipService}   = '03';
-$properties->{pickupCode}    = '01';
+$properties->{pickupType}    = '01';
 $driver->update($properties);
 
 $driver->testMode(1);
