@@ -19,7 +19,8 @@ use WebGUI::Exception;
 use Exception::Class (
 
     'WebGUI::Error::Shop::MaxOfItemInCartReached' => {
-        description     => "Some items restrict how many you can put into your cart.",
+        description  => "Some items restrict how many you can put into your cart.",
+        isa          => 'WebGUI::Error',
         },
 );
 
