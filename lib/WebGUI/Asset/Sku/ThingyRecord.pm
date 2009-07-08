@@ -207,6 +207,11 @@ sub getEditForm {
         $self->session->url->extras('yui-webgui/build/thingyRecord/thingyRecord.js'),
         { type => "text/javascript" },
     );
+    $self->session->style->setRawHeadTags(<<EOSCRIPT);
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady( function () { var thingForm = YAHOO.util.Dom.get('thingId_formId'); WebGUI.ThingyRecord.getThingFields(thingForm.options[thingForm.selectedIndex].value,'thingFields_formId')} );
+</script>
+EOSCRIPT
     return $self->SUPER::getEditForm;
 }
 

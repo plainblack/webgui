@@ -9,6 +9,7 @@
  - fixed #10612: strange i18n, with regard to label
  - fixed #9935: German characters in Collaboration System
  - fixed #10610: editing a page and editing goes away
+ - fixed #10518: ThingyRecord edit page - Fields to Edit not filled in
 
 7.7.13
  - fixed #10574: Creating Calendar Entry
