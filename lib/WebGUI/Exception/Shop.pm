@@ -56,12 +56,16 @@ Exceptions which apply only to the WebGUI commerce system.
 
 =head1 EXCEPTION TYPES
 
-These exception classes are defined in this class:
-
+These following exception classes are defined in this class.  Each is a subclass of
+WebGUI::Error.
 
 =head2 WebGUI::Error::Shop::MaxOfItemInCartReached
 
 Throw this when there are too many items of a given type added to the cart so that the user can be notified. ISA WebGUI::Error.
+
+=head2 WebGUI::Error::Shop::RemoteShippingRate
+
+Shipping drivers should throw this when there is a problem with a remote rate lookup.
 
 =cut
 
