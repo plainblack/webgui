@@ -19,11 +19,13 @@ use WebGUI::Exception;
 use Exception::Class (
 
     'WebGUI::Error::Shop::MaxOfItemInCartReached' => {
-        description     => "Some items restrict how many you can put into your cart.",
+        description  => "Some items restrict how many you can put into your cart.",
+        isa          => 'WebGUI::Error',
     },
 
     'WebGUI::Error::Shop::RemoteShippingRate' => {
-        description     => "Errors during the remote rate lookups.",
+        description  => "Errors during the remote rate lookups.",
+        isa          => 'WebGUI::Error',
     },
 
 );
