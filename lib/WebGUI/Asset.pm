@@ -2650,19 +2650,20 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 =cut
 
 sub www_editSave {
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
-    my $isNewAsset = $self->session->form->process("assetId") eq "new" ? 1 : 0;
-    return $self->session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    if ($self->session->config("maximumAssets")) {
-        my ($count) = $self->session->db->quickArray("select count(*) from asset");
-        my $i18n = WebGUI::International->new($self->session, "Asset");
-        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+    my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
+    return $session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
+    return $session->privilege->insufficient() unless $self->canEdit;
+    if ($session->config("maximumAssets")) {
+        my ($count) = $session->db->quickArray("select count(*) from asset");
+        my $i18n = WebGUI::International->new($session, "Asset");
+        return $session->style->userStyle($i18n->get("over max assets")) if ($session->config("maximumAssets") <= $count);
     }
     my $object;
     if ($isNewAsset) {
-        $object = $self->addChild({className=>$self->session->form->process("class","className")});	
+        $object = $self->addChild({className=>$session->form->process("class","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
         $object->{_properties}{url} = undef;
@@ -2672,15 +2673,15 @@ sub www_editSave {
             $object = $self->addRevision;
         } 
         else {
-            return $self->session->asset($self->getContainer)->www_view;
+            return $session->asset($self->getContainer)->www_view;
         }
     }
 
     # Process properties from form post
     my $errors = $object->processPropertiesFromFormPost;
     if (ref $errors eq 'ARRAY') {
-        $self->session->stow->set('editFormErrors', $errors);
-        if ($self->session->form->process('assetId') eq 'new') {
+        $session->stow->set('editFormErrors', $errors);
+        if ($session->form->process('assetId') eq 'new') {
             $object->purge;
             return $self->www_add();
         } else {
@@ -2696,36 +2697,47 @@ sub www_editSave {
         $object->requestAutoCommit;
     }
     # else, try to to auto commit
-    elsif(WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
-        override        => scalar $self->session->form->process('saveAndCommit'),
-        allowComments   => 1,
-        returnUrl       => $self->getUrl,
-    }) eq 'redirect') {
-        return undef;
+    else {
+        my $commitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+            override        => scalar $session->form->process('saveAndCommit'),
+            allowComments   => 1,
+            returnUrl       => $self->getUrl,
+        });
+        $session->log->warn('editSave commitStatus: '. $commitStatus);
+        if ($commitStatus eq 'redirect') {
+            ##Redirect set by tag.  Return nothing to send the user over to the redirect.
+            return undef;
+        }
+        elsif ($commitStatus eq 'commit') {
+            ##Commit was successful.  Update the local object cache so that it will no longer
+            ##register as locked.
+            $self->{_properties}{isLockedBy} = $object->{_properties}{isLockedBy} = undef;
+            $session->log->warn('Cleared isLockedBy');
+        }
     }
 
     # Handle "saveAndReturn" button
-    if ( $self->session->form->process( "saveAndReturn" ) ne "" ) {
+    if ( $session->form->process( "saveAndReturn" ) ne "" ) {
         return $object->www_edit;
     }
 
     # Handle "proceed" form parameter
-    if ($self->session->form->process("proceed") eq "manageAssets") {
-        $self->session->asset($object->getParent);
-        return $self->session->asset->www_manageAssets;
+    if ($session->form->process("proceed") eq "manageAssets") {
+        $session->asset($object->getParent);
+        return $session->asset->www_manageAssets;
     }
-    elsif ($self->session->form->process("proceed") eq "viewParent") {
-        $self->session->asset($object->getParent);
-        return $self->session->asset->www_view;
+    elsif ($session->form->process("proceed") eq "viewParent") {
+        $session->asset($object->getParent);
+        return $session->asset->www_view;
     }
-    elsif ($self->session->form->process("proceed") ne "") {
-        my $method = "www_".$self->session->form->process("proceed");
-        $self->session->asset($object);
-        return $self->session->asset->$method();
+    elsif ($session->form->process("proceed") ne "") {
+        my $method = "www_".$session->form->process("proceed");
+        $session->asset($object);
+        return $session->asset->$method();
     }
 
-    $self->session->asset($object->getContainer);
-    return $self->session->asset->www_view;
+    $session->asset($object->getContainer);
+    return $session->asset->www_view;
 }
 
 

@@ -1,4 +1,5 @@
 7.6.31
+ - fixed #10610: editing a page and editing goes away
 
 7.6.30
  - fixed #10602: Calendar feed importing extra characters.
