@@ -2768,7 +2768,6 @@ sub www_editSave {
             allowComments   => 1,
             returnUrl       => $self->getUrl,
         });
-        $session->log->warn('editSave commitStatus: '. $commitStatus);
         if ($commitStatus eq 'redirect') {
             ##Redirect set by tag.  Return nothing to send the user over to the redirect.
             return undef;
@@ -2777,7 +2776,6 @@ sub www_editSave {
             ##Commit was successful.  Update the local object cache so that it will no longer
             ##register as locked.
             $self->{_properties}{isLockedBy} = $object->{_properties}{isLockedBy} = undef;
-            $session->log->warn('Cleared isLockedBy');
         }
     }
 
