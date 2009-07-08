@@ -3,6 +3,7 @@ package WebGUI::Shop::ShipDriver::UPS;
 use strict;
 use base qw/WebGUI::Shop::ShipDriver/;
 use WebGUI::Exception;
+use WebGUI::Exception::Shop;
 use XML::Simple;
 use LWP;
 use Tie::IxHash;
@@ -85,7 +86,7 @@ sub buildXML {
 #       RequestOption => [ 'shop' ],
     };
     $xmlRate->{PickupType} = {
-        Code => [ $self->get('pickupCode') ],
+        Code => [ $self->get('pickupType') ],
     };
     $xmlRate->{Shipment} = {
         Shipper => {
@@ -193,12 +194,12 @@ sub calculate {
         my $response = $self->_doXmlRequest($xml);
         ##Error handling
         if (! $response->is_success) {
-            WebGUI::Error::RemoteShippingRate->throw(error => 'Problem connecting to UPS Web Tools: '. $response->status_line);
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Problem connecting to UPS Web Tools: '. $response->status_line);
         }
         my $returnedXML = $response->content;
         my $xmlData     = XMLin($returnedXML, ForceArray => [qw/RatedPackage/]);
         if (! $xmlData->{Response}->{ResponseStatusCode}) {
-            WebGUI::Error::RemoteShippingRate->throw(error => 'Problem with UPS Online Tools XML: '. $xmlData->{Response}->{Error}->{ErrorDescription});
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Problem with UPS Online Tools XML: '. $xmlData->{Response}->{Error}->{ErrorDescription});
         }
         ##Summarize costs from returned data
         $cost += $self->_calculateFromXML($xmlData);
