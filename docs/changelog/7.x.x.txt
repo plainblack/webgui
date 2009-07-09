@@ -13,6 +13,7 @@
  - fixed #10603: ThingyRecord Thank You/Confirmation Screen Confusing
  - fixed #10615: i18n Asset_StoryArchive - deleteIcon
  - fixed: Exceptions from WebGUI::Exception::Shop
+ - fixed #10616: karma list will break eventually
 
 7.7.13
  - fixed #10574: Creating Calendar Entry

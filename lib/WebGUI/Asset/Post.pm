@@ -708,12 +708,14 @@ Returns a hash reference of template variables for this Post.
 =cut
 
 sub getTemplateVars {
-	my $self = shift;
-	my %var = %{$self->get};
+	my $self    = shift;
+    my $session = $self->session;
+	my %var     = %{$self->get};
+    my $postUser   = WebGUI::User->new($session, $self->get("ownerUserId"));
 	$var{"userId"} = $self->get("ownerUserId");
 	$var{"user.isPoster"} = $self->isPoster;
-	$var{"avatar.url"} = $self->getAvatarUrl;
-	$var{"userProfile.url"} = $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
+	$var{"avatar.url"}    = $self->getAvatarUrl;
+	$var{"userProfile.url"} = $postUser->getProfileUrl($self->getUrl());
 	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->get("creationDate"));
 	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->get("revisionDate"));
 	$var{'title.short'} = $self->chopTitle;
