@@ -104,6 +104,7 @@ $properties = {
 };
 
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($versionTag2);
 
 my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
 
@@ -119,6 +120,7 @@ $canEditMaker->prepare({
 });
 
 my $versionTag3 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($versionTag3);
 $properties = {
 	#            '1234567890123456789012'
 	id          => 'canViewAsset0000000010',
@@ -301,6 +303,7 @@ $session->{_request} = $origRequest;
 ################################################################
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($versionTag);
 $versionTag->set({name=>"Asset tests"});
 
 $properties = {
@@ -744,6 +747,7 @@ $product3->purge;
 ################################################################
 
 my $versionTag4 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($versionTag4);
 $versionTag4->set( { name => 'inheritUrlFromParent tests' } );
 
 $properties = {
@@ -816,6 +820,7 @@ is($iufpAsset3->getUrl, '/inheriturlfromparent01/inheriturlfromparent02/inheritu
 ################################################################
 
 my $versionTag5 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($versionTag5);
 $versionTag5->set( { name => 'move commit of child to uncommitted parent on requestAutoCommit tests vt1' } );
 
 $properties = {
@@ -832,6 +837,7 @@ is($parentVersionTag->get('isCommitted'),0, 'built non-committed parent asset');
 
 
 my $versionTag6 = WebGUI::VersionTag->create($session, {});
+WebGUI::Test->tagsToRollback($versionTag6);
 $versionTag6->set( { name => 'move commit of child to uncommitted parent on requestAutoCommit tests vt2' } );
 $versionTag6->setWorking;
 
@@ -870,13 +876,6 @@ is($testVersionTag->get('isCommitted'),1,'parent asset is now committed');
 
 $childVersionTag = WebGUI::VersionTag->new($session, $childAsset->get('tagId'));
 is($childVersionTag->get('isCommitted'),1,'child asset is now committed');
-
-
-END {
-    foreach my $vTag ($versionTag, $versionTag2, $versionTag3, $versionTag4, $versionTag5, $versionTag6, ) {
-        $vTag->rollback;
-    }
-}
 
 ##Return an array of hashrefs.  Each hashref describes a test
 ##for the fixId method.
