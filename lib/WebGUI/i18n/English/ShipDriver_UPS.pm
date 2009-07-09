@@ -92,6 +92,32 @@ our $I18N = {
         lastUpdated => 1242945844,
     },
 
+    'customer classification' => {
+        message => q|Customer Classification|,
+        lastUpdated => 1241214572,
+        context => q|What kind or type of customer are you?|,
+    },
+
+    'customer classification help' => {
+        message => q|The kind or type of customer you are.|,
+        lastUpdated => 1247110533,
+    },
+
+    'customer classification 01' => {
+        message => q|Wholesale|,
+        lastUpdated => 1247110533,
+    },
+
+    'customer classification 03' => {
+        message => q|Occasional|,
+        lastUpdated => 1247110533,
+    },
+
+    'customer classification 04' => {
+        message => q|Retail|,
+        lastUpdated => 1247110533,
+    },
+
     'flatFee' => {
         message => q|Flat Fee|,
         lastUpdated => 1241214572,
@@ -206,8 +232,8 @@ our $I18N = {
     },
 
     'ship type help' => {
-        message => q|Pick a type of shipping that will be used.  The different types have different services available.  Not all services are available in all types, or in all countries.|,
-        lastUpdated => 1242166045,
+        message => q|Pick a type of shipping that will be used.  The different types have different services available.  Not all services are available in all types, or in all countries.  Changing the service will change the Ship Service options below.|,
+        lastUpdated => 1247111015,
         context => q|Label for a type of shipping from the UPS.|,
     },
 

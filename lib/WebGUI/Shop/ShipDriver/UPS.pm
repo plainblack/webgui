@@ -88,6 +88,9 @@ sub buildXML {
     $xmlRate->{PickupType} = {
         Code => [ $self->get('pickupType') ],
     };
+    $xmlRate->{CustomerClassification} = {
+        Code => [ $self->get('customerClassification') ],
+    };
     $xmlRate->{Shipment} = {
         Shipper => {
             Address => [ {
@@ -286,6 +289,12 @@ sub definition {
     $pickupTypes{'19'} = $i18n->get('pickup code 19');
     $pickupTypes{'20'} = $i18n->get('pickup code 20');
 
+    tie my %customerClassification, 'Tie::IxHash';
+    ##Note, these keys are required XML keywords in the UPS XML API.
+    $customerClassification{'01'} = $i18n->get('customer classification 01');
+    $customerClassification{'03'} = $i18n->get('customer classification 03');
+    $customerClassification{'04'} = $i18n->get('customer classification 04');
+
     my $localizedCountries = Locales::Country->new('en'); ##Note, for future i18n change the locale
     tie my %localizedCountries, 'Tie::IxHash';
     %localizedCountries = map { $_ => $_ } grep { !ref $_ } $localizedCountries->all_country_names();
@@ -349,6 +358,13 @@ sub definition {
             label        => $i18n->get('pickup type'),
             hoverHelp    => $i18n->get('pickup type help'),
             options      => \%pickupTypes,
+            defaultValue => '01',
+        },
+        customerClassification => {
+            fieldType    => 'selectBox',
+            label        => $i18n->get('customer classification'),
+            hoverHelp    => $i18n->get('customer classification help'),
+            options      => \%customerClassification,
             defaultValue => '01',
         },
 ##Note, if a flat fee is added to this driver, then according to the license

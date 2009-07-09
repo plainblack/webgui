@@ -340,13 +340,14 @@ if (! $license) {
 }
 
 $properties = $driver->get();
-$properties->{userId}        = $userId;
-$properties->{password}      = $password;
-$properties->{licenseNo}     = $license;
-$properties->{sourceZip}     = '97123';
-$properties->{sourceCountry} = 'United States';
-$properties->{shipService}   = '03';
-$properties->{pickupType}    = '01';
+$properties->{userId}                 = $userId;
+$properties->{password}               = $password;
+$properties->{licenseNo}              = $license;
+$properties->{sourceZip}              = '97123';
+$properties->{sourceCountry}          = 'United States';
+$properties->{shipService}            = '03';
+$properties->{pickupType}             = '01';
+$properties->{customerClassification} = '04';
 $driver->update($properties);
 
 $driver->testMode(1);
@@ -378,6 +379,8 @@ cmp_deeply(
     '... correct access request data structure for 1 package'
 );
 
+diag $xmlR;
+
 my $xmlRate = XMLin($xmlR,
     KeepRoot => 1,
 );
@@ -386,9 +389,10 @@ cmp_deeply(
     $xmlRate, {
         RatingServiceSelectionRequest => {
             'xml:lang' => 'en-US',
-            PickupType => { Code => '01', },
-            Request    => { RequestAction => 'Rate', },
-            Shipment   => {
+            PickupType             => { Code => '01', },
+            CustomerClassification => { Code => '04', },
+            Request                => { RequestAction => 'Rate', },
+            Shipment               => {
                 Shipper => {
                     Address => { PostalCode => 97123, CountryCode => 'us', },
                 },
@@ -430,6 +434,8 @@ $xml = $driver->buildXML($cart, @shippableUnits);
 
 ($xmlA, $xmlR) = split /\n(?=<\?xml)/, $xml;
 
+diag $xmlR;
+
 $xmlRate = XMLin( $xmlR,
     KeepRoot   => 1,
     ForceArray => ['Package'],
@@ -439,9 +445,10 @@ cmp_deeply(
     $xmlRate, {
         RatingServiceSelectionRequest => {
             'xml:lang' => 'en-US',
-            PickupType => { Code => '01', },
-            Request    => { RequestAction => 'Rate', },
-            Shipment   => {
+            PickupType             => { Code => '01', },
+            CustomerClassification => { Code => '04', },
+            Request                => { RequestAction => 'Rate', },
+            Shipment               => {
                 Shipper => {
                     Address => { PostalCode => 97123, CountryCode => 'us', },
                 },
@@ -474,6 +481,7 @@ SKIP: {
     my $xmlData = XMLin($response->content, ForceArray => [qw/RatedPackage/],);
     ok($xmlData->{Response}->{ResponseStatusCode}, '... responseCode is successful');
     ok($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue}, '... total charges returned');
+    diag $xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue};
 
 }
 
