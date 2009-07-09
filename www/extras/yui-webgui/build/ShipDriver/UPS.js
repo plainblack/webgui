@@ -16,11 +16,8 @@ WebGUI.ShipDriver.UPS.changeServices
     
     var el      = document.getElementById(elementId);
     //Delete old options
-    var wasSelected = '';
+    var wasSelected = el.options[el.selectedIndex].value;
     while ( el.options.length >= 1 ) {
-        if ( el.options[0].selected ) {
-            wasSelected = el.options[0].value;
-        }
         el.remove(0);
     }
     var fields  = {};
@@ -96,7 +93,8 @@ WebGUI.ShipDriver.UPS.initServiceTables = function () {
         '65' : WebGUI.ShipDriver.UPS.i18n.get('ShipDriver_UPS', 'us international 65')
     };
 
-    var shipService = document.getElementById('shipType_formId').value;
-    WebGUI.ShipDriver.UPS.changeServices(shipService, 'shipService_formId');
+    var shipType     = document.getElementById('shipType_formId');
+    var selectedType = shipType.options[shipType.selectedIndex].value;
+    WebGUI.ShipDriver.UPS.changeServices(selectedType, 'shipService_formId');
 
 }
