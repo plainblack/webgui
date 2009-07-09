@@ -1,3 +1,5 @@
+7.7.15
+
 7.7.14
  - fixed #10606: shelf selector
  - fixed: Have just 1 list of protected groups.  Use that everywhere.
