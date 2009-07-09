@@ -3325,6 +3325,7 @@ sequenceNumber');
             push(@field_loop,{
                 "field_value" => $value,
                 "field_id" => $fieldId,
+                "field_label" => $field->{properties}{label},
             });
         }
         my $thingDataId = $searchResult->{thingDataId};
