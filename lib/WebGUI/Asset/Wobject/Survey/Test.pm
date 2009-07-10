@@ -265,6 +265,8 @@ sub _test {
     my $responses = {};
     my $lowestIndex;
     my $surveyOrder = $rJSON->surveyOrder;
+    my $multipleChoiceTypes = $rJSON->survey->multipleChoiceTypes;
+    delete $multipleChoiceTypes->{Tagged}; # Don't treat Tagged as mc question type
     while ( my ( $variable, $spec ) = each %$args ) {
         my $index = $rJSON->surveyOrderIndex($variable);
         return fail($testCount, "Invalid question variable (1): $variable") if !defined $index;
@@ -279,18 +281,8 @@ sub _test {
         # Goal now is to figure out what answer(s) we are supposed to record
         if (!defined $spec) {
             $self->session->log->debug("Spec undefined, assuming that means ignore answer value");
-        } 
-        elsif ( $questionType eq 'Text' || $questionType eq 'Number' || $questionType eq 'Slider' || $questionType eq 'Tagged') {
-            # Assume spec is raw value to record in the single answer
-            $responses->{"$address->[0]-$address->[1]-0"} = $spec;
-        } elsif ( $questionType eq 'Year Month' ) {
-            if ($spec !~ m/\d{4} \w+/) {
-                return fail($testCount, "Invalid input for Year Month question type", "got: $spec\nExpected: YYYY Month");
-            }
-            $responses->{"$address->[0]-$address->[1]-0"} = $spec;
-        }
-        else {
-            # Assume spec is the raw text of the answer we want
+        } elsif (exists $multipleChoiceTypes->{$questionType}) {
+            # Multi-choice question, so spec is the raw text of the answer we want
             my $answer;
             my $aIndex = 0;
             my $answerAddress;
@@ -308,6 +300,15 @@ sub _test {
             }
             $self->session->log->debug("Recording $variable ($answerAddress) => $answer->{recordedAnswer}");
             $responses->{$answerAddress} = 1;
+        } elsif ( $questionType eq 'Year Month' ) {
+            # Handle YearMonth delicately
+            if ($spec !~ m/\d{4} \w+/) {
+                return fail($testCount, "Invalid input for Year Month question type", "got: $spec\nExpected: YYYY Month");
+            }
+            $responses->{"$address->[0]-$address->[1]-0"} = $spec;
+        } else {
+            # Assume spec is raw value to record in the 0th answer
+            $responses->{"$address->[0]-$address->[1]-0"} = $spec;
         }
     }
     
