@@ -37,7 +37,7 @@ Clean up the userLoginLog for space using age and last login preservation rules
 
 =head2 definition ( session, definition )
 
-See WebGUI::Workflow::Activity::defintion() for details.
+See WebGUI::Workflow::Activity::definition() for details.
 
 =cut 
 
