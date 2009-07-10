@@ -42,6 +42,11 @@ sub addFile {
     my $files     = $self->get($collateralType);
     my $uriExists = $self->getCollateralDataIndex($files, 'uri', $uri) != -1 ? 1 : 0;
     return 0, 'Duplicate URI' if $uriExists;
+    
+    if (my $msg = $self->validate($uri)) {
+        return 0, $msg;
+    }
+    
     $self->setCollateral(
         $collateralType,
         'fileId',
@@ -54,6 +59,7 @@ sub addFile {
     $self->update({lastModified => time()});
     return 1;
 }
+    
 
 #-------------------------------------------------------------------
 
@@ -569,7 +575,7 @@ A URI object.
 
 sub fetchDir {
     my ($self, $uri ) = @_;
-    my $filepath = $uri->path;
+    my $filepath = $self->resolveFilePath($uri->path);
     return {} unless (-e $filepath && -r _ && -d _);
     my @stats = stat(_);
     my $dir   = Path::Class::Dir->new($filepath);
@@ -601,7 +607,7 @@ A URI object.
 
 sub fetchFile {
     my ($self, $uri ) = @_;
-    my $filepath = $uri->path;
+    my $filepath = $self->resolveFilePath($uri->path);
     return {} unless (-e $filepath && -r _);
     return $self->fetchDir($uri) if -d _;
     my @stats = stat(_); # recycle stat data from file tests.
@@ -994,5 +1000,86 @@ sub setCollateral {
     return $keyValue;
 }
 
+#-------------------------------------------------------------------
+
+=head2 validate ( $uri )
+
+Check a uri for validation errors. Returns a validation error message (if problems found).
+
+=head3 $uri
+
+The URI to validate
+
+=cut
+
+sub validate {
+    my $self = shift;
+    my $uri = shift;
+    
+    my $urio   = URI->new($uri) or return "Invalid URI: $uri";
+    my $scheme = $urio->scheme;
+    my $path = $urio->path;
+    
+    # File validation
+    if ($scheme eq 'file') {
+        if ($path !~ m{^uploads/|^extras/}) {
+            return q{File uri must begin with file:uploads/.. or file:extras/..};
+        }
+        
+        # N.B. Once we have Path::Class >= 0.17 we can use resolve() for a better solution to this canonicalisation problem
+        if ($path =~ m{\.\./}) {
+            return q{Directory traversal not permitted};
+        }
+        
+        my $uploadsDir = Path::Class::Dir->new($self->session->config->get('uploadsPath'));
+        my $extrasDir  = Path::Class::Dir->new($self->session->config->get('extrasPath'));
+        
+        my $file = $self->resolveFilePath($path);
+        
+        return q{File not found} unless -e $file;
+        
+        if (!$uploadsDir->contains($file) && !$extrasDir->contains($file)) {
+            return q{File uri must correspond to files inside your uploads dir or your extras dir};
+        }
+    }
+    
+    return;
+}
+
+#-------------------------------------------------------------------
+
+=head2 resolveFilePath ( $path )
+
+Resolves a relative path into a L<Path::Class::File> object. The path,
+which must being with either C<uploads> or C<extras>, is resolved into
+an absolute path with C<uploads> or C<extras> replaced with the value
+of C<uploadsPath> or c<extrasPath> from the site config file.
+
+For example, the following path
+
+ file:extras/path/to/my/file
+
+Resolves to something like:
+
+ /data/WebGUI/www/extras/path/to/my/file
+
+=head3 $path
+
+A relative file path that must begine with either C<uploads> or C<extras>.
+
+=cut
+
+sub resolveFilePath {
+    my $self = shift;
+    my $path = shift;
+    
+    if ($path =~ s{^uploads/}{}) {
+        my $uploadsDir = Path::Class::Dir->new($self->session->config->get('uploadsPath'));
+        return Path::Class::File->new($uploadsDir, $path);
+    } elsif ($path =~ s{^extras/}{}) {
+        my $extrasDir  = Path::Class::Dir->new($self->session->config->get('extrasPath'));
+        return Path::Class::File->new($extrasDir, $path);
+    }
+}
 
 1;
