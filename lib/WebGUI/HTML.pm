@@ -182,7 +182,8 @@ The text content to be formatted.
 
 =head3 contentType
 
-The content type to use as formatting. Valid types are 'html', 'text', 'code', and 'mixed'. Defaults to mixed. See also the contentType method in WebGUI::Form, WebGUI::HTMLForm, and WebGUI::FormProcessor.
+The content type to use as formatting. Valid types are 'text', 'code', and 'mixed'. The default contentType is 'mixed'.
+See also the contentType method in WebGUI::Form, WebGUI::HTMLForm, and WebGUI::FormProcessor.
 
 =cut
 

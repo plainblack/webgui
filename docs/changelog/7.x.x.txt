@@ -1,5 +1,6 @@
 7.7.15
   - fixed #10629: WebGUI::ProfileField create new field bug
+  - fixed #10626: Carriage returns stripped from Wiki comments
 
 7.7.14
  - fixed #10606: shelf selector
