@@ -552,7 +552,7 @@ sub fetchAsset {
 
 #-------------------------------------------------------------------
 
-=head2 fetchDirectory ( $uri )
+=head2 fetchDir ( $uri )
 
 Fetches all files from a filesystem directory.  Returns a hashref
 with the date that the directory was last updated, a contents entry
