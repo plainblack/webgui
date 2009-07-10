@@ -33,7 +33,7 @@ WebGUI::Test->usersToDelete($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 22;        # Increment this number for each test you create
+plan tests => 28;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -79,18 +79,22 @@ ok( $ff = $uilevelField->formField(undef, undef, $newUser), 'formField method re
 $ffvalue = $newUser->profileField('uiLevel');
 like( $ff, qr/$ffvalue/, 'html returned contains value, uiLevel field, defaulted user' );
 
-#########################################################
+###########################################################
 #
-# set, changing fieldTypes
+# create
 #
-#########################################################
+###########################################################
 
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {
-    fieldType => 'Text',
+    fieldType => 'Float',  ##Note, intentionally choosing a non-Text type of field
     label     => 'Test Field',
 });
 
-my $textFieldType = lc WebGUI::Form::Text->getDatabaseFieldType();
+is($newProfileField->get('fieldType'), 'Float', 'create: makes field with correct type');
+is($newProfileField->get('label'), 'Test Field', 'correct label');
+is($newProfileField->getLabel, 'Test Field', 'getLabel works, too');
+
+my $textFieldType = lc WebGUI::Form::Float->getDatabaseFieldType();
 my $htmlFieldType = lc WebGUI::Form::HTMLArea->getDatabaseFieldType();
 
 my $fieldSpec = $session->db->quickHashRef('describe userProfileData testField');
@@ -101,6 +105,15 @@ is($newProfileField->get('fieldType'), 'HTMLArea', 'test field updated to HTMLAr
 
 $fieldSpec = $session->db->quickHashRef('describe userProfileData testField');
 is (lc $fieldSpec->{Type}, $htmlFieldType, 'database updated along with profile field object');
+
+my $newProfileField2 = WebGUI::ProfileField->create($session, 'testField2', {
+    label     => q|WebGUI::International::get('webgui','WebGUI')|,
+    fieldName => 'Text',
+});
+
+is($newProfileField2->get('fieldType'), 'ReadOnly', 'create: default fieldType is ReadOnly');
+is($newProfileField2->get('label'), q|WebGUI::International::get('webgui','WebGUI')|, 'getting raw label');
+is($newProfileField2->getLabel, 'WebGUI', 'getLabel will process safeEval calls for i18n');
 
 ###########################################################
 #
@@ -115,6 +128,7 @@ ok( !WebGUI::ProfileField->exists($session, time), "random field does not exist"
 # Cleanup
 END {
     $newProfileField->delete;
+    $newProfileField2->delete;
 }
 
 

@@ -105,17 +105,22 @@ sub create {
 
     ### Check data
     # Check if the field already exists
+    $properties->{fieldType} ||= "ReadOnly";
     return undef if $class->exists($session,$fieldName);
     return undef if $class->isReservedFieldName($fieldName);
 
     ### Data okay, create the field
     # Add the record
-    my $id 
-        = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},$fieldName);
+    my $id = $session->db->setRow("userProfileField","fieldName",
+                {
+                    fieldName=>"new",
+                    fieldType => $properties->{fieldType},
+                },
+                $fieldName
+    );
     my $self = $class->new($session,$id);
     
     # Get the field's data type
-    $properties->{fieldType} ||= "ReadOnly";
     my $formClass   = $self->getFormControlClass;
     eval { WebGUI::Pluggable::load($formClass) };
     my $dbDataType = $formClass->getDatabaseFieldType;
