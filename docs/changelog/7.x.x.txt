@@ -2,6 +2,7 @@
  - fixed #10610: editing a page and editing goes away
  - fixed: Exceptions from WebGUI::Exception::Shop
  - fixed #10579: H1 vs H2 in PageLayouts
+  - fixed #10629: WebGUI::ProfileField create new field bug
 
 7.6.30
  - fixed #10602: Calendar feed importing extra characters.

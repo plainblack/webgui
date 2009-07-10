@@ -104,6 +104,7 @@ sub create {
 
     ### Check data
     # Check if the field already exists
+    $properties->{fieldType} ||= "ReadOnly";
     my $fieldNameExists 
         = $session->db->quickScalar(
             "select count(*) from userProfileField where fieldName=?", 
@@ -114,12 +115,16 @@ sub create {
 
     ### Data okay, create the field
     # Add the record
-    my $id 
-        = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},$fieldName);
+    my $id = $session->db->setRow("userProfileField","fieldName",
+                {
+                    fieldName=>"new",
+                    fieldType => $properties->{fieldType},
+                },
+                $fieldName
+    );
     my $self = $class->new($session,$id);
     
     # Get the field's data type
-    $properties->{fieldType} ||= "ReadOnly";
     my $formClass   = $self->getFormControlClass;
     eval "use $formClass;";
     my $dbDataType = $formClass->getDatabaseFieldType;
