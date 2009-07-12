@@ -956,6 +956,7 @@ sub removeType{
     my $self = shift;
     my $address = shift;
     $self->surveyJSON->removeType($address);
+    $self->persistSurveyJSON();
     return $self->www_loadSurvey( { address => $address } );
     
 }

@@ -147,22 +147,51 @@ sub loadTypes {
     }
 }
 
+=head2 addType ( questionType, address )
+
+Adds a new multiple-choice question type. If a bundle of the same name already exists, 
+the definition for that bundle is updated.
+
+=head3 questionType
+
+The questionType of the multiple-choice question bundle
+
+=head3 address
+
+The address of a question to use as the basis for the new multiple-choice question bundle definition.
+After creating the new bundle, the question is updated so that its questionType is set to the name
+of the new bundle.
+
+=cut
+
 sub addType { 
     my $self = shift;
-    my $name = shift;
+    my $questionType = shift;
     my $address = shift;
-    my $obj = $self->getObject($address);
-    my $ansString = $obj->{answers} ? to_json $obj->{answers} : {};
-    $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$name,$ansString,$ansString]);
-    $self->question($address)->{questionType} = $name;
+    my $question = $self->question($address);
+    my $ansString = $question->{answers} ? to_json $question->{answers} : {};
+    $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$questionType,$ansString,$ansString]);
+    $question->{questionType} = $questionType;
 }
 
+=head2 removeType ( address )
+
+Removes a multiple-choice bundle.
+
+=head3 address
+
+The address of the question whose questionType corresponds to a bundle that should be removed. 
+After removing the bundle, the question is updated so that its questionType reverts back to
+the generic "Multiple Choice" questionType.
+
+=cut
 
 sub removeType {
     my $self = shift;
     my $address = shift;
-    my $obj = $self->getObject($address);
-    $self->session->db->write("DELETE FROM Survey_questionTypes WHERE questionType = ?",[$obj->{questionType}]);
+    my $question = $self->question($address);
+    $self->session->db->write("DELETE FROM Survey_questionTypes WHERE questionType = ?",[$question->{questionType}]);
+    $question->{questionType} = 'Multiple Choice';
 }
 
 =head2 specialQuestionTypes
@@ -389,7 +418,7 @@ sub getObject {
     }
 }
 
-=head2 getSectionEditVars ( $address )
+=head2 getEditVars ( $address )
 
 A dispatcher for getSectionEditVars, getQuestionEditVars and getAnswerEditVars.  Uses $address
 to figure out what has been requested, then invokes that method and returns the results
@@ -798,7 +827,13 @@ sub update {
     return;
 }
 
-sub _handleSpecialAnswerUpdates{
+=head2 _handleSpecialAnswerUpdates
+
+Private method. Handles special L<update> cases where answers need to be treated differently.
+
+=cut
+
+sub _handleSpecialAnswerUpdates {
     my $self = shift;
     my $address = shift;
     my $properties = shift;
@@ -1246,7 +1281,7 @@ sub lastQuestionIndex {
     return $self->totalQuestions(@_) - 1;
 }
 
-=head2 lastQuestionIndex
+=head2 lastAnswerIndex
 
 Convenience method to return the index of the last Answer, overall, or in the 
 given Question if $address given. Frequently used to  
@@ -1420,6 +1455,14 @@ sub validateSurvey{
    return \@messages; 
 }
 
+=head2 validateGoto
+
+Performs validation on a goto target. See L<validateSurvey>.
+
+Checks that the goto variable exists.
+
+=cut
+
 sub validateGoto{
     my $self = shift;
     my $object = shift;
@@ -1428,12 +1471,26 @@ sub validateGoto{
     return 1;
 }
 
+=head2 validateGotoInfiniteLoop
+
+Performs validation on a goto target. See L<validateSurvey>.
+
+Checks that the goto variable does not introduce an infinite loop.
+
+=cut
+
 sub validateGotoInfiniteLoop{
     my $self = shift;
     my $object = shift;
     return 0 if($object->{goto} =~ /\w/ and $object->{goto} eq $object->{variable});
     return 1;
 }
+
+=head2 validateGotoExpression
+
+Performs validation on a goto expression. See L<validateSurvey>.
+
+=cut
 
 sub validateGotoExpression{
     my $self = shift;
@@ -1448,6 +1505,15 @@ sub validateGotoExpression{
     my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
     return $engine->run($self->session, $object->{gotoExpression}, { validate => 1, validTargets => $goodTargets } );
 }
+
+=head2 validateGotoPrecedenceRules
+
+Performs validation on a section. See L<validateSurvey>.
+
+Emits a warning if a section (and nested questions/answers) contains more than one goto/gotoExpression,
+which usually indicates an error.
+
+=cut
 
 sub validateGotoPrecedenceRules {
     my $self = shift;
