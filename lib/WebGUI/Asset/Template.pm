@@ -771,6 +771,166 @@ sub update {
     $self->SUPER::update($properties);
 }
 
+#-------------------------------------------------------------------
+
+=head2 usage
+
+=cut
+
+sub usage {
+    my $self = shift;
+    my %opts = @_;
+    my ($namespace, $templateId, $replaceWith) = @opts{'namespace', 'templateId', 'replaceWith'};
+    my $session = $self->session;
+    my $title = $self->getTitle;
+    my $url = $self->getUrl;
+    
+    if (!$namespace) {
+        my $msg = "Missing mandatory namespace param";
+        $session->log->error($msg);
+        return $msg;
+    }
+    
+    my $replaceWithAsset;
+    if ($replaceWith) {
+        $replaceWithAsset = WebGUI::Asset->new($session, $replaceWith) or do {
+            my $msg = "Invalid replaceWith template assetId: $replaceWith";
+            $session->log->warn($msg);
+            return $msg;
+        }
+    }
+    
+    $session->style->setScript($session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type => 'text/javascript'});
+    
+    my $out = <<END_JS;
+<style type="text/css">
+.toggleHoverHelp {
+    cursor: pointer;
+}
+.showHoverHelp {
+    border: 1px dotted;
+    padding: 8px;
+}
+.hideHoverHelp {
+    display: none;
+}
+</style>
+<script type="text/javascript">
+function toggleHoverHelp(id) {
+    if (YAHOO.util.Dom.hasClass(id, 'hideHoverHelp')) {
+        YAHOO.util.Dom.removeClass(id, 'hideHoverHelp');
+        YAHOO.util.Dom.addClass(id, 'showHoverHelp');
+    } else {
+        YAHOO.util.Dom.removeClass(id, 'showHoverHelp');
+        YAHOO.util.Dom.addClass(id, 'hideHoverHelp');
+    }
+}
+</script>
+END_JS
+
+    my $f = WebGUI::HTMLForm->new($self->session,{action=>$self->getUrl});
+    $f->hidden(name=>"func", value=>"usage");
+    $f->hidden(name=>"instances", value=>"1");
+    $f->template(
+        name=>"templateId",
+        label=>"Show Instance Usage For",
+        hoverHelp=>"Show instance usage for the following template",
+        namespace => $namespace,
+        value => $self->getId,
+    );
+    $f->submit(value=>'Show');
+    $out .= $f->print;
+    
+    my $template;
+    if ($templateId) {
+        $template = WebGUI::Asset::Template->new($session, $templateId);
+        
+        return "Unable to instantiate template $templateId" unless $template;
+        
+        my $f = WebGUI::HTMLForm->new($self->session,{action=>$self->getUrl});
+        $f->hidden(name=>"func", value=>"usage");
+        $f->hidden(name=>"instances", value=>"1");
+        $f->template(
+            name=>"replaceWith",
+            label=>"Replace Everywhere With",
+            hoverHelp=>"Everywhere this template is currently being used (listed below), switch to use the following template. This is a useful way of decommissioning a template.",
+            namespace => $namespace,
+        );
+        $f->submit(value=>'Replace Everywhere');
+        $out .= $f->print;
+        
+        $out .= qq{<h2>Instance Usage</h2>};
+        $out .= qq{<p>The following Assets are currently using the <a href="$url?func=edit">$title</a> template (which belongs to the <a href="$url?func=usage">$namespace</a> namespace):</p><ul>};
+    } else {
+        $out .= qq{<h2>Namespace Usage</h2>};
+        $out .= qq{<p>The <a href="$url?func=edit">$title</a> template belongs to the "$namespace" namespace, which is used in the definition of the following Assets:</p><ul>};
+    }
+    
+    my $pb; 
+    if ($replaceWith) {
+        $pb = WebGUI::ProgressBar->new($session); 
+        $pb->start('Replace With', $self->getIcon);
+    }
+    
+    my %seen;
+    for my $assetClass (keys %{$self->session->config->get('assets')}) {
+        for my $defn (reverse @{$assetClass->definition($session)}) {
+            while (my ($fieldName, $prop) = each %{$defn->{properties}}) {
+                if ($prop->{fieldType} eq 'template' && $prop->{namespace} eq $namespace) {
+                    my $tableName = $defn->{tableName};
+                    my $label = $prop->{label} || $fieldName;
+                    my $info;
+                    for my $k (keys %$prop) {
+                        $info .= "<h3>$k</h3>$prop->{$k}\n";
+                    }
+                    my $domId = "$assetClass-$fieldName";
+                    if ($template) {
+                        my @assetIds 
+                            = $session->db->buildArray(<<END_SQL, [$templateId]);
+select x.assetId 
+from $tableName x 
+where $fieldName = ? and revisionDate = (
+    select max(revisionDate) 
+    from assetData ad 
+    where ad.assetId = x.assetId
+)
+END_SQL
+                        for my $assetId (@assetIds) {
+                            # Table where template field lives may be shared by multiple assets (for example assetData table),
+                            # so make sure we only process the assetId+fieldName combination once
+                            next if $seen{$assetId . $fieldName};
+                            $seen{$assetId . $fieldName}++;
+                            my $asset = WebGUI::Asset->new($session, $assetId);#, $assetClass)};
+                            if (!$asset) {
+                                $self->session->log->warn("Unable to instantiate asset using assetId: $assetId");
+                                next;
+                            }
+                            my $assetUrl = $asset->getUrl;
+                            my $assetTitle = $asset->getTitle;
+                            if ($replaceWith) {
+                                $asset->update( { $fieldName => $replaceWith } );
+                                $pb->update("Replacing $fieldName on $assetTitle");
+                                $self->session->log->warn("Setting $fieldName to $replaceWith on $assetUrl");
+                            }
+                            $out .= qq{<li><a href="$assetUrl?func=edit">$assetTitle ($label)</a></li>};
+                        }
+                    } else {
+                        $out .= qq{<li onclick=toggleHoverHelp("$domId") class="toggleHoverHelp">$assetClass ($label)<div id="$domId" class="hideHoverHelp">$info</div></li>};
+                    }
+                }
+            }
+        }
+    }
+    
+    if ($replaceWith) {
+        return $pb->finish( $self->getUrl('func=usage;instances=1') );
+    }
+    if ($template && !%seen) {
+        $out .= '<li>Template does not appear to be in use</li>';
+    }
+    $out .= '</ul>';
+    return $out;
+}
 
 #-------------------------------------------------------------------
 
@@ -826,6 +986,8 @@ ENDHTML
     $output .= $self->getEditForm->print;
 
     $self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=usage'),$i18n->get("usage")||'Namespace Usage');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=usage;instances=1'),$i18n->get("usage")||'Instance Usage');
     return $self->getAdminConsole->render( $output, $i18n->get('edit template') );
 }
 
@@ -1158,7 +1320,42 @@ sub www_styleWizard {
 		$output .= WebGUI::Form::formFooter($self->session);
 	}
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit template")) if ($self->get("url"));
-        return $self->getAdminConsole->render($output,$i18n->get('style wizard'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=usage'),$i18n->get("usage")||'Namespace Usage');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=usage;instances=1'),$i18n->get("usage")||'Instance Usage');
+    return $self->getAdminConsole->render($output,$i18n->get('style wizard'));
+}
+
+#-------------------------------------------------------------------
+=head2 www_usage
+
+=cut
+
+sub www_usage {
+	my $self = shift;
+	
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    
+    # If the templateId form param is provided, redirect the user to
+    # the usage page on that template
+    if (my $templateId = $self->session->form->param('templateId')) {
+        my $template = WebGUI::Asset->new($self->session, $templateId) or return "Invalid templateId $templateId";
+        my $url = $template->getUrl;
+        $self->session->http->setRedirect($url . '?func=usage;instances=1');
+        return;
+    }
+    
+    my $i18n = WebGUI::International->new($self->session, "Asset_Template");
+	my $output = $self->usage( 
+        namespace => $self->get('namespace'), 
+        $self->session->form->process('instances') ? ( templateId => $self->getId ) : (),
+        replaceWith => $self->session->form->process('replaceWith'),
+    );
+	
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit template")) if ($self->get("url"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=usage'),$i18n->get("usage")||'Namespace Usage');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=usage;instances=1'),$i18n->get("usage")||'Instance Usage');
+    return $self->getAdminConsole->render($output,$i18n->get('usage')||'Usage');
 }
 
 #-------------------------------------------------------------------
