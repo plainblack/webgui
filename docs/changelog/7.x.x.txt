@@ -2,6 +2,7 @@
   - fixed #10629: WebGUI::ProfileField create new field bug
   - fixed #10626: Carriage returns stripped from Wiki comments
   - fixed #10572: CDN / CloudFront breaks 7.7.11 upgrade
+  - fixed #10630: If macro says that 0 is true
 
 7.7.14
  - fixed #10606: shelf selector
