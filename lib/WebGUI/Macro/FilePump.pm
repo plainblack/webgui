@@ -23,7 +23,7 @@ Package WebGUI::Macro::Build
 
 Macro to access FilePump bundle information.
 
-=head2 process( $session, $bundleName, $type )
+=head2 process( $session, $bundleName, $type, $extras )
 
 Deliver the bundle files.  If in admin mode, give raw links to the files.
 If not in admin mode, give links to the bundled, minified files.
@@ -43,6 +43,11 @@ $bundleName, the name of a File Pump bundle.
 $type, the type of files from the Bundle that you are accessing.  
 Either JS or javascript, or CSS or css (case-insensitive).
 
+=item *
+
+$extras, extra attributes to include in the generated script or link tag(s).
+One common usage of this is to include C<media="print"> in your print CSS bundle.
+
 =back
 
 =cut
@@ -53,6 +58,7 @@ sub process {
 	my $session    = shift;
 	my $bundleName = shift;
 	my $type       = shift;
+	my $extras     = shift;
     $type          = lc $type;
 	my $output     = "";
 
@@ -96,11 +102,11 @@ sub process {
         my $dir = $bundle->getPathClassDir->relative($uploadsDir);
         if ($type eq 'js' || $type eq 'javascript') {
             my $file = $uploadsUrl->file($dir, $bundle->bundleUrl . '.js');
-            return sprintf qq|<script type="text/javascript" src="%s"></script>\n|, $file->stringify;
+            return scriptTag($session, $file->stringify, $extras);
         }
         elsif ($type eq 'css') {
             my $file = $uploadsUrl->file($dir, $bundle->bundleUrl . '.css');
-            return sprintf qq|<link rel="stylesheet" type="text/css" href="%s">\n|, $file->stringify;
+            return linkTag($session, $file->stringify, $extras);
         }
         else {
             return '';
@@ -108,14 +114,12 @@ sub process {
     }
     ##Admin/Design mode
     else {
-        my $template;
         my $files;
         if ($type eq 'js' || $type eq 'javascript') {
-            $template = qq|<script type="text/javascript" src="%s"></script>\n|;
+            $type = 'js';
             $files    = $bundle->get('jsFiles');
         }
         elsif ($type eq 'css') {
-            $template = qq|<link rel="stylesheet" type="text/css" href="%s">\n|;
             $files    = $bundle->get('cssFiles');
         }
         else {
@@ -147,11 +151,52 @@ sub process {
                 $url = $uri->as_string;
             }
             $url =~ tr{/}{/}s;
-            $output .= sprintf $template, $url;
+            $output .= $type eq 'js' ? scriptTag($session, $url, $extras) : linkTag($session, $url, $extras);
         }
         return $output;
     }
 	return '';
+}
+
+=head2 scriptTag(url, extras)
+
+Returns a HTML 4.01 Strict script tag
+
+=head3 url
+
+The url to use as the src attribute of the script tag
+
+=head3 extras (optional)
+
+Extra attributes to include in the script tag
+
+=cut
+
+sub scriptTag {
+    my ($session, $url, $extras) = @_;
+    my $template = qq|<script type="text/javascript" src="%s" $extras></script>\n|;
+    return sprintf $template, $url;
+}
+
+=head2 linkTag(url, extras)
+
+Returns a HTML 4.01 Strict link tag
+
+=head3 url
+
+The url to use as the href attribute of the link tag
+
+=head3 extras (optional)
+
+Extra attributes to include in the link tag. For instance, you can use this to set media="print"
+on your print CSS tag.
+
+=cut
+
+sub linkTag {
+    my ($session, $url, $extras) = @_;
+    my $template = qq|<link rel="stylesheet" type="text/css" href="%s" $extras>\n|;
+    return sprintf $template, $url;
 }
 
 1;
