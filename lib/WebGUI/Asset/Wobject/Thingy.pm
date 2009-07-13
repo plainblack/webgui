@@ -1503,11 +1503,20 @@ sub view {
         my $thingProperties = $self->getThing($defaultThingId);
         if ($defaultView eq "searchThing"){
             return $i18n->get("no permission to search") if( ! $self->canSearch($defaultThingId, $thingProperties));
-            return $self->search($defaultThingId,$thingProperties) 
+            return $self->search($defaultThingId,$thingProperties);
         }
         elsif ($defaultView eq "addThing"){
             return $i18n->get("no permission to edit") if( ! $self->canEditThingData($defaultThingId, "new", $thingProperties));
-            return $self->editThingData($defaultThingId,"new", $thingProperties);
+            
+            # If max entries added and we did nothing, the user will see a "max entries already added" error
+            # which isn't very nice since they didn't actively try to add something - so be nice and behave
+            # as if defaultView set to searchThing in this case
+            if ($self->hasEnteredMaxPerUser($defaultThingId)) {
+                return $i18n->get("no permission to search") if( ! $self->canSearch($defaultThingId, $thingProperties));
+                return $self->search($defaultThingId,$thingProperties);
+            } else {
+                return $self->editThingData($defaultThingId,"new", $thingProperties);
+            }
         }
         else{
             return $self->processTemplate($var, undef, $self->{_viewTemplate});
@@ -3013,7 +3022,7 @@ sub www_manage {
         );
         # set the url for the view icon to the things default view
         my $viewParams;
-        if ($thing->{defaultView} eq "addThing") {
+        if ($thing->{defaultView} eq "addThing" && !$self->hasEnteredMaxPerUser($thing->{thingId})) {
             $viewParams = 'func=editThingData;thingId='.$thing->{thingId}.';thingDataId=new';
         }
         else{
