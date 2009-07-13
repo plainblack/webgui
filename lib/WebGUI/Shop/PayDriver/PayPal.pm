@@ -115,7 +115,7 @@ sub getButton {
     my $payForm
         = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('sendToPayPal')
-        . WebGUI::Form::submit( $session, { value => $self->get('label') } )
+        . WebGUI::Form::submit( $session, { value => $self->get('name') } )
         . WebGUI::Form::formFooter($session);
 
     return $payForm;

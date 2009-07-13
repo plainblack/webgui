@@ -37,13 +37,10 @@ our $I18N = {
         lastUpdated => 1247524131,
         context     => q{Message to display when something goes wrong talking to PayPal},
     },
-    'label' => { 
-        message     => q{NewPal},
-        lastUpdated => 1247256659,
-    },
     'name' => { 
-        message     => q{NewPal},
+        message     => q{PayPal},
         lastUpdated => 1247256412,
+        context     => q{The name of the payment driver},
     },
     'password' => { 
         message     => q{Password},
