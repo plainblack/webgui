@@ -192,7 +192,9 @@ sub processPayment {
         }
 
         my $status  = $params->{PAYMENTSTATUS};
-        my $message = "Payment Status: $status";
+
+        my $i18n    = WebGUI::International->new( $self->session, $I18N );
+        my $message = sprintf $i18n->get('payment status'), $status;
         return ( 1, $params->{TRANSACTIONID}, $status, $message );
     }
 
@@ -278,7 +280,7 @@ sub www_sendToPayPal {
         unless ( $params->{ACK} =~ /^Success/ ) {
             my $log = sprintf "Paypal error: Request/response below: %s\n%s\n", Dumper($form), Dumper($params);
             $session->log->error($log);
-            $error = 'Internal Paypal Error';
+            $error = $i18n->get('internal paypal error');
         }
     }
     else {
