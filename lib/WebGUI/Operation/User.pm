@@ -576,7 +576,7 @@ Allows an administrator to assume another user.
 
 sub www_becomeUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
+	return $session->privilege->adminOnly() unless canEdit($session);
 	return undef unless WebGUI::User->validUserId($session, $session->form->process("uid"));
 	$session->var->end($session->var->get("sessionId"));
 	$session->user({userId=>$session->form->process("uid")});
@@ -595,7 +595,7 @@ after this.
 
 sub www_deleteUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
+	return $session->privilege->adminOnly() unless canEdit($session);
 	my ($u);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 	   return WebGUI::AdminConsole->new($session,"users")->render($session->privilege->vitalComponent());

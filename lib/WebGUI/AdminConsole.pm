@@ -19,6 +19,7 @@ use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::VersionTag;
+use WebGUI::HTMLForm;
 
 =head1 NAME
 
@@ -34,6 +35,7 @@ The admin console is a menuing system to manage webgui's administrative function
 
  _formatFunction
  addSubmenuItem
+ addConfirmedSubmenuItem
  getAdminConsoleParams
  getAdminFunction
  getHelp
@@ -301,6 +303,9 @@ sub render {
 	}
 
     $var{"backtosite.url"} = $self->session->url->getBackToSiteURL();
+    $var{"formHeader"} = WebGUI::Form::formHeader($self->session)
+                       . WebGUI::Form::hidden($self->session, { name=>'func', value=>'' });
+    $var{"formFooter"} = WebGUI::Form::formFooter($self->session);
     my $template
         = WebGUI::Asset::Template->new(
             $self->session,
