@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.15
+--------------------------------------------------------------------
+    * PayDriver::PayPal has been replaced with an entirely different
+      module.  If you had the old one working, the new one very likely
+      will not work (the old one did some very un-Shop things, which
+      is why it was replaced).  Please test the new one with your setup.
 
 7.7.13
 --------------------------------------------------------------------

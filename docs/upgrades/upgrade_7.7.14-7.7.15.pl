@@ -33,6 +33,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 replaceUsageOfOldTemplates($session);
+replacePayPalDriver($session);
 
 finish($session); # this line required
 
@@ -45,6 +46,24 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub replacePayPalDriver {
+    my $session = shift;
+    my $config  = $session->config;
+    my $prop    = 'paymentDrivers';
+    my $old     = 'WebGUI::Shop::PayDriver::PayPal::PayPalStd';
+    my $drivers = $config->get($prop);
+    foreach my $driver (@$drivers) {
+        # We'll do nothing if the old paypal driver isn't used
+        next unless $driver eq $old;
+
+        print "\tUpdating config to use new PayPal driver..." unless $quiet;
+        $config->deleteFromArray($prop, $old);
+        $config->addToArray($prop, 'WebGUI::Shop::PayDriver::PayPal');
+        print "DONE!\n" unless $quiet;
+        last;
+    }
+}
 
 #----------------------------------------------------------------------------
 sub replaceUsageOfOldTemplates {
