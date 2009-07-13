@@ -22,7 +22,6 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-use List::MoreUtils qw/uniq/;
 
 
 my $toVersion = '7.7.15';
@@ -32,7 +31,6 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-replaceUsageOfOldTemplates($session);
 replacePayPalDriver($session);
 
 finish($session); # this line required
@@ -120,8 +118,7 @@ sub replaceUsageOfOldTemplates {
     }
     print "DONE!\n" unless $quiet;
 }
-
-
+>>>>>>> .r11781
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
