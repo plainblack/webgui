@@ -63,62 +63,6 @@ sub replacePayPalDriver {
     }
 }
 
-#----------------------------------------------------------------------------
-sub replaceUsageOfOldTemplates {
-    my $session = shift;
-    print "\tRemoving usage of outdated templates with new ones... " unless $quiet;
-    # and here's our code
-    print "\n\t\tUpgrading Navigation templates... " unless $quiet;
-    my @navigationPairs = (
-        ##   New                    Old
-        [ qw/PBnav00000000000bullet PBtmpl0000000000000048/ ]  ##Bulleted List <- Vertical Menu
-    );
-    foreach my $pairs (@navigationPairs) {
-        my ($new, $old) = @{ $pairs };
-        $session->db->write('UPDATE Navigation SET templateId=? where templateId=?', [$new, $old])
-    }
-    print "\n\t\tUpgrading Article templates... " unless $quiet;
-    my @articlePairs = (
-        ##   New                    Old
-        [ qw/PBtmpl0000000000000103 PBtmpl0000000000000084/ ], ##Article with Image <- Center Image 
-        [ qw/PBtmpl0000000000000123 PBtmpl0000000000000129/ ], ##Item               <- Item w/pop-up Links
-        [ qw/PBtmpl0000000000000129 PBtmpl0000000000000207/ ], ##Default Article    <- Article with Files
-    );
-    foreach my $pairs (@articlePairs) {
-        my ($new, $old) = @{ $pairs };
-        $session->db->write('UPDATE Article SET templateId=? where templateId=?', [$new, $old])
-    }
-    print "\n\t\tUpgrading Layout templates... " unless $quiet;
-    my @layoutPairs = (
-        ##   New                    Old
-        [ qw/PBtmpl0000000000000135 PBtmpl00000000table125/ ], ## Side By Side   <- Left Column (Table)
-        [ qw/PBtmpl0000000000000094 PBtmpl00000000table094/ ], ## One over two   <- News (Table)
-        [ qw/PBtmpl0000000000000131 PBtmpl00000000table131/ ], ## Right Column   <- Right Column (Table)
-        [ qw/PBtmpl0000000000000135 PBtmpl00000000table135/ ], ## Side By Side   <- Side By Side (Table)
-        [ qw/PBtmpl0000000000000054 PBtmpl00000000table118/ ], ## Default Page   <- Three Over One (Table)
-        [ qw/PBtmpl0000000000000054 PBtmpl000000000table54/ ], ## Default Page   <- Default Page (Table)
-        [ qw/PBtmpl0000000000000109 PBtmpl00000000table109/ ], ## One Over Three <- One Over Three (Table)
-        [ qw/PBtmpl0000000000000135 PBtmpl0000000000000125/ ], ## Side By Side   <- Left Column
-        [ qw/PBtmpl0000000000000054 PBtmpl0000000000000118/ ], ## Default Page   <- Three Over One
-    );
-    foreach my $pairs (@layoutPairs) {
-        my ($new, $old) = @{ $pairs };
-        $session->db->write('UPDATE Layout SET templateId=? where templateId=?', [$new, $old])
-    }
-    print "\n\t\tPurging old templates... " unless $quiet;
-    my @oldTemplates = uniq map { $_->[1] } (@navigationPairs, @articlePairs, @layoutPairs);
-    TEMPLATE: foreach my $templateId (@oldTemplates) {
-        my $template = eval { WebGUI::Asset->newPending($session, $templateId); };
-        if ($@) {
-            print "\n\t\t\tUnable to instanciate templateId: $templateId.  Skipping...";
-            next TEMPLATE;
-        }
-        print "\n\t\t\tPurging ". $template->getTitle . " ..." unless $quiet;
-        $template->purge;
-    }
-    print "DONE!\n" unless $quiet;
-}
->>>>>>> .r11781
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
