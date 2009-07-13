@@ -20,7 +20,6 @@ use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 use WebGUI::Form::Country;
-use WebGUI::VersionTag;
 use Text::CSV_XS;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
@@ -672,8 +671,7 @@ sub www_editSurvey {
     
     return $self->session->privilege->insufficient()
         if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
-    
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+
     return $self->processTemplate( {}, $self->get('surveyEditTemplateId') );
 }
 
@@ -753,22 +751,6 @@ sub www_graph {
     return $ac->render($f->print . $output, $i18n->get('survey visualization'));
 }
 
-=head2 hasResponses
-
-Returns true if this Survey instance revision has any responses (started, finished or otherwise)
-associated with it
-
-=cut
-
-sub hasResponses {
-    my $self = shift;
-    my $session = $self->session;
-    
-    return $self->session->db->quickScalar(
-        'select count(*) from Survey_response where assetId = ? and revisionDate = ?',
-        [ $self->getId, $self->get('revisionDate') ] ) > 0;
-}
-
 #-------------------------------------------------------------------
 
 =head2 submitObjectEdit ( $params )
@@ -789,31 +771,22 @@ these special actions will be carried out by delegating to e.g. L<deleteObject>,
 sub submitObjectEdit {
     my $self = shift;
     my $params = shift || {};
-    my $session = $self->session;
 
     # Id is made up of at most: sectionIndex-questionIndex-answerIndex
     my @address = split /-/, $params->{id};
 
+    # We will create a new revision if any responses exist for the current revision
+    my $responses
+        = $self->session->db->quickScalar(
+        'select count(*) from Survey_response where assetId = ? and revisionDate = ?',
+        [ $self->getId, $self->get('revisionDate') ] );
+
     # Get a reference to the Survey instance that we want to perform updates on
     my $survey = $self;
-    
-    # We will create a new revision if any responses exist for the current revision
-    if ($self->hasResponses) {
-        $self->session->log->debug( "Creating a new revision, responses exist for the current revision: "
+    if ($responses) {
+        $self->session->log->debug( "Creating a new revision, $responses responses exist for the current revision "
                 . $self->get('revisionDate') );
-        
-        # New revision should be created and then committed automatically
-        my $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'noCreate');
-        my $newVersionTag = WebGUI::VersionTag->create($session, { workflowId => 'pbworkflow00000000003', });
-        $newVersionTag->setWorking;
-        
-        # Create the new revision
         $survey = $self->addRevision;
-        
-        $newVersionTag->commit();
-        
-        #Restore the old one, if it exists
-        $oldVersionTag->setWorking() if $oldVersionTag;
     }
 
     # See if any special actions were requested..
@@ -855,10 +828,9 @@ sub www_submitObjectEdit {
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
-    return $self->session->privilege->locked()
-        unless $self->canEditIfLocked;
+    my $params = $self->session->form->paramsHashRef();
     
-    return $self->submitObjectEdit( $self->session->form->paramsHashRef );
+    return $self->submitObjectEdit($params);
 }
 
 #-------------------------------------------------------------------
@@ -1017,8 +989,6 @@ See L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>
 
 sub deleteObject {
     my ( $self, $address ) = @_;
-    
-    $self->session->log->debug("Deleting object: " . join '-', @$address);
 
     # Each object checks the ref and then either updates or passes it to the correct child. 
     # New objects will have an index of -1.
@@ -1084,15 +1054,13 @@ sub www_dragDrop {
     my @bid = split /-/, $p->{before}->{id};
 
     my $target = $self->surveyJSON->getObject( \@tid );
-    $self->surveyJSON->remove( \@tid, 1 );
+    $self->surveyJSON_remove( \@tid, 1 );
     my $address = [0];
     if ( @tid == 1 ) {
-        
+
         #sections can only be inserted after another section so chop off the question and answer portion of
         $#bid = 0;
         $bid[0] = -1 if ( !defined $bid[0] );
-        
-        $self->session->log->debug("Moving section $bid[0] to $tid[0]");
 
         #If target is being moved down, then before has just moved up do to the target being deleted
         $bid[0]-- if($tid[0] < $bid[0]);
@@ -1333,7 +1301,7 @@ sub view {
     my $self    = shift;
     my $var     = $self->getMenuVars;
     
-    my $responseDetails = $self->getResponseDetails || {};
+    my $responseDetails = $self->getResponseDetails;
 
     # Add lastResponse template vars
     for my $tv qw(endDate complete restart timeout timeoutRestart) {
@@ -1422,7 +1390,7 @@ sub getResponseDetails {
     
     if (!$responseId) {
         $self->session->log->debug("ResponseId not found");
-        return;
+        return {};
     }
     
     my ( $completeCode, $endDate, $rJSON, $ruserId, $rusername ) = $self->session->db->quickArray(
@@ -1699,8 +1667,7 @@ sub www_showFeedback {
         return $self->session->privilege->insufficient();
     }
     
-    my $rd = $self->getResponseDetails( { responseId => $responseId } ) || {};
-    my $out = $rd->{templateText};
+    my $out = $self->getResponseDetails( { responseId => $responseId } )->{templateText};
     return $self->session->style->process( $out, $self->get('styleTemplateId') );
 }
 
@@ -1956,6 +1923,7 @@ sub persistSurveyJSON {
 
     my $data = $self->surveyJSON->freeze();
     $self->update({surveyJSON=>$data});
+#    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
 
     return;
 }
@@ -2093,15 +2061,15 @@ and thus should not count towards tally)
 
 The following options are supported
 
-=head4 userId (optional)
+=head4 userId
 
-The userId to count responses for. Defaults to the current user
+The userId to count responses for (required)
 
-=head4 ipAddress (optional)
+=head4 ipAddress
 
-An IP address to filter responses by
+An IP address to filter responses by (optional)
 
-=head4 isComplete  (optional)
+=head4 isComplete
 
 A complete code to use to filter responses by (optional, defaults to 1)
 
@@ -2109,10 +2077,8 @@ A complete code to use to filter responses by (optional, defaults to 1)
 
 sub takenCount {
     my $self = shift;
-    my %opts = validate(@_, { userId => 0, ipAddress => 0, isComplete => 0 });
+    my %opts = validate(@_, { userId => 1, ipAddress => 0, isComplete => 0 });
     my $isComplete = defined $opts{isComplete} ? $opts{isComplete} : 1;
-    
-    $opts{userId} ||= $self->session->user->userId;
     
     my $sql = 'select count(*) from Survey_response where';
     $sql .= ' assetId = ' . $self->session->db->quote($self->getId);
@@ -2140,9 +2106,8 @@ sub canTakeSurvey {
     my $self = shift;
 
     return $self->{canTake} if ( defined $self->{canTake} );
-    
-    # Immediately reject if not in groupToTakeSurvey or groupToEditSurvey
-    if ( !$self->session->user->isInGroup( $self->get('groupToTakeSurvey') ) && !$self->session->user->isInGroup( $self->get('groupToEditSurvey') ) ) {
+
+    if ( !$self->session->user->isInGroup( $self->get('groupToTakeSurvey') ) ) {
         return 0;
     }
 
@@ -2152,10 +2117,10 @@ sub canTakeSurvey {
     my $takenCount          = 0;
 
     if ( $userId == 1 ) {
-        $takenCount = $self->takenCount( { ipAddress => $ip });
+        $takenCount = $self->takenCount( { userId => $userId, ipAddress => $ip });
     }
     else {
-        $takenCount = $self->takenCount;
+        $takenCount = $self->takenCount( { userId => $userId });
     }
 
     # A maxResponsesPerUser value of 0 implies unlimited
@@ -2828,10 +2793,6 @@ sub www_runTest {
     
     my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $testId)
         or return $self->www_editTestSuite('Unable to find test');
-    
-    # Remove any in-progress reponses for current user
-    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ? and isComplete = 0',
-        [ $self->getId, $self->session->user->userId() ] );
     
     my $result = $test->run or return $self->www_editTestSuite('Unable to run test');
     

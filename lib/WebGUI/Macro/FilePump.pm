@@ -13,7 +13,6 @@ package WebGUI::Macro::FilePump;
 use strict;
 use WebGUI::FilePump::Bundle;
 use Path::Class;
-use WebGUI::International;
 
 =head1 NAME
 
@@ -23,7 +22,7 @@ Package WebGUI::Macro::Build
 
 Macro to access FilePump bundle information.
 
-=head2 process( $session, $bundleName, $type, $extras )
+=head2 process( $session, $bundleName, $type )
 
 Deliver the bundle files.  If in admin mode, give raw links to the files.
 If not in admin mode, give links to the bundled, minified files.
@@ -40,13 +39,7 @@ $bundleName, the name of a File Pump bundle.
 
 =item *
 
-$type, the type of files from the Bundle that you are accessing.  
-Either JS or javascript, or CSS or css (case-insensitive).
-
-=item *
-
-$extras, extra attributes to include in the generated script or link tag(s).
-One common usage of this is to include C<media="print"> in your print CSS bundle.
+$type, the type of files from the Bundle that you are accessing.  Either JS or javascript, or CSS or css.
 
 =back
 
@@ -58,7 +51,6 @@ sub process {
 	my $session    = shift;
 	my $bundleName = shift;
 	my $type       = shift;
-	my $extras     = shift;
     $type          = lc $type;
 	my $output     = "";
 
@@ -70,43 +62,19 @@ sub process {
 
     my $bundle = WebGUI::FilePump::Bundle->new($session, $bundleId->[0]);
     return '' unless $bundle;
-    
-    my $bundleDir = $bundle->getPathClassDir;
-    
-    # Sometimes, when migrating sites, restoring from backup, etc., you can
-    # get into the situation where the bundle is defined in the db but doesn't
-    # exist on the filesystem. In this case, simply generate a warning and 
-    # trigger a bundle rebuild.
-    if (!-e $bundleDir) {
-        $session->log->warn("Bundle is marked as built, but does not exist on filesystem. Attempting to rebuild: $bundleDir");
-        my ($code, $error) = $bundle->build;
-        if ($error) {
-            my $i18n = WebGUI::International->new($session, 'FilePump');
-            $error = sprintf $i18n->get('build error'), $error;
-            $session->log->error("Rebuild failed with error: $error");
-            return $error;
-        } else {
-            $session->log->warn("Rebuild succeeded, continuing with macro processing");
-        }
-    }
-    
     my $uploadsDir = Path::Class::Dir->new($session->config->get('uploadsPath'));
-    my $extrasDir  = Path::Class::Dir->new($session->config->get('extrasPath'));
     my $uploadsUrl = Path::Class::Dir->new($session->config->get('uploadsURL'));
-    my $extrasUrl  = Path::Class::Dir->new($session->config->get('extrasURL'));
 
     ##Normal mode
     if (! $session->var->isAdminOn) {
-        # Built files live at /path/to/uploads/filepump/bundle.timestamp/ which is
-        # a sub-dir of uploadsDir, so resolve the dir relative to uploads
         my $dir = $bundle->getPathClassDir->relative($uploadsDir);
         if ($type eq 'js' || $type eq 'javascript') {
             my $file = $uploadsUrl->file($dir, $bundle->bundleUrl . '.js');
-            return scriptTag($session, $file->stringify, $extras);
+            return sprintf qq|<script type="text/javascript" src="%s">\n|, $file->stringify;
         }
         elsif ($type eq 'css') {
             my $file = $uploadsUrl->file($dir, $bundle->bundleUrl . '.css');
-            return linkTag($session, $file->stringify, $extras);
+            return sprintf qq|<link rel="stylesheet" type="text/css" href="%s">\n|, $file->stringify;
         }
         else {
             return '';
@@ -114,12 +82,14 @@ sub process {
     }
     ##Admin/Design mode
     else {
+        my $template;
         my $files;
         if ($type eq 'js' || $type eq 'javascript') {
-            $type = 'js';
+            $template = qq|<script type="text/javascript" src="%s">\n|;
             $files    = $bundle->get('jsFiles');
         }
         elsif ($type eq 'css') {
+            $template = qq|<link rel="stylesheet" type="text/css" href="%s">\n|;
             $files    = $bundle->get('cssFiles');
         }
         else {
@@ -133,70 +103,20 @@ sub process {
                 $url = $uri->opaque;
             }
             elsif ($scheme eq 'file') {
-                my $file = $bundle->resolveFilePath($uri->path);
-                
-                # Un-built files live inside either uploads or extras
-                if ($uploadsDir->subsumes($file)) {
-                    my $relFile = $file->relative($uploadsDir);
-                    $url = $uploadsUrl->file($relFile)->stringify;
-                } elsif ($extrasDir->subsumes($file)) {
-                    my $relFile = $file->relative($extrasDir);
-                    $url = $extrasUrl->file($relFile)->stringify;
-                } else {
-                    $session->log->warn("Invalid file: $file");
-                    next;
-                }
+                my $file           = Path::Class::File->new($uri->path);
+                my $uploadsRelFile = $file->relative($uploadsDir);
+                $url               = $uploadsUrl->file($uploadsRelFile)->stringify;
+
             }
             elsif ($scheme eq 'http' or $scheme eq 'https') {
                 $url = $uri->as_string;
             }
             $url =~ tr{/}{/}s;
-            $output .= $type eq 'js' ? scriptTag($session, $url, $extras) : linkTag($session, $url, $extras);
+            $output .= sprintf $template, $url;
         }
         return $output;
     }
 	return '';
-}
-
-=head2 scriptTag(url, extras)
-
-Returns a HTML 4.01 Strict script tag
-
-=head3 url
-
-The url to use as the src attribute of the script tag
-
-=head3 extras (optional)
-
-Extra attributes to include in the script tag
-
-=cut
-
-sub scriptTag {
-    my ($session, $url, $extras) = @_;
-    my $template = qq|<script type="text/javascript" src="%s" $extras></script>\n|;
-    return sprintf $template, $url;
-}
-
-=head2 linkTag(url, extras)
-
-Returns a HTML 4.01 Strict link tag
-
-=head3 url
-
-The url to use as the href attribute of the link tag
-
-=head3 extras (optional)
-
-Extra attributes to include in the link tag. For instance, you can use this to set media="print"
-on your print CSS tag.
-
-=cut
-
-sub linkTag {
-    my ($session, $url, $extras) = @_;
-    my $template = qq|<link rel="stylesheet" type="text/css" href="%s" $extras>\n|;
-    return sprintf $template, $url;
 }
 
 1;

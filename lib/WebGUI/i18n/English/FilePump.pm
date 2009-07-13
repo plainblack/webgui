@@ -71,8 +71,8 @@ our $I18N = {
 	},
 
 	'otherFiles' => {
-		message => q|Collateral|,
-		lastUpdated => 1247196636,
+		message => q|CSS Images|,
+		lastUpdated => 1242681632,
 		context => q|Edit bundle label.|
 	},
 
