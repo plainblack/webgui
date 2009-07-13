@@ -156,7 +156,7 @@ sub crypt {
 	my $self = shift;
 	my $skipFatal = shift;
 	unless (exists $self->{_crypt}) {
-		my $crypt = WebGUI::Crypt->new($self,$self->config->get("crypt"));
+		my $crypt = WebGUI::Crypt->new($self);
 		if (defined $crypt) {
 			$self->{_crypt} = $crypt;
 		}

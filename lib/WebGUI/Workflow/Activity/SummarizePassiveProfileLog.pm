@@ -69,7 +69,8 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	return $self->COMPLETE unless ($self->session->setting->get("passiveProfilingEnabled"));
+	
+    return $self->COMPLETE unless ($self->session->setting->get("passiveProfilingEnabled"));
         my ($firstDate) = $self->session->db->quickArray("select min(dateOfEntry) from passiveProfileLog");
         my $sessionExpired = time() - $self->session->setting->get("sessionTimeout");
         # We process entries for registered users and expired visitor sessions

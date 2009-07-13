@@ -15,7 +15,7 @@ use WebGUI::Session;
 use WebGUI::Text;
 use WebGUI::Workflow;
 use WebGUI::Group;
-use WebGUI::Crypt;
+use WebGUI::Crypt::None;
 use File::Spec;
 use Cwd;
 
@@ -30,7 +30,7 @@ plan tests => 5;
 
 #----------------------------------------------------------------------------
 # put your tests here
-require_ok( File::Spec->catfile( cwd(), qw( t Crypt crypt.pl ) ) );
+#require_ok( File::Spec->catfile( cwd(), qw( t Crypt crypt.pl ) ) );
 
 #######################################################################
 #
@@ -38,8 +38,9 @@ require_ok( File::Spec->catfile( cwd(), qw( t Crypt crypt.pl ) ) );
 #
 #######################################################################
 {
-    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::None' } );
-    isa_ok( $crypt, 'WebGUI::Crypt', 'constructor works' );
-    isa_ok( $crypt->provider, 'WebGUI::Crypt::None', 'provider was created' );
+    my $crypt = WebGUI::Crypt::None->new( $session );
+    isa_ok( $crypt, 'WebGUI::Crypt::None', 'constructor works' );
+    isa_ok( $crypt->providerId, 'None', 'provider was created' );
     test_provider($crypt, make_string(rand(50)+1));
 }
+

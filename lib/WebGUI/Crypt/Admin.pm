@@ -78,6 +78,23 @@ sub canView {
 
 #-------------------------------------------------------------------
 
+=head2 www_startWorkflow ( session )
+
+Starts the CryptUpdateFieldProviders workflow.
+
+=cut
+
+sub www_startWorkflow{
+    my ( $session, $error ) = validate_pos( @_, { isa => 'WebGUI::Session' }, 0 );
+    my $workflowId = $session->db->quickScalar("select workflowId from WorkflowActivity where className = 'WebGUI::Workflow::Activity::CryptUpdateFieldProviders'");
+    WebGUI::Workflow::Instance->create($session, {
+        workflowId=>$workflowId,
+        })->start;
+    return www_providers($session,"Workflow started");
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_providers ( session )
 
 Manage Providers
@@ -109,12 +126,6 @@ sub www_providers {
     my $i18n = WebGUI::International->new( $session, 'Crypt' );
     my $ac = getAdminConsole($session);
 
-    my $addmenu = '<div style="float: left; width: 200px; font-size: 11px;">';
-    $addmenu .= sprintf '<a href="%s">%s</a>',
-        $session->url->page('op=crypt;func=editProvider'),
-        $i18n->get('Add a provider');
-    $addmenu .= '</div>';
-
     my $f = WebGUI::HTMLForm->new($session);
     $f->hidden(
         name  => 'op',
@@ -122,7 +133,7 @@ sub www_providers {
     );
     $f->hidden(
         name  => 'func',
-        value => 'editProviderSave'
+        value => 'startWorkflow'
     );
 
     if ($running) {
@@ -134,15 +145,18 @@ END_HTML
         $f->submit( value => $i18n->get('Start UpdateProviders Workflow') );
     }
 
+    my $providerList = getProviderList($session);
+
     my $providerTable;
     if ( my $providers = $session->config->get('crypt') ) {
         $providerTable = <<END_HTML;
 <table class="content">
     <thead class="tableHeader">
         <tr>
-            <td></td>
+            <td>Can Edit</td>
             <td>Name</td>
             <td>Provider</td>
+            <td>Tables Using</td>
         </tr>
     </thead>
     <tbody class="tableData">
@@ -150,18 +164,18 @@ END_HTML
 
         my @providerTableRows;
         while ( my ( $providerId, $provider ) = each %{$providers} ) {
-            my $icon       = $session->icon;
-            my $iconDelete = $icon->delete( "op=crypt;func=deleteProvider;providerId=$providerId",
-                undef, $i18n->get('confirm delete provider') );
-            my $iconEdit = $icon->edit("op=crypt;func=editProvider;providerId=$providerId");
-            $provider->{provider} =~ s/WebGUI::Crypt::Provider:://;
+            $provider->{provider} =~ s/WebGUI::Crypt:://;
+            my $canEdit = exists $providerList->{$providerId} ? 'No' : 'Yes';
+            my $tables;
+            map($tables .= " ". $_->[0],@{$providerList->{$providerId}});
             push @providerTableRows, {
                 name => $provider->{name},
                 html => <<END_HTML,
         <tr>
-            <td>$iconDelete $iconEdit</td>
+            <td>$canEdit</td>
             <td>$provider->{name}</td>
             <td>$provider->{provider}</td>
+            <td>$tables</td>
         </tr>
 END_HTML
             };
@@ -175,7 +189,25 @@ END_HTML
 END_HTML
     }
 
-    return $ac->render( $error . $f->print . $addmenu . $providerTable, $i18n->get('Crypt Settings') );
+    return $ac->render( $error . $f->print . $providerTable, $i18n->get('Crypt Settings') );
+}
+
+#-------------------------------------------------------------------
+
+=head2 getProviderList ( session )
+
+Returns a hash ref of arrays of the providerId and the tables which use them.
+
+=cut
+
+sub getProviderList{
+    my ($session) = @_;
+    my $ref = $session->db->buildArrayRefOfHashRefs( 
+        "select `table`, `field`, `key`, providerId, activeProviderIds from cryptFieldProviders order by providerId"
+    );
+    my $providers;
+    map(push(@{$providers->{$_->{providerId}}}, [$_->{table}, $_->{field}, $_->{key}, $_->{activeProviderIds}]),@$ref);
+    return $providers;
 }
 
 #-------------------------------------------------------------------
@@ -186,12 +218,12 @@ Save Crypt providers.
 
 =cut
 
-sub www_providersSave {
-    my ($session) = validate_pos( @_, { isa => 'WebGUI::Session' } );
-    return $session->privilege->insufficient() unless canView($session);
-    my $form = $session->form;
-    return www_providers($session);
-}
+#sub www_providersSave {
+#    my ($session) = validate_pos( @_, { isa => 'WebGUI::Session' } );
+#    return $session->privilege->insufficient() unless canView($session);
+#    my $form = $session->form;
+#    return www_providers($session);
+#}
 
 #-------------------------------------------------------------------
 
@@ -243,5 +275,4 @@ sub www_settingsSave {
     $session->setting->set( 'cryptEnabled', $form->process( 'enabled', 'yesNo' ) );
     return www_settings($session);
 }
-
 1;

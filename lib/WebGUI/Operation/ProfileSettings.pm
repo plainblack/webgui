@@ -229,6 +229,9 @@ sub www_editProfileField {
     return $session->privilege->adminOnly() unless canView($session);
     my $i18n = WebGUI::International->new($session,"WebGUIProfile");
     my $f = WebGUI::HTMLForm->new($session);
+    my $cryptChoices;
+    map( $cryptChoices->{$_} = $session->config->get('crypt')->{$_}->{'name'}, keys %{$session->config->get('crypt')} );
+    my $currentProvider = $session->crypt->lookupProviderId({table=>'userProfileData', field => $session->form->process('fid')});
     $f->submit;
     $f->hidden(
         -name => "op",
@@ -339,6 +342,13 @@ sub www_editProfileField {
         -hoverHelp=>$i18n->get('489 description'),
         -value=>$data->{profileCategoryId}
     );
+    $f->selectBox(
+        -name=>"encryptThisField",
+        -label=>$i18n->get('encrypt this field'),
+        -hoverHelp=>$i18n->get('encrypt this field hover'),
+        -options=>$cryptChoices,
+        -value=>$currentProvider
+    );
     $f->submit;
     return _submenu($session,$f->print,'471',"WebGUIProfile");
 }
@@ -387,6 +397,10 @@ sub www_editProfileFieldSave {
 		$field->set(\%data);
 		$field->setCategory($categoryId);
 	}
+
+    #Special case for setting field encryption type
+    $session->crypt->setProvider({table=>'userProfileData', field=>$session->form->get('fid'), key=>'userId', providerId=>$session->form->get('encryptThisField')});
+
 	return www_editProfileSettings($session);
 }
 

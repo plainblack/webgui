@@ -44,6 +44,9 @@ sub definition {
 	my $i18n        = shift;
 	my @fields      = ();
     my $setting     = $session->setting;
+    my $cryptChoices;
+    map( $cryptChoices->{$_} = $session->config->get('crypt')->{$_}->{'name'}, keys %{$session->config->get('crypt')} );
+    my $currentProvider = $session->crypt->lookupProviderId({table=>'inbox', field => 'message'});
 	# company info
 	push(@fields, {
 		tab=>"company",
@@ -287,6 +290,15 @@ sub definition {
 		hoverHelp=>$i18n->get('mail return path help'),
 		defaultValue=>$setting->get("mailReturnPath")
 		});
+	push(@fields, {
+		tab=>"messaging",
+		fieldType=>"selectBox",
+		name=>"inboxMessageEncryption",
+		label=>$i18n->get('inboxMessageEncryption'),
+		hoverHelp=>$i18n->get('inboxMessageEncryption help'),
+        defaultValue => $currentProvider,
+        options      => $cryptChoices
+        });
 	# misc
 	push(@fields, {
 		tab=>"misc",
@@ -688,6 +700,8 @@ sub www_saveSettings {
         # Delete the user cache
         WebGUI::Cache->new( $session, [ "user" ] )->deleteChunk( [ "user" ] );
     }
+    # Set Inbox Message Encryption
+    $session->crypt->setProvider({table=>'inbox', field=>'message', key=>'messageId', providerId=>$form->get('inboxMessageEncryption')});
 
     return www_editSettings($session, { errors => \@errors, message => $i18n->get("editSettings done") });
 }

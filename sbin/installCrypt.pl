@@ -52,6 +52,9 @@ sub installCrypt {
     if ( !$session->db->quickScalar( 'select count(*) from settings where name=?', ['cryptEnabled'] ) ) {
         $session->setting->add( 'cryptEnabled', 0 );
     }
+    if ( !$session->db->quickScalar( 'select count(*) from settings where name=?', ['inboxMessageEncryption'] ) ) {
+        $session->setting->add( 'inboxMessageEncryption', 'None' );
+    }
     print "DONE!\n" unless $quiet;
 
     # For now, force crypt on since we assume you want to use it
@@ -99,7 +102,19 @@ sub installCrypt {
     #    }
     #    $workflowActivities->{'None'} = [ @none ];
     #    $session->config->set('workflowActivities', $workflowActivities);
-    
+    $session->db->write(<<END_SQL);
+DROP TABLE IF EXISTS cryptFieldProviders;
+END_SQL
+    $session->db->write(<<END_SQL);
+CREATE TABLE `cryptFieldProviders` (
+  `table` char(128) NOT NULL,
+  `field` char(96) NOT NULL,
+  `key` char(96) NOT NULL,
+  `providerId` char(22) NOT NULL,
+  `activeProviderIds` longtext NOT NULL,
+  PRIMARY KEY  (`table`,`field`,`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+END_SQL
     $session->db->write(<<END_SQL);
 DROP TABLE if exists cryptStatus;
 END_SQL
@@ -125,18 +140,22 @@ sub installCryptDemoData {
         'crypt',
         {   '43J5WEUlScqu_0e97z0fEA' => {
                 name     => 'My Simple Provider',
-                provider => 'WebGUI::Crypt::Provider::Simple',
+                provider => 'WebGUI::Crypt::Simple',
                 key      => 'ABCDEFG'
             },
             '919ojmGovK93vUQncEdeUw' => {
                 name     => 'Another Simple Provider',
-                provider => 'WebGUI::Crypt::Provider::Simple',
+                provider => 'WebGUI::Crypt::Simple',
                 key      => 'HIJKLMN'
             },
             'qvBZ_1zvMQJALHX_tyr1Ew' => {
                 name     => 'Sensitive Data',
-                provider => 'WebGUI::Crypt::Provider::HSM',
+                provider => 'WebGUI::Crypt::HSM',
                 url      => 'https://hsm/',
+            },
+            'None' => {
+                name     => 'None',
+                provider => 'WebGUI::Crypt::None',
             },
         }
     );

@@ -20,6 +20,7 @@ These methods are available from this package:
 
 # InsideOut object properties
 readonly session => my %session;    # WebGUI::Session object
+public providerId => my %providerId;
 
 #-------------------------------------------------------------------
 
@@ -46,15 +47,12 @@ sub new {
             error => 'Need a session.'
         );
     }
-    if ( ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $arg_ref,
-            error => 'Need a valid WebGUI::Crypt config.'
-        );
-    }
+
+    #NONE doesn't need config info.  
 
     # Register Class::InsideOut object..
     my $self = register 'WebGUI::Crypt::None';
+    $providerId{$id} = $arg_ref->{providerId};
 
     # Initialise object properties..
     my $id = id $self;

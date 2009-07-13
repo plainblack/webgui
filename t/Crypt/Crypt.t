@@ -24,9 +24,15 @@ require "$FindBin::Bin/crypt.pl";
 my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
+# Create test data
+$session->db->write("drop table if exists `encryptTest`");
+$session->db->write("CREATE TABLE `encryptTest` ( `id` char(22)  NOT NULL, `testField` LONGTEXT  NOT NULL)"); 
+$session->db->write("insert into encryptTest values ('1','ABC123')");
+
+#----------------------------------------------------------------------------
 # Tests
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
-plan tests => 8;
+plan tests => 20;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -43,28 +49,17 @@ use_ok('WebGUI::Crypt');
     isa_ok( $e, 'WebGUI::Error::InvalidParam', 'new takes exception to missing session object' );
 }
 {
-    eval { my $crypt = WebGUI::Crypt->new($session) };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'new takes exception to missing config object' );
+    isa_ok(WebGUI::Crypt->new( $session ), 'WebGUI::Crypt', 'Returns a happy WebGUI::Crypt'); 
 }
+
+#######################################################################
+#
+# Config File has crypt settings
+#
+#######################################################################
+
 {
-    eval { my $crypt = WebGUI::Crypt->new( $session, {} ) };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'new takes exception to invalid config object' );
-}
-{
-    eval{my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::What::Sort::Of::Namespace::Is::This?' })};
-    my $e = Exception::Class->caught();
-    isa_ok($e, 'WebGUI::Error::Pluggable::LoadFailed', 'new takes exception to invalid module');
-}
-{
-    eval{my $crypt = WebGUI::Crypt->new( $session, { provider => 'Test::More' })};
-    my $e = Exception::Class->caught();
-    isa_ok($e, 'WebGUI::Error::Pluggable::RunFailed', 'new takes exception to invalid provider');
-}
-{
-    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => make_string(rand(10) + 1) } );
-    test_provider($crypt, make_string(rand(50) + 1));
+    is(ref $session->config->get('crypt'), 'HASH', 'Config file has the crypt hash');
 }
 
 #######################################################################
@@ -72,9 +67,97 @@ use_ok('WebGUI::Crypt');
 # session->crypt
 #
 #######################################################################
-#{
-#    # This test requires that your webgui site config file contains crypt settings
-#    my $crypt = $session->crypt;
-#    isa_ok( $crypt, 'WebGUI::Crypt', 'session contructor works too' );
-#    test_provider($crypt, "don't say nothing");
-#}
+{
+    # This test requires that your webgui site config file contains crypt settings
+    my $crypt = $session->crypt;
+    isa_ok( $crypt, 'WebGUI::Crypt', 'session contructor works too' );
+}
+
+#######################################################################
+#
+# session->crypt->setProvider
+#
+#######################################################################
+{
+    eval{$session->crypt->setProvider()};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'Must provide arguments to setProvider');
+}
+{
+    eval{$session->crypt->setProvider({})};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'Must provide valid arguments to setProvider');
+}
+{
+    is($session->crypt->setProvider({table=>'encryptTest', field=>'testField', key=>'id','providerId'=>'Test'}),1,'Valid arguments should set the provider');
+}
+{
+    is($session->crypt->setProvider({table=>'encryptTest', field=>'testField', key=>'id','providerId'=>'None'}),1,'Valid arguments should update the provider');
+}
+
+#######################################################################
+#
+# session->crypt->_parseHeader
+#
+#######################################################################
+{
+    my ($a,$b) = $session->crypt->_parseHeader("hello");
+    is($a,'None', 'No header returns the None provider');
+    is($b,'hello', 'No header returns the None provider and text');
+}
+{
+    my ($a,$b) = $session->crypt->_parseHeader("CRYPT:None:hello");
+    is($a,'None', 'Header returns the None provider');
+    is($b,'hello', 'Header returns the None provider and text');
+}
+#######################################################################
+#
+# session->crypt->isEnabled
+#
+#######################################################################
+{
+    my $enabled = $session->setting->get('cryptEnabled') ? 0 : 1;
+    is($session->crypt->notEnabled(),  $enabled, 'Does enabled show the correct setting');
+}
+#######################################################################
+#
+# session->crypt->lookupProviderId
+#
+#######################################################################
+{
+    eval{$session->crypt->lookupProviderId};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'Must provide a hashref as argument');
+}
+{
+    eval{$session->crypt->lookupProviderId({})};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'Must provide a valid hashref as argument');
+}
+{
+    is($session->crypt->lookupProviderId({table=>'encryptTest',field => 'testField'}),'None', 'ProviderId should be None');
+}
+#######################################################################
+#
+# session->_getProvider
+#
+#######################################################################
+{
+    eval{$session->crypt->_getProvider()};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'Must provide a hashref as argument');
+}
+{
+    eval{$session->crypt->_getProvider({})};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'Must provide a hashref with either providerId or table and field.');
+}
+{
+    isa_ok( $session->crypt->_getProvider({providerId => 'None'}), 'WebGUI::Crypt::None', 'There should always be a None provider to test against');
+}
+
+
+#----------------------------------------------------------------------------
+# clean up test case
+$session->db->write("drop table if exists `encryptTest`");
+$session->db->write("delete from cryptFieldProviders where `field` = 'testField' and `table` = 'encryptTest' and `key` = 'id'");

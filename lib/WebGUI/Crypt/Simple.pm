@@ -20,7 +20,7 @@ These methods are available from this package:
 
 # InsideOut object properties
 readonly session => my %session;    # WebGUI::Session object
-public provider  => my %provider;
+public providerId  => my %providerId;
 private cipher   => my %cipher;
 
 #-------------------------------------------------------------------
@@ -40,7 +40,7 @@ Crypt config object
 
 sub new {
     my ( $session, $arg_ref ) = @_;
-
+    
     # Check arguments..
     if ( !defined $session || !$session->isa('WebGUI::Session') ) {
         WebGUI::Error::InvalidParam->throw(
@@ -69,6 +69,8 @@ sub new {
     # Initialise object properties..
     my $id = id $self;
     $session{$id} = $session;
+    $providerId{$id} = $arg_ref->{providerId};
+
     $cipher{$id}  = Crypt::CBC->new(
         -key    => $arg_ref->{key},
         -cipher => $cipher_class,
@@ -76,6 +78,18 @@ sub new {
         -salt   => 1,
     );
     return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 fields ()
+
+Returns a list of parameters and if they are required or not.
+
+=cut
+
+sub fields{
+    return [{'cipher',0,'key',1}]; 
 }
 
 #-------------------------------------------------------------------
@@ -88,7 +102,7 @@ Encrypt some plaintext
 
 sub encrypt {
     my ( $self, $plaintext ) = @_;
-    return $cipher{ id $self}->encrypt($plaintext);
+    return "CRYPT:".$providerId{id $self}.":".$cipher{ id $self}->encrypt($plaintext);
 }
 
 #-------------------------------------------------------------------
@@ -101,7 +115,7 @@ Encrypt some plaintext
 
 sub encrypt_hex {
     my ( $self, $plaintext ) = @_;
-    return $cipher{ id $self}->encrypt_hex($plaintext);
+    return "CRYPT:".$providerId{id $self}.":".$cipher{ id $self}->encrypt_hex($plaintext);
 }
 
 #-------------------------------------------------------------------

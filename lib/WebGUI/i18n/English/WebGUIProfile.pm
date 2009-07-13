@@ -418,6 +418,14 @@ If you wish to set the Default Value for any other field.  Create the field with
         message => q|Extra HTML to include with this profile field.|,
         lastUpdated => 1224620527,
     },
+    'encrypt this field' => {
+        message => q|Encrypt this field:|,
+        lastUpdated => 1247347676,
+    }, 
+    'encrypt this field hover' => {
+        message => q|Select an encryption provider to encrypt this field or leave as None for no encryption. This should only be used for text like fields.|,
+        lastUpdated => 1247347676,
+    }, 
 };
 
 1;

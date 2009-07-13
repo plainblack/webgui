@@ -1412,6 +1412,14 @@ section/answer.|,
         context => q|Continue button label on Take Survey page|,
         lastUpdated => 0,
     },
+    'surveyJSONEncryptionType help' => {
+        message => q|Select the encryption provider to encrypt responses. Use provider None to leave responses as plain text.|,
+        lastUpdated => 0,
+    },
+    'surveyJSONEncryptionType' => {
+        message => q|Encrypt responses:|,
+        lastUpdated => 0,
+    },
     
     'finish' => {
         message => q|Finish|,

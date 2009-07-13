@@ -229,6 +229,54 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+#-------------------------------------------------------------------
+
+=head2 getEditForm ( )
+
+Add the javascript needed for the edit form
+
+=cut
+
+sub getEditForm {
+    my ( $self ) = @_;
+    my $tabform = $self->SUPER::getEditForm();
+    my $cryptChoices;
+    my $i18n       = WebGUI::International->new( $self->session, 'Asset_Survey' );
+    map( $cryptChoices->{$_} = $self->session->config->get('crypt')->{$_}->{'name'}, keys %{$self->session->config->get('crypt')} );
+    my $currentProvider = $self->session->crypt->lookupProviderId({table=>'Survey_response', field => 'responseJSON'});
+    $tabform->getTab("security")->selectBox(
+        -name=>"surveyJSONEncryptionType",
+        -label=>$i18n->get('surveyJSONEncryptionType'),
+        -hoverHelp=>$i18n->get('surveyJSONEncryptionType help'),
+        -defaultValue => $currentProvider,
+        -options      => $cryptChoices
+    );
+    return $tabform;
+}
+
+#-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost
+
+For catching updates to surveyJSONEncryptionType.
+
+=cut
+
+sub processPropertiesFromFormPost{
+    my ($self) = @_;
+    $self->SUPER::processPropertiesFromFormPost;    # Updates the event
+    my $providerId = $self->session->form->get('surveyJSONEncryptionType');
+    if(!$self->session->config->get('crypt')->{$providerId}){
+        WebGUI::Error::InvalidParam->throw(
+            param => $providerId,
+            error    => 'Bad providerId passed in for parameters'
+        );
+    }
+    $self->session->crypt->setProvider({table=>'Survey_response', field=>'responseJSON', key=>'Survey_responseId', providerId=>$providerId});
+    
+}
+#-------------------------------------------------------------------
+
 =head2 surveyJSON_update ( )
 
 Convenience method that delegates to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/update>
@@ -378,6 +426,7 @@ sub responseJSON {
         # See if we need to load responseJSON from the database
         if (!defined $json) {
             $json = $self->session->db->quickScalar( 'select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?', [ $self->getId, $responseId ] );
+            $json = $self->session->crypt->decrypt_hex($json);
         }
 
         # Instantiate the ResponseJSON instance, and store it
@@ -1219,6 +1268,7 @@ Determines which questions to display to the survey taker next, loads and return
 sub www_loadQuestions {
     my $self            = shift;
     my $wasRestarted    = shift;
+    
     if ( !$self->canTakeSurvey() ) {
         $self->session->log->debug('canTakeSurvey false, surveyEnd');
         return $self->surveyEnd();
@@ -1472,7 +1522,8 @@ Turns the response object into JSON and saves it to the DB.
 
 sub persistResponseJSON {
     my $self = shift;
-    my $data = $self->responseJSON->freeze();
+    my $currentProvider = $self->session->crypt->lookupProviderId({table=>'Survey_response', field => 'responseJSON'});
+    my $data = $self->session->crypt->encrypt_hex($self->responseJSON->freeze(),{providerId => $currentProvider});
     $self->session->db->write( 'update Survey_response set responseJSON = ? where Survey_responseId = ?', [ $data, $self->responseId ] );
     return;
 }
