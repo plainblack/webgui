@@ -1,6 +1,5 @@
 = FLUX README =
-This is the Flux branch of WebGUI.
-Currently, History and the PrevNext macro also live in this branch.
+This is the Flux branch of WebGUI (which also contains WebGUI::History).
 
 = Installation =
 To enable flux for a site, simply run the sbin/flux.pl script.
