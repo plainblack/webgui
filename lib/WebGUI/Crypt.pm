@@ -36,7 +36,6 @@ These methods are available from this package:
 # InsideOut object properties
 readonly session => my %session;    # WebGUI::Session object
 private providers => my %providers;
-#public provider => my %provider;
 
 #-------------------------------------------------------------------
 
@@ -100,6 +99,8 @@ sub _getProvider{
     
     if($providerId eq 'None'){
         $module = "WebGUI::Crypt::None";
+        $providerData = $session{id $self}->config->get("crypt")->{'None'};
+        $providerData->{providerId} = $providerId;
     }   
     else{    
         $providerData = $session{id $self}->config->get("crypt")->{$providerId};

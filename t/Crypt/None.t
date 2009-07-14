@@ -9,6 +9,7 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Exception::Class;
+use WebGUI::Pluggable;
 
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -22,11 +23,14 @@ use Cwd;
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
+my $providerData = $session->config->get('crypt')->{'None'};
+$providerData->{providerId} = 'None';
 
+my $crypt = eval { WebGUI::Pluggable::run( 'WebGUI::Crypt::None', 'new', [$session, $providerData] ); };
 #----------------------------------------------------------------------------
 # Tests
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
-plan tests => 5;
+plan tests => 4;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -38,9 +42,20 @@ plan tests => 5;
 #
 #######################################################################
 {
-    my $crypt = WebGUI::Crypt::None->new( $session );
+   # my $crypt = WebGUI::Crypt::None->new( $session );
+    
     isa_ok( $crypt, 'WebGUI::Crypt::None', 'constructor works' );
-    isa_ok( $crypt->providerId, 'None', 'provider was created' );
-    test_provider($crypt, make_string(rand(50)+1));
+    is( $crypt->providerId(), 'None', "provider was created ");
 }
 
+#######################################################################
+#
+# en/decrypt
+#
+#######################################################################
+{
+    is( $crypt->decrypt($crypt->encrypt("hi")), 'hi', 'encrypt hi should return hi');
+}
+{
+    is( $crypt->decrypt($crypt->encrypt('')), '', 'encrypt undef should return nothign');
+}

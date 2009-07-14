@@ -48,15 +48,14 @@ sub new {
         );
     }
 
-    #NONE doesn't need config info.  
-
     # Register Class::InsideOut object..
     my $self = register 'WebGUI::Crypt::None';
-    $providerId{$id} = $arg_ref->{providerId};
 
     # Initialise object properties..
     my $id = id $self;
+    $providerId{$id} = $arg_ref->{providerId};
     $session{$id} = $session;
+    
     return $self;
 }
 
