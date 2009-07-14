@@ -1,3 +1,5 @@
+7.6.32
+
 7.6.31
  - fixed #10610: editing a page and editing goes away
  - fixed: Exceptions from WebGUI::Exception::Shop
