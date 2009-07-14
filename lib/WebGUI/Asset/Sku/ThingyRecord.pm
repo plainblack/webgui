@@ -104,7 +104,7 @@ sub definition {
     );
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),
-        icon              => 'ThingyRecord.gif',
+        icon              => 'thingyRecord.gif',
         autoGenerateForms => 1,
         tableName         => 'ThingyRecord',
         className         => __PACKAGE__,
