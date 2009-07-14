@@ -3133,6 +3133,141 @@ or are under your current version tag.</p>
 		lastUpdated =>1118453709,
         },
 
+	'admin console template variables' => {
+		message => q|Admin Console Template Variables|,
+		lastUpdated =>1247528069,
+    },
+
+	'formHeader' => {
+		message => q|HTML code to start a form.|,
+		lastUpdated =>1247529885,
+    },
+
+	'formFooter' => {
+		message => q|HTML code to end a form.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application_loop' => {
+		message => q|A loop containing all admin applications.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.workarea' => {
+		message => q|The rendered application screen.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.title' => {
+		message => q|The title of the application.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.icon' => {
+		message => q|The URL to this application's icon.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.icon.small' => {
+		message => q|The URL to this application's icon, the small version.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.canUse' => {
+		message => q|A boolean that will be true if the current user can use this application, based on group privileges and uiLevel.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.url' => {
+		message => q|The URL to this screen.|,
+		lastUpdated =>1247529885,
+    },
+
+	'backtosite.label' => {
+		message => q|An internationalized label for the link that returns the user back to the website from the Admin Console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'backtosite.url' => {
+		message => q|The URL for the link to take the user back to the website, from the Admin Console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'toggle.on.label' => {
+		message => q|An internationalized label for the link that displays the Admin console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'toggle.off.label' => {
+		message => q|An internationalized label for the link that hides the Admin console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'submenu_loop' => {
+		message => q|A loop contains a set of links for the submenu panel.|,
+		lastUpdated =>1247529885,
+    },
+
+	'submenu.label' => {
+		message => q|A label for the link.|,
+		lastUpdated =>1247529885,
+    },
+
+	'submenu.url' => {
+		message => q|The URL for the link.|,
+		lastUpdated =>1247529885,
+    },
+
+	'submenu.extras' => {
+		message => q|Any extra parameters for the link, like javascript for a confirmation.|,
+		lastUpdated =>1247529885,
+    },
+
+	'console.title' => {
+		message => q|The admin console's title.|,
+		lastUpdated =>1247529885,
+    },
+
+	'console.icon' => {
+		message => q|The admin console's icon.|,
+		lastUpdated =>1247529885,
+    },
+
+	'console.canUse' => {
+		message => q|A boolean that will be true if the current user can use the admin console, based on group privileges and uiLevel.|,
+		lastUpdated =>1247529885,
+    },
+
+	'console.url' => {
+		message => q|The URL to the admin console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'help.url' => {
+		message => q|The URL to view the help associated with this application, if any.|,
+		lastUpdated =>1247529885,
+    },
+
+	'versionTags' => {
+		message => q|A loop containing information about open version tags.|,
+		lastUpdated =>1247529885,
+    },
+
+	'versionTags.title' => {
+		message => q|The title of this version tag.|,
+		lastUpdated =>1247529885,
+    },
+
+	'versionTags.url' => {
+		message => q|If this version tag is the current tag for the user, then this link will be to commit the tag.  Otherwise, it will be to make this tag the current tag for the user.|,
+		lastUpdated =>1247529885,
+    },
+
+	'versionTags.icon' => {
+		message => q|If this tag is the curret tag for the user, this will contain the URL to a small version of the version tags admin console icon.|,
+		lastUpdated =>1247529885,
+    },
+
 	'settings' => {
 		message => q|Settings|,
 		lastUpdated =>1092930637,
