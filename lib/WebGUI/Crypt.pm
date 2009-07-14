@@ -205,6 +205,12 @@ This is a hash ref which must contain a 'providerId' or a 'table' and 'field' in
 
 sub encrypt {
     my ($self, $plaintext, $args) = @_;
+    if ( ! defined $plaintext ) {
+        WebGUI::Error::InvalidParam->throw(
+            param => $plaintext,
+            error => 'encrypt needs $plaintext defined.'
+        );
+    }
     if($self->notEnabled()){return;}
     $self->_getProvider($args)->encrypt($plaintext);
 }
@@ -221,6 +227,12 @@ Encrypt some plaintext
 
 sub encrypt_hex {
     my ($self, $plaintext, $args) = @_;
+    if ( ! defined $plaintext ) {
+        WebGUI::Error::InvalidParam->throw(
+            param => $plaintext,
+            error => 'encrypt_hex needs $plaintext defined.'
+        );
+    }
     if($self->notEnabled()){return;}
     $self->_getProvider($args)->encrypt_hex($plaintext);
 }
@@ -235,6 +247,12 @@ Decrypt some ciphertext
 
 sub decrypt {
     my ($self, $ciphertext) = @_;
+    if ( ! defined $ciphertext ) {
+        WebGUI::Error::InvalidParam->throw(
+            param => $ciphertext,
+            error => 'decrypt needs $ciphertext defined.'
+        );
+    }
     if($self->notEnabled()){return $ciphertext;}
     my ($providerId, $text) = $self->_parseHeader($ciphertext);
     return $self->_getProvider({providerId=>$providerId})->decrypt($text);
@@ -250,6 +268,12 @@ Decrypt some ciphertext
 
 sub decrypt_hex {
     my ($self, $ciphertext) = @_;
+    if ( ! defined $ciphertext ) {
+        WebGUI::Error::InvalidParam->throw(
+            param => $ciphertext,
+            error => 'decrypt_hex needs $ciphertext defined.'
+        );
+    }
     if($self->notEnabled()){return $ciphertext;}
     my ($providerId, $text) = $self->_parseHeader($ciphertext);
     return $self->_getProvider({providerId=>$providerId})->decrypt_hex($text);

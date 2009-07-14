@@ -32,7 +32,7 @@ $session->db->write("insert into encryptTest values ('1','ABC123')");
 #----------------------------------------------------------------------------
 # Tests
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
-plan tests => 20;
+plan tests => 24;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -155,6 +155,34 @@ use_ok('WebGUI::Crypt');
 {
     isa_ok( $session->crypt->_getProvider({providerId => 'None'}), 'WebGUI::Crypt::None', 'There should always be a None provider to test against');
 }
+#######################################################################
+#
+# session->crypt/decrypt?_hex
+#
+#######################################################################
+{
+    eval{$session->crypt->encrypt()};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'encrypt must have $plaintext defined.');
+}
+{
+    eval{$session->crypt->decrypt()};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'encrypt must have $cyphertext defined.');
+}
+{
+    eval{$session->crypt->decrypt_hex()};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'decrypt_hex must have $cyphertext defined.');
+}
+{
+    eval{$session->crypt->encrypt_hex()};
+    my $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'encrypt_hex must have $plaintext defined.');
+}
+
+
+
 
 
 #----------------------------------------------------------------------------
