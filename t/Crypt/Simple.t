@@ -1,4 +1,4 @@
-# Tests WebGUI::Crypt::Simple
+# Tests WebGUI::Crypt::None
 #
 #
 
@@ -9,28 +9,31 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Exception::Class;
+use WebGUI::Pluggable;
 
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
 use WebGUI::Workflow;
 use WebGUI::Group;
-use WebGUI::Crypt;
+use WebGUI::Crypt::Simple;
 use File::Spec;
 use Cwd;
 
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
+my $config = {'provider' => 'WebGUI::Crypt::Simple', 'name' => 'simple', 'key' => 'abc'};
+$config->{providerId} = 'The Simple';
 
+my $crypt;
 #----------------------------------------------------------------------------
 # Tests
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
-plan tests => 11;
+plan tests => 4;
 
 #----------------------------------------------------------------------------
 # put your tests here
-require_ok( File::Spec->catfile( cwd(), qw( t Crypt crypt.pl ) ) );
 
 #######################################################################
 #
@@ -38,26 +41,23 @@ require_ok( File::Spec->catfile( cwd(), qw( t Crypt crypt.pl ) ) );
 #
 #######################################################################
 {
-    eval { my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple' } ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Pluggable::RunFailed', 'new takes exception to missing key in config' );
+    $crypt = eval { WebGUI::Pluggable::run( 'WebGUI::Crypt::Simple', 'new', [$session, $config] ); };
+    isa_ok( $crypt, 'WebGUI::Crypt::Simple', 'constructor works' );
+    is( $crypt->providerId(), 'The Simple', "provider was created ");
+}
+
+#######################################################################
+#
+# en/decrypt
+#
+#######################################################################
+{
+    my $t = $crypt->encrypt('hi');
+    $t =~ /CRYPT:(.*?):(.*)/;
+    is( $crypt->decrypt($2), 'hi', 'encrypt hi should return hi');
 }
 {
-    eval { my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => '' } ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Pluggable::RunFailed', 'new takes exception to empty key in config' );
-}
-{
-    # Try with default cipher, random key approx 20 chars long
-    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => make_string(rand(20)+1) } );
-    isa_ok( $crypt, 'WebGUI::Crypt', 'constructor works' );
-    isa_ok( $crypt->provider, 'WebGUI::Crypt::Simple', 'provider was created' );
-    test_provider($crypt, 'oh hai!');
-}
-{
-    # Try with a different cipher
-    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => make_string(rand(20)+1), cipher => 'Crypt::DES' } );
-    isa_ok( $crypt, 'WebGUI::Crypt', 'constructor works' );
-    isa_ok( $crypt->provider, 'WebGUI::Crypt::Simple', 'provider was created' );
-    test_provider($crypt, 'kimiwa sekushi des');
+    my $t = $crypt->encrypt('');
+    $t =~ /CRYPT:(.*?):(.*)/;
+    is( $crypt->decrypt($2), '', 'encrypt nothing should return nothing');
 }
