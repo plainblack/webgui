@@ -303,8 +303,8 @@ sub render {
 	}
 
     $var{"backtosite.url"} = $self->session->url->getBackToSiteURL();
-    $var{"formHeader"} = WebGUI::Form::formHeader($self->session)
-                       . WebGUI::Form::hidden($self->session, { name=>'func', value=>'' });
+    my $formId = $self->getSubmenuFormId;
+    $var{"formHeader"} = WebGUI::Form::formHeader($self->session, { action => $self->{_formUrl}, extras => qq|id='$formId'|, });
     $var{"formFooter"} = WebGUI::Form::formFooter($self->session);
     my $template
         = WebGUI::Asset::Template->new(
@@ -317,6 +317,23 @@ sub render {
     }
     my $output  = $template->process(\%var);
     return $self->session->style->process($output,"PBtmpl0000000000000137");
+}
+
+#-------------------------------------------------------------------
+
+=head2 setFormUrl ( $url )
+
+Sets the action for the form that is used to submit CSRF requests.
+
+=head3 $url
+
+The URL for the form to submit to.  
+
+=cut
+
+sub setFormUrl {
+	my $self = shift;
+	$self->{_formUrl} = shift;
 }
 
 #-------------------------------------------------------------------
@@ -356,6 +373,18 @@ Returns the help topic, if any, that has been set for this adminConsole.
 sub getHelp {
 	my $self = shift;
 	return (exists $self->{_helpUrl} ? $self->{_helpUrl} : '');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSubmenuFormId ( )
+
+Returns the id of the form used to to CSRF submits.
+
+=cut
+
+sub getSubmenuFormId {
+	return 'submenuForm';
 }
 
 #-------------------------------------------------------------------
