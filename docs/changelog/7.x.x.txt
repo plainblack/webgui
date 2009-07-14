@@ -6,6 +6,7 @@
   - WebGUI::Shop::PayDriver::PayPal::PayPalStd replaced by WebGUI::Shop::PayDriver::PayPal.  PayPalStd fought the Shop API and didn't work.
   - fixed #10633: GET requests in Operation/User require valid CSRF token.
   - fixed #10621: ThingRecord needs an Asset Icon
+  - fixed #10638: Paste from Admin Bar broken
 
 7.7.14
  - fixed #10606: shelf selector

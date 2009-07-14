@@ -91,14 +91,19 @@ sub process {
 		# clipboard
 		my $clipboardItems = $session->asset->getAssetsInClipboard(1);
 		if (scalar (@$clipboardItems)) {
-			$out .= q{<dt class="a-m-t">}.$i18n->get("1082").q{</dt><dd class="a-m-d"><div class="bd">};
+            my $formProceed = $session->form->get('op') eq 'assetManager' ? 'manageAssets' : '';
+			$out .= q{<dt class="a-m-t">}.$i18n->get("1082").q{</dt><dd class="a-m-d"><div class="bd">}
+                 .  WebGUI::Form::formHeader($session,
+                        { action => $session->url->page('func=pasteList;assetId=0;proceed='.$formProceed), extras => "id='adminBarClip'", }
+                    );
 			foreach my $item (@{$clipboardItems}) {
 				my $title = $asset->getTitle;
-				$out .= q{<a class="link" href="}.$asset->getUrl("func=pasteList;assetId=".$item->getId.$proceed).q{">}
+				$out .= q{<a class="link" href="}.$asset->getUrl("func=pasteList;assetId=".$item->getId.$proceed).q{" onclick="var thisForm = document.getElementById('adminBarClip'); thisForm.assetId.value='}.$item->getId.q{'; thisForm.submit(); return false;">}
 					.q{<img src="}.$item->getIcon(1).q{" style="border: 0px; vertical-align: middle;" alt="icon" /> }
 					.$item->getTitle.q{</a>};
 			}
-			$out .= qq{</div></dd>\n};
+			$out .= WebGUI::Form::formFooter($session)
+                 .  qq{</div></dd>\n};
 		}
 
 		### new content menu

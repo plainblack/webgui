@@ -545,9 +545,9 @@ the Asset Manager.
 =cut
 
 sub www_pasteList {
-	my $self    = shift;
+    my $self    = shift;
     my $session = $self->session;
-	return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
+    return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
     my $form    = $session->form;
     my $pb      = WebGUI::ProgressBar->new($session);
     ##Need to store the list of assetIds for the status subroutine
@@ -555,14 +555,15 @@ sub www_pasteList {
     ##Need to set the URL that should be displayed when it is done
     my $i18n     = WebGUI::International->new($session, 'Asset');
     $pb->start($i18n->get('Paste Assets'), $session->url->extras('adminConsole/assets.gif'));
-	ASSET: foreach my $clipId (@assetIds) {
+    ASSET: foreach my $clipId (@assetIds) {
+        next ASSET unless $clipId;
         my $pasteAsset = WebGUI::Asset->newPending($session, $clipId);
         if (! $pasteAsset && $pasteAsset->canEdit) {
             $pb->update(sprintf $i18n->get('skipping %s'), $pasteAsset->getTitle);
             next ASSET;
         }
-		$self->paste($clipId, sub {$pb->update(@_);});
-	}
+        $self->paste($clipId, sub {$pb->update(@_);});
+    }
     return $pb->finish( ($form->param('proceed') eq 'manageAssets') ? $self->getUrl('op=assetManager') : $self->getUrl );
 }
 
