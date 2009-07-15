@@ -492,7 +492,7 @@ sub purge {
         $item->delete;
     }
 
-    # Should we also remove the records from the Thingy?
+    # XXX: Should we also remove the records from the Thingy?
 
     return $self->SUPER::purge;
 }
