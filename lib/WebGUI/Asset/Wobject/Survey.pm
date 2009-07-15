@@ -426,7 +426,7 @@ sub responseJSON {
         # See if we need to load responseJSON from the database
         if (!defined $json) {
             $json = $self->session->db->quickScalar( 'select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?', [ $self->getId, $responseId ] );
-            $json = $self->session->crypt->decrypt_hex($json);
+            $json = $self->session->crypt->decrypt_hex($json) if($json);
         }
 
         # Instantiate the ResponseJSON instance, and store it
