@@ -27,6 +27,7 @@ use WebGUI::Asset;
 my $toVersion = '7.7.14';
 my $quiet; # this line required
 
+addFieldPriceToThingyRecord( $session );
 
 my $session = start(); # this line required
 
@@ -43,6 +44,21 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+
+#----------------------------------------------------------------------------
+# Add the field price storage to ThingyRecord
+sub addFieldPriceToThingyRecord {
+    my $session = shift;
+    print "\tAdd field prices to ThingyRecord... " unless $quiet;
+
+    $session->db->write(
+        "ALTER TABLE ThingyRecord ADD COLUMN fieldPrice LONGTEXT",
+    );
+
+    print "DONE!\n" unless $quiet;
+}
+
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

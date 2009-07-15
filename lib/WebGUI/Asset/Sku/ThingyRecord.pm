@@ -18,6 +18,7 @@ use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset::Sku';
 use WebGUI::Utility;
+use HTML::Entities qw( encode_entities );
 
 # Collateral data class... very long name. Zoffix eat your heart out.
 my $RECORD_CLASS = 'WebGUI::AssetCollateral::Sku::ThingyRecord::Record';
@@ -72,8 +73,6 @@ sub definition {
             options   => $class->getThingOptions($session),
             label     => $i18n->get('thingId label'),
             hoverHelp => $i18n->get('thingId description'),
-            extras =>
-                q{onchange="WebGUI.ThingyRecord.getThingFields(this.options[this.selectedIndex].value,'thingFields_formId')"},
         },
         thingFields => {
             tab       => "properties",
@@ -94,6 +93,13 @@ sub definition {
             fieldType => "float",
             label     => $i18n->get( '10', "Asset_Product" ),      #Price
             hoverHelp => $i18n->get( 'price', 'Asset_Product' ),
+        },
+        fieldPrice => {
+            tab         => "properties",
+            fieldType   => "text",
+            customDrawMethod => 'drawEditFieldPrice',
+            label       => $i18n->get( 'fieldPrice label' ),
+            hoverHelp   => $i18n->get( 'fieldPrice hoverHelp '),
         },
         duration => {
             tab          => "properties",
@@ -125,9 +131,10 @@ the header or footer!
 
 sub appendVarsEditRecord {
     my ( $self, $var, $recordId ) = @_;
-    my $session = $self->session;
-    my $thingy  = $self->getThingy;
-    my $record  = {};
+    my $session     = $self->session;
+    my $thingy      = $self->getThingy;
+    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') );
+    my $record      = {};
     if ($recordId) {
 
         # Get an existing record
@@ -141,7 +148,16 @@ sub appendVarsEditRecord {
     my @allowed = split "\n", $self->get('thingFields');
     for my $field ( @{$fields} ) {
         next unless grep { $_ eq $field->{fieldId} } @allowed;
+        
+        # Don't allow user to edit fields they didn't purchase
+        next if ( 
+            $recordId 
+            && $fieldPrice->{ $field->{fieldId} } > 0 
+            && not defined $record->{ 'field_' . $field->{fieldId} } 
+        );
+
         $field->{value} = $record->{ 'field_' . $field->{fieldId} } || $field->{defaultValue};
+        my $price       = $fieldPrice->{ $field->{fieldId} };
         my %fieldProperties = (
             "input"      => $thingy->getFormElement($field),
             "value"      => $thingy->getFieldValue( $field->{value}, $field ),
@@ -151,6 +167,7 @@ sub appendVarsEditRecord {
             "isRequired" => ( $field->{status} eq "required" ),
             "pretext"    => $field->{pretext},
             "subtext"    => $field->{subtext},
+            "price"      => $price > 0 ? $price : "",
         );
         push @{ $var->{form_fields} }, { map { "field_" . $_ => $fieldProperties{$_} } keys %fieldProperties };
 
@@ -175,6 +192,24 @@ sub deleteThingRecord {
     my $dbh       = $self->session->db->dbh;
     my $tableName = $dbh->quote_identifier( 'Thingy_' . $thingId );
     $db->write( "DELETE FROM $tableName WHERE thingDataId=?", [$recordId] );
+}
+
+#-------------------------------------------------------------------
+
+=head2 drawEditFieldPrice ( )
+
+Draw the field to edit field prices. Add appropriate javascript.
+
+=cut
+
+sub drawEditFieldPrice {
+    my ( $self ) = @_;
+
+    my $fieldHtml   = sprintf <<'ENDHTML', encode_entities( $self->get('fieldPrice') );
+<div id="fieldPrice"></div><input type="hidden" name="fieldPrice" value="%s" />
+ENDHTML
+
+    return $fieldHtml;
 }
 
 #-------------------------------------------------------------------
@@ -257,7 +292,21 @@ Get the price
 
 sub getPrice {
     my ($self) = @_;
-    return $self->get('price');
+    my $price       = $self->get('price');
+    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') );
+    my $option      = $self->getOptions;
+    my $record      = $RECORD_CLASS->new( $self->session, $option->{recordId} );
+    my $fields      = JSON->new->decode( $record->get('fields') );
+
+    # Calculate field price
+    for my $key ( keys %{$fields} ) {
+        my $fieldId = substr $key, length("field_");
+        if ( $fieldPrice->{ $fieldId } > 0 ) {
+            $price += $fieldPrice->{ $fieldId };
+        }
+    }
+
+    return $price;
 }
 
 #----------------------------------------------------------------------------
@@ -366,9 +415,9 @@ sub onCompletePurchase {
 
         # Update record
         $record->update( {
-                expires       => $now + $self->get('duration'),
-                transactionId => $item->transaction->getId,
-                isHidden      => 0,
+                expires         => $now + $self->get('duration'),
+                transactionId   => $item->transaction->getId,
+                isHidden        => 0,
             }
         );
 
@@ -445,14 +494,22 @@ Process the edit record form and return the record
 
 sub processEditRecordForm {
     my ($self) = @_;
-    my $var = {};
+    my $var         = {};
+    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') );
 
     my $fields = $self->getThingFields( $self->get('thingId') );
     for my $field ( @{$fields} ) {
         my $fieldName = 'field_' . $field->{fieldId};
         my $fieldType = $field->{fieldType};
         $fieldType = "" if ( $fieldType =~ m/^otherThing/x );
-        $var->{$fieldName} = $self->session->form->get( $fieldName, $fieldType, $field->{defaultValue}, $field );
+        my $value = $self->session->form->get( $fieldName, $fieldType, $field->{defaultValue}, $field );
+
+        # Don't save fields we didn't pay for
+        if ( $fieldPrice->{ $field->{fieldId} } > 0 && !$value ) {
+            next;
+        }
+        
+        $var->{ $fieldName } = $value;
     }
 
     return $var;
