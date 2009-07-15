@@ -168,19 +168,15 @@ use_ok('WebGUI::Crypt');
     isa_ok($e, 'WebGUI::Error::InvalidParam', 'encrypt must have $plaintext defined.');
 }
 {
-    eval{$session->crypt->decrypt()};
-    my $e = Exception::Class->caught();
-    isa_ok($e, 'WebGUI::Error::InvalidParam', 'encrypt must have $cyphertext defined.');
-}
-{
-    eval{$session->crypt->decrypt_hex()};
-    my $e = Exception::Class->caught();
-    isa_ok($e, 'WebGUI::Error::InvalidParam', 'decrypt_hex must have $cyphertext defined.');
+    is($session->crypt->decrypt(),undef,'empty call to decrypt');
 }
 {
     eval{$session->crypt->encrypt_hex()};
     my $e = Exception::Class->caught();
-    isa_ok($e, 'WebGUI::Error::InvalidParam', 'encrypt_hex must have $plaintext defined.');
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'encrypt_hex must have $cyphertext defined.');
+}
+{
+    is($session->crypt->decrypt_hex(),undef,'empty call to decrypt_hex');
 }
 
 

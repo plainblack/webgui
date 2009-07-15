@@ -41,7 +41,7 @@ plan tests => 4;
 #
 #######################################################################
 {
-    $crypt = eval { WebGUI::Pluggable::run( 'WebGUI::Crypt::Simple', 'new', [$session, $config] ); };
+    $crypt = WebGUI::Crypt::Simple->new($session, $config); 
     isa_ok( $crypt, 'WebGUI::Crypt::Simple', 'constructor works' );
     is( $crypt->providerId(), 'The Simple', "provider was created ");
 }
