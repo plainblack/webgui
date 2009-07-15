@@ -7,6 +7,7 @@
   - fixed #10633: GET requests in Operation/User require valid CSRF token.
   - fixed #10621: ThingRecord needs an Asset Icon
   - fixed #10638: Paste from Admin Bar broken
+  - fixed per-field prices in ThingyRecord
 
 7.7.14
  - fixed #10606: shelf selector

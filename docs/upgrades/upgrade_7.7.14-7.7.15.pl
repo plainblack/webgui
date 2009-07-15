@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 replacePayPalDriver($session);
+addFieldPriceToThingyRecord( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,20 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+
+#----------------------------------------------------------------------------
+# Add the field price storage to ThingyRecord
+sub addFieldPriceToThingyRecord {
+    my $session = shift;
+    print "\tAdd field prices to ThingyRecord... " unless $quiet;
+
+    $session->db->write(
+        "ALTER TABLE ThingyRecord ADD COLUMN fieldPrice LONGTEXT",
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 sub replacePayPalDriver {
     my $session = shift;
