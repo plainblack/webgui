@@ -4616,6 +4616,12 @@ Users may override this setting in their profile.
         context => 'CSRF = Cross Site Request Forgery, token is a piece of identification',
     },
 
+    'Clear' => {
+        message => 'Clear',
+        lastUpdated => 0,
+        context => 'To empty or wipe-out, similar to erase.',
+    },
+
 };
 
 1;
