@@ -68,7 +68,7 @@ WebGUI.AssetHistory.initManager = function (o) {
 */
 WebGUI.AssetHistory.initDataTable = function (o) {
     var historyPaginator = new YAHOO.widget.Paginator({
-        containers            : ['pagination'],
+        containers            : ['paginationTop', 'paginationBot'],
         pageLinks             : 7,
         rowsPerPage           : 25,
         template              : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
@@ -106,7 +106,7 @@ WebGUI.AssetHistory.initDataTable = function (o) {
 
     // Initialize the data table
     WebGUI.AssetHistory.DataTable 
-        = new YAHOO.widget.DataTable( 'dynamicdata', 
+        = new YAHOO.widget.DataTable( 'historyData', 
             WebGUI.AssetHistory.ColumnDefs, 
             WebGUI.AssetHistory.DataSource, 
             {

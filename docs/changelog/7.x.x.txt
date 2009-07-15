@@ -16,6 +16,7 @@
   - fixed a bug in My Purchases where in store credit would not be taken into
     account in the overview yielding zero or neagtive transaction amounts on
     the screen. ( Martin Kamerbeek / Oqapi )
+  - fixed #10646: Asset History not paginated
 
 7.7.14
  - fixed #10606: shelf selector
