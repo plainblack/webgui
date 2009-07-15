@@ -188,7 +188,7 @@ sub ogoneCheckoutButton {
 	$self->{ _ogoneTransaction } = "done" ;
     
     # Ogone needs the transaction amount in cents
-	my $amount  = $transaction->get('amount') * 100;
+    my $amount  = sprintf( "%.2f", $transaction->get('amount') ) * 100;
     $amount     =~ s/[^\d]//g;              # Remove any character from amount except digits.
 
     my $orderId     = $transaction->getId;

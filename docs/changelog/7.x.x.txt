@@ -10,6 +10,9 @@
   - fixed per-field prices in ThingyRecord
   - fixed a bug where VersionTag->get would return an unsafe copy of its
     state ( Martin Kamerbeek / Oqapi )
+  - fixed a bug in the Ogone pay driver where for certain combinations of tax
+    rates and in store credit a rounding error would prevent checkout at
+    Ogone. ( Martin Kamerbeek / Oqapi )
 
 7.7.14
  - fixed #10606: shelf selector
