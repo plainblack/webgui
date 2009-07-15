@@ -18,6 +18,7 @@
     the screen. ( Martin Kamerbeek / Oqapi )
   - fixed #10646: Asset History not paginated
   - fixed #10645: Asset History: search results not sorted as expected
+  - fixed #10648: Story Topic: Photos don't display
 
 7.7.14
  - fixed #10606: shelf selector
