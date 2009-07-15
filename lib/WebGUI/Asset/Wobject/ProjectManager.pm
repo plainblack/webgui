@@ -298,6 +298,11 @@ sub _resourceSearchPopup {
 
 	if ($doSearch) {
 		my @resources = @{$self->session->db->buildArrayRefOfHashRefs($args{queryCallback}->($exclude, $search))};
+        foreach my $r(@resources){
+            for my $key(keys %$r){
+                $r->{$key} = $self->session->crypt->decrypt_hex($r->{$key});
+            }
+        }    
 		$var->{doingSearch} = 1;
 		$var->{foundResults} = scalar @resources;
 

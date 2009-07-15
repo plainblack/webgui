@@ -78,3 +78,4 @@ my $ciphertext = $session->db->quickScalar("select testField from encryptTest wh
 ############
 
 $session->db->write("drop table if exists `encryptTest`");
+$session->db->write("delete from cryptFieldProviders where `table` = 'encryptTest' and `field` = 'testField'");

@@ -621,7 +621,7 @@ sub www_formUsers {
 	$output .= '<ul>';
 	my $p = doUserSearch($session,"formUsers;formId=".$session->form->process("formId"),1);
 	foreach my $data (@{$p->getPageData}) {
-		$output .= '<li><a href="#" onclick="window.opener.document.getElementById(\''.$session->form->process("formId").'\').value=\''.$data->{userId}.'\';window.opener.document.getElementById(\''.$session->form->process("formId").'_display\').value=\''.$data->{username}.'\';window.close();">'.$data->{username}.'</a></li>';
+		$output .= '<li><a href="#" onclick="window.opener.document.getElementById(\''.$session->form->process("formId").'\').value=\''.$session->crypt->decrypt_hex($data->{userId}).'\';window.opener.document.getElementById(\''.$session->form->process("formId").'_display\').value=\''.$session->crypt->decrypt_hex($data->{username}).'\';window.close();">'.$session->crypt->decrypt_hex($data->{username}).'</a></li>';
 	}
     $output .= '</ul>';
     $output .= $p->getBarTraditional;
@@ -672,6 +672,9 @@ sub www_listUsers {
 		</tr>';
 	my $p = doUserSearch($session,"listUsers",1);
 	foreach my $data (@{$p->getPageData}) {
+        for my $key(keys %$data){
+            $data->{$key} = $session->crypt->decrypt_hex($data->{$key});
+        }
         $output .= '<tr class="tableData">';
         $output .= '<td>'.$status{$data->{status}}.'</td>';
         $output .= '<td><a href="'.$session->url->page('op=editUser;uid='.$data->{userId})

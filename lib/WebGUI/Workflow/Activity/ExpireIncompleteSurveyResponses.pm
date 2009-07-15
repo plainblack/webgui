@@ -113,6 +113,9 @@ sub execute {
                     and ad.assetId = s.assetId and ad.revisionDate = s.revisionDate and upd.userId = r.userId"; 
     my $refs = $self->session->db->buildArrayRefOfHashRefs($sql);
     for my $ref (@{$refs}) {
+        for my $key(keys %$ref){
+            $ref->{$key} = $session->crypt->decrypt_hex($ref->{$key});
+        }
         if($self->get("deleteExpired") == 1){
             $self->session->db->write("delete from Survey_response where Survey_responseId = ?",[$ref->{Survey_responseId}]);
         }else{#else sent to expired but not deleted

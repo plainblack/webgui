@@ -95,7 +95,7 @@ sub _getProvider{
     my $module;
     my $providerData;
     
-    if($providerId eq 'None'){
+    if($providerId eq 'None' or ! $providerId){
         $module = "WebGUI::Crypt::None";
         $providerData = $session{id $self}->config->get("crypt")->{'None'};
         $providerData->{providerId} = $providerId;
@@ -249,12 +249,7 @@ Decrypt some ciphertext
 
 sub decrypt {
     my ($self, $ciphertext) = @_;
-    if ( ! defined $ciphertext ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $ciphertext,
-            error => 'decrypt needs $ciphertext defined.'
-        );
-    }
+    return $ciphertext if ( ! defined $ciphertext ) ;
     if($self->notEnabled()){return $ciphertext;}
     my ($providerId, $text) = $self->_parseHeader($ciphertext);
     return $self->_getProvider({providerId=>$providerId})->decrypt($text);
@@ -270,12 +265,7 @@ Decrypt some ciphertext
 
 sub decrypt_hex {
     my ($self, $ciphertext) = @_;
-    if ( ! defined $ciphertext ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $ciphertext,
-            error => 'decrypt_hex needs $ciphertext defined.'
-        );
-    }
+    return $ciphertext if ( ! defined $ciphertext ) ;
     if($self->notEnabled()){return $ciphertext;}
     my ($providerId, $text) = $self->_parseHeader($ciphertext);
     return $self->_getProvider({providerId=>$providerId})->decrypt_hex($text);

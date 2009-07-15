@@ -37,7 +37,12 @@ WHERE users.userId=?";
 	my $sth = $self->session->db->prepare($sql);
 	foreach my $userId (@userIds) {
 		$sth->execute([ $userId ]);
-		$nameHash{ $userId } = _defineUsername($sth->hashRef);
+        my $hashRef = $sth->hashRef;
+        for my $key(keys %$hashRef){
+            $hashRef->{$key} = $self->session->crypt->decrypt_hex($hashRef->{$key});
+        }
+		#$nameHash{ $userId } = _defineUsername($sth->hashRef);
+		$nameHash{ $userId } = _defineUsername($hashRef);
 	}
 	$sth->finish;
 	return %nameHash;
@@ -318,7 +323,11 @@ sub www_selectDelegates {
 			and InOutBoard.inOutGroup=?
 		group by userId
 		",[$self->getId, $self->session->user->userId, $self->getValue("inOutGroup")]);
-	while (my $data = $sth->hashRef) {
+    my $hashRef = $sth->hashRef;
+    for my $key(keys %$hashRef){
+        $hashRef->{$key} = $self->session->crypt->decrypt_hex($hashRef->{$key});
+    }
+	while (my $data = $hashRef) {
 		$userNames{ $data->{userId} } = _defineUsername($data);
 	}
 	$sth->finish;
@@ -480,6 +489,9 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 	  my $rowdata = $p->getPageData();
 	  my @rows;
 	  foreach my $data (@$rowdata) {
+        for my $key(keys %$data){
+            $data->{$key} = $self->session->crypt->decrypt_hex($data->{$key});
+        }
 		my %row;
 		
 		if ($lastDepartment ne $data->{department}) {

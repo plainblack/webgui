@@ -106,6 +106,9 @@ sub _setDataByQuery {
 	$self->{_columnNames} = [ $sth->getColumnNames ];  
 	my $pageCount = 1;
 	while (my $data = $sth->hashRef) {
+        for my $key(keys %$data){
+            $data->{$key} = $self->session->crypt->decrypt($data->{$key});
+        }
 		$rowCount++;
 		if ($rowCount/$self->{_rpp} > $pageCount) {	
 			$pageCount++;
@@ -724,6 +727,9 @@ sub setDataByQuery {
 	
     my @row = ();
 	while (my $data = $sth->hashRef) {
+        for my $key(keys %$data){
+            $data->{$key} = $self->session->crypt->decrypt($data->{$key});
+        }
         push(@row,$data);	
     }
     

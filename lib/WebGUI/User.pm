@@ -805,6 +805,7 @@ sub new {
 
         # remove undefined fields so they will fall back on defaults when requested
         for my $key (keys %profile) {
+            $profile{$key} = $self->session->crypt->decrypt_hex($profile{$key});
             if (!defined $profile{$key} || $profile{$key} eq '') {
                 delete $profile{$key};
             }
@@ -843,7 +844,8 @@ sub newByEmail {
 	my $class = shift;
 	my $session = shift;
 	my $email = shift;
-	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
+    $email = $session->crypt->encrypt_hex($email,{table=>'userProfileData', field=>'email'});
+    my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
 	my $user = $class->new($session, $id);
 	return undef if ($user->isVisitor); # visitor is never valid for this method
 	return undef unless $user->username;
@@ -909,6 +911,7 @@ sub profileField {
     if (defined $value) {
         $self->uncache;
         $self->{_profile}{$fieldName} = $value;
+        $value = $self->session->crypt->encrypt_hex($value,{table=>'userProfileData', field=>$db->dbh->quote_identifier($fieldName)});
         $db->write(
             "UPDATE userProfileData SET ".$db->dbh->quote_identifier($fieldName)."=? WHERE userId=?",
             [$value, $self->{_userId}]

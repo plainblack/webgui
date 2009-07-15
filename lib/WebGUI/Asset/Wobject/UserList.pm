@@ -508,7 +508,9 @@ sub view {
 	$sql .= " order by ".$sortBy." ".$sortOrder;
 
 	($defaultPublicProfile) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicProfile'");
+    $defaultPublicProfile = $self->session->crypt->decrypt_hex($defaultPublicProfile);
 	($defaultPublicEmail) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicEmail'");
+    $defaultPublicEmail = $self->session->crypt->decrypt_hex($defaultPublicEmail);
 
 	my $paginatePage = $form->param('pn') || 1;
 	my $currentUrl = $self->getUrl();
@@ -524,6 +526,9 @@ sub view {
 	$sth = $self->session->db->read($sql);
 	my @visibleUsers;
 	while (my $user = $sth->hashRef){
+        for my $key(keys %$user){
+            $user->{$key} = $self->session->crypt->decrypt_hex($user->{$key});
+        } 
 		my $showGroupId = $self->get("showGroupId");
 		if ($showGroupId eq '0' || ($showGroupId && $self->isInGroup($showGroupId,$user->{userId}))){
 			unless ($self->get("hideGroupId") ne '0' && $self->isInGroup($self->get("hideGroupId"),$user->{userId})){
@@ -534,6 +539,9 @@ sub view {
 	$p->setDataByArrayRef(\@visibleUsers);
 	my $users = $p->getPageData($paginatePage);
 	foreach my $user (@$users){
+        for my $key(keys %$user){
+            $user->{$key} = $self->session->crypt->decrypt_hex($user->{$key});
+        } 
         my $userObject = WebGUI::User->new($self->session,$user->{userId});
 	    if ($self->get('overridePublicProfile') || $userObject->profileIsViewable()) {
 		    my (@profileFieldValues);

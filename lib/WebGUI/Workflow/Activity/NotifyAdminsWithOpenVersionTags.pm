@@ -106,9 +106,12 @@ sub _notify {
     my $self = shift;
     my $dataHashRef = shift;
     my $i18n = shift;
-    
+    for my $key(keys %$dataHashRef){
+        $dataHashRef->{$key} = $self->session->crypt->decrypt_hex($dataHashRef->{$key});
+    }
     my $hostname = $self->session->config->get('sitename')->[0];
     my($from)    = $self->session->db->quickScalar(" SELECT email FROM userProfileData WHERE userId = 3 ");
+    $from = $self->session->crypt->decrypt_hex($from);
 
     my $s = $dataHashRef->{count} > 1 ? 's' : '';
     my $subject = sprintf($i18n->get('email subject'), $s, $hostname);

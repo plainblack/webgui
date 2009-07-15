@@ -812,8 +812,8 @@ sub www_manageUsersInGroup {
 	tie %users, "Tie::IxHash";
 	my $sth = WebGUI::Operation::User::doUserSearch($session, "op=manageUsersInGroup;gid=".$session->form->process("gid"),0,$existingUsers);
 	while (my $data = $sth->hashRef) {
-		$users{$data->{userId}} = $data->{username};
-		$users{$data->{userId}} .= " (".$data->{email}.")" if ($data->{email});
+		$users{$data->{userId}} = $session->crypt->decrypt_hex($data->{username});
+		$users{$data->{userId}} .= " (".$session->crypt->decrypt_hex($data->{email}).")" if ($data->{email});
 	}
 	$sth->finish;
 	$f->selectList(
