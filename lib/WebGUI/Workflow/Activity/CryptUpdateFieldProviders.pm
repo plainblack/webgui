@@ -52,9 +52,9 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CryptUpdateFieldProviders");
+#	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CryptUpdateFieldProviders");
 	push(@{$definition}, {
-		name        =>  $i18n->get("name"),
+#		name        =>  $i18n->get("name"),
 		name        =>  "Workflow_Activity_CryptUpdateFieldProviders",
 		properties  => {}
         });
