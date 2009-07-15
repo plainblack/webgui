@@ -76,6 +76,11 @@ sub installCrypt {
         $session->config->set( 'adminConsole', $adminConsole );
     }
 
+    # Add the workflow
+    my $workflows = $session->config->get( 'workflowActivities' );
+    push(@{$workflows->{'None'}},'WebGUI::Workflow::Activity::CryptUpdateFieldProviders');
+    $session->config->set('workflowActivities', $workflows);
+
     # Content Handler
     my $contentHandlers = $session->config->get('contentHandlers');
     if ( !isIn( 'WebGUI::Content::Crypt', @{$contentHandlers} ) ) {

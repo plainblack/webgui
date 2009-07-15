@@ -52,9 +52,9 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	#my $i18n = WebGUI::International->new($session, "Workflow_Activity_CryptUpdateFieldProviders");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CryptUpdateFieldProviders");
 	push(@{$definition}, {
-		#name        =>  $i18n->get("name"),
+		name        =>  $i18n->get("name"),
 		name        =>  "Workflow_Activity_CryptUpdateFieldProviders",
 		properties  => {}
         });
@@ -79,7 +79,8 @@ sub execute {
 
     my $endTime = time() + $self->getTTL();
     # dwindles as we progress
-    my $fieldProvidersSth = $session->db->read( "select `table`, `field`, `key`, providerId from cryptFieldProviders where activeProviderIds like ?", [ '%,%' ] );
+    my $fieldProvidersSth = $session->db->read( "select `table`, `field`, `key`, providerId from cryptFieldProviders where activeProviderIds like ? order by `table`", 
+        [ '%,%' ] );
 
     FIELD_PROVIDER: while ( my ($table, $field, $key, $providerId) = $fieldProvidersSth->array ) {
         my $fieldSth = $session->db->read( "select `$field`, `$key` from `$table` where `$field` not like ?", ["CRYPT:$providerId:%" ] ); # dwindles as we progress
