@@ -10,6 +10,9 @@
  - fixed #10630: If macro says that 0 is true
   - fixed a bug where VersionTag->get would return an unsafe copy of its
     state ( Martin Kamerbeek / Oqapi )
+  - fixed a bug in My Purchases where in store credit would not be taken into
+    account in the overview yielding zero or neagtive transaction amounts on
+    the screen. ( Martin Kamerbeek / Oqapi )
 
 7.6.30
  - fixed #10602: Calendar feed importing extra characters.
