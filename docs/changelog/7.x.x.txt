@@ -8,6 +8,8 @@
   - fixed #10621: ThingRecord needs an Asset Icon
   - fixed #10638: Paste from Admin Bar broken
   - fixed per-field prices in ThingyRecord
+  - fixed a bug where VersionTag->get would return an unsafe copy of its
+    state ( Martin Kamerbeek / Oqapi )
 
 7.7.14
  - fixed #10606: shelf selector
