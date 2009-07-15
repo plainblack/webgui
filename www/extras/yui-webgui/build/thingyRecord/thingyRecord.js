@@ -81,8 +81,6 @@ WebGUI.ThingyRecord.updateFieldPrices
             var json = YAHOO.lang.JSON.parse( form.elements["fieldPrice"].value );
             json[fieldName] = this.value;
             form.elements["fieldPrice"].value = YAHOO.lang.JSON.stringify( json );
-            alert( json );
-            alert( form.elements["fieldPrice"].value );
         } );
 
         label.appendChild( price );
