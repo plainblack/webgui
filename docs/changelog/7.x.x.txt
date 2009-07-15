@@ -13,6 +13,9 @@
   - fixed a bug in the Ogone pay driver where for certain combinations of tax
     rates and in store credit a rounding error would prevent checkout at
     Ogone. ( Martin Kamerbeek / Oqapi )
+  - fixed a bug in My Purchases where in store credit would not be taken into
+    account in the overview yielding zero or neagtive transaction amounts on
+    the screen. ( Martin Kamerbeek / Oqapi )
 
 7.7.14
  - fixed #10606: shelf selector

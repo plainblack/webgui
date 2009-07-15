@@ -197,8 +197,8 @@ sub www_managePurchases {
         push @{$var->{transactions}}, {
             %{$transaction->get},
             viewDetailUrl   => $self->getUrl('op=account;module=shop;do=viewTransaction;transactionId='.$id),
-            amount          => sprintf("%.2f", $transaction->get('amount')),
-            amountMinusTax  => sprintf( '%.2f', $transaction->get('amount') - $transaction->get('taxes') ),
+            amount          => sprintf( '%.2f', $transaction->get('amount') - $transaction->get('shopCreditDeduction') ),
+            amountMinusTax  => sprintf( '%.2f', $transaction->get('amount') - $transaction->get('shopCreditDeduction') - $transaction->get('taxes') ),
         };
     }
 
