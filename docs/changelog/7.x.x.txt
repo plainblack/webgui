@@ -17,6 +17,7 @@
     account in the overview yielding zero or neagtive transaction amounts on
     the screen. ( Martin Kamerbeek / Oqapi )
   - fixed #10646: Asset History not paginated
+  - fixed #10645: Asset History: search results not sorted as expected
 
 7.7.14
  - fixed #10606: shelf selector

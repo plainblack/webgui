@@ -27,6 +27,7 @@ WebGUI.AssetHistory.BuildQueryString = function ( state, dt ) {
               + ';sortDir='   + ((state.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
               + ';results='   + state.pagination.rowsPerPage
               + ';sortKey='   + state.sortedBy.key
+              + ';keywords='  + YAHOO.util.Dom.get('keywordsField').value 
               ;
         return query;
     };
