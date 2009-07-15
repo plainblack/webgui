@@ -86,10 +86,7 @@ Starts the CryptUpdateFieldProviders workflow.
 
 sub www_startWorkflow{
     my ( $session, $error ) = validate_pos( @_, { isa => 'WebGUI::Session' }, 0 );
-    my $workflowId = $session->db->quickScalar("select workflowId from WorkflowActivity where className = 'WebGUI::Workflow::Activity::CryptUpdateFieldProviders'");
-    WebGUI::Workflow::Instance->create($session, {
-        workflowId=>$workflowId,
-        })->start;
+    WebGUI::Crypt::startCryptWorkflow($session);
     return www_providers($session,"Workflow started");
 }
 

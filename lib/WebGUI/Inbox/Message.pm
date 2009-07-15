@@ -107,7 +107,7 @@ sub create {
 	$self->{_properties}{messageId} = "new";
 	$self->{_properties}{status}    = $properties->{status} || "pending";
 	$self->{_properties}{subject}   = $properties->{subject} || WebGUI::International->new($session)->get(523);
-	$self->{_properties}{message}   = $session->crypt->encrypt_hex($properties->{message});
+	$self->{_properties}{message}   = $session->crypt->encrypt_hex($properties->{message}, {table=>'inbox', field=>'message'});
 	$self->{_properties}{dateStamp} = time();
 	$self->{_properties}{userId}    = $properties->{userId};
 	$self->{_properties}{groupId}   = $properties->{groupId};

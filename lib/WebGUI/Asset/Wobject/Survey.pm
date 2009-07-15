@@ -241,7 +241,7 @@ sub getEditForm {
     my ( $self ) = @_;
     my $tabform = $self->SUPER::getEditForm();
     my $cryptChoices;
-    my $i18n       = WebGUI::International->new( $self->session, 'Asset_Survey' );
+    my $i18n = WebGUI::International->new( $self->session, 'Asset_Survey' );
     map( $cryptChoices->{$_} = $self->session->config->get('crypt')->{$_}->{'name'}, keys %{$self->session->config->get('crypt')} );
     my $currentProvider = $self->session->crypt->lookupProviderId({table=>'Survey_response', field => 'responseJSON'});
     $tabform->getTab("security")->selectBox(

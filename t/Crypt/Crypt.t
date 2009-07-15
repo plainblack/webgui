@@ -29,18 +29,7 @@ my $session = WebGUI::Test->session;
 # Create test data
 $session->db->write("drop table if exists `encryptTest`");
 $session->db->write("CREATE TABLE `encryptTest` ( `id` char(22)  NOT NULL, `testField` LONGTEXT  NOT NULL)"); 
-my $t0 = [gettimeofday];
-for(1 .. 100){
 $session->db->write("insert into encryptTest values ('1','ABC123') on duplicate key update testField = 'ABC123'");
-}
-my $elapsed = tv_interval ( $t0, [gettimeofday]);
-$session->log->error("time took1 $elapsed ". ($elapsed/100));
-my $t0 = [gettimeofday];
-for(1 .. 100){
-$session->db->quickScalar("select id from encryptTest");
-}
-my $elapsed = tv_interval ( $t0, [gettimeofday]);
-$session->log->error("time took $elapsed ". ($elapsed/100));
 
 #----------------------------------------------------------------------------
 # Tests

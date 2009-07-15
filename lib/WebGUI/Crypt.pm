@@ -91,8 +91,6 @@ sub _getProvider{
     }
  
     my $providerId = exists $args->{providerId} ? $args->{providerId} : $self->lookupProviderId($args);
-
-    return $providers{id $self}->{$providerId} if(exists $providers{id $self}->{$providerId});
     
     my $module;
     my $providerData;
@@ -104,13 +102,13 @@ sub _getProvider{
     }   
     else{    
         $providerData = $session{id $self}->config->get("crypt")->{$providerId};
-        $providerData->{providerId} = $providerId;
         if (!$providerData) {
             WebGUI::Error::InvalidParam->throw(
                 param => $args,
                 error => 'WebGUI::Crypt provider must be specified in config.'
             );
         }
+        $providerData->{providerId} = $providerId;
         
         $module = $providerData->{provider};
     }
@@ -123,9 +121,13 @@ sub _getProvider{
             module => $module,
         );
     }
+    
+    #return object if already created 
+    return $providers{id $self}->{$providerId} if(exists $providers{id $self}->{$providerId});
 
     # Instantiate the Provider..
-    my $provider = eval { WebGUI::Pluggable::run( $module, 'new', [$session{id $self}, $providerData] ); };
+    my $provider;
+    eval{$provider = $module->new($session{id $self}, $providerData )};
     if (Exception::Class->caught()) {
         WebGUI::Error::Pluggable::RunFailed->throw(
             error      => $EVAL_ERROR,
@@ -328,6 +330,38 @@ sub setProvider{
         $session{id $self}->db->write("update cryptFieldProviders set providerId = ?, activeProviderIds = concat(activeProviderIds,',',?) where `table` = ? and `field` = ?",
             [$arg_ref->{providerId},$arg_ref->{providerId}, $arg_ref->{table}, $arg_ref->{field}]);
     }
+    WebGUI::Crypt::startCryptWorkflow($session{id $self});
+    return 1;
+}
+#-------------------------------------------------------------------
+
+=head2 startCryptWorkflow ( )
+
+For directly starting the crypt workflow.
+
+=cut
+
+sub startCryptWorkflow{
+
+    my ($session) = @_;
+ 
+    my $workflow  = WebGUI::Workflow->create($session,
+        {
+            enabled    => 1,
+            objectType => 'None',
+            mode       => 'realtime',
+        },
+    );
+    my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::CryptUpdateFieldProviders');
+
+    my $instance = WebGUI::Workflow::Instance->create($session,
+        {
+            workflowId              => $workflow->getId,
+            skipSpectreNotification => 1,
+        }
+    );
+    $instance->run();
+
     return 1;
 }
 1;

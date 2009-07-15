@@ -39,7 +39,7 @@ Crypt config object
 =cut
 
 sub new {
-    my ( $session, $arg_ref ) = @_;
+    my ( $class, $session, $arg_ref ) = @_;
     
     # Check arguments..
     if ( !defined $session || !$session->isa('WebGUI::Session') ) {
