@@ -81,6 +81,14 @@ sub installCrypt {
     push(@{$workflows->{'None'}},'WebGUI::Workflow::Activity::CryptUpdateFieldProviders');
     $session->config->set('workflowActivities', $workflows);
 
+    $session->config->set('cryptClasses',
+        {
+          "WebGUI::Crypt::HSM" => { "url" => 1 },
+          "WebGUI::Crypt::None" => {},
+          "WebGUI::Crypt::Simple" => { "key" => 1 }
+        }
+    );
+
     # Content Handler
     my $contentHandlers = $session->config->get('contentHandlers');
     if ( !isIn( 'WebGUI::Content::Crypt', @{$contentHandlers} ) ) {
