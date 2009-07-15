@@ -247,7 +247,7 @@ sub get {
         return $self->{_data}{$name};
     }
     else {
-        return \%{ $self->{_data} },
+        return { %{ $self->{_data} } },
     }
 }
 

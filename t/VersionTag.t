@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
-use Test::More tests => 60; # increment this value for each test you create
+use Test::More tests => 62; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -242,7 +242,25 @@ ok($adminSiteWideTag->getId() eq $siteWideTagId, 'versionTagMode siteWide + admi
 $admin_session->var()->end();
 $admin_session->close();
 
+# Check if get returns a safe copy
 
+my $name        = $userTag->get( 'name' );
+my $safeCopy    = $userTag->get;
+$safeCopy->{ name   } = 'NotSoSafeAfterAll!';
+
+is(
+    $userTag->get( 'name' ),
+    $name,
+    'get returns a safe copy of the internal data hash'
+);
+
+my $otherSafeCopy = $userTag->get;
+
+isnt(
+    $safeCopy,
+    $otherSafeCopy,
+    'get returns unique safe copies on each invocation'
+);
 
 $userTag->rollback();
 $siteWideTag->rollback();
