@@ -15,7 +15,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
+use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use JSON;
@@ -39,13 +39,13 @@ plan tests => 1 + $tests;
 
 my $e;
 
-my $loaded = use_ok('WebGUI::Shop::PayDriver::PayPal::PayPalStd');
+my $loaded = use_ok('WebGUI::Shop::PayDriver::PayPal');
 
 my $storage;
 
 SKIP: {
 
-skip 'Unable to load module WebGUI::Shop::PayDriver::PayPal::PayPalStd', $tests unless $loaded;
+skip 'Unable to load module WebGUI::Shop::PayDriver::PayPal', $tests unless $loaded;
 
 #######################################################################
 #
@@ -60,10 +60,10 @@ my $options = {
     receiptMessage  => 'Pannenkoeken zijn nog lekkerder met spek',
 };
 
-$driver = WebGUI::Shop::PayDriver::PayPal::PayPalStd->create( $session, $options );
+$driver = WebGUI::Shop::PayDriver::PayPal->create( $session, $options );
 
 isa_ok  ($driver, 'WebGUI::Shop::PayDriver');
-isa_ok  ($driver, 'WebGUI::Shop::PayDriver::PayPal::PayPalStd');
+isa_ok  ($driver, 'WebGUI::Shop::PayDriver::PayPal');
 
 is($driver->getName($session), 'PayPal', 'getName returns the human readable name of this driver');
 
