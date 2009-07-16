@@ -25,6 +25,18 @@ sub new{
     return $self;
 }
 
+sub findSimpleProvider{
+    my ($self) = @_;
+    my $crypts = $session{id $self}->config->get('crypt');
+    for my $key (keys %$crypts){
+        if($crypts->{$key}->{provider} eq 'WebGUI::Crypt::Simple'){
+            return ($crypts->{$key},$key);
+            last;
+        }
+    }
+    return;
+}
+
 sub _createTestTable{
     my ($self,$text) = @_;
     $self->session->db->write("drop table if exists `encryptTest`");

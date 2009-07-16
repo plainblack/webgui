@@ -16,10 +16,23 @@ use WebGUI::Session;
 
 use WebGUI::Inbox;
 use WebGUI::User;
+use WebGUI::CryptTest;
 
 use Test::More tests => 8; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
+
+# set up crypt tests
+my $ct = WebGUI::CryptTest->new($session,'testText');
+my ($cryptConfig, $providerId) = $ct->findSimpleProvider();
+my $crypt = WebGUI::Crypt->new($session);
+
+# Store current survey crypt setting
+my $temp = $crypt->lookupProviderId({table=>'Survey_response', field=>'reponseJSON'});
+my $defaultProviderId = defined $temp ? $temp : 'None';
+
+# Set provider to Simple
+$crypt->setProvider({table=>'inbox', field=>'message', key=>'messageId','providerId'=>$providerId});
 
 # get a user so we can test retrieving messages for a specific user
 my $user = WebGUI::User->new($session, 3);
@@ -63,4 +76,5 @@ ok($message_cnt > 0, 'Messages returned for user');
 
 END {
     $session->db->write('delete from inbox where messageId = ?', [$message->getId]);
+    $crypt->setProvider({table=>'inbox', field=>'message', key=>'messageId','providerId'=>$defaultProviderId});
 }
