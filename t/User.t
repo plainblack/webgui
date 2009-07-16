@@ -93,7 +93,7 @@ ok(
 );
 
 ok(
-    !$session->db->quickScalar("SELECT COUNT(*) FROM userSessionScratch WHERE sessionId=?",[$session->getId]),
+    !$session->db->quickScalar("SELECT COUNT(*) FROM userSessionScratch WHERE sessionId=?",[$newSession->getId]),
     "Deactivating user deletes all user session scratch",
 );
 
@@ -1027,7 +1027,6 @@ $shopUser->delete;
 undef $book;
 eval { $book = WebGUI::Shop::AddressBook->new($session, $bookId); };
 my $e = Exception::Class->caught();
-diag ref $e;
 isa_ok($e, 'WebGUI::Error::ObjectNotFound', '... cleans up the address book');
 
 END {
