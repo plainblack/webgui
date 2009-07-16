@@ -321,6 +321,8 @@ Paypal's shipping information is ignored; this could be changed to accept new
 shipping info from PayPal, but that's somewhat fragile.  We're currently just
 pretending PayPal is a payment gateway.
 
+=back
+
 =cut
 
 1;
