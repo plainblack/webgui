@@ -332,9 +332,9 @@ is($viewVariables->{headline}, 'WebGUI, Web Done Right', '... headline is okay')
 cmp_bag(
     $viewVariables->{keyword_loop},
     [
-        { keyword => "foxtrot", url => '/home/test-archive?func=view;keywords=foxtrot', },
-        { keyword => "tango",   url => '/home/test-archive?func=view;keywords=tango', },
-        { keyword => "whiskey", url => '/home/test-archive?func=view;keywords=whiskey', },
+        { keyword => "foxtrot", url => '/home/test-archive?func=view;keyword=foxtrot', },
+        { keyword => "tango",   url => '/home/test-archive?func=view;keyword=tango', },
+        { keyword => "whiskey", url => '/home/test-archive?func=view;keyword=whiskey', },
     ],
     'viewTemplateVariables: keywords_loop is okay'
 );

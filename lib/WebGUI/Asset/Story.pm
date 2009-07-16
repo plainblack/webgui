@@ -894,7 +894,7 @@ sub viewTemplateVariables {
     foreach my $keyword (@{ $keywords }) {
         push @{ $var->{keyword_loop} }, {
             keyword => $keyword,
-            url     => $archive->getUrl("func=view;keywords=".$session->url->escape($keyword)),
+            url     => $archive->getUrl("func=view;keyword=".$session->url->escape($keyword)),
         };
     }
     $var->{updatedTime}      = $self->formatDuration();
