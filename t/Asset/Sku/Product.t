@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 10;        # Increment this number for each test you create
+plan tests => 12;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
