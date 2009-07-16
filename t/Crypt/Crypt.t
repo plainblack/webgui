@@ -40,11 +40,8 @@ plan tests => 24;
 # put your tests here
 use_ok('WebGUI::Crypt');
 
-#######################################################################
-#
+#----------------------------------------------------------------------------
 # constructor
-#
-#######################################################################
 {
     eval { my $crypt = WebGUI::Crypt->new() };
     my $e = Exception::Class->caught();
@@ -54,32 +51,22 @@ use_ok('WebGUI::Crypt');
     isa_ok(WebGUI::Crypt->new( $session ), 'WebGUI::Crypt', 'Returns a happy WebGUI::Crypt'); 
 }
 
-#######################################################################
-#
+#----------------------------------------------------------------------------
 # Config File has crypt settings
-#
-#######################################################################
-
 {
     is(ref $session->config->get('crypt'), 'HASH', 'Config file has the crypt hash');
 }
 
-#######################################################################
-#
+#----------------------------------------------------------------------------
 # session->crypt
-#
-#######################################################################
 {
     # This test requires that your webgui site config file contains crypt settings
     my $crypt = $session->crypt;
     isa_ok( $crypt, 'WebGUI::Crypt', 'session contructor works too' );
 }
 
-#######################################################################
-#
+#----------------------------------------------------------------------------
 # session->crypt->setProvider
-#
-#######################################################################
 {
     eval{$session->crypt->setProvider()};
     my $e = Exception::Class->caught();
@@ -97,11 +84,8 @@ use_ok('WebGUI::Crypt');
     is($session->crypt->setProvider({table=>'encryptTest', field=>'testField', key=>'id','providerId'=>'None'}),1,'Valid arguments should update the provider');
 }
 
-#######################################################################
-#
+#----------------------------------------------------------------------------
 # session->crypt->_parseHeader
-#
-#######################################################################
 {
     my ($a,$b) = $session->crypt->_parseHeader("hello");
     is($a,'None', 'No header returns the None provider');
@@ -112,20 +96,16 @@ use_ok('WebGUI::Crypt');
     is($a,'None', 'Header returns the None provider');
     is($b,'hello', 'Header returns the None provider and text');
 }
-#######################################################################
-#
+
+#----------------------------------------------------------------------------
 # session->crypt->isEnabled
-#
-#######################################################################
 {
     my $enabled = $session->setting->get('cryptEnabled') ? 0 : 1;
     is($session->crypt->notEnabled(),  $enabled, 'Does enabled show the correct setting');
 }
-#######################################################################
-#
+
+#----------------------------------------------------------------------------
 # session->crypt->lookupProviderId
-#
-#######################################################################
 {
     eval{$session->crypt->lookupProviderId};
     my $e = Exception::Class->caught();
@@ -139,11 +119,9 @@ use_ok('WebGUI::Crypt');
 {
     is($session->crypt->lookupProviderId({table=>'encryptTest',field => 'testField'}),'None', 'ProviderId should be None');
 }
-#######################################################################
-#
+
+#----------------------------------------------------------------------------
 # session->_getProvider
-#
-#######################################################################
 {
     eval{$session->crypt->_getProvider()};
     my $e = Exception::Class->caught();
@@ -157,11 +135,9 @@ use_ok('WebGUI::Crypt');
 {
     isa_ok( $session->crypt->_getProvider({providerId => 'None'}), 'WebGUI::Crypt::None', 'There should always be a None provider to test against');
 }
-#######################################################################
-#
+
+#----------------------------------------------------------------------------
 # session->crypt/decrypt?_hex
-#
-#######################################################################
 {
     eval{$session->crypt->encrypt()};
     my $e = Exception::Class->caught();
@@ -178,10 +154,6 @@ use_ok('WebGUI::Crypt');
 {
     is($session->crypt->decrypt_hex(),undef,'empty call to decrypt_hex');
 }
-
-
-
-
 
 #----------------------------------------------------------------------------
 # clean up test case

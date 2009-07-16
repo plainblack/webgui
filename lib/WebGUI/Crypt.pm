@@ -26,7 +26,7 @@ Package for interfacing with Crypt provider.
  my $ciphertext = $crypt->encrypt("Plain Text");
  my $plaintext = $crypt->decrypt($ciphertext);
  $crypt->disconnect;
- 
+
 =head1 METHODS
 
 These methods are available from this package:
@@ -42,6 +42,7 @@ private providers => my %providers;
 =head2 new ( session, config )
 
 Constructor.
+
 =head3 session
 
 A reference to the current session.

@@ -11,7 +11,7 @@ Package WebGUI::Crypt::Simple
 Simple Crypt provider for WebGUI
 
 =head1 SYNOPSIS
- 
+
 =head1 METHODS
 
 These methods are available from this package:
@@ -28,6 +28,7 @@ private cipher   => my %cipher;
 =head2 new ( session, config )
 
 Constructor.
+
 =head3 session
 
 A reference to the current session.

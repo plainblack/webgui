@@ -11,7 +11,7 @@ Package WebGUI::Crypt::None
 Pass-thru Crypt provider for people who don't need WebGUI database encryption
 
 =head1 SYNOPSIS
- 
+
 =head1 METHODS
 
 These methods are available from this package:
@@ -27,6 +27,7 @@ public providerId => my %providerId;
 =head2 new ( session, config )
 
 Constructor.
+
 =head3 session
 
 A reference to the current session.
