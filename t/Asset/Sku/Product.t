@@ -100,7 +100,6 @@ $imagedProduct->applyOptions($imagedProduct->getCollateral('variantsJSON', 'vari
 is($imagedProduct->getConfiguredTitle, 'Bible - English', 'getConfiguredTitle is overridden and concatenates the Product Title and the variant shortdesc');
 
 my $addToCartForm = $imagedProduct->getAddToCartForm();
-diag $addToCartForm;
 my @forms = HTML::Form->parse($addToCartForm, 'http://www.webgui.org');
 is(scalar @forms, 1, 'getAddToCartForm: returns only 1 form');
 my $form_variants = $forms[0]->find_input('vid');
@@ -109,3 +108,15 @@ cmp_deeply(
     [ $form_variants->possible_values ],
     '... form only has 1 variant, since the other one has 0 quantity'
 );
+
+####################################################
+#
+# addRevision
+#
+####################################################
+
+sleep 2;
+my $newImagedProduct = $imagedProduct->addRevision({title => 'Bible and hammer'});
+
+like($newImagedProduct->get('image1'), $session->id->getValidator, 'addRevision: new product rev got an image1 storage location');
+isnt($newImagedProduct->get('image1'), $imagedProduct->get('image1'), '... and it is not the same as the old one');
