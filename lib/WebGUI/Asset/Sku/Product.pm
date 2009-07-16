@@ -47,7 +47,7 @@ sub addRevision {
     my $newSelf = $self->SUPER::addRevision(@_);
     if ($newSelf->getRevisionCount > 1) {
         foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
-            if ($self->get($field) && $self->get($field) ne $newSelf->get($field)) {
+            if ($self->get($field)) {
                 my $newStorage = WebGUI::Storage->get($self->session,$self->get($field))->copy;
                 $newSelf->update({$field=>$newStorage->getId});
             }

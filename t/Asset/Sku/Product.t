@@ -34,7 +34,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 10;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -84,7 +84,18 @@ $imagedProduct->applyOptions($imagedProduct->getCollateral('variantsJSON', 'vari
 
 is($imagedProduct->getConfiguredTitle, 'Bible - English', 'getConfiguredTitle is overridden and concatenates the Product Title and the variant shortdesc');
 
-#----------------------------------------------------------------------------
+####################################################
+#
+# addRevision
+#
+####################################################
+
+sleep 2;
+my $newImagedProduct = $imagedProduct->addRevision({title => 'Bible and hammer'});
+
+like($newImagedProduct->get('image1'), $session->id->getValidator, 'addRevision: new product rev got an image1 storage location');
+isnt($newImagedProduct->get('image1'), $imagedProduct->get('image1'), '... and it is not the same as the old one');
+
 # Cleanup
 END {
     $product->purge;
@@ -94,3 +105,4 @@ END {
 }
 
 1;
+
