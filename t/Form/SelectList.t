@@ -89,7 +89,7 @@ is(scalar @forms, 1, '1 form was parsed');
 my $form = $forms[0];
 #use Data::Dumper;
 my @inputs = $form->inputs;
-is(scalar @inputs, 7, 'The form has 7 inputs');
+is(scalar @inputs, 8, 'The form has 8 inputs');
 
 #Basic tests
 

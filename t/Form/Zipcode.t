@@ -84,11 +84,11 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is(scalar @forms, 1, '1 form was parsed');
 
 my @inputs = $forms[0]->inputs;
-is(scalar @inputs, 1, 'The form has 1 input');
+is(scalar @inputs, 2, 'The form has 2 inputs');
 
 #Basic tests
 
-my $input = $inputs[0];
+my $input = $inputs[1];
 is($input->name, 'TestZip', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, '97123-ORST', 'Checking default value');
@@ -107,7 +107,7 @@ $html = join "\n",
 
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 @inputs = $forms[0]->inputs;
-$input = $inputs[0];
+$input = $inputs[1];
 is($input->name, 'TestZip2', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, '97229-MXIM', 'Checking default value');

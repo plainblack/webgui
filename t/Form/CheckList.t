@@ -61,22 +61,22 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is(scalar @forms, 1, '1 form was parsed to test basic functionality');
 
 my @inputs = $forms[0]->inputs;
-is(scalar @inputs, 4, 'The form has 3 inputs');
+is(scalar @inputs, 5, 'The form has 5 inputs');
 
 #Basic tests
 
-is($inputs[0]->name, '__CList1_isIn', 'Checking input name for hidden element');
-is($inputs[0]->type, 'hidden', 'Checking input type for hidden element');
-is($inputs[0]->value, '1', 'Checking default value for hidden element');
-is($inputs[1]->name, 'CList1', 'Checking input name for checkbox 1');
-is($inputs[1]->type, 'checkbox', 'Checking input type for checkbox 1');
-is($inputs[1]->value, 'foo', 'Checking default value for checkbox 1');
-is($inputs[2]->name, 'CList1', 'Checking input name for checkbox 2');
-is($inputs[2]->type, 'checkbox', 'Checking input type for checkbox 2');
-is($inputs[2]->value, undef, 'Checking default value for checkbox 2');
-is($inputs[3]->name, 'CList1', 'Checking input name for checkbox 3');
-is($inputs[3]->type, 'checkbox', 'Checking input type for checkbox 3');
-is($inputs[3]->value, undef, 'Checking default value for checkbox 3');
+is($inputs[1]->name, '__CList1_isIn', 'Checking input name for hidden element');
+is($inputs[1]->type, 'hidden', 'Checking input type for hidden element');
+is($inputs[1]->value, '1', 'Checking default value for hidden element');
+is($inputs[2]->name, 'CList1', 'Checking input name for checkbox 1');
+is($inputs[2]->type, 'checkbox', 'Checking input type for checkbox 1');
+is($inputs[2]->value, 'foo', 'Checking default value for checkbox 1');
+is($inputs[3]->name, 'CList1', 'Checking input name for checkbox 2');
+is($inputs[3]->type, 'checkbox', 'Checking input type for checkbox 2');
+is($inputs[3]->value, undef, 'Checking default value for checkbox 2');
+is($inputs[4]->name, 'CList1', 'Checking input name for checkbox 3');
+is($inputs[4]->type, 'checkbox', 'Checking input type for checkbox 3');
+is($inputs[4]->value, undef, 'Checking default value for checkbox 3');
 
 
 
@@ -95,10 +95,10 @@ my $html = join "\n",
 is(scalar @forms, 1, '1 form was parsed to test showSelectAll');
 
 @inputs = $forms[0]->inputs;
-is(scalar @inputs, 5, 'The form has 5 inputs (1 hidden, 1 button, 3 checkboxes)');
+is(scalar @inputs, 6, 'The form has 6 inputs (CSRF, 1 hidden, 1 button, 3 checkboxes)');
 
-is($inputs[1]->type, 'button', 'The Select All button is there and before all checkboxes');
-is( $inputs[1]->{value},
+is($inputs[2]->type, 'button', 'The Select All button is there and before all checkboxes');
+is( $inputs[2]->{value},
     WebGUI::International->new($session,"Form_CheckList")->get("selectAll label"), 
     'The value is internationalized'
 );
