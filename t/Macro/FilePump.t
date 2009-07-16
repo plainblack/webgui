@@ -54,7 +54,7 @@ my $snippet =  $root->addChild({
 my $fileAsset = $root->addChild({
     className => 'WebGUI::Asset::File',
     url       => 'filePumpFileAsset',
-    filename  => 'pumpfile',
+    filename  => 'pumpfile.css',
 }); 
 
 $fileAsset->getStorageLocation->addFileFromScalar('pumpfile.css', qq|   body {\npadding:   0px;}\n\n|);
