@@ -11,14 +11,21 @@ use Test::Deep;
 use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::CryptTest;
+use WebGUI::Crypt::Simple;
+
 
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
+#Make sure everything is on and working for crypt
+WebGUI::CryptTest->new($session,'nada');
+
+#----------------------------------------------------------------------------
 # Tests
-my $tests = 19;
+my $tests = 20;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -69,6 +76,45 @@ ok($s->canTakeSurvey, '..which means user can take survey');
 # Complete Survey
 $s->surveyEnd();
 
+
+# test use of Crypt
+my $crypt = WebGUI::Crypt->new($session);
+
+#Put json in db
+$s->persistSurveyJSON();
+
+#Store current survey crypt setting
+my $temp = $crypt->lookupProviderId({table=>'Survey_response', field=>'reponseJSON'});
+my $defaultProviderId = defined $temp ? $temp : 'None';
+
+$crypt->setProvider({ table =>'Survey_response', field =>'responseJSON', key =>'Survey_responseId', providerId => 'None'});
+
+#get copy of response json
+my $json = $s->responseJSON->freeze();
+
+my $providerId;
+my $config;
+
+for my $pkey (keys %{$session->config->get('crypt')}){
+    if($session->config->get('crypt')->{$pkey}->{provider} eq 'WebGUI::Crypt::Simple'){
+        $config = $session->config->get('crypt')->{$pkey};
+        $providerId = $pkey;
+        last;
+    }
+}
+
+$crypt->setProvider({table=>'Survey_response', field=>'responseJSON', key=>'Survey_responseId', providerId => $providerId});
+
+my $simple = WebGUI::Crypt::Simple->new($session,$config);
+
+my $encryptedJSON = $session->db->quickScalar("select responseJSON from Survey_response where Survey_responseId = '$responseId'");
+{
+    $encryptedJSON =~ /CRYPT:(.*?):(.*)/; 
+    is($json,$simple->decrypt_hex($2), 'Old plaintext json should match new encrypted json');
+}
+
+$crypt->setProvider({ table => 'Survey_response', field => 'responseJSON', key => 'Survey_responseId', providerId => "$defaultProviderId" });
+
 # Uncache canTake
 delete $s->{canTake};
 delete $s->{responseId};
@@ -111,8 +157,6 @@ ok($s->responseId, '..(and similarly for responseId)');
         is($survey->responseJSON->nextResponse, $index, "jumpTo($id) sets nextResponse to $index");
     }
 }
-
-
 }
 
 #----------------------------------------------------------------------------

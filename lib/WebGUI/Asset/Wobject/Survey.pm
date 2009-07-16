@@ -1507,7 +1507,6 @@ sub persistSurveyJSON {
 
     my $data = $self->surveyJSON->freeze();
     $self->update({surveyJSON=>$data});
-#    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
 
     return;
 }

@@ -55,7 +55,7 @@ $session->crypt->setProvider({table=>'encryptTest', field=>'testField', key=>'id
 
 my $ciphertext = $session->db->quickScalar("select testField from encryptTest where id = '1'");
 {
-    isnt('ABC123',$ciphertext,'Text should not longer be plain text');
+    isnt('ABC123',$ciphertext,'Text should no longer be plain text');
 }
 
 ############

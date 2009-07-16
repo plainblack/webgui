@@ -15,6 +15,7 @@ use WebGUI::Session;
 use WebGUI::Text;
 use WebGUI::Workflow;
 use WebGUI::Group;
+use WebGUI::CryptTest;
 
 use Time::HiRes qw( gettimeofday tv_interval);
 
@@ -27,9 +28,8 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Create test data
-$session->db->write("drop table if exists `encryptTest`");
-$session->db->write("CREATE TABLE `encryptTest` ( `id` char(22)  NOT NULL, `testField` LONGTEXT  NOT NULL)"); 
-$session->db->write("insert into encryptTest values ('1','ABC123') on duplicate key update testField = 'ABC123'");
+my $testString = 'woot';
+my $test = WebGUI::CryptTest->new($session,$testString);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -155,7 +155,3 @@ use_ok('WebGUI::Crypt');
     is($session->crypt->decrypt_hex(),undef,'empty call to decrypt_hex');
 }
 
-#----------------------------------------------------------------------------
-# clean up test case
-$session->db->write("drop table if exists `encryptTest`");
-$session->db->write("delete from cryptFieldProviders where `field` = 'testField' and `table` = 'encryptTest' and `key` = 'id'");
