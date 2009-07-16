@@ -18,7 +18,7 @@ use WebGUI::Inbox;
 use WebGUI::User;
 use WebGUI::CryptTest;
 
-use Test::More tests => 8; # increment this value for each test you create
+use Test::More tests => 9; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -66,6 +66,7 @@ ok($messageId, 'messageId retrieved');
 ####################################
 $message = $inbox->getMessage($messageId);
 ok($message->getId == $messageId, 'getMessage returns message object');
+ok($message->{_properties}{message} eq $message_body, 'Message body still matches encrypted message in DB');
 
 #########################################################
 # get a list (arrayref) of messages for a specific user #
