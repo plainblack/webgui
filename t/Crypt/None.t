@@ -26,7 +26,7 @@ my $session = WebGUI::Test->session;
 my $providerData = $session->config->get('crypt')->{'None'};
 $providerData->{providerId} = 'None';
 
-my $crypt = eval { WebGUI::Pluggable::run( 'WebGUI::Crypt::None', 'new', [$session, $providerData] ); };
+my $crypt = WebGUI::Crypt::None->new($session, $providerData);
 #----------------------------------------------------------------------------
 # Tests
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
