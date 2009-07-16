@@ -16,6 +16,114 @@ save you many hours of grief.
       un-Shop things, which is why it was replaced).  Please test the new one
       with your setup.
 
+    * 29 templates have been replaced with new ones. These are the templates
+      for the Article, File, Folder, Image, Navigation, Layout, Poll, Search
+      and Syndicated Content assets. 13 templates have been deleted (Article,
+      Navigation and Layout templates). These were deleted because of deprecated
+      code, redundancy and because we are want to reduce the number of
+      templates. This will make the whole set of templates more comprehensible.
+
+      Changes for all these templates:
+      - extra divs, classes and IDs have been added;
+      - consistent markup for recurring code, like titles, descriptions, attachments and pagination;
+      - inline styles and deprecated code removed.
+
+      Article
+      - All Article templates:
+          - Removed pagination. This will be re-added later, when the pagination macro bug has been fixed (bug #10619)
+      - Default Article:
+          - Added attachment loop (RFE #4152)
+          - Removed code for image, since there now is a dedicated Article with Image template
+      - Center Image:
+          - Deleted: align="center" is deprecated
+      - Left align image:
+          - Changed name to Article with Image
+          - Removed tables and added styles for img positioning
+      - Linked Image with Caption
+          - Removed tables and added styles for img positioning
+      - Item:
+          - Added attachment loop
+      - Item w/ popup links:
+          - Deleted: pop-up links are bad practice and this doesn't need to be a default
+      - Article with files:
+          - Deleted: attachment loop now added to Default Article
+      - article.css added
+
+      File
+      - Default File:
+          - The linktext is title instead of the filename (RFE #10173)
+      - Flash File:
+          - Template now uses swfobject code
+          - Absolute width and height attributes are set in the html to replace the percentage value and inline style
+
+      Folder
+      - File Folder:
+          - The linktext is title instead of the filename (like in the Default File template)
+          - Tables have not been removed, since they are semantically correct here
+
+      Image
+      - Image:
+          - Only added extra div with ID and class
+      - Annotate Image:
+          - No changes
+
+      Changes for Navigation
+      - crumbTrail:
+          - No specific changes
+      - verticalMenu:
+          - Deleted: best practice is using "Bulleted List" for vertical navs
+      - horizontalMenu:
+          - Based on unordered list
+          - Added styles
+      - DropMenu:
+          - Javascript cleaned up
+          - Noscript alternative added
+      - Tabs:
+          - Based on unordered list
+          - Added styles
+      - Tree Navigation:
+          - Javascript cleaned up
+      - Hierarchical top nav:
+          - Javascript cleaned up
+      - Synopsis:
+          - HTML based on definition list
+      - Bulleted list:
+          - Now always generates validating html (closing ul and li tags)
+      - Indent Nav:
+          - No specific changes
+      - navigation.css added
+
+      Layout
+      - All table layouts:
+          - Deleted: using tables for positioning is bad practice
+      - All non table layouts:
+          - Removed unnecessary divs ("layoutColumnPadding" and "content")
+          - Styles for positioning added
+      - One Over Two:
+          - Newly added
+          - Replaces News, but has one less content position
+      - News, Three Over One, Left column:
+          - Deleted: we want to reduce the number of templates and only kept the basic/most used page layouts
+      - layout.css added
+
+      Poll
+      - Default Poll:
+          - General cleanup, added extra classes and IDs
+      - poll.css added
+
+      Search
+      - Default Search:
+          - Results in a definitions list
+          - Form post back to the current page instead of to the asset in wobject focus,
+            this prevents possible "breaking" of the style
+
+      Syndicated Content
+      - Default Syndicated Content:
+          - General cleanup, added extra tags, classes and IDs
+      - Syndicated Articles:
+          - General cleanup, added extra tags, classes and IDs
+          - Removed inline style
+
 7.7.13
 --------------------------------------------------------------------
    * WebGUI has allowed metadata possible values to be processed differently

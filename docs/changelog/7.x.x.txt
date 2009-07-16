@@ -21,6 +21,7 @@
   - fixed #10648: Story Topic: Photos don't display
   - fixed #10649: Story Manager Keywords not working correctly
   - fixed #10643: Products: Pictures gone
+  - imported new templates from the Template Working Group
 
 7.7.14
  - fixed #10606: shelf selector
