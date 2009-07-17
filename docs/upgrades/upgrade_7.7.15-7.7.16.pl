@@ -22,13 +22,14 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use List::MoreUtils qw/uniq/;
 
 my $toVersion = '7.7.16';
 my $quiet; # this line required
 
 
 my $session = start(); # this line required
+replaceUsageOfOldTemplatesAgain($session);
 
 # upgrade functions go here
 
@@ -44,6 +45,33 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+sub replaceUsageOfOldTemplatesAgain {
+    my $session = shift;
+    print "\tRemoving usage of outdated templates with new ones... " unless $quiet;
+    # and here's our code
+    print "\n\t\tUpgrading Navigation templates... " unless $quiet;
+    my @navigationPairs = (
+        ##   New                    Old
+        [ qw/PBnav00000000000bullet PBtmpl0000000000000048/ ]  ##Bulleted List <- Vertical Menu
+    );
+    foreach my $pairs (@navigationPairs) {
+        my ($new, $old) = @{ $pairs };
+        $session->db->write('UPDATE Navigation SET templateId=? where templateId=?', [$new, $old])
+    }
+    print "\n\t\tPurging old templates... " unless $quiet;
+    my @oldTemplates = uniq(map { $_->[1] } (@navigationPairs));
+    TEMPLATE: foreach my $templateId (@oldTemplates) {
+        my $template = eval { WebGUI::Asset->newPending($session, $templateId); };
+        if ($@) {
+            print "\n\t\t\tUnable to instanciate templateId: $templateId.  Skipping...";
+            next TEMPLATE;
+        }
+        print "\n\t\t\tPurging ". $template->getTitle . " ..." unless $quiet;
+        $template->purge;
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
