@@ -51,6 +51,18 @@ our $I18N = {
 		context		=> q|a template variable|,
 	},
 
+	'shelf_title' => {
+		message 	=> q|The title of this shelf|,
+		lastUpdated => 0,
+		context		=> q|a template variable|,
+	},
+
+	'shelf_url' => {
+		message 	=> q|The url of this shelf|,
+		lastUpdated => 0,
+		context		=> q|a template variable|,
+	},
+
 	'products' => {
 		message 	=> q|A loop containing the list of products that match the keywords specified in this shelf, or that are children of this shelf. Only products that the user can see will be in the loop. Each record in the loop contains all the properties of the matching sku, plus the following variables.|,
 		lastUpdated => 1247603018,
