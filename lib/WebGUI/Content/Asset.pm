@@ -208,7 +208,7 @@ sub tryAssetMethod {
 	my $methodToTry = "www_".$method;
 	my $output = eval{$asset->$methodToTry()};
     if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
-        $session->errorHandler->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->assetId, $e->templateId);
+        $session->errorHandler->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
     }
 	elsif ($@) {
 		$session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
