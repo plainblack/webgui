@@ -1,6 +1,7 @@
 7.7.16
  - Fix template not found diagnostics.
  - fixed #10665: Navigations with old templates still in 7.7.16
+ - fixed #10662: Manage Clipboard / delete item
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug

@@ -488,8 +488,10 @@ $self->session->style->setLink($self->session->url->extras('assetManager/assetMa
                 $output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
                         ."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";
         }
-        $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageClipboard");
-		assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageClipboard");
+        $output .= '
+            assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageClipboard");
+            assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageClipboard");
+            assetManager.AddFormHidden({ name:"webguiCsrfToken", value:"'.$self->session->scratch->get('webguiCsrfToken').'"});
                 assetManager.Write();        
                 var assetListSelectAllToggle = false;
                 function toggleAssetListSelectAll(form) {
