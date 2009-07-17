@@ -52,12 +52,14 @@ plan tests => 4;
 #
 #######################################################################
 {
-    my $t = $crypt->encrypt('hi');
+    my $t = $crypt->encrypt_hex('hi');
     $t =~ /CRYPT:(.*?):(.*)/;
-    is( $crypt->decrypt($2), 'hi', 'encrypt hi should return hi');
+    is( $crypt->decrypt_hex($2), 'hi', 'encrypt hi should return hi');
 }
 {
-    my $t = $crypt->encrypt('');
+    my $t = $crypt->encrypt_hex('');
     $t =~ /CRYPT:(.*?):(.*)/;
-    is( $crypt->decrypt($2), '', 'encrypt nothing should return nothing');
+    my $cipher = $2;
+    $session->log->error($cipher);
+    is( $crypt->decrypt_hex($cipher), '', 'encrypt nothing should return nothing');
 }
