@@ -1,5 +1,6 @@
 7.6.32
  - Fix template not found diagnostics.
+ - fixed #10637: shelf displays assets it shouldn't
 
 7.6.31
  - fixed #10610: editing a page and editing goes away
