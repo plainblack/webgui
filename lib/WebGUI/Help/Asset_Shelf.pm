@@ -29,6 +29,8 @@ our $HELP = {
 					],
 				},
 			{	name => "templateId", description=>"shelf template help" },
+			{	name => "noViewableSkus", },
+			{	name => "emptyShelf",      },
 		],
 		related => [  
 		],

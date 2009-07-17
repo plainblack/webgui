@@ -20,11 +20,13 @@ use Test::More;
 use Test::Deep;
 use Exception::Class;
 use Data::Dumper;
+use JSON;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
 use WebGUI::Asset::Sku::Product;
+use WebGUI::VersionTag;
 
 #----------------------------------------------------------------------------
 # Init
@@ -33,7 +35,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 55;
+my $tests = 61;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -42,15 +44,14 @@ plan tests => 1 + $tests;
 my $class  = 'WebGUI::Asset::Wobject::Shelf';
 my $loaded = use_ok($class);
 
-my $storage;
 my ($e, $failure);
-my ($shelf, $shelf2);
 
 SKIP: {
 
     skip "Unable to load module $class", $tests unless $loaded;
 
-    $shelf = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+    my $root  = WebGUI::Asset->getRoot($session);
+    my $shelf = $root->addChild({className => $class});
 
     #######################################################################
     #
@@ -383,7 +384,7 @@ SKIP: {
     #
     #######################################################################
 
-    $shelf2 = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+    my $shelf2 = $root->addChild({className => $class});
 
     $pass = 0;
     eval {
@@ -443,15 +444,64 @@ SKIP: {
     $shelf2->purge;
     undef $shelf2;
 
-}
+    ##Clear out this tag so we can do downstream work.
+    my $tag = WebGUI::VersionTag->getWorking($session);
+    $tag->commit;
+    WebGUI::Test->tagsToRollback($tag);
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    if (defined $shelf and ref $shelf eq $class) {
-        $shelf->purge;
-    }
-    if (defined $shelf2 and ref $shelf2 eq $class) {
-        $shelf2->purge;
-    }
+    #######################################################################
+    #
+    # Template variables
+    #
+    #######################################################################
+
+    my $tommy  = WebGUI::User->create($session);
+    my $warden = WebGUI::User->create($session);
+    WebGUI::Test->usersToDelete($tommy, $warden);
+    my $inGroup = WebGUI::Group->new($session, 'new');
+    WebGUI::Test->groupsToDelete($inGroup);
+    $inGroup->addUsers([$tommy->getId]);
+
+    my $testTemplate = $root->addChild({
+        className => 'WebGUI::Asset::Template',
+        template  => q|{ "noViewableSkus":"<tmpl_var noViewableSkus>","emptyShelf":"<tmpl_var emptyShelf>"}|,
+    });
+    my $testShelf = $root->addChild({
+        className  => $class,
+        templateId => $testTemplate->getId,
+    });
+    my $tag2 = WebGUI::VersionTag->getWorking($session);
+    WebGUI::Test->tagsToRollback($tag2);
+    $tag2->commit;
+    $session->user({userId => 1});
+    $testShelf->prepareView;
+    my $json = $testShelf->view;
+    my $vars = eval { from_json($json) };
+    ok(  $vars->{emptyShelf},     'empty shelf: yes');
+    ok(  $vars->{noViewableSkus}, 'viewable skus: none');
+
+    my $privateSku = $testShelf->addChild({
+        className   => 'WebGUI::Asset::Sku::Product',
+        groupIdView => $inGroup->getId,
+        title       => 'Private Product',
+    });
+    my $tag3 = WebGUI::VersionTag->getWorking($session);
+    WebGUI::Test->tagsToRollback($tag3);
+    $tag3->commit;
+
+    $session->user({user => $tommy});
+    $testShelf->prepareView;
+    $json = $testShelf->view;
+    $vars = eval { from_json($json) };
+    ok( !$vars->{emptyShelf},     'empty shelf, no');
+    ok( !$vars->{noViewableSkus}, 'viewable skus: yes for user in group');
+
+    $session->user({user => $warden});
+    $testShelf->prepareView;
+    $json = $testShelf->view;
+    $vars = eval { from_json($json) };
+
+    ok( !$vars->{emptyShelf},     'empty shelf, no');
+    ok(  $vars->{noViewableSkus}, 'viewable skus: none for user not in viewable group');
+
 }
