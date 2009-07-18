@@ -169,7 +169,10 @@ sub create {
 	# add defaults
 	my $properties = $class->crud_getProperties($session);
 	foreach my $property (keys %{$properties}) {
-		$data->{$property} ||= $properties->{$property}{defaultValue};
+	    # set a default value if it's empty or undef (as per L<update>)
+        if ($data->{$property} eq "") {
+            $data->{$property} = $properties->{$property}{defaultValue};
+        }
 	}
 
 	# determine sequence
