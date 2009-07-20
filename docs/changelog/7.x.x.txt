@@ -7,6 +7,8 @@
  - fixed #10668: shop pay drivers
  - fixed: Pay Drivers update their objects
  - fixed #10652: Story Archive: hover help confusing
+ - fixed #10653: Story Archive: Description text doesn't display
+ - fixed #10656: Story: Photo caption doesn't appear
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug
