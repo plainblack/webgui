@@ -46,7 +46,7 @@ our $I18N = {
 	},
 
 	'feedDescription hoverHelp' => {
-		message => q|An optional description for the feed. If not specified the asset's synopsis will be used instead.|,
+		message => q|An optional description for the feed. If not specified the asset's summary will be used instead.|,
 		lastUpdated => 1236820473,
 		context => q|The hoverhelp of the feedDescription field.|
 	},

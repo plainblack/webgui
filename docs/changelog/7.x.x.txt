@@ -5,7 +5,8 @@
  - fixed #10637: shelf displays assets it shouldn't
  - fixed #10660: Crud doesn't like 0
  - fixed #10668: shop pay drivers
- - fixed Pay Drivers update their objects
+ - fixed: Pay Drivers update their objects
+ - fixed #10652: Story Archive: hover help confusing
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug
