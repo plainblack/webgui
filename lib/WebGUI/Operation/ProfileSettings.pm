@@ -201,8 +201,8 @@ Returns the user to www_editProfileSettings when done.
 
 #-------------------------------------------------------------------
 sub www_editProfileCategorySave {
-	my $session = shift;
-        return $session->privilege->adminOnly() unless canView($session);
+    my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session) && $session->form->validToken();
 	my %data = (
 		label      => $session->form->text("label"),
         shortLabel => $session->form->text("shortLabel"),
@@ -359,8 +359,8 @@ Returns the user to www_editProfileSettings when done.
 
 #-------------------------------------------------------------------
 sub www_editProfileFieldSave {
-	my $session = shift;
-        return $session->privilege->adminOnly() unless canView($session);
+    my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session) && $session->form->validToken();
 
 	# Special case for WebGUI auth password recovery.
 	my $requiredForPasswordRecovery = $session->form->yesNo('requiredForPasswordRecovery');
