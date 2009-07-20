@@ -3,6 +3,7 @@
  - fixed #10637: shelf displays assets it shouldn't
  - fixed #10668: shop pay drivers
  - fixed Pay Drivers update their objects
+ - fixed #10658: Delete in Story Archive doesn't delete in Story Topic
 
 7.6.31
  - fixed #10610: editing a page and editing goes away
