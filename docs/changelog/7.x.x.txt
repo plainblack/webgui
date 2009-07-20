@@ -1,6 +1,8 @@
 7.6.32
  - Fix template not found diagnostics.
  - fixed #10637: shelf displays assets it shouldn't
+ - fixed #10668: shop pay drivers
+ - fixed Pay Drivers update their objects
 
 7.6.31
  - fixed #10610: editing a page and editing goes away
