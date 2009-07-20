@@ -13,6 +13,7 @@
  - fixed #10676: Settings>Account Tab: typos
  - WebGUI::Shop::PayDriver::PayPal moved to WebGUI::Shop::PayDriver::PayPal::ExpressCheckout.
  - WebGUI::Shop::PayDriver::PayPal::PayPalStd is back, now functional.
+ - fixed #10671: shop checkout address copy broken
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug
