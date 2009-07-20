@@ -381,8 +381,6 @@ foreach my $input (@inputs) {
     push @interestingFeatures, { name => $name, type => $type };
 }
 
-diag Dumper \@interestingFeatures;
-
 cmp_deeply(
     \@interestingFeatures,
     [
@@ -561,6 +559,14 @@ cmp_deeply(
 #
 #######################################################################
 
+my $newOptions = {
+    label           => 'Yet another label',
+    enabled         => 1,
+    group           => 4,
+    receiptMessage  => 'Dropjes!',
+};
+
+$driver->update($newOptions);
 $session->user({userId => 3});
 ok($driver->canUse, 'canUse: session->user is used if no argument is passed');
 ok(!$driver->canUse({userId => 1}), 'canUse: userId explicit works, visitor cannot use this driver');
