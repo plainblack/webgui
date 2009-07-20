@@ -30,6 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 replaceUsageOfOldTemplatesAgain($session);
+updatePayPalDriversAgain($session);
 
 # upgrade functions go here
 
@@ -44,6 +45,24 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub updatePayPalDriversAgain {
+    my $session = shift;
+    my $config  = $session->config;
+    print "\tUpdating paypal drivers in config file..." unless $quiet;
+    my $old = 'WebGUI::Shop::PayDriver::PayPal';
+    my @new = qw(
+        WebGUI::Shop::PayDriver::PayPal::PayPalStd
+        WebGUI::Shop::PayDriver::PayPal::ExpressCheckout
+    );
+    $config->deleteFromArray('paymentDrivers', $old);
+    foreach my $n (@new) {
+        $config->deleteFromArray('paymentDrivers', $n);
+        $config->addToArray('paymentDrivers', $n) ;
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub replaceUsageOfOldTemplatesAgain {

@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::PayDriver_PayPal;
+package WebGUI::i18n::English::PayDriver_ExpressCheckout;
 
 use strict;
 
@@ -38,7 +38,7 @@ our $I18N = {
         context     => q{Message to display when something goes wrong talking to PayPal},
     },
     'name' => { 
-        message     => q{PayPal},
+        message     => q{PayPal Express Checkout},
         lastUpdated => 1247256412,
         context     => q{The name of the payment driver},
     },

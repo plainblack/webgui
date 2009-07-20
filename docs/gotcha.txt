@@ -7,6 +7,16 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.16
+--------------------------------------------------------------------
+    * There was some confusion about the state of 
+      WebGUI::Shop::PayDriver::PayPal::PayPalStd.  While it was in fact
+      dysfunctional, it was using the Paypal Website Standard API, while
+      the new Paypal module was using Express Checkout.  Express checkout
+      is only available in the US, UK, and Canada.  PayPalStd has
+      been repaired, and the newly written Express Checkout module is
+      available at WebGUI::Shop::PayDriver::PayPal::ExpressCheckout.
+
 7.7.15
 --------------------------------------------------------------------
     * WebGUI::Shop::PayDriver::PayPal::PayPalStd has been replaced by

@@ -11,6 +11,8 @@
  - fixed #10656: Story: Photo caption doesn't appear
  - fixed #10658: Delete in Story Archive doesn't delete in Story Topic
  - fixed #10676: Settings>Account Tab: typos
+ - WebGUI::Shop::PayDriver::PayPal moved to WebGUI::Shop::PayDriver::PayPal::ExpressCheckout.
+ - WebGUI::Shop::PayDriver::PayPal::PayPalStd is back, now functional.
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug
