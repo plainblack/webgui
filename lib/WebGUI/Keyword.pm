@@ -223,16 +223,25 @@ sub generateCloud {
 
 #-------------------------------------------------------------------
 
-=head2 getKeywordsForAsset ( { asset => $asset } )
+=head2 getKeywordsForAsset ( $options )
 
-Returns a string of keywords separated by spaces.  If the keyword has spaces in it, it
-will be quoted.
+Looks up the keywords for an asset, identified by either an asset object
+or an asset GUID in the options.  Returns a string of keywords separated
+by spaces.  If the keyword has spaces in it, it will be quoted.
 
-=head3 asset
+=head3 $options
+
+A hash reference of options.
+
+=head4 asset
 
 An asset that you want to get the keywords for.
 
-=head3 asArrayRef
+=head4 assetId
+
+The GUID of an asset you want to get the keywords for.
+
+=head4 asArrayRef
 
 A boolean, that if set to 1 will return the keywords as an array reference rather than a string.
 
@@ -254,39 +263,49 @@ sub getKeywordsForAsset {
 
 #-------------------------------------------------------------------
 
-=head2 getMatchingAssets ( { startAsset => $asset, keyword => $keyword } )
+=head2 getMatchingAssets ( $options )
 
 Returns an array reference of asset ids matching the params.  Assets are returned in order of creationDate.
+Only published assets are returned, unless the C<states> options is used.
 
-=head3 startAsset
+=head3 $options
+
+A hash reference of options.
+
+=head4 startAsset
 
 An asset object where you'd like to start searching for matching keywords. Doesn't search any particular branch if one isn't specified.
 
-=head3 keyword
+=head4 keyword
 
 The keyword to match.
 
-=head3 keywords
+=head4 keywords
 
 An array reference of keywords to match.
 
-=head3 matchAssetKeywords
+=head4 matchAssetKeywords
 
 A reference to an asset that has a list of keywords to match. This can help locate assets that are similar to another asset.
 If the referenced asset does not have any keywords, then an empty array reference is returned.
 
-=head3 isa
+=head4 isa
 
 A classname pattern to match. For example, if you provide 'WebGUI::Asset::Sku' then everything that has a class name that starts with that including 'WebGUI::Asset::Sku::Product' will be included.
 
-=head3 usePaginator
+=head4 usePaginator
 
 Instead of returning an array reference of assetId's, return a paginator object.
 
-=head3 rowsPerPage
+=head4 rowsPerPage
 
 If usePaginator is passed, then this variable will set the number of rows per page that the paginator uses.
 If usePaginator is not passed, then this variable will limit the number of assetIds that are returned.
+
+=head4 states
+
+An array reference of asset states.  The ids of assets in those states will be returned.  If this option
+is missing, only assets in the C<published> state will be returned.
 
 =cut
 
@@ -322,6 +341,20 @@ sub getMatchingAssets {
     if (exists $options->{keyword}) {
         push @clauses, 'keyword=?';
         push @params, $options->{keyword};
+    }
+
+    # looking for a single keyword
+    my @states;
+    if (exists $options->{states} && scalar(@{ $options->{states} } )) {
+        @states = @{ $options->{states} };
+    }
+    else {
+        @states = 'published';
+    }
+    {
+        my @placeholders = ('?') x scalar @states;
+        push @params, @states;
+        push @clauses, 'state in ('.join(',', @placeholders).')';
     }
 
     # looking for a list of keywords
