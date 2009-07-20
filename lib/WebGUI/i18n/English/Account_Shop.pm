@@ -60,6 +60,18 @@ our $I18N = {
         context     => q{Label for the manage tax tab},
     },
 
+    'my sales template' => {
+        message     => q{My Sales Template},
+        lastUpdated => 0,
+        context     => q{Template for displaying My Sales},
+    },
+
+    'my sales template help' => {
+        message     => q{Template to render the screen where vendor sales are displayed.},
+        lastUpdated => 0,
+        context     => q{hoverhelp for settings},
+    },
+
 };
 
 1;

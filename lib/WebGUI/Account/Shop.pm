@@ -120,8 +120,8 @@ sub editSettingsForm {
         name        => 'shopMySalesTemplateId',
         value       => $self->session->setting->get('shopMySalesTemplateId'),
         namespace   => 'Shop/MySales',
-        label       => $shopi18n->echo('my sales template'),
-        hoverHelp   => $shopi18n->echo('my sales template help'),
+        label       => $i18n->get('my sales template'),
+        hoverHelp   => $i18n->get('my sales template help'),
     );
 
     return $f->printRowsOnly;
