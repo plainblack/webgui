@@ -109,11 +109,6 @@ my @tmplVarTable = (
 		id   => 'MultiSearchTmpl0000001',
 		var  => [ qw(controls) ],
 	},
-	###Navigation
-	{
-		id   => 'PBtmpl0000000000000048',
-		var  => [ qw(controls) ],
-	},
 	###Poll
 	{
 		id   => 'PBtmpl0000000000000055',
