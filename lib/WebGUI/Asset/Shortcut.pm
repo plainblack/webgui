@@ -375,7 +375,6 @@ sub getFieldsList {
 	my $output  = '<a href="'.$self->getUrl('op=editProfileSettings').'" class="formLink">'.$i18n->get('Manage Profile Fields').'</a><br /><br />';
 	my %fieldNames;
 	tie %fieldNames, 'Tie::IxHash';
-    use Data::Dumper;
 	foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
 		my $fieldId = $field->getId;
 		next if $fieldId =~ /contentPositions/;
@@ -384,7 +383,6 @@ sub getFieldsList {
 	}
 	$output .= '<table cellspacing="0" cellpadding="3" border="1"><tr><td><table cellspacing="0" cellpadding="3" border="0">';
 	my @prefFieldsToShow = $self->getPrefFieldsToShow;
-    $session->log->warn('fieldsToShow: '.Dumper \@prefFieldsToShow);
 	my $list = WebGUI::Form::CheckList->new($session,
 		-name=>"prefFieldsToShow",
 		-value=>\@prefFieldsToShow,
