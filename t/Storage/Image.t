@@ -83,7 +83,7 @@ ok ($uploadUrl, "uploadDir defined in config");
 
 my $imageStore = WebGUI::Storage->create($session);
 WebGUI::Test->storagesToDelete($imageStore);
-my $expectedFiles = ['.', '..'];
+my $expectedFiles = ['.', ];
 cmp_bag($imageStore->getFiles(1), $expectedFiles, 'Starting with an empty storage object, no files in here except for . and ..');
 $imageStore->addFileFromScalar('.dotfile', 'dot file');
 push @{ $expectedFiles }, '.dotfile';
