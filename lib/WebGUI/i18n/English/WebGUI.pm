@@ -3264,8 +3264,8 @@ or are under your current version tag.</p>
     },
 
 	'versionTags.icon' => {
-		message => q|If this tag is the curret tag for the user, this will contain the URL to a small version of the version tags admin console icon.|,
-		lastUpdated =>1247529885,
+		message => q|If this tag is the current tag for the user, this will contain the URL to a small version of the version tags admin console icon.|,
+		lastUpdated =>1248190349,
     },
 
 	'settings' => {
