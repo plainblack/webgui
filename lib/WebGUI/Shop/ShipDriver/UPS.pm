@@ -9,6 +9,7 @@ use LWP;
 use Tie::IxHash;
 use Locales::Country qw/ en   /; 
 use Class::InsideOut qw/ :std /;
+use Data::Dumper;
 
 public testMode => my %testMode;
 
@@ -109,6 +110,9 @@ sub buildXML {
         },
         Package => [],
     };
+    if ($self->get('residentialIndicator') eq 'residential') {
+        $xmlRate->{Shipment}->{ShipTo}->{Address}->[0]->{ResidentialAddressIndicator} = [''];
+    }
     my $packHash = $xmlRate->{Shipment}->{Package};
     PACKAGE: foreach my $package (@{ $packages }) {
         my $weight = 0;
@@ -137,9 +141,9 @@ sub buildXML {
     }
     return '' unless scalar @{ $packHash }; ##Nothing to calculate shipping for.
     $xml .= XMLout(\%xmlHash,
-        KeepRoot    => 1,
-        NoSort      => 1,
-        SuppressEmpty => 0,
+        KeepRoot      => 1,
+        NoSort        => 1,
+        SuppressEmpty => '',
         XMLDecl       => 1,
     );
 
@@ -366,6 +370,16 @@ sub definition {
             hoverHelp    => $i18n->get('customer classification help'),
             options      => \%customerClassification,
             defaultValue => '01',
+        },
+        residential => {
+            fieldType    => 'radioList',
+            label        => $i18n->get('residential'),
+            hoverHelp    => $i18n->get('residential help'),
+            options      => {
+                residential => $i18n->get('residential'),
+                commercial  => $i18n->get('commercial'),
+            },
+            defaultValue => 'commercial',
         },
 ##Note, if a flat fee is added to this driver, then according to the license
 ##terms the website must display a note to the user (shop customer) that additional

@@ -35,7 +35,7 @@ $session->user({user => $user});
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 37;
+my $tests = 40;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -348,17 +348,19 @@ $properties->{sourceCountry}          = 'United States';
 $properties->{shipService}            = '03';
 $properties->{pickupType}             = '01';
 $properties->{customerClassification} = '04';
+$properties->{residentialIndicator}   = 'residential';
 $driver->update($properties);
 
 $driver->testMode(1);
 
-$rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
+my $rockItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 my @shippableUnits = $driver->_getShippableUnits($cart);
 
 ##Must look them up one zip at a time
 my $xml = $driver->buildXML($cart, $shippableUnits[0]);
 like($xml, qr/^<.xml version='1.0'.+?<.xml version=/ms, 'buildXML: has two xml declarations');
 like($xml, qr/<AccessRequest xml:lang/, '... xml:lang is an attribute of AccessRequest');
+#diag $xml;
 
 my ($xmlA, $xmlR) = split /\n(?=<\?xml)/, $xml;
 
@@ -379,11 +381,11 @@ cmp_deeply(
     '... correct access request data structure for 1 package'
 );
 
-diag $xmlR;
-
 my $xmlRate = XMLin($xmlR,
     KeepRoot => 1,
 );
+
+diag Dumper $xmlRate;
 
 cmp_deeply(
     $xmlRate, {
@@ -397,7 +399,7 @@ cmp_deeply(
                     Address => { PostalCode => 97123, CountryCode => 'us', },
                 },
                 ShipTo => {
-                    Address => { PostalCode => 53715, CountryCode => 'us', },
+                    Address => { PostalCode => 53715, CountryCode => 'us', ResidentialAddressIndicator => {}, },
                 },
                 Service => { Code => '03', },
                 Package => {
@@ -416,11 +418,31 @@ SKIP: {
 
     my $response = $driver->_doXmlRequest($xml);
     ok($response->is_success, '_doXmlRequest to UPS successful for 1 package');
+    #diag $response->content;
     my $xmlData = XMLin($response->content, ForceArray => [qw/RatedPackage/],);
     ok($xmlData->{Response}->{ResponseStatusCode}, '... responseCode is successful');
     ok($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue}, '... total charges returned');
+    diag($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue});
 
 }
+
+$rockItem->setQuantity(2);
+@shippableUnits = $driver->_getShippableUnits($cart);
+$xml = $driver->buildXML($cart, $shippableUnits[0]);
+SKIP: {
+
+    skip 'No UPS credentials for testing', 3 unless $hasUPSCredentials;
+
+    my $response = $driver->_doXmlRequest($xml);
+    ok($response->is_success, '_doXmlRequest to UPS successful for 1 item, quantity=2');
+    #diag $response->content;
+    my $xmlData = XMLin($response->content, ForceArray => [qw/RatedPackage/],);
+    ok($xmlData->{Response}->{ResponseStatusCode}, '... responseCode is successful');
+    ok($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue}, '... total charges returned');
+    diag($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue});
+
+}
+
 
 TODO: {
     local $TODO = 'single item shipping cost calculation';
@@ -434,7 +456,7 @@ $xml = $driver->buildXML($cart, @shippableUnits);
 
 ($xmlA, $xmlR) = split /\n(?=<\?xml)/, $xml;
 
-diag $xmlR;
+#diag $xmlR;
 
 $xmlRate = XMLin( $xmlR,
     KeepRoot   => 1,
