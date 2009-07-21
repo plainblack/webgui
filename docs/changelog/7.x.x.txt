@@ -19,6 +19,9 @@
  - fixed #10680: i18n PayDriver_Ogone::use test mode help
  - fixed #10681: i18n PassiveAnalytics::regexp help
  - fixed #10682: i18 PassiveAnalytics::User help
+ - fixed #10683: i18n Asset_Story::crumb_url
+ - fixed #10684: i18n Asset_StoryTopic::deleteIcon
+ - fixed #10685: i18n Asset_StoryTopic::rssUrl 
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug

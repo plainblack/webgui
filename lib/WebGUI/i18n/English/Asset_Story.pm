@@ -255,8 +255,8 @@ our $I18N = {
     },
 
     'crumb_url' => {
-        message => q|The title of a page in the crumb trail.|,
-        lastUpdated => 0,
+        message => q|The url of a page in the crumb trail.|,
+        lastUpdated => 1248191458,
     },
 
     'updatedTime' => {
