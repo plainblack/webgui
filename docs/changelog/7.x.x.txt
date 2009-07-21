@@ -7,6 +7,7 @@
  - fixed #10671: shop checkout address copy broken
  - fixed #10660: Crud doesn't like 0
  - fixed #10678: i18n in WebGUI::versionTags.icon
+ - fixed #10686: Can't access Database Links
 
 7.6.31
  - fixed #10610: editing a page and editing goes away
