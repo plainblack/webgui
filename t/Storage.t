@@ -22,6 +22,7 @@ use Test::More;
 use Test::Deep;
 use Test::MockObject;
 use Cwd;
+use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
@@ -29,7 +30,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 107; # increment this value for each test you create
+my $numTests = 122; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -99,6 +100,7 @@ undef $storage1;
 
 $storage1 = WebGUI::Storage->get($session, 'notAGUID');
 my $storage2 = WebGUI::Storage->get($session, 'notAGoodId');
+WebGUI::Test->storagesToDelete($storage2);
 
 ok(! $storage2->getErrorCount, 'No errors due to a shared common root');
 
@@ -130,6 +132,7 @@ CHECKDIR: while ($dirOpt = pop @dirOptions) {
 	last CHECKDIR if !-e $dir3;
 }
 my $storage3 = WebGUI::Storage->get($session, $dirOpt);
+WebGUI::Test->storagesToDelete($storage3);
 
 is( $storage3->getErrorCount, 1, 'Error during creation of object due to short GUID');
 
@@ -200,6 +203,31 @@ foreach my $extTest (@{ $extensionTests }) {
 
 ####################################################
 #
+# getFiles
+#
+####################################################
+
+my $fileStore = WebGUI::Storage->create($session);
+cmp_bag($fileStore->getFiles(1), ['.'], 'Starting with an empty storage object, no files in here except for . ');
+$fileStore->addFileFromScalar('.dotfile', 'dot file');
+cmp_bag($fileStore->getFiles(),  [                     ], 'getFiles() by default does not return dot files');
+cmp_bag($fileStore->getFiles(1), ['.', '.dotfile'], 'getFiles(1) returns all files, including dot files');
+$fileStore->addFileFromScalar('dot.file', 'dot.file');
+cmp_bag($fileStore->getFiles(),  ['dot.file'],            'getFiles() returns normal files');
+cmp_bag($fileStore->getFiles(1), ['.', '.dotfile', 'dot.file'], 'getFiles(1) returns all files, including dot files');
+
+####################################################
+#
+# getPathClassDir
+#
+####################################################
+
+my $obj = $storage1->getPathClassDir;
+isa_ok($obj, 'Path::Class::Dir');
+is($obj->stringify, $storage1->getPath, '... Path::Class::Dir object has correct path');
+
+####################################################
+#
 # addFileFromHashref
 #
 ####################################################
@@ -266,9 +294,32 @@ $storage1->copy($secondCopy);
 cmp_bag($secondCopy->getFiles(), $storage1->getFiles(), 'copy: passing explicit variable');
 
 my $s3copy = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($s3copy);
 my @filesToCopy = qw/WebGUI.pm testfile-hash-renamed.file/;
 $storage1->copy($s3copy, [@filesToCopy]);
 cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable and files to copy');
+{
+    my $deepStorage = WebGUI::Storage->create($session);
+    WebGUI::Test->storagesToDelete($deepStorage);
+    my $deepDir     = $deepStorage->getPathClassDir();
+    my $deepDeepDir = $deepDir->subdir('deep');
+    my $errorStr;
+    $deepDeepDir->mkpath(1, undef, { error => \$errorStr } );
+    $deepStorage->addFileFromScalar('deep/file', 'deep file');
+    cmp_bag(
+        $deepStorage->getFiles('all'),
+        [ '.', 'deep', 'deep/file' ],
+        '... storage setup for deep clear test'
+    );
+    my $deepCopy = $deepStorage->copy();
+    WebGUI::Test->storagesToDelete($deepCopy);
+    cmp_bag(
+        $deepCopy->getFiles('all'),
+        [ '.', 'deep', 'deep/file' ],
+        '... all files copied, deeply'
+    );
+}
+
 
 ####################################################
 #
@@ -284,6 +335,7 @@ cmp_bag($storage1->getFiles, [$filename], 'deleteFile: storage1 has only 1 file'
 
 ##Test for out of object file deletion
 my $hackedStore = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($hackedStore);
 $hackedStore->addFileFromScalar('fileToHack', 'Can this file be deleted from another object?');
 ok(-e $hackedStore->getPath('fileToHack'), 'set up a file for deleteFile to try and delete illegally');
 my $hackedPath = '../../../'.$hackedStore->getPathFrag().'/fileToHack';
@@ -337,23 +389,50 @@ isnt($untarStorage->getPath, $tarStorage->getPath, 'untar did not reuse the same
 
 ok(scalar @{ $copiedStorage->getFiles } > 0, 'copiedStorage has some files');
 $copiedStorage->clear;
-cmp_ok(scalar @{ $copiedStorage->getFiles }, '==', 0, 'clear removed all files from copiedStorage');
-cmp_ok(scalar @{ $copiedStorage->getFiles(1) }, '==', 2, 'clear removed _all_ files from copiedStorage, except for . and ..');
+cmp_bag(
+    $copiedStorage->getFiles('all'),
+    [ '.' ],
+    'clear removed all files from copiedStorage'
+);
+cmp_bag(
+    $copiedStorage->getFiles('all'),
+    [ '.' ],
+    '... removed _all_ files from copiedStorage, except for . and ..'
+);
 
-####################################################
-#
-# getFiles
-#
-####################################################
+$copiedStorage->setPrivileges(3,3,3);
+cmp_bag(
+    $copiedStorage->getFiles('all'),
+    [ '.', '.wgaccess' ],
+    '... removed _all_ files from copiedStorage, except for . and ..'
+);
+$copiedStorage->clear;
+cmp_bag(
+    $copiedStorage->getFiles('all'),
+    [ '.' ],
+    '... removed .wgaccess file'
+);
 
-my $fileStore = WebGUI::Storage->create($session);
-cmp_bag($fileStore->getFiles(1), ['.', '..'], 'Starting with an empty storage object, no files in here except for . and ..');
-$fileStore->addFileFromScalar('.dotfile', 'dot file');
-cmp_bag($fileStore->getFiles(),  [                     ], 'getFiles() by default does not return dot files');
-cmp_bag($fileStore->getFiles(1), ['.', '..', '.dotfile'], 'getFiles(1) returns all files, including dot files');
-$fileStore->addFileFromScalar('dot.file', 'dot.file');
-cmp_bag($fileStore->getFiles(),  ['dot.file'],            'getFiles() returns normal files');
-cmp_bag($fileStore->getFiles(1), ['.', '..', '.dotfile', 'dot.file'], 'getFiles(1) returns all files, including dot files');
+{
+    my $deepStorage = WebGUI::Storage->create($session);
+    WebGUI::Test->storagesToDelete($deepStorage);
+    my $deepDir     = $deepStorage->getPathClassDir();
+    my $deepDeepDir = $deepDir->subdir('deep');
+    my $errorStr;
+    $deepDeepDir->mkpath(1, undef, { error => \$errorStr } );
+    $deepStorage->addFileFromScalar('deep/file', 'deep file');
+    cmp_bag(
+        $deepStorage->getFiles('all'),
+        [ '.', 'deep', 'deep/file' ],
+        '... storage setup for deep clear test'
+    );
+    $deepStorage->clear();
+    cmp_bag(
+        $deepStorage->getFiles('all'),
+        [ '.', ],
+        '... clear removes directories'
+    );
+}
 
 ####################################################
 #
@@ -383,6 +462,39 @@ is($fileStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', 'Return the name of 
 foreach my $iconTest (@{ $fileIconTests }) {
 	is( $storage1->getFileIconUrl($iconTest->{filename}), $iconTest->{iconUrl}, $iconTest->{comment} );
 }
+
+####################################################
+#
+# setPrivileges
+#
+####################################################
+
+my $shallowStorage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($shallowStorage);
+$shallowStorage->setPrivileges(3,3,3);
+my $shallowDir = $shallowStorage->getPathClassDir();
+ok(-e $shallowDir->file('.wgaccess')->stringify, 'setPrivilege: .wgaccess file created in shallow storage');
+my $privs;
+$privs = $shallowStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, "3\n3\n3", '... correct group contents');
+$shallowStorage->deleteFile('.wgaccess');
+
+my $deepStorage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($deepStorage);
+my $deepDir     = $deepStorage->getPathClassDir();
+my $deepDeepDir = $deepDir->subdir('deep');
+my $errorStr;
+$deepDeepDir->mkpath(1, undef, { error => \$errorStr } );
+ok(-e $deepDeepDir->stringify, 'created storage directory with a subdirectory for testing');
+
+$deepStorage->setPrivileges(3,3,3);
+ok(-e $deepDir->file('.wgaccess')->stringify,     '.wgaccess file created in deep storage');
+ok(-e $deepDeepDir->file('.wgaccess')->stringify, '.wgaccess file created in deep storage subdir');
+
+$privs = $deepStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, "3\n3\n3", '... correct group contents, deep storage');
+$privs = $deepStorage->getFileContentsAsScalar('deep/.wgaccess');
+is ($privs, "3\n3\n3", '... correct group contents, deep storage subdir');
 
 ####################################################
 #
@@ -575,10 +687,10 @@ sub setupDataDrivenTests {
 
 END {
 	foreach my $stor (
-        $storage1,   $storage2, $storage3, $copiedStorage,
-        $secondCopy, $s3copy,   $tempStor, $tarStorage,
+        $storage1,   $copiedStorage,
+        $secondCopy, $tempStor, $tarStorage,
         $untarStorage, $fileStore,
-        $hackedStore, $cdnStorage, $cdnCopy,
+        $cdnStorage, $cdnCopy,
     ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
