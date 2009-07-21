@@ -17,6 +17,7 @@
  - fixed #10678: i18n in WebGUI::versionTags.icon
  - fixed #10679: i18n TaxDriver_EU::accept when vies unavailable help
  - fixed #10680: i18n PayDriver_Ogone::use test mode help
+ - fixed #10681: i18n PassiveAnalytics::regexp help
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug
