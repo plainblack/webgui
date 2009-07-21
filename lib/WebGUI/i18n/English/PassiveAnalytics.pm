@@ -106,8 +106,8 @@ home\?func=match<br />
 	},
 
 	'User help' => {
-		message => q|The user who will recieve an email when bucket processing is done.|,
-		lastUpdated => 0,
+		message => q|The user who will receive an email when bucket processing is done.|,
+		lastUpdated => 1248191382,
 		context => q||
 	},
 
