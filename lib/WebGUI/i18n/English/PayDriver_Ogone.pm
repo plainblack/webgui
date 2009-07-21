@@ -75,8 +75,8 @@ our $I18N = {
     },
 
     'use test mode help' => {
-        message => q|Setting this option to yes directs all payment requests to Ogone's test environment. This allows you to check if everything is set up correctlt before going live. No actual payments are being made while test mode is enabled, so don't forget to set this option to 'No' when ready testing.|,
-        lastUpdated => 0,
+        message => q|Setting this option to yes directs all payment requests to Ogone's test environment. This allows you to check if everything is set up correctly before going live. No actual payments are being made while test mode is enabled, so don't forget to set this option to 'No' when ready testing.|,
+        lastUpdated => 1248191175,
         context => q|Hover help of a setting in the ogone config screen.|,
     },
 
