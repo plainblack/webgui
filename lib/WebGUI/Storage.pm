@@ -23,6 +23,7 @@ use File::Find ();
 use File::Path ();
 use File::Spec;
 use Image::Magick;
+use Path::Class::Dir;
 use Storable ();
 use WebGUI::Utility qw(isIn);
 
@@ -134,11 +135,15 @@ sub _makePath {
 
 #-------------------------------------------------------------------
 
-=head2 _changeOwner ( )
+=head2 _changeOwner ( $file )
 
-Changes the owner to be the same as that of the uploads directory
+Changes the permissions of $file to be the same as that of the uploads directory
 
 NOTE: This is a private method and should never be called except internally to this package.
+
+=head3 $file
+
+A file or directory.  It will have its permissions changed.
 
 =cut
 
@@ -414,15 +419,29 @@ sub adjustMaxImageSize {
 
 =head2 clear ( )
 
-Clears a storage locations of all files except the .wgaccess file
+Clears a storage location of all files.
 
 =cut
 
 sub clear {
 	my $self = shift;
-	my $filelist = $self->getFiles(1);
-	foreach my $file (@{$filelist}) {
-       $self->deleteFile($file);
+    my $dir  = $self->getPathClassDir;
+    my $errors;
+    CHILD: while (my $child = $dir->next()) {
+        my $rel = $child->relative($dir);
+        next CHILD if $rel->stringify eq '.'
+                   || $rel->stringify eq '..';
+        if ($child->is_dir) {
+            my $errors;
+            $child->rmtree({ error => \$errors});
+            foreach my $error (@{ $errors }){
+                $self->_addError($error);
+            }
+        }
+        else {
+            $child->remove;
+            next CHILD;
+        }
     }
 }
 
@@ -446,14 +465,24 @@ Optionally pass in the list of filenames to copy from the specified storage loca
 sub copy {
     my $self = shift;
     my $newStorage = shift || WebGUI::Storage->create($self->session);
-    my $filelist = shift || $self->getFiles(1);
-    foreach my $file (@{$filelist}) {
-        open my $source, '<:raw', $self->getPath($file) or next;
-        open my $dest, '>:raw', $newStorage->getPath($file) or next;
-        File::Copy::copy($source, $dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
-        close $dest;
-        close $source;
-        $newStorage->_changeOwner($newStorage->getPath($file));
+    my $filelist   = shift || $self->getFiles('all');
+    FILE: foreach my $file (@{$filelist}) {
+        next if isIn($file, '.cdn', '.');
+        my $origFile = $self->getPath($file);
+        my $copyFile = $newStorage->getPath($file);
+        if (-d $origFile) {
+            mkdir($copyFile) or
+                $self->_addError("Couldn't copy directory: $copyFile: $!");
+                next FILE;
+        }
+        else {
+            open my $source, '<:raw', $origFile or next FILE;
+            open my $dest,   '>:raw', $copyFile or next FILE;
+            File::Copy::copy($source, $dest) or $self->_addError("Couldn't copy file ".$origFile." to ".$copyFile." because ".$!);
+            close $dest;
+            close $source;
+        }
+        $newStorage->_changeOwner($copyFile);
     }
     return $newStorage;
 }
@@ -546,8 +575,7 @@ sub delete {
 	my $self = shift;
 
     my $path = $self->getPath || return undef;
-    File::Path::rmtree($path)
-        if (-d $path);
+    File::Path::rmtree($path) if (-d $path);
     foreach my $subDir (join('/', @{$self->{_pathParts}}[0,1]), $self->{_pathParts}[0]) {
         my $fullPath = $self->session->config->get('uploadsPath') . '/' . $subDir;
 
@@ -562,7 +590,8 @@ sub delete {
 
 =head2 deleteFile ( filename )
 
-Deletes a file from it's storage location.
+Deletes a file from its storage location, and any thumbnails that might have been made
+with it.
 
 =head3 filename
 
@@ -818,24 +847,29 @@ Returns an array reference of the files in this storage location.
 
 =head3 showAll
 
-Whether or not to return all files, including ones with initial periods.
+Whether or not to return all files, including ones with initial periods and WebGUI created thumbnail
+files (files that start with "thumb-").
 
 =cut
 
 sub getFiles {
-    my $self = shift;
+    my $self    = shift;
     my $showAll = shift;
+    my $dir     = $self->getPathClassDir;
+    my $dirStr  = $dir->stringify;
     my @list;
-    if ( opendir my $dir, $self->getPath ) {
-        @list = readdir $dir;
-        closedir $dir;
-        if (!$showAll) {
-            # if not showing all, filter out files beginning with a period
-            @list = grep { $_ !~ /^\./ } @list;
-            # filter out thumbnails
-            @list = grep { $_ !~ /^thumb-/ } @list;
+    $dir->recurse(
+        callback => sub {
+            my $obj = shift;
+            my $rel = $obj->relative($dir);
+            my $str = $rel->stringify;
+            if (! $showAll ) {
+                return if $str =~ /^thumb-/;
+                return if $str =~ /^\./;
+            }
+            push @list, $str;
         }
-    }
+    );
     return \@list;
 }
 
@@ -907,6 +941,28 @@ sub getPath {
         return join('/', $path, $file);
     }
     return $path;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getPathClassDir (  )
+
+Returns a Path::Class::Dir object for this storage location.  If the uploadsPath is not
+configured, or the path parts don't exist, then it returns undef.
+
+=cut
+
+sub getPathClassDir {
+	my $self = shift;
+	my $file = shift;
+
+    unless ($self->session->config->get("uploadsPath") && $self->{_pathParts} && @{ $self->{_pathParts} }) {
+		$self->_addError("storage object malformed");
+		return undef;
+    }
+    my $dir = Path::Class::Dir->new($self->session->config->get("uploadsPath"), @{ $self->{_pathParts} });
+    return $dir;
 }
 
 
@@ -1175,13 +1231,23 @@ sub setPrivileges {
 	my $owner = shift;
 	my $viewGroup = shift;
 	my $editGroup = shift;
-	
-    if ($owner eq '1' || $viewGroup eq '1' || $viewGroup eq '7' || $editGroup eq '1' || $editGroup eq '7') {
-        $self->deleteFile('.wgaccess');
-    }
-    else {
-        $self->addFileFromScalar(".wgaccess",$owner."\n".$viewGroup."\n".$editGroup);
-    }
+
+    my $dirObj = $self->getPathClassDir();
+    $dirObj->recurse(
+        callback => sub {
+            my $obj = shift;
+            return unless $obj->is_dir;
+            my $rel = $obj->relative($dirObj);
+
+            if ($owner eq '1' || $viewGroup eq '1' || $viewGroup eq '7' || $editGroup eq '1' || $editGroup eq '7') {
+                $self->deleteFile($rel->file('.wgaccess')->stringify);
+            }
+            else {
+                $self->addFileFromScalar($rel->file('.wgaccess')->stringify,$owner."\n".$viewGroup."\n".$editGroup);
+            }
+        }
+    );
+
 }
 
 
