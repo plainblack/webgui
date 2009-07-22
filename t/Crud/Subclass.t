@@ -1,22 +1,3 @@
-package WebGUI::Crud::Subclass;
-
-use strict;
-use base 'WebGUI::Crud';
-sub crud_definition {
-    my ($class, $session) = @_;
-    my $definition = $class->SUPER::crud_definition($session);
-    $definition->{tableName}   = 'crudSubclass';
-    $definition->{tableKey}    = 'crudSubclassId';
-    $definition->{sequenceKey} = '';
-    my $properties = $definition->{properties};
-    $properties->{field1} = {
-        fieldType    => 'integer',
-        defaultValue => 5,
-    };    
-    return $definition;
-}
-
-#package main;
 # vim:syntax=perl
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
@@ -34,6 +15,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::SubClass;
 
 #----------------------------------------------------------------------------
 # Init
