@@ -1,3 +1,5 @@
+7.6.33
+
 7.6.32
  - Fix template not found diagnostics.
  - fixed #10637: shelf displays assets it shouldn't
