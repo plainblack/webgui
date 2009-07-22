@@ -24,6 +24,7 @@
  - fixed #10685: i18n Asset_StoryTopic::rssUrl 
  - fixed #10686: Can't access Database Links
  - fixed #10650: Unflatten WebGUI storage locations
+ - fixed #10664: ThiingyRecord disappeared... sort of
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug

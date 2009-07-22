@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 replaceUsageOfOldTemplatesAgain($session);
 updatePayPalDriversAgain($session);
+addThingyRecordFieldPriceDefaults($session);
 
 # upgrade functions go here
 
@@ -89,6 +90,15 @@ sub replaceUsageOfOldTemplatesAgain {
         print "\n\t\t\tPurging ". $template->getTitle . " ..." unless $quiet;
         $template->purge;
     }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addThingyRecordFieldPriceDefaults {
+    my $session = shift;
+    print "\tAdd default fieldPrice JSON to ThingyRecord... " unless $quiet;
+    # and here's our code
+    $session->db->write(q|UPDATE ThingyRecord set fieldPrice='{}' where fieldPrice IS NULL|);
     print "DONE!\n" unless $quiet;
 }
 
