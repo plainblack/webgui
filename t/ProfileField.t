@@ -33,7 +33,7 @@ WebGUI::Test->usersToDelete($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 28;        # Increment this number for each test you create
+plan tests => 37;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -123,6 +123,29 @@ is($newProfileField2->getLabel, 'WebGUI', 'getLabel will process safeEval calls 
 
 ok( WebGUI::ProfileField->exists($session,"firstName"), "firstName field exists" );
 ok( !WebGUI::ProfileField->exists($session, time), "random field does not exist" );
+
+###########################################################
+#
+# isReservedFieldName
+#
+###########################################################
+
+ok(  WebGUI::ProfileField->isReservedFieldName('func'),   'isReservedFieldName: func');
+ok(  WebGUI::ProfileField->isReservedFieldName('op'),     '... op');
+ok(  WebGUI::ProfileField->isReservedFieldName('userId'), '... userId');
+ok(  WebGUI::ProfileField->isReservedFieldName('wg_privacySettings'), '... wg_privacySettings');
+ok( !WebGUI::ProfileField->isReservedFieldName('function'),  '... function is not');
+ok( !WebGUI::ProfileField->isReservedFieldName('operation'), '... operation is no');
+ok( !WebGUI::ProfileField->isReservedFieldName('shop'),      '... shop is not');
+
+###########################################################
+#
+# exists
+#
+###########################################################
+
+ok(  WebGUI::ProfileField->exists($session, 'email'),  'exists: email');
+ok( !WebGUI::ProfileField->exists($session, 'userId'), '... userId (not)');
 
 #----------------------------------------------------------------------------
 # Cleanup

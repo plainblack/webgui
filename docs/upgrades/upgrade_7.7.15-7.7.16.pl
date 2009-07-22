@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::ProfileField;
 use List::MoreUtils qw/uniq/;
 
 my $toVersion = '7.7.16';
@@ -32,6 +33,7 @@ my $session = start(); # this line required
 replaceUsageOfOldTemplatesAgain($session);
 updatePayPalDriversAgain($session);
 addThingyRecordFieldPriceDefaults($session);
+correctProfileFieldColumnTypes($session);
 
 # upgrade functions go here
 
@@ -46,6 +48,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub correctProfileFieldColumnTypes {
+    my $session = shift;
+    my $config  = $session->config;
+    print "\tCheck database profile field types against form settings..." unless $quiet;
+    WebGUI::ProfileField->fixDataColumnTypes($session);
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub updatePayPalDriversAgain {
