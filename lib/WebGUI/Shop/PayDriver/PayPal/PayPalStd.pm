@@ -3,7 +3,7 @@ package WebGUI::Shop::PayDriver::PayPal::PayPalStd;
 =head1 LEGAL
  -------------------------------------------------------------------
  PayPal Standard payment driver for WebGUI.
- Copyright (C) 2009  Invicta Services, LLC.
+ Copyright (C) 2009 Plain Black Corporation. 
  -------------------------------------------------------------------
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -28,6 +28,11 @@ use warnings;
 use base qw/WebGUI::Shop::PayDriver::PayPal/;
 
 use URI;
+use URI::Escape;
+use LWP::UserAgent;
+use Readonly;
+
+Readonly my $I18N => 'PayDriver_PayPalStd'; 
 
 =head1 NAME
 
@@ -37,6 +42,11 @@ PayPal Website payments standard
 
 A PayPal Website payments standard handler for WebGUI. Provides an interface to PayPal with cart contents
 and transaction information on return.
+
+=head2 IMPORTANT NOTE
+
+In order to use this module, Auto Return and PDT must be enabled in your
+paypal seller account.  If they are not, everything will break!
 
 =head1 SYNOPSIS
 
@@ -71,7 +81,7 @@ sub definition {
         unless ref $session eq 'WebGUI::Session';
     my $definition = shift;
 
-    my $i18n = WebGUI::International->new( $session, 'PayDriver_PayPalStd' );
+    my $i18n = WebGUI::International->new( $session, $I18N );
 
     tie my %fields, 'Tie::IxHash';
     %fields = (
@@ -84,6 +94,11 @@ sub definition {
             fieldType => 'textarea',
             label     => $i18n->get('signature'),
             hoverHelp => $i18n->get('signature help'),
+        },
+        identityToken => {
+            fieldType => 'text',
+            label     => $i18n->get('identity token'),
+            hoverHelp => $i18n->get('identity token help'),
         },
         currency => {
             fieldType    => 'selectBox',
@@ -212,13 +227,16 @@ sub paymentVariables {
         currency_code => $self->get('currency'),
         no_shipping   => 1,
 
-        rm            => 2,
         return        => $return->as_string,
         cancel_return => $cancel->as_string,
 
         shipping             => $cart->calculateShipping,
         tax_cart             => $cart->calculateTaxes,
         discount_amount_cart => -($cart->calculateShopCreditDeduction),
+
+        # When we verify that we have a valid transaction ID later on in
+        # processPayment, we'll make sure it's the cart we think it is.
+        custom => $cart->getId,
     );
     
     my $counter = 0;
@@ -260,20 +278,45 @@ passed to us.
 sub processPayment {
     my ( $self, $transaction ) = @_;
     my $session = $self->session;
-    my $params  = $session->form->paramsHashRef;
-    my $status  = $params->{payment_status}; 
-    my $tx      = $params->{txn_id};
 
-    if ($status ne 'Completed') {
+    # To prevent a spoofed post to this url, we'll get the info from paypal
+    # instead of relying on what was passed to us.
+    my $tx = $session->form->process('tx');
+
+    my %form = (
+        cmd => '_notify-synch',
+        tx  => $tx,
+        at  => $self->get('identityToken'),
+    );
+    my $response = LWP::UserAgent->new->post($self->payPalUrl, \%form);
+    my ($status, @lines) = split("\n", uri_unescape($response->content));
+    my %params = map { split /=/ } @lines;
+
+    if ($status =~ /FAIL/) {
         my $message = '<table><tr><th>Field</th><th>Value</th></tr>';
-        foreach my $key ( keys %$params ) {
-            $message .= "<tr><td>$key</td><td>$params->{$key}</td></tr>";
+        foreach my $key ( keys %params ) {
+            $message .= "<tr><td>$key</td><td>$params{$key}</td></tr>";
         }
         $message .= '</table>';
         return ( 0, $tx, $status, $message );
     }
 
-    return ( 1, $tx, $status, $status );
+    # Make sure the transaction is for this cart to prevent spoofing
+    my $cartId = $self->getCart->getId;
+    if ($params{custom} ne $cartId) {
+        my $user = $session->user;
+        my $name = $user->username;
+        my $id   = $user->userId;
+        $session->log->warn("SECURITY WARNING: $name (id: $id) tried to " .
+            "checkout cart $cartId with PayPal transaction $tx, which " .
+            "did not match the cart we passed ($params{custom})");
+
+        my $i18n = WebGUI::International->new( $session, $I18N );
+        return ( 0, $tx, 'FAIL', $i18n->get('cart transaction mismatch') );
+    }
+
+    $status = $params{payment_status};
+    return ( 1, $tx, $status, $status, $status );
 } ## end sub processPayment
 
 #-------------------------------------------------------------------
