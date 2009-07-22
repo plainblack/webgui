@@ -25,6 +25,7 @@
  - fixed #10686: Can't access Database Links
  - fixed #10650: Unflatten WebGUI storage locations
  - fixed #10664: ThiingyRecord disappeared... sort of
+ - fixed #10687: i18n Asset_Product::buy_form_options
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug
