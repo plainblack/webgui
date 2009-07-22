@@ -1,4 +1,5 @@
 7.6.33
+ - fixed #10687: i18n Asset_Product::buy_form_options
 
 7.6.32
  - Fix template not found diagnostics.

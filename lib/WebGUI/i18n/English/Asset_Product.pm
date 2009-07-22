@@ -765,13 +765,13 @@ be useful, others may not.|,
 	},
 
 	'buy_form_header' => {
-		message => q|HTML code to start the form for putting variant into a shopping cart.  |,
-		lastUpdated => 1210611784,
+		message => q|HTML code to start the form for putting variants into a shopping cart.|,
+		lastUpdated => 1248282250,
 	},
 
 	'buy_form_options' => {
-		message => q|A dropdown list of available variants for this product.  Only products with a quantity greater than zero are listed.|,
-		lastUpdated => 1210611784,
+		message => q|A dropdown list of available variants for this product.  Only variants with a quantity greater than zero are listed.|,
+		lastUpdated => 1248282203,
 	},
 
 	'buy_form_button' => {
