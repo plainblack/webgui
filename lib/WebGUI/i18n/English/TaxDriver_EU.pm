@@ -63,8 +63,8 @@ our $I18N = {
     },
 
     'accept when vies unavailable help' => {
-        message => q|If one of the VIES member states' databases is temporarily unavailable or the connection to VIES failed VAT numbers cannot be checked through this service. Normally this is a temporray problem. If you set this option to yes VAT numbers that could not be checked because of such an event are usable anyway. Note that the format of VAT numbers is always checked, regardless of the availability of VIES.|,
-        lastUpdated => 0,
+        message => q|If one of the VIES member states' databases is temporarily unavailable or the connection to VIES failed VAT numbers cannot be checked through this service. Normally this is a temporary problem. If you set this option to yes VAT numbers that could not be checked because of such an event are usable anyway. Note that the format of VAT numbers is always checked, regardless of the availability of VIES.|,
+        lastUpdated => 1248190913,
         context => 'Hover help in the admin screen',
     },
 
