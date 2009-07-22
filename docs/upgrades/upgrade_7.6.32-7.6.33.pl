@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::ProfileField;
 
 
 my $toVersion = '7.6.33';
@@ -31,6 +32,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+correctProfileFieldColumnTypes($session);
 
 finish($session); # this line required
 
@@ -44,6 +46,15 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#----------------------------------------------------------------------------
+sub correctProfileFieldColumnTypes {
+    my $session = shift;
+    my $config  = $session->config;
+    print "\tCheck database profile field types against form settings..." unless $quiet;
+    WebGUI::ProfileField->fixDataColumnTypes($session);
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

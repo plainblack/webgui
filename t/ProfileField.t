@@ -33,7 +33,7 @@ WebGUI::Test->usersToDelete($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 26;        # Increment this number for each test you create
+plan tests => 37;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -114,6 +114,29 @@ my $newProfileField2 = WebGUI::ProfileField->create($session, 'testField2', {
 is($newProfileField2->get('fieldType'), 'ReadOnly', 'create: default fieldType is ReadOnly');
 is($newProfileField2->get('label'), q|WebGUI::International::get('webgui','WebGUI')|, 'getting raw label');
 is($newProfileField2->getLabel, 'WebGUI', 'getLabel will process safeEval calls for i18n');
+
+###########################################################
+#
+# isReservedFieldName
+#
+###########################################################
+
+ok(  WebGUI::ProfileField->isReservedFieldName('func'),   'isReservedFieldName: func');
+ok(  WebGUI::ProfileField->isReservedFieldName('op'),     '... op');
+ok(  WebGUI::ProfileField->isReservedFieldName('userId'), '... userId');
+ok(  WebGUI::ProfileField->isReservedFieldName('wg_privacySettings'), '... wg_privacySettings');
+ok( !WebGUI::ProfileField->isReservedFieldName('function'),  '... function is not');
+ok( !WebGUI::ProfileField->isReservedFieldName('operation'), '... operation is no');
+ok( !WebGUI::ProfileField->isReservedFieldName('shop'),      '... shop is not');
+
+###########################################################
+#
+# exists
+#
+###########################################################
+
+ok(  WebGUI::ProfileField->exists($session, 'email'),  'exists: email');
+ok( !WebGUI::ProfileField->exists($session, 'userId'), '... userId (not)');
 
 #----------------------------------------------------------------------------
 # Cleanup
