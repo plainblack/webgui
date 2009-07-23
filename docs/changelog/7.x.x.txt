@@ -1,4 +1,5 @@
 7.7.16
+ - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
  - Fix template not found diagnostics.
  - fixed #10665: Navigations with old templates still in 7.7.16
  - fixed #10662: Manage Clipboard / delete item
