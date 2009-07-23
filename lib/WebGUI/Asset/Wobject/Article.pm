@@ -125,6 +125,7 @@ sub definition {
 				fieldType=>"image",
 				deleteFileUrl=>$session->url->page("func=deleteFile;filename="),
 				maxAttachments=>2,
+                persist => 1,
 				defaultValue=>undef,
 				label=>$i18n->get("attachments"),
 				hoverHelp=>$i18n->get("attachments help")
