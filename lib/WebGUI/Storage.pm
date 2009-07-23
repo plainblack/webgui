@@ -121,7 +121,7 @@ sub _cdnAdd {
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
         if ( $cdnCfg->{'queuePath'} ) {
-            my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getDirectoryId;
             my $dest;
             if ( open $dest, '>', $cdnFile ) {
                 close $dest;    # created empty file
@@ -161,7 +161,7 @@ sub _cdnDel {
             unlink $cdnFile;
         }
         if ( $cdnCfg->{'queuePath'} ) {
-            $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getDirectoryId;
             my $dest;
             if ( open $dest, '>', $cdnFile ) {
                 print $dest "deleted\n";
@@ -718,7 +718,7 @@ sub deleteFromCdn {
         and $cdnCfg->{'enabled'}
         and $cdnCfg->{'syncProgram'} )
     {
-        my $id = $self->getHexId;
+        my $id = $self->getDirectoryId;
         my $cmd = sprintf( $cdnCfg->{'deleteProgram'}, $id );
         if ( $cmd =~ /$id/ ) {    # sanity check, no rm -rf /
             system($cmd);
@@ -726,7 +726,7 @@ sub deleteFromCdn {
                 $self->_addError("Error running CDN deleteProgram: $?");
             }
             if ( $cdnCfg->{'queuePath'} ) {
-                unlink $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+                unlink $cdnCfg->{'queuePath'} . '/' . $id;
             }
         }
         else {                    # Presume configuration error, missing %s
@@ -855,7 +855,14 @@ sub getCdnFileIterator {
                 my $sub = sub {
                     my $id = shift @ids;
                     return if !$id;
-                    return $class->get( $session, $session->id->fromHex($id) );
+                    my $storageId;
+                    if (length($id) > 22) {
+                        # convert from hex
+                        $storageId = $session->id->fromHex($id);
+                    } else {
+                        $storageId = $id;
+                    }
+                    return $class->get( $session, $storageId );
                 };
                 return $sub;
             }
@@ -1273,12 +1280,12 @@ sub getUrl {
         {
             if ( $cdnCfg->{'sslUrl'} ) {
                 substr( $cdnCfg->{'sslUrl'}, -1 ) eq '/' and $sep = '';
-                $url = $cdnCfg->{'sslUrl'} . $sep . $self->getHexId;
+                $url = $cdnCfg->{'sslUrl'} . $sep . $self->getDirectoryId;
             }             # else do NOT override $url with CDN URL  ($url = $sslUrl || $url)
         }
         else {
             substr( $cdnCfg->{'url'}, -1 ) eq '/' and $sep = '';
-            $url = $cdnCfg->{'url'} . $sep . $self->getHexId;
+            $url = $cdnCfg->{'url'} . $sep . $self->getDirectoryId;
         }
     } ## end if ( $cdnCfg and $cdnCfg...
     if ( defined $file ) {
@@ -1696,13 +1703,13 @@ sub syncToCdn {
         my $originalDir = Cwd::cwd();
         my $locDir = join '/', $self->session->config->get('uploadsPath'), @{ $self->{_pathParts} }[ 0 .. 1 ];
         chdir $locDir or croak 'Unable to chdir to ' . $locDir . " : $!";
-        my $cmd = sprintf( $cdnCfg->{'syncProgram'}, $self->getHexId );
+        my $cmd = sprintf( $cdnCfg->{'syncProgram'}, $self->getDirectoryId );
         system($cmd);
         if ($?) {
             $self->_addError("Error running CDN syncProgram: $?");
         }
         elsif ( $cdnCfg->{'queuePath'} ) {
-            unlink $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            unlink $cdnCfg->{'queuePath'} . '/' . $self->getDirectoryId;
         }
         chdir $originalDir;
         my $dest;
@@ -1782,6 +1789,20 @@ sub untar {
 
     chdir $originalDir;
     return $temp;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDirectoryId (  )
+
+Returns the id in base64 or hex depending on how it's stored in
+the uploads path.
+
+=cut
+
+sub getDirectoryId {
+    my $self = shift;
+    return $self->{_pathParts}[2];
 }
 
 1;

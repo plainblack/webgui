@@ -138,7 +138,7 @@ sub syncQueue {
     my $cdnCfg  = shift;
     my $locIter = WebGUI::Storage->getCdnFileIterator($session);
     while ( my $store = $locIter->() ) {
-        my $ctrlFile = $cdnCfg->{'queuePath'} . '/' . $session->id->toHex( $store->getId );
+        my $ctrlFile = $cdnCfg->{'queuePath'} . '/' . $store->getDirectoryId;
         if ( -r $ctrlFile and -s $ctrlFile < 12 ) {
             if ( !-s $ctrlFile ) {    # Empty means sync/add/update
                 $store->syncToCdn;
@@ -183,7 +183,12 @@ sub syncUploads {
                     if ( opendir my $S2, "$uDir/$subdir/$sub2" ) {
                         my @fileId = grep { !/^\.+$/ } readdir($S2);
                         foreach my $fileId (@fileId) {
-                            my $store = WebGUI::Storage->get( $session, $session->id->fromHex($fileId) );
+ 			    my $storageId = $fileId;
+			    if (length($storageId) > 22) {
+			        # need to convert from hex
+				$storageId = $session->id->fromHex($storageId);
+			    }
+                            my $store = WebGUI::Storage->get( $session, $storageId );
                             $store->syncToCdn;    # here is the meat
                         }
                         close $S2;

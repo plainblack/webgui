@@ -23,6 +23,7 @@ use Test::Deep;
 use Test::MockObject;
 use Cwd;
 use Data::Dumper;
+use Path::Class::Dir;
 
 my $session = WebGUI::Test->session;
 
@@ -30,7 +31,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 122; # increment this value for each test you create
+my $numTests = 136; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -62,11 +63,26 @@ is( $storage1->getLastError, undef, "No errors during path creation");
 
 ####################################################
 #
-# getPathFrag
+# getPathFrag, getDirectoryId, get
 #
 ####################################################
 
-is( $storage1->getPathFrag, '7e/8a/7e8a1b6a', 'pathFrag returns correct value');
+is( $storage1->getPathFrag,    '7e/8a/7e8a1b6a', 'pathFrag returns correct value');
+is( $storage1->getDirectoryId, '7e8a1b6a',       'getDirectoryId returns the last path element');
+
+##Build an old-style GUID storage location
+my $uploadsBase = Path::Class::Dir->new($uploadDir);
+my $newGuid = $session->id->generate();
+my @guidPathParts = (substr($newGuid, 0, 2), substr($newGuid, 2, 2), $newGuid);
+my $guidDir = $uploadsBase->subdir(@guidPathParts);
+$guidDir->mkpath(0);
+ok(-e $guidDir->stringify, 'created GUID storage location for backwards compatibility testing');
+
+my $guidStorage = WebGUI::Storage->get($session, $newGuid);
+WebGUI::Test->storagesToDelete($guidStorage);
+isa_ok($guidStorage, 'WebGUI::Storage');
+is($guidStorage->getId, $newGuid, 'GUID storage has correct id');
+is($guidStorage->getDirectoryId, $newGuid, '... getDirectoryId');
 
 ####################################################
 #
