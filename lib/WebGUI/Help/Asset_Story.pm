@@ -117,32 +117,6 @@ our $HELP = {
             { name => 'byline',
               description => 'byline tmplvar',
             },
-            { name      => 'updatedTime', },
-            { name      => 'updatedTimeEpoch', },
-        ],
-        related => []
-    },
-
-    'story asset template variables' => {
-        private => 1,
-        title   => 'story asset template variables title',
-        body    => '',
-        isa     => [
-            {   namespace => 'Asset',
-                tag       => 'asset template asset variables'
-            },
-        ],
-        fields    => [],
-        variables => [
-            { name => 'headline',
-              description => 'headline tmplvar',
-            },
-            { name => 'subtitle',
-              description => 'subtitle tmplvar',
-            },
-            { name => 'byline',
-              description => 'byline tmplvar',
-            },
             { name => 'location',
               description => 'location tmplvar',
             },
@@ -154,9 +128,6 @@ our $HELP = {
             },
             { name => 'photo',
               description => 'photo tmplvar',
-            },
-            { name => 'storageId',
-              description => 'storageId tmplvar',
             },
         ],
         related => []
