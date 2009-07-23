@@ -126,7 +126,7 @@ Returns the interval formatted as quantity and units.
 
 sub getValueAsHtml {
 	my $self = shift;
-    return join ' ', $self->session->datetime->secondsToInterval($self->getOriginalValue);
+    return join ' ', $self->session->datetime->secondsToExactInterval($self->getOriginalValue);
 }
 
 #-------------------------------------------------------------------
@@ -177,7 +177,7 @@ sub toHtml {
               years   => $i18n->get(703),
     );
     my %reverseUnits = reverse %units;
-    my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getOriginalValue);
+    my ($interval, $units) = $self->session->datetime->secondsToExactInterval($self->getOriginalValue);
     # not sure why, but these things need to be defined like this or
     # they fail under some circumstnaces 
     my $cmd = "WebGUI::Form::Integer";
@@ -209,7 +209,7 @@ Returns the field as hidden controls rather than displayable controls.
 
 sub toHtmlAsHidden {
 	my $self = shift;
-        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getOriginalValue);
+        my ($interval, $units) = $self->session->datetime->secondsToExactInterval($self->getOriginalValue);
         return WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name").'_interval',
                         value=>$interval

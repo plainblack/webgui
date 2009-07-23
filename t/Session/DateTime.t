@@ -17,7 +17,7 @@ use File::Spec;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 79; # increment this value for each test you create
+use Test::More tests => 90; # increment this value for each test you create
 
 installBadLocale();
  
@@ -212,7 +212,7 @@ cmp_ok(
 
 ####################################################
 #
-# secondsToInverval
+# secondsToInterval
 #
 ####################################################
 
@@ -227,6 +227,24 @@ is(join(" ",$dt->secondsToInterval(60*60*18)),         "18 Hour(s)",    "seconds
 is(join(" ",$dt->secondsToInterval(60*60*24*365*2.9)), "25404 Hour(s)", "secondsToInterval(), hours, longer than a year");
 is(join(" ",$dt->secondsToInterval(60*27)),            "27 Minute(s)",  "secondsToInterval(), minutes");
 is(join(" ",$dt->secondsToInterval(59)),               "59 Second(s)",  "secondsToInterval(), seconds");
+
+####################################################
+#
+# secondsToExactInterval
+#
+####################################################
+
+is(join(" ",$dt->secondsToExactInterval(60*60*24*365*2)),   "2 Year(s)",     "secondsToExactInterval(), years");
+is(join(" ",$dt->secondsToExactInterval(60*60*24*180)),     "6 Month(s)",    "secondsToExactInterval(), months");
+is(join(" ",$dt->secondsToExactInterval(60*60*24*7*3)),     "3 Week(s)",     "secondsToExactInterval(), weeks");
+is(join(" ",$dt->secondsToExactInterval(60*60*24*5)),       "5 Day(s)",      "secondsToExactInterval(), days");
+is(join(" ",$dt->secondsToExactInterval(60*60*24*8)),       "8 Day(s)",      "secondsToExactInterval(), days, longer than a week");
+is(join(" ",$dt->secondsToExactInterval(60*60*24*363)),     "363 Day(s)",    "secondsToExactInterval(), days, longer than a month");
+is(join(" ",$dt->secondsToExactInterval(60*60*24*365*2.4)), "876 Day(s)",    "secondsToExactInterval(), days, longer than a year");
+is(join(" ",$dt->secondsToExactInterval(60*60*18)),         "18 Hour(s)",    "secondsToExactInterval(), hours");
+is(join(" ",$dt->secondsToExactInterval(60*60*24*365*2.9)), "25404 Hour(s)", "secondsToExactInterval(), hours, longer than a year");
+is(join(" ",$dt->secondsToExactInterval(60*27)),            "27 Minute(s)",  "secondsToExactInterval(), minutes");
+is(join(" ",$dt->secondsToExactInterval(59)),               "59 Second(s)",  "secondsToExactInterval(), seconds");
 
 ####################################################
 #
