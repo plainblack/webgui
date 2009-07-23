@@ -29,6 +29,7 @@
  - fixed #10651: Dashboard Content positions
  - fixed #10695: Adding a new article creates a new version tag
  - fixed #10693: double titels in help for Story Archive view template
+ - fixed Story Archive sub-folders should not use the failsafe style.
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug

@@ -63,7 +63,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 45
+my $tests = 46
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -83,8 +83,14 @@ my $creationDateSth = $session->db->prepare('update asset set creationDate=? whe
 SKIP: {
 
 skip "Unable to load module $class", $tests unless $loaded;
+my $home = WebGUI::Asset->getDefault($session);
 
-$archive    = WebGUI::Asset->getDefault($session)->addChild({className => $class, title => 'My Stories', url => '/home/mystories'});
+$archive    = $home->addChild({
+                className => $class,
+                title => 'My Stories',
+                url => '/home/mystories',
+                styleTemplateId => $home->get('styleTemplateId'),
+              });
 $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
 
@@ -118,16 +124,17 @@ $canPostMaker->run();
 my $now = time();
 my $todayFolder = $archive->getFolder($now);
 isa_ok($todayFolder, 'WebGUI::Asset::Wobject::Folder', 'getFolder created a Folder');
-is($archive->getChildCount, 1, 'getFolder created a child');
+is($archive->getChildCount, 1, '... created a child');
 my $dt = DateTime->from_epoch(epoch => $now, time_zone => $session->datetime->getTimeZone);
 my $folderName = $dt->strftime('%B_%d_%Y');
 $folderName =~ s/^(\w+_)0/$1/;
-is($todayFolder->getTitle, $folderName, 'getFolder: folder has the right name');
+is($todayFolder->getTitle, $folderName, '... folder has the right name');
 my $folderUrl = join '/', $archive->getUrl, lc $folderName;
-is($todayFolder->getUrl, $folderUrl, 'getFolder: folder has the right URL');
-is($todayFolder->getParent->getId, $archive->getId, 'getFolder: created folder has the right parent');
-is($todayFolder->get('state'),  'published', 'getFolder: created folder is published');
-is($todayFolder->get('status'), 'approved',  'getFolder: created folder is approved');
+is($todayFolder->getUrl, $folderUrl, '... folder has the right URL');
+is($todayFolder->getParent->getId, $archive->getId, '... created folder has the right parent');
+is($todayFolder->get('state'),  'published', '... created folder is published');
+is($todayFolder->get('status'), 'approved',  '... created folder is approved');
+is($todayFolder->get('styleTemplateId'), $archive->get('styleTemplateId'),  '... created folder has correct styleTemplateId');
 
 my $sameFolder = $archive->getFolder($now);
 is($sameFolder->getId, $todayFolder->getId, 'call with same time returns the same folder');
@@ -558,11 +565,12 @@ $archive->exportAssetCollateral($assetFile, {}, $session);
 my $exportedFiles = $exportStorage->getFiles();
 cmp_bag(
     $exportedFiles,
-    [qw/
-        mystories.rss        mystories
-        mystories.atom
-        mystories.rdf
-    /],
+    [qw{
+        mystories.rss                mystories
+        mystories.atom               mystories.rdf
+        mystories/index.html         mystories/keyword_echo.html
+        mystories/keyword_roger.html mystories/keyword_foxtrot.html
+    }],
     'exportAssetCollateral: feed files exported'
 );
 

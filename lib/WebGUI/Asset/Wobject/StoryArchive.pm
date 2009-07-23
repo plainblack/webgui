@@ -322,11 +322,12 @@ sub getFolder {
 
     ##Call SUPER because my addChild calls getFolder
     $folder = $self->SUPER::addChild({
-        className => 'WebGUI::Asset::Wobject::Folder',
-        title     => $folderName,
-        menuTitle => $folderName,
-        url       => $folderUrl,
-        isHidden  => 1,
+        className       => 'WebGUI::Asset::Wobject::Folder',
+        title           => $folderName,
+        menuTitle       => $folderName,
+        url             => $folderUrl,
+        isHidden        => 1,
+        styleTemplateId => $self->get('styleTemplateId'),
     });
     $newVersionTag->commit();
     ##Restore the old one, if it exists
