@@ -30,7 +30,7 @@
  - fixed #10695: Adding a new article creates a new version tag
  - fixed #10693: double titels in help for Story Archive view template
  - fixed Story Archive sub-folders should not use the failsafe style.
- - fixed #10617: synchToCdn.pl misses many files (Wes Morgan, U.S. PIRG)
+ - fixed #10617: synchToCdn.pl misses many files (Wes Morgan, Public Interest Network)
 
 7.7.15
  - fixed #10629: WebGUI::ProfileField create new field bug
