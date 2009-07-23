@@ -103,6 +103,29 @@ our $I18N = {
         lastUpdated => 1247110533,
     },
 
+    'residentialIndicator' => {
+        message => q|Residential or Commercial?|,
+        lastUpdated => 1248113596,
+        context => q|Residential (a person's home) versus Commercial, a business address.|,
+    },
+
+    'residential help' => {
+        message => q|The UPS rates for delivering to a residential address, or a commercial address differ.  WebGUI will not ask the user which is which, so you will need to configure drivers for both kinds of destinations.|,
+        lastUpdated => 1248113598,
+    },
+
+    'residential' => {
+        message => q|Residential|,
+        lastUpdated => 1248113596,
+        context => q|Residential (a person's home)|,
+    },
+
+    'commercial' => {
+        message => q|Commercial|,
+        lastUpdated => 1248113596,
+        context => q|A business address|,
+    },
+
     'customer classification 01' => {
         message => q|Wholesale|,
         lastUpdated => 1247110533,
