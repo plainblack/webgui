@@ -94,7 +94,8 @@ sub definition {
             defaultValue=>undef,
             maxAttachments=>1,
             label=>$i18n->get(7),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename=")
+            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename="),
+            persist => 1,
         },
         image2=>{
             tab => "properties",
@@ -102,7 +103,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(8),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image2;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         image3=>{
             tab => "properties",
@@ -110,7 +112,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(9),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image3;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         brochure=>{
             tab => "properties",
@@ -118,7 +121,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(13),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=brochure;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         manual=>{
             tab => "properties",
@@ -126,7 +130,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(14),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         isShippingRequired => {
             tab          => "shop",
@@ -141,7 +146,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(15),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         variantsJSON => {
             ##Collateral data is stored as JSON in here
