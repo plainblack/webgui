@@ -2,6 +2,7 @@
  - fixed #10687: i18n Asset_Product::buy_form_options
  - fixed #10651: Dashboard Content positions
  - fixed #10695: Adding a new article creates a new version tag
+ - fixed search indexer concatenates keywords to content.
 
 7.6.32
  - Fix template not found diagnostics.
