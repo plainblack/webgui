@@ -160,6 +160,7 @@ my $child = $archive->addChild({className => 'WebGUI::Asset::Wobject::StoryTopic
 is($child, undef, 'addChild: Will only add Stories');
 
 $child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'});
+$child->requestAutoCommit;
 isa_ok($child, 'WebGUI::Asset::Story', 'addChild added and returned a Story');
 is($archive->getChildCount, 1, 'addChild: added it to the archive');
 my $folder = $archive->getFirstChild();
@@ -195,6 +196,7 @@ my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
 my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo'});
 $creationDateSth->execute([$wgBday, $story->getId]);
+$story->requestAutoCommit;
 
 {
     my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
@@ -203,6 +205,7 @@ $creationDateSth->execute([$wgBday, $story->getId]);
 
 my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" });
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
+$pastStory->requestAutoCommit;
 
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
@@ -276,6 +279,9 @@ foreach my $storilet ($story2, $story3, $story4) {
     $session->db->write("update asset set creationDate=$now where assetId=?",[$storilet->getId]);
 }
 $archive->update({storiesPerPage => 3});
+$story2->requestAutoCommit;
+$story3->requestAutoCommit;
+$story4->requestAutoCommit;
 
 ##Don't assume that Admin and Visitor have the same timezone.
 $session->user({userId => 3});

@@ -54,6 +54,7 @@ my $creationDateSth = $session->db->prepare('update asset set creationDate=? whe
 
 my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", keywords => 'andy,norton'});
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
+$pastStory->requestAutoCommit;
 
 my @staff       = qw/norton hadley mert trout/;
 my @inmates     = qw/bogs red brooks andy heywood tommy jake skeet/;
@@ -66,6 +67,7 @@ STORY: foreach my $name (@characters) {
     my $namedStory = $nowFolder->addChild({ className => 'WebGUI::Asset::Story', title => $name, keywords => $name, } );
     $storyHandler->{$name} = $namedStory;
     $creationDateSth->execute([$now, $namedStory->getId]);
+    $namedStory->requestAutoCommit;
 }
 
 $storyHandler->{bogs}->update({subtitle => 'drinking his food through a straw'});

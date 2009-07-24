@@ -130,6 +130,7 @@ is($story->get('isHidden'), 1, 'by default, stories are hidden');
 $story->update({isHidden => 0});
 is($story->get('isHidden'), 1, 'stories cannot be set to not be hidden');
 is($story->get('state'),    'published', 'Story is published');
+$story->requestAutoCommit;
 
 {
     ##Version control does not alter the current object's status, fetch an updated copy from the
