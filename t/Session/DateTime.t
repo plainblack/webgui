@@ -220,11 +220,11 @@ is(join(" ",$dt->secondsToInterval(60*60*24*365*2)),   "2 Year(s)",     "seconds
 is(join(" ",$dt->secondsToInterval(60*60*24*180)),     "6 Month(s)",    "secondsToInterval(), months");
 is(join(" ",$dt->secondsToInterval(60*60*24*7*3)),     "3 Week(s)",     "secondsToInterval(), weeks");
 is(join(" ",$dt->secondsToInterval(60*60*24*5)),       "5 Day(s)",      "secondsToInterval(), days");
-is(join(" ",$dt->secondsToInterval(60*60*24*8)),       "8 Day(s)",      "secondsToInterval(), days, longer than a week");
-is(join(" ",$dt->secondsToInterval(60*60*24*363)),     "363 Day(s)",    "secondsToInterval(), days, longer than a month");
-is(join(" ",$dt->secondsToInterval(60*60*24*365*2.4)), "876 Day(s)",    "secondsToInterval(), days, longer than a year");
+is(join(" ",$dt->secondsToInterval(60*60*24*8)),       "1 Week(s)",     "secondsToInterval(), days, longer than a week");
+is(join(" ",$dt->secondsToInterval(60*60*24*363)),     "12 Month(s)",   "secondsToInterval(), days, longer than a month");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2.4)), "2 Year(s)",     "secondsToInterval(), days, longer than a year");
 is(join(" ",$dt->secondsToInterval(60*60*18)),         "18 Hour(s)",    "secondsToInterval(), hours");
-is(join(" ",$dt->secondsToInterval(60*60*24*365*2.9)), "25404 Hour(s)", "secondsToInterval(), hours, longer than a year");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2.9)), "3 Year(s)",     "secondsToInterval(), hours, longer than a year");
 is(join(" ",$dt->secondsToInterval(60*27)),            "27 Minute(s)",  "secondsToInterval(), minutes");
 is(join(" ",$dt->secondsToInterval(59)),               "59 Second(s)",  "secondsToInterval(), seconds");
 
