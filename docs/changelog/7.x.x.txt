@@ -3,6 +3,7 @@
  - fixed #10651: Dashboard Content positions
  - fixed #10695: Adding a new article creates a new version tag
  - fixed search indexer concatenates keywords to content.
+ - fixed #10677: Syndicated Content ???
 
 7.6.32
  - Fix template not found diagnostics.

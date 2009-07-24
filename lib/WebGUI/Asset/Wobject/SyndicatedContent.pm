@@ -21,6 +21,54 @@ use base 'WebGUI::Asset::Wobject';
 use WebGUI::Macro;
 use XML::FeedPP;
 
+if ($XML::FeedPP::VERSION < 0.38) {
+    no warnings;
+    warn "Monkey patching XML::FeedPP";
+    *XML::FeedPP::load = sub {
+        my $self   = shift;
+        my $source = shift;
+        my $args   = { @_ };
+        my $method = $args->{'-type'};
+        Carp::croak "No feed source" unless defined $source;
+
+        if ( ! $method ) {
+            if ( $source =~ m#^https?://#s ) {
+                $method = 'url';
+            }
+            elsif ( $source =~ m#(?:\s*\xEF\xBB\xBF)?\s*
+                                 (<(\?xml|!DOCTYPE|rdf:RDF|rss|feed)\W)#xis ) {
+                $method = 'string';
+            }
+            elsif ( $source !~ /[\r\n]/ && -f $source ) {
+                $method = 'file';
+            }
+            else {
+                Carp::croak "Invalid feed source: $source";
+            }
+        }
+
+        my $opts = { map { $_ => $args->{$_} } grep { ! /^-/ } keys %$args };
+        my $tpp = XML::TreePP->new(%$XML::TreePP::TREEPP_OPTIONS, %$opts);
+
+        my $tree;
+        if ( $method eq 'url' ) {
+            $tree = $tpp->parsehttp( GET => $source );
+        }
+        elsif ( $method eq 'string' ) {
+            $tree = $tpp->parse($source);
+        }
+        elsif ( $method eq 'file' ) {
+            $tree = $tpp->parsefile($source);
+        }
+        else {
+            Carp::croak "Invalid load type: $method";
+        }
+
+        Carp::croak "Loading failed: $source" unless ref $tree;
+        %$self = %$tree;    # override myself
+        $self;
+    };
+}
 
 =head1 NAME
 
