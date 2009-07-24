@@ -4,6 +4,7 @@
  - fixed #10695: Adding a new article creates a new version tag
  - fixed search indexer concatenates keywords to content.
  - fixed #10677: Syndicated Content ???
+ - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
 
 7.6.32
  - Fix template not found diagnostics.
