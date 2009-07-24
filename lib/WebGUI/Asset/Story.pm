@@ -570,6 +570,20 @@ sub getRssData {
 
 #-------------------------------------------------------------------
 
+=head2 indexContent (  )
+
+Extend the base class to index Story properties like headline, byline, etc.
+
+=cut
+
+sub indexContent {
+	my $self    = shift;
+    my $indexer = $self->next::method();
+    $indexer->addKeywords($self->get('headline'), $self->get('subtitle'), $self->get('location'), $self->get('highlights'), $self->get('byline'), $self->get('story'), );
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 Extent the default method to handle the case when a Story Topic is rendering
