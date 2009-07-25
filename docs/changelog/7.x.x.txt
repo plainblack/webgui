@@ -3,6 +3,7 @@
  - fixed search indexer concatenates keywords to content.
  - fixed Index Story fields for Search (headline, subtitle, location, byline, highlights, story)
  - fixed #10619: Pagination macro
+ - fixed #10596: Dates in calendar wrong offset
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
