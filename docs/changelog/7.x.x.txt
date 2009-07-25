@@ -4,6 +4,7 @@
  - fixed Index Story fields for Search (headline, subtitle, location, byline, highlights, story)
  - fixed #10619: Pagination macro
  - fixed #10596: Dates in calendar wrong offset
+ - fixed #10698: hard coded root paths in account templates
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
