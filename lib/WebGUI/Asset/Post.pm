@@ -652,7 +652,9 @@ sub getSynopsisAndContent {
 	unless ($synopsis) {
            my @content;
            if( $body =~ /\^\-\;/ ) {
-               @content = split(/\^\-\;/, $body ,2);
+               my @pieces = WebGUI::HTML::splitSeparator($body);
+               $content[0] = shift @pieces;
+               $content[1] = join '', @pieces;
            }
            elsif( $body =~ /<p>/ ) {
                @content = WebGUI::HTML::splitTag($body);

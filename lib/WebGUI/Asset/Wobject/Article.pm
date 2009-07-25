@@ -17,6 +17,7 @@ use WebGUI::Cache;
 use WebGUI::Paginator;
 use WebGUI::Asset::Wobject;
 use WebGUI::Storage;
+use WebGUI::HTML;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -405,7 +406,7 @@ sub view {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);
 	} else {
-		my @pages = split(/\^\-\;/,$var{description});
+		my @pages = WebGUI::HTML::splitSeparator($var{description});
 		$p->setDataByArrayRef(\@pages);
 		$var{description} = $p->getPage;
 	}
