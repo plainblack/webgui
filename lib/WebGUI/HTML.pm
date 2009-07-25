@@ -401,7 +401,59 @@ sub processReplacements {
 
 #-------------------------------------------------------------------
 
-=head2 WebGUI::HTML::splitTag([$tag,]$html[,$count]);
+=head2 splitSeparator ( $content )
+
+Splits the supplied content on the separator macro, ^-;.  Returns an array
+of content.  If the content contains HTML, and splitting the content would
+result in sections of content missing start or end HTML tags, these are filled
+in.  Unary tags, like br, img, and hr are ignored, whether they are proper XHTML
+or not.
+
+In the special case of the separator macro inside bare paragraph tags,
+
+    <p>^-;</p>,
+    
+no empty paragraph tags are generated.
+
+=head3 content
+
+The content to split.
+
+=cut
+
+sub splitSeparator {
+	my $content = shift;
+    return $content unless $content =~ /\^-;/;
+    $content =~ s{<p>\s*\^-;\s*</p>}{\^-;}g;
+    my @tagStack = ();
+    my $parser = HTML::Parser->new(
+        api_version      => 3,
+        ignore_elements  => [ qw/br img hr/ ],
+        start_h     => [ sub { push @tagStack, $_[0]; }, 'tag'],
+        end_h       => [ sub { pop  @tagStack;        }, 'tag'], 
+    );
+    my @sections = ();
+    CHUNK: while (my ($leader, $trailer) = split /\^-;/, $content, 2) {
+        if (! defined $trailer) {
+            push @sections, $leader;
+            last CHUNK;
+        }
+        $parser->parse($leader);
+        while( my $tag = pop @tagStack) {
+            my $endTag = '</'.$tag.'>';
+            $tag       = '<'.$tag.'>';
+            $leader  .= $endTag;
+            $trailer  = $tag . $trailer;
+        }
+        push @sections, $leader;
+        $content = $trailer;
+    }
+	return @sections;
+}
+
+#-------------------------------------------------------------------
+
+=head2 splitTag([$tag,]$html[,$count]);
 
 splits an block of HTML into an array based on the contents of a single tag
 
