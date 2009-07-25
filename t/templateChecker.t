@@ -14,8 +14,6 @@ use warnings;
 use lib "$FindBin::Bin/lib"; ##t/lib
 
 use WebGUI::Test;
-use WebGUI::Operation::Help;
-use WebGUI::International;
 use WebGUI::Session;
 use Data::Dumper;
 use WebGUI::Asset::Template;
