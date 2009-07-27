@@ -27,6 +27,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Sku::Product;
 use WebGUI::Storage;
+use JSON;
 
 #----------------------------------------------------------------------------
 # Init
@@ -36,7 +37,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 12;        # Increment this number for each test you create
+plan tests => 13;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -52,8 +53,6 @@ is($product->getThumbnailUrl(), '', 'Product with no image1 property returns the
 my $image = WebGUI::Storage->create($session);
 WebGUI::Test->storagesToDelete($image);
 $image->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
-
-WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
 
 my $imagedProduct = $node->addChild({
     className          => "WebGUI::Asset::Sku::Product",
@@ -109,6 +108,10 @@ cmp_deeply(
     '... form only has 1 variant, since the other one has 0 quantity'
 );
 
+my $tag = WebGUI::VersionTag->getWorking($session);
+$tag->commit;
+WebGUI::Test->tagsToRollback($tag);
+
 ####################################################
 #
 # addRevision
@@ -120,3 +123,63 @@ my $newImagedProduct = $imagedProduct->addRevision({title => 'Bible and hammer'}
 
 like($newImagedProduct->get('image1'), $session->id->getValidator, 'addRevision: new product rev got an image1 storage location');
 isnt($newImagedProduct->get('image1'), $imagedProduct->get('image1'), '... and it is not the same as the old one');
+
+WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
+WebGUI::VersionTag->getWorking($session)->commit;
+
+####################################################
+#
+# view, template variables
+#
+####################################################
+
+my $jsonTemplate = $node->addChild({
+    className => 'WebGUI::Asset::Template',
+    title     => 'JSON template for Product testing',
+    template  => q|
+{
+    "brochure_icon":"<tmpl_var brochure_icon>",
+    "brochure_url" :"<tmpl_var brochure_url>",
+    "warranty_icon":"<tmpl_var warranty_icon>",
+    "warranty_url" :"<tmpl_var warranty_url>",
+    "manual_icon"  :"<tmpl_var manual_icon>",
+    "manual_url"   :"<tmpl_var manual_url>"
+}
+|,
+});
+
+my @storages = map { WebGUI::Storage->create($session) } 0..2;
+
+my $viewProduct = $node->addChild({
+    className  => 'WebGUI::Asset::Sku::Product',
+    title      => 'View Product for template variable tests',
+    templateId => $jsonTemplate->getId,
+    brochure   => $storages[0]->getId,
+    warranty   => $storages[1]->getId,
+    manual     => $storages[2]->getId,
+});
+
+my $tag2 = WebGUI::VersionTag->getWorking($session);
+$tag2->commit;
+WebGUI::Test->tagsToRollback($tag2);
+
+##Fetch a copy from the db, just like a page fetch
+$viewProduct = WebGUI::Asset->new($session, $viewProduct->getId, 'WebGUI::Asset::Sku::Product');
+
+$viewProduct->prepareView();
+my $json = $viewProduct->view();
+diag $json;
+
+my $vars = JSON::from_json($json);
+cmp_deeply(
+    $vars,
+    {
+        brochure_icon => '',
+        brochure_url  => '',
+        warranty_icon => '',
+        warranty_url  => '',
+        manual_icon   => '',
+        manual_url    => '',
+    },
+    'brochure, warranty and manual vars are blank since their storages are empty'
+);

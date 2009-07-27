@@ -1686,23 +1686,29 @@ sub view {
     my $i18n = WebGUI::International->new($session,'Asset_Product');
     if ($brochure) {
         my $file = WebGUI::Storage->get($session,$brochure);
-        $var{"brochure_icon"}  = $self->getFileIconUrl($file);
-        $var{"brochure_label"} = $i18n->get(13);
-        $var{"brochure_URL"}   = $self->getFileUrl($file);
+        if ($self->getFilename($file)) {
+            $var{"brochure_icon"}  = $self->getFileIconUrl($file);
+            $var{"brochure_label"} = $i18n->get(13);
+            $var{"brochure_URL"}   = $self->getFileUrl($file);
+        }
     }
     #---manual
     if ($manual) {
         my $file = WebGUI::Storage->get($session,$manual);
-        $var{"manual_icon"}  = $self->getFileIconUrl($file);
-        $var{"manual_label"} = $i18n->get(14);
-        $var{"manual_URL"}   = $self->getFileUrl($file);
+        if ($self->getFilename($file)) {
+            $var{"manual_icon"}  = $self->getFileIconUrl($file);
+            $var{"manual_label"} = $i18n->get(14);
+            $var{"manual_URL"}   = $self->getFileUrl($file);
+        }
     }
     #---warranty
     if ($warranty) {
         my $file = WebGUI::Storage->get($session,$warranty);
-        $var{"warranty_icon"}  = $self->getFileIconUrl($file);
-        $var{"warranty_label"} = $i18n->get(15);
-        $var{"warranty_URL"}   = $self->getFileUrl($file);
+        if ($self->getFilename($file)) {
+            $var{"warranty_icon"}  = $self->getFileIconUrl($file);
+            $var{"warranty_label"} = $i18n->get(15);
+            $var{"warranty_URL"}   = $self->getFileUrl($file);
+        }
     }
     #---image1
     if ($image1) {
