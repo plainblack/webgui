@@ -168,7 +168,6 @@ $viewProduct = WebGUI::Asset->new($session, $viewProduct->getId, 'WebGUI::Asset:
 
 $viewProduct->prepareView();
 my $json = $viewProduct->view();
-diag $json;
 
 my $vars = JSON::from_json($json);
 cmp_deeply(
