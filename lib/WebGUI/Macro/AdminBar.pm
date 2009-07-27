@@ -70,9 +70,9 @@ sub process {
 			else {
 				$commitUrl = $url->page("op=commitVersionTag;tagId=".$workingId);
 			}
-			$out .= q{<a class="link" href="}.$commitUrl.q{">}
-				.q{<img src="}.$url->extras('adminConsole/small/versionTags.gif').q{" style="border: 0px; vertical-align: middle;" alt="icon" /> }
-				.$i18n->get("commit my changes").q{</a>};
+            $out .= WebGUI::Form::formHeader($session, { action => $commitUrl, })
+                 .  q{<button type="submit" class="wgButton">}.q{<span><img src="}.$url->extras('adminConsole/small/versionTags.gif').q{" style="border: 0px; vertical-align: middle;" alt="icon" /> }.$i18n->get("commit my changes").q{</span></button>}
+                 .  WebGUI::Form::formFooter($session);
 		}
 		foreach my $tag (@{$versionTags}) {
 			next unless $user->isInGroup($tag->get("groupToUse"));

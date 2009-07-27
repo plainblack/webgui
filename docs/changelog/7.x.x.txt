@@ -7,6 +7,7 @@
  - fixed #10698: hard coded root paths in account templates
  - fixed #10700: Default My Sales template needs i18n
  - fixed #10702: Product displays empty brochure, warranty, manual fields
+ - fixed #10704: Commit version tag from AdminBar is not working
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks

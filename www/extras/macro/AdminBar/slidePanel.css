@@ -71,7 +71,8 @@ dl.accordion-menu dd.a-m-d {
     font-weight: normal;
 }
 
-dl.accordion-menu dd.a-m-d .link {
+dl.accordion-menu dd.a-m-d .link,
+dl.accordion-menu dd.a-m-d .wgButton {
         margin: 0;
         padding: 0;
     display: block;
@@ -92,12 +93,22 @@ dl.accordion-menu dd.a-m-d .link {
         line-height:12px;
 }
 
+dl.accordion-menu dd.a-m-d .wgButton {
+    background-color: transparent;
+    border:     none;
+    display:    inline;
+    margin-left: 0px;
+    padding-left: 0px;
+    width: auto;
+    -moz-user-select: text;
+}
+
 dl.accordion-menu dd.a-m-d .link img {
 margin-left:-20px;
 }
 
-dl.accordion-menu dd.a-m-d .link:hover {
-
+dl.accordion-menu dd.a-m-d .link:hover,
+dl.accordion-menu dd.a-m-d button.wgButton:hover span {
     color: blue;
     background-color: #F5F5F5;
 }
