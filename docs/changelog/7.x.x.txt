@@ -9,6 +9,7 @@
  - fixed #10596: Dates in calendar wrong offset
  - fixed #10698: hard coded root paths in account templates
  - fixed #10702: Product displays empty brochure, warranty, manual fields
+ - fixed #10510: Product Thumbnails overlap Controls
 
 7.6.32
  - Fix template not found diagnostics.

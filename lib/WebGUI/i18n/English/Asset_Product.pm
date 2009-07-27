@@ -858,6 +858,12 @@ be useful, others may not.|,
 		context => q|hover help for isShippingRequired in the edit sku screen|
 	},
 
+	'Controls' => {
+		message => q|Controls|,
+		lastUpdated => 0,
+		context => q|A set of links or icons to edit or alter the object.|
+	},
+
 };
 
 1;
