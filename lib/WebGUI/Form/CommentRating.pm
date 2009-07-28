@@ -137,7 +137,7 @@ sub getValueAsHtml {
     my $self = shift;
     my $value = $self->getValue;
     my $url = $self->session->url;
-    return q{<img src="}.$url->extras('wobject/Bazaar/rating/'.$value.'.png').q{" style="vertical-align: middle;" alt="}.$value.q{" />};
+    return q{<img src="}.$url->extras('form/CommentRating'.$value.'.png').q{" style="vertical-align: middle;" alt="}.$value.q{" />};
 }
 
 
