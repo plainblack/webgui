@@ -129,8 +129,8 @@ our $I18N = {
     },
 
     'manageUrl' => {
-        message     => q{The GUID of the user whose friends you are managing.},
-        lastUpdated => 0,
+        message     => q{The URL back to the Friend Manager main screen},
+        lastUpdated => 1248798355,
     },
 
     'back to friend manager' => {

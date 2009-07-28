@@ -11,6 +11,7 @@
  - fixed #10510: Product Thumbnails overlap Controls
  - fixed #10705: 7.7.2 upgrade script (sometimes) removes a table that the 7.7.7 upgrade script assumes is present
  - fixed #10706: FriendManager Style/Layout template options
+ - fixed #10707: i18n Account_FriendManager::manageUrl
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
