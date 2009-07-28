@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addFriendManagerSettings($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,13 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+sub addFriendManagerSettings {
+    my $session = shift;
+    print "\tAdding Friend Manager Style and Layout template settings... " unless $quiet;
+    $session->setting->add('fmStyleTemplateId', $session->setting->get("userFunctionStyleId"));
+    $session->setting->add('fmLayoutTemplateId', 'N716tpSna0iIQTKxS4gTWA');
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

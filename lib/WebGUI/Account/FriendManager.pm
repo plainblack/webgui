@@ -50,6 +50,33 @@ sub canView {
 
 #-------------------------------------------------------------------
 
+=head2 getLayoutTemplateId ( )
+
+Returns the template Id for the account layout. See L<WebGUI::Account::getLayoutTemplateId>.
+
+=cut
+
+sub getLayoutTemplateId {
+    my $self = shift;
+    return $self->session->setting->get("fmLayoutTemplateId") || $self->SUPER::getLayoutTemplateId;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getStyleTemplateId ( )
+
+Returns the template Id for the main style. See L<WebGUI::Account::getStyleTemplateId>.
+
+=cut
+
+sub getStyleTemplateId {
+    my $self = shift;
+    return $self->session->setting->get("fmStyleTemplateId") || $self->SUPER::getStyleTemplateId;
+}
+
+#-------------------------------------------------------------------
+
 =head2 editSettingsForm ( )
 
 Creates form elements for the settings page custom to this account module.
@@ -62,6 +89,20 @@ sub editSettingsForm {
     my $i18n    = WebGUI::International->new($session,'Account_FriendManager');
     my $f       = WebGUI::HTMLForm->new($session);
 
+    $f->template(
+        name      => "fmStyleTemplateId",
+        value     => $self->getStyleTemplateId,
+        namespace => "style",
+        label     => $i18n->get("style template label"),
+        hoverHelp => $i18n->get("style template hoverHelp"),
+    );
+    $f->template(
+        name      => "fmLayoutTemplateId",
+        value     => $self->getLayoutTemplateId,
+        namespace => "Account/Layout",
+        label     => $i18n->get("layout template label"),
+        hoverHelp => $i18n->get("layout template hoverHelp"),
+    );
     $f->group(
         name      => "groupIdAdminFriends",
         value     => $session->setting->get('groupIdAdminFriends'),
@@ -115,12 +156,13 @@ sub editSettingsFormSave {
     my $setting = $session->setting;
     my $form    = $session->form;
 
-    $setting->set("fmViewTemplateId",  $form->process("fmViewTemplateId",  "template"));
-    $setting->set("fmEditTemplateId",  $form->process("fmEditTemplateId",  "template"));
-    my $groupsToManageFriends = $form->process("groupsToManageFriends", "group");
-    $setting->set("groupsToManageFriends",  $groupsToManageFriends);
-    $setting->set("groupIdAdminFriends",    $form->process("groupIdAdminFriends",    "group"));
-    $setting->set("overrideAbleToBeFriend", $form->process("overrideAbleToBeFriend", "yesNo"));
+    $setting->set( "fmStyleTemplateId",      $form->process( "fmStyleTemplateId",      "template" ) );
+    $setting->set( "fmLayoutTemplateId",     $form->process( "fmLayoutTemplateId",     "template" ) );
+    $setting->set( "fmViewTemplateId",       $form->process( "fmViewTemplateId",       "template" ) );
+    $setting->set( "fmEditTemplateId",       $form->process( "fmEditTemplateId",       "template" ) );
+    $setting->set( "groupsToManageFriends",  $form->process( "groupsToManageFriends",  "group" ) );
+    $setting->set( "groupIdAdminFriends",    $form->process( "groupIdAdminFriends",    "group" ) );
+    $setting->set( "overrideAbleToBeFriend", $form->process( "overrideAbleToBeFriend", "yesNo" ) );
 }
 
 #-------------------------------------------------------------------
