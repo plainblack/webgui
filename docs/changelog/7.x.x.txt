@@ -13,6 +13,7 @@
  - fixed #10702: Product displays empty brochure, warranty, manual fields
  - fixed #10510: Product Thumbnails overlap Controls
  - fixed #9962: gallery thumbnail view: JS problem in IE7
+ - fixed Survey GradeBook template missing important variables and documentation
 
 7.6.32
  - Fix template not found diagnostics.
