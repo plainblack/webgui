@@ -1,3 +1,5 @@
+7.6.34
+
 7.6.33
  - fixed #10687: i18n Asset_Product::buy_form_options
  - fixed #10651: Dashboard Content positions
