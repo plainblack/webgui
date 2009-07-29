@@ -923,6 +923,42 @@ directly inside the answer_loop for other types of questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1149654771,
     },
+    
+    response_feedback_url => {
+        message => q|The URL of the individual response feedback page.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_id  => {
+        message => q|The unique ID of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_userId => {
+        message => q|The userId of the user that completed the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_ip => {
+        message => q|The IP Address of the user that completed the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_startDate => {
+        message => q|The Start Date of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_endDate => {
+        message => q|The End Date of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
 
     'survey template common vars title' => {
         message => q|Survey Template Common Vars|,
@@ -1636,6 +1672,16 @@ section/answer.|,
     
     'tests failed' => {
         message => q{Tests Failed},
+        lastUpdated => 0,
+    },
+    
+    'start date' => {
+        message => q{Start Date},
+        lastUpdated => 0,
+    },
+    
+    'end date' => {
+        message => q{End Date},
         lastUpdated => 0,
     },
 
