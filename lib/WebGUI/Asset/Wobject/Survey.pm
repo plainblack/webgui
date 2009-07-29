@@ -1344,45 +1344,61 @@ Returns the Grade Book screen.
 =cut
 
 sub www_viewGradeBook {
-    my $self    = shift;
-    my $db      = $self->session->db;
-    
+    my $self = shift;
+    my $db   = $self->session->db;
+
     return $self->session->privilege->insufficient()
-        unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+        if !$self->session->user->isInGroup( $self->get('groupToViewReports') );
 
     my $var = $self->getMenuVars;
 
     $self->loadTempReportTable();
 
-    my $paginator = WebGUI::Paginator->new($self->session,$self->getUrl('func=viewGradebook'));
-    $paginator->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate 
-        from Survey_response     
-        where assetId=".$db->quote($self->getId)." order by username,ipAddress,startDate");
-    my $users = $paginator->getPageData;
+    my $paginator = WebGUI::Paginator->new( $self->session, $self->getUrl('func=viewGradebook') );
+    my $userClause = '';
+    if (my $userId = $self->session->form->process('userId')) {
+        $userClause = ' and userId = ' . $db->quote($userId);
+    }
+    my $quotedAssetId = $db->quote( $self->getId );
+    $paginator->setDataByQuery( <<END_SQL );
+select userId, username, ipAddress, Survey_responseId, startDate, endDate
+from Survey_response 
+where assetId = $quotedAssetId
+$userClause
+order by username, ipAddress, startDate
+END_SQL
+    my $rows = $paginator->getPageData;
 
     $self->loadSurveyJSON();
-    $var->{question_count} = $self->survey->questionCount; 
-    
+    $var->{question_count} = $self->survey->questionCount;
+
     my @responseloop;
-    foreach my $user (@$users) {
-        my ($correctCount) = $db->quickArray("select count(*) from Survey_tempReport 
-            where Survey_responseId=? and isCorrect=1",[$user->{Survey_responseId}]);
-        push(@responseloop, {
-            # response_url is left out because it looks like Survey doesn't have a viewIndividualSurvey feature
-            # yet.
-            #'response_url'=>$self->getUrl('func=viewIndividualSurvey;responseId='.$user->{Survey_responseId}),
-            'response_user_name'=>($user->{userId} eq '1') ? $user->{ipAddress} : $user->{username},
-            'response_count_correct' => $correctCount,
-            'response_percent' => round(($correctCount/$var->{question_count})*100)
-            });
+    foreach my $row ( @{$rows} ) {
+        my ($correctCount)
+            = $db->quickArray(
+            'select count(*) from Survey_tempReport' . ' where Survey_responseId=? and isCorrect=1',
+            [ $row->{Survey_responseId} ] );
+        push @responseloop,
+            {
+            #response_feedback_url => $self->getUrl("func=showFeedback;responseId=$row->{Survey_responseId}"),
+            response_id           => $row->{Survey_responseId},
+            response_userId       => $row->{userId},
+            response_ip           => $row->{ip},
+            response_startDate    => $row->{startDate}
+                && WebGUI::DateTime->new( $self->session, $row->{startDate} )->toUserTimeZone,
+            response_endDate => $row->{endDate}
+                && WebGUI::DateTime->new( $self->session, $row->{endDate} )->toUserTimeZone,
+            response_user_name => ( $row->{userId} eq '1' ) ? $row->{ipAddress} : $row->{username},
+            response_count_correct => $correctCount,
+            response_percent       => round( ( $correctCount / $var->{question_count} ) * 100 ),
+            };
     }
     $var->{response_loop} = \@responseloop;
     $paginator->appendTemplateVars($var);
 
-    my $out = $self->processTemplate( $var, $self->get("gradebookTemplateId") );
-    return $self->session->style->process( $out, $self->get("styleTemplateId") );
-
-} ## end sub www_viewGradeBook
+    my $out = $self->processTemplate( $var, $self->get('gradebookTemplateId') );
+    return $self->processStyle($out);
+}
 
 #-------------------------------------------------------------------
 

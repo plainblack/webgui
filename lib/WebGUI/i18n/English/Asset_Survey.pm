@@ -774,6 +774,36 @@ directly inside the answer_loop for other types of questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1149654771,
     },
+    
+    response_id  => {
+        message => q|The unique ID of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_userId => {
+        message => q|The userId of the user that completed the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_ip => {
+        message => q|The IP Address of the user that completed the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_startDate => {
+        message => q|The Start Date of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_endDate => {
+        message => q|The End Date of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
 
     'survey template common vars title' => {
         message => q|Survey Template Common Vars|,
@@ -1285,6 +1315,16 @@ section/answer.|,
         message => q|The survey was restarted because the time limit for completing the survey was reached.|,
         lastUpdated => 0,
         context => q|The message shown to the user taking the survey when the survey is restarted after reaching the time limit for completing the survey. This message is in the 'take survey' template.|,
+    },
+    
+    'start date' => {
+        message => q{Start Date},
+        lastUpdated => 0,
+    },
+    
+    'end date' => {
+        message => q{End Date},
+        lastUpdated => 0,
     },
 };
 
