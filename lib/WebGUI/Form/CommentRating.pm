@@ -94,13 +94,14 @@ sub getOptions {
     my %options = ();
     tie %options, 'Tie::IxHash';
     my $url = $self->session->url;
+    my $pathFragment = 'form/CommentRating';
     %options = (
-        0 => q{<img src="}.$url->extras('wobject/Bazaar/rating/0.png').q{" style="vertical-align: middle;" alt="0" />},
-        1 => q{<img src="}.$url->extras('wobject/Bazaar/rating/1.png').q{" style="vertical-align: middle;" alt="1" />},
-        2 => q{<img src="}.$url->extras('wobject/Bazaar/rating/2.png').q{" style="vertical-align: middle;" alt="2" />},
-        3 => q{<img src="}.$url->extras('wobject/Bazaar/rating/3.png').q{" style="vertical-align: middle;" alt="3" />},
-        4 => q{<img src="}.$url->extras('wobject/Bazaar/rating/4.png').q{" style="vertical-align: middle;" alt="4" />},
-        5 => q{<img src="}.$url->extras('wobject/Bazaar/rating/5.png').q{" style="vertical-align: middle;" alt="5" />},
+        0 => q{<img src="}.$url->extras("$pathFragment/0.png").q{" style="vertical-align: middle;" alt="0" />},
+        1 => q{<img src="}.$url->extras("$pathFragment/1.png").q{" style="vertical-align: middle;" alt="1" />},
+        2 => q{<img src="}.$url->extras("$pathFragment/2.png").q{" style="vertical-align: middle;" alt="2" />},
+        3 => q{<img src="}.$url->extras("$pathFragment/3.png").q{" style="vertical-align: middle;" alt="3" />},
+        4 => q{<img src="}.$url->extras("$pathFragment/4.png").q{" style="vertical-align: middle;" alt="4" />},
+        5 => q{<img src="}.$url->extras("$pathFragment/5.png").q{" style="vertical-align: middle;" alt="5" />},
         );
     return \%options;
 }
@@ -136,7 +137,7 @@ sub getValueAsHtml {
     my $self = shift;
     my $value = $self->getValue;
     my $url = $self->session->url;
-    return q{<img src="}.$url->extras('wobject/Bazaar/rating/'.$value.'.png').q{" style="vertical-align: middle;" alt="}.$value.q{" />};
+    return q{<img src="}.$url->extras('form/CommentRating'.$value.'.png').q{" style="vertical-align: middle;" alt="}.$value.q{" />};
 }
 
 
