@@ -46,7 +46,11 @@
 # It should be safe to set this to 1 any time spectre and WebGUI
 # are running on the same server.
 
-"ignoreEnvProxy" : 0
+"ignoreEnvProxy" : 0,
+
+# The location of the file that keeps track of the master spectre processId.
+
+"pidFile" : "/var/run/spectre.pid"
 
 }
 

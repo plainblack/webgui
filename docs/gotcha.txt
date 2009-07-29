@@ -9,6 +9,12 @@ save you many hours of grief.
 
 7.7.17
 --------------------------------------------------------------------
+    * Spectre now works like many other programs and writes a PID
+      file.  The location of that file is required to be in your
+      spectre.conf file to start or stop.  After installing this
+      version, you will need to manually kill spectre and then
+      restart it.
+
     * The Default Gallery Album View Thumbnails template has been reworked
       to get rid of intermittent rendering bugs with IE7.  The thumbnail
       pop-up is now completely CSS.  The thumbnails.js file is still available,
