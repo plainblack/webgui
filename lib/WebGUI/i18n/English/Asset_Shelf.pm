@@ -21,11 +21,11 @@ our $I18N = {
         context => q|Message telling the user the their products have been imported successfully.|
     },
 
-	'price' => {
-		message 	=> q|The price of this sku.|,
-		lastUpdated => 0,
-		context		=> q|a template variable|,
-	},
+    'price' => {
+        message 	=> q|The price of this sku, formatted to 2 decimal places using a decimal point (not comma), and with no monetary symbol.|,
+        lastUpdated => 0,
+        context		=> q|a template variable|,
+    },
 
 	'product_url' => {
 		message 	=> q|The URL to this sku.|,
