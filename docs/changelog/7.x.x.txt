@@ -1,4 +1,5 @@
 7.6.34
+ - fixed #10692: Unprivileged users can stop spectre
 
 7.6.33
  - fixed #10687: i18n Asset_Product::buy_form_options

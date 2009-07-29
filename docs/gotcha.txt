@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.34
+--------------------------------------------------------------------
+    * Spectre now works like many other programs and writes a PID
+      file.  The location of that file is required to be in your
+      spectre.conf file to start or stop.  After installing this
+      version, you will need to manually kill spectre and then
+      restart it.
+
 7.6.33
 --------------------------------------------------------------------
     * The Default Gallery Album View Thumbnails template has been reworked
