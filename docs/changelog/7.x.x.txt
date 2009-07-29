@@ -15,6 +15,7 @@
  - fixed #10510: Product Thumbnails overlap Controls
  - fixed #9962: gallery thumbnail view: JS problem in IE7
  - fixed Survey GradeBook template missing important variables and documentation
+ - fixed #9920: Survey: cannot add questions in IE
 
 7.6.32
  - Fix template not found diagnostics.
