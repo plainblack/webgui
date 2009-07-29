@@ -7,10 +7,19 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.33
+--------------------------------------------------------------------
+    * The Default Gallery Album View Thumbnails template has been reworked
+      to get rid of intermittent rendering bugs with IE7.  The thumbnail
+      pop-up is now completely CSS.  The thumbnails.js file is still available,
+      but is now considered deprecated.
+
+
 7.6.30
 --------------------------------------------------------------------
    * It was mistakenly reported that 7.6.29 would be a stop version for
      upgrades.  This is incorrect.  7.6.29 is not a stop version.
+
 
 7.6.29
 --------------------------------------------------------------------
