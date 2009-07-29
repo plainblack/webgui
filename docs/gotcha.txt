@@ -7,7 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
-7.6.16
+7.7.17
+--------------------------------------------------------------------
+    * The Default Gallery Album View Thumbnails template has been reworked
+      to get rid of intermittent rendering bugs with IE7.  The thumbnail
+      pop-up is now completely CSS.  The thumbnails.js file is still available,
+      but is now considered deprecated.
+
+7.7.16
 --------------------------------------------------------------------
     * There was some confusion about the state of 
       WebGUI::Shop::PayDriver::PayPal::PayPalStd.  While it was in fact
