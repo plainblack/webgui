@@ -371,7 +371,7 @@ sub definition {
             options      => \%customerClassification,
             defaultValue => '01',
         },
-        residential => {
+        residentialIndicator => {
             fieldType    => 'radioList',
             label        => $i18n->get('residential'),
             hoverHelp    => $i18n->get('residential help'),
