@@ -14,6 +14,9 @@
  - fixed #10706: FriendManager Style/Layout template options
  - fixed #10707: i18n Account_FriendManager::manageUrl
  - fixed #9962: gallery thumbnail view: JS problem in IE7
+ - fixed a bug where the textarea (based) form plugins would put multiple
+   identical style tags in head in some cases, which caused javascript errors
+   in IE. ( Martin Kamerbeek / Oqapi )
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
