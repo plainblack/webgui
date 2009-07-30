@@ -209,8 +209,8 @@ foreach my $filename (keys %config) {
 	my $dumpcmd = $config{$filename}{mysqlDump} || $mysqldump;
 	my $backupTo = $config{$filename}{backupPath} || $backupDir;
 	mkdir($backupTo);
+    ++$configCounter;
 	while ($upgrade{$config{$filename}{version}}{sql} ne "" || $upgrade{$config{$filename}{version}}{pl} ne "") {
-        ++$configCounter;
 		my $upgrade = $upgrade{$config{$filename}{version}}{from};
 		print "\n".$config{$filename}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
         print "Processing $configCounter out of $totalConfigs configs\n" unless ($quiet);
