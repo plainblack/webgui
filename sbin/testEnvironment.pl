@@ -81,7 +81,6 @@ checkModule("Net::POP3",                    2.28         );
 checkModule("Tie::IxHash",                  1.21         );
 checkModule("Tie::CPHash",                  1.001        );
 checkModule("XML::Simple",                  2.09         );
-checkModule("SOAP::Lite",                   0.60         );
 checkModule("DateTime",                     0.2901       );
 checkModule("Time::HiRes",                  1.38         );
 checkModule("DateTime::Format::Strptime",   1.0601       );
