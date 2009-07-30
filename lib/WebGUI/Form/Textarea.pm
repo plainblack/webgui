@@ -142,9 +142,7 @@ sub toHtml {
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->getOriginalValue)));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
-	my ($style, $url) = $self->session->quick(qw(style url));
-	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
-    $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
+	my ($style, $url, $stow) = $self->session->quick(qw(style url stow));
 	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '
             . ( $self->get("maxlength") ? 'maxlength="' . $self->get( "maxlength" ) . '" ' : '' )
             . $self->get("extras") . ' rows="#" cols="#" style="width: '.$width.'px; height: '.$height.'px;">'.$value.'</textarea>'
@@ -160,14 +158,21 @@ sub toHtml {
         { type => 'text/javascript' }, 
     );
 
-    unless ( $self->session->stow->get( 'texareaHeadTagsLoaded' ) ) {
+    # Make sure we load the css for this plugin only once per id.
+    unless ( $stow->get( 'textareaStyleLoaded_' . $self->get('id') ) ) {
+        my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
+        $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
+        $stow->set( 'textareaStyleLoaded_' . $self->get('id'), 1 );
+    }
+    # Make sure we add the max length js only once for all texatareas.
+    unless ( $stow->get( 'texareaHeadTagsLoaded' ) ) {
         $style->setRawHeadTags( q|
             <script type="text/javascript">
                 YAHOO.util.Event.onDOMReady( function () { WebGUI.Form.Textarea.setMaxLength() } );
             </script>
         | );
 
-        $self->session->stow->set( 'texareaHeadTagsLoaded', 1 )
+        $stow->set( 'texareaHeadTagsLoaded', 1 );
     }
 
 	if ($self->get("resizable")) {
