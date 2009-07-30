@@ -304,9 +304,9 @@ our $I18N = {
     },
 
     'asset url' => {
-        message => q|The title of this url.|,
+        message => q|The title of this assetl.|,
         context => q|Template variable.|,
-        lastUpdated => 0,
+        lastUpdated => 1248972828,
     },
 
     'keyword' => {
