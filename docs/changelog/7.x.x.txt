@@ -20,6 +20,7 @@
  - fixed Survey GradeBook template missing important variables and documentation
  - fixed #9920: Survey: cannot add questions in IE
  - fixed #10717: i18n Asset_Survey::recordedAnswer and Asset_Survey::recorded answer description
+ - fixed #10716: i18n Asset_Survey::questions on section page descriptio
 
 7.6.32
  - Fix template not found diagnostics.

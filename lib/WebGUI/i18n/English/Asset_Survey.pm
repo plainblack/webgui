@@ -77,9 +77,9 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'questions on section page description' => {
-        message => q|Are question displayed on the initial page of this section or on the next page.|,
+        message => q|Whether questions are displayed on the initial page of this section or on the next page.|,
         context => q|Description of the 'questions on section page' field, used as hoverhelp in the edit section dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1249057316
     },
 
 	'section name' => {
