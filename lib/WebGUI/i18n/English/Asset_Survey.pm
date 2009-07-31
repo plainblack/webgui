@@ -1306,9 +1306,9 @@ section/answer.|,
     },
 
     'showProgress' => {
-        message => q|A boolean that is true if the asset has been configured to show how much progess the user has made in completing this Survey.|,
+        message => q|A boolean that is true if the asset has been configured to show how much progress the user has made in completing this Survey.|,
         context => q|Template variable doc.|,
-        lastUpdated => 0,
+        lastUpdated => 1249057498,
     },
 
    'restart message' =>{
