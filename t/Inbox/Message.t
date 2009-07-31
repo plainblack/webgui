@@ -65,7 +65,7 @@ my $expectedCodes = {
 cmp_deeply( $statusCodes, $expectedCodes, 'statusCodes as a class method works');
 undef $statusCodes;
 
-my $tempMessage = WebGUI::Inbox::Message->create($session, {}, {testing => 1});
+my $tempMessage = WebGUI::Inbox::Message->create($session, {}, {no_email => 1});
 $statusCodes = $tempMessage->statusCodes;
 cmp_deeply( $statusCodes, $expectedCodes, 'statusCodes as an object method works');
 undef $statusCodes;

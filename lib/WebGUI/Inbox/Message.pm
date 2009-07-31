@@ -101,9 +101,9 @@ Email subject to use rather than inbox message subject.
 
 A hash reference containing options for handling the message. 
 
-=head4 testing
+=head4 no_email 
 
-If testing is true, then no email will be made or sent.  Only
+If no_email is true, then no email will be made or sent.  Only
 the inbox message will be made.
 
 =cut
@@ -158,16 +158,13 @@ sub create {
             );
         }
     }
-
+    if ( $options->{ to_email } ) {
 	my $subject = (defined $properties->{emailSubject}) ? $properties->{emailSubject} : $self->{_properties}{subject};
-	my $mail = $options->{testing}
-             ? undef
-             : WebGUI::Mail::Send->create($session, {
+        my $mail = WebGUI::Mail::Send->create($session, {
                    toUser=>$self->{_properties}{userId},
                    toGroup=>$self->{_properties}{groupId},
                    subject=>$subject,
                });
-	if (defined $mail) {
         my $preface = "";
         my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
         #Don't append prefaces to the visitor users or messages that don't specify a user (default case)
@@ -179,7 +176,7 @@ sub create {
         $mail->addHtml($msg);
         $mail->addFooter;
 		$mail->queue;
-	}
+    }
 	$self->{_session} = $session;
 	bless $self, $class;
 }
