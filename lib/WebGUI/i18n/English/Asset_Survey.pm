@@ -1276,9 +1276,9 @@ section/answer.|,
     },
 
     'recordedAnswer' => {
-        message => q|The value that gets recorded for this answer in the database.|,
+        message => q|The answer that gets recorded for this answer in the database.  This is relevant only for Multiple Choice questions, where the answer that is recorded may be different from what is what is displayed, e.g. 'Yes' could be recorded as '1' and 'No' as '0'.|,
         context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+        lastUpdated => 1249057008,
     },
 
     'textCols' => {
