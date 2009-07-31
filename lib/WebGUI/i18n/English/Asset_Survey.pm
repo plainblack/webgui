@@ -1488,7 +1488,7 @@ section/answer.|,
     },
 
     'recordedAnswer' => {
-        message => q|Determines what gets recorded as the response value if this answer is selected. Allows you to 'recode' recorded responses, e.g. 'Yes' could be recorded as '1' and 'No' as '0'. Relevant only for Multiple Choice questions (other question types record the input actually entered by the user: free text, selected date, etc..).|,
+        message => q|The answer that gets recorded for this answer in the database.  This is relevant only for Multiple Choice questions, where the answer that is recorded may be different from what is what is displayed, e.g. 'Yes' could be recorded as '1' and 'No' as '0'.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
