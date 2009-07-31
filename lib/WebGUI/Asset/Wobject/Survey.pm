@@ -177,8 +177,8 @@ sub definition {
         gradebookTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => $i18n->get('Grabebook Report Template'),
-            hoverHelp    => $i18n->get('Grabebook Report Template help'),
+            label        => $i18n->get('Gradebook Report Template'),
+            hoverHelp    => $i18n->get('Gradebook Report Template help'),
             defaultValue => 'PBtmpl0000000000000062',
             namespace    => 'Survey/Gradebook',
         },

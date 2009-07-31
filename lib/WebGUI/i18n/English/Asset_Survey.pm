@@ -608,12 +608,12 @@ the time limit for completing the survey. This message is in the 'take survey' t
         lastUpdated => 0,
     },
 
-    'Grabebook Report Template' => {
-        message     => q|Grabebook Report Template|,
-        lastUpdated => 0,
+    'Gradebook Report Template' => {
+        message     => q|Gradebook Report Template|,
+        lastUpdated => 1249056084,
     },
 
-    'Grabebook Report Template help' => {
+    'Gradebook Report Template help' => {
         message     => q|The template used to display the Gradebook Report|,
         lastUpdated => 0,
     },
