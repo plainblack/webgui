@@ -18,6 +18,7 @@
  - fixed a bug where the textarea (based) form plugins would put multiple identical style tags in head in some cases, which caused javascript errors in IE. ( Martin Kamerbeek / Oqapi )
  - fixed #10714: i18n Asset_Survey::Grabebook Report Template and Asset_Survey::Grabebook Report Template help
  - fixed #10717: i18n Asset_Survey::recordedAnswer and Asset_Survey::recorded answer description
+ - fixed #10716: i18n Asset_Survey::questions on section page descriptio
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
