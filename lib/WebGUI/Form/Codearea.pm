@@ -133,40 +133,43 @@ Renders a code area field.
 =cut
 
 sub toHtml {
-	my $self    = shift;
-	my $output  = "";
-    
-    # Do our superclass's job
+    my $self = shift;
+    my ($style, $url, $stow) = $self->session->quick(qw(style url stow));
+
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->getOriginalValue)));
-	my $width = $self->get('width') || 400;
-	my $height = $self->get('height') || 150;
-	my ($style, $url) = $self->session->quick(qw(style url));
-	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
-    $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
-	$output = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '.$self->get("extras").' rows="#" cols="#" style="width: '.$width.'px; height: '.$height.'px;">'.$value.'</textarea>';
+    my $width = $self->get('width') || 400;
+    my $height = $self->get('height') || 150;
+    my $id = $self->get('id');
+    my $name = $self->get('name');
+    my $extras = $self->get('extras');
+    my $syntax = $self->get('syntax');
+    my $styleAttr = $self->get('style');
 
-    # Vars for JS below
-    my $id              = $self->get( "id" );
-    my $syntax          = $self->get( "syntax" );
-    my $editareaPath    = $self->session->url->extras( 'editarea' );
-
-	$self->session->style->setScript($editareaPath . '/edit_area/edit_area_full.js',{type=>"text/javascript"});
-    $output .= qq~
-        <script type="text/javascript">
-            editAreaLoader.init({
-                id              : "$id",
-                syntax          : "$syntax",
-                start_highlight : true,
-                show_line_colors: true,
-                display         : "later",
-                toolbar         : "search, go_to_line, |, undo, redo, |, syntax_selection, highlight, reset_highlight, |, help"
-            });
-        </script>
-    ~;
-
-    return $output;
+    $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
+    $style->setScript($url->extras("yui/build/utilities/utilities.js"), {type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/resize/resize-min.js"), {type=>"text/javascript"});
+    $style->setScript($url->extras('editarea/edit_area/edit_area_full.js'), {type=>"text/javascript"});
+    my $out = <<"END_HTML";
+<div id="${id}_resizewrapper" style="padding-right: 6px; padding-bottom: 6px; margin-bottom: 1em; width: ${width}px; height: ${height}px">
+    <textarea id="$id" name="$name" $extras rows="#" cols="#" style="font-family: monospace; $styleAttr; height: 100%; width: 100%;">$value</textarea>
+</div>
+<script type="text/javascript">
+(function() {
+    var resize = new YAHOO.util.Resize('${id}_resizewrapper', {useShim : true});
+    editAreaLoader.init({
+        id               : '$id',
+        syntax           : '$syntax',
+        start_highlight  : true,
+        show_line_colors : true,
+        allow_resize     : 'no',
+        display          : 'later',
+        toolbar          : 'search,go_to_line,|,undo,redo,|,syntax_selection,highlight,reset_highlight,|,help'
+    });
+})();
+</script>
+END_HTML
+    return $out;
 }
-
 
 1;
 
