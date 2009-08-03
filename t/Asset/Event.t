@@ -19,7 +19,7 @@ use WebGUI::Asset::Event;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 10;
+plan tests => 13;
 
 my $session = WebGUI::Test->session;
 
@@ -47,6 +47,7 @@ my $properties = {
 my $event = $cal->addChild($properties, $properties->{id});
 
 is($event->isAllDay, 0, 'isAllDay is zero since it has a start and end time');
+cmp_ok($event->getDateTimeEnd, '>', $event->getDateTimeEndNI, 'getDateTimeEndNI is less than getDateTimeEnd');
 
 my %templateVars = $event->getTemplateVars();
 is($templateVars{isOneDay}, 1, 'getTemplateVars: isOneDay with start times');
@@ -62,6 +63,7 @@ $properties->{url}       = 'event-asset-test2';
 my $event2 = $cal->addChild($properties, $properties->{id});
 
 is($event2->isAllDay, 1, 'isAllDay is zero since it has no start or end time');
+cmp_ok($event2->getDateTimeEnd, '==', $event2->getDateTimeEndNI, 'getDateTimeEndNI is the same as getDateTimeEnd, due to no end time');
 
 %templateVars = $event2->getTemplateVars();
 is($templateVars{dateSpan}, 'Wednesday, August 16', 'getTemplateVars: dateSpan with no times');
@@ -82,4 +84,15 @@ is($event3->isAllDay, 1, 'isAllDay is zero since it has no start or end time, ev
 is($templateVars{dateSpan}, 'Wednesday, August 16 &bull; Thursday, August 17 ', 'getTemplateVars: dateSpan with no times, across two days');
 is($templateVars{isOneDay}, 0, 'getTemplateVars: isOneDay with different start and end dates');
 
-cmp_ok($event3->getDateTimeEnd, '>', $event3->getDateTimeEndNI, 'getDateTimeEndNI is less than getDateTimeEnd');
+cmp_ok($event3->getDateTimeEnd, '==', $event3->getDateTimeEndNI, 'getDateTimeEndNI is the same as getDateTimeEnd');
+
+$properties->{startDate} = '2000-08-16';
+$properties->{endDate}   = '2000-08-17';
+$properties->{startTime} = '00:00:00';
+$properties->{endTime}   = '00:00:00';
+$properties->{id}        = 'EventAssetTest00000004';
+$properties->{url}       = 'event-asset-test4';
+
+my $event4 = $cal->addChild($properties, $properties->{id});
+
+cmp_ok($event4->getDateTimeEnd, '>', $event4->getDateTimeEndNI, 'getDateTimeEndNI is less than getDateTimeEnd');
