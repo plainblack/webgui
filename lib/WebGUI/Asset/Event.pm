@@ -586,9 +586,8 @@ sub getIcalEnd {
     my $self    = shift;
 
     if ($self->isAllDay) {
-        my $date = $self->get("endDate");
-        $date =~ s/\D//g;
-        $date += 1;
+        my $dte  = $self->getDateTimeEnd->add(days => 1);
+        my $date = $dte->toIcalDate;
         return $date;
     }
     else {
