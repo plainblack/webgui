@@ -19,7 +19,7 @@ use WebGUI::Asset::Event;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 13;
+plan tests => 16;
 
 my $session = WebGUI::Test->session;
 
@@ -86,8 +86,8 @@ is($templateVars{isOneDay}, 0, 'getTemplateVars: isOneDay with different start a
 
 cmp_ok($event3->getDateTimeEnd, '==', $event3->getDateTimeEndNI, 'getDateTimeEndNI is the same as getDateTimeEnd');
 
-$properties->{startDate} = '2000-08-16';
-$properties->{endDate}   = '2000-08-17';
+$properties->{startDate} = '2000-08-30';
+$properties->{endDate}   = '2000-08-31';
 $properties->{startTime} = '00:00:00';
 $properties->{endTime}   = '00:00:00';
 $properties->{id}        = 'EventAssetTest00000004';
@@ -96,3 +96,17 @@ $properties->{url}       = 'event-asset-test4';
 my $event4 = $cal->addChild($properties, $properties->{id});
 
 cmp_ok($event4->getDateTimeEnd, '>', $event4->getDateTimeEndNI, 'getDateTimeEndNI is less than getDateTimeEnd');
+
+is($event4->getIcalEnd, '20000831T000000Z', 'getIcalEnd, with defined time');
+
+my $properties2 = {};
+$properties2->{startDate} = '2000-08-31';
+$properties2->{endDate}   = '2000-08-31';
+$properties2->{id}        = 'EventAssetTest00000005';
+$properties2->{url}       = 'event-asset-test5';
+$properties2->{className} = 'WebGUI::Asset::Event';
+
+my $event5 = $cal->addChild($properties2, $properties2->{id});
+
+is($event5->getIcalStart, '20000831', 'getIcalStart, with no start time');
+is($event5->getIcalEnd,   '20000901', 'getIcalEnd, with no end time, day incremented');
