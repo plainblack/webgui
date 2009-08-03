@@ -57,7 +57,7 @@ use Data::Dumper;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
-plan tests => 10 + scalar @icalWrapTests;
+plan tests => 11 + scalar @icalWrapTests;
 
 my $session = WebGUI::Test->session;
 
@@ -258,9 +258,9 @@ my $tag3 = WebGUI::VersionTag->getWorking($session);
 $tag3->commit;
 WebGUI::Test->tagsToRollback($tag3);
 
-my $allVars = $weekCal->viewWeek({ start => $bday });
+my $weekVars = $weekCal->viewWeek({ start => $bday });
 my @eventBins = ();
-foreach my $day (@{ $allVars->{days} }) {
+foreach my $day (@{ $weekVars->{days} }) {
     if (exists $day->{events} and scalar @{ $day->{events} } > 0) {
         push @eventBins, $day->{dayOfWeek};
     }
@@ -285,6 +285,77 @@ foreach my $test (@icalWrapTests) {
     my $wrapOut = $cal->wrapIcal($in);
     is ($wrapOut, $out, $comment);
 }
+
+######################################################################
+#
+# viewMonth
+#
+######################################################################
+
+my $monthCal = $node->addChild({
+    className => 'WebGUI::Asset::Wobject::Calendar',
+    title     => 'Calendar for doing event span testing, month',
+});
+
+my $allDayDt = $bday->cloneToUserTimeZone;
+
+my $allDay = $monthCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'An event with explicit times that lasts all day',
+    startDate   => $allDayDt->toDatabaseDate,
+    endDate     => $allDayDt->clone->add(days => 1)->toDatabaseDate,
+    startTime   => $allDayDt->clone->truncate(to => 'day')->toDatabaseTime,
+    endTime     => $allDayDt->clone->add(days => 1)->truncate(to => 'day')->toDatabaseTime,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $tag4 = WebGUI::VersionTag->getWorking($session);
+$tag4->commit;
+WebGUI::Test->tagsToRollback($tag4);
+
+my $monthVars = $monthCal->viewMonth({ start => $bday });
+my @eventBins = ();
+foreach my $week ( @{ $monthVars->{weeks} } ) {
+    foreach my $day (@{ $week->{days} }) {
+        if (exists $day->{events} and scalar @{ $day->{events} } > 0) {
+            push @eventBins, $day->{dayMonth};
+        }
+    }
+}
+
+cmp_deeply(
+    \@eventBins,
+    [ 16 ],
+    'viewMonth: all day event is only in 1 day when time zones line up correctly'
+);
+
+
+######################################################################
+#
+# viewDay
+#
+######################################################################
+
+my $dayCal = $node->addChild({
+    className => 'WebGUI::Asset::Wobject::Calendar',
+    title     => 'Calendar for doing event span testing, day',
+});
+
+my $allDayDt = $bday->cloneToUserTimeZone;
+
+my $allDay = $dayCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'An event with explicit times that lasts all day',
+    startDate   => $allDayDt->toDatabaseDate,
+    endDate     => $allDayDt->clone->add(days => 1)->toDatabaseDate,
+    startTime   => $allDayDt->clone->truncate(to => 'day')->toDatabaseTime,
+    endTime     => $allDayDt->clone->add(days => 1)->truncate(to => 'day')->toDatabaseTime,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $tag5 = WebGUI::VersionTag->getWorking($session);
+$tag5->commit;
+WebGUI::Test->tagsToRollback($tag5);
 
 TODO: {
         local $TODO = "Tests to make later";

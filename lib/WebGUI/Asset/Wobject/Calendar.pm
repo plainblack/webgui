@@ -1338,7 +1338,7 @@ sub viewMonth {
         next EVENT unless $event->canView();
         # Get the WebGUI::DateTime objects
         my $dt_event_start  = $event->getDateTimeStart;
-        my $dt_event_end    = $event->getDateTimeEnd;
+        my $dt_event_end    = $event->getDateTimeEndNI;
         
         # Prepare the template variables
         my %eventTemplateVariables = $self->getEventVars($event);
