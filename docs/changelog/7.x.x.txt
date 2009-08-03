@@ -3,6 +3,7 @@
  - fixed #10654: Story Archive: Search not working properly
  - fixed #10692: Unprivileged users can stop spectre
  - fixed #10720: Calendar iCal dates can exceed the number of days in a month
+ - fixed #9850: Calendar Import Incorrect
  - fixed search indexer concatenates keywords to content.
  - fixed Index Story fields for Search (headline, subtitle, location, byline, highlights, story)
  - fixed #10619: Pagination macro
