@@ -272,7 +272,9 @@ sub execute {
                 elsif ($dtend =~ /(\d{4})(\d{2})(\d{2})/) {
                     my ($year, $month, $day) = $dtend =~ /(\d{4})(\d{2})(\d{2})/;
                     
-                    $properties->{endDate} = join "-",$year,$month,$day;
+                    my $endDateLet = WebGUI::DateTime->new( year => $year, month => $month, day => $day);
+                    $endDateLet->subtract( days => 1 );
+                    $properties->{endDate} = $endDateLet->toDatabaseDate;
                 }
                 # If we can't parse it, forget the whole event 
                 elsif ($dtend) {
