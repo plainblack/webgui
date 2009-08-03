@@ -1,4 +1,5 @@
 7.7.17
+ - fixed #10667: cannot change size of template editor
  - fixed #10654: Story Archive: Search not working properly
  - fixed #10692: Unprivileged users can stop spectre
  - fixed search indexer concatenates keywords to content.
