@@ -1298,7 +1298,6 @@ sub getTemplateVars {
 
     # End date/time
     my $dtEnd   = $self->getDateTimeEnd;
-    my $dtEndNI = $self->getDateTimeEndNI;
 
     $var{ "endDateSecond"       } = sprintf "%02d", $dtEnd->second;
     $var{ "endDateMinute"       } = sprintf "%02d", $dtEnd->minute;
