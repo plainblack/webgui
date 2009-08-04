@@ -4,6 +4,7 @@
  - fixed a bug where the textarea (based) form plugins would put multiple identical style tags in head in some cases, which caused javascript errors in IE. ( Martin Kamerbeek / Oqapi )
  - fixed #10720: Calendar iCal dates can exceed the number of days in a month
  - fixed #9850: Calendar Import Incorrect
+ - fixed #10721: Invalid/Missing Style TemplateIds in use
 
 7.6.33
  - fixed #10687: i18n Asset_Product::buy_form_options
