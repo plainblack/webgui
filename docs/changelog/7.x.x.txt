@@ -25,6 +25,7 @@
  - fixed #10715: i18n Asset_Survey::showProgress 
  - fixed #10721: Invalid/Missing Style TemplateIds in use
  - fixed #10029: Account CSS rule scoping
+ - fixed #10641: Matrix Asset - Compare/Search buttons broken in Opera
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
