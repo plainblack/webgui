@@ -51,10 +51,11 @@ sub fixGalleyImageFolderStyle {
     my $session = shift;
     print "\tFix the gallery image subfolder style template... " unless $quiet;
     my $folder = WebGUI::Asset->new($session, 'kaPRSaf8UKiskiGEgJgLAw', 'WebGUI::Asset::Wobject::Folder');
-    return unless $folder;
-    $folder->addRevision({
-        styleTemplateId => 'PBtmpl0000000000000060',
-    });
+    if ( $folder ) {
+        $folder->addRevision({
+            styleTemplateId => 'PBtmpl0000000000000060',
+        });
+    }
     # and here's our code
     print "DONE!\n" unless $quiet;
 }
