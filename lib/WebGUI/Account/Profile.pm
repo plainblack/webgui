@@ -285,10 +285,7 @@ This method returns the template ID for the account layout.
 
 sub getLayoutTemplateId {
     my $self    = shift;
-    my $session = $self->session;
-    my $method  = $self->method;
-    my $uid     = $self->uid;
-    return $session->setting->get("profileLayoutTemplateId") || "FJbUTvZ2nUTn65LpW6gjsA";
+    return $self->session->setting->get("profileLayoutTemplateId") || "FJbUTvZ2nUTn65LpW6gjsA";
 }
 
 #-------------------------------------------------------------------
