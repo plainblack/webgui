@@ -1,4 +1,10 @@
 YAHOO.util.Event.addListener(window, "load", function() {
+    if (YAHOO.env.ua.opera) {
+        String.prototype.trim = function() {
+         return this.replace(/^\s+|\s+$/g, '');
+        };
+    }
+
     YAHOO.example.XHR_JSON = new function() {
         this.formatUrl = function(elCell, oRecord, oColumn, sData) {
 	     elCell.innerHTML = "<a href='" + oRecord.getData("url") + "'>" + sData + "</a>";
