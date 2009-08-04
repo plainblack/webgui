@@ -32,6 +32,8 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addFriendManagerSettings($session);
+fixGalleyImageFolderStyle($session);
+fixMapTemplateFolderStyle($session);
 
 finish($session); # this line required
 
@@ -50,6 +52,37 @@ sub addFriendManagerSettings {
     print "\tAdding Friend Manager Style and Layout template settings... " unless $quiet;
     $session->setting->add('fmStyleTemplateId', $session->setting->get("userFunctionStyleId"));
     $session->setting->add('fmLayoutTemplateId', 'N716tpSna0iIQTKxS4gTWA');
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixMapTemplateFolderStyle {
+    my $session = shift;
+    print "\tFix the Map Template subfolder style template... " unless $quiet;
+    my $folder = WebGUI::Asset->new($session, 'brxm_faNdZX5tRo3p50g3g', 'WebGUI::Asset::Wobject::Folder');
+    return unless $folder;
+    if ($folder) {
+        $folder->addRevision({
+            styleTemplateId => 'PBtmpl0000000000000060',
+        });
+    }
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixGalleyImageFolderStyle {
+    my $session = shift;
+    print "\tFix the gallery image subfolder style template... " unless $quiet;
+    my $folder = WebGUI::Asset->new($session, 'kaPRSaf8UKiskiGEgJgLAw', 'WebGUI::Asset::Wobject::Folder');
+    if ($folder) {
+        $folder->addRevision({
+            styleTemplateId => 'PBtmpl0000000000000060',
+        });
+    }
+    # and here's our code
     print "DONE!\n" unless $quiet;
 }
 
