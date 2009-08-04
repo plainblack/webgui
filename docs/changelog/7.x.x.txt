@@ -1,3 +1,5 @@
+7.6.35
+
 7.6.34
  - fixed #10667: cannot change size of template editor
  - fixed #10692: Unprivileged users can stop spectre
