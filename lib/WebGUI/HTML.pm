@@ -19,6 +19,7 @@ use HTML::TagFilter;
 use strict;
 use WebGUI::Macro;
 use HTML::Parser;
+use HTML::Entities;
 
 =head1 NAME
 
@@ -96,7 +97,9 @@ The HTML content you want filtered.
 
 =head3 filter
 
-Choose from "all", "none", "macros", "javascript", or "most". Defaults to "most". "all" removes all HTML tags and macros; "none" removes no HTML tags; "javascript" removes all references to javacript and macros; "macros" removes all macros, but nothing else; and "most" removes all but simple formatting tags like bold and italics.
+Choose from "all", "none", "macros", "javascript", "xml", or "most". Defaults to "most". "all" removes all HTML tags and macros; "none" removes no HTML tags; "javascript" removes all references to javacript and macros; "macros" removes all macros, but nothing else; and "most" removes all but simple formatting tags like bold and italics.
+
+"xml" will enocde XML entities.
 
 =cut
 
@@ -160,6 +163,8 @@ sub filter {
 		WebGUI::Macro::negate(\$html);
 	} elsif ($type eq "macros") {
 		WebGUI::Macro::negate(\$html);
+	} elsif ($type eq "xml") {
+        return HTML::Entities::encode_numeric($html)
 	} elsif ($type eq "none") {
 		# do nothing
 	} else {
