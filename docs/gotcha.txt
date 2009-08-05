@@ -11,9 +11,14 @@ save you many hours of grief.
 --------------------------------------------------------------------
     * Spectre now works like many other programs and writes a PID
       file.  The location of that file is required to be in your
-      spectre.conf file to start or stop.  After installing this
-      version, you will need to manually kill spectre and then
-      restart it.
+      spectre.conf file:
+
+# The location of the file that keeps track of the master spectre
+# processId.
+"pidFile" : "/data/wre/var/run/spectre.pid",
+
+      After installing this version, you will need to manually kill
+      spectre, but it can be started again through the spectre script.
 
 7.6.33
 --------------------------------------------------------------------
