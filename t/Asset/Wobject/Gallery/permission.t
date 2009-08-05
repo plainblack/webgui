@@ -25,10 +25,12 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Gallery Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 my $maker           = WebGUI::Test::Maker::Permission->new;
 my $gallery;
 
 my $nonAdmin    = WebGUI::User->new( $session, "new" );
+WebGUI::Test->usersToDelete($nonAdmin);
 
 
 #----------------------------------------------------------------------------
@@ -74,10 +76,3 @@ $maker->prepare(
 plan tests => $maker->plan;
 
 $maker->run;
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback;
-    $nonAdmin->delete;
-}

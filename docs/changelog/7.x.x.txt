@@ -1,5 +1,6 @@
 7.6.35
  - fixed #10724: gotcha.txt for 7.6.34 enhanced
+ - fixed #10723: RSS Feed Error in Gallery
 
 7.6.34
  - fixed #10667: cannot change size of template editor

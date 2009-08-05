@@ -19,6 +19,7 @@ use File::Temp qw{ tempdir };
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
+use WebGUI::Asset::RSSFromParent;
 
 use Archive::Any;
 
@@ -1033,7 +1034,7 @@ sub www_addFileService {
 #    my $filePath = $storage->getPath( $storage->getFiles->[0] );
  #   $self->setFile( $filePath );
   #  $storage->delete;
-    $session->log->warn('XX:'. $filename);
+    #$session->log->warn('XX:'. $filename);
     
     $file->requestAutoCommit;
     
@@ -1377,10 +1378,15 @@ sub www_viewRss {
 
     my $var         = $self->getTemplateVars;
     $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
-    
+
     # Fix URLs to be full URLs
     for my $key ( qw( url url_viewRss ) ) {
         $var->{ $key } = $self->session->url->getSiteURL . $var->{ $key };
+    }
+
+    # Encode XML entities
+    for my $key ( qw( title description synopsis gallery_title gallery_menuTitle ) ) {
+        $var->{ $key } = WebGUI::Asset::RSSFromParent::_escapeXml($var->{$key});
     }
 
     # Process the file loop to add additional params
@@ -1388,6 +1394,10 @@ sub www_viewRss {
         # Fix URLs to be full URLs
         for my $key ( qw( url ) ) { 
             $file->{ $key }  = $self->session->url->getSiteURL . $file->{$key}; 
+        }
+        # Encode XML entities
+        for my $key ( qw( title description synopsis ) ) {
+            $file->{ $key } = WebGUI::Asset::RSSFromParent::_escapeXml($file->{$key});
         }
 
         $file->{ rssDate } 
