@@ -27,6 +27,7 @@
  - fixed #10721: Invalid/Missing Style TemplateIds in use
  - fixed #10029: Account CSS rule scoping
  - fixed #10641: Matrix Asset - Compare/Search buttons broken in Opera
+ - fixed #10723: RSS Feed Error in Gallery
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks

@@ -20,6 +20,7 @@ use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use Test::Deep;
+plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 
 #----------------------------------------------------------------------------
 # Init
@@ -58,6 +59,7 @@ my $gallery
     } );
 
 $versionTags[-1]->commit;
+WebGUI::Test->tagsToRollback(@versionTags);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -109,14 +111,6 @@ $mech->content_contains(
 # Creates the album with the appropriate properties
 my $album   = WebGUI::Asset->newByDynamicClass( $session, $gallery->getAlbumIds->[0] );
 cmp_deeply( $properties, subhashof( $album->get ), "Properties from edit form are set correctly" );
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    for my $tag ( @versionTags ) {
-        $tag->rollback;
-    }
-}
 
 #----------------------------------------------------------------------------
 # getMechLogin( baseUrl, WebGUI::User, "identifier" )
