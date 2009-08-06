@@ -2703,7 +2703,6 @@ sub www_editSave {
             allowComments   => 1,
             returnUrl       => $self->getUrl,
         });
-        $session->log->warn('editSave commitStatus: '. $commitStatus);
         if ($commitStatus eq 'redirect') {
             ##Redirect set by tag.  Return nothing to send the user over to the redirect.
             return undef;
