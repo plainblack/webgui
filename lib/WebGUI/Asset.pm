@@ -311,12 +311,20 @@ sub checkView {
         return "chunked";
 	}
     elsif ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
-		$http->setRedirect($self->getUrl("func=manageTrash"));
+        my $queryFrag = "func=manageTrash";
+        if ($self->session->form->process('revision')) {
+            $queryFrag .= ";revision=".$self->session->form->process('revision');
+        }
+		$http->setRedirect($self->getUrl($queryFrag));
         $http->sendHeader;
 		return "chunked";
 	} 
     elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
-		$http->setRedirect($self->getUrl("func=manageClipboard"));
+        my $queryFrag = "func=manageTrash";
+        if ($self->session->form->process('revision')) {
+            $queryFrag .= ";revision=".$self->session->form->process('revision');
+        }
+		$http->setRedirect($self->getUrl($queryFrag));
         $http->sendHeader;
 		return "chunked";
 	} 
