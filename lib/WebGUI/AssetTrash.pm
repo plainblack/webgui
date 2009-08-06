@@ -405,7 +405,7 @@ Restores a piece of content from the trash back to it's original location.
 sub www_restoreList {
         my $self = shift;
         foreach my $id ($self->session->form->param("assetId")) {
-                my $asset = WebGUI::Asset->newByDynamicClass($self->session,$id);
+                my $asset = eval { WebGUI::Asset->newPending($self->session,$id); };
                 $asset->publish if $asset->canEdit;
         }
         if ($self->session->form->process("proceed") ne "") {
