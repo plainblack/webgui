@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 115;
+my $tests = 106;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -47,38 +47,6 @@ isa_ok($responseJSON , 'WebGUI::Asset::Wobject::Survey::ResponseJSON');
 
 is($responseJSON->lastResponse(), -1, 'new: default lastResponse is -1');
 is($responseJSON->questionsAnswered, 0, 'new: questionsAnswered is 0 by default');
-cmp_ok((abs$responseJSON->startTime - $newTime), '<=', 2, 'new: by default startTime set to time');
-is_deeply( $responseJSON->responses, {}, 'new: by default, responses is an empty hashref');
-
-my $now = time();
-my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), qq!{ "startTime": $now }!);
-cmp_ok(abs($rJSON->startTime() - $now), '<=', 2, 'new: startTime set using JSON');
-
-####################################################
-#
-# startTime
-#
-####################################################
-
-$rJSON->startTime(780321600);
-is($rJSON->startTime, 780321600, 'startTime: set and get');
-
-####################################################
-#
-# hasTimedOut
-#
-####################################################
-
-##Reset for next set of tests
-$rJSON->startTime(time());
-
-ok( ! $rJSON->hasTimedOut(1), 'hasTimedOut, not timed out, checked with 1 minute timeout');
-ok( ! $rJSON->hasTimedOut(0), 'hasTimedOut, not timed out, checked with 0 minute timeout');
-
-$rJSON->startTime(time()-7200);
-ok(   $rJSON->hasTimedOut(1),    'hasTimedOut, timed out');
-ok( ! $rJSON->hasTimedOut(0),    'hasTimedOut, bad limit');
-ok( ! $rJSON->hasTimedOut(4*60), 'hasTimedOut, limit check');
 
 ####################################################
 #
@@ -86,7 +54,7 @@ ok( ! $rJSON->hasTimedOut(4*60), 'hasTimedOut, limit check');
 #
 ####################################################
 
-$rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), q!{}!);
+my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), q!{}!);
 
 #$rJSON->initSurveyOrder();
 cmp_deeply(

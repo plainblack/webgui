@@ -34,8 +34,8 @@ instances of this class to the database (one per distinct user response).
 
 Data stored in this object include the order in which questions and answers are
 presented to the user (L<"surveyOrder">), a snapshot of all completed questions   
-from the user (L<"responses">), the most recently answered question (L<"lastResponse">), the 
-number of questions answered (L<"questionsAnswered">) and the Survey start time (L<"startTime">).
+from the user (L<"responses">), the most recently answered question (L<"lastResponse">) and the 
+number of questions answered (L<"questionsAnswered">).
 
 This package is not intended to be used by any other Asset in WebGUI.
 
@@ -64,7 +64,7 @@ survey.
 =head3 $json
 
 A JSON string used to construct a new Perl object. The string should represent 
-a JSON hash made up of L<"startTime">, L<"surveyOrder">, L<"responses">, L<"lastResponse">
+a JSON hash made up of L<"surveyOrder">, L<"responses">, L<"lastResponse">
 and L<"questionsAnswered"> keys, with appropriate values.
 
 =cut
@@ -108,7 +108,6 @@ sub reset {
         responses => {},
         lastResponse => -1,
         questionsAnswered => 0,
-        startTime => time(),
         surveyOrder => undef,
         tags => {},
     };
@@ -225,29 +224,10 @@ sub freeze {
     my $self = shift;
     
     # These are the only properties of the response hash that we serialize:
-    my @props = qw(responses lastResponse questionsAnswered startTime tags);
+    my @props = qw(responses lastResponse questionsAnswered tags);
     my %serialize;
     @serialize{@props} = @{$self->response}{@props};
     return to_json(\%serialize);
-}
-
-#-------------------------------------------------------------------
-
-=head2 hasTimedOut ( $limit )
-
-Checks to see whether this survey has timed out, based on the internally stored starting
-time, and the suppied $limit value.
-
-=head3 $limit
-
-How long the user has to take the survey, in minutes.
-
-=cut
-
-sub hasTimedOut{
-    my $self = shift;
-    my ($limit) = validate_pos(@_, {type => SCALAR});
-    return $limit > 0 && $self->startTime + $limit * 60 < time;
 }
 
 #-------------------------------------------------------------------
@@ -300,30 +280,6 @@ sub questionsAnswered {
     }
     
     return $self->response->{questionsAnswered};
-}
-
-#-------------------------------------------------------------------
-
-=head2 startTime ([ $startTime ])
-
-Mutator for the time the user began the survey. 
-Returns (and optionally sets) the value of startTime.
-
-=head3 $startTime (optional)
-
-If defined, sets the starting time to $startTime.
-
-=cut
-
-sub startTime {
-    my $self     = shift;
-    my ($startTime) = validate_pos(@_, {type => SCALAR, optional => 1});
-
-    if ( defined $startTime ) {
-        $self->response->{startTime} = $startTime;
-    }
-
-    return $self->response->{startTime};
 }
 
 #-------------------------------------------------------------------

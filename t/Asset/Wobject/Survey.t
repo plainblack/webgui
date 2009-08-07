@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 42;
+my $tests = 45;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -72,6 +72,27 @@ my $responseId = $survey->responseId;
 is($survey->get('maxResponsesPerUser'), 1, 'maxResponsesPerUser defaults to 1');
 ok($survey->canTakeSurvey, '..which means user can take survey');
 is($survey->get('revisionDate'), $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 'Current revisionDate used');
+
+####################################################
+#
+# startDate
+#
+####################################################
+
+my $startDate = $survey->startDate;
+$survey->startDate($startDate + 10);
+is($survey->startDate, $startDate + 10, 'startDate get/set');
+
+####################################################
+#
+# hasTimedOut
+#
+####################################################
+
+ok(!$survey->hasTimedOut, 'Survey has not timed out');
+$survey->update( { timeLimit => 1 });
+$survey->startDate($startDate - 100);
+ok($survey->hasTimedOut, '..until we set timeLimit and change startDate');
 
 # Complete Survey
 $survey->surveyEnd();
@@ -248,7 +269,6 @@ like($storage->getFileContentsAsScalar($filename), qr{
 }xs, 'Generated graph looks roughly okay');
 
 }
-
 
 #----------------------------------------------------------------------------
 # Cleanup

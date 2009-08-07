@@ -34,6 +34,7 @@ my $session = start(); # this line required
 addFriendManagerSettings($session);
 fixGalleyImageFolderStyle($session);
 fixMapTemplateFolderStyle($session);
+addExpireIncompleteSurveyResponsesWorkflow($session);
 
 finish($session); # this line required
 
@@ -83,6 +84,25 @@ sub fixGalleyImageFolderStyle {
         });
     }
     # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+sub addExpireIncompleteSurveyResponsesWorkflow {
+    my $session = shift;
+    
+    print "\tAdd ExpireIncompleteSurveyResponses workflow activity... " unless $quiet;
+    
+    my $none = $session->config->get('workflowActivities/None');
+    if (! grep { $_ eq 'WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses' } @$none) {
+        push @$none, 'WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses';
+    }
+    $session->config->set('workflowActivities/None', [@$none]);
+    
+    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
+    my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses');
+    $activity->set('title', 'Expire Incomplete Survey Responses');
+    $activity->set('description', 'Expires incomplete Survey Responses according to per-instance Survey settings');
+    
     print "DONE!\n" unless $quiet;
 }
 

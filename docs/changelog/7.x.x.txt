@@ -29,6 +29,8 @@
  - fixed #10029: Account CSS rule scoping
  - fixed #10641: Matrix Asset - Compare/Search buttons broken in Opera
  - fixed #10723: RSS Feed Error in Gallery
+ - fixed Survey response startDate stored twice (Patrick Donelan, SDH Consulting)
+ - fixed Survey ExpireIncompleteSurveyResponses Workflow Activity not enabled (Patrick Donelan, SDH Consulting)
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
@@ -57,7 +59,7 @@
  - fixed #10685: i18n Asset_StoryTopic::rssUrl 
  - fixed #10686: Can't access Database Links
  - fixed #10650: Unflatten WebGUI storage locations
- - fixed #10664: ThiingyRecord disappeared... sort of
+ - fixed #10664: ThingyRecord disappeared... sort of
  - fixed #10687: i18n Asset_Product::buy_form_options
  - fixed #10651: Dashboard Content positions
  - fixed #10695: Adding a new article creates a new version tag

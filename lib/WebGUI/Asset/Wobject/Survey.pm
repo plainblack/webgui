@@ -782,6 +782,55 @@ sub hasResponses {
 
 #-------------------------------------------------------------------
 
+=head2 hasTimedOut ( $limit )
+
+Checks to see whether this survey has timed out, based on the internally stored starting
+time, and the suppied $limit value.
+
+=head3 $limit
+
+How long the user has to take the survey, in minutes. Defaults to the value of C<timeLimit>
+
+=cut
+
+sub hasTimedOut {
+    my $self = shift;
+    my $limit = shift;
+    $limit = $self->get('timeLimit') if not defined $limit;
+    return $limit > 0 && $self->startDate + $limit * 60 < time;
+}
+
+#-------------------------------------------------------------------
+
+=head2 startDate ([ $startDate ])
+
+Mutator for the Response start date, which is stored in a column of 
+the Survey_response table.
+
+=head3 $startDate (optional)
+
+If defined, sets the starting time to $startDate.
+
+=cut
+
+sub startDate {
+    my $self     = shift;
+    my ($startDate) = validate_pos(@_, {type => SCALAR, optional => 1});
+
+    if ( defined $startDate ) {
+        $self->session->db->write('update Survey_response set startDate = ? where Survey_responseId = ?', [$startDate, $self->responseId]);
+        $self->{_startDate} = $startDate;
+    }
+    
+    if (!$self->{_startDate}) {
+        $self->{_startDate} = $self->session->db->quickScalar('select startDate from Survey_response where Survey_responseId = ?', [$self->responseId]);
+    }
+    
+    return $self->{_startDate};
+}
+
+#-------------------------------------------------------------------
+
 =head2 submitObjectEdit ( $params )
 
 Called by L<www_submitObjectEdit> when an edit is submitted to a survey object.
@@ -1737,7 +1786,7 @@ sub www_loadQuestions {
         $self->session->log->debug('No responseId, surveyEnd');
         return $self->surveyEnd();
     }
-    if ( $self->responseJSON->hasTimedOut( $self->get('timeLimit') ) ) {
+    if ( $self->hasTimedOut ) {
         $self->session->log->debug('Response hasTimedOut, surveyEnd');
         return $self->surveyEnd( { timeout => 1 } );
     }
@@ -1939,7 +1988,7 @@ sub prepareShowSurveyTemplate {
     $section->{showProgress}      = $self->get('showProgress');
     $section->{showTimeLimit}     = $self->get('showTimeLimit');
     $section->{minutesLeft}
-        = int( ( ( $self->responseJSON->startTime() + ( 60 * $self->get('timeLimit') ) ) - time() ) / 60 );
+        = int( ( ( $self->startDate() + ( 60 * $self->get('timeLimit') ) ) - time() ) / 60 );
 
     if(scalar @{$questions} == ($section->{totalQuestions} - $section->{questionsAnswered})){
         $section->{isLastPage} = 1
@@ -2062,6 +2111,7 @@ sub responseId {
         my $takenCount = $self->takenCount( { userId => $userId } );
         if ( $maxResponsesPerUser == 0 || $takenCount < $maxResponsesPerUser ) {
             # Create a new response
+            my $startDate = time;
             $responseId = $self->session->db->setRow(
                 'Survey_response',
                 'Survey_responseId', {
@@ -2069,7 +2119,7 @@ sub responseId {
                     userId            => $userId,
                     ipAddress         => $ip,
                     username          => $user->username,
-                    startDate         => scalar time,
+                    startDate         => $startDate,
                     endDate           => 0,
                     assetId           => $self->getId,
                     revisionDate      => $self->get('revisionDate'),
@@ -2079,6 +2129,7 @@ sub responseId {
 
             # Store the newly created responseId
             $self->{responseId} = $responseId;
+            $self->startDate($startDate);
             
             $self->session->log->debug("Created new Survey response: $responseId for user: $userId for Survey: " . $self->getId);
             
