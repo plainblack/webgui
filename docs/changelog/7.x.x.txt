@@ -2,6 +2,7 @@
  - fixed #10724: gotcha.txt for 7.7.17 enhanced
  - fixed #10316: Cannot view pending version tags
  - fixed #10710: testEnvironment 7.6.33
+ - fixed #9777: Cursor disappears in non-Rich Editor window
  - fixed #10667: cannot change size of template editor
  - fixed #10654: Story Archive: Search not working properly
  - fixed #10692: Unprivileged users can stop spectre
