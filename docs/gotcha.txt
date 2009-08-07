@@ -9,6 +9,12 @@ save you many hours of grief.
 
 7.7.17
 --------------------------------------------------------------------
+    * It was found that the combination of
+        DBI: 1.52
+        DBD-mysql: 3.002
+      will cause an error during the 7.6.32 upgrade.  Later versions
+      of these modules should work.
+
     * Spectre now works like many other programs and writes a PID
       file.  The location of that file is required to be in your
       spectre.conf file:
