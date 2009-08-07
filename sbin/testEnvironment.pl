@@ -102,7 +102,7 @@ checkModule("Text::CSV_XS",                 "0.64"       );
 checkModule("Net::Subnets",                 0.21         );
 checkModule("Finance::Quote",               1.15         );
 checkModule("POE",                          1.005        );
-checkModule("POE::Component::IKC::Server",  0.2002       );
+checkModule("POE::Component::IKC::Server",  0.2001       );
 checkModule("POE::Component::Client::HTTP", 0.88         );
 checkModule("Apache2::Request",             2.08         );
 checkModule("URI::Escape",                  "3.29"       );
