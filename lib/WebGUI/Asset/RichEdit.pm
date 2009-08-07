@@ -477,7 +477,8 @@ sub getRichEditor {
 		theme_advanced_resizing => JSON::true(),
 		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
 		       (0..$#toolbarRows)),
-		ask => $self->getValue("askAboutRichEdit") ? JSON::true() : JSON::false(),
+		#ask => $self->getValue("askAboutRichEdit") ? JSON::true() : JSON::false(),
+		ask => JSON::false(),
 		preformatted => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
 		force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
 		force_p_newlines => $self->getValue("useBr") ? JSON::false() : JSON::true(),
@@ -490,6 +491,10 @@ sub getRichEditor {
 		valid_elements => $self->getValue("validElements"),
 		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
 		);
+    my $ask = $self->getValue("askAboutRichEdit");
+    if ($ask) {
+        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
+    }
 	foreach my $button (@toolbarButtons) {
 		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
             push(@plugins,"-wgspellchecker");
@@ -557,12 +562,29 @@ sub getRichEditor {
 
     $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
-    my $out = "<script type=\"text/javascript\">\n";
+    my $out = '';
+    if ($ask) {
+        $out = q|<a style="display: block;" href="javascript:toggleEditor('|.$nameId.q|')">|.$i18n->get('Toggle editor').q|</a>|;
+    }
+    $out .= q|<script type="text/javascript">|;
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
     }
-    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " )\n"
-            . "</script>";
+    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " );\n";
+    if ($ask) {
+        $out .= <<"EOHTML1";
+function toggleEditor(id) {
+    if (!tinyMCE.get(id))
+        tinyMCE.execCommand('mceAddControl', false, id);
+    else
+        tinyMCE.execCommand('mceRemoveControl', false, id);
+}
+function turnOffTinyMCE_$nameId () {
+    tinyMCE.execCommand( 'mceRemoveControl', false, '$nameId');
+}
+EOHTML1
+    }
+    $out    .= "</script>";
 }
 
 

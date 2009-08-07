@@ -4,6 +4,7 @@
  - fixed #10316: Cannot view pending version tags
  - fixed #10710: testEnvironment 7.6.33
  - fixed #10689: Version Tag Modes (Henry Tang, Long Term Results B.V.)
+ - fixed #9777: Cursor disappears in non-Rich Editor window
 
 7.6.34
  - fixed #10667: cannot change size of template editor
@@ -33,6 +34,7 @@
  - fixed #10717: i18n Asset_Survey::recordedAnswer and Asset_Survey::recorded answer description
  - fixed #10716: i18n Asset_Survey::questions on section page descriptio
  - fixed #10715: i18n Asset_Survey::showProgress 
+ - fixed #10689: Version Tag Modes (Henry Tang, Long Term Results B.V.)
 
 7.6.32
  - Fix template not found diagnostics.
