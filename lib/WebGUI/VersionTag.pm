@@ -79,9 +79,13 @@ sub autoCommitWorkingIfEnabled {
 
     # auto commit assets
     # save and commit button and site wide auto commit work the same
+    # Do not auto commit if tag is system wide tag or tag belongs to someone else
     if (
         $options->{override}
-        || $class->getVersionTagMode($session) eq q{autoCommit}
+      || ( $class->getVersionTagMode($session) eq q{autoCommit}
+        && ! $versionTag->get(q{isSiteWide})
+        && $versionTag->get(q{createdBy}) eq $session->user()->userId()
+         )
     ) {
         if ($session->setting->get("skipCommitComments") || !$options->{allowComments}) {
             $versionTag->requestCommit;
@@ -94,6 +98,7 @@ sub autoCommitWorkingIfEnabled {
             return 'redirect';
         }
     }
+    return undef;
 }
 
 #-------------------------------------------------------------------

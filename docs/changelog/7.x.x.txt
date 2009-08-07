@@ -3,6 +3,7 @@
  - fixed #10723: RSS Feed Error in Gallery
  - fixed #10316: Cannot view pending version tags
  - fixed #10710: testEnvironment 7.6.33
+ - fixed #10689: Version Tag Modes (Henry Tang, Long Term Results B.V.)
 
 7.6.34
  - fixed #10667: cannot change size of template editor
