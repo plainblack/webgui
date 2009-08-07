@@ -32,6 +32,7 @@
  - fixed #10723: RSS Feed Error in Gallery
  - fixed Survey response startDate stored twice (Patrick Donelan, SDH Consulting)
  - fixed Survey ExpireIncompleteSurveyResponses Workflow Activity not enabled (Patrick Donelan, SDH Consulting)
+ - fixed #10689: Version Tag Modes (Henry Tang, Long Term Results B.V.)
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
