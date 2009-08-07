@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.35
+--------------------------------------------------------------------
+    * It was found that the combination of
+        DBI: 1.52
+        DBD-mysql: 3.002
+      will cause an error during the 7.6.32 upgrade.  Later versions
+      of these modules should work.
+
 7.6.34
 --------------------------------------------------------------------
     * Spectre now works like many other programs and writes a PID
