@@ -1678,7 +1678,7 @@ sub www_edit {
             # Add a "Select..." option on top of a select list to prevent from
             # saving the value on top of the list when no choice is made.
             if("\l$fieldType" eq "selectBox") {
-                $options = "|" . $i18n->get("Select") . "\n" . $options;
+                $options = "|" . $i18n->get("select") . "\n" . $options;
             }
             my $form = WebGUI::Form::DynamicField->new($session,
                 name      => "metadata_".$meta->{$field}{fieldId},
