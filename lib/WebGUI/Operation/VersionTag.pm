@@ -651,6 +651,7 @@ sub www_manageRevisionsInTag {
     $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
     $ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
     $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
+    $ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
 
     # Process any actions
     my $action     = lc $session->form->get('action');
