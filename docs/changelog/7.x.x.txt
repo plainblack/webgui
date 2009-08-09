@@ -1,6 +1,7 @@
 7.6.35
  - fixed #10724: gotcha.txt for 7.6.34 enhanced
  - fixed #10723: RSS Feed Error in Gallery
+ - fixed #10738: Events do not revision their storage locations
  - fixed #10316: Cannot view pending version tags
  - fixed #10710: testEnvironment 7.6.33
  - fixed #10689: Version Tag Modes (Henry Tang, Long Term Results B.V.)
