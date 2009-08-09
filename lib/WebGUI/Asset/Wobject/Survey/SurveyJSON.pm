@@ -1370,7 +1370,10 @@ Returns an array of messages to inform a user what is logically wrong with the S
 sub validateSurvey{
     my $self = shift;
 
-    my @messages;   
+    my @messages;
+    if (JSON->backend ne 'JSON::XS') {
+        push @messages, "Your server is using @{[JSON->backend]} as its JSON backend. This may hurt performance on large Survey instances";
+    }
 
     #set up valid goto targets 
     my $gotoTargets = $self->getGotoTargets();
