@@ -7,6 +7,7 @@
  - fixed #10689: Version Tag Modes (Henry Tang, Long Term Results B.V.)
  - fixed #9777: Cursor disappears in non-Rich Editor window
  - fixed LDAP labels were made more consistent with typical usage.
+ - fixed: New Mail macro never returns any messages
 
 7.6.34
  - fixed #10667: cannot change size of template editor
