@@ -1,4 +1,5 @@
 7.7.17
+ - fixed #10738: Events do not revision their storage locations
  - fixed #10724: gotcha.txt for 7.7.17 enhanced
  - fixed #10316: Cannot view pending version tags
  - fixed #10710: testEnvironment 7.6.33

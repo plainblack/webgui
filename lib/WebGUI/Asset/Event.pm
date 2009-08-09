@@ -65,6 +65,10 @@ sub addRevision {
         $sequenceNumber = 0;
     }
     $newRev->update({iCalSequenceNumber => $sequenceNumber});
+    if ($newRev->get("storageId") && $newRev->get("storageId") eq $self->get('storageId')) {
+        my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+        $newRev->update({storageId => $newStorage->getId});
+    }
     return $newRev;
 }
 

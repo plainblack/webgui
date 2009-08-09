@@ -19,7 +19,7 @@ use WebGUI::Asset::Event;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 16;
+plan tests => 18;
 
 my $session = WebGUI::Test->session;
 
@@ -110,3 +110,22 @@ my $event5 = $cal->addChild($properties2, $properties2->{id});
 
 is($event5->getIcalStart, '20000831', 'getIcalStart, with no start time');
 is($event5->getIcalEnd,   '20000901', 'getIcalEnd, with no end time, day incremented');
+
+my $properties3 = {};
+$properties3->{startDate} = '2000-08-31';
+$properties3->{endDate}   = '2000-08-31';
+$properties3->{id}        = 'EventAssetTestStorage6';
+$properties3->{url}       = 'event-asset-test6';
+$properties3->{className} = 'WebGUI::Asset::Event';
+
+my $eventStorage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($eventStorage);
+$properties3->{storageId} = $eventStorage->getId;
+
+my $event6 = $cal->addChild($properties3, $properties3->{id});
+
+sleep 2;
+
+my $event6a = $event6->addRevision({ title => 'Event with storage', });
+ok($session->id->valid($event6a->get('storageId')), 'addRevision gives the new revision a valid storageId');
+isnt($event6a->get('storageId'), $event6->get('storageId'), '... and it is different from the previous revision');
