@@ -34,7 +34,7 @@ pod2usage( msg => "Must specify a config file!" ) unless $configFile;
 
 my $session = start( $webguiRoot, $configFile );
 
-installFilePumpHandler($session);
+installUPSDriver($session);
 
 # Do your work here
 finish($session);
@@ -43,7 +43,7 @@ finish($session);
 # Your sub here
 
 #----------------------------------------------------------------------------
-sub installFilePumpHandler {
+sub installUPSDriver
     my $session = shift;
     print "\tAdding UPS Shipping Driver... \n" unless $quiet;
     $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::UPS');
