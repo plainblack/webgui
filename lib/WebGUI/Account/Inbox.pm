@@ -218,7 +218,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("invite user confirm template hoverHelp")
 	);
     $f->selectRichEditor(
-        name        => "inboxRichEditorId",
+        name        => "inboxRichEditId",
         value       => $self->getRichEditorId,
         label       => $i18n->get("inbox rich editor label"),
         hoverHelp   => $i18n->get("inbox rich editor description"),
@@ -263,7 +263,7 @@ sub editSettingsFormSave {
     $setting->set("inboxInviteUserTemplateId",$form->process("inboxInviteUserTemplateId","template"));
     $setting->set("inboxInviteUserConfirmTemplateId",$form->process("inboxInviteUserConfirmTemplateId","template"));
 
-    $setting->set("inboxRichEditorId", $form->process("inboxRichEditorId", "selectRichEditor") );
+    $setting->set("inboxRichEditId", $form->process("inboxRichEditId", "selectRichEditor") );
 }
 
 
@@ -399,7 +399,7 @@ This method returns the rich editor ID users compose messages with.
 
 sub getRichEditorId {
     my $self    = shift;
-    return $self->session->setting->get("inboxRichEditorId") || "PBrichedit000000000001";
+    return $self->session->setting->get("inboxRichEditId") || "PBrichedit000000000001";
 }
 
 #-------------------------------------------------------------------

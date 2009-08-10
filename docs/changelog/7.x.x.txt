@@ -8,6 +8,7 @@
  - fixed #9777: Cursor disappears in non-Rich Editor window
  - fixed LDAP labels were made more consistent with typical usage.
  - fixed: New Mail macro never returns any messages
+ - fixed #10743: Inbox Rich Editor selection not saved (Eric Kennedy)
 
 7.6.34
  - fixed #10667: cannot change size of template editor
