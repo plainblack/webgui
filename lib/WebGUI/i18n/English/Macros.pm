@@ -28,7 +28,7 @@ our $I18N = {
                 message => q|<p>Making a macro available for use on your site is a two step process.</p>
 <div>
 <ol>
-<li>The macro must be put in the Macros directory in the WebGUI source code: lib/WebGUI/Macros/.</li>
+<li>The macro code should be in a macro folder in the WebGUI sourcecode or in a custom folder that ends with lib/WebGUI/Macro/ (e.g. /data/custom/lib/WebGUI/Macro). When such a custom folder is used, make sure there is a file preload.custom which indicates the presence of this custom code. With the given example a line like this should exist: /data/custom/lib</li>
 <li>The macro must be enabled in your WebGUI.conf file, in the "macros" section.  In that section, you can assign a shortcut that is different from the macro's name.</li>
 </ol>
 </div>
@@ -36,7 +36,7 @@ our $I18N = {
 
 |,
 		context => 'Content for dynamically generated macro list',
-		lastUpdated => 1150994876,
+		lastUpdated => 1249918049,
 	},
 
 	'macro enabled' => {
