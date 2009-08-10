@@ -83,7 +83,6 @@ sub execute {
     my $expired = 0;
     my $cartIds = [];
     my $limit = $now - $self->get('cartTimeout');
-    $session->log->warn("limit: $limit");
     my $expiredCarts = $session->db->read('select cartId from cart where creationDate < '.$limit);
     $expiredCarts->execute();
     CART: while( my ($cartId) = $expiredCarts->array() ) {
@@ -91,7 +90,6 @@ sub execute {
             WebGUI::Shop::Cart->new($session, $cartId);
         };
         next CART if WebGUI::Error->caught;
-        $session->log->warn("cartId: $cartId");
         $cart->delete; ##Delete will empty, then delete.
         ##Time check and set flag
         if (time() > $finishTime) {
