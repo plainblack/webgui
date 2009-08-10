@@ -39,6 +39,8 @@
  - fixed #10733: viewing pending version tags
  - added Survey JSON performance warning for people with non-wre-standard JSON modules/versions (Patrick Donelan, SDH Consulting)
  - rfe #10423: Provide a way to access the instance of the thing that was added, modified, or deleted via workflow. (Eric Kennedy)
+ - Templates can now return a JSONified version of their params hash based on
+   requested Accept headers ( Martin Kamerbeek / Oqapi )
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks

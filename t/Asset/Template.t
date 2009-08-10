@@ -16,8 +16,9 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 37; # increment this value for each test you create
+use Test::More tests => 39; # increment this value for each test you create
 use Test::Deep;
+use JSON qw{ from_json };
 
 my $session = WebGUI::Test->session;
 
@@ -46,6 +47,18 @@ $output = $template->process(\%var);
 ok($output =~ m/\bBBBBB\b/, "process() - variables");
 ok($output =~ m/true/, "process() - conditionals");
 ok($output =~ m/\b(?:XY){5}\b/, "process() - loops");
+
+# See if template listens the Accept header
+$session->request->headers_in->{Accept} = 'application/json';
+
+my $json = $template->process(\%var);
+my $andNowItsAPerlHashRef = eval { from_json( $json ) };
+ok( !$@, 'Accept = json, JSON is returned' );
+cmp_deeply( \%var, $andNowItsAPerlHashRef, 'Accept = json, The correct JSON is returned' );
+
+# Done, so remove the json Accept header.
+delete $session->request->headers_in->{Accept};
+
 
 my $newList = WebGUI::Asset::Template->getList($session, 'WebGUI Test Template');
 ok(exists $newList->{$template->getId}, 'Uncommitted template exists returned from getList');

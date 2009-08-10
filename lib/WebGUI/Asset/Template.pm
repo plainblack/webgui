@@ -24,6 +24,7 @@ use WebGUI::Exception;
 use Tie::IxHash;
 use Clone qw/clone/;
 use HTML::Packer;
+use JSON qw{ to_json };
 
 =head1 NAME
 
@@ -590,6 +591,13 @@ A hash reference containing template variables and loops. Automatically includes
 sub process {
 	my $self = shift;
 	my $vars = shift;
+
+    # Return a JSONinfied version of vars if JSON is the only requested content type.
+    if ( $self->session->request->headers_in->{Accept} eq 'application/json' ) {
+       $self->session->http->setMimeType( 'application/json' );
+       return to_json( $vars );
+    }
+
 	$self->prepare unless ($self->{_prepared});
     my $parser      = $self->getParser($self->session, $self->get("parser"));
     my $template    = $self->get('usePacked')

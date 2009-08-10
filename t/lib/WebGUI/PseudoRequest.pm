@@ -213,7 +213,7 @@ sub new {
 	my $this = shift;
 	my $class = ref($this) || $this;
 	my $headers = WebGUI::PseudoRequest::Headers->new();
-	my $self = {headers_out => $headers};
+	my $self = { headers_out => $headers, headers_in => {} };
 	bless $self, $class;
 	return $self;
 }
@@ -288,6 +288,19 @@ sub content_type {
 		$self->{content_type} = $value;
 	}
 	return $self->{content_type};
+}
+
+#----------------------------------------------------------------------------
+
+=head2 headers_in ( )
+
+Mimics the behavior of Apache2::Request->headers_in.
+
+=cut
+
+sub headers_in {
+       my $self = shift;
+       return $self->{headers_in};
 }
 
 #----------------------------------------------------------------------------
