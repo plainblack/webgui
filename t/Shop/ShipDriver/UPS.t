@@ -35,7 +35,7 @@ $session->user({user => $user});
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 40;
+my $tests = 41;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -89,6 +89,20 @@ my $nivBible = $bible->setCollateral('variantsJSON', 'variantId', 'new',
     {
         shortdesc => 'NIV Bible',    price     => 22.50,
         varSku    => 'niv-bible',    weight    => 2.0,
+        quantity  => 999999,
+    }
+);
+
+my $feather = $home->addChild({
+    className          => 'WebGUI::Asset::Sku::Product',
+    isShippingRequired => 1,     title => 'Feathers',
+    shipsSeparately    => 0,
+});
+
+my $blueFeather = $feather->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => 'blue feather',  price     => 1.00,
+        varSku    => 'blue',          weight    => 0.001,
         quantity  => 999999,
     }
 );
@@ -385,8 +399,6 @@ my $xmlRate = XMLin($xmlR,
     KeepRoot => 1,
 );
 
-diag Dumper $xmlRate;
-
 cmp_deeply(
     $xmlRate, {
         RatingServiceSelectionRequest => {
@@ -463,6 +475,8 @@ $xmlRate = XMLin( $xmlR,
     ForceArray => ['Package'],
 );
 
+diag Dumper $xmlRate;
+
 cmp_deeply(
     $xmlRate, {
         RatingServiceSelectionRequest => {
@@ -475,13 +489,13 @@ cmp_deeply(
                     Address => { PostalCode => 97123, CountryCode => 'us', },
                 },
                 ShipTo => {
-                    Address => { PostalCode => 53715, CountryCode => 'us', },
+                    Address => { PostalCode => 53715, CountryCode => 'us', ResidentialAddressIndicator => {}, },
                 },
                 Service => { Code => '03', },
                 Package => bag(
                     {
                         PackagingType => { Code   => '02',  },
-                        PackageWeight => { Weight => '1.5', },
+                        PackageWeight => { Weight => '3.0', },
                     },
                     {
                         PackagingType => { Code   => '02',  },
@@ -509,6 +523,23 @@ SKIP: {
 
 ok($driver->getEditForm(), 'getEditForm');
 
+$cart->empty;
+$feather->addToCart($feather->getCollateral('variantsJSON', 'variantId', $blueFeather));
+$xml = $driver->buildXML($cart, $driver->_getShippableUnits($cart));
+($xmlA, $xmlR) = split /\n(?=<\?xml)/, $xml;
+
+$xmlRate = XMLin( $xmlR,
+    KeepRoot   => 1,
+    ForceArray => ['Package'],
+);
+
+is (
+    $xmlRate->{RatingServiceSelectionRequest}->{Shipment}->{Package}->[0]->{PackageWeight}->{Weight},
+    '0.1',
+    'Weight is clipped at 0.1 pounds.'
+);
+
+$cart->empty;
 }
 
 #----------------------------------------------------------------------------

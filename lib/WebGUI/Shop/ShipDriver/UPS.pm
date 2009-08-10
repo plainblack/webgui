@@ -129,12 +129,14 @@ sub buildXML {
             $weight += $skuWeight;
         }
         next PACKAGE unless $weight;
+        $weight = sprintf "%.1f", $weight;
+        $weight = '0.1' if $weight == 0;
         my $options = {
             PackagingType => [ {
                 Code => [ '02' ],
             } ],
             PackageWeight => [ {
-                Weight => [ sprintf "%.1f", $weight ], ##Required formatting from spec
+                Weight => [ $weight ], ##Required formatting from spec
             } ],
         };
         push @{ $packHash }, $options;
