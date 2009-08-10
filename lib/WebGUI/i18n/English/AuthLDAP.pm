@@ -155,7 +155,7 @@ our $I18N = {
 	},
 
 	'4' => {
-		message => q|LDAP Proxy Username|,
+		message => q|LDAP Proxy User DN|,
 		lastUpdated => 1031514049,
 	},
 
@@ -536,7 +536,7 @@ our $I18N = {
 	},
 
 	'LDAPLink_994' => {
-		message => q|LDAP Proxy Username|,
+		message => q|LDAP Proxy User DN|,
 		lastUpdated => 1249689834,
 	},
 
@@ -558,11 +558,11 @@ our $I18N = {
         },
 
         'LDAPLink_994 description' => {
-                message => q|<p>The LDAP Proxy Username is the DN (Distinguished Name) that points to the user account
+                message => q|<p>The LDAP Proxy User DN is the DN (Distinguished Name) that points to the user account
 record for authenticating against this LDAP server at a permission level that has full read and write access to all of the users and groups on your LDAP server.
 Usually that will look something like:</p>
 <p>cn=Joe Shmoe,ou=people,dc=example,dc=com</p>|,
-                lastUpdated => 1249689806,
+                lastUpdated => 1249917626,
         },
 
         'LDAPLink_995 description' => {
