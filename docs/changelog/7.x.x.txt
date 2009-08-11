@@ -1,7 +1,7 @@
 7.7.17
  - fixed #10752: Missing SQL Report download group default
  - fixed: #9595: Gallery layout corruption with old browsers
- - fixed: Admin bar won't show multiple packages or prototypes with the duplicate titles
+ - fixed #10753: Admin Bar will only display 1 title at a time
  - fixed #10751: Only users in Content Managers group can make Shortcuts
  - fixed #10748: In-store credit not reported correctly in email
  - fixed #10746: SQL queriy is improper for MySQL compliant query
