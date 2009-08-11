@@ -1,6 +1,7 @@
 7.6.35
  - fixed #10752: Missing SQL Report download group default
  - fixed: #9595: Gallery layout corruption with old browsers
+ - fixed #10279: Some columns still latin1 after upgrade to 7.5.40
  - fixed #10748: In-store credit not reported correctly in email
  - fixed #10746: SQL queriy is improper for MySQL compliant query
  - fixed #10744: Shop quantity bug in Cart
