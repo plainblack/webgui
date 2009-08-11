@@ -202,9 +202,9 @@ sub definition {
             label=>$i18n->get("download mimetype"),
         },
         downloadUserGroup=>{
-            fieldType=>"group",
-            defaultValue=>"text/html",
-            label=>$i18n->get("download usergroup"),
+            fieldType    => "group",
+            defaultValue => "7",
+            label        => $i18n->get("download usergroup"),
         },
     );
     push(@{$definition}, {

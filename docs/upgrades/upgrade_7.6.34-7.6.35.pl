@@ -29,6 +29,7 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
+fixDefaultSQLReportDownloadGroup($session);
 
 # upgrade functions go here
 
@@ -44,6 +45,18 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixDefaultSQLReportDownloadGroup {
+    my $session = shift;
+    print "\tFix bad default SQL Report Download groups... " unless $quiet;
+    $session->db->write(<<EOSQL);
+UPDATE SQLReport SET downloadUserGroup='7' WHERE downloadUserGroup="text/html";
+EOSQL
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
