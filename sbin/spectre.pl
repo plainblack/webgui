@@ -74,10 +74,10 @@ if ($shutdown) {
         die "No pidFile specified in spectre.conf\n";
     }
     open my $pidFile, '<', $pidFileName or
-        die "Unable to open pidFile ($pidFileName) for writing: $!\n";
+        die "Unable to open pidFile ($pidFileName) for reading: $!\n";
     my $spectrePid = <$pidFile>;
     close $pidFile or
-        die "Unable to close pidFile ($pidFileName) after writing: $!\n";
+        die "Unable to close pidFile ($pidFileName) after reading: $!\n";
     chomp $spectrePid;
     kill 15, $spectrePid;
     sleep 1;
