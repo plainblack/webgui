@@ -462,7 +462,7 @@
 # about categories. Each listing has a key of class name, and then
 # has several properties, which are:
 #
-#   category    - The category the asset should appear in.
+#   category    - The category the asset should appear in.  Can also be an array of categories.
 #   isContainer - Whether or not the assets main purpose to display the data from other assets.
 #   addGroup    - The group the user must be in to add this asset.
 #   uiLevel     - The minimum UI level the user must have to add the asset.
