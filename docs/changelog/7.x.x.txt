@@ -1,4 +1,5 @@
 7.7.17
+ - fixed: #9595: Gallery layout corruption with old browsers
  - fixed: Admin bar won't show multiple packages or prototypes with the duplicate titles
  - fixed: Only users in 'Content Managers' can create shortcuts
  - fixed #10748: In-store credit not reported correctly in email
