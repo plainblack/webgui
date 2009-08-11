@@ -1,4 +1,5 @@
 7.6.35
+ - fixed: Only users in 'Content Managers' can create shortcuts
  - fixed #10748: In-store credit not reported correctly in email
  - fixed #10746: SQL queriy is improper for MySQL compliant query
  - fixed #10744: Shop quantity bug in Cart
