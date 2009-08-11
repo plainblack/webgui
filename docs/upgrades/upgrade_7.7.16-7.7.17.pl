@@ -34,6 +34,7 @@ my $session = start(); # this line required
 addFriendManagerSettings($session);
 fixGalleyImageFolderStyle($session);
 fixMapTemplateFolderStyle($session);
+fixDefaultSQLReportDownloadGroup($session);
 addExpireIncompleteSurveyResponsesWorkflow($session);
 
 finish($session); # this line required
@@ -68,6 +69,18 @@ sub fixMapTemplateFolderStyle {
             styleTemplateId => 'PBtmpl0000000000000060',
         });
     }
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixDefaultSQLReportDownloadGroup {
+    my $session = shift;
+    print "\tFix bad default SQL Report Download groups... " unless $quiet;
+    $session->db->write(<<EOSQL);
+UPDATE SQLReport SET downloadUserGroup='7' WHERE downloadUserGroup="text/html";
+EOSQL
     # and here's our code
     print "DONE!\n" unless $quiet;
 }
