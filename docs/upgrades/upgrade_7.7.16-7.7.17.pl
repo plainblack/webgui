@@ -36,6 +36,7 @@ fixGalleyImageFolderStyle($session);
 fixMapTemplateFolderStyle($session);
 fixDefaultSQLReportDownloadGroup($session);
 addExpireIncompleteSurveyResponsesWorkflow($session);
+ensureAllFieldsUtf8($session);
 
 finish($session); # this line required
 
@@ -48,6 +49,46 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub ensureAllFieldsUtf8 {
+    my $session = shift;
+    print "\tEnsuring all database fields are UTF-8... " unless $quiet;
+
+    my $dbh = $session->db->dbh;
+    my $sth;
+    my @tables;
+    my @stmts;
+    # Get table list
+    $sth = $dbh->table_info(undef, undef, '%');
+    while (my $row = $sth->fetchrow_hashref) {
+        push @tables, $row->{TABLE_NAME};
+    }
+    $sth->finish;
+
+    for my $table (@tables) {
+        my $sth = $dbh->column_info(undef, undef, $table, '%');
+        while (my $row = $sth->fetchrow_hashref) {
+            if ($row->{TYPE_NAME} =~ /(?:VAR)?CHAR|TEXT/i) {
+                push @stmts, sprintf('ALTER TABLE %s MODIFY %s %s %s CHARACTER SET utf8 %s %s',
+                    $dbh->quote_identifier($row->{TABLE_NAME}),
+                    $dbh->quote_identifier($row->{COLUMN_NAME}),
+                    $row->{mysql_type_name},
+                    ($row->{COLUMN_SIZE} == 22 ? 'binary' : ''),
+                    ($row->{IS_NULLABLE} eq 'NO' ? 'NOT NULL' : ''),
+                    (defined $row->{COLUMN_DEF} && $row->{COLUMN_DEF} ne '' ? 'DEFAULT ' . $dbh->quote($row->{COLUMN_DEF}) : ''),
+                );
+            }
+        }
+        $sth->finish;
+    }
+
+
+    for my $stmt (@stmts) {
+        $dbh->do($stmt);
+    }
+
+    print "Done.\n" unless $quiet;
+}
 
 sub addFriendManagerSettings {
     my $session = shift;

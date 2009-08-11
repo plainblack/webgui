@@ -3,6 +3,7 @@
  - fixed: #9595: Gallery layout corruption with old browsers
  - fixed #10753: Admin Bar will only display 1 title at a time
  - fixed #10751: Only users in Content Managers group can make Shortcuts
+ - fixed #10279: Some columns still latin1 after upgrade to 7.5.40
  - fixed #10748: In-store credit not reported correctly in email
  - fixed #10746: SQL queriy is improper for MySQL compliant query
  - fixed: Existing ThingyRecords are broken after upgrade
