@@ -381,14 +381,12 @@ The SQL query which is to be investigated.
 =cut
 
 sub queryIsAllowed {
-	my $self = shift;
+	my $self  = shift;
 	my $query = shift;
 
-	foreach (split(/\s+/, $self->{_databaseLink}{allowedKeywords})) {
-		return 1 if ($query =~ m/^$_/i);
-	}
-
-	return 0;
+    my ($firstWord) = $query =~ /(\w+)/;
+    $firstWord = lc $firstWord;
+    return isIn($firstWord, split(/\s+/, lc $self->{_databaseLink}{allowedKeywords})) ? 1 : 0;
 }
 
 #-------------------------------------------------------------------

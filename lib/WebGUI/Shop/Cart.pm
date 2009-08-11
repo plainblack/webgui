@@ -593,7 +593,7 @@ sub updateFromForm {
             eval { $item->setQuantity($form->get("quantity-".$item->getId)) };
             if (WebGUI::Error->caught("WebGUI::Error::Shop::MaxOfItemInCartReached")) {
                 my $i18n = WebGUI::International->new($self->session, "Shop");
-                $error{id $self} = sprint($i18n->get("too many of this item"), $item->get("configuredTitle"));
+                $error{id $self} = sprintf($i18n->get("too many of this item"), $item->get("configuredTitle"));
             }
             elsif (my $e = WebGUI::Error->caught) {
                 $error{id $self} = "An unknown error has occured: ".$e->message;

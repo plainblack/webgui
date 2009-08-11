@@ -1,4 +1,6 @@
 7.6.35
+ - fixed #10746: SQL queriy is improper for MySQL compliant query
+ - fixed #10744: Shop quantity bug in Cart
  - fixed #10724: gotcha.txt for 7.6.34 enhanced
  - fixed #10723: RSS Feed Error in Gallery
  - fixed #10738: Events do not revision their storage locations
