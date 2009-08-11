@@ -411,7 +411,7 @@ sub getTransactionVars {
         viewDetailUrl           => $url->page( 'shop=transaction;method=viewMy;transactionId='.$self->getId, 1 ),
         cancelRecurringUrl      => $url->page('shop=transaction;method=cancelRecurring;transactionId='.$self->getId),
         amount                  => sprintf( "%.2f", $self->get('amount') ),
-        inShopCreditDeduction   => sprintf( "%.2f", $self->get('inShopCreditDeduction') ),
+        inShopCreditDeduction   => sprintf( "%.2f", $self->get('shopCreditDeduction') ),
         taxes                   => sprintf( "%.2f", $self->get('taxes') ),
         shippingPrice           => sprintf( "%.2f", $self->get('shippingPrice') ),
         shippingAddress         => $self->formatAddress( {
