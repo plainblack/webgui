@@ -133,7 +133,7 @@ sub appendVarsEditRecord {
     my ( $self, $var, $recordId ) = @_;
     my $session     = $self->session;
     my $thingy      = $self->getThingy;
-    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') );
+    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') || '{}' );
     my $record      = {};
     if ($recordId) {
 
@@ -293,7 +293,7 @@ Get the price
 sub getPrice {
     my ($self) = @_;
     my $price       = $self->get('price');
-    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') );
+    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') || '{}' );
     my $option      = $self->getOptions;
     my $record      = $RECORD_CLASS->new( $self->session, $option->{recordId} );
     my $fields      = JSON->new->decode( $record->get('fields') );
@@ -526,7 +526,7 @@ Remove all collateral associated with the ThingyRecord sku
 sub purge {
     my $self = shift;
 
-    my $options = { constraints => { 'assetId = ?' => $self->getId, }, };
+    my $options = { constraints => [ { 'assetId = ?' => $self->getId } ] };
 
     my $iter = $RECORD_CLASS->getAllIterator( $self->session, $options );
     while ( my $item = $iter->() ) {

@@ -1,6 +1,8 @@
 7.7.17
  - fixed #10748: In-store credit not reported correctly in email
  - fixed #10746: SQL queriy is improper for MySQL compliant query
+ - fixed: Existing ThingyRecords are broken after upgrade
+ - fixed: ThingyRecords cannot be purged
  - fixed #10744: Shop quantity bug in Cart
  - fixed #10738: Events do not revision their storage locations
  - fixed #10724: gotcha.txt for 7.7.17 enhanced
