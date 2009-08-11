@@ -684,7 +684,7 @@ sub sendNotifications {
         %{$transaction->get},
         viewDetailUrl           => $url->page('shop=transaction;method=viewMy;transactionId='.$transaction->getId,1),
         amount                  => sprintf("%.2f", $transaction->get('amount')),
-        inShopCreditDeduction   => sprintf("%.2f", $transaction->get('inShopCreditDeduction')),
+        inShopCreditDeduction   => sprintf("%.2f", $transaction->get('shopCreditDeduction')),
         taxes                   => sprintf("%.2f", $transaction->get('taxes')),
         shippingPrice           => sprintf("%.2f", $transaction->get('shippingPrice')),
         shippingAddress         => $transaction->formatAddress({
