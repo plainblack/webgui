@@ -35,7 +35,7 @@ Stops the kernel when TERM signal is received
 =cut
 
 sub _safe_shutdown {
-    my ($obj) = @_[ OBJECT ];
+    my ($obj) = $_[ OBJECT ];
     $obj->error('Spectre shut down');
     POE::Kernel->stop;
 }
