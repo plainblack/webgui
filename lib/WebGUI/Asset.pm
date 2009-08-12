@@ -2768,6 +2768,9 @@ sub www_editSave {
     # we handle auto commit assets here in case they didn't handle it themselves
     if ($object->getAutoCommitWorkflowId) {
         $object->requestAutoCommit;
+        #Since the version tag makes new objects, fetch a fresh one here.
+        #Note, this workaround can still fail, if WebGUI hands off back to spectre.
+        $object = WebGUI::Asset->new($session, $object->getId, $object->get('className'));
     }
     # else, try to to auto commit
     else {

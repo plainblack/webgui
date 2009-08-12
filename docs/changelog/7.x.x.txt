@@ -1,4 +1,5 @@
 7.7.17
+ - fixed #10750: Story Manager - Save and add another photo
  - fixed i18n message for delete assets doesn't mention children.
  - fixed #10752: Missing SQL Report download group default
  - fixed: #9595: Gallery layout corruption with old browsers
@@ -52,7 +53,7 @@
  - rfe #10423: Provide a way to access the instance of the thing that was added, modified, or deleted via workflow. (Eric Kennedy)
  - Templates can now return a JSONified version of their params hash based on
    requested Accept headers ( Martin Kamerbeek / Oqapi )
-- fixed #10743: Inbox Rich Editor selection not saved (Eric Kennedy)
+ - fixed #10743: Inbox Rich Editor selection not saved (Eric Kennedy)
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
