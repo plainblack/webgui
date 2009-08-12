@@ -981,6 +981,11 @@ directly inside the answer_loop for other types of questions.|,
         message => q|A boolean flag indicating whether the Survey Response completed|,
         lastUpdated => 1242180657,
     },
+    
+    'responseId help' => {
+        message => q|The unique GUID for the response|,
+        lastUpdated => 1242180657,
+    },
 
     'response restart' => {
         message => q|Survey Response restarted|,

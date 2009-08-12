@@ -1510,6 +1510,7 @@ sub getResponseDetails {
         $tags->{endDateEpoch}   = $endDateEpoch;
         $tags->{userId}         = $ruserId;
         $tags->{username}       = $rusername;
+        $tags->{responseId}     = $responseId;
     }
     return {
         templateVars => $tags,
@@ -1525,6 +1526,7 @@ sub getResponseDetails {
         restart        => $tags->{restart},
         timeout        => $tags->{timeout},
         timeoutRestart => $tags->{timeoutRestart},
+        responseId     => $tags->{responseId},
     };
 }
 

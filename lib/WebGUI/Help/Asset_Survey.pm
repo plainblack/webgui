@@ -415,10 +415,11 @@ our $HELP = {
         fields    => [],
         variables => [
             { name => 'complete', description => 'response complete help' },
-            { name => 'restart', description => 'response complete help' },
+            { name => 'restart', description => 'response restart help' },
             { name => 'timeout', description => 'response timeout help' },
             { name => 'timeoutRestart', description => 'response timeout restart help' },
             { name => 'endDate', description => 'response endDate help' },
+            { name => 'responseId', description => 'responseId help' },
         ],
          related => [
             {   tag       => 'survey template',
