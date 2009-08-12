@@ -565,16 +565,16 @@ Usually that will look something like:</p>
         },
 
         'LDAPLink_995 description' => {
-                message => q|The password for the account entered in the "LDAP Proxy Username" field|,
-                lastUpdated => 1120164594,
+                message => q|The password for the account entered in the "LDAP Proxy User DN" field|,
+                lastUpdated => 1250099704,
         },
 
         '9 description' => {
                 message => q|<p>Enter the attribute that should be used for each record in LDAP to uniquely identify a user.
 This field is used for auto creating user accounts for users already in your LDAP repository when they attempt to log in and
-for finding users who sign up for the site via the anonymous registration feature if it is enabled. In almost all cases this attrubute is 'dn'
+for finding users who sign up for the site via the anonymous registration feature if it is enabled. In almost all cases this attribute is 'dn'
 and should be entered as such.</p>|,
-                lastUpdated => 1146630220,
+                lastUpdated => 1250099631,
         },
 
         '6 description' => {

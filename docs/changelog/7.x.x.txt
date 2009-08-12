@@ -1,5 +1,6 @@
 7.6.35
  - fixed #10751: Only users in Content Managers group can make Shortcuts
+ - fixed #10761: Two i18n issues on LDAP page
  - fixed #10752: Missing SQL Report download group default
  - fixed: #9595: Gallery layout corruption with old browsers
  - fixed #10279: Some columns still latin1 after upgrade to 7.5.40
