@@ -448,7 +448,7 @@ sub addIsDefaultTemplates {
 
 sub setDefaultTemplates {
     my $session     = shift;
-    print "\tUpdating default templates to show warning... " unless $quiet; 
+    print "\tUpdating default templates to show warning.  If these default templates have been removed from your site, you may receive a warning... " unless $quiet; 
     my $defaultTemplates    =[
           '-ANLpoTEP-n4POAdRxCzRw','05FpjceLYhq4csF1Kww1KQ','0X4Q3tBWUb_thsVbsYz9xQ',
           '2gtFt7c0qAFNU3BG_uvNvg','2rC4ErZ3c77OJzJm7O5s3w','3womoo7Teyy2YKFa25-MZg',

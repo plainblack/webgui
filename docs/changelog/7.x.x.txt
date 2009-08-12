@@ -1,7 +1,10 @@
-7.6.35
- - fixed #10751: Only users in Content Managers group can make Shortcuts
+7.6.35-1
+ - fixed #10754: assets were never added
  - fixed #10761: Two i18n issues on LDAP page
  - fixed i18n message for delete assets doesn't mention children.
+
+7.6.35
+ - fixed #10751: Only users in Content Managers group can make Shortcuts
  - fixed #10752: Missing SQL Report download group default
  - fixed: #9595: Gallery layout corruption with old browsers
  - fixed #10279: Some columns still latin1 after upgrade to 7.5.40
