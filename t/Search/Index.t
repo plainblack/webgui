@@ -33,6 +33,9 @@ my $article         = WebGUI::Asset->getImportNode( $session )->addChild( {
     title           => 'title',
     menuTitle       => 'menuTitle',
 } );
+WebGUI::Test->tagsToRollback(
+    WebGUI::VersionTag->getWorking( $session ),
+);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -224,10 +227,4 @@ cmp_deeply (
     "Index has correct information" 
 );
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    WebGUI::VersionTag->getWorking( $session )->rollback;
-}
 #vim:ft=perl
