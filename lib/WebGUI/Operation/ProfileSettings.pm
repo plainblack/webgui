@@ -307,7 +307,8 @@ sub www_editProfileField {
         -label      => $i18n->get('default privacy setting label'),
         -hoverHelp  => $i18n->get('default privacy setting description'),
         -options    => WebGUI::ProfileField->getPrivacyOptions($session),
-        -value      => $data->{defaultPrivacySetting}
+        -value      => $data->{defaultPrivacySetting},
+        -defaultValue => 'none',
     );	
     my $fieldType = WebGUI::Form::FieldType->new($session,
         -name=>"fieldType",

@@ -1,4 +1,5 @@
 7.7.17
+ - fixed #10769: No default privacy setting for new User profile fields
  - fixed #10731: i18n Translation for js-based items in Matrix
  - fixed #10762: testCodebase only runs properly from within the bin directory
  - fixed #10765: Matrix displays all products when searching
