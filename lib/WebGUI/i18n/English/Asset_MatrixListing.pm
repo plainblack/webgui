@@ -413,6 +413,12 @@ it would be best to make sure the names are the same.|,
 	context => q|i18n label for template.|,
     },
 
+    'Send Creator a Message' => {
+        lastUpdated => 1250146133,
+        message => q|Send Creator a Message|,
+        context => q|Creator, the person who created this listing|,
+    },
+
 };
 
 1;

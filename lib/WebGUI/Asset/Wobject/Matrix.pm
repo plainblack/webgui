@@ -622,6 +622,7 @@ sub view {
 	my $self    = shift;
 	my $session = $self->session;	
     my $db      = $session->db; 
+    my $i18n    = WebGUI::International->new($session, 'Asset_Matrix');
 
     # javascript and css files for compare form datatable
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
@@ -695,7 +696,9 @@ sub view {
         $varStatistics = JSON->new->decode($varStatisticsEncoded);
     }
     else{
-        $varStatistics->{alphanumeric_sortButton}   = "<span id='sortByName'><button type='button'>Sort by name</button></span><br />";
+        $varStatistics->{alphanumeric_sortButton}   = "<span id='sortByName'><button type='button'>"
+                                                    . $i18n->get('Sort by name')
+                                                    . "</button></span><br />";
 
         # Get the MatrixListing with the most views as an object using getLineage.
         my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
@@ -709,7 +712,9 @@ sub view {
             $varStatistics->{bestViews_url}           = $bestViews_listing->getUrl;
             $varStatistics->{bestViews_count}         = $bestViews_listing->get('views');
             $varStatistics->{bestViews_name}          = $bestViews_listing->get('title');
-            $varStatistics->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
+            $varStatistics->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>"
+                                                      . $i18n->get('Sort by views')
+                                                      . "</button></span><br />";
         }
 
         # Get the MatrixListing with the most compares as an object using getLineage.
@@ -725,7 +730,9 @@ sub view {
             $varStatistics->{bestCompares_url}        = $bestCompares_listing->getUrl;
             $varStatistics->{bestCompares_count}      = $bestCompares_listing->get('compares');
             $varStatistics->{bestCompares_name}       = $bestCompares_listing->get('title');
-            $varStatistics->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
+            $varStatistics->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>"
+                                                      . $i18n->get('Sort by compares')
+                                                      . "</button></span><br />";
         }
 
         # Get the MatrixListing with the most clicks as an object using getLineage.
@@ -740,7 +747,9 @@ sub view {
             $varStatistics->{bestClicks_url}          = $bestClicks_listing->getUrl;
             $varStatistics->{bestClicks_count}        = $bestClicks_listing->get('clicks');
             $varStatistics->{bestClicks_name}         = $bestClicks_listing->get('title');
-            $varStatistics->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
+            $varStatistics->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>"
+                                                      . $i18n->get('Sort by clicks')
+                                                      . "</button></span><br />";
         }
 
         # Get the 5 MatrixListings that were last updated as objects using getLineage.
@@ -759,7 +768,9 @@ sub view {
                         lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
                     });
         }
-        $varStatistics->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
+        $varStatistics->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>"
+                                                  . $i18n->get('Sort by updated')
+                                                  . "</button></span><br />";
 
         # For each category, get the MatrixListings with the best ratings.
 

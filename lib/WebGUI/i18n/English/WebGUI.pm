@@ -4622,6 +4622,11 @@ Users may override this setting in their profile.
         context => 'To empty or wipe-out, similar to erase.',
     },
 
+    'Comments' => {
+        message => 'Comments',
+        lastUpdated => 0,
+    },
+
 };
 
 1;

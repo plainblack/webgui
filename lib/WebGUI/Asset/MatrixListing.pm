@@ -644,7 +644,7 @@ A boolean indicating if the user has rated this listing.
 
 =head3 emailSent 
 
-A boolean indicating if an email to the listing maintianer was sent.
+A boolean indicating if an email to the listing maintainer was sent.
 
 =cut
 
