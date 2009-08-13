@@ -14,7 +14,6 @@ $|=1;
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../t/lib";
 use File::Spec qw[];
 use Getopt::Long;
 use Pod::Usage;
@@ -35,6 +34,9 @@ GetOptions(
 	'coverage'=>\$coverage,
 	);
 
+##Defaults to command-line switch
+$configFile ||= $ENV{WEBGUI_CONFIG};
+
 pod2usage( verbose => 2 ) if $help;
 pod2usage() unless $configFile ne '';
 
@@ -42,17 +44,19 @@ my $verboseFlag = "-v" if ($verbose);
 
 $perlBase .= '/bin/' if ($perlBase);
 
-##Defaults to command-line switch
-$configFile ||= $ENV{WEBGUI_CONFIG};
-
 if (! -e $configFile) {
 	##Probably given the name of the config file with no path,
 	##attempt to prepend the path to it.
+    warn "Config file $configFile does not exist, assuming that you supplied a bare config and are running from inside the sbin directory\n";
 	$configFile = File::Spec->canonpath($FindBin::Bin.'/../etc/'.$configFile);
 }
 
 die "Unable to use $configFile as a WebGUI config file\n"
 	unless(-e $configFile and -f _);
+
+my (undef, $directories, $file) = File::Spec->splitpath($configFile);
+my $webguiRoot = File::Spec->canonpath(File::Spec->catdir($directories, File::Spec->updir));
+my $webguiTest = File::Spec->catdir($webguiRoot, 't');
 
 my $prefix = "WEBGUI_CONFIG=".$configFile;
 
@@ -62,8 +66,8 @@ $prefix .= " CODE_COP=1" unless $noLongTests;
 # Add coverage tests
 $prefix .= " HARNESS_PERL_SWITCHES='-MDevel::Cover=-db,/tmp/coverdb'" if $coverage;
 
-print(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t'); print "\n";
-system(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t');
+print(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r', $webguiTest); print "\n";
+system(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r', $webguiTest);
 
 __END__
 
@@ -73,7 +77,7 @@ testCodebase - Test WebGUI's code base.
 
 =head1 SYNOPSIS
 
- testCodebase --configFile config.conf
+ testCodebase --configFile /data/WebGUI/etc/config.conf
               [--coverage]
               [--noLongTests]
               [--perlBase path]
@@ -93,11 +97,20 @@ of the test may be destructive.
 
 =over
 
-=item B<--configFile config.conf>
+=item B<--configFile /data/WebGUI/etc/config.conf>
 
-The WebGUI config file to use. Only the file name needs to be specified,
-since it will be looked up inside WebGUI's configuration directory. Be
-aware that some of the tests may be destructive. This parameter is required.
+A WebGUI config file is required for testing.  If one cannot be
+found based on input from the user, then the script aborts
+without running any tests.
+
+Config files can be supplied on the command line, or via the environment
+variable, WEBGUI_CONFIG being used as a fallback.  If the config file
+cannot be found, the script assumes that a bare filename was provided and
+that it is being from from the WebGUI sbin directory.  It then looks in
+the parallel directory, '../etc', for the config file.
+
+Be aware that some of the tests are destructive, and running tests
+on production sites is not recommended.
 
 =item B<--coverage>
 
