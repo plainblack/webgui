@@ -1172,7 +1172,7 @@ sub www_getCompareFormData {
     my @results;
     if($form->process("search")){
         if ($searchParamList){
-            foreach my $result (@{$self->getListings}) {
+            RESULT: foreach my $result (@{$self->getListings}) {
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
                             select value, fieldType, attributeId from Matrix_attribute
                             left join MatrixListing_attribute as listing using(attributeId)
@@ -1195,7 +1195,7 @@ sub www_getCompareFormData {
                         }
                 }
                 $result->{assetId}  =~ s/-/_____/g;
-                push @results, $result;
+                push @results, $result if $result->{checked} eq 'checked';
             }
         }
         else{   
