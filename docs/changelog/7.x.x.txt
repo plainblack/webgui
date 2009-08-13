@@ -63,6 +63,7 @@
  - Templates can now return a JSONified version of their params hash based on
    requested Accept headers ( Martin Kamerbeek / Oqapi )
  - fixed #10743: Inbox Rich Editor selection not saved (Eric Kennedy)
+ - fixed #10771: setIsPublic tries to use string as arrayref
 
 7.7.16
  - fixed #10590: Session::DateTime->secondsToInterval doesn't allow 7 weeks
