@@ -426,9 +426,18 @@ sub getEditForm {
     my $photoData      = $self->getPhotoData;
     my $numberOfPhotos = scalar @{ $photoData };
     foreach my $photoIndex (1..$numberOfPhotos) {
-        my $photo = $photoData->[$photoIndex-1];
+        my $photo   = $photoData->[$photoIndex-1];
+        my $storage = WebGUI::Storage->get($session, $photo->{storageId});
+        my $filename = $storage->getFiles->[0];
         push @{ $var->{ photo_form_loop } }, {
-            imgUploadForm  => $self->getPhotoUploadForm($photoIndex, $photo->{storageId}),
+            hasPhoto       => $filename ? 1                                    : 0, 
+            imgThumb       => $filename ? $storage->getThumbnailUrl($filename) : '', 
+            imgUrl         => $filename ? $storage->getUrl($filename)          : '', 
+            imgFilename    => $filename ? $filename                            : '',
+            newUploadForm  => WebGUI::Form::file($session, {
+                                name => 'newPhoto' . $photoIndex,
+                                maxAttachments => 1,
+                              }),
             imgCaptionForm => WebGUI::Form::text($session, {
                                  name  => 'imgCaption'.$photoIndex,
                                  value => $photo->{caption},
@@ -456,7 +465,7 @@ sub getEditForm {
         };
     }
     push @{ $var->{ photo_form_loop } }, {
-        imgUploadForm  => WebGUI::Form::image($session, {
+        newUploadForm  => WebGUI::Form::image($session, {
                              name           => 'newPhoto',
                              maxAttachments => 1,
                           }),
@@ -503,48 +512,6 @@ sub getPhotoData {
         $self->{_photoData} = from_json($json);
 	}
 	return dclone($self->{_photoData});
-}
-
-#-------------------------------------------------------------------
-
-=head2 getPhotoUploadForm ( $index, $storageId )
-
-Render a simple file form control that displays the current image if it is
-uploaded.
-
-=head3 $index
-
-The index of a piece of Photo collateral.  An upload form for that index
-will be generated.
-
-=head3 $storageId
-
-The storage location for that piece of Photo collateral, to display an
-existing image if it exists.
-
-=cut
-
-sub getPhotoUploadForm {
-	my $self      = shift;
-    my $session   = $self->session;
-    my $index     = shift;
-    my $storageId = shift;
-
-    my $html      = '';
-    my $storage   = WebGUI::Storage->get($session, $storageId);
-    my $filename  = $storage->getFiles->[0];
-
-    if ($filename) {
-        $html .= WebGUI::Form::readOnly($session, {
-            value => '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($filename).'"><img src="'.$storage->getThumbnailUrl($filename).'" alt="'.$filename.'" style="border-style:none;vertical-align:middle;" /> '.$filename.'</a></p>',
-        })
-    }
-
-    $html .= WebGUI::Form::file($session, {
-        name => 'newPhoto' . $index,
-        maxAttachments => 1,
-    });
-    return $html;
 }
 
 #-------------------------------------------------------------------
