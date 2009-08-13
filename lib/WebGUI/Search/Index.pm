@@ -214,7 +214,7 @@ sub setIsPublic {
 	my $self = shift;
 	my $boolean = shift;
 	my $set = $self->session->db->prepare("update assetIndex set isPublic=? where assetId=?");
-	$set->execute($boolean, $self->getId);
+	$set->execute([$boolean, $self->getId]);
 }
 
 #-------------------------------------------------------------------
