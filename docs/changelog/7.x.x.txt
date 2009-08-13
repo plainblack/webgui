@@ -1,4 +1,5 @@
 7.7.17
+ - fixed #10764: Matrix i18n: hitting compare button says I have 1 item selected.
  - fixed #10763: Matrix: Search button doesn't work.
  - fixed #10761: Two i18n issues on LDAP page
  - fixed #10750: Story Manager - Save and add another photo

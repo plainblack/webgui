@@ -864,8 +864,8 @@ selectBox.</p>|
     },
 
     'too few message' => {
-        lastUpdated => 0,
-        message => q|You tried to compare only one listing. If you want to view just one listing, click on its name.|,
+        lastUpdated => 1250141046,
+        message => q|To compare, at least two listing must be selected. If you want to view just one listing, click on its name.|,
         context => q|A message shown to the user when they have selected only one listing to compare.|,
     }
 };
