@@ -1,4 +1,5 @@
 7.7.17
+ - fixed #10697: Story: Image crowds text
  - fixed #10655: Story: can't delete photos
  - fixed #10769: No default privacy setting for new User profile fields
  - fixed #10731: i18n Translation for js-based items in Matrix
