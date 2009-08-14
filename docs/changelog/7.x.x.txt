@@ -1,3 +1,5 @@
+7.7.18
+
 7.7.17
  - fixed #10697: Story: Image crowds text
  - fixed #10655: Story: can't delete photos
