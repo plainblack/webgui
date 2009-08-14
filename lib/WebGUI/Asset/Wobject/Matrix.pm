@@ -1181,8 +1181,8 @@ sub www_getCompareFormData {
     }
 
     my @results;
-    if($form->process("search")){
-        if ($searchParamList){
+    if($form->process("search")) {
+        if ($searchParamList) {
             RESULT: foreach my $result (@{$self->getListings}) {
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
                             select value, fieldType, attributeId from Matrix_attribute
@@ -1209,14 +1209,15 @@ sub www_getCompareFormData {
                 push @results, $result if $result->{checked} eq 'checked';
             }
         }
-        else{   
+        else {   
             foreach my $result (@{$self->getListings}) {
                 $result->{checked} = 'checked';
                 $result->{assetId}  =~ s/-/_____/g;
                 push @results, $result;
             }
         }
-    }else{
+    }
+    else {
         foreach my $result (@{$self->getListings}) {
             $result->{assetId}  =~ s/-/_____/g;
             if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
@@ -1356,19 +1357,24 @@ sub www_listAttributes {
     
     return $session->privilege->insufficient() unless($self->canEdit);
     
-    my $i18n = WebGUI::International->new($session,'Asset_Matrix');
-    my $output = "<br /><a href='".$self->getUrl("func=editAttribute;attributeId=new")."'>"
-                .$i18n->get('add attribute label')."</a><br /><br />";
-    
+    my $i18n       = WebGUI::International->new($session,'Asset_Matrix');
+    my $console    = $self->getAdminConsole();
     my $attributes = $session->db->read("select attributeId, name from Matrix_attribute where assetId=? order by name"
         ,[$self->getId]);
+    my $output = '';
     while (my $attribute = $attributes->hashRef) {
-        $output .= $session->icon->delete("func=deleteAttribute;attributeId=".$attribute->{attributeId}
-            , $self->getUrl,$i18n->get("delete attribute confirm message"))
-            .$session->icon->edit("func=editAttribute;attributeId=".$attribute->{attributeId})
-            .' '.$attribute->{name}."<br />\n";
+        $output .= $session->icon->delete(
+                       "func=deleteAttribute;attributeId=".$attribute->{attributeId},
+                       $self->getUrl,$i18n->get("delete attribute confirm message")
+                   )
+                . $session->icon->edit("func=editAttribute;attributeId=".$attribute->{attributeId})
+                . ' '
+                . $attribute->{name}
+                ."<br />\n";
     }
-    return $self->getAdminConsole->render($output, $i18n->get('list attributes title'));
+    $console->addSubmenuItem($self->getUrl("func=editAttribute;attributeId=new"), $i18n->get('add attribute label'));
+    $console->addSubmenuItem($self->getUrl, $i18n->get('Return to Matrix'));
+    return $console->render($output, $i18n->get('list attributes title'));
 }
 
 #-------------------------------------------------------------------

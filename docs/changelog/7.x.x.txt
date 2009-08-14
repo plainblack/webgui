@@ -1,4 +1,5 @@
 7.7.18
+ - fixed #10778: Matrix navigation: list attributes
  - fixed #10776: i18n AuthLDAP::7 description 
  - fixed #10775: i18n AuthLDAP::6 description
  - fixed #10774: i18n Asset::Storyarchive tag asset url
