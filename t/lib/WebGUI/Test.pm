@@ -1,9 +1,5 @@
 package WebGUI::Test;
 
-use strict;
-use warnings;
-use Clone qw/clone/;
-
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -25,6 +21,12 @@ Package WebGUI::Test
 Utility module for making testing in WebGUI easier.
 
 =cut
+
+
+use strict;
+use warnings;
+use Clone qw/clone/;
+use Test::MockObject;
 
 our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL );
 
@@ -66,7 +68,15 @@ my $smtpdPid;
 my $smtpdStream;
 my $smtpdSelect;
 
+my $mocker;
+
 BEGIN {
+
+    $mocker = Test::MockObject->fake_module(
+        'APR::Request::Apache2',
+        handle => sub { return bless {}, 'APR::Request::Apache2'; }, 
+        jar    => sub { return { }; },
+    );
 
     STDERR->autoflush(1);
 
