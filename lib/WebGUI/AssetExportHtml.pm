@@ -267,6 +267,7 @@ sub exportAsHtml {
     my $exportSession = WebGUI::Session->open(
         $session->config->getWebguiRoot,
         $session->config->getFilename,
+        $session->request,
     );
     my $esGuard = Scope::Guard->new(sub {
         $exportSession->var->end;
@@ -502,6 +503,7 @@ sub exportGetDescendants {
             $session = WebGUI::Session->open(
                 $session->config->getWebguiRoot,
                 $session->config->getFilename,
+                $session->request,
             );
             $session->user( { userId => $user->userId } );
             $sGuard = Scope::Guard->new(sub {
