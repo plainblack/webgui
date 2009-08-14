@@ -593,7 +593,7 @@ sub process {
 	my $vars = shift;
 
     # Return a JSONinfied version of vars if JSON is the only requested content type.
-    if ( $self->session->request->headers_in->{Accept} eq 'application/json' ) {
+    if ( defined $self->session->request && $self->session->request->headers_in->{Accept} eq 'application/json' ) {
        $self->session->http->setMimeType( 'application/json' );
        return to_json( $vars );
     }
