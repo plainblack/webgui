@@ -303,7 +303,8 @@ sub _invokeWorkflowOnExportedFiles {
 
 =head2 www_delete
 
-Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
+Moves self to trash, returns www_view() method of Container or Parent if canEdit.
+Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -313,8 +314,12 @@ sub www_delete {
 	return $self->session->privilege->vitalComponent() if $self->get('isSystem');
 	return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
 	$self->trash;
-	$self->session->asset($self->getParent);
-	return $self->getParent->www_view;
+    my $asset = $self->getContainer;
+    if ($self->getId eq $asset->getId) {
+        $asset = $self->getParent;
+    }
+	$self->session->asset($asset);
+	return $asset->www_view;
 }
 
 #-------------------------------------------------------------------

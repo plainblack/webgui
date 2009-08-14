@@ -336,7 +336,8 @@ sub www_createShortcut {
 
 =head2 www_cut ( )
 
-Cuts (removes to clipboard) self, returns the www_view of the Parent if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
+If the current user canEdit, it puts $self into the clipboard and calls www_view on it's container.
+Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -346,8 +347,14 @@ sub www_cut {
     return $self->session->privilege->vitalComponent
         if $self->get('isSystem');
 	$self->cut;
-	$self->session->asset($self->getParent);
-	return $self->getParent->www_view;
+    my $asset = $self->getContainer;
+    if ($self->getId eq $asset->getId) {
+        $asset = $self->getParent;
+    }
+	$self->session->asset($asset);
+	return $asset->www_view;
+
+
 }
 
 #-------------------------------------------------------------------

@@ -81,7 +81,7 @@ WebGUI::Test->storagesToDelete($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 44;
+my $tests = 45;
 plan tests => 1
             + $tests
             + $canEditMaker->plan
@@ -147,6 +147,14 @@ $story->requestAutoCommit;
 ############################################################
 
 is($story->getArchive->getId, $archive->getId, 'getArchive gets the parent archive for the Story');
+
+############################################################
+#
+# getContainer
+#
+############################################################
+
+is($story->getContainer->getId, $archive->getId, 'getContainer gets the parent archive for the Story');
 
 ############################################################
 #

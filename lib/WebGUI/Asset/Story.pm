@@ -311,6 +311,15 @@ sub getAutoCommitWorkflowId {
     return undef;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getContainer (  )
+
+Returns the archive for this story, instead of the folder.
+
+=cut
+
+BEGIN { *getContainer = *getArchive }
 
 #-------------------------------------------------------------------
 
