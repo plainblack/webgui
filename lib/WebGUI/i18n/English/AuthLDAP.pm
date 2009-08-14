@@ -579,13 +579,13 @@ and should be entered as such.</p>|,
         },
 
         '6 description' => {
-                message => q|The Username Attribute is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>cn</b>, <b>uid</b>, or <b>shortname</b>. Example: jdoe. Therefore, if you specify the LDAP identity to be <b>shortname</b> then Jon Doe would enter <i>jdoe</i> during the registration process.|,
-                lastUpdated => 1249690122,
+                message => q|The Username Attribute is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>cn</b>, <b>uid</b>, or <b>shortname</b>. Example: jdoe. Therefore, if you specify the LDAP Username Attribute to be <b>shortname</b> then Jon Doe would enter <i>jdoe</i> during the registration process.|,
+                lastUpdated => 1250264355,
         },
 
         '7 description' => {
-                message => q|The label used to describe the LDAP Identity to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP identity is known as their <i>Web Username</i>. So you could enter that label here for consistency.  Used to be called LDAP Identity Label.|,
-                lastUpdated => 1249690190,
+                message => q|The label used to describe the LDAP Authentication Attribute to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP Authentication Attribute is known as their <i>Web Username</i>. So you could enter that label here for consistency.  Used to be called LDAP Identity Label.|,
+                lastUpdated => 1250264194,
         },
 
         '8 description' => {
