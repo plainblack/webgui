@@ -4555,7 +4555,7 @@ Users may override this setting in their profile.
     },
 
  	'sms gateway' => {
- 		message => q|SMS gateway|,
+ 		message => q|SMS Gateway|,
  		context => q|email to SMS/text email address for this site.|,
  		lastUpdated => 1235685248,
  	},
@@ -4563,6 +4563,17 @@ Users may override this setting in their profile.
  	'sms gateway help' => {
  		message => q|The email address that this site would use to send an SMS message.|,
  		lastUpdated => 1235695517,
+ 	},
+ 	
+ 	'sms gateway subject' => {
+ 		message => q|SMS Gateway Subject|,
+ 		context => q|Subject to use for the SMS Gateway for this site.|,
+ 		lastUpdated => 0,
+ 	},
+
+ 	'sms gateway subject help' => {
+ 		message => q|The email subject to pass to the SMS Gateway (typically used for SMS Gateway authorization).|,
+ 		lastUpdated => 0,
  	},
  
     'Select One' => {

@@ -774,6 +774,17 @@ our $I18N = {
         message => q|Should WebGUI just send notifications about Inbox messages, instead of the message itself?|,
         lastUpdated => 1235696295,
     },
+    
+    'inbox notifications subject' => {
+        message => q|Inbox Notification Email Subject|,
+        context => q|Site setting.  A notification is a short message that a message is in the Inbox.|,
+        lastUpdated => 0,
+    },
+
+    'inbox notifications subject help' => {
+        message => q|The email subject to use for inbox notifications|,
+        lastUpdated => 0,
+    },
 
     'inbox notification' => {
         message => q|You have a new message in your Inbox.|,
@@ -788,6 +799,22 @@ our $I18N = {
 
     'inbox notification template help' => {
         message => q|Choose a template that will be used to display Inbox Notifications.|,
+        lastUpdated => 1242274703,
+    },
+    
+    'inbox sms notification' => {
+        message => q|You have a new message in your Inbox.|,
+        lastUpdated => 1235708853,
+    },
+ 
+    'inbox sms notification template' => {
+        message => q|Inbox SMS Notification Template|,
+        context => q|Site setting.  A notification is a short SMS message that a message is in the Inbox.|,
+        lastUpdated => 1242274705,
+    },
+
+    'inbox sms notification template help' => {
+        message => q|Choose a template that will be used to display Inbox SMS Notifications.|,
         lastUpdated => 1242274703,
     },
 

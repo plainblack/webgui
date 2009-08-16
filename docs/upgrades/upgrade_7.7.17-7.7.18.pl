@@ -31,7 +31,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-
+addSmsGatewaySubjectSetting($session);
+addInboxNotificationsSubjectSetting($session);
 finish($session); # this line required
 
 
@@ -44,6 +45,19 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+sub addSmsGatewaySubjectSetting {
+    my $session = shift;
+    print "\tAdding smsGatewaySubject setting... " unless $quiet;
+    $session->setting->add('smsGatewaySubject', '');
+    print "DONE!\n" unless $quiet;
+}
+
+sub addInboxNotificationsSubjectSetting {
+    my $session = shift;
+    print "\tAdding inboxNotificationsSubject setting... " unless $quiet;
+    $session->setting->add('inboxNotificationsSubject', '');
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

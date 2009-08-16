@@ -22,7 +22,7 @@ use WebGUI::User;
 use WebGUI::ProfileField;
 use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 224; # increment this value for each test you create
+use Test::More tests => 221; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -970,7 +970,7 @@ $friend->deleteFromGroups([$neighbor->friends->getId]);
 
 ################################################################
 #
-# getInboxAddresses
+# getInboxNotificationAddresses
 #
 ################################################################
 
@@ -982,32 +982,23 @@ $inmate->profileField('email',     '');
 $inmate->profileField('cellPhone', '');
 $inmate->profileField('receiveInboxEmailNotifications', 0);
 $inmate->profileField('receiveInboxSmsNotifications',   0);
-is ($inmate->getInboxAddresses, '', 'getInboxAddresses: with no profile info, returns blank');
+is ($inmate->getInboxNotificationAddresses, '', 'getInboxNotificationAddresses: with no profile info, returns blank');
 
 $inmate->profileField('receiveInboxEmailNotifications', 1);
-is ($inmate->getInboxAddresses, '', 'getInboxAddresses: with receiveInboxEmailNotifications=1, but not email address, returns blank');
+is ($inmate->getInboxNotificationAddresses, '', 'getInboxNotificationAddresses: with receiveInboxEmailNotifications=1, but not email address, returns blank');
 
 $inmate->profileField('email', 'andy@shawshank.com');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: email address only');
+is ($inmate->getInboxNotificationAddresses, 'andy@shawshank.com', 'getInboxNotificationAddresses: email address only');
 
 $inmate->profileField('receiveInboxSmsNotifications',   1);
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 but no other profile info');
+is ($inmate->getInboxNotificationAddresses, 'andy@shawshank.com', 'getInboxNotificationAddresses: receive only email address, with receiveInboSMSNotifications=1 but no other profile info');
 
 $inmate->profileField('cellPhone', '37927');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and cell phone but no gateway');
+is ($inmate->getInboxNotificationAddresses, 'andy@shawshank.com', 'getInboxNotificationAddresses: receive only email address, with receiveInboSMSNotifications=1 and cell phone but no gateway');
 
 $inmate->profileField('cellPhone', '');
 $session->setting->set('smsGateway', 'textme.com');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
-
-$inmate->profileField('cellPhone', '37927');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com,37927@textme.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
-
-$inmate->profileField('receiveInboxEmailNotifications', 0);
-is ($inmate->getInboxAddresses, '37927@textme.com', 'getInboxAddresses: can get SMS and no email, even with email info present');
-
-$inmate->profileField('receiveInboxSmsNotifications', 0);
-is ($inmate->getInboxAddresses, '', 'getInboxAddresses: can get no SMS and no email, even with profile info present');
+is ($inmate->getInboxNotificationAddresses, 'andy@shawshank.com', 'getInboxNotificationAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
 
 ################################################################
 #

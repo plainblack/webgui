@@ -284,7 +284,7 @@ sub create {
 		if (defined $user) {
             my $email;
             if ($isInbox) {
-                $email = $user->getInboxAddresses;
+                $email = $user->getInboxNotificationAddresses;
             }
             else {
                 $email = $user->profileField("email");
@@ -511,7 +511,7 @@ sub send {
             next USER unless $user->status eq 'Active';    ##Don't send this to invalid user accounts
             my $emailAddress;
             if ($self->{_isInbox}) {
-                $emailAddress = $user->getInboxAddresses;
+                $emailAddress = $user->getInboxNotificationAddresses;
             }
             else {
                 $emailAddress = $user->profileField('email');

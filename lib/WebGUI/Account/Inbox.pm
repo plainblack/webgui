@@ -237,11 +237,24 @@ sub editSettingsForm {
         hoverHelp    => $i18n->get('send inbox notifications only help'),
         defaultValue => $setting->get('sendInboxNotificationsOnly'),
     );
+    $f->text(
+        name         => 'inboxNotificationsSubject',
+        label        => $i18n->get('inbox notifications subject'),
+        hoverHelp    => $i18n->get('inbox notifications subject help'),
+        defaultValue => $setting->get('inboxNotificationsSubject'),
+    );
     $f->template(
         name         => 'inboxNotificationTemplateId',
         label        => $i18n->get('inbox notification template'),
         hoverHelp    => $i18n->get('inbox notification template help'),
         defaultValue => $self->getInboxNotificationTemplateId,
+        namespace    => 'Account/Inbox/Notification',
+    );
+    $f->template(
+        name         => 'inboxSmsNotificationTemplateId',
+        label        => $i18n->get('inbox sms notification template'),
+        hoverHelp    => $i18n->get('inbox sms notification template help'),
+        defaultValue => $self->getInboxSmsNotificationTemplateId,
         namespace    => 'Account/Inbox/Notification',
     );
 
@@ -284,12 +297,14 @@ sub editSettingsFormSave {
     $setting->set("inboxInviteUserTemplateId",         $form->process("inboxInviteUserTemplateId",         "template"));
     $setting->set("inboxInviteUserConfirmTemplateId",  $form->process("inboxInviteUserConfirmTemplateId",  "template"));
     #General Inbox Settings
-    $setting->set("inboxRichEditId",                 $form->process("inboxRichEditId",                 "selectRichEditor") );
+    $setting->set("inboxRichEditId",                   $form->process("inboxRichEditId",                 "selectRichEditor") );
     $setting->set("inboxCopySender",                   $form->process("inboxCopySender",                   "yesNo"));
 
     #Inbox Notification Settings
     $setting->set("sendInboxNotificationsOnly",        $form->process("sendInboxNotificationsOnly", "yesNo"));
+    $setting->set("inboxNotificationsSubject",         $form->process("inboxNotificationsSubject", "text"));
     $setting->set("inboxNotificationTemplateId",       $form->process("inboxNotificationTemplateId","template"));
+    $setting->set("inboxSmsNotificationTemplateId",    $form->process("inboxSmsNotificationTemplateId","template"));
 }
 
 
@@ -317,6 +332,19 @@ This method returns the template ID for inbox notifications.
 sub getInboxNotificationTemplateId {
     my $self = shift;
     return $self->session->setting->get("inboxNotificationTemplateId") || "b1316COmd9xRv4fCI3LLGA";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getInboxSMSNotificationTemplateId ( )
+
+This method returns the template ID for inbox SMS notifications.
+
+=cut
+
+sub getInboxSmsNotificationTemplateId {
+    my $self = shift;
+    return $self->session->setting->get("inboxSmsNotificationTemplateId") || "i9-G00ALhJOr0gMh-vHbKA";
 }
 
 #-------------------------------------------------------------------
@@ -1302,39 +1330,84 @@ sub www_sendMessageSave {
     #Let sendMessage deal with displaying errors
     return $self->www_sendMessage($errorMsg) if $hasError;
 
-    my $messageProperties = {
-        message => $message,
-        subject => $subject,
-        status  => 'unread',
-        sentBy  => $fromUser->userId
-    };
-
-    if ($session->setting->get('sendInboxNotificationsOnly')) {
-        my $template = WebGUI::Asset::Template->new($session, $self->getInboxNotificationTemplateId);
-        if ($template) {
-            ##Create template variables
-            my $var = {
-                fromUsername => $fromUser->username,
-                subject      => $messageProperties->{subject},
-                message      => $messageProperties->{message},
-                inboxLink    => $session->url->append($session->url->getSiteURL, 'op=account;module=inbox'),
-            };
-            ##Fill in template
-            my $output = $template->process($var);
-            ##Evaluate macros by hand
-            WebGUI::Macro::process($session, \$output);
-            ##Assign template output to $messageProperties->{emailMessage}
-            $messageProperties->{emailMessage} = $output;
-        }
-        else {
-            $session->log->warn(sprintf "Unable to instanciate notification template: ". $self->getInboxNotificationTemplateId);
-        }
-
-    }
-
     foreach my $uid (@toUsers) {
+        my $messageProperties = {
+            message => $message,
+            subject => $subject,
+            status  => 'unread',
+            sentBy  => $fromUser->userId
+        };
+        my $messageOptions = {};
+        
+        # Handle Email/SMS Notifications
+        my $user = WebGUI::User->new($session, $uid);
+        
+        # Sender only gets CCd on inbox message (not real email)
+        my $isSender = $uid == $session->user->userId;
+        $messageOptions->{no_email} = 1 if $isSender;
+        
+        # Optionally set SMS notification details (excluding sender)
+        my $smsAddress = $user->getInboxSmsNotificationAddress;
+        if ( $smsAddress && !$isSender ) {
+            my $smsNotificationTemplate
+                = WebGUI::Asset::Template->new($session, $self->getInboxSmsNotificationTemplateId);
+            if ($smsNotificationTemplate) {
+                ##Create template variables
+                my $var = {
+                    fromUsername => $fromUser->username,
+                    subject      => $messageProperties->{subject},
+                    message      => $messageProperties->{message},
+                    inboxLink    => $session->url->append($session->url->getSiteURL, 'op=account;module=inbox'),
+                };
+                ##Fill in template
+                my $output = $smsNotificationTemplate->process($var);
+                ##Evaluate macros by hand
+                WebGUI::Macro::process($session, \$output);
+                ##Assign template output to $messageProperties->{emailMessage}
+                $messageProperties->{smsMessage} = $output;
+                $messageProperties->{smsAddress} = $smsAddress;
+                $messageProperties->{smsSubject} = $self->session->setting->get('smsGatewaySubject');
+            }
+            else {
+                $session->log->warn(sprintf "Unable to instanciate notification template: ". $self->getInboxSmsNotificationTemplateId);
+            }
+        }
+        
+        # Optionally set email notification details (excluding sender)
+        if ($session->setting->get('sendInboxNotificationsOnly') && !$isSender) {
+            my $notificationAddresses = $user->getInboxNotificationAddresses;
+            
+            # If user has turned off email notifications and admin has turned on sendInboxNotificationsOnly,
+            # user gets no email at all - because email and email notification are mutually exclusive.
+            # Note that they can still possibly get SMS notification above
+            if (!$notificationAddresses) {
+                $messageOptions->{no_email} = 1;
+            } else {
+                my $template = WebGUI::Asset::Template->new($session, $self->getInboxNotificationTemplateId);
+                if ($template) {
+                    ##Create template variables
+                    my $var = {
+                        fromUsername => $fromUser->username,
+                        subject      => $messageProperties->{subject},
+                        message      => $messageProperties->{message},
+                        inboxLink    => $session->url->append($session->url->getSiteURL, 'op=account;module=inbox'),
+                    };
+                    ##Fill in template
+                    my $output = $template->process($var);
+                    ##Evaluate macros by hand
+                    WebGUI::Macro::process($session, \$output);
+                    ##Assign template output to $messageProperties->{emailMessage}
+                    $messageProperties->{emailMessage} = $output;
+                    $messageProperties->{emailSubject} = $session->setting->get('inboxNotificationsSubject');
+                }
+                else {
+                    $session->log->warn(sprintf "Unable to instanciate notification template: ". $self->getInboxNotificationTemplateId);
+                }
+            }
+        }
+        
         $messageProperties->{userId} = $uid;
-        my $thisMessage = $inbox->addMessage($messageProperties);
+        my $thisMessage = $inbox->addMessage($messageProperties, $messageOptions);
         if ($uid eq $session->user->userId) {
             $thisMessage->setRead;
         }

@@ -305,11 +305,19 @@ sub definition {
 		});
 	push(@fields, {
 		tab          => 'messaging',
-		fieldType    => 'email',
+		fieldType    => 'text',
 		name         => 'smsGateway',
 		label        => $i18n->get('sms gateway'),
 		hoverHelp    => $i18n->get('sms gateway help'),
 		defaultValue => $setting->get('smsGateway'),
+        });
+    push(@fields, {
+		tab          => 'messaging',
+		fieldType    => 'text',
+		name         => 'smsGatewaySubject',
+		label        => $i18n->get('sms gateway subject'),
+		hoverHelp    => $i18n->get('sms gateway subject help'),
+		defaultValue => $setting->get('smsGatewaySubject'),
 		});
 	# misc
 	push(@fields, {
