@@ -1138,16 +1138,12 @@ sub www_sendMessage {
                 $disabled  = "";
                 $activeFriendCount++;
             }
-            my $fname      = $friend->profileField("firstName");
-            my $lname      = $friend->profileField("lastName");
-            my $wholeName  = "";
-            $wholeName     = $fname." ".$lname if($fname && $lname);
 
             my $isChecked  = WebGUI::Utility::isIn($friendId,@friendsChecked);            
             my $friendHash = {
                 'friend_id'        => $friendId,
                 'friend_name'      => $friends->{$friendId},
-                'friend_wholeName' => $wholeName,
+                'friend_wholeName' => $friend->getWholeName,
             };
 
             push(@checkedFriends,$friendHash) if($isChecked);
