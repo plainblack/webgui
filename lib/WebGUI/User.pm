@@ -736,6 +736,8 @@ this user, constructed as:
 
  cellPhone@smsGateway
 
+Non digits, such as area code separators, are removed from the cell phone information.
+
 =cut
 
 sub getInboxSmsNotificationAddress {
