@@ -1334,9 +1334,9 @@ sub www_sendMessageSave {
 
     foreach my $uid (@toUsers) {
         $messageProperties->{userId} = $uid;
-        $inbox->addMessage($messageProperties);
+        my $thisMessage = $inbox->addMessage($messageProperties);
         if ($uid eq $session->user->userId) {
-            $message->setRead;
+            $thisMessage->setRead;
         }
     }
 

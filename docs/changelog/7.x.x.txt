@@ -1,4 +1,5 @@
 7.7.18
+ - fixed #10783: Inbox Copy Sender broken
  - fixed #10782: Send Message friend_wholeName template var
  - fixed #10778: Matrix navigation: list attributes
  - fixed #10776: i18n AuthLDAP::7 description 
