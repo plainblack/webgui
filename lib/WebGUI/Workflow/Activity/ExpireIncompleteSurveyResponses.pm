@@ -113,7 +113,6 @@ where r.isComplete = 0
     and s.timeLimit > 0 
     and ( unix_timestamp() - r.startDate ) > ( s.timeLimit * 60 ) 
     and r.assetId = s.assetId 
-    and s.revisionDate = r.revisionDate
     and ad.assetId = s.assetId 
     and ad.revisionDate = s.revisionDate 
     and upd.userId = r.userId
