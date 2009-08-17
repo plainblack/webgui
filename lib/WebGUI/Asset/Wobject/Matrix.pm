@@ -1160,6 +1160,7 @@ sub www_getCompareFormData {
     my @listingIds = $session->form->checkList("listingId");
     
     $session->http->setMimeType("application/json");
+    my $db = $session->db;
 
     my (@searchParams,@searchParams_sorted,@searchParamList,$searchParamList);
     if($form->process("search")){
@@ -1172,8 +1173,23 @@ sub www_getCompareFormData {
                 $attributeId =~ s/^search_//;
                 $attributeId =~ s/_____/-/g;
                 $parameter->{attributeId} = $attributeId;
-                push(@searchParamList,'"'.$parameter->{attributeId}.'"');
-                push(@searchParams,$parameter);
+                push(@searchParamList,  $db->quote($parameter->{attributeId}) );
+                push(@searchParams,     $parameter);
+            }
+        }
+        if (! scalar @searchParamList) {
+            ##Use defaults for all form values
+            foreach my $category (keys %{$self->getCategories}) {
+                my $attributes = $db->read("select * from Matrix_attribute where category =? and assetId = ?",
+                    [$category,$self->getId]);
+                while (my $attribute = $attributes->hashRef) {
+                    push @searchParamList, $db->quote($attribute->{attributeId});
+                    push @searchParams, {
+                        name        => $attribute->{name},
+                        value       => $attribute->{defaultValue},
+                        attributeId => $attribute->{attributeId},
+                    };
+                }
             }
         }
         $searchParamList        = join(',',@searchParamList);
