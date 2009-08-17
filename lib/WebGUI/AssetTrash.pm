@@ -218,6 +218,20 @@ sub purge {
 
 #-------------------------------------------------------------------
 
+=head2 restore
+
+Publishes assets from the trash.
+
+=cut
+
+sub restore {
+   my $self = shift;
+   $self->publish;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 trash ( $options )
 
 Removes asset from lineage, places it in trash state. The "gap" in the 
@@ -479,7 +493,7 @@ sub www_restoreList {
         my $self = shift;
         foreach my $id ($self->session->form->param("assetId")) {
                 my $asset = eval { WebGUI::Asset->newPending($self->session,$id); };
-                $asset->publish if $asset->canEdit;
+                $asset->restore if $asset->canEdit;
         }
         if ($self->session->form->process("proceed") ne "") {
                 my $method = "www_".$self->session->form->process("proceed");

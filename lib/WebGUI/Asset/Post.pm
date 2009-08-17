@@ -1253,6 +1253,21 @@ sub recalculatePostRating {
 
 #-------------------------------------------------------------------
 
+=head2 restore
+
+Extend the base class to also make the thread containing this post to recalculate its replies
+
+=cut
+
+sub restore {
+   my $self = shift;
+   $self->SUPER::restore(@_);
+   $self->getThread->sumReplies;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 rethreadUnder ($thread)
 
 Update the Post's threadId property with a new thread.
