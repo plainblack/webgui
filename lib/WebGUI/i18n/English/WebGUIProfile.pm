@@ -69,8 +69,8 @@ Internationalization system if labels need to be localized.|,
         },
 
         '474 description' => {
-                message => q|Should the user be required to fill out this field?|,
-                lastUpdated => 1122316558,
+                message => q|Should the user be required to fill out this field?  If this option is set to yes, then the field will automatically be set to be editable as well.|,
+                lastUpdated => 1250537322,
         },
 
         '486 description' => {

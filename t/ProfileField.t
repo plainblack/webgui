@@ -33,7 +33,7 @@ WebGUI::Test->usersToDelete($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 37;        # Increment this number for each test you create
+plan tests => 45;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -147,11 +147,38 @@ ok( !WebGUI::ProfileField->isReservedFieldName('shop'),      '... shop is not');
 ok(  WebGUI::ProfileField->exists($session, 'email'),  'exists: email');
 ok( !WebGUI::ProfileField->exists($session, 'userId'), '... userId (not)');
 
+###########################################################
+#
+# set
+#
+###########################################################
+
+my $newProfileField3 = WebGUI::ProfileField->create($session, 'testField3', {
+    label     => q|WebGUI::International::get('webgui','WebGUI')|,
+    fieldName => 'Text',
+});
+
+is ($newProfileField3->get('editable'), 0, 'default editable = 0');
+is ($newProfileField3->get('required'), 0, 'default required = 0');
+
+$newProfileField3->set({ editable => 1});
+is ($newProfileField3->get('editable'), 1, 'set editable=1');
+is ($newProfileField3->get('required'), 0, '... required=0');
+
+$newProfileField3->set({ editable => 0});
+is ($newProfileField3->get('editable'), 0, 'set editable = 0');
+is ($newProfileField3->get('required'), 0, '... required = 0');
+
+$newProfileField3->set({ required => 1});
+is ($newProfileField3->get('required'), 1, 'set required = 1');
+is ($newProfileField3->get('editable'), 1, '... editable = 1');
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
     $newProfileField->delete;
     $newProfileField2->delete;
+    $newProfileField3->delete;
 }
 
 

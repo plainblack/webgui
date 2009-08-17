@@ -33,8 +33,8 @@ my $session = start(); # this line required
 # upgrade functions go here
 addSmsGatewaySubjectSetting($session);
 addInboxNotificationsSubjectSetting($session);
+profileFieldRequiredEditable($session);
 finish($session); # this line required
-
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -44,6 +44,18 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub profileFieldRequiredEditable {
+    my $session = shift;
+    print "\tTurn on the editable bit for all Profile Fields which are required... " unless $quiet;
+    FIELD: foreach my $field (@{ WebGUI::ProfileField->getRequiredFields($session) } ) {
+        my $properties = $field->get();
+        next FIELD unless !$properties->{editable};
+        $properties->{editable} = 1;
+        $field->set($properties);
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 sub addSmsGatewaySubjectSetting {
     my $session = shift;

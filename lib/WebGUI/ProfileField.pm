@@ -877,13 +877,15 @@ sub set {
     my $db          = $session->db;
 
     # Set the defaults
-    $properties->{visible} = 0 unless ($properties->{visible} == 1);
-    $properties->{editable} = 0 unless ($properties->{editable} == 1);
-    $properties->{protected} = 0 unless ($properties->{protected} == 1);
-    $properties->{required} = 0 unless ($properties->{required} == 1);
-    $properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
-    $properties->{fieldType} = 'text' unless ($properties->{fieldType});
-    $properties->{extras} = '' unless ($properties->{extras});
+    $properties->{visible}   = 0           unless ($properties->{visible}   == 1);
+    $properties->{protected} = 0           unless ($properties->{protected} == 1);
+    $properties->{required}  = 0           unless ($properties->{required}  == 1);
+    $properties->{editable}  = $properties->{required} == 1 ? 1
+                             : $properties->{editable} == 1 ? 1
+                             : 0;
+    $properties->{label}     = 'Undefined' if     ($properties->{label} =~ /^[\"\']*$/);
+    $properties->{fieldType} = 'text'      unless ($properties->{fieldType});
+    $properties->{extras}    = ''          unless ($properties->{extras});
     if ($properties->{dataDefault} && $properties->{fieldType}=~/List$/) {
         unless ($properties->{dataDefault} =~ /^\[/) {
             $properties->{dataDefault} = "[".$properties->{dataDefault};

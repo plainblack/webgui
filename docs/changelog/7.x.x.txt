@@ -1,4 +1,5 @@
 7.7.18
+ - fixed #10781: User Profile Editable/Required gotcha
  - fixed #10786: Matrix navigation: search screen to view screen
  - fixed #10766: Matrix search: search dropdowns do not match what is displayed when search form opens.
  - fixed #10783: Inbox Copy Sender broken
