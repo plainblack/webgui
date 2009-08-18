@@ -296,7 +296,13 @@ sub canView {
 
 =head2 checkView ( )
 
-Returns error messages if a user can't view due to publishing problems, otherwise it sets the cookie and returns undef. This is sort of a hack until we find something better.
+Returns error messages if a user can't view due to publishing problems,
+otherwise it sets the cookie and returns undef. This is sort of a hack
+until we find something better.
+
+If SSL in enabled in the config file, and the asset has encryptPage set, and
+HTTPS is set and SSLPROXY is not set in the ENV, then this page is redirected
+to SSL.
 
 =cut
 
