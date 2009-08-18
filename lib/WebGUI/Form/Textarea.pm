@@ -149,9 +149,9 @@ sub toHtml {
         . ' name="' . $self->get("name") . '"'
         . ( $self->get("maxlength") ? ' maxlength="' . $self->get( "maxlength" ) . '"' : '' )
         . ' ' . $self->get("extras")
-        . ' rows="#" cols="#"'
+        . ' rows="5" cols="60"'
         . ' style="' . $self->get('style')
-        . ( $self->get("resizable") ? ' height: 100%; width: 100%' : $sizeStyle ) . '"'
+        . ( $self->get("resizable") ? ' height: 100%; width: 100%; resize: none;' : $sizeStyle ) . '"'
         . '>' . $value . '</textarea>';
 
     if ($self->get("resizable")) {
@@ -163,6 +163,11 @@ sub toHtml {
 <script type="text/javascript">
 (function() {
     var resize = new YAHOO.util.Resize('%1$s_resizewrapper');
+    resize.on('resize', function(e) {
+        YAHOO.util.Dom.setStyle('%1$s', 'width', resize.getStyle('width'));
+        YAHOO.util.Dom.setStyle('%1$s', 'height', resize.getStyle('height'));
+    });
+    resize.reset();
 })();
 </script>
 END_HTML
