@@ -151,7 +151,7 @@ sub toHtml {
     $style->setScript($url->extras('editarea/edit_area/edit_area_full.js'), {type=>"text/javascript"});
     my $out = <<"END_HTML";
 <div id="${id}_resizewrapper" style="padding-right: 6px; padding-bottom: 6px; margin-bottom: 1em; width: ${width}px; height: ${height}px">
-    <textarea id="$id" name="$name" $extras rows="#" cols="#" style="font-family: monospace; $styleAttr; height: 100%; width: 100%;">$value</textarea>
+    <textarea id="$id" name="$name" $extras rows="10" cols="60" style="font-family: monospace; $styleAttr; height: 100%; width: 100%; resize: none;">$value</textarea>
 </div>
 <script type="text/javascript">
 (function() {
@@ -165,6 +165,13 @@ sub toHtml {
         display          : 'later',
         toolbar          : 'search,go_to_line,|,undo,redo,|,syntax_selection,highlight,reset_highlight,|,help'
     });
+    resize.on('resize', function(e) {
+        YAHOO.util.Dom.setStyle('${id}', 'width', resize.getStyle('width'));
+        YAHOO.util.Dom.setStyle('${id}', 'height', resize.getStyle('height'));
+        YAHOO.util.Dom.setStyle('frame_${id}', 'width', resize.getStyle('width'));
+        YAHOO.util.Dom.setStyle('frame_${id}', 'height', resize.getStyle('height'));
+    });
+    resize.reset();
 })();
 </script>
 END_HTML
