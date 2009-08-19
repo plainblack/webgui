@@ -409,6 +409,7 @@ sub delete {
     $db->write("DELETE FROM userSession WHERE userId=?",[$userId]);
 
     # remove inbox entries
+    $db->write("DELETE FROM inbox_messageState WHERE userId=?",[$userId]);
     $db->write("DELETE FROM inbox WHERE userId=? AND (groupId IS NULL OR groupId='')",[$userId]);
 
     # Shop cleanups
