@@ -34,6 +34,7 @@ my $session = start(); # this line required
 addSmsGatewaySubjectSetting($session);
 addInboxNotificationsSubjectSetting($session);
 profileFieldRequiredEditable($session);
+deleteOldInboxMessageStates($session);
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -44,6 +45,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub deleteOldInboxMessageStates {
+    my $session = shift;
+    print "\tDelete Inbox messages states for users who have been deleted... " unless $quiet;
+    $session->db->write(<<EOSQL);
+DELETE FROM inbox_messageState WHERE userId NOT IN (SELECT userId FROM users)
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
 
 sub profileFieldRequiredEditable {
     my $session = shift;
