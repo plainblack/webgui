@@ -567,11 +567,12 @@ Completely remove an asset from existence.
 
 sub DESTROY {
 	my $self = shift;
-	# something bad happens when the following is enabled, not sure why
-	# must check this out later
-	#$self->{_parent}->DESTROY if (exists $self->{_parent});
-	$self->{_firstChild}->DESTROY if (exists $self->{_firstChild});
-	$self->{_lastChild}->DESTROY if (exists $self->{_lastChild});
+
+	# Let the parent be garbage collected if no one else is referencing
+	# him.  firstChild and lastChild are weak references, so no need to
+	# worry about them here.
+	delete $self->{_parent};
+
 	$self = undef;
 }
 

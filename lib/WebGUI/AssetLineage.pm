@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use Carp qw( croak );
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -91,6 +92,35 @@ sub addChild {
 	return $newAsset;
 }
 
+#-------------------------------------------------------------------
+
+=head2 cacheChild ( [first|last], asset? )
+
+A cache is kept of the first and last child assets in several cases.  In order
+to avoid memory leaks, these references must be weak, and the child assets
+must have a _parent reference to avoid early collection.  cacheChild maintains
+this delicate state, and so should be called instead of setting this cache
+directly.
+
+If called without an asset argument, the cached child is simply returned.
+
+=cut
+
+sub cacheChild {
+	my ($self, $which, $child) = @_;
+	my $slot = "_${which}Child";
+
+	if ($child) {
+		$self->{$slot} = $child;
+		$child->{_parent} = $self;
+		weaken($self->{$slot});
+	}
+	else {
+		$child = $self->{$slot};
+	}
+
+	return $child;
+}
 
 #-------------------------------------------------------------------
 
@@ -229,6 +259,7 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 
 sub getFirstChild {
 	my $self = shift;
+	# TODO: Use accessor here instead
 	unless (exists $self->{_firstChild}) {
 		my $assetLineage = $self->session->stow->get("assetLineage");
 		my $lineage = $assetLineage->{firstChild}{$self->getId};
@@ -239,8 +270,10 @@ sub getFirstChild {
 				$self->session->stow->set("assetLineage", $assetLineage);
 			}
 		}
-		$self->{_firstChild} = WebGUI::Asset->newByLineage($self->session,$lineage);
+		my $child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$self->cacheChild(first => $child);
 	}
+	# TODO: Use accessor here instead
 	return $self->{_firstChild};
 }
 
@@ -255,6 +288,7 @@ Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
 
 sub getLastChild {
 	my $self = shift;
+	# TODO: Use accessor here instead
 	unless (exists $self->{_lastChild}) {
 		my $assetLineage = $self->session->stow->get("assetLineage");
 		my $lineage = $assetLineage->{lastChild}{$self->getId};
@@ -263,8 +297,10 @@ sub getLastChild {
 			$assetLineage->{lastChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
-		$self->{_lastChild} = WebGUI::Asset->newByLineage($self->session,$lineage);
+		my $child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$self->cacheChild(last => $child);
 	}
+	# TODO: Use accessor here instead
 	return $self->{_lastChild};
 }
 
@@ -383,11 +419,14 @@ sub getLineage {
 		}
 		# since we have the relatives info now, why not cache it
 		if ($rules->{returnObjects}) {
-			my $parent = $relativeCache{$parentId};
 			$relativeCache{$id} = $asset;
-			$asset->{_parent} = $parent if exists $relativeCache{$parentId};
-			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
-			$parent->{_lastChild} = $asset;
+			if (my $parent = $relativeCache{$parentId}) {
+				$asset->{_parent} = $parent; 
+				unless ($parent->cacheChild('first')) {
+					$parent->cacheChild(first => $asset);
+				}
+				$parent->cacheChild(last => $asset);
+			}
 		}
 		push(@lineage,$asset);
 	}
@@ -748,8 +787,10 @@ Returns 1 or the count of Assets with the same parentId as current Asset's asset
 sub hasChildren {
 	my $self = shift;
 	unless (exists $self->{_hasChildren}) {
+		# TODO: Use accessor here instead
 		if (exists $self->{_firstChild}) {
 			$self->{_hasChildren} = 1;
+		# TODO: Use accessor here instead
 		} elsif (exists $self->{_lastChild}) {
 			$self->{_hasChildren} = 1;
 		} else {

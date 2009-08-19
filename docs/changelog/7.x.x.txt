@@ -2,6 +2,7 @@
  - fixed #10788: Thread rating calculate during post delete/restore
  - will now respect X-Forwarded-Proto header
  - no longer need special Apache configuration to handle SSLPROXY header
+ - fixed semi-rare memory leak in getLineage
  - fixed #10674: CDN URLs are cached across HTTP/HTTPS accesses
  - fixed: Copied assets don't always get URL extensions added
  - fixed #10789: Inbox message states not deleted when a user is deleted
