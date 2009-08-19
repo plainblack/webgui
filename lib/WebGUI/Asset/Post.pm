@@ -1255,14 +1255,16 @@ sub recalculatePostRating {
 
 =head2 restore
 
-Extend the base class to also make the thread containing this post to recalculate its replies
+Extend the base class to also make the thread containing this post to recalculate its replies and
+the thread rating.
 
 =cut
 
 sub restore {
-   my $self = shift;
-   $self->SUPER::restore(@_);
-   $self->getThread->sumReplies;
+    my $self = shift;
+    $self->SUPER::restore(@_);
+    $self->getThread->sumReplies;
+    $self->getThread->updateThreadRating;
 }
 
 
@@ -1338,7 +1340,7 @@ sub setStatusUnarchived {
 
 =head2 trash ( )
 
-Moves post to the trash and updates reply counter on thread.
+Moves post to the trash, updates reply counter on thread and recalculates the thread rating.
 
 =cut
 
@@ -1346,6 +1348,7 @@ sub trash {
     my $self = shift;
     $self->SUPER::trash;
     $self->getThread->sumReplies if ($self->isReply);
+    $self->getThread->updateThreadRating;
     if ($self->getThread->get("lastPostId") eq $self->getId) {
         my $threadLineage = $self->getThread->get("lineage");
         my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
