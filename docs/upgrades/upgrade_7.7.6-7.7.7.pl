@@ -60,7 +60,7 @@ sub removeDanglingOldRssAssets {
         }
         else {
             print "\t\tNot used, removing leftover assets, if any.\n" unless $quiet;
-            $session->db->write(q|DELETE FROM assetData WHERE assetId IN (SELECT assetId FROM ASSET WHERE className="WebGUI::Asset::RssFromParent")|);
+            $session->db->write(q|DELETE FROM assetData WHERE assetId IN (SELECT assetId FROM asset WHERE className="WebGUI::Asset::RssFromParent")|);
             $session->db->write(q|DELETE FROM asset WHERE className = "WebGUI::Asset::RssFromParent"|);
         }
     }
