@@ -1,5 +1,6 @@
 7.6.35-1
  - fixed #10754: assets were never added
+ - fixed #10790: Data Form doesn't always auto-commit version tags
  - fixed #10739: Textarea and Codearea resize don't work in IE or Webkit browsers
  - fixed #10761: Two i18n issues on LDAP page
  - fixed i18n message for delete assets doesn't mention children.

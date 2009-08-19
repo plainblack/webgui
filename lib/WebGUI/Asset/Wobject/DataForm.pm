@@ -1236,12 +1236,11 @@ sub www_editFieldSave {
         $newSelf->createField($newName, \%field);
     }
 
-
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
     if ($form->process("proceed") eq "editField") {
         return $newSelf->www_editField('new');
     }
     $newSelf->{_mode} = 'form';
-    WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
     return $newSelf->www_view;
 }
 
