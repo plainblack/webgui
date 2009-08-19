@@ -192,7 +192,12 @@ Returns true if a https request was made.
 
 sub sslRequest {
     my $self = shift;
-    return ($self->get('HTTPS') eq 'on' || $self->get('SSLPROXY') ? 1 : 0);
+    return (
+           $self->get('HTTPS') eq 'on'
+        || $self->get('SSLPROXY')
+        || $self->get('HTTP_SSLPROXY')
+        || $self->get('HTTP_X_FORWARDED_PROTO') eq 'https'
+    );
 }
 
 
