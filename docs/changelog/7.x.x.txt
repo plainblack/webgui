@@ -1,4 +1,5 @@
 7.7.18
+ - fixed #10674: CDN URLs are cached across HTTP/HTTPS accesses
  - fixed: Copied assets don't always get URL extensions added
  - fixed #10789: Inbox message states not deleted when a user is deleted
  - fixed #10790: Data Form doesn't always auto-commit version tags

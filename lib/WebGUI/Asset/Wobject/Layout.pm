@@ -409,7 +409,11 @@ sub www_view {
     ) {
         my $check = $self->checkView;
         return $check if (defined $check);
-        my $cache = WebGUI::Cache->new($session, "view_".$self->getId);
+        my $cacheKey = "view_".$self->getId;
+        if ($session->env->sslRequest) {
+            $cacheKey .= '_ssl';
+        }
+        my $cache = WebGUI::Cache->new($session, $cacheKey);
         my $out = $cache->get if defined $cache;
         unless ($out) {
             $self->prepareView;
