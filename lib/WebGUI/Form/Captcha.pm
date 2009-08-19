@@ -161,7 +161,7 @@ sub toHtml {
         my $env = $self->session->env;
         my $pubKey = $self->session->setting->get('recaptchaPublicKey');
         my $server = "http://api.recaptcha.net";
-        if ($env->get("HTTPS") eq "on" || $env->get("SSLPROXY")) {
+        if ($env->sslRequest) {
             $server = "http://api-secure.recaptcha.net";
         }
         return

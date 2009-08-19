@@ -310,7 +310,7 @@ sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
 	my ($conf, $env, $var, $http) = $self->session->quick(qw(config env var http));
-    if ($conf->get("sslEnabled") && $self->get("encryptPage") && $env->get("HTTPS") ne "on" && !$env->get("SSLPROXY")) {
+    if ($conf->get("sslEnabled") && $self->get("encryptPage") && ! $env->sslRequest) {
         # getUrl already changes url to https if 'encryptPage'
         $http->setRedirect($self->getUrl);
         $http->sendHeader;
