@@ -21,6 +21,7 @@
  - fixed #10774: i18n Asset::Storyarchive tag asset url
  - fixed #10657: Story Topic: delete story displays failsafe
  - fixed SMS/Email notification handling (Patrick Donelan, SDH Consulting)
+ - fixed #10624: map template problem with floats
 
 7.7.17
  - fixed #10697: Story: Image crowds text

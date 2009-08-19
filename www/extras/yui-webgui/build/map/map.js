@@ -136,6 +136,7 @@ WebGUI.Map.editPointSave
 WebGUI.Map.focusOn
 = function ( assetId ) {
     var marker  = WebGUI.Map.markers[assetId];
+    if ( !marker ) return;
     var map     = marker.map;
     var infoWin = marker.infoWin;
     if ( map.getZoom() < 5 ) {
