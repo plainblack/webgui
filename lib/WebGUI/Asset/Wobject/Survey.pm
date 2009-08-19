@@ -19,6 +19,7 @@ use WebGUI::Utility;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
+use WebGUI::Asset::Wobject::Survey::Test;
 use WebGUI::Form::Country;
 use WebGUI::VersionTag;
 use Text::CSV_XS;
