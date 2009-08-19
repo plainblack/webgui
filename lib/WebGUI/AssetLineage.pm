@@ -259,8 +259,8 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 
 sub getFirstChild {
 	my $self = shift;
-	# TODO: Use accessor here instead
-	unless (exists $self->{_firstChild}) {
+	my $child = $self->cacheChild('first');
+	unless ($child) {
 		my $assetLineage = $self->session->stow->get("assetLineage");
 		my $lineage = $assetLineage->{firstChild}{$self->getId};
 		unless ($lineage) {
@@ -270,11 +270,10 @@ sub getFirstChild {
 				$self->session->stow->set("assetLineage", $assetLineage);
 			}
 		}
-		my $child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
 		$self->cacheChild(first => $child);
 	}
-	# TODO: Use accessor here instead
-	return $self->{_firstChild};
+	return $child;
 }
 
 
@@ -288,8 +287,8 @@ Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
 
 sub getLastChild {
 	my $self = shift;
-	# TODO: Use accessor here instead
-	unless (exists $self->{_lastChild}) {
+	my $child = $self->cacheChild('last');
+	unless ($child) {
 		my $assetLineage = $self->session->stow->get("assetLineage");
 		my $lineage = $assetLineage->{lastChild}{$self->getId};
 		unless ($lineage) {
@@ -297,11 +296,10 @@ sub getLastChild {
 			$assetLineage->{lastChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
-		my $child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
 		$self->cacheChild(last => $child);
 	}
-	# TODO: Use accessor here instead
-	return $self->{_lastChild};
+	return $child;
 }
 
 #-------------------------------------------------------------------
@@ -787,11 +785,9 @@ Returns 1 or the count of Assets with the same parentId as current Asset's asset
 sub hasChildren {
 	my $self = shift;
 	unless (exists $self->{_hasChildren}) {
-		# TODO: Use accessor here instead
-		if (exists $self->{_firstChild}) {
+		if ($self->cacheChild('first')) {
 			$self->{_hasChildren} = 1;
-		# TODO: Use accessor here instead
-		} elsif (exists $self->{_lastChild}) {
+		} elsif ($self->cacheChild('last')) {
 			$self->{_hasChildren} = 1;
 		} else {
 			$self->{_hasChildren} = $self->getChildCount;
