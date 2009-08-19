@@ -22,6 +22,7 @@
  - fixed #10657: Story Topic: delete story displays failsafe
  - fixed SMS/Email notification handling (Patrick Donelan, SDH Consulting)
  - fixed #10624: map template problem with floats
+ - fixed #10793: Map->Add Point photo field missing
 
 7.7.17
  - fixed #10697: Story: Image crowds text
