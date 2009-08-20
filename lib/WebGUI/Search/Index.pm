@@ -175,18 +175,27 @@ A string containing keywords.
 =cut
 
 sub _filterKeywords {
-	my $self     = shift;
+    my $self     = shift;
     my $keywords = shift;
 
-	$keywords = WebGUI::HTML::filter($keywords, "all");
-#-------------------- added by zxp for chinese word segment
-	utf8::decode($keywords);
-	my @segs = split /([A-z|\d]+|\S)/, $keywords;
-	my $newKeywords = join " ",@segs;
-	$newKeywords =~ s/(^\s+|\s+$)//g;
-	$newKeywords =~ s/\s+/\'\'/g;
-#-------------------- added by zxp end
-    return $newKeywords;
+    $keywords = WebGUI::HTML::filter($keywords, "all");
+
+    # split into 'words'.  Ideographic characters (such as Chinese) are
+    # treated as distinct words.  Everything else is space delimited.
+    my @words = grep { $_ ne '' } split /\s+|(\p{Ideographic})/, $keywords;
+
+    # remove punctuation characters at the start and end of each word.
+    for my $word ( @words ) {
+        $word =~ s/\A\p{isPunct}+//;
+        $word =~ s/\p{isPunct}+\z//;
+        # we add padding to ideographic characters to avoid minimum word length limits on indexing
+        if ($word =~ /\p{Ideographic}/) {
+            $word = qq{''$word''};
+        }
+    }
+
+    $keywords = join q{ }, @words;
+    return $keywords;
 }
 
 #-------------------------------------------------------------------

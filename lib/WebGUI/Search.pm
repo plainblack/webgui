@@ -366,32 +366,27 @@ sub search {
 	my $query = "";
 	my @clauses;
         my @orClauses;
-	if ($rules->{keywords}) {
-		my $keywords = $rules->{keywords};
-		unless ($keywords =~ m/"|\*/) { # do wildcards for people, like they'd expect
-        		my @terms = split(' ',$keywords);
-        		for (my $i = 0; $i < scalar(@terms); $i++) {
-			#-------------- Edited by zxp for Chinese Word Segment
-				utf8::decode($terms[$i]);
-				my @segs = split /([A-z,+-|\d]+|\S)/, $terms[$i];
-				$terms[$i] = join " ",@segs;
-				$terms[$i] =~ s/\s{2,}/ /g;
-				$terms[$i] =~ s/(^\s|\s$)//g;
-				$terms[$i] =~ s/\s/\'\'/g;
-				if($terms[$i] =~ m/\'/) { # has non-latin latter in terms
-					$terms[$i] = '"' . $terms[$i] . '"';
-				}
-			#-------------- Edited by zxp end
-                $terms[$i] .= "*";
-				
-                # By default results need to match ALL keywords / Len Kranendonk 20060811
-                # Do not force matching of possible stopwords
-                if (!$self->_isStopword( $terms[$i] )) {
-                    $terms[$i] = "+" . $terms[$i] if ($terms[$i] !~ m/^[+-]/);
+    if ($rules->{keywords}) {
+        my $keywords = $rules->{keywords};
+        # do wildcards for people like they'd expect unless they are doing it themselves
+        unless ($keywords =~ m/"|\*/) {
+            # split into 'words'.  Ideographic characters (such as Chinese) are
+            # treated as distinct words.  Everything else is space delimited.
+            my @terms = grep { $_ ne q{} } split /\s+|(\p{Ideographic})/, $keywords;
+            for my $term (@terms) {
+                # we add padding to ideographic characters to avoid minimum word length limits on indexing
+                if ($term =~ /\p{Ideographic}/) {
+                    $term = qq{''$term''};
                 }
+                $term .= q{*};
+                next
+                    if $self->_isStopword($term);
+                next
+                    if $term =~ /^[+-]/;
+                $term = q{+} . $term;
             }
-            $keywords = join(" ", @terms);
-		}	
+            $keywords = join q{ }, @terms;
+        }
 		push(@params, $keywords, $keywords);
 		$self->{_score} = "match (keywords) against (?) as score";
 		push(@clauses, "match (keywords) against (? in boolean mode)");
