@@ -1,4 +1,5 @@
 7.7.18
+ - fixed #10511: Carousel cutting off edge of photo
  - fixed #10804: EMS Schedule Screen broken
  - fixed: Logging errors when getting the list of available driver classes.
  - fixed #10797: Unable to search for non-ASCII text

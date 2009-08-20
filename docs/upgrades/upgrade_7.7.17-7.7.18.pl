@@ -36,6 +36,7 @@ addInboxNotificationsSubjectSetting($session);
 profileFieldRequiredEditable($session);
 deleteOldInboxMessageStates($session);
 setDefaultEMSScheduleTemplate($session);
+addCarouselSlideWidth($session);
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -46,6 +47,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub addCarouselSlideWidth {
+    my $session = shift;
+    print "\tAdd a default width property to the Carousel... " unless $quiet;
+    $session->db->write(<<EOSQL);
+ALTER TABLE Carousel ADD COLUMN slideWidth int(11)
+EOSQL
+    $session->db->write(<<EOSQL);
+UPDATE Carousel SET slideWidth=0;
+EOSQL
+    
+    print "DONE!\n" unless $quiet;
+}
 
 sub setDefaultEMSScheduleTemplate {
     my $session = shift;

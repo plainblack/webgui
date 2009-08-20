@@ -18,7 +18,8 @@ our $HELP = {
                     {   'name'          => 'itemId'},
                     {   'name'          => 'sequenceNumber'},
                 ],
-            }
+            },
+            {   'name'      => 'slideWidth', },
         ],
         related => [],
     },
