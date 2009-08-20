@@ -35,6 +35,7 @@ addSmsGatewaySubjectSetting($session);
 addInboxNotificationsSubjectSetting($session);
 profileFieldRequiredEditable($session);
 deleteOldInboxMessageStates($session);
+setDefaultEMSScheduleTemplate($session);
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -45,6 +46,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub setDefaultEMSScheduleTemplate {
+    my $session = shift;
+    print "\tSet the default EMS schedule template on existing EMS'es that do not have one... " unless $quiet;
+    $session->db->write(<<EOSQL);
+update EventManagementSystem set scheduleTemplateId='S2_LsvVa95OSqc66ITAoig' where scheduleTemplateId IS NULL;
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
 
 sub deleteOldInboxMessageStates {
     my $session = shift;
