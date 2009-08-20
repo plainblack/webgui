@@ -1,4 +1,5 @@
 7.7.18
+ - fixed: Logging errors when getting the list of available driver classes.
  - fixed #10797: Unable to search for non-ASCII text
  - fixed #10800: Ogone payment driver typo
  - fixed #10799: Shop: Ogone payment driver- typo

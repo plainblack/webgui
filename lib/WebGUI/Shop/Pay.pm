@@ -88,8 +88,13 @@ This subroutine returns a hash reference of available shipping driver classes as
 sub getDrivers {
     my $self      = shift;
     my %drivers = ();
-    foreach my $class (@{$self->session->config->get('paymentDrivers')}) {
-        $drivers{$class} = eval { WebGUI::Pluggable::instanciate($class, 'getName', [ $self->session ])};
+    CLASS: foreach my $class (@{$self->session->config->get('paymentDrivers')}) {
+        my $driverName   = eval { WebGUI::Pluggable::instanciate($class, 'getName', [ $self->session ])};
+        if ($@) {
+            $self->session->log->warn("Error loading $class: $@");
+        }
+        next CLASS unless $driverName;
+        $drivers{$class} = $driverName;
     }
     return \%drivers;
 }
