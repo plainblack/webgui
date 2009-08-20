@@ -24,6 +24,9 @@
  - fixed SMS/Email notification handling (Patrick Donelan, SDH Consulting)
  - fixed #10624: map template problem with floats
  - fixed #10793: Map->Add Point photo field missing
+ - fixed #10625: Map point no save button
+ - fixed #10639: Map: Can't edit or delete points
+ - fixed #10640: Map: points not working correctly
 
 7.7.17
  - fixed #10697: Story: Image crowds text
