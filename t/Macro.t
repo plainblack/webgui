@@ -44,7 +44,7 @@ foreach my $macro (qw/
 }
 $session->config->addToHash('macros', "Ex'tras", "Extras");
 
-plan tests => 39;
+plan tests => 42;
 
 my $macroText = "CompanyName: ^c;";
 my $companyName = $session->setting->get('companyName');
@@ -236,6 +236,9 @@ tie my %quotingEdges, 'Tie::IxHash';
         => '@MacroCall[`@MacroCall[`something`.`something else`]:`.`more still`]:',
     q{^VisualMacro("^VisualMacro('something', 'something else');", "more still");}
         => '@MacroCall[`@MacroCall[`something`.`something else`]:`.`more still`]:',
+    '^VisualMacro(,,);'                             => '@MacroCall[``.``]:',
+    '^VisualMacro("","",);'                         => '@MacroCall[``.``]:',
+    '^VisualMacro(,,"");'                           => '@MacroCall[``.``.``]:',
 );
 while (my ($inText, $outText) = each %quotingEdges) {
     my $procText = $inText;
