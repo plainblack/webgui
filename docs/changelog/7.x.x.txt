@@ -1,4 +1,6 @@
 7.7.18
+ - fixed #10800: Ogone payment driver typo
+ - fixed #10799: Shop: Ogone payment driver- typo
  - fixed #10798: Couple of typos in Shop EU Tax Driver screen
  - fixed #10795: Copy and edit template give error
  - fixed #10788: Thread rating calculate during post delete/restore
