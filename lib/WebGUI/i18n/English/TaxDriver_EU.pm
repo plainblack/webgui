@@ -51,14 +51,14 @@ our $I18N = {
     },
 
     'auto vies approval help' => {
-        message => q|If you set this to yes, VAT numbers that are validated through the VIES service are directly usable by your customers. If set to no, only VAT numbers that have been expicitly approved by you are usable.|,
-        lastUpdated => 0,
+        message => q|If you set this to yes, VAT numbers that are validated through the VIES service are directly usable by your customers. If set to no, only VAT numbers that have been explicitly approved by you are usable.|,
+        lastUpdated => 1250796443,
         context => 'Hover help in the admin screen',
     },
 
     'accept when vies unavailable' => {
-        message => q|Accept unvalidated VAT numbers when VIES is unavailable?|,
-        lastUpdated => 0,
+        message => q|Accept non-validated VAT numbers when VIES is unavailable?|,
+        lastUpdated => 1250796458,
         context => 'Form label in admin screen',
     },
 
