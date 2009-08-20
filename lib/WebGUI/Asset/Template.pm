@@ -874,7 +874,7 @@ sub www_editDuplicate {
         menuTitle   => $self->get( "menuTitle" ) . " (copy)",
     } );
 
-    # Make our asset use our new template
+    # Make the asset that originally invoked edit template use the newly created asset.
     if ( $self->session->form->get( "proceed" ) eq "goBackToPage" ) {
         if ( my $asset = WebGUI::Asset->newByUrl( $session, $form->get( "returnUrl" ) ) ) {
             # Find which property we should set by comparing namespaces and current values
@@ -888,7 +888,11 @@ sub www_editDuplicate {
 
                         # Auto-commit our revision if necessary
                         # TODO: This needs to be handled automatically somehow...
-                        WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
+                        my $status = WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
+                        ##Force the locked by tag
+                        if ($status eq 'commit') {
+                            $newTemplate->{_properties}{isLockedBy} = undef;
+                        }
                         last DEF;
                     }
                 }

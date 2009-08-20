@@ -1,4 +1,5 @@
 7.7.18
+ - fixed #10795: Copy and edit template give error
  - fixed #10788: Thread rating calculate during post delete/restore
  - will now respect X-Forwarded-Proto header
  - no longer need special Apache configuration to handle SSLPROXY header
