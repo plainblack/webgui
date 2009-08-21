@@ -1,3 +1,5 @@
+7.7.19
+
 7.7.18
  - fixed #10801: Payment Methods: can select a blank method
  - fixed #10511: Carousel cutting off edge of photo
