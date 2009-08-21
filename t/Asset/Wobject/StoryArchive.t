@@ -79,6 +79,7 @@ my $storage;
 my $versionTag;
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
+my @skipAutoCommit  = (undef, undef, { skipAutoCommitWorkflows => 1 });
 
 SKIP: {
 
@@ -93,6 +94,7 @@ $archive    = $home->addChild({
               });
 $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
+WebGUI::Test->tagsToRollback($versionTag);
 
 isa_ok($archive, 'WebGUI::Asset::Wobject::StoryArchive', 'created StoryArchive');
 
@@ -159,8 +161,10 @@ is($archive->getChildCount, 0, 'leaving with an empty archive');
 my $child = $archive->addChild({className => 'WebGUI::Asset::Wobject::StoryTopic'});
 is($child, undef, 'addChild: Will only add Stories');
 
-$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'});
-$child->requestAutoCommit;
+$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'}, @skipAutoCommit);
+my $tag1 = WebGUI::VersionTag->getWorking($session);
+$tag1->commit;
+WebGUI::Test->tagsToRollback($tag1);
 isa_ok($child, 'WebGUI::Asset::Story', 'addChild added and returned a Story');
 is($archive->getChildCount, 1, 'addChild: added it to the archive');
 my $folder = $archive->getFirstChild();
@@ -194,18 +198,22 @@ my $newFolder = $archive->getFolder($yesterday);
 my ($wgBdayMorn,undef)    = $session->datetime->dayStartEnd($wgBday);
 my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
-my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo'});
+my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo'}, @skipAutoCommit);
 $creationDateSth->execute([$wgBday, $story->getId]);
-$story->requestAutoCommit;
+my $tag2 = WebGUI::VersionTag->getWorking($session);
+$tag2->commit;
+WebGUI::Test->tagsToRollback($tag2);
 
 {
     my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
     is ($storyDB->get('status'), 'approved', 'addRevision always calls for an autocommit');
 }
 
-my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" });
+my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" }, @skipAutoCommit);
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
-$pastStory->requestAutoCommit;
+my $tag3 = WebGUI::VersionTag->getWorking($session);
+$tag3->commit;
+WebGUI::Test->tagsToRollback($tag3);
 
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
@@ -234,6 +242,8 @@ KEY: foreach my $key (keys %{ $templateVars }) {
     next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop mode/);
     delete $templateVars->{$key};
 }
+
+diag Dumper $templateVars;
 
 $session->user({userId => 1});
 cmp_deeply(
@@ -272,16 +282,16 @@ cmp_deeply(
     'viewTemplateVariables: returns expected template variables with 3 stories in different folders, user is cannot edit stories'
 );
 
-my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot"});
-my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo"});
-my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo"});
+my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot"}, @skipAutoCommit);
+my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo"},  @skipAutoCommit);
+my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo"},    @skipAutoCommit);
 foreach my $storilet ($story2, $story3, $story4) {
     $session->db->write("update asset set creationDate=$now where assetId=?",[$storilet->getId]);
 }
 $archive->update({storiesPerPage => 3});
-$story2->requestAutoCommit;
-$story3->requestAutoCommit;
-$story4->requestAutoCommit;
+my $tag4 = WebGUI::VersionTag->getWorking($session);
+$tag4->commit;
+WebGUI::Test->tagsToRollback($tag4);
 
 ##Don't assume that Admin and Visitor have the same timezone.
 $session->user({userId => 3});
@@ -644,12 +654,6 @@ $archive->update({ url => '/home/mystories' });
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    if (defined $archive and ref $archive eq $class) {
-        $archive->purge;
-    }
-    if ($versionTag) {
-        $versionTag->rollback;
-    }
     $creationDateSth->finish;
 }
 
