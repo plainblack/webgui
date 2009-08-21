@@ -141,7 +141,7 @@ cmp_deeply (
         className       => ref($article),
         isPublic        => 1, # default
         keywords        => all( # keywords contains synopsis, title, menuTitle, every part of the URL and every keyword
-            re("This''is''a''synopsis"),
+            re("This is a synopsis"),
             re($article->get('title')),
             re($article->get('menuTitle')),
             re("root"), re("import"),
