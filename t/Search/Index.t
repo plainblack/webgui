@@ -242,4 +242,25 @@ cmp_deeply (
     "Index has decoded entities" 
 );
 
+#----------------------------------------------------------------------------
+# Test that Chinese ideographical characters are inserted and searchable.
+use utf8;
+$article->update({
+    description     => "甲骨文",
+});
+$indexer = WebGUI::Search::Index->create( $article );
+
+$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] );
+cmp_deeply ( 
+    $row,
+    superhashof({
+        keywords        => all( # keywords contains title, menuTitle, every part of the URL and every keyword
+            re("''甲''"),
+            re("''骨''"),
+            re("''文''"),
+        ),
+    }),
+    "Index has Chinese ideographs, separated by spaces and delimited with quotes to pad the length" 
+);
+
 #vim:ft=perl
