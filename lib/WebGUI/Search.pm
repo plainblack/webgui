@@ -383,7 +383,7 @@ sub search {
             for my $term (@terms) {
                 # we add padding to ideographic characters to avoid minimum word length limits on indexing
                 if ($term =~ /\p{Ideographic}/) {
-                    $term = qq{''$term''};
+                    $term = q{''}.$term.q{''};
                 }
                 $term .= q{*};
                 next

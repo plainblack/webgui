@@ -193,7 +193,7 @@ sub _filterKeywords {
         $word =~ s/\p{isPunct}+\z//;
         # we add padding to ideographic characters to avoid minimum word length limits on indexing
         if ($word =~ /\p{Ideographic}/) {
-            $word = qq{''$word''};
+            $word = q{''}.$word.q{''};
         }
     }
 

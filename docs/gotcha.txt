@@ -18,6 +18,11 @@ save you many hours of grief.
       or, to index all of the sites on the server:
         perl search.pl --indexall
 
+    * For searching content with ideograms, ft_min_word_len must be
+      set to 2 in the Mysql config file.  WebGUI will safely pad the
+      characters so that it does not need to be set to 1.  The WRE
+      has ft_min_word_len set to 2 by default.
+
 7.7.18
 --------------------------------------------------------------------
     * The search indexer was not properly indexing non-ASCII content.  The
