@@ -224,7 +224,8 @@ sub getResultSet {
 
 =head2 new ( session  [ , isPublic ] )
 
-Constructor.
+Constructor.  Each search object can handle doing 1 search.  Performing multiple searches
+will accumulate internal data and cause errors due to number of placeholder mismatches.
 
 =head3 session
 
