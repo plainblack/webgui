@@ -281,7 +281,7 @@ WebGUI::Test->groupsToDelete($inboxGroup);
 $inboxGroup->addUsers([$emailUser->userId, $inboxUser->userId, $lonelyUser->userId]);
 
 SKIP: {
-    my $numtests        = 3; # Number of tests in this block
+    my $numtests        = 1; # Number of tests in this block
 
     # Must be able to write the config, or we'll die
     skip "Cannot test email notifications", $numtests unless $smtpServerOk;
