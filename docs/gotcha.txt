@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.19
+--------------------------------------------------------------------
+    * The search indexer was not properly indexing non-ASCII content
+      entered via TinyMCE.  The behaviour has been corrected.  If your
+      site has content in languages other than English, you should
+      re-index the site.  This can be done with the search.pl utility
+      script by running
+        perl search.pl --configFile=www.mysite.com.conf --indexsite
+      or, to index all of the sites on the server:
+        perl search.pl --indexall
+
 7.7.18
 --------------------------------------------------------------------
     * The search indexer was not properly indexing non-ASCII content.  The

@@ -40,7 +40,7 @@ WebGUI::Test->tagsToRollback(
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 16;        # Increment this number for each test you create
+plan tests => 15;        # Increment this number for each test you create
 
 use_ok( 'WebGUI::Search::Index' );
 
@@ -123,7 +123,7 @@ $article->update({
 } );
 $indexer = WebGUI::Search::Index->create( $article );
 
-ok ( my $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] ),
+ok ( $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] ),
     "assetId exists in assetIndex"
 );
 cmp_deeply ( 
@@ -149,7 +149,7 @@ cmp_deeply (
         ),
         lineage         => $article->get('lineage'),
     },
-    "Index has correct information" 
+    "Index has synopsis information in keywords" 
 );
 
 
@@ -161,9 +161,7 @@ $article->update({
 });
 $indexer = WebGUI::Search::Index->create( $article );
 
-ok ( my $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] ),
-    "assetId exists in assetIndex"
-);
+$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ]);
 cmp_deeply ( 
     $row,
     {
@@ -187,7 +185,7 @@ cmp_deeply (
         ),
         lineage         => $article->get('lineage'),
     },
-    "Index has correct information" 
+    "Index has description in keywords" 
 );
 
 
@@ -199,9 +197,7 @@ $article->update({
 });
 $indexer = WebGUI::Search::Index->create( $article );
 
-ok ( my $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] ),
-    "assetId exists in assetIndex"
-);
+$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] );
 cmp_deeply ( 
     $row,
     {
@@ -224,7 +220,26 @@ cmp_deeply (
         ),
         lineage         => $article->get('lineage'),
     },
-    "Index has correct information" 
+    "Index has synopsis and description in keywords" 
+);
+
+#----------------------------------------------------------------------------
+# Test that HTML entities are decoded.
+$article->update({
+    description     => "sch&ouml;n ca&ntilde;&oacute;n",
+});
+$indexer = WebGUI::Search::Index->create( $article );
+
+$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] );
+cmp_deeply ( 
+    $row,
+    superhashof({
+        keywords        => all( # keywords contains title, menuTitle, every part of the URL and every keyword
+            re("sch\xF6n"),
+            re("ca\xF1\xF3n"),
+        ),
+    }),
+    "Index has decoded entities" 
 );
 
 #vim:ft=perl

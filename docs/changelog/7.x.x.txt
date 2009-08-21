@@ -1,4 +1,5 @@
 7.7.19
+ - fixed #10797: searching non-ascii-characters (e.g. wiki), part 2
 
 7.7.18
  - fixed #10801: Payment Methods: can select a blank method

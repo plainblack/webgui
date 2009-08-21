@@ -15,6 +15,7 @@ package WebGUI::Search::Index;
 =cut
 
 use strict;
+use HTML::Entities;
 
 =head1 NAME
 
@@ -82,7 +83,6 @@ sub addKeywords {
 	my $self = shift;
 	my $text = join(" ", @_);
 
-	$text = WebGUI::HTML::filter($text, "all");
     $text = $self->_filterKeywords($text);
 	my ($keywords) = $self->session->db->quickArray("select keywords from assetIndex where assetId=?",[$self->getId]);
 	$self->session->db->write("update assetIndex set keywords =? where assetId=?", [$keywords.' '.$text, $self->getId]);
@@ -166,7 +166,8 @@ sub DESTROY {
 
 =head2 _filterKeywords ( $keywords )
 
-Perform filtering and cleaning up of the keywords before submitting them.
+Perform filtering and cleaning up of the keywords before submitting them.  Ideographic characters are padded
+so that they are still searchable.  HTML entities are decoded.
 
 =head3 $keywords
 
@@ -179,6 +180,8 @@ sub _filterKeywords {
     my $keywords = shift;
 
     $keywords = WebGUI::HTML::filter($keywords, "all");
+    $keywords = HTML::Entities::decode_entities($keywords);
+    utf8::upgrade($keywords);
 
     # split into 'words'.  Ideographic characters (such as Chinese) are
     # treated as distinct words.  Everything else is space delimited.
