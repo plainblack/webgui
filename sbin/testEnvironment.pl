@@ -132,6 +132,7 @@ checkModule('Scope::Guard',                 '0.03'       );
 checkModule('Digest::SHA',                  '5.47'       );
 checkModule("CSS::Minifier::XS",            "0.03"       );
 checkModule("JavaScript::Minifier::XS",     "0.05"       );
+checkModule("Readonly",                     "1.03"       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
