@@ -296,6 +296,12 @@ This rule limits the search to a specific set of descendants in the asset tree. 
 
  lineage => [ "000001000003", "000001000024000005" ]
 
+=head4 assetIds
+
+This rule limits the search to a specific set of assetIds. An array reference of assetIds to match against.
+
+ assetIds => [ "PBasset000000000000001", ]
+
 =head4 classes
 
 This rule limits the search to a specific set of asset classes. An array reference of class names.
