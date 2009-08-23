@@ -31,7 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-
+addInboxSmsNotificationTemplateIdSetting($session);
 finish($session); # this line required
 
 
@@ -44,6 +44,14 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+sub addInboxSmsNotificationTemplateIdSetting {
+    my $session = shift;
+    print "\tAdding inboxSmsNotificationTemplateId setting... " unless $quiet;
+    if (!$session->db->quickScalar('select count(*) from settings where name = "inboxSmsNotificationTemplateId"')) {
+        $session->setting->add('inboxSmsNotificationTemplateId', 'i9-G00ALhJOr0gMh-vHbKA');
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
