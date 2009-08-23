@@ -700,7 +700,7 @@ END_WHY
     
     # Check score, if asked
     if ($score && ref $score eq 'HASH') {
-        my $currentScores = $rJSON->responseScoresByVariableName;
+        my $currentScores = $rJSON->responseScores( indexBy => 'variable' );
         while (my ($scoreKey, $scoreValue) = each %$score) {
             my $currentScore = $currentScores->{$scoreKey};
             if ($currentScore != $scoreValue) {

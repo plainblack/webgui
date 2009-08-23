@@ -266,7 +266,7 @@ Add a new answer to the indexed question inside the indexed section.
 
 sub newObject {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    my $address = shift;
 
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
@@ -336,7 +336,7 @@ its answers.  Should ALWAYS have two elements since we want to address a questio
 
 sub getDragDropList {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    my $address = shift;
 
     my @data;
     for my $sIndex (0 .. $self->lastSectionIndex) {
@@ -399,7 +399,7 @@ Returns that answer.
 
 sub getObject {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    my $address = shift;
 
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
@@ -433,7 +433,7 @@ sections, questions, or answers.
 
 sub getEditVars {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    my $address = shift;
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
 
@@ -501,7 +501,7 @@ See L<"Address Parameter">. Specifies which question to fetch variables for.
 
 sub getSectionEditVars {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    my $address = shift;
 
     my $section  = $self->section($address);
     my %var     = %{$section};
@@ -556,7 +556,7 @@ See L<"Address Parameter">. Specifies which question to fetch variables for.
 
 sub getQuestionEditVars {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    my $address = shift;
 
     my $question  = $self->question($address);
     my %var       = %{$question};
@@ -618,7 +618,7 @@ See L<"Address Parameter">. Specifies which answer to fetch variables for.
 
 sub getAnswerEditVars {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    my $address = shift;
 
     my $object  = $self->answer($address);
     my %var     = %{$object};
@@ -943,7 +943,7 @@ Nothing happens. It is not allowed to duplicate answers.
 
 sub copy {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    my $address = shift;
 
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
@@ -1321,7 +1321,7 @@ See L<"Address Parameter">.
 
 sub totalQuestions {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1 });
+    my $address = shift;
 
     if ($address) {
         return scalar @{ $self->questions($address) };
@@ -1346,7 +1346,7 @@ See L<"Address Parameter">.
 
 sub totalAnswers {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1 });
+    my $address = shift;
 
     if ($address) {
         return scalar @{ $self->answers($address) };
@@ -1571,7 +1571,7 @@ See L<"Address Parameter">.
 
 sub section {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    my $address = shift;
 
     return $self->sections->[ $address->[0] ];
 }
@@ -1599,7 +1599,7 @@ See L<"Address Parameter">. If not defined, returns all questions.
 
 sub questions {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1});
+    my $address = shift;
 
     if ($address) {
         return $self->sections->[ $address->[0] ]->{questions} || [];
@@ -1622,7 +1622,7 @@ See L<"Address Parameter">.
 
 sub question {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    my $address = shift;
 
     return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ];
 }
@@ -1658,7 +1658,7 @@ See L<"Address Parameter">.
 
 sub answers {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    my $address = shift;
 
     return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers} || [];
 }
@@ -1675,7 +1675,7 @@ See L<"Address Parameter">.
 
 sub answer {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    my $address = shift;
 
     return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
 }
@@ -1687,10 +1687,7 @@ This method exists purely to improve code readability.
 
 =cut
 
-sub sIndex {
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
-    return $address->[0];
-}
+sub sIndex { $_[0][0] }
 
 =head2 qIndex ($address)
 
@@ -1699,10 +1696,7 @@ This method exists purely to improve code readability.
 
 =cut
 
-sub qIndex {
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
-    return $address->[1];
-}
+sub qIndex { $_[0][1] }
 
 =head2 aIndex ($address)
 
@@ -1711,9 +1705,6 @@ This method exists purely to improve code readability.
 
 =cut
 
-sub aIndex {
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
-    return $address->[2];
-}
+sub aIndex { $_[0][2] }
 
 1;

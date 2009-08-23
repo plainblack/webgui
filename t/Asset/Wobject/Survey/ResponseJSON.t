@@ -309,7 +309,7 @@ cmp_deeply($rJSON->surveyOrderIndex(), $expect, 'surveyOrderIndex');
 
 ####################################################
 #
-# responseScoresByVariableName
+# responseScores
 #
 ####################################################
 
@@ -321,14 +321,14 @@ $rJSON->survey->question([1,0])->{variable} = 's1q0';
 $rJSON->survey->question([1,1])->{variable} = 's1q1';
 $rJSON->survey->answer([1,0,0])->{value} = 100; # set answer score
 $rJSON->survey->answer([1,1,0])->{value} = 200; # set answer score
-cmp_deeply($rJSON->responseScoresByVariableName, {}, 'scores initially empty');
+cmp_deeply($rJSON->responseScores, {}, 'scores initially empty');
 
 $rJSON->lastResponse(2);
 $rJSON->recordResponses({
     '1-0-0'        => 'My chosen answer',
     '1-1-0'        => 'My chosen answer',
 });
-cmp_deeply($rJSON->responseScoresByVariableName, { s1q0 => 100, s1q1 => 200, s1 => 300}, 'scores now reflect q answers and section totals');
+cmp_deeply($rJSON->responseScores(indexBy => 'variable'), { s1q0 => 100, s1q1 => 200, s1 => 300}, 'scores now reflect q answers and section totals');
 
 ####################################################
 #

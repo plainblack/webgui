@@ -543,8 +543,8 @@ sub run {
 
             my $rJSON = $asset->responseJSON( undef, $mostRecentlyCompletedResponseId );
             $otherInstances->{$asset_spec} = {
-                values => $rJSON->responseValuesByVariableName,
-                scores => $rJSON->responseScoresByVariableName,
+                values => $rJSON->responseValues( indexBy => 'variable' ),
+                scores => $rJSON->responseScores( indexBy => 'variable' ),
                 tags => $rJSON->tags,
             };
             $session->log->debug("Successfully looked up asset: $assetId. Repeating reval.");
