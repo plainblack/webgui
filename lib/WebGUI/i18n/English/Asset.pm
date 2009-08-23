@@ -1318,12 +1318,12 @@ Couldn't open %-s because %-s <br />
 
     'Trying to delete system page %s.  Aborting' => {
         message     => q{Trying to delete system page %s.  Aborting},
-        lastUpdated => 0,
+        lastUpdated => 1251071942,
         context     => q{},
     },
 
     'Undefined child' => {
-        message     => q{Trying to delete system page %s.  Aborting purge},
+        message     => q{Undefined child.},
         lastUpdated => 0,
         context     => q{},
     },
@@ -1360,6 +1360,12 @@ Couldn't open %-s because %-s <br />
 
     'Clearing asset tables' => {
         message     => q{Clearing asset tables},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Delete Assets' => {
+        message     => q{Delete Assets},
         lastUpdated => 0,
         context     => q{},
     },

@@ -150,7 +150,7 @@ sub purge {
         if (defined $kid) {
             unless ($kid->purge) {
                 $self->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
-                $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting purge'), $self->getTitle);
+                $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
                 return 0;
             }
         }
