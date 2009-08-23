@@ -2217,7 +2217,7 @@ sub canTakeSurvey {
     my $userId              = $self->session->user->userId();
     my $takenCount          = 0;
 
-    if ( $userId == 1 ) {
+    if ( $userId eq 1 ) {
         $takenCount = $self->takenCount( { ipAddress => $ip });
     }
     else {

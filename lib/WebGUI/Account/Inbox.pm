@@ -1343,7 +1343,7 @@ sub www_sendMessageSave {
         my $user = WebGUI::User->new($session, $uid);
         
         # Sender only gets CCd on inbox message (not real email)
-        my $isSender = $uid == $session->user->userId;
+        my $isSender = $uid eq $session->user->userId;
         $messageOptions->{no_email} = 1 if $isSender;
         
         # Optionally set SMS notification details (excluding sender)

@@ -100,7 +100,7 @@ sub process {
 	# Calculate the total number of active users
 	$var{'total'} = $var{'members'} + $var{'visitors'};
 	# Set some flags
-   	$var{'isVisitor'} = 1 if ($session->user->userId == 1);
+   	$var{'isVisitor'} = 1 if ($session->user->userId eq 1);
 	$var{'hasMembers'} = 1 if $var{'member_loop'};
 
 	# Assign labels
