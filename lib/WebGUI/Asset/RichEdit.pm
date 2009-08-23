@@ -579,10 +579,6 @@ sub getRichEditor {
         $out = q|<a style="display: block;" href="javascript:toggleEditor('|.$nameId.q|')">|.$i18n->get('Toggle editor').q|</a>|;
     }
     $out .= q|<script type="text/javascript">|;
-    while (my ($plugin, $path) = each %loadPlugins) {
-        $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
-    }
-    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " );\n";
     if ($ask) {
         $out .= <<"EOHTML1";
 function toggleEditor(id) {
@@ -596,6 +592,10 @@ function turnOffTinyMCE_$nameId () {
 }
 EOHTML1
     }
+    while (my ($plugin, $path) = each %loadPlugins) {
+        $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
+    }
+    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " );\n";
     $out    .= "</script>";
 }
 

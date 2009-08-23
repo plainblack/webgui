@@ -47,7 +47,7 @@ finish($session); # this line required
 sub addInboxSmsNotificationTemplateIdSetting {
     my $session = shift;
     print "\tAdding inboxSmsNotificationTemplateId setting... " unless $quiet;
-    if (!$session->db->quickScalar('select count(*) from settings where name = "inboxSmsNotificationTemplateId"')) {
+    if (!$session->setting->has("inboxSmsNotificationTemplateId")) {
         $session->setting->add('inboxSmsNotificationTemplateId', 'i9-G00ALhJOr0gMh-vHbKA');
     }
     print "DONE!\n" unless $quiet;
