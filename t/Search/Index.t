@@ -40,7 +40,7 @@ WebGUI::Test->tagsToRollback(
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 15;        # Increment this number for each test you create
+plan tests => 16;        # Increment this number for each test you create
 
 use_ok( 'WebGUI::Search::Index' );
 
