@@ -71,7 +71,7 @@ if ($shutdown) {
     local $/;
     my $pidFileName = $config->get('pidFile');
     if (! $pidFileName) {
-        warn "No pidFile specified in spectre.conf, trying /var/run/spectre.pid\n";
+        warn "No pidFile specified in spectre.conf;  please add one.  Trying /var/run/spectre.pid instead.\n";
         $pidFileName = '/var/run/spectre.pid';
     }
     open my $pidFile, '<', $pidFileName or
@@ -104,7 +104,7 @@ elsif ($daemon) {
     my $pidFileName = $config->get('pidFile');
     ##Write the PID file
     if (! $pidFileName) {
-        warn "No pidFile specified in spectre.conf.  Trying /var/run/spectre.pid instead\n";
+        warn "No pidFile specified in spectre.conf;  please add one.  Trying /var/run/spectre.pid instead.\n";
         $pidFileName = '/var/run/spectre.pid';
     }
     if (!ping()) {
