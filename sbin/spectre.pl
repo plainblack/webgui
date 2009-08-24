@@ -71,7 +71,8 @@ if ($shutdown) {
     local $/;
     my $pidFileName = $config->get('pidFile');
     if (! $pidFileName) {
-        die "No pidFile specified in spectre.conf\n";
+        warn "No pidFile specified in spectre.conf, trying /var/run/spectre.pid\n";
+        $pidFileName = '/var/run/spectre.pid';
     }
     open my $pidFile, '<', $pidFileName or
         die "Unable to open pidFile ($pidFileName) for reading: $!\n";
@@ -101,6 +102,11 @@ elsif ($run) {
 }
 elsif ($daemon) {
     my $pidFileName = $config->get('pidFile');
+    ##Write the PID file
+    if (! $pidFileName) {
+        warn "No pidFile specified in spectre.conf.  Trying /var/run/spectre.pid instead\n";
+        $pidFileName = '/var/run/spectre.pid';
+    }
     if (!ping()) {
         die "Spectre is already running.\n";
     }
@@ -111,10 +117,6 @@ elsif ($daemon) {
     require POSIX;
     fork and exit;
     POSIX::setsid();
-    ##Write the PID file
-    if (! $pidFileName) {
-        die "No pidFile specified in spectre.conf\n";
-    }
     open my $pidFile, '>', $pidFileName or
         die "Unable to open pidFile ($pidFileName) for writing: $!\n";
     chdir "/";
