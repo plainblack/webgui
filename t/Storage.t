@@ -75,7 +75,7 @@ my $uploadsBase = Path::Class::Dir->new($uploadDir);
 my $newGuid = $session->id->generate();
 my @guidPathParts = (substr($newGuid, 0, 2), substr($newGuid, 2, 2), $newGuid);
 my $guidDir = $uploadsBase->subdir(@guidPathParts);
-$guidDir->mkpath(0);
+$guidDir->mkpath();
 ok(-e $guidDir->stringify, 'created GUID storage location for backwards compatibility testing');
 
 my $guidStorage = WebGUI::Storage->get($session, $newGuid);
@@ -320,7 +320,8 @@ cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable 
     my $deepDir     = $deepStorage->getPathClassDir();
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
-    $deepDeepDir->mkpath(1, undef, { error => \$errorStr } );
+    my @foo = $deepDeepDir->mkpath({ error => \$errorStr } );
+    diag Dumper \@foo;
     $deepStorage->addFileFromScalar('deep/file', 'deep file');
     cmp_bag(
         $deepStorage->getFiles('all'),
@@ -435,7 +436,7 @@ cmp_bag(
     my $deepDir     = $deepStorage->getPathClassDir();
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
-    $deepDeepDir->mkpath(1, undef, { error => \$errorStr } );
+    $deepDeepDir->mkpath({ error => \$errorStr } );
     $deepStorage->addFileFromScalar('deep/file', 'deep file');
     cmp_bag(
         $deepStorage->getFiles('all'),
@@ -500,7 +501,7 @@ WebGUI::Test->storagesToDelete($deepStorage);
 my $deepDir     = $deepStorage->getPathClassDir();
 my $deepDeepDir = $deepDir->subdir('deep');
 my $errorStr;
-$deepDeepDir->mkpath(1, undef, { error => \$errorStr } );
+$deepDeepDir->mkpath({ error => \$errorStr } );
 ok(-e $deepDeepDir->stringify, 'created storage directory with a subdirectory for testing');
 
 $deepStorage->setPrivileges(3,3,3);
