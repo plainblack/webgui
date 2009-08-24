@@ -709,7 +709,7 @@ sub www_search {
                         . q{<p class="actions">} . $i18n->get( 'with selected' )
                         . q{<input type="submit" name="action" value="}.$i18n->get( 'delete' ) . q{" />}
                         . q{<input type="submit" name="action" value="}.$i18n->get( "cut" )    . q{" />}
-                        . q{<input type="submit" name="action" value="}.$i18n->get( "copy" )    .q{" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "Copy" )    .q{" />}
                         . q{</p>}
                         . q{</form>}
                         ;
