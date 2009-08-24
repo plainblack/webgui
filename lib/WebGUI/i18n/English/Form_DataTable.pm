@@ -139,6 +139,19 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Button to delete a column, shown in the Edit Schema dialog},
     },
+
+    "New Column" => {
+        message     => q{New Column},
+        lastUpdated => 0,
+        context     => q{The name of a newly added column},
+    },
+
+    "Value" => {
+        message     => q{Value},
+        lastUpdated => 0,
+        context     => q{The name of a newly added value to a column},
+    },
+
 };
 
 1;

@@ -181,14 +181,15 @@ sub getDefaultValue {
     my $self  = shift;
     my $value = $self->SUPER::getDefaultValue(@_);
 
+    my $i18n = WebGUI::International->new($self->session, 'Form_DataTable');
     if ( !$value ) {
         $value = JSON->new->encode( {
                 columns => [ {
-                        key       => "New Column",
+                        key       => $i18n->get('New Column'),
                         formatter => "text",
                     },
                 ],
-                rows => [ { "New Column" => "Value", }, ],
+                rows => [ { $i18n->get('New Column') => $i18n->get("Value"), }, ],
             }
         );
     }
