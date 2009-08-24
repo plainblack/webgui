@@ -477,10 +477,11 @@ sub getRichEditor {
     my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
     my @toolbarButtons = map{ @{$_} } @toolbarRows;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
+    my $ask = $self->getValue("askAboutRichEdit");
 	my %config = (
-		mode => "exact",
+		mode     => $ask ? "none" : "exact",
 		elements => $nameId,
-		theme => "advanced",
+		theme    => "advanced",
 		relative_urls => JSON::false(),
 		remove_script_host => JSON::true(),
 		auto_reset_designmode => JSON::true(),
@@ -503,10 +504,9 @@ sub getRichEditor {
 		valid_elements => $self->getValue("validElements"),
 		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
 		);
-    my $ask = $self->getValue("askAboutRichEdit");
-    if ($ask) {
-        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
-    }
+#    if ($ask) {
+#        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
+#    }
 	foreach my $button (@toolbarButtons) {
 		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
             push(@plugins,"-wgspellchecker");
@@ -572,13 +572,15 @@ sub getRichEditor {
 	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
 	$config{plugins} = join(",",@plugins);
 
-    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
     my $out = '';
     if ($ask) {
         $out = q|<a style="display: block;" href="javascript:toggleEditor('|.$nameId.q|')">|.$i18n->get('Toggle editor').q|</a>|;
     }
-    $out .= q|<script type="text/javascript">|;
+    $out .= qq|<script type="text/javascript">\n|;
     if ($ask) {
         $out .= <<"EOHTML1";
 function toggleEditor(id) {
@@ -587,10 +589,13 @@ function toggleEditor(id) {
     else
         tinyMCE.execCommand('mceRemoveControl', false, id);
 }
-function turnOffTinyMCE_$nameId () {
-    tinyMCE.execCommand( 'mceRemoveControl', false, '$nameId');
-}
 EOHTML1
+#function turnOffTinyMCE_$nameId () {
+#    if (tinyMCE.get('$nameId')) {
+#        tinyMCE.execCommand( 'mceRemoveControl', false, '$nameId');
+#    }
+#}
+#YAHOO.util.Event.onDOMReady(turnOffTinyMCE_$nameId);
     }
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
