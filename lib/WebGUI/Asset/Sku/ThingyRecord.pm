@@ -96,7 +96,7 @@ sub definition {
         },
         fieldPrice => {
             tab         => "properties",
-            fieldType   => "text",
+            fieldType   => "textarea",
             customDrawMethod => 'drawEditFieldPrice',
             label       => $i18n->get( 'fieldPrice label' ),
             hoverHelp   => $i18n->get( 'fieldPrice description'),

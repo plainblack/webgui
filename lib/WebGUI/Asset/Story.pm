@@ -163,7 +163,7 @@ sub definition {
             defaultValue => '',
         },
         photo => {
-            fieldType    => 'text',
+            fieldType    => 'textarea',
             defaultValue => '[]',
             noFormPost   => 1,
         },

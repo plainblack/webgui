@@ -1,4 +1,5 @@
 7.7.19
+ - fixed #10825: Text and MediumText fields should be LongText
  - fixed #10808: Ask user about using rich edit option causes error in IE6
  - fixed #10822: spectre pid sucks
  - fixed #10817: Datatable not internationalized

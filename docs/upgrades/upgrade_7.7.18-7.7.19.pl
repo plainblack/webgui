@@ -32,8 +32,8 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addInboxSmsNotificationTemplateIdSetting($session);
+upgradeJSONDatabaseFields($session); 
 finish($session); # this line required
-
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -50,6 +50,45 @@ sub addInboxSmsNotificationTemplateIdSetting {
     if (!$session->setting->has("inboxSmsNotificationTemplateId")) {
         $session->setting->add('inboxSmsNotificationTemplateId', 'i9-G00ALhJOr0gMh-vHbKA');
     }
+    print "DONE!\n" unless $quiet;
+}
+
+sub upgradeJSONDatabaseFields {
+    my $session = shift;
+    print "\tUpgrading all fields which use JSON to LONGTEXT... " unless $quiet;
+    print "\n\t\tUpgrading Sku fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE sku MODIFY taxConfiguration      LONGTEXT|);
+    print "\n\t\tUpgrading Product fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE Product MODIFY variantsJSON      LONGTEXT|);
+    $session->db->write(q|ALTER TABLE Product MODIFY accessoryJSON     LONGTEXT|);
+    $session->db->write(q|ALTER TABLE Product MODIFY relatedJSON       LONGTEXT|);
+    $session->db->write(q|ALTER TABLE Product MODIFY specificationJSON LONGTEXT|);
+    $session->db->write(q|ALTER TABLE Product MODIFY featureJSON       LONGTEXT|);
+    $session->db->write(q|ALTER TABLE Product MODIFY benefitJSON       LONGTEXT|);
+    print "\n\t\tUpgrading DataForm fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE DataForm MODIFY fieldConfiguration  LONGTEXT|);
+    $session->db->write(q|ALTER TABLE DataForm MODIFY tabConfiguration    LONGTEXT|);
+    print "\n\t\tUpgrading DataForm entry fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE DataForm_entry MODIFY entryData     LONGTEXT|);
+    print "\n\t\tUpgrading Scheduler fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE WorkflowSchedule MODIFY parameters  LONGTEXT|);
+    print "\n\t\tUpgrading Workflow Instance fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE WorkflowInstance MODIFY parameters  LONGTEXT|);
+    print "\n\t\tUpgrading AssetAspect Comments fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE assetAspectComments MODIFY comments LONGTEXT|);
+    print "\n\t\tUpgrading Thingy Record fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE ThingyRecord MODIFY fieldPrice      LONGTEXT|);
+    print "\n\t\tUpgrading Payment Gateway fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE paymentGateway MODIFY options       LONGTEXT|);
+    print "\n\t\tUpgrading Shipping driver fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE shipper MODIFY options              LONGTEXT|);
+    print "\n\t\tUpgrading Tax Driver fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE taxDriver MODIFY options            LONGTEXT|);
+    print "\n\t\tUpgrading Transaction Item fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE transactionItem MODIFY options      LONGTEXT|);
+    $session->db->write(q|ALTER TABLE transactionItem MODIFY taxConfiguration LONGTEXT|);
+    print "\n\t\tUpgrading Cart Item fields... " unless $quiet;
+    $session->db->write(q|ALTER TABLE cartItem MODIFY options             LONGTEXT|);
     print "DONE!\n" unless $quiet;
 }
 
