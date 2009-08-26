@@ -126,7 +126,7 @@ sub addRevision {
 		# get the default values of each property
 		foreach my $property (keys %{$definition->{properties}}) {
 			$defaults{$property} = $definition->{properties}{$property}{defaultValue};
-            if (ref($defaults{$property}) eq 'ARRAY') {
+            if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{properties}{$property}{serialize}) {
                 $defaults{$property} = $defaults{$property}->[0];
             }
 		}

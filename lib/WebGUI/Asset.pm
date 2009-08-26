@@ -2495,8 +2495,13 @@ sub update {
             }
 
             # set the property
+            if ($propertyDefinition->{serialize}) {
+                $setPairs{$property} = JSON->new->canonical->encode($value);
+            }
+            else {
+                $setPairs{$property} = $value;
+            }
 			$self->{_properties}{$property} = $value;
-			$setPairs{$property} = $value;
 		}
 
         # if there's anything to update, then do so
