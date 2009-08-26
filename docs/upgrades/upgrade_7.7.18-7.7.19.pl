@@ -22,6 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Calendar;
+use JSON;
 
 
 my $toVersion = '7.7.19';
@@ -33,6 +35,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addInboxSmsNotificationTemplateIdSetting($session);
 upgradeJSONDatabaseFields($session); 
+moveCalendarFeedsToJSON($session); 
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -89,6 +92,30 @@ sub upgradeJSONDatabaseFields {
     $session->db->write(q|ALTER TABLE transactionItem MODIFY taxConfiguration LONGTEXT|);
     print "\n\t\tUpgrading Cart Item fields... " unless $quiet;
     $session->db->write(q|ALTER TABLE cartItem MODIFY options             LONGTEXT|);
+    print "DONE!\n" unless $quiet;
+}
+
+sub moveCalendarFeedsToJSON {
+    my $session = shift;
+    print "\tMoveing Calendar feeds from database collateral to JSON... " unless $quiet;
+    $session->db->write(q|ALTER TABLE Calendar ADD COLUMN icalFeeds LONGTEXT|);
+    my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
+    while (my $calendar = $getCalendar->()) {
+        my $feeds = $session->db->buildHashRefOfHashRefs(
+            "select * from Calendar_feeds where assetId=?",
+            [$calendar->getId],
+            "feedId"
+        );
+        foreach my $feedParams (values %{ $feeds }) {
+            delete $feedParams->{assetId};
+            $calendar->addFeed($feedParams);
+        }
+        ##Copy the JSON across all the revisions of this Calendar.
+        my $jsonFeeds = $session->db->quickScalar('select icalFeeds from Calendar where assetId=? and revisionDate=?', [ $calendar->getId, $calendar->get('revisionDate')]);
+        $session->db->write('update Calendar set icalFeeds=? where assetId=?', [$jsonFeeds, $calendar->getId]);
+    }
+    $session->db->write(q|DROP TABLE Calendar_feeds|);
+
     print "DONE!\n" unless $quiet;
 }
 

@@ -20,6 +20,7 @@ use WebGUI::Asset::Wobject::Calendar;
 
 use Test::More;
 use Test::Deep;
+use Data::Dumper;
 
 if (!$ENV{WEBGUI_LIVE}) {
     plan skip_all => 'No website available';
@@ -40,11 +41,10 @@ my $receiver = $home->addChild({
     title     => 'Receiving Calendar',
 });
 
-$session->db->setRow('Calendar_feeds', 'feedId', {
-    feedId   => 'new',
-    assetId  => $receiver->getId,
+$receiver->addFeed({
     url      => $session->url->getSiteURL.$session->url->gateway($sender->getUrl('func=ical')),
     feedType => 'ical',
+    lastUpdated => 'never',
 });
 
 my $dt = WebGUI::DateTime->new($session, time());
