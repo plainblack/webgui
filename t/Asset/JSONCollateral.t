@@ -12,6 +12,14 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
 
+################################################################
+#
+# Checks that Assets can use WebGUI::JSONCollateral, that assets
+# can automatically serialize and deserialize data structures
+# and other asset functions work correctly.
+#
+################################################################
+
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset;
@@ -38,7 +46,7 @@ create table jsonCollateralDummy (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 EOSQL
 
-plan tests => 39;
+plan tests => 40;
 
 my $asset = WebGUI::Asset->getDefault($session)->addChild({
     className => 'WebGUI::Asset::JSONCollateralDummy',
@@ -81,6 +89,20 @@ cmp_deeply(
     $asset->get('jsonField'),
     [ { alpha => "aye", beta => "bee"} ],
     'get returns a hash ref with data in it'
+);
+
+################################################################
+#
+# Checking Asset deserialization
+#
+################################################################
+
+my $assetClone = WebGUI::Asset->new($session, $asset->getId, 'WebGUI::Asset::JSONCollateralDummy');
+
+cmp_deeply(
+    $assetClone->get('jsonField'),
+    [ { alpha => "aye", beta => "bee"} ],
+    'new deserializes data from the db'
 );
 
 $asset->update({

@@ -1770,6 +1770,13 @@ sub new {
     if (defined $properties) {
         my $object = { _session=>$session, _properties => $properties };
         bless $object, $class;
+        foreach my $definition (@{ $object->definition($session) }) {
+            foreach my $property (keys %{ $definition->{properties} }) {
+                if ($definition->{properties}->{$property}->{serialize} && $object->{_properties}->{$property} ne '') {
+                    $object->{_properties}->{$property} = JSON->new->canonical->decode($object->{_properties}->{$property});
+                }
+            }
+        }
         return $object;
     }	
     $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
