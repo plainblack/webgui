@@ -1,4 +1,6 @@
 7.6.35-1
+ - fixed #10831: Graphing tab in Poll is not i18n'ed
+ - fixed #10829: Extra field in Poll Property tab
  - fixed #10808: Ask user about using rich edit option causes error in IE6
  - fixed #10754: assets were never added
  - fixed #10790: Data Form doesn't always auto-commit version tags

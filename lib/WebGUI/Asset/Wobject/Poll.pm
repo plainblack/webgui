@@ -158,13 +158,14 @@ sub definition {
 				fieldType=>"hidden",
 				defaultValue=>undef,
 				},
-			generateGraph=>{
-				fieldType=>"yesNo",
-				defaultValue=>0,
-				},
-			}
-		});
-        return $class->SUPER::definition($session, $definition);
+            generateGraph => {
+                fieldType    => "yesNo",
+                defaultValue => 0,
+                autoGenerate => 0,
+            },
+        }
+    });
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -273,7 +274,7 @@ sub getEditForm {
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
 		my $config = $self->getGraphConfig;
 
-		$tabform->addTab('graph', 'Graphing');
+		$tabform->addTab('graph', $i18n->get('Graphing','Image_Graph'));
 		$tabform->getTab('graph')->yesNo(
 			-name		=> 'generateGraph',
 			-label		=> $i18n->get('generate graph'),
