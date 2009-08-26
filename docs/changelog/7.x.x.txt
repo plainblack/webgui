@@ -1,4 +1,5 @@
 7.7.19
+ - fixed #10829: Extra field in Poll Property tab
  - refactored out JSON collateral module, to use with any module in WebGUI.
  - fixed #10825: Text and MediumText fields should be LongText
  - fixed #10808: Ask user about using rich edit option causes error in IE6

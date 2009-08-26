@@ -177,13 +177,14 @@ sub definition {
 				fieldType=>"hidden",
 				defaultValue=>undef,
 				},
-			generateGraph=>{
-				fieldType=>"yesNo",
-				defaultValue=>0,
-				},
-			}
-		});
-        return $class->SUPER::definition($session, $definition);
+            generateGraph => {
+                fieldType    => "yesNo",
+                defaultValue => 0,
+                autoGenerate => 0,
+            },
+        }
+    });
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
