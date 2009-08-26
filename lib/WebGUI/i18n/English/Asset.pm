@@ -754,7 +754,7 @@ case of the check box list, then enter one per line.  The total amount of data i
                    message => q|Hide from navigation?|
                  },
         '43' => {
-                  message => q|Are you certain that you wish to delete this content, and all content below it? Note that this change is not versioned and will take place immediately.|
+                  message => q|Are you certain that you wish to delete this content, and all content below it? Note that this change is not versioned and will take place immediately.|,
                   lastUpdated => 1250091423,
                 },
         '940' => {
