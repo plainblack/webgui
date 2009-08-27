@@ -88,7 +88,7 @@ sub addSlice {
 
 	# Work around a bug in imagemagick where an A path with the same start and end point will segfault.
 	if ($percentage == 1) { 
-		$percentage = 0.999999999;
+		$percentage = 0.99999;
 	}
 
 	my $label = $properties->{label};

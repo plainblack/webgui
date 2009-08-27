@@ -11,6 +11,7 @@
  - fixed #10814: matrix translations
  - fixed Survey reporting of simple/transported results to csv/tab
  - fixed #10797: searching non-ascii-characters (e.g. wiki), part 2
+ - fixed #10830: Pie chart broken (Martin Kamerbeek / Oqapi)
 
 7.7.18
  - fixed #10801: Payment Methods: can select a blank method
