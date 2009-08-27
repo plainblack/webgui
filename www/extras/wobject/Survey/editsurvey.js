@@ -77,9 +77,6 @@ Survey.Data = (function(){
                 lastId = d.address;
             }
             
-			// First purge any event handlers bound to sections node..
-            YAHOO.util.Event.purgeElement('sections-panel', true);
-
             if (!Survey.Data.ddContainer) {
                 
                 // Calculate the bottom of the warnings div (with a little padding)
@@ -108,8 +105,14 @@ Survey.Data = (function(){
                 Survey.Data.ddContainer.render();
             }
             else {
+                var children = document.getElementById('sections-panel').childNodes;
+                for( i in children){
+                    if(children[i].className == 'bd'){
+                        YAHOO.util.Event.purgeElement(children[i], true);
+                    }
+                }
                 Survey.Data.ddContainer.setBody(d.ddhtml);
-                Survey.Data.ddContainer.setFooter(document.getElementById("buttons"));
+                //Survey.Data.ddContainer.setFooter(document.getElementById("buttons"));
             }
             
             // (re)Add resize handler
@@ -141,36 +144,36 @@ Survey.Data = (function(){
                 YAHOO.util.Dom.addClass(selectedId, 'selected');
             }
 
-			if (sButton) {
-			    sButton.destroy();
+			if (!sButton) {
+                sButton = new YAHOO.widget.Button({
+                    label: "Add Section",
+                    id: "addSection",
+                    container: "addSection"
+                });
+                sButton.on("click", this.addSection);
 			}
-			sButton = new YAHOO.widget.Button({
-                label: "Add Section",
-                id: "addSection",
-                container: "addSection"
-            });
-            sButton.on("click", this.addSection);
 
-			if (qButton) {
-			    qButton.destroy();
+			if (!qButton) {
+                qButton = new YAHOO.widget.Button({
+                    label: "Add Question",
+                    id: "addQuestion",
+                    container: "addQuestion"
+                });
+                qButton.on("click", this.addQuestion, d.buttons.question);
 			}
-            qButton = new YAHOO.widget.Button({
-                label: "Add Question",
-                id: "addQuestion",
-                container: "addQuestion"
-            });
-            qButton.on("click", this.addQuestion, d.buttons.question);
 
             if (d.buttons.answer) {
-				if (aButton) {
-				    aButton.destroy();
-				}
-                aButton = new YAHOO.widget.Button({
-                    label: "Add Answer",
-                    id: "addAnswer",
-                    container: "addAnswer"
-                });
+                YAHOO.util.Dom.setStyle('addAnswer', 'display', 'inline');
+				if (!aButton) {
+                    aButton = new YAHOO.widget.Button({
+                        label: "Add Answer",
+                        id: "addAnswer",
+                        container: "addAnswer"
+                    });
                 aButton.on("click", this.addAnswer, d.buttons.answer);
+				}
+            }else{
+                YAHOO.util.Dom.setStyle('addAnswer', 'display', 'none');
             }
 
             if (showEdit == 1) {
