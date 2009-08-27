@@ -7,6 +7,7 @@
  - fixed #10739: Textarea and Codearea resize don't work in IE or Webkit browsers
  - fixed #10761: Two i18n issues on LDAP page
  - fixed i18n message for delete assets doesn't mention children.
+ - fixed #10830 Pie Chart broken. (Martin Kamerbeek / Oqapi)
 
 7.6.35
  - fixed #10751: Only users in Content Managers group can make Shortcuts
