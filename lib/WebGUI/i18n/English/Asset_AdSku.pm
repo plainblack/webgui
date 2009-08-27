@@ -88,8 +88,8 @@ our $I18N = {
 	},
 
 	'property click discounts help' => {
-		message => q|Enter discounts one per line at the start of the line.  Extra text is ignored so you can add comments to the discounts.  Each discount consists of two numbers seperated by '@' with no spaces.  The first number is the percent discount(no decimal point) the second number is the number of items purchased.  So 5@1000 indicates a 5% discount for 1000 or more clicks purchased.|,
-		lastUpdated => 0,
+		message => q|Enter discounts one per line at the start of the line.  Extra text is ignored so you can add comments to the discounts.  Each discount consists of two numbers separated by '@' with no spaces.  The first number is the percent discount(no decimal point) the second number is the number of items purchased.  So 5@1000 indicates a 5% discount for 1000 or more clicks purchased.|,
+		lastUpdated => 1251410363,
 		context => q|Help text for the click discounts field.|
 	},
 
@@ -100,8 +100,8 @@ our $I18N = {
 	},
 
 	'property impression discounts help' => {
-		message => q|Enter discounts one per line at the start of the line.  Extra text is ignored so you can add comments to the discounts.  Each discount consists of two numbers seperated by '@' with no spaces.  The first number is the percent discount(no decimal point) the second number is the number of items purchased. So 5@1000 indicates a 5% discount for 1000 or more impressions purchased.|,
-		lastUpdated => 0,
+		message => q|Enter discounts one per line at the start of the line.  Extra text is ignored so you can add comments to the discounts.  Each discount consists of two numbers separated by '@' with no spaces.  The first number is the percent discount(no decimal point) the second number is the number of items purchased. So 5@1000 indicates a 5% discount for 1000 or more impressions purchased.|,
+		lastUpdated => 1251410361,
 		context => q|Help text for the impresison discounts field.|
 	},
 
