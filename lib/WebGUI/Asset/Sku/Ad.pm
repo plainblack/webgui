@@ -78,7 +78,6 @@ sub definition {
         adSpace => {
             tab             => "properties",
             fieldType       => "AdSpace",
-            namespace       => "AdSku",
             label           => $i18n->get("property ad space"),
             hoverHelp       => $i18n->get("property ad Space help"),
         },
