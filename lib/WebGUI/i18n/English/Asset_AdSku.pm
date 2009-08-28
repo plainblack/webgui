@@ -129,6 +129,18 @@ our $I18N = {
 		context => q|%f is the price charged for each impression of the ad.|
 	},
 
+	'minimum impressions' => {
+		message => q|Must buy at least %d impressions|,
+		lastUpdated => 0,
+		context => q|%d is the number of impressions that must be bought.|
+	},
+
+	'minimum clicks' => {
+		message => q|Must buy at least %d clicks|,
+		lastUpdated => 0,
+		context => q|%d is the number of clicks that must be bought.|
+	},
+
 	'form manage title' => {
 		message => q|Manage My Ads|,
 		lastUpdated => 0,

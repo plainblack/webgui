@@ -1,4 +1,5 @@
 7.7.19
+ - fixed #10843: Ad Sales: how many do I have to buy?
  - fixed #10835: Ad Sales: Ad Space field not user-friendly
  - fixed #10841: Ad Sales: hover help spelling error
  - fixed #10833: Calendar feeds not versioned, not duplicated

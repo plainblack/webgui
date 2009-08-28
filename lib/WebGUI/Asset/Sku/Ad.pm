@@ -153,6 +153,20 @@ sub getAddToCartForm {
 
 #-------------------------------------------------------------------
 
+=head2 getAdSpace
+
+Returns an AdSpace object for this Ad Sku.
+
+=cut
+
+sub getAdSpace {
+    my $self    = shift;
+    my $adSpace = WebGUI::AdSpace->new($self->session,$self->get('adSpace'));
+    return $adSpace;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getClickDiscountText
 
 returns the text to display the number of clicks purchasaed where discounts apply
@@ -458,56 +472,56 @@ sub view {
     my $session = $self->session;
     my $options = $self->getOptions();
 
-	my $i18n = WebGUI::International->new($session, "Asset_AdSku");
+	my $i18n    = WebGUI::International->new($session, "Asset_AdSku");
+    my $adSpace = $self->getAdSpace;
     my %var = (
         formHeader          => WebGUI::Form::formHeader($session, { action=>$self->getUrl })
-            . WebGUI::Form::hidden( $session, { name=>"func", value=>"addToCart" }),
+                             . WebGUI::Form::hidden( $session, { name=>"func", value=>"addToCart" }),
         formFooter          => WebGUI::Form::formFooter($session),
         formSubmit          => WebGUI::Form::submit( $session,  { value => $i18n->get("form purchase button") }),
-	error_msg           => $options->{error_msg},
+        error_msg           => $options->{error_msg},
         hasAddedToCart      => $self->{_hasAddedToCart},
         continueShoppingUrl => $self->getUrl,
-        manageLink         => $self->getUrl("func=manage"),
-        adSkuTitle         => $self->get('title'),
-        adSkuDescription   => $self->get('description'),
-        formTitle          => WebGUI::Form::text($session, {
-                                 -name=>"formTitle",
-                                 -value=>$options->{adtitle},
-                                 -size=>40
-				 -default=>'untitled',
-                                }),
-        formLink           => WebGUI::Form::Url($session, {
-                                 -name=>"formLink",
-                                 -value=>$options->{link},
-                                 -size=>40
-				 -required=>1,
-                                }),
-        formImage          => WebGUI::Form::File($session, {
-                                 -name=>"formImage",
-                                 -value=>$options->{image},
-                                 -size=>40
-				 -forceImageOnly=>1,
-                                }),
+        manageLink          => $self->getUrl("func=manage"),
+        adSkuTitle          => $self->get('title'),
+        adSkuDescription    => $self->get('description'),
+        formTitle           => WebGUI::Form::text($session, {
+                                  -name         => "formTitle",
+                                  -value        => $options->{adtitle},
+                                  -size         => 40
+                                  -defaultValue => 'untitled',
+                                 }),
+        formLink            => WebGUI::Form::Url($session, {
+                                  -name=>"formLink",
+                                  -value=>$options->{link},
+                                  -size=>40
+                                 }),
+        formImage           => WebGUI::Form::File($session, {
+                                  -name=>"formImage",
+                                  -value=>$options->{image},
+                                  -size=>40
+                                  -forceImageOnly=>1,
+                                 }),
         formClicks          => WebGUI::Form::Integer($session, {
-                                 -name=>"formClicks",
-                                 -value=>$options->{clicks},
-                                 -size=>40
-				 -required=>1,
-                                }),
-        formImpressions          => WebGUI::Form::Integer($session, {
-                                 -name=>"formImpressions",
-                                 -value=>$options->{impressions},
-                                 -size=>40
-				 -required=>1,
-                                }),
-        formAdId          => WebGUI::Form::Hidden($session, {
-                                 -name=>"formAdId",
-                                 -value=>$options->{adId} || '',
-                                }),
-        clickPrice   => $self->get('pricePerClick'),
-        impressionPrice   => $self->get('pricePerImpression'),
-        clickDiscount   => $self->getClickDiscountText,
-        impressionDiscount   => $self->getImpressionDiscountText,
+                                  -name=>"formClicks",
+                                  -value=>$options->{clicks},
+                                  -size=>40
+                                 }),
+        formImpressions     => WebGUI::Form::Integer($session, {
+                                  -name=>"formImpressions",
+                                  -value=>$options->{impressions},
+                                  -size=>40
+                                 }),
+        formAdId            => WebGUI::Form::Hidden($session, {
+                                  -name=>"formAdId",
+                                  -value=>$options->{adId} || '',
+                                 }),
+        clickPrice          => $self->get('pricePerClick'),
+        impressionPrice     => $self->get('pricePerImpression'),
+        minimumClicks       => $adSpace->get('minimumClicks'),
+        minimumImpressions  => $adSpace->get('minimumImpressions'),
+        clickDiscount       => $self->getClickDiscountText,
+        impressionDiscount  => $self->getImpressionDiscountText,
     );
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
@@ -521,66 +535,72 @@ Add this subscription to the cart.
 =cut
 
 sub www_addToCart {
-    my $self = shift;
+    my $self    = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
     my $session = $self->session;
-    my $i18n = $self->i18n;
-    if ($self->canView) {
-	my $form = $session->form;
-        my @errors;
-	#my $imageStorage = $self->getOptions->{image} || WebGUI::Storage->create($session);  # LATER should be createTemp
-        my $imageStorageId = $form->process('formImage', 'image'); # , $self->getOptions->{image});
-	my $imageStorage = WebGUI::Storage->get($session,$imageStorageId);
-	my $code;
-	if( not defined $imageStorage ) { $code = 1; }
-	elsif( $imageStorage->getErrorCount > 0 ) { $code = 2; }
-        elsif( scalar(@{$imageStorage->getFiles}) == 0 ) { $code = 3; }
-        elsif( $imageStorage->isImage((@{$imageStorage->getFiles})[0]) ) {  $code = 4; }
-	if( not defined $imageStorage
-	or $imageStorage->getErrorCount > 0
-        or scalar(@{$imageStorage->getFiles}) == 0
-        # or $imageStorage->isImage((@{$imageStorage->getFiles})[0])  # not currently working
-                   ) { 
-	    push @errors, $i18n->get('form error no image') . $code . eval { (@{$imageStorage->getFiles})[0] } ;
-	}
-	my $title = $form->process('formTitle');
-	if($title eq '' ) {
-	    push @errors, $i18n->get('form error no title');
-	}
-	my $link = $form->process('formLink','url');
-	if($link eq '' ) {
-	    push @errors, $i18n->get('form error no link');
-	}
-	my $adId = $self->get('adSpace');
-	my $adSpace = WebGUI::AdSpace->new($session,$adId);
-	my $clicks = $form->process('formClicks','integer');
-	if($clicks < $adSpace->get('minimumClicks') ) {
-	    push @errors, sprintf($i18n->get('form error min clicks'), $adSpace->get('minimumClicks'));
-	}
-	my $impressions = $form->process('formImpressions','integer');
-	if($impressions < $adSpace->get('minimumImpressions') ) {
-	    push @errors, sprintf($i18n->get('form error min impressions'), $adSpace->get('minimumImpressions'));
-	}
-	if( @errors == 0 ) {
-	    $self->{_hasAddedToCart} = 1;
-	    $self->addToCart({
-		  adtitle => $title,
-		  link => $link,
-		  clicks => $clicks,
-		  impressions => $impressions,
-		  adId => $adId,
-		  image => $imageStorageId,
-			 });
-	} else {
-	    $self->applyOptions({
-		  adtitle => $title,
-		  link => $link,
-		  clicks => $clicks,
-		  impressions => $impressions,
-		  adId => $adId,
-		  image => $imageStorageId,
-		  error_msg => join( '<br>', @errors ),
-	    });
-	}
+    my $i18n    = $self->i18n;
+    my $form    = $session->form;
+    my @errors;
+#my $imageStorage = $self->getOptions->{image} || WebGUI::Storage->create($session);  # LATER should be createTemp
+    my $imageStorageId = $form->process('formImage', 'image'); # , $self->getOptions->{image});
+    my $imageStorage   = WebGUI::Storage->get($session,$imageStorageId);
+    my $code;
+    if( not defined $imageStorage ) {
+        $code = 1;
+    }
+    elsif( $imageStorage->getErrorCount > 0 ) {
+        $code = 2;
+    }
+    elsif( scalar(@{$imageStorage->getFiles}) == 0 ) {
+        $code = 3;
+    }
+    elsif( $imageStorage->isImage((@{$imageStorage->getFiles})[0]) ) { 
+        $code = 4;
+    }
+    if( not defined $imageStorage
+        or $imageStorage->getErrorCount > 0
+        or scalar(@{$imageStorage->getFiles}) == 0) { 
+        push @errors, $i18n->get('form error no image') . $code . eval { (@{$imageStorage->getFiles})[0] } ;
+    }
+    my $title = $form->process('formTitle');
+    if($title eq '' ) {
+        push @errors, $i18n->get('form error no title');
+    }
+    my $link = $form->process('formLink','url');
+    if($link eq '' ) {
+        push @errors, $i18n->get('form error no link');
+    }
+    my $adSpace = $self->getAdSpace;
+    my $adId    = $self->get('adId');
+    my $clicks  = $form->process('formClicks','integer');
+    if($clicks < $adSpace->get('minimumClicks') ) {
+        push @errors, sprintf($i18n->get('form error min clicks'), $adSpace->get('minimumClicks'));
+    }
+    my $impressions = $form->process('formImpressions','integer');
+    if($impressions < $adSpace->get('minimumImpressions') ) {
+        push @errors, sprintf($i18n->get('form error min impressions'), $adSpace->get('minimumImpressions'));
+    }
+    if( @errors == 0 ) {
+        $self->{_hasAddedToCart} = 1;
+        $self->addToCart({
+          adtitle     => $title,
+          link        => $link,
+          clicks      => $clicks,
+          impressions => $impressions,
+          adId        => $adId,
+          image       => $imageStorageId,
+        });
+    }
+    else {
+        $self->applyOptions({
+          adtitle     => $title,
+          link        => $link,
+          clicks      => $clicks,
+          impressions => $impressions,
+          adId        => $adId,
+          image       => $imageStorageId,
+          error_msg   => join( '<br>', @errors ),
+        });
     }
     return $self->www_view;
 }
@@ -594,18 +614,18 @@ manage previously purchased ads
 =cut
 
 sub www_manage {
-        my $self = shift;
-        my $check = $self->checkView;
-        return $check if (defined $check);
-        $self->session->http->setLastModified($self->getContentLastModified);
-        $self->session->http->sendHeader;
-        $self->prepareManage;
-        my $style = $self->processStyle($self->getSeparator);
-        my ($head, $foot) = split($self->getSeparator,$style);
-        $self->session->output->print($head, 1);
-        $self->session->output->print($self->manage);
-        $self->session->output->print($foot, 1);
-        return "chunked";
+    my $self = shift;
+    my $check = $self->checkView;
+    return $check if (defined $check);
+    $self->session->http->setLastModified($self->getContentLastModified);
+    $self->session->http->sendHeader;
+    $self->prepareManage;
+    my $style = $self->processStyle($self->getSeparator);
+    my ($head, $foot) = split($self->getSeparator,$style);
+    $self->session->output->print($head, 1);
+    $self->session->output->print($self->manage);
+    $self->session->output->print($foot, 1);
+    return "chunked";
 }
 
 #-------------------------------------------------------------------
@@ -617,20 +637,20 @@ renew an ad
 =cut
 
 sub www_renew {
-        my $self = shift;
-	my $session = $self->session;
-	my $id = $session->form->get('Id');
-        my $crud = WebGUI::AssetCollateral::Sku::Ad::Ad->new($session,$id);
-	my $ad = WebGUI::AdSpace::Ad->new($session,$crud->get('adId'));
-	$self->applyOptions({
-                  adtitle =>  $ad->get('title'),
-		  clicks => $crud->get('clicksPurchased'),
-		  impressions => $crud->get('impressionsPurchased'),
-		  link => $ad->get('url'),
-		  image => $ad->get('storageId'),
-		  adId => $crud->get('adId'),
-             });
-	return $self->www_view;
+    my $self = shift;
+    my $session = $self->session;
+    my $id = $session->form->get('Id');
+    my $crud = WebGUI::AssetCollateral::Sku::Ad::Ad->new($session,$id);
+    my $ad = WebGUI::AdSpace::Ad->new($session,$crud->get('adId'));
+    $self->applyOptions({
+          adtitle =>  $ad->get('title'),
+          clicks => $crud->get('clicksPurchased'),
+          impressions => $crud->get('impressionsPurchased'),
+          link => $ad->get('url'),
+          image => $ad->get('storageId'),
+          adId => $crud->get('adId'),
+    });
+    return $self->www_view;
 }
 
 1;
