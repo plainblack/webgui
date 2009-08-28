@@ -24,6 +24,7 @@ use WebGUI::Shop::Pay;
 use WebGUI::AssetCollateral::Sku::Ad::Ad;
 use WebGUI::AdSpace;
 use WebGUI::AdSpace::Ad;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -322,42 +323,42 @@ sub onCompletePurchase {
 # LATER: if we use Temp Storage for the image we need to move it to perm storage
 
     if( $options->{adId} ne '' ) {
-	$ad = WebGUI::AdSpace::Ad->new($self->session,$options->{adId});
-	my $clicks = $options->{clicks} + $ad->get('clicksBought');
-	my $impressions = $options->{impressions} + $ad->get('impressionsBought');
-	$ad->set({
+        $ad = WebGUI::AdSpace::Ad->new($self->session,$options->{adId});
+        my $clicks = $options->{clicks} + $ad->get('clicksBought');
+        my $impressions = $options->{impressions} + $ad->get('impressionsBought');
+        $ad->set({
             title =>  $options->{'adtitle'},
-	    clicksBought => $clicks,
-	    impressionsBought => $impressions,
-	    url =>   $options->{'link'},
-	    storageId =>  $options->{'image'},
-	});
-    } else {
+            clicksBought => $clicks,
+            impressionsBought => $impressions,
+            url =>   $options->{'link'},
+            storageId =>  $options->{'image'},
+        });
+    }
+    else {
         $ad = WebGUI::AdSpace::Ad->create($self->session,$self->get('adSpace'),{
             title =>  $options->{'adtitle'},
-	    clicksBought => $options->{'clicks'},
-	    impressionsBought => $options->{'impressions'},
-	    url =>   $options->{'link'},
-	    storageId =>  $options->{'image'},
-	    ownerUserId =>  $self->session->user->userId,
-	    isActive => 1,
-	    type =>  'image',
-	    priority => $self->get('priority'),
-	    adSpace => $self->get('adSpace'),
+            clicksBought => $options->{'clicks'},
+            impressionsBought => $options->{'impressions'},
+            url =>   $options->{'link'},
+            storageId =>  $options->{'image'},
+            ownerUserId =>  $self->session->user->userId,
+            isActive => 1,
+            type =>  'image',
+            priority => $self->get('priority'),
+            adSpace => $self->get('adSpace'),
         });
     }
 
     WebGUI::AssetCollateral::Sku::Ad::Ad->create($self->session,{
-           userId => $item->transaction->get('userId'),
-	   transactionItemId => $item->getId,
-	   adId => $ad->getId,
-	   clicksPurchased => $options->{'clicks'},
-	   impressionsPurchased => $options->{'impressions'},
-	   dateOfPurchase => $item->transaction->get('dateOfPurchase'),
-	   storedImage =>  $options->{'image'},
-	   isDeleted => 0,
-        });
-
+        userId => $item->transaction->get('userId'),
+        transactionItemId => $item->getId,
+        adId => $ad->getId,
+        clicksPurchased => $options->{'clicks'},
+        impressionsPurchased => $options->{'impressions'},
+        dateOfPurchase => $item->transaction->get('dateOfPurchase'),
+        storedImage =>  $options->{'image'},
+        isDeleted => 0,
+    });
 }
 
 #-------------------------------------------------------------------
@@ -471,6 +472,7 @@ sub view {
     my ($self) = @_;
     my $session = $self->session;
     my $options = $self->getOptions();
+    my $form    = $session->form;
 
 	my $i18n    = WebGUI::International->new($session, "Asset_AdSku");
     my $adSpace = $self->getAdSpace;
@@ -496,20 +498,20 @@ sub view {
                                   -value=>$options->{link},
                                   -size=>40
                                  }),
-        formImage           => WebGUI::Form::File($session, {
+        formImage           => WebGUI::Form::Image($session, {
                                   -name=>"formImage",
-                                  -value=>$options->{image},
+                                  -value=>$form->get('formImage','image'),
                                   -size=>40
                                   -forceImageOnly=>1,
                                  }),
         formClicks          => WebGUI::Form::Integer($session, {
                                   -name=>"formClicks",
-                                  -value=>$options->{clicks},
+                                  -value=>$options->{clicks} || $adSpace->get('minimumClicks'),
                                   -size=>40
                                  }),
         formImpressions     => WebGUI::Form::Integer($session, {
                                   -name=>"formImpressions",
-                                  -value=>$options->{impressions},
+                                  -value=>$options->{impressions} || $adSpace->get('minimumImpressions'),
                                   -size=>40
                                  }),
         formAdId            => WebGUI::Form::Hidden($session, {
@@ -542,7 +544,10 @@ sub www_addToCart {
     my $form    = $session->form;
     my @errors;
 #my $imageStorage = $self->getOptions->{image} || WebGUI::Storage->create($session);  # LATER should be createTemp
+    $session->log->warn(Dumper($self->getOptions));
     my $imageStorageId = $form->process('formImage', 'image'); # , $self->getOptions->{image});
+    $session->log->warn("storageId: $imageStorageId");
+    $session->log->warn("storageText: ". $form->process('formImage'));
     my $imageStorage   = WebGUI::Storage->get($session,$imageStorageId);
     my $code;
     if( not defined $imageStorage ) {
@@ -599,8 +604,10 @@ sub www_addToCart {
           impressions => $impressions,
           adId        => $adId,
           image       => $imageStorageId,
-          error_msg   => join( '<br>', @errors ),
+          error_msg   => join( '<br />', @errors ),
         });
+        ##Since Sku Options do not persist until an item is created, we need a way to persist the storageId through the
+        ##form generation, and back into www_addToCart.
     }
     return $self->www_view;
 }
