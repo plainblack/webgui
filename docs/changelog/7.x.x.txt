@@ -1,4 +1,5 @@
 7.7.19
+ - fixed #10850: Unable to check out with Sales Ad asset
  - fixed #10845: Shop 'Who can manage' denied access
  - fixed #10849: Shop: Bad behavior with no shipping drivers
  - fixed #10843: Ad Sales: how many do I have to buy?
