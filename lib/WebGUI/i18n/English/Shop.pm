@@ -1647,6 +1647,18 @@ our $I18N = {
         context => q|Label in the EU tax manager|,
     },
 
+    'No shipping plugins configured' => {
+        message => q|No shipping plugins configured.  Please notify the site adminstrator.|,
+        lastUpdated => 0,
+        context => q|Error message in the cart|,
+    },
+
+    'No shippers' => {
+        message => q|No shipping drivers are configured.  Users will not be able to checkout until at least one is configured.|,
+        lastUpdated => 0,
+        context => q|Error message in the manage ship driver screen.|,
+    },
+
 };
 
 1;

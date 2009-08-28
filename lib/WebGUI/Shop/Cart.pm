@@ -520,6 +520,9 @@ sub readyForCheckout {
         return 0 if $total < $requiredAmount;
     }
 
+    ##Check for any other logged errors
+    return 0 if $error{ id $self };
+
     # All checks passed so return true
     return 1;
 }
@@ -799,7 +802,6 @@ sub www_view {
     my %var = (
         %{$self->get},
         items                   => \@items,
-        error                   => $error{id $self},
         formHeader              => WebGUI::Form::formHeader($session)
             . WebGUI::Form::hidden($session, {name=>"shop", value=>"cart"})
             . WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
@@ -847,9 +849,16 @@ sub www_view {
             $defaultOption = $option;
             $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
         }
-        $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, defaultValue=>$defaultOption, value=>$self->get("shipperId")});
-        $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
-        $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
+        if ($defaultOption) {
+            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, defaultValue=>$defaultOption, value=>$self->get("shipperId")});
+            $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
+            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
+        }
+        else {
+            $var{shippingOptions} = '';
+            $var{shippingPrice}   = 0;
+            $error{id $self}      = $i18n->get("No shipping plugins configured");
+        }
     }
   
     # Tax variables
@@ -871,6 +880,7 @@ sub www_view {
     $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
     $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
     $var{ readyForCheckout      } = $self->readyForCheckout;
+    $var{ error                 } = $error{id $self}; 
 
     # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
