@@ -780,8 +780,6 @@ sub www_getCredentials {
         name  => 'zipcode',
         value => $form->process("zipcode") || $addressData->{ code } || $u->profileField('homeZip'),
     });
-    $session->log->warn("form: ". $form->process("country",'country'));
-    $session->log->warn("addressData: ". $addressData->{country});
     $var->{countryField} = WebGUI::Form::country($session, {
         name  => 'country',
         value => ($form->process("country",'country', '') || $addressData->{ country } || $u->profileField("homeCountry") || 'United States of A'),
