@@ -1,4 +1,5 @@
 7.7.19
+ - fixed #10839: Ad Sales: Uploaded Images Disappear
  - fixed #10851: Search Template Pagination
  - fixed #10850: Unable to check out with Sales Ad asset
  - fixed #10845: Shop 'Who can manage' denied access

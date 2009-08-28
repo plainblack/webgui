@@ -28,7 +28,7 @@ use Data::Dumper;
 
 =head1 NAME
 
-Package WebGUI::Asset::Sku::Ad	
+Package WebGUI::Asset::Sku::Ad    
 
 =head1 DESCRIPTION
 
@@ -53,29 +53,29 @@ Adds purchaseTemplate, manageTemplate, adSpace, priority, pricePerClick, pricePe
 =cut
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_AdSku");
-	%properties = (
-		purchaseTemplate      => {
-			tab             => "display",
-			fieldType       => "template",
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my %properties;
+    tie %properties, 'Tie::IxHash';
+    my $i18n = WebGUI::International->new($session, "Asset_AdSku");
+    %properties = (
+        purchaseTemplate      => {
+            tab             => "display",
+            fieldType       => "template",
                         namespace       => "AdSku/Purchase",
-			defaultValue    => 'AldPGu0u-jm_5xK13atCSQ',
-			label           => $i18n->get("property purchase template"),
-			hoverHelp       => $i18n->get("property purchase template help"),
-		},
-		manageTemplate      => {
-			tab             => "display",
-			fieldType       => "template",
+            defaultValue    => 'AldPGu0u-jm_5xK13atCSQ',
+            label           => $i18n->get("property purchase template"),
+            hoverHelp       => $i18n->get("property purchase template help"),
+        },
+        manageTemplate      => {
+            tab             => "display",
+            fieldType       => "template",
                         namespace       => "AdSku/Manage",
-			defaultValue    => 'ohjyzab5i-yW6GOWTeDUHg',
-			label           => $i18n->get("property manage template"),
-			hoverHelp       => $i18n->get("property manage template help"),
-		},
+            defaultValue    => 'ohjyzab5i-yW6GOWTeDUHg',
+            label           => $i18n->get("property manage template"),
+            hoverHelp       => $i18n->get("property manage template help"),
+        },
         adSpace => {
             tab             => "properties",
             fieldType       => "AdSpace",
@@ -85,36 +85,36 @@ sub definition {
         priority => {
             tab             => "properties",
             defaultValue    => '1',
-		fieldType       => "integer",
-		label           => $i18n->get("property priority"),
-		hoverHelp       => $i18n->get("property priority help"),
+        fieldType       => "integer",
+        label           => $i18n->get("property priority"),
+        hoverHelp       => $i18n->get("property priority help"),
             },
         pricePerClick => {
             tab             => "shop",
             defaultValue    => '0.00',
-		fieldType       => "float",
-		label           => $i18n->get("property price per click"),
-		hoverHelp       => $i18n->get("property price per click help"),
+        fieldType       => "float",
+        label           => $i18n->get("property price per click"),
+        hoverHelp       => $i18n->get("property price per click help"),
             },
         pricePerImpression => {
             tab             => "shop",
             defaultValue    => '0.00',
-		fieldType       => "float",
-		label           => $i18n->get("property price per impression"),
-		hoverHelp       => $i18n->get("property price per impression help"),
+        fieldType       => "float",
+        label           => $i18n->get("property price per impression"),
+        hoverHelp       => $i18n->get("property price per impression help"),
             },
         clickDiscounts   => {
             tab             => "shop",
             fieldType       => 'textarea',
-            label	    => $i18n->get('property click discounts'),
-            hoverHelp	    => $i18n->get('property click discounts help'),
+            label        => $i18n->get('property click discounts'),
+            hoverHelp        => $i18n->get('property click discounts help'),
             defaultValue    => '',
         },
         impressionDiscounts => {
             tab             => "shop",
             fieldType       => 'textarea',
-            label	    => $i18n->get('property impression discounts'),
-            hoverHelp	    => $i18n->get('property impression discounts help'),
+            label        => $i18n->get('property impression discounts'),
+            hoverHelp        => $i18n->get('property impression discounts help'),
             defaultValue    => '',
         },
     );
@@ -125,19 +125,19 @@ sub definition {
             type            => 'integer',
             label           => $i18n->get('property adsku karma'),
             hoverHelp       => $i18n->get('property adsku karma description'),
-            defaultvalue	=> 0,
+            defaultvalue    => 0,
         };
     }
 
-	push(@{$definition}, {
-		assetName           => $i18n->get('assetName'),
-		icon                => 'adsku.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'AdSku',
-		className           => 'WebGUI::Asset::Sku::AdSku',
-		properties          => \%properties,
-	    });
-	return $class->SUPER::definition($session, $definition);
+    push(@{$definition}, {
+        assetName           => $i18n->get('assetName'),
+        icon                => 'adsku.gif',
+        autoGenerateForms   => 1,
+        tableName           => 'AdSku',
+        className           => 'WebGUI::Asset::Sku::AdSku',
+        properties          => \%properties,
+        });
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -207,7 +207,7 @@ sub getDiscountAmount {
     my $previousDiscount = 0;
     foreach my $discountSet ( @discounts ) {
         last if $count < $discountSet->[1];
-	$previousDiscount = $discountSet->[0];
+    $previousDiscount = $discountSet->[0];
     }
     return $previousDiscount;
 }
@@ -288,20 +288,20 @@ sub manage {
     my %var;
     $var{purchaseLink} = $self->getUrl;
     my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($session,{
-	     constraints => [ { "adSkuPurchase.userId = ?" => $self->session->user->userId } ],
-	     orderBy => 'dateOfPurchase',
-             });
+         constraints => [ { "adSkuPurchase.userId = ?" => $self->session->user->userId } ],
+         orderBy => 'dateOfPurchase',
+    });
     my %ads;
-    while( my $object = $iterator->() ) {
-	next if $object->get('isDeleted');
-        next if exists $ads{$object->get('adId')};
-	my $ad = $ads{$object->get('adId')} = WebGUI::AdSpace::Ad->new($session,$object->get('adId'));
+    OBJECT: while( my $object = $iterator->() ) {
+        next OBJECT if $object->get('isDeleted');
+        next OBJECT if exists $ads{$object->get('adId')};
+        my $ad = $ads{$object->get('adId')} = WebGUI::AdSpace::Ad->new($session,$object->get('adId'));
         push @{$var{myAds}}, {
-	      rowTitle => $ad->get('title'),
-	      rowClicks => $ad->get('clicks') . '/' . $ad->get('clicksBought'),
-	      rowImpressions => $ad->get('impressions') . '/' . $ad->get('impressionsBought'),
-	      rowRenewLink => $self->getUrl('func=renew;Id=' . $object->get('adSkuPurchaseId') ),
-	};
+            rowTitle       => $ad->get('title'),
+            rowClicks      => $ad->get('clicks') . '/' . $ad->get('clicksBought'),
+            rowImpressions => $ad->get('impressions') . '/' . $ad->get('impressionsBought'),
+            rowRenewLink   => $self->getUrl('func=renew;Id=' . $object->get('adSkuPurchaseId') ),
+        };
     }
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
@@ -391,7 +391,7 @@ sub  onRefund {
     my $item = shift;
 
     my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($self->session,{
-	     constraints => [ { "transactionItemId = ?" => $item->getId } ],
+         constraints => [ { "transactionItemId = ?" => $item->getId } ],
              });
     my $crud = $iterator->();
 
@@ -399,8 +399,8 @@ sub  onRefund {
     my $clicks = $ad->get('clicksBought') - $crud->get('clicksPurchased');
     my $impressions = $ad->get('impressionsBought') - $crud->get('impressionsPurchased') ;
     $ad->set({
-	clicksBought => $clicks,
-	impressionsBought => $impressions,
+    clicksBought => $clicks,
+    impressionsBought => $impressions,
     });
 
     $crud->delete;
@@ -419,9 +419,9 @@ sub  parseDiscountText {
     my @lines = split "\n", $discountDescription;
     my @discounts;
     foreach my $line ( @lines ) {
-	if( $line =~ /^(\d+)\@(\d+)/ ) {
+    if( $line =~ /^(\d+)\@(\d+)/ ) {
             push @discounts, [ $1, $2 ];
-	}
+    }
     }
     return sort { $a->[1] <=> $b->[1] } @discounts;
 }
@@ -435,12 +435,12 @@ Prepares the template.
 =cut
 
 sub prepareManage {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $templateId = $self->get("manageTemplate");
-	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $templateId = $self->get("manageTemplate");
+    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_viewTemplate} = $template;
 }
 
 #-------------------------------------------------------------------
@@ -452,12 +452,12 @@ Prepares the template.
 =cut
 
 sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $templateId = $self->get("purchaseTemplate");
-	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $templateId = $self->get("purchaseTemplate");
+    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_viewTemplate} = $template;
 }
 
 #-------------------------------------------------------------------
@@ -474,7 +474,7 @@ sub view {
     my $options = $self->getOptions();
     my $form    = $session->form;
 
-	my $i18n    = WebGUI::International->new($session, "Asset_AdSku");
+    my $i18n    = WebGUI::International->new($session, "Asset_AdSku");
     my $adSpace = $self->getAdSpace;
     my %var = (
         formHeader          => WebGUI::Form::formHeader($session, { action=>$self->getUrl })
@@ -499,10 +499,10 @@ sub view {
                                   -size=>40
                                  }),
         formImage           => WebGUI::Form::Image($session, {
-                                  -name=>"formImage",
-                                  -value=>$form->get('formImage','image'),
-                                  -size=>40
-                                  -forceImageOnly=>1,
+                                  -name           => "formImage",
+                                  -value          => $options->{image} || $form->get('formImage','image'),
+                                  -size           => 40
+                                  -forceImageOnly => 1,
                                  }),
         formClicks          => WebGUI::Form::Integer($session, {
                                   -name=>"formClicks",
@@ -544,10 +544,7 @@ sub www_addToCart {
     my $form    = $session->form;
     my @errors;
 #my $imageStorage = $self->getOptions->{image} || WebGUI::Storage->create($session);  # LATER should be createTemp
-    $session->log->warn(Dumper($self->getOptions));
     my $imageStorageId = $form->process('formImage', 'image'); # , $self->getOptions->{image});
-    $session->log->warn("storageId: $imageStorageId");
-    $session->log->warn("storageText: ". $form->process('formImage'));
     my $imageStorage   = WebGUI::Storage->get($session,$imageStorageId);
     my $code;
     if( not defined $imageStorage ) {
@@ -644,18 +641,18 @@ renew an ad
 =cut
 
 sub www_renew {
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
-    my $id = $session->form->get('Id');
-    my $crud = WebGUI::AssetCollateral::Sku::Ad::Ad->new($session,$id);
-    my $ad = WebGUI::AdSpace::Ad->new($session,$crud->get('adId'));
+    my $id      = $session->form->get('Id');
+    my $crud    = WebGUI::AssetCollateral::Sku::Ad::Ad->new($session,$id);
+    my $ad      = WebGUI::AdSpace::Ad->new($session,$crud->get('adId'));
     $self->applyOptions({
           adtitle =>  $ad->get('title'),
-          clicks => $crud->get('clicksPurchased'),
+          clicks  => $crud->get('clicksPurchased'),
           impressions => $crud->get('impressionsPurchased'),
-          link => $ad->get('url'),
+          link  => $ad->get('url'),
           image => $ad->get('storageId'),
-          adId => $crud->get('adId'),
+          adId  => $crud->get('adId'),
     });
     return $self->www_view;
 }
