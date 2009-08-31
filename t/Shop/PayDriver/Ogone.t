@@ -326,7 +326,7 @@ cmp_deeply  (
     'getName requires a session object passed to it',
 );
 
-is          (WebGUI::Shop::PayDriver->getName($session), 'Payment Driver', 'getName returns the human readable name of this driver');
+is (WebGUI::Shop::PayDriver::Ogone->getName($session), 'Ogone', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
