@@ -36,7 +36,7 @@ my $session = start(); # this line required
 addInboxSmsNotificationTemplateIdSetting($session);
 upgradeJSONDatabaseFields($session); 
 moveCalendarFeedsToJSON($session); 
-addEmsScheduleColumnsDefaultValue($session)
+addEmsScheduleColumnsDefaultValue($session);
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ sub addEmsScheduleColumnsDefaultValue {
     my $session = shift;
     print "\tAdding default value for EMS Schedule Columns per Page..." unless $quiet;
 
-    $session->db->write( 'UPDATE TABLE EventManagementSystem set scheduleColumnsPerPage=5 where scheduleColumnsPerPage IS NULL' );
+    $session->db->write( 'UPDATE EventManagementSystem set scheduleColumnsPerPage=5 where scheduleColumnsPerPage IS NULL' );
 
     print "Done\n" unless $quiet;
 
