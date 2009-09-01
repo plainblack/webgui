@@ -37,6 +37,7 @@ addInboxSmsNotificationTemplateIdSetting($session);
 upgradeJSONDatabaseFields($session); 
 moveCalendarFeedsToJSON($session); 
 addEmsScheduleColumnsDefaultValue($session);
+removeOrphanedVersionTags( $session );
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -127,6 +128,28 @@ sub moveCalendarFeedsToJSON {
         $session->db->write('update Calendar set icalFeeds=? where assetId=?', [$jsonFeeds, $calendar->getId]);
     }
     $session->db->write(q|DROP TABLE Calendar_feeds|);
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Remove the orphan version tags, tags with no revisions in them
+sub removeOrphanedVersionTags {
+    my $session = shift;
+    print "\tRemoving orphan version tags (this may take a while)... " unless $quiet;
+
+    my $sth = $session->db->read(
+        "SELECT tagId FROM assetVersionTag",
+    );
+    while ( my ($tagId) = $sth->array ) {
+        if ( !$session->db->quickScalar( 
+            "SELECT COUNT(*) FROM assetData WHERE tagId=?", 
+            [ $tagId ] 
+        ) ) {
+            my $tag = WebGUI::VersionTag->new( $session, $tagId );
+            $tag->rollback;
+        }
+    }
 
     print "DONE!\n" unless $quiet;
 }
