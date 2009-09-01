@@ -204,7 +204,12 @@ sub execute {
 		my $post = undef;
 		if ($message->{inReplyTo} && $message->{inReplyTo} =~ m/cs\-([\w_-]{22})\@/) {
 			my $id = $1;
-			$post = WebGUI::Asset->newByDynamicClass($self->session, $id);
+            my $repliedPost = WebGUI::Asset->newByDynamicClass($self->session, $id);
+            if ($repliedPost
+                && $repliedPost->isa('WebGUI::Asset::Post')
+                && $repliedPost->getThread->getParent->getId eq $cs->getId) {
+                $post = $repliedPost;
+            }
 		}
 
 		if (defined $post && $cs->get("allowReplies") && $user->isInGroup($cs->get("postGroupId")) && (!$cs->get("requireSubscriptionForEmailPosting") || $user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
