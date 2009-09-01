@@ -129,13 +129,9 @@ YAHOO.WebGUI.Form.DatePicker = {
             if(res = this.inputBox.value.match(/(\d+)-(\d+)-(\d+)(?: (\d+):(\d+):(\d+))?/)) {
                 date = res[1] + '-' + res[2] + '-' + res[3];
                 if (res[4]) {
-                    if (!this.hour){
-                        this.hour = (res[4] < 10 ? '0' : '') + (1 * res[4]);
-                    }
-                    if (!this.min){
-                        this.min = (res[5] < 10 ? '0' : '') + (1 * res[5]);
-                    }
-                    this.sec = (res[6] < 10 ? '0' : '') + (1 * res[6]);
+                    this.hour = (res[4] < 10 ? '0' : '') + (1 * res[4]);
+                    this.min  = (res[5] < 10 ? '0' : '') + (1 * res[5]);
+                    this.sec  = (res[6] < 10 ? '0' : '') + (1 * res[6]);
                 }
             }
             if (!this.hour)
@@ -145,9 +141,9 @@ YAHOO.WebGUI.Form.DatePicker = {
             if (!this.sec)
                 this.sec = '00';
             if (this.useTime) {
-                this.hourEl.value = this.hour;
+                this.hourEl.value   = this.hour;
                 this.minuteEl.value = this.min;
-                this.secEl.value = this.sec;
+                this.secEl.value    = this.sec;
             }
             this.calendar.select(date);
             var selectedDates = this.calendar.getSelectedDates();
