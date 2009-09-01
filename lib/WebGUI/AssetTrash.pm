@@ -178,6 +178,7 @@ sub purge {
 	}
 
     # gonna need this at the end
+    my $tags  = $session->db->buildArrayRef('select tagId from assetData where assetId=?',[$self->getId]);
     my $tagId = $self->get("tagId");
 
     # clean up keywords
@@ -208,10 +209,13 @@ sub purge {
 	$self = undef;
 
     # clean up version tag if empty
-    my $versionTag = WebGUI::VersionTag->new($session, $tagId);
-    if ($versionTag && $versionTag->getAssetCount == 0) {
-        $versionTag->rollback;
+    foreach my $tagId (@{ $tags }) {
+        my $versionTag = WebGUI::VersionTag->new($session, $tagId);
+        if ($versionTag && $versionTag->getAssetCount == 0) {
+            $versionTag->rollback;
+        }
     }
+
     return 1;
 }
 

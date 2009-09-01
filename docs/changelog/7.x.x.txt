@@ -1,4 +1,5 @@
 7.7.19
+ - fixed #10872: Purging an asset leaves old version tags
  - fixed #10867: EMS: can't set Ticket time
  - fixed #10855: Bug in submitting data to ITransact
  - fixed #10868: EMS Schedule screen won't display
