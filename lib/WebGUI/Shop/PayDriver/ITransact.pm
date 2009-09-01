@@ -378,6 +378,8 @@ sub checkRecurringTransaction {
 sub definition {
     my $class       = shift;
     my $session     = shift;
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
+        unless ref $session eq 'WebGUI::Session';
     my $definition  = shift;
 
     my $i18n = WebGUI::International->new($session, 'PayDriver_ITransact');
@@ -424,7 +426,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 doXmlRequest ( xml [ isAdministrative ] )
+=head2 doXmlRequest ( xml, [ isGatewayInterface ] )
 
 Post an xml request to the ITransact backend. Returns a LWP::UserAgent response object.
 
@@ -457,7 +459,7 @@ sub doXmlRequest {
     # Create a request and stuff the xml in it
     my $request = HTTP::Request->new( POST => $xmlTransactionScript );
 	$request->content_type( 'text/xml' );
-	$request->content( $xml );
+	$request->add_content_utf8( $xml );
 
     # Do the request
     my $response = $userAgent->request($request);
@@ -621,7 +623,6 @@ sub processPayment {
 
     # Get the payment definition XML
     my $xml = $self->_generatePaymentRequestXML( $transaction );
-    $session->errorHandler->debug("XML Request: $xml");
 
     # Send the xml to ITransact
     my $response = $self->doXmlRequest( $xml );

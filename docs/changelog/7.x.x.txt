@@ -1,4 +1,5 @@
 7.7.19
+ - fixed #10855: Bug in submitting data to ITransact
  - fixed #10868: EMS Schedule screen won't display
  - fixed #10857: Wrong entry i18n: Asset_TimeTracking.pm
  - fixed #10839: Ad Sales: Uploaded Images Disappear
