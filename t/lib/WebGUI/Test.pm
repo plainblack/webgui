@@ -57,6 +57,7 @@ our $logger_error;
 my %originalConfig;
 my $originalSetting;
 
+my @assetsToPurge;
 my @groupsToDelete;
 my @usersToDelete;
 my @sessionsToDelete;
@@ -172,7 +173,7 @@ END {
         my $newUser = WebGUI::User->new($SESSION, $userId);
         $newUser->delete if $newUser;
     }
-    foreach my $stor (@storagesToDelete) {
+    STORAGE: foreach my $stor (@storagesToDelete) {
         if ($SESSION->id->valid($stor)) {
             my $storage = WebGUI::Storage->get($SESSION, $stor);
             $storage->delete if $storage;
@@ -206,6 +207,9 @@ END {
                 /;
 
         $workflow->delete;
+    }
+    ASSET: foreach my $asset (@assetsToPurge) {
+        $asset->purge;
     }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions : '.$SESSION->db->quickScalar('select count(*) from userSession'));
@@ -498,6 +502,23 @@ sub originalConfig {
         $safeValue = clone $value;
     }
     $originalConfig{$param} = $safeValue;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 assetsToPurge ( $asset, [$asset ] )
+
+Push a list of Asset objects onto the stack of assets to be automatically purged
+at the end of the test.  This will also clean-up all version tags associated
+with the Asset.
+
+This is a class method.
+
+=cut
+
+sub assetsToPurge {
+    my $class = shift;
+    push @assetsToPurge, @_;
 }
 
 #----------------------------------------------------------------------------

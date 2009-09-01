@@ -36,6 +36,8 @@ my $import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey
 $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+my $tag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->assetsToPurge($survey);
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
 my $sJSON = $survey->surveyJSON;
@@ -177,7 +179,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     WebGUI::Test->getPage( $survey, 'www_jumpTo', { formParams => {id => '0'} } );
     is( $session->http->getStatus, '201', 'Page request ok' ); # why is "201 - created" status used??
     is($survey->responseJSON->nextResponse, 0, 'S0 is the first response');
-    
+
     tie my %expectedSurveyOrder, 'Tie::IxHash';
     %expectedSurveyOrder =  (
         'undefined' => 0,
@@ -200,16 +202,16 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     $session->db->write('delete from Survey_response where assetId = ?', [$survey->getId]);
     delete $survey->{responseId};
     delete $survey->{surveyJSON};
-    
+
     my $surveyId = $survey->getId;
     my $revisionDate = WebGUI::Asset->getCurrentRevisionDate($session, $surveyId);
     ok($revisionDate, 'Revision Date initially defined');
-    
+
     # Modify Survey structure, new revision not created
     $survey->submitObjectEdit({ id =>  "0", text => "new text"});
     is($survey->surveyJSON->section([0])->{text}, 'new text', 'Survey updated');
     is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision unchanged');
-    
+
     # Push revisionDate into the past because we can't have 2 revision dates with the same epoch (this is very hacky)
     $revisionDate--;
     $session->stow->deleteAll();
@@ -217,11 +219,11 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     $session->db->write('update Survey set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update assetData set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update wobject set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
-    
+
     $survey = WebGUI::Asset->new($session, $surveyId);
     isa_ok($survey, 'WebGUI::Asset::Wobject::Survey', 'Got back survey after monkeying with revisionDate');
     is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision date pushed back');
-    
+
     # Create new response
     my $responseId = $survey->responseId;
     is(
@@ -229,26 +231,26 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
         $revisionDate, 
         'Pushed back revisionDate used for new response'
     );
-    
+
     # Make another change, causing new revision to be automatically created
     $survey->submitObjectEdit({ id =>  "0", text => "newer text"});
-    
+
     my $newerSurvey = WebGUI::Asset->new($session, $surveyId); # retrieve newer revision
     isa_ok($newerSurvey, 'WebGUI::Asset::Wobject::Survey', 'After change, re-retrieved Survey instance');
     is($newerSurvey->getId, $surveyId, '..which is the same survey');
     is($newerSurvey->surveyJSON->section([0])->{text}, 'newer text', '..with updated text');
     ok($newerSurvey->get('revisionDate') > $revisionDate, '..and newer revisionDate');
-    
+
     # Create another response (this one will use the new revision)
     my $newUser = WebGUI::User->new( $session, 'new' );
     WebGUI::Test->usersToDelete($newUser);
     $session->user({ user => $newUser });
     my $newResponseId = $survey->responseId;
     is($newerSurvey->responseJSON->nextResponseSection()->{text}, 'newer text', 'New response uses the new text');
-    
+
     # And the punch line..
     is($survey->responseJSON->nextResponseSection()->{text}, 'new text', '..wheras the original response uses the original text');
-    
+
 }
 }
 
@@ -270,11 +272,3 @@ like($storage->getFileContentsAsScalar($filename), qr{
 
 }
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $survey->purge() if $survey;
-
-    my $versionTag = WebGUI::VersionTag->getWorking( $session, 1 );
-    $versionTag->rollback() if $versionTag;
-}
