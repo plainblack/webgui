@@ -62,6 +62,7 @@
  - fixed #10625: Map point no save button
  - fixed #10639: Map: Can't edit or delete points
  - fixed #10640: Map: points not working correctly
+ - fixed Codearea editor to work a lot better and be more compatible
 
 7.7.17
  - fixed #10697: Story: Image crowds text

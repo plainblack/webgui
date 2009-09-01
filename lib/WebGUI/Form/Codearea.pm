@@ -16,6 +16,7 @@ package WebGUI::Form::Codearea;
 
 use strict;
 use base 'WebGUI::Form::Textarea';
+use HTML::Entities qw(encode_entities decode_entities);
 use WebGUI::International;
 
 =head1 NAME
@@ -114,6 +115,21 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getValue ( [value] )
+
+Return the value, HTML decoded
+
+=cut
+
+sub getValue {
+    my ( $self, @args ) = @_;
+    my $value = $self->SUPER::getValue( @args );
+    $self->session->log->warn( $value );
+    return decode_entities( $value );
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -136,7 +152,7 @@ sub toHtml {
     my $self = shift;
     my ($style, $url, $stow) = $self->session->quick(qw(style url stow));
 
-    my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
+    my $value = encode_entities( $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue))) );
     my $width = $self->get('width') || 400;
     my $height = $self->get('height') || 150;
     my $id = $self->get('id');
@@ -146,33 +162,31 @@ sub toHtml {
     my $styleAttr = $self->get('style');
 
     $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
-    $style->setScript($url->extras("yui/build/utilities/utilities.js"), {type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/resize/resize-min.js"), {type=>"text/javascript"});
-    $style->setScript($url->extras('editarea/edit_area/edit_area_full.js'), {type=>"text/javascript"});
+    $style->setLink($url->extras("yui/build/assets/skins/sam/skin.css"), {type=>"text/css", rel=>"stylesheet"});
+    $style->setLink($url->extras('yui/build/logger/assets/skins/sam/logger.css'), {type=>"text/css", rel=>"stylesheet"});
+    $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/utilities/utilities.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/container/container_core-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/menu/menu-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/button/button-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/element/element-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/resize/resize-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/editor/editor-debug.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/logger/logger.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"),{type=>"text/javascript"});
+    my $codeCss = $url->extras("yui-webgui/build/code-editor/code.css");
     my $out = <<"END_HTML";
-<div id="${id}_resizewrapper" style="padding-right: 6px; padding-bottom: 6px; margin-bottom: 1em; width: ${width}px; height: ${height}px">
-    <textarea id="$id" name="$name" $extras rows="10" cols="60" style="font-family: monospace; $styleAttr; height: 100%; width: 100%; resize: none;">$value</textarea>
-</div>
+<textarea id="$id" name="$name" $extras rows="10" cols="60" style="font-family: monospace; $styleAttr; height: 100%; width: 100%; resize: none;">$value</textarea>
 <script type="text/javascript">
-(function() {
-    var resize = new YAHOO.util.Resize('${id}_resizewrapper', {useShim : true});
-    editAreaLoader.init({
-        id               : '$id',
-        syntax           : '$syntax',
-        start_highlight  : true,
-        show_line_colors : true,
-        allow_resize     : 'no',
-        display          : 'later',
-        toolbar          : 'search,go_to_line,|,undo,redo,|,syntax_selection,highlight,reset_highlight,|,help'
-    });
-    resize.on('resize', function(e) {
-        YAHOO.util.Dom.setStyle('${id}', 'width', resize.getStyle('width'));
-        YAHOO.util.Dom.setStyle('${id}', 'height', resize.getStyle('height'));
-        YAHOO.util.Dom.setStyle('frame_${id}', 'width', resize.getStyle('width'));
-        YAHOO.util.Dom.setStyle('frame_${id}', 'height', resize.getStyle('height'));
-    });
-    resize.reset();
-})();
+(function(){
+    YAHOO.util.Event.onDOMReady( function () {
+        YAHOO.util.Dom.addClass( document.body, "yui-skin-sam" );
+        var mylogger = new YAHOO.widget.LogReader();
+        var myeditor = new YAHOO.widget.CodeEditor('${id}', { handleSubmit: true, css_url: '${codeCss}', height: '${height}px', width: '${width}px', status: true, resize: true });
+        myeditor.render();
+    } );
+}());
 </script>
 END_HTML
     return $out;
