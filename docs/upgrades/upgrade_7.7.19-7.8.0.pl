@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+reorganizeAdSpaceProperties($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,18 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub reorganizeAdSpaceProperties {
+    my $session = shift;
+    print "\tReorganize AdSpace and Ad Sales properties... " unless $quiet;
+    $session->db->write(q|ALTER TABLE adSpace DROP COLUMN costPerClick|);
+    $session->db->write(q|ALTER TABLE adSpace DROP COLUMN costPerImpression|);
+    $session->db->write(q|ALTER TABLE adSpace DROP COLUMN groupToPurchase|);
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

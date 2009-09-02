@@ -346,6 +346,20 @@ sub www_editAdSpace {
         label       => $i18n->get("description"),
     );
     $f->integer(
+        name            => "minimumClicks",
+        value           => $session->form->get('minimumClicks') || ($adSpace && $adSpace->get('minimumClicks')),
+        defaultValue    => 1000,
+        hoverHelp       => $i18n->get("minimum clicks help"),
+        label           => $i18n->get("minimum clicks"),
+    );
+    $f->integer(
+        name            => "minimumImpressions",
+        value           => $session->form->get('minimumImpressions') || ($adSpace && $adSpace->get('minimumImpressions')),
+        defaultValue    => 1000,
+        hoverHelp       => $i18n->get("minimum impressions help"),
+        label           => $i18n->get("minimum impressions"),
+    );
+    $f->integer(
         name            => "width",
         value           => $session->form->get('width') || ($adSpace && $adSpace->get('width')),
         defaultValue    => 468,
@@ -396,11 +410,13 @@ sub www_editAdSpaceSave {
     my $i18n    = WebGUI::International->new( $session, "AdSpace" );
     
     my %properties = (
-        name        => $session->form->process("name", "text"),	
-        title       => $session->form->process("title", "text"),	
-        description => $session->form->process("description", "textarea"),	
-        width       => $session->form->process("width", "integer"),	
-        height      => $session->form->process("height", "integer"),	
+        name               => $session->form->process("name",               "text"),	
+        title              => $session->form->process("title",              "text"),	
+        description        => $session->form->process("description",        "textarea"),	
+        width              => $session->form->process("width",              "integer"),	
+        height             => $session->form->process("height",             "integer"),	
+        minimumClicks      => $session->form->process("minimumClicks",      "integer"),	
+        minimumImpressions => $session->form->process("minimumImpressions", "integer"),	
     );
 
     ### Validate form entry
