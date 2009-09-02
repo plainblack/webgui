@@ -24,7 +24,7 @@ save you many hours of grief.
       has ft_min_word_len set to 2 by default.
 
     * If upgrading from WebGUI 7.6, you must first upgrade to 7.6.35,
-      then you can upgrade to WebGUI 7.7.17 and beyond.
+      then you can upgrade to WebGUI 7.7.19 and beyond.
 
 7.7.18
 --------------------------------------------------------------------
