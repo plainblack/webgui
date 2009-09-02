@@ -163,7 +163,6 @@ sub toHtml {
 
     $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
     $style->setLink($url->extras("yui/build/assets/skins/sam/skin.css"), {type=>"text/css", rel=>"stylesheet"});
-    $style->setLink($url->extras('yui/build/logger/assets/skins/sam/logger.css'), {type=>"text/css", rel=>"stylesheet"});
     $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/utilities/utilities.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/container/container_core-min.js"),{type=>"text/javascript"});
@@ -172,8 +171,7 @@ sub toHtml {
     $style->setScript($url->extras("yui/build/element/element-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/resize/resize-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/editor/editor-debug.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/logger/logger.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/editor/editor-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"),{type=>"text/javascript"});
     my $codeCss = $url->extras("yui-webgui/build/code-editor/code.css");
     my $out = <<"END_HTML";
@@ -181,8 +179,6 @@ sub toHtml {
 <script type="text/javascript">
 (function(){
     YAHOO.util.Event.onDOMReady( function () {
-        YAHOO.util.Dom.addClass( document.body, "yui-skin-sam" );
-        var mylogger = new YAHOO.widget.LogReader();
         var myeditor = new YAHOO.widget.CodeEditor('${id}', { handleSubmit: true, css_url: '${codeCss}', height: '${height}px', width: '${width}px', status: true, resize: true });
         myeditor.render();
     } );
