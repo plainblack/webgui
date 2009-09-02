@@ -24,7 +24,7 @@ use WebGUI::Storage;
 use WebGUI::Asset;
 
 
-my $toVersion = '7.7.20';
+my $toVersion = '7.8.0';
 my $quiet; # this line required
 
 
