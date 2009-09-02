@@ -83,7 +83,7 @@
             { code: /\'(.*?)(\'|<br>|<\/P>)/gi, tag: '<s>\'$1$2</s>' }, // strings single quote
             { code: /\b(alert|isNaN|parent|Array|parseFloat|parseInt|blur|clearTimeout|prompt|prototype|close|confirm|length|Date|location|Math|document|element|name|self|elements|setTimeout|navigator|status|String|escape|Number|submit|eval|Object|event|onblur|focus|onerror|onfocus|onclick|top|onload|toString|onunload|unescape|open|valueOf|window|onmouseover|innerHTML)\b/g, tag: '<u>$1</u>' }, // special words
             { code: /([^:]|^)\/\/(.*?)(<br|<\/P)/gi, tag: '$1<i>//$2</i>$3' }, // comments //
-            { code: /\/\*(.*?)\*\//g, tag: '<i>/*$1* /</i>' } // comments / * */
+            { code: /\/\*(.*?)\*\//g, tag: '<i>/*$1*/</i>' } // comments / * */
         ];
         //End Borrowed Content
 
