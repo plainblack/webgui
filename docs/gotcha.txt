@@ -23,6 +23,9 @@ save you many hours of grief.
       characters so that it does not need to be set to 1.  The WRE
       has ft_min_word_len set to 2 by default.
 
+    * If upgrading from WebGUI 7.6, you must first upgrade to 7.6.35,
+      then you can upgrade to WebGUI 7.7.17 and beyond.
+
 7.7.18
 --------------------------------------------------------------------
     * The search indexer was not properly indexing non-ASCII content.  The
