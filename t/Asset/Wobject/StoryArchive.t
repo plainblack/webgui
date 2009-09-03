@@ -63,7 +63,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 46
+my $tests = 48
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -198,7 +198,7 @@ my $newFolder = $archive->getFolder($yesterday);
 my ($wgBdayMorn,undef)    = $session->datetime->dayStartEnd($wgBday);
 my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
-my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo'}, @skipAutoCommit);
+my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo,all'}, @skipAutoCommit);
 $creationDateSth->execute([$wgBday, $story->getId]);
 my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
@@ -243,8 +243,6 @@ KEY: foreach my $key (keys %{ $templateVars }) {
     delete $templateVars->{$key};
 }
 
-diag Dumper $templateVars;
-
 $session->user({userId => 1});
 cmp_deeply(
     $templateVars,
@@ -282,9 +280,9 @@ cmp_deeply(
     'viewTemplateVariables: returns expected template variables with 3 stories in different folders, user is cannot edit stories'
 );
 
-my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot"}, @skipAutoCommit);
-my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo"},  @skipAutoCommit);
-my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo"},    @skipAutoCommit);
+my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot,all"}, @skipAutoCommit);
+my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo,all"},  @skipAutoCommit);
+my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo,all"},    @skipAutoCommit);
 foreach my $storilet ($story2, $story3, $story4) {
     $session->db->write("update asset set creationDate=$now where assetId=?",[$storilet->getId]);
 }
@@ -395,6 +393,10 @@ cmp_deeply(
 );
 
 $archive->update({storiesPerPage => 3});
+$session->request->setup_body({ keyword => 'all' } );
+$templateVars = $archive->viewTemplateVariables('keyword');
+ok($templateVars->{'pagination.pageCount.isMultiple'}, 'keyword search with multiple pages');
+is($templateVars->{'pagination.lastPageUrl'}, '/home/mystories?func=view;keyword=all;pn=2', '... pagination variable has correct URL');
 
 $session->request->setup_body({ } );
 
@@ -492,7 +494,7 @@ $session->scratch->delete('isExporting');
 $templateVars = $archive->viewTemplateVariables();
 my @anchors = simpleHrefParser($templateVars->{keywordCloud});
 my @expectedAnchors = ();
-foreach my $keyword(qw/echo foxtrot roger/) {
+foreach my $keyword(qw/echo foxtrot roger all/) {
     push @expectedAnchors, [ $keyword, '/home/mystories?func=view;keyword='.$keyword ];
 }
 cmp_bag(
@@ -512,7 +514,7 @@ $session->scratch->set('isExporting', 1);
 $templateVars = $archive->viewTemplateVariables();
 @anchors = simpleHrefParser($templateVars->{keywordCloud});
 @expectedAnchors = ();
-foreach my $keyword(qw/echo foxtrot roger/) {
+foreach my $keyword(qw/echo foxtrot roger all/) {
     push @expectedAnchors, [ $keyword, '/home/mystories/keyword_'.$keyword.'.html' ];
 }
 cmp_bag(
@@ -586,6 +588,7 @@ cmp_bag(
         mystories.atom               mystories.rdf
         mystories/index.html         mystories/keyword_echo.html
         mystories/keyword_roger.html mystories/keyword_foxtrot.html
+        mystories/keyword_all.html
     }],
     'exportAssetCollateral: feed files exported'
 );
@@ -596,6 +599,7 @@ cmp_bag(
         keyword_echo.html
         keyword_roger.html
         keyword_foxtrot.html
+        keyword_all.html
         index.html
     /],
     'exportAssetCollateral: keyword files exported into correct dir (below the asset)'
