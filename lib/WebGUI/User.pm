@@ -814,7 +814,7 @@ sub getProfileUrl {
 
     my $identifier = $session->config->get("profileModuleIdentifier");
 
-    return qq{$page?op=account;module=$identifier;do=view;uid=}.$self->userId;
+    return $session->url->append($page,qq{op=account;module=$identifier;do=view;uid=}.$self->userId);
 
 }   
 

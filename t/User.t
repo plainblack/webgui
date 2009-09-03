@@ -22,7 +22,7 @@ use WebGUI::User;
 use WebGUI::ProfileField;
 use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 225; # increment this value for each test you create
+use Test::More tests => 226; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -833,6 +833,7 @@ isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 # getProfileUrl
 #
 ################################################################
+$session->setting->set('preventProxyCache', 0);
 
 WebGUI::Test->originalConfig('profileModuleIdentifier');
 my $profileModuleId = $session->config->get('profileModuleIdentifier');
@@ -845,7 +846,7 @@ $session->config->set('profileModuleIdentifier', 'someOtherThing');
 is(
     $newFish->getProfileUrl('cellblock'),
     "cellblock?op=account;module=someOtherThing;do=view;uid=".$newFish->userId,
-    'getProfileUrl: uses profileModuleIdentifier to pick the right Account module'
+    '... uses profileModuleIdentifier to pick the right Account module'
 );
 $session->config->set('profileModuleIdentifier', $profileModuleId);
 
@@ -853,8 +854,19 @@ $session->asset(WebGUI::Asset->getDefault($session));
 is(
     $newFish->getProfileUrl(),
     "/home?op=account;module=$profileModuleId;do=view;uid=".$newFish->userId,
-    'getProfileUrl: uses session->url->page if no URL is passed in'
+    '... uses session->url->page if no URL is passed in'
 );
+
+$session->setting->set('preventProxyCache', 1);
+my $newFishId = $newFish->userId;
+
+like(
+    $newFish->getProfileUrl(),
+    qr{/home\?noCache=\d+:\d+;op=account;module=$profileModuleId;do=view;uid=$newFishId},
+    '... handles preventProxyCache correctly'
+);
+
+$session->setting->set('preventProxyCache', 0);
 
 ################################################################
 #
