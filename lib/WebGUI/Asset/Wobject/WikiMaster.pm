@@ -542,7 +542,7 @@ sub www_byKeyword {
         keyword         => $keyword,   
         usePaginator    => 1,
         });
-    $p->setBaseUrl($self->getUrl("func=byKeyword"));
+    $p->setBaseUrl($self->getUrl("func=byKeyword;keyword=".$keyword));
     foreach my $assetData (@{$p->getPageData}) {
         my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetData->{assetId});
         next unless defined $asset;
