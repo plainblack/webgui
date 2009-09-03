@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixTemplateSettingsFromShunt($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,26 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixTemplateSettingsFromShunt {
+    my $session = shift;
+    print "\tClear isPackage and set isDefault on recently imported templates... " unless $quiet;
+    ASSET: foreach my $assetId (qw/PBtmpl0000000000000137 CarouselTmpl0000000002 aIpCmr9Hi__vgdZnDTz1jw
+                                   2CS-BErrjMmESOtGT90qOg 2rC4ErZ3c77OJzJm7O5s3w pbtmpl0000000000000220
+                                   pbtmpl0000000000000221 2gtFt7c0qAFNU3BG_uvNvg PBtmpl0000000000000081
+                                   ThingyTmpl000000000001 PcRRPhh-0KfvLLNIPdxJTw g8W53Pd71uHB9pxaXhWf_A/) {
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        next ASSET unless $asset;
+        $asset->update({
+            isPackage => 0,
+            isDefault => 1,
+        });
+    }
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
