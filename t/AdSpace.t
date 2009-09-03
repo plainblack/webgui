@@ -22,11 +22,8 @@ my $newAdSpaceSettings = {
     name               => "newAdSpaceName",
     title              => "Ad Space",
     description        => 'This is a space reserved for ads',
-    costPerImpression  => '1.00',
-    costPerClick       => '1.00',
     minimumImpressions => 100,
     minimumClicks      => 200,
-    groupToPurchase    => "7",
     width              => "400",
     height             => "300",
 };

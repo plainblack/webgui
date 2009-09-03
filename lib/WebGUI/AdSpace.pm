@@ -310,10 +310,6 @@ An integer indicating the minimum number of impressions an advertiser is allowed
 
 An integer indicating the minimum number of clicks an advertiser is allowed to purchase.
 
-=head4 groupToPurchase
-
-A groupId representing the group allowed to purchase ads directly from the web site.
-
 =head4 width
 
 The width, in pixels, of this ad space.
@@ -338,7 +334,6 @@ sub set {
 	$self->{_properties}{description} = exists $properties->{description} ? $properties->{description} : $self->{_properties}{description};
 	$self->{_properties}{minimumImpressions} = $properties->{minimumImpressions} || $self->{_properties}{minimumImpressions};
 	$self->{_properties}{minimumClicks} = $properties->{minimumClicks} || $self->{_properties}{minimumClicks};
-	$self->{_properties}{groupToPurchase} = $properties->{groupToPurchase} || $self->{_properties}{groupToPurchase} || "3";
 	$self->{_properties}{width} = $properties->{width} || $self->{_properties}{width} || "468";
 	$self->{_properties}{height} = $properties->{height} || $self->{_properties}{height} || "60";
 	$self->session->db->setRow("adSpace","adSpaceId",$self->{_properties});
