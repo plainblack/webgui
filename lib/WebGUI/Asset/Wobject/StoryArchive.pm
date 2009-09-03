@@ -509,6 +509,7 @@ sub viewTemplateVariables {
             usePaginator => 1,
             rowsPerPage  => $self->get('storiesPerPage'),
         });
+        $p->setBaseUrl($self->getUrl("func=view;keyword=".$keywords));
     }
     elsif ($mode eq 'search') {
         $var->{mode} = 'search';

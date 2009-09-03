@@ -1,4 +1,5 @@
 7.7.20
+ - fixed #10890: Story Manager: pagination broken for keywords
  - fixed #10856: no paginate in wiki keyword search 
  - fixed #10877: getProfileUrl() broken
  - fixed #10878: Template issues in 7.7.19
