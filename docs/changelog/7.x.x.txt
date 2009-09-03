@@ -1,6 +1,7 @@
 7.8.0
  - fixed #10856: no paginate in wiki keyword search 
  - fixed #10877: getProfileUrl() broken
+ - fixed #10878: Template issues in 7.7.19
  - fixed #10844: Ad Sales: No template variable Help
  - fixed #10873: Code editor breaks CSS comments
 
