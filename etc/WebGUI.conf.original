@@ -80,8 +80,11 @@
 
 "richEditorsUseAssetUrls" : 1,
 
+# Used to generate user facing URLs.
 # If you are not running your web server on the standard
-# port (80) then use this setting to specify that.
+# port (80) then use this setting to specify that.  If you
+# are running WebGUI behind a proxy, then webServerPort should
+# be set to which ever port the proxy is listening to.
 
 #"webServerPort" : 80,
 
