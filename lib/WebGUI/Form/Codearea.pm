@@ -124,7 +124,6 @@ Return the value, HTML decoded
 sub getValue {
     my ( $self, @args ) = @_;
     my $value = $self->SUPER::getValue( @args );
-    $self->session->log->warn( $value );
     return decode_entities( $value );
 }
 
