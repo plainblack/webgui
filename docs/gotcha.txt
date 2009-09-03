@@ -261,6 +261,11 @@ save you many hours of grief.
      RssFeed AssetAspect.  If not used by custom assets, the tables
      used by them will be removed from the database.
 
+     This will change the URLs for your RSS Feeds from "myAsset.rss" to
+     "myAsset?func=viewRss".  You will need to update all Syndicated Content
+     assets and other content aggregators that had the old URLs.  Alternately,
+     you can use Redirect assets to forward the old URL to the new one.
+
 7.7.1
 --------------------------------------------------------------------
    * Keywords are now comma separated rather than space separated.  Quotes are
