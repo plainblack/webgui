@@ -1196,7 +1196,6 @@ sub resetGroupFields {
     }
     ##VersionTags
     $tableCache->{assetVersionTag} = ['groupToUse'];
-    $tableCache->{adSpace}         = ['groupToPurchase'];
     foreach my $tableName (keys %{ $tableCache }) {
         foreach my $fieldName (@{ $tableCache->{$tableName} }) {
             my $sql = sprintf 'UPDATE %s SET %s=3 where %s=?',
