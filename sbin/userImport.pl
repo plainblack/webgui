@@ -92,7 +92,7 @@ while(my $line = <FILE>) {
     next
         if $line eq '';
     my @row = split($delimiter, $line);
-    use Data::Dumper ();
+    #use Data::Dumper;
     chomp @row;
     if ($lineNumber == 1) {
         @field = @row;
@@ -272,13 +272,21 @@ names are:
 =over
 
 =item B<username>
+
 =item B<password>
+
 =item B<authMethod>
+
 =item B<status>
+
 =item B<ldapUrl>
+
 =item B<connectDN>
+
 =item B<groups>
+
 =item B<expireOffset>
+
 =item Any valid User Profile field name available in WebGUI's database,
       e.g. B<firstName>, B<lastName>, B<mail>, etc.
 
