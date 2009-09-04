@@ -9,6 +9,7 @@
  - fixed #10883: Recover Password / Auth::WebGUI /getSiteUrl
  - fixed #10892: In/Out Board
  - fixed #10893: Code editor uses element-min.js
+ - fixed #10891: Asset manager JSON feed has macros processed
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
