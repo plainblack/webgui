@@ -167,7 +167,7 @@ sub toHtml {
     $style->setScript($url->extras("yui/build/container/container_core-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/menu/menu-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/button/button-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/element/element-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/element/element-beta-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/resize/resize-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/editor/editor-min.js"),{type=>"text/javascript"});
