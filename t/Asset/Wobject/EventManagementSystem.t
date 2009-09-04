@@ -57,6 +57,7 @@ my $ems = $node->addChild({
 	workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
 });
 $versionTag->commit;
+WebGUI::Test->tagsToRollback($versionTag);
 
 # Test for a sane object type
 isa_ok($ems, 'WebGUI::Asset::Wobject::EventManagementSystem');
@@ -326,10 +327,3 @@ cmp_deeply( JSON::from_json($data), {
        },
      'twelve tickets: schedule data looks good' );
 
-#---------------------------------------------------------------------------# Cleanup
-END {
-		$ems->purge;
-
-        # Clean up after thy self
-        #$versionTag->rollback();
-}
