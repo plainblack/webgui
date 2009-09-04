@@ -311,12 +311,11 @@ sub view {
     my @products = ();
     PRODUCT: foreach my $id (@productIds) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
-		if (defined $asset && $asset->canView) {
-            push @products, $asset;
-        }
-		else {
+        if (!defined $asset) {
 			$session->errorHandler->error(q|Couldn't instanciate SKU with assetId |.$id.q| on shelf with assetId |.$self->getId);
-		}
+            next PRODUCT;
+        }
+        push @products, $asset if $asset->canView;
     }
 
 	# create paginator
