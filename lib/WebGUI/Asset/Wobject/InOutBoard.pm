@@ -147,17 +147,20 @@ status.
 =cut
 
 sub view {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 	my %var;
 	my $url = $self->getUrl('func=view');
 	
 	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
-	if ($self->session->user->isInGroup($self->getValue("reportViewerGroup"))) {
-	  $var{'viewReportURL'} = $self->getUrl("func=viewReport");
-	  $var{'viewReportLabel'} = $i18n->get('view report label');
-	  $var{canViewReport} = 1;
+	if ($session->user->isInGroup($self->getValue("reportViewerGroup"))) {
+        $var{'viewReportURL'}   = $self->getUrl("func=viewReport");
+        $var{'viewReportLabel'} = $i18n->get('view report label');
+        $var{canViewReport}     = 1;
 	}
-	else { $var{canViewReport} = 0; }
+	else {
+        $var{canViewReport} = 0;
+    }
 	
 	my $statusUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
 	my $statusListString = $self->getValue("statusList");
@@ -171,13 +174,19 @@ sub view {
 		$statusListHashRef->{$status} = $status;
 	}
 
-	#$self->session->errorHandler->warn("VIEW: userId: ".$statusUserId."\n" );
-	my ($status) = $self->session->db->quickArray("select status from InOutBoard_status where userId=".$self->session->db->quote($statusUserId)." and assetId=".$self->session->db->quote($self->getId));
+	#$self->session->log->warn("VIEW: userId: ".$statusUserId."\n" );
+	my ($status) = $session->db->quickArray(
+        "select status from InOutBoard_status where userId=? and assetId=?",
+        [ $statusUserId, $self->getId]
+    );
 
 	##Find all the users for which I am a delegate
-	my @users = $self->session->db->buildArray("select userId from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and delegateUserId=".$self->session->db->quote($self->session->user->userId));
+	my @users = $session->db->buildArray(
+        "select userId from InOutBoard_delegates where assetId=? and delegateUserId=?",
+        [ $self->getId, $session->user->userId ]
+    );
 
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	my $f = WebGUI::HTMLForm->new($session,-action=>$self->getUrl);
 	if (@users) {
 		my %nameHash;
 		tie %nameHash, "Tie::IxHash";
@@ -188,7 +197,7 @@ sub view {
 		$f->selectBox(
 			-name=>"delegate",
 			-options=>\%nameHash,
-			-value=>[ $self->session->scratch->get("userId") ],
+			-value=>[ $session->scratch->get("userId") ],
 			-label=>$i18n->get('delegate'),
 			-hoverHelp=>$i18n->get('delegate description'),
 			-extras=>q|onchange="this.form.submit();"|,
@@ -212,18 +221,23 @@ sub view {
 		);
 	$f->submit;
 	
-	my ($isInGroup) = $self->session->db->quickArray("select count(*) from groupings where userId=".$self->session->db->quote($self->session->user->userId)." and groupId=".$self->session->db->quote($self->get("inOutGroup")));
+	my ($isInGroup) = $session->db->quickArray(
+        "select count(*) from groupings where userId=? and groupId=?",
+        [ $session->user->userId, $self->get("inOutGroup") ]
+    );
 	if ($isInGroup) {
-	  $var{displayForm} = 1;
-	  $var{'form'} = $f->print;
-	  $var{'selectDelegatesURL'} = $self->getUrl("func=selectDelegates");
-	  $var{'selectDelegatesLabel'} = $i18n->get('select delegates label');
+	    $var{displayForm} = 1;
+	    $var{'form'} = $f->print;
+	    $var{'selectDelegatesURL'} = $self->getUrl("func=selectDelegates");
+	    $var{'selectDelegatesLabel'} = $i18n->get('select delegates label');
 	}
-	else { $var{displayForm} = 0; }
+	else {
+        $var{displayForm} = 0;
+    }
 	
 	my $lastDepartment = "_nothing_";
 	
-	my $p = WebGUI::Paginator->new($self->session,$url, $self->getValue("paginateAfter"));
+	my $p = WebGUI::Paginator->new($session, $url, $self->getValue("paginateAfter"));
 	
 	my $sql = "select users.username, 
 users.userId, 
@@ -238,12 +252,12 @@ from users
 left join groupings on  groupings.userId=users.userId
 left join InOutBoard on groupings.groupId=InOutBoard.inOutGroup
 left join userProfileData on users.userId=userProfileData.userId
-left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=".$self->session->db->quote($self->getId())."
-where users.userId<>'1' and InOutBoard.inOutGroup=".$self->session->db->quote($self->get("inOutGroup"))."
+left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=?
+where users.userId<>'1' and InOutBoard.inOutGroup=?
 group by userId
 order by department, lastName, firstName";
 
-	$p->setDataByQuery($sql);
+	$p->setDataByQuery($sql, 0, [ $self->getId, $self->get('inOutGroup') ], );
 	my $rowdata = $p->getPageData();
 	my @rows;
 	foreach my $data (@$rowdata) {
@@ -344,14 +358,20 @@ Process the selectDeletages form.
 =cut
 
 sub www_selectDelegatesEditSave {
-	my $self = shift;
-	my @delegates = $self->session->form->selectList("delegates");
-	$self->session->db->write("delete from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($self->session->user->userId));
+	my $self      = shift;
+    my $session   = $self->session;
+    my $db        = $session->db;
+	my @delegates = $session->form->selectList("delegates");
+	$db->write(
+        "delete from InOutBoard_delegates where assetId=? and userId=?",
+        [ $self->getId, $session->user->userId ]
+    );
 
 	foreach my $delegate (@delegates) {
-		$self->session->db->write("insert into InOutBoard_delegates
-		(userId,delegateUserId,assetId) values
-		(".$self->session->db->quote($self->session->user->userId).",".$self->session->db->quote($delegate).",".$self->session->db->quote($self->getId).")");
+		$db->write(
+            "insert into InOutBoard_delegates (userId,delegateUserId,assetId) values (?,?,?)",
+            [$session->user->userId, $delegate, $self->getId ],
+        );
 	}
 	return "";
 }
@@ -364,24 +384,26 @@ Process the form from the view method to set status for a user.
 =cut
 
 sub www_setStatus {
-	my $self = shift;
-	#$self->session->errorHandler->warn("delegateId: ". $self->session->form->process("delegate")."\n" );
-	#$self->session->errorHandler->warn("userId: ".$self->session->scratch->get("userId") ."\n" );
-	if ($self->session->form->process("delegate") eq $self->session->scratch->get("userId")) {
-		#$self->session->errorHandler->warn("Wrote data and removed scratch\n");
-		my $sessionUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
-		#$self->session->errorHandler->warn("user Id: ".$sessionUserId."\n");
-		$self->session->scratch->delete("userId");
-		$self->session->db->write("delete from InOutBoard_status where userId=".$self->session->db->quote($sessionUserId)." and  assetId=".$self->session->db->quote($self->getId));
-		$self->session->db->write("insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).","
-			.$self->session->db->quote($self->session->form->process("status")).",".$self->session->datetime->time().",".$self->session->db->quote($self->session->form->process("message")).")");
-		$self->session->db->write("insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).",".$self->session->db->quote($self->session->user->userId).","
-			.$self->session->db->quote($self->session->form->process("status")).",".$self->session->datetime->time().",".$self->session->db->quote($self->session->form->process("message")).")");
+	my $self     = shift;
+    my $session  = $self->session;
+    my $db       = $session->db;
+    my $delegate = $session->form->process('delegate');
+	if ($delegate eq $self->session->scratch->get("userId")) {
+		my $sessionUserId = $session->scratch->get("userId") || $session->user->userId;
+		$session->scratch->delete("userId");
+		$db->write("delete from InOutBoard_status where userId=? and assetId=?", [ $sessionUserId, $self->getId ]);
+        my $message = $session->form->process('message');
+		$db->write(
+            "insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (?,?,?,?,?)",
+            [$self->getId, $sessionUserId, $session->form->process("status"), $session->datetime->time(), $message ], 
+        );
+		$db->write(
+            "insert into InOutBoard_status (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
+            [$self->getId, $sessionUserId, $session->user->userId, $session->form->process("status"), $session->datetime->time(), $message ], 
+        );
 	}
 	else {
-		#$self->session->errorHandler->warn("Set scratch, redisplay\n");
-		#$self->session->errorHandler->warn(sprintf "Delegate is %s\n", $self->session->form->process("delegate"));
-		$self->session->scratch->set("userId",$self->session->form->process("delegate"));
+		$session->scratch->set("userId",$session->form->process("delegate"));
 	}
 	return $self->www_view;
 }
@@ -426,14 +448,18 @@ sub www_viewReport {
 		-hoverHelp=>$i18n->get('17 description'),
 		-value=>$endDate
 		);
+    ##Make a list of available departments.  Map empty departments to the No departments label, and
+    ##handle the SQL clause for searching.
 	my %depHash;
-	%depHash = map { $_ => $_ } ($self->_fetchDepartments(),
-				     $i18n->get('all departments'));
-	my $defaultDepartment =  $self->session->form->process("selectDepartment")
-	                      || $i18n->get('all departments');
-	my $departmentSQLclause = ($defaultDepartment eq $i18n->get('all departments'))
+	%depHash = map { $_ => $_ } 
+               ($self->_fetchDepartments(), $i18n->get('all departments'));
+    $depHash{''} = $i18n->get('7');
+	my $defaultDepartment   =  $self->session->form->process("selectDepartment");
+	my $departmentSQLclause = $defaultDepartment eq $i18n->get('all departments')
 	                        ? ''
-				: 'and c.fieldData='.$self->session->db->quote($defaultDepartment);
+                            : $defaultDepartment eq ''
+                            ? 'and userProfileData.department IS NULL'
+                            : 'and userProfileData.department='.$self->session->db->quote($defaultDepartment);
 	$f->selectBox(
 		-name=>"selectDepartment",
 		-options=>\%depHash,
@@ -452,10 +478,10 @@ sub www_viewReport {
 		-label=>$i18n->get(14),
 		-hoverHelp=>$i18n->get('14 description'),
 	);
-	$f->submit(-value=>"Search");
+	$f->submit(-value=>$i18n->get('search','Asset'));
 	$var{'reportTitleLabel'} = $i18n->get('report title');
-	$var{'form'} = $f->print;
-	my $url = $self->getUrl("func=viewReport;selectDepartment=".$self->session->form->process("selectDepartment").";reportPagination=".$self->session->form->process("reportPagination").";startDate=".$self->session->form->process("startDate").";endDate=".$self->session->form->process("endDate").";doit=1");
+	$var{'form'}             = $f->print;
+	my $url = $self->getUrl("func=viewReport;selectDepartment=".$defaultDepartment.";reportPagination=".$pageReportAfter.";startDate=".$self->session->form->process("startDate").";endDate=".$endDate.";doit=1");
 	if ($self->session->form->process("doit")) {
 	  $var{showReport} = 1;
 	  $endDate = $self->session->datetime->addToTime($endDate,24,0,0);
@@ -484,7 +510,7 @@ where users.userId<>'1' and
  $departmentSQLclause
 group by InOutBoard_statusLog.dateStamp
 order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
-	  #$self->session->errorHandler->warn("QUERY: $sql\n");
+	  $self->session->log->warn("QUERY: $sql\n");
 	  $p->setDataByQuery($sql);
 	  my $rowdata = $p->getPageData();
 	  my @rows;
@@ -520,7 +546,9 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 	  $var{'updatedBy.label'} = $i18n->get('updatedBy label');
 	  $p->appendTemplateVars(\%var);
 	}
-	else { $var{showReport} = 0; }
+	else {
+        $var{showReport} = 0;
+    }
 	
 	return $self->processStyle($self->processTemplate(\%var, $self->getValue("reportTemplateId")));
 }
