@@ -7,6 +7,7 @@
  - fixed #10873: Code editor breaks CSS comments
  - fixed #10884: EMS Lookup Registrant problem
  - fixed #10883: Recover Password / Auth::WebGUI /getSiteUrl
+ - fixed #10892: In/Out Board
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
