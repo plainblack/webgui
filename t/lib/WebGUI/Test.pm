@@ -186,6 +186,9 @@ END {
         $session->var->end;
         $session->close;
     }
+    ASSET: foreach my $asset (@assetsToPurge) {
+        $asset->purge;
+    }
     TAG: foreach my $tag (@tagsToRollback) {
         $tag->rollback;
     }
@@ -207,9 +210,6 @@ END {
                 /;
 
         $workflow->delete;
-    }
-    ASSET: foreach my $asset (@assetsToPurge) {
-        $asset->purge;
     }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions : '.$SESSION->db->quickScalar('select count(*) from userSession'));
