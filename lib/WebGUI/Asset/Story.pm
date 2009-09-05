@@ -914,6 +914,7 @@ sub viewTemplateVariables {
     $var->{hasPhotos}   = $photoCounter;
     $var->{singlePhoto} = $photoCounter == 1;
     $var->{canEdit}     = $self->canEdit;
+    $var->{photoWidth}  = $archive->get('photoWidth');
     return $var;
 }
 
