@@ -35,6 +35,8 @@ WebGUI::Test->usersToDelete($user);
 
 # Create a Survey
 my $survey = WebGUI::Asset->getImportNode($session)->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
+WebGUI::Test->assetsToPurge($survey);
 my $sJSON = $survey->surveyJSON;
 $sJSON->newObject([0]);    # add a question to 0th section
 $sJSON->update([0,0], { questionType => 'Yes/No' });
