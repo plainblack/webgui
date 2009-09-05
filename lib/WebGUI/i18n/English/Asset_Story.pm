@@ -418,6 +418,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'photoWidth' => {
+        message => q|The width of photos, set in the Story Archive for this Story.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
     'hasPhoto' => {
         message => q|This template variable will be true if the a photo in the photo_loop has an image in it.|,
         context => q|Template variable|,
