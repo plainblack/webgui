@@ -38,30 +38,34 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 duplicateBranch ( )
+=head2 duplicateBranch ( [ $childrenOnly ] )
 
 Duplicates this asset and the entire subtree below it.  Returns the root of the new subtree.
+
+=head3 $childrenOnly
+
+If true, then only children, and not descendants, will be duplicated.
 
 =cut
 
 sub duplicateBranch {
-    my $self = shift;
-    my $childrenOnly = shift || 0;
+    my $self         = shift;
+    my $childrenOnly = shift;
 
     my $newAsset = $self->duplicate({skipAutoCommitWorkflows=>1,skipNotification=>1});
     my $contentPositions = $self->get("contentPositions");
-    my $assetsToHide = $self->get("assetsToHide");
+    my $assetsToHide     = $self->get("assetsToHide");
 
     foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
         my $newChild = $childrenOnly ? $child->duplicate({skipAutoCommitWorkflows=>1, skipNotification=>1}) : $child->duplicateBranch;
         $newChild->setParent($newAsset);
         my ($oldChildId, $newChildId) = ($child->getId, $newChild->getId);
         $contentPositions =~ s/\Q${oldChildId}\E/${newChildId}/g if ($contentPositions);
-        $assetsToHide =~ s/\Q${oldChildId}\E/${newChildId}/g if ($assetsToHide);
+        $assetsToHide     =~ s/\Q${oldChildId}\E/${newChildId}/g if ($assetsToHide);
     }
 
     $newAsset->update({contentPositions=>$contentPositions}) if $contentPositions;
-    $newAsset->update({assetsToHide=>$assetsToHide}) if $assetsToHide;
+    $newAsset->update({assetsToHide=>$assetsToHide})         if $assetsToHide;
     return $newAsset;
 }
 
