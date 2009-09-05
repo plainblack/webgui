@@ -181,7 +181,7 @@ deleting the file if it was specified.
 
 sub getValue {
 	my $self = shift;
-	my $value = $self->SUPER::getValue(@_);
+	my $value = $self->getOriginalValue;
 	my $storage = WebGUI::Storage->get($self->session,$value);
 	if (defined $storage) {
 		foreach my $file (@{$storage->getFiles}) {
