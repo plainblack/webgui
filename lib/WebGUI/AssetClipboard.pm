@@ -90,9 +90,13 @@ Assets that normally autocommit their workflows (like CS Posts, and Wiki Pages) 
 sub duplicate {
     my $self        = shift;
     my $options     = shift;
+    my $parent      = $self->getParent;
     my $newAsset    
-        = $self->getParent->addChild( $self->get, undef, $self->get("revisionDate"), { skipAutoCommitWorkflows => $options->{skipAutoCommitWorkflows} } );
+        = $parent->addChild( $self->get, undef, $self->get("revisionDate"), { skipAutoCommitWorkflows => $options->{skipAutoCommitWorkflows} } );
 
+    $self->session->log->error(
+        sprintf "Unable to add child %s (%s) to %s (%s)", $self->getTitle, $self->getId, $parent->getTitle, $parent->getId
+    );
     # Duplicate metadata fields
     my $sth = $self->session->db->read(
         "select * from metaData_values where assetId = ?", 
