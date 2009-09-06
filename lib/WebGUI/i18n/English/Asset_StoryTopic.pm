@@ -183,6 +183,12 @@ our $I18N = {
         lastUpdated => 1248191629,
     },
 
+    'Read more stories' => {
+        message => q|Read more stories.|,
+        context => q|Template label.|,
+        lastUpdated => 1252202057,
+    },
+
 };
 
 1;
