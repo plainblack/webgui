@@ -917,7 +917,7 @@ ok(! $neighbor->profileIsViewable($friend), '... visitor permission follows publ
 ok(! $neighbor->profileIsViewable($admin), '... visitor permission follows publicProfile=none, even admin');
 $neighbor->profileField('publicProfile', 'all');
 ok(  $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=all');
-ok(  $neighbor->profileIsViewable($visitor), '... visitor permission follows publicProfile=all, even visitor');
+ok(! $neighbor->profileIsViewable($visitor), '... visitor may not see profiles, regardless of privacy setting');
 $neighbor->profileField('publicProfile', 'friends');
 ok(! $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=friend, not a friend');
 $friend->addToGroups([$neighbor->friends->getId]);

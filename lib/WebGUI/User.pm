@@ -1207,6 +1207,7 @@ sub profileIsViewable {
     my $userId   = $user->userId;
 
     return 0 if ($self->isVisitor);  #Can't view visitor's profile
+    return 0 if ($user->isVisitor);  #User is not allowed to see anyone's profile, either
     return 1 if ($self->userId eq $userId);  #Users can always view their own profile
 
     my $profileSetting = $self->profileField('publicProfile');
