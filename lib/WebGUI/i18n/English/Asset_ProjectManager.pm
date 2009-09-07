@@ -938,8 +938,8 @@ Otherwise, just the duration will be displayed as text.|,
 	},
 
 	'project.endDate.data' => {
-		message => q|The project's starting date in YYYY-MM-DD format.  If no start date has been set, then it will have a short internationalized message.|,
-		lastUpdated => 1168969193,
+		message => q|The project's ending date in YYYY-MM-DD format.  If no end date has been set, then it will have a short internationalized message.|,
+		lastUpdated => 1252361540,
 	},
 
 	'project.cost.data.int' => {
@@ -953,13 +953,13 @@ Otherwise, just the duration will be displayed as text.|,
 	},
 
 	'project.complete.data.int' => {
-		message => q|Pecentage completion for the project, as an integer.|,
-		lastUpdated => 1168969193,
+		message => q|Percentage completion for the project, as an integer.|,
+		lastUpdated => 1252361508,
 	},
 
 	'project.complete.data.float' => {
-		message => q|Pecentage completion for the project, as a floating number with two decimal places of accuracy.|,
-		lastUpdated => 1168969193,
+		message => q|Percentage completion for the project, as a floating number with two decimal places of accuracy.|,
+		lastUpdated => 1252361512,
 	},
 
 	'project.edit.url' => {
