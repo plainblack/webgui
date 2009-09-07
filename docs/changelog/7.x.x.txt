@@ -17,6 +17,7 @@
  - fixed #10915: StoryManager: Carousel clips content
  - fixed #10907: profiles viewable by everybody
  - added custom box size to USPS driver, priority service
+ - fixed #10919: is visitor or is not visitor??
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
