@@ -19,6 +19,7 @@
  - fixed #10919: is visitor or is not visitor??
  - fixed #10920: addUser or addGroup?
  - fixed #10921: different tags - same message
+ - fixed #10922: double tags
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
