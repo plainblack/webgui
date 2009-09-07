@@ -1206,8 +1206,8 @@ Otherwise, just the duration will be displayed as text.|,
 	},
 
 	'form.addUser.text' => {
-		message => q|A unique identifier for the link that creates the add group pop-up.|,
-		lastUpdated => 1169764123,
+		message => q|A unique identifier for the link that creates the add user pop-up.|,
+		lastUpdated => 1252351938,
 	},
 
 	'form.addGroup.id' => {
