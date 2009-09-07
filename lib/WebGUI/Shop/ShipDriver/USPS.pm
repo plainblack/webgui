@@ -53,6 +53,9 @@ sub buildXML {
     $xmlTop->{Package} = [];
     ##Do a request for each package.
     my $packageIndex;
+    my $shipType = $self->get('shipType');
+    my $service  = $shipType eq 'PRIORITY VARIABLE' ? 'PRIORITY'
+                 : $shipType;
     PACKAGE: for(my $packageIndex = 0; $packageIndex < scalar @packages; $packageIndex++) {
         my $package = $packages[$packageIndex];
         next PACKAGE unless scalar @{ $package };
@@ -73,13 +76,16 @@ sub buildXML {
         my $destination = $package->[0]->getShippingAddress;
         my $destZipCode = $destination->get('code');
         $packageData{ID}              = $packageIndex;
-        $packageData{Service}         = [ $self->get('shipType')  ];
+        $packageData{Service}         = [ $service                ];
         $packageData{ZipOrigination}  = [ $self->get('sourceZip') ];
         $packageData{ZipDestination}  = [ $destZipCode            ];
         $packageData{Pounds}          = [ $pounds                 ];
         $packageData{Ounces}          = [ $ounces                 ];
-        if ($self->get('shipType') eq 'PRIORITY') {
+        if ($shipType eq 'PRIORITY') {
             $packageData{Container}   = [ 'FLAT RATE BOX'         ];
+        }
+        elsif ($shipType eq 'PRIORITY VARIABLE') {
+            #$packageData{Container}   = [ 'VARIABLE'           ];
         }
         $packageData{Size}            = [ 'REGULAR'               ];
         $packageData{Machinable}      = [ 'true'                  ];
@@ -218,10 +224,11 @@ sub definition {
     my $definition = shift || [];
     my $i18n = WebGUI::International->new($session, 'ShipDriver_USPS');
     tie my %shippingTypes, 'Tie::IxHash';
-    ##Note, these keys are required XML keywords in the USPS XML API.
-    $shippingTypes{'PRIORITY'} = $i18n->get('priority');
-    $shippingTypes{'EXPRESS' } = $i18n->get('express');
-    $shippingTypes{'PARCEL'  } = $i18n->get('parcel post');
+    ##Note, these keys are used by buildXML
+    $shippingTypes{'PRIORITY VARIABLE'} = $i18n->get('priority variable');
+    $shippingTypes{'PRIORITY'}          = $i18n->get('priority');
+    $shippingTypes{'EXPRESS' }          = $i18n->get('express');
+    $shippingTypes{'PARCEL'  }          = $i18n->get('parcel post');
     tie my %fields, 'Tie::IxHash';
     %fields = (
         instructions => {

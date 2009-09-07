@@ -93,6 +93,7 @@ my $nivBible = $bible->setCollateral('variantsJSON', 'variantId', 'new',
 );
 
 $versionTag->commit;
+WebGUI::Test->tagsToRollback($versionTag);
 
 SKIP: {
 
@@ -699,6 +700,65 @@ SKIP: {
 }
 
 
+$properties = $driver->get();
+$properties->{shipType} = 'PRIORITY VARIABLE';
+$driver->update($properties);
+
+$xml = $driver->buildXML($cart, @shippableUnits);
+my $xmlData = XMLin($xml,
+    KeepRoot   => 1,
+    ForceArray => ['Package'],
+);
+cmp_deeply(
+    $xmlData,
+    {
+        RateV3Request => {
+            USERID => $userId,
+            Package => [
+                {
+                    ID => 0,
+                    ZipDestination => '53715',    ZipOrigination => '97123',
+                    Pounds         => '1',        Ounces         => '8',
+                    Size           => 'REGULAR',  Service        => 'PRIORITY',
+                    Machinable     => 'true',#     Container      => 'VARIABLE',
+                },
+            ],
+        }
+    },
+    'buildXML: PRIORITY, VARIABLE service, 1 item in cart'
+);
+like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
+
+SKIP: {
+
+    skip 'No userId for testing', 2 unless $hasRealUserId;
+
+    my $response = $driver->_doXmlRequest($xml);
+    ok($response->is_success, '... _doXmlRequest to USPS successful');
+    my $xmlData = XMLin($response->content, ForceArray => [qw/Package/],);
+    cmp_deeply(
+        $xmlData,
+        {
+            Package => [
+                {
+                    ID             => 0,
+                    ZipOrigination => ignore(), ZipDestination => ignore(),
+                    Ounces         => ignore(), Pounds         => ignore(),
+                    Size           => ignore(), Zone           => ignore(),
+                    Postage        => {
+                        CLASSID     => ignore(),
+                        MailService => ignore(),
+                        Rate        => num(8,8),  ##A number around 10...
+                    }
+                },
+            ],
+        },
+        '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
+    );
+
+}
+
+
 }
 
 #----------------------------------------------------------------------------
@@ -711,8 +771,5 @@ END {
         my $addressBook = $cart->getAddressBook();
         $addressBook->delete if $addressBook;
         $cart->delete;
-    }
-    if (defined $versionTag) {
-        $versionTag->rollback;
     }
 }

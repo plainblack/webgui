@@ -76,6 +76,12 @@ our $I18N = {
         context => q|Label for a type of shipping from the USPS.|,
     },
 
+    'priority variable' => {
+        message => q|Priority, Custom box|,
+        lastUpdated => 1203569511,
+        context => q|Label for a type of shipping from the USPS.|,
+    },
+
     'express' => {
         message => q|Express, Regular size|,
         lastUpdated => 1203569511,
