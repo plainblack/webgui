@@ -556,7 +556,7 @@ from working.|,
 		lastUpdated => 1149824991,
 	},
 
-	'form.start.error' => {
+	'form.end.error' => {
 		message => q|An internationalized error message for not entering an end date.|,
 		lastUpdated => 1149824991,
 	},
