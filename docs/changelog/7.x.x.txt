@@ -21,6 +21,8 @@
  - fixed #10920: addUser or addGroup?
  - fixed #10921: different tags - same message
  - fixed #10922: double tags
+ - fixed #10923: Typo in i18n
+ - fixed #10925: Wrong message in i18n
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
