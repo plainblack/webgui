@@ -477,15 +477,13 @@ from working.|,
 	},
 
 	'form.header' => {
-		message => q|If the user is in the group to add projects, then this variable will contain HTML form code
-to make on the fly editing of tasks work.|,
-		lastUpdated => 1149824991,
+		message => q|HTML code to start the form for making on the fly editing of tasks work.  If the user is not in the group to add projects, it will be blank.|,
+		lastUpdated => 1252352849,
 	},
 
 	'form.footer' => {
-		message => q|If the user is in the group to add projects, then this variable will contain HTML form code
-to make on the fly editing of tasks work.|,
-		lastUpdated => 1149824991,
+		message => q|HTML code to end the form for making on the fly editing of tasks work.  If the user is not in the group to add projects, it will be blank.|,
+		lastUpdated => 1252352847,
 	},
 
 	'project.canEdit' => {
