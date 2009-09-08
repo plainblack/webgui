@@ -1971,7 +1971,8 @@ sub www_printTicket {
 	my $registrant = $self->getRegistrant($form->get('badgeId'));
 	my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $form->get('ticketAssetId'));
 	$registrant->{ticketTitle} = $ticket->getTitle;
-	$registrant->{ticketStart} = $ticket->get('startDate');
+        my $startTime = WebGUI::DateTime->new($ticket->get('startDate'))->set_time_zone($self->get('timezone'));
+	$registrant->{ticketStart} = $startTime->strftime('%F %R');
 	$registrant->{ticketDuration} = $ticket->get('duration');
 	$registrant->{ticketLocation} = $ticket->get('location');
 	$registrant->{ticketEventNumber} = $ticket->get('eventNumber');
