@@ -3058,9 +3058,9 @@ or are under your current version tag.</p>
         },
 
 	'help' => {
-		message => q|Help|,
+		message => q|Template Help|,
 		lastUpdated =>1092930637,
-                context => q|Title of the help index for the admin console.|
+        context => q|Title of the help index for the admin console.|
         },
 
 	'content filters' => {
@@ -3492,8 +3492,8 @@ a user.|,
 	},
 
 	'help index' => {
-		message => q|Index|,
-		lastUpdated => 1128552837
+		message => q|Help Index|,
+		lastUpdated => 1252424721
 	},
 
 	'help toc' => {

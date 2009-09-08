@@ -407,7 +407,7 @@ sub www_viewHelpIndex {
 	}
 	$output .= '</td></tr></table>';
     my $ac = WebGUI::AdminConsole->new($session,"help");
-    return $ac->render($i18n->get("external help", "WebGUI").$output, join ': ',$i18n->get(93), $i18n->get('help index'));
+    return $ac->render($i18n->get("external help", "WebGUI").$output, $i18n->get('help index'));
 }
 
 1;
