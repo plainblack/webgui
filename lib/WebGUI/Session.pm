@@ -252,7 +252,7 @@ sub duplicate {
     my $newSession = WebGUI::Session->open(
         $self->config->getWebguiRoot,
         $self->config->getFilename,
-        $self->request,
+        undef,
         undef,
         $self->getId,
     );
