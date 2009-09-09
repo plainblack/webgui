@@ -206,7 +206,7 @@ sub drawEditFieldPrice {
     my ( $self ) = @_;
 
     my $fieldHtml   = sprintf <<'ENDHTML', encode_entities( $self->get('fieldPrice') );
-<div id="fieldPrice"></div><input type="hidden" name="fieldPrice" value="%s" />
+<div id="fieldPrice"></div><input type="hidden" name="fieldPrice" value="%s" id="fieldPrice_formId"/>
 ENDHTML
 
     return $fieldHtml;
