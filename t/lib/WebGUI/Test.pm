@@ -127,9 +127,7 @@ BEGIN {
     push (@INC,$WEBGUI_LIB);
 
     ##Handle custom loaded library paths
-    warn $WEBGUI_ROOT;
     my $customPreload = File::Spec->catdir( $WEBGUI_ROOT, 'sbin', 'preload.custom');
-    warn $customPreload;
     if (-e $customPreload) {
         open my $PRELOAD, '<', $customPreload or
             croak "Unload to open $customPreload: $!\n";
@@ -138,7 +136,6 @@ BEGIN {
             $line =~ s/^\s+//;
             $line =~ s/\s+$//;
             next LINE if !$line;
-            warn $line;
             push @INC, $line;
         }
         close $PRELOAD;
