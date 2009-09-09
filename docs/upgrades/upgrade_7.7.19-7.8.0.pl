@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 reorganizeAdSpaceProperties($session);
 fixTemplateSettingsFromShunt($session);
+addMatrixColumnDefaults($session);
 
 finish($session); # this line required
 
@@ -54,6 +55,18 @@ sub reorganizeAdSpaceProperties {
     $session->db->write(q|ALTER TABLE adSpace DROP COLUMN costPerClick|);
     $session->db->write(q|ALTER TABLE adSpace DROP COLUMN costPerImpression|);
     $session->db->write(q|ALTER TABLE adSpace DROP COLUMN groupToPurchase|);
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addMatrixColumnDefaults {
+    my $session = shift;
+    print "\tUpdate existing Matrixes with default values for maxComparisons... " unless $quiet;
+    $session->db->write(q|UPDATE Matrix set maxComparisons=25           where maxComparisons           IS NULL|);
+    $session->db->write(q|UPDATE Matrix set maxComparisonsGroup=25      where maxComparisonsGroup      IS NULL|);
+    $session->db->write(q|UPDATE Matrix set maxComparisonsPrivileged=25 where maxComparisonsPrivileged IS NULL|);
     # and here's our code
     print "DONE!\n" unless $quiet;
 }
