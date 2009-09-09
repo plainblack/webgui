@@ -33,7 +33,7 @@ WebGUI::Test->usersToDelete($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 45;        # Increment this number for each test you create
+plan tests => 47;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -135,8 +135,10 @@ ok(  WebGUI::ProfileField->isReservedFieldName('op'),     '... op');
 ok(  WebGUI::ProfileField->isReservedFieldName('userId'), '... userId');
 ok(  WebGUI::ProfileField->isReservedFieldName('wg_privacySettings'), '... wg_privacySettings');
 ok( !WebGUI::ProfileField->isReservedFieldName('function'),  '... function is not');
-ok( !WebGUI::ProfileField->isReservedFieldName('operation'), '... operation is no');
-ok( !WebGUI::ProfileField->isReservedFieldName('shop'),      '... shop is not');
+ok( !WebGUI::ProfileField->isReservedFieldName('operation'), '... operation is not');
+ok(  WebGUI::ProfileField->isReservedFieldName('shop'),      '... shop is not');
+ok(  WebGUI::ProfileField->isReservedFieldName('username'),  '... username');
+ok(  WebGUI::ProfileField->isReservedFieldName('status'),    '... status');
 
 ###########################################################
 #
