@@ -26,6 +26,7 @@
  - relabel Help in the Admin Console to Template Help
  - fixed #10928: EMS Print Ticket -- Time not processed for timezone
  - fixed #10889: Old Matrixs break for Admin users
+ - fixed #10939: Commit with Approval workflow does not show confirmation screen
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread

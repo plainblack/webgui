@@ -153,7 +153,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 113 
+plan tests => 115 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -873,6 +873,20 @@ is($testVersionTag->get('isCommitted'),1,'parent asset is now committed');
 
 $childVersionTag = WebGUI::VersionTag->new($session, $childAsset->get('tagId'));
 is($childVersionTag->get('isCommitted'),1,'child asset is now committed');
+
+################################################################
+#
+# cloneFromDb
+#
+################################################################
+
+my $assetToCommit = $defaultAsset->addChild({ className => 'WebGUI::Asset::Snippet', title => 'Snippet to commit and clone from db', });
+my $cloneTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($cloneTag);
+$cloneTag->commit;
+is($assetToCommit->get('status'), 'pending', 'cloneFromDb: local asset is still pending');
+$assetToCommit = $assetToCommit->cloneFromDb;
+is($assetToCommit->get('status'), 'approved', '... returns fresh, commited asset from the db');
 
 ##Return an array of hashrefs.  Each hashref describes a test
 ##for the fixId method.
