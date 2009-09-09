@@ -22,12 +22,10 @@ use Test::More;
 use Test::Deep;
 use Data::Dumper;
 
-if (!$ENV{WEBGUI_LIVE}) {
-    plan skip_all => 'No website available';
-}
-else {
-    plan tests => 14; # increment this value for each test you create
-}
+plan skip_all => 'set WEBGUI_LIVE to enable this test'
+    unless $ENV{WEBGUI_LIVE};
+
+plan tests => 14; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
