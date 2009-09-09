@@ -17,6 +17,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Test::Exception;
+use Scope::Guard;
 
 use Test::MockObject;
 my $mockSpectre = Test::MockObject->new();
@@ -46,7 +48,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 32;        # Increment this number for each test you create
+plan tests => 34;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -180,6 +182,46 @@ my $wf2 = WebGUI::Workflow->create(
 
 my $wf2Instance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf2->getId});
 cmp_deeply($wf2Instance->get('parameters'), {}, 'get returns {} for parameters when there are no parameters stored');
+
+###############################################################################
+#
+#  getObject
+#
+###############################################################################
+
+{
+    my $return;
+    Test::MockObject->fake_module('WebGUI::Test::Workflow::Instance::TestObject',
+        new => sub {
+            return $return;
+        },
+    );
+
+    my $wf3 = WebGUI::Workflow->create(
+        $session,
+        {
+            title => 'WebGUI::Workflow::Instance Test',
+            description => 'getObject test',
+            type => 'WebGUI::Test::Workflow::Instance::TestObject',
+        }
+    );
+    my $wf3guard = Scope::Guard->new(sub {
+        $wf3->delete;
+    });
+
+    my $wf3Instance = WebGUI::Workflow::Instance->create( $session, {
+        workflowId => $wf3->getId,
+        className  => 'WebGUI::Test::Workflow::Instance::TestObject',
+        methodName => 'new',
+    });
+
+    dies_ok { $wf3Instance->getObject } 'getObject throws when instanciation returns undef';
+
+    $return = Test::MockObject->new;
+    lives_and {
+        is $wf3Instance->getObject, $return;
+    } 'getObject is able to retrieve correct object';
+}
 
 #----------------------------------------------------------------------------
 # Cleanup
