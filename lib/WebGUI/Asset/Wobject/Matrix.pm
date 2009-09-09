@@ -472,7 +472,8 @@ sub getCompareForm {
     }
     else{
         $maxComparisons = $self->get('maxComparisonsPrivileged');
-    }        
+    }
+    $maxComparisons += 0;
     $form .=  "\n<script type='text/javascript'>\n".
         'var maxComparisons = '.$maxComparisons.";\n".
         "var matrixUrl = '".$self->getUrl."';\n".
@@ -664,6 +665,7 @@ sub view {
     else{
         $maxComparisons = $self->get('maxComparisonsPrivileged');
     }
+    $maxComparisons += 0;
     $var->{maxComparisons} = $maxComparisons;
    
     if ($self->canEdit){
@@ -912,6 +914,7 @@ sub www_compare {
     else{
         $maxComparisons = $self->get('maxComparisonsPrivileged');
     }
+    $maxComparisons += 0;
 
     foreach my $listingId (@listingIds){
         my $listingId_safe = $listingId;

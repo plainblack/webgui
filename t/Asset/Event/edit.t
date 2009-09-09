@@ -74,9 +74,8 @@ if ( !$mech->success ) {
     plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
 }
 
-if ( !$ENV{WEBGUI_LIVE}) {
-    plan skip_all => "Live tests not enabled";
-}
+plan skip_all => 'set WEBGUI_LIVE to enable this test'
+    unless $ENV{WEBGUI_LIVE};
 
 plan tests => 8;        # Increment this number for each test you create
 

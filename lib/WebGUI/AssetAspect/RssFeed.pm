@@ -232,7 +232,7 @@ sub exportAssetCollateral {
         my $exportSession = WebGUI::Session->open(
             $self->session->config->getWebguiRoot,
             $self->session->config->getFilename,
-            $self->session->request,
+            undef,
             undef,
             $self->session->getId,
         );

@@ -102,9 +102,7 @@ $post2mock->set_always('getId', $post2_id);
 
 {
     # simulate asset not found
-    local *WebGUI::Asset::newByDynamicClass = sub {
-        return undef;
-    };
+    WebGUI::Test->mockAssetId($post2_id, undef);
     $getmock->set_series('getNextMessage', {
         from => 'admin@localhost',
         parts => ['parts'],
@@ -114,12 +112,11 @@ $post2mock->set_always('getId', $post2_id);
     });
     $activity->execute($csmock);
     is $parentAsset->getId, $cs_id, 'add as new thread to current cs if reply to nonexistant post';
+    WebGUI::Test->unmockAssetId($post2_id);
 }
 
 {
-    local *WebGUI::Asset::newByDynamicClass = sub {
-        return $post2mock;
-    };
+    WebGUI::Test->mockAssetId($post2_id, $post2mock);
     $getmock->set_series('getNextMessage', {
         from => 'admin@localhost',
         parts => ['parts'],
@@ -129,12 +126,11 @@ $post2mock->set_always('getId', $post2_id);
     });
     $activity->execute($csmock);
     is $parentAsset->getId, $cs_id, 'add as new thread to current cs if reply to post in another CS';
+    WebGUI::Test->unmockAssetId($post2_id);
 }
 
 {
-    local *WebGUI::Asset::newByDynamicClass = sub {
-        return $postmock;
-    };
+    WebGUI::Test->mockAssetId($post_id, $postmock);
     $getmock->set_series('getNextMessage', {
         from => 'admin@localhost',
         parts => ['parts'],
@@ -144,6 +140,7 @@ $post2mock->set_always('getId', $post2_id);
     });
     $activity->execute($csmock);
     is $parentAsset->getId, $post_id, 'add as reply to post if reply to post in current CS';
+    WebGUI::Test->unmockAssetId($post_id);
 }
 
 #----------------------------------------------------------------------------

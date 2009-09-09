@@ -126,6 +126,24 @@ BEGIN {
 
     push (@INC,$WEBGUI_LIB);
 
+    ##Handle custom loaded library paths
+    warn $WEBGUI_ROOT;
+    my $customPreload = File::Spec->catdir( $WEBGUI_ROOT, 'sbin', 'preload.custom');
+    warn $customPreload;
+    if (-e $customPreload) {
+        open my $PRELOAD, '<', $customPreload or
+            croak "Unload to open $customPreload: $!\n";
+        LINE: while (my $line = <$PRELOAD>) {
+            $line =~ s/#.*//;
+            $line =~ s/^\s+//;
+            $line =~ s/\s+$//;
+            next LINE if !$line;
+            warn $line;
+            push @INC, $line;
+        }
+        close $PRELOAD;
+    }
+
     # http://thread.gmane.org/gmane.comp.apache.apreq/3378
     # http://article.gmane.org/gmane.comp.apache.apreq/3388
     if ( $^O eq 'darwin' && $Config::Config{osvers} lt '8.0.0' ) {
@@ -244,6 +262,100 @@ END {
         # we killed it, so there will be an error.  Prevent that from setting the exit value.
         $? = 0;
     }
+}
+
+=head2 mockAssetId ( $assetId, $object )
+
+Causes WebGUI::Asset->new* initializers to return the specified
+object instead of retreiving it from the database for the given
+asset ID.
+
+=cut
+
+my %mockedAssetIds;
+sub mockAssetId {
+    my ($class, $assetId, $object) = @_;
+    _mockAssetInits();
+    $mockedAssetIds{$assetId} = $object;
+}
+
+=head2 unmockAssetId ( $assetId )
+
+Removes a given asset ID from being mocked.
+
+=cut
+
+sub unmockAssetId {
+    my ($class, $assetId) = @_;
+    delete $mockedAssetIds{$assetId};
+}
+
+=head2 mockAssetUrl ( $url, $object )
+
+Causes WebGUI::Asset->newByUrl to return the specified object instead
+of retreiving it from the database for the given URL.
+
+=cut
+
+my %mockedAssetUrls;
+sub mockAssetUrl {
+    my ($url, $object) = @_;
+    _mockAssetInits();
+    $mockedAssetUrls{$url} = $object;
+}
+
+=head2 unmockAssetUrl ( $url )
+
+Removes a given asset URL from being mocked.
+
+=cut
+
+sub unmockAssetUrl {
+    my ($class, $url) = @_;
+    delete $mockedAssetUrls{$url};
+}
+
+my $mockedNew;
+sub _mockAssetInits {
+    no warnings 'redefine';
+
+    return
+        if $mockedNew;
+    require WebGUI::Asset;
+    my $original_new = \&WebGUI::Asset::new;
+    *WebGUI::Asset::new = sub {
+        my ($class, $session, $assetId, $className, $revisionDate) = @_;
+        if ($mockedAssetIds{$assetId}) {
+            return $mockedAssetIds{$assetId};
+        }
+        goto $original_new;
+    };
+    my $original_newByDynamicClass = \&WebGUI::Asset::newByDynamicClass;
+    *WebGUI::Asset::newByDynamicClass = sub {
+        my ($class, $session, $assetId, $revisionDate) = @_;
+        if ($mockedAssetIds{$assetId}) {
+            return $mockedAssetIds{$assetId};
+        }
+        goto $original_newByDynamicClass;
+    };
+    my $original_newPending = \&WebGUI::Asset::newPending;
+    *WebGUI::Asset::newPending = sub {
+        my ($class, $session, $assetId, $revisionDate) = @_;
+        if ($mockedAssetIds{$assetId}) {
+            return $mockedAssetIds{$assetId};
+        }
+        goto $original_newPending;
+    };
+    my $original_newByUrl = \&WebGUI::Asset::newByUrl;
+    *WebGUI::Asset::newByUrl = sub {
+        my ($class, $session, $url, $revisionDate) = @_;
+        if ($mockedAssetUrls{$url}) {
+            return $mockedAssetUrls{$url};
+        }
+        goto $original_newByUrl;
+    };
+
+    $mockedNew = 1;
 }
 
 #----------------------------------------------------------------------------

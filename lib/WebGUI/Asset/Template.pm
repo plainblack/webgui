@@ -889,9 +889,9 @@ sub www_editDuplicate {
                         # Auto-commit our revision if necessary
                         # TODO: This needs to be handled automatically somehow...
                         my $status = WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
-                        ##Force the locked by tag
+                        ##get a fresh object from the database
                         if ($status eq 'commit') {
-                            $newTemplate->{_properties}{isLockedBy} = undef;
+                            $newTemplate = $newTemplate->cloneFromDb;
                         }
                         last DEF;
                     }

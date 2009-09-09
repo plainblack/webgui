@@ -346,6 +346,26 @@ sub checkView {
 
 #-------------------------------------------------------------------
 
+=head2 cloneFromDb ( )
+
+Fetches a new fresh clone of this object from the database.  Often used after
+calling commit on version tags.
+
+Returns the new Asset object.
+
+=cut
+
+sub cloneFromDb {
+	my $self = shift;
+    return WebGUI::Asset->new($self->session,
+        $self->getId,
+        $self->get('className'),
+        $self->get('revisionDate')
+    );
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( session, [ definition ] )
 
 Basic definition of an Asset. Properties, default values. Returns an array reference containing tableName,className,properties
@@ -2784,11 +2804,12 @@ sub www_editSave {
     $object->updateHistory("edited");
 
     # we handle auto commit assets here in case they didn't handle it themselves
+    $session->log->warn('pre object isa'. ref $object);
     if ($object->getAutoCommitWorkflowId) {
+        $session->log->warn('got autocommit workflow id');
         $object->requestAutoCommit;
         #Since the version tag makes new objects, fetch a fresh one here.
-        #Note, this workaround can still fail, if WebGUI hands off back to spectre.
-        $object = WebGUI::Asset->new($session, $object->getId, $object->get('className'));
+        $object = $object->cloneFromDb;
     }
     # else, try to to auto commit
     else {
@@ -2804,9 +2825,10 @@ sub www_editSave {
         elsif ($commitStatus eq 'commit') {
             ##Commit was successful.  Update the local object cache so that it will no longer
             ##register as locked.
-            $self->{_properties}{isLockedBy} = $object->{_properties}{isLockedBy} = undef;
+            $object = $object->cloneFromDb;
         }
     }
+    $session->log->warn('post object isa'. ref $object);
 
     # Handle "saveAndReturn" button
     if ( $session->form->process( "saveAndReturn" ) ne "" ) {
@@ -2814,23 +2836,23 @@ sub www_editSave {
     }
 
     # Handle "proceed" form parameter
-    my $proceed = $self->session->form->process('proceed');
+    my $proceed = $session->form->process('proceed');
     if ($proceed eq "manageAssets") {
-        $self->session->asset($object->getParent);
-        return $self->session->asset->www_manageAssets;
+        $session->asset($object->getParent);
+        return $session->asset->www_manageAssets;
     }
     elsif ($proceed eq "viewParent") {
-        $self->session->asset($object->getParent);
-        return $self->session->asset->www_view;
+        $session->asset($object->getParent);
+        return $session->asset->www_view;
     }
-    elsif ($proceed eq "goBackToPage" && $self->session->form->process('returnUrl')) {
-        $self->session->http->setRedirect($self->session->form->process("returnUrl"));
+    elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
+        $session->http->setRedirect($session->form->process("returnUrl"));
         return undef;
     }
     elsif ($proceed ne "") {
-        my $method = "www_".$self->session->form->process("proceed");
-        $self->session->asset($object);
-        return $self->session->asset->$method();
+        my $method = "www_".$session->form->process("proceed");
+        $session->asset($object);
+        return $session->asset->$method();
     }
 
     $session->asset($object->getContainer);
