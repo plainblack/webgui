@@ -126,6 +126,24 @@ BEGIN {
 
     push (@INC,$WEBGUI_LIB);
 
+    ##Handle custom loaded library paths
+    warn $WEBGUI_ROOT;
+    my $customPreload = File::Spec->catdir( $WEBGUI_ROOT, 'sbin', 'preload.custom');
+    warn $customPreload;
+    if (-e $customPreload) {
+        open my $PRELOAD, '<', $customPreload or
+            croak "Unload to open $customPreload: $!\n";
+        LINE: while (my $line = <$PRELOAD>) {
+            $line =~ s/#.*//;
+            $line =~ s/^\s+//;
+            $line =~ s/\s+$//;
+            next LINE if !$line;
+            warn $line;
+            push @INC, $line;
+        }
+        close $PRELOAD;
+    }
+
     # http://thread.gmane.org/gmane.comp.apache.apreq/3378
     # http://article.gmane.org/gmane.comp.apache.apreq/3388
     if ( $^O eq 'darwin' && $Config::Config{osvers} lt '8.0.0' ) {
