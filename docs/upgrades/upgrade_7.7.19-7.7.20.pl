@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 fixTemplateSettingsFromShunt($session);
+addMatrixColumnDefaults($session);
 
 finish($session); # this line required
 
@@ -47,6 +48,16 @@ finish($session); # this line required
 
 #----------------------------------------------------------------------------
 # Describe what our function does
+sub addMatrixColumnDefaults {
+    my $session = shift;
+    print "\tUpdate existing Matrixes with default values for maxComparisons... " unless $quiet;
+    $session->db->write(q|UPDATE Matrix set maxComparisons=25           where maxComparisons           IS NULL|);
+    $session->db->write(q|UPDATE Matrix set maxComparisonsGroup=25      where maxComparisonsGroup      IS NULL|);
+    $session->db->write(q|UPDATE Matrix set maxComparisonsPrivileged=25 where maxComparisonsPrivileged IS NULL|);
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
 sub fixTemplateSettingsFromShunt {
     my $session = shift;
     print "\tClear isPackage and set isDefault on recently imported templates... " unless $quiet;
