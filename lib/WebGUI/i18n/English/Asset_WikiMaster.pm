@@ -494,6 +494,35 @@ listing of pages that are related to a specific keyword?| },
         lastUpdated => 1166848379,
     },
 
+    'help isSubscribed' => {
+        message     => q{This variable is true if the user is subscribed to the entire wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'help subscribeUrl' => {
+        message     => q{The URL to subscribe to the entire wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'help unsubscribeUrl' => {
+        message     => q{The URL to unsubscribe from the entire wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'subscribe' => {
+        message     => q{Subscribe},
+        lastUpdated => 0,
+        context     => q{Label for link to subscribe to e-mail notifications},
+    },
+
+    'unsubscribe' => {
+        message     => q{Unsubscribe},
+        lastUpdated => 0,
+        context     => q{Label for link to unsubscribe from e-mail notifications},
+    },
 };
 
 1;

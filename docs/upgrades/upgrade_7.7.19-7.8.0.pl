@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 reorganizeAdSpaceProperties($session);
 fixTemplateSettingsFromShunt($session);
+addSubscribableAspect( $session );
 
 finish($session); # this line required
 
@@ -45,6 +46,26 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add tables for the subscribable aspect
+sub addSubscribableAspect {
+    my $session = shift;
+    print "\tAdding Subscribable aspect..." unless $quiet;
+
+    $session->db->write( <<'ESQL' );
+CREATE TABLE assetAspect_Subscribable (
+    assetId CHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    subscriptionGroupId CHAR(22) BINARY,
+    subscriptionTemplateId CHAR(22) BINARY,
+    skipNotification INT,
+    PRIMARY KEY ( assetId, revisionDate )
+)
+ESQL
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

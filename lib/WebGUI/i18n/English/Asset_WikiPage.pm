@@ -268,6 +268,41 @@ our $I18N =
                 lastUpdated => 1169141075,
         },
 
+    'help isSubscribed' => {
+        message     => q{This variable is true if the user is subscribed to this wiki page},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'help subscribeUrl' => {
+        message     => q{The URL to subscribe to this wiki page},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'help unsubscribeUrl' => {
+        message     => q{The URL to unsubscribe from this wiki page},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'help owner' => {
+        message     => q{The username of the owner of the page},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'help subscription title' => {
+        message     => q{Wiki Page Subscription E-mail},
+        lastUpdated => 0,
+        context     => 'Title for help page',
+    },
+
+    'help subscription body' => {
+        message     => q{The template to send via e-mail to the people subscribed to the wiki},
+        lastUpdated => 0,
+        context     => 'Body text for help page',
+    },
 };
 
 1;

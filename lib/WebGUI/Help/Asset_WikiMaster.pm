@@ -146,6 +146,18 @@ our $HELP = {
             { 'name' => 'useContentFilter', },
             { 'name' => 'filterCode', },
             { 'name' => 'maxImageSize', },
+            {
+                name        => 'isSubscribed',
+                description => 'help isSubscribed',
+            },
+            {
+                name        => 'subscribeUrl',
+                description => 'help subscribeUrl',
+            },
+            {
+                name        => 'unsubscribeUrl',
+                description => 'help unsubscribeUrl',
+            },
         ],
         fields  => [],
         related => [],

@@ -12,7 +12,11 @@ package WebGUI::Asset::WikiPage;
 
 use strict;
 use Class::C3;
-use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
+use base qw(
+    WebGUI::AssetAspect::Subscribable
+    WebGUI::AssetAspect::Comments 
+    WebGUI::Asset
+);
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
@@ -236,6 +240,73 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 
+=head2 getSubscriptionTemplate ( )
+
+=cut
+
+sub getSubscriptionTemplate { 
+    my ( $self ) = @_;
+    return $self->getParent->getSubscriptionTemplate;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getTemplateVars ( )
+
+Get the common template vars for this asset
+
+=cut
+
+sub getTemplateVars {
+    my ( $self ) = @_;
+    my $i18n        = WebGUI::International->new($self->session, "Asset_WikiPage");
+    my $wiki        = $self->getWiki;
+    my $owner       = WebGUI::User->new( $self->session, $self->get('ownerUserId') );
+    my $keywords    = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({
+        asset       => $self,
+        asArrayRef  => 1,
+    });
+    my @keywordsLoop = ();
+    foreach my $word (@{$keywords}) {
+        push @keywordsLoop, {
+            keyword => $word,
+            url     => $wiki->getUrl("func=byKeyword;keyword=".$word),
+        };
+    }
+    my $var = {
+        %{ $self->get },
+        url                 => $self->getUrl,
+        keywordsLoop        => \@keywordsLoop,
+        viewLabel           => $i18n->get("viewLabel"),
+        editLabel           => $i18n->get("editLabel"),
+        historyLabel        => $i18n->get("historyLabel"),
+        wikiHomeLabel       => $i18n->get("wikiHomeLabel", "Asset_WikiMaster"),
+        searchLabel         => $i18n->get("searchLabel", "Asset_WikiMaster"),	
+        searchUrl           => $wiki->getUrl("func=search"),
+        recentChangesUrl    => $wiki->getUrl("func=recentChanges"),
+        recentChangesLabel  => $i18n->get("recentChangesLabel", "Asset_WikiMaster"),
+        mostPopularUrl      => $wiki->getUrl("func=mostPopular"),
+        mostPopularLabel    => $i18n->get("mostPopularLabel", "Asset_WikiMaster"),
+        wikiHomeUrl         => $wiki->getUrl,
+        historyUrl          => $self->getUrl("func=getHistory"),
+        editContent         => $self->getEditForm,
+        allowsAttachments   => $wiki->get("allowAttachments"),
+        comments	    => $self->getFormattedComments(),
+        canEdit             => $self->canEdit,
+        content             => $wiki->autolinkHtml(
+            $self->scrubContent,
+            {skipTitles => [$self->get('title')]},
+        ),	
+        isSubscribed        => $self->isSubscribed,
+        subscribeUrl        => $self->getSubscribeUrl,
+        unsubscribeUrl      => $self->getUnsubscribeUrl,
+        owner               => $owner->get('alias'),
+    };
+    return $var;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getWiki 
 
 Returns an object referring to the wiki that contains this page.  If it is not a WikiMaster,
@@ -438,43 +509,7 @@ Renders this asset.
 
 sub view {
 	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
-    my $keywords = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({
-        asset=>$self,
-        asArrayRef=>1,
-        });
-    my $wiki = $self->getWiki;
-    my @keywordsLoop = ();
-    foreach my $word (@{$keywords}) {
-        push(@keywordsLoop, {
-            keyword=>$word,
-            url=>$wiki->getUrl("func=byKeyword;keyword=".$word),
-            });
-    }
-	my $var = {
-        keywordsLoop        => \@keywordsLoop,
-		viewLabel           => $i18n->get("viewLabel"),
-		editLabel           => $i18n->get("editLabel"),
-		historyLabel        => $i18n->get("historyLabel"),
-		wikiHomeLabel       => $i18n->get("wikiHomeLabel", "Asset_WikiMaster"),
-		searchLabel         => $i18n->get("searchLabel", "Asset_WikiMaster"),	
-		searchUrl           => $self->getParent->getUrl("func=search"),
-		recentChangesUrl    => $self->getParent->getUrl("func=recentChanges"),
-		recentChangesLabel  => $i18n->get("recentChangesLabel", "Asset_WikiMaster"),
-		mostPopularUrl      => $self->getParent->getUrl("func=mostPopular"),
-		mostPopularLabel    => $i18n->get("mostPopularLabel", "Asset_WikiMaster"),
-		wikiHomeUrl         => $self->getParent->getUrl,
-		historyUrl          => $self->getUrl("func=getHistory"),
-		editContent         => $self->getEditForm,
-        allowsAttachments   => $self->getWiki->get("allowAttachments"),
-		comments			=> $self->getFormattedComments(),
-        canEdit             => $self->canEdit,
-		content             => $self->getWiki->autolinkHtml(
-            $self->scrubContent,
-            {skipTitles => [$self->get('title')]},
-        ),	
-		};
-	return $self->processTemplate($var, $self->getWiki->get("pageTemplateId"));
+	return $self->processTemplate($self->getTemplateVars, $self->getWiki->get("pageTemplateId"));
 }
 
 #-------------------------------------------------------------------

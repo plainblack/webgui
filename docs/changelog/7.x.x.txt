@@ -25,6 +25,7 @@
  - fixed #10925: Wrong message in i18n
  - relabel Help in the Admin Console to Template Help
  - fixed #10928: EMS Print Ticket -- Time not processed for timezone
+ - added Subscribable AssetAspect to Wiki
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
