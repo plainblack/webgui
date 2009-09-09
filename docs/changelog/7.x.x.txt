@@ -26,6 +26,7 @@
  - fixed #10928: EMS Print Ticket -- Time not processed for timezone
  - fixed #10889: Old Matrixs break for Admin users
  - fixed #10939: Commit with Approval workflow does not show confirmation screen
+ - fixed #10943: ThingyRecord JS Broken
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread

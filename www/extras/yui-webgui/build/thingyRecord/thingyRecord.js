@@ -15,7 +15,7 @@ WebGUI.ThingyRecord.getThingFields
     var callback = {
         success : function (o) {
             // Add fields to select list
-            var el      = document.forms[0].elements['thingFields'];
+            var el      = document.getElementById('thingFields_formId');
             while ( el.options.length >= 1 )
                 el.remove(0);
             var fields  = YAHOO.lang.JSON.parse( o.responseText );
@@ -38,16 +38,17 @@ WebGUI.ThingyRecord.getThingFields
 WebGUI.ThingyRecord.updateFieldPrices
 = function ( ) {
     var form        = document.forms[0];
-    var fieldList   = form.elements["thingFields"];
+    var fieldList   = document.getElementById( 'thingFields_formId' );
     var selected    = [];
     var div         = document.getElementById( 'fieldPrice' );
+    var fieldPrice  = document.getElementById( 'fieldPrice_formId' );
     var currentPrices = {};
     try {
-        currentPrices = YAHOO.lang.JSON.parse( form.elements["fieldPrice"].value );
+        currentPrices = YAHOO.lang.JSON.parse( fieldPrice.value );
     } 
     catch (e) {
         // Initialize if there's a parse error
-        form.elements["fieldPrice"].value = "{}";    
+        fieldPrice.value = "{}";    
     }
 
     // Get the selected fields
@@ -60,7 +61,7 @@ WebGUI.ThingyRecord.updateFieldPrices
             currentPrices[ opt.value ] = 0;
         }
     }
-    form.elements['fieldPrice'].value = YAHOO.lang.JSON.stringify( currentPrices );
+    fieldPrice.value = YAHOO.lang.JSON.stringify( currentPrices );
 
     // Clear out old records
     while ( div.childNodes.length ) 
@@ -78,9 +79,9 @@ WebGUI.ThingyRecord.updateFieldPrices
         price.value = currentPrices[ opt.value ] ? currentPrices[ opt.value ] : "0.00";
         YAHOO.util.Event.addListener( price, "change", function () {
             var fieldName = this.name.substr( "fieldPrice_".length );
-            var json = YAHOO.lang.JSON.parse( form.elements["fieldPrice"].value );
+            var json = YAHOO.lang.JSON.parse( fieldPrice.value );
             json[fieldName] = this.value;
-            form.elements["fieldPrice"].value = YAHOO.lang.JSON.stringify( json );
+            fieldPrice.value = YAHOO.lang.JSON.stringify( json );
         } );
 
         label.appendChild( price );
@@ -93,19 +94,21 @@ WebGUI.ThingyRecord.updateFieldPrices
 
 // Load the columns and field prices
 YAHOO.util.Event.onDOMReady( function () {
-    var form    = document.forms[0];
+    var form        = document.forms[0];
+    var thingId     = document.getElementById("thingId_formId");
+    var thingFields = document.getElementById("thingFields_formId")
 
     // Add events to form fields
-    YAHOO.util.Event.addListener( form.elements["thingId"], "change", function () {
+    YAHOO.util.Event.addListener( thingId, "change", function () {
         WebGUI.ThingyRecord.getThingFields( this.value );
     } );
     
-    YAHOO.util.Event.addListener( form.elements['thingFields'], "change", function () {
+    YAHOO.util.Event.addListener( thingFields, "change", function () {
         WebGUI.ThingyRecord.updateFieldPrices();
     } );
 
     // Populate the fields list if necessary
-    if ( form.elements[ "thingId" ].value ) {
-        WebGUI.ThingyRecord.getThingFields( form.elements[ "thingId"].value );
+    if ( thingId.value ) {
+        WebGUI.ThingyRecord.getThingFields( thingId.value );
     }
 } );
