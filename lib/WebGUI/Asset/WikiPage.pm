@@ -125,6 +125,11 @@ sub definition {
 			defaultValue => '',
 			noFormPost => 1,
 			},
+                isFeatured => {
+                    fieldType       => "yesNo",
+                    defaultValue    => 0,
+                    noFormPost      => 1,
+                },
 	    );
 
 	push @$definition,
@@ -205,6 +210,7 @@ sub getEditForm {
 		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }) ,
 		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
 		formProtect => WebGUI::Form::yesNo($session, { name => "isProtected", value=>$self->getValue("isProtected")}),
+                formFeatured => WebGUI::Form::yesNo( $session, { name => 'isFeatured', value=>$self->getValue('isFeatured')}),
         formKeywords => WebGUI::Form::keywords($session, {
             name    => "keywords",
             value   => WebGUI::Keyword->new($session)->getKeywordsForAsset({asset=>$self}),
@@ -404,6 +410,7 @@ sub processPropertiesFromFormPost {
 
 	if ($wiki->canAdminister) {
 		$properties->{isProtected} = $self->session->form->get("isProtected");
+		$properties->{isFeatured} = $self->session->form->get("isFeatured");
 	}
 
 	$self->update($properties);

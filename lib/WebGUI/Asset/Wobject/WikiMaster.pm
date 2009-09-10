@@ -25,6 +25,24 @@ use URI::Escape;
 
 #-------------------------------------------------------------------
 
+=head2 appendFeaturedPageVars ( var, asset )
+
+Append the template variables to C<var> for the featured page C<asset>. Returns
+the C<var> for convenience.
+
+=cut
+
+sub appendFeaturedPageVars {
+    my ( $self, $var, $asset ) = @_;
+    my $assetVar = $asset->getTemplateVars;
+    for my $key ( keys %{$assetVar} ) {
+        $var->{ 'featured_' . $key } = $assetVar->{$key};
+    }
+    return $var;
+}
+
+#-------------------------------------------------------------------
+
 =head2 appendMostPopular ($var, [ $limit ])
 
 =head3 $var
@@ -419,6 +437,25 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getFeaturedPageIds ( )
+
+Get the asset IDs of the pages that are marked as Featured.
+
+=cut
+
+sub getFeaturedPageIds {
+    my ( $self ) = @_;
+
+    my $assetIds    = $self->getLineage( ['children'], {
+        joinClass       => 'WebGUI::Asset::WikiPage',
+        whereClause     => 'isFeatured = 1',
+    } );
+    
+    return $assetIds;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRssFeedItems ()
 
 Returns an array reference of hash references. Each hash reference has a title,
@@ -547,6 +584,7 @@ Render the front page of the wiki.
 
 sub view {
 	my $self = shift;
+    my $session = $self->session;
         my $var = $self->getTemplateVars;
         $var->{ description     } = $self->autolinkHtml( $var->{ description } );
         $var->{ keywordCloud } 
@@ -555,6 +593,15 @@ sub view {
                 displayFunc=>"byKeyword",
             });
 	my $template = $self->{_frontPageTemplate};
+
+    # Get a random featured page
+    my $featuredIds = $self->getFeaturedPageIds;
+    my $featuredId  = $featuredIds->[ int( rand @$featuredIds ) - 1 ]; 
+    my $featured    = WebGUI::Asset->newByDynamicClass( $session, $featuredId );
+    if ( $featured ) {
+        $self->appendFeaturedPageVars( $var, $featured );
+    }
+
 	$self->appendSearchBoxVars($var);
 	$self->appendRecentChanges($var, $self->get('recentChangesCountFront'));
 	$self->appendMostPopular($var, $self->get('mostPopularCountFront'));

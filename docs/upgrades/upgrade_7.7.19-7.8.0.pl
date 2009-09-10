@@ -35,6 +35,7 @@ reorganizeAdSpaceProperties($session);
 fixTemplateSettingsFromShunt($session);
 addSubscribableAspect( $session );
 addMatrixColumnDefaults($session);
+addFeaturedPageWiki( $session );
 
 finish($session); # this line required
 
@@ -47,6 +48,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add the column for featured wiki pages
+sub exampleFunction {
+    my $session = shift;
+    print "\tAdding featured pages to the Wiki " unless $quiet;
+
+    $session->db->write( 
+        "ALTER TABLE WikiPage ADD COLUMN isFeatured INT(1)",
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add tables for the subscribable aspect

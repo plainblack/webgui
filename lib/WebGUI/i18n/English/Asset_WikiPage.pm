@@ -303,6 +303,13 @@ our $I18N =
         lastUpdated => 0,
         context     => 'Body text for help page',
     },
+
+
+    'isFeatured label' => {
+        message     => q{Feature this on the front page},
+        lastUpdated => 0,
+        context     => 'Label for asset property',
+    },
 };
 
 1;
