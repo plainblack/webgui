@@ -41,6 +41,9 @@ sub addChild {
     my $self = shift;
     my ($properties) = @_;
     ##Allow subclassing
+    if ($properties->{className} eq 'WebGUI::Asset::Wobject::Folder') {
+        return $self->SUPER::addChild(@_);
+    }
     return undef unless $properties->{className} =~ /^WebGUI::Asset::Story/;
     my $todayFolder = $self->getFolder;
     return undef unless $todayFolder;

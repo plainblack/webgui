@@ -63,7 +63,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 48
+my $tests = 50
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -161,15 +161,23 @@ is($archive->getChildCount, 0, 'leaving with an empty archive');
 my $child = $archive->addChild({className => 'WebGUI::Asset::Wobject::StoryTopic'});
 is($child, undef, 'addChild: Will only add Stories');
 
+$child = $archive->addChild({className => 'WebGUI::Asset::Snippet'});
+is($child, undef, '... will not add snippets');
+
+$child = $archive->addChild({className => 'WebGUI::Asset::Wobject::Folder'});
+isa_ok($child, 'WebGUI::Asset::Wobject::Folder', '... will add folders, so importing a package works');
+
+$child->purge;
+
 $child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'}, @skipAutoCommit);
 my $tag1 = WebGUI::VersionTag->getWorking($session);
 $tag1->commit;
 WebGUI::Test->tagsToRollback($tag1);
 isa_ok($child, 'WebGUI::Asset::Story', 'addChild added and returned a Story');
-is($archive->getChildCount, 1, 'addChild: added it to the archive');
+is($archive->getChildCount, 1, '... added it to the archive');
 my $folder = $archive->getFirstChild();
-isa_ok($folder, 'WebGUI::Asset::Wobject::Folder', 'Folder was added to Archive');
-is($folder->getChildCount, 1, 'The folder has 1 child...');
+isa_ok($folder, 'WebGUI::Asset::Wobject::Folder', '... Folder was added to Archive');
+is($folder->getChildCount, 1, '... The folder has 1 child...');
 is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct child');
 
 ################################################################
