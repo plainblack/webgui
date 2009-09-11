@@ -29,6 +29,7 @@
  - fixed #10943: ThingyRecord JS Broken
  - fixed #10941: New user profile fields with unfortunate names
  - fixed #10955: Story Manager: unable to import packages
+ - fixed #10970: Newsletter Asset: no subscribe link
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
