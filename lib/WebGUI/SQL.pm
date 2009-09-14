@@ -203,15 +203,24 @@ sub buildHashRef {
     unless ($options->{noOrder}) {
         tie %hash, "Tie::IxHash";
     }
-    my $sth = $self->prepare($sql);
-    $sth->execute($params);
-    while (my @data = $sth->array) {
-        my $value = pop @data;
-        my $key = join(":", @data); # if more than two columns is selected, join them together with :
-        $key = $value unless ($key); # if only one column is selected, then it is both the key and the value
-        $hash{$key} = $value;
+    $self->session->log->query($sql, $params);
+    my $dbh = $self->dbh;
+    my $results = $dbh->selectall_arrayref($sql, {}, @$params);
+    if ($dbh->err) {
+        $self->session->log->fatal("Couldn't execute prepared statement: $sql : With place holders: ".join(", ", @{$params}).".  Root cause: ". $dbh->errstr);
     }
-    $sth->finish;
+    my $width = @{$results} && @{$results->[0]};
+    %hash
+        = $width == 2 ? map { @{ $_ } } @{ $results }
+        # for single column, use it for both key and value
+        : $width == 1 ? map { $_->[0], $_->[0] } @{ $results }
+        : $width == 0 ? ()
+        : map {
+            # for more than 2 columns, use all but last joined with colons for key
+            join( q{:}, @{$_}[ 0 .. ($#{$_} - 1) ] ),
+            # and last column as value
+            $_->[-1]
+        } @{ $results };
     return \%hash;
 }
 
