@@ -46,7 +46,9 @@ my $parenthesis;
 $parenthesis = qr{
     \(                      # Start with '(',
     (?:                     # Followed by
-        (?>[^()]+)              # Non-parenthesis
+        (?>\\[()])              # Escaped parenthesis
+    |                       # or
+        (?>[^()])               # Non-parenthesis
     |                       # or
         (??{ $parenthesis })    # a balanced parenthesis block
     )*                      # zero or more times

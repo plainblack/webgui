@@ -16,6 +16,7 @@
  - fixed #10876: EMS Schedule displaying wrong dates for ticket events
  - fixed #10915: StoryManager: Carousel clips content
  - fixed #10907: profiles viewable by everybody
+ - fixed #10967: Using a round bracket (parenthesis) in a macro
  - added custom box size to USPS driver, priority service
  - fixed #10919: is visitor or is not visitor??
  - fixed #10920: addUser or addGroup?
