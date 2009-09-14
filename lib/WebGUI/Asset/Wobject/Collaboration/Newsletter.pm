@@ -200,7 +200,7 @@ sub view {
 
 =head2 www_mySubscriptions 
 
-Build a form to dispaly to the user their current subscriptions, and allow them to
+Build a form to display to the user their current subscriptions, and allow them to
 alter them.
 
 =cut

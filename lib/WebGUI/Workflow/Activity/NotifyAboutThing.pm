@@ -84,7 +84,6 @@ sub execute {
     my $self            = shift;
     my $thingy          = shift;
     my $inbox           = WebGUI::Inbox->new($self->session);
-    my $messageTemplate = $self->get('messageTemplate');
     my $properties      = {
         status  => 'completed',
         subject => 'Thingy at URL ' . $thingy->getUrl . ' changed.',

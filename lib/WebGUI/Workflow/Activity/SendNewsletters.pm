@@ -22,15 +22,11 @@ use WebGUI::Mail::Send;
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::Skeleton
+Package WebGUI::Workflow::Activity::SendNewsletters
 
 =head1 DESCRIPTION
 
-Tell a little about what this activity does.
-
-=head1 SYNOPSIS
-
-See WebGUI::Workflow::Activity for details on how to use any activity.
+Process subscription requests from all Newsletters and send emails.
 
 =head1 METHODS
 
@@ -62,7 +58,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 execute ( [ object ] )
+=head2 execute ( )
 
 See WebGUI::Workflow::Activity::execute() for details.
 
@@ -70,8 +66,6 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-    my $object = shift;
-    my $instance = shift;
     my ($db,$eh) = $self->session->quick(qw(db errorHandler));
     
     my $time = time();
@@ -195,7 +189,7 @@ sub execute {
         $db->write("update Newsletter_subscriptions set lastTimeSent = ?", [time()]);
 
         # timeout if we're taking too long
-        if (time() - $time > 50) {
+        if (time() - $time > $self->getTTL ) {
             $eh->info("Oops. Ran out of time. Will continue building newsletters in a bit.");
             $subscriptionResultSet->finish;
             return $self->WAITING(1);

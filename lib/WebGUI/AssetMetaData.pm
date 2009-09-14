@@ -151,8 +151,9 @@ If specified, the hashRef will contain only this field.
 =cut
 
 sub getMetaDataFields {
-	my $self = shift;
+	my $self    = shift;
 	my $fieldId = shift;
+    my $session = $self->session;
 	my $sql = "select
 		 	f.fieldId, 
 			f.fieldName, 
@@ -162,21 +163,15 @@ sub getMetaDataFields {
 			f.possibleValues,
 			d.value
 		from metaData_properties f
-		left join metaData_values d on f.fieldId=d.fieldId and d.assetId=".$self->session->db->quote($self->getId);
-	$sql .= " where f.fieldId = ".$self->session->db->quote($fieldId) if ($fieldId);
+		left join metaData_values d on f.fieldId=d.fieldId and d.assetId=".$session->db->quote($self->getId);
+	$sql .= " where f.fieldId = ".$session->db->quote($fieldId) if ($fieldId);
 	$sql .= " order by f.fieldName";
 	if ($fieldId) {
-		return $self->session->db->quickHashRef($sql);	
+		return $session->db->quickHashRef($sql);	
 	}
     else {
         tie my %hash, 'Tie::IxHash';
-        my $sth = $self->session->db->read($sql);
-        while( my $h = $sth->hashRef) {
-			foreach(keys %$h) {
-				$hash{$h->{fieldId}}{$_} = $h->{$_};
-			}
-		}
-        $sth->finish;
+        %hash = %{ $session->db->buildHashRefOfHashRefs($sql, [], 'fieldId') };
         return \%hash;
 	}
 }

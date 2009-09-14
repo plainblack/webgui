@@ -51,7 +51,7 @@ finish($session); # this line required
 
 #----------------------------------------------------------------------------
 # Add the column for featured wiki pages
-sub exampleFunction {
+sub addFeaturedPageWiki {
     my $session = shift;
     print "\tAdding featured pages to the Wiki " unless $quiet;
 
