@@ -157,7 +157,8 @@ Store subscription information for a user into the database.
 
 =head3 $subscriptions
 
-A string containing newline separated subscriptions for a user.
+A string containing newline separated subscriptions for a user.  A "subscription" is the
+fieldId of an asset metadata field joined with the metadata value with a tilde "~".
 
 =head3 $userId
 
