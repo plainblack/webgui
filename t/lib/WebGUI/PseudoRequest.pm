@@ -4,13 +4,14 @@ use strict;
 
 use Test::MockObject;
 
-my $mocker = Test::MockObject->new();
-$mocker->fake_module(
-    'Apache2::Cookie', 
-    new     => sub { return bless {}, 'Apache2::Cookie'; },
-    expires => sub { 1; },
-    domain  => sub { 1; },
-    bake    => sub { 1; },
+Test::MockObject->fake_module(
+    'Apache2::Cookie',
+    new => sub {
+        my $class = shift;
+        my $self = Test::MockObject->new;
+        $self->set_isa($class);
+        $self->set_true(qw(expires domain bake));
+    }
 );
 
 =head1 LEGAL
