@@ -81,7 +81,7 @@ sub execute {
         $eh->info("Getting user $userId");
         my $user = WebGUI::User->new($self->session, $userId);
         next if ($user->isVisitor);
-        my $emailAddress = $user->profileField("email");
+        my $emailAddress = $user->get("email");
         next if ($emailAddress eq "");
 
 
@@ -130,7 +130,7 @@ sub execute {
             push(@threadLoop, {
                 title       => $thread->getTitle,
                 synopsis    => $thread->get("synopsis"),
-                body        => $thread->get("body"),
+                body        => $thread->get("content"),
                 url         => $siteurl.$thread->getUrl,
                 });
         }
