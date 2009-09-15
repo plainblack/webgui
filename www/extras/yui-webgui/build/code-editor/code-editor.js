@@ -161,7 +161,7 @@
         html = html.replace(/ ?<br>/gi,'\n');
         html = html.replace(/<[^>]+>/g,'');
         // Remove spaces at end of lines
-        html = html.replace(/ +\r?\n/g,"");
+        html = html.replace(/ +(\r?)\n/g,"$1\n");
         return html;
     };
 
