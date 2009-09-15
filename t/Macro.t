@@ -44,7 +44,7 @@ foreach my $macro (qw/
 }
 $session->config->addToHash('macros', "Ex'tras", "Extras");
 
-plan tests => 43;
+plan tests => 47;
 
 my $macroText = "CompanyName: ^c;";
 my $companyName = $session->setting->get('companyName');
@@ -119,6 +119,38 @@ is(
     $macroText,
     q{Extras(): /extras/},
     "Extras macro with parens but no args",
+);
+
+my $macroText = q{Extras("(test"): ^Extras("\(test");};
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    q{Extras("(test"): /extras/(test},
+    "Extras macro with escaped unbalanced opening parenthesis."
+);
+
+my $macroText = q{Extras("(test"): ^Extras("prefix \(test");};
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    q{Extras("(test"): /extras/prefix (test},
+    "Extras macro with escaped unbalanced opening parenthesis in the middle."
+);
+
+my $macroText = q{Extras("test)"): ^Extras("test\)");};
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    q{Extras("test)"): /extras/test)},
+    "Extras macro with escaped unbalanced closing parenthesis."
+);
+
+my $macroText = q{Extras("test)"): ^Extras("test\) suffix");};
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    q{Extras("test)"): /extras/test) suffix},
+    "Extras macro with escaped unbalanced closing parenthesis in the middle."
 );
 
 my $macroText = <<'EOF'
@@ -286,6 +318,7 @@ is(
     '',
     "Macro can return undef",
 );
+
 
 
 END {
