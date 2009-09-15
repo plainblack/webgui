@@ -432,8 +432,8 @@ sub www_editSave {
     unless(scalar(@{$retHash->{errors}})) {
         my $profile  = $retHash->{profile};
         my $privacy  = {};
+        $session->user->update($profile);
         foreach my $fieldName (keys %{$profile}) {
-            $session->user->profileField($fieldName,$profile->{$fieldName});
             my $privacySetting     = $session->form->get("privacy_".$fieldName);
             next unless $privacySetting;
             $privacy->{$fieldName} = $privacySetting;
