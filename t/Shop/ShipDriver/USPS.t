@@ -24,6 +24,10 @@ use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
+plan tests => 46;
+use_ok('WebGUI::Shop::ShipDriver::USPS')
+    or die 'Unable to load module WebGUI::Shop::ShipDriver::USPS';
+
 #----------------------------------------------------------------------------
 # Init
 my $session   = WebGUI::Test->session;
@@ -34,13 +38,9 @@ $session->user({user => $user});
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 41;
-plan tests => 1 + $tests;
-
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::ShipDriver::USPS');
 
 my $storage;
 my ($driver, $cart);
@@ -94,10 +94,6 @@ my $nivBible = $bible->setCollateral('variantsJSON', 'variantId', 'new',
 
 $versionTag->commit;
 WebGUI::Test->tagsToRollback($versionTag);
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::ShipDriver::USPS', $tests unless $loaded;
 
 #######################################################################
 #
@@ -758,8 +754,6 @@ SKIP: {
 
 }
 
-
-}
 
 #----------------------------------------------------------------------------
 # Cleanup
