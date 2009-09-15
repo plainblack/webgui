@@ -691,7 +691,7 @@ test suite.
 
 sub getAdminConsole {
     my $self = shift;
-    my $ac = $self->SUPER::getAdminConsole;
+    my $ac = WebGUI::AdminConsole->new( $self->session, 'Survey' );
     my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
     $ac->addSubmenuItem($self->session->url->page("func=edit"), WebGUI::International->new($self->session, "WebGUI")->get(575));
     $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), $i18n->get('edit survey'));
