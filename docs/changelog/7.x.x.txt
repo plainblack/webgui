@@ -34,6 +34,7 @@
  - fixed #10970: Newsletter Asset: no subscribe link
  - fixed #10953: SendNewsletters Activity: Invalid template variable
  - fixed #10913: User profiles: Impossible to delete field contents
+ - fixed #10929: EMS Ticket Start Date Sort
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
