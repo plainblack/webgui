@@ -136,7 +136,7 @@ BEGIN {
             $line =~ s/^\s+//;
             $line =~ s/\s+$//;
             next LINE if !$line;
-            push @INC, $line;
+            unshift @INC, $line;
         }
         close $PRELOAD;
     }
