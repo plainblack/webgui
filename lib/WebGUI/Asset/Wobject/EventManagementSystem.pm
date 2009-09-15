@@ -1261,11 +1261,13 @@ sub www_getTicketsAsJson {
     my ($self) = @_;
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
-    my ($db, $form) = $session->quick(qw(db form));
-    my $startIndex = $form->get('startIndex') || 0;
-    my $numberOfResults = $form->get('results') || 25;
+    my ($db, $form)     = $session->quick(qw(db form));
+    my $startIndex      = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results')    || 25;
+    my $sortDir         = $form->get('sortDir')    || 'ASC';
+    my $sortKey         = $form->get('sortKey')    || 'eventNumber';
     my %results = ();
-	my @ids = ();
+	my @ids     = ();
 	my $keywords = $form->get('keywords');
 	
 	# looking for specific events
@@ -1287,7 +1289,7 @@ sub www_getTicketsAsJson {
 	# just get all tickets
 	else {
 		@ids = $db->buildArray("select assetId from asset left join EMSTicket using (assetId) where parentId=? and
-className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by eventNumber", [$self->getId]);
+className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by $sortKey $sortDir", [$self->getId]);
 	}
 	
 	# get badge's badge groups
