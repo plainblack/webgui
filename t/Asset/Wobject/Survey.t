@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 45;
+my $tests = 46;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -272,3 +272,45 @@ like($storage->getFileContentsAsScalar($filename), qr{
 
 }
 
+my $adminConsole = $survey->getAdminConsole();
+cmp_deeply(
+    $adminConsole->{_submenuItem},
+    [
+        {
+          'extras' => undef,
+          'url' => '/home?func=edit',
+          'label' => 'Edit'
+        },
+        {
+          'extras' => undef,
+          'url' => '/home?func=editSurvey',
+          'label' => 'Edit Survey'
+        },
+        {
+          'extras' => undef,
+          'url' => '/home?func=takeSurvey',
+          'label' => 'Take Survey'
+        },
+        {
+          'extras' => undef,
+          'url' => '/home?func=graph',
+          'label' => 'Visualize'
+        },
+        {
+          'extras' => undef,
+          'url' => '/home?func=editTestSuite',
+          'label' => 'Test Suite'
+        },
+        {
+          'extras' => undef,
+          'url' => '/home?func=runTests',
+          'label' => 'Run All Tests'
+        },
+        {
+          'extras' => undef,
+          'url' => '/home?func=runTests;format=tap',
+          'label' => 'Run All Tests (TAP)'
+        }
+    ],
+    "Admin console submenu",
+);
