@@ -713,9 +713,11 @@ sub getListTemplateVars {
     while ( my $entry = $entryIter->() ) {
         my $entryData = $entry->fields;
         my @dataLoop;
+        my %dataVars;
         for my $fieldName ( @{ $self->getFieldOrder } ) {
             my $field = $fieldConfig->{$fieldName};
             my $form = $self->_createForm($field, $entryData->{$fieldName});
+            $dataVars{ 'record.noloop.' . $fieldName } = $entryData->{$fieldName};
             push @dataLoop, {
                 "record.data.name"          => $field->{name},
                 "record.data.label"         => $field->{label},
@@ -725,6 +727,7 @@ sub getListTemplateVars {
             };
         }
         push @recordLoop, {
+            %dataVars,
             "record.ipAddress"              => $entry->ipAddress,
             "record.edit.url"               => $self->getFormUrl("func=view;entryId=".$entry->getId),
             "record.edit.icon"              => $self->session->icon->edit("func=view;entryId=".$entry->getId, $self->get('url')),

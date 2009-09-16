@@ -179,6 +179,7 @@ our $HELP = {
                     { 'name' => 'record.userId' },
                     { 'name' => 'record.submissionDate.epoch' },
                     { 'name' => 'record.submissionDate.human' },
+                    { 'name' => 'record.noloop.', description => 'help record.noloop', },
                     {   'name'      => 'record.data_loop',
                         'variables' => [
                             { 'name' => 'record.data.name' },

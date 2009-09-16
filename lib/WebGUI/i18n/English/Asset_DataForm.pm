@@ -1044,6 +1044,12 @@ be useful, others may not.|,
         context     => q{The date that this entry was submitted to the site. i18n label for template},
     },
 
+    'help record.noloop' => {
+        message     => q{You can get any field's value in this record by name, ex: record.noloop.subject},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
 };
 
 1;
