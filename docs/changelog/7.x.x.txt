@@ -1,3 +1,5 @@
+7.7.21
+
 7.7.20
  - fixed #10982: Survey menu options appearing twice
  - fixed #10890: Story Manager: pagination broken for keywords
