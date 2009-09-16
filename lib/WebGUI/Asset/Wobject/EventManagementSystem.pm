@@ -1156,6 +1156,7 @@ returns the JSON data for a page of the schedule table
 sub www_getScheduleDataJSON {
     my $self = shift;
     my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
     # the following two are expected to be configurable...
     my $locationsPerPage = $self->get('scheduleColumnsPerPage');
 
@@ -2053,7 +2054,7 @@ sub www_toggleRegistrantCheckedIn {
 
 =head2 www_viewSchedule ()
 
-view the schedule table
+View the schedule table.
 
 =cut
 
@@ -2076,7 +2077,7 @@ sub www_viewSchedule {
                       rowsPerPage => $rowsPerPage,
                       dataColumns => $dataColumns,
                       fieldList => $fieldList,
-		      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
+                      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
                   },$self->get('scheduleTemplateId')));
 
 }

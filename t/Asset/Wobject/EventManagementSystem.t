@@ -50,7 +50,7 @@ $versionTag->set({name=>"EventManagementSystem Test"});
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 32 ;        # Increment this number for each test you create
+plan tests => 34 ;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -161,14 +161,27 @@ ok(scalar(@$ribbons) == 2, 'Two ribbons exist');
 ok( $ems->can('www_getScheduleDataJSON'), 'Can call get Schedule data' );
 ok( $ems->can('www_viewSchedule'), 'Can call view Schedule' );
 
+my $data;
 $session->user({userId => $crasher->getId});
-my $data = $ems->www_viewSchedule();
-is($session->http->getStatus, 401, 'www_viewSchedule: visitor may not see the schedule');
 $session->http->setStatus(201);
+$data = $ems->www_viewSchedule();
+is($session->http->getStatus, 401, 'www_viewSchedule: visitor may not see the schedule');
 
+$session->http->setStatus(201);
 $session->user({userId => $attender->getId});
-my $data = $ems->www_viewSchedule();
-is($session->http->getStatus, 201, 'attender user may see the schedule');
+$data = $ems->www_viewSchedule();
+is($session->http->getStatus, 201, '... attender user can see the schedule');
+
+$session->http->setStatus(201);
+$session->user({userId => $crasher->getId});
+$data = $ems->www_getScheduleDataJSON();
+is($session->http->getStatus, 401, 'www_getScheduleDataJSON: non-attender may now see the schedule JSON');
+
+$session->http->setStatus(201);
+$session->user({userId => $attender->getId});
+$data = $ems->www_getScheduleDataJSON();
+is($session->http->getStatus, 201, '... attender can see the schedule JSON');
+$session->http->setStatus(201);
 
 my $html = $ems->www_viewSchedule();
 ok( $html !~ /REPLACE/, 'tags were successfully replaced');
