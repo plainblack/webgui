@@ -22,8 +22,8 @@ use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Group;
 use JSON;
+use Data::Dumper;
 use Test::Deep;
-#use Data::Dumper;
 
 #----------------------------------------------------------------------------
 # Init
@@ -128,12 +128,16 @@ ok(scalar(@$badges) == 2, 'Two Badges exist');
 # Add tickets
 my @tickets;
 push(@tickets, $ems->addChild({
-        className=>'WebGUI::Asset::Sku::EMSTicket',
-    startDate => '2009-01-01 14:00:00',
+    className   => 'WebGUI::Asset::Sku::EMSTicket',
+    startDate   => '2009-01-01 14:00:00',
+    eventNumber => 1,
+    location    => 'qq',
 }));
 push(@tickets, $ems->addChild({
-    className=>'WebGUI::Asset::Sku::EMSTicket',
-    startDate => '2009-01-01 14:00:00',
+    className   => 'WebGUI::Asset::Sku::EMSTicket',
+    startDate   => '2009-01-01 14:00:00',
+    eventNumber => 2,
+    location    => 'qq',
 }));
 
 foreach my $ticket(@tickets) {
@@ -173,14 +177,19 @@ is($session->http->getStatus, 201, '... attender user can see the schedule');
 
 $session->http->setStatus(201);
 $session->user({userId => $crasher->getId});
-$data = $ems->www_getScheduleDataJSON();
-is($session->http->getStatus, 401, 'www_getScheduleDataJSON: non-attender may now see the schedule JSON');
+my ($json, $records);
+$json    = $ems->www_getScheduleDataJSON();
+$records = eval { JSON::from_json($json)->{records} };
+cmp_deeply($records, [], 'www_getScheduleDataJSON: visitor may not see the schedule JSON');
 
-$session->http->setStatus(201);
 $session->user({userId => $attender->getId});
-$data = $ems->www_getScheduleDataJSON();
-is($session->http->getStatus, 201, '... attender can see the schedule JSON');
-$session->http->setStatus(201);
+$json    = $ems->www_getScheduleDataJSON();
+$records = eval { JSON::from_json($json)->{records} };
+cmp_deeply($records, [ignore(), ignore()], '... attender can see the schedule JSON');
+
+foreach my $ticket (@tickets) {
+    $ticket->purge;
+}
 
 my $html = $ems->www_viewSchedule();
 ok( $html !~ /REPLACE/, 'tags were successfully replaced');
@@ -291,7 +300,7 @@ my @tickets= (
 );
 is( scalar(@tickets), 12, 'created tickets for ems');
 my $tickets = $ems->getTickets;
-is(scalar(@$tickets), 14, 'Fourteen tickets exist');
+is(scalar(@{ $tickets }), 12, 'Fourteen tickets exist');
 my $locations = [ $ems->getLocations ];
 cmp_deeply($locations, [ 'a','b','c','d','e','f' ], 'get locations returns all expected locations');
 # print 'locations=[', join( ',', @$locations ),"]\n";
