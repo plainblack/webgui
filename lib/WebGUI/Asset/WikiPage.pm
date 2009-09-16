@@ -299,6 +299,7 @@ sub getTemplateVars {
         allowsAttachments   => $wiki->get("allowAttachments"),
         comments	    => $self->getFormattedComments(),
         canEdit             => $self->canEdit,
+		isProtected         => $self->isProtected,
         content             => $wiki->autolinkHtml(
             $self->scrubContent,
             {skipTitles => [$self->get('title')]},
