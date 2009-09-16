@@ -1198,19 +1198,21 @@ The day to look at.
 =cut
 
 sub viewDay {
-    my $self        = shift;
-    my $session     = $self->session;
-    my $params      = shift;
-    my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
-    my $var         = $self->getTemplateVars;
-    
+    my $self     = shift;
+    my $session  = $self->session;
+    my $params   = shift;
+    my $i18n     = WebGUI::International->new($session,"Asset_Calendar");
+    my $var      = $self->getTemplateVars;
+    my $tz       = $session->datetime->getTimeZone;
+
     ### Get all the events in this time period
     # Get the range of the epoch of this day
-    my $dt        = WebGUI::DateTime->new($session, $params->{start});
+    my $dt       = WebGUI::DateTime->new($session, $params->{start});
+    $dt->set_time_zone($tz);
     $dt->truncate( to => "day");
-    
+
     my @events    = $self->getEventsIn($dt->toMysql,$dt->clone->add(days => 1)->toMysql);
-    
+
     #### Create the template parameters
     # The events
     my $pos        = -1;
@@ -1219,7 +1221,7 @@ sub viewDay {
         next EVENT unless $event->canView();
         my $dt      = $event->getDateTimeStart;
         my $hour    = $dt->clone->truncate(to=>"hour")->hour;
-        
+
         # Update position if necessary
         unless ($hour == $last_hour) {
             $pos++;
@@ -1231,7 +1233,7 @@ sub viewDay {
                 "hourM"     => ( $hour < 12 ? "am" : "pm"),
                 };
         }
-        
+
         my $eventVar    = $event->get;
         my %eventDates  = $event->getTemplateVars;
         push @{$var->{hours}->[$pos]->{events}}, {
@@ -1240,8 +1242,8 @@ sub viewDay {
             (map { "event".ucfirst($_) => $eventDates{$_} } keys %eventDates),
             };
     }
-    
-    
+
+
     # Make the navigation bars
     $var->{"pageNextStart"}     = $dt->clone->add(days=>1)->toMysql;
     $var->{"pageNextUrl"}       = $self->getUrl("type=day;start=".$var->{"pageNextStart"});
@@ -1259,8 +1261,8 @@ sub viewDay {
     $var->{"mdy"}               = $dt->mdy;
     $var->{"dmy"}               = $dt->dmy;
     $var->{"epoch"}             = $dt->epoch;
-    
-    
+
+
     # Return the template parameters
     return $var;
 }
@@ -1375,6 +1377,7 @@ sub viewMonth {
     #### Get all the events in this time period
     # Get the range of the epoch of this month
     my $dt          = WebGUI::DateTime->new($self->session, $params->{start});
+    $dt->set_time_zone($tz);
     $dt->truncate( to => "month");
     my $start = $dt->toMysql;
     my $dtEnd = $dt->clone->add(months => 1);
