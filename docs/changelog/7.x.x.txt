@@ -39,6 +39,7 @@
  - fixed #10913: User profiles: Impossible to delete field contents
  - fixed #10929: EMS Ticket Start Date Sort
  - fixed #10885: Code Editor breaks Javascript comments
+ - fixed #10991: Calendar: bug in Display tab
  - added direct value access in DataForm list view
 
 7.7.19

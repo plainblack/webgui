@@ -261,6 +261,7 @@ sub definition {
             defaultValue    => [],
             serialize       => 1,
             noFormPost      => 1,
+            autoGenerate    => 0,
             tab             => "display",
         },
 
