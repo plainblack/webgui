@@ -19,6 +19,8 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::User;
+use WebGUI::Group;
 use JSON;
 use Test::Deep;
 #use Data::Dumper;
@@ -26,6 +28,13 @@ use Test::Deep;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+
+my $registrar = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($registrar);
+my $registrars = WebGUI::Group->new($session, 'new');
+WebGUI::Test->groupsToDelete($registrars);
+$registrars->addUsers([$registrar->getId]);
+
 
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
@@ -55,6 +64,7 @@ my $ems = $node->addChild({
 	description => 'This is a test ems', 
 	url => '/test-ems',
 	workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
+    registrationStaffGroupId => $registrars->getId,
 });
 $versionTag->commit;
 WebGUI::Test->tagsToRollback($versionTag);
@@ -81,10 +91,11 @@ ok($preparedView, 'prepareView returns something');
 my $view = $ems->view();
 ok($view, 'View returns something');
 
-ok($ems->isRegistrationStaff == 0, 'User is not part of registration staff');
+$session->user({ userId => 1 });
+ok($ems->isRegistrationStaff == 0, 'Visitor is not part of registration staff');
 
 # Become admin for testing
-$session->user({ userId => 3 });
+$session->user({ userId => $registrar->getId });
 ok($ems->isRegistrationStaff == 1, 'User is part of registration staff');
 
 # Add two badges, using addChild instead of Mech
@@ -325,5 +336,6 @@ cmp_deeply( JSON::from_json($data), {
          pageSize => 10,
          rowsPerPage => 6,
        },
-     'twelve tickets: schedule data looks good' );
+     'twelve tickets: schedule data looks good'
+);
 
