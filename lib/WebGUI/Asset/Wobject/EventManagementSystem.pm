@@ -1156,29 +1156,30 @@ returns the JSON data for a page of the schedule table
 sub www_getScheduleDataJSON {
     my $self = shift;
     my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canView;
+    my $emptyRecord = JSON->new->encode( {
+        records         => [ ],   totalRecords        => 0,     recordsReturned    => 0,
+        startIndex      => 0,     currentLocationPage => 0,     totalLocationPages => 0,
+        currentDatePage => 0,     totalDatePages      => 0,     dateRecords        => [ ],
+        sort            => undef, dir                 => 'asc', pageSize           => 0,
+    });
+    return $emptyRecord unless $self->canView;
     # the following two are expected to be configurable...
-    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
+    my $locationsPerPage   = $self->get('scheduleColumnsPerPage');
 
-    my ($db, $form) = $session->quick(qw(db form));
+    my ($db, $form)        = $session->quick(qw(db form));
     my $locationPageNumber = $form->get('locationPage') || 1;
-    my $datePageNumber = $form->get('datePage') || 1;
+    my $datePageNumber     = $form->get('datePage')     || 1;
     my @dateRecords;
     my @ticketLocations = $self->getLocations( \@dateRecords );
     # the total number of pages is the number of locations divided by the number of locations per page
     my $numberOfLocationPages = int( .9 + scalar(@ticketLocations) / $locationsPerPage );
         # skip everything else if there are no locations/pages
-    return JSON->new->encode( {
-        records => [ ],  totalRecords => 0, recordsReturned => 0, startIndex => 0,
-        currentLocationPage => 0, totalLocationPages => 0,
-        currentDatePage => 0, totalDatePages => 0, dateRecords => [ ],
-        sort => undef,  dir => 'asc', pageSize => 0,
-    })  if $numberOfLocationPages == 0;
+    return $emptyRecord if $numberOfLocationPages == 0;
     # now we pick out the locations to be displayed on this page
     my $indexFirstLocation = ($locationPageNumber-1)*$locationsPerPage;
-    my $indexLastLocation = $locationPageNumber*$locationsPerPage - 1;
-    my $currentDate = $dateRecords[$datePageNumber-1];
-    @ticketLocations = @ticketLocations[$indexFirstLocation..$indexLastLocation];
+    my $indexLastLocation  = $locationPageNumber*$locationsPerPage - 1;
+    my $currentDate        = $dateRecords[$datePageNumber-1];
+    @ticketLocations       = @ticketLocations[$indexFirstLocation..$indexLastLocation];
 	my $tickets = $db->read( q{
              select assetData.assetId, sku.description, assetData.title, EMSTicket.startDate, EMSTicket.location
                from EMSTicket
