@@ -38,6 +38,7 @@
  - fixed #10929: EMS Ticket Start Date Sort
  - fixed #10885: Code Editor breaks Javascript comments
  - fixed #10991: Calendar: bug in Display tab
+ - fixed #10987: EMS Schedule -- No Permission Check
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread

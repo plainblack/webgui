@@ -2058,13 +2058,14 @@ view the schedule table
 =cut
 
 sub www_viewSchedule {
-	my $self = shift;
-	my $db = $self->session->db;
-    my $rowsPerPage = 25;
+	my $self             = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+	my $db               = $self->session->db;
+    my $rowsPerPage      = 25;
     my $locationsPerPage = $self->get('scheduleColumnsPerPage');
 
     my @columnNames = map { "'col" . $_ . "'" } ( 1..$locationsPerPage );
-    my $fieldList = join ',', @columnNames;
+    my $fieldList   = join ',', @columnNames;
     my $dataColumns = join ",\n",  map {
 	    '{key:' . $_ . ',sortable:false,label:"",formatter:formatViewScheduleItem}'
                      }  @columnNames;
