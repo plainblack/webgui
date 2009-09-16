@@ -39,7 +39,6 @@ WebGUI::Test->groupsToDelete($registrars, $attendees);
 $registrars->addUsers([$registrar->getId]);
 $attendees->addUsers([$attender->getId]);
 
-
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
