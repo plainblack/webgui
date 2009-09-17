@@ -2425,10 +2425,6 @@ sub editThingData {
 
     return $session->privilege->insufficient() unless $canEditThingData;
 
-    if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
-        return $i18n->get("has entered max per user message");
-    }
-
     my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
@@ -2510,6 +2506,14 @@ sub editThingData {
     $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value => $thingProperties->{saveButtonLabel}});
     $var->{"form_end"} = WebGUI::Form::formFooter($self->session);
     $self->appendThingsVars($var, $thingId);
+
+    if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
+        delete $var->{form_start};
+        delete $var->{form_end};
+        delete $var->{form_submit};
+        delete $var->{field_loop};
+        $var->{editInstructions} = $i18n->get("has entered max per user message");
+    }
     return $self->processTemplate($var,$thingProperties->{editTemplateId});
 }
 
