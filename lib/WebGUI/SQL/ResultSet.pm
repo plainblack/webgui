@@ -132,9 +132,7 @@ sub execute {
 	my $self = shift;
 	my $placeholders = shift || [];
 	my $sql = $self->{_sql};
-	my $errorHandler = $self->db->session->errorHandler;
-	$errorHandler->query($sql,$placeholders);
-	$self->sth->execute(@{ $placeholders }) or $errorHandler->fatal("Couldn't execute prepared statement: $sql : With place holders: ".join(", ", @{$placeholders}).".  Root cause: ". $self->errorMessage);
+	$self->sth->execute(@{ $placeholders }) or $self->session->errorHandler->fatal("Couldn't execute prepared statement: $sql : With place holders: ".join(", ", @{$placeholders}).".  Root cause: ". $self->errorMessage);
 }
 
 

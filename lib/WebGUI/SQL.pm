@@ -203,7 +203,6 @@ sub buildHashRef {
     unless ($options->{noOrder}) {
         tie %hash, "Tie::IxHash";
     }
-    $self->session->log->query($sql, $params);
     my $dbh = $self->dbh;
     my $results = $dbh->selectall_arrayref($sql, {}, @$params);
     if ($dbh->err) {
@@ -428,10 +427,15 @@ sub connect {
 	my $pass    = shift;
     my $params  = shift;
 
+    require WebGUI::SQL::Trace;
+    open my $trace_handle, '>:via(WebGUI::SQL::Trace)', $session;
     my (undef, $driver) = DBI->parse_dsn($dsn);
-    my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError => 0, AutoCommit => 1,
+    my $dbh = DBI->connect($dsn, $user, $pass, {
+        RaiseError => 0,
+        AutoCommit => 1,
         $driver eq 'mysql' ? (mysql_enable_utf8 => 1) : (),
     });
+    $dbh->trace('2|SQL', $trace_handle);
 
 	unless (defined $dbh) {
 		$session->errorHandler->error("Couldn't connect to database: $dsn : $DBI::errstr");
