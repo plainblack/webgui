@@ -4258,12 +4258,6 @@ LongTruncOk=1</p>
         context     => q{General purpose, similar to submit.},
     },
 
-    'save' => {
-        message     => q{Save},
-        lastUpdated => 0,
-        context     => q{General purpose, similar to submit.},
-    },
-
     'company information' => {
         message     => q{Company Information},
         lastUpdated => 0,

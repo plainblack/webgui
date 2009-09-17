@@ -47,6 +47,7 @@
  - fixed #10901: Calendar More Button/Display Box IE8 error.
  - fixed #10954: DataForm fails silently
  - fixed #10950: Thingy
+ - fixed #10976: Form::Date not internationalized /DateTime::setToEpoch
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
