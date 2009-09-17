@@ -2,6 +2,7 @@
  - fixed #10998: wiki page locked?
  - fixed #10924: Calendar event in last day of month does not display in month/day view
  - fixed #10901: Calendar More Button/Display Box IE8 error.
+ - fixed #10954: DataForm fails silently
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
