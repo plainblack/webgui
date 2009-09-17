@@ -33,11 +33,6 @@ my $session = start(); # this line required
 # upgrade functions go here
 fixTemplateSettingsFromShunt($session);
 addMatrixColumnDefaults($session);
-<<<<<<< HEAD:docs/upgrades/upgrade_7.7.19-7.7.20.pl
-=======
-addFeaturedPageWiki( $session );
-fixEmptyCalendarIcalFeeds( $session );
->>>>>>> 255abcd... Set correct defaults for icalFeeds in existant calendars.  Fixes bug #11005:docs/upgrades/upgrade_7.7.19-7.8.0.pl
 
 finish($session); # this line required
 
@@ -52,54 +47,6 @@ finish($session); # this line required
 #}
 
 #----------------------------------------------------------------------------
-<<<<<<< HEAD:docs/upgrades/upgrade_7.7.19-7.7.20.pl
-=======
-# Add the column for featured wiki pages
-sub fixEmptyCalendarIcalFeeds {
-    my $session = shift;
-    print "\tSetting icalFeeds in the Calendar to the proper default... " unless $quiet;
-
-    $session->db->write( 
-        "UPDATE Calendar set icalFeeds='[]' where icalFeeds IS NULL",
-    );
-
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-# Add the column for featured wiki pages
-sub addFeaturedPageWiki {
-    my $session = shift;
-    print "\tAdding featured pages to the Wiki " unless $quiet;
-
-    $session->db->write( 
-        "ALTER TABLE WikiPage ADD COLUMN isFeatured INT(1)",
-    );
-
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-# Add tables for the subscribable aspect
-sub addSubscribableAspect {
-    my $session = shift;
-    print "\tAdding Subscribable aspect..." unless $quiet;
-
-    $session->db->write( <<'ESQL' );
-CREATE TABLE assetAspect_Subscribable (
-    assetId CHAR(22) BINARY NOT NULL,
-    revisionDate BIGINT NOT NULL,
-    subscriptionGroupId CHAR(22) BINARY,
-    subscriptionTemplateId CHAR(22) BINARY,
-    skipNotification INT,
-    PRIMARY KEY ( assetId, revisionDate )
-)
-ESQL
-
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
 # Describe what our function does
 sub reorganizeAdSpaceProperties {
     my $session = shift;
@@ -112,7 +59,6 @@ sub reorganizeAdSpaceProperties {
 }
 
 #----------------------------------------------------------------------------
->>>>>>> 255abcd... Set correct defaults for icalFeeds in existant calendars.  Fixes bug #11005:docs/upgrades/upgrade_7.7.19-7.8.0.pl
 # Describe what our function does
 sub addMatrixColumnDefaults {
     my $session = shift;
