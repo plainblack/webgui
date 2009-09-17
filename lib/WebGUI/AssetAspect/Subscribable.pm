@@ -2,6 +2,7 @@ package WebGUI::AssetAspect::Subscribable;
 
 use strict;
 use Class::C3;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -25,14 +26,14 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session, 'AssetAspect_Subscribable');
 
     tie my %properties, 'Tie::IxHash', (
         subscriptionGroupId => {
             tab             => "security",
             fieldType       => "subscriptionGroup",
-            label           => $i18n->echo("Subscription Group"),
-            hoverHelp       => $i18n->echo("The users who are subscribed to recieve e-mail alerts for this asset"),
+            label           => $i18n->get("Subscription Group"),
+            hoverHelp       => $i18n->get("Subscription Group help"),
             defaultValue    => undef,
             noFormPost      => 1,
         },
@@ -40,8 +41,8 @@ sub definition {
             tab             => "display",
             fieldType       => "template",
             namespace       => $class->getSubscriptionTemplateNamespace,
-            label           => $i18n->echo("Subscription Template"),
-            hoverHelp       => $i18n->echo("The template to use to send out e-mail notifications"),
+            label           => $i18n->get("Email Template"),
+            hoverHelp       => $i18n->get("Email Template help"),
         },
         skipNotification => {
             autoGenerate    => 0,
@@ -256,21 +257,6 @@ Get the URL to unsubscribe from this asset.
 sub getUnsubscribeUrl {
     my $self    = shift;
     return $self->getUrl( 'func=unsubscribe' );
-}
-
-#----------------------------------------------------------------------------
-
-=head2 i18n ( )
-
-Get the i18n for RSSCapable
-
-=cut
-
-sub i18n {
-    my $class       = shift;
-    my $session     = shift;
-
-    return WebGUI::International->new( $session );
 }
 
 #----------------------------------------------------------------------------
