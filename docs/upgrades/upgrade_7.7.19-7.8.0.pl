@@ -36,6 +36,7 @@ fixTemplateSettingsFromShunt($session);
 addSubscribableAspect( $session );
 addMatrixColumnDefaults($session);
 addFeaturedPageWiki( $session );
+fixEmptyCalendarIcalFeeds( $session );
 
 finish($session); # this line required
 
@@ -48,6 +49,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add the column for featured wiki pages
+sub fixEmptyCalendarIcalFeeds {
+    my $session = shift;
+    print "\tSetting icalFeeds in the Calendar to the proper default... " unless $quiet;
+
+    $session->db->write( 
+        "UPDATE Calendar set icalFeeds='[]' where icalFeeds IS NULL",
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add the column for featured wiki pages
