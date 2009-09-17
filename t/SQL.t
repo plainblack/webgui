@@ -17,7 +17,7 @@ use WebGUI::Session;
 use Data::Dumper;
 use Test::Deep;
 
-use Test::More tests => 53; # increment this value for each test you create
+use Test::More tests => 56; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -124,8 +124,17 @@ my %buildHash = $session->db->buildHash("select incrementerId,nextValue from inc
 is($buildHash{theBigTest}, 25, "buildHash()");
 
 # buildHashRef
-my $buildHashRef = $session->db->buildHashRef("select incrementerId,nextValue from incrementer where incrementerId='theBigTest'");
-is($buildHashRef->{theBigTest}, 25, "buildHashRef()");
+my $buildHashRef = $session->db->buildHashRef("select incrementerId from incrementer where incrementerId='theBigTest'");
+is_deeply($buildHashRef, {'theBigTest' => 'theBigTest'}, "buildHashRef() with 1 column");
+
+$buildHashRef = $session->db->buildHashRef("select incrementerId,nextValue from incrementer where incrementerId='theBigTest'");
+is_deeply($buildHashRef, {'theBigTest' => 25}, "buildHashRef() with 2 columns");
+
+$buildHashRef = $session->db->buildHashRef("select incrementerId,incrementerId,nextValue from incrementer where incrementerId='theBigTest'");
+is_deeply($buildHashRef, {'theBigTest:theBigTest' => 25}, "buildHashRef() with 3 columns");
+
+$buildHashRef = $session->db->buildHashRef("select incrementerId,nextValue from incrementer where incrementerId='nonexistantIncrementer'");
+is_deeply($buildHashRef, {}, "buildHashRef() with no results");
 
 # getNextId
 is($session->db->getNextId('theBigTest'), 25, "getNextId()");
