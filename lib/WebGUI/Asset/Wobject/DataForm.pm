@@ -51,22 +51,24 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _createForm {
-    my $self = shift;
-    my $data = shift;
-    my $value = shift;
+    my $self    = shift;
+    my $data    = shift;
+    my $value   = shift;
+    my $session = $self->session;
     # copy select entries
-    my %param = map { $_ => $data->{$_} } qw(name width extras vertical defaultValue options);
-    $param{value} = $value;
-    $param{size} = $param{width};
+    my %param      = map { $_ => $data->{$_} } qw(name width extras vertical defaultValue options);
+    $param{value}  = $value;
+    $param{size}   = $param{width};
     $param{height} = $data->{rows};
 
-    WebGUI::Macro::process($self->session, \( $param{defaultValue} ));
+    WebGUI::Macro::process($session, \( $param{defaultValue} ));
 
-    my $type = "\u$data->{type}";
+    my $type = ucfirst $data->{type};
     my $class = "WebGUI::Form::$type";
-    eval {
-        WebGUI::Pluggable::load("WebGUI::Form::$type");
-    } || return undef;
+    if (!  eval { WebGUI::Pluggable::load("WebGUI::Form::$type"); } ) {
+        $session->log->error( "Unable to load form control - $type" );
+        return undef;
+    }
     if ($type eq "Checkbox") {
         $param{defaultValue} = ($param{defaultValue} =~ /checked/i);
     }
@@ -76,7 +78,7 @@ sub _createForm {
     elsif ( $type eq 'HTMLArea' && $data->{htmlAreaRichEditor} ne '**Use_Default_Editor**') {
         $param{richEditId} = $data->{htmlAreaRichEditor}  ;
     }
-    return $class->new($self->session, \%param);
+    return $class->new($session, \%param);
 }
 
 #-------------------------------------------------------------------
