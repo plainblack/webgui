@@ -1341,7 +1341,8 @@ sub www_deleteFieldConfirm {
     $newSelf->deleteField($self->session->form->process("fieldName"));
     $newSelf->{_mode} = 'form';
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
-    return $newSelf->www_view;
+    my $freshSelf = $newSelf->cloneFromDb();
+    return $freshSelf->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -1365,7 +1366,8 @@ sub www_deleteTabConfirm {
     $newSelf->deleteTab($self->session->form->process("tabId"));
     $newSelf->{_mode} = 'form';
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
-    return $newSelf->www_view;
+    my $freshSelf = $newSelf->cloneFromDb();
+    return $freshSelf->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -1585,11 +1587,12 @@ sub www_editFieldSave {
     }
 
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
+    my $freshSelf = $newSelf->cloneFromDb();
     if ($form->process("proceed") eq "editField") {
-        return $newSelf->www_editField('new');
+        return $freshSelf->www_editField('new');
     }
-    $newSelf->{_mode} = 'form';
-    return $newSelf->www_view;
+    $freshSelf->{_mode} = 'form';
+    return $freshSelf->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -1825,7 +1828,8 @@ sub www_moveFieldDown {
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldDown($fieldName);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
-    return $newSelf->www_view;
+    my $freshSelf = $newSelf->cloneFromDb();
+    return $freshSelf->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -1882,7 +1886,8 @@ sub www_moveFieldUp {
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldUp($fieldName);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
-    return $newSelf->www_view;
+    my $freshSelf = $newSelf->cloneFromDb();
+    return $freshSelf->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -1940,7 +1945,8 @@ sub www_moveTabRight {
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabRight($tabId);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
-    return $newSelf->www_view;
+    my $freshSelf = $newSelf->cloneFromDb();
+    return $freshSelf->www_view;
 }
 
 
@@ -1993,7 +1999,8 @@ sub www_moveTabLeft {
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabLeft($tabId);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
-    return $newSelf->www_view;
+    my $freshSelf = $newSelf->cloneFromDb();
+    return $freshSelf->www_view;
 }
 
 #-------------------------------------------------------------------
