@@ -5,6 +5,7 @@
  - fixed #10954: DataForm fails silently
  - fixed #10950: Thingy
  - fixed #10976: Form::Date not internationalized /DateTime::setToEpoch
+ - fixed #11005: calendar feed workflow
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
@@ -47,6 +48,11 @@
  - fixed #10885: Code Editor breaks Javascript comments
  - fixed #10991: Calendar: bug in Display tab
  - fixed #10987: EMS Schedule -- No Permission Check
+ - fixed #10924: Calendar event in last day of month does not display in month/day view
+ - fixed #10901: Calendar More Button/Display Box IE8 error.
+ - fixed #10954: DataForm fails silently
+ - fixed #10950: Thingy
+ - fixed #10976: Form::Date not internationalized /DateTime::setToEpoch
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread

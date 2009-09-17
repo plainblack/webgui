@@ -57,7 +57,7 @@ use Data::Dumper;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
-plan tests => 14 + scalar @icalWrapTests;
+plan tests => 15 + scalar @icalWrapTests;
 
 my $session = WebGUI::Test->session;
 
@@ -432,6 +432,28 @@ cmp_deeply(
     \@eventBins,
     [ 19 ],
     '... end of day event in proper bin'
+);
+
+######################################################################
+#
+# getFeeds
+#
+######################################################################
+
+my $feedCal = $node->addChild({
+    className => 'WebGUI::Asset::Wobject::Calendar',
+    title     => 'Calendar for doing feed tests',
+});
+
+my $feedTag = WebGUI::VersionTag->getWorking($session);
+$feedTag->set({name=>"Calendar Feed Test"});
+WebGUI::Test->tagsToRollback($feedTag);
+$feedTag->commit;
+
+cmp_deeply(
+    $feedCal->getFeeds(),
+    [],
+    'getFeeds: returns an empty array ref with no feeds'
 );
 
 TODO: {
