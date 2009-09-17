@@ -6,6 +6,7 @@
  - fixed #10950: Thingy
  - fixed #10976: Form::Date not internationalized /DateTime::setToEpoch
  - fixed #11005: calendar feed workflow
+ - fixed #11008: Test::Class
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
