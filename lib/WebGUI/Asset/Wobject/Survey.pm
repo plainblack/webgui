@@ -2480,7 +2480,7 @@ sub www_exportTransposedResults {
     return $self->session->privilege->insufficient()
         if !$self->session->user->isInGroup( $self->get('groupToViewReports') );
 
-    $self->loadTempReportTable( ignoreRevisionDate =>  );
+    $self->loadTempReportTable( ignoreRevisionDate => 1, );
     
     return $self->export( 
         sql => <<END_SQL,
