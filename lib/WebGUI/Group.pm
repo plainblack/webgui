@@ -1113,8 +1113,9 @@ sub new {
 	$self->{_groupId}   = shift;
 	my $override        = shift;
     my $noAdmin         = shift;
+    my $session         = $self->{_session};
 
-    my $cached = $self->{_session}->stow->get("groupObj", { noclone => 1});
+    my $cached = $session->stow->get("groupObj", { noclone => 1});
 	return $cached->{$self->{_groupId}} if ($cached->{$self->{_groupId}});
 
 	bless $self, $class;
@@ -1126,18 +1127,18 @@ sub new {
 	}
     else {
         # Check if the groupId is valid. If not return undef
-        my ($groupExists) = $self->{_session}->db->quickArray('select groupId from groups where groupId=?', [
+        my ($groupExists) = $session->db->quickArray('select groupId from groups where groupId=?', [
             $self->{_groupId},
         ]);
         unless ($groupExists) {
-            $self->{_session}->errorHandler->warn('WebGUI::Group->new called with a non-existant groupId:'
+            $session->errorHandler->warn('WebGUI::Group->new called with a non-existant groupId:'
                 .'['.$self->{_groupId}.']');
             return undef;
         }
     }
 
 	$cached->{$self->{_groupId}} = $self;
-	$self->{_session}->stow->set("groupObj", $cached);
+	$session->stow->set("groupObj", $cached);
 	return $self;
 }
 
