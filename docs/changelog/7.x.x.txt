@@ -51,6 +51,7 @@
  - fixed #11005: calendar feed workflow
  - fixed #11008: Test::Class
  - fixed #11003: Subscribable AssetAspect: no i18n
+ - fixed #11004: Subscribable AssetAspect: handling the subscription group
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread

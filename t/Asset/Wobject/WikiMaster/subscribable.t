@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Group;
 
 #----------------------------------------------------------------------------
 # Init
@@ -36,7 +37,7 @@ WebGUI::Test->tagsToRollback( WebGUI::VersionTag->getWorking( $session ) );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 17;        # Increment this number for each test you create
+plan tests => 20;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test subscribable methods
@@ -91,6 +92,26 @@ ok( !$new_rev->get('skipNotification'), 'addRevision resets skipNotification to 
 
 # notify subscribers
 # subscription content
+
+#----------------------------------------------------------------------------
+# duplication
+
+my $otherWiki = $wiki->duplicate({ skipAutoCommitWorkflows => 1 });
+ok($otherWiki->get('subscriptionGroupId'), 'duplicate: duplicated wiki got a subscription group');
+isnt(
+    $wiki->get('subscriptionGroupId'),
+    $otherWiki->get('subscriptionGroupId'),
+    'and it is a different group from the original wiki'
+);
+
+#----------------------------------------------------------------------------
+# purging
+
+my $otherGroup = $otherWiki->getSubscriptionGroup();
+$otherWiki->purge;
+
+my $groupShouldBeGone = WebGUI::Group->new($session, $otherGroup->getId);
+is(ref $groupShouldBeGone, '', 'purge: cleaned up the subscription group');
 
 #----------------------------------------------------------------------------
 # Cleanup

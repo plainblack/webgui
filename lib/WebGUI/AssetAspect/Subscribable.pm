@@ -62,6 +62,23 @@ sub definition {
 
 #----------------------------------------------------------------------------
 
+=head2 duplicate ( [ options ] )
+
+Subclass the method to create a new group for subscribers for the new asset.
+
+=cut
+
+sub duplicate {
+    my $self        = shift;
+    my $properties  = shift;
+    my $newSelf     = $self->next::method( $properties );
+    $newSelf->update({ subscriptionGroupId => '' });
+    $newSelf->createSubscriptionGroup;
+    return $newSelf;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 addRevision ( properties [, revisionDate, options ] )
 
 Override addRevision to set skipNotification to 0 for each new revision.
@@ -401,6 +418,25 @@ sub notifySubscribers {
         $mail->addFooter;
         $mail->queue;
     }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 purge ( )
+
+Subclass the method to remove the subscription group.
+
+=cut
+
+sub purge {
+    my $self    = shift;
+    my $options = shift;
+
+    my $group   = $self->getSubscriptionGroup();
+    $group->delete;
+    $self->next::method($options);
+
+    return;
 }
 
 #----------------------------------------------------------------------------
