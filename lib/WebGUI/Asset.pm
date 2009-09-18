@@ -1207,7 +1207,7 @@ sub getImportNode {
 
 #-------------------------------------------------------------------
 
-=head2 getIsa ( $session )
+=head2 getIsa ( $session, [ $offset ] )
 
 A class method to return an iterator for getting all Assets by class (and all sub-classes)
 as Asset objects, one at a time.  When the end of the assets is reached, then the iterator
@@ -1219,6 +1219,15 @@ my $productIterator = WebGUI::Asset::Product->getIsa($session);
 while (my $product = $productIterator->()) {
   ##Do something useful with $product
 }
+
+=head3 $session
+
+A reference to a WebGUI::Session object.
+
+=head3 $offset
+
+An offset, from the beginning of the results returned from the query, to really begin
+returning results.  This allows very large sets of results to be handled in chunks.
 
 =cut
 
