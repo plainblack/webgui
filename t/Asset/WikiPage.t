@@ -93,10 +93,3 @@ TODO: {
     ok(0, 'Lots and lots to do');
 }
 
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-	$secondVersionTag->rollback();
-	$thirdVersionTag->rollback();
-}
-
