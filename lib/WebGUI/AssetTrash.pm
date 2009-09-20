@@ -149,7 +149,7 @@ sub purge {
 		# Technically get lineage should never return an undefined object from getLineage when called like this, but it did so this saves the world from destruction.
         if (defined $kid) {
             unless ($kid->purge) {
-                $self->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
+                $session->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
                 $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
                 return 0;
             }
