@@ -519,12 +519,15 @@ is ($privs, "3\n3\n3", '... correct group contents, deep storage subdir');
 #
 ####################################################
 
+my $cdnTestPath = File::Temp::tempdir();
+my $cdnQueueTestPath = File::Temp::tempdir();
+
 my $cdnCfg = {
     "enabled"       => 1,
-    "url"           => "file:///data/storage",
-    "queuePath"     => "/data/cdnqueue",
-    "syncProgram"   => "cp -r -- '%s' /data/storage/",
-    "deleteProgram" => "rm -r -- '/data/storage/%s' > /dev/null 2>&1"
+    "url"           => "file://$cdnTestPath",
+    "queuePath"     => $cdnQueueTestPath,
+    "syncProgram"   => "cp -r -- '%s' $cdnTestPath/",
+    "deleteProgram" => "rm -r -- '$cdnTestPath/%s' > /dev/null 2>&1"
 };
 my ($addedCdnQ, $addedCdnU);
 $addedCdnQ = mkdir $cdnCfg->{'queuePath'}  unless -e $cdnCfg->{'queuePath'};
