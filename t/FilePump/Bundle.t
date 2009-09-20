@@ -417,8 +417,9 @@ ok(-e $cssFile->stringify   && -f _ && -s _, '... minified CSS file built, not e
 ok(-e $otherFile->stringify && -f _ && -s _, '... other file copied over, not empty');
 ok(-e $otherDir->stringify  && -d _ ,        '... other directory copied over');
 
+my @sortedChildren = sort { lc $a cmp lc $b } map { $_->basename } $otherDir->children;
 cmp_deeply(
-    [ map { $_->basename } $otherDir->children ],
+    \@sortedChildren,
     [ qw/addendum ShawshankRedemptionMoviePoster.jpg/ ],
     '... File copied over to new directory'
 );
