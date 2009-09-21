@@ -18,6 +18,7 @@ use WebGUI::Storage;
 use WebGUI::PseudoRequest;
 
 use File::Spec;
+use File::Temp qw/tempdir/;
 use Test::More;
 use Test::Deep;
 use Test::MockObject;
@@ -519,8 +520,8 @@ is ($privs, "3\n3\n3", '... correct group contents, deep storage subdir');
 #
 ####################################################
 
-my $cdnTestPath = File::Temp::tempdir();
-my $cdnQueueTestPath = File::Temp::tempdir();
+my $cdnTestPath      = tempdir();
+my $cdnQueueTestPath = tempdir();
 
 my $cdnCfg = {
     "enabled"       => 1,
