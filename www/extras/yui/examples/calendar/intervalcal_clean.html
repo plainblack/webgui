@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Interval Selection Calendar</title>
 
@@ -48,7 +50,7 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
     <cite class="byline">The <code>IntervalCalendar</code> class and example is based on the <a target="_blank" href="http://blogs.whardy.com/john/2008/05/27/interval-calendar-control/"><code>iCalendarGroup</code></a> class, graciously contributed to YUI by John Peloquin, of <a target="_blank" href="http://www.whardy.com/">W. Hardy Interactive, Inc.</a>.</cite>
 
@@ -310,7 +312,7 @@ body {
                 this.deselectAll();
 
                 // Get individual date deselected and page containing it
-                var d = a[0];
+                var d = a[0][0];
                 var date = YAHOO.widget.DateMath.getDate(d[0], d[1] - 1, d[2]);
                 var page = this.getCalendarPage(date);
                 if(page) {

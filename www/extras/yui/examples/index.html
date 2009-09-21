@@ -2,6 +2,8 @@
 <html>
 <head>
 	<title>Yahoo! User Interface Library (YUI): Index of Library Examples</title>
+    
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     	<link rel="stylesheet" type="text/css" href="../assets/yui.css" >
 
@@ -9,12 +11,11 @@
 /*Supplemental CSS for the YUI distribution*/
 #custom-doc { width: 95%; min-width: 950px; }
 #pagetitle {background-image: url(../assets/bg_hd.gif);}
-#pagetitle h1 {background-image: url(../assets/title_h_bg.gif);}
-
 </style>
 
 <!--Script and CSS includes for YUI dependencies on this page-->
-<script type="text/javascript" src="../../build/yuiloader-dom-event/yuiloader-dom-event.js"></script>
+<script type="text/javascript" src="../../build/yuiloader/yuiloader-min.js"></script>
+<script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
 
 <script type="text/javascript">
 //enable passthrough of errors from YUI Event:
@@ -64,7 +65,7 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 	
 <h1 class="firstContent">YUI Library: Index of Official Examples</h1>
 	
-<p>Every YUI Library component ships with a series of 298 examples that illustrate its implementation.  These examples can serve as starting points for your exploration of YUI, as code snippets to get you started in your own programming, or simply as an inspiration as to how various interaction patterns can be enabled in the web browser via YUI.</p>
+<p>Every YUI Library component ships with a series of 342 examples that illustrate its implementation.  These examples can serve as starting points for your exploration of YUI, as code snippets to get you started in your own programming, or simply as an inspiration as to how various interaction patterns can be enabled in the web browser via YUI.</p>
 
 <p>The navigation controls on the left side of this page allow you to explore these examples component-by-component; on this page you'll find the full index of library examples with a link to and short description of each one.</p>
 
@@ -103,13 +104,14 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='odd'><td class='title'><a href='grids/grids-t4.html'>Preset Template 4, 180px right</a></td><td class='description'>Use Grids' preset templates to put a 180px narrow column on the right side.</td></tr>
 <tr class='even'><td class='title'><a href='grids/grids-t5.html'>Preset Template 5, 240px right</a></td><td class='description'>Use Grids' preset templates to put a 240px narrow column on the right side.</td></tr>
 <tr class='odd'><td class='title'><a href='grids/grids-t6.html'>Preset Template 6, 300px right</a></td><td class='description'>Use Grids' preset templates to put a 300px narrow column on the right side.</td></tr>
-<tr class='even'><td class='title'><a href='grids/grids-g.html'>Standard Nesting Grid (1/2 - 1/2)</a></td><td class='description'>The buiding block of nested grids is the Standard Nesting Grid which creates to evenly-wide child columns. Learn how in this example.</td></tr>
+<tr class='even'><td class='title'><a href='grids/grids-g.html'>Standard Nesting Grid (1/2 - 1/2)</a></td><td class='description'>The buiding block of nested grids is the Standard Nesting Grid which creates two evenly-wide child columns. Learn how in this example.</td></tr>
 <tr class='odd'><td class='title'><a href='grids/grids-gb.html'>Special Nesting Grid "B" (1/3, 1/3, 1/3)</a></td><td class='description'>What you need an odd number of columns, or unevenly divided space, use Special Nesting Grids instead of Standard Nesting Grids.</td></tr>
 <tr class='even'><td class='title'><a href='grids/grids-gc.html'>Special Nesting Grid "C" (2/3, 1/3)</a></td><td class='description'>Create two uneven columns with this Special Nesting Grid.</td></tr>
 <tr class='odd'><td class='title'><a href='grids/grids-gd.html'>Special Nesting Grid "D" (1/3, 2/3)</a></td><td class='description'>Create two uneven columns with this Special Nesting Grid.</td></tr>
 <tr class='even'><td class='title'><a href='grids/grids-ge.html'>Special Nesting Grid "E" (3/4, 1/4)</a></td><td class='description'>Create two uneven columns with this Special Nesting Grid.</td></tr>
 <tr class='odd'><td class='title'><a href='grids/grids-gf.html'>Special Nesting Grid "F" (1/4, 3/4)</a></td><td class='description'>Create two uneven columns with this Special Nesting Grid.</td></tr>
 <tr class='even'><td class='title'><a href='grids/grids-gg.html'>Nested Standard Nesting Grids (1/4 - 1/4 - 1/4 - 1/4)</a></td><td class='description'>Create more than 2 (or 3) columns by nesting grids. This example shows a four-column even-width layout achieved by nesting Standard Nesting Grids inside of Standard Nesting Grids.</td></tr>
+<tr class='odd'><td class='title'><a href='grids/grids-landmarks.html'>Using ARIA Landmark Roles With Grids</a></td><td class='description'>The ARIA Landmark Roles improve the accessibility of layouts created using Grids by allowing developers to more accurately communicate to users of screen readers the intended purpose of each section of a document or application.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -143,6 +145,7 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='even'><td class='title'><a href='event/custom-event.html'>Using Custom Events</a></td><td class='description'>Custom Events are an excellent way to publish and subscribe to interesting moments in your own scripts.</td></tr>
 <tr class='odd'><td class='title'><a href='event/event-timing.html'>Using onAvailable, onContentReady, and onDOMReady</a></td><td class='description'>Event Utility gives you control over when you execute your scripts.  In addition to the window's <code>load</code> event, Event Utility lets you know when an element is available, when its children are available, and when the page's full DOM is available.</td></tr>
 <tr class='even'><td class='title'><a href='event/event-delegation.html'>Using Event Utility and Event Delegation to Improve Performance</a></td><td class='description'>Assigning events to parent elements allows you to listen for those same events on descendant elements, reducing the number of event listeners you need in your application.</td></tr>
+<tr class='odd'><td class='title'><a href='event/event-focus-blur.html'>Skinning via Progressive Enhancement using the Event Utility and the YUILoader</a></td><td class='description'>Using Progressive Enhancement to skin checkboxes with the help of the YUILoader and the Event Utility's "focus" and "blur" events and the "delegate" method.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -176,7 +179,7 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h3>Browser History Manager (beta)</h3></th></tr></thead>
+<tr><th class='title' colspan='2'><h3>Browser History Manager</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='history/history-navbar.html'>Simple Navigation Bar</a></td><td class='description'>Use the Browser History Manager to "ajaxify" a simple navigation bar without compromising the use of the back/forward buttons.</td></tr>
 <tr class='even'><td class='title'><a href='history/history-tabview.html'>TabView Control</a></td><td class='description'>The Browser History Manager is used here to remember which tabs have been visited.</td></tr>
@@ -192,13 +195,14 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='even'><td class='title'><a href='connection/post.html'>Connection Manager POST Transaction</a></td><td class='description'>Explores the use of HTTP POST to send data to the server and retrieve the server's response.</td></tr>
 <tr class='odd'><td class='title'><a href='connection/abort.html'>Connection Manager Transaction Timeout</a></td><td class='description'>Connection Manager's built-in transaction timeout feature allows you to abort requests that are too slow in returning data.</td></tr>
 <tr class='even'><td class='title'><a href='connection/weather.html'>Retrieving a Yahoo! Weather RSS Feed</a></td><td class='description'>Demonstrates how to retrieve XML data from a web service and make use of that information within the page.</td></tr>
-<tr class='odd'><td class='title'><a href='connection/global_customevents.html'>Subscribing to Connection Manager Global Events</a></td><td class='description'>Subscribe to Custom Events for an aspect-oriented approach to managing transactions and response data.</td></tr>
-<tr class='even'><td class='title'><a href='connection/callback_customevents.html'>Subscribing to Connection Manager's Custom Events via the Callback Object</a></td><td class='description'>Target and handle Custom Events for specific transactions using the callback object.</td></tr>
+<tr class='odd'><td class='title'><a href='connection/xdr.html'>Cross-Domain Transactions with Connection Manager</a></td><td class='description'>This example demonstrates a cross-domain request using the alternate Flash transport.</td></tr>
+<tr class='even'><td class='title'><a href='connection/global_customevents.html'>Subscribing to Connection Manager Global Events</a></td><td class='description'>Subscribe to Custom Events for an aspect-oriented approach to managing transactions and response data.</td></tr>
+<tr class='odd'><td class='title'><a href='connection/callback_customevents.html'>Subscribing to Connection Manager's Custom Events via the Callback Object</a></td><td class='description'>Target and handle Custom Events for specific transactions using the callback object.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h3>Cookie Utility (beta)</h3></th></tr></thead>
+<tr><th class='title' colspan='2'><h3>Cookie Utility</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='cookie/cookie-simple-example.html'>Simple Cookie Example</a></td><td class='description'>Demonstrates basic usage of the Cookie utility for reading and writing cookies.</td></tr>
 <tr class='even'><td class='title'><a href='cookie/cookie-advanced-example.html'>Advanced Cookie Example</a></td><td class='description'>Demonstrates using the Cookie utility to get, set and remove cookies.</td></tr>
@@ -209,6 +213,8 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <thead>
 <tr><th class='title' colspan='2'><h3>DataSource Utility</h3></th></tr></thead>
 <tbody>
+<tr class='odd'><td class='title'><a href='datasource/datasource_table_to_array.html'>Extracting data from an HTML table</a></td><td class='description'>Extract data from an HTML table into an array of object records</td></tr>
+<tr class='even'><td class='title'><a href='datasource/datasource_yql.html'>YQLDataSource</a></td><td class='description'>YQLDataSource is a subclass of ScriptNodeDataSource that makes it easy to work with YQL data.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -230,8 +236,9 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <thead>
 <tr><th class='title' colspan='2'><h3>Get Utility</h3></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='get/get-script-basic.html'>Getting a Script Node with JSON Data</a></td><td class='description'>This example illustrates the simple use case in which the Get Utility is used to retrieve JSON data from a web service.</td></tr>
-<tr class='even'><td class='title'><a href='get/get-css-basic.html'>Getting CSS Style Sheets</a></td><td class='description'>Attach and remove stylesheets using the Get Utility.</td></tr>
+<tr class='odd'><td class='title'><a href='get/get-script-simple.html'>Quickstart Example: Getting a Script File with YUI Get</a></td><td class='description'>This example illustrates the simplest use case in which the Get Utility is used to retrieve a script file.</td></tr>
+<tr class='even'><td class='title'><a href='get/get-script-basic.html'>Getting a Script Node with JSON Data from a Web Service</a></td><td class='description'>This example shows how to retrieve JSON data from a web service using the YUI Get Utility and how to then display that data on the page.</td></tr>
+<tr class='odd'><td class='title'><a href='get/get-css-basic.html'>Getting CSS Style Sheets</a></td><td class='description'>Attach and remove stylesheets using the Get Utility.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -249,6 +256,8 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr><th class='title' colspan='2'><h3>JSON Utility</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='json/json_connect.html'>JSON with Connection Manager</a></td><td class='description'>Use the JSON Utility to parse data received from Connection Manager calls</td></tr>
+<tr class='even'><td class='title'><a href='json/json_freeze_thaw.html'>Rebuilding class instances from JSON data</a></td><td class='description'>Using the replacer and reviver parameters to reconstitute object instances</td></tr>
+<tr class='odd'><td class='title'><a href='json/json_convert_values.html'>Adding new object members during parsing</a></td><td class='description'>Using a currency conversion calculation to add a new price member to a JSON response</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -267,6 +276,22 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 </table>
 <table class='examplesTable'>
 <thead>
+<tr><th class='title' colspan='2'><h3>SWF Utility</h3></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='swf/swf-simple.html'>Simple SWF Utility Example</a></td><td class='description'>A demonstration of core features of the SWF Utility. In this example, we create an instance of a SWF using a sample SWF file, and embed it into the page.</td></tr>
+<tr class='even'><td class='title'><a href='swf/swf-advanced.html'>Advanced SWF Utility Example With Flashvars and Javascript interaction</a></td><td class='description'>This advanced SWF example shows how to use a corresponding YUIBridge library on the SWF side to call methods and receive events from the SWF</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h3>SWFStore Utility</h3></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='swfstore/swfstore-advanced-example.html'>SWFStore Advanced Example</a></td><td class='description'>Shows how to get, set, and remove items from storage using the YUI SWFStore utility and a DataTable</td></tr>
+<tr class='even'><td class='title'><a href='swfstore/swfstore-settings-example.html'>SWFStore Settings Example</a></td><td class='description'>Shows how to increase storage on a client machine.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
 <tr><th class='title' colspan='2'><h3>Selector Utility</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='selector/query.html'>Using query</a></td><td class='description'>The <code>query</code> method retrieves an array of DOM elements that match the provided selector.</td></tr>
@@ -275,7 +300,23 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h3>YUI Loader Utility (beta)</h3></th></tr></thead>
+<tr><th class='title' colspan='2'><h3>Storage Utility</h3></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='storage/storage-simple.html'>Simple Storage Example &mdash; Saving In-Progress Text Entry</a></td><td class='description'>This example demonstrates a very simple use case for the Storage Utility.</td></tr>
+<tr class='even'><td class='title'><a href='storage/storage-advanced.html'>Advanced Storage Example</a></td><td class='description'>A demonstration of how to use the Storage Utility with a variety of storage techniques.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h3>StyleSheet Utility</h3></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='stylesheet/stylesheet_theme.html'>Using StyleSheet to create a page theme</a></td><td class='description'>Use the StyleSheet Utility to adjust a page's theme by styling page elements on the fly.</td></tr>
+<tr class='even'><td class='title'><a href='stylesheet/stylesheet_anim_multi.html'>Animating multiple elements with StyleSheet</a></td><td class='description'>Using a single Anim instance with StyleSheet to animate multiple elements.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h3>YUI Loader Utility</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='yuiloader/yl-basic.html'>Using YUI Loader to Load the Calendar Control</a></td><td class='description'>This example demonstrates a simple implementation in which we bring in the YUI Calendar Control &mdash; and its JavaScript and CSS dependencies &mdash; using the YUI Loader Utility.</td></tr>
 <tr class='even'><td class='title'><a href='yuiloader/yl-insert.html'>Using YUI Loader to Place Additional Components on a Page</a></td><td class='description'>In some cases, you may wish to use YUI Loader to bring additional components into a page that already contains some YUI content.  In this example, we'll look at how to use YUI Loader to augment a page's existing YUI content by bringing in additional dependencies for a new component.</td></tr>
@@ -290,17 +331,18 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tbody>
 <tr class='odd'><td class='title'><a href='autocomplete/ac_basic_array.html'>Basic Local Data</a></td><td class='description'>Demonstrates the use of a manageably large JavaScript array to provide responsive, in-memory AutoComplete functionality without relying on a server-side component.</td></tr>
 <tr class='even'><td class='title'><a href='autocomplete/ac_basic_xhr.html'>Basic Remote Data</a></td><td class='description'>Uses an XHRDataSource to point to an online script serving delimited text data</td></tr>
-<tr class='odd'><td class='title'><a href='autocomplete/ac_xhr_customrequest.html'>Customizing Remote Requests</a></td><td class='description'>Uses an XHRDataSource plus a local proxy to point to the Yahoo! Search webservice. The generateRequest() method must be customized to comply with the third-party API.</td></tr>
-<tr class='even'><td class='title'><a href='autocomplete/ac_formatting_proxyless.html'>Custom Formatting, with a Proxyless Remote DataSource</a></td><td class='description'>Uses a ScriptNodeDataSource to point to the Yahoo! Autdio Search webservice without a proxy. The generateRequest() method must be customized to comply with the third-party API. A custom formatResults() method has been defined to show thumbnail images within the results container.</td></tr>
-<tr class='odd'><td class='title'><a href='autocomplete/ac_itemselect.html'>Searching Field A, Submitting Field B with itemSelectEvent</a></td><td class='description'>Uses itemSelectEvent to allow the user to search by name, but sumbits ID for the server to consume.</td></tr>
-<tr class='even'><td class='title'><a href='autocomplete/ac_combobox.html'>Combo Box</a></td><td class='description'>Combobox example also demonstrates CSS required to support multiple stacked instances.</td></tr>
-<tr class='odd'><td class='title'><a href='autocomplete/ac_tags_alwaysshow.html'>Tagging Example with alwaysShowContainer</a></td><td class='description'>Uses alwaysShowContainer to display and filter tags.</td></tr>
-<tr class='even'><td class='title'><a href='autocomplete/ac_fn_multfields.html'>Custom Function to Search Different Fields at Runtime</a></td><td class='description'>Searches different fields of a two-dimensional array on the fly</td></tr>
-<tr class='odd'><td class='title'><a href='autocomplete/ac_ysearch_json.html'>Centering AutoComplete On a Page</a></td><td class='description'>Illustrates how to customize AutoComplete to be centered on a page.</td></tr>
-<tr class='even'><td class='title'><a href='autocomplete/ac_ysearch_flat.html'>Subset Matching</a></td><td class='description'>Demonstrates how queryMatchSubset can be enabled to maximize caching. Note the custom CSS that is needed for stacking AutoComplete instances.</td></tr>
-<tr class='odd'><td class='title'><a href='autocomplete/ac_flickr_xml.html'>Find Photos on Flickr</a></td><td class='description'>Uses AutoComplete to find photos on Flickr by tag, and keeps a collection of selected photos on the page.</td></tr>
-<tr class='even'><td class='title'><a href='autocomplete/ac_customize.html'>Configurations Dashboard</a></td><td class='description'>An interactive dashboard that allows you to manipulate many of AutoComplete's built-in configuration options and explore the impact of those changes on the UI.</td></tr>
-<tr class='odd'><td class='title'><a href='autocomplete/ac_skinning.html'>Skinning Model</a></td><td class='description'>Explanation of AutoComplete's skinning model.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_accessible.html'>Screenreader Accessibility</a></td><td class='description'>A screenreader-accessible Autocomplete example.</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_xhr_customrequest.html'>Customizing Remote Requests</a></td><td class='description'>Uses an XHRDataSource plus a local proxy to point to the Yahoo! Search webservice. The generateRequest() method must be customized to comply with the third-party API.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_formatting_proxyless.html'>Custom Formatting, with a Proxyless Remote DataSource</a></td><td class='description'>Uses a ScriptNodeDataSource to point to the Yahoo! Autdio Search webservice without a proxy. The generateRequest() method must be customized to comply with the third-party API. A custom formatResults() method has been defined to show thumbnail images within the results container.</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_itemselect.html'>Searching Field A, Submitting Field B with itemSelectEvent</a></td><td class='description'>Uses itemSelectEvent to allow the user to search by name, but sumbits ID for the server to consume.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_combobox.html'>Combobox, with CSS for Multiple Stacked Instances</a></td><td class='description'>This Combobox example also demonstrates CSS required to support multiple stacked instances.</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_tags_alwaysshow.html'>Tagging Example with alwaysShowContainer</a></td><td class='description'>Uses alwaysShowContainer to display and filter tags.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_fn_multfields.html'>FunctionDataSource to Search Multiple Fields of an Address Book at Runtime</a></td><td class='description'>Searches against first name, last name, and nickname using a FunctionDataSource</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_ysearch_json.html'>Centering AutoComplete On a Page</a></td><td class='description'>Illustrates how to customize AutoComplete to be centered on a page.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_ysearch_flat.html'>Subset Matching</a></td><td class='description'>Demonstrates how queryMatchSubset can be enabled to maximize caching. Note the custom CSS that is needed for stacking AutoComplete instances.</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_flickr_xml.html'>Find Photos on Flickr</a></td><td class='description'>Uses AutoComplete to find photos on Flickr by tag, and keeps a collection of selected photos on the page.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_customize.html'>Configurations Dashboard</a></td><td class='description'>An interactive dashboard that allows you to manipulate many of AutoComplete's built-in configuration options and explore the impact of those changes on the UI.</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_skinning.html'>Skinning Model</a></td><td class='description'>Explanation of AutoComplete's skinning model.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -322,6 +364,8 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='odd'><td class='title'><a href='button/btn_example13.html'>Glowing Button</a></td><td class='description'>This example demonstrates how to skin a Button instance to create a glossy, glass-like effect with a glowing background reminiscent of Aqua buttons found in Mac OS X.</td></tr>
 <tr class='even'><td class='title'><a href='button/btn_example14.html'>Slider Button</a></td><td class='description'>This example demonstrates how to combine a Split Button with a Slider to create an opacity slider button, similar to that found in Adobe Photoshop.</td></tr>
 <tr class='odd'><td class='title'><a href='button/button-ariaplugin.html'>Using the Button ARIA Plugin</a></td><td class='description'>The Button ARIA plugin makes it easy to use the WAI-ARIA Roles and States with the Button control.</td></tr>
+<tr class='even'><td class='title'><a href='button/button-menu-select.html'>Using A Menu Button To Replace A &#60;select&#62; Element</a></td><td class='description'>This example illustrates how to use Button to mimic the behavior of an HTML <code>&#60;select&#62;</code> element.</td></tr>
+<tr class='odd'><td class='title'><a href='button/button-menu-swap.html'>Replacing the content of a Button's Menu</a></td><td class='description'>This example illustrates how to replace the content of a Button's Menu on the fly.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -337,12 +381,13 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='odd'><td class='title'><a href='calendar/formtxt.html'>Calendar and Text Fields</a></td><td class='description'>Populate a form's text input field using the Calendar's selected date and vice versa.</td></tr>
 <tr class='even'><td class='title'><a href='calendar/formsel.html'>Calendar and Select Fields</a></td><td class='description'>Populate a series of form select input fields using the Calendar's selected date and vice versa.</td></tr>
 <tr class='odd'><td class='title'><a href='calendar/render.html'>Using the Render Stack</a></td><td class='description'>Customize how specific dates or date ranges are rendered by plugging in custom renderers.</td></tr>
-<tr class='even'><td class='title'><a href='calendar/popup.html'>Popup Calendar</a></td><td class='description'>Configure either Calendar or CalendarGroup for use as a popup layer that is displayed above the document.</td></tr>
+<tr class='even'><td class='title'><a href='calendar/popup.html'>Popup Calendar - Basic</a></td><td class='description'>Configure either Calendar or CalendarGroup for use as a popup layer that is displayed above the document.</td></tr>
+<tr class='odd'><td class='title'><a href='calendar/calcontainer.html'>Popup Calendar - Advanced</a></td><td class='description'>This example wraps Calendar in a Dialog control to provide positioning, button and potentially dragdrop support</td></tr>
+<tr class='even'><td class='title'><a href='calendar/intervalcal.html'>Interval Selection Calendar</a></td><td class='description'>This example provides an IntervalCalendar class, a custom version of CalendarGroup which can be used to select start and end dates for date intervals.</td></tr>
 <tr class='odd'><td class='title'><a href='calendar/germany.html'>Localization - Germany</a></td><td class='description'>Use localization features to customize the Calendar for use in Germany.</td></tr>
 <tr class='even'><td class='title'><a href='calendar/japan.html'>Localization - Japan</a></td><td class='description'>Use localization features to customize the CalendarGroup for use in Japan.</td></tr>
-<tr class='odd'><td class='title'><a href='calendar/calcontainer.html'>Calendar inside a Container</a></td><td class='description'>This example wraps Calendar in a Dialog control to provide positioning, button and potentially dragdrop support</td></tr>
-<tr class='even'><td class='title'><a href='calendar/intervalcal.html'>Interval Selection Calendar</a></td><td class='description'>This example provides an IntervalCalendar class, a custom version of CalendarGroup which can be used to select start and end dates for date intervals.</td></tr>
-<tr class='odd'><td class='title'><a href='calendar/calskin.html'>Skinning The Calendar</a></td><td class='description'>YUI has a default skin for it's controls called "Sam Skin". This example shares the CSS rules which make up "Sam Skin" for the Calendar and CalendarGroup controls.</td></tr>
+<tr class='odd'><td class='title'><a href='calendar/taiwan.html'>Localization - Taiwan (Year Offset)</a></td><td class='description'>Use the YEAR_OFFSET property to customize a Calendar for use in Taiwan (zh-TW), for which the year is 1911 years behind the Gregorian calendar.</td></tr>
+<tr class='even'><td class='title'><a href='calendar/calskin.html'>Skinning The Calendar</a></td><td class='description'>YUI has a default skin for it's controls called "Sam Skin". This example shares the CSS rules which make up "Sam Skin" for the Calendar and CalendarGroup controls.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -354,12 +399,16 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='odd'><td class='title'><a href='carousel/csl_reveal.html'>Partially revealing previous and next items</a></td><td class='description'>Demonstrates partial revealing of previous and next items in the Carousel Control.</td></tr>
 <tr class='even'><td class='title'><a href='carousel/csl_imagentext.html'>Using both images and text within an item</a></td><td class='description'>Demonstrates the use of both images and text within an item in the Carousel Control.</td></tr>
 <tr class='odd'><td class='title'><a href='carousel/csl_dynload2.html'>Using Ajax for deferred loading of items</a></td><td class='description'>Demonstrates the use of Ajax for deferred loading of items in the Carousel Control.</td></tr>
+<tr class='even'><td class='title'><a href='carousel/csl_dynloadandreplace.html'>Using deferred loading of items and Carousel's built-in paginator</a></td><td class='description'>Demonstrates deferred loading of items with the replaceItem method to support Carousel's built-in paginator.</td></tr>
+<tr class='odd'><td class='title'><a href='carousel/csl_multirow.html'>Multi-row example</a></td><td class='description'>Using Carousel to display an album of images.</td></tr>
+<tr class='even'><td class='title'><a href='carousel/csl_paginationtemplate.html'>Pagination template example</a></td><td class='description'>Using Carousel to display customized pagination information.</td></tr>
+<tr class='odd'><td class='title'><a href='carousel/csl_pagination.html'>Using Paginator with Carousel</a></td><td class='description'>Demonstrates the use of Paginator for navigating the Carousel control.</td></tr>
 <tr class='even'><td class='title'><a href='carousel/carousel-ariaplugin.html'>Using the Carousel ARIA Plugin</a></td><td class='description'>The Carousel ARIA plugin makes it easy to use the WAI-ARIA Roles and States with the Carousel control.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h3>Charts Control (experimental)</h3></th></tr></thead>
+<tr><th class='title' colspan='2'><h3>Charts Control</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='charts/charts-quickstart.html'>Charts Quickstart Example</a></td><td class='description'>A demonstration of the Chart control's basic features.</td></tr>
 <tr class='even'><td class='title'><a href='charts/charts-legend.html'>Chart with Legend Example</a></td><td class='description'>Creates a PieChart with an HTML legend.</td></tr>
@@ -367,6 +416,13 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='even'><td class='title'><a href='charts/charts-datatable.html'>Chart and DataTable Example</a></td><td class='description'>A Chart and a DataTable share the same DataSource.</td></tr>
 <tr class='odd'><td class='title'><a href='charts/charts-xhr-polling.html'>Chart with DataSource Polling</a></td><td class='description'>A Chart polls a DataSource that frequently loads new data through XHR.</td></tr>
 <tr class='even'><td class='title'><a href='charts/charts-stacked.html'>Stacked Bar Chart</a></td><td class='description'>Creates a StackedBarChart</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-tabview.html'>Charts in a TabView</a></td><td class='description'>Creates a TabView containing different Chart types</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-rotation.html'>Column Chart with Rotated Title and Labels</a></td><td class='description'>Creates a ColumnChart with a rotated title on the y-axis and rotated labels on the x-axis.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-styles.html'>Styling Lines, Borders and Fills</a></td><td class='description'>Creates a LineChart with styled series and a highlighted zero gridline.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-dualaxes.html'>Chart with 2 Numeric Axes</a></td><td class='description'>Creates a LineChart with a different axis for each series.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-hideseries.html'>Hide series in a chart.</a></td><td class='description'>Creates a line chart in which the series can be hidden.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-seriescustomization.html'>Customize series items</a></td><td class='description'>Creates a chart and differentiates individual series through custom properties.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-functionscope.html'>Apply scope to label functions</a></td><td class='description'>Creates a chart and set functions with a defined scope to the chart.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -412,22 +468,29 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='odd'><td class='title'><a href='datatable/dt_nestedheaders.html'>Nested Headers</a></td><td class='description'>Nested column headers.</td></tr>
 <tr class='even'><td class='title'><a href='datatable/dt_xhrjson.html'>JSON Data Over XHR</a></td><td class='description'>The display of tabular JSON data retrieved via XHR.</td></tr>
 <tr class='odd'><td class='title'><a href='datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></td><td class='description'>The display of XML data retrieved via an XHR POST request.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_xhrtext.html'>Textual Data Over XHR</a></td><td class='description'>The display of textual data retrieved over XHR</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_xhrlocalxml.html'>Local XML Data</a></td><td class='description'>The display of XML data placed locally within the page by Connection Manager.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_rowadddelete.html'>Adding and Deleting Rows</a></td><td class='description'>Adding and deleting rows with dynamic data.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_clientpagination.html'>Client-side Pagination</a></td><td class='description'>The use of client-side pagination to break up a dataset into manageable, page-sized chunks.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_clientsorting.html'>Client-side Sorting</a></td><td class='description'>Client-side Column sort using a custom function.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_dynamicdata.html'>Server-side Pagination and Sorting for Dynamic Data</a></td><td class='description'>Server-side pagination and sorting for dynamic data.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_xpath.html'>XML Data with XPath</a></td><td class='description'>Accessing XML data with XPath-syntax locators.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_xhrtext.html'>Textual Data Over XHR</a></td><td class='description'>The display of textual data retrieved over XHR</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_polling.html'>Polling the DataSource</a></td><td class='description'>Polling the DataSource for data at regular intervals</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_rowdatamod.html'>Adding, Updating, and Deleting Rows</a></td><td class='description'>Adding, updating, and deleting row data.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_clientpagination.html'>Client-side Pagination</a></td><td class='description'>The use of client-side pagination to break up a dataset into manageable, page-sized chunks.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_clientsorting.html'>Client-side Sorting</a></td><td class='description'>Client-side Column sort using a custom function.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_dynamicdata.html'>Server-side Pagination and Sorting for Dynamic Data</a></td><td class='description'>Server-side pagination and sorting for dynamic data.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_bhm.html'>Integrating Browser History Manager with Server-side Pagination and Sorting</a></td><td class='description'>Integration of Browser History Manager and DataTable, with server-side pagination and sorting enabled.</td></tr>
 <tr class='even'><td class='title'><a href='datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></td><td class='description'>Scrolling along x, y, or xy axes.</td></tr>
 <tr class='odd'><td class='title'><a href='datatable/dt_rowselect.html'>Row Selection</a></td><td class='description'>Row selection models.</td></tr>
 <tr class='even'><td class='title'><a href='datatable/dt_cellselect.html'>Cell Selection</a></td><td class='description'>Cell selection models.</td></tr>
 <tr class='odd'><td class='title'><a href='datatable/dt_cellediting.html'>Inline Cell Editing</a></td><td class='description'>Implementing inline cell editing.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_contextmenu.html'>Context Menu Integration</a></td><td class='description'>Integration of DataTable with the the <a href='http://developer.yahoo.com/yui/menu'>Menu Control</a>'s ContextMenu feature.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_colshowhide.html'>Showing, Hiding, and Reordering Columns.</a></td><td class='description'>Showing, hiding, and reordering Columns.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></td><td class='description'>Enable highlighting on cells, rows, or columns</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_complex.html'>Complex Example of Multiple Features</a></td><td class='description'>Several features combined into one DataTable.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></td><td class='description'>Use an AutoComplete Control to filter Datatable results.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_skinning.html'>Skinning Model</a></td><td class='description'>An explanation of DataTable's skinning model.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_colshowhide.html'>Showing, Hiding, and Reordering Columns.</a></td><td class='description'>Showing, hiding, and reordering Columns.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></td><td class='description'>Enable highlighting on cells, rows, or columns</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_ddrows.html'>Reorder Rows with Drag and Drop</a></td><td class='description'>Integration of DataTable with <a href='http://developer.yahoo.com/yui/dragdrop'>Drag and Drop</a> to enable row reordering.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_rowexp_basic.html'>Row Expansion</a></td><td class='description'>A demonstration of the DataTable's row expansion feature to display a list of "Interestingness" from Flickr.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_contextmenu.html'>Context Menu Integration</a></td><td class='description'>Integration of DataTable with the <a href='http://developer.yahoo.com/yui/menu'>Menu Control</a>'s ContextMenu feature.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_tabview.html'>TabView Integration</a></td><td class='description'>Integration of DataTable with the the <a href='http://developer.yahoo.com/yui/menu'>Menu Control</a>'s ContextMenu feature.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_complex.html'>Complex Example of Multiple Features</a></td><td class='description'>Several features combined into one DataTable.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_localfilter.html'>Client-side Filtering of Local Data</a></td><td class='description'>Filtering of local data with an input field.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_dynamicfilter.html'>Filtering of Dynamic Data</a></td><td class='description'>Filtering of dynamic data through Menu Button controls.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></td><td class='description'>Use an AutoComplete Control to filter Datatable results.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_skinning.html'>Skinning Model</a></td><td class='description'>An explanation of DataTable's skinning model.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -493,8 +556,18 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tbody>
 <tr class='odd'><td class='title'><a href='paginator/pag_getting_started.html'>Getting started with Paginator</a></td><td class='description'>A demonstration of the basic setup of a Paginator.</td></tr>
 <tr class='even'><td class='title'><a href='paginator/pag_multiple_containers.html'>Rendering controls into multiple containers</a></td><td class='description'>A demonstration of how Paginator keeps all controls in sync.</td></tr>
-<tr class='odd'><td class='title'><a href='paginator/pag_manual_render.html'>Manually rendering Paginator UI Components</a></td><td class='description'>A demonstration of the basic setup of a Paginator.</td></tr>
+<tr class='odd'><td class='title'><a href='paginator/pag_manual_render.html'>Manually rendering Paginator UI Components</a></td><td class='description'>Distributing individual Paginator ui components exclusive of the containers config.</td></tr>
 <tr class='even'><td class='title'><a href='paginator/pag_configuration.html'>Configuring the Paginator</a></td><td class='description'>Exhibition of Paginator instance configuration.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h3>ProgressBar Control</h3></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='progressbar/pb_basic.html'>Basic Features</a></td><td class='description'>This example shows the simplest ProgressBar with the default skin, with a control box that allows you to change various settings.</td></tr>
+<tr class='even'><td class='title'><a href='progressbar/pb_events.html'>Events</a></td><td class='description'>This example shows how you can use the events that ProgressBar fires.</td></tr>
+<tr class='odd'><td class='title'><a href='progressbar/pb_ratings.html'>Ratings</a></td><td class='description'>Using ProgressBar to display ratings UI instead of a number.</td></tr>
+<tr class='even'><td class='title'><a href='progressbar/pb_vumeter.html'>VU Meters</a></td><td class='description'>These VU meters are ProgressBars with animation and custom graphics.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -516,6 +589,7 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='odd'><td class='title'><a href='editor/simple_adv_editor.html'>Simple Editor &mdash; Advanced Buttons</a></td><td class='description'>Using the SimpleEditor Control with Advanced Buttons.</td></tr>
 <tr class='even'><td class='title'><a href='editor/editor_adv_editor.html'>Editor &mdash; Basic Buttons</a></td><td class='description'>Using the Editor Control with Basic Buttons.</td></tr>
 <tr class='odd'><td class='title'><a href='editor/autoheight_editor.html'>Editor Auto Adjusting Height</a></td><td class='description'>Using the autoHeight config to make the Editor change it's height based on the content.</td></tr>
+<tr class='even'><td class='title'><a href='editor/dialog_editor.html'>Editor in a Dialog Control</a></td><td class='description'>It's easy to use the Rich Text Editor to enhance a textarea within a Dialog Control; this example shows you how.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -527,7 +601,7 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='odd'><td class='title'><a href='slider/slider-rgb.html'>RBG Slider Control</a></td><td class='description'>This example demonstrates how to use the slider as a building block for a more complex widget.  It employs three slider instances that work together to produce RGB values.</td></tr>
 <tr class='even'><td class='title'><a href='slider/slider_vert_swapped.html'>Bottom to top Vertical Slider</a></td><td class='description'>This example demonstrates how to create a vertical slider with values increasing as the slider moves up.</td></tr>
 <tr class='odd'><td class='title'><a href='slider/slider_dual_thumb.html'>Horizontal Slider with two thumbs</a></td><td class='description'>This example demonstrates how to create a Slider with two thumbs.</td></tr>
-<tr class='even'><td class='title'><a href='slider/slider_dual_with_highlight.html'>Dual-thumb Slider with range highlight</a></td><td class='description'>This example demonstrates how to create a dual thumb slider with the enclosed range highlighted.</td></tr>
+<tr class='even'><td class='title'><a href='slider/slider_dual_with_highlight.html'>Dual-thumb Slider with range highlight</a></td><td class='description'>This example demonstrates how to create a dual-thumb slider with the enclosed range highlighted.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -552,19 +626,20 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <tr class='odd'><td class='title'><a href='treeview/folder_style.html'>Folder-Style TreeView Design</a></td><td class='description'>By using an alternative CSS file, you can modify the appearance of the TreeView Control; in this example, the TreeView implements a folder-style iconography.</td></tr>
 <tr class='even'><td class='title'><a href='treeview/menu_style.html'>Menu-Style TreeView Design</a></td><td class='description'>By using an alternative CSS file, you can modify the appearance of the TreeView Control; in this example, the TreeView implements a menu-style iconography.  It also makes use of the Menu Node, in which only one child at each depth level can remain open.</td></tr>
 <tr class='odd'><td class='title'><a href='treeview/customicons.html'>Using TreeView with Custom Icons</a></td><td class='description'>Applying a specific label style to each node allows you to customize the icons that each node displays.</td></tr>
-<tr class='even'><td class='title'><a href='treeview/tasklist.html'>Custom TreeView with Check Boxes</a></td><td class='description'>In this example, the TreeView icons are represented by checkboxes allowing for a task-list-style display.</td></tr>
-<tr class='odd'><td class='title'><a href='treeview/tv_tooltip.html'>TreeView with Tooltips</a></td><td class='description'>In this example, the a single Tooltip is configured to work with all of the nodes in the tree.</td></tr>
-<tr class='even'><td class='title'><a href='treeview/tv-markup.html'>Three Ways to Define a TreeView: Markup (Progressive Enhancement), Existing TreeView Instance, and Object Literal </a></td><td class='description'>TreeView supports a number of different inputs for creating the node structure, including consuming existing markup on the page.  This example takes you through three common mechanisms for defining a TreeView.</td></tr>
-<tr class='odd'><td class='title'><a href='treeview/tv-edit.html'>Inline Editing of TreeView Node Labels</a></td><td class='description'>TreeView has intrinsic support for user-editing of node labels.  This example explores the interaction model for inline editing with TreeView.  It also illustrates the use of a special date-editor class that leverages the <a href='http://developer.yahoo.com/yui/calendar/'>YUI Calendar Control</a>.</td></tr>
+<tr class='even'><td class='title'><a href='treeview/tv_tooltip.html'>TreeView with Tooltips</a></td><td class='description'>In this example, the a single Tooltip is configured to work with all of the nodes in the tree.</td></tr>
+<tr class='odd'><td class='title'><a href='treeview/tv_markup.html'>Three Ways to Define a TreeView: Markup (Progressive Enhancement), Existing TreeView Instance, and Object Literal </a></td><td class='description'>TreeView supports a number of different inputs for creating the node structure, including consuming existing markup on the page.  This example takes you through three common mechanisms for defining a TreeView.</td></tr>
+<tr class='even'><td class='title'><a href='treeview/tv_edit.html'>Inline Editing of TreeView Node Labels</a></td><td class='description'>TreeView has intrinsic support for user-editing of node labels.  This example explores the interaction model for inline editing with TreeView.  It also illustrates the use of a special date-editor class that leverages the <a href='http://developer.yahoo.com/yui/calendar/'>YUI Calendar Control</a>.</td></tr>
+<tr class='odd'><td class='title'><a href='treeview/tv_highlight.html'>Treeview Node Selection and Checkbox Example</a></td><td class='description'>In this simple example you can see how to do node selection in the <a href="http://developer.yahoo.com/yui/treeview/">TreeView Control</a>.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h3>Uploader Control (experimental)</h3></th></tr></thead>
+<tr><th class='title' colspan='2'><h3>Uploader Control (beta)</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='uploader/uploader-simple-button.html'>Simple Uploader Example With Button UI</a></td><td class='description'>A demonstration of core features of the Uploader Control. In this example, the Uploader control is rendered as a sprite-skinned button. The user is allowed to select a single file and upload it to a specified location. The upload progress is tracked and reported back to the user.</td></tr>
 <tr class='even'><td class='title'><a href='uploader/uploader-advanced-postvars.html'>Advanced Uploader Example With Additional POST Variables and Server Data Return</a></td><td class='description'>This advanced Uploader example is rendered as a transparent overlay UI over a text link. It allows the user to upload a single file, along with additional POST variables, and displays the data returned back from the server.</td></tr>
-<tr class='odd'><td class='title'><a href='uploader/uploader-advanced-queue.html'>Advanced Uploader Example With Transparent UI and Automatic Queue Management</a></td><td class='description'>This advanced Uploader example is rendered as a transparent overlay UI over a text link. The uploader allows the user to upload multiple files, using built-in queue management, and reports back progress.</td></tr>
+<tr class='odd'><td class='title'><a href='uploader/uploader-advanced-cookie.html'>Advanced Uploader Example With Cookie Submission as a POST variable</a></td><td class='description'>This advanced Uploader example demonstrates setting of a document cookie and attaching the cookie data as a variable in the file upload POST request. The backend server echoes the submitted data, ascertaining that the cookie data has been received.</td></tr>
+<tr class='even'><td class='title'><a href='uploader/uploader-advanced-queue.html'>Advanced Uploader Example With Transparent UI and Automatic Queue Management</a></td><td class='description'>This advanced Uploader example is rendered as a transparent overlay UI over a text link. The uploader allows the user to upload multiple files, using built-in queue management, and reports back progress.</td></tr>
 </tbody>
 </table>
 
@@ -581,7 +656,7 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h3>Profiler (beta)</h3></th></tr></thead>
+<tr><th class='title' colspan='2'><h3>Profiler</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='profiler/profiler-simple-example.html'>Simple Profiling Example</a></td><td class='description'>Demonstrates basic usage of the Profiler for profiling functions.</td></tr>
 <tr class='even'><td class='title'><a href='profiler/profiler-object-example.html'>Object Profiling Example</a></td><td class='description'>Demonstrates usage of the Profiler for profiling objects.</td></tr>
@@ -589,7 +664,7 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h3>ProfilerViewer Control (beta)</h3></th></tr></thead>
+<tr><th class='title' colspan='2'><h3>ProfilerViewer Control</h3></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='profilerviewer/pv-basic.html'>Simple Profiling</a></td><td class='description'>A simple use case profiling a <a href='http://developer.yahoo.com/yui/calendar'>Calendar Control</a> instance with the ProfilerViewer Control.</td></tr>
 <tr class='even'><td class='title'><a href='profilerviewer/pv-api.html'>Using the ProfilerViewer API while Profiling the YUI Menu Control</a></td><td class='description'>In this example, profiling a simple set of menus and submenus, ProfilerViewer's API is leveraged to place the console in a floating, draggable palette.</td></tr>
@@ -639,13 +714,13 @@ if ((typeof YAHOO !== "undefined") && (YAHOO.util) && (YAHOO.util.Event)) {
 <div id="toc">
 	
 <ul>
-<li class="sect first">Yahoo! UI Library</li><li class="item"><a title="The Yahoo! User Interface Library (YUI)" href="http://developer.yahoo.com/yui/">Home (external)</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUIBlog (external)</a></li><li class="item"><a title="The Yahoo! Group YDN-JavaScript hosts the YUI community forum" href="http://tech.groups.yahoo.com/group/ydn-javascript/">YUI Discussion Forum (external)</a></li><li class="item"><a title="The YUI Library can be downloaded from SourceForge" href="http://sourceforge.net/projects/yui/">YUI on Sourceforge (external)</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../docs/index.html">API Documentation</a></li><li class="selected "><a title="Examples of every YUI utility and control in action" href="../examples/">Functional Examples</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License (external)</a></li><li class="sect">YUI Functional Examples</li><li class="item"><a title="The YUI Animation Utility - Functional Examples" href="../examples/animation/index.html">Animation</a></li><li class="item"><a title="The YUI AutoComplete Control - Functional Examples" href="../examples/autocomplete/index.html">AutoComplete</a></li><li class="item"><a title="The YUI Browser History Manager - Functional Examples" href="../examples/history/index.html">Browser History Manager</a></li><li class="item"><a title="The YUI Button Control - Functional Examples" href="../examples/button/index.html">Button</a></li><li class="item"><a title="The YUI Calendar Control - Functional Examples" href="../examples/calendar/index.html">Calendar</a></li><li class="item"><a title="The YUI Carousel Control - Functional Examples" href="../examples/carousel/index.html">Carousel</a></li><li class="item"><a title="The YUI Charts Control - Functional Examples" href="../examples/charts/index.html">Charts (experimental)</a></li><li class="item"><a title="The YUI Color Picker Control - Functional Examples" href="../examples/colorpicker/index.html">Color Picker</a></li><li class="item"><a title="The YUI Cookie Utility - Functional Examples" href="../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="The YUI Connection Manager (AJAX) - Functional Examples" href="../examples/connection/index.html">Connection Manager</a></li><li class="item"><a title="The YUI Container Family (Module, Overlay, Tooltip, Panel, Dialog, SimpleDialog) - Functional Examples" href="../examples/container/index.html">Container</a></li><li class="item"><a title="The YUI DataTable Control - Functional Examples" href="../examples/datatable/index.html">DataTable</a></li><li class="item"><a title="The YUI Dom Collection - Functional Examples" href="../examples/dom/index.html">Dom</a></li><li class="item"><a title="The YUI Drag &amp; Drop Utility - Functional Examples" href="../examples/dragdrop/index.html">Drag &amp; Drop</a></li><li class="item"><a title="The YUI Event Utility - Functional Examples" href="../examples/event/index.html">Event</a></li><li class="item"><a title="The YUI Get Utility - Functional Examples" href="../examples/get/index.html">Get</a></li><li class="item"><a title="The YUI ImageCropper Control - Functional Examples" href="../examples/imagecropper/index.html">ImageCropper</a></li><li class="item"><a title="The YUI ImageLoader Utility - Functional Examples" href="../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="The YUI JSON Utility - Functional Examples" href="../examples/json/index.html">JSON</a></li><li class="item"><a title="The YUI Layout Manager - Functional Examples" href="../examples/layout/index.html">Layout Manager</a></li><li class="item"><a title="The YUI Logger Control - Functional Examples" href="../examples/logger/index.html">Logger</a></li><li class="item"><a title="The YUI Menu Control - Functional Examples" href="../examples/menu/index.html">Menu</a></li><li class="item"><a title="The YUI Paginator - Functional Examples" href="../examples/paginator/index.html">Paginator</a></li><li class="item"><a title="The YUI Profiler Utility - Functional Examples" href="../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="The YUI ProfileViewer Control - Functional Examples" href="../examples/profilerviewer/index.html">ProfilerViewer</a></li><li class="item"><a title="The YUI Resize Utility - Functional Examples" href="../examples/resize/index.html">Resize</a></li><li class="item"><a title="The YUI Rich Text Editor - Functional Examples" href="../examples/editor/index.html">Rich Text Editor</a></li><li class="item"><a title="The YUI Selector Utility - Functional Examples" href="../examples/selector/index.html">Selector</a></li><li class="item"><a title="The YUI Slider Control - Functional Examples" href="../examples/slider/index.html">Slider</a></li><li class="item"><a title="The YUI TabView Control - Functional Examples" href="../examples/tabview/index.html">TabView</a></li><li class="item"><a title="The YUI TreeView Control - Functional Examples" href="../examples/treeview/index.html">TreeView</a></li><li class="item"><a title="The YUI Uploader Utility - Functional Examples" href="../examples/uploader/index.html">Uploader (experimental)</a></li><li class="item"><a title="The YUI YAHOO Global Object - Functional Examples" href="../examples/yahoo/index.html">YAHOO Global Object</a></li><li class="item"><a title="The YUI Loader Utility - Functional Examples" href="../examples/yuiloader/index.html">YUI Loader</a></li><li class="item"><a title="The YUI Test Utility - Functional Examples" href="../examples/yuitest/index.html">YUI Test</a></li><li class="item"><a title="YUI Reset CSS - Functional Examples" href="../examples/reset/index.html">Reset CSS</a></li><li class="item"><a title="YUI Base CSS - Functional Examples" href="../examples/base/index.html">Base CSS</a></li><li class="item"><a title="YUI Fonts CSS - Functional Examples" href="../examples/fonts/index.html">Fonts CSS</a></li><li class="item"><a title="YUI Grids CSS - Functional Examples" href="../examples/grids/index.html">Grids CSS</a></li><li class="sect">YUI Articles on the YUI Website</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Reporting Bugs and Making Feature Requests for YUI Components" href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests (external)</a></li><li class="item"><a title="Serve YUI source files from Yahoo! -- free, fast, and simple" href="http://developer.yahoo.com/yui/articles/hosting/">Serving YUI Files from Yahoo! (external)</a></li><li class="item"><a title="Best practices for working with web services while protecting user privacy" href="http://developer.yahoo.com/security/">Security Best Practices (external)</a></li></ul>
+<li class="sect first">Yahoo! UI Library</li><li class="item"><a title="The Yahoo! User Interface Library (YUI)" href="http://developer.yahoo.com/yui/">Home (external)</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUIBlog (external)</a></li><li class="item"><a title="YUILibrary.com hosts the YUI community forums" href="http://yuilibrary.com/forum/">YUI Discussion Forum (external)</a></li><li class="item"><a title="The YUI Library source can be checked out from GitHub" href="http://github.com/yui/">YUI on GitHub</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../docs/index.html">API Documentation</a></li><li class="selected "><a title="Examples of every YUI utility and control in action" href="../examples/">Functional Examples</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License (external)</a></li><li class="sect">YUI Functional Examples</li><li class="item"><a title="The YUI Animation Utility - Functional Examples" href="../examples/animation/index.html">Animation</a></li><li class="item"><a title="The YUI AutoComplete Control - Functional Examples" href="../examples/autocomplete/index.html">AutoComplete</a></li><li class="item"><a title="The YUI Browser History Manager - Functional Examples" href="../examples/history/index.html">Browser History Manager</a></li><li class="item"><a title="The YUI Button Control - Functional Examples" href="../examples/button/index.html">Button</a></li><li class="item"><a title="The YUI Calendar Control - Functional Examples" href="../examples/calendar/index.html">Calendar</a></li><li class="item"><a title="The YUI Carousel Control - Functional Examples" href="../examples/carousel/index.html">Carousel</a></li><li class="item"><a title="The YUI Charts Control - Functional Examples" href="../examples/charts/index.html">Charts</a></li><li class="item"><a title="The YUI Color Picker Control - Functional Examples" href="../examples/colorpicker/index.html">Color Picker</a></li><li class="item"><a title="The YUI Cookie Utility - Functional Examples" href="../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="The YUI Connection Manager (AJAX) - Functional Examples" href="../examples/connection/index.html">Connection Manager</a></li><li class="item"><a title="The YUI Container Family (Module, Overlay, Tooltip, Panel, Dialog, SimpleDialog) - Functional Examples" href="../examples/container/index.html">Container</a></li><li class="item"><a title="The YUI DataTable Control - Functional Examples" href="../examples/datatable/index.html">DataTable</a></li><li class="item"><a title="The YUI Dom Collection - Functional Examples" href="../examples/dom/index.html">Dom</a></li><li class="item"><a title="The YUI Drag &amp; Drop Utility - Functional Examples" href="../examples/dragdrop/index.html">Drag &amp; Drop</a></li><li class="item"><a title="The YUI Event Utility - Functional Examples" href="../examples/event/index.html">Event</a></li><li class="item"><a title="The YUI Get Utility - Functional Examples" href="../examples/get/index.html">Get</a></li><li class="item"><a title="The YUI ImageCropper Control - Functional Examples" href="../examples/imagecropper/index.html">ImageCropper</a></li><li class="item"><a title="The YUI ImageLoader Utility - Functional Examples" href="../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="The YUI JSON Utility - Functional Examples" href="../examples/json/index.html">JSON</a></li><li class="item"><a title="The YUI Layout Manager - Functional Examples" href="../examples/layout/index.html">Layout Manager</a></li><li class="item"><a title="The YUI Logger Control - Functional Examples" href="../examples/logger/index.html">Logger</a></li><li class="item"><a title="The YUI Menu Control - Functional Examples" href="../examples/menu/index.html">Menu</a></li><li class="item"><a title="The YUI Paginator - Functional Examples" href="../examples/paginator/index.html">Paginator</a></li><li class="item"><a title="The YUI Profiler Utility - Functional Examples" href="../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="The YUI ProfileViewer Control - Functional Examples" href="../examples/profilerviewer/index.html">ProfilerViewer</a></li><li class="item"><a title="The YUI ProgressBar Control - Functional Examples" href="../examples/progressbar/index.html">ProgressBar</a></li><li class="item"><a title="The YUI Resize Utility - Functional Examples" href="../examples/resize/index.html">Resize</a></li><li class="item"><a title="The YUI Rich Text Editor - Functional Examples" href="../examples/editor/index.html">Rich Text Editor</a></li><li class="item"><a title="The YUI Selector Utility - Functional Examples" href="../examples/selector/index.html">Selector</a></li><li class="item"><a title="The YUI Slider Control - Functional Examples" href="../examples/slider/index.html">Slider</a></li><li class="item"><a title="The YUI Storage Utility - Functional Examples" href="../examples/storage/index.html">Storage</a></li><li class="item"><a title="The YUI SWF Utility - Functional Examples" href="../examples/swf/index.html">SWF</a></li><li class="item"><a title="The YUI SWFStore Utility - Functional Examples" href="../examples/swfstore/index.html">SWFStore</a></li><li class="item"><a title="The YUI Stylesheet Utility - Functional Examples" href="../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="The YUI TabView Control - Functional Examples" href="../examples/tabview/index.html">TabView</a></li><li class="item"><a title="The YUI TreeView Control - Functional Examples" href="../examples/treeview/index.html">TreeView</a></li><li class="item"><a title="The YUI Uploader Utility - Functional Examples" href="../examples/uploader/index.html">Uploader (experimental)</a></li><li class="item"><a title="The YUI YAHOO Global Object - Functional Examples" href="../examples/yahoo/index.html">YAHOO Global Object</a></li><li class="item"><a title="The YUI Loader Utility - Functional Examples" href="../examples/yuiloader/index.html">YUI Loader</a></li><li class="item"><a title="The YUI Test Utility - Functional Examples" href="../examples/yuitest/index.html">YUI Test</a></li><li class="item"><a title="YUI Reset CSS - Functional Examples" href="../examples/reset/index.html">Reset CSS</a></li><li class="item"><a title="YUI Base CSS - Functional Examples" href="../examples/base/index.html">Base CSS</a></li><li class="item"><a title="YUI Fonts CSS - Functional Examples" href="../examples/fonts/index.html">Fonts CSS</a></li><li class="item"><a title="YUI Grids CSS - Functional Examples" href="../examples/grids/index.html">Grids CSS</a></li><li class="sect">YUI Articles on the YUI Website</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Reporting Bugs and Making Feature Requests for YUI Components" href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests (external)</a></li><li class="item"><a title="Serve YUI source files from Yahoo! -- free, fast, and simple" href="http://developer.yahoo.com/yui/articles/hosting/">Serving YUI Files from Yahoo! (external)</a></li><li class="item"><a title="Best practices for working with web services while protecting user privacy" href="http://developer.yahoo.com/security/">Security Best Practices (external)</a></li></ul>
 </div>
 </div>
 	</div><!--closes bd-->
 
 	<div id="ft">
-        <p class="first">Copyright &copy; 2008 Yahoo! Inc. All rights reserved.</p>
+        <p class="first">Copyright &copy; 2009 Yahoo! Inc. All rights reserved.</p>
         <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
             <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
             <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 

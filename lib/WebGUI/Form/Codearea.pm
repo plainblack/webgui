@@ -162,13 +162,10 @@ sub toHtml {
 
     $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
     $style->setLink($url->extras("yui/build/assets/skins/sam/skin.css"), {type=>"text/css", rel=>"stylesheet"});
-    $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/utilities/utilities.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/container/container_core-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/menu/menu-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/button/button-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/element/element-beta-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/resize/resize-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/editor/editor-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"),{type=>"text/javascript"});

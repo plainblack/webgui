@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Slider Button</title>
 
@@ -25,7 +27,7 @@ body {
 <script type="text/javascript" src="../../build/slider/slider-min.js"></script>
 <script type="text/javascript" src="../../build/container/container_core-min.js"></script>
 <script type="text/javascript" src="../../build/menu/menu-min.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
 
 
@@ -110,7 +112,7 @@ body {
         text label is updated.
     */
 
-    #opacitybutton-currentopactiy {
+    #opacitybutton-currentopacity {
 
         width: 3em;
         font-style: normal;
@@ -126,11 +128,12 @@ body {
 	}
 
 </style>
+
 <!--end custom header content for this example-->
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Slider Button</h1>
@@ -189,7 +192,7 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
             var oButton = new YAHOO.widget.Button({ 
                                                 type: "menu", 
                                                 id: "opacitybutton", 
-                                                label: "<em id=\"opacitybutton-currentopactiy\">100%</em>", 
+                                                label: "<em id=\"opacitybutton-currentopacity\">100%</em>", 
                                                 menu: oOpacityMenu,  
                                                 container: "opacitycontrols" });
 
@@ -217,7 +220,7 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
 
                 oOpacityMenu.render(this.get("container"));			
 			
-				oCurrentOpacity = Dom.get("opacitybutton-currentopactiy");
+				oCurrentOpacity = Dom.get("opacitybutton-currentopacity");
 			
 			});
             
@@ -282,7 +285,7 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
                          communicate the state change.
                     */
 
-                    oSliderEl.title = "slider value = " + nOpacity;
+                    oSliderEl.title = "slider value = " + Math.round(nOpacity);
                     
 
 
@@ -341,6 +344,7 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
 </script>
 
 <div id="example"><a href="http://www.flickr.com/photos/toddlr/477993821/" title="Photo Sharing"><img id="photo" src="http://farm1.static.flickr.com/198/477993821_0079194851.jpg" width="500" height="375" alt="Ella - A Shih Tzu + Maltese Mix Puppy"></a></div>
+
 <!--END SOURCE CODE FOR EXAMPLE =============================== -->
 
 </body>

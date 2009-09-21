@@ -352,7 +352,7 @@ sub prepare {
     $style->setLink( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         { rel => "stylesheet", type => "text/css" } );
     $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
-    $style->setScript( $url->extras('yui/build/element/element-beta.js') );
+    $style->setScript( $url->extras('yui/build/element/element-min.js') );
     $style->setScript( $url->extras('yui/build/dragdrop/dragdrop-min.js') );
     $style->setScript( $url->extras('yui/build/connection/connection-min.js') );
     $style->setScript( $url->extras('yui/build/json/json-min.js') );

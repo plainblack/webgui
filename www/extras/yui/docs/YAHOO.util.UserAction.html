@@ -1,8 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
 <head>
-	<title>API: yuitest  YAHOO.util.UserAction   (YUI Library)</title>
-	<link rel="stylesheet" type="text/css" href="assets/api.css">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: event-simulate  YAHOO.util.UserAction   (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
     <script type="text/javascript" src="assets/api-js"></script>
     <script type="text/javascript" src="assets/ac-js"></script>
 </head>
@@ -10,27 +14,33 @@
 <body id="yahoo-com">
 
 <div id="doc3" class="yui-t2">
-
 	<div id="hd">
-        <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>yuitest&nbsp; <span class="subtitle">2.6.0</span></h3>
-        <p>
-        <a href="./index.html">Yahoo! UI Library</a> 
-            &gt; <a href="./module_yuitest.html">yuitest</a>
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>event-simulate&nbsp; <span class="subtitle">2.8.0r4</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_event-simulate.html" title="event-simulate">event-simulate</a>
                  &gt; YAHOO.util.UserAction 
                 
-            </p>
-
-
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
 	</div>
 
 	<div id="bd">
 		<div id="yui-main">
 			<div class="yui-b">
-            <form name="yui-classopts-form">
-    <span id="classopts"><input type="checkbox" name="showprivate" id="showprivate" /> <label for="showprivate">Show Private</label></span>
-    <span id="classopts"><input type="checkbox" name="showprotected" id="showprotected" /> <label for="showprotected">Show Protected</label></span>
-    <span id="classopts"><input type="checkbox" name="showdeprecated" id="showdeprecated" /> <label for="showdeprecated">Show Deprecated</label></span>
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
             </form>
 
                     <h2>
@@ -38,43 +48,42 @@
 
                         <code>static</code>
                         
-                            Class <b>YAHOO.util.UserAction</b>
+                            Class <b property="yui:name">YAHOO.util.UserAction</b>
                         <span class="extends">
                         </span>
 
-                        <span class="extends">
-                        </span>
-                        
-                        </code>
                     </h2>
                     <!-- class tree goes here -->
                     
                 
   
 
-                    <div class="summary description">
+                    <div class="summary description" property="yui:description">
                         The UserAction object provides functions that simulate events occurring in
 the browser. Since these are simulated events, they do not behave exactly
 as regular, user-initiated events do, but can be used to test simple
 user interactions safely.
                     </div>
 
+                    
+                    <div rel="yui:properties" resource="#properties">
 
+                    </div>
 
-
+                    <div rel="yui:methods" resource="#methods">
                         <div class="section method details">
                             <h3 id="methods">Methods</h3>
                             <div class="content">
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_click">
                                     <h4>
                                         <a name="method_click">click</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>click</strong>
+                                            <strong property="yui:name">click</strong>
                                            (
                                                 
                                                         
@@ -88,30 +97,34 @@ user interactions safely.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a click on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to click on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to click on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -122,16 +135,16 @@ user interactions safely.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_dblclick">
                                     <h4>
                                         <a name="method_dblclick">dblclick</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>dblclick</strong>
+                                            <strong property="yui:name">dblclick</strong>
                                            (
                                                 
                                                         
@@ -145,30 +158,34 @@ user interactions safely.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a double click on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to double click on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to double click on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -179,16 +196,16 @@ user interactions safely.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="private">
+                                    <div class="private" rel="yui:method" resource="#method_fireKeyEvent">
                                     <h4>
                                         <a name="method_fireKeyEvent">fireKeyEvent</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                          private 
                                          static 
                                         
                                         void
-                                            <strong>fireKeyEvent</strong>
+                                            <strong property="yui:name">fireKeyEvent</strong>
                                            (
                                                 
                                                         
@@ -206,7 +223,7 @@ user interactions safely.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Fires an event that normally would be fired by the keyboard (keyup,
 keydown, keypress). Make sure to specify either keyCode or charCode as
 an option.
@@ -214,29 +231,35 @@ an option.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>type &lt;String&gt;</code>
-                                                             The type of event ("keyup", "keydown" or "keypress").
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">type</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The type of event ("keyup", "keydown" or "keypress").</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The target of the event.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The target of the event.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Options for the event. Either keyCode or charCode
-are required.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Options for the event. Either keyCode or charCode
+are required.</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -247,16 +270,16 @@ are required.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_keydown">
                                     <h4>
                                         <a name="method_keydown">keydown</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>keydown</strong>
+                                            <strong property="yui:name">keydown</strong>
                                            (
                                                 
                                                         
@@ -270,30 +293,34 @@ are required.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a keydown event on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to act on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to act on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -304,16 +331,16 @@ are required.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_keypress">
                                     <h4>
                                         <a name="method_keypress">keypress</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>keypress</strong>
+                                            <strong property="yui:name">keypress</strong>
                                            (
                                                 
                                                         
@@ -327,30 +354,34 @@ are required.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a keypress on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to act on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to act on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -361,16 +392,16 @@ are required.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_keyup">
                                     <h4>
                                         <a name="method_keyup">keyup</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>keyup</strong>
+                                            <strong property="yui:name">keyup</strong>
                                            (
                                                 
                                                         
@@ -384,30 +415,34 @@ are required.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a keyup event on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to act on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to act on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -418,16 +453,16 @@ are required.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_mousedown">
                                     <h4>
                                         <a name="method_mousedown">mousedown</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>mousedown</strong>
+                                            <strong property="yui:name">mousedown</strong>
                                            (
                                                 
                                                         
@@ -441,30 +476,34 @@ are required.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a mousedown on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to act on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to act on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -475,16 +514,16 @@ are required.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_mouseEvent">
                                     <h4>
                                         <a name="method_mouseEvent">mouseEvent</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>mouseEvent</strong>
+                                            <strong property="yui:name">mouseEvent</strong>
                                            (
                                                 
                                                         
@@ -502,36 +541,42 @@ are required.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a mouse event on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to click on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to click on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>type &lt;String&gt;</code>
-                                                             The type of event to fire. This can be any one of
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">type</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The type of event to fire. This can be any one of
 the following: click, dblclick, mousedown, mouseup, mouseout,
-mouseover, and mousemove.
+mouseover, and mousemove.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -542,16 +587,16 @@ mouseover, and mousemove.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_mousemove">
                                     <h4>
                                         <a name="method_mousemove">mousemove</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>mousemove</strong>
+                                            <strong property="yui:name">mousemove</strong>
                                            (
                                                 
                                                         
@@ -565,30 +610,34 @@ mouseover, and mousemove.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a mousemove on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to act on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to act on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -599,16 +648,16 @@ mouseover, and mousemove.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_mouseout">
                                     <h4>
                                         <a name="method_mouseout">mouseout</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>mouseout</strong>
+                                            <strong property="yui:name">mouseout</strong>
                                            (
                                                 
                                                         
@@ -622,7 +671,7 @@ mouseover, and mousemove.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a mouseout event on a particular element. Use "relatedTarget"
 on the options object to specify where the mouse moved to.
 Quirks: Firefox less than 2.0 doesn't set relatedTarget properly, so
@@ -634,24 +683,28 @@ in both browsers.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to act on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to act on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -662,16 +715,16 @@ in both browsers.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_mouseover">
                                     <h4>
                                         <a name="method_mouseover">mouseover</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>mouseover</strong>
+                                            <strong property="yui:name">mouseover</strong>
                                            (
                                                 
                                                         
@@ -685,7 +738,7 @@ in both browsers.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a mouseover event on a particular element. Use "relatedTarget"
 on the options object to specify where the mouse moved from.
 Quirks: Firefox less than 2.0 doesn't set relatedTarget properly, so
@@ -697,24 +750,28 @@ in both browsers.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to act on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to act on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -725,16 +782,16 @@ in both browsers.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_mouseup">
                                     <h4>
                                         <a name="method_mouseup">mouseup</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>mouseup</strong>
+                                            <strong property="yui:name">mouseup</strong>
                                            (
                                                 
                                                         
@@ -748,30 +805,34 @@ in both browsers.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a mouseup on a particular element.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The element to act on.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The element to act on.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>options &lt;Object&gt;</code>
-                                                             Additional event options (use DOM standard names).
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Additional event options (use DOM standard names).</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -782,16 +843,16 @@ in both browsers.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="private">
+                                    <div class="private" rel="yui:method" resource="#method_simulateKeyEvent">
                                     <h4>
                                         <a name="method_simulateKeyEvent">simulateKeyEvent</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                          private 
                                          static 
                                         
                                         void
-                                            <strong>simulateKeyEvent</strong>
+                                            <strong property="yui:name">simulateKeyEvent</strong>
                                            (
                                                 
                                                         
@@ -841,7 +902,7 @@ in both browsers.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a key event using the given event information to populate
 the generated event object. This method does browser-equalizing
 calculations to account for differences in the DOM and IE event models
@@ -851,73 +912,95 @@ crash.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The target of the given event.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The target of the given event.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>type &lt;String&gt;</code>
-                                                             The type of event to fire. This can be any one of
-the following: keyup, keydown, and keypress.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">type</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The type of event to fire. This can be any one of
+the following: keyup, keydown, and keypress.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>bubbles &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if the event can be
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">bubbles</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if the event can be
 bubbled up. DOM Level 3 specifies that all key events bubble by
-default. The default is true.
+default. The default is true.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>cancelable &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if the event can be
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">cancelable</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if the event can be
 canceled using preventDefault(). DOM Level 3 specifies that all
 key events can be cancelled. The default 
-is true.
+is true.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>view &lt;Window&gt;</code>
-                                                             (Optional) The view containing the target. This is
-typically the window object. The default is window.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">view</span>
+                                                        &lt;<span property="yui:type">Window</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The view containing the target. This is
+typically the window object. The default is window.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>ctrlKey &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if one of the CTRL keys
-is pressed while the event is firing. The default is false.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">ctrlKey</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if one of the CTRL keys
+is pressed while the event is firing. The default is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>altKey &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if one of the ALT keys
-is pressed while the event is firing. The default is false.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">altKey</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if one of the ALT keys
+is pressed while the event is firing. The default is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>shiftKey &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if one of the SHIFT keys
-is pressed while the event is firing. The default is false.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">shiftKey</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if one of the SHIFT keys
+is pressed while the event is firing. The default is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>metaKey &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if one of the META keys
-is pressed while the event is firing. The default is false.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">metaKey</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if one of the META keys
+is pressed while the event is firing. The default is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>keyCode &lt;int&gt;</code>
-                                                             (Optional) The code for the key that is in use. 
-The default is 0.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">keyCode</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The code for the key that is in use. 
+The default is 0.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>charCode &lt;int&gt;</code>
-                                                             (Optional) The Unicode code for the character
-associated with the key being used. The default is 0.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">charCode</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The Unicode code for the character
+associated with the key being used. The default is 0.</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -928,16 +1011,16 @@ associated with the key being used. The default is 0.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="private">
+                                    <div class="private" rel="yui:method" resource="#method_simulateMouseEvent">
                                     <h4>
                                         <a name="method_simulateMouseEvent">simulateMouseEvent</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                          private 
                                          static 
                                         
                                         void
-                                            <strong>simulateMouseEvent</strong>
+                                            <strong property="yui:name">simulateMouseEvent</strong>
                                            (
                                                 
                                                         
@@ -1007,7 +1090,7 @@ associated with the key being used. The default is 0.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Simulates a mouse event using the given event information to populate
 the generated event object. This method does browser-equalizing
 calculations to account for differences in the DOM and IE event models
@@ -1016,105 +1099,137 @@ as well as different browser quirks.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>target &lt;HTMLElement&gt;</code>
-                                                             The target of the given event.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">target</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The target of the given event.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>type &lt;String&gt;</code>
-                                                             The type of event to fire. This can be any one of
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">type</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The type of event to fire. This can be any one of
 the following: click, dblclick, mousedown, mouseup, mouseout,
-mouseover, and mousemove.
+mouseover, and mousemove.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>bubbles &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if the event can be
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">bubbles</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if the event can be
 bubbled up. DOM Level 2 specifies that all mouse events bubble by
-default. The default is true.
+default. The default is true.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>cancelable &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if the event can be
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">cancelable</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if the event can be
 canceled using preventDefault(). DOM Level 2 specifies that all
 mouse events except mousemove can be cancelled. The default 
 is true for all events except mousemove, for which the default 
-is false.
+is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>view &lt;Window&gt;</code>
-                                                             (Optional) The view containing the target. This is
-typically the window object. The default is window.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">view</span>
+                                                        &lt;<span property="yui:type">Window</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The view containing the target. This is
+typically the window object. The default is window.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>detail &lt;int&gt;</code>
-                                                             (Optional) The number of times the mouse button has
-been used. The default value is 1.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">detail</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The number of times the mouse button has
+been used. The default value is 1.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>screenX &lt;int&gt;</code>
-                                                             (Optional) The x-coordinate on the screen at which
-point the event occured. The default is 0.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">screenX</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The x-coordinate on the screen at which
+point the event occured. The default is 0.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>screenY &lt;int&gt;</code>
-                                                             (Optional) The y-coordinate on the screen at which
-point the event occured. The default is 0.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">screenY</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The y-coordinate on the screen at which
+point the event occured. The default is 0.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>clientX &lt;int&gt;</code>
-                                                             (Optional) The x-coordinate on the client at which
-point the event occured. The default is 0.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">clientX</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The x-coordinate on the client at which
+point the event occured. The default is 0.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>clientY &lt;int&gt;</code>
-                                                             (Optional) The y-coordinate on the client at which
-point the event occured. The default is 0.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">clientY</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The y-coordinate on the client at which
+point the event occured. The default is 0.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>ctrlKey &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if one of the CTRL keys
-is pressed while the event is firing. The default is false.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">ctrlKey</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if one of the CTRL keys
+is pressed while the event is firing. The default is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>altKey &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if one of the ALT keys
-is pressed while the event is firing. The default is false.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">altKey</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if one of the ALT keys
+is pressed while the event is firing. The default is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>shiftKey &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if one of the SHIFT keys
-is pressed while the event is firing. The default is false.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">shiftKey</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if one of the SHIFT keys
+is pressed while the event is firing. The default is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>metaKey &lt;Boolean&gt;</code>
-                                                             (Optional) Indicates if one of the META keys
-is pressed while the event is firing. The default is false.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">metaKey</span>
+                                                        &lt;<span property="yui:type">Boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) Indicates if one of the META keys
+is pressed while the event is firing. The default is false.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>button &lt;int&gt;</code>
-                                                             (Optional) The button being pressed while the event
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">button</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) The button being pressed while the event
 is executing. The value should be 0 for the primary mouse button
 (typically the left button), 1 for the terciary mouse button
 (typically the middle button), and 2 for the secondary mouse button
-(typically the right button). The default is 0.
+(typically the right button). The default is 0.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>relatedTarget &lt;HTMLElement&gt;</code>
-                                                             (Optional) For mouseout events,
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">relatedTarget</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (Optional) For mouseout events,
 this is the element that the mouse has moved to. For mouseover
 events, this is the element that the mouse has moved from. This
-argument is ignored for all other events. The default is null.
+argument is ignored for all other events. The default is null.</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -1128,186 +1243,108 @@ argument is ignored for all other events. The default is null.
                             </div>
                         </div>
 
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
 
 
+                    </div>
 
+                    <div rel="yui:attributes" resource="#configattributes">
 
-
+                    </div>
 
 			</div>
 		</div>
 		<div class="yui-b">
             <div class="nav">
 
-                    <div class="module">
+                    <div id="moduleList" class="module">
                         <h4>Modules</h4>
                         <ul class="content">
-
-                                <li class=""><a href="module_animation.html">animation</a></li>
-
-                                <li class=""><a href="module_autocomplete.html">autocomplete</a></li>
-
-                                <li class=""><a href="module_button.html">button</a></li>
-
-                                <li class=""><a href="module_calendar.html">calendar</a></li>
-
-                                <li class=""><a href="module_carousel.html">carousel</a></li>
-
-                                <li class=""><a href="module_charts.html">charts</a></li>
-
-                                <li class=""><a href="module_colorpicker.html">colorpicker</a></li>
-
-                                <li class=""><a href="module_connection.html">connection</a></li>
-
-                                <li class=""><a href="module_container.html">container</a></li>
-
-                                <li class=""><a href="module_cookie.html">cookie</a></li>
-
-                                <li class=""><a href="module_datasource.html">datasource</a></li>
-
-                                <li class=""><a href="module_datatable.html">datatable</a></li>
-
-                                <li class=""><a href="module_dom.html">dom</a></li>
-
-                                <li class=""><a href="module_dragdrop.html">dragdrop</a></li>
-
-                                <li class=""><a href="module_editor.html">editor</a></li>
-
-                                <li class=""><a href="module_element.html">element</a></li>
-
-                                <li class=""><a href="module_event.html">event</a></li>
-
-                                <li class=""><a href="module_get.html">get</a></li>
-
-                                <li class=""><a href="module_history.html">history</a></li>
-
-                                <li class=""><a href="module_imagecropper.html">imagecropper</a></li>
-
-                                <li class=""><a href="module_imageloader.html">imageloader</a></li>
-
-                                <li class=""><a href="module_json.html">json</a></li>
-
-                                <li class=""><a href="module_layout.html">layout</a></li>
-
-                                <li class=""><a href="module_logger.html">logger</a></li>
-
-                                <li class=""><a href="module_menu.html">menu</a></li>
-
-                                <li class=""><a href="module_paginator.html">paginator</a></li>
-
-                                <li class=""><a href="module_profiler.html">profiler</a></li>
-
-                                <li class=""><a href="module_profilerviewer.html">profilerviewer</a></li>
-
-                                <li class=""><a href="module_resize.html">resize</a></li>
-
-                                <li class=""><a href="module_selector.html">selector</a></li>
-
-                                <li class=""><a href="module_slider.html">slider</a></li>
-
-                                <li class=""><a href="module_tabview.html">tabview</a></li>
-
-                                <li class=""><a href="module_treeview.html">treeview</a></li>
-
-                                <li class=""><a href="module_uploader.html">uploader</a></li>
-
-                                <li class=""><a href="module_yahoo.html">yahoo</a></li>
-
-                                <li class=""><a href="module_yuiloader.html">yuiloader</a></li>
-
-                                <li class="selected"><a href="module_yuitest.html">yuitest</a></li>
+                                <li class=""><a href="module_animation.html" title="animation">animation</a></li>
+                                <li class=""><a href="module_autocomplete.html" title="autocomplete">autocomplete</a></li>
+                                <li class=""><a href="module_button.html" title="button">button</a></li>
+                                <li class=""><a href="module_calendar.html" title="calendar">calendar</a></li>
+                                <li class=""><a href="module_carousel.html" title="carousel">carousel</a></li>
+                                <li class=""><a href="module_charts.html" title="charts">charts</a></li>
+                                <li class=""><a href="module_colorpicker.html" title="colorpicker">colorpicker</a></li>
+                                <li class=""><a href="module_connection.html" title="connection">connection</a></li>
+                                <li class=""><a href="module_container.html" title="container">container</a></li>
+                                <li class=""><a href="module_cookie.html" title="cookie">cookie</a></li>
+                                <li class=""><a href="module_datasource.html" title="datasource">datasource</a></li>
+                                <li class=""><a href="module_datatable.html" title="datatable">datatable</a></li>
+                                <li class=""><a href="module_datemath.html" title="datemath">datemath</a></li>
+                                <li class=""><a href="module_dom.html" title="dom">dom</a></li>
+                                <li class=""><a href="module_dragdrop.html" title="dragdrop">dragdrop</a></li>
+                                <li class=""><a href="module_editor.html" title="editor">editor</a></li>
+                                <li class=""><a href="module_element.html" title="element">element</a></li>
+                                <li class=""><a href="module_element-delegate.html" title="element-delegate">element-delegate</a></li>
+                                <li class=""><a href="module_event.html" title="event">event</a></li>
+                                <li class=""><a href="module_event-delegate.html" title="event-delegate">event-delegate</a></li>
+                                <li class=""><a href="module_event-mouseenter.html" title="event-mouseenter">event-mouseenter</a></li>
+                                <li class="selected"><a href="module_event-simulate.html" title="event-simulate">event-simulate</a></li>
+                                <li class=""><a href="module_get.html" title="get">get</a></li>
+                                <li class=""><a href="module_history.html" title="history">history</a></li>
+                                <li class=""><a href="module_imagecropper.html" title="imagecropper">imagecropper</a></li>
+                                <li class=""><a href="module_imageloader.html" title="imageloader">imageloader</a></li>
+                                <li class=""><a href="module_json.html" title="json">json</a></li>
+                                <li class=""><a href="module_layout.html" title="layout">layout</a></li>
+                                <li class=""><a href="module_logger.html" title="logger">logger</a></li>
+                                <li class=""><a href="module_menu.html" title="menu">menu</a></li>
+                                <li class=""><a href="module_paginator.html" title="paginator">paginator</a></li>
+                                <li class=""><a href="module_profiler.html" title="profiler">profiler</a></li>
+                                <li class=""><a href="module_profilerviewer.html" title="profilerviewer">profilerviewer</a></li>
+                                <li class=""><a href="module_progressbar.html" title="progressbar">progressbar</a></li>
+                                <li class=""><a href="module_resize.html" title="resize">resize</a></li>
+                                <li class=""><a href="module_selector.html" title="selector">selector</a></li>
+                                <li class=""><a href="module_slider.html" title="slider">slider</a></li>
+                                <li class=""><a href="module_storage.html" title="Storage">Storage</a></li>
+                                <li class=""><a href="module_stylesheet.html" title="stylesheet">stylesheet</a></li>
+                                <li class=""><a href="module_swf.html" title="swf">swf</a></li>
+                                <li class=""><a href="module_swfdetect.html" title="swfdetect">swfdetect</a></li>
+                                <li class=""><a href="module_swfstore.html" title="swfstore">swfstore</a></li>
+                                <li class=""><a href="module_tabview.html" title="tabview">tabview</a></li>
+                                <li class=""><a href="module_treeview.html" title="treeview">treeview</a></li>
+                                <li class=""><a href="module_uploader.html" title="uploader">uploader</a></li>
+                                <li class=""><a href="module_yahoo.html" title="yahoo">yahoo</a></li>
+                                <li class=""><a href="module_yuiloader.html" title="yuiloader">yuiloader</a></li>
+                                <li class=""><a href="module_yuitest.html" title="yuitest">yuitest</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="classList" class="module">
                         <h4>Classes</h4>
                         <ul class="content">
-                                <li class=""><a href="YAHOO.tool.TestCase.html">YAHOO.tool.TestCase</a></li>
-                                <li class=""><a href="YAHOO.tool.TestCase.Wait.html">YAHOO.tool.TestCase.Wait</a></li>
-                                <li class=""><a href="YAHOO.tool.TestLogger.html">YAHOO.tool.TestLogger</a></li>
-                                <li class=""><a href="YAHOO.tool.TestManager.html">YAHOO.tool.TestManager</a></li>
-                                <li class=""><a href="YAHOO.tool.TestNode.html">YAHOO.tool.TestNode</a></li>
-                                <li class=""><a href="YAHOO.tool.TestReporter.html">YAHOO.tool.TestReporter</a></li>
-                                <li class=""><a href="YAHOO.tool.TestRunner.html">YAHOO.tool.TestRunner</a></li>
-                                <li class=""><a href="YAHOO.tool.TestSuite.html">YAHOO.tool.TestSuite</a></li>
-                                <li class=""><a href="YAHOO.util.ArrayAssert.html">YAHOO.util.ArrayAssert</a></li>
-                                <li class=""><a href="YAHOO.util.Assert.html">YAHOO.util.Assert</a></li>
-                                <li class=""><a href="YAHOO.util.AssertionError.html">YAHOO.util.AssertionError</a></li>
-                                <li class=""><a href="YAHOO.util.ComparisonFailure.html">YAHOO.util.ComparisonFailure</a></li>
-                                <li class=""><a href="YAHOO.util.DateAssert.html">YAHOO.util.DateAssert</a></li>
-                                <li class=""><a href="YAHOO.util.ObjectAssert.html">YAHOO.util.ObjectAssert</a></li>
-                                <li class=""><a href="YAHOO.util.ShouldError.html">YAHOO.util.ShouldError</a></li>
-                                <li class=""><a href="YAHOO.util.ShouldFail.html">YAHOO.util.ShouldFail</a></li>
-                                <li class=""><a href="YAHOO.util.UnexpectedError.html">YAHOO.util.UnexpectedError</a></li>
-                                <li class=""><a href="YAHOO.util.UnexpectedValue.html">YAHOO.util.UnexpectedValue</a></li>
-                                <li class="selected"><a href="YAHOO.util.UserAction.html">YAHOO.util.UserAction</a></li>
+                                <li class="selected"><a href="YAHOO.util.UserAction.html" title="YAHOO.util.UserAction">YAHOO.util.UserAction</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="fileList" class="module">
                         <h4>Files</h4>
                         <ul class="content">        
-                                <li class=""><a href="ArrayAssert.js.html">ArrayAssert.js</a></li>
-                                <li class=""><a href="Assert.js.html">Assert.js</a></li>
-                                <li class=""><a href="DateAssert.js.html">DateAssert.js</a></li>
-                                <li class=""><a href="ObjectAssert.js.html">ObjectAssert.js</a></li>
-                                <li class=""><a href="TestCase.js.html">TestCase.js</a></li>
-                                <li class=""><a href="TestFormat.js.html">TestFormat.js</a></li>
-                                <li class=""><a href="TestLogger.js.html">TestLogger.js</a></li>
-                                <li class=""><a href="TestManager.js.html">TestManager.js</a></li>
-                                <li class=""><a href="TestReporter.js.html">TestReporter.js</a></li>
-                                <li class=""><a href="TestRunner.js.html">TestRunner.js</a></li>
-                                <li class=""><a href="TestSuite.js.html">TestSuite.js</a></li>
-                                <li class=""><a href="UserAction.js.html">UserAction.js</a></li>
+                                <li class=""><a href="UserAction.js.html" title="UserAction.js">UserAction.js</a></li>
                         </ul>
                     </div>
 
 
-                    <div class="module">
+                    <div id="methodsList" class="module">
                         <h4>Methods</h4>
                         <ul class="content">        
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_click">click</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_dblclick">dblclick</a>
-                                </li>
-                                <li class="private"><!--<code>void</code>-->
-                                <a href="#method_fireKeyEvent">fireKeyEvent</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_keydown">keydown</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_keypress">keypress</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_keyup">keyup</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_mousedown">mousedown</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_mouseEvent">mouseEvent</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_mousemove">mousemove</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_mouseout">mouseout</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_mouseover">mouseover</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_mouseup">mouseup</a>
-                                </li>
-                                <li class="private"><!--<code>void</code>-->
-                                <a href="#method_simulateKeyEvent">simulateKeyEvent</a>
-                                </li>
-                                <li class="private"><!--<code>void</code>-->
-                                <a href="#method_simulateMouseEvent">simulateMouseEvent</a>
-                                </li>
+                                <li class=""><a href="#method_click" title="click">click</a></li>
+                                <li class=""><a href="#method_dblclick" title="dblclick">dblclick</a></li>
+                                <li class="private"><a href="#method_fireKeyEvent" title="fireKeyEvent">fireKeyEvent</a></li>
+                                <li class=""><a href="#method_keydown" title="keydown">keydown</a></li>
+                                <li class=""><a href="#method_keypress" title="keypress">keypress</a></li>
+                                <li class=""><a href="#method_keyup" title="keyup">keyup</a></li>
+                                <li class=""><a href="#method_mousedown" title="mousedown">mousedown</a></li>
+                                <li class=""><a href="#method_mouseEvent" title="mouseEvent">mouseEvent</a></li>
+                                <li class=""><a href="#method_mousemove" title="mousemove">mousemove</a></li>
+                                <li class=""><a href="#method_mouseout" title="mouseout">mouseout</a></li>
+                                <li class=""><a href="#method_mouseover" title="mouseover">mouseover</a></li>
+                                <li class=""><a href="#method_mouseup" title="mouseup">mouseup</a></li>
+                                <li class="private"><a href="#method_simulateKeyEvent" title="simulateKeyEvent">simulateKeyEvent</a></li>
+                                <li class="private"><a href="#method_simulateMouseEvent" title="simulateMouseEvent">simulateMouseEvent</a></li>
                         </ul>
                     </div>
 
@@ -1318,8 +1355,11 @@ argument is ignored for all other events. The default is null.
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2008 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2009 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
+<script type="text/javascript">
+    ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.util.UserAction", "name": "click", "url": "YAHOO.util.UserAction.html#method_click", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "dblclick", "url": "YAHOO.util.UserAction.html#method_dblclick", "type": "method"}, {"access": "private", "host": "YAHOO.util.UserAction", "name": "fireKeyEvent", "url": "YAHOO.util.UserAction.html#method_fireKeyEvent", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "keydown", "url": "YAHOO.util.UserAction.html#method_keydown", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "keypress", "url": "YAHOO.util.UserAction.html#method_keypress", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "keyup", "url": "YAHOO.util.UserAction.html#method_keyup", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "mousedown", "url": "YAHOO.util.UserAction.html#method_mousedown", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "mouseEvent", "url": "YAHOO.util.UserAction.html#method_mouseEvent", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "mousemove", "url": "YAHOO.util.UserAction.html#method_mousemove", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "mouseout", "url": "YAHOO.util.UserAction.html#method_mouseout", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "mouseover", "url": "YAHOO.util.UserAction.html#method_mouseover", "type": "method"}, {"access": "", "host": "YAHOO.util.UserAction", "name": "mouseup", "url": "YAHOO.util.UserAction.html#method_mouseup", "type": "method"}, {"access": "private", "host": "YAHOO.util.UserAction", "name": "simulateKeyEvent", "url": "YAHOO.util.UserAction.html#method_simulateKeyEvent", "type": "method"}, {"access": "private", "host": "YAHOO.util.UserAction", "name": "simulateMouseEvent", "url": "YAHOO.util.UserAction.html#method_simulateMouseEvent", "type": "method"}];
+</script>
 </body>
 </html>

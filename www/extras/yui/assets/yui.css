@@ -23,15 +23,6 @@ ul li {
 	list-style: disc outside;
 }
 
-/*
-AutoComplete Control CSS:
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
-*/
-.yui-skin-sam .yui-ac{position:relative;font-family:arial;font-size:100%;}.yui-skin-sam .yui-ac-input{position:absolute;width:100%;}.yui-skin-sam .yui-ac-container{position:absolute;top:1.6em;width:100%;}.yui-skin-sam .yui-ac-content{position:absolute;width:100%;border:1px solid #808080;background:#fff;overflow:hidden;z-index:9050;}.yui-skin-sam .yui-ac-shadow{position:absolute;margin:.3em;width:100%;background:#000;-moz-opacity:0.10;opacity:.10;filter:alpha(opacity=10);z-index:9049;}.yui-skin-sam .yui-ac iframe{opacity:0;filter:alpha(opacity=0);padding-right:.3em;padding-bottom:.3em;}.yui-skin-sam .yui-ac-content ul{margin:0;padding:0;width:100%;}.yui-skin-sam .yui-ac-content li{margin:0;padding:2px 5px;cursor:default;white-space:nowrap;list-style:none;zoom:1;}.yui-skin-sam .yui-ac-content li.yui-ac-prehighlight{background:#B3D4FF;}.yui-skin-sam .yui-ac-content li.yui-ac-highlight{background:#426FD9;color:#FFF;}
-
 /*begin YDN/YUI styles*/
 #bd {padding-top:1em;}
 .yui-gb:after{clear:none;}
@@ -72,7 +63,7 @@ h1 a:visited {color:#E76300}
 #bd ol li ol li ol{list-style:lower-roman}
 #bd ol li ol li ol li {margin-bottom:1em}
 
-#bd p.errormessage {background:url(http://us.i1.yimg.com/us.yimg.com/i/us/search/gr/alertbubble.gif) 0 0 no-repeat; padding-left:30px; margin:2em 2em 2em 1em; font-weight:bold}
+#bd p.errormessage {background:url(http://l.yimg.com/a/i/us/search/gr/alertbubble.gif) 0 0 no-repeat; padding-left:30px; margin:2em 2em 2em 1em; font-weight:bold}
 
 /*formerly #bd targeting*/
 ul {margin-top:2px; }
@@ -110,8 +101,8 @@ h3.methods { border-top:none; margin-top:0; margin-bottom:.2em; font-size: 100%;
 #ft p { padding-bottom:2em; margin:0; text-align:center; font-size:80%; line-height:1.4em}
 #ft p.first { padding:1em 0 0 0; margin:0; }
 
-#pagetitle {background: url(http://us.i1.yimg.com/us.yimg.com/i/ydn/bg_hd.gif) 0 0 repeat-x #B6CDE1; border: 1px solid #93B2CC; }
-#pagetitle h1 {text-indent:15px; padding:4px 0 2px 0; background: url(http://us.i1.yimg.com/us.yimg.com/i/ydn/title_h_bg.gif) 0 0 no-repeat;  margin:0; color:#000; font-size:120%; font-weight:bold; position:relative; left:-1px; top:-1px; margin-right:-2px;}
+#pagetitle {background: url(http://l.yimg.com/a/i/ydn/bg_hd.gif) 0 0 repeat-x #B6CDE1; border: 1px solid #93B2CC; }
+#pagetitle h1 {text-indent:15px; padding:4px 0 2px 0; margin:0; color:#000; font-size:120%; font-weight:bold; position:relative; left:-1px; top:-1px; margin-right:-2px;}
 #pagetitle h1 em {color:#FF9933; font-size:60%; font-weight:bold; font-style:normal; position:relative; top:-6px}
 
 #ygunav {background:#eee; border-bottom:2px solid #ccc; padding:0 10px;font-size:78%;text-align:right;margin-bottom:6px;height:2.5em;line-height:2.5em;}
@@ -175,7 +166,7 @@ img.example {clear:right;margin-bottom:10px;margin-left:10px;border:0;float:righ
 #yui-theater div {float:right; font-size:85%;}
 
 /*rss reader styles*/
-p.loading-content {background-image:url(http://us.i1.yimg.com/us.yimg.com/i/ydn/yuiweb/img/busy_arrow.gif); background-position:top left; background-repeat:no-repeat; height:20px;padding:4px 0 0 25px; margin:0;}
+p.loading-content {background-image:url(http://l.yimg.com/a/i/ydn/yuiweb/img/busy_arrow.gif); background-position:top left; background-repeat:no-repeat; height:20px;padding:4px 0 0 25px; margin:0;}
 #doc3 ul.yuirssreader {margin:0; padding:0;}
 #doc3 ul.yuirssreader li {list-style-type:none;padding:5px 0 0 12px; margin:0;}
 #doc3 ul.yuirssreader li p {margin:0; padding:0;}
@@ -314,9 +305,7 @@ p.loggerButton {text-align:center;}
 #ygunav {overflow:visible !important;}
 #sitesearch {float:right; width:40em; position:relative; text-align:right;}
 #searchinput {width:15em; font-size:11px; font-weight:bold; position:relative; top:2px;}
-#searchcontainer {text-align:left; width:40em; overflow:hidden; line-height:normal; position:absolute;}
-#searchcontainer .yui-ac-bd {font-size:10px; color:#666; background-color:#EAEFF2; text-align:left;}
-#searchcontainer li {overflow:hidden; text-overflow:ellipsis; -o-text-overflow:ellipsis; cursor:pointer; padding-top:2px; }
-#searchcontainer em {font-style:normal; font-weight:bold; color:#000033;}
-.yui-ac-ft {padding:3px; font-size:10px; text-align:right;}
-#searchcontainer .yui-ac-highlight {background-color:#87A4D6;}
+
+/*RSS links*/
+#yuiblogTitle a, #ydnJsTitle a, #delicious a, #yui-theater h3 a { color: #E76300; text-decoration: none; }
+#yuiblogTitle a:hover, #ydnJsTitle a:hover, #delicious a:hover, #yui-theater h3 a:hover { text-decoration: underline; }

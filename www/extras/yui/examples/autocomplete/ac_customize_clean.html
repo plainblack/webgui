@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Configurations Dashboard</title>
 
@@ -28,7 +30,8 @@ body {
 <!--begin custom header content for this example-->
 <style type="text/css">
 /* custom styles for this example */
-#dashboard_autocomplete {margin:0 1em 0 0;width:40%;height:4em;}/* set width and height of widget here*/
+#dashboard_autocomplete {margin:0 1em 0 0;width:50%;height:4em;}/* set width and height of widget here*/
+#dashboard_autocomplete label {display:block;color:#E76300;font-weight:bold;}
 </style>
 
 
@@ -36,21 +39,21 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Configurations Dashboard</h1>
 
 <div class="exampleIntro">
-	<p>This example is designed to allow you to experiment with the various configuration properties provided by AutoComplete and to explore their impact on the interaction.  The first field after the AutoComplete input textbox is a select element that allows you to test for bleed-through on Internet Explorer when the AutoComplete suggestion container descends to cover it.  The remaining form fields allow you to change property settings on the AutoComplete instance and to see immediately how those changes feel in the browser.</p>
+	<p>This example is designed to allow you to experiment with the various configuration properties provided by AutoComplete and to explore their impact on the interaction.  The first field after the AutoComplete input textbox is a select element that allows you to test for bleed-through on Internet Explorer when the AutoComplete suggestion container descends to cover it.  The remaining form fields allow you to change property settings on the AutoComplete instance and to see immediately how those changes look and feel in the browser.</p>
 			
 </div>
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 
 <!-- AutoComplete begins -->
-<h3>Search the Web Using Yahoo!'s Search API:</h3>
 <div id="dashboard_autocomplete">
+    <label for="dashboard_input">Search the Web Using Yahoo!'s Search API:</label>
 	<input id="dashboard_input" type="text" name="p">
 	<div id="dashboard_container"></div>
 </div>

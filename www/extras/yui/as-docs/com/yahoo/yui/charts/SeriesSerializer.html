@@ -55,28 +55,32 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <div class="summarySignature">
 <a class="signatureLink" href="#readSeries()">readSeries</a>(input:Object, series:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a> = null):<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a>
 </div>
-<div class="summaryTableDescription">[static]</div>
+<div class="summaryTableDescription">[static]
+   Creates or updates a series based on an object of series properties.</div>
 </td><td class="summaryTableOwnerCol">SeriesSerializer</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
 <a class="signatureLink" href="#seriesTypeToShortName()">seriesTypeToShortName</a>(type:Class):String</div>
-<div class="summaryTableDescription">[static]</div>
+<div class="summaryTableDescription">[static]
+   Returns a series string reference based on a class.</div>
 </td><td class="summaryTableOwnerCol">SeriesSerializer</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
 <a class="signatureLink" href="#shortNameToSeriesType()">shortNameToSeriesType</a>(name:String):Class</div>
-<div class="summaryTableDescription">[static]</div>
+<div class="summaryTableDescription">[static]
+   Returns a series class based on a string reference.</div>
 </td><td class="summaryTableOwnerCol">SeriesSerializer</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
 <a class="signatureLink" href="#writeSeries()">writeSeries</a>(input:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a>):Object</div>
-<div class="summaryTableDescription">[static]</div>
+<div class="summaryTableDescription">[static]
+   Returns the properties of a series.</div>
 </td><td class="summaryTableOwnerCol">SeriesSerializer</td>
 </tr>
 </table>
@@ -95,23 +99,31 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public static function readSeries(input:Object, series:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a> = null):<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a></code><span class="label">Parameters</span>
+<code>public static function readSeries(input:Object, series:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a> = null):<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a></code><p>
+   Creates or updates a series based on an object of series properties.
+      </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20px"></td><td><code><span class="label">input</span>:Object</code></td>
+<td width="20px"></td><td><code><span class="label">input</span>:Object</code> &mdash; Properties to be applied to the series.
+   </td>
 </tr>
 <tr>
 <td class="paramSpacer">&nbsp;</td>
 </tr>
 <tr>
-<td width="20px"></td><td><code><span class="label">series</span>:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a></code> (default = <code>null</code>)<code></code></td>
+<td width="20px"></td><td><code><span class="label">series</span>:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a></code> (default = <code>null</code>)<code></code> &mdash; Series to be updated
+   </td>
 </tr>
 </table>
 <p></p>
 <span class="label">Returns</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20"></td><td><code><a href="../../astra/fl/charts/series/ISeries.html">ISeries</a></code></td>
+<td width="20"></td><td><code><a href="../../astra/fl/charts/series/ISeries.html">ISeries</a></code> &mdash; 
+                        New or updated series.
+   
+                        
+                     </td>
 </tr>
 </table>
 </div>
@@ -122,17 +134,21 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public static function seriesTypeToShortName(type:Class):String</code><span class="label">Parameters</span>
+<code>public static function seriesTypeToShortName(type:Class):String</code><p>
+   Returns a series string reference based on a class.
+      </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20px"></td><td><code><span class="label">type</span>:Class</code></td>
+<td width="20px"></td><td><code><span class="label">type</span>:Class</code> &mdash; Series class from which to derive a string reference.
+   </td>
 </tr>
 </table>
 <p></p>
 <span class="label">Returns</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20"></td><td><code>String</code></td>
+<td width="20"></td><td><code>String</code> &mdash; Reference to the series.
+   </td>
 </tr>
 </table>
 </div>
@@ -143,17 +159,22 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public static function shortNameToSeriesType(name:String):Class</code><span class="label">Parameters</span>
+<code>public static function shortNameToSeriesType(name:String):Class</code><p>
+   Returns a series class based on a string reference.
+   
+   </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20px"></td><td><code><span class="label">name</span>:String</code></td>
+<td width="20px"></td><td><code><span class="label">name</span>:String</code> &mdash; Reference from which to derive a class.
+   </td>
 </tr>
 </table>
 <p></p>
 <span class="label">Returns</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20"></td><td><code>Class</code></td>
+<td width="20"></td><td><code>Class</code> &mdash; Series Class
+   </td>
 </tr>
 </table>
 </div>
@@ -164,17 +185,21 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public static function writeSeries(input:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a>):Object</code><span class="label">Parameters</span>
+<code>public static function writeSeries(input:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a>):Object</code><p>
+   Returns the properties of a series.
+      </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20px"></td><td><code><span class="label">input</span>:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a></code></td>
+<td width="20px"></td><td><code><span class="label">input</span>:<a href="../../astra/fl/charts/series/ISeries.html">ISeries</a></code> &mdash; Series from which to retrieve the properties.
+   </td>
 </tr>
 </table>
 <p></p>
 <span class="label">Returns</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20"></td><td><code>Object</code></td>
+<td width="20"></td><td><code>Object</code> &mdash; Properties of the Series.
+   </td>
 </tr>
 </table>
 </div>

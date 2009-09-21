@@ -101,10 +101,9 @@
             YAHOO.util.Event.onContentReady("productsandservices", function () {
 
                 /*
-                     Instantiate a Menu:  The first argument passed to the 
-                     constructor is the id of the element in the page 
-                     representing the Menu; the second is an object literal 
-                     of configuration properties.
+					Instantiate a Menu:  The first argument passed to the constructor
+					is the id for the Menu element to be created, the second is an 
+					object literal of configuration properties.
                 */
 
                 var oMenu = new YAHOO.widget.Menu("productsandservices", { 
@@ -198,12 +197,15 @@
 
                 oMenu.subscribe("beforeRender", function () {
 
+					var nSubmenus = aSubmenuData.length,
+						i;
+
+
                     if (this.getRoot() == this) {
 
-                        this.getItem(0).cfg.setProperty("submenu", aSubmenuData[0]);
-                        this.getItem(1).cfg.setProperty("submenu", aSubmenuData[1]);
-                        this.getItem(2).cfg.setProperty("submenu", aSubmenuData[2]);
-                        this.getItem(3).cfg.setProperty("submenu", aSubmenuData[3]);
+						for (i = 0; i < nSubmenus; i++) {
+                        	this.getItem(i).cfg.setProperty("submenu", aSubmenuData[i]);
+						}
 
                     }
 

@@ -31,7 +31,7 @@
 
                 text-indent: -6em;
                 display: block;
-                background: url(http://us.i1.yimg.com/us.yimg.com/i/us/nt/b/purpley.1.0.gif) center center no-repeat;
+                background: url(http://l.yimg.com/a/i/us/nt/b/purpley.1.0.gif) center center no-repeat;
                 width: 2em;
                 overflow: hidden;
 
@@ -90,6 +90,10 @@
 
             YAHOO.util.Event.onDOMReady(function () {
 
+				var onMenuItemClick = function () {
+					alert("Callback for MenuItem: " + this.cfg.getProperty("text"));
+				};
+
                 /*
                      Define an array of object literals, each containing 
                      the data necessary to create the items for a MenuBar.
@@ -116,9 +120,9 @@
                             id: "filemenu", 
                             itemdata: [
 
-                                { text: "New File", helptext: "Ctrl + N" },
+                                { text: "New File", helptext: "Ctrl + N", onclick: { fn: onMenuItemClick }, keylistener: { ctrl: true, keys: 78 } },
                                 "New Folder",
-                                { text: "Open", helptext: "Ctrl + O" },
+                                { text: "Open", helptext: "Ctrl + O", onclick: { fn: onMenuItemClick }, keylistener: { ctrl: true, keys: 79 } },
                                 { 
                                     text: "Open With...", 
                                     submenu: { 
@@ -131,7 +135,7 @@
                                         ] 
                                     } 
                                 },
-                                { text: "Print", helptext: "Ctrl + P" }
+                                { text: "Print", helptext: "Ctrl + P", onclick: { fn: onMenuItemClick }, keylistener: { ctrl: true, keys: 80 } }
 
                             ] 
                         }
@@ -145,22 +149,22 @@
                             itemdata: [
 
                                 [ 
-                                    { text: "Undo", helptext: "Ctrl + Z" },
+                                    { text: "Undo", helptext: "Ctrl + Z", onclick: { fn: onMenuItemClick }, keylistener: { ctrl: true, keys: 90 } },
                                     { text: "Redo", helptext: "Ctrl + Y", disabled: true }
                                 ],
                                 
                                 [
                                     { text: "Cut", helptext: "Ctrl + X", disabled: true },
                                     { text: "Copy", helptext: "Ctrl + C", disabled: true },
-                                    { text: "Paste", helptext: "Ctrl + V" },
+                                    { text: "Paste", helptext: "Ctrl + V", onclick: { fn: onMenuItemClick }, keylistener: { ctrl: true, keys: 86 } },
                                     { text: "Delete", helptext: "Del", disabled: true }
                                 ],
                                 
-                                [ { text: "Select All", helptext: "Ctrl + A" } ],
+                                [ { text: "Select All", helptext: "Ctrl + A", onclick: { fn: onMenuItemClick }, keylistener: { ctrl: true, keys: 65 } } ],
     
                                 [
-                                    { text: "Find", helptext: "Ctrl + F" },
-                                    { text: "Find Again", helptext: "Ctrl + G" }
+                                    { text: "Find", helptext: "Ctrl + F", onclick: { fn: onMenuItemClick }, keylistener: { ctrl: true, keys: 70 } },
+                                    { text: "Find Again", helptext: "Ctrl + G", onclick: { fn: onMenuItemClick }, keylistener: { ctrl: true, keys: 71 } }
                                 ]
                     
                         ] }
@@ -178,9 +182,9 @@
 
 
                 /*
-                     Instantiate a MenuBar:  The first argument passed to the 
-                     constructor is the id of the element to be created; the 
-                     second is an object literal of configuration properties.
+					Instantiate a Menu:  The first argument passed to the constructor
+					is the id for the Menu element to be created, the second is an 
+					object literal of configuration properties.
                 */
 
                 var oMenuBar = new YAHOO.widget.MenuBar("mymenubar", { 
@@ -265,6 +269,10 @@
                 oPanel.setBody("This example demonstrates how to create an application-like menu bar using JavaScript.");
 
                 oPanel.render(document.body);
+
+
+				// Hide any currently visible submenus of the menubar when the dialog is clicked
+				YAHOO.util.Event.on(oPanel.element, "mousedown", oMenuBar.clearActiveItem, null, oMenuBar);
             
             });
 

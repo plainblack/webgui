@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Inline Color Picker Control from Script</title>
 
@@ -19,8 +21,11 @@ body {
 <link rel="stylesheet" type="text/css" href="../../build/slider/assets/skins/sam/slider.css" />
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="../../build/colorpicker/assets/skins/sam/colorpicker.css" />
-<script type="text/javascript" src="../../build/utilities/utilities.js"></script>
+<script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="../../build/animation/animation-min.js"></script>
+<script type="text/javascript" src="../../build/dragdrop/dragdrop-min.js"></script>
 <script type="text/javascript" src="../../build/slider/slider-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
 <script type="text/javascript" src="../../build/colorpicker/colorpicker-min.js"></script>
 
 
@@ -36,13 +41,14 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Inline Color Picker Control from Script</h1>
 
 <div class="exampleIntro">
-	<p>The simplest way to implement the Color Picker Control is to do so entirely via script.  In this example, a Color Picker Control is placed on the page via script and allowed to create its own DOM structure.  In cases where you've provided other form controls on the page for color specification (ie, controls not dependent on JavaScript), this approach allows you to provide a richer visual experience for sighted users with JavaScript enabled.</p>			
+	<p>The simplest way to implement the <a href="http://developer.yahoo.com/yui/colorpicker/">Color Picker Control</a> is to do so entirely via script.  In this example, a Color Picker is placed on the page via script and allowed to create its own DOM structure.  In cases where you've provided other form controls on the page for color specification (ie, controls not dependent on JavaScript), this approach allows you to provide a richer visual experience for sighted users with JavaScript enabled.</p>
+			
 </div>
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->

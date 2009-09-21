@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Subset Matching</title>
 
@@ -31,6 +33,7 @@ body {
 #example1 { z-index:9001; } /* z-index needed on top instances for ie & sf absolute inside relative issue */
 #example2 { z-index:9000; } /* z-index needed on top instances for ie & sf absolute inside relative issue */
 .autocomplete { padding-bottom:2em;width:40%; }/* set width of widget here*/
+label {color:#E76300;}
 </style>
 
 
@@ -38,7 +41,7 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Subset Matching</h1>
@@ -48,6 +51,8 @@ body {
 
 <p>The second AutoComplete instance does not enable <code>queryMatchSubset</code>
 so each typed letter results in a new request to the server.</p>
+
+<p>Note the custom CSS that is needed for stacking AutoComplete instances.</p>
 			
 </div>
 
@@ -55,12 +60,12 @@ so each typed letter results in a new request to the server.</p>
 
 <div id="autocomplete_examples">
     <p><strong>Note:</strong> The flat-file database accessed here has a limited number of terms; for best results, type one-letter at at time and let the AutoComplete instance return &mdash; if you type a full, highly-specifc phrase (such as your name) you'll probably get no results from the small dataset.</p>
-	<h2>First AutoComplete instance enables queryMatchSubset:</h2>
+	<label for="ysearchinput1">First AutoComplete instance enables queryMatchSubset:</label>
 	<div id="example1" class="autocomplete">
 		<input id="ysearchinput1" type="text">
 		<div id="ysearchcontainer1"></div>
 	</div>
-	<h2>Second AutoComplete instance does not enable queryMatchSubset:</h2>
+	<label for="ysearchinput2">Second AutoComplete instance does not enable queryMatchSubset:</label>
 	<div id="example2" class="autocomplete">
 		<input id="ysearchinput2" type="text">
 		<div id="ysearchcontainer2"></div>

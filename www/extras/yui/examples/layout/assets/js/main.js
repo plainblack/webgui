@@ -68,8 +68,8 @@
                     YAHOO.util.Get.script('assets/js/calendar.js');
                 }, 0);
                 YAHOO.example.app.layout.getUnitByPosition('right').collapse();
-                YAHOO.util.Dom.setStyle(document.body, 'visibility', 'visible');
                 setTimeout(function() {
+                    YAHOO.util.Dom.setStyle(document.body, 'visibility', 'visible');
                     YAHOO.example.app.layout.resize();
                 }, 1000);
             });

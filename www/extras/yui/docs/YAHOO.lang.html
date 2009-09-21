@@ -1,8 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
 <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<title>API: yahoo  YAHOO.lang   (YUI Library)</title>
-	<link rel="stylesheet" type="text/css" href="assets/api.css">
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
     <script type="text/javascript" src="assets/api-js"></script>
     <script type="text/javascript" src="assets/ac-js"></script>
 </head>
@@ -10,27 +14,33 @@
 <body id="yahoo-com">
 
 <div id="doc3" class="yui-t2">
-
 	<div id="hd">
-        <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>YAHOO Global&nbsp; <span class="subtitle">2.6.0</span></h3>
-        <p>
-        <a href="./index.html">Yahoo! UI Library</a> 
-            &gt; <a href="./module_yahoo.html">yahoo</a>
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>YAHOO Global&nbsp; <span class="subtitle">2.8.0r4</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_yahoo.html" title="yahoo">yahoo</a>
                  &gt; YAHOO.lang 
                 
-            </p>
-
-
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
 	</div>
 
 	<div id="bd">
 		<div id="yui-main">
 			<div class="yui-b">
-            <form name="yui-classopts-form">
-    <span id="classopts"><input type="checkbox" name="showprivate" id="showprivate" /> <label for="showprivate">Show Private</label></span>
-    <span id="classopts"><input type="checkbox" name="showprotected" id="showprotected" /> <label for="showprotected">Show Protected</label></span>
-    <span id="classopts"><input type="checkbox" name="showdeprecated" id="showdeprecated" /> <label for="showdeprecated">Show Deprecated</label></span>
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
             </form>
 
                     <h2>
@@ -38,34 +48,31 @@
 
                         
                         
-                            Class <b>YAHOO.lang</b>
+                            Class <b property="yui:name">YAHOO.lang</b>
                         <span class="extends">
                         </span>
 
-                        <span class="extends">
-                        </span>
-                        
-                        </code>
                     </h2>
                     <!-- class tree goes here -->
                     
                 
   
 
-                    <div class="summary description">
+                    <div class="summary description" property="yui:description">
                         Provides the language utilites and extensions used by the library
                     </div>
 
-
+                    
+                    <div rel="yui:properties" resource="#properties">
                         <div class="section field details">
                             <h3 id="properties">Properties</h3>
                             <div class="content">
-                                    <div class="private">
-                                    <h4><a name="property__IEEnumFix">_IEEnumFix</a>
-                                        <code>- private static object</code>
+                                    <div class="private" rel="yui:property" resource="#property__IEEnumFix">
+                                    <h4><a name="property__IEEnumFix" property="yui:name">_IEEnumFix</a>
+                                        - <code>private static <span property="yui:type">object</span></code>
                                     </h4>
                                     <div class="detail">
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             IE will not enumerate native functions in a derived object even if the
 function was overridden.  This is a workaround for specific functions 
 we care about on the Object prototype.
@@ -77,25 +84,25 @@ we care about on the Object prototype.
 
                                     <hr />
                                     </div>
-
-
                             </div>
                         </div>
 
+                    </div>
 
+                    <div rel="yui:methods" resource="#methods">
                         <div class="section method details">
                             <h3 id="methods">Methods</h3>
                             <div class="content">
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_augment">
                                     <h4>
                                         <a name="method_augment">augment</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>augment</strong>
+                                            <strong property="yui:name">augment</strong>
                                            (
                                                 
                                                         
@@ -113,41 +120,47 @@ we care about on the Object prototype.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Same as YAHOO.lang.augmentObject, except it only applies prototype 
 properties.  This is an alias for augmentProto.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>r &lt;Function&gt;</code>
-                                                              the object to receive the augmentation
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">r</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the object to receive the augmentation</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>s &lt;Function&gt;</code>
-                                                              the object that supplies the properties to augment
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">s</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the object that supplies the properties to augment</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>arguments &lt;String*|boolean&gt;</code>
-                                                             zero or more properties methods to 
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">arguments</span>
+                                                        &lt;<span property="yui:type">String*|boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> zero or more properties methods to 
 augment the receiver with.  If none specified, everything
 in the supplier will be used unless it would
 overwrite an existing property in the receiver.  if true
 is specified as the third parameter, all properties will
 be applied and will overwrite an existing property in
-the receiver
+the receiver</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -158,16 +171,16 @@ the receiver
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_augmentObject">
                                     <h4>
                                         <a name="method_augmentObject">augmentObject</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>augmentObject</strong>
+                                            <strong property="yui:name">augmentObject</strong>
                                            (
                                                 
                                                         
@@ -185,7 +198,7 @@ the receiver
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Applies all properties in the supplier to the receiver if the
 receiver does not have these properties yet.  Optionally, one or 
 more methods/properties can be specified (as additional 
@@ -197,34 +210,40 @@ the receiver.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>r &lt;Function&gt;</code>
-                                                              the object to receive the augmentation
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">r</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the object to receive the augmentation</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>s &lt;Function&gt;</code>
-                                                              the object that supplies the properties to augment
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">s</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the object that supplies the properties to augment</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>arguments &lt;String*|boolean&gt;</code>
-                                                             zero or more properties methods 
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">arguments</span>
+                                                        &lt;<span property="yui:type">String*|boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> zero or more properties methods 
 to augment the receiver with.  If none specified, everything
 in the supplier will be used unless it would
 overwrite an existing property in the receiver. If true
 is specified as the third parameter, all properties will
 be applied and will overwrite an existing property in
-the receiver
+the receiver</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -235,16 +254,16 @@ the receiver
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_augmentProto">
                                     <h4>
                                         <a name="method_augmentProto">augmentProto</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>augmentProto</strong>
+                                            <strong property="yui:name">augmentProto</strong>
                                            (
                                                 
                                                         
@@ -262,39 +281,45 @@ the receiver
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Same as YAHOO.lang.augmentObject, except it only applies prototype properties
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>r &lt;Function&gt;</code>
-                                                              the object to receive the augmentation
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">r</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the object to receive the augmentation</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>s &lt;Function&gt;</code>
-                                                              the object that supplies the properties to augment
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">s</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the object that supplies the properties to augment</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>arguments &lt;String*|boolean&gt;</code>
-                                                             zero or more properties methods 
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">arguments</span>
+                                                        &lt;<span property="yui:type">String*|boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> zero or more properties methods 
 to augment the receiver with.  If none specified, everything 
 in the supplier will be used unless it would overwrite an existing 
 property in the receiver.  if true is specified as the third 
 parameter, all properties will be applied and will overwrite an 
-existing property in the receiver
+existing property in the receiver</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -305,16 +330,16 @@ existing property in the receiver
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_dump">
                                     <h4>
                                         <a name="method_dump">dump</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         String
-                                            <strong>dump</strong>
+                                            <strong property="yui:name">dump</strong>
                                            (
                                                 
                                                         
@@ -328,7 +353,7 @@ existing property in the receiver
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Returns a simple string representation of the object or array.
 Other types of objects will be returned unprocessed.  Arrays
 are expected to be indexed.  Use object notation for
@@ -337,24 +362,28 @@ associative arrays.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;Object&gt;</code>
-                                                              The object to dump
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  The object to dump</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>d &lt;int&gt;</code>
-                                                              How deep to recurse child objects, default 3
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">d</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  How deep to recurse child objects, default 3</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         String
                                                     </code></dt>
-                                                    <dd>the dump result</dd>
+                                                    <dd property="yui:returnInfo">the dump result</dd>
                                                 </dl>
 
 
@@ -365,16 +394,16 @@ associative arrays.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_extend">
                                     <h4>
                                         <a name="method_extend">extend</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                          static 
                                         
                                         void
-                                            <strong>extend</strong>
+                                            <strong property="yui:name">extend</strong>
                                            (
                                                 
                                                         
@@ -392,7 +421,7 @@ associative arrays.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Utility to set up the prototype, constructor and superclass properties to
 support an inheritance strategy that can chain constructors and methods.
 Static members will not be inherited.
@@ -400,31 +429,37 @@ Static members will not be inherited.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>subc &lt;Function&gt;</code>
-                                                               the object to modify
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">subc</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">   the object to modify</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>superc &lt;Function&gt;</code>
-                                                             the object to inherit
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">superc</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> the object to inherit</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>overrides &lt;Object&gt;</code>
-                                                              additional properties/methods to add to the
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">overrides</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  additional properties/methods to add to the
 subclass prototype.  These will override the
 matching items obtained from the superclass 
-if present.
+if present.</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         void
                                                     </code></dt>
-                                                    <dd></dd>
+                                                    <dd property="yui:returnInfo"></dd>
                                                 </dl>
 
 
@@ -435,16 +470,16 @@ if present.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_hasOwnProperty">
                                     <h4>
                                         <a name="method_hasOwnProperty">hasOwnProperty</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>hasOwnProperty</strong>
+                                            <strong property="yui:name">hasOwnProperty</strong>
                                            (
                                                 
                                                         
@@ -458,7 +493,7 @@ if present.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Determines whether or not the property was added
 to the object instance.  Returns false if the property is not present
 in the object, or was inherited from the prototype.
@@ -478,24 +513,28 @@ alert(YAHOO.lang.hasOwnProperty(a, 'foo')); // false when using fallback
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>prop &lt;string&gt;</code>
-                                                              the name of the property to test
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">prop</span>
+                                                        &lt;<span property="yui:type">string</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the name of the property to test</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -506,16 +545,16 @@ alert(YAHOO.lang.hasOwnProperty(a, 'foo')); // false when using fallback
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isArray">
                                     <h4>
                                         <a name="method_isArray">isArray</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isArray</strong>
+                                            <strong property="yui:name">isArray</strong>
                                            (
                                                 
                                                         
@@ -525,31 +564,28 @@ alert(YAHOO.lang.hasOwnProperty(a, 'foo')); // false when using fallback
                                             )
                                         </code>
                                         
-                                        <div class="description">
-                                            Determines whether or not the provided object is an array.
-Testing typeof/instanceof/constructor of arrays across frame 
-boundaries isn't possible in Safari unless you have a reference
-to the other frame to test against its Array prototype.  To
-handle this case, we test well-known array properties instead.
-properties.
+                                        <div class="description" property="yui:description">
+                                            Determines wheather or not the provided object is an array.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -560,16 +596,16 @@ properties.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isBoolean">
                                     <h4>
                                         <a name="method_isBoolean">isBoolean</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isBoolean</strong>
+                                            <strong property="yui:name">isBoolean</strong>
                                            (
                                                 
                                                         
@@ -579,26 +615,28 @@ properties.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Determines whether or not the provided object is a boolean
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -609,16 +647,16 @@ properties.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isFunction">
                                     <h4>
                                         <a name="method_isFunction">isFunction</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isFunction</strong>
+                                            <strong property="yui:name">isFunction</strong>
                                            (
                                                 
                                                         
@@ -628,26 +666,35 @@ properties.
                                             )
                                         </code>
                                         
-                                        <div class="description">
-                                            Determines whether or not the provided object is a function
+                                        <div class="description" property="yui:description">
+                                            Determines whether or not the provided object is a function.
+Note: Internet Explorer thinks certain functions are objects:
+var obj = document.createElement("object");
+YAHOO.lang.isFunction(obj.getAttribute) // reports false in IE
+var input = document.createElement("input"); // append to body
+YAHOO.lang.isFunction(input.focus) // reports false in IE
+You will have to implement additional tests if these functions
+matter to you.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -658,16 +705,16 @@ properties.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isNull">
                                     <h4>
                                         <a name="method_isNull">isNull</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isNull</strong>
+                                            <strong property="yui:name">isNull</strong>
                                            (
                                                 
                                                         
@@ -677,26 +724,28 @@ properties.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Determines whether or not the provided object is null
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -707,16 +756,16 @@ properties.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isNumber">
                                     <h4>
                                         <a name="method_isNumber">isNumber</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isNumber</strong>
+                                            <strong property="yui:name">isNumber</strong>
                                            (
                                                 
                                                         
@@ -726,26 +775,28 @@ properties.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Determines whether or not the provided object is a legal number
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -756,16 +807,16 @@ properties.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isObject">
                                     <h4>
                                         <a name="method_isObject">isObject</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isObject</strong>
+                                            <strong property="yui:name">isObject</strong>
                                            (
                                                 
                                                         
@@ -775,27 +826,29 @@ properties.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Determines whether or not the provided object is of type object
 or function
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -806,16 +859,16 @@ or function
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isString">
                                     <h4>
                                         <a name="method_isString">isString</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isString</strong>
+                                            <strong property="yui:name">isString</strong>
                                            (
                                                 
                                                         
@@ -825,26 +878,28 @@ or function
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Determines whether or not the provided object is a string
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -855,16 +910,16 @@ or function
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isUndefined">
                                     <h4>
                                         <a name="method_isUndefined">isUndefined</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isUndefined</strong>
+                                            <strong property="yui:name">isUndefined</strong>
                                            (
                                                 
                                                         
@@ -874,26 +929,28 @@ or function
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Determines whether or not the provided object is undefined
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                             The object being testing
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The object being testing</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>the result</dd>
+                                                    <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
 
 
@@ -904,16 +961,16 @@ or function
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_isValue">
                                     <h4>
                                         <a name="method_isValue">isValue</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         boolean
-                                            <strong>isValue</strong>
+                                            <strong property="yui:name">isValue</strong>
                                            (
                                                 
                                                         
@@ -923,7 +980,7 @@ or function
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             A convenience method for detecting a legitimate non-null value.
 Returns false for null/undefined/NaN, true for other values, 
 including 0/false/''
@@ -931,20 +988,22 @@ including 0/false/''
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>o &lt;any&gt;</code>
-                                                              the item to test
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">any</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the item to test</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         boolean
                                                     </code></dt>
-                                                    <dd>true if it is not null/undefined/NaN || false</dd>
+                                                    <dd property="yui:returnInfo">true if it is not null/undefined/NaN || false</dd>
                                                 </dl>
 
 
@@ -955,16 +1014,16 @@ including 0/false/''
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_later">
                                     <h4>
                                         <a name="method_later">later</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         
-                                            <strong>later</strong>
+                                            <strong property="yui:name">later</strong>
                                            (
                                                 
                                                         
@@ -990,7 +1049,7 @@ including 0/false/''
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Executes the supplied function in the context of the supplied 
 object 'when' milliseconds later.  Executes the function a 
 single time unless periodic is set to true.
@@ -998,34 +1057,44 @@ single time unless periodic is set to true.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>when &lt;int&gt;</code>
-                                                              the number of milliseconds to wait until the fn 
-is executed
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">when</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the number of milliseconds to wait until the fn 
+is executed</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>o &lt;object&gt;</code>
-                                                             the context object
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> the context object</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>fn &lt;Function|String&gt;</code>
-                                                              the function to execute or the name of 
-the method in the 'o' object to execute
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">fn</span>
+                                                        &lt;<span property="yui:type">Function|String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the function to execute or the name of 
+the method in the 'o' object to execute</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>data &lt;object&gt;</code>
-                                                             [Array] data that is provided to the function.  This accepts
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">data</span>
+                                                        &lt;<span property="yui:type">object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> [Array] data that is provided to the function.  This accepts
 either a single item or an array.  If an array is provided, the
 function is executed with one parameter for each array item.  If
 you need to pass a single array parameter, it needs to be wrapped in
-an array [myarray]
+an array [myarray]</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>periodic &lt;boolean&gt;</code>
-                                                              if true, executes continuously at supplied 
-interval until canceled
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">periodic</span>
+                                                        &lt;<span property="yui:type">boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  if true, executes continuously at supplied 
+interval until canceled</span>
                                                         </dd>
                                                 </dl>
 
@@ -1038,16 +1107,16 @@ interval until canceled
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_merge">
                                     <h4>
                                         <a name="method_merge">merge</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         
-                                            <strong>merge</strong>
+                                            <strong property="yui:name">merge</strong>
                                            (
                                                 
                                                         
@@ -1057,7 +1126,7 @@ interval until canceled
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Returns a new object containing all of the properties of
 all the supplied objects.  The properties from later objects
 will overwrite those in earlier objects.
@@ -1065,11 +1134,13 @@ will overwrite those in earlier objects.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>arguments &lt;Object*&gt;</code>
-                                                              the objects to merge
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">arguments</span>
+                                                        &lt;<span property="yui:type">Object*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the objects to merge</span>
                                                         </dd>
                                                 </dl>
 
@@ -1082,16 +1153,16 @@ will overwrite those in earlier objects.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_substitute">
                                     <h4>
                                         <a name="method_substitute">substitute</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         String
-                                            <strong>substitute</strong>
+                                            <strong property="yui:name">substitute</strong>
                                            (
                                                 
                                                         
@@ -1109,7 +1180,7 @@ will overwrite those in earlier objects.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Does variable substitution on a string. It scans through the string 
 looking for expressions enclosed in { } braces. If an expression 
 is found, it is used a key on the object.  If there is a space in
@@ -1126,31 +1197,37 @@ pairs.
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>s &lt;String&gt;</code>
-                                                              The string that will be modified.
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">s</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  The string that will be modified.</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>o &lt;Object&gt;</code>
-                                                              An object containing the replacement values
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  An object containing the replacement values</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>f &lt;Function&gt;</code>
-                                                              An optional function that can be used to
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">f</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  An optional function that can be used to
 process each match.  It receives the key,
 value, and any extra metadata included with
-the key inside of the braces.
+the key inside of the braces.</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         String
                                                     </code></dt>
-                                                    <dd>the substituted string</dd>
+                                                    <dd property="yui:returnInfo">the substituted string</dd>
                                                 </dl>
 
 
@@ -1161,16 +1238,16 @@ the key inside of the braces.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_trim">
                                     <h4>
                                         <a name="method_trim">trim</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         string
-                                            <strong>trim</strong>
+                                            <strong property="yui:name">trim</strong>
                                            (
                                                 
                                                         
@@ -1180,27 +1257,29 @@ the key inside of the braces.
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Returns a string without any leading or trailing whitespace.  If 
 the input is not a string, the input will be returned untouched.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>s &lt;string&gt;</code>
-                                                              the string to trim
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">s</span>
+                                                        &lt;<span property="yui:type">string</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the string to trim</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         string
                                                     </code></dt>
-                                                    <dd>the trimmed string</dd>
+                                                    <dd property="yui:returnInfo">the trimmed string</dd>
                                                 </dl>
 
 
@@ -1214,186 +1293,125 @@ the input is not a string, the input will be returned untouched.
                             </div>
                         </div>
 
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
 
 
+                    </div>
 
+                    <div rel="yui:attributes" resource="#configattributes">
 
-
+                    </div>
 
 			</div>
 		</div>
 		<div class="yui-b">
             <div class="nav">
 
-                    <div class="module">
+                    <div id="moduleList" class="module">
                         <h4>Modules</h4>
                         <ul class="content">
-
-                                <li class=""><a href="module_animation.html">animation</a></li>
-
-                                <li class=""><a href="module_autocomplete.html">autocomplete</a></li>
-
-                                <li class=""><a href="module_button.html">button</a></li>
-
-                                <li class=""><a href="module_calendar.html">calendar</a></li>
-
-                                <li class=""><a href="module_carousel.html">carousel</a></li>
-
-                                <li class=""><a href="module_charts.html">charts</a></li>
-
-                                <li class=""><a href="module_colorpicker.html">colorpicker</a></li>
-
-                                <li class=""><a href="module_connection.html">connection</a></li>
-
-                                <li class=""><a href="module_container.html">container</a></li>
-
-                                <li class=""><a href="module_cookie.html">cookie</a></li>
-
-                                <li class=""><a href="module_datasource.html">datasource</a></li>
-
-                                <li class=""><a href="module_datatable.html">datatable</a></li>
-
-                                <li class=""><a href="module_dom.html">dom</a></li>
-
-                                <li class=""><a href="module_dragdrop.html">dragdrop</a></li>
-
-                                <li class=""><a href="module_editor.html">editor</a></li>
-
-                                <li class=""><a href="module_element.html">element</a></li>
-
-                                <li class=""><a href="module_event.html">event</a></li>
-
-                                <li class=""><a href="module_get.html">get</a></li>
-
-                                <li class=""><a href="module_history.html">history</a></li>
-
-                                <li class=""><a href="module_imagecropper.html">imagecropper</a></li>
-
-                                <li class=""><a href="module_imageloader.html">imageloader</a></li>
-
-                                <li class=""><a href="module_json.html">json</a></li>
-
-                                <li class=""><a href="module_layout.html">layout</a></li>
-
-                                <li class=""><a href="module_logger.html">logger</a></li>
-
-                                <li class=""><a href="module_menu.html">menu</a></li>
-
-                                <li class=""><a href="module_paginator.html">paginator</a></li>
-
-                                <li class=""><a href="module_profiler.html">profiler</a></li>
-
-                                <li class=""><a href="module_profilerviewer.html">profilerviewer</a></li>
-
-                                <li class=""><a href="module_resize.html">resize</a></li>
-
-                                <li class=""><a href="module_selector.html">selector</a></li>
-
-                                <li class=""><a href="module_slider.html">slider</a></li>
-
-                                <li class=""><a href="module_tabview.html">tabview</a></li>
-
-                                <li class=""><a href="module_treeview.html">treeview</a></li>
-
-                                <li class=""><a href="module_uploader.html">uploader</a></li>
-
-                                <li class="selected"><a href="module_yahoo.html">yahoo</a></li>
-
-                                <li class=""><a href="module_yuiloader.html">yuiloader</a></li>
-
-                                <li class=""><a href="module_yuitest.html">yuitest</a></li>
+                                <li class=""><a href="module_animation.html" title="animation">animation</a></li>
+                                <li class=""><a href="module_autocomplete.html" title="autocomplete">autocomplete</a></li>
+                                <li class=""><a href="module_button.html" title="button">button</a></li>
+                                <li class=""><a href="module_calendar.html" title="calendar">calendar</a></li>
+                                <li class=""><a href="module_carousel.html" title="carousel">carousel</a></li>
+                                <li class=""><a href="module_charts.html" title="charts">charts</a></li>
+                                <li class=""><a href="module_colorpicker.html" title="colorpicker">colorpicker</a></li>
+                                <li class=""><a href="module_connection.html" title="connection">connection</a></li>
+                                <li class=""><a href="module_container.html" title="container">container</a></li>
+                                <li class=""><a href="module_cookie.html" title="cookie">cookie</a></li>
+                                <li class=""><a href="module_datasource.html" title="datasource">datasource</a></li>
+                                <li class=""><a href="module_datatable.html" title="datatable">datatable</a></li>
+                                <li class=""><a href="module_datemath.html" title="datemath">datemath</a></li>
+                                <li class=""><a href="module_dom.html" title="dom">dom</a></li>
+                                <li class=""><a href="module_dragdrop.html" title="dragdrop">dragdrop</a></li>
+                                <li class=""><a href="module_editor.html" title="editor">editor</a></li>
+                                <li class=""><a href="module_element.html" title="element">element</a></li>
+                                <li class=""><a href="module_element-delegate.html" title="element-delegate">element-delegate</a></li>
+                                <li class=""><a href="module_event.html" title="event">event</a></li>
+                                <li class=""><a href="module_event-delegate.html" title="event-delegate">event-delegate</a></li>
+                                <li class=""><a href="module_event-mouseenter.html" title="event-mouseenter">event-mouseenter</a></li>
+                                <li class=""><a href="module_event-simulate.html" title="event-simulate">event-simulate</a></li>
+                                <li class=""><a href="module_get.html" title="get">get</a></li>
+                                <li class=""><a href="module_history.html" title="history">history</a></li>
+                                <li class=""><a href="module_imagecropper.html" title="imagecropper">imagecropper</a></li>
+                                <li class=""><a href="module_imageloader.html" title="imageloader">imageloader</a></li>
+                                <li class=""><a href="module_json.html" title="json">json</a></li>
+                                <li class=""><a href="module_layout.html" title="layout">layout</a></li>
+                                <li class=""><a href="module_logger.html" title="logger">logger</a></li>
+                                <li class=""><a href="module_menu.html" title="menu">menu</a></li>
+                                <li class=""><a href="module_paginator.html" title="paginator">paginator</a></li>
+                                <li class=""><a href="module_profiler.html" title="profiler">profiler</a></li>
+                                <li class=""><a href="module_profilerviewer.html" title="profilerviewer">profilerviewer</a></li>
+                                <li class=""><a href="module_progressbar.html" title="progressbar">progressbar</a></li>
+                                <li class=""><a href="module_resize.html" title="resize">resize</a></li>
+                                <li class=""><a href="module_selector.html" title="selector">selector</a></li>
+                                <li class=""><a href="module_slider.html" title="slider">slider</a></li>
+                                <li class=""><a href="module_storage.html" title="Storage">Storage</a></li>
+                                <li class=""><a href="module_stylesheet.html" title="stylesheet">stylesheet</a></li>
+                                <li class=""><a href="module_swf.html" title="swf">swf</a></li>
+                                <li class=""><a href="module_swfdetect.html" title="swfdetect">swfdetect</a></li>
+                                <li class=""><a href="module_swfstore.html" title="swfstore">swfstore</a></li>
+                                <li class=""><a href="module_tabview.html" title="tabview">tabview</a></li>
+                                <li class=""><a href="module_treeview.html" title="treeview">treeview</a></li>
+                                <li class=""><a href="module_uploader.html" title="uploader">uploader</a></li>
+                                <li class="selected"><a href="module_yahoo.html" title="yahoo">yahoo</a></li>
+                                <li class=""><a href="module_yuiloader.html" title="yuiloader">yuiloader</a></li>
+                                <li class=""><a href="module_yuitest.html" title="yuitest">yuitest</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="classList" class="module">
                         <h4>Classes</h4>
                         <ul class="content">
-                                <li class=""><a href="YAHOO.html">YAHOO</a></li>
-                                <li class=""><a href="YAHOO.env.html">YAHOO.env</a></li>
-                                <li class=""><a href="YAHOO.env.ua.html">YAHOO.env.ua</a></li>
-                                <li class="selected"><a href="YAHOO.lang.html">YAHOO.lang</a></li>
-                                <li class=""><a href="YAHOO_config.html">YAHOO_config</a></li>
+                                <li class=""><a href="YAHOO.html" title="YAHOO">YAHOO</a></li>
+                                <li class=""><a href="YAHOO.env.html" title="YAHOO.env">YAHOO.env</a></li>
+                                <li class=""><a href="YAHOO.env.ua.html" title="YAHOO.env.ua">YAHOO.env.ua</a></li>
+                                <li class="selected"><a href="YAHOO.lang.html" title="YAHOO.lang">YAHOO.lang</a></li>
+                                <li class=""><a href="YAHOO_config.html" title="YAHOO_config">YAHOO_config</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="fileList" class="module">
                         <h4>Files</h4>
                         <ul class="content">        
-                                <li class=""><a href="Env.js.html">Env.js</a></li>
-                                <li class=""><a href="Lang.js.html">Lang.js</a></li>
-                                <li class=""><a href="YAHOO.js.html">YAHOO.js</a></li>
+                                <li class=""><a href="Env.js.html" title="Env.js">Env.js</a></li>
+                                <li class=""><a href="Lang.js.html" title="Lang.js">Lang.js</a></li>
+                                <li class=""><a href="YAHOO.js.html" title="YAHOO.js">YAHOO.js</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="propertyList" class="module">
                         <h4>Properties</h4>
                         <ul class="content">        
-                                <li class="private"><a href="#property__IEEnumFix">_IEEnumFix</a>
-                                        <!--<code>&lt;object&gt;</code>-->
-                                </li>
+                                <li class="private"><a href="#property__IEEnumFix" title="_IEEnumFix">_IEEnumFix</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="methodsList" class="module">
                         <h4>Methods</h4>
                         <ul class="content">        
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_augment">augment</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_augmentObject">augmentObject</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_augmentProto">augmentProto</a>
-                                </li>
-                                <li class=""><!--<code>String</code>-->
-                                <a href="#method_dump">dump</a>
-                                </li>
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#method_extend">extend</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_hasOwnProperty">hasOwnProperty</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isArray">isArray</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isBoolean">isBoolean</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isFunction">isFunction</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isNull">isNull</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isNumber">isNumber</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isObject">isObject</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isString">isString</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isUndefined">isUndefined</a>
-                                </li>
-                                <li class=""><!--<code>boolean</code>-->
-                                <a href="#method_isValue">isValue</a>
-                                </li>
-                                <li class=""><!--<code></code>-->
-                                <a href="#method_later">later</a>
-                                </li>
-                                <li class=""><!--<code></code>-->
-                                <a href="#method_merge">merge</a>
-                                </li>
-                                <li class=""><!--<code>String</code>-->
-                                <a href="#method_substitute">substitute</a>
-                                </li>
-                                <li class=""><!--<code>string</code>-->
-                                <a href="#method_trim">trim</a>
-                                </li>
+                                <li class=""><a href="#method_augment" title="augment">augment</a></li>
+                                <li class=""><a href="#method_augmentObject" title="augmentObject">augmentObject</a></li>
+                                <li class=""><a href="#method_augmentProto" title="augmentProto">augmentProto</a></li>
+                                <li class=""><a href="#method_dump" title="dump">dump</a></li>
+                                <li class=""><a href="#method_extend" title="extend">extend</a></li>
+                                <li class=""><a href="#method_hasOwnProperty" title="hasOwnProperty">hasOwnProperty</a></li>
+                                <li class=""><a href="#method_isArray" title="isArray">isArray</a></li>
+                                <li class=""><a href="#method_isBoolean" title="isBoolean">isBoolean</a></li>
+                                <li class=""><a href="#method_isFunction" title="isFunction">isFunction</a></li>
+                                <li class=""><a href="#method_isNull" title="isNull">isNull</a></li>
+                                <li class=""><a href="#method_isNumber" title="isNumber">isNumber</a></li>
+                                <li class=""><a href="#method_isObject" title="isObject">isObject</a></li>
+                                <li class=""><a href="#method_isString" title="isString">isString</a></li>
+                                <li class=""><a href="#method_isUndefined" title="isUndefined">isUndefined</a></li>
+                                <li class=""><a href="#method_isValue" title="isValue">isValue</a></li>
+                                <li class=""><a href="#method_later" title="later">later</a></li>
+                                <li class=""><a href="#method_merge" title="merge">merge</a></li>
+                                <li class=""><a href="#method_substitute" title="substitute">substitute</a></li>
+                                <li class=""><a href="#method_trim" title="trim">trim</a></li>
                         </ul>
                     </div>
 
@@ -1404,8 +1422,11 @@ the input is not a string, the input will be returned untouched.
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2008 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2009 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
+<script type="text/javascript">
+    ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.lang", "name": "augment", "url": "YAHOO.lang.html#method_augment", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "augmentObject", "url": "YAHOO.lang.html#method_augmentObject", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "augmentProto", "url": "YAHOO.lang.html#method_augmentProto", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "dump", "url": "YAHOO.lang.html#method_dump", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "extend", "url": "YAHOO.lang.html#method_extend", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "hasOwnProperty", "url": "YAHOO.lang.html#method_hasOwnProperty", "type": "method"}, {"access": "private", "host": "YAHOO.lang", "name": "_IEEnumFix", "url": "YAHOO.lang.html#property__IEEnumFix", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "isArray", "url": "YAHOO.lang.html#method_isArray", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isBoolean", "url": "YAHOO.lang.html#method_isBoolean", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isFunction", "url": "YAHOO.lang.html#method_isFunction", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isNull", "url": "YAHOO.lang.html#method_isNull", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isNumber", "url": "YAHOO.lang.html#method_isNumber", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isObject", "url": "YAHOO.lang.html#method_isObject", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isString", "url": "YAHOO.lang.html#method_isString", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isUndefined", "url": "YAHOO.lang.html#method_isUndefined", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isValue", "url": "YAHOO.lang.html#method_isValue", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "later", "url": "YAHOO.lang.html#method_later", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "merge", "url": "YAHOO.lang.html#method_merge", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "substitute", "url": "YAHOO.lang.html#method_substitute", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "trim", "url": "YAHOO.lang.html#method_trim", "type": "method"}];
+</script>
 </body>
 </html>

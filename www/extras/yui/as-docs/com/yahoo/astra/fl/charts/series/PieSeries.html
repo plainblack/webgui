@@ -4,7 +4,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../../../../style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="../../../../../../print.css" type="text/css" media="print">
-<meta content="PieSeries,com.yahoo.astra.fl.charts.series.PieSeries,categoryField,categoryNames,dataField,labelFunction,clone,copyStylesToRenderer,createLegendItemData,getStyleDefinition,itemToCategory,itemToData,itemToPercentage" name="keywords">
+<meta content="PieSeries,com.yahoo.astra.fl.charts.series.PieSeries,categoryField,categoryNames,dataField,labelFunction,clone,copyStylesToRenderer,createLegendItemData,itemToCategory,itemToData,itemToPercentage" name="keywords">
 <title>com.yahoo.astra.fl.charts.series.PieSeries</title>
 </head>
 <body>
@@ -78,7 +78,7 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </tr>
 <tr class="hideInheritedProperty">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="Series.html#chart">chart</a> : Object<div class="summaryTableDescription">
-   </div>
+   The chart in which this series appears.</div>
 </td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
 </tr>
 <tr class="">
@@ -88,12 +88,18 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </tr>
 <tr class="hideInheritedProperty">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="Series.html#dataProvider">dataProvider</a> : Object<div class="summaryTableDescription">
+   The data provider for this series.</div>
+</td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="Series.html#dataTipFunction">dataTipFunction</a> : Function<div class="summaryTableDescription">
+   DataTip Function for series
    </div>
 </td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
 </tr>
 <tr class="hideInheritedProperty">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="Series.html#displayName">displayName</a> : String<div class="summaryTableDescription">
-   </div>
+   The name of the series as it appears to the user.</div>
 </td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
 </tr>
 <tr class="hideInheritedProperty">
@@ -107,8 +113,14 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </td><td class="summaryTableOwnerCol">PieSeries</td>
 </tr>
 <tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="Series.html#legendLabelFunction">legendLabelFunction</a> : Function<div class="summaryTableDescription">
+   If defined, the chart will call the input function to determine the text displayed in 
+   in the chart's legend.</div>
+</td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
+</tr>
+<tr class="hideInheritedProperty">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="Series.html#length">length</a> : int<div class="summaryTableDescription">
-   </div>
+   The number of items in the series.</div>
 </td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
 </tr>
 </table>
@@ -155,20 +167,12 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
    Creates an Array of LegendItemData objects to pass to the chart's legend.</div>
 </td><td class="summaryTableOwnerCol">PieSeries</td>
 </tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
-<div class="summarySignature">
-<a class="signatureLink" href="#getStyleDefinition()">getStyleDefinition</a>():Object</div>
-<div class="summaryTableDescription">[static]
-   </div>
-</td><td class="summaryTableOwnerCol">PieSeries</td>
-</tr>
 <tr class="hideInheritedMethod">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
 <a class="signatureLink" href="Series.html#itemRendererToIndex()">itemRendererToIndex</a>(renderer:<a href="../series/ISeriesItemRenderer.html">ISeriesItemRenderer</a>):int</div>
 <div class="summaryTableDescription">
-   </div>
+   Returns the index of an item renderer.</div>
 </td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
 </tr>
 <tr class="">
@@ -192,7 +196,8 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <div class="summarySignature">
 <a class="signatureLink" href="Series.html#itemToItemRenderer()">itemToItemRenderer</a>(item:Object):<a href="../series/ISeriesItemRenderer.html">ISeriesItemRenderer</a>
 </div>
-<div class="summaryTableDescription"></div>
+<div class="summaryTableDescription">
+   Converts an item to its corresponding item renderer.</div>
 </td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
 </tr>
 <tr class="">
@@ -296,10 +301,42 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="hideInheritedStyle">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="Series.html#style:fillColor">fillColor</a>
+<a class="signatureLink" href="Series.html#style:borderAlpha">borderAlpha</a>
+</div>
+</td><td class="summaryTableDescription"><span class="label">Type: </span>Number<br>
+     The alpha value from 0.0 to 1.0 to use for drawing the border of markers.</td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
+</tr>
+<tr class="hideInheritedStyle">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="Series.html#style:borderColor">borderColor</a>
+</div>
+</td><td class="summaryTableDescription"><span class="label">Type: </span>uint<br> 
+     The border color used by programatic skins in this series.</td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
+</tr>
+<tr class="hideInheritedStyle">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="Series.html#style:color">color</a>
 </div>
 </td><td class="summaryTableDescription"><span class="label">Type: </span>uint<br>
   The base color used by objects displayed in this series.</td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
+</tr>
+<tr class="hideInheritedStyle">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="Series.html#style:fillAlpha">fillAlpha</a>
+</div>
+</td><td class="summaryTableDescription"><span class="label">Type: </span>Number<br>
+     The alpha value from 0.0 to 1.0 to use for drawing the fills of markers.</td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
+</tr>
+<tr class="hideInheritedStyle">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="Series.html#style:fillColor">fillColor</a>
+</div>
+</td><td class="summaryTableDescription"><span class="label">Type: </span>uint<br>
+  The fill color used by programatic skins in this series.</td><td class="summaryTableOwnerCol"><a href="Series.html">Series</a></td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol"><a name="style:fillColors"></a>&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
@@ -516,22 +553,6 @@ showHideInherited();
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20"></td><td><code>Array</code></td>
-</tr>
-</table>
-</div>
-<a name="getStyleDefinition()"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
-<tr>
-<td class="detailHeaderName">getStyleDefinition</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
-</tr>
-</table>
-<div class="detailBody">
-<code>public static function getStyleDefinition():Object</code><p>
-   </p><p></p>
-<span class="label">Returns</span>
-<table border="0" cellspacing="0" cellpadding="0">
-<tr>
-<td width="20"></td><td><code>Object</code></td>
 </tr>
 </table>
 </div>

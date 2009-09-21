@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Simple Uploader Example With Button UI</title>
 
@@ -18,14 +20,14 @@ body {
 
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
-<script type="text/javascript" src="../../build/uploader/uploader-experimental.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
+<script type="text/javascript" src="../../build/uploader/uploader-min.js"></script>
 
 <!--there is no custom header content for this example-->
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Simple Uploader Example With Button UI</h1>
@@ -109,6 +111,12 @@ body {
 	uploader.clearFileList();
 	uploader.enable();
 	fileID = null;
+	
+	var filename = document.getElementById("fileName");
+	filename.innerHTML = "";
+	
+	var progressbar = document.getElementById("progressBar");
+	progressbar.innerHTML = "";
 	}
 		
 	// When contentReady event is fired, you can call methods on the uploader.

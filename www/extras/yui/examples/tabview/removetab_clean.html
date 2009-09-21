@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Removing Tabs</title>
 
@@ -19,7 +21,7 @@ body {
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="../../build/tabview/assets/skins/sam/tabview.css" />
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
 <script type="text/javascript" src="../../build/tabview/tabview-min.js"></script>
 
 
@@ -36,7 +38,7 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Removing Tabs</h1>
@@ -67,7 +69,10 @@ body {
     var tabView = new YAHOO.widget.TabView('demo');
     
     var removeTab = function() {
-        tabView.removeTab(tabView.get('activeTab'));
+        var activeTab = tabView.get('activeTab');
+        if (activeTab) {
+            tabView.removeTab(activeTab);
+        }
     };
 
     var button = document.createElement('button');

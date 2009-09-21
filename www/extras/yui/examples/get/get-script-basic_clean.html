@@ -1,8 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Getting a Script Node with JSON Data</title>
+<title>Getting a Script Node with JSON Data from a Web Service</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -18,8 +20,10 @@ body {
 
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
-<script type="text/javascript" src="../../build/utilities/utilities.js"></script>
+<script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
+<script type="text/javascript" src="../../build/get/get-min.js"></script>
 
 
 <!--begin custom header content for this example-->
@@ -42,10 +46,10 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
-<h1>Getting a Script Node with JSON Data</h1>
+<h1>Getting a Script Node with JSON Data from a Web Service</h1>
 
 <div class="exampleIntro">
 	<p>This example employs the <a href="http://developer.yahoo.com/yui/get/">YUI Get Utility</a> in a simple use case: retrieving JSON data from a cross-domain web service. While this is a relatively common usage, it's important to understand the security ramifications of this technique. Scripts loaded via the Get Utility (or any other &quot;script node&quot; solution) execute immediately once they are loaded. If you do not fully control (or fully trust) the script's source, this is not a safe technique and it can put the security of your users' data at risk. (For more information on the dangers of cross-site scripting [XSS] exploits, <a href="http://en.wikipedia.org/wiki/Cross-site_scripting">check out the Wikipedia entry on this subject</a>.)</p>
@@ -137,7 +141,7 @@ YAHOO.log("The Get Utility failed.", "info", "example");
         //Load the transitional state of the results section:
         elResults.innerHTML = "<h3>Retrieving incoming links for " +
             Dom.get("searchString").value + ":</h3>" +
-            "<img src='http://l.yimg.com/us.yimg.com/i/nt/ic/ut/bsc/busybar_1.gif' " +
+            "<img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' " +
             "alt='Please wait...'>";
         
         //prepare the URL for the Yahoo Site Explorer API:

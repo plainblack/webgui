@@ -7,7 +7,7 @@
 		ContextMenu = YAHOO.widget.ContextMenu,		
 
 		MenuPrototype = YAHOO.widget.Menu.prototype,
-		fnMenuInitDefaultConfig = MenuPrototype.initDefaultConfig,
+
 
 		// The currently focused MenuItem label, or the MenuItem label that can be focused 
 		// by the user.
@@ -27,11 +27,14 @@
 		_MENU = "menu",
 		_MENUBAR = "menubar",
 		_LABELLED_BY = "labelledby",
-		_FOCUS = "focus", 
-		_BLUR = "blur",
 		_ITEM_ADDED = "itemAdded",
-		_USE_ARIA = "usearia",
-		_TRIGGER = "trigger";
+		_TRIGGER = "trigger",
+		_VISIBLE = "visible",
+		_HIDDEN = "hidden",
+		_ONCLICK = "onclick",
+		_HTML_EVENTS = "HTMLEvents",
+		_CLICK = "click",
+		_KEY_PRESS = "keypress";
 
 
 	// Menu ARIA plugin		
@@ -119,12 +122,12 @@
 		if (oMenuItem && nCharCode === 13) {
 
 			if (UA.ie) {
-				oTarget.fireEvent("onclick");
+				oTarget.fireEvent(_ONCLICK);
 			}
 			else {
 
-				oEvent = document.createEvent("HTMLEvents");
-				oEvent.initEvent("click", true, true);
+				oEvent = document.createEvent(_HTML_EVENTS);
+				oEvent.initEvent(_CLICK, true, true);
 
 				oTarget.dispatchEvent(oEvent);
 
@@ -201,6 +204,13 @@
 	};
 
 
+	var onMenuVisibleConfigChange = function () {
+	
+		setARIAProperty(this.element, _HIDDEN, !this.cfg.getProperty(_VISIBLE));
+			
+	};
+
+
 	MenuPrototype.configUseARIA = function (type, args) {
 	
 		var bUseARIA = args[0],
@@ -210,7 +220,6 @@
 			aMenuItems,
 			nMenuItems,
 			oMenuItem,
-			oMenuItemLabel,
 			sId,
 			i;
 
@@ -273,7 +282,9 @@
 			
 
 			this.subscribe(_ITEM_ADDED, onItemAdded);
-			this.subscribe("keypress", onKeyPress);
+			this.subscribe(_KEY_PRESS, onKeyPress);
+			
+			this.cfg.subscribeToConfigEvent(_VISIBLE, onMenuVisibleConfigChange);			
 	
 		}	
 
@@ -350,3 +361,5 @@
 	};
 
 }());
+YAHOO.register("menuariaplugin", YAHOO.widget.Menu, {version: "@VERSION@", build: "@BUILD@"});
+YAHOO.register("menuariaplugin", YAHOO.widget.Menu, {version: "@VERSION@", build: "@BUILD@"});

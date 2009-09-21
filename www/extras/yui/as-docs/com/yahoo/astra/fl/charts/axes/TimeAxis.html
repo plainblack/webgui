@@ -4,7 +4,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../../../../style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="../../../../../../print.css" type="text/css" media="print">
-<meta content="TimeAxis,com.yahoo.astra.fl.charts.axes.TimeAxis,positionMultiplier,majorTimeUnit,majorUnit,maximum,minimum,minorTimeUnit,minorUnit,snapToUnits,stackingEnabled,stack,updateScale,valueToLabel,valueToLocal" name="keywords">
+<meta content="TimeAxis,com.yahoo.astra.fl.charts.axes.TimeAxis,positionMultiplier,calculateByLabelSize,idealPixels,majorTimeUnit,majorUnit,maximum,minimum,minorTimeUnit,minorUnit,snapToUnits,stackingEnabled,getMaxLabel,stack,updateScale,valueToLabel,valueToLocal" name="keywords">
 <title>com.yahoo.astra.fl.charts.axes.TimeAxis</title>
 </head>
 <body>
@@ -38,7 +38,7 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <td class="classHeaderTableLabel">Class</td><td class="classSignature">public class TimeAxis</td>
 </tr>
 <tr>
-<td class="classHeaderTableLabel">Inheritance</td><td class="inheritanceList">TimeAxis <img class="inheritArrow" alt="Inheritance" title="Inheritance" src="../../../../../../images/inherit-arrow.gif"> <a href="BaseAxis.html">BaseAxis</a></td>
+<td class="classHeaderTableLabel">Inheritance</td><td class="inheritanceList">TimeAxis <img class="inheritArrow" alt="Inheritance" title="Inheritance" src="../../../../../../images/inherit-arrow.gif"> <a href="BaseAxis.html">BaseAxis</a> <img class="inheritArrow" alt="Inheritance" title="Inheritance" src="../../../../../../images/inherit-arrow.gif"> flash.events.EventDispatcher</td>
 </tr>
 <tr>
 <td class="classHeaderTableLabel">Implements</td><td><a href="IAxis.html">IAxis</a>, <a href="IStackingAxis.html">IStackingAxis</a></td>
@@ -67,6 +67,12 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr>
 <th>&nbsp;</th><th colspan="2">Property</th><th class="summaryTableOwnerCol">Defined&nbsp;by</th>
 </tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#calculateByLabelSize">calculateByLabelSize</a> : Boolean<div class="summaryTableDescription"> 
+   Indicates whether to use the maximum size of an axis label 
+   when calculating the majorUnit.</div>
+</td><td class="summaryTableOwnerCol">TimeAxis</td>
+</tr>
 <tr class="hideInheritedProperty">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#chart">chart</a> : <a href="../../charts/IChart.html">IChart</a>
 <div class="summaryTableDescription">
@@ -74,8 +80,37 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
 </tr>
 <tr class="hideInheritedProperty">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#labelFunction">labelFunction</a> : Function<div class="summaryTableDescription">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#dataProvider">dataProvider</a> : Array<div class="summaryTableDescription">
+   Data provider for the axis
    </div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#height">height</a> : Number<div class="summaryTableDescription"> 
+   Total height of axis
+   </div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#idealPixels">idealPixels</a> : Number<div class="summaryTableDescription">
+   Desired distance between majorUnits.</div>
+</td><td class="summaryTableOwnerCol">TimeAxis</td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#labelData">labelData</a> : <a href="../axes/AxisLabelData.html">AxisLabelData</a>
+<div class="summaryTableDescription">
+   Maximum dimensions of axis labels
+   </div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#labelFunction">labelFunction</a> : Function<div class="summaryTableDescription">
+   A function may be set to determine the text value of the labels.</div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#labelSpacing">labelSpacing</a> : Number<div class="summaryTableDescription">
+   The space, in pixels, between labels on an axis.</div>
 </td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
 </tr>
 <tr class="">
@@ -93,6 +128,23 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
    The maximum value displayed on the axis.</div>
 </td><td class="summaryTableOwnerCol">TimeAxis</td>
 </tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#maxLabel">maxLabel</a> : String<div class="summaryTableDescription">
+   Gets or sets the largest possible label.</div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#maxLabelHeight">maxLabelHeight</a> : Number<div class="summaryTableDescription">
+   Gets or sets the maximum height of a label
+   </div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#maxLabelWidth">maxLabelWidth</a> : Number<div class="summaryTableDescription">
+   Gets or sets the maximum width of a label
+   </div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#minimum">minimum</a> : Date<div class="summaryTableDescription">
    The minimum value displayed on the axis.</div>
@@ -107,6 +159,17 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#minorUnit">minorUnit</a> : Number<div class="summaryTableDescription">
    The minor unit at which new lines are drawn.</div>
 </td><td class="summaryTableOwnerCol">TimeAxis</td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#order">order</a> : String = "primary"<div class="summaryTableDescription">
+   </div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#position">position</a> : String<div class="summaryTableDescription">
+   Position of axis in relation to the chart
+   </div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
 </tr>
 <tr class="hideInheritedProperty">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#renderer">renderer</a> : <a href="../axes/IAxisRenderer.html">IAxisRenderer</a>
@@ -136,6 +199,12 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#title">title</a> : String<div class="summaryTableDescription">
    The text that will appear next to the axis to indicate information
    about the data that it displays.</div>
+</td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
+</tr>
+<tr class="hideInheritedProperty">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol"><img class="inheritedSummaryImage" title="Inherited" alt="Inherited" src="../../../../../../images/inheritedSummary.gif"></td><td class="summaryTableSignatureCol"><a class="signatureLink" href="BaseAxis.html#width">width</a> : Number<div class="summaryTableDescription">
+   Total width of axis
+   </div>
 </td><td class="summaryTableOwnerCol"><a href="BaseAxis.html">BaseAxis</a></td>
 </tr>
 </table>
@@ -171,6 +240,15 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
+<a class="signatureLink" href="#getMaxLabel()">getMaxLabel</a>():String</div>
+<div class="summaryTableDescription">
+   
+   Returns the maximum string length of a label on the axis.</div>
+</td><td class="summaryTableOwnerCol">TimeAxis</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
 <a class="signatureLink" href="#stack()">stack</a>(top:Object, ... rest):Object</div>
 <div class="summaryTableDescription">
    
@@ -180,7 +258,7 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#updateScale()">updateScale</a>(data:Array):void</div>
+<a class="signatureLink" href="#updateScale()">updateScale</a>():void</div>
 <div class="summaryTableDescription">
    
    Determines the axis scale based on the input data set.</div>
@@ -213,10 +291,44 @@ showHideInherited();
 <div class="MainContent">
 <a name="propertyDetail"></a>
 <div class="detailSectionHeader">Property detail</div>
+<a name="calculateByLabelSize"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">calculateByLabelSize</td><td class="detailHeaderType">property</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>calculateByLabelSize:Boolean</code>&nbsp;&nbsp;[read-write]<p> 
+   Indicates whether to use the maximum size of an axis label 
+   when calculating the majorUnit.
+   </p><span class="label">Implementation</span>
+<br>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;public function get calculateByLabelSize():Boolean</code>
+<br>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;public function set calculateByLabelSize(value:Boolean):void</code>
+<br>
+</div>
+<a name="idealPixels"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">idealPixels</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>idealPixels:Number</code>&nbsp;&nbsp;[read-write]<p>
+   Desired distance between majorUnits. Used to calculate the major unit
+   when unspecified and <code>calculateByLabelSize</code> is set to false.
+   </p><span class="label">Implementation</span>
+<br>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;public function get idealPixels():Number</code>
+<br>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;public function set idealPixels(value:Number):void</code>
+<br>
+</div>
 <a name="majorTimeUnit"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">majorTimeUnit</td><td class="detailHeaderType">property</td>
+<td class="detailHeaderName">majorTimeUnit</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
 </table>
 <div class="detailBody">
@@ -381,10 +493,29 @@ showHideInherited();
    </p></div>
 <a name="methodDetail"></a>
 <div class="detailSectionHeader">Method detail</div>
+<a name="getMaxLabel()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">getMaxLabel</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>public override function getMaxLabel():String</code><p>
+   
+   Returns the maximum string length of a label on the axis.
+      </p><p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20"></td><td><code>String</code> &mdash;    the formatted label
+   </td>
+</tr>
+</table>
+</div>
 <a name="stack()"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">stack</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td>
+<td class="detailHeaderName">stack</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
 </table>
 <div class="detailBody">
@@ -421,20 +552,13 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function updateScale(data:Array):void</code><p>
+<code>public function updateScale():void</code><p>
    
    Determines the axis scale based on the input data set.
    Seperating this function from the draw method optimizes processing time,
    and it allows the chart to synchronize its axes.
    
-   </p><span class="label">Parameters</span>
-<table border="0" cellspacing="0" cellpadding="0">
-<tr>
-<td width="20px"></td><td><code><span class="label">data</span>:Array</code> &mdash;  The complete dataset that could be drawn on the axis.
-   </td>
-</tr>
-</table>
-</div>
+   </p></div>
 <a name="valueToLabel()"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>

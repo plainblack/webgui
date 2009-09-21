@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Menu Buttons</title>
 
@@ -22,7 +24,7 @@ body {
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
 <script type="text/javascript" src="../../build/container/container_core-min.js"></script>
 <script type="text/javascript" src="../../build/menu/menu-min.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
 
 
@@ -50,7 +52,7 @@ body {
     }
 
     #menubutton3menu,
-    #menubutton5menu {
+    #menubutton4menu {
     
         position: absolute;
         visibility: hidden;
@@ -81,118 +83,207 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Menu Buttons</h1>
 
 <div class="exampleIntro">
-	<p>This example demonstrates different ways to create a Menu Button.</p>			
+	<p>This example demonstrates different ways to create and use a Menu Button.</p>			
 </div>
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 
 <script type="text/javascript">
 
-    YAHOO.example.init = function () {
+	//	"contentready" event handler for the "menubuttonsfrommarkup" <fieldset>
 
-        // "contentready" event handler for the "menubuttonsfrommarkup" <fieldset>
+	YAHOO.util.Event.onContentReady("menubuttonsfrommarkup", function () {
 
-        YAHOO.util.Event.onContentReady("menubuttonsfrommarkup", function () {
+		//	Create a Button using an existing <input> and <select> element.
+		//	Because the "type" attribute of the <input> element was set to 
+		//	"submit" - clicking on any MenuItem in the Button's Menu will
+		//	automatically submit the Button's parent <form>.
 
-            // Create a Button using an existing <input> element as a data source
+		var oMenuButton1 = new YAHOO.widget.Button("menubutton1", 
+								{ type: "menu", menu: "menubutton1select" });
+		
 
-            var oMenuButton1 = new YAHOO.widget.Button("menubutton1", { type: "menu", menu: "menubutton1select" });
+		//	"render" event handler for the Button's Menu
 
-            var oMenuButton2 = new YAHOO.widget.Button("menubutton2", { type: "menu", menu: "menubutton2select" });
+		var onMenuRender = function (p_sType, p_aArgs) {
+		
+			this.addItems([
 
+				{ text: "Four", value: 4 },
+				{ text: "Five", value: 5 }
 
-            // Create a Button using an existing <input> element and a YAHOO.widget.Overlay instance as its menu
-
-            var oMenuButton3 = new YAHOO.widget.Button("menubutton3", { type: "menu", menu: "menubutton3menu" });
-        
-        });
-
-
-        // "click" event handler for each item in the Button's menu
-
-        function onMenuItemClick(p_sType, p_aArgs, p_oItem) {
-
-            oMenuButton4.set("label", p_oItem.cfg.getProperty("text"));
-                            
-        }
+			]);
+			
+		};
 
 
-        // Create a Button without using existing markup
+		//	Add some additional MenuItems to the Button's Menu once it has 
+		//	been rendered
+		
+		oMenuButton1.getMenu().subscribe("render", onMenuRender);
+		
 
-        //  Create an array of YAHOO.widget.MenuItem configuration properties
+		//	"submit" event handler for the <form>
 
-        var aMenuButton4Menu = [
+		var onExampleSubmit = function(p_oEvent) {
 
-            { text: "one", value: 1, onclick: { fn: onMenuItemClick } },
-            { text: "two", value: 2, onclick: { fn: onMenuItemClick } },
-            { text: "three", value: 3, onclick: { fn: onMenuItemClick } }
-        
-        ];
+			var bSubmit = 
+					window.confirm("Are you sure you want to submit the form?");
 
-        /*
-            Instantiate a Menu Button using the array of YAHOO.widget.MenuItem 
-            configuration properties as the value for the "menu" configuration 
-            attribute.
-        */
-        
-        var oMenuButton4 = new YAHOO.widget.Button({ type: "menu", label: "one", name: "mymenubutton", menu: aMenuButton4Menu, container: "menubuttonsfromjavascript" });            
+			if(!bSubmit) {
+				YAHOO.util.Event.preventDefault(p_oEvent);
+			}
 
-
-        /*
-            Search for an element to place the Menu Button into via the 
-            Event utilities "onContentReady" method
-        */
-        
-        YAHOO.util.Event.onContentReady("menubuttonsfromjavascript", function () {
-        
-            // Instantiate an Overlay instance
-        
-            var oOverlay = new YAHOO.widget.Overlay("menubutton5menu", { visible: false });
-            
-            oOverlay.setBody("Menu Button 5 Menu");
-        
-            // Instantiate a Menu Button
-        
-            var oMenuButton5 = new YAHOO.widget.Button({ type: "menu", label: "Menu Button 5", menu: oOverlay });
-            
-            /*
-                 Append the Menu Button and Overlay to the element with the id 
-                 of "menubuttonsfromjavascript"
-            */
-            
-            oMenuButton5.appendTo(this);
-
-            oOverlay.render(this);
-        
-        });
+		};
 
 
-        function onExampleSubmit(p_oEvent) {
+		//	Add a "submit" event handler to the <form> to confirm that 
+		//	clicking on one of the MenuItems in the Button's Menu 
+		//	submits the <form>.
 
-            var bSubmit = window.confirm("Are you sure you want to submit this form?");
+		YAHOO.util.Event.on("button-example-form", "submit", onExampleSubmit);
 
-            if(!bSubmit) {
-            
-                YAHOO.util.Event.preventDefault(p_oEvent);
-            
-            }
 
-        }
+		//	Create a Button using an existing <input> and <select> element
 
-        YAHOO.util.Event.on("button-example-form", "submit", onExampleSubmit);
+		var oMenuButton2 = new YAHOO.widget.Button("menubutton2", 
+								{ type: "menu", menu: "menubutton2select" });
 
-    } ();
+
+		//	"click" event listener for the second Button's Menu instance
+
+		var onMenuClick = function (p_sType, p_aArgs) {
+
+			var oEvent = p_aArgs[0],	//	DOM event
+
+				oMenuItem = p_aArgs[1];	//	MenuItem instance that was the 
+										//	target of the event
+
+			if (oMenuItem) {
+				YAHOO.log("[MenuItem Properties] text: " + 
+							oMenuItem.cfg.getProperty("text") + ", value: " + 
+							oMenuItem.value);
+			}
+
+		};
+
+
+		//	Add a "click" event listener for the Button's Menu
+
+		oMenuButton2.getMenu().subscribe("click", onMenuClick);
+
+
+		//	Create a Button using an existing <input> element and a 
+		//	YAHOO.widget.Overlay instance as its menu
+
+		var oMenuButton3 = new YAHOO.widget.Button("menubutton3", 
+								{ type: "menu", menu: "menubutton3menu" });
+
+
+		//	"click" event listener for the third Button's 
+		//	menu (Overlay instance)
+
+		var onOverlayClick = function (p_oEvent) {
+			
+			YAHOO.log("You clicked the Button's menu.");
+			
+		};
+
+
+		//	Add a "click" event listener to the Button's menu (Overlay instance)
+
+		YAHOO.util.Event.on(oMenuButton3.getMenu().element, 
+								"click", onOverlayClick);
+
+
+		//	"show" event listener for the third Button's menu (Overlay instance)
+
+		var onOverlayShow = function (p_sType, p_aArgs) {
+		
+			YAHOO.log("The Button's menu is now visible.");
+			
+		};
+		
+
+		//	Add a listener for the Button's "show" event
+		
+		oMenuButton3.getMenu().subscribe("show", onOverlayShow);
+
+	});
+
+
+
+	//	Search for an element to place the Menu Button into via the 
+	//	Event utility's "onContentReady" method
+
+	YAHOO.util.Event.onContentReady("menubuttonsfromjavascript", function () {
+
+		//	Create two Buttons without using existing markup
+
+
+		// Instantiate an Overlay instance
+
+		var oOverlay = new YAHOO.widget.Overlay("menubutton4menu", 
+													{ visible: false });
+
+		oOverlay.setBody("Menu Button 4 Menu");
+
+
+		// Instantiate a Menu Button
+
+		var oMenuButton4 = new YAHOO.widget.Button({	type: "menu", 
+														label: "Menu Button 4", 
+														menu: oOverlay, 
+														container: this });
+
+
+		//	"click" event handler for each item in the Button's menu
+
+		var onMenuItemClick = function (p_sType, p_aArgs, p_oItem) {
+			
+			var sText = p_oItem.cfg.getProperty("text");
+			
+			YAHOO.log("[MenuItem Properties] text: " + sText + ", value: " + 
+					p_oItem.value);
+			
+    		oMenuButton5.set("label", sText);			
+
+		};
+
+
+		//	Create an array of YAHOO.widget.MenuItem configuration properties
+
+		var aMenuButton5Menu = [
+
+			{ text: "One", value: 1, onclick: { fn: onMenuItemClick } },
+			{ text: "Two", value: 2, onclick: { fn: onMenuItemClick } },
+			{ text: "Three", value: 3, onclick: { fn: onMenuItemClick } }
+
+		];
+
+
+		//	Instantiate a Menu Button using the array of YAHOO.widget.MenuItem 
+		//	configuration properties as the value for the "menu"  
+		//	configuration attribute.
+
+		var oMenuButton5 = new YAHOO.widget.Button({	type: "menu", 
+														label: "One", 
+														name: "mymenubutton", 
+														menu: aMenuButton5Menu, 
+														container: this });
+
+	});
 
 </script>
 
 
-<form id="button-example-form" name="button-example-form" method="post" action="#">
+<form id="button-example-form" name="button-example-form" method="post">
 
     <fieldset id="menubuttons">
         <legend>Menu Buttons</legend>

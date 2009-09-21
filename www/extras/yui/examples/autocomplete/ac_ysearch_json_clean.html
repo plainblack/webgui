@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Centering AutoComplete On a Page</title>
 
@@ -30,6 +32,7 @@ body {
 <style type="text/css">
 /* custom styles for centered example */
 body, h1 { margin:0;padding:0; } /* needed for known issue with Dom.getXY() in safari for absolute elements in positioned containers */
+label { color:#E76300;font-weight:bold;}
 #ysearch { text-align:center; }
 #ysearchinput { position:static;width:20em; } /* to center, set static and explicit width: */
 #ysearchcontainer { text-align:left;width:20em; } /* to center, set left-align and explicit width: */
@@ -39,13 +42,13 @@ body, h1 { margin:0;padding:0; } /* needed for known issue with Dom.getXY() in s
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Centering AutoComplete On a Page</h1>
 
 <div class="exampleIntro">
-	<p>This example points to Yahoo! Search Web Services. To achieve the shrink-wrapped, centered search module, custom CSS rules have been applied, and the method <code>doBeforeExpandContainer</code> has been customized to position the container directly below the input field.</p>
+	<p>This example points to Yahoo! Search Web Services. Custom CSS rules have been applied to achieve the shrink-wrapped, centered search module.</p>
 			
 </div>
 
@@ -53,7 +56,7 @@ body, h1 { margin:0;padding:0; } /* needed for known issue with Dom.getXY() in s
 
 <form action="http://search.yahoo.com/search">
     <div id="ysearch">
-		<label>Yahoo! Search: </label>
+		<label for="ysearchinput">Yahoo! Search: </label>
 		<input id="ysearchinput" type="text" name="p">
 		<input id="ysearchsubmit" type="submit" value="Submit Query">
 		<div id="ysearchcontainer"></div>
@@ -75,12 +78,12 @@ YAHOO.example.Centered = function() {
     myAutoComp.useShadow = true;
     
     // Keeps container centered
-    myAutoComp.doBeforeExpandContainer = function(oTextbox, oContainer, sQuery, aResults) {
+    /*myAutoComp.doBeforeExpandContainer = function(oTextbox, oContainer, sQuery, aResults) {
         var pos = YAHOO.util.Dom.getXY(oTextbox);
         pos[1] += YAHOO.util.Dom.get(oTextbox).offsetHeight + 2;
         YAHOO.util.Dom.setXY(oContainer,pos);
         return true;
-    };
+    };*/
     
     return {
         oDS: myDataSource,

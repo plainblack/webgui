@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Glowing Button</title>
 
@@ -23,7 +25,7 @@ body {
 <script type="text/javascript" src="../../build/animation/animation-min.js"></script>
 <script type="text/javascript" src="../../build/container/container_core-min.js"></script>
 <script type="text/javascript" src="../../build/menu/menu-min.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
 
 
@@ -62,12 +64,12 @@ body {
         border-color: #004d89;
         margin: 0 -1px;
 
-        /*
-            The following is necessary to get negative margins working in IE.s
-        */
-
-        *position: relative;
-        *left: -1px;
+		/*
+			Using negative margins for rounded corners won't work in IE 6 and 
+			IE 7 (Quirks Mode Only), so set the "margin" property to "0" for 
+			those browsers.
+		*/
+	 	_margin: 0;
     
     }
     

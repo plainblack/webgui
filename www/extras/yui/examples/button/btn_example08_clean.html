@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Split Buttons</title>
 
@@ -22,7 +24,7 @@ body {
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
 <script type="text/javascript" src="../../build/container/container_core-min.js"></script>
 <script type="text/javascript" src="../../build/menu/menu-min.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
 
 
@@ -50,7 +52,7 @@ body {
     }
     
     #splitbutton3menu,
-    #splitbutton5menu {
+    #splitbutton4menu {
     
         position: absolute;
         visibility: hidden;
@@ -81,107 +83,172 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Split Buttons</h1>
 
 <div class="exampleIntro">
-	<p>This example demonstrates different ways to create a Split Button.</p>			
+	<p>This example demonstrates different ways to create and use a Split Button.</p>			
 </div>
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 
 <script type="text/javascript">
 
-    YAHOO.example.init = function () {
+	//	"contentready" event handler for the "splitbuttonsfrommarkup" <fieldset>
 
-        // "contentready" event handler for the "splitbuttonsfrommarkup" <fieldset>
+	YAHOO.util.Event.onContentReady("splitbuttonsfrommarkup", function () {
 
-        YAHOO.util.Event.onContentReady("splitbuttonsfrommarkup", function () {
+		//	Create a Button using an existing <input> and <select> element.
+		//	Because the "type" attribute of the <input> element was set to 
+		//	"submit" - clicking on any MenuItem in the Button's Menu will
+		//	automatically submit the Button's parent <form>.
 
-            // Create a Button using an existing <input> element as a data source
+		var oSplitButton1 = new YAHOO.widget.Button("splitbutton1", { type: "split", menu: "splitbutton1select" });
 
-            var oSplitButton1 = new YAHOO.widget.Button("splitbutton1", { type: "split", menu: "splitbutton1select" });
+		//	"render" event handler for the Button's Menu
 
-            var oSplitButton2 = new YAHOO.widget.Button("splitbutton2", { type: "split", menu: "splitbutton2select" });
-            
-            // Create a Button using an existing <input> element and a YAHOO.widget.Overlay instance as its menu
-            
-            var oSplitButton3 = new YAHOO.widget.Button("splitbutton3", { type: "split", menu: "splitbutton3menu" });
-        
-        });
+		var onMenuRender = function (p_sType, p_aArgs) {
+		
+			this.addItems([
 
+				{ text: "Four", value: 4 },
+				{ text: "Five", value: 5 }
 
-        // Create a Button without using existing markup    
+			]);
+			
+		};
 
-        //  Create an array of YAHOO.widget.MenuItem configuration properties
+		//	Add some additional MenuItems to the Button's Menu once it has been rendered
+		
+		oSplitButton1.getMenu().subscribe("render", onMenuRender);
 
-        var aSplitButton4Menu = [
-        
-            { text: "one", value: 1 },
-            { text: "two", value: 2 },
-            { text: "three", value: 3 }
-        
-        ];
+		//	"submit" event handler for the <form>
+		
+		var onExampleSubmit = function (p_oEvent) {
 
-        /*
-            Instantiate a Split Button using the array of YAHOO.widget.MenuItem 
-            configuration properties as the value for the "menu" configuration 
-            attribute.
-        */
+			var bSubmit = window.confirm("Are you sure you want to submit this form?");
 
-        var oSplitButton4 = new YAHOO.widget.Button({ type: "split",  label: "Split Button 4", name: "splitbutton3", menu: aSplitButton4Menu, container: "splitbuttonsfromjavascript" });
+			if(!bSubmit) {
+				YAHOO.util.Event.preventDefault(p_oEvent);
+			}
 
-        /*
-            Search for an element to place the Split Button into via the 
-            Event utilities "onContentReady" method
-        */
+		};
 
-        YAHOO.util.Event.onContentReady("splitbuttonsfromjavascript", function () {
-        
-            // Instantiate an Overlay instance
-        
-            var oOverlay = new YAHOO.widget.Overlay("splitbutton5menu", { visible: false });
-            
-            oOverlay.setBody("Split Button 5 Menu");
+		//	Add a "submit" event handler to the <form> to confirm that 
+		//	clicking on one of the MenuItems in the Button's Menu 
+		//	submits the <form>.
+
+		YAHOO.util.Event.on("button-example-form", "submit", onExampleSubmit);
 
 
-            // Instantiate a Split Button
 
-            var oSplitButton5 = new YAHOO.widget.Button({ type: "split",  label: "Split Button 5", menu: oOverlay });
+		//	"click" event handler for the Button - called when the user clicks 
+		//	on the Button's text label, not when the user clicks on the area 
+		//	of the Button that displays the Button's Menu.
 
-            /*
-                 Append the Split Button and Overlay to the element with the id 
-                 of "splitbuttonsfromjavascript"
-            */
+		var onButtonClick = function () {
+		
+			YAHOO.log("You clicked the Button.");
+			
+		};
 
-            oSplitButton5.appendTo(this);
+		//	Create a Button using an existing <input> and <select> element
 
-            oOverlay.render(this);
-                            
-        });
+		var oSplitButton2 = new YAHOO.widget.Button("splitbutton2", { type: "split", menu: "splitbutton2select", onclick: { fn: onButtonClick } });
+
+		//	Click event listener for the second Button's Menu instance
+
+		var onMenuClick = function (p_sType, p_aArgs) {
+
+			var oEvent = p_aArgs[0],	//	DOM event
+				oMenuItem = p_aArgs[1];	//	MenuItem instance that was the target of the event
+
+			if (oMenuItem) {
+				YAHOO.log("[MenuItem Properties] text: " + oMenuItem.cfg.getProperty("text") + ", value: " + oMenuItem.value);
+			}
+
+		};
+
+		//	Add a "click" event listener for the Button's Menu
+
+		oSplitButton2.getMenu().subscribe("click", onMenuClick);
+		
+		//	"option" event listener - called when the user clicks on the 
+		//	area of the Button that displays its Menu.
+		
+		var onOption = function () {
+			
+			YAHOO.log("You clicked the Split Button's option area.");
+			
+		};
+
+		//	Add a listener for the Button's "option" event
+
+		oSplitButton2.on("option", onOption);
+
+		
+
+		// Create a Button using an existing <input> element and an Overlay instance as its menu
+
+		var oSplitButton3 = new YAHOO.widget.Button("splitbutton3", { type: "split", menu: "splitbutton3menu" });
+
+	});
 
 
-        function onExampleSubmit(p_oEvent) {
 
-            var bSubmit = window.confirm("Are you sure you want to submit this form?");
+	//	Search for an element to place the Split Button into via the 
+	//	Event Utility's "onContentReady" method
 
-            if(!bSubmit) {
-            
-                YAHOO.util.Event.preventDefault(p_oEvent);
-            
-            }
+	YAHOO.util.Event.onContentReady("splitbuttonsfromjavascript", function () {
 
-        }
+		//	Create two Buttons without using existing markup
 
-        YAHOO.util.Event.on("button-example-form", "submit", onExampleSubmit);
+
+		// Instantiate an Overlay instance
+
+		var oOverlay = new YAHOO.widget.Overlay("splitbutton4menu", { visible: false });
+
+		oOverlay.setBody("Split Button 4 Menu");
+
+		// Instantiate a Split Button
+
+		var oSplitButton4 = new YAHOO.widget.Button({ type: "split",  label: "Split Button 4", menu: oOverlay, container: this });
+
+
+
+		//	"click" event handler for each item in the Button's Menu
+
+		var onMenuItemClick = function (p_sType, p_aArgs, p_oItem) {
+			
+			var sText = p_oItem.cfg.getProperty("text");
+			
+			YAHOO.log("[MenuItem Properties] text: " + sText + ", value: " + p_oItem.value);
+
+		};
+
+		//	Create an array of YAHOO.widget.MenuItem configuration properties
+
+		var aSplitButton5Menu = [
+
+			{ text: "One", value: 1, onclick: { fn: onMenuItemClick } },
+			{ text: "Two", value: 2, onclick: { fn: onMenuItemClick } },
+			{ text: "Three", value: 3, onclick: { fn: onMenuItemClick } }
+
+		];
+
+		//	Instantiate a Split Button using the array of YAHOO.widget.MenuItem 
+		//	configuration properties as the value for the "menu" 
+		//	configuration attribute.
+
+		var oSplitButton5 = new YAHOO.widget.Button({ type: "split",  label: "Split Button 5", name: "splitbutton5", menu: aSplitButton5Menu, container: this });
     
-    } ();
+	});
 
 </script>
 
-<form id="button-example-form" name="button-example-form" method="post" action="#">
+<form id="button-example-form" name="button-example-form" method="post">
 
     <fieldset id="splitbuttons">
         <legend>Split Buttons</legend>

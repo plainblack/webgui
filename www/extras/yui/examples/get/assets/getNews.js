@@ -32,7 +32,7 @@ YAHOO.example.GetNews = function() {
 		//Load the transitional state of the results section:
 		elResults.innerHTML = "<h3>Retrieving news search results for for " +
 			Dom.get("searchString").value + ":</h3>" +
-			"<img src='http://l.yimg.com/us.yimg.com/i/nt/ic/ut/bsc/busybar_1.gif' " +
+			"<img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' " +
 			"alt='Please wait...'>";
 		
 		//prepare the URL for the Yahoo Site Explorer API:

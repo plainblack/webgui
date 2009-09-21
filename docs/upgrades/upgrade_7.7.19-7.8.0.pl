@@ -37,6 +37,7 @@ addSubscribableAspect( $session );
 addMatrixColumnDefaults($session);
 addFeaturedPageWiki( $session );
 fixEmptyCalendarIcalFeeds( $session );
+upgradeToYUI28( $session );
 
 finish($session); # this line required
 
@@ -49,6 +50,25 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+sub upgradeToYUI28 {
+    my $session = shift;
+    print "\tUpgrading to YUI 2.8... " unless $quiet;
+
+    $session->db->write(
+        "UPDATE template SET template = REPLACE(template, 'element-beta.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET template = REPLACE(template, 'element-beta-min.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadBlock = REPLACE(extraHeadBlock, 'element-beta.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadBlock = REPLACE(extraHeadBlock, 'element-beta-min.js', 'element-min.js')"
+    );
+
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add the column for featured wiki pages

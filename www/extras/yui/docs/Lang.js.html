@@ -1,8 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
 <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<title>API: yahoo   Lang.js  (YUI Library)</title>
-	<link rel="stylesheet" type="text/css" href="assets/api.css">
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
     <script type="text/javascript" src="assets/api-js"></script>
     <script type="text/javascript" src="assets/ac-js"></script>
 </head>
@@ -10,34 +14,40 @@
 <body id="yahoo-com">
 
 <div id="doc3" class="yui-t2">
-
 	<div id="hd">
-        <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>YAHOO Global&nbsp; <span class="subtitle">2.6.0</span></h3>
-        <p>
-        <a href="./index.html">Yahoo! UI Library</a> 
-            &gt; <a href="./module_yahoo.html">yahoo</a>
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>YAHOO Global&nbsp; <span class="subtitle">2.8.0r4</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_yahoo.html" title="yahoo">yahoo</a>
                 
                  &gt; Lang.js (source view) 
-            </p>
-
-
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
 	</div>
 
 	<div id="bd">
 		<div id="yui-main">
 			<div class="yui-b">
-            <form name="yui-classopts-form">
-    <span id="classopts"><input type="checkbox" name="showprivate" id="showprivate" /> <label for="showprivate">Show Private</label></span>
-    <span id="classopts"><input type="checkbox" name="showprotected" id="showprotected" /> <label for="showprotected">Show Protected</label></span>
-    <span id="classopts"><input type="checkbox" name="showdeprecated" id="showdeprecated" /> <label for="showdeprecated">Show Deprecated</label></span>
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
             </form>
 
                     <div id="srcout">
                         <style>
-                            #doc3 #classopts { display:none; }
+                            #doc3 .classopts { display:none; }
                         </style>
-<div class="highlight" ><pre><span class="c">/**</span>
+                        <div class="highlight" ><pre><span class="c">/**</span>
 <span class="c"> * Provides the language utilites and extensions used by the library</span>
 <span class="c"> * @class YAHOO.lang</span>
 <span class="c"> */</span>
@@ -45,7 +55,14 @@
 
 <span class="o">(</span><span class="k">function</span><span class="o">()</span> <span class="o">{</span>
 
+
 <span class="k">var</span> <span class="nx">L</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">,</span>
+
+    <span class="nx">OP</span> <span class="o">=</span> <span class="nb">Object</span><span class="o">.</span><span class="nx">prototype</span><span class="o">,</span>
+    <span class="nx">ARRAY_TOSTRING</span> <span class="o">=</span> <span class="s1">&#39;[object Array]&#39;</span><span class="o">,</span>
+    <span class="nx">FUNCTION_TOSTRING</span> <span class="o">=</span> <span class="s1">&#39;[object Function]&#39;</span><span class="o">,</span>
+    <span class="nx">OBJECT_TOSTRING</span> <span class="o">=</span> <span class="s1">&#39;[object Object]&#39;</span><span class="o">,</span>
+    <span class="nx">NOTHING</span> <span class="o">=</span> <span class="o">[],</span>
 
     <span class="c">// ADD = [&quot;toString&quot;, &quot;valueOf&quot;, &quot;hasOwnProperty&quot;],</span>
 <span class="c"></span>    <span class="nx">ADD</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;toString&quot;</span><span class="o">,</span> <span class="s2">&quot;valueOf&quot;</span><span class="o">],</span>
@@ -53,21 +70,13 @@
     <span class="nx">OB</span> <span class="o">=</span> <span class="o">{</span>
 
     <span class="c">/**</span>
-<span class="c">     * Determines whether or not the provided object is an array.</span>
-<span class="c">     * Testing typeof/instanceof/constructor of arrays across frame </span>
-<span class="c">     * boundaries isn&#39;t possible in Safari unless you have a reference</span>
-<span class="c">     * to the other frame to test against its Array prototype.  To</span>
-<span class="c">     * handle this case, we test well-known array properties instead.</span>
-<span class="c">     * properties.</span>
+<span class="c">     * Determines wheather or not the provided object is an array.</span>
 <span class="c">     * @method isArray</span>
 <span class="c">     * @param {any} o The object being testing</span>
 <span class="c">     * @return {boolean} the result</span>
 <span class="c">     */</span>
     <span class="nx">isArray</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">o</span><span class="o">)</span> <span class="o">{</span> 
-        <span class="k">if</span> <span class="o">(</span><span class="nx">o</span><span class="o">)</span> <span class="o">{</span>
-           <span class="k">return</span> <span class="nx">L</span><span class="o">.</span><span class="nx">isNumber</span><span class="o">(</span><span class="nx">o</span><span class="o">.</span><span class="nx">length</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nx">L</span><span class="o">.</span><span class="nx">isFunction</span><span class="o">(</span><span class="nx">o</span><span class="o">.</span><span class="nx">splice</span><span class="o">);</span>
-        <span class="o">}</span>
-        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">return</span> <span class="nx">OP</span><span class="o">.</span><span class="nx">toString</span><span class="o">.</span><span class="nx">apply</span><span class="o">(</span><span class="nx">o</span><span class="o">)</span> <span class="o">===</span> <span class="nx">ARRAY_TOSTRING</span><span class="o">;</span>
     <span class="o">},</span>
 
     <span class="c">/**</span>
@@ -81,13 +90,24 @@
     <span class="o">},</span>
     
     <span class="c">/**</span>
-<span class="c">     * Determines whether or not the provided object is a function</span>
+<span class="c">     * Determines whether or not the provided object is a function.</span>
+<span class="c">     * Note: Internet Explorer thinks certain functions are objects:</span>
+<span class="c">     *</span>
+<span class="c">     * var obj = document.createElement(&quot;object&quot;);</span>
+<span class="c">     * YAHOO.lang.isFunction(obj.getAttribute) // reports false in IE</span>
+<span class="c">     *</span>
+<span class="c">     * var input = document.createElement(&quot;input&quot;); // append to body</span>
+<span class="c">     * YAHOO.lang.isFunction(input.focus) // reports false in IE</span>
+<span class="c">     *</span>
+<span class="c">     * You will have to implement additional tests if these functions</span>
+<span class="c">     * matter to you.</span>
+<span class="c">     *</span>
 <span class="c">     * @method isFunction</span>
 <span class="c">     * @param {any} o The object being testing</span>
 <span class="c">     * @return {boolean} the result</span>
 <span class="c">     */</span>
     <span class="nx">isFunction</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">o</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="o">;</span>
+        <span class="k">return</span> <span class="o">(</span><span class="k">typeof</span> <span class="nx">o</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="o">)</span> <span class="o">||</span> <span class="nx">OP</span><span class="o">.</span><span class="nx">toString</span><span class="o">.</span><span class="nx">apply</span><span class="o">(</span><span class="nx">o</span><span class="o">)</span> <span class="o">===</span> <span class="nx">FUNCTION_TOSTRING</span><span class="o">;</span>
     <span class="o">},</span>
         
     <span class="c">/**</span>
@@ -153,9 +173,13 @@
 <span class="c">     * @private</span>
 <span class="c">     */</span>
     <span class="nx">_IEEnumFix</span><span class="o">:</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">env</span><span class="o">.</span><span class="nx">ua</span><span class="o">.</span><span class="nx">ie</span><span class="o">)</span> <span class="o">?</span> <span class="k">function</span><span class="o">(</span><span class="nx">r</span><span class="o">,</span> <span class="nx">s</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">ADD</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span><span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">var</span> <span class="nx">fname</span><span class="o">=</span><span class="nx">ADD</span><span class="o">[</span><span class="nx">i</span><span class="o">],</span><span class="nx">f</span><span class="o">=</span><span class="nx">s</span><span class="o">[</span><span class="nx">fname</span><span class="o">];</span>
-                <span class="k">if</span> <span class="o">(</span><span class="nx">L</span><span class="o">.</span><span class="nx">isFunction</span><span class="o">(</span><span class="nx">f</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nx">f</span><span class="o">!=</span><span class="nb">Object</span><span class="o">.</span><span class="nx">prototype</span><span class="o">[</span><span class="nx">fname</span><span class="o">])</span> <span class="o">{</span>
+            <span class="k">var</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">fname</span><span class="o">,</span> <span class="nx">f</span><span class="o">;</span>
+            <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">ADD</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span><span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
+
+                <span class="nx">fname</span> <span class="o">=</span> <span class="nx">ADD</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
+                <span class="nx">f</span> <span class="o">=</span> <span class="nx">s</span><span class="o">[</span><span class="nx">fname</span><span class="o">];</span>
+
+                <span class="k">if</span> <span class="o">(</span><span class="nx">L</span><span class="o">.</span><span class="nx">isFunction</span><span class="o">(</span><span class="nx">f</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nx">f</span><span class="o">!=</span><span class="nx">OP</span><span class="o">[</span><span class="nx">fname</span><span class="o">])</span> <span class="o">{</span>
                     <span class="nx">r</span><span class="o">[</span><span class="nx">fname</span><span class="o">]=</span><span class="nx">f</span><span class="o">;</span>
                 <span class="o">}</span>
             <span class="o">}</span>
@@ -180,17 +204,17 @@
             <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="o">(</span><span class="s2">&quot;extend failed, please check that &quot;</span> <span class="o">+</span>
                             <span class="s2">&quot;all dependencies are included.&quot;</span><span class="o">);</span>
         <span class="o">}</span>
-        <span class="k">var</span> <span class="nx">F</span> <span class="o">=</span> <span class="k">function</span><span class="o">()</span> <span class="o">{};</span>
+        <span class="k">var</span> <span class="nx">F</span> <span class="o">=</span> <span class="k">function</span><span class="o">()</span> <span class="o">{},</span> <span class="nx">i</span><span class="o">;</span>
         <span class="nx">F</span><span class="o">.</span><span class="nx">prototype</span><span class="o">=</span><span class="nx">superc</span><span class="o">.</span><span class="nx">prototype</span><span class="o">;</span>
         <span class="nx">subc</span><span class="o">.</span><span class="nx">prototype</span><span class="o">=</span><span class="k">new</span> <span class="nx">F</span><span class="o">();</span>
         <span class="nx">subc</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">constructor</span><span class="o">=</span><span class="nx">subc</span><span class="o">;</span>
         <span class="nx">subc</span><span class="o">.</span><span class="nx">superclass</span><span class="o">=</span><span class="nx">superc</span><span class="o">.</span><span class="nx">prototype</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="nx">superc</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">constructor</span> <span class="o">==</span> <span class="nb">Object</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">constructor</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="nx">superc</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">constructor</span> <span class="o">==</span> <span class="nx">OP</span><span class="o">.</span><span class="nx">constructor</span><span class="o">)</span> <span class="o">{</span>
             <span class="nx">superc</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">constructor</span><span class="o">=</span><span class="nx">superc</span><span class="o">;</span>
         <span class="o">}</span>
     
         <span class="k">if</span> <span class="o">(</span><span class="nx">overrides</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">overrides</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="nx">i</span> <span class="k">in</span> <span class="nx">overrides</span><span class="o">)</span> <span class="o">{</span>
                 <span class="k">if</span> <span class="o">(</span><span class="nx">L</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">(</span><span class="nx">overrides</span><span class="o">,</span> <span class="nx">i</span><span class="o">))</span> <span class="o">{</span>
                     <span class="nx">subc</span><span class="o">.</span><span class="nx">prototype</span><span class="o">[</span><span class="nx">i</span><span class="o">]=</span><span class="nx">overrides</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
                 <span class="o">}</span>
@@ -226,14 +250,14 @@
         <span class="k">if</span> <span class="o">(!</span><span class="nx">s</span><span class="o">||!</span><span class="nx">r</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="o">(</span><span class="s2">&quot;Absorb failed, verify dependencies.&quot;</span><span class="o">);</span>
         <span class="o">}</span>
-        <span class="k">var</span> <span class="nx">a</span><span class="o">=</span><span class="nx">arguments</span><span class="o">,</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">p</span><span class="o">,</span> <span class="nx">override</span><span class="o">=</span><span class="nx">a</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
-        <span class="k">if</span> <span class="o">(</span><span class="nx">override</span> <span class="o">&amp;&amp;</span> <span class="nx">override</span><span class="o">!==</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span> <span class="c">// only absorb the specified properties</span>
+        <span class="k">var</span> <span class="nx">a</span><span class="o">=</span><span class="nx">arguments</span><span class="o">,</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">p</span><span class="o">,</span> <span class="nx">overrideList</span><span class="o">=</span><span class="nx">a</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
+        <span class="k">if</span> <span class="o">(</span><span class="nx">overrideList</span> <span class="o">&amp;&amp;</span> <span class="nx">overrideList</span><span class="o">!==</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span> <span class="c">// only absorb the specified properties</span>
 <span class="c"></span>            <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">2</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">a</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
                 <span class="nx">r</span><span class="o">[</span><span class="nx">a</span><span class="o">[</span><span class="nx">i</span><span class="o">]]</span> <span class="o">=</span> <span class="nx">s</span><span class="o">[</span><span class="nx">a</span><span class="o">[</span><span class="nx">i</span><span class="o">]];</span>
             <span class="o">}</span>
         <span class="o">}</span> <span class="k">else</span> <span class="o">{</span> <span class="c">// take everything, overwriting only if the third parameter is true</span>
 <span class="c"></span>            <span class="k">for</span> <span class="o">(</span><span class="nx">p</span> <span class="k">in</span> <span class="nx">s</span><span class="o">)</span> <span class="o">{</span> 
-                <span class="k">if</span> <span class="o">(</span><span class="nx">override</span> <span class="o">||</span> <span class="o">!(</span><span class="nx">p</span> <span class="k">in</span> <span class="nx">r</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="nx">overrideList</span> <span class="o">||</span> <span class="o">!(</span><span class="nx">p</span> <span class="k">in</span> <span class="nx">r</span><span class="o">))</span> <span class="o">{</span>
                     <span class="nx">r</span><span class="o">[</span><span class="nx">p</span><span class="o">]</span> <span class="o">=</span> <span class="nx">s</span><span class="o">[</span><span class="nx">p</span><span class="o">];</span>
                 <span class="o">}</span>
             <span class="o">}</span>
@@ -261,8 +285,8 @@
             <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="o">(</span><span class="s2">&quot;Augment failed, verify dependencies.&quot;</span><span class="o">);</span>
         <span class="o">}</span>
         <span class="c">//var a=[].concat(arguments);</span>
-<span class="c"></span>        <span class="k">var</span> <span class="nx">a</span><span class="o">=[</span><span class="nx">r</span><span class="o">.</span><span class="nx">prototype</span><span class="o">,</span><span class="nx">s</span><span class="o">.</span><span class="nx">prototype</span><span class="o">];</span>
-        <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">2</span><span class="o">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">arguments</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span><span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
+<span class="c"></span>        <span class="k">var</span> <span class="nx">a</span><span class="o">=[</span><span class="nx">r</span><span class="o">.</span><span class="nx">prototype</span><span class="o">,</span><span class="nx">s</span><span class="o">.</span><span class="nx">prototype</span><span class="o">],</span> <span class="nx">i</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">2</span><span class="o">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">arguments</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span><span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
             <span class="nx">a</span><span class="o">.</span><span class="nx">push</span><span class="o">(</span><span class="nx">arguments</span><span class="o">[</span><span class="nx">i</span><span class="o">]);</span>
         <span class="o">}</span>
         <span class="nx">L</span><span class="o">.</span><span class="nx">augmentObject</span><span class="o">.</span><span class="nx">apply</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="nx">a</span><span class="o">);</span>
@@ -362,7 +386,8 @@
 <span class="c">     */</span>
     <span class="nx">substitute</span><span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">s</span><span class="o">,</span> <span class="nx">o</span><span class="o">,</span> <span class="nx">f</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">var</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">j</span><span class="o">,</span> <span class="nx">k</span><span class="o">,</span> <span class="nx">key</span><span class="o">,</span> <span class="nx">v</span><span class="o">,</span> <span class="nx">meta</span><span class="o">,</span> <span class="nx">saved</span><span class="o">=[],</span> <span class="nx">token</span><span class="o">,</span> 
-            <span class="nx">DUMP</span><span class="o">=</span><span class="s1">&#39;dump&#39;</span><span class="o">,</span> <span class="nx">SPACE</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="o">,</span> <span class="nx">LBRACE</span><span class="o">=</span><span class="s1">&#39;{&#39;</span><span class="o">,</span> <span class="nx">RBRACE</span><span class="o">=</span><span class="s1">&#39;}&#39;</span><span class="o">;</span>
+            <span class="nx">DUMP</span><span class="o">=</span><span class="s1">&#39;dump&#39;</span><span class="o">,</span> <span class="nx">SPACE</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="o">,</span> <span class="nx">LBRACE</span><span class="o">=</span><span class="s1">&#39;{&#39;</span><span class="o">,</span> <span class="nx">RBRACE</span><span class="o">=</span><span class="s1">&#39;}&#39;</span><span class="o">,</span>
+            <span class="nx">dump</span><span class="o">,</span> <span class="nx">objstr</span><span class="o">;</span>
 
 
         <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
@@ -400,17 +425,19 @@
                     <span class="nx">meta</span> <span class="o">=</span> <span class="nx">meta</span> <span class="o">||</span> <span class="s2">&quot;&quot;</span><span class="o">;</span>
 
                     <span class="c">// look for the keyword &#39;dump&#39;, if found force obj dump</span>
-<span class="c"></span>                    <span class="k">var</span> <span class="nx">dump</span> <span class="o">=</span> <span class="nx">meta</span><span class="o">.</span><span class="nx">indexOf</span><span class="o">(</span><span class="nx">DUMP</span><span class="o">);</span>
+<span class="c"></span>                    <span class="nx">dump</span> <span class="o">=</span> <span class="nx">meta</span><span class="o">.</span><span class="nx">indexOf</span><span class="o">(</span><span class="nx">DUMP</span><span class="o">);</span>
                     <span class="k">if</span> <span class="o">(</span><span class="nx">dump</span> <span class="o">&gt;</span> <span class="o">-</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
                         <span class="nx">meta</span> <span class="o">=</span> <span class="nx">meta</span><span class="o">.</span><span class="nx">substring</span><span class="o">(</span><span class="m">4</span><span class="o">);</span>
                     <span class="o">}</span>
 
+                    <span class="nx">objstr</span> <span class="o">=</span> <span class="nx">v</span><span class="o">.</span><span class="nx">toString</span><span class="o">();</span>
+
                     <span class="c">// use the toString if it is not the Object toString </span>
 <span class="c"></span>                    <span class="c">// and the &#39;dump&#39; meta info was not found</span>
-<span class="c"></span>                    <span class="k">if</span> <span class="o">(</span><span class="nx">v</span><span class="o">.</span><span class="nx">toString</span><span class="o">===</span><span class="nb">Object</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">toString</span><span class="o">||</span><span class="nx">dump</span><span class="o">&gt;-</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
+<span class="c"></span>                    <span class="k">if</span> <span class="o">(</span><span class="nx">objstr</span> <span class="o">===</span> <span class="nx">OBJECT_TOSTRING</span> <span class="o">||</span> <span class="nx">dump</span> <span class="o">&gt;</span> <span class="o">-</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
                         <span class="nx">v</span> <span class="o">=</span> <span class="nx">L</span><span class="o">.</span><span class="nx">dump</span><span class="o">(</span><span class="nx">v</span><span class="o">,</span> <span class="nb">parseInt</span><span class="o">(</span><span class="nx">meta</span><span class="o">,</span> <span class="m">10</span><span class="o">));</span>
                     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-                        <span class="nx">v</span> <span class="o">=</span> <span class="nx">v</span><span class="o">.</span><span class="nx">toString</span><span class="o">();</span>
+                        <span class="nx">v</span> <span class="o">=</span> <span class="nx">objstr</span><span class="o">;</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
             <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(!</span><span class="nx">L</span><span class="o">.</span><span class="nx">isString</span><span class="o">(</span><span class="nx">v</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">L</span><span class="o">.</span><span class="nx">isNumber</span><span class="o">(</span><span class="nx">v</span><span class="o">))</span> <span class="o">{</span>
@@ -461,8 +488,8 @@
 <span class="c">     * @return the new merged object</span>
 <span class="c">     */</span>
     <span class="nx">merge</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">var</span> <span class="nx">o</span><span class="o">={},</span> <span class="nx">a</span><span class="o">=</span><span class="nx">arguments</span><span class="o">;</span>
-        <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">l</span><span class="o">=</span><span class="nx">a</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">l</span><span class="o">;</span> <span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">var</span> <span class="nx">o</span><span class="o">={},</span> <span class="nx">a</span><span class="o">=</span><span class="nx">arguments</span><span class="o">,</span> <span class="nx">l</span><span class="o">=</span><span class="nx">a</span><span class="o">.</span><span class="nx">length</span><span class="o">,</span> <span class="nx">i</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">l</span><span class="o">;</span> <span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
             <span class="nx">L</span><span class="o">.</span><span class="nx">augmentObject</span><span class="o">(</span><span class="nx">o</span><span class="o">,</span> <span class="nx">a</span><span class="o">[</span><span class="nx">i</span><span class="o">],</span> <span class="kc">true</span><span class="o">);</span>
         <span class="o">}</span>
         <span class="k">return</span> <span class="nx">o</span><span class="o">;</span>
@@ -502,12 +529,12 @@
             <span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="o">(</span><span class="s2">&quot;method undefined&quot;</span><span class="o">);</span>
         <span class="o">}</span>
 
-        <span class="k">if</span> <span class="o">(!</span><span class="nx">L</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="nx">d</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="nx">d</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">L</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="nx">d</span><span class="o">))</span> <span class="o">{</span>
             <span class="nx">d</span> <span class="o">=</span> <span class="o">[</span><span class="nx">data</span><span class="o">];</span>
         <span class="o">}</span>
 
         <span class="nx">f</span> <span class="o">=</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
-            <span class="nx">m</span><span class="o">.</span><span class="nx">apply</span><span class="o">(</span><span class="nx">o</span><span class="o">,</span> <span class="nx">d</span><span class="o">);</span>
+            <span class="nx">m</span><span class="o">.</span><span class="nx">apply</span><span class="o">(</span><span class="nx">o</span><span class="o">,</span> <span class="nx">d</span> <span class="o">||</span> <span class="nx">NOTHING</span><span class="o">);</span>
         <span class="o">};</span>
 
         <span class="nx">r</span> <span class="o">=</span> <span class="o">(</span><span class="nx">periodic</span><span class="o">)</span> <span class="o">?</span> <span class="nx">setInterval</span><span class="o">(</span><span class="nx">f</span><span class="o">,</span> <span class="nx">when</span><span class="o">)</span> <span class="o">:</span> <span class="nx">setTimeout</span><span class="o">(</span><span class="nx">f</span><span class="o">,</span> <span class="nx">when</span><span class="o">);</span>
@@ -561,7 +588,7 @@
 <span class="c"> * @param prop {string} the name of the property to test</span>
 <span class="c"> * @return {boolean} the result</span>
 <span class="c"> */</span>
-<span class="nx">L</span><span class="o">.</span><span class="nx">hasOwnProperty</span> <span class="o">=</span> <span class="o">(</span><span class="nb">Object</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">)</span> <span class="o">?</span>
+<span class="nx">L</span><span class="o">.</span><span class="nx">hasOwnProperty</span> <span class="o">=</span> <span class="o">(</span><span class="nx">OP</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">)</span> <span class="o">?</span>
     <span class="k">function</span><span class="o">(</span><span class="nx">o</span><span class="o">,</span> <span class="nx">prop</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nx">o</span> <span class="o">&amp;&amp;</span> <span class="nx">o</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">(</span><span class="nx">prop</span><span class="o">);</span>
     <span class="o">}</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">o</span><span class="o">,</span> <span class="nx">prop</span><span class="o">)</span> <span class="o">{</span>
@@ -624,109 +651,84 @@
 
 <span class="o">})();</span>
 </pre></div>
+
                     </div>
 			</div>
 		</div>
 		<div class="yui-b">
             <div class="nav">
 
-                    <div class="module">
+                    <div id="moduleList" class="module">
                         <h4>Modules</h4>
                         <ul class="content">
-
-                                <li class=""><a href="module_animation.html">animation</a></li>
-
-                                <li class=""><a href="module_autocomplete.html">autocomplete</a></li>
-
-                                <li class=""><a href="module_button.html">button</a></li>
-
-                                <li class=""><a href="module_calendar.html">calendar</a></li>
-
-                                <li class=""><a href="module_carousel.html">carousel</a></li>
-
-                                <li class=""><a href="module_charts.html">charts</a></li>
-
-                                <li class=""><a href="module_colorpicker.html">colorpicker</a></li>
-
-                                <li class=""><a href="module_connection.html">connection</a></li>
-
-                                <li class=""><a href="module_container.html">container</a></li>
-
-                                <li class=""><a href="module_cookie.html">cookie</a></li>
-
-                                <li class=""><a href="module_datasource.html">datasource</a></li>
-
-                                <li class=""><a href="module_datatable.html">datatable</a></li>
-
-                                <li class=""><a href="module_dom.html">dom</a></li>
-
-                                <li class=""><a href="module_dragdrop.html">dragdrop</a></li>
-
-                                <li class=""><a href="module_editor.html">editor</a></li>
-
-                                <li class=""><a href="module_element.html">element</a></li>
-
-                                <li class=""><a href="module_event.html">event</a></li>
-
-                                <li class=""><a href="module_get.html">get</a></li>
-
-                                <li class=""><a href="module_history.html">history</a></li>
-
-                                <li class=""><a href="module_imagecropper.html">imagecropper</a></li>
-
-                                <li class=""><a href="module_imageloader.html">imageloader</a></li>
-
-                                <li class=""><a href="module_json.html">json</a></li>
-
-                                <li class=""><a href="module_layout.html">layout</a></li>
-
-                                <li class=""><a href="module_logger.html">logger</a></li>
-
-                                <li class=""><a href="module_menu.html">menu</a></li>
-
-                                <li class=""><a href="module_paginator.html">paginator</a></li>
-
-                                <li class=""><a href="module_profiler.html">profiler</a></li>
-
-                                <li class=""><a href="module_profilerviewer.html">profilerviewer</a></li>
-
-                                <li class=""><a href="module_resize.html">resize</a></li>
-
-                                <li class=""><a href="module_selector.html">selector</a></li>
-
-                                <li class=""><a href="module_slider.html">slider</a></li>
-
-                                <li class=""><a href="module_tabview.html">tabview</a></li>
-
-                                <li class=""><a href="module_treeview.html">treeview</a></li>
-
-                                <li class=""><a href="module_uploader.html">uploader</a></li>
-
-                                <li class="selected"><a href="module_yahoo.html">yahoo</a></li>
-
-                                <li class=""><a href="module_yuiloader.html">yuiloader</a></li>
-
-                                <li class=""><a href="module_yuitest.html">yuitest</a></li>
+                                <li class=""><a href="module_animation.html" title="animation">animation</a></li>
+                                <li class=""><a href="module_autocomplete.html" title="autocomplete">autocomplete</a></li>
+                                <li class=""><a href="module_button.html" title="button">button</a></li>
+                                <li class=""><a href="module_calendar.html" title="calendar">calendar</a></li>
+                                <li class=""><a href="module_carousel.html" title="carousel">carousel</a></li>
+                                <li class=""><a href="module_charts.html" title="charts">charts</a></li>
+                                <li class=""><a href="module_colorpicker.html" title="colorpicker">colorpicker</a></li>
+                                <li class=""><a href="module_connection.html" title="connection">connection</a></li>
+                                <li class=""><a href="module_container.html" title="container">container</a></li>
+                                <li class=""><a href="module_cookie.html" title="cookie">cookie</a></li>
+                                <li class=""><a href="module_datasource.html" title="datasource">datasource</a></li>
+                                <li class=""><a href="module_datatable.html" title="datatable">datatable</a></li>
+                                <li class=""><a href="module_datemath.html" title="datemath">datemath</a></li>
+                                <li class=""><a href="module_dom.html" title="dom">dom</a></li>
+                                <li class=""><a href="module_dragdrop.html" title="dragdrop">dragdrop</a></li>
+                                <li class=""><a href="module_editor.html" title="editor">editor</a></li>
+                                <li class=""><a href="module_element.html" title="element">element</a></li>
+                                <li class=""><a href="module_element-delegate.html" title="element-delegate">element-delegate</a></li>
+                                <li class=""><a href="module_event.html" title="event">event</a></li>
+                                <li class=""><a href="module_event-delegate.html" title="event-delegate">event-delegate</a></li>
+                                <li class=""><a href="module_event-mouseenter.html" title="event-mouseenter">event-mouseenter</a></li>
+                                <li class=""><a href="module_event-simulate.html" title="event-simulate">event-simulate</a></li>
+                                <li class=""><a href="module_get.html" title="get">get</a></li>
+                                <li class=""><a href="module_history.html" title="history">history</a></li>
+                                <li class=""><a href="module_imagecropper.html" title="imagecropper">imagecropper</a></li>
+                                <li class=""><a href="module_imageloader.html" title="imageloader">imageloader</a></li>
+                                <li class=""><a href="module_json.html" title="json">json</a></li>
+                                <li class=""><a href="module_layout.html" title="layout">layout</a></li>
+                                <li class=""><a href="module_logger.html" title="logger">logger</a></li>
+                                <li class=""><a href="module_menu.html" title="menu">menu</a></li>
+                                <li class=""><a href="module_paginator.html" title="paginator">paginator</a></li>
+                                <li class=""><a href="module_profiler.html" title="profiler">profiler</a></li>
+                                <li class=""><a href="module_profilerviewer.html" title="profilerviewer">profilerviewer</a></li>
+                                <li class=""><a href="module_progressbar.html" title="progressbar">progressbar</a></li>
+                                <li class=""><a href="module_resize.html" title="resize">resize</a></li>
+                                <li class=""><a href="module_selector.html" title="selector">selector</a></li>
+                                <li class=""><a href="module_slider.html" title="slider">slider</a></li>
+                                <li class=""><a href="module_storage.html" title="Storage">Storage</a></li>
+                                <li class=""><a href="module_stylesheet.html" title="stylesheet">stylesheet</a></li>
+                                <li class=""><a href="module_swf.html" title="swf">swf</a></li>
+                                <li class=""><a href="module_swfdetect.html" title="swfdetect">swfdetect</a></li>
+                                <li class=""><a href="module_swfstore.html" title="swfstore">swfstore</a></li>
+                                <li class=""><a href="module_tabview.html" title="tabview">tabview</a></li>
+                                <li class=""><a href="module_treeview.html" title="treeview">treeview</a></li>
+                                <li class=""><a href="module_uploader.html" title="uploader">uploader</a></li>
+                                <li class="selected"><a href="module_yahoo.html" title="yahoo">yahoo</a></li>
+                                <li class=""><a href="module_yuiloader.html" title="yuiloader">yuiloader</a></li>
+                                <li class=""><a href="module_yuitest.html" title="yuitest">yuitest</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="classList" class="module">
                         <h4>Classes</h4>
                         <ul class="content">
-                                <li class=""><a href="YAHOO.html">YAHOO</a></li>
-                                <li class=""><a href="YAHOO.env.html">YAHOO.env</a></li>
-                                <li class=""><a href="YAHOO.env.ua.html">YAHOO.env.ua</a></li>
-                                <li class=""><a href="YAHOO.lang.html">YAHOO.lang</a></li>
-                                <li class=""><a href="YAHOO_config.html">YAHOO_config</a></li>
+                                <li class=""><a href="YAHOO.html" title="YAHOO">YAHOO</a></li>
+                                <li class=""><a href="YAHOO.env.html" title="YAHOO.env">YAHOO.env</a></li>
+                                <li class=""><a href="YAHOO.env.ua.html" title="YAHOO.env.ua">YAHOO.env.ua</a></li>
+                                <li class=""><a href="YAHOO.lang.html" title="YAHOO.lang">YAHOO.lang</a></li>
+                                <li class=""><a href="YAHOO_config.html" title="YAHOO_config">YAHOO_config</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="fileList" class="module">
                         <h4>Files</h4>
                         <ul class="content">        
-                                <li class=""><a href="Env.js.html">Env.js</a></li>
-                                <li class="selected"><a href="Lang.js.html">Lang.js</a></li>
-                                <li class=""><a href="YAHOO.js.html">YAHOO.js</a></li>
+                                <li class=""><a href="Env.js.html" title="Env.js">Env.js</a></li>
+                                <li class="selected"><a href="Lang.js.html" title="Lang.js">Lang.js</a></li>
+                                <li class=""><a href="YAHOO.js.html" title="YAHOO.js">YAHOO.js</a></li>
                         </ul>
                     </div>
 
@@ -739,8 +741,11 @@
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2008 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2009 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
+<script type="text/javascript">
+    ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.env.ua", "name": "air", "url": "YAHOO.env.ua.html#property_air", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "augment", "url": "YAHOO.lang.html#method_augment", "type": "method"}, {"access": "", "host": "YAHOO", "name": "augment", "url": "YAHOO.html#method_augment", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "augmentObject", "url": "YAHOO.lang.html#method_augmentObject", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "augmentProto", "url": "YAHOO.lang.html#method_augmentProto", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "caja", "url": "YAHOO.env.ua.html#property_caja", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "dump", "url": "YAHOO.lang.html#method_dump", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "extend", "url": "YAHOO.lang.html#method_extend", "type": "method"}, {"access": "", "host": "YAHOO", "name": "extend", "url": "YAHOO.html#method_extend", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "gecko", "url": "YAHOO.env.ua.html#property_gecko", "type": "property"}, {"access": "", "host": "YAHOO.env", "name": "getVersion", "url": "YAHOO.env.html#method_getVersion", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "hasOwnProperty", "url": "YAHOO.lang.html#method_hasOwnProperty", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "ie", "url": "YAHOO.env.ua.html#property_ie", "type": "property"}, {"access": "private", "host": "YAHOO.lang", "name": "_IEEnumFix", "url": "YAHOO.lang.html#property__IEEnumFix", "type": "property"}, {"access": "", "host": "YAHOO_config", "name": "injecting", "url": "YAHOO_config.html#property_injecting", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "isArray", "url": "YAHOO.lang.html#method_isArray", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isBoolean", "url": "YAHOO.lang.html#method_isBoolean", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isFunction", "url": "YAHOO.lang.html#method_isFunction", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isNull", "url": "YAHOO.lang.html#method_isNull", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isNumber", "url": "YAHOO.lang.html#method_isNumber", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isObject", "url": "YAHOO.lang.html#method_isObject", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isString", "url": "YAHOO.lang.html#method_isString", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isUndefined", "url": "YAHOO.lang.html#method_isUndefined", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isValue", "url": "YAHOO.lang.html#method_isValue", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "later", "url": "YAHOO.lang.html#method_later", "type": "method"}, {"access": "", "host": "YAHOO_config", "name": "listener", "url": "YAHOO_config.html#property_listener", "type": "property"}, {"access": "", "host": "YAHOO.env", "name": "listeners", "url": "YAHOO.env.html#property_listeners", "type": "property"}, {"access": "", "host": "YAHOO_config", "name": "load", "url": "YAHOO_config.html#property_load", "type": "property"}, {"access": "", "host": "YAHOO_config", "name": "locale", "url": "YAHOO_config.html#property_locale", "type": "property"}, {"access": "", "host": "YAHOO", "name": "log", "url": "YAHOO.html#method_log", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "merge", "url": "YAHOO.lang.html#method_merge", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "mobile", "url": "YAHOO.env.ua.html#property_mobile", "type": "property"}, {"access": "", "host": "YAHOO.env", "name": "modules", "url": "YAHOO.env.html#property_modules", "type": "property"}, {"access": "", "host": "YAHOO", "name": "namespace", "url": "YAHOO.html#method_namespace", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "opera", "url": "YAHOO.env.ua.html#property_opera", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "os", "url": "YAHOO.env.ua.html#property_os", "type": "property"}, {"access": "", "host": "YAHOO", "name": "register", "url": "YAHOO.html#method_register", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "secure", "url": "YAHOO.env.ua.html#property_secure", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "substitute", "url": "YAHOO.lang.html#method_substitute", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "trim", "url": "YAHOO.lang.html#method_trim", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "webkit", "url": "YAHOO.env.ua.html#property_webkit", "type": "property"}];
+</script>
 </body>
 </html>

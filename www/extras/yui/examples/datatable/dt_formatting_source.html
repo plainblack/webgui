@@ -30,14 +30,14 @@ loader.insert({
             // a green background color if value of field3 is greater than 100.
             // Otherwise renders a down icon and assigns class "down", setting
             // the background color to red.
-            var myCustomFormatter = function(elCell, oRecord, oColumn, oData) {
+            var myCustomFormatter = function(elLiner, oRecord, oColumn, oData) {
                 if(oRecord.getData("field3") > 100) {
-                    YAHOO.util.Dom.replaceClass(elCell.parentNode, "down", "up");
-                    elCell.innerHTML = '&nbsp;<img src="../../build/datatable/assets/skins/sam/dt-arrow-up.png">';
+                    YAHOO.util.Dom.replaceClass(elLiner.parentNode, "down", "up");
+                    elLiner.innerHTML = '&nbsp;<img src="../../build/datatable/assets/skins/sam/dt-arrow-up.png">';
                 }
                 else {
-                    YAHOO.util.Dom.replaceClass(elCell.parentNode, "up","down");
-                    elCell.innerHTML = '&nbsp;<img src="../../build/datatable/assets/skins/sam/dt-arrow-dn.png">';
+                    YAHOO.util.Dom.replaceClass(elLiner.parentNode, "up","down");
+                    elLiner.innerHTML = '&nbsp;<img src="../../build/datatable/assets/skins/sam/dt-arrow-dn.png">';
                 }
             };
             
@@ -45,9 +45,9 @@ loader.insert({
             YAHOO.widget.DataTable.Formatter.myCustom = myCustomFormatter;
 
             // Override the built-in formatter
-            YAHOO.widget.DataTable.formatEmail = function(elCell, oRecord, oColumn, oData) {
+            YAHOO.widget.DataTable.formatEmail = function(elLiner, oRecord, oColumn, oData) {
                 var user = oData;
-                elCell.innerHTML = "<a href=\"mailto:" + user + "@mycompany.com\">" + user + "</a>";
+                elLiner.innerHTML = "<a href=\"mailto:" + user + "@mycompany.com\">" + user + "</a>";
             };
             
 

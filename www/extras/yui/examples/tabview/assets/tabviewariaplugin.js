@@ -92,8 +92,7 @@
 			aTabListItems = m_oTabListItems[this.get(_ID)],
 			oCurrentTabLI,
 			oNextTabLI,
-			oNextTabAnchor,
-			bArrowKeyPressed = false;
+			oNextTabAnchor;
 
 
 		if (oCurrentTabAnchor) {
@@ -266,11 +265,22 @@
 	
 
 				oTabList = Dom.getFirstChild(this.get(_ELEMENT));
-		
-	
+
+
 				//	Set the "role" attribute of the <UL> encapsulating the Tabs to "tablist"
 		
-				setARIARole(oTabList, _TAB_LIST);
+				if (!oTabList) {
+				
+					this.on("appendTo", function () {
+					
+						setARIARole(Dom.getFirstChild(this.get(_ELEMENT)), _TAB_LIST);
+					
+					}, null, this);
+				
+				}
+				else {
+					setARIARole(oTabList, _TAB_LIST);
+				}
 		
 		
 				//	Add a keypress listener that toggles the active Tab instance when the user 
@@ -344,14 +354,15 @@
 			});
 
 
-			fnTabViewInitAttributes.call(this, p_oAttributes);
-			
 			if (m_bUseARIA) {
 				this.set(_USE_ARIA, true);
 			}
+
+			fnTabViewInitAttributes.call(this, p_oAttributes);
 		
 		}
 	
 	}, "initAttributes", "_setUseARIA", "_setLabelledBy", "_setDescribedBy", "addTab");
 
 }());
+YAHOO.register("tabviewariaplugin", YAHOO.widget.TabView, {version: "@VERSION@", build: "@BUILD@"});

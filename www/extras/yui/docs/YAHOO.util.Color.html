@@ -1,8 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
 <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<title>API: colorpicker  YAHOO.util.Color   (YUI Library)</title>
-	<link rel="stylesheet" type="text/css" href="assets/api.css">
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
     <script type="text/javascript" src="assets/api-js"></script>
     <script type="text/javascript" src="assets/ac-js"></script>
 </head>
@@ -10,27 +14,33 @@
 <body id="yahoo-com">
 
 <div id="doc3" class="yui-t2">
-
 	<div id="hd">
-        <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>colorpicker&nbsp; <span class="subtitle">2.6.0</span></h3>
-        <p>
-        <a href="./index.html">Yahoo! UI Library</a> 
-            &gt; <a href="./module_colorpicker.html">colorpicker</a>
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>colorpicker&nbsp; <span class="subtitle">2.8.0r4</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_colorpicker.html" title="colorpicker">colorpicker</a>
                  &gt; YAHOO.util.Color 
                 
-            </p>
-
-
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
 	</div>
 
 	<div id="bd">
 		<div id="yui-main">
 			<div class="yui-b">
-            <form name="yui-classopts-form">
-    <span id="classopts"><input type="checkbox" name="showprivate" id="showprivate" /> <label for="showprivate">Show Private</label></span>
-    <span id="classopts"><input type="checkbox" name="showprotected" id="showprotected" /> <label for="showprotected">Show Protected</label></span>
-    <span id="classopts"><input type="checkbox" name="showdeprecated" id="showdeprecated" /> <label for="showdeprecated">Show Deprecated</label></span>
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
             </form>
 
                     <h2>
@@ -38,77 +48,39 @@
 
                         
                         
-                            Class <b>YAHOO.util.Color</b>
+                            Class <b property="yui:name">YAHOO.util.Color</b>
                         <span class="extends">
                         </span>
 
-                        <span class="extends">
-                        </span>
-                        
-                        </code>
                     </h2>
                     <!-- class tree goes here -->
                     
                 
   
 
-                    <div class="summary description">
+                    <div class="summary description" property="yui:description">
                         Provides color conversion and validation utils
                     </div>
 
+                    
+                    <div rel="yui:properties" resource="#properties">
 
+                    </div>
 
-
+                    <div rel="yui:methods" resource="#methods">
                         <div class="section method details">
                             <h3 id="methods">Methods</h3>
                             <div class="content">
-                                    <div class="private">
-                                    <h4>
-                                        <a name="method__createHostElement">_createHostElement</a></h4>
-                                    <div class="detail">
-                                        <code>
-                                         private 
-                                        
-                                        
-                                        void
-                                            <strong>_createHostElement</strong>
-                                           (
-                                            )
-                                        </code>
-                                        
-                                        <div class="description">
-                                            Creates the host element if it doesn't exist
-                                        </div>
-
-                                        <div class="description">
-
-
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code>
-                                                        void
-                                                    </code></dt>
-                                                    <dd></dd>
-                                                </dl>
-
-
-             
-
-                                        </div>
-
-                                    </div>
-                                    <hr />
-                                    </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_dec2hex">
                                     <h4>
                                         <a name="method_dec2hex">dec2hex</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         string
-                                            <strong>dec2hex</strong>
+                                            <strong property="yui:name">dec2hex</strong>
                                            (
                                                 
                                                         
@@ -118,26 +90,28 @@
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Converts an int 0...255 to hex pair 00...FF
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>n &lt;int&gt;</code>
-                                                              the number to convert
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">n</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the number to convert</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         string
                                                     </code></dt>
-                                                    <dd>the hex equivalent</dd>
+                                                    <dd property="yui:returnInfo">the hex equivalent</dd>
                                                 </dl>
 
 
@@ -148,16 +122,16 @@
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_hex2dec">
                                     <h4>
                                         <a name="method_hex2dec">hex2dec</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         int
-                                            <strong>hex2dec</strong>
+                                            <strong property="yui:name">hex2dec</strong>
                                            (
                                                 
                                                         
@@ -167,26 +141,28 @@
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Converts a hex pair 00...FF to an int 0...255
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>str &lt;string&gt;</code>
-                                                              the hex pair to convert
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">str</span>
+                                                        &lt;<span property="yui:type">string</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the hex pair to convert</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         int
                                                     </code></dt>
-                                                    <dd>the decimal</dd>
+                                                    <dd property="yui:returnInfo">the decimal</dd>
                                                 </dl>
 
 
@@ -197,16 +173,16 @@
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_hex2rgb">
                                     <h4>
                                         <a name="method_hex2rgb">hex2rgb</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         [int, int, int]
-                                            <strong>hex2rgb</strong>
+                                            <strong property="yui:name">hex2rgb</strong>
                                            (
                                                 
                                                         
@@ -216,26 +192,28 @@
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Converts a hex string to rgb
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>str &lt;string&gt;</code>
-                                                              the hex string
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">str</span>
+                                                        &lt;<span property="yui:type">string</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the hex string</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         [int, int, int]
                                                     </code></dt>
-                                                    <dd>an array containing the rgb values</dd>
+                                                    <dd property="yui:returnInfo">an array containing the rgb values</dd>
                                                 </dl>
 
 
@@ -246,16 +224,16 @@
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_hsv2rgb">
                                     <h4>
                                         <a name="method_hsv2rgb">hsv2rgb</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         [int, int, int]
-                                            <strong>hsv2rgb</strong>
+                                            <strong property="yui:name">hsv2rgb</strong>
                                            (
                                                 
                                                         
@@ -273,35 +251,41 @@
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Converts HSV (h[0-360], s[0-1]), v[0-1] to RGB [255,255,255]
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>h &lt;int|[int, float, float]&gt;</code>
-                                                              the hue, or an
-array containing all three parameters
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">h</span>
+                                                        &lt;<span property="yui:type">int|[int, float, float]</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the hue, or an
+array containing all three parameters</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>s &lt;float&gt;</code>
-                                                              the saturation
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">s</span>
+                                                        &lt;<span property="yui:type">float</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the saturation</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>v &lt;float&gt;</code>
-                                                              the value/brightness
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">v</span>
+                                                        &lt;<span property="yui:type">float</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the value/brightness</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         [int, int, int]
                                                     </code></dt>
-                                                    <dd>the red, green, blue values in
+                                                    <dd property="yui:returnInfo">the red, green, blue values in
 decimal.</dd>
                                                 </dl>
 
@@ -313,16 +297,16 @@ decimal.</dd>
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_real2dec">
                                     <h4>
                                         <a name="method_real2dec">real2dec</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         int
-                                            <strong>real2dec</strong>
+                                            <strong property="yui:name">real2dec</strong>
                                            (
                                                 
                                                         
@@ -332,26 +316,28 @@ decimal.</dd>
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Converts 0-1 to 0-255
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>n &lt;float&gt;</code>
-                                                              the number to convert
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">n</span>
+                                                        &lt;<span property="yui:type">float</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the number to convert</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         int
                                                     </code></dt>
-                                                    <dd>a number 0-255</dd>
+                                                    <dd property="yui:returnInfo">a number 0-255</dd>
                                                 </dl>
 
 
@@ -362,16 +348,16 @@ decimal.</dd>
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_rgb2hex">
                                     <h4>
                                         <a name="method_rgb2hex">rgb2hex</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         string
-                                            <strong>rgb2hex</strong>
+                                            <strong property="yui:name">rgb2hex</strong>
                                            (
                                                 
                                                         
@@ -389,36 +375,42 @@ decimal.</dd>
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Converts decimal rgb values into a hex string
 255,255,255 -> FFFFFF
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>r &lt;int|[int, int, int]&gt;</code>
-                                                              the red value, or an
-array containing all three parameters
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">r</span>
+                                                        &lt;<span property="yui:type">int|[int, int, int]</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the red value, or an
+array containing all three parameters</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>g &lt;int&gt;</code>
-                                                              the green value
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">g</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the green value</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>b &lt;int&gt;</code>
-                                                              the blue value
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">b</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the blue value</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         string
                                                     </code></dt>
-                                                    <dd>the hex string</dd>
+                                                    <dd property="yui:returnInfo">the hex string</dd>
                                                 </dl>
 
 
@@ -429,16 +421,16 @@ array containing all three parameters
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_rgb2hsv">
                                     <h4>
                                         <a name="method_rgb2hsv">rgb2hsv</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         [int, float, float]
-                                            <strong>rgb2hsv</strong>
+                                            <strong property="yui:name">rgb2hsv</strong>
                                            (
                                                 
                                                         
@@ -456,35 +448,41 @@ array containing all three parameters
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Converts to RGB [255,255,255] to HSV (h[0-360], s[0-1]), v[0-1]
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>r &lt;int|[int, int, int]&gt;</code>
-                                                              the red value, or an
-array containing all three parameters
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">r</span>
+                                                        &lt;<span property="yui:type">int|[int, int, int]</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the red value, or an
+array containing all three parameters</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>g &lt;int&gt;</code>
-                                                              the green value
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">g</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the green value</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>b &lt;int&gt;</code>
-                                                              the blue value
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">b</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the blue value</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         [int, float, float]
                                                     </code></dt>
-                                                    <dd>the value converted to hsv</dd>
+                                                    <dd property="yui:returnInfo">the value converted to hsv</dd>
                                                 </dl>
 
 
@@ -495,16 +493,16 @@ array containing all three parameters
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="">
+                                    <div class="" rel="yui:method" resource="#method_websafe">
                                     <h4>
                                         <a name="method_websafe">websafe</a></h4>
-                                    <div class="detail">
+                                    <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         [int, int, int]
-                                            <strong>websafe</strong>
+                                            <strong property="yui:name">websafe</strong>
                                            (
                                                 
                                                         
@@ -522,35 +520,41 @@ array containing all three parameters
                                             )
                                         </code>
                                         
-                                        <div class="description">
+                                        <div class="description" property="yui:description">
                                             Returns the closest websafe color to the supplied rgb value.
                                         </div>
 
                                         <div class="description">
 
-                                                <dl>
+                                                <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>r &lt;int|[int, int, int]&gt;</code>
-                                                              the red value, or an
-array containing all three parameters
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">r</span>
+                                                        &lt;<span property="yui:type">int|[int, int, int]</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the red value, or an
+array containing all three parameters</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>g &lt;int&gt;</code>
-                                                              the green value
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">g</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the green value</span>
                                                         </dd>
-                                                        <dd>
-                                                            <code>b &lt;int&gt;</code>
-                                                              the blue value
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">b</span>
+                                                        &lt;<span property="yui:type">int</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the blue value</span>
                                                         </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
-                                                    <code>
+                                                    <code property="yui:return">
                                                         [int, int, int]
                                                     </code></dt>
-                                                    <dd>an array containing the closes
+                                                    <dd property="yui:returnInfo">an array containing the closes
 websafe rgb colors.</dd>
                                                 </dl>
 
@@ -565,144 +569,104 @@ websafe rgb colors.</dd>
                             </div>
                         </div>
 
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
 
 
+                    </div>
 
+                    <div rel="yui:attributes" resource="#configattributes">
 
-
+                    </div>
 
 			</div>
 		</div>
 		<div class="yui-b">
             <div class="nav">
 
-                    <div class="module">
+                    <div id="moduleList" class="module">
                         <h4>Modules</h4>
                         <ul class="content">
-
-                                <li class=""><a href="module_animation.html">animation</a></li>
-
-                                <li class=""><a href="module_autocomplete.html">autocomplete</a></li>
-
-                                <li class=""><a href="module_button.html">button</a></li>
-
-                                <li class=""><a href="module_calendar.html">calendar</a></li>
-
-                                <li class=""><a href="module_carousel.html">carousel</a></li>
-
-                                <li class=""><a href="module_charts.html">charts</a></li>
-
-                                <li class="selected"><a href="module_colorpicker.html">colorpicker</a></li>
-
-                                <li class=""><a href="module_connection.html">connection</a></li>
-
-                                <li class=""><a href="module_container.html">container</a></li>
-
-                                <li class=""><a href="module_cookie.html">cookie</a></li>
-
-                                <li class=""><a href="module_datasource.html">datasource</a></li>
-
-                                <li class=""><a href="module_datatable.html">datatable</a></li>
-
-                                <li class=""><a href="module_dom.html">dom</a></li>
-
-                                <li class=""><a href="module_dragdrop.html">dragdrop</a></li>
-
-                                <li class=""><a href="module_editor.html">editor</a></li>
-
-                                <li class=""><a href="module_element.html">element</a></li>
-
-                                <li class=""><a href="module_event.html">event</a></li>
-
-                                <li class=""><a href="module_get.html">get</a></li>
-
-                                <li class=""><a href="module_history.html">history</a></li>
-
-                                <li class=""><a href="module_imagecropper.html">imagecropper</a></li>
-
-                                <li class=""><a href="module_imageloader.html">imageloader</a></li>
-
-                                <li class=""><a href="module_json.html">json</a></li>
-
-                                <li class=""><a href="module_layout.html">layout</a></li>
-
-                                <li class=""><a href="module_logger.html">logger</a></li>
-
-                                <li class=""><a href="module_menu.html">menu</a></li>
-
-                                <li class=""><a href="module_paginator.html">paginator</a></li>
-
-                                <li class=""><a href="module_profiler.html">profiler</a></li>
-
-                                <li class=""><a href="module_profilerviewer.html">profilerviewer</a></li>
-
-                                <li class=""><a href="module_resize.html">resize</a></li>
-
-                                <li class=""><a href="module_selector.html">selector</a></li>
-
-                                <li class=""><a href="module_slider.html">slider</a></li>
-
-                                <li class=""><a href="module_tabview.html">tabview</a></li>
-
-                                <li class=""><a href="module_treeview.html">treeview</a></li>
-
-                                <li class=""><a href="module_uploader.html">uploader</a></li>
-
-                                <li class=""><a href="module_yahoo.html">yahoo</a></li>
-
-                                <li class=""><a href="module_yuiloader.html">yuiloader</a></li>
-
-                                <li class=""><a href="module_yuitest.html">yuitest</a></li>
+                                <li class=""><a href="module_animation.html" title="animation">animation</a></li>
+                                <li class=""><a href="module_autocomplete.html" title="autocomplete">autocomplete</a></li>
+                                <li class=""><a href="module_button.html" title="button">button</a></li>
+                                <li class=""><a href="module_calendar.html" title="calendar">calendar</a></li>
+                                <li class=""><a href="module_carousel.html" title="carousel">carousel</a></li>
+                                <li class=""><a href="module_charts.html" title="charts">charts</a></li>
+                                <li class="selected"><a href="module_colorpicker.html" title="colorpicker">colorpicker</a></li>
+                                <li class=""><a href="module_connection.html" title="connection">connection</a></li>
+                                <li class=""><a href="module_container.html" title="container">container</a></li>
+                                <li class=""><a href="module_cookie.html" title="cookie">cookie</a></li>
+                                <li class=""><a href="module_datasource.html" title="datasource">datasource</a></li>
+                                <li class=""><a href="module_datatable.html" title="datatable">datatable</a></li>
+                                <li class=""><a href="module_datemath.html" title="datemath">datemath</a></li>
+                                <li class=""><a href="module_dom.html" title="dom">dom</a></li>
+                                <li class=""><a href="module_dragdrop.html" title="dragdrop">dragdrop</a></li>
+                                <li class=""><a href="module_editor.html" title="editor">editor</a></li>
+                                <li class=""><a href="module_element.html" title="element">element</a></li>
+                                <li class=""><a href="module_element-delegate.html" title="element-delegate">element-delegate</a></li>
+                                <li class=""><a href="module_event.html" title="event">event</a></li>
+                                <li class=""><a href="module_event-delegate.html" title="event-delegate">event-delegate</a></li>
+                                <li class=""><a href="module_event-mouseenter.html" title="event-mouseenter">event-mouseenter</a></li>
+                                <li class=""><a href="module_event-simulate.html" title="event-simulate">event-simulate</a></li>
+                                <li class=""><a href="module_get.html" title="get">get</a></li>
+                                <li class=""><a href="module_history.html" title="history">history</a></li>
+                                <li class=""><a href="module_imagecropper.html" title="imagecropper">imagecropper</a></li>
+                                <li class=""><a href="module_imageloader.html" title="imageloader">imageloader</a></li>
+                                <li class=""><a href="module_json.html" title="json">json</a></li>
+                                <li class=""><a href="module_layout.html" title="layout">layout</a></li>
+                                <li class=""><a href="module_logger.html" title="logger">logger</a></li>
+                                <li class=""><a href="module_menu.html" title="menu">menu</a></li>
+                                <li class=""><a href="module_paginator.html" title="paginator">paginator</a></li>
+                                <li class=""><a href="module_profiler.html" title="profiler">profiler</a></li>
+                                <li class=""><a href="module_profilerviewer.html" title="profilerviewer">profilerviewer</a></li>
+                                <li class=""><a href="module_progressbar.html" title="progressbar">progressbar</a></li>
+                                <li class=""><a href="module_resize.html" title="resize">resize</a></li>
+                                <li class=""><a href="module_selector.html" title="selector">selector</a></li>
+                                <li class=""><a href="module_slider.html" title="slider">slider</a></li>
+                                <li class=""><a href="module_storage.html" title="Storage">Storage</a></li>
+                                <li class=""><a href="module_stylesheet.html" title="stylesheet">stylesheet</a></li>
+                                <li class=""><a href="module_swf.html" title="swf">swf</a></li>
+                                <li class=""><a href="module_swfdetect.html" title="swfdetect">swfdetect</a></li>
+                                <li class=""><a href="module_swfstore.html" title="swfstore">swfstore</a></li>
+                                <li class=""><a href="module_tabview.html" title="tabview">tabview</a></li>
+                                <li class=""><a href="module_treeview.html" title="treeview">treeview</a></li>
+                                <li class=""><a href="module_uploader.html" title="uploader">uploader</a></li>
+                                <li class=""><a href="module_yahoo.html" title="yahoo">yahoo</a></li>
+                                <li class=""><a href="module_yuiloader.html" title="yuiloader">yuiloader</a></li>
+                                <li class=""><a href="module_yuitest.html" title="yuitest">yuitest</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="classList" class="module">
                         <h4>Classes</h4>
                         <ul class="content">
-                                <li class="selected"><a href="YAHOO.util.Color.html">YAHOO.util.Color</a></li>
-                                <li class=""><a href="YAHOO.widget.ColorPicker.html">YAHOO.widget.ColorPicker</a></li>
+                                <li class="selected"><a href="YAHOO.util.Color.html" title="YAHOO.util.Color">YAHOO.util.Color</a></li>
+                                <li class=""><a href="YAHOO.widget.ColorPicker.html" title="YAHOO.widget.ColorPicker">YAHOO.widget.ColorPicker</a></li>
                         </ul>
                     </div>
 
-                    <div class="module">
+                    <div id="fileList" class="module">
                         <h4>Files</h4>
                         <ul class="content">        
-                                <li class=""><a href="Color.js.html">Color.js</a></li>
-                                <li class=""><a href="ColorPicker.js.html">ColorPicker.js</a></li>
+                                <li class=""><a href="Color.js.html" title="Color.js">Color.js</a></li>
+                                <li class=""><a href="ColorPicker.js.html" title="ColorPicker.js">ColorPicker.js</a></li>
                         </ul>
                     </div>
 
 
-                    <div class="module">
+                    <div id="methodsList" class="module">
                         <h4>Methods</h4>
                         <ul class="content">        
-                                <li class="private"><!--<code>void</code>-->
-                                <a href="#method__createHostElement">_createHostElement</a>
-                                </li>
-                                <li class=""><!--<code>string</code>-->
-                                <a href="#method_dec2hex">dec2hex</a>
-                                </li>
-                                <li class=""><!--<code>int</code>-->
-                                <a href="#method_hex2dec">hex2dec</a>
-                                </li>
-                                <li class=""><!--<code>[int, int, int]</code>-->
-                                <a href="#method_hex2rgb">hex2rgb</a>
-                                </li>
-                                <li class=""><!--<code>[int, int, int]</code>-->
-                                <a href="#method_hsv2rgb">hsv2rgb</a>
-                                </li>
-                                <li class=""><!--<code>int</code>-->
-                                <a href="#method_real2dec">real2dec</a>
-                                </li>
-                                <li class=""><!--<code>string</code>-->
-                                <a href="#method_rgb2hex">rgb2hex</a>
-                                </li>
-                                <li class=""><!--<code>[int, float, float]</code>-->
-                                <a href="#method_rgb2hsv">rgb2hsv</a>
-                                </li>
-                                <li class=""><!--<code>[int, int, int]</code>-->
-                                <a href="#method_websafe">websafe</a>
-                                </li>
+                                <li class=""><a href="#method_dec2hex" title="dec2hex">dec2hex</a></li>
+                                <li class=""><a href="#method_hex2dec" title="hex2dec">hex2dec</a></li>
+                                <li class=""><a href="#method_hex2rgb" title="hex2rgb">hex2rgb</a></li>
+                                <li class=""><a href="#method_hsv2rgb" title="hsv2rgb">hsv2rgb</a></li>
+                                <li class=""><a href="#method_real2dec" title="real2dec">real2dec</a></li>
+                                <li class=""><a href="#method_rgb2hex" title="rgb2hex">rgb2hex</a></li>
+                                <li class=""><a href="#method_rgb2hsv" title="rgb2hsv">rgb2hsv</a></li>
+                                <li class=""><a href="#method_websafe" title="websafe">websafe</a></li>
                         </ul>
                     </div>
 
@@ -713,8 +677,11 @@ websafe rgb colors.</dd>
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2008 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2009 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
+<script type="text/javascript">
+    ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.util.Color", "name": "dec2hex", "url": "YAHOO.util.Color.html#method_dec2hex", "type": "method"}, {"access": "", "host": "YAHOO.util.Color", "name": "hex2dec", "url": "YAHOO.util.Color.html#method_hex2dec", "type": "method"}, {"access": "", "host": "YAHOO.util.Color", "name": "hex2rgb", "url": "YAHOO.util.Color.html#method_hex2rgb", "type": "method"}, {"access": "", "host": "YAHOO.util.Color", "name": "hsv2rgb", "url": "YAHOO.util.Color.html#method_hsv2rgb", "type": "method"}, {"access": "", "host": "YAHOO.util.Color", "name": "real2dec", "url": "YAHOO.util.Color.html#method_real2dec", "type": "method"}, {"access": "", "host": "YAHOO.util.Color", "name": "rgb2hex", "url": "YAHOO.util.Color.html#method_rgb2hex", "type": "method"}, {"access": "", "host": "YAHOO.util.Color", "name": "rgb2hsv", "url": "YAHOO.util.Color.html#method_rgb2hsv", "type": "method"}, {"access": "", "host": "YAHOO.util.Color", "name": "websafe", "url": "YAHOO.util.Color.html#method_websafe", "type": "method"}];
+</script>
 </body>
 </html>

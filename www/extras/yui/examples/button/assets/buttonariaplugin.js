@@ -289,3 +289,4 @@
 	
 
 }());
+YAHOO.register("buttonariaplugin", YAHOO.widget.Button, {version: "@VERSION@", build: "@BUILD@"});

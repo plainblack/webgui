@@ -361,7 +361,7 @@ sub www_annotate {
 	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
 
 	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});
@@ -640,7 +640,7 @@ sub www_resize {
 	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
 	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
 	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/animation/animation-min.js'), {type=>'text/javascript'});
@@ -779,7 +779,7 @@ sub www_crop {
 	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
 	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
 	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});

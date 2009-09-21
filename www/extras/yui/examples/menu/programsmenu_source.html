@@ -71,7 +71,7 @@
                 background-color: #ccc;
                 color: #000;
                 text-decoration: none;
-                background: url(http://us.i1.yimg.com/us.yimg.com/i/us/nt/b/purpley.1.0.gif) 10% 50% no-repeat;
+                background: url(http://l.yimg.com/a/i/us/nt/b/purpley.1.0.gif) 10% 50% no-repeat;
             
             }
 
@@ -105,7 +105,7 @@
 
             .yui-skin-sam #yproducts li.yuimenuitem .yuimenuitemlabel {
 
-                background: url(http://us.i1.yimg.com/us.yimg.com/i/us/nt/b/purpley.1.0.gif) no-repeat 4px;
+                background: url(http://l.yimg.com/a/i/us/nt/b/purpley.1.0.gif) no-repeat 4px;
                 padding: 0 20px 0 24px;
 
             }
@@ -143,19 +143,19 @@
 
             .yui-skin-sam #yproducts li#help .yuimenuitemlabel {
 
-                background-image: url(http://us.i1.yimg.com/us.yimg.com/i/nt/ic/ut/bsc/hlp16_1.gif);
+                background-image: url(http://l.yimg.com/a/i/nt/ic/ut/bsc/hlp16_1.gif);
             
             }
 
             .yui-skin-sam #yproducts li#search .yuimenuitemlabel {
 
-                background-image: url(http://us.i1.yimg.com/us.yimg.com/i/nt/ic/ut/bsc/srch16_1.gif);
+                background-image: url(http://l.yimg.com/a/i/nt/ic/ut/bsc/srch16_1.gif);
             
             }
 
             .yui-skin-sam #yproducts li#goto .yuimenuitemlabel {
 
-                background-image: url(http://us.i1.yimg.com/us.yimg.com/i/nt/ic/ut/bsc/arorght16_1.gif);
+                background-image: url(http://l.yimg.com/a/i/nt/ic/ut/bsc/arorght16_1.gif);
 
             }
 
@@ -321,6 +321,10 @@
                 */
 
                 YAHOO.widget.Overlay.windowResizeEvent.subscribe(positionMenu);
+
+
+				// Hide the Menu the dialog is clicked
+				YAHOO.util.Event.on(oPanel.element, "mousedown", oMenu.hide, null, oMenu);
             
             });
 

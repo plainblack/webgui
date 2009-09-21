@@ -176,42 +176,42 @@ body {
                     cal.render();
                 });
                 cal.render();
+                resize = new YAHOO.util.Resize('demo', {
+                    handles: ['br'],
+                    autoRatio: true,
+                    status: true,
+                    proxy: true,
+                    useShim: true,
+                    minWidth: 700,
+                    minHeight: 400
+                });
+                resize.on('resize', function(args) {
+                    var h = args.height;
+                    var hh = this.header.clientHeight;
+                    var padding = ((10 * 2) + 2); //Sam's skin applied a 10px padding and a 1 px border to the element..
+                    var bh = (h - hh - padding);
+                    Dom.setStyle(this.body, 'height', bh + 'px');
+                    layout.set('height', bh);
+                    layout.set('width', (args.width - padding));
+                    layout.resize();
+
+                    //Editor Resize
+                    var th = (editor.toolbar.get('element').clientHeight + 2); //It has a 1px border..
+                    var eH = (h - th);
+                    editor.set('width', args.width + 'px');
+                    editor.set('height', eH + 'px');
+                }, panel, true);
+                resize.on('endResize', function() {
+                    //Fixing IE's calculations
+                    this.innerElement.style.height = '';
+                    //Focus the Editor so they can type.
+                    editor._focusWindow();
+                }, panel, true);
             });
             layout.render();
         });
     });
     panel.render(document.body);
-    resize = new YAHOO.util.Resize('demo', {
-        handles: ['br'],
-        autoRatio: true,
-        status: true,
-        proxy: true,
-        useShim: true,
-        minWidth: 700,
-        minHeight: 400
-    });
-    resize.on('resize', function(args) {
-        var h = args.height;
-        var hh = this.header.clientHeight;
-        var padding = ((10 * 2) + 2); //Sam's skin applied a 10px padding and a 1 px border to the element..
-        var bh = (h - hh - padding);
-        Dom.setStyle(this.body, 'height', bh + 'px');
-        layout.set('height', bh);
-        layout.set('width', (args.width - padding));
-        layout.resize();
-
-        //Editor Resize
-        var th = (editor.toolbar.get('element').clientHeight + 2); //It has a 1px border..
-        var eH = (h - th);
-        editor.set('width', args.width + 'px');
-        editor.set('height', eH + 'px');
-    }, panel, true);
-    resize.on('endResize', function() {
-        //Fixing IE's calculations
-        this.innerElement.style.height = '';
-        //Focus the Editor so they can type.
-        editor._focusWindow();
-    }, panel, true);
     
 })();
 </script>
