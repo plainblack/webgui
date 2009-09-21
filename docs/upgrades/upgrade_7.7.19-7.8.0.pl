@@ -61,10 +61,23 @@ sub upgradeToYUI28 {
         "UPDATE template SET template = REPLACE(template, 'element-beta-min.js', 'element-min.js')"
     );
     $session->db->write(
-        "UPDATE assetData SET extraHeadBlock = REPLACE(extraHeadBlock, 'element-beta.js', 'element-min.js')"
+        "UPDATE template SET templatePacked = REPLACE(templatePacked, 'element-beta.js', 'element-min.js')"
     );
     $session->db->write(
-        "UPDATE assetData SET extraHeadBlock = REPLACE(extraHeadBlock, 'element-beta-min.js', 'element-min.js')"
+        "UPDATE template SET templatePacked = REPLACE(templatePacked, 'element-beta-min.js', 'element-min.js')"
+    );
+
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTags = REPLACE(extraHeadTags, 'element-beta.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTags = REPLACE(extraHeadTags, 'element-beta-min.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'element-beta.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'element-beta-min.js', 'element-min.js')"
     );
 
     print "Done.\n" unless $quiet;
