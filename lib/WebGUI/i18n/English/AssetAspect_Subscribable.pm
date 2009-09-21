@@ -4,6 +4,11 @@ use strict;
 
 our $I18N = {
 
+    "new post" => {
+        message     => 'has posted to one of your subscriptions',
+        context     => 'Title of the e-mail that is sent for subscriptions',
+    },
+
     "Subscription Group" => {
         message     => 'Subscription Group',
         lastUpdated => 0,
