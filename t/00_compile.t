@@ -23,6 +23,7 @@ use Cwd qw(realpath);
 
 my $wgRoot = realpath catdir(dirname(__FILE__), updir);
 my $wgLib = catdir($wgRoot, 'lib');
+unshift @INC, $wgLib;
 
 my @modules = findModules($wgLib);
 my @scripts = findScripts(catdir($wgRoot, 'docs', 'upgrades'), catdir($wgRoot, 'sbin'));
