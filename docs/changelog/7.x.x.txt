@@ -1,4 +1,5 @@
 7.8.0
+ - upgraded YUI to 2.8.0r4
  - fixed #10998: wiki page locked?
  - fixed #10982: Survey menu options appearing twice
  - fixed #10890: Story Manager: pagination broken for keywords
