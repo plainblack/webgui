@@ -97,17 +97,6 @@
         _defaultCSS: 'html { height: 95%; } body { background-color: #fff; font:13px/1.22 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small; } a, a:visited, a:hover { color: blue !important; text-decoration: underline !important; cursor: text !important; } .warning-localfile { border-bottom: 1px dashed red !important; } .yui-busy { cursor: wait !important; } img.selected { border: 2px dotted #808080; } img { cursor: pointer !important; border: none; } body.ptags.webkit div { margin: 11px 0; }'
     });
     
-    YAHOO.lang.substitute = function ( original ) {
-        return function( s, o, f ) {
-            s.replace(/{/g, 'RIGHT_BRACKET');
-            s.replace(/}/g, 'LEFT_BRACKET');
-            s = original( s, o, f );
-            s.replace(/RIGHT_BRACKET/g, '{');
-            s.replace(/LEFT_BRACKET/g, '}');
-            return s;
-        };
-    }(YAHOO.lang.substitute);
-
     YAHOO.widget.CodeEditor.prototype._cleanIncomingHTML = function(str) {
         // Workaround for bug in Lang.substitute
         str = str.replace(/{/gi, 'RIGHT_BRACKET');
