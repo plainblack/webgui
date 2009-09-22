@@ -97,17 +97,6 @@
         _defaultCSS: 'html { height: 95%; } body { background-color: #fff; font:13px/1.22 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small; } a, a:visited, a:hover { color: blue !important; text-decoration: underline !important; cursor: text !important; } .warning-localfile { border-bottom: 1px dashed red !important; } .yui-busy { cursor: wait !important; } img.selected { border: 2px dotted #808080; } img { cursor: pointer !important; border: none; } body.ptags.webkit div { margin: 11px 0; }'
     });
     
-    YAHOO.lang.substitute = function ( original ) {
-        return function( s, o, f ) {
-            s.replace(/{/g, 'RIGHT_BRACKET');
-            s.replace(/}/g, 'LEFT_BRACKET');
-            s = original( s, o, f );
-            s.replace(/RIGHT_BRACKET/g, '{');
-            s.replace(/LEFT_BRACKET/g, '}');
-            return s;
-        };
-    }(YAHOO.lang.substitute);
-
     YAHOO.widget.CodeEditor.prototype._cleanIncomingHTML = function(str) {
         // Workaround for bug in Lang.substitute
         str = str.replace(/{/gi, 'RIGHT_BRACKET');
@@ -128,7 +117,85 @@
         return;
     };
     /* End override to fix problem */
+
+    /** Override setEditorHTML and _setInitialContent to fix problems 
+     * with YAHOO.Lang.substitute 
+     */
+    YAHOO.widget.CodeEditor.prototype.setEditorHTML = function(incomingHTML) {
+        var html = this._cleanIncomingHTML(incomingHTML);
+        html = html.replace(/RIGHT_BRACKET/gi, '{');
+        html = html.replace(/LEFT_BRACKET/gi, '}');
+        this._getDoc().body.innerHTML = html;
+        this.nodeChange();
+    };
    
+    YAHOO.widget.CodeEditor.prototype._setInitialContent = function(raw) {
+        YAHOO.log('Populating editor body with contents of the text area', 'info', 'SimpleEditor');
+
+        var value = ((this._textarea) ? this.get('element').value : this.get('element').innerHTML),
+            doc = null;
+
+        if (value === '') {
+            value = '<br>';
+        }
+
+        var html = Lang.substitute(this.get('html'), {
+            TITLE: this.STR_TITLE,
+            CONTENT: this._cleanIncomingHTML(value),
+            CSS: this.get('css'),
+            HIDDEN_CSS: ((this.get('hiddencss')) ? this.get('hiddencss') : '/* No Hidden CSS */'),
+            EXTRA_CSS: ((this.get('extracss')) ? this.get('extracss') : '/* No Extra CSS */')
+        }),
+        check = true;
+
+        html = html.replace(/RIGHT_BRACKET/gi, '{');
+        html = html.replace(/LEFT_BRACKET/gi, '}');
+
+        if (document.compatMode != 'BackCompat') {
+            YAHOO.log('Adding Doctype to editable area', 'info', 'SimpleEditor');
+            html = this._docType + "\n" + html;
+        } else {
+            YAHOO.log('DocType skipped because we are in BackCompat Mode.', 'warn', 'SimpleEditor');
+        }
+
+        if (this.browser.ie || this.browser.webkit || this.browser.opera || (navigator.userAgent.indexOf('Firefox/1.5') != -1)) {
+            //Firefox 1.5 doesn't like setting designMode on an document created with a data url
+            try {
+                //Adobe AIR Code
+                if (this.browser.air) {
+                    doc = this._getDoc().implementation.createHTMLDocument();
+                    var origDoc = this._getDoc();
+                    origDoc.open();
+                    origDoc.close();
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                    var node = origDoc.importNode(doc.getElementsByTagName("html")[0], true);
+                    origDoc.replaceChild(node, origDoc.getElementsByTagName("html")[0]);
+                    origDoc.body._rteLoaded = true;
+                } else {
+                    doc = this._getDoc();
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                }
+            } catch (e) {
+                YAHOO.log('Setting doc failed.. (_setInitialContent)', 'error', 'SimpleEditor');
+                //Safari will only be here if we are hidden
+                check = false;
+            }
+        } else {
+            //This keeps Firefox 2 from writing the iframe to history preserving the back buttons functionality
+            this.get('iframe').get('element').src = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+        }
+        this.get('iframe').setStyle('visibility', '');
+        if (check) {
+            this._checkLoaded(raw);
+        }            
+    };
+    /* End override to fix problems with Lang.substitute */
+
+
     YAHOO.widget.CodeEditor.prototype._writeStatus = function () {
         if ( this.status ) {
             var text = this.getEditorText();
