@@ -13,6 +13,7 @@
  - fixed #11011: Inherit URL from parent can generate bad URLs
  - fixed #11022: Deleting user shows "TRUE" prompt
  - fixed #10029: Account CSS rule scoping, round #2.
+ - fixed #11012: Code editor corrupts JS
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
@@ -64,6 +65,11 @@
  - fixed #11008: Test::Class
  - fixed #11003: Subscribable AssetAspect: no i18n
  - fixed #11004: Subscribable AssetAspect: handling the subscription group
+ - fixed #10990: Survey: View Transposed Results not working
+ - fixed #11009: Shipping address is lost after login
+ - fixed #11010: Purchasing non-recurring subscription twice does not extend group membership
+ - fixed #11011: Inherit URL from parent can generate bad URLs
+ - fixed #11022: Deleting user shows "TRUE" prompt
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
