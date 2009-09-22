@@ -263,10 +263,9 @@ The address book that this address belongs to.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    foreach my $field (qw(email organization address1 address2 address3 state code city label firstName lastName country phoneNumber)) {
+    foreach my $field (qw(addressBookId email organization address1 address2 address3 state code city label firstName lastName country phoneNumber)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
-    $properties{$id}{addressBookId} = $self->addressBook->getId;
     $self->addressBook->session->db->setRow("address","addressId",$properties{$id});
 }
 
