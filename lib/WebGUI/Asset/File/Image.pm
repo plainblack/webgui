@@ -364,7 +364,7 @@ sub www_annotate {
 	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'), {type=>'text/javascript'});
 
     # my $imageAsset = $self->session->db->getRow("ImageAsset","assetId",$self->getId);
 
@@ -782,7 +782,7 @@ sub www_crop {
 	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'), {type=>'text/javascript'});
 
 	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
 
