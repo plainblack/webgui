@@ -85,7 +85,9 @@ Deletes this address book and all addresses contained in it.
 
 sub delete {
     my ($self) = @_;
+    my $myId   = id $self;
     foreach my $address (@{$self->getAddresses}) {
+        delete $addressCache{$myId}{$address->getId};
         $address->delete;
     } 
     $self->session->db->write("delete from addressBook where addressBookId=?",[$self->getId]);
