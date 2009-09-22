@@ -216,6 +216,65 @@ sub www_editBranch {
                 -uiLevel=>5,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_extraHeadTags"})
                 );
+
+
+        $tabform->getTab("meta")->yesNo(
+            -name         => 'usePackedHeadTags',
+            -label        => $i18n->get('usePackedHeadTags label'),
+            -hoverHelp    => $i18n->get('usePackedHeadTags description'),
+            -uiLevel      => 7,
+            -fieldType    => 'yesNo',
+            -defaultValue => 0,
+            -subtext      => '<br />'
+                . $i18n->get("change") . ' '
+                . WebGUI::Form::yesNo( $self->session, { name => "change_usePackedHeadTags" } ),
+        );
+        $tabform->getTab("meta")->yesNo(
+            -name         => 'isPackage',
+            -label        => $i18n->get("make package"),
+            -hoverHelp    => $i18n->get('make package description'),
+            -uiLevel      => 7,
+            -fieldType    => 'yesNo',
+            -defaultValue => 0,
+            -subtext      => '<br />'
+                . $i18n->get("change") . ' '
+                . WebGUI::Form::yesNo( $self->session, { name => "change_isPackage" } ),
+        );
+        $tabform->getTab("meta")->yesNo(
+            -name         => 'isPrototype',
+            -label        => $i18n->get("make prototype"),
+            -hoverHelp    => $i18n->get('make prototype description'),
+            -uiLevel      => 9,
+            -fieldType    => 'yesNo',
+            -defaultValue => 0,
+            -subtext      => '<br />'
+                . $i18n->get("change") . ' '
+                . WebGUI::Form::yesNo( $self->session, { name => "change_isPrototype" } ),
+        );
+        $tabform->getTab("meta")->yesNo(
+            -name         => 'isExportable',
+            -label        => $i18n->get('make asset exportable'),
+            -hoverHelp    => $i18n->get('make asset exportable description'),
+            -uiLevel      => 9,
+            -fieldType    => 'yesNo',
+            -defaultValue => 1,
+            -subtext      => '<br />'
+                . $i18n->get("change") . ' '
+                . WebGUI::Form::yesNo( $self->session, { name => "change_isExportable" } ),
+        );
+        $tabform->getTab("meta")->yesNo(
+            -name         => 'inheritUrlFromParent',
+            -label        => $i18n->get('does asset inherit URL from parent'),
+            -hoverHelp    => $i18n->get('does asset inherit URL from parent description'),
+            -uiLevel      => 9,
+            -fieldType    => 'yesNo',
+            -defaultValue => 0,
+            -subtext      => '<br />'
+                . $i18n->get("change") . ' '
+                . WebGUI::Form::yesNo( $self->session, { name => "change_inheritUrlFromParent" } ),
+        );
+
+
         if ($self->session->setting->get("metaDataEnabled")) {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {
@@ -264,7 +323,19 @@ sub www_editBranchSave {
     $data{ownerUserId}   = $form->selectBox("ownerUserId") if ($form->yesNo("change_ownerUserId"));
     $data{groupIdView}   = $form->group("groupIdView")     if ($form->yesNo("change_groupIdView"));
     $data{groupIdEdit}   = $form->group("groupIdEdit")     if ($form->yesNo("change_groupIdEdit"));
-    $data{extraHeadTags} = $form->group("extraHeadTags")   if ($form->yesNo("change_extraHeadTags"));
+    $data{extraHeadTags} = $form->textarea("extraHeadTags")
+        if $form->yesNo("change_extraHeadTags");
+    $data{usePackedHeadTags}    = $form->yesNo("usePackedHeadTags")
+        if $form->yesNo("change_usePackedHeadTags");
+    $data{isPackage}            = $form->yesNo("isPackage")
+        if $form->yesNo("change_isPackage");
+    $data{isPrototype}          = $form->yesNo("isPrototype")
+        if $form->yesNo("change_isPrototype");
+    $data{isExportable}         = $form->yesNo("isExportable")
+        if $form->yesNo("change_isExportable");
+    $data{inheritUrlFromParent} = $form->yesNo("inheritUrlFromParent")
+        if $form->yesNo("change_inheritUrlFromParent");
+
     my %wobjectData = %data;
     $wobjectData{displayTitle} = $form->yesNo("displayTitle")
         if ($form->yesNo("change_displayTitle"));
