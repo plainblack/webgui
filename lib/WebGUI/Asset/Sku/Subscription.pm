@@ -79,8 +79,6 @@ sub apply {
 
 =head2 definition
 
-Adds templateId, thankYouMessage, and defaultPrice fields.
-
 =cut
 
 sub definition {
@@ -526,7 +524,7 @@ sub redeemCode {
 
 =head2 view
 
-Displays the donation form.
+Displays the subscription form.
 
 =cut
 
