@@ -2813,9 +2813,7 @@ sub www_editSave {
     $object->updateHistory("edited");
 
     # we handle auto commit assets here in case they didn't handle it themselves
-    $session->log->warn('pre object isa'. ref $object);
     if ($object->getAutoCommitWorkflowId) {
-        $session->log->warn('got autocommit workflow id');
         $object->requestAutoCommit;
         #Since the version tag makes new objects, fetch a fresh one here.
         $object = $object->cloneFromDb;
