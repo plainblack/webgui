@@ -31,19 +31,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 27;
-plan tests => 1 + $tests;
+plan tests => 28;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::Address');
-
 my $storage;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::Address', $tests unless $loaded;
 my $e;
 my $address;
 
@@ -81,7 +74,8 @@ cmp_deeply(
     'create takes exception to giving it a session variable',
 );
 
-my $book = WebGUI::Shop::AddressBook->create($session);
+my $book  = WebGUI::Shop::AddressBook->create($session);
+my $book2 = WebGUI::Shop::AddressBook->create($session);
 
 eval { $address = WebGUI::Shop::Address->create($book); };
 $e = Exception::Class->caught();
@@ -159,10 +153,15 @@ is($address->get('label'), undef, 'get returns a safe copy of the hash');
 #######################################################################
 
 $address->update({ label => 'home'});
-is($address->get('label'), 'home', 'update updates the object properties cache');
+is($address->get('label'), 'home', 'update: updates the object properties cache');
 $address->update({ address1 => 'Shawshank Prison', 'state' => 'Maine'});
-is($address->get('address1'), 'Shawshank Prison', 'update updates the object properties cache for more than one key');
-is($address->get('state'), 'Maine', 'update updates the object properties cache for more than one key');
+is($address->get('address1'), 'Shawshank Prison', '... updates the object properties cache for more than one key');
+is($address->get('state'), 'Maine', '... updates the object properties cache for more than one key');
+
+$address->update({ addressBookId => $book2->getId });
+is($address->get('addressBookId'), $book2->getId, '... addressBookId can be updated');
+##Restore it back to normal for downstream tests;
+$address->update({ addressBookId => $book->getId });
 
 #######################################################################
 #
@@ -243,8 +242,6 @@ cmp_deeply(
 $address->delete;
 my $check = $session->db->quickScalar('select count(*) from address where addressId=?',[$address->getId]);
 is( $check, 0, 'delete worked');
-
-}
 
 END {
     $session->db->write('delete from addressBook');
