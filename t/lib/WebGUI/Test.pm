@@ -73,6 +73,36 @@ my $mocker;
 
 BEGIN {
 
+#----------------------------------------------------------------------------
+
+=head2 sessionsToDelete ( $session, [$session, ...] )
+
+Push a list of session objects onto the stack of groups to be automatically deleted
+at the end of the test.  Note, this will be the last group of objects to be
+cleaned up.
+
+This is a class method.
+
+=cut
+
+sub sessionsToDelete {
+    my $class = shift;
+    push @sessionsToDelete, @_;
+}
+
+
+sub newSession {
+    my $pseudoRequest = WebGUI::PseudoRequest->new;
+    my $session = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
+    $session->{_request} = $pseudoRequest;
+    WebGUI::Test->sessionsToDelete($session);
+    return $session;
+}
+
+}
+
+BEGIN {
+
     $mocker = Test::MockObject->fake_module(
         'APR::Request::Apache2',
         handle => sub { return bless {}, 'APR::Request::Apache2'; }, 
@@ -162,10 +192,8 @@ BEGIN {
         exit(1);
     }
 
-    my $pseudoRequest = WebGUI::PseudoRequest->new;
-    #$SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE, $pseudoRequest );
-    $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
-    $SESSION->{_request} = $pseudoRequest;
+
+    $SESSION = WebGUI::Test->newSession;
 
     $originalSetting = clone $SESSION->setting->get;
 }
@@ -192,10 +220,6 @@ END {
         else {
             $stor->delete;
         }
-    }
-    SESSION: foreach my $session (@sessionsToDelete) {
-        $session->var->end;
-        $session->close;
     }
     ASSET: foreach my $asset (@assetsToPurge) {
         $asset->purge;
@@ -243,8 +267,10 @@ END {
     while (my ($param, $value) = each %{ $originalSetting }) {
         $SESSION->setting->set($param, $value);
     }
-    $SESSION->var->end;
-    $SESSION->close if defined $SESSION;
+    SESSION: foreach my $session (@sessionsToDelete) {
+        $session->var->end;
+        $session->close;
+    }
 
     # Close SMTPD
     if ($smtpdPid) {
@@ -256,6 +282,12 @@ END {
         $? = 0;
     }
 }
+
+=head2 newSession ( )
+
+Builds a WebGUI session object for testing.
+
+=cut
 
 =head2 mockAssetId ( $assetId, $object )
 
@@ -712,23 +744,6 @@ This is a class method.
 sub storagesToDelete {
     my $class = shift;
     push @storagesToDelete, @_;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 sessionsToDelete ( $session, [$session, ...] )
-
-Push a list of session objects onto the stack of groups to be automatically deleted
-at the end of the test.  Note, this will be the last group of objects to be
-cleaned up.
-
-This is a class method.
-
-=cut
-
-sub sessionsToDelete {
-    my $class = shift;
-    push @sessionsToDelete, @_;
 }
 
 #----------------------------------------------------------------------------

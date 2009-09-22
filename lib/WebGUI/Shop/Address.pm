@@ -24,7 +24,8 @@ Package WebGUI::Shop::Address
 
 =head1 DESCRIPTION
 
-An address is used to track shipping or payment addresses in the commerce system.
+An address is used to track shipping or payment addresses in the commerce system.  Because of
+object caching in the AddressBook, addresses should never, ever be accessed directly.
 
 =head1 SYNOPSIS
 

@@ -8,6 +8,7 @@
  - fixed #11005: calendar feed workflow
  - fixed #11008: Test::Class
  - fixed #10990: Survey: View Transposed Results not working
+ - fixed #11009: Shipping address is lost after login
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
