@@ -9,6 +9,7 @@
  - fixed #11008: Test::Class
  - fixed #10990: Survey: View Transposed Results not working
  - fixed #11009: Shipping address is lost after login
+ - fixed #11010: Purchasing non-recurring subscription twice does not extend group membership
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
