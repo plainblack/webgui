@@ -18,7 +18,6 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
-use Test::Number::Delta;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
