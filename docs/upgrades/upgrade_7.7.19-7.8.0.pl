@@ -80,6 +80,32 @@ sub upgradeToYUI28 {
         "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'element-beta-min.js', 'element-min.js')"
     );
 
+    $session->db->write(
+        "UPDATE template SET template = REPLACE(template, 'carousel-beta.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET template = REPLACE(template, 'carousel-beta-min.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET templatePacked = REPLACE(templatePacked, 'carousel-beta.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET templatePacked = REPLACE(templatePacked, 'carousel-beta-min.js', 'carousel-min.js')"
+    );
+
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTags = REPLACE(extraHeadTags, 'carousel-beta.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTags = REPLACE(extraHeadTags, 'carousel-beta-min.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'carousel-beta.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'carousel-beta-min.js', 'carousel-min.js')"
+    );
+
     print "Done.\n" unless $quiet;
 }
 
