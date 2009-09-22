@@ -12,6 +12,7 @@
  - fixed #11010: Purchasing non-recurring subscription twice does not extend group membership
  - fixed #11011: Inherit URL from parent can generate bad URLs
  - fixed #11022: Deleting user shows "TRUE" prompt
+ - fixed #10029: Account CSS rule scoping, round #2.
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
