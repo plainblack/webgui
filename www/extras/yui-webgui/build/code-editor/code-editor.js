@@ -114,7 +114,9 @@
         str = str.replace(/}/gi, 'LEFT_BRACKET');
 
         // &nbsp; before <br> for IE7 so lines show up correctly
-        str = str.replace(/\r?\n/g, "&nbsp;<br>");
+        if ( this.browser.ie && this.browser.ie <= 7 ) {
+            str = str.replace(/\r?\n/g, "&nbsp;<br>");
+        }
         return str;
     };
 
