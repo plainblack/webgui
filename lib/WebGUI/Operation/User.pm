@@ -87,7 +87,7 @@ sub _submenu {
 			$ac->addSubmenuItem($user->getProfileUrl(), $i18n->get('view profile'));
             my $confirm = $i18n->get(167);
             $confirm =~ s/([\\\'])/\\$1/g;
-			$ac->addSubmenuItem($session->url->page('op=deleteUser;uid='.$userId), $i18n->get(750), qq|onclick="var ack = confirm('$confirm'); alert(ack); if (ack) { var thisForm=document.getElementById('$formId');thisForm.op.value='deleteUser';thisForm.submit();} return false;"|);
+			$ac->addSubmenuItem($session->url->page('op=deleteUser;uid='.$userId), $i18n->get(750), qq|onclick="var ack = confirm('$confirm'); if (ack) { var thisForm=document.getElementById('$formId');thisForm.op.value='deleteUser';thisForm.submit();} return false;"|);
 			if ($session->setting->get("useKarma")) {
 				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=$userId"), $i18n->get(555));
 			}
