@@ -66,6 +66,11 @@
             // That is the problem we're trying to avoid with disabling
             // highlighting for arrows and modifiers
 
+            // Don't highlight Ctrl, Alt, or Meta key combinations
+            if ( ev.ev.ctrlKey || ev.ev.altKey || ev.ev.metaKey ) {
+                return;
+            }
+
             // Highlight every keypress
             Lang.later(10, this, this.highlight);
             Lang.later(100, this, this._writeStatus);
