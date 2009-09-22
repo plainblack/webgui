@@ -681,12 +681,12 @@ sub fixUrl {
 		$url =~ s/(.*)\..*/$1/;
 		$url .= '/'.$self->getValue("menuTitle");
 	}
-	$url = $self->session->url->urlize($url);
 
     # if we're inheriting the URL from our parent, set that appropriately
     if($self->get('inheritUrlFromParent')) {
        $url = $self->fixUrlFromParent($url); 
     }
+	$url = $self->session->url->urlize($url);
 
 	# fix urls used by uploads and extras
 	# and those beginning with http
@@ -768,15 +768,10 @@ sub fixUrlFromParent {
     my @parts = split(m{/}, $url);
 
     # don't do anything unless we need to
-    if("/$url" ne $self->getParent->getUrl . '/' . $parts[-1]) {
-        $url = $self->getParent->getUrl . '/' . $parts[-1];
+    if($url ne $self->getParent->get('url') . '/' . $parts[-1]) {
+        $url = $self->getParent->get('url') . '/' . $parts[-1];
     }
 
-    ##Note we do not need to call fixUrl on the url argument.  Here's the reasoning why.
-    ##If a URL has not been set to updated at the same time that inheritUrlFromParent is
-    ##called, then it has already been "fixed".
-    ##On the other hand, if it has, the sideEffect nature of this method guarantees that
-    ##the URL was "fixed" before it was called.
     return $url;
 }
 
