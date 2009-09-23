@@ -344,7 +344,7 @@ cmp_deeply(
     '...collateral was removed'
 );
 
-diag $asset->getId;
+note $asset->getId;
 
 
 $tag->rollback;

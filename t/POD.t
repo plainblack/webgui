@@ -39,7 +39,7 @@ foreach my $package (sort @modules) {
         skip "No subroutines found by Devel::Symdump for $package", 1 if $goodReason;
         ok($coverage, sprintf "%s has %d%% POD coverage", $package, $pc->coverage*100);
         if (!$coverage && $ENV{POD_COVERAGE}) {
-            diag Dumper [$pc->naked];
+            diag explain [$pc->naked];
             diag $pc->why_unrated;
         }
     }

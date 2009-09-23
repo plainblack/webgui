@@ -357,8 +357,7 @@ cmp_deeply(
 
 isa_ok( $driver->get(), 'HASH', 'get returns a hashref if called with no param');
 
-use Data::Dumper;
-diag Dumper $driver->get();
+note explain $driver->get();
 
 is($driver->get('groupToUse'), 7, '... default group is 7');
 

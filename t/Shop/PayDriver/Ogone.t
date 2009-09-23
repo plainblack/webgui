@@ -39,7 +39,7 @@ plan tests => 1 + $tests;
 
 my $e;
 
-diag('Testing existence');
+note('Testing existence');
 my $loaded = use_ok('WebGUI::Shop::PayDriver::Ogone');
 
 SKIP: {
@@ -52,7 +52,7 @@ skip 'Unable to load module WebGUI::Shop::PayDriver::Ogone', $tests unless $load
 #
 #######################################################################
 
-diag('Testing definition');
+note('Testing definition');
 my $definition;
 
 eval { $definition = WebGUI::Shop::PayDriver::Ogone->definition(); };

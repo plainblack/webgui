@@ -322,7 +322,7 @@ cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable 
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
     my @foo = $deepDeepDir->mkpath({ error => \$errorStr } );
-    diag Dumper \@foo;
+    note explain \@foo;
     $deepStorage->addFileFromScalar('deep/file', 'deep file');
     cmp_bag(
         $deepStorage->getFiles('all'),

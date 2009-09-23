@@ -62,4 +62,4 @@ WHOLE: for (my $i=0; $i<=999; $i++) {
 
 is(scalar(@bins), 4, "All bins have values on a sample size of 1000");
 
-#diag Dumper \@bins;
+#note explain \@bins;

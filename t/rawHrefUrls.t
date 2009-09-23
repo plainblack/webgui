@@ -30,7 +30,7 @@ my $lib = WebGUI::Test->lib;
 
 ##Find the name of the International macro in the user's config file.
 
-#diag "International macro name = $international";
+#note "International macro name = $international";
 
 ##Regexp setup for parsing out the Macro calls.
 my $macro     = qr{

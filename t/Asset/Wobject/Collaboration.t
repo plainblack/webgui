@@ -94,7 +94,7 @@ $post = $collab->addChild($props,
 my $rssitems = $collab->getRssFeedItems();
 is(scalar @{ $rssitems }, 2, 'rssitems set to number of posts added');
 
-diag "AssetAspect tests";
+note "AssetAspect tests";
 is($collab->getRssFeedUrl,  '/collab?func=viewRss',  'getRssFeedUrl');
 is($collab->getRdfFeedUrl,  '/collab?func=viewRdf',  'getRdfFeedUrl');
 is($collab->getAtomFeedUrl, '/collab?func=viewAtom', 'getAtomFeedUrl');

@@ -161,7 +161,7 @@ foreach my $tmpl (@tmplVarTable) {
 
 plan tests => $numTests;
 
-#diag("planning on $numTests tests");
+#note("planning on $numTests tests");
 
 foreach my $tmpl ( @tmplVarTable ) {
 	my $tmplId = $tmpl->{id};

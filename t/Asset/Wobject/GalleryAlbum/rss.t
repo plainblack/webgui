@@ -50,8 +50,8 @@ my $album
     {
         skipAutoCommitWorkflows => 1,
     });
-diag $album->get('title');
-diag $album->get('description');
+note $album->get('title');
+note $album->get('description');
 my @photos;
 for my $i ( 0 .. 5 ) {
     $photos[ $i ] 

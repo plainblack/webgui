@@ -107,7 +107,7 @@ foreach my $testSet (@testArray) {
         $testSet->{comment}
     );
     if (!$ok) {
-        diag Dumper \@output;
+        diag explain \@output;
     }
 }
 

@@ -36,5 +36,5 @@ my $form = WebGUI::Form::DynamicField->new($session,
     fieldType => 'FormTest',
 );
 
-diag "Test loading a Form from a location outside of /data/WebGUI/lib/WebGUI";
+note "Test loading a Form from a location outside of /data/WebGUI/lib/WebGUI";
 isa_ok($form, 'WebGUI::Form::FormTest');
