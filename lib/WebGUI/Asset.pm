@@ -2830,8 +2830,6 @@ sub www_editSave {
             $object = $object->cloneFromDb;
         }
     }
-    $session->log->warn('post object isa'. ref $object);
-
     # Handle "saveAndReturn" button
     if ( $session->form->process( "saveAndReturn" ) ne "" ) {
         return $object->www_edit;
