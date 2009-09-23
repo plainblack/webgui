@@ -585,21 +585,32 @@ A hash reference containing template variables and loops. Automatically includes
 
 =cut
 
-# TODO: Have this throw an error so we can catch it and print more information
-# about the template that has the error. Finding an "ERROR: Error in template" 
-# in the error log is not very helpful...
 sub process {
-	my $self = shift;
-	my $vars = shift;
+	my $self    = shift;
+	my $vars    = shift;
+    my $session = $self->session;
+
+    if ($self->get('state') =~ /^trash/) {
+        my $i18n = WebGUI::International->new($session, 'Asset_Template');
+        $session->errorHandler->warn('process called on template in trash: '.$self->getId
+            .'. The template was called through this url: '.$session->asset->get('url'));
+        return $session->var->isAdminOn ? $i18n->get('template in trash') : '';
+    }
+    elsif ($self->get('state') =~ /^clipboard/) {
+        my $i18n = WebGUI::International->new($session, 'Asset_Template');
+        $session->errorHandler->warn('process called on template in clipboard: '.$self->getId
+            .'. The template was called through this url: '.$session->asset->get('url'));
+        return $session->var->isAdminOn ? $i18n->get('template in clipboard') : '';
+    }
 
     # Return a JSONinfied version of vars if JSON is the only requested content type.
-    if ( defined $self->session->request && $self->session->request->headers_in->{Accept} eq 'application/json' ) {
-       $self->session->http->setMimeType( 'application/json' );
+    if ( defined $session->request && $session->request->headers_in->{Accept} eq 'application/json' ) {
+       $session->http->setMimeType( 'application/json' );
        return to_json( $vars );
     }
 
 	$self->prepare unless ($self->{_prepared});
-    my $parser      = $self->getParser($self->session, $self->get("parser"));
+    my $parser      = $self->getParser($session, $self->get("parser"));
     my $template    = $self->get('usePacked')
                     ? $self->get('templatePacked')
                     : $self->get('template')
@@ -607,8 +618,8 @@ sub process {
     my $output;
     eval { $output = $parser->process($template, $vars); };
     if (my $e = Exception::Class->caught) {
-        $self->session->log->error(sprintf "Error processing template: %s, %s, %s", $self->getUrl, $self->getId, $e->error);
-        my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+        $session->log->error(sprintf "Error processing template: %s, %s, %s", $self->getUrl, $self->getId, $e->error);
+        my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $output = sprintf $i18n->get('template error').$e->error, $self->getUrl, $self->getId;
     }
 	return $output;

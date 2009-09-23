@@ -369,6 +369,16 @@ Any scratch variables will be available in the template with this syntax:<br/>
         lastUpdated => 0,
         context     => "Label for a JS file attachment that goes after all the content in the <body> block",
     },
+
+    'template in trash' => {
+        message     => q|Template in trash|,
+        lastUpdated => 0,
+    },
+
+    'template in clipboard' => {
+        message     => q|Template in clipboard|,
+        lastUpdated => 0,
+    },
 };
 
 1;

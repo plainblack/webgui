@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 39; # increment this value for each test you create
+use Test::More tests => 43; # increment this value for each test you create
 use Test::Deep;
 use JSON qw{ from_json };
 
@@ -123,13 +123,40 @@ is(@$att4, 3, 'rev is proper size');
 
 $template3rev->purgeRevision();
 
+## Check how templates in the trash and clipboard are handled.
+
+$session->asset($importNode);
+$session->var->switchAdminOff;
+
+my $trashTemplate = $importNode->addChild({
+    className => "WebGUI::Asset::Template",
+    title     => 'Trash template',
+    template  => q|Trash Trash Trash Trash|,
+});
+
+$trashTemplate->trash;
+is($trashTemplate->process, '', 'process: returns nothing when the template is in the trash, and admin mode is off');
+
+$trashTemplate->cut;
+is($trashTemplate->process, '', '... returns nothing when the template is in the trash, and admin mode is off');
+
+$session->var->switchAdminOn;
+
+$trashTemplate->trash;
+is($trashTemplate->process, 'Template in trash', '... returns message when the template is in the trash, and admin mode is on');
+
+$trashTemplate->cut;
+is($trashTemplate->process, 'Template in clipboard', '... returns message when the template is in the trash, and admin mode is on');
+
+$session->var->switchAdminOff;
+
+# Check error logging for bad templates
+
 my $brokenTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'Broken template',
     template  => q|<tmpl_if unclosedIf>If clause with no ending tag|,
 });
-
-# done checking revision stuff
 
 WebGUI::Test->interceptLogging;
 my $brokenOutput = $brokenTemplate->process({});
