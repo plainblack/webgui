@@ -50,8 +50,6 @@ ok($jsonText, 'The file is not empty');
 my $perlScalar;
 eval { $perlScalar = JSON->new->relaxed(1)->decode($jsonText) };
 
-diag $@;
-
 if ($@) {
     my $index;
     ($index) = $@ =~ /character offset (\d+)/;

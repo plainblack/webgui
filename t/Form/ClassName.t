@@ -118,7 +118,7 @@ is($input->value, 'WebGUI::Storage', 'Checking default value');
 
 ##Test Form Output parsing
 
-#diag $formType;
+#note $formType;
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
 #

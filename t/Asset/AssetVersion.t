@@ -43,7 +43,7 @@ my $originalVersionTags = $session->db->quickScalar(q{select count(*) from asset
 #
 ################################################################
 
-diag "purgeRevision tests";
+note "purgeRevision tests";
 my $template = $root->addChild($propertyHash);
 $template->commit;
 
@@ -93,7 +93,7 @@ $templatev2 = $template->addRevision({template => 'Vie gates.  Ich bin ein templ
 my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
 WebGUI::Test->tagsToRollback($tag2);
-diag "purge";
+note "purge";
 checkTableEntries($templatev2->getId, 1,2,2);
 $versionTagCheck = $session->db->quickScalar(q{select count(*) from assetVersionTag});
 is($versionTagCheck, $originalVersionTags+2, 'created two version tags');

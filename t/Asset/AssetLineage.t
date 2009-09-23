@@ -184,12 +184,12 @@ is(
 #
 ####################################################
 
-#diag $snippets[0]->get('lineage');
-#diag $snippet2->get('lineage');
+#note $snippets[0]->get('lineage');
+#note $snippet2->get('lineage');
 ##Uncomment me to crash the test
 #$snippet2->cascadeLineage($snippets[0]->get('lineage'));
-#diag $snippets[0]->get('lineage');
-#diag $snippet2->get('lineage');
+#note $snippets[0]->get('lineage');
+#note $snippet2->get('lineage');
 
 ####################################################
 #

@@ -40,7 +40,7 @@ plan tests => 1 + $tests;
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
 
-diag('Testing existence');
+note('Testing existence');
 my $loaded = use_ok('WebGUI::Shop::PayDriver::ITransact');
 
 my $e;
@@ -96,7 +96,7 @@ skip 'Unable to load module WebGUI::Shop::PayDriver::ITransact', $tests unless $
 #
 #######################################################################
 
-diag('Testing definition');
+note('Testing definition');
 my $definition;
 
 eval { $definition = WebGUI::Shop::PayDriver::ITransact->definition(); };
@@ -294,7 +294,7 @@ TODO: {
 SKIP: {
     skip "Skipping XML requests to ITransact due to lack of userId and password", 2 unless $hasTestAccount;
     my $response = eval { $driver->doXmlRequest($xml) };
-    diag 'doXmlrequest';
+    note 'doXmlrequest';
     isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
     ok( $response->is_success, '... was successful');
 }
@@ -313,7 +313,7 @@ SKIP: {
     my $response = eval { $driver->doXmlRequest($xml) };
     isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
     ok( $response->is_success, '... was successful');
-    diag $response->content;
+    note $response->content;
 }
 
 #######################################################################

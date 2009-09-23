@@ -237,7 +237,7 @@ is(WebGUI::DatabaseLink->new($session,'foobar'), undef, 'new returns undef with 
 #
 ####################################################
 
-diag 'queryIsValid';
+note 'queryIsValid';
 foreach my $query (@{ $queries }) {
     is($dbLink->queryIsAllowed($query->{query}), $query->{expect}, $query->{comment});
 }

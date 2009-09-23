@@ -54,7 +54,7 @@ my $properties1 = {
 my $root = WebGUI::Asset->getRoot($session);
 my $product1 = $root->addChild($properties1);
 
-diag ref $product1;
+note ref $product1;
 
 my $properties2 = {
     className     => 'WebGUI::Asset::Wobject::Product',
@@ -67,7 +67,7 @@ my $properties2 = {
 
 my $product2 = $root->addChild($properties2);
 
-diag ref $product2;
+note ref $product2;
 
 $tag->commit;
 sleep 2;
@@ -185,4 +185,4 @@ $productb->setCollateral('Product_benefit', 'Product_benefitId', {
 
 $tag->commit;
 
-diag "Done.";
+note "Done.";

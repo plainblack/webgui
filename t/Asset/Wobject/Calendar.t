@@ -219,9 +219,9 @@ is(scalar @{ $windowCal->getLineage(['children'])}, 9, 'added events to the wind
 
 my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
 
-#diag $startDt->toDatabase;
-#diag join "\n", map { join ' ', $_->get('title'), $_->get('startDate'), $_->get('startTime')} @window;
-#diag $endDt->toDatabase;
+#note $startDt->toDatabase;
+#note join "\n", map { join ' ', $_->get('title'), $_->get('startDate'), $_->get('startTime')} @window;
+#note $endDt->toDatabase;
 
 is(scalar @window, 4, 'getEventsIn returned 4 events');
 cmp_bag(

@@ -324,7 +324,7 @@ $story->setPhotoData([
 
 
 my $viewVariables = $story->viewTemplateVariables;
-#diag Dumper $viewVariables;
+#note explain $viewVariables;
 cmp_deeply(
     $viewVariables->{highlights_loop},
     [

@@ -23,7 +23,7 @@ File::Find::find( \&getWebGUIModules, $wgLib);
 
 plan tests => scalar(@modules);
 
-#diag("Planning on ".scalar(@modules)." tests");
+#note("Planning on ".scalar(@modules)." tests");
 
 my %options;
 $options{-warnings} = 0; # report only errors for now

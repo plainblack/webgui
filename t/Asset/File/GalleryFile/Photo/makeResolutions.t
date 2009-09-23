@@ -69,7 +69,8 @@ ok(
     eval{ $photo->makeResolutions; 1 },
     "makeResolutions succeeds when photo under photo gallery and no resolution given",
 );
-diag( $@ );
+diag( $@ )
+    if $@;
 
 cmp_deeply(
     $photo->getStorageLocation->getFiles, 
@@ -121,7 +122,8 @@ ok(
     eval{ $photo->makeResolutions(['100x100','200x200']); 1 },
     "makeResolutions succeeds when first argument is array reference of resolutions to make",
 );
-diag( $@ );
+diag( $@ )
+    if $@;
 
 is_deeply(
     [ sort({ $a cmp $b} @{ $photo->getStorageLocation->getFiles }) ], 
@@ -194,7 +196,8 @@ $photo->update({ filename => 'page_title.jpg' });
         eval{ $photo->makeResolutions(['abc','200','3d400']); 1 },
         "makeResolutions succeeds when invalid resolutions are given",
     );
-    diag( $@ );
+    diag( $@ )
+        if $@;
 
     is(
         scalar @warnings, 2,

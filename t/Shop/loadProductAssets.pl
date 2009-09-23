@@ -81,4 +81,4 @@ my $template1 = $root->addChild($tProperties1);
 
 $tag->commit;
 
-diag "Done.";
+note "Done.";
