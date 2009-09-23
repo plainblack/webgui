@@ -22,6 +22,7 @@ use Pod::Usage;
 use strict;
 use WebGUI::Session;
 use WebGUI::User;
+use WebGUI::Inbox;
 
 $|=1;
 
