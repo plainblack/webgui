@@ -36,24 +36,25 @@ $df->createField( "name",    { type => "text", } );
 $df->createField( "message", { type => "text", } );
 
 # Add entries to the dataform
-my @entries = (
-    $df->entryClass->newFromHash(
-        $df, {
-            name    => "Andy",
-            subject => "Problem!",
-            message => "I need a Rita Heyworth",
-        }
-    ),
-    $df->entryClass->newFromHash(
-        $df, {
-            name    => "Red",
-            subject => "Solution!",
-            message => "I need about tree fiddy",
-        }
-    ),
+my @entryProperties = (
+    {
+        name    => "Andy",
+        subject => "Problem!",
+        message => "I need a Rita Heyworth",
+    },
+    {
+        name    => "Red",
+        subject => "Solution!",
+        message => "I need about tree fiddy",
+    }
 );
-for my $entry (@entries) {
+
+my @entries = ();
+for my $properties (@entryProperties) {
+    my $entry = $df->entryClass->newFromHash( $df, $properties );
     $entry->save;
+    push @entries, $entry;
+    sleep 1;
 }
 
 #----------------------------------------------------------------------------
