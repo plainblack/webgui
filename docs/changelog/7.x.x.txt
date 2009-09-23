@@ -15,6 +15,7 @@
  - fixed #10029: Account CSS rule scoping, round #2.
  - fixed #11012: Code editor corrupts JS
  - fixed #11019: Ctrl-A blinks and deletes code in Code Editor
+ - fixed #11024: In/Out Board Busted
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
