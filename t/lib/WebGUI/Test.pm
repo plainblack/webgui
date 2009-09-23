@@ -22,142 +22,89 @@ Utility module for making testing in WebGUI easier.
 
 =cut
 
-
 use strict;
 use warnings;
-use Clone qw/clone/;
-use Test::MockObject;
+use base qw(Test::Builder::Module);
 
-our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL );
+BEGIN {
+    # http://thread.gmane.org/gmane.comp.apache.apreq/3378
+    # http://article.gmane.org/gmane.comp.apache.apreq/3388
+    if ( $^O eq 'darwin' && $Config::Config{osvers} lt '8.0.0' ) {
+        unshift @INC, sub {
+            return undef unless $_[1] =~ m/^Apache2|APR/;
+            my $buffer = '1';
+            open my $fh, '<', \$buffer;
+            return $fh;
+        };
 
-use Config     qw[];
-use IO::Handle qw[];
-use File::Spec qw[];
-use IO::Select qw[];
-use Cwd        qw[];
-use Test::MockObject::Extends;
-use WebGUI::PseudoRequest;
-use Scalar::Util qw( blessed );
-use List::MoreUtils qw/ any /;
-use Carp qw[ carp croak ];
-use JSON qw( from_json to_json );
-
-##Hack to get ALL test output onto STDOUT.
-use Test::Builder;
-sub import {
-    no warnings;
-    *Test::Builder::failure_output = sub { return \*STDOUT };
+        no warnings 'redefine';
+        *Apache2::Const::OK        = sub () {   0 };
+        *Apache2::Const::DECLINED  = sub () {  -1 };
+        *Apache2::Const::NOT_FOUND = sub () { 404 };
+    }
 }
 
-our $logger_warns;
-our $logger_debug;
-our $logger_info;
-our $logger_error;
+use Test::MockObject;
+use Test::MockObject::Extends;
+use Clone               qw(clone);
+use Config              ();
+use IO::Handle          ();
+use File::Spec          ();
+use IO::Select          ();
+use Cwd                 ();
+use Scalar::Util        qw( blessed );
+use List::MoreUtils     qw( any );
+use Carp                qw( carp croak );
+use JSON                qw( from_json to_json );
+use Scope::Guard;
+
+use WebGUI::PseudoRequest;
+use WebGUI::Session;
+
+our @EXPORT = qw(cleanupGuard);
+our @EXPORT_OK = qw(session config);
+
+my $CLASS = __PACKAGE__;
 
 my %originalConfig;
-my $originalSetting;
 
-my @assetsToPurge;
-my @groupsToDelete;
-my @usersToDelete;
-my @sessionsToDelete;
-my @storagesToDelete;
-my @tagsToRollback;
-my @workflowsToDelete;
+my @guarded;
 
 my $smtpdPid;
 my $smtpdStream;
 my $smtpdSelect;
 
-my $mocker;
+$CLASS->init;
 
-BEGIN {
+our $SESSION = WebGUI::Test->newSession(1);
 
-#----------------------------------------------------------------------------
+my $originalSetting = clone $SESSION->setting->get;
 
-=head2 sessionsToDelete ( $session, [$session, ...] )
+sub init {
+    our $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
 
-Push a list of session objects onto the stack of groups to be automatically deleted
-at the end of the test.  Note, this will be the last group of objects to be
-cleaned up.
+    die "Enviroment variable WEBGUI_CONFIG must be set to the full path to a WebGUI config file.\n"
+        unless $CONFIG_FILE;
+    die "WEBGUI_CONFIG path '$CONFIG_FILE' does not exist.\n"
+        unless -e $CONFIG_FILE;
+    die "WEBGUI_CONFIG path '$CONFIG_FILE' is not a file.\n"
+        unless -f _;
+    die "WEBGUI_CONFIG path '$CONFIG_FILE' is not readable by effective uid '$>'.\n"
+        unless -r _;
 
-This is a class method.
+    $CONFIG_FILE = File::Spec->rel2abs($CONFIG_FILE);
+    (my $volume, our $WEBGUI_ROOT, $CONFIG_FILE) = File::Spec->splitpath($CONFIG_FILE);
+    $WEBGUI_ROOT = Cwd::realpath(File::Spec->catpath($volume,
+        File::Spec->catdir($WEBGUI_ROOT, File::Spec->updir), ''));
 
-=cut
+    our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
 
-sub sessionsToDelete {
-    my $class = shift;
-    push @sessionsToDelete, @_;
-}
+    our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_ROOT, 'lib' );
 
-
-sub newSession {
-    my $pseudoRequest = WebGUI::PseudoRequest->new;
-    my $session = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
-    $session->{_request} = $pseudoRequest;
-    WebGUI::Test->sessionsToDelete($session);
-    return $session;
-}
-
-}
-
-BEGIN {
-
-    $mocker = Test::MockObject->fake_module(
-        'APR::Request::Apache2',
-        handle => sub { return bless {}, 'APR::Request::Apache2'; }, 
-        jar    => sub { return { }; },
-    );
-
-    STDERR->autoflush(1);
-
-    $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
-
-    unless ( defined $CONFIG_FILE ) {
-        warn qq/Enviroment variable WEBGUI_CONFIG must be set to the full path to a WebGUI config file.\n/;
-        exit(1);
-    }
-   
-    unless ( $CONFIG_FILE ) {
-        warn qq/Enviroment variable WEBGUI_CONFIG must not be empty.  It must be set to the full path of a WebGUI config file.\n/;
-        exit(1);
-    }
-
-    unless ( -e $CONFIG_FILE ) {
-        warn qq/WEBGUI_CONFIG path '$CONFIG_FILE' does not exist.\n/;
-        exit(1);
-    }
-
-    unless ( -f _ ) {
-        warn qq/WEBGUI_CONFIG path '$CONFIG_FILE' is not a file.\n/;
-        exit(1);
-    }
-
-    unless ( -r _ ) {
-        warn qq/WEBGUI_CONFIG path '$CONFIG_FILE' is not readable by effective uid '$>'.\n/;
-        exit(1);
-    }
-
-    $WEBGUI_ROOT = $CONFIG_FILE;
-    
-    # convert to absolute path
-    unless ( File::Spec->file_name_is_absolute($WEBGUI_ROOT) ) {
-        $WEBGUI_ROOT = File::Spec->rel2abs($WEBGUI_ROOT);
-    }
-
-    $CONFIG_FILE = ( File::Spec->splitpath( $WEBGUI_ROOT ) )[2];
-    $WEBGUI_ROOT = substr( $WEBGUI_ROOT, 0, index( $WEBGUI_ROOT, File::Spec->catdir( 'etc', $CONFIG_FILE ) ) );
-    $WEBGUI_ROOT = File::Spec->canonpath($WEBGUI_ROOT);
-    $WEBGUI_ROOT = Cwd::realpath($WEBGUI_ROOT);
-    $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
-
-    my ($volume,$directories) = File::Spec->splitpath( $WEBGUI_ROOT, 'no_file' );
-    $WEBGUI_LIB ||= File::Spec->catpath( $volume, $directories, 'lib' );
-
-    push (@INC,$WEBGUI_LIB);
+    push @INC, $WEBGUI_LIB;
 
     ##Handle custom loaded library paths
-    my $customPreload = File::Spec->catdir( $WEBGUI_ROOT, 'sbin', 'preload.custom');
+    my $customPreload = File::Spec->catfile( $WEBGUI_ROOT, 'sbin', 'preload.custom');
     if (-e $customPreload) {
         open my $PRELOAD, '<', $customPreload or
             croak "Unload to open $customPreload: $!\n";
@@ -170,92 +117,11 @@ BEGIN {
         }
         close $PRELOAD;
     }
-
-    # http://thread.gmane.org/gmane.comp.apache.apreq/3378
-    # http://article.gmane.org/gmane.comp.apache.apreq/3388
-    if ( $^O eq 'darwin' && $Config::Config{osvers} lt '8.0.0' ) {
-        unshift @INC, sub {
-            return undef unless $_[1] =~ m/^Apache2|APR/;
-            my $buffer = '1';
-            open my $fh, '<', \$buffer;
-            return $fh;
-        };
-
-        no warnings 'redefine';
-        *Apache2::Const::OK        = sub {   0 };
-        *Apache2::Const::DECLINED  = sub {  -1 };
-        *Apache2::Const::NOT_FOUND = sub { 404 };
-    }
-
-    unless ( eval { require WebGUI::Session; } ) {
-        warn qq/Failed to require package 'WebGUI::Session'. Reason: '$@'.\n/;
-        exit(1);
-    }
-
-
-    $SESSION = WebGUI::Test->newSession;
-
-    $originalSetting = clone $SESSION->setting->get;
 }
 
 END {
-    my $Test = Test::Builder->new;
-    GROUP: foreach my $group (@groupsToDelete) {
-        my $groupId = $group->getId;
-        next GROUP if WebGUI::Group->vitalGroup($groupId);
-        my $newGroup = WebGUI::Group->new($SESSION, $groupId);
-        $newGroup->delete if $newGroup;
-    }
-    USER: foreach my $user (@usersToDelete) {
-        my $userId = $user->userId;
-        next USER if any { $userId eq $_ } (1,3);
-        my $newUser = WebGUI::User->new($SESSION, $userId);
-        $newUser->delete if $newUser;
-    }
-    STORAGE: foreach my $stor (@storagesToDelete) {
-        if ($SESSION->id->valid($stor)) {
-            my $storage = WebGUI::Storage->get($SESSION, $stor);
-            $storage->delete if $storage;
-        }
-        else {
-            $stor->delete;
-        }
-    }
-    ASSET: foreach my $asset (@assetsToPurge) {
-        $asset->purge;
-    }
-    TAG: foreach my $tag (@tagsToRollback) {
-        $tag->rollback;
-    }
-    WORKFLOW: foreach my $workflow (@workflowsToDelete) {
-        my $workflowId = $workflow->getId;
-        next WORKFLOW if any { $workflowId eq $_ } qw/
-                AuthLDAPworkflow000001 
-                csworkflow000000000001 
-                DPWwf20061030000000002 
-                PassiveAnalytics000001 
-                pbworkflow000000000001 
-                pbworkflow000000000002 
-                pbworkflow000000000003 
-                pbworkflow000000000004 
-                pbworkflow000000000005 
-                pbworkflow000000000006 
-                pbworkflow000000000007 
-                send_webgui_statistics 
-                /;
+    my $Test = $CLASS->builder;
 
-        $workflow->delete;
-    }
-    if ($ENV{WEBGUI_TEST_DEBUG}) {
-        $Test->diag('Sessions : '.$SESSION->db->quickScalar('select count(*) from userSession'));
-        $Test->diag('Scratch  : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
-        $Test->diag('Users    : '.$SESSION->db->quickScalar('select count(*) from users'));
-        $Test->diag('Groups   : '.$SESSION->db->quickScalar('select count(*) from groups'));
-        $Test->diag('mailQ    : '.$SESSION->db->quickScalar('select count(*) from mailQueue'));
-        $Test->diag('Tags     : '.$SESSION->db->quickScalar('select count(*) from assetVersionTag'));
-        $Test->diag('Assets   : '.$SESSION->db->quickScalar('select count(*) from assetData'));
-        $Test->diag('Workflows: '.$SESSION->db->quickScalar('select count(*) from Workflow'));
-    }
     while (my ($key, $value) = each %originalConfig) {
         if (defined $value) {
             $SESSION->config->set($key, $value);
@@ -267,10 +133,25 @@ END {
     while (my ($param, $value) = each %{ $originalSetting }) {
         $SESSION->setting->set($param, $value);
     }
-    SESSION: foreach my $session (@sessionsToDelete) {
-        $session->var->end;
-        $session->close;
+
+    # remove guards in reverse order they were added, triggering all of the
+    # requested cleanup operations
+    pop @guarded
+        while @guarded;
+
+    if ($ENV{WEBGUI_TEST_DEBUG}) {
+        $Test->diag('Sessions : '.$SESSION->db->quickScalar('select count(*) from userSession'));
+        $Test->diag('Scratch  : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
+        $Test->diag('Users    : '.$SESSION->db->quickScalar('select count(*) from users'));
+        $Test->diag('Groups   : '.$SESSION->db->quickScalar('select count(*) from groups'));
+        $Test->diag('mailQ    : '.$SESSION->db->quickScalar('select count(*) from mailQueue'));
+        $Test->diag('Tags     : '.$SESSION->db->quickScalar('select count(*) from assetVersionTag'));
+        $Test->diag('Assets   : '.$SESSION->db->quickScalar('select count(*) from assetData'));
+        $Test->diag('Workflows: '.$SESSION->db->quickScalar('select count(*) from Workflow'));
     }
+
+    $SESSION->var->end;
+    $SESSION->close;
 
     # Close SMTPD
     if ($smtpdPid) {
@@ -283,11 +164,29 @@ END {
     }
 }
 
-=head2 newSession ( )
+=head2 newSession ( $noCleanup )
 
 Builds a WebGUI session object for testing.
 
+=head3 $noCleanup
+
+If true, the session won't be registered for automatic deletion.
+
 =cut
+
+#----------------------------------------------------------------------------
+
+sub newSession {
+    my $noCleanup = shift;
+    my $pseudoRequest = WebGUI::PseudoRequest->new;
+    my $session = WebGUI::Session->open( $CLASS->root, $CLASS->file );
+    $session->{_request} = $pseudoRequest;
+    if ( ! $noCleanup ) {
+        WebGUI::Test->sessionsToDelete($session);
+    }
+    return $session;
+}
+
 
 =head2 mockAssetId ( $assetId, $object )
 
@@ -396,10 +295,10 @@ sub interceptLogging {
     my $logger = $SESSION->log->getLogger;
     $logger = Test::MockObject::Extends->new( $logger );
 
-    $logger->mock( 'warn',     sub { $WebGUI::Test::logger_warns = $_[1]} );
-    $logger->mock( 'debug',    sub { $WebGUI::Test::logger_debug = $_[1]} );
-    $logger->mock( 'info',     sub { $WebGUI::Test::logger_info  = $_[1]} );
-    $logger->mock( 'error',    sub { $WebGUI::Test::logger_error = $_[1]} );
+    $logger->mock( 'warn',     sub { our $logger_warns = $_[1]} );
+    $logger->mock( 'debug',    sub { our $logger_debug = $_[1]} );
+    $logger->mock( 'info',     sub { our $logger_info  = $_[1]} );
+    $logger->mock( 'error',    sub { our $logger_error = $_[1]} );
     $logger->mock( 'isDebug',  sub { return 1 } );
     $logger->mock( 'is_debug', sub { return 1 } );
 }
@@ -445,7 +344,7 @@ Returns the name of the WebGUI config file used for this test.
 =cut
 
 sub file {
-    return $CONFIG_FILE;
+    return our $CONFIG_FILE;
 }
 
 #----------------------------------------------------------------------------
@@ -468,7 +367,6 @@ below.
 
 sub getPage {
     my $class       = shift;
-    my $session     = $SESSION; # The session object
     my $actor       = shift;    # The actor to work on
     my $page        = shift;    # The page subroutine
     my $optionsRef  = shift;    # A hashref of options
@@ -477,14 +375,7 @@ sub getPage {
                                 # userId    => A user ID to set, "user" takes
                                 #              precedence
 
-    #!!! GETTING COOKIES WITH WebGUI::PseudoRequest DOESNT WORK, SO WE USE 
-    # THIS AS A WORKAROUND
-    $session->http->{_http}->{noHeader} = 1;
-    
-    # Open a buffer as a filehandle
-    my $buffer  = "";
-    open my $output, ">", \$buffer or die "Couldn't open memory buffer as filehandle: $@";
-    $session->output->setHandle($output);
+    my $session = $SESSION;
 
     # Set the appropriate user
     my $oldUser     = $session->user;
@@ -514,24 +405,18 @@ sub getPage {
         # Try using it as a subroutine
         no strict 'refs';
         $returnedContent = $actor->(@{$optionsRef->{args}});    
-        use strict 'refs';
     }
 
     if ($returnedContent && $returnedContent ne "chunked") {
-        print $output $returnedContent;
+        $session->output->print($returnedContent);
     }
 
-    close $output;
-    
     # Restore the former user and request
     $session->user({ user => $oldUser });
     $session->{_request} = $oldRequest;
 
-    #!!! RESTORE THE WORKAROUND
-    delete $session->http->{_http}->{noHeader};
-
     # Return the page's output
-    return $buffer;
+    my $return = $request->get_output;
 }
 
 #----------------------------------------------------------------------------
@@ -548,7 +433,7 @@ Optionally adds a filename to the end.
 sub getTestCollateralPath {
     my $class           = shift;
     my $filename        = shift;
-    return File::Spec->catfile($WEBGUI_TEST_COLLATERAL,$filename);
+    return File::Spec->catfile(our $WEBGUI_TEST_COLLATERAL, $filename);
 }
 
 #----------------------------------------------------------------------------
@@ -560,7 +445,7 @@ Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
 =cut
 
 sub lib {
-    return $WEBGUI_LIB;
+    return our $WEBGUI_LIB;
 }
 
 #----------------------------------------------------------------------------
@@ -572,7 +457,7 @@ Returns the full path to the WebGUI root directory, usually /data/WebGUI.
 =cut
 
 sub root {
-    return $WEBGUI_ROOT;
+    return our $WEBGUI_ROOT;
 }
 
 #----------------------------------------------------------------------------
@@ -662,39 +547,6 @@ sub originalConfig {
 
 #----------------------------------------------------------------------------
 
-=head2 assetsToPurge ( $asset, [$asset ] )
-
-Push a list of Asset objects onto the stack of assets to be automatically purged
-at the end of the test.  This will also clean-up all version tags associated
-with the Asset.
-
-This is a class method.
-
-=cut
-
-sub assetsToPurge {
-    my $class = shift;
-    push @assetsToPurge, @_;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 groupsToDelete ( $group, [$group ] )
-
-Push a list of group objects onto the stack of groups to be automatically deleted
-at the end of the test.
-
-This is a class method.
-
-=cut
-
-sub groupsToDelete {
-    my $class = shift;
-    push @groupsToDelete, @_;
-}
-
-#----------------------------------------------------------------------------
-
 =head2 getMail ( ) 
 
 Read a sent mail from the prepared mail server (L<prepareMailServer>)
@@ -748,6 +600,56 @@ sub getMailFromQueue {
 
     return $class->getMail;
 }
+#----------------------------------------------------------------------------
+
+=head2 sessionsToDelete ( $session, [$session, ...] )
+
+Push a list of session objects onto the stack of groups to be automatically deleted
+at the end of the test.  Note, this will be the last group of objects to be
+cleaned up.
+
+This is a class method.
+
+=cut
+
+sub sessionsToDelete {
+    my $class = shift;
+    push @guarded, cleanupGuard(@_);
+}
+
+#----------------------------------------------------------------------------
+
+=head2 assetsToPurge ( $asset, [$asset ] )
+
+Push a list of Asset objects onto the stack of assets to be automatically purged
+at the end of the test.  This will also clean-up all version tags associated
+with the Asset.
+
+This is a class method.
+
+=cut
+
+sub assetsToPurge {
+    my $class = shift;
+    push @guarded, cleanupGuard(@_);
+}
+
+#----------------------------------------------------------------------------
+
+=head2 groupsToDelete ( $group, [$group ] )
+
+Push a list of group objects onto the stack of groups to be automatically deleted
+at the end of the test.
+
+This is a class method.
+
+=cut
+
+sub groupsToDelete {
+    my $class = shift;
+    push @guarded, cleanupGuard(@_);
+}
+
 
 #----------------------------------------------------------------------------
 
@@ -762,7 +664,9 @@ This is a class method.
 
 sub storagesToDelete {
     my $class = shift;
-    push @storagesToDelete, @_;
+    push @guarded, cleanupGuard(map {
+        ref $_ ? $_ : ('WebGUI::Storage' => $_)
+    } @_);
 }
 
 #----------------------------------------------------------------------------
@@ -777,7 +681,7 @@ This is a class method.
 
 sub tagsToRollback {
     my $class = shift;
-    push @tagsToRollback, @_;
+    push @guarded, cleanupGuard(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -793,7 +697,7 @@ This is a class method.
 
 sub usersToDelete {
     my $class = shift;
-    push @usersToDelete, @_;
+    push @guarded, cleanupGuard(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -809,7 +713,189 @@ This is a class method.
 
 sub workflowsToDelete {
     my $class = shift;
-    push @workflowsToDelete, @_;
+    push @guarded, cleanupGuard(@_);
+}
+
+
+#----------------------------------------------------------------------------
+
+=head2 cleanupGuard ( $object, $class => $ident )
+
+Pass in a list of objects or pairs of classes and identifiers, and
+it will return a guard object for cleaning them up.  When the guard
+object goes out of scope, it will automatically clean up all of the
+passed in objects.  Objects will be destroyed in the order they
+were passed in.  Currently able to destroy:
+
+    WebGUI::Asset
+    WebGUI::Group
+    WebGUI::Session
+    WebGUI::Storage
+    WebGUI::User
+    WebGUI::VersionTag
+    WebGUI::Workflow
+
+Example call:
+
+    my $guard = cleanupGuard(
+        $user,
+        $workflow,
+        'WebGUI::Group' => $groupId,
+        $asset,
+    );
+
+=cut
+
+{
+    my %initialize = (
+        '' => sub {
+            my ($class, $ident) = @_;
+            return $class->new($SESSION, $ident);
+        },
+        'WebGUI::Storage' => sub {
+            my ($class, $ident) = @_;
+            return WebGUI::Storage->get($SESSION, $ident);
+        },
+    );
+
+    my %clone = (
+        'WebGUI::User' => sub {
+            WebGUI::User->new($SESSION, shift->getId);
+        },
+        'WebGUI::Group' => sub {
+            WebGUI::Group->new($SESSION, shift->getId);
+        },
+    );
+
+    my %check = (
+        'WebGUI::User' => sub {
+            my $user = shift;
+            my $userId = $user->userId;
+            die "Refusing to clean up vital user @{[ $user->username ]}!\n"
+                if any { $userId eq $_ } (1, 3);
+        },
+        'WebGUI::Group' => sub {
+            my $group = shift;
+            die "Refusing to clean up vital group @{[ $group->name ]}!\n"
+                if $group->vitalGroup;
+        },
+        'WebGUI::Workflow' => sub {
+            my $workflow = shift;
+            my $workflowId = $workflow->getId;
+            die "Refusing to clean up vital workflow @{[ $workflow->get('title') ]}!\n"
+                if any { $workflowId eq $_ } qw{
+                    AuthLDAPworkflow000001
+                    csworkflow000000000001
+                    DPWwf20061030000000002
+                    PassiveAnalytics000001
+                    pbworkflow000000000001
+                    pbworkflow000000000002
+                    pbworkflow000000000003
+                    pbworkflow000000000004
+                    pbworkflow000000000005
+                    pbworkflow000000000006
+                    pbworkflow000000000007
+                    send_webgui_statistics
+                };
+        },
+    );
+
+    my %cleanup = (
+        'WebGUI::User' => 'delete',
+        'WebGUI::Group' => 'delete',
+        'WebGUI::Storage' => 'delete',
+        'WebGUI::Asset' => 'purge',
+        'WebGUI::VersionTag' => 'rollback',
+        'WebGUI::Workflow' => 'delete',
+        'WebGUI::Session' => sub {
+            my $session = shift;
+            $session->var->end;
+            $session->close;
+        },
+    );
+
+    sub cleanupGuard {
+        shift
+            if ref $_[0] && $_[0]->isa($CLASS);
+        my @cleanups;
+        while (@_) {
+            my $class = shift;
+            my $construct;
+            if ( ref $class ) {
+                my $object = $class;
+                my $cloneSub = $CLASS->_findByIsa($class, \%clone);
+                $construct = $cloneSub ? sub { $object->$cloneSub } : sub { $object };
+                $class = ref $class;
+            }
+            else {
+                my $id = shift;
+                my $initSub = $CLASS->_findByIsa($class, \%initialize)
+                    || croak "Can't find initializer for $class\n";
+                $construct = sub { $initSub->($class, $id) };
+            }
+            if (my $check = $CLASS->_findByIsa($class, \%check)) {
+                local $@;
+                if ( ! eval { $construct->()->$check; 1 } ) {
+                    if ($@) {
+                        carp $@;
+                    }
+                    else {
+                        carp "Refusing to clean up vital $class!\n";
+                    }
+                    next;
+                }
+            }
+            my $destroy = $CLASS->_findByIsa($class, \%cleanup)
+                || croak "Can't find destructor for $class";
+            push @cleanups, $construct, $destroy;
+        }
+        return Scope::Guard->new(sub {
+            local $@;
+            while ( 1 ) {
+                my ($construct, $destroy) = (shift @cleanups, shift @cleanups);
+                last
+                    if ! $construct;
+                if ( my $object = eval { $construct->() } ) {
+                    eval { $object->$destroy };
+                }
+                if (ref $@ && $@->isa('WebGUI::Error::ObjectNotFound')) {
+                    # ignore objects that don't exist
+                }
+                elsif ($@) {
+                    warn $@;
+                }
+            }
+            return;
+        });
+    }
+}
+
+sub _findByIsa {
+    my $self = shift;
+    my $toFind = shift;
+    my $hash = shift;
+    for my $key ( sort { length $b <=> length $a} keys %$hash ) {
+        if ($toFind->isa($key)) {
+            return $hash->{$key};
+        }
+    }
+    return $hash->{''};
+}
+
+#----------------------------------------------------------------------------
+
+=head2 addToCleanup ( $object, $class => $ident )
+
+Takes the same parameters as cleanupGuard, but cleans the objects
+up at the end of the test instead of returning a guard object.
+
+This is a class method.
+
+=cut
+
+sub addToCleanup {
+    my $class = shift;
+    push @guarded, cleanupGuard(@_);
 }
 
 #----------------------------------------------------------------------------
