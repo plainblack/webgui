@@ -434,11 +434,6 @@ be useful, others may not.|,
 		lastUpdated => 1168992648
 	},
 
-	'inOutGroup' => {
-		message => q|The ID of the group that is allowed to use the In/Out Board.|,
-		lastUpdated => 1168992648
-	},
-
 	'inOutTemplateId' => {
 		message => q|The ID of the template that is used to display the main screen of the In/Out Board.|,
 		lastUpdated => 1168992648
