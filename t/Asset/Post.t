@@ -59,23 +59,22 @@ my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboratio
 my $postingUser         = WebGUI::User->new($session, 'new');
 my $otherUser           = WebGUI::User->new($session, 'new');
 my $groupIdEditUser     = WebGUI::User->new($session, 'new');
-my $groupToEditPost     = WebGUI::Group->new($session, $collab->get('groupToEditPost'));
-my $groupIdEditGroup    = WebGUI::Group->new($session, $collab->get('groupIdEdit'));
+my $groupToEditPostId   = $collab->get('groupToEditPost');
+my $groupIdEdit         = $collab->get('groupIdEdit');
 WebGUI::Test->usersToDelete($postingUser, $otherUser, $groupIdEditUser);
 $postingUser->username('userForPosting');
 $otherUser->username('otherUser');
-WebGUI::Test->groupsToDelete($groupToEditPost, $groupIdEditGroup);
 
 # Add the posting user to the group allowd to post.
 $postingUser->addToGroups([$collab->get('postGroupId')]);
 
 # Add $otherUser to $groupToEditPost so that they can edit the posts after the
 # timeout has expired.
-$otherUser->addToGroups([$groupToEditPost->getId]);
+$otherUser->addToGroups([$groupToEditPostId]);
 
 # Similarly, add $groupIdEditUser to $groupIdEditGroup so that they, too, can
 # edit posts after the timeout has expired.
-$groupIdEditUser->addToGroups([$groupIdEditGroup->getId]);
+$groupIdEditUser->addToGroups([$groupIdEdit]);
 
 # We need to become $postingUser to ensure that the canEdit tests below use
 # $postingUser's credentials rather than the default user assigned to the

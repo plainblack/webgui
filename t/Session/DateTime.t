@@ -93,7 +93,7 @@ is ($dt->getTimeZone(), 'America/Chicago', 'getTimeZone: fetching cached version
 my $buster = WebGUI::User->new($session, "new");
 $buster->profileField('timeZone', 'Amerigo/Vespucci');
 $session->user({user => $buster});
-WebGUI::Test->usersToDelete($buster);
+my $user_guard = cleanupGuard $buster;
 is ($dt->getTimeZone(), 'America/Chicago', 'getTimeZone: time zones not in the approved list get reset to the default');
 
 my $dude = WebGUI::User->new($session, "new");

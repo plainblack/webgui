@@ -34,6 +34,7 @@ WebGUI::Test->usersToDelete($user{'2'});
 $user{"2"}->addToGroups( ['2'] ); # Registered user
 
 my $versionTag      = WebGUI::VersionTag->getWorking( $session );
+WebGUI::Test->tagsToRollback($versionTag);
 $versionTag->set( { name => "Collaboration Test" } );
 
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
@@ -120,10 +121,5 @@ $maker->prepare( {
 } )->run;
 $thread->unlock;
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    my $subscriptionGroup = WebGUI::Group->new($session, $thread->get('subscriptionGroupId'));
-    WebGUI::Test->groupsToDelete($subscriptionGroup);
-    $versionTag->rollback;
-}
+WebGUI::Test->addToCleanup('WebGUI::Group' => $thread->get('subscriptionGroupId'));
+
