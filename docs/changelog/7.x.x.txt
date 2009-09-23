@@ -1,4 +1,5 @@
 7.8.1
+ - fixed: Wikis broken by 7.8.0 upgrade
 
 7.8.0
  - upgraded YUI to 2.8.0r4

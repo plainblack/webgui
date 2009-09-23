@@ -30,7 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+fixWikis( $session );
 
 finish($session); # this line required
 
@@ -43,6 +43,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+# Describe what our function does
+sub fixWikis {
+    my $session = shift;
+    print "\tFixing Wikis... " unless $quiet;
+    $session->db->write('INSERT IGNORE INTO assetAspect_Subscribable (assetId, revisionDate) SELECT assetId, revisionDate FROM WikiMaster');
+    $session->db->write('INSERT IGNORE INTO assetAspect_Subscribable (assetId, revisionDate) SELECT assetId, revisionDate FROM WikiPage');
+    print "Done.\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
