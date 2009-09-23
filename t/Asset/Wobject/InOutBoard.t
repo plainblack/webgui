@@ -18,7 +18,7 @@ use Test::MockObject::Extends;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 6; # increment this value for each test you create
+use Test::More tests => 8; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -27,6 +27,7 @@ my $templateMock = Test::MockObject->new({});
 $templateMock->set_isa('WebGUI::Asset::Template');
 $templateMock->set_always('getId', $templateId);
 my $templateVars;
+$templateMock->mock('prepare', sub {  } );
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
 use WebGUI::Asset::Wobject::InOutBoard;
@@ -101,6 +102,29 @@ cmp_deeply(
     },
     '... set statusLog for a user'
 );
+
+$session->scratch->set('userId', $users[1]->userId);
+$session->request->setup_body({
+    delegate => $users[1]->userId,
+    status   => undef,
+    message  => 'work time',
+});
+$board->www_setStatus;
+$status = $session->db->quickHashRef('select * from InOutBoard_status where assetId=? and userId=?',[$board->getId, $users[1]->userId]);
+cmp_deeply(
+    $status,
+    { },
+    "... no status table entry made when the users's status is blank"
+);
+my $statusLog;
+$statusLog = $session->db->quickHashRef('select * from InOutBoard_statusLog where assetId=? and userId=?',[$board->getId, $users[1]->userId]);
+cmp_deeply(
+    $statusLog,
+    { },
+    '... no statusLog set when status is blank'
+);
+
+
 $session->request->setup_body({ });
 $session->scratch->delete('userId');
 
@@ -122,7 +146,8 @@ cmp_bag(
             username       => 'red',
         },
         ignore(), ignore(), ignore(), ignore(),
-    ]
+    ],
+    'view: returns one entry for each user, entry is correct for user with status'
 );
 
 WebGUI::Test->unmockAssetId($templateId);
