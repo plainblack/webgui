@@ -267,7 +267,7 @@ sub _mockAssetInits {
     my $original_newPending = \&WebGUI::Asset::newPending;
     *WebGUI::Asset::newPending = sub {
         my ($class, $session, $assetId, $revisionDate) = @_;
-        if ($mockedAssetIds{$assetId}) {
+        if ($assetId && $mockedAssetIds{$assetId}) {
             return $mockedAssetIds{$assetId};
         }
         goto $original_newPending;
@@ -275,7 +275,7 @@ sub _mockAssetInits {
     my $original_newByUrl = \&WebGUI::Asset::newByUrl;
     *WebGUI::Asset::newByUrl = sub {
         my ($class, $session, $url, $revisionDate) = @_;
-        if ($mockedAssetUrls{$url}) {
+        if ($url && $mockedAssetUrls{$url}) {
             return $mockedAssetUrls{$url};
         }
         goto $original_newByUrl;
