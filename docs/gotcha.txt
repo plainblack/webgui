@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.8.0
+--------------------------------------------------------------------
+
+    !!! IMPORTANT !!!
+    You must upgrade to 7.7.20 before upgrading to 7.8.0
+
 7.7.19
 --------------------------------------------------------------------
     * The search indexer was not properly indexing non-ASCII content
