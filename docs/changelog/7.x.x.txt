@@ -1,6 +1,23 @@
 7.8.0
  - upgraded YUI to 2.8.0r4
  - fixed #10998: wiki page locked?
+ - fixed #10862: Version tag contents page
+ - added Subscribable AssetAspect to Wiki
+ - added direct value access in DataForm list view
+ - fixed #11003: Subscribable AssetAspect: no i18n
+ - fixed #11004: Subscribable AssetAspect: handling the subscription group
+ - fixed #10029: Account CSS rule scoping, round #2.
+ - fixed #11012: Code editor corrupts JS
+ - fixed #11019: Ctrl-A blinks and deletes code in Code Editor
+ - fixed #10954: DataForm fails silently
+ - fixed #10901: Calendar More Button/Display Box IE8 error.
+ - fixed #10950: Thingy
+ - fixed #11011: Inherit URL from parent can generate bad URLs
+ - fixed #11010: Purchasing non-recurring subscription twice does not extend group membership
+ - fixed #11009: Shipping address is lost after login
+ - fixed #10990: Survey: View Transposed Results not working
+
+7.7.20
  - fixed #10982: Survey menu options appearing twice
  - fixed #10890: Story Manager: pagination broken for keywords
  - fixed #10856: no paginate in wiki keyword search 
@@ -31,9 +48,7 @@
  - fixed #10928: EMS Print Ticket -- Time not processed for timezone
  - fixed #10889: Old Matrixs break for Admin users
  - fixed #10939: Commit with Approval workflow does not show confirmation screen
- - fixed #10862: Version tag contents page
  - fixed #10943: ThingyRecord JS Broken
- - added Subscribable AssetAspect to Wiki
  - fixed #10941: New user profile fields with unfortunate names
  - fixed #10955: Story Manager: unable to import packages
  - fixed #10970: Newsletter Asset: no subscribe link
@@ -42,25 +57,15 @@
  - fixed #10929: EMS Ticket Start Date Sort
  - fixed #10885: Code Editor breaks Javascript comments
  - fixed #10991: Calendar: bug in Display tab
- - added direct value access in DataForm list view
  - fixed #10987: EMS Schedule -- No Permission Check
  - fixed #10924: Calendar event in last day of month does not display in month/day view
- - fixed #10901: Calendar More Button/Display Box IE8 error.
  - fixed #10954: DataForm fails silently
  - fixed #10950: Thingy
  - fixed #10976: Form::Date not internationalized /DateTime::setToEpoch
  - fixed #11005: calendar feed workflow
  - fixed #11008: Test::Class
- - fixed #11003: Subscribable AssetAspect: no i18n
- - fixed #11004: Subscribable AssetAspect: handling the subscription group
  - fixed #10990: Survey: View Transposed Results not working
- - fixed #11009: Shipping address is lost after login
- - fixed #11010: Purchasing non-recurring subscription twice does not extend group membership
- - fixed #11011: Inherit URL from parent can generate bad URLs
  - fixed #11022: Deleting user shows "TRUE" prompt
- - fixed #10029: Account CSS rule scoping, round #2.
- - fixed #11012: Code editor corrupts JS
- - fixed #11019: Ctrl-A blinks and deletes code in Code Editor
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
