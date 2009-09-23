@@ -305,6 +305,25 @@ sub interceptLogging {
 
 #----------------------------------------------------------------------------
 
+=head2 restoreLogging
+
+Restores's the logging object to its original state.
+
+=cut
+
+sub restoreLogging {
+    my $logger = $SESSION->log->getLogger;
+
+    $logger->unmock( 'warn'     )
+           ->unmock( 'debug'    )
+           ->unmock( 'info'     )
+           ->unmock( 'error'    )
+           ->unmock( 'isDebug'  )
+           ->unmock( 'is_debug' );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 config
 
 Returns the config object from the session.
