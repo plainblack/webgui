@@ -257,7 +257,7 @@ where users.userId<>'1' and InOutBoard.inOutGroup=?
 group by userId
 order by department, lastName, firstName";
 
-	$p->setDataByQuery($sql, 0, [ $self->getId, $self->get('inOutGroup') ], );
+	$p->setDataByQuery($sql, undef, 0, [ $self->getId, $self->get('inOutGroup') ], );
 	my $rowdata = $p->getPageData();
 	my @rows;
 	foreach my $data (@$rowdata) {
@@ -398,7 +398,7 @@ sub www_setStatus {
             [$self->getId, $sessionUserId, $session->form->process("status"), $session->datetime->time(), $message ], 
         );
 		$db->write(
-            "insert into InOutBoard_status (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
+            "insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
             [$self->getId, $sessionUserId, $session->user->userId, $session->form->process("status"), $session->datetime->time(), $message ], 
         );
 	}
