@@ -4,6 +4,7 @@
  - fixed #11025: Yo dudely in Wiki Keyword Search Template
  - fixed #11027: trash warning but no trash-limbo warning
  - fixed #11031: AssetProxy refering to trash-limbo asset
+ - fixed #11028: IOB: Not choosing status causes Problem With Request
 
 7.8.0
  - upgraded YUI to 2.8.0r4

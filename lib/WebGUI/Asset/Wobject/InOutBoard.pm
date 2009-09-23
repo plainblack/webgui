@@ -407,10 +407,11 @@ sub www_setStatus {
     my $delegate = $session->form->process('delegate');
 	if ($delegate eq $self->session->scratch->get("userId")) {
 		my $sessionUserId = $session->scratch->get("userId") || $session->user->userId;
-		$session->scratch->delete("userId");
-		$db->write("delete from InOutBoard_status where userId=? and assetId=?", [ $sessionUserId, $self->getId ]);
-        my $message = $session->form->process('message');
         my $status  = $session->form->process('status');
+        return $self->www_view if $status eq '';
+		$session->scratch->delete("userId");
+        my $message = $session->form->process('message');
+		$db->write("delete from InOutBoard_status where userId=? and assetId=?", [ $sessionUserId, $self->getId ]);
 		$db->write(
             "insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (?,?,?,?,?)",
             [$self->getId, $sessionUserId, $status, $session->datetime->time(), $message ], 
