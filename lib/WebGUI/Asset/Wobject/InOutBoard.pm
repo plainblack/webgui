@@ -139,6 +139,23 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
+=head2 purge ( )
+
+Extend the base method to cleanup the status and statusLog tables.
+
+=cut
+
+sub purge {
+    my $self    = shift;
+    my $session = $self->session;
+    $session->db->write('delete from InOutBoard_status    where assetId=?', [$self->getId]);
+    $session->db->write('delete from InOutBoard_statusLog where assetId=?', [$self->getId]);
+    $self->SUPER::purge(@_);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 view 
 
 Render the viewing screen, which displays In/Out status and a form to change
@@ -393,17 +410,18 @@ sub www_setStatus {
 		$session->scratch->delete("userId");
 		$db->write("delete from InOutBoard_status where userId=? and assetId=?", [ $sessionUserId, $self->getId ]);
         my $message = $session->form->process('message');
+        my $status  = $session->form->process('status');
 		$db->write(
             "insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (?,?,?,?,?)",
-            [$self->getId, $sessionUserId, $session->form->process("status"), $session->datetime->time(), $message ], 
+            [$self->getId, $sessionUserId, $status, $session->datetime->time(), $message ], 
         );
 		$db->write(
             "insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
-            [$self->getId, $sessionUserId, $session->user->userId, $session->form->process("status"), $session->datetime->time(), $message ], 
+            [$self->getId, $sessionUserId, $session->user->userId, $status, $session->datetime->time(), $message ], 
         );
 	}
 	else {
-		$session->scratch->set("userId",$session->form->process("delegate"));
+		$session->scratch->set("userId",$delegate);
 	}
 	return $self->www_view;
 }
