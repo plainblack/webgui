@@ -28,6 +28,7 @@ $templateMock->set_isa('WebGUI::Asset::Template');
 $templateMock->set_always('getId', $templateId);
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
+$templateMock->set_true('prepare');
 
 use WebGUI::Asset::Wobject::InOutBoard;
 
