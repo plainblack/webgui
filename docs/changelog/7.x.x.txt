@@ -2,6 +2,7 @@
  - fixed: Wikis broken by 7.8.0 upgrade
  - fixed #11024: In/Out Board Busted
  - fixed #11025: Yo dudely in Wiki Keyword Search Template
+ - fixed #11027: trash warning but no trash-limbo warning
 
 7.8.0
  - upgraded YUI to 2.8.0r4
@@ -14,13 +15,6 @@
  - fixed #10029: Account CSS rule scoping, round #2.
  - fixed #11012: Code editor corrupts JS
  - fixed #11019: Ctrl-A blinks and deletes code in Code Editor
- - fixed #10954: DataForm fails silently
- - fixed #10901: Calendar More Button/Display Box IE8 error.
- - fixed #10950: Thingy
- - fixed #11011: Inherit URL from parent can generate bad URLs
- - fixed #11010: Purchasing non-recurring subscription twice does not extend group membership
- - fixed #11009: Shipping address is lost after login
- - fixed #10990: Survey: View Transposed Results not working
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice

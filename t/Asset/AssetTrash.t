@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 1; # increment this value for each test you create
+use Test::More tests => 7; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -26,6 +26,7 @@ my $session = WebGUI::Test->session;
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"AssetLineage Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 
 my $root = WebGUI::Asset->getRoot($session);
 my $topFolder = $root->addChild({
@@ -35,8 +36,39 @@ my $topFolder = $root->addChild({
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
 });
+my $folder1a = $topFolder->addChild({
+    url   => 'folder_1a',
+    title => 'folder1a',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
+});
+my $folder1b = $topFolder->addChild({
+    url   => 'folder_1b',
+    title => 'folder1b',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
+});
+my $folder1a2 = $folder1a->addChild({
+    url   => 'folder_1a2',
+    title => 'folder1a2',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
+});
 
 $versionTag->commit;
+
+####################################################
+#
+# trash
+#
+####################################################
+
+is( $topFolder->trash, 1, 'trash: returns 1 if successful' );
+is($topFolder->get('state'),              'trash', '... state set to trash on the trashed asset object');
+is($topFolder->cloneFromDb->get('state'), 'trash', '... state set to trash in db on object');
+is($folder1a->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on child #1');
+is($folder1b->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on child #2');
+is($folder1a2->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on grandchild #1-1');
 
 ####################################################
 #
@@ -45,9 +77,3 @@ $versionTag->commit;
 ####################################################
 
 is($topFolder->purge, 1, 'purge returns 1 if asset can be purged');
-
-END {
-    foreach my $tag ($versionTag) {
-        $tag->rollback;
-    }
-}
