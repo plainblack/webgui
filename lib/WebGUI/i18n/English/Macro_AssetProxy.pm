@@ -10,10 +10,12 @@ our $I18N = {
 
     'asset in trash' => {
         message     => q|AssetProxy: Asset in trash|,
+        lastUpdated => 1221160383,
     },
 
     'asset in clipboard' => {
         message     => q|AssetProxy: Asset in clipboard|,
+        lastUpdated => 1221160383,
     },
 
 };
