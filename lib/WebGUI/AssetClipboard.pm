@@ -54,6 +54,7 @@ sub canPaste {
 =head2 cut ( )
 
 Removes asset from lineage, places it in clipboard state. The "gap" in the lineage is changed in state to clipboard-limbo.
+Return 1 if the cut was successful, otherwise it returns undef.
 
 =cut
 
@@ -65,9 +66,12 @@ sub cut {
 	$session->db->write("update asset set state='clipboard-limbo' where lineage like ? and state='published'",[$self->get("lineage").'%']);
 	$session->db->write("update asset set state='clipboard', stateChangedBy=?, stateChanged=? where assetId=?", [$session->user->userId, $session->datetime->time(), $self->getId]);
 	$session->db->commit;
-	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
-	$self->purgeCache;
+    foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
+        $asset->purgeCache;
+        $asset->updateHistory('cut');
+    }
+    return 1;
 }
  
 

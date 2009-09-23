@@ -239,7 +239,8 @@ sub restore {
 =head2 trash ( $options )
 
 Removes asset from lineage, places it in trash state. The "gap" in the 
-lineage is changed in state to trash-limbo.
+lineage is changed in state to trash-limbo.  Returns 1 if the trash
+was successful, otherwise it return undef.
 
 =head3 $options
 
@@ -264,9 +265,15 @@ sub trash {
         return undef;
     }
 
-    $outputSub->($i18n->get('Deleting exported files'));
     foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
+        $outputSub->($i18n->get('Clearing search index'));
+        my $index = WebGUI::Search::Index->new($asset);
+        $index->delete;
+        $outputSub->($i18n->get('Deleting exported files'));
         $asset->_invokeWorkflowOnExportedFiles($session->setting->get('trashWorkflow'), 1);
+        $outputSub->($i18n->get('Purging the cache'));
+        $asset->purgeCache;
+        $asset->updateHistory("trashed");
     }
 
     # Trash any shortcuts to this asset
@@ -280,12 +287,6 @@ sub trash {
     # Raw database work is more efficient than $asset->update
     my $db = $session->db;
     $db->beginTransaction;
-    my $sth = $db->read("select assetId from asset where lineage like ?",[$self->get("lineage").'%']);
-    $outputSub->($i18n->get('Clearing search index'));
-    while (my ($id) = $sth->array) {
-        $db->write("delete from assetIndex where assetId=?",[$id]);
-    }
-
     $outputSub->($i18n->get('Clearing asset tables'));
     $db->write("update asset set state='trash-limbo' where lineage like ?",[$self->get("lineage").'%']);
     $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$session->user->userId, $session->datetime->time(), $self->getId]);
@@ -293,8 +294,7 @@ sub trash {
 
     # Update ourselves since we didn't use update()
     $self->{_properties}{state} = "trash";
-    $self->updateHistory("trashed");
-    $self->purgeCache;
+    return 1;
 }
 
 require WebGUI::Workflow::Activity::DeleteExportedFiles;

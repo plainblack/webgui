@@ -17,6 +17,7 @@
  - fixed #11019: Ctrl-A blinks and deletes code in Code Editor
  - fixed #11024: In/Out Board Busted
  - fixed #11025: Yo dudely in Wiki Keyword Search Template
+ - fixed #11027: trash warning but no trash-limbo warning
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
