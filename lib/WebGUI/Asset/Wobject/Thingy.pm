@@ -1927,7 +1927,7 @@ sub www_editThing {
     );
 
     # create the options hash for the 'Who can edit' and 'Who can view' selectBoxes.
-    %editViewOptions = ('owner'=>'owner',$session->db->buildHash(
+    %editViewOptions = ('owner'=>$i18n->get('owner'),$session->db->buildHash(
         "select groupId,groupName from groups where showInForms=1 order by groupName"
     ));
 
