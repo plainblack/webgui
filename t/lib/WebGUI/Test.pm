@@ -58,47 +58,11 @@ use Carp                qw( carp croak );
 use JSON                qw( from_json to_json );
 use Scope::Guard;
 
-use WebGUI::PseudoRequest;
-use WebGUI::Session;
+BEGIN {
+    my $file_root = File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], '');
 
-our @EXPORT = qw(cleanupGuard);
-our @EXPORT_OK = qw(session config);
-
-my $CLASS = __PACKAGE__;
-
-my %originalConfig;
-
-my @guarded;
-
-my $smtpdPid;
-my $smtpdStream;
-my $smtpdSelect;
-
-$CLASS->init;
-
-our $SESSION = WebGUI::Test->newSession(1);
-
-my $originalSetting = clone $SESSION->setting->get;
-
-sub init {
-    our $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
-
-    die "Enviroment variable WEBGUI_CONFIG must be set to the full path to a WebGUI config file.\n"
-        unless $CONFIG_FILE;
-    die "WEBGUI_CONFIG path '$CONFIG_FILE' does not exist.\n"
-        unless -e $CONFIG_FILE;
-    die "WEBGUI_CONFIG path '$CONFIG_FILE' is not a file.\n"
-        unless -f _;
-    die "WEBGUI_CONFIG path '$CONFIG_FILE' is not readable by effective uid '$>'.\n"
-        unless -r _;
-
-    $CONFIG_FILE = File::Spec->rel2abs($CONFIG_FILE);
-    (my $volume, our $WEBGUI_ROOT, $CONFIG_FILE) = File::Spec->splitpath($CONFIG_FILE);
-    $WEBGUI_ROOT = Cwd::realpath(File::Spec->catpath($volume,
-        File::Spec->catdir($WEBGUI_ROOT, File::Spec->updir), ''));
-
+    our $WEBGUI_ROOT = Cwd::realpath( File::Spec->catdir( $file_root, (File::Spec->updir) x 3 ));
     our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
-
     our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_ROOT, 'lib' );
 
     push @INC, $WEBGUI_LIB;
@@ -119,48 +83,79 @@ sub init {
     }
 }
 
+use WebGUI::Session;
+use WebGUI::PseudoRequest;
+
+our @EXPORT = qw(cleanupGuard addToCleanup);
+our @EXPORT_OK = qw(session config);
+
+my $CLASS = __PACKAGE__;
+
+my @guarded;
+
+sub import {
+    our $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
+
+    die "Enviroment variable WEBGUI_CONFIG must be set to the full path to a WebGUI config file.\n"
+        unless $CONFIG_FILE;
+    die "WEBGUI_CONFIG path '$CONFIG_FILE' does not exist.\n"
+        unless -e $CONFIG_FILE;
+    die "WEBGUI_CONFIG path '$CONFIG_FILE' is not a file.\n"
+        unless -f _;
+    die "WEBGUI_CONFIG path '$CONFIG_FILE' is not readable by effective uid '$>'.\n"
+        unless -r _;
+
+    $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, File::Spec->catdir($CLASS->root, 'etc'));
+    my $session = our $SESSION = $CLASS->newSession(1);
+
+    my $originalSetting = clone $session->setting->get;
+    push @guarded, Scope::Guard->new(sub {
+        while (my ($param, $value) = each %{ $originalSetting }) {
+            $session->setting->set($param, $value);
+        }
+    });
+
+    if ($ENV{WEBGUI_TEST_DEBUG}) {
+        my @checkCount = (
+            Sessions  => 'userSession',
+            Scratch   => 'userSessionScratch',
+            Users     => 'users',
+            Groups    => 'groups',
+            mailQ     => 'mailQueue',
+            Tags      => 'assetVersionTag',
+            Assets    => 'assetData',
+            Workflows => 'Workflow',
+        );
+        my %initCounts;
+        for ( my $i = 0; $i < @checkCount; $i += 2) {
+            my ($label, $table) = @checkCount[$i, $i+1];
+            $initCounts{$table} = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
+        }
+        push @guarded, Scope::Guard->new(sub {
+            for ( my $i = 0; $i < @checkCount; $i += 2) {
+                my ($label, $table) = @checkCount[$i, $i+1];
+                my $quant = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
+                $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, ($quant - $initCounts{$table}));
+            }
+        });
+    }
+
+    goto &{ $_[0]->can('SUPER::import') };
+}
+
 END {
-    my $Test = $CLASS->builder;
+    $CLASS->cleanup;
+}
 
-    while (my ($key, $value) = each %originalConfig) {
-        if (defined $value) {
-            $SESSION->config->set($key, $value);
-        }
-        else {
-            $SESSION->config->delete($key);
-        }
-    }
-    while (my ($param, $value) = each %{ $originalSetting }) {
-        $SESSION->setting->set($param, $value);
-    }
-
+sub cleanup {
     # remove guards in reverse order they were added, triggering all of the
     # requested cleanup operations
     pop @guarded
         while @guarded;
 
-    if ($ENV{WEBGUI_TEST_DEBUG}) {
-        $Test->diag('Sessions : '.$SESSION->db->quickScalar('select count(*) from userSession'));
-        $Test->diag('Scratch  : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
-        $Test->diag('Users    : '.$SESSION->db->quickScalar('select count(*) from users'));
-        $Test->diag('Groups   : '.$SESSION->db->quickScalar('select count(*) from groups'));
-        $Test->diag('mailQ    : '.$SESSION->db->quickScalar('select count(*) from mailQueue'));
-        $Test->diag('Tags     : '.$SESSION->db->quickScalar('select count(*) from assetVersionTag'));
-        $Test->diag('Assets   : '.$SESSION->db->quickScalar('select count(*) from assetData'));
-        $Test->diag('Workflows: '.$SESSION->db->quickScalar('select count(*) from Workflow'));
-    }
-
-    $SESSION->var->end;
-    $SESSION->close;
-
-    # Close SMTPD
-    if ($smtpdPid) {
-        kill INT => $smtpdPid;
-    }
-    if ($smtpdStream) {
-        close $smtpdStream;
-        # we killed it, so there will be an error.  Prevent that from setting the exit value.
-        $? = 0;
+    if ( my $session = $CLASS->session ) {
+        $session->var->end;
+        $session->close;
     }
 }
 
@@ -182,7 +177,7 @@ sub newSession {
     my $session = WebGUI::Session->open( $CLASS->root, $CLASS->file );
     $session->{_request} = $pseudoRequest;
     if ( ! $noCleanup ) {
-        WebGUI::Test->sessionsToDelete($session);
+        $CLASS->sessionsToDelete($session);
     }
     return $session;
 }
@@ -223,7 +218,7 @@ of retreiving it from the database for the given URL.
 
 my %mockedAssetUrls;
 sub mockAssetUrl {
-    my ($url, $object) = @_;
+    my ($class, $url, $object) = @_;
     _mockAssetInits();
     $mockedAssetUrls{$url} = $object;
 }
@@ -238,6 +233,20 @@ sub unmockAssetUrl {
     my ($class, $url) = @_;
     delete $mockedAssetUrls{$url};
 }
+
+=head2 unmockAllAssets ( )
+
+Removes all asset IDs and URLs from being mocked.
+
+=cut
+
+sub unmockAllAssets {
+    my ($class) = @_;
+    keys %mockedAssetIds = ();
+    keys %mockedAssetUrls = ();
+    return;
+}
+
 
 my $mockedNew;
 sub _mockAssetInits {
@@ -292,7 +301,7 @@ mock the isDebug flag so that debug output is always generated.
 =cut
 
 sub interceptLogging {
-    my $logger = $SESSION->log->getLogger;
+    my $logger = $CLASS->session->log->getLogger;
     $logger = Test::MockObject::Extends->new( $logger );
 
     $logger->mock( 'warn',     sub { our $logger_warns = $_[1]} );
@@ -312,7 +321,7 @@ Restores's the logging object to its original state.
 =cut
 
 sub restoreLogging {
-    my $logger = $SESSION->log->getLogger;
+    my $logger = $CLASS->session->log->getLogger;
 
     $logger->unmock( 'warn'     )
            ->unmock( 'debug'    )
@@ -331,8 +340,8 @@ Returns the config object from the session.
 =cut
 
 sub config {
-    return undef unless defined $SESSION;
-    return $SESSION->config;
+    return undef unless defined $CLASS->session;
+    return $CLASS->session->config;
 }
 
 #----------------------------------------------------------------------------
@@ -375,7 +384,7 @@ sub getPage {
                                 # userId    => A user ID to set, "user" takes
                                 #              precedence
 
-    my $session = $SESSION;
+    my $session = $CLASS->session;
 
     # Set the appropriate user
     my $oldUser     = $session->user;
@@ -476,7 +485,7 @@ disabled.
 =cut
 
 sub session {
-    return $SESSION;
+    return our $SESSION;
 }
 
 #----------------------------------------------------------------------------
@@ -500,6 +509,10 @@ Prepare a Net::SMTP::Server to use for testing mail.
 
 =cut
 
+my $smtpdPid;
+my $smtpdStream;
+my $smtpdSelect;
+
 sub prepareMailServer {
     eval {
         require Net::SMTP::Server;
@@ -509,20 +522,32 @@ sub prepareMailServer {
 
     my $SMTP_HOST        = 'localhost';
     my $SMTP_PORT        = '54921';
-    my $smtpd    = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
+    my $smtpd    = File::Spec->catfile( $CLASS->root, 't', 'smtpd.pl' );
     $smtpdPid = open $smtpdStream, '-|', $^X, $smtpd, $SMTP_HOST, $SMTP_PORT
         or die "Could not open pipe to SMTPD: $!";
 
     $smtpdSelect = IO::Select->new;
     $smtpdSelect->add($smtpdStream);
 
-    $SESSION->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
+    $CLASS->session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
 
-    WebGUI::Test->originalConfig('emailToLog');
-    $SESSION->config->set( 'emailToLog', 0 );
+    $CLASS->originalConfig('emailToLog');
+    $CLASS->session->config->set( 'emailToLog', 0 );
 
     # Let it start up yo
     sleep 2;
+
+    push @guarded, Scope::Guard->new(sub {
+        # Close SMTPD
+        if ($smtpdPid) {
+            kill INT => $smtpdPid;
+        }
+        if ($smtpdStream) {
+            # we killed it, so there will be an error.  Prevent that from setting the exit value.
+            local $?;
+            close $smtpdStream;
+        }
+    });
 
     return;
 }
@@ -536,11 +561,25 @@ automatically at the end of the test.  This is a class method.
 
 =cut
 
+my %originalConfig;
 sub originalConfig {
     my ($class, $param) = @_;
-    my $safeValue = my $value = $SESSION->config->get($param);
+    my $safeValue = my $value = $CLASS->session->config->get($param);
     if (ref $value) {
         $safeValue = clone $value;
+    }
+    # add cleanup handler if this is the first time we were run
+    if (! keys %originalConfig) {
+        push @guarded, Scope::Guard->new(sub {
+            while (my ($key, $value) = each %originalConfig) {
+                if (defined $value) {
+                    $CLASS->session->config->set($key, $value);
+                }
+                else {
+                    $CLASS->session->config->delete($key);
+                }
+            }
+        });
     }
     $originalConfig{$param} = $safeValue;
 }
@@ -591,11 +630,12 @@ sub getMailFromQueue {
         $class->prepareMailServer;
     }
     
-    my $messageId = $SESSION->db->quickScalar( "SELECT messageId FROM mailQueue" );
+    my $messageId = $CLASS->session->db->quickScalar( "SELECT messageId FROM mailQueue" );
     warn $messageId;
     return unless $messageId; 
 
-    my $mail    = WebGUI::Mail::Send->retrieve( $SESSION, $messageId );
+    require WebGUI::Mail::Send;
+    my $mail    = WebGUI::Mail::Send->retrieve( $CLASS->session, $messageId );
     $mail->send;
 
     return $class->getMail;
@@ -750,20 +790,20 @@ Example call:
     my %initialize = (
         '' => sub {
             my ($class, $ident) = @_;
-            return $class->new($SESSION, $ident);
+            return $class->new($CLASS->session, $ident);
         },
         'WebGUI::Storage' => sub {
             my ($class, $ident) = @_;
-            return WebGUI::Storage->get($SESSION, $ident);
+            return WebGUI::Storage->get($CLASS->session, $ident);
         },
     );
 
     my %clone = (
         'WebGUI::User' => sub {
-            WebGUI::User->new($SESSION, shift->getId);
+            WebGUI::User->new($CLASS->session, shift->getId);
         },
         'WebGUI::Group' => sub {
-            WebGUI::Group->new($SESSION, shift->getId);
+            WebGUI::Group->new($CLASS->session, shift->getId);
         },
     );
 
@@ -816,7 +856,7 @@ Example call:
 
     sub cleanupGuard {
         shift
-            if ref $_[0] && $_[0]->isa($CLASS);
+            if eval { $_[0]->isa($CLASS) };
         my @cleanups;
         while (@_) {
             my $class = shift;
@@ -894,7 +934,8 @@ This is a class method.
 =cut
 
 sub addToCleanup {
-    my $class = shift;
+    shift
+        if eval { $_[0]->isa($CLASS) };
     push @guarded, cleanupGuard(@_);
 }
 

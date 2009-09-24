@@ -20,6 +20,7 @@ use Test::More;
 use Test::Deep;
 use Path::Class;
 use File::Path;
+use File::Basename qw(basename);
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -60,7 +61,7 @@ SKIP: {
         $cacher,
         noclass({
             _session   => ignore(),
-            _namespace => WebGUI::Test->file(),
+            _namespace => basename(WebGUI::Test->file),
             _key       => re('[a-zA-Z0-9+\-]{22}'),
         }),
         'New FileCache object has correct defaults',
