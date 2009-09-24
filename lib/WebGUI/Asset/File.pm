@@ -656,19 +656,20 @@ When viewed directly, stream the stored file to the user.
 =cut
 
 sub www_view {
-	my $self = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
+	my $self    = shift;
+    my $session = $self->session;
+	return $session->privilege->noAccess() unless $self->canView;
 
 	# Check to make sure it's not in the trash or some other weird place
 	if ($self->get("state") ne "published") {
-		my $i18n = WebGUI::International->new($self->session,'Asset_File');
-		$self->session->http->setStatus("404");
+		my $i18n = WebGUI::International->new($session,'Asset_File');
+		$session->http->setStatus("404");
 		return sprintf($i18n->get("file not found"), $self->getUrl());
 	}
 
-    $self->session->http->setRedirect($self->getFileUrl);
-    $self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
-    $self->session->http->sendHeader;
+    $session->http->setRedirect($self->getFileUrl) unless $session->config->get('enableStreamingUploads');
+    $session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
+    $session->http->sendHeader;
     return 'chunked';
 }
 

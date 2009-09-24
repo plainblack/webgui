@@ -24,7 +24,7 @@ use WebGUI::Asset::File;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 8;
+plan tests => 10;
 
 #TODO: This script tests certain aspects of WebGUI::Storage and it should not
 
@@ -32,7 +32,6 @@ my $session = WebGUI::Test->session;
 
 ##Create a storage location
 my $storage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($storage);
 
 ##Save the image to the location
 my $filename = "someScalarFile.txt";
@@ -48,6 +47,7 @@ cmp_bag($storage->getFiles, ['someScalarFile.txt'], 'Only 1 file in storage with
 $session->user({userId=>3});
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"File Asset test"});
+my $guard1 = cleanupGuard($versionTag);
 my $properties = {
 	#     '1234567890123456789012'
 	id => 'FileAssetTest000000012',
@@ -85,15 +85,22 @@ $versionTag->commit;
 ############################################
 
 my $fileStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($fileStorage);
+my $guard2 = cleanupGuard($fileStorage);
 $mocker->set_always('getValue', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
 
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
-	##Storage is cleaned up by rolling back the version tag
-    $fileStorage->delete;
-}
+############################################
+#
+# www_view
+#
+############################################
+
+$session->config->set('enableStreamingUploads', '0');
+$asset->www_view;
+is($session->http->getRedirectLocation, $storage->getUrl('someScalarFile.txt'), 'www_view: sets a redirect');
+
+$session->config->set('enableStreamingUploads', '1');
+$session->http->setRedirectLocation('');
+$asset->www_view;
+is($session->http->getRedirectLocation, '', '... redirect not set when enableStreamingUploads is set');
