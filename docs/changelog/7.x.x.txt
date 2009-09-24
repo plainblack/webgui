@@ -6,6 +6,7 @@
  - fixed #11031: AssetProxy refering to trash-limbo asset
  - fixed #11028: IOB: Not choosing status causes Problem With Request
  - fixed #11029: enableStreamingUploads
+ - fixed #11018: no lowercase typing possible in addressbook
 
 7.8.0
  - upgraded YUI to 2.8.0r4

@@ -82,6 +82,7 @@ sub getName {
 =head2 getValue ( [ value ] )
 
 Returns a validated form post result. If the result does not pass validation, it returns undef instead.
+Uppercases any lowercase letters.
 
 =head3 value
 
@@ -93,6 +94,7 @@ sub getValue {
 	my $self = shift;
 	my $value = $self->SUPER::getValue(@_);
 	$value =~ tr/\r\n//d;
+	$value =~ tr/a-z/A-Z/d;
    	if ($value =~ /^[A-Z\d\s\-]+$/) {
 		return $value;
 	}
@@ -122,7 +124,7 @@ Renders a zip code field.
 sub toHtml {
 	my $self = shift;
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
-	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ- \')"');
+	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz- \')"');
 	return $self->SUPER::toHtml;
 }
 
