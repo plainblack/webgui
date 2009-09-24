@@ -400,7 +400,8 @@ sub getPage {
     my $oldRequest  = $session->request;
     my $request     = WebGUI::PseudoRequest->new;
     $request->setup_param($optionsRef->{formParams});
-    $session->{_request} = $request;
+    local $session->{_request} = $request;
+    local $session->output->{_handle};
 
     # Fill the buffer
     my $returnedContent;
@@ -413,7 +414,7 @@ sub getPage {
     else {
         # Try using it as a subroutine
         no strict 'refs';
-        $returnedContent = $actor->(@{$optionsRef->{args}});    
+        $returnedContent = $actor->(@{$optionsRef->{args}});
     }
 
     if ($returnedContent && $returnedContent ne "chunked") {
@@ -422,10 +423,9 @@ sub getPage {
 
     # Restore the former user and request
     $session->user({ user => $oldUser });
-    $session->{_request} = $oldRequest;
 
     # Return the page's output
-    my $return = $request->get_output;
+    return $request->get_output;
 }
 
 #----------------------------------------------------------------------------
