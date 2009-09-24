@@ -21,6 +21,7 @@
  - fixed #11031: AssetProxy refering to trash-limbo asset
  - fixed #11028: IOB: Not choosing status causes Problem With Request
  - fixed #11029: enableStreamingUploads
+ - fixed #11018: no lowercase typing possible in addressbook
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice

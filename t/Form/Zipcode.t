@@ -55,7 +55,7 @@ my $testBlock = [
 	{
 		key => 'Zip5',
 		testValue => 'abcde',
-		expected  => undef,
+		expected  => 'ABCDE',
 		comment   => 'lower case',
 	},
 ];
