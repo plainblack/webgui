@@ -135,7 +135,10 @@ sub import {
             for ( my $i = 0; $i < @checkCount; $i += 2) {
                 my ($label, $table) = @checkCount[$i, $i+1];
                 my $quant = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
-                $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, ($quant - $initCounts{$table}));
+                my $delta = $quant - $initCounts{$table};
+                if ($delta) {
+                    $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, $delta);
+                }
             }
         });
     }
