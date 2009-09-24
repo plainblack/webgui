@@ -271,7 +271,7 @@ sub trash {
         $index->delete;
         $outputSub->($i18n->get('Deleting exported files'));
         $asset->_invokeWorkflowOnExportedFiles($session->setting->get('trashWorkflow'), 1);
-        $outputSub->($i18n->get('Purging the cache'));
+        $outputSub->($i18n->get('Clearing cache'));
         $asset->purgeCache;
         $asset->updateHistory("trashed");
     }
