@@ -49,7 +49,7 @@ sub handler {
     if ($session->setting->get("specialState") eq "upgrading") {
         $session->http->sendHeader;
         my $output = "";
-        open(my $FILE,"<",$session->config->getWebguiRoot."/docs/maintenance.html");
+        open(my $FILE,"<",$session->config->getWebguiRoot."/www/maintenance.html");
         while (<$FILE>) {
             $output .= $_;
         }
