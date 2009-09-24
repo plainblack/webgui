@@ -948,7 +948,7 @@ sub getFormElement {
 
 Returns an instanciated WebGUI::Form::* plugin.
 
-=head3 proeprties
+=head3 properties
 
 The properties to configure the form plugin with. The fieldType key should contain the type of the form plugin.
 
