@@ -810,6 +810,7 @@ sub exportWriteFile {
     unless($contents eq 'chunked') {
         $self->session->output->print($contents);
     }
+    $fh->close;
 }
 
 #-------------------------------------------------------------------
