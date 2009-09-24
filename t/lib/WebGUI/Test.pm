@@ -798,6 +798,7 @@ Example call:
         'WebGUI::Group' => sub {
             WebGUI::Group->new($CLASS->session, shift->getId);
         },
+        'WebGUI::Session' => 'duplicate',
     );
 
     my %check = (
