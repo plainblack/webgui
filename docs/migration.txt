@@ -1,0 +1,6 @@
+WebGUI 8 Migration Guide
+------------------------
+
+The information contained herein documents the API changes that have occurred in the WebGUI 8 development effort and how to migrate your code to accomodate the new APIs.
+
+
