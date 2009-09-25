@@ -15,13 +15,11 @@ package WebGUI::Cache;
 =cut
 
 use strict;
-use Digest::MD5;
+use File::Path ();
 use HTTP::Headers;
 use HTTP::Request;
 use LWP::UserAgent;
-use Memcached::libmemcached;
-use Storable ();
-
+use Digest::MD5;
 
 =head1 NAME
 
@@ -29,19 +27,19 @@ Package WebGUI::Cache
 
 =head1 DESCRIPTION
 
-An API that allows you to cache items to a memcached server.
+A base class for all Cache modules to extend.
 
 =head1 SYNOPSIS
 
  use WebGUI::Cache;
  
- my $cache = WebGUI::Cache->new($session);
+ my $cache = WebGUI::Cache->new($session, "my app cache");
+ my $cache = WebGUI::Cache->new($session, [ "my app", $assetId, $version ]);
 
- $cache->set($name, $value);
- $cache->set(\@nameSegments, $value);
- $cache->setByHttp($name, "http://www.google.com/");
+ $cache->set($value);
+ $cache->setByHTTP("http://www.google.com/");
 
- my $value = $cache->get($name);
+ my $value = $cache->get;
 
  $cache->delete;
  $cache->deleteChunk("my app cache");
@@ -56,104 +54,74 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 delete ( name )
+=head2 delete ( )
 
-Delete a key from the cache.
-
-=head3 name
-
-The key to delete.
+Delete a key from the cache. Must be overridden.
 
 =cut
 
 sub delete {
-    my ($self, $name) = @_;
-    Memcached::libmemcached::memcached_delete($self->getMemcached, $self->parseKey($name));
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteChunk ( key )
+
+Deletes a bunch of keys from the cache based upon a partial composite key. Unless overridden by the cache subclass this will just flush the whole cache.
+
+=head3 key
+
+An array reference representing the portion of the key to delete. So if you have a key like ["asset","abc","def"] and you want to delete all items that match abc, you'd specify ["asset","abc"].
+
+=cut
+
+sub deleteChunk {
+	my $self = shift;
+	$self->flush;
 }
 
 #-------------------------------------------------------------------
 
 =head2 flush ( )
 
-Empties the caching system.
+Flushes the caching system. Must be overridden.
 
 =cut
 
 sub flush {
-    my ($self) = @_;
-    Memcached::libmemcached::memcached_flush($self->getMemcached);
+	my $self = shift;
+	File::Path::rmtree($self->session->config->get("uploadsPath")."/temp");
 }
 
 #-------------------------------------------------------------------
 
-=head2 get ( name )
+=head2 get ( )
 
-Retrieves a key value from the cache.
-
-=head3 name
-
-The key to retrieve.
+Retrieves a key value from the cache. Must be overridden.
 
 =cut
 
 sub get {
-    my ($self, $name) = @_;
-    my $content = Memcached::libmemcached::memcached_get($self->getMemcached, $self->parseKey($name));
-    $content = Storable::thaw($content);
-    return undef unless $content && ref $content;
-    return ${$content};
-}
 
-#-------------------------------------------------------------------
-
-=head2 getMemcached ( )
-
-Returns a reference to the Memcached::libmemcached object.
-
-=cut
-
-sub getMemcached {
-    my ($self) = @_;
-    return $self->{_memcached};
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 mget ( names )
-
-Retrieves multiple values from cache at once, which is much faster than retrieving one at a time. Returns an array reference containing the values in the order they were requested.
-
-=head3 names
-
-An array reference of keys to retrieve.
-
-=cut
-
-sub mget {
-    my ($self, $names) = @_;
-    my @parsedNames = ();
-    foreach my $name (@{$names}) {
-        push @parsedNames, $self->parseKey($name);
-    }
-    $self->getMemcached->mget_into_hashref($self->getMemcached, \@parsedNames, my $result);
-    my @values = ();
-    foreach my $name (@{$names}) {
-        my $parsedName = shift @parsedNames;
-        push @values, ${$result->{$parsedName}};
-    }
-    return \@values;
-}
-
-#-------------------------------------------------------------------
-
-=head2 new ( session, [ namespace ] )
+=head2 new ( session, key, [ namespace ] )
 
 The new method will return a handler for the configured caching mechanism.  Defaults to WebGUI::Cache::FileCache. You must override this method when building your own cache plug-in.
 
 =head3 session
 
 A reference to the current session.
+
+=head3 key
+
+A key to store the value under or retrieve it from. Can either be a scalar or an array reference of pieces (called
+a composite key). Composite keys are useful for deleting a chunk (see deleteChunk()) of cache data all at once, and
+for using multi-level identifiers like assetId/revisionDate.
 
 =head3 namespace
 
@@ -162,52 +130,49 @@ A subdivider to store this cache under. When building your own cache plug-in def
 =cut
 
 sub new {
-    my ($class, $session, $namespace) = @_;
-    my $config = $session->config;
-    $namespace ||= $config->getFilename;
-    my $memcached = Memcached::libmemcached::memcached_create();
-    foreach my $server (@{$config->get('cacheServers')}) {
-        if (exists $server->{socket}) {
-            Memcached::libmemcached::memcached_server_add_unix_socket($memcached, $server->{socket});
-        }
-        else {
-            Memcached::libmemcached::memcached_server_add($memcached, $server->{host}, $server->{port});
-        }
-    }
-    bless {_memcached => $memcached, _namespace => $namespace, _sesssion => $session}, $class;
+	my $class = shift;
+	my $session = shift;
+	if ($session->config->get("cacheType") eq "WebGUI::Cache::Database") {
+		require WebGUI::Cache::Database;
+		return WebGUI::Cache::Database->new($session,@_);
+	} else {
+		require WebGUI::Cache::FileCache;
+		return WebGUI::Cache::FileCache->new($session,@_);
+	}
 }
 
 #-------------------------------------------------------------------
 
-=head2 parseKey ( name ) 
+=head2 parseKey ( key ) 
 
-Returns a formatted string version of the key.
+Returns a formatted string version of the key. A class method.
 
-=head3 name
+=head3 key
 
 Can either be a text key, or a composite key. If it's a composite key, it will be an array reference of strings that can be joined together to create a key. You might want to use a composite key in order to be able to delete large portions of cache all at once. For instance, if you have a key of ["asset","abc","def"] you can delete all cache matching ["asset","abc"].
 
 =cut
 
 sub parseKey {
-    my ($self, $name) = @_;
-
-    # prepend namespace to the key
-    my @key = ($self->{_namespace});
-
+	my $class = shift;
     # check for composite or simple key, make array from either
-    if (! $name) {
-        # throw exception because no key was specified
+    my @key;
+    if (! $_[0]) {
+        return;
     }
-    elsif (ref $name eq 'ARRAY') {
-        @key = @{ $name };
+    elsif (ref $_[0] eq 'ARRAY') {
+        @key = @{ +shift };
     }
     else {
-        @key = $name;
+        @key = shift;
     }
-
-    # merge key parts
-    return join(':', @key);
+    foreach my $part (@key) {
+        # convert to octets, then md5 them
+        utf8::encode($part);
+        $part = Digest::MD5::md5_base64($part);
+        $part =~ tr{/}{-};
+    }
+    return join('/', @key);
 }
 
 #-------------------------------------------------------------------
@@ -219,23 +184,18 @@ Returns a reference to the current session.
 =cut
 
 sub session {
-    my ($self) = @_;
-    $self->{_session};
+    $_[0]->{_session};
 }
 
 #-------------------------------------------------------------------
 
-=head2 set ( name, value [, ttl] )
+=head2 set ( value [, ttl] )
 
-Sets a key value to the cache.
-
-=head3 name
-
-The name of the key to set.
+Sets a key value to the cache. Must be overridden.
 
 =head3 value
 
-A scalar value to store. You can also pass a hash reference or an array reference. 
+A scalar value to store.
 
 =head3 ttl
 
@@ -244,23 +204,15 @@ A time in seconds for the cache to exist. When you override default it to 60 sec
 =cut
 
 sub set {
-    my ($self, $name, $value, $ttl) = @_;
-    $ttl ||= 60;
-    $value = Storable::nfreeze(\(scalar $value)); # Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
-    Memcached::libmemcached::memcached_set($self->getMemcached, $self->parseKey($name), $value, $ttl);
-    return $value;
+
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 setByHttp ( name, url [, ttl ] )
+=head2 setByHTTP ( url [, ttl ] )
 
 Retrieves a document via HTTP and stores it in the cache and returns the content as a string. No need to override.
-
-=head3 name
-
-The name of the key to store the request under.
 
 =head3 url
 
@@ -272,20 +224,27 @@ The time to live for this content. This is the amount of time (in seconds) that 
 
 =cut
 
-sub setByHttp {
-    my ($self, $name, $url, $ttl) = @_;
-    my $userAgent = new LWP::UserAgent;
+sub setByHTTP {
+	my $self = shift;
+	my $url = shift;
+	my $ttl = shift;
+        my $userAgent = new LWP::UserAgent;
 	$userAgent->env_proxy;
-    $userAgent->agent("WebGUI/".$WebGUI::VERSION);
-    $userAgent->timeout(30);
-    my $request = HTTP::Request->new(GET => $url);
+        $userAgent->agent("WebGUI/".$WebGUI::VERSION);
+        $userAgent->timeout(30);
+        my $header = new HTTP::Headers;
+        my $referer = "http://webgui.http.request/".$self->session->env->get("SERVER_NAME").$self->session->env->get("REQUEST_URI");
+        chomp $referer;
+        $header->referer($referer);
+    my $request = HTTP::Request->new(GET => $url, $header);
     my $response = $userAgent->request($request);
     if ($response->is_error) {
-        $self->session->log->error($url." could not be retrieved.");
-        # show throw exception
-        return undef;
+        $self->session->errorHandler->error($url." could not be retrieved.");
     }
-    return $self->set($response->decoded_content, $ttl);
+    else {
+        $self->set($response->decoded_content,$ttl);
+    }
+    return $response->decoded_content;
 }
 
 #-------------------------------------------------------------------
