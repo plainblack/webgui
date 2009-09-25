@@ -109,6 +109,28 @@ sub asset {
 
 #-------------------------------------------------------------------
 
+=head2 cache ( ) 
+
+Returns a WebGUI::Cache object, which is connected to the WebGUI memcached server.
+
+=cut
+
+sub cache {
+	my $self = shift;
+	unless (exists $self->{_cache}) {
+        my $cache = WebGUI::Cache->new($self);
+		if (defined $cache) {
+			$self->{_cache} = $cache;
+		}
+		else {
+		    $self->log->fatal("Couldn't connect to WebGUI memcached server, and can't continue without it.");
+		}
+	}
+	return $self->{_cache};
+}
+
+#-------------------------------------------------------------------
+
 =head2 close
 
 Cleans up a WebGUI session information from memory and disconnects from any resources opened by the session.
