@@ -21,7 +21,7 @@ use HTTP::Request;
 use LWP::UserAgent;
 use Memcached::libmemcached;
 use Storable ();
-use WebGUI::Error;
+use WebGUI::Exception;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
@@ -71,14 +71,29 @@ The key to delete.
 =cut
 
 sub delete {
-    validate(@_, 
-        { name => {
-            type    => SCALAR
-            }
-        });
-        
-    my ($self, $name) = @_;
-    Memcached::libmemcached::memcached_delete($self->getMemcached, $self->parseKey($name));
+    my ($self, $name) = validate_pos(@_, 
+        1,
+        { type => SCALAR | ARRAYREF },
+        );
+    my $memcached = $self->getMemcached;
+    Memcached::libmemcached::memcached_delete($memcached, $self->parseKey($name));
+    if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        WebGUI::Error::Connection->throw(
+            error   => "Cannot connect to memcached server."
+            );
+    }
+    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        WebGUI::Error->throw(
+            error   => "No memcached servers specified in config file."
+            );
+    }
+    elsif ($memcached->errstr ne 'SUCCESS' # deleted
+        && $memcached->errstr ne 'PROTOCOL ERROR' # doesn't exist to delete
+        ) {
+        WebGUI::Error->throw(
+            error   => "Couldn't delete $name from cache because ".$memcached->errstr
+            );
+    }
 }
 
 #-------------------------------------------------------------------
@@ -91,7 +106,23 @@ Empties the caching system.
 
 sub flush {
     my ($self) = @_;
-    Memcached::libmemcached::memcached_flush($self->getMemcached);
+    my $memcached = $self->getMemcached;
+    Memcached::libmemcached::memcached_flush($memcached);
+    if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        WebGUI::Error::Connection->throw(
+            error   => "Cannot connect to memcached server."
+            );
+    }
+    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        WebGUI::Error->throw(
+            error   => "No memcached servers specified in config file."
+            );
+    }
+    elsif ($memcached->errstr ne 'SUCCESS') {
+        WebGUI::Error->throw(
+            error   => "Couldn't flush cache because ".$memcached->errstr
+            );
+    }
 }
 
 #-------------------------------------------------------------------
@@ -107,10 +138,35 @@ The key to retrieve.
 =cut
 
 sub get {
-    my ($self, $name) = @_;
-    my $content = Memcached::libmemcached::memcached_get($self->getMemcached, $self->parseKey($name));
+    my ($self, $name) = validate_pos(@_, 
+        1,
+        { type => SCALAR | ARRAYREF },
+        );
+    my $memcached = $self->getMemcached;
+    my $content = Memcached::libmemcached::memcached_get($memcached, $self->parseKey($name));
+    if ($memcached->errstr eq 'NOT FOUND' ) {
+        WebGUI::Error::ObjectNotFound->throw(
+            error   => "The cache key $name has no value.",
+            id      => $name,
+            );
+    }
+    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        WebGUI::Error->throw(
+            error   => "No memcached servers specified in config file."
+            );
+    }
+    elsif ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        WebGUI::Error::Connection->throw(
+            error   => "Cannot connect to memcached server."
+            );
+    }
+    elsif ($memcached->errstr ne 'SUCCESS') {
+        WebGUI::Error->throw(
+            error   => "Couldn't get $name from cache because ".$memcached->errstr
+            );
+    }
     $content = Storable::thaw($content);
-    return undef unless $content && ref $content;
+    return undef unless ref $content;
     return ${$content};
 }
 
@@ -141,10 +197,25 @@ An array reference of keys to retrieve.
 =cut
 
 sub mget {
-    my ($self, $names) = @_;
+    my ($self, $names) = validate_pos(@_, 
+        1,
+        { type => ARRAYREF },
+        );
     my @parsedNames = map { $self->parseKey($_) } @{ $names };
     my %result;
-    $self->getMemcached->mget_into_hashref(\@parsedNames, \%result);
+    my $memcached = $self->getMemcached;
+    $memcached->mget_into_hashref(\@parsedNames, \%result);
+    if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        WebGUI::Error::Connection->throw(
+            error   => "Cannot connect to memcached server."
+            );
+    }
+    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        WebGUI::Error->throw(
+            error   => "No memcached servers specified in config file."
+            );
+    }
+    # no other useful status messages are returned
     my @values;
     foreach my $name (@parsedNames) {
         my $content = Storable::thaw($result{$name});
@@ -156,7 +227,7 @@ sub mget {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, [ namespace ] )
+=head2 new ( session )
 
 The new method will return a handler for the configured caching mechanism.  Defaults to WebGUI::Cache::FileCache. You must override this method when building your own cache plug-in.
 
@@ -164,23 +235,23 @@ The new method will return a handler for the configured caching mechanism.  Defa
 
 A reference to the current session.
 
-=head3 namespace
-
-A subdivider to store this cache under. When building your own cache plug-in default this to the WebGUI config file.
-
 =cut
 
 sub new {
-    my ($class, $session, $namespace) = @_;
+    my ($class, $session) = validate_pos(@_, 
+        1,
+        { isa => 'WebGUI::Session' },
+        );
+    my ($class, $session) = @_;
     my $config = $session->config;
-    $namespace ||= $config->getFilename;
-    my $memcached = Memcached::libmemcached::memcached_create();
+    my $namespace = $config->getFilename;
+    my $memcached = Memcached::libmemcached::memcached_create(); # no exception because always returns success
     foreach my $server (@{$config->get('cacheServers')}) {
         if (exists $server->{socket}) {
-            Memcached::libmemcached::memcached_server_add_unix_socket($memcached, $server->{socket});
+            Memcached::libmemcached::memcached_server_add_unix_socket($memcached, $server->{socket}); # no exception because always returns success
         }
         else {
-            Memcached::libmemcached::memcached_server_add($memcached, $server->{host}, $server->{port});
+            Memcached::libmemcached::memcached_server_add($memcached, $server->{host}, $server->{port}); # no exception because always returns success
         }
     }
     bless {_memcached => $memcached, _namespace => $namespace, _sesssion => $session}, $class;
@@ -199,16 +270,16 @@ Can either be a text key, or a composite key. If it's a composite key, it will b
 =cut
 
 sub parseKey {
-    my ($self, $name) = @_;
+    my ($self, $name) = validate_pos(@_, 
+        1,
+        { type => SCALAR | ARRAYREF },
+        );
 
     # prepend namespace to the key
     my @key = ($self->{_namespace});
 
     # check for composite or simple key, make array from either
-    if (! $name) {
-        # throw exception because no key was specified
-    }
-    elsif (ref $name eq 'ARRAY') {
+    if (ref $name eq 'ARRAY') {
         push @key, @{ $name };
     }
     else {
@@ -253,10 +324,30 @@ A time in seconds for the cache to exist. When you override default it to 60 sec
 =cut
 
 sub set {
-    my ($self, $name, $value, $ttl) = @_;
-    $ttl ||= 60;
+    my ($self, $name, $value, $ttl) = validate_pos(@_, 
+        1,
+        { type => SCALAR | ARRAYREF },
+        { type => SCALAR },
+        { type => SCALAR | UNDEF, optional => 1, default=> 60 },
+        );
     my $frozenValue = Storable::nfreeze(\(scalar $value)); # Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
-    Memcached::libmemcached::memcached_set($self->getMemcached, $self->parseKey($name), $frozenValue, $ttl);
+    my $memcached = $self->getMemcached;
+    Memcached::libmemcached::memcached_set($memcached, $self->parseKey($name), $frozenValue, $ttl);
+    if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        WebGUI::Error::Connection->throw(
+            error   => "Cannot connect to memcached server."
+            );
+    }
+    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        WebGUI::Error->throw(
+            error   => "No memcached servers specified in config file."
+            );
+    }
+    elsif ($memcached->errstr ne 'SUCCESS') {
+        WebGUI::Error->throw(
+            error   => "Couldn't set $name to cache because ".$memcached->errstr
+            );
+    }
     return $value;
 }
 
@@ -282,21 +373,41 @@ The time to live for this content. This is the amount of time (in seconds) that 
 =cut
 
 sub setByHttp {
-    my ($self, $name, $url, $ttl) = @_;
+    my ($self, $name, $url, $ttl) = validate_pos(@_, 
+        1,
+        { type => SCALAR | ARRAYREF },
+        { type => SCALAR },
+        { type => SCALAR, optional => 1 },
+        );
     my $userAgent = new LWP::UserAgent;
 	$userAgent->env_proxy;
     $userAgent->agent("WebGUI/".$WebGUI::VERSION);
     $userAgent->timeout(30);
     my $request = HTTP::Request->new(GET => $url);
+
+
     my $response = $userAgent->request($request);
     if ($response->is_error) {
         $self->session->log->error($url." could not be retrieved.");
-        # show throw exception
-        return undef;
+        WebGUI::Error::Connection->throw(
+            error       => "Couldn't fetch $url because ".$response->message,
+            resource    => $url,
+            );
     }
     return $self->set($name, $response->decoded_content, $ttl);
 }
 
+
+=head1 EXCEPTIONS
+
+This class throws a huge number of exceptions about everything you can imagine, and many things you can't. However, because cache should be treated as optional, none of them matter except for testing, debugging, or in very specific use cases. Therefore the best practice is to simply call each method with an eval wrapper, and then not even bother testing for specific exceptions like this:
+
+ my $value = eval { $session->cache->get($key) };
+ unless (defined $value) {
+    $value = $db->fetchValueFromTheDatabase;
+ }
+
+=cut
 
 
 1;

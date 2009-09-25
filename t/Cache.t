@@ -45,9 +45,9 @@ my ($a, $b) = @{$cache->mget(["Shawshank",["andy", "dufresne"]])};
 is($a, "Prison", "mget first value");
 is($b, "Prisoner", "mget second value");
 $cache->delete("Shawshank");
-is($cache->get("Shawshank"), undef, 'delete');
+is(eval{$cache->get("Shawshank")}, undef, 'delete');
 $cache->flush;
-is($cache->get(["andy", "dufresne"]), undef, 'flush');
+is(eval{$cache->get(["andy", "dufresne"])}, undef, 'flush');
 $cache->setByHttp("google", "http://www.google.com/");
 cmp_ok($cache->get("google"), 'ne', '', 'setByHttp');
 

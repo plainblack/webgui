@@ -88,6 +88,18 @@
 
 #"webServerPort" : 80,
 
+# The cacheServers directive tells WebGUI how to connect to
+# memcached. If a "socket" is specified it will be used instead
+# of the host and port info, and this should be the
+# path to the unix socket that you started memcached with. "host"
+# and "port" are used to tell WebGUI how to connect to
+# memcached over TCP. And since this is an array you can specify
+# as many server connections as you have memcached servers
+
+ "cacheServers" : [
+	{ "socket" : "/tmp/memcached.sock", "host" : "127.0.0.1", "port" : "11211" }
+],
+
 # The database connection string. It usually takes the form of
 # DBI:<driver>:<db>;host:<hostname>
 

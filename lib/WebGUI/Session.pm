@@ -467,7 +467,6 @@ sub open {
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);
-	$self->errorHandler->warn("You've disabled cache in your config file and that can cause many problems on a production site.") if ($config->get("disableCache"));
 	return $self;
 }
 
