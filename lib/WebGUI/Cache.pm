@@ -43,9 +43,9 @@ An API that allows you to cache items to a memcached server.
 
  my $value = $cache->get($name);
 
- $cache->delete;
- $cache->deleteChunk("my app cache");
- $cache->deleteChunk([ "my app", $assetId ]);
+ $cache->delete($name);
+
+ $cache->flush;
 
 =head1 METHODS
 
@@ -200,10 +200,10 @@ sub parseKey {
         # throw exception because no key was specified
     }
     elsif (ref $name eq 'ARRAY') {
-        @key = @{ $name };
+        push @key, @{ $name };
     }
     else {
-        @key = $name;
+        push @key, $name;
     }
 
     # merge key parts
