@@ -1,4 +1,5 @@
 7.7.21
+ - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
  - fixed #10998: wiki page locked?
  - fixed #10924: Calendar event in last day of month does not display in month/day view
  - fixed #10901: Calendar More Button/Display Box IE8 error.
