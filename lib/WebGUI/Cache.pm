@@ -132,13 +132,10 @@ An array reference of keys to retrieve.
 
 sub mget {
     my ($self, $names) = @_;
-    my @parsedNames = ();
-    foreach my $name (@{$names}) {
-        push @parsedNames, $self->parseKey($name);
-    }
+    my @parsedNames = map { $self->parseKey($_) } @{ $names };
     my %result;
     $self->getMemcached->mget_into_hashref(\@parsedNames, \%result);
-    my @values = ();
+    my @values;
     foreach my $name (@parsedNames) {
         my $content = Storable::thaw($result{$name});
         next unless ref $content;
