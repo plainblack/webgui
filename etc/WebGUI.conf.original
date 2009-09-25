@@ -88,25 +88,6 @@
 
 #"webServerPort" : 80,
 
-# What kind of cache do you wish to use? Available types are 
-# WebGUI::Cache::FileCache and WebGUI::Cache::Database.
-# We highly recommend the database cache if you are running
-# sites with more than a few hundred pages, or if you're
-# running in a multi-server environment. The file cache is better
-# for very small sites.
-
-"cacheType" : "WebGUI::Cache::FileCache",
-
-# Tell WebGUI where to store cached files. Defaults to the 
-# /tmp or c:\temp folder depending upon your operating system.
-
-# "fileCacheRoot" : "/path/to/cache",
-
-# Set this to 1 to disable WebGUI's caching subsystems. This is
-# mainly useful for developers.
-
-"disableCache" : 0,
-
 # The database connection string. It usually takes the form of
 # DBI:<driver>:<db>;host:<hostname>
 
@@ -857,8 +838,6 @@
         "WebGUI::Workflow::Activity::ArchiveOldStories",
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
-        "WebGUI::Workflow::Activity::CleanDatabaseCache",
-        "WebGUI::Workflow::Activity::CleanFileCache",
         "WebGUI::Workflow::Activity::CleanLoginHistory",
         "WebGUI::Workflow::Activity::CleanTempStorage", 
         "WebGUI::Workflow::Activity::CreateCronJob",

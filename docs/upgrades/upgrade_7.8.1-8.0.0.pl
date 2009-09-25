@@ -18,6 +18,7 @@ BEGIN {
 }
 
 use strict;
+use File::Path qw/rmtree/;
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
@@ -31,9 +32,30 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 moveMaintenance($session);
+migrateToNewCache($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub migrateToNewCache {
+    my $session = shift;
+    print "\tMigrating to new cache " unless $quiet;
+    rmtree "../../lib/WebGUI/Cache";
+    unlink "../../lib/WebGUI/Workflow/Activity/CleanDatabaseCache.pm";
+    unlink "../../lib/WebGUI/Workflow/Activity/CleanFileCache.pm";
+    my $config = $session->config;
+    $config->set("cacheServers" => [ { "socket" => "/data/wre/var/memcached.sock", "host" => "127.0.0.1", "port" => "11211" } ]);
+    $config->delete("disableCache");
+    $config->delete("cacheType");
+    $config->delete("fileCacheRoot");
+    $config->deleteFromArray("workflowActivities/None", "WebGUI::Workflow::Activity::CleanDatabaseCache");
+    $config->deleteFromArray("workflowActivities/None", "WebGUI::Workflow::Activity::CleanFileCache");
+    my $db = $session->db;
+    $db->write("drop table cache");
+    $db->write("delete from WorkflowActivity where className in ('WebGUI::Workflow::Activity::CleanDatabaseCache','WebGUI::Workflow::Activity::CleanFileCache')");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub moveMaintenance {
