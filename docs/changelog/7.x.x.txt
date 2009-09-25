@@ -8,6 +8,7 @@
  - fixed #11029: enableStreamingUploads
  - fixed #11018: no lowercase typing possible in addressbook
  - fixed #11033: Calendar, recurring dates
+ - fixed #11038: My Carousel Broke
 
 7.8.0
  - upgraded YUI to 2.8.0r4
