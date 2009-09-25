@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 7;        # Increment this number for each test you create
+plan tests => 10;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -44,7 +44,12 @@ is($cache->get(["andy", "dufresne"]), "Prisoner", "set/get composite");
 my ($a, $b) = @{$cache->mget(["Shawshank",["andy", "dufresne"]])};
 is($a, "Prison", "mget first value");
 is($b, "Prisoner", "mget second value");
-
+$cache->delete("Shawshank");
+is($cache->get("Shawshank"), undef, 'delete');
+$cache->flush;
+is($cache->get(["andy", "dufresne"]), undef, 'flush');
+$cache->setByHttp("google", "http://www.google.com/");
+cmp_ok($cache->get("google"), 'ne', '', 'setByHttp');
 
 
 #----------------------------------------------------------------------------

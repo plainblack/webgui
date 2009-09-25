@@ -245,8 +245,8 @@ A time in seconds for the cache to exist. When you override default it to 60 sec
 sub set {
     my ($self, $name, $value, $ttl) = @_;
     $ttl ||= 60;
-    $value = Storable::nfreeze(\(scalar $value)); # Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
-    Memcached::libmemcached::memcached_set($self->getMemcached, $self->parseKey($name), $value, $ttl);
+    my $frozenValue = Storable::nfreeze(\(scalar $value)); # Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
+    Memcached::libmemcached::memcached_set($self->getMemcached, $self->parseKey($name), $frozenValue, $ttl);
     return $value;
 }
 
@@ -284,20 +284,9 @@ sub setByHttp {
         # show throw exception
         return undef;
     }
-    return $self->set($response->decoded_content, $ttl);
+    return $self->set($name, $response->decoded_content, $ttl);
 }
 
-#-------------------------------------------------------------------
-
-=head2 stats ( )
-
-Return a formatted text string describing cache usage. Must be overridden.
-
-=cut
-
-sub stats {
-
-}
 
 
 1;
