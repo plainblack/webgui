@@ -32,9 +32,10 @@ BEGIN {
     if ( $^O eq 'darwin' && $Config::Config{osvers} lt '8.0.0' ) {
         unshift @INC, sub {
             return undef unless $_[1] =~ m/^Apache2|APR/;
-            my $buffer = '1';
-            open my $fh, '<', \$buffer;
-            return $fh;
+            return IO::File->new( $INC{'Class/Null.pm'}, &IO::File::O_RDONLY );
+            #my $buffer = '1';
+            #open my $fh, '<', \$buffer;
+            #return $fh;
         };
 
         no warnings 'redefine';
