@@ -10,6 +10,7 @@
  - fixed #11033: Calendar, recurring dates
  - fixed #11038: My Carousel Broke
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
+ - fixed #10994: Gallery: Problems with uploading ZIP-archives
 
 7.8.0
  - upgraded YUI to 2.8.0r4

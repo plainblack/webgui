@@ -82,6 +82,7 @@ sub finish {
 parent.location.href='%s';
 </script>
 EOJS
+    local $| = 1;
     $self->session->output->print($text . $self->{_foot}, 1); # skipMacros
     return 'chunked';
 }
