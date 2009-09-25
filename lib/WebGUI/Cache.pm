@@ -21,6 +21,10 @@ use HTTP::Request;
 use LWP::UserAgent;
 use Memcached::libmemcached;
 use Storable ();
+use WebGUI::Error;
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
+
 
 
 =head1 NAME
@@ -67,6 +71,12 @@ The key to delete.
 =cut
 
 sub delete {
+    validate(@_, 
+        { name => {
+            type    => SCALAR
+            }
+        });
+        
     my ($self, $name) = @_;
     Memcached::libmemcached::memcached_delete($self->getMemcached, $self->parseKey($name));
 }
