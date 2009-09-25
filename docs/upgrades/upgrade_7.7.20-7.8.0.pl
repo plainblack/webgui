@@ -35,7 +35,6 @@ reorganizeAdSpaceProperties($session);
 addSubscribableAspect( $session );
 addFeaturedPageWiki( $session );
 fixEmptyCalendarIcalFeeds( $session );
-upgradeToYUI28( $session );
 
 finish($session); # this line required
 
@@ -224,6 +223,7 @@ sub start {
 sub finish {
     my $session = shift;
     updateTemplates($session);
+    upgradeToYUI28( $session );
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
     $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
