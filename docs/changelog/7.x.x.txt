@@ -13,8 +13,6 @@
  - fixed #11010: Purchasing non-recurring subscription twice does not extend group membership
  - fixed #11011: Inherit URL from parent can generate bad URLs
  - fixed #11022: Deleting user shows "TRUE" prompt
- - fixed #10029: Account CSS rule scoping, round #2.
- - fixed #11012: Code editor corrupts JS
  - fixed #11019: Ctrl-A blinks and deletes code in Code Editor
  - fixed #11024: In/Out Board Busted
  - fixed #11025: Yo dudely in Wiki Keyword Search Template
@@ -24,6 +22,8 @@
  - fixed #11029: enableStreamingUploads
  - fixed #11018: no lowercase typing possible in addressbook
  - fixed #11033: Calendar, recurring dates
+ - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
+ - fixed #10994: Gallery: Problems with uploading ZIP-archives
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
