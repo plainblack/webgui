@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 3;        # Increment this number for each test you create
+plan tests => 7;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -37,7 +37,13 @@ my $cache = WebGUI::Cache->new($session);
 isa_ok($cache, 'WebGUI::Cache');
 is($cache->parseKey("andy"), $session->config->getFilename.":andy", "parseKey single key");
 is($cache->parseKey(["andy","red"]), $session->config->getFilename.":andy:red", "parseKey composite key");
-
+$cache->set("Shawshank","Prison");
+is($cache->get("Shawshank"), "Prison", "set/get");
+$cache->set(["andy", "dufresne"], "Prisoner");
+is($cache->get(["andy", "dufresne"]), "Prisoner", "set/get composite");
+my ($a, $b) = @{$cache->mget(["Shawshank",["andy", "dufresne"]])};
+is($a, "Prison", "mget first value");
+is($b, "Prisoner", "mget second value");
 
 
 

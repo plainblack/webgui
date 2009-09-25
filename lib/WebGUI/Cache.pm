@@ -136,11 +136,12 @@ sub mget {
     foreach my $name (@{$names}) {
         push @parsedNames, $self->parseKey($name);
     }
-    $self->getMemcached->mget_into_hashref($self->getMemcached, \@parsedNames, my $result);
+    my %result;
+    $self->getMemcached->mget_into_hashref(\@parsedNames, \%result);
     my @values = ();
-    foreach my $name (@{$names}) {
-        my $parsedName = shift @parsedNames;
-        push @values, ${$result->{$parsedName}};
+    foreach my $name (@parsedNames) {
+        next unless ref $result{$name};
+        push @values, ${$result{$name}};
     }
     return \@values;
 }
