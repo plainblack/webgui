@@ -140,8 +140,9 @@ sub mget {
     $self->getMemcached->mget_into_hashref(\@parsedNames, \%result);
     my @values = ();
     foreach my $name (@parsedNames) {
-        next unless ref $result{$name};
-        push @values, ${$result{$name}};
+        my $content = Storable::thaw($result{$name});
+        next unless ref $content;
+        push @values, ${$content};
     }
     return \@values;
 }
