@@ -965,9 +965,9 @@ sub getFormPlugin {
 
     my %param;
     my $session = $self->session;
-    my $db = $session->db;
-    my $dbh = $db->dbh;
-    my $i18n = WebGUI::International->new($session,"Asset_Thingy");
+    my $db      = $session->db;
+    my $dbh     = $db->dbh;
+    my $i18n    = WebGUI::International->new($session,"Asset_Thingy");
 
     $param{name} = "field_".$data->{fieldId};
     my $name = $param{name};
@@ -989,7 +989,7 @@ sub getFormPlugin {
 
     if ( WebGUI::Utility::isIn( $data->{fieldType}, qw(SelectList CheckList SelectBox Attachments) ) ) {
         my @values;
-        if ( $useFormPostData && $self->session->form->param($name) ) {
+        if ( $useFormPostData && $session->form->param($name) ) {
             $param{ value } = [ $session->form->process( $name, $data->{fieldType} ) ];
         }
         elsif ( $data->{ value } ) {
@@ -1000,7 +1000,7 @@ sub getFormPlugin {
             $param{value} = \@values;
         }
     }
-    elsif ( $useFormPostData && $self->session->form->param($name) ) {
+    elsif ( $useFormPostData && $session->form->param($name) ) {
         $param{value} = $session->form->process( $name, $data->{fieldType} );
     }
 
@@ -1045,10 +1045,16 @@ sub getFormPlugin {
         my $errorMessage = $self->badOtherThing($tableName, $fieldName);
         return $errorMessage if $errorMessage;
 
-        $options = $db->buildHashRef('select thingDataId, '
+        my $sth = $session->db->read('select thingDataId, '
             .$dbh->quote_identifier($fieldName)
             .' from '.$dbh->quote_identifier($tableName));
     
+        while (my $result = $sth->hashRef){
+            if ($self->canViewThingData($otherThingId,$result->{thingDataId})){
+                $options->{$result->{thingDataId}} = $result->{$fieldName}
+            }
+        }
+ 
         my $value = $data->{value} || $data->{defaultValue};
         ($param{value}) = $db->quickArray('select '
             .$dbh->quote_identifier($fieldName)
