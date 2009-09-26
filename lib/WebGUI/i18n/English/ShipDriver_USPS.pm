@@ -94,6 +94,18 @@ our $I18N = {
         context => q|Label for a type of shipping from the USPS.|,
     },
 
+    'add insurance' => {
+        message => q|Ship with insurance?|,
+        lastUpdated => 1253988886,
+        context => q|Label for a type of shipping from the USPS.|,
+    },
+
+    'add insurance help' => {
+        message => q|If set to yes, the shipping plugin will ask the USPS for the cost of insuring this shipment.  The cost will be added to the total cost of shipping.  If insurance is not available, then the option to use this driver will not be presented to the user.|,
+        lastUpdated => 1253988884,
+        context => q|Label for a type of shipping from the USPS.|,
+    },
+
 };
 
 1;

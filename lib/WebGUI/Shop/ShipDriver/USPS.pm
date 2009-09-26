@@ -262,6 +262,12 @@ sub definition {
             options      => \%shippingTypes,
             defaultValue => 'PARCEL',
         },
+        addInsurance => {
+            fieldType    => 'yesNo',
+            label        => $i18n->get('add insurance'),
+            hoverHelp    => $i18n->get('add insurance help'),
+            defaultValue => 0,
+        },
 ##Note, if a flat fee is added to this driver, then according to the license
 ##terms the website must display a note to the user (shop customer) that additional
 ##fees have been added.
