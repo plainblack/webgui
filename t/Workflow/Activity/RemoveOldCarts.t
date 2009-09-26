@@ -69,6 +69,9 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
+my $guard0 = cleanupGuard($workflow);
+my $guard1 = cleanupGuard($cart1);
+my $guard2 = cleanupGuard($cart2);
 my $cartNuker = $workflow->addActivity('WebGUI::Workflow::Activity::RemoveOldCarts');
 $cartNuker->set('cartTimeout', 3600);
 
@@ -103,8 +106,4 @@ cmp_bag(
 
 END {
     $instance1->delete('skipNotify');
-    $workflow->delete;
-    $cart1->delete;
-    $cart2->delete;
-    $donation->purge;
 }
