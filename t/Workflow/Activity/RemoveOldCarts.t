@@ -32,11 +32,13 @@ my $donation = $root->addChild({
 });
 my $tag = WebGUI::VersionTag->getWorking($session);
 $tag->commit;
+WebGUI::Test->tagsToRollback($tag);
 
 
 my $cart1 = WebGUI::Shop::Cart->create($session);
 
 my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+WebGUI::Test->sessionsToDelete($session2);
 my $cart2 = WebGUI::Shop::Cart->create($session2);
 $cart2->update({creationDate => time()-10000});
 
@@ -104,7 +106,5 @@ END {
     $workflow->delete;
     $cart1->delete;
     $cart2->delete;
-    $session2->close;
     $donation->purge;
-    $tag->rollback;
 }
