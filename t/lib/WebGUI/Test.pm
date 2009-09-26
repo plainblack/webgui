@@ -74,6 +74,8 @@ our @EXPORT_OK = qw(session config);
 my $CLASS = __PACKAGE__;
 
 my @guarded;
+our @checkCount;
+our %initCounts;
 
 sub import {
     our $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
@@ -98,30 +100,22 @@ sub import {
     });
 
     if ($ENV{WEBGUI_TEST_DEBUG}) {
-        my @checkCount = (
-            Sessions  => 'userSession',
-            Scratch   => 'userSessionScratch',
-            Users     => 'users',
-            Groups    => 'groups',
-            mailQ     => 'mailQueue',
-            Tags      => 'assetVersionTag',
-            Assets    => 'assetData',
-            Workflows => 'Workflow',
+        ##Offset Sessions, and Scratch by 1 because 1 will exist at the start
+        @checkCount = (
+            Sessions  => userSession           => 1,
+            Scratch   => userSessionScratch    => 1,
+            Users     => users                 => 0,
+            Groups    => groups                => 0,
+            mailQ     => mailQueue             => 0,
+            Tags      => assetVersionTag       => 0,
+            Assets    => assetData             => 0,
+            Workflows => Workflow              => 0,
         );
-        my %initCounts;
-        for ( my $i = 0; $i < @checkCount; $i += 2) {
+        for ( my $i = 0; $i < @checkCount; $i += 3) {
             my ($label, $table) = @checkCount[$i, $i+1];
             $initCounts{$table} = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
         }
         push @guarded, Scope::Guard->new(sub {
-            for ( my $i = 0; $i < @checkCount; $i += 2) {
-                my ($label, $table) = @checkCount[$i, $i+1];
-                my $quant = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
-                my $delta = $quant - $initCounts{$table};
-                if ($delta) {
-                    $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, $delta);
-                }
-            }
         });
     }
 
@@ -140,7 +134,20 @@ sub cleanup {
 
     if ( my $session = $CLASS->session ) {
         $session->var->end;
+        my $db = delete $session->{_db};
         $session->close;
+        ##Do this absolutely last, so that there's no session or other object pieces left over.
+        if ($ENV{WEBGUI_TEST_DEBUG}) {
+            for ( my $i = 0; $i < @checkCount; $i += 3) {
+                my ($label, $table, $offset) = @checkCount[$i, $i+1, $i+2];
+                my $quant = $db->quickScalar('SELECT COUNT(*) FROM ' . $table);
+                my $delta = $quant - $initCounts{$table} + $offset;
+                if ($delta) {
+                    $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, $delta);
+                }
+            }
+        }
+        $db->disconnect;
     }
 }
 
