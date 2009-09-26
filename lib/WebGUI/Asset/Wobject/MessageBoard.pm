@@ -12,7 +12,6 @@ package WebGUI::Asset::Wobject::MessageBoard;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::Cache;
 use WebGUI::Asset::Wobject;
 use WebGUI::International;
 use WebGUI::SQL;
@@ -91,7 +90,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->session->cache->delete("view_".$self->getId);
 	$self->SUPER::purgeCache;
 }
 
@@ -105,8 +104,9 @@ See WebGUI::Asset::view() for details.
 
 sub view {
 	my $self = shift;
+    my $cache = $self->session->cache;
 	if ($self->session->user->isVisitor) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		my $out = $cache->get("view_".$self->getId);
 		return $out if $out;
 	}
 	my %var;
@@ -171,7 +171,7 @@ sub view {
 
 	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if ($self->session->user->isVisitor) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+		$cache->set("view_".$self->getId, $out, $self->get("visitorCacheTimeout"));
 	}
        	return $out;
 }

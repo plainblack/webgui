@@ -13,7 +13,6 @@ package WebGUI::Asset::Wobject::Collaboration;
 use strict;
 use Tie::IxHash;
 use WebGUI::Group;
-use WebGUI::Cache;
 use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Paginator;
@@ -1404,8 +1403,9 @@ Extend the base method to delete view and visitor caches.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
-	WebGUI::Cache->new($self->session,$self->_visitorCacheKey)->delete;
+    my $cache = $self->session->cache;
+	$cache->delete("view_".$self->getId);
+	$cache->delete($self->_visitorCacheKey);
 	$self->next::method;
 }
 
@@ -1549,8 +1549,9 @@ Render the CS, and handle local caching.
 
 sub view {
 	my $self = shift;
+    my $cache = $self->session->cache;
 	if ($self->_visitorCacheOk) {
-		my $out = WebGUI::Cache->new($self->session,$self->_visitorCacheKey)->get;
+		my $out = $cache->get($self->_visitorCacheKey);
 		$self->session->errorHandler->debug("HIT") if $out;
 		return $out if $out;
 	}
@@ -1561,7 +1562,7 @@ sub view {
 	$self->prepareView unless ($self->{_viewTemplate});
     my $out = $self->processTemplate($self->getViewTemplateVars,undef,$self->{_viewTemplate});
 	if ($self->_visitorCacheOk) {
-		WebGUI::Cache->new($self->session,$self->_visitorCacheKey)->set($out,$self->get("visitorCacheTimeout"));
+		$cache->set($self->_visitorCacheKey, $out, $self->get("visitorCacheTimeout"));
 	}
     return $out;
 }

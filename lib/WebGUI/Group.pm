@@ -127,7 +127,7 @@ not be added to any group.  Groups may not be added to themselves.
 sub addGroups {
 	my $self = shift;
 	my $groups = shift;
-	WebGUI::Cache->new($self->session, $self->getId)->delete;
+	$self->session->cache->delete($self->getId);
 	GROUP: foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
 		next if ($gid eq $self->getId);
@@ -232,12 +232,14 @@ sub clearCaches {
 	my $self = shift;
 	##Clear my cache and the cache of all groups above me.
 	my $groups = $self->getAllGroupsFor();
+    my $cache = $self->session->cache;
 	foreach my $group ( $self->getId, @{ $groups } ) {
-		WebGUI::Cache->new($self->session, $group)->delete;
+		$cache->delete($group);
 	}
-	$self->session->stow->delete("groupObj");
-	$self->session->stow->delete("isInGroup");
-	$self->session->stow->delete("gotGroupsInGroup");
+    my $stow = $self->session->stow;
+	$stow->delete("groupObj");
+	$stow->delete("isInGroup");
+	$stow->delete("gotGroupsInGroup");
 }
 
 #-------------------------------------------------------------------
@@ -560,8 +562,8 @@ sub getAllUsers {
 	my $withoutExpired = shift;
 	my $loopCount = shift;
 	my $expireTime = 0;
-	my $cache = WebGUI::Cache->new($self->session, $self->getId);
-	my $value = $cache->get;
+	my $cache = $self->session->cache;
+	my $value = $cache->get($self->getId);
 	return $value if defined $value;
 	my @users = ();
 	push @users,
@@ -586,7 +588,7 @@ sub getAllUsers {
 	}
 	my %users = map { $_ => 1 } @users;
 	@users = keys %users;
-	$cache->set(\@users, $self->groupCacheTimeout);
+	$cache->set($self->getId, \@users, $self->groupCacheTimeout);
 	return \@users;
 }
 

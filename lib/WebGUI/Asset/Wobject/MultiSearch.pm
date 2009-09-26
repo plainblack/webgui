@@ -24,7 +24,6 @@ use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::SQL;
-use WebGUI::Cache;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
 
@@ -114,7 +113,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->session->cache->delete("view_".$self->getId);
 	$self->SUPER::purgeCache;
 }
 
@@ -129,8 +128,9 @@ to be displayed within the page style
 
 sub view {
 	my $self = shift;	
+    my $cache = $self->session->cache;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		my $out = $cache->get("view_".$self->getId);
 		return $out if $out;
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');
@@ -143,7 +143,7 @@ sub view {
 
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+		$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"));
 	}
        	return $out;
 }

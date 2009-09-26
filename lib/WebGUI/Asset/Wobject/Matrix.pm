@@ -505,8 +505,9 @@ sub getListings {
         $session->var->isAdminOn
         || $self->get("listingsCacheTimeout") <= 10
         || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+    my $cache = $session->cache;
     unless ($noCache) {
-        $listingsEncoded = WebGUI::Cache->new($session,"matrixListings_".$self->getId)->get;
+        $listingsEncoded = $cache->get("matrixListings_".$self->getId);
     }
 
     if ($listingsEncoded){
@@ -546,9 +547,7 @@ assetData.revisionDate
         }
 
         $listingsEncoded = JSON->new->encode($listings);
-            WebGUI::Cache->new($session,"matrixListings_".$self->getId)->set(
-                $listingsEncoded,$self->get("listingsCacheTimeout")
-            );
+        $cache->set("matrixListings_".$self->getId, $listingsEncoded, $self->get("listingsCacheTimeout"));
     }
     return $listings;
 }
@@ -687,8 +686,9 @@ sub view {
         $session->var->isAdminOn
         || $self->get("statisticsCacheTimeout") <= 10
         || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+    my $cache = $session->cache;
     unless ($noCache) {
-        $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$self->getId)->get;
+        $varStatisticsEncoded = $cache->get("matrixStatistics_".$self->getId);
     }
 
     if ($varStatisticsEncoded){
@@ -837,9 +837,7 @@ sub view {
         [$self->getId]);
 
         $varStatisticsEncoded = JSON->new->encode($varStatistics);
-        WebGUI::Cache->new($session,"matrixStatistics_".$self->getId)->set(
-            $varStatisticsEncoded,$self->get("statisticsCacheTimeout")
-        );
+        $cache->set("matrixStatistics_".$self->getId, $varStatisticsEncoded, $self->get("statisticsCacheTimeout"));
     }
 
     foreach my $statistic (keys %{$varStatistics}) {

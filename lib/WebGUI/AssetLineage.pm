@@ -147,9 +147,8 @@ sub cascadeLineage {
         "UPDATE asset SET lineage=CONCAT(?,SUBSTRING(lineage,?)) WHERE lineage LIKE ?",
         [$newLineage, length($oldLineage) + 1, $oldLineage . '%']
     );
-    my $cache = WebGUI::Cache->new($self->session);
     if ($records > 20) {
-        $cache->flush;
+        $self->session->cache->flush;
     }
     else {
         my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage . '%']);

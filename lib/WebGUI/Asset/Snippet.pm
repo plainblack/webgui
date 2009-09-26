@@ -250,9 +250,9 @@ Extending purgeCache to handle caching of the rendered snippet
 
 sub purgeCache {
 	my $self = shift;
-
-	WebGUI::Cache->new($self->session,"view__".$self->getId)->delete;
-	WebGUI::Cache->new($self->session,"view_1_".$self->getId)->delete;	
+    my $self->session->cache;
+	$cache->delete("view__".$self->getId);
+	$cache->delete("view_1_".$self->getId);	
 	$self->SUPER::purgeCache();
 }
 
@@ -279,7 +279,7 @@ sub view {
         || $self->get("cacheTimeout") <= 10
         || ($versionTag && $versionTag->getId eq $self->get("tagId"));
     unless ($noCache) {
-		my $out = WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->get;
+		my $out = $session->cache("view_".$calledAsWebMethod."_".$self->getId);
 		return $out if $out;
 	}
 	my $output = $self->get('usePacked')
@@ -292,7 +292,7 @@ sub view {
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-		WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
+		$session->cache->set("view_".$calledAsWebMethod."_".$self->getId, $output, $self->get("cacheTimeout"));
 	}
     return $output;
 }

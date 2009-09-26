@@ -20,7 +20,6 @@ use WebGUI::International;
 use WebGUI::Storage;
 use WebGUI::Asset::Wobject;
 use WebGUI::Asset::Wobject::HttpProxy::Parse;
-use WebGUI::Cache;
 use WebGUI::Macro;
 use Apache2::Upload;
 
@@ -277,8 +276,9 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"URL")->delete;
-	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"HEADER")->delete;
+    my $cache = $self->session->cache;
+	$cache->delete([$self->get("proxiedUrl"),"URL"]);
+	$cache->delete([$self->get("proxiedUrl"),"HEADER"]);
 	$self->SUPER::purgeCache;
 }
 
@@ -320,12 +320,11 @@ sub view {
 	my $requestMethod = $self->session->env->get("REQUEST_METHOD") || "GET";
 	
 	### Do we have cached content to get?
-	my $cacheContent = WebGUI::Cache->new($self->session,$proxiedUrl,"URL");
-	my $cacheHeader = WebGUI::Cache->new($self->session,$proxiedUrl,"HEADER");
+    my $cache = $self->session->cache;
 	if ($requestMethod =~ /^GET$/i)
 	{
-		$var{header} 	= $cacheHeader->get;
-		$var{content} 	= $cacheContent->get;
+		$var{header} 	= $cache->get([$proxiedUrl,'HEADER']);
+		$var{content} 	= $cache->get([$proxiedUrl,"URL"]);
 	}
 	
 	# Unless we have cached content
@@ -465,8 +464,8 @@ sub view {
 			$var{content} = sprintf $i18n->get('fetch page error'), $proxiedUrl, $proxiedUrl, $response->status_line;
 		}
 		unless ($self->get("cacheTimeout") <= 10) {
-			$cacheContent->set($var{content},$self->get("cacheTimeout"));
-			$cacheHeader->set($var{header},$self->get("cacheTimeout"));
+			$cache->set([$proxiedUrl,'URL'], $var{content}, $self->get("cacheTimeout"));
+			$cache->set([$proxiedUrl,'HEADER'], $var{header}, $self->get("cacheTimeout"));
 		}
 	}
 	

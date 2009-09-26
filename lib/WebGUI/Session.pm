@@ -15,6 +15,7 @@ package WebGUI::Session;
 =cut
 
 use strict;
+use WebGUI::Cache;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;

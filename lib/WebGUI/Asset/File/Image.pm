@@ -222,8 +222,9 @@ Renders this asset.
 
 sub view {
 	my $self = shift;
+    my $cache = $self->session->cache;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		my $out = $cache->get("view_".$self->getId);
 		return $out if $out;
 	}
 	my %var = %{$self->get};
@@ -247,7 +248,7 @@ sub view {
 	my $form = $self->session->form;
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+		$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"));
 	}
        	return $out;
 }
@@ -310,16 +311,7 @@ sub www_undo {
     my $previous = (@{$self->getRevisions()})[1];
     # instantiate assetId 
     if ($previous) {
-	    # my $session = $self->session;
-
-	    # my $cache = WebGUI::Cache->new($self->session, ["asset",$self->getId,$self->getRevisionDate]);
-	    # $cache->flush;
-	    # my $cache = WebGUI::Cache->new($previous->session, ["asset",$previous->getId,$previous->getRevisionDate]);
-	    # $cache->flush;
-
 	    $self = $self->purgeRevision();
-	    # $self = undef;
-	    # $self = WebGUI::Asset->new($previous->session, $previous->getId, ref $previous, $previous->getRevisionDate);
 	    $self = $previous;
 	    $self->generateThumbnail;
     }

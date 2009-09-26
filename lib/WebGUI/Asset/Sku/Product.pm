@@ -13,7 +13,6 @@ package WebGUI::Asset::Sku::Product;
 use strict;
 use Tie::CPHash;
 use Tie::IxHash;
-use WebGUI::Cache;
 use WebGUI::HTMLForm;
 use WebGUI::Storage;
 use WebGUI::SQL;
@@ -789,7 +788,7 @@ Extends the base class to handle cleaning up the cache for this asset.
 
 sub purgeCache {
     my $self = shift;
-    WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+    $self->session->cache->delete("view_".$self->getId);
     $self->SUPER::purgeCache;
 }
 
@@ -1674,8 +1673,9 @@ sub view {
     my $self = shift;
     my $error = shift;
     my $session = $self->session;
+    my $cache = $session->cache;
     if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10){
-        my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+        my $out = $cache->get("view_".$self->getId);
         return $out if $out;
     }
     my (%data, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
@@ -1878,7 +1878,7 @@ sub view {
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && $self->{_hasAddedToCart} != 1){
-        WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+        $cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"));
     }
     return $out;
 }

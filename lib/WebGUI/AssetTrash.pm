@@ -191,7 +191,6 @@ sub purge {
 
     # clean up cache
     $outputSub->($i18n->get('Clearing cache'));
-	WebGUI::Cache->new($session)->deleteChunk(["asset",$self->getId]);
 	$self->purgeCache;
 
     # delete stuff out of the asset tables

@@ -13,7 +13,6 @@ package WebGUI::Asset::Post::Thread;
 use strict;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post;
-use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::International;
 use WebGUI::Paginator;
@@ -1026,8 +1025,9 @@ sub view {
 	my $currentPost = shift || $self;
     $self->markRead;
     $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
+    my $cache = $self->session->cache;
 	if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
-        my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+        my $out = $cache->get("view_".$self->getId);
         return $out if $out;
     }
     $self->session->scratch->set("discussionLayout",$self->session->form->process("layout")) if ($self->session->form->process("layout"));
@@ -1134,7 +1134,7 @@ sub view {
     my $out                             = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	
     if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->getThread->getParent->get("visitorCacheTimeout"));
+		$cache->set("view_".$self->getId, $out, $self->getThread->getParent->get("visitorCacheTimeout"));
 	}
     return $out;
 }

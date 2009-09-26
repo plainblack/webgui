@@ -15,7 +15,6 @@ package WebGUI::User;
 =cut
 
 use strict;
-use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::DatabaseLink;
 use WebGUI::Exception;
@@ -282,13 +281,12 @@ Saves the user object into the cache.
 
 sub cache {
     my $self = shift;
-    my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
     # copy user object
     my %userData;
     for my $k (qw(_userId _user _profile)) {
         $userData{$k} = $self->{$k};
     }
-    $cache->set(\%userData, 60*60*24);
+    $self->session->cache->set(["user",$self->userId], \%userData, 60*60*24);
 }
 
 #-------------------------------------------------------------------
@@ -1062,8 +1060,7 @@ sub new {
     my $userId      = shift || 1;
     my $overrideId  = shift;
     $userId         = _create($session, $overrideId) if ($userId eq "new");
-    my $cache       = WebGUI::Cache->new($session,["user",$userId]);
-    my $self        = $cache->get || {};
+    my $self        = $session->cache->get(["user",$userId]) || {};
     bless $self, $class;
     $self->{_session} = $session;
     unless ($self->{_userId} && $self->{_user}{username}) {
@@ -1337,8 +1334,7 @@ Deletes this user object out of the cache.
 
 sub uncache {
 	my $self = shift;
-	my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
-	$cache->delete;
+	$self->session->cache->delete(["user",$self->userId]);
 }
 
 #----------------------------------------------------------------------------
