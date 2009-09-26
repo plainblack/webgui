@@ -112,12 +112,12 @@ sub www_manageCache {
     my $flushURL    = $session->url->page('op=flushCache');
     my $i18n        = WebGUI::International->new($session);
     my $output =
-        WebGUI::Form::formHeader($session);
+        WebGUI::Form::formHeader($session)
          .WebGUI::Form::button($session, {
             value   => $i18n->get("clear cache"),
             extras  => qq{onclick="document.location.href='$flushURL';"},
         }) 
-         .WebGUI::Form::formFooter($session);
+         .WebGUI::Form::formFooter($session)
         ;
 
     return _submenu($session,$output);

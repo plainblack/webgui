@@ -250,7 +250,7 @@ Extending purgeCache to handle caching of the rendered snippet
 
 sub purgeCache {
 	my $self = shift;
-    my $self->session->cache;
+    my $cache = $self->session->cache;
 	eval {
         $cache->delete("view__".$self->getId);
 	    $cache->delete("view_1_".$self->getId);	
