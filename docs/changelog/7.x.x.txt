@@ -25,6 +25,7 @@
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
  - fixed #10994: Gallery: Problems with uploading ZIP-archives
  - fixed #11032: The Thingy form field "otherThingy" not checking for privilege
+ - fixed #11037: Maintenance page is being cached
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
