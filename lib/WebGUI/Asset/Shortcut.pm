@@ -267,8 +267,14 @@ Return the largest of either the asset revision date, or the shortcut revision d
 sub getContentLastModified {
     my $self = shift;
     my $assetRev = $self->get('revisionDate');
-    my $shortcuttedRev = $self->getShortcut->get('revisionDate');
-    return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
+    my $shortcut = $self->getShortcut;
+    my $shortcuttedRev;
+    if (defined $shortcut) {
+        $shortcuttedRev = $shortcut->get('revisionDate');
+        return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
+    } else {
+        return 0;
+    }
 }
 
 #-------------------------------------------------------------------
