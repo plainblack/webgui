@@ -92,7 +92,7 @@ sub www_flushCache {
     return $session->privilege->adminOnly unless canView($session);
 
     # Flush the cache
-    $session->cache->flush;
+    eval{$session->cache->flush};
 
     return www_manageCache($session);
 }

@@ -2662,7 +2662,7 @@ sub www_export {
         push(@fieldLabels,@metaDataFields)
     }
  
-    $query = $session->cache->get("query_".$thingId);
+    $query = eval{$session->cache->get("query_".$thingId)};
     $sth = $session->db->read($query);
 
     ### Loop through the returned structure and put it through Text::CSV
@@ -3307,7 +3307,7 @@ sequenceNumber');
     }
 
     # store query in cache for thirty minutes
-    $self->session->cache->set("query_".$thingId, $query, 30*60);
+    eval{$self->session->cache->set("query_".$thingId, $query, 30*60)};
 
     $paginatePage = $self->session->form->param('pn') || 1;
     $currentUrl = $self->session->url->append($currentUrl, "orderBy=".$orderBy) if $orderBy;

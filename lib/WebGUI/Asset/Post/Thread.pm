@@ -1027,7 +1027,7 @@ sub view {
     $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
     my $cache = $self->session->cache;
 	if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
-        my $out = $cache->get("view_".$self->getId);
+        my $out = eval{$cache->get("view_".$self->getId)};
         return $out if $out;
     }
     $self->session->scratch->set("discussionLayout",$self->session->form->process("layout")) if ($self->session->form->process("layout"));
@@ -1134,7 +1134,7 @@ sub view {
     my $out                             = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	
     if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
-		$cache->set("view_".$self->getId, $out, $self->getThread->getParent->get("visitorCacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->getThread->getParent->get("visitorCacheTimeout"))};
 	}
     return $out;
 }

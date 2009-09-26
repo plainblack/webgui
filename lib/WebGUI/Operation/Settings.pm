@@ -726,7 +726,7 @@ sub www_saveSettings {
         $session->db->write( 
             "UPDATE userProfileData SET showMessageOnLoginSeen=0"
         );
-        $session->cache->flush;
+        eval{$session->cache->flush};
     }
 
     return www_editSettings($session, { errors => \@errors, message => $i18n->get("editSettings done") });

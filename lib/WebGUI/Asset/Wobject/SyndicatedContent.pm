@@ -142,9 +142,9 @@ sub generateFeed {
 		if ($self->get('processMacroInRssUrl')) {
 			WebGUI::Macro::process($self->session, \$url);
 		}
-		my $value = $cache->get($url);
+		my $value = eval{$cache->get($url)};
 		unless ($value) {
-            $value = $cache->setByHttp($url, $url, $self->get("cacheTimeout"));
+            $value = eval{$cache->setByHttp($url, $url, $self->get("cacheTimeout"))};
             $newlyCached = 1;
         }
         # if the content can be downgraded, it is either valid latin1 or didn't have
@@ -327,7 +327,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-    $self->session->cache->delete("view_".$self->getId);
+    eval{$self->session->cache->delete("view_".$self->getId)};
 	$self->next::method;
 }
 
@@ -345,7 +345,7 @@ sub view {
 
 	# try the cached version
 	my $cache = $session->cache; 
-	my $out = $cache->get("view_".$self->getId);
+	my $out = eval{$cache->get("view_".$self->getId)};
 	return $out if ($out ne "" && !$session->var->isAdminOn);
     #return $out if $out;
 
@@ -353,7 +353,7 @@ sub view {
 	my $feed = $self->generateFeed;
 	$out = $self->processTemplate($self->getTemplateVariables($feed),undef,$self->{_viewTemplate});
 	if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
 	}
 	return $out;
 }

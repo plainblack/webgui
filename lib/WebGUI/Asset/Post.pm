@@ -1187,7 +1187,7 @@ Extend the base class to handle caching.
 
 sub purgeCache {
 	my $self = shift;
-	$self->session->cache->delete("view_".$self->getThread->getId) if ($self->getThread);
+	eval{$self->session->cache->delete("view_".$self->getThread->getId)} if ($self->getThread);
 	$self->SUPER::purgeCache;
 }
 

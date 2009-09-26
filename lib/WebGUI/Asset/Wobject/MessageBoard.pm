@@ -90,7 +90,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	$self->session->cache->delete("view_".$self->getId);
+	eval{$self->session->cache->delete("view_".$self->getId)};
 	$self->SUPER::purgeCache;
 }
 
@@ -106,7 +106,7 @@ sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
 	if ($self->session->user->isVisitor) {
-		my $out = $cache->get("view_".$self->getId);
+		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
 	my %var;
@@ -171,7 +171,7 @@ sub view {
 
 	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if ($self->session->user->isVisitor) {
-		$cache->set("view_".$self->getId, $out, $self->get("visitorCacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->get("visitorCacheTimeout"))};
 	}
        	return $out;
 }

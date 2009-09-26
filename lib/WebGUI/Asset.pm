@@ -1777,7 +1777,7 @@ sub new {
         return undef unless $revisionDate;
     }
     
-    my $properties = $session->cache->get(["asset",$assetId,$revisionDate]);
+    my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
     if (exists $properties->{assetId}) {
         # got properties from cache
     } 
@@ -1787,7 +1787,7 @@ sub new {
             $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
             return undef;
         }
-        $cache->set($properties,60*60*24);
+        eval{$session->cache->set(["asset",$assetId,$revisionDate], $properties, 60*60*24)};
     }
     if (defined $properties) {
         my $object = { _session=>$session, _properties => $properties };
@@ -2377,7 +2377,7 @@ sub purgeCache {
 	$stow->delete('assetLineage');
 	$stow->delete('assetClass');
 	$stow->delete('assetRevision');
-    $self->session->cache->delete(["asset",$self->getId,$self->get("revisionDate")]);
+    eval{$self->session->cache->delete(["asset",$self->getId,$self->get("revisionDate")])};
 }
 
 

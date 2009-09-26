@@ -484,7 +484,7 @@ sub getOverrides {
 	my $cache   = $session->cache;
     my $u       = WebGUI::User->new($self->session, $self->discernUserId);
 
-	my $overridesRef = $cache->get($self->_overridesCacheTag);
+	my $overridesRef = eval{$cache->get($self->_overridesCacheTag)};
     ##If admin mode is not on, and the cache is valid, and not expired, and the user object was not updated,
     ##return the cached value.
     if ( ! $session->var->isAdminOn
@@ -532,7 +532,7 @@ sub getOverrides {
         }
     }
     $overrides{userLastUpdated} = $session->user->get('lastUpdated');
-    $cache->set($self->_overridesCacheTag, \%overrides, 60*60);
+    eval{$cache->set($self->_overridesCacheTag, \%overrides, 60*60)};
     $overridesRef = \%overrides;
 	return %{ $overridesRef };
 }
@@ -879,7 +879,7 @@ Delete any cached overrides.
 
 sub uncacheOverrides {
 	my $self = shift;
-	$self->session->cache->delete($self->_overridesCacheTag);
+	eval{$self->session->cache->delete($self->_overridesCacheTag)};
 }
 
 #-------------------------------------------------------------------

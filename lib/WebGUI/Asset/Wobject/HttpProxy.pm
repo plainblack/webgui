@@ -277,8 +277,10 @@ See WebGUI::Asset::purgeCache() for details.
 sub purgeCache {
 	my $self = shift;
     my $cache = $self->session->cache;
-	$cache->delete([$self->get("proxiedUrl"),"URL"]);
-	$cache->delete([$self->get("proxiedUrl"),"HEADER"]);
+	eval {
+        $cache->delete([$self->get("proxiedUrl"),"URL"]);
+	    $cache->delete([$self->get("proxiedUrl"),"HEADER"]);
+    };
 	$self->SUPER::purgeCache;
 }
 
@@ -321,10 +323,11 @@ sub view {
 	
 	### Do we have cached content to get?
     my $cache = $self->session->cache;
-	if ($requestMethod =~ /^GET$/i)
-	{
-		$var{header} 	= $cache->get([$proxiedUrl,'HEADER']);
-		$var{content} 	= $cache->get([$proxiedUrl,"URL"]);
+	if ($requestMethod =~ /^GET$/i) {
+        eval {
+		    $var{header} 	= $cache->get([$proxiedUrl,'HEADER']);
+		    $var{content} 	= $cache->get([$proxiedUrl,"URL"]);
+        };
 	}
 	
 	# Unless we have cached content
@@ -464,8 +467,10 @@ sub view {
 			$var{content} = sprintf $i18n->get('fetch page error'), $proxiedUrl, $proxiedUrl, $response->status_line;
 		}
 		unless ($self->get("cacheTimeout") <= 10) {
-			$cache->set([$proxiedUrl,'URL'], $var{content}, $self->get("cacheTimeout"));
-			$cache->set([$proxiedUrl,'HEADER'], $var{header}, $self->get("cacheTimeout"));
+			eval{
+                $cache->set([$proxiedUrl,'URL'], $var{content}, $self->get("cacheTimeout"));
+			    $cache->set([$proxiedUrl,'HEADER'], $var{header}, $self->get("cacheTimeout"));
+            };
 		}
 	}
 	

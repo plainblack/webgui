@@ -222,7 +222,7 @@ sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = $cache->get("view_".$self->getId);
+		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
 	my %var = %{$self->get};
@@ -245,7 +245,7 @@ sub view {
 	$var{noFileSpecified} = $i18n->get('noFileSpecified');
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
 	}
        	return $out;
 }

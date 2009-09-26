@@ -148,12 +148,15 @@ sub cascadeLineage {
         [$newLineage, length($oldLineage) + 1, $oldLineage . '%']
     );
     if ($records > 20) {
-        $self->session->cache->flush;
+        eval{$self->session->cache->flush};
     }
     else {
         my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage . '%']);
         while (my ($assetId, $lineage) = $descendants->array) {
-            $cache->deleteChunk(["asset",$assetId]);
+            my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+            if (defined $asset) {
+                $asset->purgeCache;
+            }
         }
         $descendants->finish;
     }

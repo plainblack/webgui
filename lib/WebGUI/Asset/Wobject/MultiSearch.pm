@@ -113,7 +113,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	$self->session->cache->delete("view_".$self->getId);
+	eval{$self->session->cache->delete("view_".$self->getId)};
 	$self->SUPER::purgeCache;
 }
 
@@ -130,7 +130,7 @@ sub view {
 	my $self = shift;	
     my $cache = $self->session->cache;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = $cache->get("view_".$self->getId);
+		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');
@@ -143,7 +143,7 @@ sub view {
 
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
 	}
        	return $out;
 }

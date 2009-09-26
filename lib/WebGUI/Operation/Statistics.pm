@@ -180,9 +180,9 @@ sub www_viewStatistics {
 	my $i18n = WebGUI::International->new($session);
 	my $url = "http://update.webgui.org/latest-version.txt";
 	my $cache = $session->cache;
-	my $version = $cache->get($url);
+	my $version = eval{$cache->get($url)};
 	if (not defined $version) {
-		$version = $cache->setByHttp($url, $url, 43200);
+		$version = eval{$cache->setByHttp($url, $url, 43200)};
 	}
 	chomp $version;
 	$output .= '<table>';

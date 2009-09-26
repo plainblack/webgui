@@ -413,12 +413,12 @@ sub www_view {
             $cacheKey .= '_ssl';
         }
         my $cache = $session->cache;
-        my $out = $cache->get($cacheKey);
+        my $out = eval{$cache->get($cacheKey)};
         unless ($out) {
             $self->prepareView;
             $session->stow->set("cacheFixOverride", 1);
             $out = $self->processStyle($self->view, { noHeadTags => 1 });
-            $cache->set($cacheKey, $out, 60);
+            eval{$cache->set($cacheKey, $out, 60)};
             $session->stow->delete("cacheFixOverride");
         }
         # keep those ads rotating even though the output is cached
