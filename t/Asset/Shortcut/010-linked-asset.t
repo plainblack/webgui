@@ -50,7 +50,7 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 9;
+plan tests => 10;
 
 #----------------------------------------------------------------------------
 # Test shortcut's link to original asset
@@ -107,6 +107,42 @@ ok(
 );
 
 #----------------------------------------------------------------------------
+# Test purging snippet but keeping shortcut doesn't cause
+# getContentLastModified to generate an error; makes sure that
+# http://www.webgui.org/use/bugs/tracker/11052 stays fixed.
+$session->db->beginTransaction();
+$session->db->write("delete from assetData where assetId = ?",
+                    [$snippet->getId]);
+$session->db->write("delete from asset where assetId = ?",
+                    [$snippet->getId]);
+$session->db->write("delete from snippet where assetId = ?",
+                    [$snippet->getId]);
+$session->db->commit();
+
+my $contentLastModified;
+eval {
+    $contentLastModified = $shortcut->getContentLastModified();
+};
+
+is(
+    $contentLastModified, 0,
+    "Purged Linked Asset: getContentLastModified returns 0",
+);
+
+# re-init so further tests will work
+$snippet 
+    = $node->addChild({
+        className       => "WebGUI::Asset::Snippet",
+    });
+
+$shortcut
+    = $node->addChild({
+        className           => "WebGUI::Asset::Shortcut",
+        shortcutToAssetId   => $snippet->getId,
+    });
+
+
+#----------------------------------------------------------------------------
 # Test purging snippet purges shortcut also
 $snippet->purge;
 $shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
@@ -115,4 +151,3 @@ ok(
     !defined $shortcut,
     "Purge Linked Asset: Shortcut is not defined",
 );
-
