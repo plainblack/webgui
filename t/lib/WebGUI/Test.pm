@@ -110,6 +110,7 @@ sub import {
             Tags      => assetVersionTag       => 0,
             Assets    => assetData             => 0,
             Workflows => Workflow              => 0,
+            Carts     => cart                  => 0,
         );
         for ( my $i = 0; $i < @checkCount; $i += 3) {
             my ($label, $table) = @checkCount[$i, $i+1];
@@ -833,13 +834,14 @@ Example call:
     );
 
     my %cleanup = (
-        'WebGUI::User' => 'delete',
-        'WebGUI::Group' => 'delete',
-        'WebGUI::Storage' => 'delete',
-        'WebGUI::Asset' => 'purge',
+        'WebGUI::User'       => 'delete',
+        'WebGUI::Group'      => 'delete',
+        'WebGUI::Storage'    => 'delete',
+        'WebGUI::Shop::Cart' => 'delete',
+        'WebGUI::Asset'      => 'purge',
         'WebGUI::VersionTag' => 'rollback',
-        'WebGUI::Workflow' => 'delete',
-        'WebGUI::Session' => sub {
+        'WebGUI::Workflow'   => 'delete',
+        'WebGUI::Session'    => sub {
             my $session = shift;
             $session->var->end;
             $session->close;
