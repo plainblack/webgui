@@ -26,19 +26,10 @@ use WebGUI::Asset::Snippet;
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Shortcut Test"});
 
 my $snippet;
 my $shortcut;
 init();
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-	$versionTag->rollback();
-}
-
 
 #----------------------------------------------------------------------------
 # Tests
@@ -66,7 +57,7 @@ is(
 #----------------------------------------------------------------------------
 # Test trashing snippet trashes shortcut also
 $snippet->trash;
-$shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
+$shortcut   = $shortcut->cloneFromDb();
 
 ok(
     defined $shortcut,
@@ -86,7 +77,7 @@ ok(
 #----------------------------------------------------------------------------
 # Test restoring snippet restores shortcut also
 $snippet->publish;
-$shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
+$shortcut   = $shortcut->cloneFromDb();
 
 ok( 
     defined $shortcut,
@@ -131,7 +122,7 @@ init();
 $snippet->trash();
 
 $snippet->purge();
-$shortcut = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
+$shortcut   = $shortcut->cloneFromDb();
 
 ok(
     !defined $shortcut,
@@ -144,7 +135,7 @@ init();
 #----------------------------------------------------------------------------
 # Test purging snippet purges shortcut also
 $snippet->purge;
-$shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
+$shortcut   = $shortcut->cloneFromDb();
 
 ok( 
     !defined $shortcut,
@@ -155,6 +146,9 @@ ok(
 # init a new snippet and shortcut; handy to have in a sub because we destroy
 # them in some tests and need to reset them for the next round
 sub init {
+    my $versionTag      = WebGUI::VersionTag->getWorking($session);
+    $versionTag->set({name=>"Shortcut Test"});
+    WebGUI::Test->tagsToRollback($versionTag);
     # Make a snippet to shortcut
     $snippet 
         = $node->addChild({
