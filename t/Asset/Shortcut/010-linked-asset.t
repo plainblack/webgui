@@ -29,17 +29,9 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Shortcut Test"});
 
-# Make a snippet to shortcut
-my $snippet 
-    = $node->addChild({
-        className       => "WebGUI::Asset::Snippet",
-    });
-
-my $shortcut
-    = $node->addChild({
-        className           => "WebGUI::Asset::Shortcut",
-        shortcutToAssetId   => $snippet->getId,
-    });
+my $snippet;
+my $shortcut;
+init();
 
 #----------------------------------------------------------------------------
 # Cleanup
@@ -50,7 +42,7 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 10;
+plan tests => 11;
 
 #----------------------------------------------------------------------------
 # Test shortcut's link to original asset
@@ -126,21 +118,28 @@ eval {
 
 is(
     $contentLastModified, 0,
-    "Purged Linked Asset: getContentLastModified returns 0",
+    "Purged Linked Asset: getContentLastModified returns 0 when linked asset missing",
 );
 
 # re-init so further tests will work
-$snippet 
-    = $node->addChild({
-        className       => "WebGUI::Asset::Snippet",
-    });
+init();
 
-$shortcut
-    = $node->addChild({
-        className           => "WebGUI::Asset::Shortcut",
-        shortcutToAssetId   => $snippet->getId,
-    });
+#----------------------------------------------------------------------------
+# Test purging snippet purges shortcut also, even when they're both in the trash
 
+# This will trash both the snippet and the shortcut (or else an earlier test failed)
+$snippet->trash();
+
+$snippet->purge();
+$shortcut = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
+
+ok(
+    !defined $shortcut,
+    "Purge Linked Asset: Shortcut is purged even though it's in the trash"
+);
+
+# re-init so further tests will work
+init();
 
 #----------------------------------------------------------------------------
 # Test purging snippet purges shortcut also
@@ -151,3 +150,20 @@ ok(
     !defined $shortcut,
     "Purge Linked Asset: Shortcut is not defined",
 );
+
+#----------------------------------------------------------------------------
+# init a new snippet and shortcut; handy to have in a sub because we destroy
+# them in some tests and need to reset them for the next round
+sub init {
+    # Make a snippet to shortcut
+    $snippet 
+        = $node->addChild({
+            className       => "WebGUI::Asset::Snippet",
+        });
+
+    $shortcut
+        = $node->addChild({
+            className           => "WebGUI::Asset::Shortcut",
+            shortcutToAssetId   => $snippet->getId,
+        });
+}

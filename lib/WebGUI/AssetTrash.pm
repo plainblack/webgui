@@ -161,7 +161,7 @@ sub purge {
 	}
 
     # Delete shortcuts to this asset
-    # Also publish any shortcuts to this asset that are in the trash
+    # Also purge any shortcuts to this asset that are in the trash
     $outputSub->($i18n->get('Purging shortcuts'));
     my $shortcuts 
         = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { 
