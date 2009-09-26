@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 22; # increment this value for each test you create
+use Test::More tests => 26; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
@@ -300,11 +300,19 @@ cmp_deeply(
 
 ($newThingDataId,$errors) = $thingy->editThingDataSave($thingId,'new',{"field_".$fieldId => 'second test value'});
 
+#################################################################
+#
+# maxEntriesPerUser
+#
+#################################################################
+
 my %otherThingProperties = %thingProperties;
 $otherThingProperties{maxEntriesPerUser} = 1;
 $otherThingProperties{editTemplateId   } = $templateId;
 my $otherThingId = $thingy->addThing(\%otherThingProperties, 0); 
-my $otherFieldId = $thingy->addField(\%fieldProperties, 0);
+my %otherFieldProperties = %fieldProperties;
+$otherFieldProperties{thingId} = $otherThingId;
+my $otherFieldId = $thingy->addField(\%otherFieldProperties, 0);
 ok( ! $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser: returns false with no data entered');
 
 my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
@@ -327,7 +335,7 @@ my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
 }
 
 $thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'other test value'} );
-ok( $thingy->hasEnteredMaxPerUser($otherThingId), '... returns true with one row entered, and maxEntriesPerUser=1');
+ok( $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser returns true with one row entered, and maxEntriesPerUser=1');
 
 {
     WebGUI::Test->mockAssetId($templateId, $templateMock);
@@ -343,3 +351,50 @@ ok( $thingy->hasEnteredMaxPerUser($otherThingId), '... returns true with one row
         'thing edit form variables do not exist, because max entries was reached'
     );
 }
+
+#################################################################
+#
+# deleteThing
+#
+#################################################################
+
+$thingy->deleteThing($otherThingId);
+my $count;
+$count = $session->db->quickScalar('select count(*) from Thingy_things where thingId=?',[$otherThingId]);
+is($count, 0, 'deleteThing: clears thing from Thingy_things');
+$count = $session->db->quickScalar('select count(*) from Thingy_fields where thingId=?',[$otherThingId]);
+is($count, 0, '... clears thing from Thingy_fields');
+my $table = $session->db->dbh->table_info(undef, undef, 'Thingy_'.$otherThingId)->fetchrow_hashref();
+is($table, undef, '... drops thing specific table');
+
+#################################################################
+#
+# thing data permissions, getFormPlugin
+#
+#################################################################
+
+%otherThingProperties                = %thingProperties;
+$otherThingProperties{'groupIdView'} = 3;
+$otherThingId                        = $thingy->addThing(\%otherThingProperties, 0); 
+%otherFieldProperties                = %fieldProperties;
+$otherFieldProperties{thingId}       = $otherThingId;
+$otherFieldId                        = $thingy->addField(\%otherFieldProperties, 0);
+$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 1'} );
+$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 2'} );
+$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 3'} );
+
+my $andy = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($andy);
+$session->user({userId => $andy->userId});
+
+my $form = $thingy->getFormPlugin({
+    name                => 'fakeFormForTesting',
+    fieldType           => 'otherThing_'.$otherThingId,
+    fieldInOtherThingId => $otherFieldId,
+});
+
+cmp_deeply(
+    $form->get('options'),
+    {},
+    'getFormPlugin: form has no data since the user does not have viewing privileges'
+);

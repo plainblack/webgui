@@ -137,7 +137,7 @@ my $inside = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $inside2 = $windowCal->addChild({
+my $insidewt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Inside window, with times',
     startDate   => $bday->toDatabaseDate,
@@ -171,7 +171,17 @@ my $straddle = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $straddleLow = $windowCal->addChild({
+my $straddlewt = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Straddles the window with times, inclusive',
+    startDate   => $startDt->clone->subtract(hours => 12)->toDatabaseDate,
+    endDate     => $endDt->clone->add(hours => 12)->toDatabaseDate,
+    startTime   => $startDt->clone->subtract(hours => 12)->toDatabaseTime,
+    endTime     => $endDt->clone->add(hours => 12)->toDatabaseTime,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $straddleLowwt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Straddles the window, lower side',
     startDate   => $startDt->clone->subtract(hours => 12)->toDatabaseDate,
@@ -181,7 +191,7 @@ my $straddleLow = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $straddleHigh = $windowCal->addChild({
+my $straddleHighwt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Straddles the window, higher side',
     startDate   => $endDt->clone->subtract(hours => 12)->toDatabaseDate,
@@ -191,7 +201,7 @@ my $straddleHigh = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $justBefore = $windowCal->addChild({
+my $justBeforewt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Just before the window.  Ending time coincident with window start',
     startDate   => $startDt->clone->subtract(hours => 1)->toDatabaseDate,
@@ -201,7 +211,7 @@ my $justBefore = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $justAfter = $windowCal->addChild({
+my $justAfterwt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Just after the window.  Start time coincident with window end',
     startDate   => $endDt->toDatabaseDate,
@@ -211,11 +221,25 @@ my $justAfter = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
+#    wt suffix = with times
+#                      inside
+#                      insidewt
+#          |-------------straddle-----------------|
+#          |-------------straddlewt---------------|
+#      straddleLowwt
+#                                           straddleHighwt
+# window:      |-------------------------------|
+#   justBeforewt                               justAfterwt
+#                                                 outside high
+# outside low
+#
+# Everything above the window should be included in the set of events returned.
+
 my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
 WebGUI::Test->tagsToRollback($tag2);
 
-is(scalar @{ $windowCal->getLineage(['children'])}, 9, 'added events to the window calendar');
+is(scalar @{ $windowCal->getLineage(['children'])}, 10, 'added events to the window calendar');
 
 my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
 
@@ -223,11 +247,11 @@ my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
 #note join "\n", map { join ' ', $_->get('title'), $_->get('startDate'), $_->get('startTime')} @window;
 #note $endDt->toDatabase;
 
-is(scalar @window, 4, 'getEventsIn returned 4 events');
+is(scalar @window, 6, 'getEventsIn returned 6 events');
 cmp_bag(
     [ map { $_->get('title') } @window ],
-    [ map { $_->get('title') } ($inside, $inside2, $straddle, $straddleHigh)],
-    '..returns correct 4 events'
+    [ map { $_->get('title') } ($inside, $insidewt, $straddle, $straddleHighwt, $straddleLowwt, $straddlewt)],
+    '..returns correct 6 events'
 );
 
 ######################################################################

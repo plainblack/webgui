@@ -787,17 +787,17 @@ sub getEventsIn {
                     && 
                         !(
                             Event.startDate >= '$endDate' 
-                         || Event.endDate   <  '$startDate'
+                         || Event.endDate   <= '$startDate'
                         )
                 ) 
-                || ( 
-                       CONCAT(Event.startDate,' ',Event.startTime) >= '$start' 
-                    && CONCAT(Event.startDate,' ',Event.startTime) <  '$end'
+                || !( 
+                       CONCAT(Event.startDate,' ',Event.startTime) >= '$end' 
+                    || CONCAT(Event.endDate,  ' ',Event.endTime  ) <= '$start'
                 )
         };
 
     my @order_priority 
-       = ( 'Event.startDate', 
+       = (  'Event.startDate', 
             'Event.startTime', 
             'Event.endDate', 
             'Event.endTime', 
