@@ -1288,6 +1288,8 @@ sub getShortcutsForAssetId {
 
     $properties->{ joinClass            } = 'WebGUI::Asset::Shortcut';
     $properties->{ whereClause          } = 'Shortcut.shortcutToAssetId = ' . $db->quote($assetId);
+    $properties->{ statesToInclude      } = ['published', 'trash', 'clipboard', 'clipboard-limbo', 'trash-limbo'];
+    $properties->{ statusToInclude      } = ['approved', 'pending', 'archived'];
 
     return WebGUI::Asset->getRoot($session)->getLineage(['descendants'], $properties); 
 }
