@@ -61,15 +61,19 @@ sub buildXML {
         next PACKAGE unless scalar @{ $package };
         tie my %packageData, 'Tie::IxHash';
         my $weight = 0;
+        my $cost   = 0;
         foreach my $item (@{ $package }) {
             my $sku = $item->getSku;
             my $itemWeight = $sku->getWeight();
+            my $itemCost   = $sku->getPrice();
             ##Items that ship separately with a quantity > 1 are rate estimated as 1 item and then the
             ##shipping cost is multiplied by the quantity.
             if (! $sku->shipsSeparately ) {
                 $itemWeight *= $item->get('quantity');
+                $itemCost   *= $item->get('quantity');
             }
             $weight += $itemWeight;
+            $cost   += $itemCost;
         }
         my $pounds = int($weight);
         my $ounces = int(16 * ($weight - $pounds));
@@ -89,6 +93,9 @@ sub buildXML {
         }
         $packageData{Size}            = [ 'REGULAR'               ];
         $packageData{Machinable}      = [ 'true'                  ];
+        if ($self->get('addInsurance')) {
+            $packageData{ValueOfContents} = $cost;
+        }
         push @{ $xmlTop->{Package} }, \%packageData;
     }
     my $xml = XMLout(\%xmlHash,
