@@ -46,6 +46,7 @@ An API that allows you to cache items to a memcached server.
  $cache->setByHttp($name, "http://www.google.com/");
 
  my $value = $cache->get($name);
+ my ($val1, $val2) = @{$cache->mget([$name1, $name2])};
 
  $cache->delete($name);
 
@@ -64,6 +65,8 @@ These methods are available from this class:
 
 Delete a key from the cache.
 
+Throws WebGUI::Error::InvalidParam, WebGUI::Error::Connection and WebGUI::Error.
+
 =head3 name
 
 The key to delete.
@@ -75,14 +78,19 @@ sub delete {
         1,
         { type => SCALAR | ARRAYREF },
         );
+    my $log = $self->session->log;
+    my $key = $self->parseKey($name);
+    $log->debug("Called delete() on cache key $key.");
     my $memcached = $self->getMemcached;
-    Memcached::libmemcached::memcached_delete($memcached, $self->parseKey($name));
+    Memcached::libmemcached::memcached_delete($memcached, $key);
     if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        $log->debug("Cannot connect to memcached server.");
         WebGUI::Error::Connection->throw(
             error   => "Cannot connect to memcached server."
             );
     }
     elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        $log->warn("No memcached servers specified in config file.");
         WebGUI::Error->throw(
             error   => "No memcached servers specified in config file."
             );
@@ -90,8 +98,9 @@ sub delete {
     elsif ($memcached->errstr ne 'SUCCESS' # deleted
         && $memcached->errstr ne 'PROTOCOL ERROR' # doesn't exist to delete
         ) {
+        $log->debug("Couldn't delete $key from cache because ".$memcached->errstr);
         WebGUI::Error->throw(
-            error   => "Couldn't delete $name from cache because ".$memcached->errstr
+            error   => "Couldn't delete $key from cache because ".$memcached->errstr
             );
     }
 }
@@ -101,6 +110,8 @@ sub delete {
 =head2 flush ( )
 
 Empties the caching system.
+
+Throws WebGUI::Error::Connection and WebGUI::Error.
 
 =cut
 
@@ -130,6 +141,8 @@ sub flush {
 =head2 get ( name )
 
 Retrieves a key value from the cache.
+
+Throws WebGUI::Error::InvalidParam, WebGUI::Error::ObjectNotFound, WebGUI::Error::Connection and WebGUI::Error.
 
 =head3 name
 
@@ -190,6 +203,8 @@ sub getMemcached {
 
 Retrieves multiple values from cache at once, which is much faster than retrieving one at a time. Returns an array reference containing the values in the order they were requested.
 
+Throws WebGUI::Error::InvalidParam, WebGUI::Error::Connection and WebGUI::Error.
+
 =head3 names
 
 An array reference of keys to retrieve.
@@ -231,6 +246,8 @@ sub mget {
 
 The new method will return a handler for the configured caching mechanism.  Defaults to WebGUI::Cache::FileCache. You must override this method when building your own cache plug-in.
 
+Throws WebGUI::Error::InvalidParam.
+
 =head3 session
 
 A reference to the current session.
@@ -262,6 +279,8 @@ sub new {
 =head2 parseKey ( name ) 
 
 Returns a formatted string version of the key.
+
+Throws WebGUI::Error::InvalidParam.
 
 =head3 name
 
@@ -308,6 +327,8 @@ sub session {
 =head2 set ( name, value [, ttl] )
 
 Sets a key value to the cache.
+
+Throws WebGUI::Error::InvalidParam, WebGUI::Error::Connection, and WebGUI::Error.
 
 =head3 name
 
@@ -358,6 +379,8 @@ sub set {
 
 Retrieves a document via HTTP and stores it in the cache and returns the content as a string. No need to override.
 
+Throws WebGUI::Error::InvalidParam, WebGUI::Error::Connection, and WebGUI::Error.
+
 =head3 name
 
 The name of the key to store the request under.
@@ -400,12 +423,32 @@ sub setByHttp {
 
 =head1 EXCEPTIONS
 
-This class throws a huge number of exceptions about everything you can imagine, and many things you can't. However, because cache should be treated as optional, none of them matter except for testing, debugging, or in very specific use cases. Therefore the best practice is to simply call each method with an eval wrapper, and then not even bother testing for specific exceptions like this:
+This class throws a lot of inconvenient exceptions. However, because cache should be treated as optional, none of them matter except for testing, debugging, or in very specific use cases. Therefore the best practice is to simply call each method with an eval wrapper, and then not even bother testing for specific exceptions like this:
 
  my $value = eval { $session->cache->get($key) };
  unless (defined $value) {
     $value = $db->fetchValueFromTheDatabase;
  }
+
+If you want to see what exceptions are being thrown, or anything else about the internal operations of the cache system, simply turn on DEBUG mode in your log. Everything you want will be there.
+
+The exceptions that can be thrown are:
+
+=head2 WebGUI::Error
+
+When an uknown exception happens, or there are no configured memcahed servers in the cacheServers directive in your config file.
+
+=head2 WebGUI::Error::Connection
+
+When it can't connect to the memcached servers that are configured, or to the http server in the case of the setByHttp method.
+
+=head2 WebGUI::Error::InvalidParam
+
+When you pass in the wrong arguments.
+
+=head2 WebGUI::Error::ObjectNotFound
+
+When you request a cache key that doesn't exist on any configured memcached server.
 
 =cut
 

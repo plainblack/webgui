@@ -281,7 +281,7 @@ sub view {
         || $self->get("cacheTimeout") <= 10
         || ($versionTag && $versionTag->getId eq $self->get("tagId"));
     unless ($noCache) {
-		my $out = $session->cache("view_".$calledAsWebMethod."_".$self->getId);
+		my $out = eval{$session->cache->get("view_".$calledAsWebMethod."_".$self->getId)};
 		return $out if $out;
 	}
 	my $output = $self->get('usePacked')
