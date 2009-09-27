@@ -48,8 +48,8 @@ $cache->delete("Shawshank");
 is(eval{$cache->get("Shawshank")}, undef, 'delete');
 $cache->flush;
 is(eval{$cache->get(["andy", "dufresne"])}, undef, 'flush');
-$cache->setByHttp("google", "http://www.google.com/");
-cmp_ok($cache->get("google"), 'ne', '', 'setByHttp');
+$cache->setByHttp("http://www.google.com/");
+cmp_ok($cache->get("http://www.google.com/"), 'ne', '', 'setByHttp');
 
 
 #----------------------------------------------------------------------------

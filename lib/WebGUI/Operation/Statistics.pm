@@ -182,7 +182,7 @@ sub www_viewStatistics {
 	my $cache = $session->cache;
 	my $version = eval{$cache->get($url)};
 	if (not defined $version) {
-		$version = eval{$cache->setByHttp($url, $url, 43200)};
+		$version = eval{$cache->setByHttp($url, 43200)};
 	}
 	chomp $version;
 	$output .= '<table>';

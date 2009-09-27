@@ -117,19 +117,24 @@ Throws WebGUI::Error::Connection and WebGUI::Error.
 
 sub flush {
     my ($self) = @_;
+    my $log = $self->session->log;
+    $log->debug("Called flush() on cache.");
     my $memcached = $self->getMemcached;
     Memcached::libmemcached::memcached_flush($memcached);
     if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        $log->debug("Cannot connect to memcached server.");
         WebGUI::Error::Connection->throw(
             error   => "Cannot connect to memcached server."
             );
     }
     elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        $log->warn("No memcached servers specified in config file.");
         WebGUI::Error->throw(
             error   => "No memcached servers specified in config file."
             );
     }
     elsif ($memcached->errstr ne 'SUCCESS') {
+        $log->debug("Couldn't flush cache because ".$memcached->errstr);
         WebGUI::Error->throw(
             error   => "Couldn't flush cache because ".$memcached->errstr
             );
@@ -142,7 +147,7 @@ sub flush {
 
 Retrieves a key value from the cache.
 
-Throws WebGUI::Error::InvalidParam, WebGUI::Error::ObjectNotFound, WebGUI::Error::Connection and WebGUI::Error.
+Throws WebGUI::Error::InvalidObject, WebGUI::Error::InvalidParam, WebGUI::Error::ObjectNotFound, WebGUI::Error::Connection and WebGUI::Error.
 
 =head3 name
 
@@ -155,31 +160,43 @@ sub get {
         1,
         { type => SCALAR | ARRAYREF },
         );
+    my $log = $self->session->log;
+    my $key = $self->parseKey($name);
+    $log->debug("Called get() on cache key $key.");
     my $memcached = $self->getMemcached;
-    my $content = Memcached::libmemcached::memcached_get($memcached, $self->parseKey($name));
+    my $content = Memcached::libmemcached::memcached_get($memcached, $key);
     if ($memcached->errstr eq 'NOT FOUND' ) {
+        $log->debug("The cache key $key has no value.");
         WebGUI::Error::ObjectNotFound->throw(
-            error   => "The cache key $name has no value.",
-            id      => $name,
+            error   => "The cache key $key has no value.",
+            id      => $key,
             );
     }
     elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        $log->warn("No memcached servers specified in config file.");
         WebGUI::Error->throw(
             error   => "No memcached servers specified in config file."
             );
     }
     elsif ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        $log->debug("Cannot connect to memcached server.");
         WebGUI::Error::Connection->throw(
             error   => "Cannot connect to memcached server."
             );
     }
     elsif ($memcached->errstr ne 'SUCCESS') {
+        $log->debug("Couldn't get $key from cache because ".$memcached->errstr);
         WebGUI::Error->throw(
-            error   => "Couldn't get $name from cache because ".$memcached->errstr
+            error   => "Couldn't get $key from cache because ".$memcached->errstr
             );
     }
     $content = Storable::thaw($content);
-    return undef unless ref $content;
+    unless (ref $content) {
+        $log->debug("Couldn't thaw value for $key.");
+        WebGUI::Error::InvalidObject->throw(
+            error   => "Couldn't thaw value for $key."
+            );
+    }
     return ${$content};
 }
 
@@ -216,25 +233,32 @@ sub mget {
         1,
         { type => ARRAYREF },
         );
-    my @parsedNames = map { $self->parseKey($_) } @{ $names };
+    my $log = $self->session->log;
+    my @keys = map { $self->parseKey($_) } @{ $names };
+    $log->debug("Called mget() for keys (".join(", ",@keys).") on cache.");
     my %result;
     my $memcached = $self->getMemcached;
-    $memcached->mget_into_hashref(\@parsedNames, \%result);
+    $memcached->mget_into_hashref(\@keys, \%result);
     if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        $log->debug("Cannot connect to memcached server.");
         WebGUI::Error::Connection->throw(
             error   => "Cannot connect to memcached server."
             );
     }
     elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        $log->warn("No memcached servers specified in config file.");
         WebGUI::Error->throw(
             error   => "No memcached servers specified in config file."
             );
     }
     # no other useful status messages are returned
     my @values;
-    foreach my $name (@parsedNames) {
-        my $content = Storable::thaw($result{$name});
-        next unless ref $content;
+    foreach my $key (@keys) {
+        my $content = Storable::thaw($result{$key});
+        unless (ref $content) {
+            $log->debug("Cannot thaw key $key.");
+            next;
+        }
         push @values, ${$content};
     }
     return \@values;
@@ -259,7 +283,7 @@ sub new {
         1,
         { isa => 'WebGUI::Session' },
         );
-    my ($class, $session) = @_;
+    $session->log->debug("Instanciated cache object.");
     my $config = $session->config;
     my $namespace = $config->getFilename;
     my $memcached = Memcached::libmemcached::memcached_create(); # no exception because always returns success
@@ -351,22 +375,28 @@ sub set {
         { type => SCALAR },
         { type => SCALAR | UNDEF, optional => 1, default=> 60 },
         );
+    my $log = $self->session->log;
+    my $key = $self->parseKey($name);
+    $log->debug("Called set() on cache key $key with $value as the value.");
     my $frozenValue = Storable::nfreeze(\(scalar $value)); # Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
     my $memcached = $self->getMemcached;
-    Memcached::libmemcached::memcached_set($memcached, $self->parseKey($name), $frozenValue, $ttl);
+    Memcached::libmemcached::memcached_set($memcached, $key, $frozenValue, $ttl);
     if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+        $log->debug("Cannot connect to memcached server.");
         WebGUI::Error::Connection->throw(
             error   => "Cannot connect to memcached server."
             );
     }
     elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+        $log->warn("No memcached servers specified in config file.");
         WebGUI::Error->throw(
             error   => "No memcached servers specified in config file."
             );
     }
     elsif ($memcached->errstr ne 'SUCCESS') {
+        $log->debug("Couldn't set $key to cache because ".$memcached->errstr);
         WebGUI::Error->throw(
-            error   => "Couldn't set $name to cache because ".$memcached->errstr
+            error   => "Couldn't set $key to cache because ".$memcached->errstr
             );
     }
     return $value;
@@ -381,13 +411,9 @@ Retrieves a document via HTTP and stores it in the cache and returns the content
 
 Throws WebGUI::Error::InvalidParam, WebGUI::Error::Connection, and WebGUI::Error.
 
-=head3 name
-
-The name of the key to store the request under.
-
 =head3 url
 
-The URL of the document to retrieve. It must begin with the standard "http://".
+The URL of the document to retrieve. It must begin with the standard "http://". This will be used as the key for this cache entry.
 
 =head3 ttl
 
@@ -396,12 +422,13 @@ The time to live for this content. This is the amount of time (in seconds) that 
 =cut
 
 sub setByHttp {
-    my ($self, $name, $url, $ttl) = validate_pos(@_, 
+    my ($self, $url, $ttl) = validate_pos(@_, 
         1,
-        { type => SCALAR | ARRAYREF },
         { type => SCALAR },
         { type => SCALAR, optional => 1 },
         );
+    my $log = $self->session->log;
+    $log->debug("Called setByHttp() with URL $url.");
     my $userAgent = new LWP::UserAgent;
 	$userAgent->env_proxy;
     $userAgent->agent("WebGUI/".$WebGUI::VERSION);
@@ -411,13 +438,13 @@ sub setByHttp {
 
     my $response = $userAgent->request($request);
     if ($response->is_error) {
-        $self->session->log->error($url." could not be retrieved.");
+        $log->error("$url could not be retrieved.");
         WebGUI::Error::Connection->throw(
             error       => "Couldn't fetch $url because ".$response->message,
             resource    => $url,
             );
     }
-    return $self->set($name, $response->decoded_content, $ttl);
+    return $self->set($url, $response->decoded_content, $ttl);
 }
 
 

@@ -144,7 +144,7 @@ sub generateFeed {
 		}
 		my $value = eval{$cache->get($url)};
 		unless ($value) {
-            $value = eval{$cache->setByHttp($url, $url, $self->get("cacheTimeout"))};
+            $value = eval{$cache->setByHttp($url, $self->get("cacheTimeout"))};
             $newlyCached = 1;
         }
         # if the content can be downgraded, it is either valid latin1 or didn't have
