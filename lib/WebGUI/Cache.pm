@@ -295,7 +295,7 @@ sub new {
             Memcached::libmemcached::memcached_server_add($memcached, $server->{host}, $server->{port}); # no exception because always returns success
         }
     }
-    bless {_memcached => $memcached, _namespace => $namespace, _sesssion => $session}, $class;
+    bless {_memcached => $memcached, _namespace => $namespace, _session => $session}, $class;
 }
 
 #-------------------------------------------------------------------
