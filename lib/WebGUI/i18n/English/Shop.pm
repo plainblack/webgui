@@ -1659,6 +1659,18 @@ our $I18N = {
         context => q|Error message in the manage ship driver screen.|,
     },
 
+    'Choose a shipping method' => {
+        message => q|Choose a shipping method|,
+        lastUpdated => 0,
+        context => q|Label to make the user choose a shipping method|,
+    },
+
+    'Choose a shipping method and update the cart to checkout' => {
+        message => q|Choose a shipping method and update the cart to checkout|,
+        lastUpdated => 0,
+        context => q|Label to make the user choose a shipping method|,
+    },
+
 };
 
 1;
