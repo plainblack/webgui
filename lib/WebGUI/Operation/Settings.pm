@@ -726,8 +726,7 @@ sub www_saveSettings {
         $session->db->write( 
             "UPDATE userProfileData SET showMessageOnLoginSeen=0"
         );
-        # Delete the user cache
-        WebGUI::Cache->new( $session, [ "user" ] )->deleteChunk( [ "user" ] );
+        eval{$session->cache->flush};
     }
 
     return www_editSettings($session, { errors => \@errors, message => $i18n->get("editSettings done") });

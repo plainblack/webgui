@@ -16,7 +16,6 @@ package WebGUI::Asset::Wobject::Folder;
 
 use strict;
 use WebGUI::Asset::Wobject;
-use WebGUI::Cache;
 use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
@@ -208,7 +207,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	eval{$self->session->cache->delete("view_".$self->getId)};
 	$self->SUPER::purgeCache;
 }
 
@@ -225,8 +224,9 @@ sub view {
 	my $self    = shift;
 	
     # Use cached version for visitors
+    my $cache = $self->session->cache;
 	if ($self->session->user->isVisitor) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
 
@@ -291,8 +291,7 @@ sub view {
 
     # Update the cache
 	if ($self->session->user->isVisitor) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)
-            ->set($out,$self->get("visitorCacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->get("visitorCacheTimeout"))};
 	}
 
     return $out;

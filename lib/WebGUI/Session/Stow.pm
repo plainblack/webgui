@@ -118,7 +118,6 @@ sub get {
 	my $self    = shift;
 	my $var     = shift;
     my $opt     = shift || {};
-	return undef if $self->session->config->get("disableCache");
     my $value   = $self->{_data}{$var};
     return undef unless defined $value;
     my $ref     = ref $value;
@@ -190,8 +189,6 @@ The value of the stow variable.  Any scalar or reference.
 
 sub set {
 	my $self = shift;
-	$self->session->errorHandler->debug('Stow->set() is being called but cache has been disabled')
-		if $self->session->config->get("disableCache");
 	my $name = shift;
 	my $value = shift;
 	return undef unless ($name);

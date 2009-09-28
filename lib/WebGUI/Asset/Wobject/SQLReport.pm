@@ -18,7 +18,6 @@ use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
-use WebGUI::Cache;
 use WebGUI::Text qw(:csv);
 
 our @ISA = qw(WebGUI::Asset::Wobject);
@@ -518,7 +517,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	eval{$self->session->cache->delete("view_".$self->getId)};
 	$self->SUPER::purgeCache;
 }
 
@@ -533,8 +532,9 @@ if the user is not in Admin Mode.
 
 sub view {
 	my $self = shift;
+    my $cache = $self->session->cache;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
         # Initiate an empty debug loop
@@ -560,7 +560,7 @@ sub view {
 	
        	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
 	}
        	return $out;
 }

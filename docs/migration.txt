@@ -4,3 +4,12 @@ WebGUI 8 Migration Guide
 The information contained herein documents the API changes that have occurred in the WebGUI 8 development effort and how to migrate your code to accomodate the new APIs.
 
 
+WebGUI::Cache
+=============
+WebGUI::Cache has been completely rewritten. If you were using the cache API in the past, you'll need to update your code to reflect the changes. NOTE: you can get a cached reference to the cache object from WebGUI::Session, which will be substantially faster than instantiating the object yourself.
+
+my $cache = $session->cache;
+
+
+
+

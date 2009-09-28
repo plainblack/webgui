@@ -147,14 +147,16 @@ sub cascadeLineage {
         "UPDATE asset SET lineage=CONCAT(?,SUBSTRING(lineage,?)) WHERE lineage LIKE ?",
         [$newLineage, length($oldLineage) + 1, $oldLineage . '%']
     );
-    my $cache = WebGUI::Cache->new($self->session);
     if ($records > 20) {
-        $cache->flush;
+        eval{$self->session->cache->flush};
     }
     else {
         my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage . '%']);
         while (my ($assetId, $lineage) = $descendants->array) {
-            $cache->deleteChunk(["asset",$assetId]);
+            my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+            if (defined $asset) {
+                $asset->purgeCache;
+            }
         }
         $descendants->finish;
     }
@@ -265,10 +267,8 @@ sub getFirstChild {
 		my $lineage = $assetLineage->{firstChild}{$self->getId};
 		unless ($lineage) {
 			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=? and asset.assetId=assetData.assetId and asset.state='published'",[$self->getId]);
-			unless ($self->session->config->get("disableCache")) {
-				$assetLineage->{firstChild}{$self->getId} = $lineage;
-				$self->session->stow->set("assetLineage", $assetLineage);
-			}
+			$assetLineage->{firstChild}{$self->getId} = $lineage;
+			$self->session->stow->set("assetLineage", $assetLineage);
 		}
 		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
 		$self->cacheChild(first => $child);

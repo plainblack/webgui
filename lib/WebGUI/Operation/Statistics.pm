@@ -12,7 +12,6 @@ package WebGUI::Operation::Statistics;
 
 use strict;
 use WebGUI::AdminConsole;
-use WebGUI::Cache;
 use WebGUI::International;
 use WebGUI::Workflow::Cron;
 use WebGUI::DateTime;
@@ -180,10 +179,10 @@ sub www_viewStatistics {
     my ($output, $data);
 	my $i18n = WebGUI::International->new($session);
 	my $url = "http://update.webgui.org/latest-version.txt";
-	my $cache = WebGUI::Cache->new($session,$url,"URL");
-	my $version = $cache->get;
+	my $cache = $session->cache;
+	my $version = eval{$cache->get($url)};
 	if (not defined $version) {
-		$version = $cache->setByHTTP($url,43200);
+		$version = eval{$cache->setByHttp($url, 43200)};
 	}
 	chomp $version;
 	$output .= '<table>';

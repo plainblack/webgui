@@ -18,7 +18,6 @@ use strict;
 use WebGUI::AdSpace;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
-use WebGUI::Cache;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -413,13 +412,13 @@ sub www_view {
         if ($session->env->sslRequest) {
             $cacheKey .= '_ssl';
         }
-        my $cache = WebGUI::Cache->new($session, $cacheKey);
-        my $out = $cache->get if defined $cache;
+        my $cache = $session->cache;
+        my $out = eval{$cache->get($cacheKey)};
         unless ($out) {
             $self->prepareView;
             $session->stow->set("cacheFixOverride", 1);
             $out = $self->processStyle($self->view, { noHeadTags => 1 });
-            $cache->set($out, 60);
+            eval{$cache->set($cacheKey, $out, 60)};
             $session->stow->delete("cacheFixOverride");
         }
         # keep those ads rotating even though the output is cached

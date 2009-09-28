@@ -56,7 +56,6 @@ Deconstructor.
 
 sub DESTROY {
         my $self = shift;
-        undef $self;
 }
 
 
@@ -69,10 +68,13 @@ Removes the specified user session from memory and database.
 =cut
 
 sub end {
-        my $self = shift;
-        $self->session->scratch->deleteAll;
-        $self->session->db->write("delete from userSession where sessionId=?",[$self->getId]);
-        delete $self->session->{_user};
+    my $self = shift;
+    my $session = $self->session;
+    my $id = $self->getId;
+    eval{$session->cache->delete(['session',$id])};
+    $session->scratch->deleteAll;
+    $session->db->write("delete from userSession where sessionId=?",[$id]);
+    delete $session->{_user};
 	$self->DESTROY;
 }
 
@@ -168,16 +170,16 @@ normally be used by anyone.
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
+    my ($class, $session, $sessionId, $noFuss) = @_;
 	my $self = bless {_session=>$session}, $class;
-	my $sessionId = shift;
-	my $noFuss = shift;
 	if ($sessionId eq "") { ##New session
 		$self->start(1);
 	}
     else { ##existing session requested
-        $self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=?",[$sessionId]);
+        $self->{_var} = eval{$session->cache->get(['session',$sessionId])};
+        unless ($self->{_var}{sessionId} eq $sessionId) {
+            $self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=?",[$sessionId]);
+        }
         ##We have to make sure that the session variable has a sessionId, otherwise downstream users of
         ##the object will break
         if ($noFuss && $self->{_var}{sessionId}) {
@@ -189,11 +191,20 @@ sub new {
 			$self->start(1,$sessionId);
 		}
         elsif ($self->{_var}{sessionId} ne "") { ##Fetched an existing session.  Update variables with recent data.
-			$self->{_var}{lastPageView} = $session->datetime->time();
+            my $time = $session->datetime->time();
+            my $timeout = $session->setting->get("sessionTimeout");
+			$self->{_var}{lastPageView} = $time;
 			$self->{_var}{lastIP} = $session->env->getIp;
-			$self->{_var}{expires} = $session->datetime->time() + $session->setting->get("sessionTimeout");
+			$self->{_var}{expires} = $time + $timeout;
+            if ($self->{_var}{nextCacheFlush} > 0 && $self->{_var}{nextCacheFlush} < $time) {
+                delete $self->{_var}{nextCacheFlush};
+			    $session->db->setRow("userSession","sessionId",$self->{_var});
+            }
+            else {
+                $self->{_var}{nextCacheFlush} = $time + $session->config->get("hotSessionFlushToDb");
+                eval{$session->cache->set(['session',$sessionId], $self->{_var}, $timeout)};
+            }
 			$self->session->{_sessionId} = $self->{_var}{sessionId};
-			$session->db->setRow("userSession","sessionId",$self->{_var});
             return $self;
 		}
         else {  ##Start a new default session with the requested, non-existant id.
@@ -240,19 +251,24 @@ sub start {
 	my $userId = shift;
 	$userId = 1 if ($userId eq "");
 	my $sessionId = shift;
-	$sessionId = $self->session->id->generate if ($sessionId eq "");
-	my $time = $self->session->datetime->time();
+    my $session = $self->session;
+    my $id = $session->id;
+	$sessionId = $id->generate if ($sessionId eq "");
+    my $timeout = $session->setting->get('sessionTimeout');
+	my $time = $session->datetime->time();
 	$self->{_var} = {
-		expires      => $time + $self->session->setting->get("sessionTimeout"),
+		expires      => $time + $timeout,
 		lastPageView => $time,
-		lastIP       => $self->session->env->getIp,
+		lastIP       => $session->env->getIp,
 		adminOn      => 0,
 		userId       => $userId
 	};
-	$self->{_var}{sessionId} = $sessionId;
-	$self->session->db->setRow("userSession","sessionId",$self->{_var},$sessionId);
-	$self->session->{_sessionId} = $sessionId;
-    $self->session->scratch->set('webguiCsrfToken', $self->session->id->generate);
+    $self->session->{_sessionId} = $sessionId;
+    eval{$session->cache->set(['session',$sessionId], $self->{_var}, $timeout)};
+    delete $self->{_var}{nextCacheFlush};
+	$session->db->setRow("userSession","sessionId",$self->{_var},$sessionId);
+	$self->{_sessionId} = $sessionId;
+    $session->scratch->set('webguiCsrfToken', $id->generate); # create cross site request forgery token
 }
 
 #-------------------------------------------------------------------
@@ -264,9 +280,12 @@ Disables admin mode.
 =cut
 
 sub switchAdminOff {
-        my $self = shift;
-        $self->{_var}{adminOn} = 0;
-        $self->session->db->setRow("userSession","sessionId", $self->{_var});
+    my $self = shift;
+    $self->{_var}{adminOn} = 0;
+    my $session = $self->session;
+    eval{$session->cache->set(['session',$self->getId], $self->{_var}, $session->setting->get('sessionTimeout'))};
+    delete $self->{_var}{nextCacheFlush};
+    $session->db->setRow("userSession","sessionId", $self->{_var});
 }
 
 #-------------------------------------------------------------------
@@ -278,9 +297,12 @@ Enables admin mode.
 =cut
 
 sub switchAdminOn {
-        my $self = shift;
-        $self->{_var}{adminOn} = 1;
-        $self->session->db->setRow("userSession","sessionId", $self->{_var});
+    my $self = shift;
+    $self->{_var}{adminOn} = 1;
+    my $session = $self->session;
+    eval{$session->cache->set(['session',$self->getId], $self->{_var}, $session->setting->get('sessionTimeout'))};
+    delete $self->{_var}{nextCacheFlush};
+    $self->session->db->setRow("userSession","sessionId", $self->{_var});
 }
 
 

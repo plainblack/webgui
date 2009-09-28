@@ -16,7 +16,6 @@ use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post::Thread;
-use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -1188,7 +1187,7 @@ Extend the base class to handle caching.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getThread->getId)->delete if ($self->getThread);
+	eval{$self->session->cache->delete("view_".$self->getThread->getId)} if ($self->getThread);
 	$self->SUPER::purgeCache;
 }
 

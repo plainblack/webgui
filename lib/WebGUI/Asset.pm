@@ -31,7 +31,6 @@ use WebGUI::AssetVersioning;
 use strict;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
-use WebGUI::Cache;
 use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -1778,19 +1777,16 @@ sub new {
         return undef unless $revisionDate;
     }
     
-    my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
-    my $properties = $cache->get;
-    if (exists $properties->{assetId}) {
-        # got properties from cache
-    } 
-    else {
+    my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
+    unless (exists $properties->{assetId}) {
         $properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
         unless (exists $properties->{assetId}) {
             $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
             return undef;
         }
-        $cache->set($properties,60*60*24);
+        eval{ $session->cache->set(["asset",$assetId,$revisionDate], $properties, 60*60*24) };
     }
+
     if (defined $properties) {
         my $object = { _session=>$session, _properties => $properties };
         bless $object, $class;
@@ -2345,10 +2341,11 @@ sub publish {
         my $idList = $self->session->db->quoteAndJoin($assetIds);
         
 	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
-	my $cache = WebGUI::Cache->new($self->session);
         foreach my $id (@{$assetIds}) {
-        	# we do the purge directly cuz it's a lot faster than instantiating all these assets
-                $cache->deleteChunk(["asset",$id]);
+                my $asset = WebGUI::Asset->newByDynamicClass($self->session, $id);
+                if (defined $asset) {
+                    $asset->purgeCache;
+                }
         }
 	$self->{_properties}{state} = "published";
 
@@ -2378,7 +2375,7 @@ sub purgeCache {
 	$stow->delete('assetLineage');
 	$stow->delete('assetClass');
 	$stow->delete('assetRevision');
-	WebGUI::Cache->new($self->session,["asset",$self->getId,$self->get("revisionDate")])->deleteChunk(["asset",$self->getId]);
+    eval{$self->session->cache->delete(["asset",$self->getId,$self->get("revisionDate")])};
 }
 
 

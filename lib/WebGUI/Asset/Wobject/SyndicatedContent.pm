@@ -13,7 +13,6 @@ package WebGUI::Asset::Wobject::SyndicatedContent;
 use strict;
 use HTML::Entities;
 use Tie::IxHash;
-use WebGUI::Cache;
 use WebGUI::Exception;
 use WebGUI::HTML;
 use WebGUI::International;
@@ -136,16 +135,16 @@ sub generateFeed {
 	
 	# build one feed out of many
     my $newlyCached = 0;
+	my $cache = $self->session->cache;
 	foreach my $url (split(/\s+/, $self->get('rssUrl'))) {
 		$log->info("Processing FEED: ".$url);
 		$url =~ s/^feed:/http:/;
 		if ($self->get('processMacroInRssUrl')) {
 			WebGUI::Macro::process($self->session, \$url);
 		}
-		my $cache = WebGUI::Cache->new($self->session, $url, "RSS");
-		my $value = $cache->get;
+		my $value = eval{$cache->get($url)};
 		unless ($value) {
-            $value = $cache->setByHTTP($url, $self->get("cacheTimeout"));
+            $value = eval{$cache->setByHttp($url, $self->get("cacheTimeout"))};
             $newlyCached = 1;
         }
         # if the content can be downgraded, it is either valid latin1 or didn't have
@@ -328,7 +327,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+    eval{$self->session->cache->delete("view_".$self->getId)};
 	$self->next::method;
 }
 
@@ -345,8 +344,8 @@ sub view {
     my $session = $self->session;
 
 	# try the cached version
-	my $cache = WebGUI::Cache->new($session,"view_".$self->getId);
-	my $out = $cache->get;
+	my $cache = $session->cache; 
+	my $out = eval{$cache->get("view_".$self->getId)};
 	return $out if ($out ne "" && !$session->var->isAdminOn);
     #return $out if $out;
 
@@ -354,7 +353,7 @@ sub view {
 	my $feed = $self->generateFeed;
 	$out = $self->processTemplate($self->getTemplateVariables($feed),undef,$self->{_viewTemplate});
 	if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		$cache->set($out,$self->get("cacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
 	}
 	return $out;
 }

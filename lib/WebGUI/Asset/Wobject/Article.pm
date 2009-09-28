@@ -13,7 +13,6 @@ package WebGUI::Asset::Wobject::Article;
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Cache;
 use WebGUI::Paginator;
 use WebGUI::Asset::Wobject;
 use WebGUI::Storage;
@@ -319,7 +318,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	eval{$self->session->cache->delete("view_".$self->getId)};
 	$self->SUPER::purgeCache;
 }
 
@@ -348,9 +347,10 @@ returns the output.
 
 sub view {
 	my $self = shift;
+    my $cache = $self->session->cache;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
 	my %var;
@@ -414,7 +414,7 @@ sub view {
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
 	}
        	return $out;
 }

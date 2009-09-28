@@ -15,6 +15,7 @@ package WebGUI::Session;
 =cut
 
 use strict;
+use WebGUI::Cache;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
@@ -109,6 +110,28 @@ sub asset {
 
 #-------------------------------------------------------------------
 
+=head2 cache ( ) 
+
+Returns a WebGUI::Cache object, which is connected to the WebGUI memcached server.
+
+=cut
+
+sub cache {
+	my $self = shift;
+	unless (exists $self->{_cache}) {
+        my $cache = WebGUI::Cache->new($self);
+		if (defined $cache) {
+			$self->{_cache} = $cache;
+		}
+		else {
+		    $self->log->fatal("Couldn't connect to WebGUI memcached server, and can't continue without it.");
+		}
+	}
+	return $self->{_cache};
+}
+
+#-------------------------------------------------------------------
+
 =head2 close
 
 Cleans up a WebGUI session information from memory and disconnects from any resources opened by the session.
@@ -121,7 +144,7 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _errorHandler/) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler/) {
 		delete $self->{$key};
 	}
 }
@@ -445,7 +468,6 @@ sub open {
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);
-	$self->errorHandler->warn("You've disabled cache in your config file and that can cause many problems on a production site.") if ($config->get("disableCache"));
 	return $self;
 }
 

@@ -1378,7 +1378,6 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
     my $self = shift;
-    WebGUI::Cache->new( $self->session, 'view_' . $self->getId )->delete;
     return $self->SUPER::purgeCache;
 }
 

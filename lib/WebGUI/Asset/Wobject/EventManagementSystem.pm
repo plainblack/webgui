@@ -25,7 +25,6 @@ use WebGUI::Asset::Sku::EMSBadge;
 use WebGUI::Asset::Sku::EMSTicket;
 use WebGUI::Asset::Sku::EMSRibbon;
 use WebGUI::Asset::Sku::EMSToken;
-use WebGUI::Cache;
 use WebGUI::Exception;
 use WebGUI::FormValidator;
 use WebGUI::HTMLForm;

@@ -7,6 +7,18 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+8.0.0
+--------------------------------------------------------------------
+ * WebGUI 8 is not API compatible with WebGUI 7. If you have custom
+   code, chances are you'll need to update it to make it work with
+   WebGUI 8.
+
+ * WebGUI now requires memcached.
+
+ * WebGUI now requires the following Perl Modules:
+	- Memcached::libmemcached (0.3102)
+
+
 7.8.0
 --------------------------------------------------------------------
 

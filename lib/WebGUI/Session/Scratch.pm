@@ -62,7 +62,10 @@ sub delete {
 	my $name = shift;
 	return undef unless ($name);
 	my $value = delete $self->{_data}{$name};
-	$self->session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $self->session->getId]);
+    my $session = $self->session;
+    my $id = $session->getId;
+    eval{$session->cache->set(["sessionscratch",$id], $self->{_data}, $session->setting->get('sessionTimeout'))};
+	$session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $id]);
 	return $value;
 }
 
@@ -78,7 +81,10 @@ Deletes all scratch variables for this session.
 sub deleteAll {
 	my $self = shift;
 	delete $self->{_data};
-	$self->session->db->write("delete from userSessionScratch where sessionId=?", [$self->session->getId]);
+    my $session = $self->session;
+    my $id = $session->getId;
+    eval{$session->cache->delete(["sessionscratch",$id])};
+	$session->db->write("delete from userSessionScratch where sessionId=?", [$id]);
 }
 
 
@@ -99,7 +105,9 @@ sub deleteName {
 	my $name = shift;
 	return undef unless ($name);	
 	delete $self->{_data}{$name};
-	$self->session->db->write("delete from userSessionScratch where name=?", [$name]);
+    my $session = $self->session;
+    eval{$session->cache->flush};
+	$session->db->write("delete from userSessionScratch where name=?", [$name]);
 }
 
 #-------------------------------------------------------------------
@@ -124,7 +132,9 @@ sub deleteNameByValue {
 	my $value = shift;
 	return undef unless ($name and defined $value);
 	delete $self->{_data}{$name} if ($self->{_data}{$name} eq $value);
-	$self->session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
+    my $session = $self->session;
+    eval{$session->cache->flush};
+	$session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
 
 
@@ -155,8 +165,7 @@ The name of the variable.
 =cut
 
 sub get {
-	my $self = shift;
-	my $var = shift;
+    my ($self, $var) = @_;
 	return $self->{_data}{$var};
 }
 
@@ -174,10 +183,12 @@ The current session.
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
-	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId], {noOrder => 1});
-	bless {_session=>$session, _data=>$data}, $class;
+    my ($class, $session) = @_;
+    my $scratch = eval{$session->cache->get(["sessionscratch",$session->getId])};
+    unless (ref $scratch eq "HASH") {
+	    $scratch = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId], {noOrder => 1});
+    }
+	bless {_session=>$session, _data=>$scratch}, $class;
 }
 
 
@@ -212,12 +223,13 @@ The value of the scratch variable.  Must be a string no longer than 16000 charac
 =cut
 
 sub set {
-	my $self = shift;
-	my $name = shift;
-	my $value = shift;
+    my ($self, $name, $value) = @_;
 	return undef unless ($name);
 	$self->{_data}{$name} = $value;
-	$self->session->db->write("insert into userSessionScratch (sessionId, name, value) values (?,?,?) on duplicate key update value=VALUES(value)", [$self->session->getId, $name, $value]);
+    my $session = $self->session;
+    my $id = $session->getId;
+    eval{$session->cache->set(["sessionscratch",$id], $self->{_data}, $session->setting->get('sessionTimeout'))};
+	$session->db->write("replace into userSessionScratch (sessionId, name, value) values (?,?,?)", [$id, $name, $value]);
 }
 
 
