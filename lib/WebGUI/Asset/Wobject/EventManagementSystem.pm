@@ -66,7 +66,7 @@ sub definition {
 			tab			=> 'display',
 			label			=> $i18n->get('schedule template'),
 			hoverHelp		=> $i18n->get('schedule template help'),
-			namespace		=> 'EMS',
+			namespace		=> 'EMS/Schedule',
 		},
 		scheduleColumnsPerPage => {
 			fieldType 		=> 'Integer',

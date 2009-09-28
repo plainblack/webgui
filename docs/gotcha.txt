@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.21
+--------------------------------------------------------------------
+
+    * The EventManagementSystem schedule template was accidently given
+    the same namespace as the main EMS template.  This allowed the
+    wrong template to be chosen for the main EMS template and the
+    schedule template.  The upgrade from 7.8.0 to 7.8.1 will attempt
+    to fix this when default templates have been used.
+
 7.7.19
 --------------------------------------------------------------------
     * The search indexer was not properly indexing non-ASCII content
