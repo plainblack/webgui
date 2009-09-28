@@ -16,6 +16,7 @@
  - fixed #11056: No history in wiki 
  - added RFE #10940: Force the user to pick a shipping method before checking out.
  - fixed #10988: EMS Schedule -- Data Error
+ - fixed: DataForm allows edits when locked by another version tag
 
 7.8.0
  - upgraded YUI to 2.8.0r4
