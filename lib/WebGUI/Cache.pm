@@ -74,34 +74,37 @@ The key to delete.
 =cut
 
 sub delete {
-    my ($self, $name) = validate_pos(@_, 
-        1,
-        { type => SCALAR | ARRAYREF },
-        );
-    my $log = $self->session->log;
+    my $self = shift;
+    my $debug = $self->withDebug;
+    my ($name) = ($debug) ? validate_pos(@_, { type => SCALAR | ARRAYREF }) : @_;
     my $key = $self->parseKey($name);
-    $log->debug("Called delete() on cache key $key.");
+    if ($debug) {
+        $self->session->log->debug("Called delete() on cache key $key.");
+    }
     my $memcached = $self->getMemcached;
     Memcached::libmemcached::memcached_delete($memcached, $key);
-    if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
-        $log->debug("Cannot connect to memcached server.");
-        WebGUI::Error::Connection->throw(
-            error   => "Cannot connect to memcached server."
-            );
-    }
-    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
-        $log->warn("No memcached servers specified in config file.");
-        WebGUI::Error->throw(
-            error   => "No memcached servers specified in config file."
-            );
-    }
-    elsif ($memcached->errstr ne 'SUCCESS' # deleted
-        && $memcached->errstr ne 'PROTOCOL ERROR' # doesn't exist to delete
-        ) {
-        $log->debug("Couldn't delete $key from cache because ".$memcached->errstr);
-        WebGUI::Error->throw(
-            error   => "Couldn't delete $key from cache because ".$memcached->errstr
-            );
+    if ($debug) {
+        my $log = $self->session->log;
+        if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+            $log->debug("Cannot connect to memcached server.");
+            WebGUI::Error::Connection->throw(
+                error   => "Cannot connect to memcached server."
+                );
+        }
+        elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+            $log->warn("No memcached servers specified in config file.");
+            WebGUI::Error->throw(
+                error   => "No memcached servers specified in config file."
+                );
+        }
+        elsif ($memcached->errstr ne 'SUCCESS' # deleted
+            && $memcached->errstr ne 'PROTOCOL ERROR' # doesn't exist to delete
+            ) {
+            $log->debug("Couldn't delete $key from cache because ".$memcached->errstr);
+            WebGUI::Error->throw(
+                error   => "Couldn't delete $key from cache because ".$memcached->errstr
+                );
+        }
     }
 }
 
@@ -117,27 +120,32 @@ Throws WebGUI::Error::Connection and WebGUI::Error.
 
 sub flush {
     my ($self) = @_;
-    my $log = $self->session->log;
-    $log->debug("Called flush() on cache.");
+    my $debug = $self->withDebug;
+    if ($debug) {
+        $self->session->log->debug("Called flush() on cache.");
+    }
     my $memcached = $self->getMemcached;
     Memcached::libmemcached::memcached_flush($memcached);
-    if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
-        $log->debug("Cannot connect to memcached server.");
-        WebGUI::Error::Connection->throw(
-            error   => "Cannot connect to memcached server."
-            );
-    }
-    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
-        $log->warn("No memcached servers specified in config file.");
-        WebGUI::Error->throw(
-            error   => "No memcached servers specified in config file."
-            );
-    }
-    elsif ($memcached->errstr ne 'SUCCESS') {
-        $log->debug("Couldn't flush cache because ".$memcached->errstr);
-        WebGUI::Error->throw(
-            error   => "Couldn't flush cache because ".$memcached->errstr
-            );
+    if ($debug) {
+        my $log = $self->session->log;
+        if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+            $log->debug("Cannot connect to memcached server.");
+            WebGUI::Error::Connection->throw(
+                error   => "Cannot connect to memcached server."
+                );
+        }
+        elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+            $log->warn("No memcached servers specified in config file.");
+            WebGUI::Error->throw(
+                error   => "No memcached servers specified in config file."
+                );
+        }
+        elsif ($memcached->errstr ne 'SUCCESS') {
+            $log->debug("Couldn't flush cache because ".$memcached->errstr);
+            WebGUI::Error->throw(
+                error   => "Couldn't flush cache because ".$memcached->errstr
+                );
+        }
     }
 }
 
@@ -156,48 +164,53 @@ The key to retrieve.
 =cut
 
 sub get {
-    my ($self, $name) = validate_pos(@_, 
-        1,
-        { type => SCALAR | ARRAYREF },
-        );
-    my $log = $self->session->log;
+    my $self = shift;
+    my $debug = $self->withDebug;
+    my ($name) = ($debug) ? validate_pos(@_, { type => SCALAR | ARRAYREF }) : @_;
     my $key = $self->parseKey($name);
-    $log->debug("Called get() on cache key $key.");
+    if ($debug) {
+        $self->session->log->debug("Called get() on cache key $key.");
+    }
     my $memcached = $self->getMemcached;
     my $content = Memcached::libmemcached::memcached_get($memcached, $key);
-    if ($memcached->errstr eq 'NOT FOUND' ) {
-        $log->debug("The cache key $key has no value.");
-        WebGUI::Error::ObjectNotFound->throw(
-            error   => "The cache key $key has no value.",
-            id      => $key,
-            );
-    }
-    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
-        $log->warn("No memcached servers specified in config file.");
-        WebGUI::Error->throw(
-            error   => "No memcached servers specified in config file."
-            );
-    }
-    elsif ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
-        $log->debug("Cannot connect to memcached server.");
-        WebGUI::Error::Connection->throw(
-            error   => "Cannot connect to memcached server."
-            );
-    }
-    elsif ($memcached->errstr ne 'SUCCESS') {
+    $content = Storable::thaw($content);
+    if ($debug) {
+        my $log = $self->session->log;
+        if ($memcached->errstr eq 'SUCCESS') {
+            unless (ref $content) {
+                $log->debug("Couldn't thaw value for $key.");
+                WebGUI::Error::InvalidObject->throw(
+                    error   => "Couldn't thaw value for $key."
+                    );
+            }
+            return ${$content};
+        }
+        elsif ($memcached->errstr eq 'NOT FOUND' ) {
+            $log->debug("The cache key $key has no value.");
+            WebGUI::Error::ObjectNotFound->throw(
+                error   => "The cache key $key has no value.",
+                id      => $key,
+                );
+        }
+        elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+            $log->warn("No memcached servers specified in config file.");
+            WebGUI::Error->throw(
+                error   => "No memcached servers specified in config file."
+                );
+        }
+        elsif ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+            $log->debug("Cannot connect to memcached server.");
+            WebGUI::Error::Connection->throw(
+                error   => "Cannot connect to memcached server."
+                );
+        }
         $log->debug("Couldn't get $key from cache because ".$memcached->errstr);
         WebGUI::Error->throw(
             error   => "Couldn't get $key from cache because ".$memcached->errstr
-            );
+        );
+        return undef;
     }
-    $content = Storable::thaw($content);
-    unless (ref $content) {
-        $log->debug("Couldn't thaw value for $key.");
-        WebGUI::Error::InvalidObject->throw(
-            error   => "Couldn't thaw value for $key."
-            );
-    }
-    return ${$content};
+    return (ref $content) ? ${$content} : undef;
 }
 
 #-------------------------------------------------------------------
@@ -229,34 +242,37 @@ An array reference of keys to retrieve.
 =cut
 
 sub mget {
-    my ($self, $names) = validate_pos(@_, 
-        1,
-        { type => ARRAYREF },
-        );
-    my $log = $self->session->log;
+    my $self = shift;
+    my $debug = $self->withDebug;
+    my ($names) = ($debug) ? validate_pos(@_, { type => ARRAYREF }) : @_;
     my @keys = map { $self->parseKey($_) } @{ $names };
-    $log->debug("Called mget() for keys (".join(", ",@keys).") on cache.");
+    my $log = $self->session->log;
+    if ($debug) {
+        $log->debug("Called mget() for keys (".join(", ",@keys).") on cache.");
+    }
     my %result;
     my $memcached = $self->getMemcached;
     $memcached->mget_into_hashref(\@keys, \%result);
-    if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
-        $log->debug("Cannot connect to memcached server.");
-        WebGUI::Error::Connection->throw(
-            error   => "Cannot connect to memcached server."
-            );
-    }
-    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
-        $log->warn("No memcached servers specified in config file.");
-        WebGUI::Error->throw(
-            error   => "No memcached servers specified in config file."
-            );
+    if ($debug) {
+        if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+            $log->debug("Cannot connect to memcached server.");
+            WebGUI::Error::Connection->throw(
+                error   => "Cannot connect to memcached server."
+                );
+        }
+        elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+            $log->warn("No memcached servers specified in config file.");
+            WebGUI::Error->throw(
+                error   => "No memcached servers specified in config file."
+                );
+        }
     }
     # no other useful status messages are returned
     my @values;
     foreach my $key (@keys) {
         my $content = Storable::thaw($result{$key});
         unless (ref $content) {
-            $log->debug("Cannot thaw key $key.");
+            $log->debug("Cannot thaw key $key.") if ($debug);
             next;
         }
         push @values, ${$content};
@@ -266,9 +282,9 @@ sub mget {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session )
+=head2 new ( session, withDebug )
 
-The new method will return a handler for the configured caching mechanism.  Defaults to WebGUI::Cache::FileCache. You must override this method when building your own cache plug-in.
+Constructor. Will return a handler for the configured caching mechanism.  Defaults to WebGUI::Cache::FileCache. You must override this method when building your own cache plug-in.
 
 Throws WebGUI::Error::InvalidParam.
 
@@ -276,14 +292,23 @@ Throws WebGUI::Error::InvalidParam.
 
 A reference to the current session.
 
+=head3 withDebug
+
+A boolean indicating you want to enable parameter validation, exception handling, and debug logging. Note that this will make the cahe system up to 3 times slower. It will still be very fast, but not production fast.
+
 =cut
 
 sub new {
-    my ($class, $session) = validate_pos(@_, 
+    my ($class, $session, $withDebug) = validate_pos(@_, 
         1,
         { isa => 'WebGUI::Session' },
+        { type => SCALAR | UNDEF, optional=>1, default=>0 },
         );
-    $session->log->debug("Instanciated cache object.");
+    if ($withDebug) {
+        my $log = $session->log;
+        $log->debug("Instanciated cache object.");
+        $log->debug("Cache debugging ".($withDebug ? "enabled" : "disabled").".");
+    }
     my $config = $session->config;
     my $namespace = $config->getFilename;
     my $memcached = Memcached::libmemcached::memcached_create(); # no exception because always returns success
@@ -295,7 +320,7 @@ sub new {
             Memcached::libmemcached::memcached_server_add($memcached, $server->{host}, $server->{port}); # no exception because always returns success
         }
     }
-    bless {_memcached => $memcached, _namespace => $namespace, _session => $session}, $class;
+    bless {_memcached => $memcached, _namespace => $namespace, _session => $session, _withDebug=>$withDebug}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -313,10 +338,8 @@ Can either be a text key, or a composite key. If it's a composite key, it will b
 =cut
 
 sub parseKey {
-    my ($self, $name) = validate_pos(@_, 
-        1,
-        { type => SCALAR | ARRAYREF },
-        );
+    my $self = shift;
+    my ($name) = ($self->withDebug) ? validate_pos(@_, { type => SCALAR | ARRAYREF }) : @_;
 
     # prepend namespace to the key
     my @key = ($self->{_namespace});
@@ -369,31 +392,34 @@ A time in seconds for the cache to exist. When you override default it to 60 sec
 =cut
 
 sub set {
-    my ($self, $name, $value, $ttl) = validate_pos(@_, 
-        1,
-        { type => SCALAR | ARRAYREF },
-        { type => SCALAR },
-        { type => SCALAR | UNDEF, optional => 1, default=> 60 },
-        );
-    my $log = $self->session->log;
+    my $self = shift;
+    my $debug = $self->withDebug;
+    my ($name, $value, $ttl) = ($debug) ? validate_pos(@_, { type => SCALAR | ARRAYREF }, { type => SCALAR }, { type => SCALAR | UNDEF, optional => 1 }) : @_;
+    $ttl ||= 60;
     my $key = $self->parseKey($name);
-    $log->debug("Called set() on cache key $key with $value as the value.");
+    if ($debug) {
+        $self->session->log->debug("Called set() on cache key $key with $value as the value.");
+    }
     my $frozenValue = Storable::nfreeze(\(scalar $value)); # Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
     my $memcached = $self->getMemcached;
     Memcached::libmemcached::memcached_set($memcached, $key, $frozenValue, $ttl);
-    if ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
-        $log->debug("Cannot connect to memcached server.");
-        WebGUI::Error::Connection->throw(
-            error   => "Cannot connect to memcached server."
-            );
-    }
-    elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
-        $log->warn("No memcached servers specified in config file.");
-        WebGUI::Error->throw(
-            error   => "No memcached servers specified in config file."
-            );
-    }
-    elsif ($memcached->errstr ne 'SUCCESS') {
+    if ($debug) {
+        my $log = $self->session->log;
+        if ($memcached->errstr eq 'SUCCESS') {
+            return $value;
+        }
+        elsif ($memcached->errstr eq 'SYSTEM ERROR Unknown error: 0') {
+            $log->debug("Cannot connect to memcached server.");
+            WebGUI::Error::Connection->throw(
+                error   => "Cannot connect to memcached server."
+                );
+        }
+        elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
+            $log->warn("No memcached servers specified in config file.");
+            WebGUI::Error->throw(
+                error   => "No memcached servers specified in config file."
+                );
+        }
         $log->debug("Couldn't set $key to cache because ".$memcached->errstr);
         WebGUI::Error->throw(
             error   => "Couldn't set $key to cache because ".$memcached->errstr
@@ -422,30 +448,44 @@ The time to live for this content. This is the amount of time (in seconds) that 
 =cut
 
 sub setByHttp {
-    my ($self, $url, $ttl) = validate_pos(@_, 
-        1,
-        { type => SCALAR },
-        { type => SCALAR, optional => 1 },
-        );
-    my $log = $self->session->log;
-    $log->debug("Called setByHttp() with URL $url.");
+    my $self = shift;
+    my $debug = $self->withDebug;
+    my ($url, $ttl) = ($debug) ? validate_pos(@_, { type => SCALAR }, { type => SCALAR, optional => 1 }) : @_;
+    if ($debug) {
+        $self->session->log->debug("Called setByHttp() with URL $url.");
+    }
     my $userAgent = new LWP::UserAgent;
 	$userAgent->env_proxy;
     $userAgent->agent("WebGUI/".$WebGUI::VERSION);
     $userAgent->timeout(30);
     my $request = HTTP::Request->new(GET => $url);
-
-
     my $response = $userAgent->request($request);
     if ($response->is_error) {
-        $log->error("$url could not be retrieved.");
-        WebGUI::Error::Connection->throw(
-            error       => "Couldn't fetch $url because ".$response->message,
-            resource    => $url,
-            );
+        $self->session->log->error("$url could not be retrieved.");
+        if ($debug) {
+            WebGUI::Error::Connection->throw(
+                error       => "Couldn't fetch $url because ".$response->message,
+                resource    => $url,
+                );
+        }
     }
     return $self->set($url, $response->decoded_content, $ttl);
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 withDebug () 
+
+Returns a boolean indicating whether the cache system should log debug, validate parameters, and throw exceptions.
+
+=cut
+
+sub withDebug {
+    my $self = shift;
+    return $self->{_withDebug};
+}
+
 
 
 =head1 EXCEPTIONS
@@ -458,6 +498,8 @@ This class throws a lot of inconvenient exceptions. However, because cache shoul
  }
 
 If you want to see what exceptions are being thrown, or anything else about the internal operations of the cache system, simply turn on DEBUG mode in your log. Everything you want will be there.
+
+NOTE: In order for exceptions to be thrown and logged with debug must be passed into the constructor. 
 
 The exceptions that can be thrown are:
 
@@ -476,6 +518,10 @@ When you pass in the wrong arguments.
 =head2 WebGUI::Error::ObjectNotFound
 
 When you request a cache key that doesn't exist on any configured memcached server.
+
+=head2 WebGUI::Error::InvalidObject
+
+When an object can't be thawed from cache due to corruption of some sort.
 
 =cut
 
