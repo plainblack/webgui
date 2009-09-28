@@ -851,6 +851,9 @@ sub www_view {
         }
         if ($defaultOption) {
             $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, defaultValue=>$defaultOption, value=>$self->get("shipperId")});
+            if (! exists $options->{ $self->get('shipperId') }) {
+                $self->update({shipperId => ''});
+            }
             $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
             $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
         }
@@ -859,6 +862,7 @@ sub www_view {
             $var{shippingPrice}   = 0;
             $error{id $self}      = $i18n->get("No shipping plugins configured");
         }
+
     }
   
     # Tax variables

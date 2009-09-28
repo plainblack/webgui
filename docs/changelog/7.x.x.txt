@@ -28,6 +28,7 @@
  - fixed #11037: Maintenance page is being cached
  - fixed #11056: No history in wiki 
  - fixed #10988: EMS Schedule -- Data Error
+ - fixed #11001: Shipping plugin returning nothing, causing price formatter to puke
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
