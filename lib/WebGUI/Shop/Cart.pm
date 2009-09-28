@@ -865,8 +865,10 @@ sub www_view {
             foreach my $option (keys %{$options}) {
                 $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
             }
-            my $defaultOption = $self->get('shipperId') ? $self->get('shipperId') : '';
             $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$self->get("shipperId")});
+            if (!exists $options->{$self->get('shipperId')}) {
+                $self->update({shipperId => ''});
+            }
             if (my $shipperId = $self->get('shipperId')) {
                 $var{shippingPrice} = $options->{$shipperId}->{price};
             }
