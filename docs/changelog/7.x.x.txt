@@ -13,6 +13,7 @@
  - fixed #10994: Gallery: Problems with uploading ZIP-archives
  - fixed #11032: The Thingy form field "otherThingy" not checking for privilege
  - fixed #11037: Maintenance page is being cached
+ - fixed #11056: No history in wiki 
 
 7.8.0
  - upgraded YUI to 2.8.0r4
