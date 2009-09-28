@@ -29,11 +29,11 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 10;        # Increment this number for each test you create
+plan tests => 11;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
-my $cache = WebGUI::Cache->new($session);
+my $cache = WebGUI::Cache->new($session, 1);
 isa_ok($cache, 'WebGUI::Cache');
 is($cache->parseKey("andy"), $session->config->getFilename.":andy", "parseKey single key");
 is($cache->parseKey(["andy","red"]), $session->config->getFilename.":andy:red", "parseKey composite key");
@@ -50,6 +50,91 @@ $cache->flush;
 is(eval{$cache->get(["andy", "dufresne"])}, undef, 'flush');
 $cache->setByHttp("http://www.google.com/");
 cmp_ok($cache->get("http://www.google.com/"), 'ne', '', 'setByHttp');
+my $longValue ='abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*(
+    ';
+$cache->set("really-long-value",$longValue);
+is($cache->get("really-long-value"), $longValue, "set/get really long value");
 
 
 #----------------------------------------------------------------------------

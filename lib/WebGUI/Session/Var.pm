@@ -202,7 +202,7 @@ sub new {
             }
             else {
                 $self->{_var}{nextCacheFlush} = $time + $session->config->get("hotSessionFlushToDb");
-                $session->cache->set(['session',$sessionId], $self->{_var}, $timeout);
+                eval{$session->cache->set(['session',$sessionId], $self->{_var}, $timeout)};
             }
 			$self->session->{_sessionId} = $self->{_var}{sessionId};
             return $self;

@@ -1778,17 +1778,15 @@ sub new {
     }
     
     my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
-    if (exists $properties->{assetId}) {
-        # got properties from cache
-    } 
-    else {
+    unless (exists $properties->{assetId}) {
         $properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
         unless (exists $properties->{assetId}) {
             $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
             return undef;
         }
-        eval{$session->cache->set(["asset",$assetId,$revisionDate], $properties, 60*60*24)};
+        eval{ $session->cache->set(["asset",$assetId,$revisionDate], $properties, 60*60*24) };
     }
+
     if (defined $properties) {
         my $object = { _session=>$session, _properties => $properties };
         bless $object, $class;

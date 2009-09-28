@@ -23,7 +23,11 @@ use Memcached::libmemcached;
 use Storable ();
 use WebGUI::Exception;
 use Params::Validate qw(:all);
-Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
+Params::Validate::validation_options( on_fail => sub { 
+        my $error = shift; 
+        warn "Error in Cache params: ".$error; 
+        WebGUI::Error::InvalidParam->throw( error => $error );
+        } );
 
 
 
@@ -89,6 +93,13 @@ sub delete {
             $log->debug("Cannot connect to memcached server.");
             WebGUI::Error::Connection->throw(
                 error   => "Cannot connect to memcached server."
+                );
+        }
+        elsif ($memcached->errstr eq 'NOT FOUND' ) {
+            $log->debug("The cache key $key has no value.");
+            WebGUI::Error::ObjectNotFound->throw(
+                error   => "The cache key $key has no value.",
+                id      => $key,
                 );
         }
         elsif ($memcached->errstr eq 'NO SERVERS DEFINED') {
@@ -394,7 +405,7 @@ A time in seconds for the cache to exist. When you override default it to 60 sec
 sub set {
     my $self = shift;
     my $debug = $self->withDebug;
-    my ($name, $value, $ttl) = ($debug) ? validate_pos(@_, { type => SCALAR | ARRAYREF }, { type => SCALAR }, { type => SCALAR | UNDEF, optional => 1 }) : @_;
+    my ($name, $value, $ttl) = ($debug) ? validate_pos(@_, { type => SCALAR | ARRAYREF }, { type => SCALAR | ARRAYREF | HASHREF }, { type => SCALAR | UNDEF, optional => 1 }) : @_;
     $ttl ||= 60;
     my $key = $self->parseKey($name);
     if ($debug) {
