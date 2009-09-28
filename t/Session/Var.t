@@ -129,10 +129,16 @@ $var->end;
 ##by looking for admin status and userId
 $var2 = WebGUI::Session::Var->new($session);
 $var2->switchAdminOn;
+
+# jury rig the database and the cache to expire
 $session->db->write("update userSession set userId=? where sessionId=?",
 	[3, $var2->getId]);
 $session->db->write("update userSession set expires=? where sessionId=?",
 	[$var2->get('lastPageView')-1, $var2->getId]);
+my %copyOfVar2 = %{$var2->{_var}};
+$copyOfVar2{expires} = $var2->get('lastPageView')-1;
+$copyOfVar2{userId} = 3;
+$session->cache->set(['session',$var2->getId], \%copyOfVar2);
 
 my $var3 = WebGUI::Session::Var->new($session, $var2->getId);
 is($var3->getId,           $var2->getId, 'new Var object has correct id');

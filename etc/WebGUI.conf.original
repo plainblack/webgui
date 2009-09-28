@@ -96,9 +96,20 @@
 # memcached over TCP. And since this is an array you can specify
 # as many server connections as you have memcached servers
 
- "cacheServers" : [
+"cacheServers" : [
 	{ "socket" : "/tmp/memcached.sock", "host" : "127.0.0.1", "port" : "11211" }
 ],
+
+# Sessions that are "hot", those that are not only not expired,
+# but that are currently active on the site are kept in memory
+# to make them exceptionally fast. The hotSessionFlushToDb 
+# directive allows you to say how often (in seconds) those
+# sessions should be pushed down to the database. On most sites
+# 10 minutes is a good duration. If you have an exceptionally
+# short session timeout (in the settings) then you may wish to
+# set it lower.
+
+"hotSessionFlushToDb" : 600,
 
 # The database connection string. It usually takes the form of
 # DBI:<driver>:<db>;host:<hostname>
