@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 fixWikis( $session );
+fixEMSTemplates( $session );
 
 finish($session); # this line required
 
@@ -50,6 +51,15 @@ sub fixWikis {
     print "\tFixing Wikis... " unless $quiet;
     $session->db->write('INSERT IGNORE INTO assetAspect_Subscribable (assetId, revisionDate) SELECT assetId, revisionDate FROM WikiMaster');
     $session->db->write('INSERT IGNORE INTO assetAspect_Subscribable (assetId, revisionDate) SELECT assetId, revisionDate FROM WikiPage');
+    print "Done.\n" unless $quiet;
+}
+
+# Describe what our function does
+sub fixEMSTemplates {
+    my $session = shift;
+    print "\tFixing bad usage of Event Management System templates... " unless $quiet;
+    $session->db->write(q|update EventManagementSystem set templateId='2rC4ErZ3c77OJzJm7O5s3w'         where templateId='S2_LsvVa95OSqc66ITAoig'|);
+    $session->db->write(q|update EventManagementSystem set scheduleTemplateId='S2_LsvVa95OSqc66ITAoig' where scheduleTemplateId='2rC4ErZ3c77OJzJm7O5s3w'|);
     print "Done.\n" unless $quiet;
 }
 
