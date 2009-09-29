@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 fixWikis( $session );
 fixEMSTemplates( $session );
+removeOldSubscriptionTables( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+# Describe what our function does
+sub removeOldSubscriptionTables {
+    my $session = shift;
+    print "\tRemoving tables leftover from the old 7.5 Commerce System... " unless $quiet;
+    $session->db->write('DROP TABLE IF EXISTS subscriptionCode');
+    $session->db->write('DROP TABLE IF EXISTS subscriptionCodeBatch');
+    $session->db->write('DROP TABLE IF EXISTS subscriptionCodeSubscriptions');
+    print "Done.\n" unless $quiet;
+}
 
 # Describe what our function does
 sub fixWikis {

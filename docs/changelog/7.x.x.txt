@@ -20,6 +20,7 @@
  - fixed #11001: Shipping plugin returning nothing, causing price formatter to puke
  - fixed #11059: WebGUI upgrade packages do not overwrite versions in the db
  - fixed #11064: spelling error
+ - fixed #11062: subscriptionCode
 
 7.8.0
  - upgraded YUI to 2.8.0r4
