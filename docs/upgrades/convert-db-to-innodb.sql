@@ -1952,8 +1952,7 @@ CREATE TABLE `assetIndex_inno` (
   `isPublic` int(11) NOT NULL default '1',
   `keywords` mediumtext,
   `lineage` char(255) default NULL,
-  PRIMARY KEY  (`assetId`),
-  FULLTEXT KEY `keywords` (`keywords`)
+  PRIMARY KEY  (`assetId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2481,14 +2480,14 @@ CREATE TABLE `template_inno` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-
+-- Removed primary key due to bug
+--  PRIMARY KEY  (`templateId`,`revisionDate`,`url`)
 CREATE TABLE `template_attachments_inno` (
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
   `url` varchar(256) character set utf8 NOT NULL,
   `type` varchar(20) character set utf8 default NULL,
-  `sequence` int(11) default NULL,
-  PRIMARY KEY  (`templateId`,`revisionDate`,`url`)
+  `sequence` int(11) default NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2610,56 +2609,56 @@ CREATE TABLE `userProfileCategory_inno` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-
+-- changed all char 255 to char 55 to avoid erno 139
 CREATE TABLE `userProfileData_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `email` char(255) default NULL,
-  `firstName` char(255) default NULL,
-  `middleName` char(255) default NULL,
-  `lastName` char(255) default NULL,
-  `icq` char(255) default NULL,
-  `aim` char(255) default NULL,
-  `msnIM` char(255) default NULL,
-  `yahooIM` char(255) default NULL,
-  `cellPhone` char(255) default NULL,
-  `pager` char(255) default NULL,
-  `emailToPager` char(255) default NULL,
-  `language` char(255) default NULL,
-  `homeAddress` char(255) default NULL,
-  `homeCity` char(255) default NULL,
-  `homeState` char(255) default NULL,
-  `homeZip` char(255) default NULL,
-  `homeCountry` char(255) default NULL,
-  `homePhone` char(255) default NULL,
-  `workAddress` char(255) default NULL,
-  `workCity` char(255) default NULL,
-  `workState` char(255) default NULL,
-  `workZip` char(255) default NULL,
-  `workCountry` char(255) default NULL,
-  `workPhone` char(255) default NULL,
-  `gender` char(255) default NULL,
+  `email` char(55) default NULL,
+  `firstName` char(55) default NULL,
+  `middleName` char(55) default NULL,
+  `lastName` char(55) default NULL,
+  `icq` char(55) default NULL,
+  `aim` char(55) default NULL,
+  `msnIM` char(55) default NULL,
+  `yahooIM` char(55) default NULL,
+  `cellPhone` char(55) default NULL,
+  `pager` char(55) default NULL,
+  `emailToPager` char(55) default NULL,
+  `language` char(55) default NULL,
+  `homeAddress` char(55) default NULL,
+  `homeCity` char(55) default NULL,
+  `homeState` char(55) default NULL,
+  `homeZip` char(55) default NULL,
+  `homeCountry` char(55) default NULL,
+  `homePhone` char(55) default NULL,
+  `workAddress` char(55) default NULL,
+  `workCity` char(55) default NULL,
+  `workState` char(55) default NULL,
+  `workZip` char(55) default NULL,
+  `workCountry` char(55) default NULL,
+  `workPhone` char(55) default NULL,
+  `gender` char(55) default NULL,
   `birthdate` bigint(20) default NULL,
-  `homeURL` char(255) default NULL,
-  `workURL` char(255) default NULL,
-  `workName` char(255) default NULL,
-  `timeZone` char(255) default NULL,
-  `dateFormat` char(255) default NULL,
-  `timeFormat` char(255) default NULL,
-  `discussionLayout` char(255) default NULL,
-  `firstDayOfWeek` char(255) default NULL,
-  `uiLevel` char(255) default NULL,
-  `alias` char(255) default NULL,
+  `homeURL` char(55) default NULL,
+  `workURL` char(55) default NULL,
+  `workName` char(55) default NULL,
+  `timeZone` char(55) default NULL,
+  `dateFormat` char(55) default NULL,
+  `timeFormat` char(55) default NULL,
+  `discussionLayout` char(55) default NULL,
+  `firstDayOfWeek` char(55) default NULL,
+  `uiLevel` char(55) default NULL,
+  `alias` char(55) default NULL,
   `signature` longtext,
   `publicProfile` longtext,
-  `toolbar` char(255) default NULL,
+  `toolbar` char(55) default NULL,
   `photo` char(22) character set utf8 collate utf8_bin default NULL,
   `avatar` char(22) character set utf8 collate utf8_bin default NULL,
-  `department` char(255) default NULL,
+  `department` char(55) default NULL,
   `allowPrivateMessages` longtext,
   `ableToBeFriend` tinyint(4) default NULL,
   `showMessageOnLoginSeen` bigint(20) default NULL,
   `showOnline` tinyint(1) default NULL,
-  `versionTagMode` char(255) default NULL,
+  `versionTagMode` char(55) default NULL,
   `wg_privacySettings` longtext,
   `receiveInboxEmailNotifications` tinyint(1) default NULL,
   `receiveInboxSmsNotifications` tinyint(1) default NULL,
@@ -2824,7 +2823,7 @@ INSERT INTO `Photo_rating_inno` SELECT * FROM `Photo_rating` ORDER BY `assetId`;
 INSERT INTO `Poll_inno` SELECT * FROM `Poll` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `Poll_answer_inno` SELECT * FROM `Poll_answer`; 
 INSERT INTO `Post_inno` SELECT * FROM `Post` ORDER BY `assetId`, `revisionDate`; 
-INSERT INTO `Post_rating_inno` SELECT * FROM `Post_rating` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Post_rating_inno` SELECT * FROM `Post_rating`; 
 INSERT INTO `Product_inno` SELECT * FROM `Product` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `RichEdit_inno` SELECT * FROM `RichEdit` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `SQLReport_inno` SELECT * FROM `SQLReport` ORDER BY `assetId`, `revisionDate`; 
@@ -2856,7 +2855,7 @@ INSERT INTO `ThingyRecord_record_inno` SELECT * FROM `ThingyRecord_record` ORDER
 INSERT INTO `Thingy_fields_inno` SELECT * FROM `Thingy_fields` ORDER BY `assetId`, `thingId`, `fieldId`; 
 INSERT INTO `Thingy_things_inno` SELECT * FROM `Thingy_things` ORDER BY `thingId`; 
 INSERT INTO `Thread_inno` SELECT * FROM `Thread` ORDER BY `assetId`, `revisionDate`; 
-INSERT INTO `Thread_read_inno` SELECT * FROM `Thread_read` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Thread_read_inno` SELECT * FROM `Thread_read`; 
 INSERT INTO `UserList_inno` SELECT * FROM `UserList` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `WeatherData_inno` SELECT * FROM `WeatherData` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `WikiMaster_inno` SELECT * FROM `WikiMaster` ORDER BY `assetId`, `revisionDate`; 
@@ -2886,29 +2885,29 @@ INSERT INTO `assetVersionTag_inno` SELECT * FROM `assetVersionTag` ORDER BY `tag
 INSERT INTO `authentication_inno` SELECT * FROM `authentication` ORDER BY `userId`, `authMethod`, `fieldName`; 
 INSERT INTO `bucketLog_inno` SELECT * FROM `bucketLog`; 
 INSERT INTO `cart_inno` SELECT * FROM `cart` ORDER BY `cartId`; 
-INSERT INTO `cartItem_inno` SELECT * FROM `cartItem` ORDER BY `cartItemId`; 
+INSERT INTO `cartItem_inno` SELECT * FROM `cartItem` ORDER BY `itemId`; 
 INSERT INTO `databaseLink_inno` SELECT * FROM `databaseLink` ORDER BY `databaseLinkId`; 
-INSERT INTO `deltaLog_inno` SELECT * FROM `deltaLog` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `deltaLog_inno` SELECT * FROM `deltaLog`; 
 INSERT INTO `donation_inno` SELECT * FROM `donation` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `filePumpBundle_inno` SELECT * FROM `filePumpBundle` ORDER BY `bundleId`; 
 INSERT INTO `friendInvitations_inno` SELECT * FROM `friendInvitations` ORDER BY `inviteId`; 
-INSERT INTO `groupGroupings_inno` SELECT * FROM `groupGroupings` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `groupGroupings_inno` SELECT * FROM `groupGroupings`; 
 INSERT INTO `groupings_inno` SELECT * FROM `groupings` ORDER BY `groupId`, `userId`; 
 INSERT INTO `groups_inno` SELECT * FROM `groups` ORDER BY `groupId`; 
 INSERT INTO `imageColor_inno` SELECT * FROM `imageColor` ORDER BY `colorId`; 
 INSERT INTO `imageFont_inno` SELECT * FROM `imageFont` ORDER BY `fontId`; 
-INSERT INTO `imagePalette_inno` SELECT * FROM `imagePalette` ORDER BY `palletteId`; 
-INSERT INTO `imagePaletteColors_inno` SELECT * FROM `imagePaletteColors` ORDER BY `palletteId`, `paletteOrder`; 
+INSERT INTO `imagePalette_inno` SELECT * FROM `imagePalette` ORDER BY `paletteId`; 
+INSERT INTO `imagePaletteColors_inno` SELECT * FROM `imagePaletteColors` ORDER BY `paletteId`, `paletteOrder`; 
 INSERT INTO `inbox_inno` SELECT * FROM `inbox` ORDER BY `messageId`; 
 INSERT INTO `inbox_messageState_inno` SELECT * FROM `inbox_messageState` ORDER BY `messageId`, `userId`; 
 INSERT INTO `incrementer_inno` SELECT * FROM `incrementer` ORDER BY `incrementerId`; 
-INSERT INTO `karmaLog_inno` SELECT * FROM `karmaLog` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `karmaLog_inno` SELECT * FROM `karmaLog`; 
 INSERT INTO `ldapLink_inno` SELECT * FROM `ldapLink` ORDER BY `ldapLinkId`; 
 INSERT INTO `mailQueue_inno` SELECT * FROM `mailQueue` ORDER BY `messageId`; 
 INSERT INTO `metaData_properties_inno` SELECT * FROM `metaData_properties` ORDER BY `fieldId`; 
 INSERT INTO `metaData_values_inno` SELECT * FROM `metaData_values` ORDER BY `fieldId`, `assetId`; 
-INSERT INTO `passiveAnalyticsStatus_inno` SELECT * FROM `passiveAnalyticsStatus` ORDER BY `assetId`, `revisionDate`; 
-INSERT INTO `passiveLog_inno` SELECT * FROM `passiveLog` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `passiveAnalyticsStatus_inno` SELECT * FROM `passiveAnalyticsStatus`; 
+INSERT INTO `passiveLog_inno` SELECT * FROM `passiveLog`; 
 INSERT INTO `passiveProfileAOI_inno` SELECT * FROM `passiveProfileAOI` ORDER BY `userId`, `fieldId`, `value`; 
 INSERT INTO `passiveProfileLog_inno` SELECT * FROM `passiveProfileLog` ORDER BY `passiveProfileLogId`; 
 INSERT INTO `paymentGateway_inno` SELECT * FROM `paymentGateway` ORDER BY `paymentGatewayId`; 
@@ -2926,9 +2925,9 @@ INSERT INTO `tax_generic_rates_inno` SELECT * FROM `tax_generic_rates` ORDER BY 
 INSERT INTO `template_inno` SELECT * FROM `template` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `template_attachments_inno` SELECT * FROM `template_attachments` ORDER BY `templateId`, `revisionDate`, `url`; 
 INSERT INTO `transaction_inno` SELECT * FROM `transaction` ORDER BY `transactionId`; 
-INSERT INTO `transactionItem_inno` SELECT * FROM `transactionItem` ORDER BY `transactionItemId`; 
+INSERT INTO `transactionItem_inno` SELECT * FROM `transactionItem` ORDER BY `itemId`; 
 INSERT INTO `userInvitations_inno` SELECT * FROM `userInvitations` ORDER BY `inviteId`; 
-INSERT INTO `userLoginLog_inno` SELECT * FROM `userLoginLog` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `userLoginLog_inno` SELECT * FROM `userLoginLog`; 
 INSERT INTO `userProfileCategory_inno` SELECT * FROM `userProfileCategory` ORDER BY `profileCategoryId`; 
 INSERT INTO `userProfileData_inno` SELECT * FROM `userProfileData` ORDER BY `userId`; 
 INSERT INTO `userProfileField_inno` SELECT * FROM `userProfileField` ORDER BY `fieldName`; 
@@ -2936,7 +2935,7 @@ INSERT INTO `userSession_inno` SELECT * FROM `userSession` ORDER BY `sessionId`;
 INSERT INTO `userSessionScratch_inno` SELECT * FROM `userSessionScratch` ORDER BY `sessionId`, `name`; 
 INSERT INTO `users_inno` SELECT * FROM `users` ORDER BY `userId`; 
 INSERT INTO `vendor_inno` SELECT * FROM `vendor` ORDER BY `vendorId`; 
-INSERT INTO `webguiVersion_inno` SELECT * FROM `webguiVersion` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `webguiVersion_inno` SELECT * FROM `webguiVersion`; 
 INSERT INTO `wobject_inno` SELECT * FROM `wobject` ORDER BY `assetId`, `revisionDate`;
 
 
