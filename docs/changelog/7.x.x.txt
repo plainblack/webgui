@@ -21,6 +21,7 @@
  - fixed #11059: WebGUI upgrade packages do not overwrite versions in the db
  - fixed #11064: spelling error
  - fixed #11062: subscriptionCode
+ - fixed #11061: SQLForm_fieldOrder
 
 7.8.0
  - upgraded YUI to 2.8.0r4
@@ -83,6 +84,7 @@
  - fixed #11008: Test::Class
  - fixed #10990: Survey: View Transposed Results not working
  - fixed #11022: Deleting user shows "TRUE" prompt
+ - fixed 
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread

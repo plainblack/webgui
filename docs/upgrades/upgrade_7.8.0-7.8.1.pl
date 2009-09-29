@@ -33,6 +33,7 @@ my $session = start(); # this line required
 fixWikis( $session );
 fixEMSTemplates( $session );
 removeOldSubscriptionTables( $session );
+removeSQLFormTables( $session );
 
 finish($session); # this line required
 
@@ -45,6 +46,18 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+# Describe what our function does
+sub removeSQLFormTables {
+    my $session = shift;
+    print "\tRemoving leftover SQL Form tables if not used... " unless $quiet;
+    my $tablesUsed = $session->db->quickScalar("select count(*) from asset where className='WebGUI::Asset::Wobject::SQLForm'");
+    if (!$tablesUsed) {
+        $session->db->write('DROP TABLE IF EXISTS SQLForm_fieldOrder');
+        print "\n\t\tSQL Form not used, dropping table...";
+    }
+    print "Done.\n" unless $quiet;
+}
 
 # Describe what our function does
 sub removeOldSubscriptionTables {
