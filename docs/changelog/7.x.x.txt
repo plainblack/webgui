@@ -33,6 +33,7 @@
  - fixed #11059: WebGUI upgrade packages do not overwrite versions in the db
  - fixed #11064: spelling error
  - fixed #11062: subscriptionCode
+ - fixed #11061: SQLForm_fieldOrder
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
@@ -89,6 +90,7 @@
  - fixed #11010: Purchasing non-recurring subscription twice does not extend group membership
  - fixed #11011: Inherit URL from parent can generate bad URLs
  - fixed #11022: Deleting user shows "TRUE" prompt
+ - fixed 
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread
