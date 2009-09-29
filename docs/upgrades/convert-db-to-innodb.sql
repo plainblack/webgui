@@ -32,7 +32,7 @@ CREATE TABLE `Article_inno` (
 
 CREATE TABLE `Calendar_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `revisionDate` bigint(20) unsigned NOT NULL default '0',
+  `revisionDate` bigint(20) NOT NULL default '0',
   `defaultDate` enum('current','first','last') default 'current',
   `defaultView` enum('month','week','day','list') default 'month',
   `visitorCacheTimeout` int(11) unsigned default NULL,
@@ -137,7 +137,7 @@ CREATE TABLE `Collaboration_inno` (
 
 CREATE TABLE `Dashboard_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `revisionDate` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `revisionDate` bigint(20) NOT NULL,
   `adminsGroupId` char(22) character set utf8 collate utf8_bin NOT NULL default '4',
   `usersGroupId` char(22) character set utf8 collate utf8_bin NOT NULL default '2',
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'DashboardViewTmpl00001',
@@ -332,7 +332,7 @@ CREATE TABLE `EMSToken_inno` (
 
 CREATE TABLE `Event_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `revisionDate` bigint(20) unsigned NOT NULL,
+  `revisionDate` bigint(20) NOT NULL,
   `feedId` char(22) character set utf8 collate utf8_bin default NULL,
   `feedUid` char(255) default NULL,
   `startDate` date default NULL,
@@ -792,7 +792,7 @@ CREATE TABLE `MessageBoard_inno` (
 
 CREATE TABLE `MultiSearch_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `revisionDate` bigint(20) unsigned NOT NULL default '0',
+  `revisionDate` bigint(20) NOT NULL default '0',
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'MultiSearchTmpl0000001',
   `predefinedSearches` text,
   `cacheTimeout` int(11) NOT NULL default '3600',
@@ -1159,7 +1159,7 @@ CREATE TABLE `StockData_inno` (
   `defaultStocks` text,
   `source` char(50) default 'usa',
   `failover` int(11) default '1',
-  `revisionDate` int(11) NOT NULL,
+  `revisionDate` bigint(20) NOT NULL,
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1583,7 +1583,7 @@ CREATE TABLE `UserList_inno` (
 
 CREATE TABLE `WeatherData_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `revisionDate` bigint(20) unsigned NOT NULL default '0',
+  `revisionDate` bigint(20) NOT NULL default '0',
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'WeatherDataTmpl0000001',
   `locations` text,
   `partnerId` char(100) default NULL,
@@ -3378,5 +3378,5 @@ alter table userLoginLog add foreign key (userId) references users(userId) on de
 alter table userSessionScratch add foreign key (sessionId) references userSession(sessionId) on delete cascade on update cascade;
 alter table cart add foreign key (sessionId) references userSession(sessionId) on delete cascade on update cascade;
 alter table cartItem add foreign key (cartId) references cart(cartId) on delete cascade on update cascade;
-alter table transactionItem add foreign key (transactionId) references transactionId(transactionId) on delete cascade on update cascade;
+alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
 
