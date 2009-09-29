@@ -1,6 +1,7 @@
+SET SESSION sort_buffer_size=512*1024*1024; 
+SET SESSION read_rnd_buffer_size=512*1024*1024;
 
-
-CREATE TABLE `AdSku` (
+CREATE TABLE `AdSku_inno` (
   `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `purchaseTemplate` varchar(22) character set utf8 collate utf8_bin NOT NULL,
@@ -16,7 +17,7 @@ CREATE TABLE `AdSku` (
 
 
 
-CREATE TABLE `Article` (
+CREATE TABLE `Article_inno` (
   `linkTitle` char(255) default NULL,
   `linkURL` text,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -29,7 +30,7 @@ CREATE TABLE `Article` (
 
 
 
-CREATE TABLE `Calendar` (
+CREATE TABLE `Calendar_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) unsigned NOT NULL default '0',
   `defaultDate` enum('current','first','last') default 'current',
@@ -60,7 +61,7 @@ CREATE TABLE `Calendar` (
 
 
 
-CREATE TABLE `Carousel` (
+CREATE TABLE `Carousel_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `items` mediumtext character set utf8,
@@ -71,7 +72,7 @@ CREATE TABLE `Carousel` (
 
 
 
-CREATE TABLE `Collaboration` (
+CREATE TABLE `Collaboration_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `postGroupId` char(22) character set utf8 collate utf8_bin NOT NULL default '2',
   `canStartThreadGroupId` char(22) character set utf8 collate utf8_bin NOT NULL default '2',
@@ -134,7 +135,7 @@ CREATE TABLE `Collaboration` (
 
 
 
-CREATE TABLE `Dashboard` (
+CREATE TABLE `Dashboard_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` char(22) character set utf8 collate utf8_bin NOT NULL,
   `adminsGroupId` char(22) character set utf8 collate utf8_bin NOT NULL default '4',
@@ -147,7 +148,7 @@ CREATE TABLE `Dashboard` (
 
 
 
-CREATE TABLE `DataForm` (
+CREATE TABLE `DataForm_inno` (
   `acknowledgement` text,
   `mailData` int(11) NOT NULL default '1',
   `emailTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -170,7 +171,7 @@ CREATE TABLE `DataForm` (
 
 
 
-CREATE TABLE `DataForm_entry` (
+CREATE TABLE `DataForm_entry_inno` (
   `DataForm_entryId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `username` char(255) default NULL,
@@ -185,7 +186,7 @@ CREATE TABLE `DataForm_entry` (
 
 
 
-CREATE TABLE `DataTable` (
+CREATE TABLE `DataTable_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `data` longtext character set utf8,
@@ -195,7 +196,7 @@ CREATE TABLE `DataTable` (
 
 
 
-CREATE TABLE `EMSBadge` (
+CREATE TABLE `EMSBadge_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL default '0',
@@ -211,7 +212,7 @@ CREATE TABLE `EMSBadge` (
 
 
 
-CREATE TABLE `EMSBadgeGroup` (
+CREATE TABLE `EMSBadgeGroup_inno` (
   `badgeGroupId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `emsAssetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(100) default NULL,
@@ -220,7 +221,7 @@ CREATE TABLE `EMSBadgeGroup` (
 
 
 
-CREATE TABLE `EMSEventMetaField` (
+CREATE TABLE `EMSEventMetaField_inno` (
   `fieldId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin default NULL,
   `label` char(100) default NULL,
@@ -235,7 +236,7 @@ CREATE TABLE `EMSEventMetaField` (
 
 
 
-CREATE TABLE `EMSRegistrant` (
+CREATE TABLE `EMSRegistrant_inno` (
   `badgeId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin default NULL,
   `badgeNumber` int(11) NOT NULL auto_increment,
@@ -263,7 +264,7 @@ CREATE TABLE `EMSRegistrant` (
 
 
 
-CREATE TABLE `EMSRegistrantRibbon` (
+CREATE TABLE `EMSRegistrantRibbon_inno` (
   `badgeId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `ribbonAssetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `transactionItemId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -272,7 +273,7 @@ CREATE TABLE `EMSRegistrantRibbon` (
 
 
 
-CREATE TABLE `EMSRegistrantTicket` (
+CREATE TABLE `EMSRegistrantTicket_inno` (
   `badgeId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `ticketAssetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `purchaseComplete` tinyint(1) default NULL,
@@ -283,7 +284,7 @@ CREATE TABLE `EMSRegistrantTicket` (
 
 
 
-CREATE TABLE `EMSRegistrantToken` (
+CREATE TABLE `EMSRegistrantToken_inno` (
   `badgeId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `tokenAssetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `quantity` int(11) default NULL,
@@ -293,7 +294,7 @@ CREATE TABLE `EMSRegistrantToken` (
 
 
 
-CREATE TABLE `EMSRibbon` (
+CREATE TABLE `EMSRibbon_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `percentageDiscount` float NOT NULL default '10',
@@ -303,7 +304,7 @@ CREATE TABLE `EMSRibbon` (
 
 
 
-CREATE TABLE `EMSTicket` (
+CREATE TABLE `EMSTicket_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL default '0',
@@ -320,7 +321,7 @@ CREATE TABLE `EMSTicket` (
 
 
 
-CREATE TABLE `EMSToken` (
+CREATE TABLE `EMSToken_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL default '0',
@@ -329,7 +330,7 @@ CREATE TABLE `EMSToken` (
 
 
 
-CREATE TABLE `Event` (
+CREATE TABLE `Event_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) unsigned NOT NULL,
   `feedId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -356,7 +357,7 @@ CREATE TABLE `Event` (
 
 
 
-CREATE TABLE `EventManagementSystem` (
+CREATE TABLE `EventManagementSystem_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `groupToApproveEvents` char(22) character set utf8 collate utf8_bin default NULL,
@@ -378,7 +379,7 @@ CREATE TABLE `EventManagementSystem` (
 
 
 
-CREATE TABLE `Event_recur` (
+CREATE TABLE `Event_recur_inno` (
   `recurId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `recurType` char(16) default NULL,
   `pattern` char(255) default NULL,
@@ -389,18 +390,19 @@ CREATE TABLE `Event_recur` (
 
 
 
-CREATE TABLE `Event_relatedlink` (
+CREATE TABLE `Event_relatedlink_inno` (
   `eventlinkId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `linkURL` tinytext,
   `linktext` char(80) default NULL,
   `groupIdView` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `sequenceNumber` bigint(20) default NULL
+  `sequenceNumber` bigint(20) default NULL,
+  PRIMARY KEY (`eventLinkId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
-CREATE TABLE `FileAsset` (
+CREATE TABLE `FileAsset_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `storageId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `filename` char(255) NOT NULL,
@@ -412,7 +414,7 @@ CREATE TABLE `FileAsset` (
 
 
 
-CREATE TABLE `FlatDiscount` (
+CREATE TABLE `FlatDiscount_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL default '63ix2-hU0FchXGIWkG3tow',
@@ -425,7 +427,7 @@ CREATE TABLE `FlatDiscount` (
 
 
 
-CREATE TABLE `Folder` (
+CREATE TABLE `Folder_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
@@ -437,7 +439,7 @@ CREATE TABLE `Folder` (
 
 
 
-CREATE TABLE `Gallery` (
+CREATE TABLE `Gallery_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `groupIdAddComment` char(22) character set utf8 collate utf8_bin default NULL,
@@ -478,7 +480,7 @@ CREATE TABLE `Gallery` (
 
 
 
-CREATE TABLE `GalleryAlbum` (
+CREATE TABLE `GalleryAlbum_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `allowComments` int(11) default NULL,
@@ -494,7 +496,7 @@ CREATE TABLE `GalleryAlbum` (
 
 
 
-CREATE TABLE `GalleryFile` (
+CREATE TABLE `GalleryFile_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `userDefined1` longtext,
@@ -510,7 +512,7 @@ CREATE TABLE `GalleryFile` (
 
 
 
-CREATE TABLE `GalleryFile_comment` (
+CREATE TABLE `GalleryFile_comment_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `commentId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -523,7 +525,7 @@ CREATE TABLE `GalleryFile_comment` (
 
 
 
-CREATE TABLE `HttpProxy` (
+CREATE TABLE `HttpProxy_inno` (
   `proxiedUrl` text,
   `timeout` int(11) default NULL,
   `removeStyle` int(11) default NULL,
@@ -548,7 +550,7 @@ CREATE TABLE `HttpProxy` (
 
 
 
-CREATE TABLE `ITransact_recurringStatus` (
+CREATE TABLE `ITransact_recurringStatus_inno` (
   `gatewayId` char(128) NOT NULL,
   `initDate` bigint(20) NOT NULL default '0',
   `lastTransaction` bigint(20) NOT NULL default '0',
@@ -560,7 +562,7 @@ CREATE TABLE `ITransact_recurringStatus` (
 
 
 
-CREATE TABLE `ImageAsset` (
+CREATE TABLE `ImageAsset_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `thumbnailSize` int(11) NOT NULL default '50',
   `parameters` text,
@@ -571,7 +573,7 @@ CREATE TABLE `ImageAsset` (
 
 
 
-CREATE TABLE `InOutBoard` (
+CREATE TABLE `InOutBoard_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
   `statusList` text,
@@ -586,7 +588,7 @@ CREATE TABLE `InOutBoard` (
 
 
 
-CREATE TABLE `InOutBoard_delegates` (
+CREATE TABLE `InOutBoard_delegates_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `delegateUserId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL
@@ -594,7 +596,7 @@ CREATE TABLE `InOutBoard_delegates` (
 
 
 
-CREATE TABLE `InOutBoard_status` (
+CREATE TABLE `InOutBoard_status_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `status` char(255) default NULL,
@@ -604,7 +606,7 @@ CREATE TABLE `InOutBoard_status` (
 
 
 
-CREATE TABLE `InOutBoard_statusLog` (
+CREATE TABLE `InOutBoard_statusLog_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `status` char(255) default NULL,
@@ -615,7 +617,7 @@ CREATE TABLE `InOutBoard_statusLog` (
 
 
 
-CREATE TABLE `Layout` (
+CREATE TABLE `Layout_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `contentPositions` text,
@@ -628,7 +630,7 @@ CREATE TABLE `Layout` (
 
 
 
-CREATE TABLE `Map` (
+CREATE TABLE `Map_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `groupIdAddPoint` char(22) character set utf8 collate utf8_bin default NULL,
@@ -647,7 +649,7 @@ CREATE TABLE `Map` (
 
 
 
-CREATE TABLE `MapPoint` (
+CREATE TABLE `MapPoint_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `latitude` float default NULL,
@@ -673,7 +675,7 @@ CREATE TABLE `MapPoint` (
 
 
 
-CREATE TABLE `Matrix` (
+CREATE TABLE `Matrix_inno` (
   `detailTemplateId` char(22) character set utf8 collate utf8_bin default NULL,
   `compareTemplateId` char(22) character set utf8 collate utf8_bin default NULL,
   `searchTemplateId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -706,7 +708,7 @@ CREATE TABLE `Matrix` (
 
 
 
-CREATE TABLE `MatrixListing` (
+CREATE TABLE `MatrixListing_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `screenshots` char(22) character set utf8 collate utf8_bin default NULL,
@@ -729,7 +731,7 @@ CREATE TABLE `MatrixListing` (
 
 
 
-CREATE TABLE `MatrixListing_attribute` (
+CREATE TABLE `MatrixListing_attribute_inno` (
   `matrixId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `matrixListingId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `attributeId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -739,7 +741,7 @@ CREATE TABLE `MatrixListing_attribute` (
 
 
 
-CREATE TABLE `MatrixListing_rating` (
+CREATE TABLE `MatrixListing_rating_inno` (
   `timeStamp` int(11) NOT NULL default '0',
   `category` char(255) default NULL,
   `rating` int(11) NOT NULL default '1',
@@ -751,7 +753,7 @@ CREATE TABLE `MatrixListing_rating` (
 
 
 
-CREATE TABLE `MatrixListing_ratingSummary` (
+CREATE TABLE `MatrixListing_ratingSummary_inno` (
   `listingId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `category` char(255) NOT NULL,
   `meanValue` decimal(3,2) default NULL,
@@ -763,7 +765,7 @@ CREATE TABLE `MatrixListing_ratingSummary` (
 
 
 
-CREATE TABLE `Matrix_attribute` (
+CREATE TABLE `Matrix_attribute_inno` (
   `attributeId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `category` char(255) NOT NULL,
   `name` char(255) default NULL,
@@ -778,7 +780,7 @@ CREATE TABLE `Matrix_attribute` (
 
 
 
-CREATE TABLE `MessageBoard` (
+CREATE TABLE `MessageBoard_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
@@ -788,7 +790,7 @@ CREATE TABLE `MessageBoard` (
 
 
 
-CREATE TABLE `MultiSearch` (
+CREATE TABLE `MultiSearch_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) unsigned NOT NULL default '0',
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'MultiSearchTmpl0000001',
@@ -799,7 +801,7 @@ CREATE TABLE `MultiSearch` (
 
 
 
-CREATE TABLE `Navigation` (
+CREATE TABLE `Navigation_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetsToInclude` text,
   `startType` char(35) default NULL,
@@ -818,7 +820,7 @@ CREATE TABLE `Navigation` (
 
 
 
-CREATE TABLE `Newsletter` (
+CREATE TABLE `Newsletter_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `newsletterTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'newsletter000000000001',
@@ -831,7 +833,7 @@ CREATE TABLE `Newsletter` (
 
 
 
-CREATE TABLE `Newsletter_subscriptions` (
+CREATE TABLE `Newsletter_subscriptions_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `subscriptions` text,
@@ -842,7 +844,7 @@ CREATE TABLE `Newsletter_subscriptions` (
 
 
 
-CREATE TABLE `PM_project` (
+CREATE TABLE `PM_project_inno` (
   `projectId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin default NULL,
   `name` char(255) NOT NULL,
@@ -865,7 +867,7 @@ CREATE TABLE `PM_project` (
 
 
 
-CREATE TABLE `PM_task` (
+CREATE TABLE `PM_task_inno` (
   `taskId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `projectId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `taskName` char(255) NOT NULL,
@@ -887,7 +889,7 @@ CREATE TABLE `PM_task` (
 
 
 
-CREATE TABLE `PM_taskResource` (
+CREATE TABLE `PM_taskResource_inno` (
   `taskResourceId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `taskId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL,
@@ -900,7 +902,7 @@ CREATE TABLE `PM_taskResource` (
 
 
 
-CREATE TABLE `PM_wobject` (
+CREATE TABLE `PM_wobject_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `projectDashboardTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'ProjectManagerTMPL0001',
   `projectDisplayTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'ProjectManagerTMPL0002',
@@ -915,7 +917,7 @@ CREATE TABLE `PM_wobject` (
 
 
 
-CREATE TABLE `Photo` (
+CREATE TABLE `Photo_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `exifData` longtext,
@@ -925,7 +927,7 @@ CREATE TABLE `Photo` (
 
 
 
-CREATE TABLE `Photo_rating` (
+CREATE TABLE `Photo_rating_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin default NULL,
   `visitorIp` char(255) default NULL,
@@ -935,7 +937,7 @@ CREATE TABLE `Photo_rating` (
 
 
 
-CREATE TABLE `Poll` (
+CREATE TABLE `Poll_inno` (
   `active` int(11) NOT NULL default '1',
   `graphWidth` int(11) NOT NULL default '150',
   `voteGroup` char(22) character set utf8 collate utf8_bin default NULL,
@@ -972,7 +974,7 @@ CREATE TABLE `Poll` (
 
 
 
-CREATE TABLE `Poll_answer` (
+CREATE TABLE `Poll_answer_inno` (
   `answer` char(3) default NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `ipAddress` char(50) default NULL,
@@ -981,7 +983,7 @@ CREATE TABLE `Poll_answer` (
 
 
 
-CREATE TABLE `Post` (
+CREATE TABLE `Post_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `threadId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `username` char(30) default NULL,
@@ -1003,7 +1005,7 @@ CREATE TABLE `Post` (
 
 
 
-CREATE TABLE `Post_rating` (
+CREATE TABLE `Post_rating_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `ipAddress` char(15) NOT NULL,
@@ -1015,7 +1017,7 @@ CREATE TABLE `Post_rating` (
 
 
 
-CREATE TABLE `Product` (
+CREATE TABLE `Product_inno` (
   `image1` char(255) default NULL,
   `image2` char(255) default NULL,
   `image3` char(255) default NULL,
@@ -1039,7 +1041,7 @@ CREATE TABLE `Product` (
 
 
 
-CREATE TABLE `RichEdit` (
+CREATE TABLE `RichEdit_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `askAboutRichEdit` int(11) NOT NULL default '0',
   `preformatted` int(11) NOT NULL default '0',
@@ -1068,15 +1070,7 @@ CREATE TABLE `RichEdit` (
 
 
 
-CREATE TABLE `SQLForm_fieldOrder` (
-  `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `fieldId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `rank` int(11) NOT NULL default '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
-CREATE TABLE `SQLReport` (
+CREATE TABLE `SQLReport_inno` (
   `dbQuery1` text,
   `paginateAfter` int(11) NOT NULL default '50',
   `preprocessMacros1` int(11) default '0',
@@ -1118,7 +1112,7 @@ CREATE TABLE `SQLReport` (
 
 
 
-CREATE TABLE `Shelf` (
+CREATE TABLE `Shelf_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'nFen0xjkZn8WkpM93C9ceQ',
@@ -1127,7 +1121,7 @@ CREATE TABLE `Shelf` (
 
 
 
-CREATE TABLE `Shortcut` (
+CREATE TABLE `Shortcut_inno` (
   `overrideTitle` int(11) NOT NULL default '0',
   `overrideDescription` int(11) NOT NULL default '0',
   `overrideTemplate` int(11) NOT NULL default '0',
@@ -1149,7 +1143,7 @@ CREATE TABLE `Shortcut` (
 
 
 
-CREATE TABLE `Shortcut_overrides` (
+CREATE TABLE `Shortcut_overrides_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `fieldName` char(255) NOT NULL,
   `newValue` text,
@@ -1158,7 +1152,7 @@ CREATE TABLE `Shortcut_overrides` (
 
 
 
-CREATE TABLE `StockData` (
+CREATE TABLE `StockData_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'StockListTMPL000000001',
   `displayTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'StockListTMPL000000002',
@@ -1171,7 +1165,7 @@ CREATE TABLE `StockData` (
 
 
 
-CREATE TABLE `Story` (
+CREATE TABLE `Story_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `headline` char(255) character set utf8 default NULL,
@@ -1186,7 +1180,7 @@ CREATE TABLE `Story` (
 
 
 
-CREATE TABLE `StoryArchive` (
+CREATE TABLE `StoryArchive_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `storiesPerPage` int(11) default NULL,
@@ -1204,7 +1198,7 @@ CREATE TABLE `StoryArchive` (
 
 
 
-CREATE TABLE `StoryTopic` (
+CREATE TABLE `StoryTopic_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `storiesPer` int(11) default NULL,
@@ -1216,7 +1210,7 @@ CREATE TABLE `StoryTopic` (
 
 
 
-CREATE TABLE `Subscription` (
+CREATE TABLE `Subscription_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1233,7 +1227,7 @@ CREATE TABLE `Subscription` (
 
 
 
-CREATE TABLE `Subscription_code` (
+CREATE TABLE `Subscription_code_inno` (
   `code` char(64) NOT NULL,
   `batchId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `status` char(10) NOT NULL default 'Unused',
@@ -1244,7 +1238,7 @@ CREATE TABLE `Subscription_code` (
 
 
 
-CREATE TABLE `Subscription_codeBatch` (
+CREATE TABLE `Subscription_codeBatch_inno` (
   `batchId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(255) default NULL,
   `description` mediumtext,
@@ -1256,7 +1250,7 @@ CREATE TABLE `Subscription_codeBatch` (
 
 
 
-CREATE TABLE `Survey` (
+CREATE TABLE `Survey_inno` (
   `groupToTakeSurvey` char(22) character set utf8 collate utf8_bin NOT NULL default '2',
   `groupToEditSurvey` char(22) character set utf8 collate utf8_bin NOT NULL default '3',
   `groupToViewReports` char(22) character set utf8 collate utf8_bin NOT NULL default '3',
@@ -1289,7 +1283,7 @@ CREATE TABLE `Survey` (
 
 
 
-CREATE TABLE `Survey_questionTypes` (
+CREATE TABLE `Survey_questionTypes_inno` (
   `questionType` varchar(56) character set utf8 NOT NULL,
   `answers` text character set utf8 NOT NULL,
   PRIMARY KEY  (`questionType`)
@@ -1297,7 +1291,7 @@ CREATE TABLE `Survey_questionTypes` (
 
 
 
-CREATE TABLE `Survey_response` (
+CREATE TABLE `Survey_response_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `Survey_responseId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -1314,7 +1308,7 @@ CREATE TABLE `Survey_response` (
 
 
 
-CREATE TABLE `Survey_tempReport` (
+CREATE TABLE `Survey_tempReport_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `Survey_responseId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `order` smallint(5) unsigned NOT NULL,
@@ -1336,7 +1330,7 @@ CREATE TABLE `Survey_tempReport` (
 
 
 
-CREATE TABLE `Survey_test` (
+CREATE TABLE `Survey_test_inno` (
   `testId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL default '1',
   `dateCreated` datetime default NULL,
@@ -1350,7 +1344,7 @@ CREATE TABLE `Survey_test` (
 
 
 
-CREATE TABLE `SyndicatedContent` (
+CREATE TABLE `SyndicatedContent_inno` (
   `rssUrl` text,
   `maxHeadlines` int(11) NOT NULL default '0',
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1364,7 +1358,7 @@ CREATE TABLE `SyndicatedContent` (
 
 
 
-CREATE TABLE `TT_projectList` (
+CREATE TABLE `TT_projectList_inno` (
   `projectId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin default NULL,
   `projectName` char(255) NOT NULL,
@@ -1377,7 +1371,7 @@ CREATE TABLE `TT_projectList` (
 
 
 
-CREATE TABLE `TT_projectResourceList` (
+CREATE TABLE `TT_projectResourceList_inno` (
   `projectId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `resourceId` char(22) character set utf8 collate utf8_bin NOT NULL,
   PRIMARY KEY  (`projectId`,`resourceId`)
@@ -1385,7 +1379,7 @@ CREATE TABLE `TT_projectResourceList` (
 
 
 
-CREATE TABLE `TT_projectTasks` (
+CREATE TABLE `TT_projectTasks_inno` (
   `taskId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `projectId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `taskName` char(255) NOT NULL,
@@ -1394,7 +1388,7 @@ CREATE TABLE `TT_projectTasks` (
 
 
 
-CREATE TABLE `TT_report` (
+CREATE TABLE `TT_report_inno` (
   `reportId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `startDate` char(10) NOT NULL,
@@ -1409,7 +1403,7 @@ CREATE TABLE `TT_report` (
 
 
 
-CREATE TABLE `TT_timeEntry` (
+CREATE TABLE `TT_timeEntry_inno` (
   `entryId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `projectId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `taskId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1422,7 +1416,7 @@ CREATE TABLE `TT_timeEntry` (
 
 
 
-CREATE TABLE `TT_wobject` (
+CREATE TABLE `TT_wobject_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userViewTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'TimeTrackingTMPL000001',
   `managerViewTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'TimeTrackingTMPL000002',
@@ -1436,7 +1430,7 @@ CREATE TABLE `TT_wobject` (
 
 
 
-CREATE TABLE `Thingy` (
+CREATE TABLE `Thingy_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1446,7 +1440,7 @@ CREATE TABLE `Thingy` (
 
 
 
-CREATE TABLE `ThingyRecord` (
+CREATE TABLE `ThingyRecord_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `templateIdView` char(22) character set utf8 collate utf8_bin default NULL,
@@ -1461,7 +1455,7 @@ CREATE TABLE `ThingyRecord` (
 
 
 
-CREATE TABLE `ThingyRecord_record` (
+CREATE TABLE `ThingyRecord_record_inno` (
   `recordId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL default '1',
   `dateCreated` datetime default NULL,
@@ -1478,7 +1472,7 @@ CREATE TABLE `ThingyRecord_record` (
 
 
 
-CREATE TABLE `Thingy_fields` (
+CREATE TABLE `Thingy_fields_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `thingId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `fieldId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1509,7 +1503,7 @@ CREATE TABLE `Thingy_fields` (
 
 
 
-CREATE TABLE `Thingy_things` (
+CREATE TABLE `Thingy_things_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `thingId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `label` char(255) NOT NULL,
@@ -1542,7 +1536,7 @@ CREATE TABLE `Thingy_things` (
 
 
 
-CREATE TABLE `Thread` (
+CREATE TABLE `Thread_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `replies` int(11) NOT NULL default '0',
   `lastPostId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1560,7 +1554,7 @@ CREATE TABLE `Thread` (
 
 
 
-CREATE TABLE `Thread_read` (
+CREATE TABLE `Thread_read_inno` (
   `threadId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   KEY `threadId_userId` (`threadId`,`userId`)
@@ -1568,7 +1562,7 @@ CREATE TABLE `Thread_read` (
 
 
 
-CREATE TABLE `UserList` (
+CREATE TABLE `UserList_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
   `templateId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -1587,7 +1581,7 @@ CREATE TABLE `UserList` (
 
 
 
-CREATE TABLE `WeatherData` (
+CREATE TABLE `WeatherData_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) unsigned NOT NULL default '0',
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL default 'WeatherDataTmpl0000001',
@@ -1599,7 +1593,7 @@ CREATE TABLE `WeatherData` (
 
 
 
-CREATE TABLE `WikiMaster` (
+CREATE TABLE `WikiMaster_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `groupToEditPages` char(22) character set utf8 collate utf8_bin NOT NULL default '2',
@@ -1628,7 +1622,7 @@ CREATE TABLE `WikiMaster` (
 
 
 
-CREATE TABLE `WikiPage` (
+CREATE TABLE `WikiPage_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `content` mediumtext,
@@ -1642,7 +1636,7 @@ CREATE TABLE `WikiPage` (
 
 
 
-CREATE TABLE `Workflow` (
+CREATE TABLE `Workflow_inno` (
   `workflowId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `title` char(255) NOT NULL default 'Untitled',
   `description` text,
@@ -1654,7 +1648,7 @@ CREATE TABLE `Workflow` (
 
 
 
-CREATE TABLE `WorkflowActivity` (
+CREATE TABLE `WorkflowActivity_inno` (
   `activityId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `workflowId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `title` char(255) NOT NULL default 'Untitled',
@@ -1666,7 +1660,7 @@ CREATE TABLE `WorkflowActivity` (
 
 
 
-CREATE TABLE `WorkflowActivityData` (
+CREATE TABLE `WorkflowActivityData_inno` (
   `activityId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
@@ -1675,7 +1669,7 @@ CREATE TABLE `WorkflowActivityData` (
 
 
 
-CREATE TABLE `WorkflowInstance` (
+CREATE TABLE `WorkflowInstance_inno` (
   `instanceId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `workflowId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `currentActivityId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1692,7 +1686,7 @@ CREATE TABLE `WorkflowInstance` (
 
 
 
-CREATE TABLE `WorkflowInstanceScratch` (
+CREATE TABLE `WorkflowInstanceScratch_inno` (
   `instanceId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
@@ -1701,7 +1695,7 @@ CREATE TABLE `WorkflowInstanceScratch` (
 
 
 
-CREATE TABLE `WorkflowSchedule` (
+CREATE TABLE `WorkflowSchedule_inno` (
   `taskId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `title` char(255) NOT NULL default 'Untitled',
   `enabled` int(11) NOT NULL default '0',
@@ -1721,7 +1715,7 @@ CREATE TABLE `WorkflowSchedule` (
 
 
 
-CREATE TABLE `ZipArchiveAsset` (
+CREATE TABLE `ZipArchiveAsset_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `showPage` char(255) NOT NULL default 'index.html',
@@ -1731,7 +1725,7 @@ CREATE TABLE `ZipArchiveAsset` (
 
 
 
-CREATE TABLE `adSkuPurchase` (
+CREATE TABLE `adSkuPurchase_inno` (
   `adSkuPurchaseId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL default '1',
   `dateCreated` datetime default NULL,
@@ -1749,7 +1743,7 @@ CREATE TABLE `adSkuPurchase` (
 
 
 
-CREATE TABLE `adSpace` (
+CREATE TABLE `adSpace_inno` (
   `adSpaceId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(35) NOT NULL,
   `title` char(255) NOT NULL,
@@ -1764,7 +1758,7 @@ CREATE TABLE `adSpace` (
 
 
 
-CREATE TABLE `address` (
+CREATE TABLE `address_inno` (
   `addressId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `addressBookId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `label` char(35) default NULL,
@@ -1786,7 +1780,7 @@ CREATE TABLE `address` (
 
 
 
-CREATE TABLE `addressBook` (
+CREATE TABLE `addressBook_inno` (
   `addressBookId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sessionId` char(22) character set utf8 collate utf8_bin default NULL,
   `userId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -1798,7 +1792,7 @@ CREATE TABLE `addressBook` (
 
 
 
-CREATE TABLE `advertisement` (
+CREATE TABLE `advertisement_inno` (
   `adId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `adSpaceId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `ownerUserId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1825,7 +1819,7 @@ CREATE TABLE `advertisement` (
 
 
 
-CREATE TABLE `analyticRule` (
+CREATE TABLE `analyticRule_inno` (
   `ruleId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL default '1',
   `dateCreated` datetime default NULL,
@@ -1837,7 +1831,7 @@ CREATE TABLE `analyticRule` (
 
 
 
-CREATE TABLE `asset` (
+CREATE TABLE `asset_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `parentId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `lineage` char(255) NOT NULL,
@@ -1861,7 +1855,7 @@ CREATE TABLE `asset` (
 
 
 
-CREATE TABLE `assetAspectComments` (
+CREATE TABLE `assetAspectComments_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `comments` longtext,
@@ -1871,7 +1865,7 @@ CREATE TABLE `assetAspectComments` (
 
 
 
-CREATE TABLE `assetAspectRssFeed` (
+CREATE TABLE `assetAspectRssFeed_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `itemsPerFeed` int(11) default '25',
@@ -1887,7 +1881,7 @@ CREATE TABLE `assetAspectRssFeed` (
 
 
 
-CREATE TABLE `assetAspect_Subscribable` (
+CREATE TABLE `assetAspect_Subscribable_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `subscriptionGroupId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -1898,7 +1892,7 @@ CREATE TABLE `assetAspect_Subscribable` (
 
 
 
-CREATE TABLE `assetData` (
+CREATE TABLE `assetData_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
   `revisedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1934,7 +1928,7 @@ CREATE TABLE `assetData` (
 
 
 
-CREATE TABLE `assetHistory` (
+CREATE TABLE `assetHistory_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `dateStamp` bigint(20) NOT NULL default '0',
@@ -1944,7 +1938,7 @@ CREATE TABLE `assetHistory` (
 
 
 
-CREATE TABLE `assetIndex` (
+CREATE TABLE `assetIndex_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `title` char(255) default NULL,
   `synopsis` text,
@@ -1964,7 +1958,7 @@ CREATE TABLE `assetIndex` (
 
 
 
-CREATE TABLE `assetKeyword` (
+CREATE TABLE `assetKeyword_inno` (
   `keyword` char(64) NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   PRIMARY KEY  (`keyword`,`assetId`),
@@ -1974,7 +1968,7 @@ CREATE TABLE `assetKeyword` (
 
 
 
-CREATE TABLE `assetVersionTag` (
+CREATE TABLE `assetVersionTag_inno` (
   `tagId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(255) NOT NULL,
   `isCommitted` int(11) NOT NULL default '0',
@@ -1996,7 +1990,7 @@ CREATE TABLE `assetVersionTag` (
 
 
 
-CREATE TABLE `authentication` (
+CREATE TABLE `authentication_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `authMethod` char(30) NOT NULL,
   `fieldName` char(128) NOT NULL,
@@ -2006,7 +2000,7 @@ CREATE TABLE `authentication` (
 
 
 
-CREATE TABLE `bucketLog` (
+CREATE TABLE `bucketLog_inno` (
   `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `Bucket` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `duration` int(11) default NULL,
@@ -2015,19 +2009,7 @@ CREATE TABLE `bucketLog` (
 
 
 
-CREATE TABLE `cache` (
-  `namespace` char(128) NOT NULL,
-  `cachekey` char(128) NOT NULL,
-  `expires` bigint(20) NOT NULL,
-  `size` int(11) NOT NULL,
-  `content` mediumblob,
-  PRIMARY KEY  (`namespace`,`cachekey`),
-  KEY `namespace_cachekey_size` (`namespace`,`cachekey`,`expires`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
-CREATE TABLE `cart` (
+CREATE TABLE `cart_inno` (
   `cartId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sessionId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `shippingAddressId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -2040,7 +2022,7 @@ CREATE TABLE `cart` (
 
 
 
-CREATE TABLE `cartItem` (
+CREATE TABLE `cartItem_inno` (
   `itemId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `cartId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -2055,7 +2037,7 @@ CREATE TABLE `cartItem` (
 
 
 
-CREATE TABLE `databaseLink` (
+CREATE TABLE `databaseLink_inno` (
   `databaseLinkId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `title` char(255) default NULL,
   `DSN` char(255) default NULL,
@@ -2069,7 +2051,7 @@ CREATE TABLE `databaseLink` (
 
 
 
-CREATE TABLE `deltaLog` (
+CREATE TABLE `deltaLog_inno` (
   `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `delta` int(11) default NULL,
@@ -2079,7 +2061,7 @@ CREATE TABLE `deltaLog` (
 
 
 
-CREATE TABLE `donation` (
+CREATE TABLE `donation_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `defaultPrice` float NOT NULL default '100',
@@ -2090,7 +2072,7 @@ CREATE TABLE `donation` (
 
 
 
-CREATE TABLE `filePumpBundle` (
+CREATE TABLE `filePumpBundle_inno` (
   `bundleId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL default '1',
   `dateCreated` datetime default NULL,
@@ -2106,7 +2088,7 @@ CREATE TABLE `filePumpBundle` (
 
 
 
-CREATE TABLE `friendInvitations` (
+CREATE TABLE `friendInvitations_inno` (
   `inviteId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `inviterId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `friendId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -2118,14 +2100,14 @@ CREATE TABLE `friendInvitations` (
 
 
 
-CREATE TABLE `groupGroupings` (
+CREATE TABLE `groupGroupings_inno` (
   `groupId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `inGroup` char(22) character set utf8 collate utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
-CREATE TABLE `groupings` (
+CREATE TABLE `groupings_inno` (
   `groupId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `expireDate` bigint(20) NOT NULL default '2114402400',
@@ -2136,7 +2118,7 @@ CREATE TABLE `groupings` (
 
 
 
-CREATE TABLE `groups` (
+CREATE TABLE `groups_inno` (
   `groupId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `groupName` char(100) default NULL,
   `description` char(255) default NULL,
@@ -2169,7 +2151,7 @@ CREATE TABLE `groups` (
 
 
 
-CREATE TABLE `imageColor` (
+CREATE TABLE `imageColor_inno` (
   `colorId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(255) NOT NULL default 'untitled',
   `fillTriplet` char(7) NOT NULL default '#000000',
@@ -2181,7 +2163,7 @@ CREATE TABLE `imageColor` (
 
 
 
-CREATE TABLE `imageFont` (
+CREATE TABLE `imageFont_inno` (
   `fontId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(255) default NULL,
   `storageId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -2191,7 +2173,7 @@ CREATE TABLE `imageFont` (
 
 
 
-CREATE TABLE `imagePalette` (
+CREATE TABLE `imagePalette_inno` (
   `paletteId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(255) NOT NULL default 'untitled',
   PRIMARY KEY  (`paletteId`)
@@ -2199,7 +2181,7 @@ CREATE TABLE `imagePalette` (
 
 
 
-CREATE TABLE `imagePaletteColors` (
+CREATE TABLE `imagePaletteColors_inno` (
   `paletteId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `colorId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `paletteOrder` int(11) NOT NULL,
@@ -2208,7 +2190,7 @@ CREATE TABLE `imagePaletteColors` (
 
 
 
-CREATE TABLE `inbox` (
+CREATE TABLE `inbox_inno` (
   `messageId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `status` char(15) NOT NULL default 'pending',
   `dateStamp` bigint(20) NOT NULL,
@@ -2227,7 +2209,7 @@ CREATE TABLE `inbox` (
 
 
 
-CREATE TABLE `inbox_messageState` (
+CREATE TABLE `inbox_messageState_inno` (
   `messageId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `isRead` tinyint(4) NOT NULL default '0',
@@ -2238,7 +2220,7 @@ CREATE TABLE `inbox_messageState` (
 
 
 
-CREATE TABLE `incrementer` (
+CREATE TABLE `incrementer_inno` (
   `incrementerId` char(50) NOT NULL,
   `nextValue` int(11) NOT NULL default '1',
   PRIMARY KEY  (`incrementerId`)
@@ -2246,7 +2228,7 @@ CREATE TABLE `incrementer` (
 
 
 
-CREATE TABLE `karmaLog` (
+CREATE TABLE `karmaLog_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `amount` int(11) NOT NULL default '1',
   `source` char(255) default NULL,
@@ -2256,7 +2238,7 @@ CREATE TABLE `karmaLog` (
 
 
 
-CREATE TABLE `ldapLink` (
+CREATE TABLE `ldapLink_inno` (
   `ldapLinkId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `ldapLinkName` char(255) NOT NULL,
   `ldapUrl` char(255) NOT NULL,
@@ -2277,7 +2259,7 @@ CREATE TABLE `ldapLink` (
 
 
 
-CREATE TABLE `mailQueue` (
+CREATE TABLE `mailQueue_inno` (
   `messageId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `message` mediumtext,
   `toGroup` char(22) character set utf8 collate utf8_bin default NULL,
@@ -2287,7 +2269,7 @@ CREATE TABLE `mailQueue` (
 
 
 
-CREATE TABLE `metaData_properties` (
+CREATE TABLE `metaData_properties_inno` (
   `fieldId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `fieldName` char(100) NOT NULL,
   `description` mediumtext NOT NULL,
@@ -2300,7 +2282,7 @@ CREATE TABLE `metaData_properties` (
 
 
 
-CREATE TABLE `metaData_values` (
+CREATE TABLE `metaData_values_inno` (
   `fieldId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `value` char(255) default NULL,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -2309,7 +2291,7 @@ CREATE TABLE `metaData_values` (
 
 
 
-CREATE TABLE `passiveAnalyticsStatus` (
+CREATE TABLE `passiveAnalyticsStatus_inno` (
   `startDate` datetime default NULL,
   `endDate` datetime default NULL,
   `running` int(2) default '0',
@@ -2318,7 +2300,7 @@ CREATE TABLE `passiveAnalyticsStatus` (
 
 
 
-CREATE TABLE `passiveLog` (
+CREATE TABLE `passiveLog_inno` (
   `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `sessionId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
@@ -2328,7 +2310,7 @@ CREATE TABLE `passiveLog` (
 
 
 
-CREATE TABLE `passiveProfileAOI` (
+CREATE TABLE `passiveProfileAOI_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `fieldId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `value` char(100) NOT NULL,
@@ -2338,7 +2320,7 @@ CREATE TABLE `passiveProfileAOI` (
 
 
 
-CREATE TABLE `passiveProfileLog` (
+CREATE TABLE `passiveProfileLog_inno` (
   `passiveProfileLogId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sessionId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -2349,7 +2331,7 @@ CREATE TABLE `passiveProfileLog` (
 
 
 
-CREATE TABLE `paymentGateway` (
+CREATE TABLE `paymentGateway_inno` (
   `paymentGatewayId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `className` char(255) default NULL,
   `options` longtext,
@@ -2358,7 +2340,7 @@ CREATE TABLE `paymentGateway` (
 
 
 
-CREATE TABLE `redirect` (
+CREATE TABLE `redirect_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `redirectUrl` text,
   `revisionDate` bigint(20) NOT NULL default '0',
@@ -2368,7 +2350,7 @@ CREATE TABLE `redirect` (
 
 
 
-CREATE TABLE `replacements` (
+CREATE TABLE `replacements_inno` (
   `replacementId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `searchFor` char(255) default NULL,
   `replaceWith` text,
@@ -2377,7 +2359,7 @@ CREATE TABLE `replacements` (
 
 
 
-CREATE TABLE `search` (
+CREATE TABLE `search_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
   `classLimiter` text,
@@ -2390,7 +2372,7 @@ CREATE TABLE `search` (
 
 
 
-CREATE TABLE `settings` (
+CREATE TABLE `settings_inno` (
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY  (`name`)
@@ -2398,7 +2380,7 @@ CREATE TABLE `settings` (
 
 
 
-CREATE TABLE `shipper` (
+CREATE TABLE `shipper_inno` (
   `shipperId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `className` char(255) default NULL,
   `options` longtext,
@@ -2407,7 +2389,7 @@ CREATE TABLE `shipper` (
 
 
 
-CREATE TABLE `shopCredit` (
+CREATE TABLE `shopCredit_inno` (
   `creditId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `amount` float NOT NULL default '0',
@@ -2419,7 +2401,7 @@ CREATE TABLE `shopCredit` (
 
 
 
-CREATE TABLE `sku` (
+CREATE TABLE `sku_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `description` mediumtext,
@@ -2437,7 +2419,7 @@ CREATE TABLE `sku` (
 
 
 
-CREATE TABLE `snippet` (
+CREATE TABLE `snippet_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `snippet` mediumtext,
   `processAsTemplate` int(11) NOT NULL default '0',
@@ -2451,38 +2433,7 @@ CREATE TABLE `snippet` (
 
 
 
-CREATE TABLE `subscriptionCode` (
-  `batchId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `code` char(64) NOT NULL,
-  `status` char(10) NOT NULL default 'Unused',
-  `dateCreated` int(11) NOT NULL default '0',
-  `dateUsed` int(11) NOT NULL default '0',
-  `expires` int(11) NOT NULL default '0',
-  `usedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
-  PRIMARY KEY  (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
-CREATE TABLE `subscriptionCodeBatch` (
-  `batchId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `name` char(128) default NULL,
-  `description` mediumtext NOT NULL,
-  `subscriptionId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  PRIMARY KEY  (`batchId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
-CREATE TABLE `subscriptionCodeSubscriptions` (
-  `code` char(64) NOT NULL,
-  `subscriptionId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  UNIQUE KEY `code` (`code`,`subscriptionId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
-CREATE TABLE `taxDriver` (
+CREATE TABLE `taxDriver_inno` (
   `className` char(255) character set utf8 NOT NULL,
   `options` longtext,
   PRIMARY KEY  (`className`)
@@ -2490,7 +2441,7 @@ CREATE TABLE `taxDriver` (
 
 
 
-CREATE TABLE `tax_eu_vatNumbers` (
+CREATE TABLE `tax_eu_vatNumbers_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `countryCode` char(3) character set utf8 NOT NULL,
   `vatNumber` char(20) character set utf8 NOT NULL,
@@ -2502,7 +2453,7 @@ CREATE TABLE `tax_eu_vatNumbers` (
 
 
 
-CREATE TABLE `tax_generic_rates` (
+CREATE TABLE `tax_generic_rates_inno` (
   `taxId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `country` char(100) NOT NULL,
   `state` char(100) default NULL,
@@ -2514,7 +2465,7 @@ CREATE TABLE `tax_generic_rates` (
 
 
 
-CREATE TABLE `template` (
+CREATE TABLE `template_inno` (
   `template` mediumtext,
   `namespace` char(35) NOT NULL default 'Page',
   `isEditable` int(11) NOT NULL default '1',
@@ -2531,7 +2482,7 @@ CREATE TABLE `template` (
 
 
 
-CREATE TABLE `template_attachments` (
+CREATE TABLE `template_attachments_inno` (
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
   `url` varchar(256) character set utf8 NOT NULL,
@@ -2542,7 +2493,7 @@ CREATE TABLE `template_attachments` (
 
 
 
-CREATE TABLE `transaction` (
+CREATE TABLE `transaction_inno` (
   `transactionId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `originatingTransactionId` char(22) character set utf8 collate utf8_bin default NULL,
   `isSuccessful` tinyint(1) NOT NULL default '0',
@@ -2590,7 +2541,7 @@ CREATE TABLE `transaction` (
 
 
 
-CREATE TABLE `transactionItem` (
+CREATE TABLE `transactionItem_inno` (
   `itemId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `transactionId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin default NULL,
@@ -2623,7 +2574,7 @@ CREATE TABLE `transactionItem` (
 
 
 
-CREATE TABLE `userInvitations` (
+CREATE TABLE `userInvitations_inno` (
   `inviteId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `dateSent` date default NULL,
@@ -2635,7 +2586,7 @@ CREATE TABLE `userInvitations` (
 
 
 
-CREATE TABLE `userLoginLog` (
+CREATE TABLE `userLoginLog_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `status` char(30) default NULL,
   `timeStamp` int(11) default NULL,
@@ -2647,7 +2598,7 @@ CREATE TABLE `userLoginLog` (
 
 
 
-CREATE TABLE `userProfileCategory` (
+CREATE TABLE `userProfileCategory_inno` (
   `profileCategoryId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `label` char(255) NOT NULL default 'Undefined',
   `shortLabel` char(255) default NULL,
@@ -2660,7 +2611,7 @@ CREATE TABLE `userProfileCategory` (
 
 
 
-CREATE TABLE `userProfileData` (
+CREATE TABLE `userProfileData_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `email` char(255) default NULL,
   `firstName` char(255) default NULL,
@@ -2717,7 +2668,7 @@ CREATE TABLE `userProfileData` (
 
 
 
-CREATE TABLE `userProfileField` (
+CREATE TABLE `userProfileField_inno` (
   `fieldName` char(128) NOT NULL,
   `label` char(255) NOT NULL default 'Undefined',
   `visible` int(11) NOT NULL default '0',
@@ -2739,7 +2690,7 @@ CREATE TABLE `userProfileField` (
 
 
 
-CREATE TABLE `userSession` (
+CREATE TABLE `userSession_inno` (
   `sessionId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `expires` int(11) default NULL,
   `lastPageView` int(11) default NULL,
@@ -2752,7 +2703,7 @@ CREATE TABLE `userSession` (
 
 
 
-CREATE TABLE `userSessionScratch` (
+CREATE TABLE `userSessionScratch_inno` (
   `sessionId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
@@ -2761,7 +2712,7 @@ CREATE TABLE `userSessionScratch` (
 
 
 
-CREATE TABLE `users` (
+CREATE TABLE `users_inno` (
   `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `username` char(100) default NULL,
   `authMethod` char(30) NOT NULL default 'WebGUI',
@@ -2777,7 +2728,7 @@ CREATE TABLE `users` (
 
 
 
-CREATE TABLE `vendor` (
+CREATE TABLE `vendor_inno` (
   `vendorId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `dateCreated` datetime default NULL,
   `name` char(255) default NULL,
@@ -2792,7 +2743,7 @@ CREATE TABLE `vendor` (
 
 
 
-CREATE TABLE `webguiVersion` (
+CREATE TABLE `webguiVersion_inno` (
   `webguiVersion` char(10) default NULL,
   `versionType` char(30) default NULL,
   `dateApplied` int(11) default NULL
@@ -2800,7 +2751,7 @@ CREATE TABLE `webguiVersion` (
 
 
 
-CREATE TABLE `wobject` (
+CREATE TABLE `wobject_inno` (
   `displayTitle` int(11) NOT NULL default '1',
   `description` mediumtext,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -2810,4 +2761,540 @@ CREATE TABLE `wobject` (
   `mobileStyleTemplateId` char(22) character set utf8 collate utf8_bin default 'PBtmpl0000000000000060',
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+INSERT INTO `AdSku_inno` SELECT * FROM `AdSku` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Article_inno` SELECT * FROM `Article` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Calendar_inno` SELECT * FROM `Calendar` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Carousel_inno` SELECT * FROM `Carousel` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Collaboration_inno` SELECT * FROM `Collaboration` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Dashboard_inno` SELECT * FROM `Dashboard` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `DataForm_inno` SELECT * FROM `DataForm` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `DataForm_entry_inno` SELECT * FROM `DataForm_entry` ORDER BY `DataForm_entryId`; 
+INSERT INTO `DataTable_inno` SELECT * FROM `DataTable` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `EMSBadge_inno` SELECT * FROM `EMSBadge` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `EMSBadgeGroup_inno` SELECT * FROM `EMSBadgeGroup` ORDER BY `badgeGroupId`; 
+INSERT INTO `EMSEventMetaField_inno` SELECT * FROM `EMSEventMetaField` ORDER BY `fieldId`; 
+INSERT INTO `EMSRegistrant_inno` SELECT * FROM `EMSRegistrant` ORDER BY `badgeId`; 
+INSERT INTO `EMSRegistrantRibbon_inno` SELECT * FROM `EMSRegistrantRibbon` ORDER BY `badgeId`, `ribbonAssetId`; 
+INSERT INTO `EMSRegistrantTicket_inno` SELECT * FROM `EMSRegistrantTicket` ORDER BY `badgeId`, `ticketAssetId`; 
+INSERT INTO `EMSRegistrantToken_inno` SELECT * FROM `EMSRegistrantToken` ORDER BY `badgeId`, `tokenAssetId`; 
+INSERT INTO `EMSRibbon_inno` SELECT * FROM `EMSRibbon` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `EMSTicket_inno` SELECT * FROM `EMSTicket` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `EMSToken_inno` SELECT * FROM `EMSToken` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Event_inno` SELECT * FROM `Event` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `EventManagementSystem_inno` SELECT * FROM `EventManagementSystem` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Event_recur_inno` SELECT * FROM `Event_recur` ORDER BY `recurId`; 
+INSERT INTO `Event_relatedlink_inno` SELECT * FROM `Event_relatedlink` ORDER BY `eventlinkId`; 
+INSERT INTO `FileAsset_inno` SELECT * FROM `FileAsset` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `FlatDiscount_inno` SELECT * FROM `FlatDiscount` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Folder_inno` SELECT * FROM `Folder` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Gallery_inno` SELECT * FROM `Gallery` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `GalleryAlbum_inno` SELECT * FROM `GalleryAlbum` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `GalleryFile_inno` SELECT * FROM `GalleryFile` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `GalleryFile_comment_inno` SELECT * FROM `GalleryFile_comment` ORDER BY `assetId`, `commentId`; 
+INSERT INTO `HttpProxy_inno` SELECT * FROM `HttpProxy` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `ITransact_recurringStatus_inno` SELECT * FROM `ITransact_recurringStatus` ORDER BY `gatewayId`; 
+INSERT INTO `ImageAsset_inno` SELECT * FROM `ImageAsset` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `InOutBoard_inno` SELECT * FROM `InOutBoard` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `InOutBoard_delegates_inno` SELECT * FROM `InOutBoard_delegates`; 
+INSERT INTO `InOutBoard_status_inno` SELECT * FROM `InOutBoard_status`; 
+INSERT INTO `InOutBoard_statusLog_inno` SELECT * FROM `InOutBoard_statusLog`; 
+INSERT INTO `Layout_inno` SELECT * FROM `Layout` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Map_inno` SELECT * FROM `Map` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `MapPoint_inno` SELECT * FROM `MapPoint` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Matrix_inno` SELECT * FROM `Matrix` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `MatrixListing_inno` SELECT * FROM `MatrixListing` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `MatrixListing_attribute_inno` SELECT * FROM `MatrixListing_attribute` ORDER BY `matrixListingId`, `attributeId`; 
+INSERT INTO `MatrixListing_rating_inno` SELECT * FROM `MatrixListing_rating`; 
+INSERT INTO `MatrixListing_ratingSummary_inno` SELECT * FROM `MatrixListing_ratingSummary` ORDER BY `listingId`, `category`; 
+INSERT INTO `Matrix_attribute_inno` SELECT * FROM `Matrix_attribute` ORDER BY `attributeId`; 
+INSERT INTO `MessageBoard_inno` SELECT * FROM `MessageBoard` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `MultiSearch_inno` SELECT * FROM `MultiSearch` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Navigation_inno` SELECT * FROM `Navigation` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Newsletter_inno` SELECT * FROM `Newsletter` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Newsletter_subscriptions_inno` SELECT * FROM `Newsletter_subscriptions` ORDER BY `assetId`, `userId`; 
+INSERT INTO `PM_project_inno` SELECT * FROM `PM_project` ORDER BY `projectId`; 
+INSERT INTO `PM_task_inno` SELECT * FROM `PM_task` ORDER BY `taskId`; 
+INSERT INTO `PM_taskResource_inno` SELECT * FROM `PM_taskResource` ORDER BY `taskResourceId`; 
+INSERT INTO `PM_wobject_inno` SELECT * FROM `PM_wobject` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Photo_inno` SELECT * FROM `Photo` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Photo_rating_inno` SELECT * FROM `Photo_rating` ORDER BY `assetId`; 
+INSERT INTO `Poll_inno` SELECT * FROM `Poll` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Poll_answer_inno` SELECT * FROM `Poll_answer`; 
+INSERT INTO `Post_inno` SELECT * FROM `Post` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Post_rating_inno` SELECT * FROM `Post_rating` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Product_inno` SELECT * FROM `Product` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `RichEdit_inno` SELECT * FROM `RichEdit` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `SQLReport_inno` SELECT * FROM `SQLReport` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Shelf_inno` SELECT * FROM `Shelf` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Shortcut_inno` SELECT * FROM `Shortcut` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Shortcut_overrides_inno` SELECT * FROM `Shortcut_overrides` ORDER BY `assetId`, `fieldName`; 
+INSERT INTO `StockData_inno` SELECT * FROM `StockData` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Story_inno` SELECT * FROM `Story` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `StoryArchive_inno` SELECT * FROM `StoryArchive` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `StoryTopic_inno` SELECT * FROM `StoryTopic` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Subscription_inno` SELECT * FROM `Subscription` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Subscription_code_inno` SELECT * FROM `Subscription_code` ORDER BY `code`; 
+INSERT INTO `Subscription_codeBatch_inno` SELECT * FROM `Subscription_codeBatch` ORDER BY `batchId`; 
+INSERT INTO `Survey_inno` SELECT * FROM `Survey` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Survey_questionTypes_inno` SELECT * FROM `Survey_questionTypes` ORDER BY `questionType`; 
+INSERT INTO `Survey_response_inno` SELECT * FROM `Survey_response` ORDER BY `Survey_responseId`; 
+INSERT INTO `Survey_tempReport_inno` SELECT * FROM `Survey_tempReport` ORDER BY `assetId`, `Survey_responseId`, `order`; 
+INSERT INTO `Survey_test_inno` SELECT * FROM `Survey_test` ORDER BY `testId`; 
+INSERT INTO `SyndicatedContent_inno` SELECT * FROM `SyndicatedContent` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `TT_projectList_inno` SELECT * FROM `TT_projectList` ORDER BY `projectId`; 
+INSERT INTO `TT_projectResourceList_inno` SELECT * FROM `TT_projectResourceList` ORDER BY `projectId`, `resourceId`; 
+INSERT INTO `TT_projectTasks_inno` SELECT * FROM `TT_projectTasks` ORDER BY `taskId`; 
+INSERT INTO `TT_report_inno` SELECT * FROM `TT_report`; 
+INSERT INTO `TT_timeEntry_inno` SELECT * FROM `TT_timeEntry` ORDER BY `entryId`; 
+INSERT INTO `TT_wobject_inno` SELECT * FROM `TT_wobject` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Thingy_inno` SELECT * FROM `Thingy` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `ThingyRecord_inno` SELECT * FROM `ThingyRecord` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `ThingyRecord_record_inno` SELECT * FROM `ThingyRecord_record` ORDER BY `recordId`; 
+INSERT INTO `Thingy_fields_inno` SELECT * FROM `Thingy_fields` ORDER BY `assetId`, `thingId`, `fieldId`; 
+INSERT INTO `Thingy_things_inno` SELECT * FROM `Thingy_things` ORDER BY `thingId`; 
+INSERT INTO `Thread_inno` SELECT * FROM `Thread` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Thread_read_inno` SELECT * FROM `Thread_read` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `UserList_inno` SELECT * FROM `UserList` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `WeatherData_inno` SELECT * FROM `WeatherData` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `WikiMaster_inno` SELECT * FROM `WikiMaster` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `WikiPage_inno` SELECT * FROM `WikiPage` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `Workflow_inno` SELECT * FROM `Workflow` ORDER BY `workflowId`; 
+INSERT INTO `WorkflowActivity_inno` SELECT * FROM `WorkflowActivity` ORDER BY `activityId`; 
+INSERT INTO `WorkflowActivityData_inno` SELECT * FROM `WorkflowActivityData` ORDER BY `activityId`, `name`; 
+INSERT INTO `WorkflowInstance_inno` SELECT * FROM `WorkflowInstance` ORDER BY `instanceId`; 
+INSERT INTO `WorkflowInstanceScratch_inno` SELECT * FROM `WorkflowInstanceScratch` ORDER BY `instanceId`, `name`; 
+INSERT INTO `WorkflowSchedule_inno` SELECT * FROM `WorkflowSchedule` ORDER BY `taskId`; 
+INSERT INTO `ZipArchiveAsset_inno` SELECT * FROM `ZipArchiveAsset` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `adSkuPurchase_inno` SELECT * FROM `adSkuPurchase` ORDER BY `adSkuPurchaseId`; 
+INSERT INTO `adSpace_inno` SELECT * FROM `adSpace` ORDER BY `adSpaceId`; 
+INSERT INTO `address_inno` SELECT * FROM `address` ORDER BY `addressId`; 
+INSERT INTO `addressBook_inno` SELECT * FROM `addressBook` ORDER BY `addressBookId`; 
+INSERT INTO `advertisement_inno` SELECT * FROM `advertisement` ORDER BY `adId`; 
+INSERT INTO `analyticRule_inno` SELECT * FROM `analyticRule` ORDER BY `ruleId`; 
+INSERT INTO `asset_inno` SELECT * FROM `asset` ORDER BY `assetId`; 
+INSERT INTO `assetAspectComments_inno` SELECT * FROM `assetAspectComments` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `assetAspectRssFeed_inno` SELECT * FROM `assetAspectRssFeed` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `assetAspect_Subscribable_inno` SELECT * FROM `assetAspect_Subscribable` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `assetData_inno` SELECT * FROM `assetData` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `assetHistory_inno` SELECT * FROM `assetHistory`; 
+INSERT INTO `assetIndex_inno` SELECT * FROM `assetIndex` ORDER BY `assetId`; 
+INSERT INTO `assetKeyword_inno` SELECT * FROM `assetKeyword` ORDER BY `keyword`, `assetId`; 
+INSERT INTO `assetVersionTag_inno` SELECT * FROM `assetVersionTag` ORDER BY `tagId`; 
+INSERT INTO `authentication_inno` SELECT * FROM `authentication` ORDER BY `userId`, `authMethod`, `fieldName`; 
+INSERT INTO `bucketLog_inno` SELECT * FROM `bucketLog`; 
+INSERT INTO `cart_inno` SELECT * FROM `cart` ORDER BY `cartId`; 
+INSERT INTO `cartItem_inno` SELECT * FROM `cartItem` ORDER BY `cartItemId`; 
+INSERT INTO `databaseLink_inno` SELECT * FROM `databaseLink` ORDER BY `databaseLinkId`; 
+INSERT INTO `deltaLog_inno` SELECT * FROM `deltaLog` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `donation_inno` SELECT * FROM `donation` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `filePumpBundle_inno` SELECT * FROM `filePumpBundle` ORDER BY `bundleId`; 
+INSERT INTO `friendInvitations_inno` SELECT * FROM `friendInvitations` ORDER BY `inviteId`; 
+INSERT INTO `groupGroupings_inno` SELECT * FROM `groupGroupings` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `groupings_inno` SELECT * FROM `groupings` ORDER BY `groupId`, `userId`; 
+INSERT INTO `groups_inno` SELECT * FROM `groups` ORDER BY `groupId`; 
+INSERT INTO `imageColor_inno` SELECT * FROM `imageColor` ORDER BY `colorId`; 
+INSERT INTO `imageFont_inno` SELECT * FROM `imageFont` ORDER BY `fontId`; 
+INSERT INTO `imagePalette_inno` SELECT * FROM `imagePalette` ORDER BY `palletteId`; 
+INSERT INTO `imagePaletteColors_inno` SELECT * FROM `imagePaletteColors` ORDER BY `palletteId`, `paletteOrder`; 
+INSERT INTO `inbox_inno` SELECT * FROM `inbox` ORDER BY `messageId`; 
+INSERT INTO `inbox_messageState_inno` SELECT * FROM `inbox_messageState` ORDER BY `messageId`, `userId`; 
+INSERT INTO `incrementer_inno` SELECT * FROM `incrementer` ORDER BY `incrementerId`; 
+INSERT INTO `karmaLog_inno` SELECT * FROM `karmaLog` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `ldapLink_inno` SELECT * FROM `ldapLink` ORDER BY `ldapLinkId`; 
+INSERT INTO `mailQueue_inno` SELECT * FROM `mailQueue` ORDER BY `messageId`; 
+INSERT INTO `metaData_properties_inno` SELECT * FROM `metaData_properties` ORDER BY `fieldId`; 
+INSERT INTO `metaData_values_inno` SELECT * FROM `metaData_values` ORDER BY `fieldId`, `assetId`; 
+INSERT INTO `passiveAnalyticsStatus_inno` SELECT * FROM `passiveAnalyticsStatus` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `passiveLog_inno` SELECT * FROM `passiveLog` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `passiveProfileAOI_inno` SELECT * FROM `passiveProfileAOI` ORDER BY `userId`, `fieldId`, `value`; 
+INSERT INTO `passiveProfileLog_inno` SELECT * FROM `passiveProfileLog` ORDER BY `passiveProfileLogId`; 
+INSERT INTO `paymentGateway_inno` SELECT * FROM `paymentGateway` ORDER BY `paymentGatewayId`; 
+INSERT INTO `redirect_inno` SELECT * FROM `redirect` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `replacements_inno` SELECT * FROM `replacements` ORDER BY `replacementId`; 
+INSERT INTO `search_inno` SELECT * FROM `search` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `settings_inno` SELECT * FROM `settings` ORDER BY `name`; 
+INSERT INTO `shipper_inno` SELECT * FROM `shipper` ORDER BY `shipperId`; 
+INSERT INTO `shopCredit_inno` SELECT * FROM `shopCredit` ORDER BY `creditId`; 
+INSERT INTO `sku_inno` SELECT * FROM `sku` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `snippet_inno` SELECT * FROM `snippet` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `taxDriver_inno` SELECT * FROM `taxDriver` ORDER BY `className`; 
+INSERT INTO `tax_eu_vatNumbers_inno` SELECT * FROM `tax_eu_vatNumbers` ORDER BY `userId`, `vatNumber`; 
+INSERT INTO `tax_generic_rates_inno` SELECT * FROM `tax_generic_rates` ORDER BY `taxId`; 
+INSERT INTO `template_inno` SELECT * FROM `template` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `template_attachments_inno` SELECT * FROM `template_attachments` ORDER BY `templateId`, `revisionDate`, `url`; 
+INSERT INTO `transaction_inno` SELECT * FROM `transaction` ORDER BY `transactionId`; 
+INSERT INTO `transactionItem_inno` SELECT * FROM `transactionItem` ORDER BY `transactionItemId`; 
+INSERT INTO `userInvitations_inno` SELECT * FROM `userInvitations` ORDER BY `inviteId`; 
+INSERT INTO `userLoginLog_inno` SELECT * FROM `userLoginLog` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `userProfileCategory_inno` SELECT * FROM `userProfileCategory` ORDER BY `profileCategoryId`; 
+INSERT INTO `userProfileData_inno` SELECT * FROM `userProfileData` ORDER BY `userId`; 
+INSERT INTO `userProfileField_inno` SELECT * FROM `userProfileField` ORDER BY `fieldName`; 
+INSERT INTO `userSession_inno` SELECT * FROM `userSession` ORDER BY `sessionId`; 
+INSERT INTO `userSessionScratch_inno` SELECT * FROM `userSessionScratch` ORDER BY `sessionId`, `name`; 
+INSERT INTO `users_inno` SELECT * FROM `users` ORDER BY `userId`; 
+INSERT INTO `vendor_inno` SELECT * FROM `vendor` ORDER BY `vendorId`; 
+INSERT INTO `webguiVersion_inno` SELECT * FROM `webguiVersion` ORDER BY `assetId`, `revisionDate`; 
+INSERT INTO `wobject_inno` SELECT * FROM `wobject` ORDER BY `assetId`, `revisionDate`;
+
+
+
+DROP TABLE `AdSku`; 
+DROP TABLE `Article`; 
+DROP TABLE `Calendar`; 
+DROP TABLE `Carousel`; 
+DROP TABLE `Collaboration`; 
+DROP TABLE `Dashboard`; 
+DROP TABLE `DataForm`; 
+DROP TABLE `DataForm_entry`; 
+DROP TABLE `DataTable`; 
+DROP TABLE `EMSBadge`; 
+DROP TABLE `EMSBadgeGroup`; 
+DROP TABLE `EMSEventMetaField`; 
+DROP TABLE `EMSRegistrant`; 
+DROP TABLE `EMSRegistrantRibbon`; 
+DROP TABLE `EMSRegistrantTicket`; 
+DROP TABLE `EMSRegistrantToken`; 
+DROP TABLE `EMSRibbon`; 
+DROP TABLE `EMSTicket`; 
+DROP TABLE `EMSToken`; 
+DROP TABLE `Event`; 
+DROP TABLE `EventManagementSystem`; 
+DROP TABLE `Event_recur`; 
+DROP TABLE `Event_relatedlink`; 
+DROP TABLE `FileAsset`; 
+DROP TABLE `FlatDiscount`; 
+DROP TABLE `Folder`; 
+DROP TABLE `Gallery`; 
+DROP TABLE `GalleryAlbum`; 
+DROP TABLE `GalleryFile`; 
+DROP TABLE `GalleryFile_comment`; 
+DROP TABLE `HttpProxy`; 
+DROP TABLE `ITransact_recurringStatus`; 
+DROP TABLE `ImageAsset`; 
+DROP TABLE `InOutBoard`; 
+DROP TABLE `InOutBoard_delegates`; 
+DROP TABLE `InOutBoard_status`; 
+DROP TABLE `InOutBoard_statusLog`; 
+DROP TABLE `Layout`; 
+DROP TABLE `Map`; 
+DROP TABLE `MapPoint`; 
+DROP TABLE `Matrix`; 
+DROP TABLE `MatrixListing`; 
+DROP TABLE `MatrixListing_attribute`; 
+DROP TABLE `MatrixListing_rating`; 
+DROP TABLE `MatrixListing_ratingSummary`; 
+DROP TABLE `Matrix_attribute`; 
+DROP TABLE `MessageBoard`; 
+DROP TABLE `MultiSearch`; 
+DROP TABLE `Navigation`; 
+DROP TABLE `Newsletter`; 
+DROP TABLE `Newsletter_subscriptions`; 
+DROP TABLE `PM_project`; 
+DROP TABLE `PM_task`; 
+DROP TABLE `PM_taskResource`; 
+DROP TABLE `PM_wobject`; 
+DROP TABLE `Photo`; 
+DROP TABLE `Photo_rating`; 
+DROP TABLE `Poll`; 
+DROP TABLE `Poll_answer`; 
+DROP TABLE `Post`; 
+DROP TABLE `Post_rating`; 
+DROP TABLE `Product`; 
+DROP TABLE `RichEdit`; 
+DROP TABLE `SQLReport`; 
+DROP TABLE `Shelf`; 
+DROP TABLE `Shortcut`; 
+DROP TABLE `Shortcut_overrides`; 
+DROP TABLE `StockData`; 
+DROP TABLE `Story`; 
+DROP TABLE `StoryArchive`; 
+DROP TABLE `StoryTopic`; 
+DROP TABLE `Subscription`; 
+DROP TABLE `Subscription_code`; 
+DROP TABLE `Subscription_codeBatch`; 
+DROP TABLE `Survey`; 
+DROP TABLE `Survey_questionTypes`; 
+DROP TABLE `Survey_response`; 
+DROP TABLE `Survey_tempReport`; 
+DROP TABLE `Survey_test`; 
+DROP TABLE `SyndicatedContent`; 
+DROP TABLE `TT_projectList`; 
+DROP TABLE `TT_projectResourceList`; 
+DROP TABLE `TT_projectTasks`; 
+DROP TABLE `TT_report`; 
+DROP TABLE `TT_timeEntry`; 
+DROP TABLE `TT_wobject`; 
+DROP TABLE `Thingy`; 
+DROP TABLE `ThingyRecord`; 
+DROP TABLE `ThingyRecord_record`; 
+DROP TABLE `Thingy_fields`; 
+DROP TABLE `Thingy_things`; 
+DROP TABLE `Thread`; 
+DROP TABLE `Thread_read`; 
+DROP TABLE `UserList`; 
+DROP TABLE `WeatherData`; 
+DROP TABLE `WikiMaster`; 
+DROP TABLE `WikiPage`; 
+DROP TABLE `Workflow`; 
+DROP TABLE `WorkflowActivity`; 
+DROP TABLE `WorkflowActivityData`; 
+DROP TABLE `WorkflowInstance`; 
+DROP TABLE `WorkflowInstanceScratch`; 
+DROP TABLE `WorkflowSchedule`; 
+DROP TABLE `ZipArchiveAsset`; 
+DROP TABLE `adSkuPurchase`; 
+DROP TABLE `adSpace`; 
+DROP TABLE `address`; 
+DROP TABLE `addressBook`; 
+DROP TABLE `advertisement`; 
+DROP TABLE `analyticRule`; 
+DROP TABLE `asset`; 
+DROP TABLE `assetAspectComments`; 
+DROP TABLE `assetAspectRssFeed`; 
+DROP TABLE `assetAspect_Subscribable`; 
+DROP TABLE `assetData`; 
+DROP TABLE `assetHistory`; 
+DROP TABLE `assetIndex`; 
+DROP TABLE `assetKeyword`; 
+DROP TABLE `assetVersionTag`; 
+DROP TABLE `authentication`; 
+DROP TABLE `bucketLog`; 
+DROP TABLE `cart`; 
+DROP TABLE `cartItem`; 
+DROP TABLE `databaseLink`; 
+DROP TABLE `deltaLog`; 
+DROP TABLE `donation`; 
+DROP TABLE `filePumpBundle`; 
+DROP TABLE `friendInvitations`; 
+DROP TABLE `groupGroupings`; 
+DROP TABLE `groupings`; 
+DROP TABLE `groups`; 
+DROP TABLE `imageColor`; 
+DROP TABLE `imageFont`; 
+DROP TABLE `imagePalette`; 
+DROP TABLE `imagePaletteColors`; 
+DROP TABLE `inbox`; 
+DROP TABLE `inbox_messageState`; 
+DROP TABLE `incrementer`; 
+DROP TABLE `karmaLog`; 
+DROP TABLE `ldapLink`; 
+DROP TABLE `mailQueue`; 
+DROP TABLE `metaData_properties`; 
+DROP TABLE `metaData_values`; 
+DROP TABLE `passiveAnalyticsStatus`; 
+DROP TABLE `passiveLog`; 
+DROP TABLE `passiveProfileAOI`; 
+DROP TABLE `passiveProfileLog`; 
+DROP TABLE `paymentGateway`; 
+DROP TABLE `redirect`; 
+DROP TABLE `replacements`; 
+DROP TABLE `search`; 
+DROP TABLE `settings`; 
+DROP TABLE `shipper`; 
+DROP TABLE `shopCredit`; 
+DROP TABLE `sku`; 
+DROP TABLE `snippet`; 
+DROP TABLE `taxDriver`; 
+DROP TABLE `tax_eu_vatNumbers`; 
+DROP TABLE `tax_generic_rates`; 
+DROP TABLE `template`; 
+DROP TABLE `template_attachments`; 
+DROP TABLE `transaction`; 
+DROP TABLE `transactionItem`; 
+DROP TABLE `userInvitations`; 
+DROP TABLE `userLoginLog`; 
+DROP TABLE `userProfileCategory`; 
+DROP TABLE `userProfileData`; 
+DROP TABLE `userProfileField`; 
+DROP TABLE `userSession`; 
+DROP TABLE `userSessionScratch`; 
+DROP TABLE `users`; 
+DROP TABLE `vendor`; 
+DROP TABLE `webguiVersion`; 
+DROP TABLE `wobject`;
+
+
+
+
+ALTER TABLE `AdSku_inno` RENAME `AdSku`; 
+ALTER TABLE `Article_inno` RENAME `Article`; 
+ALTER TABLE `Calendar_inno` RENAME `Calendar`; 
+ALTER TABLE `Carousel_inno` RENAME `Carousel`; 
+ALTER TABLE `Collaboration_inno` RENAME `Collaboration`; 
+ALTER TABLE `Dashboard_inno` RENAME `Dashboard`; 
+ALTER TABLE `DataForm_inno` RENAME `DataForm`; 
+ALTER TABLE `DataForm_entry_inno` RENAME `DataForm_entry`; 
+ALTER TABLE `DataTable_inno` RENAME `DataTable`; 
+ALTER TABLE `EMSBadge_inno` RENAME `EMSBadge`; 
+ALTER TABLE `EMSBadgeGroup_inno` RENAME `EMSBadgeGroup`; 
+ALTER TABLE `EMSEventMetaField_inno` RENAME `EMSEventMetaField`; 
+ALTER TABLE `EMSRegistrant_inno` RENAME `EMSRegistrant`; 
+ALTER TABLE `EMSRegistrantRibbon_inno` RENAME `EMSRegistrantRibbon`; 
+ALTER TABLE `EMSRegistrantTicket_inno` RENAME `EMSRegistrantTicket`; 
+ALTER TABLE `EMSRegistrantToken_inno` RENAME `EMSRegistrantToken`; 
+ALTER TABLE `EMSRibbon_inno` RENAME `EMSRibbon`; 
+ALTER TABLE `EMSTicket_inno` RENAME `EMSTicket`; 
+ALTER TABLE `EMSToken_inno` RENAME `EMSToken`; 
+ALTER TABLE `Event_inno` RENAME `Event`; 
+ALTER TABLE `EventManagementSystem_inno` RENAME `EventManagementSystem`; 
+ALTER TABLE `Event_recur_inno` RENAME `Event_recur`; 
+ALTER TABLE `Event_relatedlink_inno` RENAME `Event_relatedlink`; 
+ALTER TABLE `FileAsset_inno` RENAME `FileAsset`; 
+ALTER TABLE `FlatDiscount_inno` RENAME `FlatDiscount`; 
+ALTER TABLE `Folder_inno` RENAME `Folder`; 
+ALTER TABLE `Gallery_inno` RENAME `Gallery`; 
+ALTER TABLE `GalleryAlbum_inno` RENAME `GalleryAlbum`; 
+ALTER TABLE `GalleryFile_inno` RENAME `GalleryFile`; 
+ALTER TABLE `GalleryFile_comment_inno` RENAME `GalleryFile_comment`; 
+ALTER TABLE `HttpProxy_inno` RENAME `HttpProxy`; 
+ALTER TABLE `ITransact_recurringStatus_inno` RENAME `ITransact_recurringStatus`; 
+ALTER TABLE `ImageAsset_inno` RENAME `ImageAsset`; 
+ALTER TABLE `InOutBoard_inno` RENAME `InOutBoard`; 
+ALTER TABLE `InOutBoard_delegates_inno` RENAME `InOutBoard_delegates`; 
+ALTER TABLE `InOutBoard_status_inno` RENAME `InOutBoard_status`; 
+ALTER TABLE `InOutBoard_statusLog_inno` RENAME `InOutBoard_statusLog`; 
+ALTER TABLE `Layout_inno` RENAME `Layout`; 
+ALTER TABLE `Map_inno` RENAME `Map`; 
+ALTER TABLE `MapPoint_inno` RENAME `MapPoint`; 
+ALTER TABLE `Matrix_inno` RENAME `Matrix`; 
+ALTER TABLE `MatrixListing_inno` RENAME `MatrixListing`; 
+ALTER TABLE `MatrixListing_attribute_inno` RENAME `MatrixListing_attribute`; 
+ALTER TABLE `MatrixListing_rating_inno` RENAME `MatrixListing_rating`; 
+ALTER TABLE `MatrixListing_ratingSummary_inno` RENAME `MatrixListing_ratingSummary`; 
+ALTER TABLE `Matrix_attribute_inno` RENAME `Matrix_attribute`; 
+ALTER TABLE `MessageBoard_inno` RENAME `MessageBoard`; 
+ALTER TABLE `MultiSearch_inno` RENAME `MultiSearch`; 
+ALTER TABLE `Navigation_inno` RENAME `Navigation`; 
+ALTER TABLE `Newsletter_inno` RENAME `Newsletter`; 
+ALTER TABLE `Newsletter_subscriptions_inno` RENAME `Newsletter_subscriptions`; 
+ALTER TABLE `PM_project_inno` RENAME `PM_project`; 
+ALTER TABLE `PM_task_inno` RENAME `PM_task`; 
+ALTER TABLE `PM_taskResource_inno` RENAME `PM_taskResource`; 
+ALTER TABLE `PM_wobject_inno` RENAME `PM_wobject`; 
+ALTER TABLE `Photo_inno` RENAME `Photo`; 
+ALTER TABLE `Photo_rating_inno` RENAME `Photo_rating`; 
+ALTER TABLE `Poll_inno` RENAME `Poll`; 
+ALTER TABLE `Poll_answer_inno` RENAME `Poll_answer`; 
+ALTER TABLE `Post_inno` RENAME `Post`; 
+ALTER TABLE `Post_rating_inno` RENAME `Post_rating`; 
+ALTER TABLE `Product_inno` RENAME `Product`; 
+ALTER TABLE `RichEdit_inno` RENAME `RichEdit`; 
+ALTER TABLE `SQLReport_inno` RENAME `SQLReport`; 
+ALTER TABLE `Shelf_inno` RENAME `Shelf`; 
+ALTER TABLE `Shortcut_inno` RENAME `Shortcut`; 
+ALTER TABLE `Shortcut_overrides_inno` RENAME `Shortcut_overrides`; 
+ALTER TABLE `StockData_inno` RENAME `StockData`; 
+ALTER TABLE `Story_inno` RENAME `Story`; 
+ALTER TABLE `StoryArchive_inno` RENAME `StoryArchive`; 
+ALTER TABLE `StoryTopic_inno` RENAME `StoryTopic`; 
+ALTER TABLE `Subscription_inno` RENAME `Subscription`; 
+ALTER TABLE `Subscription_code_inno` RENAME `Subscription_code`; 
+ALTER TABLE `Subscription_codeBatch_inno` RENAME `Subscription_codeBatch`; 
+ALTER TABLE `Survey_inno` RENAME `Survey`; 
+ALTER TABLE `Survey_questionTypes_inno` RENAME `Survey_questionTypes`; 
+ALTER TABLE `Survey_response_inno` RENAME `Survey_response`; 
+ALTER TABLE `Survey_tempReport_inno` RENAME `Survey_tempReport`; 
+ALTER TABLE `Survey_test_inno` RENAME `Survey_test`; 
+ALTER TABLE `SyndicatedContent_inno` RENAME `SyndicatedContent`; 
+ALTER TABLE `TT_projectList_inno` RENAME `TT_projectList`; 
+ALTER TABLE `TT_projectResourceList_inno` RENAME `TT_projectResourceList`; 
+ALTER TABLE `TT_projectTasks_inno` RENAME `TT_projectTasks`; 
+ALTER TABLE `TT_report_inno` RENAME `TT_report`; 
+ALTER TABLE `TT_timeEntry_inno` RENAME `TT_timeEntry`; 
+ALTER TABLE `TT_wobject_inno` RENAME `TT_wobject`; 
+ALTER TABLE `Thingy_inno` RENAME `Thingy`; 
+ALTER TABLE `ThingyRecord_inno` RENAME `ThingyRecord`; 
+ALTER TABLE `ThingyRecord_record_inno` RENAME `ThingyRecord_record`; 
+ALTER TABLE `Thingy_fields_inno` RENAME `Thingy_fields`; 
+ALTER TABLE `Thingy_things_inno` RENAME `Thingy_things`; 
+ALTER TABLE `Thread_inno` RENAME `Thread`; 
+ALTER TABLE `Thread_read_inno` RENAME `Thread_read`; 
+ALTER TABLE `UserList_inno` RENAME `UserList`; 
+ALTER TABLE `WeatherData_inno` RENAME `WeatherData`; 
+ALTER TABLE `WikiMaster_inno` RENAME `WikiMaster`; 
+ALTER TABLE `WikiPage_inno` RENAME `WikiPage`; 
+ALTER TABLE `Workflow_inno` RENAME `Workflow`; 
+ALTER TABLE `WorkflowActivity_inno` RENAME `WorkflowActivity`; 
+ALTER TABLE `WorkflowActivityData_inno` RENAME `WorkflowActivityData`; 
+ALTER TABLE `WorkflowInstance_inno` RENAME `WorkflowInstance`; 
+ALTER TABLE `WorkflowInstanceScratch_inno` RENAME `WorkflowInstanceScratch`; 
+ALTER TABLE `WorkflowSchedule_inno` RENAME `WorkflowSchedule`; 
+ALTER TABLE `ZipArchiveAsset_inno` RENAME `ZipArchiveAsset`; 
+ALTER TABLE `adSkuPurchase_inno` RENAME `adSkuPurchase`; 
+ALTER TABLE `adSpace_inno` RENAME `adSpace`; 
+ALTER TABLE `address_inno` RENAME `address`; 
+ALTER TABLE `addressBook_inno` RENAME `addressBook`; 
+ALTER TABLE `advertisement_inno` RENAME `advertisement`; 
+ALTER TABLE `analyticRule_inno` RENAME `analyticRule`; 
+ALTER TABLE `asset_inno` RENAME `asset`; 
+ALTER TABLE `assetAspectComments_inno` RENAME `assetAspectComments`; 
+ALTER TABLE `assetAspectRssFeed_inno` RENAME `assetAspectRssFeed`; 
+ALTER TABLE `assetAspect_Subscribable_inno` RENAME `assetAspect_Subscribable`; 
+ALTER TABLE `assetData_inno` RENAME `assetData`; 
+ALTER TABLE `assetHistory_inno` RENAME `assetHistory`; 
+ALTER TABLE `assetIndex_inno` RENAME `assetIndex`; 
+ALTER TABLE `assetKeyword_inno` RENAME `assetKeyword`; 
+ALTER TABLE `assetVersionTag_inno` RENAME `assetVersionTag`; 
+ALTER TABLE `authentication_inno` RENAME `authentication`; 
+ALTER TABLE `bucketLog_inno` RENAME `bucketLog`; 
+ALTER TABLE `cart_inno` RENAME `cart`; 
+ALTER TABLE `cartItem_inno` RENAME `cartItem`; 
+ALTER TABLE `databaseLink_inno` RENAME `databaseLink`; 
+ALTER TABLE `deltaLog_inno` RENAME `deltaLog`; 
+ALTER TABLE `donation_inno` RENAME `donation`; 
+ALTER TABLE `filePumpBundle_inno` RENAME `filePumpBundle`; 
+ALTER TABLE `friendInvitations_inno` RENAME `friendInvitations`; 
+ALTER TABLE `groupGroupings_inno` RENAME `groupGroupings`; 
+ALTER TABLE `groupings_inno` RENAME `groupings`; 
+ALTER TABLE `groups_inno` RENAME `groups`; 
+ALTER TABLE `imageColor_inno` RENAME `imageColor`; 
+ALTER TABLE `imageFont_inno` RENAME `imageFont`; 
+ALTER TABLE `imagePalette_inno` RENAME `imagePalette`; 
+ALTER TABLE `imagePaletteColors_inno` RENAME `imagePaletteColors`; 
+ALTER TABLE `inbox_inno` RENAME `inbox`; 
+ALTER TABLE `inbox_messageState_inno` RENAME `inbox_messageState`; 
+ALTER TABLE `incrementer_inno` RENAME `incrementer`; 
+ALTER TABLE `karmaLog_inno` RENAME `karmaLog`; 
+ALTER TABLE `ldapLink_inno` RENAME `ldapLink`; 
+ALTER TABLE `mailQueue_inno` RENAME `mailQueue`; 
+ALTER TABLE `metaData_properties_inno` RENAME `metaData_properties`; 
+ALTER TABLE `metaData_values_inno` RENAME `metaData_values`; 
+ALTER TABLE `passiveAnalyticsStatus_inno` RENAME `passiveAnalyticsStatus`; 
+ALTER TABLE `passiveLog_inno` RENAME `passiveLog`; 
+ALTER TABLE `passiveProfileAOI_inno` RENAME `passiveProfileAOI`; 
+ALTER TABLE `passiveProfileLog_inno` RENAME `passiveProfileLog`; 
+ALTER TABLE `paymentGateway_inno` RENAME `paymentGateway`; 
+ALTER TABLE `redirect_inno` RENAME `redirect`; 
+ALTER TABLE `replacements_inno` RENAME `replacements`; 
+ALTER TABLE `search_inno` RENAME `search`; 
+ALTER TABLE `settings_inno` RENAME `settings`; 
+ALTER TABLE `shipper_inno` RENAME `shipper`; 
+ALTER TABLE `shopCredit_inno` RENAME `shopCredit`; 
+ALTER TABLE `sku_inno` RENAME `sku`; 
+ALTER TABLE `snippet_inno` RENAME `snippet`; 
+ALTER TABLE `taxDriver_inno` RENAME `taxDriver`; 
+ALTER TABLE `tax_eu_vatNumbers_inno` RENAME `tax_eu_vatNumbers`; 
+ALTER TABLE `tax_generic_rates_inno` RENAME `tax_generic_rates`; 
+ALTER TABLE `template_inno` RENAME `template`; 
+ALTER TABLE `template_attachments_inno` RENAME `template_attachments`; 
+ALTER TABLE `transaction_inno` RENAME `transaction`; 
+ALTER TABLE `transactionItem_inno` RENAME `transactionItem`; 
+ALTER TABLE `userInvitations_inno` RENAME `userInvitations`; 
+ALTER TABLE `userLoginLog_inno` RENAME `userLoginLog`; 
+ALTER TABLE `userProfileCategory_inno` RENAME `userProfileCategory`; 
+ALTER TABLE `userProfileData_inno` RENAME `userProfileData`; 
+ALTER TABLE `userProfileField_inno` RENAME `userProfileField`; 
+ALTER TABLE `userSession_inno` RENAME `userSession`; 
+ALTER TABLE `userSessionScratch_inno` RENAME `userSessionScratch`; 
+ALTER TABLE `users_inno` RENAME `users`; 
+ALTER TABLE `vendor_inno` RENAME `vendor`; 
+ALTER TABLE `webguiVersion_inno` RENAME `webguiVersion`; 
+ALTER TABLE `wobject_inno` RENAME `wobject`;
+
+
+
+
 
