@@ -31,6 +31,7 @@
  - fixed #11001: Shipping plugin returning nothing, causing price formatter to puke
  - fixed: DataForm allows edits when locked by another version tag
  - fixed #11059: WebGUI upgrade packages do not overwrite versions in the db
+ - fixed #11064: spelling error
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice

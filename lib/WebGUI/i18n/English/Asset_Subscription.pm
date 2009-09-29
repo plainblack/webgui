@@ -405,8 +405,8 @@ characters long.</p>|,
     },
 
     'default thank you message' => {
-		message => q|The subsciption has been added to the cart.|,
-		lastUpdated => 0,
+		message => q|The subscription has been added to the cart.|,
+		lastUpdated => 1254256971,
 		context => q|the default message that will go in the thank you message field|,
 	},
 
