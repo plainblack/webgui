@@ -77,7 +77,7 @@ sub addPackage {
     $storage->addFileFromFilesystem( $file );
 
     # Import the package into the import node
-    my $package = eval { WebGUI::Asset->getImportNode($session)->importPackage( $storage ); };
+    my $package = eval { WebGUI::Asset->getImportNode($session)->importPackage( $storage, { overwriteLatest => 1 } ); };
 
     if ($package eq 'corrupt') {
         die "Corrupt package found in $file.  Stopping upgrade.\n";
