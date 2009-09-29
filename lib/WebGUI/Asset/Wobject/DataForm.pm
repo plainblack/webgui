@@ -1337,6 +1337,8 @@ sub www_deleteFieldConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     $newSelf->deleteField($self->session->form->process("fieldName"));
     $newSelf->{_mode} = 'form';
@@ -1362,6 +1364,8 @@ sub www_deleteTabConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     $newSelf->deleteTab($self->session->form->process("tabId"));
     $newSelf->{_mode} = 'form';
@@ -1384,6 +1388,8 @@ sub www_editField {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     my $fieldName = shift || $self->session->form->process("fieldName");
     my $field;
@@ -1533,6 +1539,8 @@ sub www_editFieldSave {
     my $session = $self->session;
     return $session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $form = $session->form;
     my $fieldName = $form->process('fieldName');
     my $newName = $session->url->urlize($form->process('newName') || $form->process('label'));
@@ -1676,6 +1684,8 @@ sub www_editTab {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     my $tabId = shift || $self->session->form->process("tabId") || "new";
     my $tab;
@@ -1731,6 +1741,8 @@ sub www_editTabSave {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $name = $self->session->form->process("name") || $self->session->form->process("label");
     $name = $self->session->url->urlize($name);
     my $tabId = $self->session->form->process('tabId');
@@ -1824,6 +1836,8 @@ sub www_moveFieldDown {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldDown($fieldName);
@@ -1882,6 +1896,8 @@ sub www_moveFieldUp {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldUp($fieldName);
@@ -1941,6 +1957,8 @@ sub www_moveTabRight {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabRight($tabId);
@@ -1995,6 +2013,8 @@ sub www_moveTabLeft {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabLeft($tabId);
