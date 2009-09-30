@@ -153,7 +153,7 @@ sub new
 	{
 		$self	= $class->SUPER::new(@_);
 	}
-	elsif ($_[0] =~ /^\d+$/)
+	elsif ($_[0] =~ /^-?\d+$/)
 	{
 		$self	= DateTime->from_epoch(epoch=>$_[0], time_zone=>"UTC", locale=>$locale);
 	}

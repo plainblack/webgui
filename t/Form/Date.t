@@ -36,15 +36,21 @@ my $testBlock = [
 	},
 	{
 		key => 'Date2',
-		testValue  => "2008-08-01 16:34:26",
-		expected   => $session->datetime->setToEpoch("2008-08-01 16:34:26"),#must call this so that value is appropriate for testers timezone
+		testValue  => "2008-08-01",
+		expected   => $session->datetime->setToEpoch("2008-08-01"),#must call this so that value is appropriate for testers timezone
 		comment    => 'MySQL formatted to epoch',
+	},
+	{
+		key => 'Date3',
+		testValue  => '-1',
+		expected   => '-1',
+		comment    => 'negative epoch to negative epoch',
 	},
 ];
 
 my $formType = 'date';
 
-my $numTests = 16 + scalar @{ $testBlock } ;
+my $numTests = 26 + scalar @{ $testBlock } ;
 
 
 plan tests => $numTests;
@@ -110,13 +116,50 @@ WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
 
 #Dates to MySQL
-my $date2 = WebGUI::Form::Date->new($session, {'defaultValue' => '2008-08-01 16:34:26'});
-is($date2->getValue(1217608466), '2008-08-01 11:34:26', "Epoch to MySQL");
-is($date2->getValue('2008-08-01 11:34:26'), '2008-08-01 11:34:26', "MySQL to MySQL");
+my $date2;
+$date2 = WebGUI::Form::Date->new($session, {'defaultValue' => '2008-08-01 16:34:26'});
+is($date2->getValue(1217608466),   '2008-08-01 11:34:26', "getValue, defaultValue MySQL format: Epoch to MySQL");
+is($date2->getValue('2008-08-01'), '2008-08-01', "... MySQL to MySQL");
+is($date2->getValue(-1),           '1969-12-31 17:59:59', "... Negative epoch to MySQL");
 
-my $date2 = WebGUI::Form::Date->new($session);
-is($date2->getValue(1217608466), 1217608466, "Default Epoch to Epoch");
-is($date2->getValue('2008-08-01 11:34:26'), 1217608466, "Default MySQL to Epoch");
+$date2 = WebGUI::Form::Date->new($session);
+is($date2->getValue(1217608466),   1217608466, "getValue, no default: Default Epoch to Epoch");
+is($date2->getValue('2008-08-01'), 1217566800, "... Default MySQL to Epoch");
+is($date2->getValue(-1),           -1,         "... Default negative epoch to negative epoch");
 
-__END__
+my $bday = WebGUI::Test->webguiBirthday;
 
+$date2 = WebGUI::Form::Date->new($session);
+is($date2->getValueAsHtml(), $session->datetime->epochToSet($date2->getDefaultValue), "getValueAsHtml: no defaultValue set, no value set, returns now in user's format");
+
+$date2 = WebGUI::Form::Date->new($session, {defaultValue => 1217608466});
+is($date2->getValueAsHtml(), '2008-08-01', "getValueAsHtml: defaultValue in epoch format, returns now in mysql format");
+is(
+    getValueFromForm($session, $date2->toHtmlAsHidden),
+    '2008-08-01',
+    "toHtmlAsHidden: defaultValue in epoch format, returns date in mysql format"
+);
+is(
+    getValueFromForm($session, $date2->toHtml),
+    '2008-08-01',
+    "toHtml: defaultValue in epoch format, returns date in mysql format"
+);
+$date2 = WebGUI::Form::Date->new($session, {defaultValue => -1});
+is($date2->getValueAsHtml(), '1969-12-31', "getValueAsHtml: defaultValue as negative epoch, returns in mysql format");
+
+$date2 = WebGUI::Form::Date->new($session, {defaultValue => '2008-08-01'});
+is($date2->getValueAsHtml(), '2008-08-01', "getValueAsHtml: defaultValue in mysql format, returns default value in mysql format");
+
+$date2 = WebGUI::Form::Date->new($session, {defaultValue => '2008-08-01', value => $bday, });
+is($date2->getValueAsHtml(), '2001-08-16', "getValueAsHtml: defaultValue in mysql format, value as epoch returns value in user's format");
+
+$date2 = WebGUI::Form::Date->new($session, {defaultValue => '2008-08-01', value => '2001-08-16', });
+is($date2->getValueAsHtml(), '2001-08-16', "getValueAsHtml: defaultValue in mysql format, value as mysql returns value in mysql format");
+
+sub getValueFromForm {
+    my ($session, $textForm) = @_;
+    my ($header, $footer)    = (WebGUI::Form::formHeader($session), WebGUI::Form::formFooter($session));
+    my @forms = HTML::Form->parse($header.$textForm.$footer, 'http://www.webgui.org');
+    my @inputs = $forms[0]->inputs;
+    return $inputs[1]->{value};
+}
