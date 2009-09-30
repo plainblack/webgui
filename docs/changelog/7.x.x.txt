@@ -23,6 +23,7 @@
  - fixed #11062: subscriptionCode
  - fixed #11061: SQLForm_fieldOrder
  - fixed #11066: wrong definitions
+ - fixed #11070: i18n Asset_Navigation::assetsToInclude
 
 7.8.0
  - upgraded YUI to 2.8.0r4
