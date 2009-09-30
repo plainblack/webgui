@@ -34,7 +34,6 @@ my $session = start(); # this line required
 fixEmptyCalendarIcalFeeds( $session );
 fixEMSTemplates( $session );
 removeOldSubscriptionTables( $session );
-removeOldITransactTables( $session );
 removeSQLFormTables( $session );
 fixBadRevisionDateColumns( $session );
 

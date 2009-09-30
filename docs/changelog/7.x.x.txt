@@ -40,19 +40,6 @@
  - fixed #11061: SQLForm_fieldOrder
  - fixed #11066: wrong definitions
 
-7.8.0
- - upgraded YUI to 2.8.0r4
- - fixed #10998: wiki page locked?
- - fixed #10862: Version tag contents page
- - added Subscribable AssetAspect to Wiki
- - added direct value access in DataForm list view
- - fixed #11003: Subscribable AssetAspect: no i18n
- - fixed #11004: Subscribable AssetAspect: handling the subscription group
- - fixed #10029: Account CSS rule scoping, round #2.
- - fixed #11012: Code editor corrupts JS
- - fixed #11019: Ctrl-A blinks and deletes code in Code Editor
->>>>>>> 0388a2e... More cleanups from the old 7.5 commerce system.  Fixes bug #11068:docs/changelog/7.x.x.txt
-
 7.7.20
  - fixed #10982: Survey menu options appearing twice
  - fixed #10890: Story Manager: pagination broken for keywords
