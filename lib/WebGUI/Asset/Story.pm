@@ -166,6 +166,7 @@ sub definition {
             fieldType    => 'textarea',
             defaultValue => '[]',
             noFormPost   => 1,
+            autoGenerate => 0,
         },
     );
     push(@{$definition}, {
