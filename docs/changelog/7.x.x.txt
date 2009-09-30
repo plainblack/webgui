@@ -1,4 +1,5 @@
 7.7.22
+ - fixed #11070: i18n Asset_Navigation::assetsToInclude
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
@@ -37,7 +38,6 @@
  - fixed #11062: subscriptionCode
  - fixed #11061: SQLForm_fieldOrder
  - fixed #11066: wrong definitions
- - fixed #11070: i18n Asset_Navigation::assetsToInclude
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice
