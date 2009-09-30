@@ -2,16 +2,16 @@ SET SESSION sort_buffer_size=512*1024*1024;
 SET SESSION read_rnd_buffer_size=512*1024*1024;
 
 CREATE TABLE `AdSku_inno` (
-  `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `purchaseTemplate` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-  `manageTemplate` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-  `adSpace` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `purchaseTemplate` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `manageTemplate` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `adSpace` char(22) character set utf8 collate utf8_bin NOT NULL,
   `priority` int(11) default '1',
   `pricePerClick` float default '0',
   `pricePerImpression` float default '0',
-  `clickDiscounts` varchar(1024) character set utf8 default NULL,
-  `impressionDiscounts` varchar(1024) character set utf8 default NULL,
+  `clickDiscounts` text character set utf8 default NULL,
+  `impressionDiscounts` text character set utf8 default NULL,
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -128,8 +128,8 @@ CREATE TABLE `Collaboration_inno` (
   `groupToEditPost` char(22) character set utf8 collate utf8_bin NOT NULL,
   `archiveEnabled` int(1) default '1',
   `postReceivedTemplateId` char(22) character set utf8 collate utf8_bin default 'default_post_received1',
-  `replyRichEditor` varchar(22) character set utf8 collate utf8_bin default 'PBrichedit000000000002',
-  `replyFilterCode` varchar(30) default 'javascript',
+  `replyRichEditor` char(22) character set utf8 collate utf8_bin default 'PBrichedit000000000002',
+  `replyFilterCode` char(30) default 'javascript',
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -165,7 +165,7 @@ CREATE TABLE `DataForm_inno` (
   `fieldConfiguration` longtext,
   `tabConfiguration` longtext,
   `workflowIdAddEntry` char(22) character set utf8 collate utf8_bin default NULL,
-  `htmlAreaRichEditor` varchar(22) character set utf8 collate utf8_bin default '**Use_Default_Editor**',
+  `htmlAreaRichEditor` char(22) character set utf8 collate utf8_bin default '**Use_Default_Editor**',
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -173,7 +173,7 @@ CREATE TABLE `DataForm_inno` (
 
 CREATE TABLE `DataForm_entry_inno` (
   `DataForm_entryId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `userId` char(22) character set utf8 collate utf8_bin,
   `username` char(255) default NULL,
   `ipAddress` char(255) default NULL,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -550,18 +550,6 @@ CREATE TABLE `HttpProxy_inno` (
 
 
 
-CREATE TABLE `ITransact_recurringStatus_inno` (
-  `gatewayId` char(128) NOT NULL,
-  `initDate` bigint(20) NOT NULL default '0',
-  `lastTransaction` bigint(20) NOT NULL default '0',
-  `status` char(10) NOT NULL,
-  `errorMessage` char(128) default NULL,
-  `recipe` char(15) NOT NULL,
-  PRIMARY KEY  (`gatewayId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
 CREATE TABLE `ImageAsset_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `thumbnailSize` int(11) NOT NULL default '50',
@@ -654,16 +642,16 @@ CREATE TABLE `MapPoint_inno` (
   `revisionDate` bigint(20) NOT NULL,
   `latitude` float default NULL,
   `longitude` float default NULL,
-  `website` varchar(255) character set utf8 default NULL,
-  `address1` varchar(255) character set utf8 default NULL,
-  `address2` varchar(255) character set utf8 default NULL,
-  `city` varchar(255) character set utf8 default NULL,
-  `state` varchar(255) character set utf8 default NULL,
-  `zipCode` varchar(255) character set utf8 default NULL,
-  `country` varchar(255) character set utf8 default NULL,
-  `phone` varchar(255) character set utf8 default NULL,
-  `fax` varchar(255) character set utf8 default NULL,
-  `email` varchar(255) character set utf8 default NULL,
+  `website` char(255) character set utf8 default NULL,
+  `address1` char(255) character set utf8 default NULL,
+  `address2` char(255) character set utf8 default NULL,
+  `city` char(255) character set utf8 default NULL,
+  `state` char(255) character set utf8 default NULL,
+  `zipCode` char(255) character set utf8 default NULL,
+  `country` char(255) character set utf8 default NULL,
+  `phone` char(255) character set utf8 default NULL,
+  `fax` char(255) character set utf8 default NULL,
+  `email` char(255) character set utf8 default NULL,
   `storageIdPhoto` char(22) character set utf8 collate utf8_bin default NULL,
   `userDefined1` text character set utf8,
   `userDefined2` text character set utf8,
@@ -1272,7 +1260,7 @@ CREATE TABLE `Survey_inno` (
   `showProgress` tinyint(3) unsigned NOT NULL default '0',
   `showTimeLimit` tinyint(3) unsigned NOT NULL default '0',
   `doAfterTimeLimit` char(22) character set utf8 collate utf8_bin default NULL,
-  `onSurveyEndWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `onSurveyEndWorkflowId` char(22) character set utf8 collate utf8_bin default NULL,
   `quizModeSummary` tinyint(3) default NULL,
   `surveySummaryTemplateId` char(22) character set utf8 collate utf8_bin default NULL,
   `allowBackBtn` tinyint(3) default NULL,
@@ -1284,7 +1272,7 @@ CREATE TABLE `Survey_inno` (
 
 
 CREATE TABLE `Survey_questionTypes_inno` (
-  `questionType` varchar(56) character set utf8 NOT NULL,
+  `questionType` char(56) character set utf8 NOT NULL,
   `answers` text character set utf8 NOT NULL,
   PRIMARY KEY  (`questionType`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2000,8 +1988,8 @@ CREATE TABLE `authentication_inno` (
 
 
 CREATE TABLE `bucketLog_inno` (
-  `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-  `Bucket` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `Bucket` char(22) character set utf8 collate utf8_bin NOT NULL,
   `duration` int(11) default NULL,
   `timeStamp` datetime default NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2051,11 +2039,11 @@ CREATE TABLE `databaseLink_inno` (
 
 
 CREATE TABLE `deltaLog_inno` (
-  `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-  `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `delta` int(11) default NULL,
   `timeStamp` bigint(20) default NULL,
-  `url` varchar(255) NOT NULL
+  `url` char(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2294,17 +2282,17 @@ CREATE TABLE `passiveAnalyticsStatus_inno` (
   `startDate` datetime default NULL,
   `endDate` datetime default NULL,
   `running` int(2) default '0',
-  `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+  `userId` char(22) character set utf8 collate utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
 CREATE TABLE `passiveLog_inno` (
-  `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-  `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-  `sessionId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `sessionId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `timeStamp` bigint(20) default NULL,
-  `url` varchar(255) NOT NULL
+  `url` char(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2485,8 +2473,8 @@ CREATE TABLE `template_inno` (
 CREATE TABLE `template_attachments_inno` (
   `templateId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
-  `url` varchar(256) character set utf8 NOT NULL,
-  `type` varchar(20) character set utf8 default NULL,
+  `url` char(255) character set utf8 NOT NULL,
+  `type` char(20) character set utf8 default NULL,
   `sequence` int(11) default NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2794,7 +2782,6 @@ INSERT INTO `GalleryAlbum_inno` SELECT * FROM `GalleryAlbum` ORDER BY `assetId`,
 INSERT INTO `GalleryFile_inno` SELECT * FROM `GalleryFile` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `GalleryFile_comment_inno` SELECT * FROM `GalleryFile_comment` ORDER BY `assetId`, `commentId`; 
 INSERT INTO `HttpProxy_inno` SELECT * FROM `HttpProxy` ORDER BY `assetId`, `revisionDate`; 
-INSERT INTO `ITransact_recurringStatus_inno` SELECT * FROM `ITransact_recurringStatus` ORDER BY `gatewayId`; 
 INSERT INTO `ImageAsset_inno` SELECT * FROM `ImageAsset` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `InOutBoard_inno` SELECT * FROM `InOutBoard` ORDER BY `assetId`, `revisionDate`; 
 INSERT INTO `InOutBoard_delegates_inno` SELECT * FROM `InOutBoard_delegates`; 
@@ -2971,7 +2958,6 @@ DROP TABLE `GalleryAlbum`;
 DROP TABLE `GalleryFile`; 
 DROP TABLE `GalleryFile_comment`; 
 DROP TABLE `HttpProxy`; 
-DROP TABLE `ITransact_recurringStatus`; 
 DROP TABLE `ImageAsset`; 
 DROP TABLE `InOutBoard`; 
 DROP TABLE `InOutBoard_delegates`; 
@@ -3149,7 +3135,6 @@ ALTER TABLE `GalleryAlbum_inno` RENAME `GalleryAlbum`;
 ALTER TABLE `GalleryFile_inno` RENAME `GalleryFile`; 
 ALTER TABLE `GalleryFile_comment_inno` RENAME `GalleryFile_comment`; 
 ALTER TABLE `HttpProxy_inno` RENAME `HttpProxy`; 
-ALTER TABLE `ITransact_recurringStatus_inno` RENAME `ITransact_recurringStatus`; 
 ALTER TABLE `ImageAsset_inno` RENAME `ImageAsset`; 
 ALTER TABLE `InOutBoard_inno` RENAME `InOutBoard`; 
 ALTER TABLE `InOutBoard_delegates_inno` RENAME `InOutBoard_delegates`; 
@@ -3303,6 +3288,9 @@ alter table assetKeyword add foreign key (assetId) references asset(assetId) on 
 alter table assetData add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table redirect add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table Event add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
+alter table Event add foreign key (recurId) references Event_recur(recurId) on delete set null on update cascade;
+alter table Event_relatedlink add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table Event_relatedlink add foreign key (groupIdView) references groups(groupId) on delete restrict on update cascade;
 alter table snippet add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table template add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table MapPoint add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
@@ -3314,37 +3302,134 @@ alter table Post add foreign key (assetId,revisionDate) references assetData(ass
 alter table Thread add foreign key (assetId,revisionDate) references Post(assetId,revisionDate) on delete cascade on update cascade;
 alter table RichEdit add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table FileAsset add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
+alter table FileAsset add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table ZipArchiveAsset add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
 alter table GalleryFile add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
+alter table GalleryFile add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table Photo add foreign key (assetId,revisionDate) references GalleryFile(assetId,revisionDate) on delete cascade on update cascade;
 alter table ImageAsset add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
 alter table sku add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table donation add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table AdSku add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
+alter table AdSku add foreign key (purchaseTemplate) references asset(assetId) on delete restrict on update cascade;
+alter table AdSku add foreign key (manageTemplate) references asset(assetId) on delete restrict on update cascade;
+alter table AdSku add foreign key (adSpace) references adSpace(adSpaceId) on delete cascade on update cascade;
 alter table Subscription add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table EMSBadge add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
+alter table EMSBadge add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table EMSRibbon add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table EMSTicket add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table EMSToken add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table FlatDiscount add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
+alter table FlatDiscount add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Product add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table wobject add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table Article add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table Article add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Calendar add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table Calendar add foreign key (templateIdMonth) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdWeek) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdDay) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdEvent) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdEventEdit) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdSearch) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdPrintMonth) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdPrintWeek) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdPrintDay) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdPrintEvent) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (groupIdEventEdit) references groups(groupId) on delete restrict on update cascade;
+alter table Calendar add foreign key (groupIdSubscribed) references groups(groupId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdList) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (templateIdPrintList) references asset(assetId) on delete restrict on update cascade;
+alter table Calendar add foreign key (workflowIdCommit) references Workflow(workflowId) on delete restrict on update cascade;
 alter table Carousel add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table Carousel add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Collaboration add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table Newsletter add foreign key (assetId,revisionDate) references Collaboration(assetId,revisionDate) on delete cascade on update cascade;
 alter table Dashboard add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table Dashboard add foreign key (adminsGroupId) references groups(groupId) on delete restrict on update cascade;
+alter table Dashboard add foreign key (usersGroupId) references groups(groupId) on delete restrict on update cascade;
+alter table Dashboard add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table DataForm add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table DataForm add foreign key (emailTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table DataForm add foreign key (acknowlegementTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table DataForm add foreign key (listTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table DataForm add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
+alter table DataForm add foreign key (groupToViewEntries) references groups(groupId) on delete restrict on update cascade;
+alter table DataForm add foreign key (workflowIdAddEntry) references Workflow(workflowId) on delete set null on update cascade;
+alter table DataForm add foreign key (htmlAreaRichEditor) references asset(assetId) on delete restrict on update cascade;
+alter table DataForm_entry add foreign key (userId) references users(userId) on delete set null on update cascade;
+alter table DataForm_entry add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table DataTable add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table DataTable add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table EventManagementSystem add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table EventManagementSystem add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
+alter table EventManagementSystem add foreign key (badgeBuilderTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table EventManagementSystem add foreign key (lookupRegistrantTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table EventManagementSystem add foreign key (printBadgeTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table EventManagementSystem add foreign key (printTicketTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table EventManagementSystem add foreign key (scheduleTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table EventManagementSystem add foreign key (groupToApproveEvents) references groups(groupId) on delete restrict on update cascade;
+alter table EventManagementSystem add foreign key (registrationStaffGroupId) references groups(groupId) on delete restrict on update cascade;
+alter table EMSBadgeGroup add foreign key (emsAssetId) references asset(assetId) on delete cascade on update cascade;
+alter table EMSEventMetaField add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table EMSRegistrant add foreign key (userId) references users(userId) on delete set null on update cascade;
+alter table EMSRegistrant add foreign key (badgeAssetId) references asset(assetId) on delete cascade on update cascade;
+alter table EMSRegistrant add foreign key (emsAssetId) references asset(assetId) on delete cascade on update cascade;
+alter table EMSRegistrant add foreign key (transactionItemId) references transactionItem(itemId) on delete cascade on update cascade;
+alter table EMSRegistrantRibbon add foreign key (ribbonAssetId) references asset(assetId) on delete cascade on update cascade;
+alter table EMSRegistrantRibbon add foreign key (transactionItemId) references transactionItem(itemId) on delete cascade on update cascade;
+alter table EMSRegistrantTicket add foreign key (ticketAssetId) references asset(assetId) on delete cascade on update cascade;
+alter table EMSRegistrantTicket add foreign key (transactionItemId) references transactionItem(itemId) on delete cascade on update cascade;
+alter table EMSRegistrantToken add foreign key (tokenAssetId) references asset(assetId) on delete cascade on update cascade;
 alter table search add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table Folder add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table Folder add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Gallery add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table Gallery add foreign key (groupIdAddComment) references groups(groupId) on delete restrict on update cascade;
+alter table Gallery add foreign key (groupIdAddFile) references groups(groupId) on delete restrict on update cascade;
+alter table Gallery add foreign key (richEditIdComment) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdAddArchive) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdDeleteAlbum) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdDeleteFile) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdEditAlbum) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdEditFile) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdListAlbums) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdListAlbumsRss) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdListFilesForUser) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdListFilesForUserRss) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdMakeShortcut) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdSearch) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdViewSlideshow) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdViewThumbnails) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdViewAlbum) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdViewAlbumRss) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdViewFile) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (viewAlbumAssetId) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (workflowIdCommit) references Workflow(workflowId) on delete restrict on update cascade;
+alter table Gallery add foreign key (templateIdEditComment) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (richEditIdAlbum) references asset(assetId) on delete restrict on update cascade;
+alter table Gallery add foreign key (richEditIdFile) references asset(assetId) on delete restrict on update cascade;
 alter table GalleryAlbum add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table GalleryAlbum add foreign key (assetIdThumbnail) references asset(assetId) on delete restrict on update cascade;
 alter table HttpProxy add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table HttpProxy add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table InOutBoard add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table InOutBoard add foreign key (reportViewerGroup) references groups(groupId) on delete restrict on update cascade;
+alter table InOutBoard add foreign key (inOutGroup) references groups(groupId) on delete restrict on update cascade;
+alter table InOutBoard add foreign key (inOutTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table InOutBoard add foreign key (reportTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table InOutBoard_delegates add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table InOutBoard_delegates add foreign key (delegateUserId) references users(userId) on delete cascade on update cascade;
+alter table InOutBoard_delegates add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table InOutBoard_status add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table InOutBoard_status add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table InOutBoard_statusLog add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table InOutBoard_statusLog add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table InOutBoard_statusLog add foreign key (createdBy) references users(userId) on delete cascade on update cascade;
 alter table Layout add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table Layout add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
+alter table Layout add foreign key (mobileTemplateId) references asset(assetId) on delete restrict on update cascade;
 alter table Map add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table Matrix add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table MessageBoard add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
