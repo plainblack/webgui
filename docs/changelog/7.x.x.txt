@@ -34,6 +34,7 @@
  - fixed #11064: spelling error
  - fixed #11062: subscriptionCode
  - fixed #11061: SQLForm_fieldOrder
+ - fixed #11066: wrong definitions
 
 7.7.20
  - fixed #10982: Survey menu options appearing twice

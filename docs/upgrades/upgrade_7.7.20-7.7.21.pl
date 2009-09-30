@@ -35,6 +35,7 @@ fixEmptyCalendarIcalFeeds( $session );
 fixEMSTemplates( $session );
 removeOldSubscriptionTables( $session );
 removeSQLFormTables( $session );
+fixBadRevisionDateColumns( $session );
 
 finish($session); # this line required
 
@@ -50,6 +51,19 @@ finish($session); # this line required
 
 # Describe what our function does
 #----------------------------------------------------------------------------
+sub fixBadRevisionDateColumns {
+    my $session = shift;
+    print "\tGive all revisionDate columns the correct definition... " unless $quiet;
+    $session->db->write("ALTER TABLE Event       MODIFY COLUMN revisionDate BIGINT NOT NULL DEFAULT 0");
+    $session->db->write("ALTER TABLE Calendar    MODIFY COLUMN revisionDate BIGINT NOT NULL DEFAULT 0");
+    $session->db->write("ALTER TABLE MultiSearch MODIFY COLUMN revisionDate BIGINT NOT NULL DEFAULT 0");
+    $session->db->write("ALTER TABLE Dashboard   MODIFY COLUMN revisionDate BIGINT NOT NULL DEFAULT 0");
+    $session->db->write("ALTER TABLE StockData   MODIFY COLUMN revisionDate BIGINT NOT NULL DEFAULT 0");
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
 sub removeSQLFormTables {
     my $session = shift;
     print "\tRemoving leftover SQL Form tables if not used... " unless $quiet;
