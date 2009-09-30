@@ -47,7 +47,7 @@ cmp_bag($storage->getFiles, ['someScalarFile.txt'], 'Only 1 file in storage with
 $session->user({userId=>3});
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"File Asset test"});
-my $guard1 = cleanupGuard($versionTag);
+WebGUI::Test->tagsToRollback($versionTag);
 my $properties = {
 	#     '1234567890123456789012'
 	id => 'FileAssetTest000000012',
@@ -85,7 +85,7 @@ $versionTag->commit;
 ############################################
 
 my $fileStorage = WebGUI::Storage->create($session);
-my $guard2 = cleanupGuard($fileStorage);
+WebGUI::Test->storagesToDelete($fileStorage);
 $mocker->set_always('getValue', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
