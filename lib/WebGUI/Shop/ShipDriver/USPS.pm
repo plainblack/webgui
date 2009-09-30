@@ -93,9 +93,6 @@ sub buildXML {
         }
         $packageData{Size}            = [ 'REGULAR'               ];
         $packageData{Machinable}      = [ 'true'                  ];
-        if ($self->get('addInsurance')) {
-            $packageData{ValueOfContents} = $cost;
-        }
         push @{ $xmlTop->{Package} }, \%packageData;
     }
     my $xml = XMLout(\%xmlHash,
@@ -158,6 +155,7 @@ sub calculate {
     }
     ##Summarize costs from returned data
     $cost = $self->_calculateFromXML($xmlData, @shippableUnits);
+    $cost += $self->_calculateInsurance(@shippableUnits);
     return $cost;
 }
 
@@ -210,6 +208,29 @@ sub _calculateFromXML {
             $cost += $rate;
         }
     }
+    return $cost;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _calculateInsurance ( @shippableUnits )
+
+Takes data from the USPS and returns the calculated shipping price.
+
+=head3 @shippableUnits
+
+The set of shippable units, which are required to do quantity and cost lookups.
+
+=cut
+
+sub _calculateInsurance {
+    my ($self, @shippableUnits) = @_;
+    my $cost = 0;
+    return $cost unless $self-get('addInsurance') && $self->get('insuranceRates');
+    my @insuranceTable = map { my ($cost,$value) = split /:/, $_; [$cost, $value]; }
+                            split /\r?\n/, $self->get('insuranceRates');
+    ##Sort by increasing value for easy post processing
+    my @insuranceTable = map { $_->[1] } sort { $a <=> $b } map { [ $_->[0], $_ ] } @insuranceTable;
     return $cost;
 }
 
@@ -274,6 +295,12 @@ sub definition {
             label        => $i18n->get('add insurance'),
             hoverHelp    => $i18n->get('add insurance help'),
             defaultValue => 0,
+        },
+        insuranceRates => {
+            fieldType    => 'textarea',
+            label        => $i18n->get('insurance rates'),
+            hoverHelp    => $i18n->get('insurance rates help'),
+            defaultValue => "50:1.75\n100:2.25",
         },
 ##Note, if a flat fee is added to this driver, then according to the license
 ##terms the website must display a note to the user (shop customer) that additional

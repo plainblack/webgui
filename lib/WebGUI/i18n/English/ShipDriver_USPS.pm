@@ -97,13 +97,25 @@ our $I18N = {
     'add insurance' => {
         message => q|Ship with insurance?|,
         lastUpdated => 1253988886,
-        context => q|Label for a type of shipping from the USPS.|,
+        context => q|Label for the edit screen.|,
     },
 
     'add insurance help' => {
         message => q|If set to yes, the shipping plugin will ask the USPS for the cost of insuring this shipment.  The cost will be added to the total cost of shipping.  If insurance is not available, then the option to use this driver will not be presented to the user.|,
         lastUpdated => 1253988884,
         context => q|Label for a type of shipping from the USPS.|,
+    },
+
+    'insurance rates' => {
+        message => q|Insurance Rate Table|,
+        lastUpdated => 1253988886,
+        context => q|Label for the edit screen.|,
+    },
+
+    'insurance rates help' => {
+        message => q|Enter in one field per line with the format, value:cost.<br />value is the value of the contents.<br />cost is the cost of insurance at that value.|,
+        lastUpdated => 1253988884,
+        context => q|Help for the insurance rate field.|,
     },
 
 };
