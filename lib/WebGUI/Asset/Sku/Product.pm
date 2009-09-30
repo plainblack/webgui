@@ -153,37 +153,43 @@ sub definition {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
-            fieldType=>"textarea",
+            fieldType    => "textarea",
+            noFormPost   => 1,
         },
         accessoryJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
-            fieldType=>"textarea",
+            fieldType    => "textarea",
+            noFormPost   => 1,
         },
         relatedJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
-            fieldType=>"textarea",
+            fieldType    => "textarea",
+            noFormPost   => 1,
         },
         specificationJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
-            fieldType=>"textarea",
+            fieldType    => "textarea",
+            noFormPost   => 1,
         },
         featureJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
-            fieldType=>"textarea",
+            fieldType    => "textarea",
+            noFormPost   => 1,
         },
         benefitJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
-            fieldType=>"textarea",
+            fieldType    => "textarea",
+            noFormPost   => 1,
         },
     );
     push(@{$definition}, {
