@@ -35,6 +35,7 @@ reorganizeAdSpaceProperties($session);
 addSubscribableAspect( $session );
 addFeaturedPageWiki( $session );
 fixEmptyCalendarIcalFeeds( $session );
+addEMSSubmission( $session );
 
 finish($session); # this line required
 
@@ -115,6 +116,59 @@ sub fixEmptyCalendarIcalFeeds {
     $session->db->write( 
         "UPDATE Calendar set icalFeeds='[]' where icalFeeds IS NULL",
     );
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add tables for the EMS Submission feature
+sub addEMSSubmission {
+    my $session = shift;
+    print "\tAdding EMS Submission feature..." unless $quiet;
+
+    $session->db->write( <<'ESQL' );
+CREATE TABLE EMSSubmissionForm (
+    assetId CHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    nextSubmissionId INT,
+    canSubmitGroupId CHAR(22) BINARY,
+    daysBeforeCleanup INT,
+    deleteCreatedItems INT(1),
+    formDescription TEXT,
+    PRIMARY KEY ( assetId, revisionDate )
+)
+ESQL
+
+    $session->db->write( <<'ESQL' );
+CREATE TABLE EMSSubmission (
+    assetId CHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    submissionId INT NOT NULL,
+    price FLOAT,
+    seatsAvailable INT,
+    startDate DATETIME,
+    duration FLOAT
+    eventNumber INT,
+    location CHAR(100),
+    relatedBadgeGroups MEDIUMTEXT,
+    relatedRibbons MEDIUMTEXT,
+    eventMetaData MEDIUMTEXT,
+    sendEmailOnChange INT(1),
+    PRIMARY KEY ( assetId, revisionDate )
+)
+ESQL
+
+    $session->db->write( q{ ALTER TABLE EventManagementSystem 
+	    ADD COLLUMN eventSubmissionTemplateId CHAR(22) BINARY; });
+
+    $session->db->write( q{ ALTER TABLE EventManagementSystem 
+	    ADD COLLUMN viewEventSubmissionQueueTemplateId CHAR(22) BINARY; });
+
+    $session->db->write( q{ ALTER TABLE EventManagementSystem 
+	    ADD COLLUMN editEventSubmissionTemplateId CHAR(22) BINARY; });
+
+    $session->db->write( q{ ALTER TABLE EventManagementSystem 
+	    ADD COLLUMN eventSubmissionGroups MEDIUMTEXT; });
 
     print "DONE!\n" unless $quiet;
 }
