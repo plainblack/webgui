@@ -26,6 +26,7 @@
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
  - fixed #11068: ITransact_recurringStatus
  - fixed #11075: product destroys variants
+ - fixed #11073: preview interchanges width and height properties
 
 7.8.0
  - upgraded YUI to 2.8.0r4
