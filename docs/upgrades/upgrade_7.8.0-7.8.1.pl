@@ -36,6 +36,7 @@ removeOldSubscriptionTables( $session );
 removeOldITransactTables( $session );
 removeSQLFormTables( $session );
 fixBadRevisionDateColumns( $session );
+removeImportCruft( $session );
 
 finish($session); # this line required
 
@@ -106,6 +107,17 @@ sub fixEMSTemplates {
     print "\tFixing bad usage of Event Management System templates... " unless $quiet;
     $session->db->write(q|update EventManagementSystem set templateId='2rC4ErZ3c77OJzJm7O5s3w'         where templateId='S2_LsvVa95OSqc66ITAoig'|);
     $session->db->write(q|update EventManagementSystem set scheduleTemplateId='S2_LsvVa95OSqc66ITAoig' where scheduleTemplateId='2rC4ErZ3c77OJzJm7O5s3w'|);
+    print "Done.\n" unless $quiet;
+}
+
+# Describe what our function does
+sub removeImportCruft {
+    my $session = shift;
+    print "\tRemoving cruft from the import node... " unless $quiet;
+    my $propFolder = WebGUI::Asset->newByDynamicClass($session, '2c4RcwsUfQMup_WNujoTGg');
+    if ($propFolder) {
+        $propFolder->purge;
+    }
     print "Done.\n" unless $quiet;
 }
 

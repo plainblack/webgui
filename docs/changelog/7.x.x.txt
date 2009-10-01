@@ -31,6 +31,7 @@
  - fixed #11071: Form::Date / Session::DateTime
  - fixed #11076: WebGUI::Account::Friends message_rpp
  - fixed #11067: My Purchases Detail Template - Status Message broken
+ - fixed #11081: Prop style in 7.8.0?
 
 7.8.0
  - upgraded YUI to 2.8.0r4
