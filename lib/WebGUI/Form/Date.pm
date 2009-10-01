@@ -178,7 +178,7 @@ sub getValueAsHtml {
       ||  $self->get("defaultValue") =~ $isaEpoch
       || !$self->get("value")     
       ||  $self->get("value")        =~ $isaEpoch) {
-		return $self->session->datetime->epochToSet($self->getOriginalValue);
+		return $self->session->datetime->epochToHuman($self->getOriginalValue, '%z');
     } 
     else {
         # MySQL format
@@ -217,7 +217,7 @@ sub toHtml {
         $value = $self->set("value",'');
     }
     else {
-        $value = $self->getValueAsHtml;
+        $value = WebGUI::DateTime->new($session, $self->getOriginalValue)->toMysqlDate;
     }
 
     my $style   = $session->style;
@@ -252,9 +252,10 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 =cut
 
 sub toHtmlAsHidden {
-    my $self = shift;
-	my $value = $self->getValueAsHtml();
-    return WebGUI::Form::Hidden->new($self->session,
+    my $self    = shift;
+    my $session = $self->session;
+    my $value = WebGUI::DateTime->new($session, $self->getOriginalValue)->toMysqlDate;
+    return WebGUI::Form::Hidden->new($session,
         name	=> $self->get("name"),
         value	=> $value,
     )->toHtmlAsHidden;
