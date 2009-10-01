@@ -30,6 +30,7 @@
  - fixed #11079: Datepicker, without times, does not highlight my birthday
  - fixed #11071: Form::Date / Session::DateTime
  - fixed #11076: WebGUI::Account::Friends message_rpp
+ - fixed #11067: My Purchases Detail Template - Status Message broken
 
 7.8.0
  - upgraded YUI to 2.8.0r4
