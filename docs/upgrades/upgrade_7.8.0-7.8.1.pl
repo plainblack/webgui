@@ -33,9 +33,14 @@ my $session = start(); # this line required
 fixWikis( $session );
 fixEMSTemplates( $session );
 removeOldSubscriptionTables( $session );
+removeOldITransactTables( $session );
 removeSQLFormTables( $session );
 fixBadRevisionDateColumns( $session );
+<<<<<<< HEAD:docs/upgrades/upgrade_7.8.0-7.8.1.pl
 addEMSSubmission( $session );
+=======
+removeImportCruft( $session );
+>>>>>>> ad702e908f63d36d79be04054b586044bd3c9ecf:docs/upgrades/upgrade_7.8.0-7.8.1.pl
 
 finish($session); # this line required
 
@@ -84,6 +89,14 @@ sub removeOldSubscriptionTables {
 }
 
 # Describe what our function does
+sub removeOldITransactTables {
+    my $session = shift;
+    print "\tRemoving tables leftover from the old 7.5 ITransact Plugin... " unless $quiet;
+    $session->db->write('DROP TABLE IF EXISTS ITransact_recurringStatus');
+    print "Done.\n" unless $quiet;
+}
+
+# Describe what our function does
 sub fixWikis {
     my $session = shift;
     print "\tFixing Wikis... " unless $quiet;
@@ -101,7 +114,6 @@ sub fixEMSTemplates {
     print "Done.\n" unless $quiet;
 }
 
-#----------------------------------------------------------------------------
 # Add tables for the EMS Submission feature
 sub addEMSSubmission {
     my $session = shift;
@@ -152,6 +164,17 @@ ESQL
 	    ADD COLUMN eventSubmissionGroups MEDIUMTEXT; });
 
     print "DONE!\n" unless $quiet;
+}
+
+# Describe what our function does
+sub removeImportCruft {
+    my $session = shift;
+    print "\tRemoving cruft from the import node... " unless $quiet;
+    my $propFolder = WebGUI::Asset->newByDynamicClass($session, '2c4RcwsUfQMup_WNujoTGg');
+    if ($propFolder) {
+        $propFolder->purge;
+    }
+    print "Done.\n" unless $quiet;
 }
 
 

@@ -892,10 +892,10 @@ sub getFieldValue {
     my $processedValue = $value;    
     my $dbh = $self->session->db->dbh;
 
-    if ($field->{fieldType} eq "date"){
+    if (lc $field->{fieldType} eq "date"){
         $processedValue = $self->session->datetime->epochToHuman($value,$dateFormat);
     }
-    elsif ($field->{fieldType} eq "dateTime"){
+    elsif (lc $field->{fieldType} eq "datetime"){
         $processedValue = $self->session->datetime->epochToHuman($value,$dateTimeFormat);
     }
     # TODO: The otherThing field type is probably also handled by getFormPlugin, so the elsif below can probably be

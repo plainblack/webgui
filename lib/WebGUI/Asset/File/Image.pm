@@ -654,8 +654,8 @@ sub www_resize {
 			      var resize = new YAHOO.util.Resize('yui_img', { 
 				  handles: 'all', 
 				  knobHandles: true, 
-				  height: '${x}px', 
-				  width: '${y}px', 
+				  height: '${y}px', 
+				  width: '${x}px', 
 				    proxy: true, 
 				    ghost: true, 
 				    status: true, 

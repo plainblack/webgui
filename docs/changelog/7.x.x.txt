@@ -23,6 +23,15 @@
  - fixed #11062: subscriptionCode
  - fixed #11061: SQLForm_fieldOrder
  - fixed #11066: wrong definitions
+ - fixed #11070: i18n Asset_Navigation::assetsToInclude
+ - fixed #11068: ITransact_recurringStatus
+ - fixed #11075: product destroys variants
+ - fixed #11073: preview interchanges width and height properties
+ - fixed #11079: Datepicker, without times, does not highlight my birthday
+ - fixed #11071: Form::Date / Session::DateTime
+ - fixed #11076: WebGUI::Account::Friends message_rpp
+ - fixed #11067: My Purchases Detail Template - Status Message broken
+ - fixed #11081: Prop style in 7.8.0?
 
 7.8.0
  - upgraded YUI to 2.8.0r4

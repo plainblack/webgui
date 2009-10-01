@@ -114,7 +114,7 @@ WebGUI.AssetManager.formatActions = function ( elCell, oRecord, oColumn, orderNu
 
     var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
     YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ) } );
-    YAHOO.util.Event.addListener( more, "click", function (e) { menu.show(); menu.focus(); YAHOO.util.Event.stopEvent(e); }, null, menu );
+    YAHOO.util.Event.addListener( more, "click", function (e) { YAHOO.util.Event.stopEvent(e); menu.show(); menu.focus(); }, null, menu );
 };
 
 /*---------------------------------------------------------------------------
@@ -156,8 +156,8 @@ WebGUI.AssetManager.formatLockedBy = function ( elCell, oRecord, oColumn, orderN
             + 'title="' + WebGUI.AssetManager.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
             + '</a>'
         : '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="' + WebGUI.AssetManager.i18n.get('WebGUI', 'unlocked') + '" '
-            + 'title="' + WebGUI.AssetManager.i18n.get('WebGUI', 'unlocked') +'" border="0" />'
+            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="' + WebGUI.AssetManager.i18n.get('Asset', 'unlocked') + '" '
+            + 'title="' + WebGUI.AssetManager.i18n.get('Asset', 'unlocked') +'" border="0" />'
             + '</a>'
         ;
 };
