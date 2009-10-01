@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 26; # increment this value for each test you create
+use Test::More tests => 28; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
@@ -373,28 +373,51 @@ is($table, undef, '... drops thing specific table');
 #
 #################################################################
 
-%otherThingProperties                = %thingProperties;
-$otherThingProperties{'groupIdView'} = 3;
-$otherThingId                        = $thingy->addThing(\%otherThingProperties, 0); 
-%otherFieldProperties                = %fieldProperties;
-$otherFieldProperties{thingId}       = $otherThingId;
-$otherFieldId                        = $thingy->addField(\%otherFieldProperties, 0);
-$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 1'} );
-$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 2'} );
-$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 3'} );
+{
+    my %newThingProperties                = %thingProperties;
+    $newThingProperties{'groupIdView'} = 3;
+    my $newThingId                        = $thingy->addThing(\%newThingProperties, 0); 
+    my %newFieldProperties                = %fieldProperties;
+    $newFieldProperties{thingId}       = $newThingId;
+    my $newFieldId                        = $thingy->addField(\%newFieldProperties, 0);
+    $thingy->editThingDataSave($newThingId, 'new', {"field_".$newFieldId => 'value 1'} );
+    $thingy->editThingDataSave($newThingId, 'new', {"field_".$newFieldId => 'value 2'} );
+    $thingy->editThingDataSave($newThingId, 'new', {"field_".$newFieldId => 'value 3'} );
 
-my $andy = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($andy);
-$session->user({userId => $andy->userId});
+    my $andy = WebGUI::User->create($session);
+    WebGUI::Test->usersToDelete($andy);
+    $session->user({userId => $andy->userId});
 
-my $form = $thingy->getFormPlugin({
-    name                => 'fakeFormForTesting',
-    fieldType           => 'otherThing_'.$otherThingId,
-    fieldInOtherThingId => $otherFieldId,
-});
+    my $form = $thingy->getFormPlugin({
+        name                => 'fakeFormForTesting',
+        fieldType           => 'otherThing_'.$newThingId,
+        fieldInOtherThingId => $newFieldId,
+    });
 
-cmp_deeply(
-    $form->get('options'),
-    {},
-    'getFormPlugin: form has no data since the user does not have viewing privileges'
-);
+    cmp_deeply(
+        $form->get('options'),
+        {},
+        'getFormPlugin: form has no data since the user does not have viewing privileges'
+    );
+}
+
+#################################################################
+#
+# getFieldValue
+#
+#################################################################
+{
+    my %newThingProperties             = %thingProperties;
+    my $newThingId                     = $thingy->addThing(\%newThingProperties, 0); 
+    my %newFieldProperties             = %fieldProperties;
+    $newFieldProperties{thingId}       = $newThingId;
+    $newFieldProperties{fieldType}     = 'Date';
+
+    my $date = $thingy->getFieldValue(WebGUI::Test->webguiBirthday, \%newFieldProperties);
+    like($date, qr{\d+/\d+/\d+}, "getFieldValue: Date field type returns data in user's format");
+
+    $newFieldProperties{fieldType}     = 'DateTime';
+    my $datetime = $thingy->getFieldValue(WebGUI::Test->webguiBirthday, \%newFieldProperties);
+    like($datetime, qr{^\d+/\d+/\d+\s+\d+:\d+}, "... DateTime field also returns data in user's format");
+}
+
