@@ -107,6 +107,30 @@ sub definition {
 			hoverHelp		=> $i18n->get('print ticket template help'),
 			namespace		=> 'EMS/PrintTicket',
 		},
+		eventSubmissionTemplateId => {
+			fieldType 		=> 'template',
+			defaultValue 	=> 'yBwydfooiLvhEFawJb0VTQ',
+			tab				=> 'display',
+			label			=> $i18n->get('print ticket template'),
+			hoverHelp		=> $i18n->get('print ticket template help'),
+			namespace		=> 'EMS/PrintTicket',
+		},
+		viewEventSubmissionQueueTemplateId => {
+			fieldType 		=> 'template',
+			defaultValue 	=> 'yBwydfooiLvhEFawJb0VTQ',
+			tab				=> 'display',
+			label			=> $i18n->get('print ticket template'),
+			hoverHelp		=> $i18n->get('print ticket template help'),
+			namespace		=> 'EMS/PrintTicket',
+		},
+		editEventSubmissionTemplateId => {
+			fieldType 		=> 'template',
+			defaultValue 	=> 'yBwydfooiLvhEFawJb0VTQ',
+			tab				=> 'display',
+			label			=> $i18n->get('print ticket template'),
+			hoverHelp		=> $i18n->get('print ticket template help'),
+			namespace		=> 'EMS/PrintTicket',
+		},
 		badgeInstructions => {
 			fieldType 		=> 'HTMLArea',
 			defaultValue 	=> $i18n->get('default badge instructions'),
@@ -141,6 +165,11 @@ sub definition {
 			tab				=> 'security',
 			label			=> $i18n->get('registration staff group'),
 			hoverHelp		=> $i18n->get('registration staff group help'),
+		},
+		eventSubmissionGroups => {
+			fieldType 		=> 'hidden',
+			defaultValue 	        => '',
+                        noFormPost              => 1,
 		},
 	);
 	push(@{$definition}, {
