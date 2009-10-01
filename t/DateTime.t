@@ -14,29 +14,25 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::User;
+use DateTime;
+use WebGUI::DateTime;
 
 # load your modules here
 
 use Test::More;
+use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 1 + 17;
-plan tests => $numTests;
-
-my $loaded = use_ok("WebGUI::DateTime");
+plan tests => 23;
 
 my $timeZoneUser = addUser($session);
 
-SKIP: {
-
-skip "Unable to load WebGUI::DateTime", $numTests-1 unless $loaded;
-
 my $dt = WebGUI::DateTime->new($session,"2006-11-06 21:12:45");
 
-isa_ok($dt, "WebGUI::DateTime", "constructor");
+isa_ok($dt, "WebGUI::DateTime", "constructor via epoch");
 isa_ok($dt, "DateTime", "constructor");
 
 is($dt->toDatabase,     "2006-11-06 21:12:45", "toDatabase returns the identical string since it is in UTC");
@@ -67,7 +63,18 @@ is($copiedDt->toUserTimeZone(),  "2006-11-06 15:12:45", "add returns the correct
 my $epochDt = WebGUI::DateTime->new($session, "1169141075");
 isa_ok($epochDt, "WebGUI::DateTime", "epochal construction");
 
-}
+my $now;
+my $nowDt = WebGUI::DateTime->new($session);
+isa_ok($nowDt, 'WebGUI::DateTime', 'constructed with undef');
+cmp_deeply($nowDt->epoch, num(time(),5), '... uses now as the epoch');
+
+$nowDt = WebGUI::DateTime->new($session, '');
+isa_ok($nowDt, 'WebGUI::DateTime', 'constructed with empty string');
+cmp_deeply($nowDt->epoch, num(time(),5), '... uses now as the epoch');
+
+my $dt1970 = WebGUI::DateTime->new($session, 0);
+isa_ok($dt1970, 'WebGUI::DateTime', 'constructed with 0');
+is($dt1970->epoch, 0, '... uses 0 for epoch');
 
 sub addUser {
 	my $session = shift;
@@ -80,7 +87,3 @@ sub addUser {
     WebGUI::Test->usersToDelete($user);
 	return $user;
 }
-
-END { ##Clean-up after yourself, always
-}
-
