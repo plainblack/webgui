@@ -5,6 +5,7 @@
  - fixed #11073: preview interchanges width and height properties
  - fixed #11079: Datepicker, without times, does not highlight my birthday
  - fixed #11071: Form::Date / Session::DateTime
+ - fixed #11076: WebGUI::Account::Friends message_rpp
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
