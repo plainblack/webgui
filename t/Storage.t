@@ -91,10 +91,8 @@ is($guidStorage->getDirectoryId, $newGuid, '... getDirectoryId');
 #
 ####################################################
 
-my $savecdn = $session->config->get('cdn');
-if ($savecdn) {
-    $session->config->delete('cdn');
-}
+WebGUI::Test->originalConfig('cdn');
+$session->config->delete('cdn');
 # Note: the CDN configuration will be reverted after CDN tests below
 
 my $storageDir1 = join '/', $uploadDir, '7e', '8a', '7e8a1b6a';
@@ -530,10 +528,7 @@ my $cdnCfg = {
     "syncProgram"   => "cp -r -- '%s' $cdnTestPath/",
     "deleteProgram" => "rm -r -- '$cdnTestPath/%s' > /dev/null 2>&1"
 };
-my ($addedCdnQ, $addedCdnU);
-$addedCdnQ = mkdir $cdnCfg->{'queuePath'}  unless -e $cdnCfg->{'queuePath'};
 my $dest = substr($cdnCfg->{'url'}, 7);
-$addedCdnU = mkdir $dest  unless  -e $dest;
 $session->config->set('cdn', $cdnCfg);
 my $cdnUrl = $cdnCfg->{'url'};
 my $cdnUlen = length $cdnUrl;
@@ -715,11 +710,4 @@ END {
     ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
-	if ($savecdn) {
-	   $session->config->set('cdn', $savecdn);
-	} else {
-	   $session->config->delete('cdn');
-	}
-	$addedCdnQ  and  rmdir $addedCdnQ;
-	$addedCdnU  and  rmdir $addedCdnU;
 }
