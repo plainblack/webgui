@@ -27,6 +27,7 @@ use WebGUI::Asset::Wobject;
 use WebGUI::Pluggable;
 use WebGUI::DateTime;
 use WebGUI::User;
+use WebGUI::Utility;
 use WebGUI::Group;
 use WebGUI::AssetCollateral::DataForm::Entry;
 use WebGUI::Form::SelectRichEditor;
@@ -225,7 +226,8 @@ an entry is being viewed, bypass caching altogether.
 
 sub getContentLastModified {
     my $self = shift;
-    if ($self->currentView eq 'list' || $self->session->form->process('entryId')) {
+    my $hasCaptcha = isIn('Captcha', map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder });
+    if ($self->currentView eq 'list' || $self->session->form->process('entryId') || $hasCaptcha) {
         return time;
     }
     return $self->SUPER::getContentLastModified;
@@ -1594,7 +1596,7 @@ sub www_editFieldSave {
         $newSelf->createField($newName, \%field);
     }
 
-    WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session);
     my $freshSelf = $newSelf->cloneFromDb();
     if ($form->process("proceed") eq "editField") {
         return $freshSelf->www_editField('new');
