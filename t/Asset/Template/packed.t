@@ -25,7 +25,9 @@ use CSS::Packer;
 use JavaScript::Packer;
 use WebGUI::Asset::Template;
 
-skip_all("Set CODE_COP to enable these tests") unless $ENV{CODE_COP};
+if ( !$ENV{CODE_COP} ) {
+    plan skip_all => "Set CODE_COP to enable these tests";
+}
 
 #----------------------------------------------------------------------------
 # Init
@@ -34,6 +36,7 @@ my $templates       = WebGUI::Asset->getRoot( $session )
                     ->getLineage( ['descendants'], { 
                         includeOnlyClasses => [ 'WebGUI::Asset::Template' ],
                     } );
+WebGUI::Test->tagsToRollback( WebGUI::VersionTag->getWorking( $session ) );
 
 #----------------------------------------------------------------------------
 # Tests
@@ -68,9 +71,4 @@ for my $templateId ( @$templates ) {
 }
 
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    WebGUI::VersionTag->getWorking( $session )->rollback;
-}
 #vim:ft=perl
