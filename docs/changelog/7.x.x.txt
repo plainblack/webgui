@@ -12,6 +12,7 @@
  - fixed #10544: Child assets under uncommitted parents
  - fixed failure in test 250 of t/00_compile.t
  - fixed #11084: option to view private profiles
+ - fixed #11082: Admin group in Visitor group?
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision

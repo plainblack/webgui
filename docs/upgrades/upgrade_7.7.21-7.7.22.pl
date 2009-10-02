@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 removeOldITransactTables( $session );
 removeImportCruft( $session );
+removeAdminFromVisitorGroup( $session );
 
 # upgrade functions go here
 
@@ -55,6 +56,15 @@ sub removeImportCruft {
     if ($propFolder) {
         $propFolder->purge;
     }
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub removeAdminFromVisitorGroup {
+    my $session = shift;
+    print "\tRemoving Admin group from Visitor group... " unless $quiet;
+    $session->db->write("delete from groupGroupings where groupId='3' and inGroup='1'");
     print "Done.\n" unless $quiet;
 }
 

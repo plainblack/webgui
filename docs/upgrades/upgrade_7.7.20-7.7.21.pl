@@ -49,6 +49,7 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 #----------------------------------------------------------------------------
 sub fixBadRevisionDateColumns {
@@ -75,6 +76,7 @@ sub removeSQLFormTables {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 #----------------------------------------------------------------------------
 sub removeOldSubscriptionTables {
@@ -106,7 +108,6 @@ sub fixEMSTemplates {
     $session->db->write(q|update EventManagementSystem set scheduleTemplateId='S2_LsvVa95OSqc66ITAoig' where scheduleTemplateId='2rC4ErZ3c77OJzJm7O5s3w'|);
     print "Done.\n" unless $quiet;
 }
-
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
