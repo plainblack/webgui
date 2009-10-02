@@ -36,6 +36,12 @@ my $df  = WebGUI::Asset->getImportNode( $session )
             fieldConfiguration  => '[]',
         } );
 
+my $dform = WebGUI::Asset->getDefault($session)->addChild({
+    className           => "WebGUI::Asset::Wobject::DataForm",
+    mailData            => 0,
+});
+$dform->createField('gotCaptcha', { type => 'Captcha', name => 'humanCheck', });
+
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag);
 $versionTag->commit;
@@ -43,7 +49,7 @@ $versionTag->commit;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 1;        # Increment this number for each test you create
+plan tests => 4;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # _createForm
@@ -59,5 +65,27 @@ $df->_createForm(
 );
 
 is($WebGUI::Test::logger_error, "Unable to load form control - MASSIVE FORM FAILURE", '_createForm logs when it cannot load a form type');
+
+#----------------------------------------------------------------------------
+# getContentLastModified
+
+sleep 3;
+
+$df->{_mode} = 'form';
+is($df->getContentLastModified,  $df->get('lastModified'), 'getContentLastModified: form normally returns lastModified');
+$df->{_mode} = 'list';
+cmp_ok(
+    $df->getContentLastModified,
+    '>',
+    $df->get('lastModified'),
+    '... form in list mode does not return lastModified'
+);
+$dform->{_mode} = 'form';
+cmp_ok(
+    $dform->getContentLastModified,
+    '>',
+    $dform->get('lastModified'),
+    '... form with a captcha does not return lastModified, even in form mode'
+);
 
 #vim:ft=perl

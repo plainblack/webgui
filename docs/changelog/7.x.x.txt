@@ -37,6 +37,7 @@
  - fixed failure in test 250 of t/00_compile.t
  - fixed #11084: option to view private profiles
  - fixed #11082: Admin group in Visitor group?
+ - fixed #11049: form caching incorrectly
 
 7.8.0
  - upgraded YUI to 2.8.0r4
