@@ -1293,9 +1293,19 @@ the preview is displayed, the Post can either be edited or canceled.|,
 		lastUpdated => 1149655722,
 	},
 
-	'user.isVisitor' => {
+	'post_loop_user.isVisitor' => {
 		message => q|A conditional that is true if the poster is a visitor.|,
 		lastUpdated => 1149655722,
+	},
+
+	'user.isVisitor' => {
+		message => q|A conditional that is true if the current user is a visitor.|,
+		lastUpdated => 1149655722,
+	},
+
+	'hideProfileUrl' => {
+		message => q|A conditional that is true if the poster is a visitor, or the current user is a visitor.  In the first case, Visitor's profile is not visible to any user.  In the second case, Visitor is not allowed to view any user's profile|,
+		lastUpdated => 1254506340,
 	},
 
 	'edit.url' => {
@@ -1357,6 +1367,11 @@ user has an avatar.|,
 	'lastReply.user.isVisitor' => {
 		message => q|A conditional that is true if the poster of the last reply is a visitor.|,
 		lastUpdated => 1149655722,
+	},
+
+	'lastReply.hideProfileUrl' => {
+		message => q|A conditional that is true if the poster of the last reply is a visitor, or the current user is a visitor.  In the first case, Visitor's profile is not visible to any user.  In the second case, Visitor is not allowed to view any user's profile|,
+		lastUpdated => 1254506340,
 	},
 
 	'lastReply.username' => {
