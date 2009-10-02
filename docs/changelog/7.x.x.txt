@@ -10,6 +10,7 @@
  - fixed #11081: Prop style in 7.8.0?
  - fixed #11083: TGC template bug fixes, round #1
  - fixed #10544: Child assets under uncommitted parents
+ - fixed failure in test 250 of t/00_compile.t
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision

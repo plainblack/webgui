@@ -380,7 +380,7 @@ sub getKeywordStaticURL {
     my $url = $self->getUrl;
     my @parts = split /\//, $url;
     my $lastPart = pop @parts;
-    if (index $lastPart, '.' == -1) {
+    if (index( $lastPart, '.' ) == -1) {
         return join '/', $self->getUrl, $self->getKeywordFilename($keyword);
     }
     else {
