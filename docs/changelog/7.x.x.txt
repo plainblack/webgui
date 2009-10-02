@@ -35,6 +35,7 @@
  - fixed #11083: TGC template bug fixes, round #1
  - fixed #10544: Child assets under uncommitted parents
  - fixed failure in test 250 of t/00_compile.t
+ - fixed #11084: option to view private profiles
 
 7.8.0
  - upgraded YUI to 2.8.0r4

@@ -100,14 +100,16 @@ A reference to a WebGUI::Paginator object.
 =cut
 
 sub appendPostListTemplateVars {
-	my $self = shift;
-	my $var = shift;
-	my $p = shift;
-	my $page = $p->getPageData;
-	my $i = 0;
-    my ($icon, $datetime) = $self->session->quick(qw(icon datetime));
+	my $self    = shift;
+    my $session = $self->session;
+	my $var     = shift;
+	my $p       = shift;
+	my $page    = $p->getPageData;
+	my $i       = 0;
+    my ($icon, $datetime) = $session->quick(qw(icon datetime));
+    my $isVisitor         = $session->user->isVisitor;
 	foreach my $row (@$page) {
-		my $post = WebGUI::Asset->new($self->session,$row->{assetId}, $row->{className}, $row->{revisionDate});
+		my $post = WebGUI::Asset->new($session,$row->{assetId}, $row->{className}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
 		my $controls = $icon->delete('func=delete',$post->get("url"),"Delete") . $icon->edit('func=edit',$post->get("url"));
 		if ($self->get("sortBy") eq "lineage") {
@@ -132,6 +134,7 @@ sub appendPostListTemplateVars {
                     "lastReply.title"               => $lastPost->get("title"),
                     "lastReply.user.isVisitor"      => $lastPost->get("ownerUserId") eq "1",
                     "lastReply.username"            => $lastPost->get("username"),
+                    "lastReply.hideProfileUrl"      => $lastPost->get("ownerUserId") eq "1" || $isVisitor,
                     "lastReply.userProfile.url"     => $lastPost->getPosterProfileUrl(),
                     "lastReply.dateSubmitted.human" => $datetime->epochToHuman($lastPost->get("creationDate"),"%z"),
                     "lastReply.timeSubmitted.human" => $datetime->epochToHuman($lastPost->get("creationDate"),"%Z"),
@@ -158,6 +161,7 @@ sub appendPostListTemplateVars {
             "dateUpdated.human"     => $datetime->epochToHuman($post->get("revisionDate"),"%z"),
             "timeSubmitted.human"   => $datetime->epochToHuman($post->get("creationDate"),"%Z"),
             "timeUpdated.human"     => $datetime->epochToHuman($post->get("revisionDate"),"%Z"),
+            "hideProfileUrl"        => $post->get('ownerUserId') eq '1' || $isVisitor,
             "userProfile.url"       => $post->getPosterProfileUrl,
             "user.isVisitor"        => $post->get("ownerUserId") eq "1",
         	"edit.url"              => $post->getEditUrl,
@@ -175,7 +179,7 @@ sub appendPostListTemplateVars {
 		if ($row->{className} =~ m/^WebGUI::Asset::Post::Thread/) {
 			$postVars{'rating'} = $post->get('threadRating');
 		}
-                push(@{$var->{post_loop}}, \%postVars );
+        push(@{$var->{post_loop}}, \%postVars );
 		$i++;
 	}
 	$p->appendTemplateVars($var);
@@ -1222,10 +1226,10 @@ sub getViewTemplateVars {
 	my %var;
 	$var{'user.canPost'} = $self->canPost;
 	$var{'user.canStartThread'} = $self->canStartThread;
-        $var{"add.url"} = $self->getNewThreadUrl;
-        $var{"rss.url"} = $self->getRssFeedUrl;
-        $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($self->session->user->isVisitor);
+    $var{"add.url"} = $self->getNewThreadUrl;
+    $var{"rss.url"} = $self->getRssFeedUrl;
+    $var{'user.isModerator'} = $self->canModerate;
+    $var{'user.isVisitor'} = ($self->session->user->isVisitor);
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
