@@ -69,7 +69,7 @@ sub removeSQLFormTables {
     my $tablesUsed = $session->db->quickScalar("select count(*) from asset where className='WebGUI::Asset::Wobject::SQLForm'");
     if (!$tablesUsed) {
         $session->db->write('DROP TABLE IF EXISTS SQLForm_fieldOrder');
-        print "\n\t\tSQL Form not used, dropping table...";
+        print "\n\t\tSQL Form not used, dropping table..." unless $quiet;
     }
     print "Done.\n" unless $quiet;
 }
