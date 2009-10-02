@@ -30,6 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 removeOldITransactTables( $session );
+removeImportCruft( $session );
 
 # upgrade functions go here
 
@@ -45,6 +46,17 @@ sub removeOldITransactTables {
     print "Done.\n" unless $quiet;
 }
 
+
+# Describe what our function does
+sub removeImportCruft {
+    my $session = shift;
+    print "\tRemoving cruft from the import node... " unless $quiet;
+    my $propFolder = WebGUI::Asset->newByDynamicClass($session, '2c4RcwsUfQMup_WNujoTGg');
+    if ($propFolder) {
+        $propFolder->purge;
+    }
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
