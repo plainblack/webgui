@@ -25,6 +25,8 @@ use CSS::Packer;
 use JavaScript::Packer;
 use WebGUI::Asset::Template;
 
+skip_all("Set CODE_COP to enable these tests") unless $ENV{CODE_COP};
+
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
