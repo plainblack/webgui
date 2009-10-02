@@ -101,7 +101,16 @@ sub addRevision {
             } ); 
     }
     else {
-        $workingTag = WebGUI::VersionTag->getWorking($self->session);
+        my $parentAsset;
+        if ( not defined( $parentAsset = $self->getParent ) ) {
+            $parentAsset = WebGUI::Asset->newPending( $self->session, $self->get('parentId') );
+        }
+        if ( $parentAsset->hasBeenCommitted ) {
+            $workingTag = WebGUI::VersionTag->getWorking( $self->session );
+        }
+        else {
+            $workingTag = WebGUI::VersionTag->new( $self->session, $parentAsset->get('tagId') );
+        }
     }
     
     #Create a dummy revision to be updated with real data later

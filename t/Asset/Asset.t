@@ -815,67 +815,83 @@ is($iufpAsset2->get('url'), 'inheriturlfromparent01/iufp2', '... update works pr
 
 ################################################################
 #
-# requestAutoCommit to move uncommitted child to uncommitted parent
+# addRevision to uncommitted child of uncommitted parent
 #
 ################################################################
 
 my $versionTag5 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag5);
-$versionTag5->set( { name => 'move commit of child to uncommitted parent on requestAutoCommit tests vt1' } );
+$versionTag5->set( { name => 'move revision of uncommitted child to uncommitted parent tests vt1' } );
 
 $properties = {
+
     #              '1234567890123456789012'
-    id          => 'moveVersionToParent_01',
-    title       => 'moveVersionToParent_01',
-    className   => 'WebGUI::Asset::Wobject::Layout',
-    url         => 'moveVersionToParent_01',
+    id        => 'moveVersionToParent_01',
+    title     => 'moveVersionToParent_01',
+    className => 'WebGUI::Asset::Wobject::Layout',
+    url       => 'moveVersionToParent_01',
 };
 
-my $parentAsset = $defaultAsset->addChild($properties, $properties->{id});
-my $parentVersionTag = WebGUI::VersionTag->new($session, $parentAsset->get('tagId'));
-is($parentVersionTag->get('isCommitted'),0, 'built non-committed parent asset');
+my $parentAsset = $defaultAsset->addChild( $properties, $properties->{id}, undef, { skipAutoCommitWorkflows => 1 } );
+my $parentVersionTag = WebGUI::VersionTag->new( $session, $parentAsset->get('tagId') );
+is( $parentVersionTag->get('isCommitted'), 0, 'built non-committed parent asset' );
 
-
-my $versionTag6 = WebGUI::VersionTag->create($session, {});
-WebGUI::Test->tagsToRollback($versionTag6);
-$versionTag6->set( { name => 'move commit of child to uncommitted parent on requestAutoCommit tests vt2' } );
+my $versionTag6 = WebGUI::VersionTag->create( $session, {} );
+$versionTag6->set( { name => 'move revision of uncommitted child to uncommitted parent tests vt2' } );
 $versionTag6->setWorking;
 
 $properties2 = {
+
     #              '1234567890123456789012'
-    id          => 'moveVersionToParent_03',
-    title       => 'moveVersionToParent_03',
-    className   => 'WebGUI::Asset::Wobject::Layout',
-    url         => 'moveVersionToParent_03',
+    id        => 'moveVersionToParent_03',
+    title     => 'moveVersionToParent_03',
+    className => 'WebGUI::Asset::Wobject::Layout',
+    url       => 'moveVersionToParent_03',
 };
 
-my $childAsset = $parentAsset->addChild($properties, $properties2->{id});
-my $testAsset = WebGUI::Asset->newPending($session, $childAsset->get('parentId'));
-my $testVersionTag = WebGUI::VersionTag->new($session, $testAsset->get('tagId'));
+my $childAsset = $parentAsset->addChild(
+    $properties2, $properties2->{id},
+    $session->datetime->time(),
+    { skipAutoCommitWorkflows => 1 }
+);
+my $testAsset      = WebGUI::Asset->newPending( $session, $childAsset->get('parentId') );
+my $testVersionTag = WebGUI::VersionTag->new( $session,   $testAsset->get('tagId') );
 
 my $childVersionTag;
-$childVersionTag = WebGUI::VersionTag->new($session, $childAsset->get('tagId'));
-is($childVersionTag->get('isCommitted'),0, 'built non-committed child asset');
+$childVersionTag = WebGUI::VersionTag->new( $session, $childAsset->get('tagId') );
+is( $childVersionTag->get('isCommitted'), 0, 'built non-committed child asset' );
 
-isnt($testAsset->get('tagId'),$childAsset->get('tagId'),'parent asset and child asset have different version tags');
-isnt($testVersionTag->getId,$childVersionTag->getId,'parent asset and child asset version tags unmatched');
+is( $testAsset->get('tagId'),
+    $childAsset->get('tagId'),
+    'uncommitted parent asset and uncommitted child asset have same version tag at addChild'
+);
 
-eval {
-    $childAsset->requestAutoCommit;
-    $childVersionTag = WebGUI::VersionTag->new($session, $childAsset->get('tagId'));
+$properties2 = {
+
+    #              '1234567890123456789012'
+    id        => 'moveVersionToParent_03',
+    title     => 'moveVersionToParent_03a',
+    className => 'WebGUI::Asset::Wobject::Layout',
+    url       => 'moveVersionToParent_03a',
 };
-is($childVersionTag->get('isCommitted'),0, 'confirm non-committed child asset');
+sleep 2;
+$childAsset->addRevision( $properties2, $session->datetime->time(), { skipAutoCommitWorkflows => 1 } );
 
-is($testAsset->get('tagId'),$childAsset->get('tagId'),'parent asset and child asset have same version tags');
+is( $parentVersionTag->get('isCommitted'), 0, 'confimr non-committed parent asset after revision' );
+is( $childVersionTag->get('isCommitted'),  0, 'confirm non-committed child asset after revision' );
 
-eval {
-    $testVersionTag->commit;
-};
+is( $testAsset->get('tagId'),
+    $childAsset->get('tagId'),
+    'uncommitted parent asset and uncommitted child asset have same version tag after addRevision'
+);
 
-is($testVersionTag->get('isCommitted'),1,'parent asset is now committed');
+eval { $testVersionTag->commit; };
 
-$childVersionTag = WebGUI::VersionTag->new($session, $childAsset->get('tagId'));
-is($childVersionTag->get('isCommitted'),1,'child asset is now committed');
+$session->log->warn('parent asset is now committed');
+is( $testVersionTag->get('isCommitted'), 1, 'parent asset is now committed' );
+
+$childVersionTag = WebGUI::VersionTag->new( $session, $childAsset->get('tagId') );
+$session->log->warn('child asset is now committed');
+is( $childVersionTag->get('isCommitted'), 1, 'child asset is now committed' );
 
 ################################################################
 #
