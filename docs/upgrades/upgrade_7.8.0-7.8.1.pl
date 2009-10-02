@@ -37,6 +37,7 @@ removeOldITransactTables( $session );
 removeSQLFormTables( $session );
 fixBadRevisionDateColumns( $session );
 removeImportCruft( $session );
+removeAdminFromVisitorGroup( $session );
 
 finish($session); # this line required
 
@@ -50,6 +51,7 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub fixBadRevisionDateColumns {
     my $session = shift;
@@ -62,6 +64,7 @@ sub fixBadRevisionDateColumns {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeSQLFormTables {
     my $session = shift;
@@ -74,6 +77,7 @@ sub removeSQLFormTables {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeOldSubscriptionTables {
     my $session = shift;
@@ -84,6 +88,7 @@ sub removeOldSubscriptionTables {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeOldITransactTables {
     my $session = shift;
@@ -92,6 +97,17 @@ sub removeOldITransactTables {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub removeAdminFromVisitorGroup {
+    my $session = shift;
+    print "\tRemoving Admin group from Visitor group... " unless $quiet;
+    $session->db->write("delete from groupGroupings where groupId='3' and inGroup='1'");
+    print "Done.\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub fixWikis {
     my $session = shift;
@@ -101,6 +117,7 @@ sub fixWikis {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub fixEMSTemplates {
     my $session = shift;
@@ -110,6 +127,7 @@ sub fixEMSTemplates {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeImportCruft {
     my $session = shift;
