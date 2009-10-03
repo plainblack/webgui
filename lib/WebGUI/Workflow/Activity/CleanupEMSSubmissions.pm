@@ -70,7 +70,7 @@ sub execute {
 	my $self    = shift;
     my $session = $self->session;
     my $root    = WebGUI::Asset->getRoot($session);
-
+return $self->FAILED;
     
     my $sth     = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::HelpDesk'");
     while (my ($assetId) = $sth->array) {

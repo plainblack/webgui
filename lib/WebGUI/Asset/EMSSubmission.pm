@@ -14,15 +14,11 @@ package WebGUI::Asset::EMSSubmission;
 
 =cut
 
+use Class::C3;
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::Asset';
+use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
 use WebGUI::Utility;
-# TODO add AssetAspect::Comment;
-
-# To get an installer for your wobject, add the Installable AssetAspect
-# See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
-# details
 
 =head1 NAME
 
@@ -54,7 +50,7 @@ handles revisions to NewAsset Assets.
 
 #sub addRevision {
 #    my $self    = shift;
-#    my $newSelf = $self->SUPER::addRevision(@_);
+#    my $newSelf = $self->next::method(@_);
 #    return $newSelf;
 #}
 
@@ -102,7 +98,7 @@ sub definition {
         startDate => {
 		    noFormPost      => 1,
 		    fieldType       => "hidden",
-		    defaultValue    => $date->toDatabase,
+		    defaultValue    => '',
 		    label           => $EMS_i18n->get("add/edit event start date"),
 		    hoverHelp       => $EMS_i18n->get("add/edit event start date help"),
 		    autoGenerate    => 0,
@@ -122,14 +118,14 @@ sub definition {
                         label           => $EMS_i18n->get("location"),
                         hoverHelp       => $EMS_i18n->get("location help"),
         },
-        relateBadgeGroup => {
+        relatedBadgeGroup => {
                         tab             => "properties",
                         fieldType       => "checkList",
                         customDrawMethod=> 'drawRelatedBadgeGroupsField',
                         label           => $EMS_i18n->get("related badge groups"),
                         hoverHelp       => $EMS_i18n->get("related badge groups ticket help"),
         },
-        relateRibbons => {
+        relatedRibbons => {
                         tab             => "properties",
                         fieldType       => "checkList",
                         customDrawMethod=> 'drawRelatedRibbonsField',
@@ -157,7 +153,7 @@ sub definition {
         className         => 'WebGUI::Asset::EMSSubmission',
         properties        => \%properties,
         };
-    return $class->SUPER::definition( $session, $definition );
+    return $class->next::method( $session, $definition );
 } ## end sub definition
 
 #-------------------------------------------------------------------
@@ -172,7 +168,7 @@ whenever a copy action is executed
 
 #sub duplicate {
 #    my $self     = shift;
-#    my $newAsset = $self->SUPER::duplicate(@_);
+#    my $newAsset = $self->next::method(@_);
 #    return $newAsset;
 #}
 
@@ -186,7 +182,7 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 sub indexContent {
     my $self    = shift;
-    my $indexer = $self->SUPER::indexContent;
+    my $indexer = $self->next::method;
     $indexer->setIsPublic(0);
 }
 
@@ -200,7 +196,7 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
     my $self = shift;
-    $self->SUPER::prepareView();
+    $self->next::method();
     my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
@@ -218,7 +214,7 @@ when /yourAssetUrl?func=editSave is requested/posted.
 
 sub processPropertiesFromFormPost {
     my $self = shift;
-    $self->SUPER::processPropertiesFromFormPost;
+    $self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -235,7 +231,7 @@ asset instances, you will need to purge them here.
 
 #sub purge {
 #    my $self = shift;
-#    return $self->SUPER::purge;
+#    return $self->next::method;
 #}
 
 #-------------------------------------------------------------------
@@ -246,10 +242,10 @@ This method is called when data is purged by the system.
 
 =cut
 
-sub purgeRevision {
-    my $self = shift;
-    return $self->SUPER::purgeRevision;
-}
+#sub purgeRevision {
+#    my $self = shift;
+#    return $self->next::method;
+#}
 
 #-------------------------------------------------------------------
 

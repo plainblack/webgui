@@ -119,7 +119,7 @@ sub fixEmptyCalendarIcalFeeds {
 
     print "DONE!\n" unless $quiet;
 }
-
+[
 #----------------------------------------------------------------------------
 # Add tables for the EMS Submission feature
 sub addEMSSubmission {
@@ -147,7 +147,7 @@ CREATE TABLE EMSSubmission (
     price FLOAT,
     seatsAvailable INT,
     startDate DATETIME,
-    duration FLOAT
+    duration FLOAT,
     eventNumber INT,
     location CHAR(100),
     relatedBadgeGroups MEDIUMTEXT,
@@ -159,20 +159,20 @@ CREATE TABLE EMSSubmission (
 ESQL
 
     $session->db->write( q{ ALTER TABLE EventManagementSystem 
-	    ADD COLLUMN eventSubmissionTemplateId CHAR(22) BINARY; });
+	    ADD COLUMN eventSubmissionTemplateId CHAR(22) BINARY; });
 
     $session->db->write( q{ ALTER TABLE EventManagementSystem 
-	    ADD COLLUMN viewEventSubmissionQueueTemplateId CHAR(22) BINARY; });
+	    ADD COLUMN viewEventSubmissionQueueTemplateId CHAR(22) BINARY; });
 
     $session->db->write( q{ ALTER TABLE EventManagementSystem 
-	    ADD COLLUMN editEventSubmissionTemplateId CHAR(22) BINARY; });
+	    ADD COLUMN editEventSubmissionTemplateId CHAR(22) BINARY; });
 
     $session->db->write( q{ ALTER TABLE EventManagementSystem 
-	    ADD COLLUMN eventSubmissionGroups MEDIUMTEXT; });
+	    ADD COLUMN eventSubmissionGroups MEDIUMTEXT; });
 
     print "DONE!\n" unless $quiet;
 }
-
+]
 #----------------------------------------------------------------------------
 # Add the column for featured wiki pages
 sub addFeaturedPageWiki {

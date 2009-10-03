@@ -46,6 +46,28 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 addSubmission
+
+Creates an EMSSubmission object based on the params
+
+=cut
+
+sub addSubmission {
+    my $self = shift;
+    my $parent = $self->getParent;
+    my $session = $self->session;
+    my $params = shift || {};
+    $self->validateSubmission($params);
+    $parent->addChild({
+          className => 'WebGUI::Asset::EMSSubmission',
+          status => 'pending',
+          title => $params->{title},
+          # TODO add all the fields...
+    });
+}
+
+#-------------------------------------------------------------------
+
 =head2 addRevision
 
 This method exists for demonstration purposes only.  The superclass
@@ -231,6 +253,20 @@ sub view {
     my $var  = $self->get;    # $var is a hash reference.
     $var->{controls} = $self->getToolbar;
     return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
+}
+
+#-------------------------------------------------------------------
+
+=head2 validateSubmission ( )
+
+=cut
+
+sub validateSubmission {
+    my $self    = shift;
+    my $session = $self->session;
+# compare fields passed with field definition
+# return true if ok, false if not ok
+    return 0;
 }
 
 #-------------------------------------------------------------------
