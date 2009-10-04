@@ -36,11 +36,8 @@ removeOldSubscriptionTables( $session );
 removeOldITransactTables( $session );
 removeSQLFormTables( $session );
 fixBadRevisionDateColumns( $session );
-<<<<<<< HEAD:docs/upgrades/upgrade_7.8.0-7.8.1.pl
 addEMSSubmission( $session );
-=======
 removeImportCruft( $session );
->>>>>>> ad702e908f63d36d79be04054b586044bd3c9ecf:docs/upgrades/upgrade_7.8.0-7.8.1.pl
 
 finish($session); # this line required
 
