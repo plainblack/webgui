@@ -38,6 +38,12 @@ and then become EMSTicket's.
 
 use WebGUI::Asset::EMSSubmissionForm;
 
+=head1 TODO
+
+add a lastSubmissionDate -- after that the submission form will be closed
+    the link will still exist but the form will just say '<title> submissions closed as of <date>'
+
+
 =head1 METHODS
 
 These methods are available from this class:
@@ -235,10 +241,10 @@ This method is called when data is purged by the system.
 
 =cut
 
-sub purgeRevision {
-    my $self = shift;
-    return $self->SUPER::purgeRevision;
-}
+#sub purgeRevision {
+#    my $self = shift;
+#    return $self->SUPER::purgeRevision;
+#}
 
 #-------------------------------------------------------------------
 

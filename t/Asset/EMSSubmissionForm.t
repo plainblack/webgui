@@ -17,6 +17,7 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
+use Test::Deep;
 use WebGUI::Group;
 use WebGUI::User;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -122,9 +123,12 @@ my $frmA = $ems->addChild({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test A -- long',
     canSubmitGroup           => $submitGroupA->getId,
-    formDescription          => q{
-   TODO = 1
-                     },
+    formDescription          => q{ {
+   'title' : { 'type' : 'text' },
+   'synopsis' : { 'type' : 'textarea' },
+   'duration' : { 'default' : 2.0 },
+   'startDate' : { 'type' : 'selectList', 'options' : [ '', '', '' ] },
+                     } },
 });
 isa_ok( $frmA, 'WebGUI::Asset::EMSSubmissionForm' );
 ok( $frmA->validateSubmission({
@@ -135,19 +139,20 @@ ok( !$frmA->validateSubmission({
 	}), 'not a valid submission' );
 # TODO: test more field validations
 
-print "after tests\n";
 
 # TODO use meta field in this form
 my $frmB = $ems->addChild({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test B -- short',
     canSubmitGroup           => $submitGroupB->getId,
-    formDescription          => q{
-   TODO = 1
-                     },
+    formDescription          => q{ {
+   'title' : { 'type' : 'text' },
+   'synopsis' : { 'type' : 'textarea' },
+   'duration' : { 'default' : 0.5 },
+   'startDate' : { 'default' : '' },
+                     } },
 });
 # TODO: test meta field validation
-print "created one form\n";
 
 loginUserA;
 
@@ -155,13 +160,13 @@ loginUserA;
 my $sub1 = $frmA->addSubmission({
     title => 'my favorite thing to talk about',
 });
+isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "valid submission succeeded" );
 
-print "created one submission\n";
 #this one should fail
 my $sub2 = $frmB->addSubmission({
     title => 'why i like to be important',
 });
-print "created another submission\n";
+ok( not defined $sub2, "invalid submission failed" );
 
 loginUserB;
 
@@ -169,24 +174,35 @@ loginUserB;
 my $sub3 = $frmB->addSubmission({
     title => 'five minutes of me',
 });
+isa_ok( $sub3, 'WebGUI::Asset::EMSSubmission', "checked permissions for group B" );
 
-print "created third submission\n";
 loginUserC;
 
 # should work
 my $sub4 = $frmB->addSubmission({
     title => 'why humility is underrated',
 });
-print "created fourth submission\n";
+isa_ok( $sub4, 'WebGUI::Asset::EMSSubmission', "user C is in group B" );
 
 # should work
 my $sub5 = $frmA->addSubmission({
     title => 'what you should know about everybody',
 });
-print "created fifth submission\n";
+isa_ok( $sub5, 'WebGUI::Asset::EMSSubmission', "user C is also in group A" );
 
-$sub1->addComment({ 'this is a test comment' });
-print "added a comment\n";
+$sub1->addComment( 'this is a test comment' );
+cmp_deeply($sub1->get('comments')->[0],{
+      id => re( qr/.+/ ),
+      alias => '',
+      userId => $userC->userId,
+      comment => 'this is a test comment',
+      rating => 0,
+      date => re( qr/\d{10}/ ),
+      ip => undef,
+}, "successfully added comment" );
+
+ok($sub1->update({
+}),'update submission');
 
 my $TODO = q{
 modify submission(s)
@@ -195,7 +211,8 @@ run submission approval activity
 run submission cleanup activity
 };
 $versionTag->commit;
-print "end of program\n";
+
+#done_testing();
 
 #----------------------------------------------------------------------------
 # Cleanup

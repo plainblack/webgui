@@ -32,6 +32,16 @@ Describe your New Asset's functionality and features here.
 
 use WebGUI::Asset::EMSSubmission;
 
+=head1 TODO
+
+the comments tab may need to be added in a getEditForm function like Sku::EMSTicket
+
+make a button/link for the admin to view the submission as the owner sees it.
+
+the www_edit function should see if the userid is the owner and call a seperate function
+else if it is not in the admin group return insufitient priviledges
+else call the getEditForm function like sku::EMSTicket does...
+
 
 =head1 METHODS
 
@@ -76,74 +86,116 @@ sub definition {
     my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmission" );
     my $EMS_i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
     tie my %properties, 'Tie::IxHash', (
-        submissionId => {
-		    noFormPost      => 1,
-		    fieldType       => "hidden",
+		submissionId => {
+			    noFormPost      => 1,
+			    fieldType       => "hidden",
+			    defaultValue => undef,
+		},
+                description => {
+                        tab                             => "properties",
+                        fieldType               => "HTMLArea",
+                        defaultValue    => undef,
+                        label                   => $i18n->get("description"),
+                        hoverHelp               => $i18n->get("description help")
+                        },
+                sku => {
+                        tab                             => "shop",
+                        fieldType               => "text",
+                        defaultValue    => $session->id->generate,
+                        label                   => $i18n->get("sku"),
+                        hoverHelp               => $i18n->get("sku help")
+                        },
+                displayTitle => {
+                        tab                             => "display",
+                        fieldType               => "yesNo",
+                        defaultValue    => 1,
+                        label                   => $i18n->get("display title"),
+                        hoverHelp               => $i18n->get("display title help")
+                        },
+                vendorId => {
+                        tab                             => "shop",
+                        fieldType               => "vendor",
+                        defaultValue    => 'defaultvendor000000000',
+                        label                   => $i18n->get("vendor"),
+                        hoverHelp               => $i18n->get("vendor help")
+                        },
+		shipsSeparately => {
+		    tab             => 'shop',
+		    fieldType       => 'yesNo',
+		    defaultValue    => 0,
+		    label           => $i18n->get('shipsSeparately'),
+		    hoverHelp       => $i18n->get('shipsSeparately help'),
+		},
+
+		price => {
+				tab             => "shop",
+				fieldType       => "float",
+				defaultValue    => 0.00,
+				label           => $EMS_i18n->get("price"),
+				hoverHelp       => $EMS_i18n->get("price help"),
+		},
+		seatsAvailable => {
+				tab             => "shop",
+				fieldType       => "integer",
+				defaultValue    => 25,
+				label           => $EMS_i18n->get("seats available"),
+				hoverHelp       => $EMS_i18n->get("seats available help"),
+		},
+		startDate => {
+			    noFormPost      => 1,
+			    fieldType       => "hidden",
+			    defaultValue    => '',
+			    label           => $EMS_i18n->get("add/edit event start date"),
+			    hoverHelp       => $EMS_i18n->get("add/edit event start date help"),
+			    autoGenerate    => 0,
+		},
+		duration => {
+				tab             => "properties",
+				fieldType       => "float",
+				defaultValue    => 1.0,
+				subtext         => $EMS_i18n->get('hours'),
+				label           => $EMS_i18n->get("duration"),
+				hoverHelp       => $EMS_i18n->get("duration help"),
+		},
+		location => {
+				fieldType       => "combo",
+				tab             => "properties",
+				customDrawMethod=> 'drawLocationField',
+				label           => $EMS_i18n->get("location"),
+				hoverHelp       => $EMS_i18n->get("location help"),
+		},
+		relatedBadgeGroup => {
+				tab             => "properties",
+				fieldType       => "checkList",
+				customDrawMethod=> 'drawRelatedBadgeGroupsField',
+				label           => $EMS_i18n->get("related badge groups"),
+				hoverHelp       => $EMS_i18n->get("related badge groups ticket help"),
+		},
+		relatedRibbons => {
+				tab             => "properties",
+				fieldType       => "checkList",
+				customDrawMethod=> 'drawRelatedRibbonsField',
+				label           => $EMS_i18n->get("related ribbons"),
+				hoverHelp       => $EMS_i18n->get("related ribbons help"),
+		},
+		eventMetaData => {
+				noFormPost              => 1,
+				fieldType               => "hidden",
+				defaultValue    => '{}',
+		},
+		sendEmailOnChange => {
+		    tab          => "properties",
+		    fieldType    => "text",
 		    defaultValue => undef,
-        },
-        price => {
-                        tab             => "shop",
-                        fieldType       => "float",
-                        defaultValue    => 0.00,
-                        label           => $EMS_i18n->get("price"),
-                        hoverHelp       => $EMS_i18n->get("price help"),
-        },
-        seatsAvailable => {
-                        tab             => "shop",
-                        fieldType       => "integer",
-                        defaultValue    => 25,
-                        label           => $EMS_i18n->get("seats available"),
-                        hoverHelp       => $EMS_i18n->get("seats available help"),
-        },
-        startDate => {
-		    noFormPost      => 1,
-		    fieldType       => "hidden",
-		    defaultValue    => '',
-		    label           => $EMS_i18n->get("add/edit event start date"),
-		    hoverHelp       => $EMS_i18n->get("add/edit event start date help"),
-		    autoGenerate    => 0,
-        },
-        duration => {
-                        tab             => "properties",
-                        fieldType       => "float",
-                        defaultValue    => 1.0,
-                        subtext         => $EMS_i18n->get('hours'),
-                        label           => $EMS_i18n->get("duration"),
-                        hoverHelp       => $EMS_i18n->get("duration help"),
-        },
-        location => {
-                        fieldType       => "combo",
-                        tab             => "properties",
-                        customDrawMethod=> 'drawLocationField',
-                        label           => $EMS_i18n->get("location"),
-                        hoverHelp       => $EMS_i18n->get("location help"),
-        },
-        relatedBadgeGroup => {
-                        tab             => "properties",
-                        fieldType       => "checkList",
-                        customDrawMethod=> 'drawRelatedBadgeGroupsField',
-                        label           => $EMS_i18n->get("related badge groups"),
-                        hoverHelp       => $EMS_i18n->get("related badge groups ticket help"),
-        },
-        relatedRibbons => {
-                        tab             => "properties",
-                        fieldType       => "checkList",
-                        customDrawMethod=> 'drawRelatedRibbonsField',
-                        label           => $EMS_i18n->get("related ribbons"),
-                        hoverHelp       => $EMS_i18n->get("related ribbons help"),
-        },
-        eventMetaData => {
-                        noFormPost              => 1,
-                        fieldType               => "hidden",
-                        defaultValue    => '{}',
-        },
-        sendEmailOnChange => {
-            tab          => "properties",
-            fieldType    => "text",
-            defaultValue => undef,
-            label        => $i18n->get("foo label"),
-            hoverHelp    => $i18n->get("foo label help")
-        },
+		    label        => $i18n->get("send email label"),
+		    hoverHelp    => $i18n->get("send email label help")
+		},
+		commentTab => {
+		      noFormPost => 1,
+		      tab       => "comments",
+		      fieldType => "hidden",
+		      customDrawMethod => 'drawComments',
+		 }
     );
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),
