@@ -135,6 +135,8 @@ ok( !$frmA->validateSubmission({
 	}), 'not a valid submission' );
 # TODO: test more field validations
 
+print "after tests\n";
+
 # TODO use meta field in this form
 my $frmB = $ems->addChild({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
@@ -145,6 +147,7 @@ my $frmB = $ems->addChild({
                      },
 });
 # TODO: test meta field validation
+print "created one form\n";
 
 loginUserA;
 
@@ -153,10 +156,12 @@ my $sub1 = $frmA->addSubmission({
     title => 'my favorite thing to talk about',
 });
 
+print "created one submission\n";
 #this one should fail
 my $sub2 = $frmB->addSubmission({
     title => 'why i like to be important',
 });
+print "created another submission\n";
 
 loginUserB;
 
@@ -165,19 +170,23 @@ my $sub3 = $frmB->addSubmission({
     title => 'five minutes of me',
 });
 
+print "created third submission\n";
 loginUserC;
 
 # should work
 my $sub4 = $frmB->addSubmission({
     title => 'why humility is underrated',
 });
+print "created fourth submission\n";
 
 # should work
 my $sub5 = $frmA->addSubmission({
     title => 'what you should know about everybody',
 });
+print "created fifth submission\n";
 
 $sub1->addComment({ 'this is a test comment' });
+print "added a comment\n";
 
 my $TODO = q{
 modify submission(s)
@@ -186,6 +195,7 @@ run submission approval activity
 run submission cleanup activity
 };
 $versionTag->commit;
+print "end of program\n";
 
 #----------------------------------------------------------------------------
 # Cleanup

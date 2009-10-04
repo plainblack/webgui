@@ -1,9 +1,14 @@
-package WebGUI::i18n::English::_i18n;  ##Be sure to change the package name to match the filename
+package WebGUI::i18n::English::Asset_EMSSubmissionForm;  ##Be sure to change the package name to match the filename
 
 use strict; ##Required for all good Perl::Critic compliant code
 
 our $I18N = { ##hashref of hashes
 
+	'assetName' => {
+		message => q|EMS Event Submission Form|,
+		lastUpdated => 1131394072,
+		context => q|Then name of the Asset ( Event Management System - Event Submission Form ).|
+	},
 	'next submission id label' => {
 		message => q|Next Submission Id|,
 		lastUpdated => 1131394072,
