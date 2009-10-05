@@ -125,18 +125,27 @@ my $frmA = $ems->addChild({
     canSubmitGroup           => $submitGroupA->getId,
     formDescription          => q{ {
    'title' : { 'type' : 'text' },
-   'synopsis' : { 'type' : 'textarea' },
+   'description' : { 'type' : 'textarea' },
    'duration' : { 'default' : 2.0 },
-   'startDate' : { 'type' : 'selectList', 'options' : [ '', '', '' ] },
+   'startDate' : { 'type' : 'selectList', 'options' :
+                     [ '1255150800', '1255237200', '1255323600' ] },
                      } },
 });
 isa_ok( $frmA, 'WebGUI::Asset::EMSSubmissionForm' );
 ok( $frmA->validateSubmission({
-   TODO => 1
+   title => 'titlea',
+   description => 'the description',
+   startDate => '1255150800',
 	}), 'a valid submission' );
 ok( !$frmA->validateSubmission({
    TODO => 1
-	}), 'not a valid submission' );
+	}), 'not a valid submission: invalid value' );
+ok( !$frmA->validateSubmission({
+   TODO => 1
+	}), 'not a valid submission: invalid field' );
+ok( !$frmA->validateSubmission({
+   TODO => 1
+	}), 'not a valid submission: readonly field' );
 # TODO: test more field validations
 
 
@@ -149,7 +158,7 @@ my $frmB = $ems->addChild({
    'title' : { 'type' : 'text' },
    'synopsis' : { 'type' : 'textarea' },
    'duration' : { 'default' : 0.5 },
-   'startDate' : { 'default' : '' },
+   'startDate' : { 'default' : '1255150800' },
                      } },
 });
 # TODO: test meta field validation
@@ -165,7 +174,7 @@ isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "valid submission succeeded" );
 #this one should fail
 my $sub2 = $frmB->addSubmission({
     title => 'why i like to be important',
-});
+}, 'invalid submission fails' );
 ok( not defined $sub2, "invalid submission failed" );
 
 loginUserB;
