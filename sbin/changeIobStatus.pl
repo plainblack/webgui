@@ -74,7 +74,7 @@ if ($userMessageFile) {
 
 print "Searching for users with a status of $currentStatus ...\n" unless ($quiet);
 my $userList;
-my $now = $session->datetime->time();
+my $now = time();
 my $inbox = WebGUI::Inbox->new($session);
 my $sth = $session->db->read("select userId,assetId from InOutBoard_status where status=?",[$currentStatus]);
 while (my ($userId,$assetId) = $sth->array) {

@@ -289,7 +289,7 @@ sub trash {
     $db->beginTransaction;
     $outputSub->($i18n->get('Clearing asset tables'));
     $db->write("update asset set state='trash-limbo' where lineage like ?",[$self->get("lineage").'%']);
-    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$session->user->userId, $session->datetime->time(), $self->getId]);
+    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$session->user->userId, time(), $self->getId]);
     $db->commit;
 
     # Update ourselves since we didn't use update()

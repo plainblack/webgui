@@ -84,7 +84,7 @@ sub execute {
 	my $urlOfSingleAsset = "";
 
     #By default, we'll make it so that things happen now.
-    my $time = $session->datetime->time();
+    my $time = time();
     
     #If the type is startTime, we'll wait until the version tag starttime to proceed
     if($self->get("type") eq "startTime") {
@@ -98,7 +98,7 @@ sub execute {
     my $dt = WebGUI::DateTime->new($session,$time);
     
     #Get the current UTC time
-    my $now = WebGUI::DateTime->new($session,$session->datetime->time());
+    my $now = WebGUI::DateTime->new($session,time());
     
     #Workflow is complete if the time has passed.
     if($now->epoch >= $dt->epoch) {

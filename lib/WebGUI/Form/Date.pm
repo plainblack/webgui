@@ -82,7 +82,7 @@ sub definition {
 	
     push(@{$definition}, {
 		defaultValue=>{
-			defaultValue=>$session->datetime->time()
+			defaultValue=>time()
 			},
 		maxlength=>{
 			defaultValue=> 10

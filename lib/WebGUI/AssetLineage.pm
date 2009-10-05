@@ -68,7 +68,7 @@ sub addChild {
 	my $self        = shift;
 	my $properties  = shift;
 	my $id          = shift || $self->session->id->generate();
-	my $now         = shift || $self->session->datetime->time();
+	my $now         = shift || time();
 	my $options     = shift;
 
 	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
@@ -85,7 +85,8 @@ sub addChild {
 	$properties->{assetId} = $id;
 	$properties->{parentId} = $self->getId;
 	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,$properties) || croak "Couldn't create a new $properties->{className} asset!";
-	$temp->{_parent} = $self;
+        # Do not set the parent here, since it could be stale and poison the child
+	#$temp->{_parent} = $self;
 	my $newAsset = $temp->addRevision($properties, $now, $options); 
 	$self->updateHistory("added child ".$id);
 	$self->session->http->setStatus(201,"Asset Creation Successful");

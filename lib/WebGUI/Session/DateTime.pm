@@ -950,7 +950,7 @@ sub setToEpoch {
 	}
 	unless ($dt) {
 		$self->session->errorHandler->warn("Could not format date $set for epoch.  Returning current time");
-		return $self->time();
+		return time();
 	}
 	return $dt->epoch;
 }
@@ -959,7 +959,8 @@ sub setToEpoch {
 
 =head2 time ( )
 
-Returns an epoch date for now.
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
+the perl built in function time().
 
 =cut
 

@@ -38,6 +38,7 @@ removeSQLFormTables( $session );
 fixBadRevisionDateColumns( $session );
 addEMSSubmission( $session );
 removeImportCruft( $session );
+removeAdminFromVisitorGroup( $session );
 
 finish($session); # this line required
 
@@ -51,6 +52,7 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub fixBadRevisionDateColumns {
     my $session = shift;
@@ -63,6 +65,7 @@ sub fixBadRevisionDateColumns {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeSQLFormTables {
     my $session = shift;
@@ -70,11 +73,12 @@ sub removeSQLFormTables {
     my $tablesUsed = $session->db->quickScalar("select count(*) from asset where className='WebGUI::Asset::Wobject::SQLForm'");
     if (!$tablesUsed) {
         $session->db->write('DROP TABLE IF EXISTS SQLForm_fieldOrder');
-        print "\n\t\tSQL Form not used, dropping table...";
+        print "\n\t\tSQL Form not used, dropping table..." unless $quiet;
     }
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeOldSubscriptionTables {
     my $session = shift;
@@ -85,6 +89,7 @@ sub removeOldSubscriptionTables {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeOldITransactTables {
     my $session = shift;
@@ -93,6 +98,17 @@ sub removeOldITransactTables {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub removeAdminFromVisitorGroup {
+    my $session = shift;
+    print "\tRemoving Admin group from Visitor group... " unless $quiet;
+    $session->db->write("delete from groupGroupings where groupId='3' and inGroup='1'");
+    print "Done.\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub fixWikis {
     my $session = shift;
@@ -102,6 +118,7 @@ sub fixWikis {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub fixEMSTemplates {
     my $session = shift;
@@ -163,6 +180,7 @@ ESQL
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeImportCruft {
     my $session = shift;
@@ -236,7 +254,7 @@ sub finish {
     updateTemplates($session);
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
-    $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
+    $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".time().")");
     $session->close();
 }
 

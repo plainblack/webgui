@@ -710,30 +710,31 @@ Returns a hash reference of template variables for this Post.
 =cut
 
 sub getTemplateVars {
-	my $self    = shift;
+    my $self    = shift;
     my $session = $self->session;
-	my %var     = %{$self->get};
+    my %var     = %{$self->get};
     my $postUser   = WebGUI::User->new($session, $self->get("ownerUserId"));
-	$var{"userId"} = $self->get("ownerUserId");
-	$var{"user.isPoster"} = $self->isPoster;
-	$var{"avatar.url"}    = $self->getAvatarUrl;
-	$var{"userProfile.url"} = $postUser->getProfileUrl($self->getUrl());
-	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->get("creationDate"));
-	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->get("revisionDate"));
-	$var{'title.short'} = $self->chopTitle;
-	$var{content} = $self->formatContent if ($self->getThread);
-	$var{'user.canEdit'} = $self->canEdit if ($self->getThread);
-	$var{"delete.url"} = $self->getDeleteUrl;
-	$var{"edit.url"} = $self->getEditUrl;
-	$var{"status"} = $self->getStatus;
-	$var{"reply.url"} = $self->getReplyUrl;
-	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
-	$var{'url'} = $self->getUrl.'#id'.$self->getId;
-        $var{'url.raw'} = $self->getUrl;
-	$var{'rating.value'} = $self->get("rating")+0;
-	$var{'rate.url.thumbsUp'} = $self->getRateUrl(1);
-	$var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
-	$var{'hasRated'} = $self->hasRated;
+    $var{"userId"}              = $self->get("ownerUserId");
+    $var{"user.isPoster"}       = $self->isPoster;
+    $var{"avatar.url"}          = $self->getAvatarUrl;
+    $var{"userProfile.url"}     = $postUser->getProfileUrl($self->getUrl());
+    $var{"hideProfileUrl" }     = $self->get('ownerUserId') eq '1' || $session->user->isVisitor;
+    $var{"dateSubmitted.human"} = $self->session->datetime->epochToHuman($self->get("creationDate"));
+    $var{"dateUpdated.human"}   = $self->session->datetime->epochToHuman($self->get("revisionDate"));
+    $var{'title.short'}         = $self->chopTitle;
+    $var{content}               = $self->formatContent if ($self->getThread);
+    $var{'user.canEdit'}        = $self->canEdit if ($self->getThread);
+    $var{"delete.url"}          = $self->getDeleteUrl;
+    $var{"edit.url"}            = $self->getEditUrl;
+    $var{"status"}              = $self->getStatus;
+    $var{"reply.url"}           = $self->getReplyUrl;
+    $var{'reply.withquote.url'} = $self->getReplyUrl(1);
+    $var{'url'}                 = $self->getUrl.'#id'.$self->getId;
+    $var{'url.raw'}             = $self->getUrl;
+    $var{'rating.value'}        = $self->get("rating")+0;
+    $var{'rate.url.thumbsUp'}   = $self->getRateUrl(1);
+    $var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
+    $var{'hasRated'}            = $self->hasRated;
 	my $gotImage;
 	my $gotAttachment;
 	@{$var{'attachment_loop'}} = ();
@@ -890,7 +891,7 @@ sub insertUserPostRating {
 		[$self->getId,
 		 $self->session->user->userId,
 		 $self->session->env->getIp,
-		 $self->session->datetime->time(),
+		 time(),
 		 $rating,]
 	);
 }

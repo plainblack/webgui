@@ -24,6 +24,7 @@ use WebGUI::Form::Country;
 use WebGUI::VersionTag;
 use Text::CSV_XS;
 use Params::Validate qw(:all);
+use WebGUI::Macro;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 my $TAP_PARSER_MISSING = <<END_WARN;
@@ -1255,6 +1256,8 @@ sub www_loadSurvey {
     elsif ( $var->{type} eq 'answer' ) {
         $editHtml = $self->processTemplate( $var, $self->get('answerEditTemplateId') );
     }
+
+    WebGUI::Macro::process($self->session, \$editHtml);
 
     # Generate the list of valid goto targets
     my $gotoTargets = $self->surveyJSON->getGotoTargets;

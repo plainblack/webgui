@@ -1,4 +1,5 @@
 7.8.1
+ - mark $session->datetime->time as deprecated and remove its use from core code
  - fixed: Wikis broken by 7.8.0 upgrade
  - fixed #11024: In/Out Board Busted
  - fixed #11025: Yo dudely in Wiki Keyword Search Template
@@ -32,6 +33,14 @@
  - fixed #11076: WebGUI::Account::Friends message_rpp
  - fixed #11067: My Purchases Detail Template - Status Message broken
  - fixed #11081: Prop style in 7.8.0?
+ - fixed #11083: TGC template bug fixes, round #1
+ - fixed #10544: Child assets under uncommitted parents
+ - fixed failure in test 250 of t/00_compile.t
+ - fixed #11084: option to view private profiles
+ - fixed #11082: Admin group in Visitor group?
+ - fixed #11049: form caching incorrectly
+ - fixed #11088: i18n Survey Section Information
+ - fixed #11087: SC asset repeats its own description in feeds
 
 7.8.0
  - upgraded YUI to 2.8.0r4

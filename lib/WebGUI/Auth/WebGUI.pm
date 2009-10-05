@@ -266,7 +266,7 @@ sub createAccountSave {
     $properties->{ changeUsername       } = $setting->get("webguiChangeUsername");
     $properties->{ changePassword       } = $setting->get("webguiChangePassword");   
     $properties->{ identifier           } = $self->hashPassword($password);
-    $properties->{ passwordLastUpdated  } = $session->datetime->time();
+    $properties->{ passwordLastUpdated  } = time();
     $properties->{ passwordTimeout      } = $setting->get("webguiPasswordTimeout");
     $properties->{ status } = 'Deactivated' if ($setting->get("webguiValidateEmail"));
 
@@ -433,16 +433,16 @@ sub editUserFormSave {
    unless (!$identifier || $identifier eq "password") {
       $properties->{identifier} = $self->hashPassword($self->session->form->process('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){
-	     $properties->{passwordLastUpdated} =$self->session->datetime->time();
+	     $properties->{passwordLastUpdated} =time();
       }
    }
    $properties->{passwordTimeout} = $self->session->form->interval('authWebGUI.passwordTimeout');
    $properties->{changeUsername} = $self->session->form->process('authWebGUI.changeUsername');
    $properties->{changePassword} = $self->session->form->process('authWebGUI.changePassword');
    	if($userId eq "new") {
-   		$properties->{passwordLastUpdated} =$self->session->datetime->time();
+   		$properties->{passwordLastUpdated} =time();
 		if ($self->session->setting->get("webguiExpirePasswordOnCreation")){
-      			$properties->{passwordLastUpdated} =$self->session->datetime->time() - $properties->{passwordTimeout};   
+      			$properties->{passwordLastUpdated} =time() - $properties->{passwordTimeout};   
 		}
    	}
    
@@ -753,7 +753,7 @@ sub login {
    my $userData = $self->getParams;
    if($self->getSetting("passwordTimeout") && $userData->{passwordTimeout}){
       my $expireTime = $userData->{passwordLastUpdated} + $userData->{passwordTimeout};
-      if ($self->session->datetime->time() >= $expireTime){
+      if (time() >= $expireTime){
 		my $userId = $self->userId;
 		 $self->logout;
    	     return $self->resetExpiredPassword($userId);
@@ -1031,7 +1031,7 @@ sub profileRecoverPasswordFinish {
 		$self->user( $user );
 		$self->saveParams($userId, $self->authMethod,
 				  { identifier => $self->hashPassword($password),
-				    passwordLastUpdated => $self->session->datetime->time });
+				    passwordLastUpdated => time });
 		$self->_logSecurityMessage;
 		return $self->SUPER::login;
 	} else {
@@ -1182,7 +1182,7 @@ sub emailResetPasswordFinish {
                $self->user(WebGUI::User->new($self->session, $userId));
                $self->saveParams($userId, $self->authMethod,
                                  { identifier => $self->hashPassword($password),
-                                   passwordLastUpdated => $self->session->datetime->time });
+                                   passwordLastUpdated => time });
                $self->_logSecurityMessage;
 
 #              delete the emailRecoverPasswordVerificationNumber
@@ -1236,7 +1236,7 @@ sub resetExpiredPasswordSave {
    return $self->resetExpiredPassword($u->userId, "<h1>".$i18n->get(70)."</h1><ul>".$error.'</ul>') if ($error);
    
    $properties->{identifier} = $self->hashPassword($self->session->form->process("identifier"));
-   $properties->{passwordLastUpdated} =$self->session->datetime->time();
+   $properties->{passwordLastUpdated} =time();
    
    $self->saveParams($u->userId,$self->authMethod,$properties);
    $self->_logSecurityMessage();
@@ -1314,7 +1314,7 @@ sub updateAccount {
             $properties->{identifier} = $self->hashPassword($password);
 			$self->_logSecurityMessage();
 	        if($userData->{identifier} ne $properties->{identifier}){
-	           $properties->{passwordLastUpdated} =$self->session->datetime->time();
+	           $properties->{passwordLastUpdated} =time();
             }
          }
       }

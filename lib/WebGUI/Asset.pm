@@ -2344,7 +2344,7 @@ sub publish {
 	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%')." $where");
         my $idList = $self->session->db->quoteAndJoin($assetIds);
         
-	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
+	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".time()." where assetId in (".$idList.")");
 	my $cache = WebGUI::Cache->new($self->session);
         foreach my $id (@{$assetIds}) {
         	# we do the purge directly cuz it's a lot faster than instantiating all these assets

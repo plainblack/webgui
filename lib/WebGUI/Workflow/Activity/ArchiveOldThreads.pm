@@ -69,7 +69,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-        my $epoch = $self->session->datetime->time();
+        my $epoch = time();
         my $a = $self->session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::Collaboration'");
         while (my ($assetId) = $a->array) {
                 my $cs = WebGUI::Asset->new($self->session, $assetId, "WebGUI::Asset::Wobject::Collaboration");
