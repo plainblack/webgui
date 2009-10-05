@@ -20,13 +20,12 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 19; # increment this value for each test you create
+use Test::More tests => 20; # increment this value for each test you create
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
 
 my $session = WebGUI::Test->session;
 my %var;
-my (@rss_feeds);
 
 ##############################
 ##          SETUP           ##
@@ -37,6 +36,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Create a version tag to work in
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"SyndicatedContent Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 my $syndicated_content = $node->addChild({className=>'WebGUI::Asset::Wobject::SyndicatedContent'});
 
 ##############################
@@ -106,8 +106,35 @@ cmp_ok(scalar(@{$var->{item_loop}}), '>', 0, 'the item loop has items');
 my $processed_template = eval {$syndicated_content->processTemplate($var,undef,$template) };
 ok($processed_template, "A response was received from processTemplate.");
 
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-}
+####################################################################
+#
+#  getTemplateVariables
+#
+####################################################################
 
+##Construct a feed with no description, so the resulting template variables can
+##be checked for an undef description
+my $feed = XML::FeedPP->new(<<EOFEED);
+<?xml version="1.0" encoding="UTF-8" ?>
+<feed xmlns="http://purl.org/atom/ns#" version="0.3" xmlns:admin="http://webns.net/mvcb/" xmlns:syn="http://purl.org/rss/1.0/modules/syndication/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/">
+<title type="text/plain">Revision Log - /WebGUI/</title>
+<link rel="alternate" type="text/html" href="https://svn.webgui.org/svnweb/plainblack/log/WebGUI/" />
+<author>
+<name></name>
+</author>
+<modified>1970-01-01T00:53:41</modified>
+<entry>
+<title type="text/plain">12312 - Ready for 7.7.20 development.
+</title>
+<link rel="alternate" type="text/html" href="https://svn.webgui.org/svnweb/plainblack/revision?rev=12312" />
+<author>
+<name>colin</name>
+</author>
+<id>https://svn.webgui.org/svnweb/plainblack/revision?rev=12312</id>
+<issued>1970-01-01T00:53:41</issued>
+<modified>1970-01-01T00:53:41</modified>
+</entry>
+EOFEED
+
+my $vars = $syndicated_content->getTemplateVariables($feed);
+ok( defined $vars->{item_loop}->[0]->{description}, 'getTemplateVariables: description is not undefined');
