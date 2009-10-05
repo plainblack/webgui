@@ -137,7 +137,7 @@ sub importAssetData {
     my $error       = $self->session->errorHandler;
     my $id          = $data->{properties}{assetId};
     my $class       = $data->{properties}{className};
-    my $version     = $options->{overwriteLatest} ? 0 : $data->{properties}{revisionDate};
+    my $version     = $options->{overwriteLatest} ? time : $data->{properties}{revisionDate};
 
     # Load the class
     WebGUI::Asset->loadModule( $self->session, $class );
