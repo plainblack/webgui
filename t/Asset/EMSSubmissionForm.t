@@ -138,15 +138,29 @@ ok( $frmA->validateSubmission({
    startDate => '1255150800',
 	}), 'a valid submission' );
 ok( !$frmA->validateSubmission({
-   TODO => 1
+   title => 'titlea',
+   description => 'the description',
+   startDate => '1205150800',
 	}), 'not a valid submission: invalid value' );
 ok( !$frmA->validateSubmission({
-   TODO => 1
+   title => 'titlea',
+   price => 300.0,
+   description => 'the description',
+   startDate => '1255150800',
 	}), 'not a valid submission: invalid field' );
 ok( !$frmA->validateSubmission({
-   TODO => 1
+   title => 'titlea',
+   duration => 3.0,
+   description => 'the description',
+   startDate => '1255150800',
 	}), 'not a valid submission: readonly field' );
-# TODO: test more field validations
+ok( $frmA->validateSubmission({
+   title => 'titlea',
+   duration => 3.0,
+   description => 'the description',
+   startDate => '1255150800',
+   adminOverride => q{ { 'duration' : 3.0 } },
+	}), 'valid submission: field value override by admin' );
 
 
 # TODO use meta field in this form
@@ -156,12 +170,22 @@ my $frmB = $ems->addChild({
     canSubmitGroup           => $submitGroupB->getId,
     formDescription          => q{ {
    'title' : { 'type' : 'text' },
-   'synopsis' : { 'type' : 'textarea' },
+   'description' : { 'type' : 'textarea' },
    'duration' : { 'default' : 0.5 },
    'startDate' : { 'default' : '1255150800' },
+   'metaField1' : { 'type' : 'Url' },
                      } },
 });
-# TODO: test meta field validation
+ok( $frmA->validateSubmission({
+   title => 'title',
+   description => 'description',
+   metaField1 => 'http://google.com/',
+	}), 'valid submission: test valid metafield value' );
+ok( !$frmA->validateSubmission({
+   title => 'title',
+   description => 'description',
+   metaField1 => 'joe@sams.org',
+	}), 'invalid submission: test invalid metafield value' );
 
 loginUserA;
 

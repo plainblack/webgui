@@ -136,6 +136,13 @@ sub definition {
             label        => $i18n->get("delete created items label"),
             hoverHelp    => $i18n->get("delete created items label help")
         },
+        submissionDeadline => { 
+            tab          => "properties",
+            fieldType    => "Date",
+            defaultValue => undef,
+            label        => $i18n->get("submission deadline label"),
+            hoverHelp    => $i18n->get("submission deadline label help")
+        },
         formDescription => { 
             tab          => "properties",
             fieldType    => "text",

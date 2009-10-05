@@ -190,12 +190,11 @@ sub definition {
 		    label        => $i18n->get("send email label"),
 		    hoverHelp    => $i18n->get("send email label help")
 		},
-		commentTab => {
-		      noFormPost => 1,
-		      tab       => "comments",
-		      fieldType => "hidden",
-		      customDrawMethod => 'drawComments',
-		 }
+		adminOverride => {
+				noFormPost              => 1,
+				fieldType               => "hidden",
+				defaultValue    => '{}',
+		},
     );
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),
