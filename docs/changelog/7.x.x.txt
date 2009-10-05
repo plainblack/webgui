@@ -14,6 +14,7 @@
  - fixed #11084: option to view private profiles
  - fixed #11082: Admin group in Visitor group?
  - fixed #11049: form caching incorrectly
+ - fixed #11088: i18n Survey Section Information
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
