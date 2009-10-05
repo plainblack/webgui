@@ -266,7 +266,8 @@ sub getTemplateVariables {
         $item{author} = WebGUI::HTML::filter(scalar $object->author, 'javascript');
         $item{guid} = WebGUI::HTML::filter(scalar $object->guid, 'javascript');
         $item{link} = WebGUI::HTML::filter(scalar $object->link, 'javascript');
-        $item{description} = WebGUI::HTML::filter(scalar($object->description), 'javascript');
+        my $description = WebGUI::HTML::filter(scalar($object->description), 'javascript');
+        $item{description} = defined $description ? $description : '';
         $item{descriptionFirst100words} = $item{description};
         $item{descriptionFirst100words} =~ s/(((\S+)\s+){100}).*/$1/s;
         $item{descriptionFirst75words} = $item{descriptionFirst100words};

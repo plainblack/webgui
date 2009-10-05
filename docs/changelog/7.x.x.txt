@@ -39,6 +39,7 @@
  - fixed #11082: Admin group in Visitor group?
  - fixed #11049: form caching incorrectly
  - fixed #11088: i18n Survey Section Information
+ - fixed #11087: SC asset repeats its own description in feeds
 
 7.8.0
  - upgraded YUI to 2.8.0r4
