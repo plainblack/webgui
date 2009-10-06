@@ -32,7 +32,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 127; # increment this value for each test you create
+my $numTests = 130; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -54,6 +54,7 @@ my $storage1 = WebGUI::Storage->get($session);
 is( $storage1, undef, "get requires id to be passed");
 
 $storage1 = WebGUI::Storage->get($session, 'foobar');
+addToCleanup($storage1);
 
 isa_ok( $storage1, "WebGUI::Storage", "storage will accept non GUID arguments");
 is ( $storage1->getId, 'foobar', 'getId returns the requested GUID');
@@ -223,6 +224,7 @@ foreach my $extTest (@{ $extensionTests }) {
 ####################################################
 
 my $fileStore = WebGUI::Storage->create($session);
+addToCleanup($fileStore);
 cmp_bag($fileStore->getFiles(1), ['.'], 'Starting with an empty storage object, no files in here except for . ');
 $fileStore->addFileFromScalar('.dotfile', 'dot file');
 cmp_bag($fileStore->getFiles(),  [                     ], 'getFiles() by default does not return dot files');
@@ -302,9 +304,11 @@ ok(
 ####################################################
 
 my $copiedStorage = $storage1->copy();
+addToCleanup($copiedStorage);
 cmp_bag($copiedStorage->getFiles(), $storage1->getFiles(), 'copy: both storage objects have the same files');
 
 my $secondCopy = WebGUI::Storage->create($session);
+addToCleanup($secondCopy);
 $storage1->copy($secondCopy);
 cmp_bag($secondCopy->getFiles(), $storage1->getFiles(), 'copy: passing explicit variable');
 
@@ -320,7 +324,6 @@ cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable 
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
     my @foo = $deepDeepDir->mkpath({ error => \$errorStr } );
-    note explain \@foo;
     $deepStorage->addFileFromScalar('deep/file', 'deep file');
     cmp_bag(
         $deepStorage->getFiles('all'),
@@ -365,6 +368,7 @@ ok(-e $hackedStore->getPath('fileToHack'), 'deleteFile did not delete the file i
 ####################################################
 
 my $tempStor = WebGUI::Storage->createTemp($session);
+addToCleanup($tempStor);
 
 isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object");
 is (substr($tempStor->getPathFrag, 0, 5), 'temp/', '... puts stuff in the temp directory');
@@ -379,6 +383,7 @@ is($tempStor->getHexId, $session->id->toHex($tempStor->getId), '... returns the 
 ####################################################
 
 my $tarStorage = $copiedStorage->tar('tar.tar');
+addToCleanup($tarStorage);
 isa_ok( $tarStorage, "WebGUI::Storage", "tar: returns a WebGUI::Storage object");
 is (substr($tarStorage->getPathFrag, 0, 5), 'temp/', 'tar: puts stuff in the temp directory');
 cmp_bag($tarStorage->getFiles(), [ 'tar.tar' ], 'tar: storage contains only the tar file');
@@ -391,6 +396,7 @@ isnt($tarStorage->getPath, $copiedStorage->getPath, 'tar did not reuse the same 
 ####################################################
 
 my $untarStorage = $tarStorage->untar('tar.tar');
+addToCleanup($untarStorage);
 isa_ok( $untarStorage, "WebGUI::Storage", "untar: returns a WebGUI::Storage object");
 is (substr($untarStorage->getPathFrag, 0, 5), 'temp/', 'untar: puts stuff in the temp directory');
 ##Note, getFiles will NOT recurse, so do not use a deep directory structure here
@@ -461,13 +467,23 @@ is($fileStore->addFileFromFormPost(), '', 'addFileFromFormPost returns empty str
 
 $session->http->setStatus(200);
 $session->request->upload('files', []);
-is($fileStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns empty string when asking for a form variable with no files attached');
+my $formStore = WebGUI::Storage->create($session);
+addToCleanup($formStore);
+is($formStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns empty string when asking for a form variable with no files attached');
 
 $session->request->uploadFiles(
     'oneFile',
     [ WebGUI::Test->getTestCollateralPath('WebGUI.pm') ],
 );
-is($fileStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', 'Return the name of the uploaded file');
+is($formStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', '... returns the name of the uploaded file');
+cmp_bag($formStore->getFiles, [ qw/WebGUI.pm/ ], '... adds the file to the storage location');
+
+$session->request->uploadFiles(
+    'thumbFile',
+    [ WebGUI::Test->getTestCollateralPath('thumb-thumb.gif') ],
+);
+is($formStore->addFileFromFormPost('thumbFile'), 'thumb.gif', '... strips thumb- prefix from files');
+cmp_bag($formStore->getFiles, [ qw/WebGUI.pm thumb.gif/ ], '... adds the file to the storage location');
 
 ####################################################
 #
@@ -533,6 +549,7 @@ $session->config->set('cdn', $cdnCfg);
 my $cdnUrl = $cdnCfg->{'url'};
 my $cdnUlen = length $cdnUrl;
 my $cdnStorage = WebGUI::Storage->create($session);
+addToCleanup($cdnStorage);
 # Functional URL before sync done
 my $hexId = $session->id->toHex($cdnStorage->getId);
 my $initUrl = join '/', $uploadUrl, $cdnStorage->getPathFrag;
@@ -596,6 +613,7 @@ $mockEnv{HTTPS} = undef;
 is ($cdnStorage->getUrl, $locUrl, 'CDN: getUrl: cleartext request to not use sslUrl');
 # Copy
 my $cdnCopy = $cdnStorage->copy;
+addToCleanup($cdnCopy);
 my $qcp = $cdnCfg->{'queuePath'} . '/' . $session->id->toHex($cdnCopy->getId);
 ok (-e $qcp, 'CDN: queue file created when storage location copied');
 my $dotcp = $cdnCopy->getPath . '/.cdn';
@@ -693,21 +711,4 @@ sub setupDataDrivenTests {
     ];
 
     return ($extensionTests, $fileIconTests)
-}
-
-####################################################
-#
-# END block, clean-up after yourself
-#
-####################################################
-
-END {
-	foreach my $stor (
-        $storage1,   $copiedStorage,
-        $secondCopy, $tempStor, $tarStorage,
-        $untarStorage, $fileStore,
-        $cdnStorage, $cdnCopy,
-    ) {
-		ref $stor eq "WebGUI::Storage" and $stor->delete;
-	}
 }
