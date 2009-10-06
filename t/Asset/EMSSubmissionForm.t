@@ -119,20 +119,23 @@ WebGUI::Test->tagsToRollback($versionTag);
 
 loginRgstr;
 
+is( $ems->hasForms, 0, 'ems currently has no forms' );
+
 my $frmA = $ems->addChild({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test A -- long',
     canSubmitGroup           => $submitGroupA->getId,
     daysBeforeCleanup        => 1,
     formDescription          => q{ {
-   'title' : { 'type' : 'text' },
-   'description' : { 'type' : 'textarea' },
-   'duration' : { 'default' : 2.0 },
-   'startDate' : { 'type' : 'selectList', 'options' :
+	   'title' : { 'type' : 'text' },
+	   'description' : { 'type' : 'textarea' },
+	   'duration' : { 'default' : 2.0 },
+	   'startDate' : { 'type' : 'selectList', 'options' :
                      [ '1255150800', '1255237200', '1255323600' ] },
                      } },
 });
 isa_ok( $frmA, 'WebGUI::Asset::EMSSubmissionForm' );
+is( $ems->hasForms, 1, 'ems now has forms' );
 ok( $frmA->validateSubmission({
    title => 'titlea',
    description => 'the description',
@@ -170,13 +173,14 @@ my $frmB = $ems->addChild({
     daysBeforeCleanup        => 0,
     canSubmitGroup           => $submitGroupB->getId,
     formDescription          => q{ {
-   'title' : { 'type' : 'text' },
-   'description' : { 'type' : 'textarea' },
-   'duration' : { 'default' : 0.5 },
-   'startDate' : { 'default' : '1255150800' },
-   'metaField1' : { 'type' : 'Url' },
+	   'title' : { 'type' : 'text' },
+	   'description' : { 'type' : 'textarea' },
+	   'duration' : { 'default' : 0.5 },
+	   'startDate' : { 'default' : '1255150800' },
+	   'metaField1' : { 'type' : 'Url' },
                      } },
 });
+is( $ems->hasForms, 1, 'ems still has forms' );
 ok( $frmA->validateSubmission({
    title => 'title',
    description => 'description',
@@ -188,19 +192,26 @@ ok( !$frmA->validateSubmission({
    metaField1 => 'joe@sams.org',
 	}), 'invalid submission: test invalid metafield value' );
 
+logout;
+
+is( $ems->canSubmit, 0, 'current user cannot submit to this ems' );
+
 loginUserA;
 
+is( $ems->canSubmit, 1, 'current user can submit to this ems' );
+is( $ems->hasSubmissions, 0, 'current user has no submissions' );
 # this one should work
 my $sub1 = $frmA->addSubmission({
     title => 'my favorite thing to talk about',
 });
 isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "valid submission succeeded" );
+is( $ems->hasSubmissions, 1, 'current user has submissions on this ems' );
 
 #this one should fail
 my $sub2 = $frmB->addSubmission({
     title => 'why i like to be important',
 });
-ok( not defined $sub2, "invalid submission failed" );
+ok( not defined $sub2, "user cannot submit to this form" );
 
 loginUserB;
 
@@ -242,13 +253,11 @@ ok($sub1->update({
 is( $sub1->get('title'),'the new title','successfully changed the title');
 
 
-ok($sub1->update({
-    status => 'approved'
-}),'set status to approved');
+$sub1->update({ status => 'approved' });
+is($sub1->get('status'),'approved','set status to approved');
 
-ok($sub2->update({
-    status => 'denied'
-}),'set status to denied');
+$sub2->update({ status => 'denied' });
+is($sub2->get('status'),'denied','set status to denied');
 
 # create the workflows/activities for processing
 my $approveSubmissions = WebGUI::Test::Activity->create( $session,

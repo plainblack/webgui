@@ -1878,6 +1878,36 @@ normal templates.|,
         context => q|help text for the columns per page field|,
     },
 
+    'new submission form' => {
+        message => q|New Submission Form|,
+        lastUpdated => 1147050475,
+        context => q|Label for the link to create a new submission form.|,
+    },
+
+    'view submission queue' => {
+        message => q|Submission Queue|,
+        lastUpdated => 1147050475,
+        context => q|Label for link to view submission queue.|,
+    },
+
+    'new submission' => {
+        message => q|New Submission|,
+        lastUpdated => 1147050475,
+        context => q|Label for link to create a new submission for an event.|,
+    },
+
+    'view my submissions' => {
+        message => q|My Submissions|,
+        lastUpdated => 1147050475,
+        context => q|Label for link to view submissions owned by current user.|,
+    },
+
+#    'TODO' => {
+#        message => q|TODO|,
+#        lastUpdated => 1147050475,
+#        context => q|TODO|,
+#    },
+
 };
 
 1;

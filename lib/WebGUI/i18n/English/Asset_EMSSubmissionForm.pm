@@ -69,6 +69,21 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1131394072,
 		context => q|This is the label used to describe the EMS submission cleanup activity|
 	},
+	'past deadline message' => {
+		message => q|The deadline for this submission is past, no more submissions will be taken at this time.|,
+		lastUpdated => 1131394072,
+		context => q|This is the default message for informing the user that the submission deadline is past.|
+	},
+	'past deadline label' => {
+		message => q|Post SUbmission Deadline Text|,
+		lastUpdated => 1131394072,
+		context => q|This is the label for the message indicating that the deadline for submissions has past.|
+	},
+	'past deadline label help' => {
+		message => q|Enter a message here to let the user know that submissions are no longer being taken because the deadline has past.|,
+		lastUpdated => 1131394072,
+		context => q|This help text should describe how the user tells submitters that the submission deadline has past.|
+	},
 
 #	'TODO' => {
 #		message => q|TODO|,

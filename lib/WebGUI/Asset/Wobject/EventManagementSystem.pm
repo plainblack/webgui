@@ -37,6 +37,22 @@ use Data::Dumper;
 
 
 #-------------------------------------------------------------------
+=head2 canSubmit
+
+returns true is the current user can submit to any form attached to this EMS
+
+=cut
+
+sub canSubmit {
+    my $self = shift;
+    my $user = $self->session->user;
+    for my $groupId (split ' ', $self->get('eventSubmissionGroups')) {
+        return 1 if $user->isInGroup($groupId);
+    }
+    return 0;
+}
+
+#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -109,27 +125,27 @@ sub definition {
 		},
 		eventSubmissionTemplateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> 'yBwydfooiLvhEFawJb0VTQ',
+			defaultValue 	=> 'eventSubmissionTmplt01',
 			tab				=> 'display',
 			label			=> $i18n->get('print ticket template'),
 			hoverHelp		=> $i18n->get('print ticket template help'),
-			namespace		=> 'EMS/PrintTicket',
+			namespace		=> 'EMS/SubmissionForm',
 		},
 		viewEventSubmissionQueueTemplateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> 'yBwydfooiLvhEFawJb0VTQ',
+			defaultValue 	=> 'eventQueueTmplate00001',
 			tab				=> 'display',
 			label			=> $i18n->get('print ticket template'),
 			hoverHelp		=> $i18n->get('print ticket template help'),
-			namespace		=> 'EMS/PrintTicket',
+			namespace		=> 'EMS/SubmissionQueue',
 		},
 		editEventSubmissionTemplateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> 'yBwydfooiLvhEFawJb0VTQ',
+			defaultValue 	=> 'editEventSubmissionT01',
 			tab				=> 'display',
 			label			=> $i18n->get('print ticket template'),
 			hoverHelp		=> $i18n->get('print ticket template help'),
-			namespace		=> 'EMS/PrintTicket',
+			namespace		=> 'EMS/EditSubmission',
 		},
 		badgeInstructions => {
 			fieldType 		=> 'HTMLArea',
@@ -404,6 +420,28 @@ sub getTokens {
 }
 
 #-------------------------------------------------------------------
+=head2 hasForms
+
+returns true if the EMS has subission forms attached
+
+=cut
+
+sub hasForms {
+   return 0;
+}
+
+#-------------------------------------------------------------------
+=head2 hasSubmissions
+
+returns true if the current user has submission forms in this EMS
+
+=cut
+
+sub hasSubmissions {
+   return 0;
+}
+
+#-------------------------------------------------------------------
 
 =head2 isRegistrationStaff ( [ user ] )
 
@@ -498,9 +536,16 @@ sub view {
 		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
 		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
+		newSubmissionUrl	=> $self->getUrl('func=newSubmission'),
+		viewSubmissionsUrl	=> $self->getUrl('func=viewSubmissions'),
+		viewSubmissionQueueUrl	=> $self->getUrl('func=viewSubmissionQueue'),
+		addSubmissionFormUrl	=> $self->getUrl('func=addSubmissionForm'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
 		canEdit				=> $self->canEdit,
+		canSubmit			=> $self->canSubmit,
+		hasSubmissions			=> $self->hasSubmissions,
+		hasForms			=> $self->hasForms,
 		lookupRegistrantUrl	=> $self->getUrl('func=lookupRegistrant'),
 		);
 
