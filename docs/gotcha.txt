@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.22
+--------------------------------------------------------------------
+
+    * In the past, it was possible to leave WebguiRoot undefined
+      or incorrectly specified, and WebGUI would still function.  It
+      must now be properly specified, which means it must be configured
+      in the global Apache section (outside any VirtualHost or
+      Directory sections) and point to the correct WebGUI root
+      directory.  For example:
+        PerlSetVar WebguiRoot /data/WebGUI
+
 7.7.21
 --------------------------------------------------------------------
 
