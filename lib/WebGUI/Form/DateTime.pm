@@ -84,7 +84,7 @@ sub definition {
 	my $definition = shift || [];
 	push(@{$definition}, {
 		defaultValue=>{
-                        defaultValue=>$session->datetime->time()
+                        defaultValue=>time()
                         },
 		maxlength=>{
 			defaultValue=> 19

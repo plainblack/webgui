@@ -850,7 +850,7 @@ $properties2 = {
 
 my $childAsset = $parentAsset->addChild(
     $properties2, $properties2->{id},
-    $session->datetime->time(),
+    time(),
     { skipAutoCommitWorkflows => 1 }
 );
 my $testAsset      = WebGUI::Asset->newPending( $session, $childAsset->get('parentId') );
@@ -874,7 +874,7 @@ $properties2 = {
     url       => 'moveVersionToParent_03a',
 };
 sleep 2;
-$childAsset->addRevision( $properties2, $session->datetime->time(), { skipAutoCommitWorkflows => 1 } );
+$childAsset->addRevision( $properties2, time(), { skipAutoCommitWorkflows => 1 } );
 
 is( $parentVersionTag->get('isCommitted'), 0, 'confimr non-committed parent asset after revision' );
 is( $childVersionTag->get('isCommitted'),  0, 'confirm non-committed child asset after revision' );

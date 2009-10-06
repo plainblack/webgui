@@ -213,7 +213,7 @@ sub calculateExpireOffset {
         }
     }
     if ($units eq "fixed") {
-        my $seconds = (($offset - $session->datetime->time()));
+        my $seconds = (($offset - time()));
         if ($seconds < 1) {
             return undef;
         }

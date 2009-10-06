@@ -204,7 +204,7 @@ sub exportAsHtml {
     my $i18n = WebGUI::International->new($self->session, 'Asset');
 
     # take down when we started to tell the user how long the process took.
-    my $startTime           = $session->datetime->time;
+    my $startTime           = time;
 
     # get the export path and ensure it is valid.
     my $exportPath          = $self->exportCheckPath;
@@ -298,7 +298,7 @@ sub exportAsHtml {
     }
 
     # we're done. give the user a status report.
-    my $timeRequired = $session->datetime->time - $startTime;
+    my $timeRequired = time - $startTime;
     my $message = sprintf $i18n->get('export information'), $exportedCount, $timeRequired;
     return $message;
 }

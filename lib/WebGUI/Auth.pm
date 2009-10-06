@@ -64,7 +64,7 @@ sub _isDuplicateUsername {
 	my ($otherUser) = $self->session->db->quickArray("select count(*) from users where username=".$self->session->db->quote($username));
 	return 0 if !$otherUser;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->error('<li>'.sprintf($i18n->get(77), $username,$username,$username,$self->session->datetime->epochToHuman($self->session->datetime->time(),"%y")).'</li>');
+	$self->error('<li>'.sprintf($i18n->get(77), $username,$username,$username,$self->session->datetime->epochToHuman(time(),"%y")).'</li>');
 	return 1;
 }
 
@@ -108,11 +108,11 @@ sub _logLogin {
 		[ 
             $_[0],
             $_[1],
-            $self->session->datetime->time(),
+            time(),
             $self->session->env->getIp,
             $self->session->env->get("HTTP_USER_AGENT"),
             $self->session->getId,
-            $self->session->datetime->time(),
+            time(),
         ]
     );
 }

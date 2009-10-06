@@ -68,7 +68,7 @@ sub addChild {
 	my $self        = shift;
 	my $properties  = shift;
 	my $id          = shift || $self->session->id->generate();
-	my $now         = shift || $self->session->datetime->time();
+	my $now         = shift || time();
 	my $options     = shift;
 
 	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.

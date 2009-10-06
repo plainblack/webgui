@@ -891,7 +891,7 @@ sub insertUserPostRating {
 		[$self->getId,
 		 $self->session->user->userId,
 		 $self->session->env->getIp,
-		 $self->session->datetime->time(),
+		 time(),
 		 $rating,]
 	);
 }

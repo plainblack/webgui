@@ -23,7 +23,7 @@ use WebGUI::Asset;
 use Test::More;
 use Test::Deep;
 
-my $startingTime = $session->datetime->time();
+my $startingTime = time();
 
 my $numTests = 5; # increment this value for each test you create
 plan tests => 1 + $numTests;
@@ -77,7 +77,7 @@ is($count, 0, 'add: Nothing added if passive profiling is not enabled');
 $session->setting->set('passiveProfilingEnabled', 1);
 
 my $timeLogged;
-$timeLogged = $session->datetime->time();
+$timeLogged = time();
 WebGUI::PassiveProfiling::add( $session, $page->getId );
 
 my $count = $session->db->quickScalar('select count(*) from passiveProfileLog where assetId=? and dateOfEntry >= ?',[$page->getId, $startingTime]);

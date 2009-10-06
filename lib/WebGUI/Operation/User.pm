@@ -840,7 +840,7 @@ sub www_editUserSave {
         }
 	# Display an error telling them the username they are trying to use is not available and suggest alternatives	
 	} else {
-       		$error = '<ul>' . sprintf($i18n->get(77), $postedUsername, $postedUsername, $postedUsername, $session->datetime->epochToHuman($session->datetime->time(),"%y")).'</ul>';
+       		$error = '<ul>' . sprintf($i18n->get(77), $postedUsername, $postedUsername, $postedUsername, $session->datetime->epochToHuman(time(),"%y")).'</ul>';
 	}
 	if ($isSecondary) {
 		return _submenu($session,{workarea => $i18n->get(978)});

@@ -81,7 +81,7 @@ sub execute {
 		return $self->COMPLETE;
 	}
 
-	my @userIds = $self->session->db->buildArray("SELECT a.userId FROM authentication AS a INNER JOIN users AS u ON a.userId = u.userId WHERE a.authMethod = 'WebGUI' AND a.fieldName = 'emailValidationKey' AND u.status = 'Deactivated' AND u.dateCreated < ?", [$self->session->datetime->time - $self->get('interval')]);
+	my @userIds = $self->session->db->buildArray("SELECT a.userId FROM authentication AS a INNER JOIN users AS u ON a.userId = u.userId WHERE a.authMethod = 'WebGUI' AND a.fieldName = 'emailValidationKey' AND u.status = 'Deactivated' AND u.dateCreated < ?", [time - $self->get('interval')]);
 	foreach my $userId (@userIds) {
 		WebGUI::User->new($self->session, $userId)->delete;
 	}

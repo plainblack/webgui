@@ -65,7 +65,7 @@ A hash reference containing a list of properties to associate with the child.
 =head3 revisionDate
 
 An epoch date representing the date/time stamp that this revision was 
-created. Defaults to $self->session->datetime->time().
+created. Defaults to time().
 
 =head3 options
 
@@ -87,7 +87,7 @@ Posts) will know not to send them under certain conditions.
 sub addRevision {
     my $self             = shift;
     my $properties       = shift || {};
-    my $now              = shift     || $self->session->datetime->time();
+    my $now              = shift     || time();
     my $options          = shift;
 
     my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
@@ -573,7 +573,7 @@ sub updateHistory {
     my $session = $self->session;
 	my $action = shift;
 	my $userId = shift || $session->user->userId || '3';
-	my $dateStamp =$session->datetime->time();
+	my $dateStamp =time();
 	$session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp, url) values (?,?,?,?,?)", [$self->getId, $userId, $action, $dateStamp, $self->get('url')]);
 }
 

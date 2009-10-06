@@ -226,7 +226,7 @@ sub finish {
     upgradeToYUI28( $session );
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
-    $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
+    $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".time().")");
     $session->close();
 }
 
