@@ -950,7 +950,7 @@ sub setToEpoch {
 	}
 	unless ($dt) {
 		$self->session->errorHandler->warn("Could not format date $set for epoch.  Returning current time");
-		return $time();
+		return time();
 	}
 	return $dt->epoch;
 }
