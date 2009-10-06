@@ -177,7 +177,7 @@ cmp_deeply(
 
 $session->user({userId => 3});
 my $json = $matrix->www_getCompareFormData('score');
-diag $session->getId;
+note $session->getId;
 
 my $compareFormData = JSON->new->decode($json);
 
