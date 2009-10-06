@@ -10,22 +10,22 @@ save you many hours of grief.
 7.7.22
 --------------------------------------------------------------------
 
-    * In the past, it was possible to leave WebguiRoot undefined
-      or incorrectly specified, and WebGUI would still function.  It
-      must now be properly specified, which means it must be configured
-      in the global Apache section (outside any VirtualHost or
-      Directory sections) and point to the correct WebGUI root
-      directory.  For example:
-        PerlSetVar WebguiRoot /data/WebGUI
+    * WebGUI creates thumbnails for uploaded images.  The name for
+      those thumbnail files is created by prepending "thumb-" to the
+      name of the file.  If a file that starts with "thumb-" is uploaded
+      then WebGUI would throw an error.  Starting with 7.7.22, files
+      that start with "thumb-" will be renamed by removing that
+      prefix from their filename.
+
 
 7.7.21
 --------------------------------------------------------------------
 
     * The EventManagementSystem schedule template was accidently given
-    the same namespace as the main EMS template.  This allowed the
-    wrong template to be chosen for the main EMS template and the
-    schedule template.  The upgrade from 7.8.0 to 7.8.1 will attempt
-    to fix this when default templates have been used.
+      the same namespace as the main EMS template.  This allowed the
+      wrong template to be chosen for the main EMS template and the
+      schedule template.  The upgrade from 7.8.0 to 7.8.1 will attempt
+      to fix this when default templates have been used.
 
 7.7.19
 --------------------------------------------------------------------
