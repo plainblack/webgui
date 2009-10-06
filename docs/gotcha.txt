@@ -16,6 +16,15 @@ save you many hours of grief.
     schedule template.  The upgrade from 7.8.0 to 7.8.1 will attempt
     to fix this when default templates have been used.
 
+    * In the past, it was possible to leave WebguiRoot undefined
+      or incorrectly specified, and WebGUI would still function.  It
+      must now be properly specified, which means it must be configured
+      in the global Apache section (outside any VirtualHost or
+      Directory sections) and point to the correct WebGUI root
+      directory.  For example:
+        PerlSetVar WebguiRoot /data/WebGUI
+
+
 7.8.0
 --------------------------------------------------------------------
 
