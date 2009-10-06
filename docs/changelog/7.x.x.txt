@@ -17,6 +17,7 @@
  - fixed #11088: i18n Survey Section Information
  - fixed #11087: SC asset repeats its own description in feeds
  - fixed #10916: png icon
+ - fixed #11100: syncToCdn's help is not proper POD
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
