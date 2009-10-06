@@ -115,7 +115,7 @@ sub definition {
             label        => $i18n->get("next submission id label"),
             hoverHelp    => $i18n->get("next submission id label help")
         },
-        canSubmitGroup => { 
+        canSubmitGroupId => { 
             tab          => "security",
             fieldType    => "groupid",
             defaultValue => undef,

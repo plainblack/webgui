@@ -59,6 +59,16 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1131394072,
 		context => q|This help text is for the form description field.  The user should be warned not to edit it unless they really know what they are doing.|
 	},
+	'activity title approve submissions' => {
+		message => q|Process Approved EMS Submissions|,
+		lastUpdated => 1131394072,
+		context => q|This is the label used to describe the EMS submission approval activity|
+	},
+	'activity title cleanup submissions' => {
+		message => q|Cleanup EMS Submissions|,
+		lastUpdated => 1131394072,
+		context => q|This is the label used to describe the EMS submission cleanup activity|
+	},
 
 #	'TODO' => {
 #		message => q|TODO|,

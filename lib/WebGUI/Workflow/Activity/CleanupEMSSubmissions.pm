@@ -18,6 +18,7 @@ package WebGUI::Workflow::Activity::CleanupEMSSubmissions;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -50,8 +51,9 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
+        my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmissionForm" );
 	push(@{$definition}, {
-		name       => "Cleanup EMS Submissions",   # TODO internationalize
+		name       => $i18n->get("activity title cleanup submissions"),
 		properties => {}
 	});
 	return $class->SUPER::definition($session,$definition);
@@ -70,7 +72,7 @@ sub execute {
 	my $self    = shift;
     my $session = $self->session;
     my $root    = WebGUI::Asset->getRoot($session);
-return $self->FAILED;
+return $self->ERROR;
     
     my $sth     = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::HelpDesk'");
     while (my ($assetId) = $sth->array) {

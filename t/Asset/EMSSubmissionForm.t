@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 200;        # Increment this number for each test you create
+plan tests => 30;        # Increment this number for each test you create
 
 my $submitGroupA = WebGUI::Group->new($session,'new');
 my $submitGroupB = WebGUI::Group->new($session,'new');
@@ -123,6 +123,7 @@ my $frmA = $ems->addChild({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test A -- long',
     canSubmitGroup           => $submitGroupA->getId,
+    daysBeforeCleanup        => 1,
     formDescription          => q{ {
    'title' : { 'type' : 'text' },
    'description' : { 'type' : 'textarea' },
@@ -163,10 +164,10 @@ ok( $frmA->validateSubmission({
 	}), 'valid submission: field value override by admin' );
 
 
-# TODO use meta field in this form
 my $frmB = $ems->addChild({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test B -- short',
+    daysBeforeCleanup        => 0,
     canSubmitGroup           => $submitGroupB->getId,
     formDescription          => q{ {
    'title' : { 'type' : 'text' },
@@ -198,7 +199,7 @@ isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "valid submission succeeded" );
 #this one should fail
 my $sub2 = $frmB->addSubmission({
     title => 'why i like to be important',
-}, 'invalid submission fails' );
+});
 ok( not defined $sub2, "invalid submission failed" );
 
 loginUserB;
@@ -235,14 +236,44 @@ cmp_deeply($sub1->get('comments')->[0],{
 }, "successfully added comment" );
 
 ok($sub1->update({
+    title => 'the new title'
 }),'update submission');
 
+is( $sub1->get('title'),'the new title','successfully changed the title');
+
+
+ok($sub1->update({
+    status => 'approved'
+}),'set status to approved');
+
+ok($sub2->update({
+    status => 'denied'
+}),'set status to denied');
+
+# create the workflows/activities for processing
+my $approveSubmissions = WebGUI::Test::Activity->create( $session,
+              "WebGUI::Workflow::Activity::ProcessEMSApprovals"
+);
+my $cleanupSubmissions = WebGUI::Test::Activity->create( $session,
+              "WebGUI::Workflow::Activity::CleanupEMSSubmissions"
+);
+
+is($approveSubmissions->run, 'complete', 'approval complete');
+is($approveSubmissions->run, 'done', 'approval done');
+
+is( $sub1->get('status'),'created','submission has been created');
+
 my $TODO = q{
-modify submission(s)
-change submission status
-run submission approval activity
+can we look for the EMSTicket asset for the created submission?
+	-- perhaps it should be assigned to the ticket somehow?
+run addpoval on a submission that is missing data
+    -- approval runs fine, but status should be failed
+update submissions to be more than a day old
 run submission cleanup activity
+    --  cleanup only denied entries
+    --  cleanup denied and created entries
 };
+
 $versionTag->commit;
 
 #done_testing();
@@ -250,6 +281,7 @@ $versionTag->commit;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-# everything should be  entered into the WG::Test cleanup lists...
+   $approveSubmissions->delete;
+   $cleanupSubmissions->delete;
 }
 #vim:ft=perl

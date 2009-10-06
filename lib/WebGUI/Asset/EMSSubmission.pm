@@ -164,7 +164,7 @@ sub definition {
 				label           => $EMS_i18n->get("location"),
 				hoverHelp       => $EMS_i18n->get("location help"),
 		},
-		relatedBadgeGroup => {
+		relatedBadgeGroups => {
 				tab             => "properties",
 				fieldType       => "checkList",
 				customDrawMethod=> 'drawRelatedBadgeGroupsField',
