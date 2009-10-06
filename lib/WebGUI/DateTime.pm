@@ -599,14 +599,18 @@ sub _splitMysql
           (\d+)   # Month
           \D*
           (\d+)   # Day
-          \D*
-          (\d+)   # Hours
-          \D*
-          (\d+)   # Minutes
-          \D*
-          (\d+)   # Seconds
+          (?: \D*
+              (\d+)   # Hours
+              \D*
+              (\d+)   # Minutes
+              \D*
+              (\d+)   # Seconds
+          )?
         }x;
 
+    foreach my $unit (qw/hour minute second/) {
+        $hash{$unit} = 0 if ($hash{$unit} eq '');
+    }
 	return %hash;
 }
 
