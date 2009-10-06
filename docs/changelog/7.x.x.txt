@@ -42,6 +42,7 @@
  - fixed #11088: i18n Survey Section Information
  - fixed #11087: SC asset repeats its own description in feeds
  - fixed #10916: png icon
+ - fixed #11100: syncToCdn's help is not proper POD
 
 7.8.0
  - upgraded YUI to 2.8.0r4
