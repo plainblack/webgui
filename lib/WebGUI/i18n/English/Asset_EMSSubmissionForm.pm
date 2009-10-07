@@ -75,7 +75,7 @@ our $I18N = { ##hashref of hashes
 		context => q|This is the default message for informing the user that the submission deadline is past.|
 	},
 	'past deadline label' => {
-		message => q|Post SUbmission Deadline Text|,
+		message => q|Past Submission Deadline Text|,
 		lastUpdated => 1131394072,
 		context => q|This is the label for the message indicating that the deadline for submissions has past.|
 	},
@@ -83,6 +83,18 @@ our $I18N = { ##hashref of hashes
 		message => q|Enter a message here to let the user know that submissions are no longer being taken because the deadline has past.|,
 		lastUpdated => 1131394072,
 		context => q|This help text should describe how the user tells submitters that the submission deadline has past.|
+	},
+
+	'submission deadline label' => {
+		message => q|Submission Deadline|,
+		lastUpdated => 1131394072,
+		context => q|Label for the submission deadline field|
+	},
+
+	'submission deadline label help' => {
+		message => q|Enter a date after which no more new submissions will be taken.|,
+		lastUpdated => 1131394072,
+		context => q|Help text for the submission deadline field.  After this date this submission form will not accept any more entries.|
 	},
 
 #	'TODO' => {

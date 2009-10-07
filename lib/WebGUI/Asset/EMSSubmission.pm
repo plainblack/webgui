@@ -85,6 +85,7 @@ sub definition {
     my $definition = shift;
     my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmission" );
     my $EMS_i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
+    my $SKU_i18n = WebGUI::International->new($session, "Asset_Sku");
     tie my %properties, 'Tie::IxHash', (
 		submissionId => {
 			    noFormPost      => 1,
@@ -102,29 +103,29 @@ sub definition {
                         tab                             => "shop",
                         fieldType               => "text",
                         defaultValue    => $session->id->generate,
-                        label                   => $i18n->get("sku"),
-                        hoverHelp               => $i18n->get("sku help")
+                        label                   => $SKU_i18n->get("sku"),
+                        hoverHelp               => $SKU_i18n->get("sku help")
                         },
                 displayTitle => {
                         tab                             => "display",
                         fieldType               => "yesNo",
                         defaultValue    => 1,
-                        label                   => $i18n->get("display title"),
-                        hoverHelp               => $i18n->get("display title help")
+                        label                   => $SKU_i18n->get("display title"),
+                        hoverHelp               => $SKU_i18n->get("display title help")
                         },
                 vendorId => {
                         tab                             => "shop",
                         fieldType               => "vendor",
                         defaultValue    => 'defaultvendor000000000',
-                        label                   => $i18n->get("vendor"),
-                        hoverHelp               => $i18n->get("vendor help")
+                        label                   => $SKU_i18n->get("vendor"),
+                        hoverHelp               => $SKU_i18n->get("vendor help")
                         },
 		shipsSeparately => {
 		    tab             => 'shop',
 		    fieldType       => 'yesNo',
 		    defaultValue    => 0,
-		    label           => $i18n->get('shipsSeparately'),
-		    hoverHelp       => $i18n->get('shipsSeparately help'),
+		    label           => $SKU_i18n->get('shipsSeparately'),
+		    hoverHelp       => $SKU_i18n->get('shipsSeparately help'),
 		},
 
 		price => {
@@ -185,8 +186,8 @@ sub definition {
 		},
 		sendEmailOnChange => {
 		    tab          => "properties",
-		    fieldType    => "text",
-		    defaultValue => undef,
+		    fieldType    => "yesNo",
+		    defaultValue => 1,
 		    label        => $i18n->get("send email label"),
 		    hoverHelp    => $i18n->get("send email label help")
 		},
@@ -209,6 +210,71 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 drawLocationField ()
+
+Draws the field for the location property.
+
+TODO: check form params for additional options
+
+=cut
+
+sub drawLocationField {
+        my ($self, $params) = @_;
+        my $options = $self->session->db->buildHashRef("select distinct(location) from EMSTicket left join asset using (assetId)
+                where parentId=? order by location",[$self->get('parentId')]);
+        return WebGUI::Form::combo($self->session, {
+                name    => 'location',
+                value   => $self->get('location'),
+                options => $options,
+                });
+}
+
+#-------------------------------------------------------------------
+
+=head2 drawRelatedBadgeGroupsField ()
+
+Draws the field for the relatedBadgeGroups property.
+
+TODO: check form params for additional options
+
+=cut
+
+sub drawRelatedBadgeGroupsField {
+        my ($self, $params) = @_;
+        return WebGUI::Form::checkList($self->session, {
+                name            => $params->{name},
+                value           => $self->get($params->{name}),
+                vertical        => 1,
+                options         => $self->getParent->getBadgeGroups,
+                });
+}
+
+#-------------------------------------------------------------------
+
+=head2 drawRelatedRibbonsField ()
+
+Draws the field for the relatedRibbons property.
+
+TODO: check form params for additional options
+
+=cut
+
+sub drawRelatedRibbonsField {
+        my ($self, $params) = @_;
+        my %ribbons = ();
+        foreach my $ribbon (@{$self->getParent->getRibbons}) {
+                $ribbons{$ribbon->getId} = $ribbon->getTitle;
+        }
+        return WebGUI::Form::checkList($self->session, {
+                name            => $params->{name},
+                value           => $self->get($params->{name}),
+                vertical        => 1,
+                options         => \%ribbons,
+                });
+}
+
+#-------------------------------------------------------------------
+
 =head2 duplicate
 
 This method exists for demonstration purposes only.  The superclass
@@ -222,6 +288,49 @@ whenever a copy action is executed
 #    my $newAsset = $self->next::method(@_);
 #    return $newAsset;
 #}
+
+#-------------------------------------------------------------------
+
+=head2 getEditForm ( )
+
+Extends the base class to add Tax information for the Sku, in a new tab.
+
+=cut
+
+sub getEditForm {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $tabform = $self->SUPER::getEditForm;
+
+    my $comments        = $tabform->getTab( 'comments' );
+
+    #add the comments...
+    $comments->div({name => 'comments',
+      contentCallback => sub { $self->getFormattedComments },
+    });
+
+    return $tabform;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getEditTabs ( )
+
+Not to be modified, just defines 2 new tabs.
+the shop tab is created here to mimic the function of the sku-created 
+shop tab.  this class holds data like Sku assets so that they can be assigned
+in the future when the sku asset is created from this data.
+
+=cut
+
+sub getEditTabs {
+        my $self = shift;
+        my $i18n = WebGUI::International->new($self->session,"Asset_EMSSubmission");
+        my $sku_i18n = WebGUI::International->new($self->session,"Asset_Sku");
+        return ($self->SUPER::getEditTabs(), ['shop', $sku_i18n->get('shop'), 9], ['comments', $i18n->get('comments'), 9]);
+}
+
 
 #-------------------------------------------------------------------
 

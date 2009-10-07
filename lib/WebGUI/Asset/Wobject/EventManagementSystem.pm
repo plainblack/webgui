@@ -37,6 +37,59 @@ use Data::Dumper;
 
 
 #-------------------------------------------------------------------
+=head2 addSubmissionForm
+
+creates a child of class WG::Asset::EMSSubmissionForm
+
+=head3 params
+
+parameters that define the form
+
+=head4 title
+
+the title for the form
+
+=head4 canSubmitGroupId ( optional )
+
+group id for the users that are allowed to submit via this form
+defaults to 2 -- registered users
+
+=head4 daysBeforeCleanup ( optional )
+
+number fo days to leave denied/created status items in the database before deleting
+defaults t0 7
+
+=head4 deleteCreatedItems ( optional )
+
+1 indicates that items with status 'created' should be deleted as well as denied
+default: 0
+
+=head4 formDescription
+
+a JSON description of the form data fields
+
+TODO: write a comprehensive doc for this field
+
+=cut
+
+sub addSubmissionForm {
+    my $self = shift;
+    my $params = shift;
+    $params{className} = 'WebGUI::Asset::EMSSubmissionForm';
+    $params{canSubmitGroupId} ||= 2;
+    $self->addGroupToSubmitList($params{canSubmitGroupId});
+    # DOING -- add previous function and finish adding operations to this function
+    # TODO re-edit the Badge view template and save it, see that it gets added after resets
+    # TODO  see how hard it would be to dump the whole template class to the file system
+    # also how hard is it to sync it?
+    # perhaps there is a way to write a module based on the test system that would be simple enough
+    # to look for new versions of the templates and save it off to the file system -- also notice
+    # when the file system is newer than the database ad load the file.
+    #--  ultimate goal is to figure out what is failing in the test battery...
+    # also add tests for Form_Div
+}
+
+#-------------------------------------------------------------------
 =head2 canSubmit
 
 returns true is the current user can submit to any form attached to this EMS
@@ -427,7 +480,12 @@ returns true if the EMS has subission forms attached
 =cut
 
 sub hasForms {
-   return 0;
+   my $self = shift;
+		   # are there ~any~ forms attached to this ems?
+   my $res = $self->getLineage(['children'],{ limit => 1,
+	 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+     } );
+   return scalar(@$res);
 }
 
 #-------------------------------------------------------------------
@@ -438,7 +496,13 @@ returns true if the current user has submission forms in this EMS
 =cut
 
 sub hasSubmissions {
-   return 0;
+   my $self = shift;
+   return 0 if ! $self->canSubmit;
+   my @res = $self->getLineage(['descendants'],{ limit => 1,
+	 includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
+	 whereClause => q{createdBy='} . $self->session->user->userId . q/'/,
+     } );
+   return scalar(@res);
 }
 
 #-------------------------------------------------------------------
@@ -2156,6 +2220,29 @@ sub www_viewSchedule {
                   },$self->get('scheduleTemplateId')));
 
 }
+
+#---------------------------------------------
+=head2 www_viewSubmission
+
+=cut
+
+sub www_viewSubmission {
+
+# fill the view submission template
+
+}
+
+#---------------------------------------------
+=head2 www_viewSubmissionQueue
+
+=cut
+
+sub www_viewSubmissionQueue {
+
+# fill the view submission queue template
+
+}
+
 
 1;
 

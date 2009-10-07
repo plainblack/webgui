@@ -20,6 +20,12 @@ our $I18N = { ##hashref of hashes
 		context => q|This is the help text for the 'send email' flag.  If set to 'Yes', the user will recieve email for every change made to the submission.|
 	},
 
+	'comments' => {
+		message => q|Comments|,
+		lastUpdated => 1131394072,
+		context => q|Label for the comments tab.|
+	},
+
 #	'TODO' => {
 #		message => q|TODO|,
 #		lastUpdated => 1131394072,

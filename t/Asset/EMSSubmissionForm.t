@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use JSON;
 use WebGUI::Group;
 use WebGUI::User;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -38,15 +39,15 @@ my $session         = WebGUI::Test->session;
 
 plan tests => 30;        # Increment this number for each test you create
 
-my $submitGroupA = WebGUI::Group->new($session,'new');
-my $submitGroupB = WebGUI::Group->new($session,'new');
-my $registrars = WebGUI::Group->new($session, 'new');
-my $attendees  = WebGUI::Group->new($session, 'new');
+my $submitGroupA = WebGUI::Group->new($session,'new',{groupName=>'groupA'});
+my $submitGroupB = WebGUI::Group->new($session,'new',{groupName=>'groupB'});
+my $registrars = WebGUI::Group->new($session, 'new',{groupName=>'registrars'});
+my $attendees  = WebGUI::Group->new($session, 'new',{groupName=>'attendees'});
 
-my $registrar = WebGUI::User->create($session);
-my $userA = WebGUI::User->create($session);
-my $userB = WebGUI::User->create($session);
-my $userC = WebGUI::User->create($session);
+my $registrar = WebGUI::User->create($session,{username=>'registrar'});
+my $userA = WebGUI::User->create($session,{username=>'userA'});
+my $userB = WebGUI::User->create($session,{username=>'userB'});
+my $userC = WebGUI::User->create($session,{username=>'userC'});
 
 $registrars->addUsers([$registrar->getId]);
 $submitGroupA->addUsers([$userA->userId,$userC->userId]);
@@ -121,21 +122,27 @@ loginRgstr;
 
 is( $ems->hasForms, 0, 'ems currently has no forms' );
 
-my $frmA = $ems->addChild({
+#print 'press return to continue test' ; <>;
+
+my $formAdesc = {
+    title => { type => 'text' },
+    descrition => { type => 'textarea' },
+    duration => { default => 2.0 },
+    startDate => { type => 'selectList',
+               options =>  [ '1255150800', '1255237200', '1255323600' ],
+             },
+};
+
+my $frmA = $ems->addSubmissionForm({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test A -- long',
-    canSubmitGroup           => $submitGroupA->getId,
+    canSubmitGroupId         => $submitGroupA->getId,
     daysBeforeCleanup        => 1,
-    formDescription          => q{ {
-	   'title' : { 'type' : 'text' },
-	   'description' : { 'type' : 'textarea' },
-	   'duration' : { 'default' : 2.0 },
-	   'startDate' : { 'type' : 'selectList', 'options' :
-                     [ '1255150800', '1255237200', '1255323600' ] },
-                     } },
+    formDescription          => to_json( $formAdesc ),
 });
 isa_ok( $frmA, 'WebGUI::Asset::EMSSubmissionForm' );
 is( $ems->hasForms, 1, 'ems now has forms' );
+is_deeply( $frmA->getFormDescription, $formAdesc, 'form description matches' );
 ok( $frmA->validateSubmission({
    title => 'titlea',
    description => 'the description',
@@ -146,12 +153,6 @@ ok( !$frmA->validateSubmission({
    description => 'the description',
    startDate => '1205150800',
 	}), 'not a valid submission: invalid value' );
-ok( !$frmA->validateSubmission({
-   title => 'titlea',
-   price => 300.0,
-   description => 'the description',
-   startDate => '1255150800',
-	}), 'not a valid submission: invalid field' );
 ok( !$frmA->validateSubmission({
    title => 'titlea',
    duration => 3.0,
@@ -167,7 +168,7 @@ ok( $frmA->validateSubmission({
 	}), 'valid submission: field value override by admin' );
 
 
-my $frmB = $ems->addChild({
+my $frmB = $ems->addSubmissionForm({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test B -- short',
     daysBeforeCleanup        => 0,
@@ -180,7 +181,6 @@ my $frmB = $ems->addChild({
 	   'metaField1' : { 'type' : 'Url' },
                      } },
 });
-is( $ems->hasForms, 1, 'ems still has forms' );
 ok( $frmA->validateSubmission({
    title => 'title',
    description => 'description',
@@ -195,10 +195,13 @@ ok( !$frmA->validateSubmission({
 logout;
 
 is( $ems->canSubmit, 0, 'current user cannot submit to this ems' );
+is( $frmA->canSubmit, 0, 'current user cannot submit to form' );
 
 loginUserA;
 
 is( $ems->canSubmit, 1, 'current user can submit to this ems' );
+is( $frmA->canSubmit, 1, 'current user can submit to formA' );
+is( $frmB->canSubmit, 0, 'current user cannot submit to formB' );
 is( $ems->hasSubmissions, 0, 'current user has no submissions' );
 # this one should work
 my $sub1 = $frmA->addSubmission({
@@ -286,7 +289,7 @@ run submission cleanup activity
 $versionTag->commit;
 
 #done_testing();
-
+print 'press return to complete test' ; <>;
 #----------------------------------------------------------------------------
 # Cleanup
 END {

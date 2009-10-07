@@ -17,6 +17,7 @@ package WebGUI::Asset::EMSSubmissionForm;
 use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset';
+use JSON;
 use WebGUI::Utility;
 
 # TODO:
@@ -55,21 +56,22 @@ These methods are available from this class:
 =head2 addSubmission
 
 Creates an EMSSubmission object based on the params
+( called by www_saveSubmission )
 
 =cut
 
 sub addSubmission {
     my $self = shift;
-    my $parent = $self->getParent;
     my $session = $self->session;
     my $params = shift || {};
-    $self->validateSubmission($params);
-    $parent->addChild({
-          className => 'WebGUI::Asset::EMSSubmission',
-          status => 'pending',
-          title => $params->{title},
-          # TODO add all the fields...
-    });
+    return undef if $self->canSubmit;
+    return undef unless $self->validateSubmission($params);
+    for my $param ( keys %{$self->getFormDefinition()} ) {
+        
+    }
+    $params->{className} = 'WebGUI::Asset::EMSSubmission';
+    $params->{status} = 'pending';
+    $self->addChild($params);
 }
 
 #-------------------------------------------------------------------
@@ -86,6 +88,20 @@ handles revisions to NewAsset Assets.
 #    my $newSelf = $self->SUPER::addRevision(@_);
 #    return $newSelf;
 #}
+
+#-------------------------------------------------------------------
+
+=head2 canSubmit
+
+returns true if current user can submit using this form
+
+=cut
+
+sub canSubmit {
+    my $self = shift;
+
+    return $session->user->isInGroup($self->get('canSubmitGroupId');
+}
 
 #-------------------------------------------------------------------
 
@@ -117,8 +133,8 @@ sub definition {
         },
         canSubmitGroupId => { 
             tab          => "security",
-            fieldType    => "groupid",
-            defaultValue => undef,
+            fieldType    => "group",
+            defaultValue => 2,
             label        => $i18n->get("can submit group label"),
             hoverHelp    => $i18n->get("can submit group label help")
         },
@@ -131,22 +147,29 @@ sub definition {
         },
         deleteCreatedItems => { 
             tab          => "properties",
-            fieldType    => "yesno",
-            defaultValue => 'no',
+            fieldType    => "yesNo",
+            defaultValue => undef,
             label        => $i18n->get("delete created items label"),
             hoverHelp    => $i18n->get("delete created items label help")
         },
         submissionDeadline => { 
             tab          => "properties",
             fieldType    => "Date",
-            defaultValue => undef,
+            defaultValue => '677496912', # far in the future...
             label        => $i18n->get("submission deadline label"),
             hoverHelp    => $i18n->get("submission deadline label help")
         },
+        pastDeadlineMessage => { 
+            tab          => "properties",
+            fieldType    => "HTMLArea",
+            defaultValue => $i18n->get('past deadline message'),
+            label        => $i18n->get("past deadline label"),
+            hoverHelp    => $i18n->get("past deadline label help")
+        },
         formDescription => { 
             tab          => "properties",
-            fieldType    => "text",
-            defaultValue => undef,
+            fieldType    => "textarea",
+            defaultValue => '{ }',
             label        => $i18n->get("form dscription label"),
             hoverHelp    => $i18n->get("form dscription label help")
         },
@@ -158,7 +181,7 @@ sub definition {
         tableName         => 'EMSSubmissionForm',
         className         => 'WebGUI::Asset::EMSSubmissionForm',
         properties        => \%properties,
-        };
+    };
     return $class->SUPER::definition( $session, $definition );
 } ## end sub definition
 
@@ -180,17 +203,31 @@ whenever a copy action is executed
 
 #-------------------------------------------------------------------
 
+=head2 getFormDefinition
+
+returns a hash ref decoded from the JSON in the form description field
+
+=cut
+
+sub getFormDefinition {
+    my $self = shift;
+    return JSON->new->decode($self->get('formDescription'));
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 indexContent ( )
 
 Making private. See WebGUI::Asset::indexContent() for additonal details. 
 
 =cut
 
-sub indexContent {
-    my $self    = shift;
-    my $indexer = $self->SUPER::indexContent;
-    $indexer->setIsPublic(0);
-}
+#sub indexContent {
+#    my $self    = shift;
+#    my $indexer = $self->SUPER::indexContent;
+#    $indexer->setIsPublic(0);
+#}
 
 #-------------------------------------------------------------------
 
