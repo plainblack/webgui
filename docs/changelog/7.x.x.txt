@@ -1,3 +1,5 @@
+7.8.2
+
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
  - fixed: Wikis broken by 7.8.0 upgrade
