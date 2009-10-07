@@ -63,7 +63,16 @@ sub fixTableDefaultCharsets {
             ['utf8'],
         );
     }
-    # and here's our code
+    my $db_name = $db->dbh->{Name};
+    my $database = (split /[;:]/, $db_name)[0];
+    while ( $db_name =~ /([^=;:]+)=([^;:]+)/msxg ) {
+        if ( $1 eq 'db' || $1 eq 'database' || $1 eq 'dbname' ) {
+            $database = $2;
+            last;
+        }
+    }
+    $session->db->write(sprintf 'ALTER DATABASE %s DEFAULT CHARACTER SET utf8', $db->dbh->quote_identifier($database));
+
     print "Done.\n" unless $quiet;
 }
 
