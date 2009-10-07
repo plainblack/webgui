@@ -45,54 +45,6 @@ unless ( flock( DATA, LOCK_EX | LOCK_NB ) ) {
     exit 3;
 }
 
-sub printHelp {
-    print <<STOP;
-
-Usage: perl $0 --configfile=<webguiConfig>
-
-	--configFile		WebGUI config file.
-
-Options:
-
-	--override		This utility is designed to be run as
-				a privileged user on Linux style systems.
-				If you wish to run this utility without
-				being the super user, then use this flag,
-				but note that it may not work as
-				intended.
-
-	--migrate		Migrate entirety of uploads directory to CDN.
-				Ignore the CDN queue and sync everything.
-
-	--help			Display this help message and exit.
-
-	--quiet			Disable output unless there's an error.
-
-EXIT STATUS
-
-  The following exit values are returned:
-
-  0
-	Successful execution.
-
-  1
-	Only super user may run the script.
-
-  2
-	Help requested.
-
-  3
-	Only one instance of this script can run at a time.
-
-  4
-	Error during invocation of the command.
-
-  5
-	Content Delivery Network (CDN) is not enabled.
-
-STOP
-} ## end sub printHelp
-
 if ( !( $^O =~ /^Win/i ) && $> != 0 && !$override ) {
     print "You must be the super user to use this utility.\n";
     exit 1;
