@@ -32,11 +32,42 @@ my $session = start(); # this line required
 removeOldITransactTables( $session );
 removeImportCruft( $session );
 removeAdminFromVisitorGroup( $session );
+fixPackageFlagOnOlder( $session );
 
 # upgrade functions go here
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixPackageFlagOnOlder {
+    my $session = shift;
+    print "\tFixing isPackage flag on folders from 7.6.35 to 7.7.17 upgrade... " unless $quiet;
+
+    my @assetIds = qw( TvOZs8U1kRXLtwtmyW75pg
+    tXwf1zaOXTvsqPn6yu-GSw
+    tPagC0AQErZXjLFZQ6OI1g
+    brxm_faNdZX5tRo3p50g3g
+    BFfNj5wA9bDw8H3cnr8pTw
+    VZK3CRgiMb8r4dBjUmCTgQ
+    2c4RcwsUfQMup_WNujoTGg
+    f_tn9FfoSfKWX43F83v_3w
+    oGfxez5sksyB_PcaAsEm_Q
+    GaBAW-2iVhLMJaZQzVLE5A
+    7-0-style0000000000049
+    GYaFxnMu9UsEG8oanwB6TA
+    );
+
+    for my $assetId ( @assetIds ) {
+        my $asset = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        next unless $asset;
+        next unless $asset->get('isPackage');
+        $asset->addRevision({ isPackage => 0 });
+    }
+
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
