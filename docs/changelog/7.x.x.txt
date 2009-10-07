@@ -1,4 +1,5 @@
 7.8.2
+ - fixed #11098: Leaving a version tag makes everyone leave
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
