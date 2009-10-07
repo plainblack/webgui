@@ -22,6 +22,7 @@
  - fixed #11101: 7.6.35-7.7 upgrade leaves packages
  - fixed #11096: Error on deleting FAQ(CS)-item
  - fixed #11089: No message body in Notification
+ - fixed #11060: Some tables have latin1 as the default character set
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision

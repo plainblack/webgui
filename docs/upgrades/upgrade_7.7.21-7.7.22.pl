@@ -34,7 +34,7 @@ removeImportCruft( $session );
 removeAdminFromVisitorGroup( $session );
 fixPackageFlagOnOlder( $session );
 
-# upgrade functions go here
+fixTableDefaultCharsets($session);
 
 finish($session); # this line required
 
@@ -78,6 +78,28 @@ sub removeOldITransactTables {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub fixTableDefaultCharsets {
+    my $session = shift;
+    my $db = $session->db;
+    print "\tFixing default character set on tables... " unless $quiet;
+    my @tables = qw(
+        Carousel Collaboration DataTable Map MapPoint MatrixListing
+        MatrixListing_attribute Story StoryArchive StoryTopic
+        Survey_questionTypes Survey_test ThingyRecord ThingyRecord_record
+        adSkuPurchase assetAspectComments assetAspectRssFeed
+        filePumpBundle inbox_messageState taxDriver tax_eu_vatNumbers
+        template_attachments
+    );
+    for my $table (@tables) {
+        $db->write(
+            sprintf('ALTER TABLE %s DEFAULT CHARACTER SET = ?', $db->dbh->quote_identifier($table)),
+            ['utf8'],
+        );
+    }
+    # and here's our code
+    print "Done.\n" unless $quiet;
+}
 
 # Describe what our function does
 sub removeImportCruft {
