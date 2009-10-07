@@ -464,7 +464,7 @@ A reference to the current session.
 
 sub www_leaveVersionTag {
     my $session = shift;
-    WebGUI::VersionTag->getWorking($session)->clearWorking;
+    WebGUI::VersionTag->getWorking($session)->leaveTag;
     return www_manageVersions($session);
 }
 

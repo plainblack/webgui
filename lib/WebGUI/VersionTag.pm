@@ -515,6 +515,20 @@ sub getWorking {
 
 #-------------------------------------------------------------------
 
+=head2 leaveTag ( )
+
+Make the user leave their current tag.
+
+=cut
+
+sub leaveTag {
+	my $self = shift;
+	$self->session->scratch->delete('versionTag');
+	$self->session->stow->delete("versionTag");
+}
+
+#-------------------------------------------------------------------
+
 =head2 lock ( )
 
 Sets this version tag up so no more revisions may be applied to it.
