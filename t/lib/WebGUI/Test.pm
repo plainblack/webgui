@@ -152,6 +152,8 @@ sub cleanup {
     }
 }
 
+#----------------------------------------------------------------------------
+
 =head2 newSession ( $noCleanup )
 
 Builds a WebGUI session object for testing.
@@ -161,8 +163,6 @@ Builds a WebGUI session object for testing.
 If true, the session won't be registered for automatic deletion.
 
 =cut
-
-#----------------------------------------------------------------------------
 
 sub newSession {
     my $noCleanup = shift;
@@ -175,6 +175,8 @@ sub newSession {
     return $session;
 }
 
+
+#----------------------------------------------------------------------------
 
 =head2 mockAssetId ( $assetId, $object )
 
