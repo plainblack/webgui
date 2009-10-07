@@ -2,6 +2,7 @@
  - fixed #11098: Leaving a version tag makes everyone leave
  - fixed #11096: Error on deleting FAQ(CS)-item
  - fixed #11060: Some tables have latin1 as the default character set
+ - fixed #11089: No message body in Notification
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
