@@ -30,7 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+fixTableDefaultCharsets($session);
 
 finish($session); # this line required
 
@@ -44,6 +44,28 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+sub fixTableDefaultCharsets {
+    my $session = shift;
+    my $db = $session->db;
+    print "\tFixing default character set on tables... " unless $quiet;
+    my @tables = qw(
+        Carousel Collaboration DataTable Map MapPoint MatrixListing
+        MatrixListing_attribute Story StoryArchive StoryTopic
+        Survey_questionTypes Survey_test ThingyRecord ThingyRecord_record
+        adSkuPurchase assetAspectComments assetAspectRssFeed
+        filePumpBundle inbox_messageState taxDriver tax_eu_vatNumbers
+        template_attachments
+    );
+    for my $table (@tables) {
+        $db->write(
+            sprintf('ALTER TABLE %s DEFAULT CHARACTER SET = ?', $db->dbh->quote_identifier($table)),
+            ['utf8'],
+        );
+    }
+    # and here's our code
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
