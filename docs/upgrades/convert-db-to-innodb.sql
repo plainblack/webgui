@@ -1448,10 +1448,10 @@ CREATE TABLE `ThingyRecord_record_inno` (
   `sequenceNumber` int(11) NOT NULL default '1',
   `dateCreated` datetime default NULL,
   `lastUpdated` datetime default NULL,
-  `transactionId` char(255) character set utf8 default NULL,
-  `assetId` char(255) character set utf8 default NULL,
+  `transactionId` char(22) character set utf8 collate utf8_bin default NULL,
+  `assetId` char(22) character set utf8 collate utf8_bin default NULL,
   `expires` bigint(20) NOT NULL default '0',
-  `userId` char(255) character set utf8 default NULL,
+  `userId` char(22) character set utf8 collate utf8_bin default NULL,
   `fields` longtext character set utf8,
   `isHidden` tinyint(1) NOT NULL default '0',
   `sentExpiresNotice` tinyint(1) NOT NULL default '0',
@@ -3300,7 +3300,7 @@ alter table MatrixListing_attribute add foreign key (matrixListingId) references
 alter table MatrixListing_attribute add foreign key (attributeId) references Matrix_attribute(attributeId) on delete cascade on update cascade;
 alter table MatrixListing_rating add foreign key (listingId) references asset(assetId) on delete cascade on update cascade;
 alter table MatrixListing_rating add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
-alter table MatrixListing_rating add foreign key (users) references users(userId) on delete cascade on update cascade;
+alter table MatrixListing_rating add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table MatrixListing_ratingSummary add foreign key (listingId) references asset(assetId) on delete cascade on update cascade;
 alter table MatrixListing_ratingSummary add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table Matrix_attribute add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
@@ -3311,19 +3311,23 @@ alter table Shortcut add foreign key (shortcutToAssetId) references asset(assetI
 alter table Shortcut_overrides add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table Story add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table WikiPage add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
+alter table WikiPage add foreign key (actionTakenBy) references users(userId) on delete set null on update cascade;
 alter table Post add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table Post add foreign key (threadId) references asset(assetId) on delete cascade on update cascade;
 alter table Post_rating add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table Post_rating add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table Thread add foreign key (assetId,revisionDate) references Post(assetId,revisionDate) on delete cascade on update cascade;
+alter table Thread add foreign key (lastPostId) references asset(assetId) on delete set null update cascade;
+alter table Thread add foreign key (subscriptionGroupId) references groups(groupId) on delete restrict on update cascade;
+alter table Thread_read add foreign key (threadId) references asset(assetId) on delete cascade on update cascade;
+alter table Thread_read add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table RichEdit add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table FileAsset add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table FileAsset add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table ZipArchiveAsset add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
+alter table ZipArchiveAsset add foreign key (templateId) references asset(assetId) on delete cascade on update cascade;
 alter table GalleryFile add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
-alter table GalleryFile add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table Photo add foreign key (assetId,revisionDate) references GalleryFile(assetId,revisionDate) on delete cascade on update cascade;
-alter table Photo add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table Photo add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table ImageAsset add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
 alter table sku add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
@@ -3499,7 +3503,50 @@ alter table Survey_test add foreign key (assetId) references asset(assetId) on d
 alter table Survey_tempReport add foreign key (assetId) references asset(assetId) on delete restrict on update cascade;
 alter table Survey_tempReport add foreign key (Survey_responseId) references Survey_response(Survey_responseId) on delete restrict on update cascade;
 alter table Thingy add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table Thingy add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
+alter table Thingy add foreign key (defaultThingId) references Thingy_things(thingId) on delete set null on update cascade;
+alter table Thingy_fields add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table Thingy_fields add foreign key (thingId) references Thingy_things(thingId) on delete cascade on update cascade;
+alter table Thingy_fields add foreign key (createdBy) references users(userId) on delete set null on update cascade;
+alter table Thingy_fields add foreign key (updatedBy) references users(userId) on delete set null on update cascade;
+alter table Thingy_fields add foreign key (fieldInOtherThingId) references Thingy_things(thingId) on delete set null on update cascade;
+alter table Thingy_things add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table Thingy_things add foreign key (groupIdAdd) references groups(groupId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (groupIdEdit) references groups(groupId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (viewTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (searchTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (editTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (onAddWorkflowId) references Workflow(workflowId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (onEditWorkflowId) references Workflow(workflowId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (onDeleteWorkflowId) references Workflow(workflowId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (groupIdView) references groups(groupId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (groupIdSearch) references groups(groupId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (groupIdImport) references groups(groupId) on delete restrict on update cascade;
+alter table Thingy_things add foreign key (groupIdExport) references groups(groupId) on delete restrict on update cascade;
+alter table ThingyRecord add foreign key (assetId,revisionDate) references Sku(assetId,revisionDate) on delete cascade on update cascade;
+alter table ThingyRecord add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
+alter table ThingyRecord add foreign key (thingId) references Thingy_things(thingId) on delete set null on update cascade;
+alter table ThingyRecord_record add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table ThingyRecord_record add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table ThingyRecord_record add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
 alter table TT_wobject add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table TT_wobject add foreign key (userViewTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table TT_wobject add foreign key (managerViewTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table TT_wobject add foreign key (groupToManage) references groups(groupId) on delete restrict on update cascade;
+alter table TT_wobject add foreign key (pmAssetId) references asset(assetId) on delete restrict on update cascade;
+alter table TT_wobject add foreign key (timeRowTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table TT_report add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table TT_report add foreign key (createdBy) references users(userId) on delete set null on update cascade;
+alter table TT_report add foreign key (lastUpdatedBy) references users(userId) on delete set null on update cascade;
+alter table TT_report add foreign key (resourceId) references TT_projectResoureList(resourceId) on delete cascade on update cascade;
+alter table TT_project add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table TT_project add foreign key (createdBy) references users(userId) on delete set null on update cascade;
+alter table TT_project add foreign key (lastUpdatedBy) references users(userId) on delete set null on update cascade;
+alter table TT_timeEntry add foreign key (projectId) references TT_project(projectId) on delete cascade on update cascade;
+alter table TT_timeEntry add foreign key (taskId) references TT_projectTasks(taskId) on delete cascade on update cascade;
+alter table TT_timeEntry add foreign key (reportId) references TT_report(reportId) on delete cascade on update cascade;
+alter table TT_projectResourceList add foreign key (projectId) references TT_project(projectId) on delete cascade on update cascade;
+alter table TT_projectList add foreign key (projectId) references TT_project(projectId) on delete cascade on update cascade;
 alter table SyndicatedContent add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table SyndicatedContent add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Navigation add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
@@ -3525,8 +3572,24 @@ alter table PM_task add foreign key (lastUpdatedBy) references users(userId) on 
 alter table PM_taskResource add foreign key (taskId) references PM_task(taskId) on delete cascade on update cascade;
 alter table Poll add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table UserList add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table UserList add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
+alter table UserList add foreign key (showGroupId) references groups(groupId) on delete restrict on update cascade;
+alter table UserList add foreign key (hideGroupId) references groups(groupId) on delete restrict on update cascade;
 alter table WeatherData add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table WeatherData add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table WikiMaster add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table WikiMaster add foreign key (groupToEditPages) references groups(groupId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (groupToAdminister) references groups(groupId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (richEditor) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (frontPageTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (pageTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (pageEditTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (recentChangesTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (mostPopularTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (pageHistoryTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (searchTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (byKeywordTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table WikiMaster add foreign key (approvalWorkflow) references Workflow(workflowId) on delete restrict on update cascade;
 alter table SQLReport add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table SQLReport add foreign key (databaseLinkId1) references databaseLink(databaseLinkId) on delete restrict on update cascade;
 alter table SQLReport add foreign key (databaseLinkId2) references databaseLink(databaseLinkId) on delete restrict on update cascade;
@@ -3566,4 +3629,12 @@ alter table userSessionScratch add foreign key (sessionId) references userSessio
 alter table cart add foreign key (sessionId) references userSession(sessionId) on delete cascade on update cascade;
 alter table cartItem add foreign key (cartId) references cart(cartId) on delete cascade on update cascade;
 alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
+
+alter table WorkflowActivity add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
+alter table WorkflowActivityData add foreign key (activityId) references WorkflowActivity(activityId) on delete cascade on update cascade;
+alter table WorkflowInstance add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
+alter table WorkflowInstance add foreign key (currentActivityId) references WorkflowActivity(activityId) on delete set null on update cascade;
+alter table WorkflowInstanceScratch add foreign key (instanceId) references WorkflowInstance(instanceId) on delete cascade on update cascade;
+alter table WorkflowSchedule add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
+
 
