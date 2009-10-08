@@ -61,19 +61,15 @@ sub buildXML {
         next PACKAGE unless scalar @{ $package };
         tie my %packageData, 'Tie::IxHash';
         my $weight = 0;
-        my $cost   = 0;
         foreach my $item (@{ $package }) {
             my $sku = $item->getSku;
             my $itemWeight = $sku->getWeight();
-            my $itemCost   = $sku->getPrice();
             ##Items that ship separately with a quantity > 1 are rate estimated as 1 item and then the
             ##shipping cost is multiplied by the quantity.
             if (! $sku->shipsSeparately ) {
                 $itemWeight *= $item->get('quantity');
-                $itemCost   *= $item->get('quantity');
             }
             $weight += $itemWeight;
-            $cost   += $itemCost;
         }
         my $pounds = int($weight);
         my $ounces = int(16 * ($weight - $pounds));
@@ -226,12 +222,23 @@ The set of shippable units, which are required to do quantity and cost lookups.
 sub _calculateInsurance {
     my ($self, @shippableUnits) = @_;
     my $cost = 0;
-    return $cost unless $self-get('addInsurance') && $self->get('insuranceRates');
-    my @insuranceTable = map { my ($cost,$value) = split /:/, $_; [$cost, $value]; }
+    return $cost unless $self->get('addInsurance') && $self->get('insuranceRates');
+    my @insuranceTable = map { my ($value,$cost) = split /:/, $_; [$value, $cost]; }
                             split /\r?\n/, $self->get('insuranceRates');
-    ##Sort by increasing value for easy post processing
-    my @insuranceTable = map { $_->[1] } sort { $a <=> $b } map { [ $_->[0], $_ ] } @insuranceTable;
-    return $cost;
+    ##Sort by decreasing value for easy post processing
+    @insuranceTable = sort { $b->[0] <=> $a->[0] } @insuranceTable;
+    my $insuranceCost  = 0;
+    foreach my $package (@shippableUnits) {
+        ITEM: foreach my $item (@{ $package }) {
+            $cost += $item->getSku->getPrice() * $item->get('quantity');
+        }
+        my $pricePoint;
+        POINT: foreach $pricePoint (@insuranceTable) {
+            last POINT if $cost <= $pricePoint->[0];
+        }
+        $insuranceCost += $pricePoint->[1];
+    }
+    return $insuranceCost;
 }
 
 #-------------------------------------------------------------------
