@@ -510,6 +510,7 @@ deletion of this location's files, to CDN queue.
 sub clear {
 	my $self = shift;
     my $dir  = $self->getPathClassDir;
+    return undef if !defined $dir;
     my $errors;
     CHILD: while (my $child = $dir->next()) {
         my $rel = $child->relative($dir);
@@ -1055,6 +1056,7 @@ sub getFiles {
     my $self    = shift;
     my $showAll = shift;
     my $dir     = $self->getPathClassDir;
+    return [] if ! defined $dir;
     my $dirStr  = $dir->stringify;
     my @list;
     $dir->recurse(
@@ -1175,6 +1177,10 @@ sub getPathClassDir {
 		return undef;
     }
     my $dir = Path::Class::Dir->new($self->session->config->get("uploadsPath"), @{ $self->{_pathParts} });
+    if (! -e $dir->stringify) {
+        $self->_addError("directory for storage location ". $self->getId." does not exist");
+        return undef;
+    }
     return $dir;
 }
 
@@ -1661,6 +1667,7 @@ sub setPrivileges {
 	my $editGroup = shift;
 
     my $dirObj = $self->getPathClassDir();
+    return undef if ! defined $dirObj;
     $dirObj->recurse(
         callback => sub {
             my $obj = shift;
