@@ -24,6 +24,7 @@
  - fixed #11089: No message body in Notification
  - fixed #11060: Some tables have latin1 as the default character set
  - fixed #2569: robots.txt issues
+ - fixed #11104: Wrong name for request tracker post form template
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
