@@ -65,12 +65,13 @@ sub addSubmission {
     my $session = $self->session;
     my $params = shift || {};
     return undef if $self->canSubmit;
-    return undef unless $self->validateSubmission($params);
-    for my $param ( keys %{$self->getFormDefinition()} ) {
-        
-    }
+    $params = $self->validateSubmission($params);
+    # TODO this whould return something so errors can be reported
+    return undef if ! $self->{isValid} ;
     $params->{className} = 'WebGUI::Asset::EMSSubmission';
     $params->{status} = 'pending';
+    $params->{submissionId} = $self->get('nextSubmissionId');
+    $self->update({nextSubmissionId => $params->{submissionId}+1 });
     $self->addChild($params);
 }
 
@@ -100,7 +101,7 @@ returns true if current user can submit using this form
 sub canSubmit {
     my $self = shift;
 
-    return $session->user->isInGroup($self->get('canSubmitGroupId');
+    return $self->session->user->isInGroup($self->get('canSubmitGroupId'));
 }
 
 #-------------------------------------------------------------------
@@ -203,16 +204,15 @@ whenever a copy action is executed
 
 #-------------------------------------------------------------------
 
-=head2 getFormDefinition
+=head2 getFormDescription
 
 returns a hash ref decoded from the JSON in the form description field
 
 =cut
 
-sub getFormDefinition {
+sub getFormDescription {
     my $self = shift;
     return JSON->new->decode($self->get('formDescription'));
-
 }
 
 #-------------------------------------------------------------------
@@ -307,16 +307,80 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 validateSubmission ( )
+=head2 validateSubmission ( submission )
+
+test submitted data against form description
+
+=head3 submission
+
+hash ref with the submitted data
 
 =cut
 
 sub validateSubmission {
     my $self    = shift;
+    my $submission = shift;
+    my $adminOverride = JSON->new->decode( $submission->{adminOverride} || ' { } ' );
     my $session = $self->session;
-# compare fields passed with field definition
-# return true if ok, false if not ok
-    return 0;
+    my $target = { isValid => 1 };
+    my $form = $self->getFormDescription;
+    for  my $field (keys %{$form}) {
+        my $value = $submission->{$field} || $form->{field}{default} || '';
+	next if defined $adminOverride->{$field} && ( $value == $adminOverride->{$field} || $value eq $adminOverride->{$field} );
+        $self->validateSubmissionField( $value, $form->{$field}, $field, $target );
+    }
+    return $target;
+}
+
+#-------------------------------------------------------------------
+
+=head2 validateSubmissionField ( value, fieldDef, name )
+
+test field data against definition
+
+=head4 value
+
+value submitted
+
+=head4 fieldDef
+
+field definition
+
+=head4 name
+
+name of the field -- for error reporting
+
+=cut
+
+sub validateSubmissionField {
+     my $self = shift;
+     my $value = shift;
+     my $fieldDef = shift;
+     my $name = shift;
+     my $target = shift;
+     my $type = $fieldDef->{type};
+     if( $type eq 'url' ) {
+         if( $value !~ /^http:/ ) { # TODO get a better test for Earls
+	     $target->{isValid} = 0;
+	     push @{$target->{errors}}, $name . ' is not a valid Url';
+	     return 0;
+	 }
+     } elsif( $type eq 'text' ) {
+         ;   # there is no test here...
+     } elsif( $type eq 'textarea' ) {
+         ;   # there is no test here...
+     } elsif( $type eq 'selectList' ) {
+         if( ! grep { $_ eq $value } @{$fieldDef->{options}} ) {
+	     $target->{isValid} = 0;
+	     push @{$target->{errors}}, $name . ' is not a valid Url';
+	     return 0;
+	 }
+     } else {
+	 push @{$target->{errors}}, $type . ' is not a valid data type';
+	 return 0;
+     }
+     $target->{$name} = $value;
+     return 1;
 }
 
 #-------------------------------------------------------------------

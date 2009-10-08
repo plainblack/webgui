@@ -37,7 +37,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 30;        # Increment this number for each test you create
+plan tests => 50;        # Increment this number for each test you create
 
 my $submitGroupA = WebGUI::Group->new($session,'new',{groupName=>'groupA'});
 my $submitGroupB = WebGUI::Group->new($session,'new',{groupName=>'groupB'});
@@ -95,8 +95,8 @@ my $ems = $node->addChild({
 # its not pretty, but there is no other way to add a meta field
         $ems->setCollateral("EMSEventMetaField", "fieldId",{
                 fieldId=> 'new',
-                label => 'metaField1',
-                dataType => 'Url',
+                label => 'mfRequiredUrl',
+                dataType => 'url',
                 visible => 1,
                 required => 1,
                 possibleValues => '',
@@ -105,8 +105,8 @@ my $ems = $node->addChild({
 
         $ems->setCollateral("EMSEventMetaField", "fieldId",{
                 fieldId=> 'new',
-                label => 'metaField2',
-                dataType => 'Date',
+                label => 'mfDate',
+                dataType => 'date',
                 visible => 1,
                 required => 0,
                 possibleValues => '',
@@ -114,6 +114,18 @@ my $ems = $node->addChild({
         },1,1);
 
 $versionTag->commit;
+
+# quick test of addGroupToSubmitList
+is($ems->get('eventSubmissionGroups'),'', 'event submission groups is blank');
+$ems->addGroupToSubmitList('joe');
+is($ems->get('eventSubmissionGroups'),'joe', 'event submission groups has one item');
+$ems->addGroupToSubmitList('frank');
+is($ems->get('eventSubmissionGroups'),'frank joe', 'event submission groups has two items');
+$ems->addGroupToSubmitList('joe');
+is($ems->get('eventSubmissionGroups'),'joe frank', 'event submission groups still has two items');
+$ems->update({eventSubmissionGroups => ''});
+is($ems->get('eventSubmissionGroups'),'', 'event submission groups is reset to blank');
+
 
 $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag);
@@ -134,7 +146,6 @@ my $formAdesc = {
 };
 
 my $frmA = $ems->addSubmissionForm({
-    className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test A -- long',
     canSubmitGroupId         => $submitGroupA->getId,
     daysBeforeCleanup        => 1,
@@ -143,100 +154,100 @@ my $frmA = $ems->addSubmissionForm({
 isa_ok( $frmA, 'WebGUI::Asset::EMSSubmissionForm' );
 is( $ems->hasForms, 1, 'ems now has forms' );
 is_deeply( $frmA->getFormDescription, $formAdesc, 'form description matches' );
-ok( $frmA->validateSubmission({
+my $submission = {
    title => 'titlea',
    description => 'the description',
    startDate => '1255150800',
-	}), 'a valid submission' );
-ok( !$frmA->validateSubmission({
+        };
+ok( $frmA->validateSubmission($submission)->{isValid}, 'a valid submission' );
+$submission = {
    title => 'titlea',
    description => 'the description',
    startDate => '1205150800',
-	}), 'not a valid submission: invalid value' );
-ok( !$frmA->validateSubmission({
+        };
+ok( !$frmA->validateSubmission($submission)->{isValid}, 'not a valid submission: invalid value in startDate' );
+$submission = {
    title => 'titlea',
    duration => 3.0,
    description => 'the description',
    startDate => '1255150800',
-	}), 'not a valid submission: readonly field' );
-ok( $frmA->validateSubmission({
-   title => 'titlea',
-   duration => 3.0,
-   description => 'the description',
-   startDate => '1255150800',
-   adminOverride => q{ { 'duration' : 3.0 } },
-	}), 'valid submission: field value override by admin' );
+        };
+ok( $frmA->validateSubmission($submission)->{isValid}, 'valid submission: readonly field ignored' );
 
 
+my $formBdesc = {
+    title => { type => 'text' },
+    description => { type => 'textarea' },
+    duration => { type => 'integer', default => 0.5, max => 0.5 },
+    startDate => { default => '1255150800' },
+    mfRequiredUrl => { type => 'url' },
+};
 my $frmB = $ems->addSubmissionForm({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test B -- short',
     daysBeforeCleanup        => 0,
     canSubmitGroup           => $submitGroupB->getId,
-    formDescription          => q{ {
-	   'title' : { 'type' : 'text' },
-	   'description' : { 'type' : 'textarea' },
-	   'duration' : { 'default' : 0.5 },
-	   'startDate' : { 'default' : '1255150800' },
-	   'metaField1' : { 'type' : 'Url' },
-                     } },
+    formDescription          => to_json($formBdesc),
 });
-ok( $frmA->validateSubmission({
+$submission = {
    title => 'title',
    description => 'description',
-   metaField1 => 'http://google.com/',
-	}), 'valid submission: test valid metafield value' );
-ok( !$frmA->validateSubmission({
+   mfRequiredUrl => 'http://google.com/',
+};
+ok( $frmB->validateSubmission($submission)->{isValid},  'valid submission: test valid metafield value' );
+$submission = {
    title => 'title',
    description => 'description',
-   metaField1 => 'joe@sams.org',
-	}), 'invalid submission: test invalid metafield value' );
+   mfRequiredUrl => 'joe@sams.org',
+};
+ok( !$frmB->validateSubmission($submission)->{isValid}, 'invalid submission: test invalid metafield value' );
+$submission = {
+   title => 'titlea',
+   duration => 0.6,
+   description => 'the description',
+   adminOverride => to_json( { duration => 0.6 } ),
+        };
+ok( $frmB->validateSubmission($submission)->{isValid}, 'valid submission: field value override by admin' );
 
 logout;
 
-is( $ems->canSubmit, 0, 'current user cannot submit to this ems' );
-is( $frmA->canSubmit, 0, 'current user cannot submit to form' );
+ok( !$ems->canSubmit, 'Visitor cannot submit to this ems' );
+ok( !$frmA->canSubmit, 'Visitor cannot submit to form' );
 
 loginUserA;
 
-is( $ems->canSubmit, 1, 'current user can submit to this ems' );
-is( $frmA->canSubmit, 1, 'current user can submit to formA' );
-is( $frmB->canSubmit, 0, 'current user cannot submit to formB' );
-is( $ems->hasSubmissions, 0, 'current user has no submissions' );
+ok( $ems->canSubmit, 'UserA can submit to this ems' );
+ok( $frmA->canSubmit, 'UserA can submit to formA' );
+ok( !$frmB->canSubmit, 'UserA cannot submit to formB' );
+ok( !$ems->hasSubmissions, 'UserA has no submissions' );
 # this one should work
 my $sub1 = $frmA->addSubmission({
     title => 'my favorite thing to talk about',
 });
 isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "valid submission succeeded" );
-is( $ems->hasSubmissions, 1, 'current user has submissions on this ems' );
+is( $ems->hasSubmissions, 1, 'UserA has submissions on this ems' );
 
 #this one should fail
 my $sub2 = $frmB->addSubmission({
     title => 'why i like to be important',
 });
-ok( not defined $sub2, "user cannot submit to this form" );
+ok( not defined $sub2, "UserA cannot submit to formB" );
 
 loginUserB;
 
-# should work
-my $sub3 = $frmB->addSubmission({
-    title => 'five minutes of me',
-});
-isa_ok( $sub3, 'WebGUI::Asset::EMSSubmission', "checked permissions for group B" );
+ok( $ems->canSubmit, 'UserB can submit to this ems' );
+ok( !$frmA->canSubmit, 'UserB cannot submit to formA' );
+ok( $frmB->canSubmit, 'UserB can submit to formB' );
 
 loginUserC;
 
-# should work
-my $sub4 = $frmB->addSubmission({
-    title => 'why humility is underrated',
-});
-isa_ok( $sub4, 'WebGUI::Asset::EMSSubmission', "user C is in group B" );
+ok( $ems->canSubmit, 'UserC can submit to this ems' );
+ok( $frmA->canSubmit, 'UserC can submit to formA' );
+ok( $frmB->canSubmit, 'UserC can submit to formB' );
 
-# should work
-my $sub5 = $frmA->addSubmission({
-    title => 'what you should know about everybody',
-});
-isa_ok( $sub5, 'WebGUI::Asset::EMSSubmission', "user C is also in group A" );
+SKIP: { skip 'create submission failed', 8 unless defined $sub1;
+
+loginUserA;
 
 $sub1->addComment( 'this is a test comment' );
 cmp_deeply($sub1->get('comments')->[0],{
@@ -270,6 +281,8 @@ my $cleanupSubmissions = WebGUI::Test::Activity->create( $session,
               "WebGUI::Workflow::Activity::CleanupEMSSubmissions"
 );
 
+WebGUI::Test->workflowsToDelete($approveSubmissions,$cleanupSubmissions);
+
 is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
@@ -286,6 +299,8 @@ run submission cleanup activity
     --  cleanup denied and created entries
 };
 
+} # end of skip
+
 $versionTag->commit;
 
 #done_testing();
@@ -293,7 +308,6 @@ print 'press return to complete test' ; <>;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-   $approveSubmissions->delete;
-   $cleanupSubmissions->delete;
+   # nothing to cleanup;
 }
 #vim:ft=perl
