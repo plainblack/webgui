@@ -35,6 +35,21 @@ use WebGUI::Workflow::Instance;
 use Tie::IxHash;
 use Data::Dumper;
 
+#-------------------------------------------------------------------
+=head2 addGroupToSubmitList ( groupId )
+
+adds the parameter to eventSubmissionGroups
+
+=cut
+
+sub addGroupToSubmitList {
+    my $self = shift;
+    my $groupId = shift;
+    my @ids = split(' ', $self->get('eventSubmissionGroups'));
+    my %h;
+    @ids = map { $h{$_}++ == 0 ? $_ : () } ( $groupId, @ids );
+    $self->update({eventSubmissionGroups => join( ' ', @ids ) });
+}
 
 #-------------------------------------------------------------------
 =head2 addSubmissionForm
@@ -75,18 +90,14 @@ TODO: write a comprehensive doc for this field
 sub addSubmissionForm {
     my $self = shift;
     my $params = shift;
-    $params{className} = 'WebGUI::Asset::EMSSubmissionForm';
-    $params{canSubmitGroupId} ||= 2;
-    $self->addGroupToSubmitList($params{canSubmitGroupId});
-    # DOING -- add previous function and finish adding operations to this function
+    $params->{className} = 'WebGUI::Asset::EMSSubmissionForm';
+    $params->{canSubmitGroupId} ||= 2;
+    $self->addGroupToSubmitList($params->{canSubmitGroupId});
     # TODO re-edit the Badge view template and save it, see that it gets added after resets
     # TODO  see how hard it would be to dump the whole template class to the file system
-    # also how hard is it to sync it?
-    # perhaps there is a way to write a module based on the test system that would be simple enough
-    # to look for new versions of the templates and save it off to the file system -- also notice
-    # when the file system is newer than the database ad load the file.
     #--  ultimate goal is to figure out what is failing in the test battery...
     # also add tests for Form_Div
+    $self->addChild($params);
 }
 
 #-------------------------------------------------------------------
@@ -386,23 +397,12 @@ sub getLocations {
 
     my %hash;
     my %hashDate;
+    my %h;
     my $tickets = $self->getTickets;
-    for my $ticket ( @$tickets ) {
-	my $name = $ticket->get('location');
-        my $date = $ticket->get('startDate');
-        $hash{$name} = 1 if defined $name;
-              # cut off the time from the startDate.
-        $date =~ s/\s*\d+:\d+(:\d+)?// if defined $date;
-        $hashDate{$date} = 1 if defined $date;
-    }
-    my @locations = sort keys %hash;
-    push @$dateRef, sort keys %hashDate ;
-#	@locations = $self->session->db->read(q{
-#                     select distinct(EMSTicket.location)
-#                       from EMSTicket join asset using (assetId)
-#                      where asset.parentId = ?
-#                      order by EMSTicket.location
-#                     },[$self->getId])->array;
+# this is a really compact 'uniq' operation
+    my @locations = map { $h{$_}++ == 0 ? $_ : () } ( map { $_->get('location') } ( @$tickets ) );
+# the dates have the time data removed with a pattern substitution
+    push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
 
     return @locations;
 }
@@ -1336,7 +1336,7 @@ sub www_getScheduleDataJSON {
                               and ( assetData.status = 'approved'
                                   or assetData.tagId = ? )
 	      )
-              order by EMSTicket.startDate
+              order by EMSTicket.startDate, eventNumber asc
                      },[  $self->getId,  $currentDate,
                            $session->scratch->get("versionTag")
                       ]);
@@ -1344,8 +1344,10 @@ sub www_getScheduleDataJSON {
     tie %hash, 'Tie::IxHash';
     while( my $row = $tickets->hashRef ) {
 	$row->{type} = 'ticket';
-        $hash{$row->{startDate}}{$row->{location}} = $row;
+        $row->{location} = '&nbsp;' if $row->{location} eq '';
+        push @{$hash{$row->{startDate}}{$row->{location}}}, $row;
     }
+    grep { $_ = '&nbsp;' if defined $_ && $_ eq '' } @ticketLocations;
     my %results = ();
     $results{records} = [];  ##Initialize to an empty array
     my $ctr = 0;
@@ -1353,20 +1355,25 @@ sub www_getScheduleDataJSON {
          # fill out the columns in the table
     while( $ctr < $locationsPerPage ) { $locationMap{ 'col' . ++$ctr } = '' };
     push @{$results{records}}, { colDate => '' , map { $_ , { type => 'label', title => $locationMap{$_} || '' } } ( keys %locationMap ) };
+    my $redo = 0;
     for my $startDate ( keys %hash ) {
+        $redo = 0;
         my $row = { colDate => $startDate };
 	my $empty = 1;
 	for my $col ( keys %locationMap ) {
 	    my $location = $locationMap{$col};
 	    if( exists $hash{$startDate}{$location} ) {
-	        $row->{$col} = $hash{$startDate}{$location};
+	        $row->{$col} = pop @{$hash{$startDate}{$location}};
 		$empty = 0;
+                $redo = 1 if scalar(@{$hash{$startDate}{$location}}) > 0;
+                delete $hash{$startDate}{$location} if scalar(@{$hash{$startDate}{$location}}) == 0;
 	    } else {
 	        $row->{$col} = { type => 'empty' };
 	    }
 	}
 	next if $empty;
 	push @{$results{records}}, $row;
+        redo if $redo;
     }
 
     my $rowCount = scalar(@{$results{records}});

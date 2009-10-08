@@ -49,7 +49,7 @@ $versionTag->set({name=>"EventManagementSystem Test"});
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 34 ;        # Increment this number for each test you create
+plan tests => 35 ;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -185,7 +185,7 @@ cmp_deeply($records, [], 'www_getScheduleDataJSON: visitor may not see the sched
 $session->user({userId => $attender->getId});
 $json    = $ems->www_getScheduleDataJSON();
 $records = eval { JSON::from_json($json)->{records} };
-cmp_deeply($records, [ignore(), ignore()], '... attender can see the schedule JSON');
+cmp_deeply($records, [ignore(), ignore(), ignore()], '... attender can see the schedule JSON');
 
 foreach my $ticket (@tickets) {
     $ticket->purge;
@@ -297,12 +297,26 @@ my @tickets= (
     startDate => '2009-01-01 14:00:00',
     location => 'f',
     }),
+    $ems->addChild({
+    className => "WebGUI::Asset::Sku::EMSTicket",
+    title => 'lecture 13 blank location 2 pm',
+    eventNumber => 13,
+    startDate => '2009-01-01 14:00:00',
+    location => '',
+    }),
+    $ems->addChild({
+    className => "WebGUI::Asset::Sku::EMSTicket",
+    title => 'lecture 14 blank location 2 pm',
+    eventNumber => 14,
+    startDate => '2009-01-01 14:00:00',
+    location => '',
+    }),
 );
-is( scalar(@tickets), 12, 'created tickets for ems');
+is( scalar(@tickets), 14, 'created tickets for ems');
 my $tickets = $ems->getTickets;
-is(scalar(@{ $tickets }), 12, 'Fourteen tickets exist');
+is(scalar(@{ $tickets }), 14, 'Fourteen tickets exist');
 my $locations = [ $ems->getLocations ];
-cmp_deeply($locations, [ 'a','b','c','d','e','f' ], 'get locations returns all expected locations');
+cmp_deeply($locations, [ 'a','b','c','d','e','f','' ], 'get locations returns all expected locations');
 # print 'locations=[', join( ',', @$locations ),"]\n";
 
 $data = $ems->www_getScheduleDataJSON();
@@ -312,7 +326,7 @@ sub ticketInfo { my $tk = shift; return {
     title => $tk->get('title'),
     assetId => $tk->get('assetId'),
     description => $tk->get('description'),
-    location => $tk->get('location'),
+    location => $tk->get('location') || '&nbsp;',
     startDate => $tk->get('startDate'),
 }; }
 cmp_deeply( JSON::from_json($data), { 
@@ -373,6 +387,47 @@ cmp_deeply( JSON::from_json($data), {
          pageSize => 10,
          rowsPerPage => 6,
        },
-     'twelve tickets: schedule data looks good'
+     'Fourteen tickets: schedule data looks good'
+);
+$session->request->setup_body({ locationPage => 2 } );
+$data = $ems->www_getScheduleDataJSON();
+cmp_deeply( JSON::from_json($data), { 
+         records => [
+       { colDate => '',
+         col1 => { type => 'label', title => 'f' },
+         col2 => { type => 'label', title => '&nbsp;' },
+         col3 => { type => 'label', title => '' },
+         col4 => { type => 'label', title => '' },
+         col5 => { type => 'label', title => '' },
+       },
+       { colDate => $tickets[11]->get('startDate'),
+         col1 => ticketInfo( $tickets[11] ),
+         col2 => ticketInfo( $tickets[13] ),
+         col3 => { type => 'empty' },
+         col4 => { type => 'empty' },
+         col5 => { type => 'empty' },
+       },
+       { colDate => $tickets[13]->get('startDate'),
+         col1 => { type => 'empty' },
+         col2 => ticketInfo( $tickets[12] ),
+         col3 => { type => 'empty' },
+         col4 => { type => 'empty' },
+         col5 => { type => 'empty' },
+       },
+     ],
+     totalRecords => 3,
+         recordsReturned => 3,
+         startIndex => 0,
+         sort => undef,
+         dir => 'asc',
+         totalLocationPages => 2,
+         currentLocationPage => 2,
+         totalDatePages => 1,
+         currentDatePage => 1,
+         dateRecords => [ '2009-01-01' ],
+         pageSize => 10,
+         rowsPerPage => 3,
+       },
+     'Location page #2 looks good'
 );
 
