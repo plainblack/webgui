@@ -139,7 +139,7 @@ sub cleanup {
     pop @guarded
         while @guarded;
 
-    if ( $SESSION ) {
+    if ( our $SESSION ) {
         $SESSION->var->end;
         $SESSION->close;
         undef $SESSION;
