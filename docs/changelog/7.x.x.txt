@@ -4,6 +4,7 @@
  - fixed #11060: Some tables have latin1 as the default character set
  - fixed #11089: No message body in Notification
  - fixed #2569: robots.txt issues
+ - fixed #11104: Wrong name for request tracker post form template
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
