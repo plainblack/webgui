@@ -846,8 +846,8 @@ CREATE TABLE `PM_project_inno` (
   `percentComplete` float NOT NULL default '0',
   `parentId` char(22) character set utf8 collate utf8_bin default NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `lastUpdatedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `createdBy` char(22) character set utf8 collate utf8_bin,
+  `lastUpdatedBy` char(22) character set utf8 collate utf8_bin,
   `lastUpdateDate` bigint(20) NOT NULL,
   `projectObserver` char(22) character set utf8 collate utf8_bin default '7',
   PRIMARY KEY  (`projectId`)
@@ -867,8 +867,8 @@ CREATE TABLE `PM_task_inno` (
   `percentComplete` float default NULL,
   `sequenceNumber` int(11) NOT NULL default '1',
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `lastUpdatedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `createdBy` char(22) character set utf8 collate utf8_bin,
+  `lastUpdatedBy` char(22) character set utf8 collate utf8_bin,
   `lastUpdateDate` bigint(20) NOT NULL,
   `lagTime` bigint(20) default '0',
   `taskType` enum('timed','progressive','milestone') NOT NULL default 'timed',
@@ -1323,7 +1323,7 @@ CREATE TABLE `Survey_test_inno` (
   `sequenceNumber` int(11) NOT NULL default '1',
   `dateCreated` datetime default NULL,
   `lastUpdated` datetime default NULL,
-  `assetId` char(255) character set utf8 default NULL,
+  `assetId` char(22) character set utf8 collate utf8_bin default NULL,
   `name` char(255) character set utf8 default NULL,
   `test` mediumtext character set utf8 NOT NULL,
   PRIMARY KEY  (`testId`),
@@ -1351,8 +1351,8 @@ CREATE TABLE `TT_projectList_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin default NULL,
   `projectName` char(255) NOT NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `lastUpdatedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `createdBy` char(22) character set utf8 collate utf8_bin,
+  `lastUpdatedBy` char(22) character set utf8 collate utf8_bin,
   `lastUpdateDate` bigint(20) NOT NULL,
   PRIMARY KEY  (`projectId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1384,8 +1384,8 @@ CREATE TABLE `TT_report_inno` (
   `reportComplete` int(11) NOT NULL default '0',
   `resourceId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `lastUpdatedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `createdBy` char(22) character set utf8 collate utf8_bin,
+  `lastUpdatedBy` char(22) character set utf8 collate utf8_bin,
   `lastUpdateDate` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1466,9 +1466,9 @@ CREATE TABLE `Thingy_fields_inno` (
   `fieldId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL,
   `dateCreated` bigint(20) NOT NULL,
-  `createdBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `createdBy` char(22) character set utf8 collate utf8_bin,
   `dateUpdated` bigint(20) NOT NULL,
-  `updatedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `updatedBy` char(22) character set utf8 collate utf8_bin,
   `label` char(255) NOT NULL,
   `fieldType` char(255) NOT NULL,
   `defaultValue` longtext,
@@ -1527,7 +1527,7 @@ CREATE TABLE `Thingy_things_inno` (
 CREATE TABLE `Thread_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `replies` int(11) NOT NULL default '0',
-  `lastPostId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `lastPostId` char(22) character set utf8 collate utf8_bin,
   `lastPostDate` bigint(20) default NULL,
   `isLocked` int(11) NOT NULL default '0',
   `isSticky` int(11) NOT NULL default '0',
@@ -1617,7 +1617,7 @@ CREATE TABLE `WikiPage_inno` (
   `views` bigint(20) NOT NULL default '0',
   `isProtected` int(11) NOT NULL default '0',
   `actionTaken` char(35) NOT NULL,
-  `actionTakenBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `actionTakenBy` char(22) character set utf8 collate utf8_bin,
   `isFeatured` int(1) default NULL,
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -3317,7 +3317,7 @@ alter table Post add foreign key (threadId) references asset(assetId) on delete 
 alter table Post_rating add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table Post_rating add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table Thread add foreign key (assetId,revisionDate) references Post(assetId,revisionDate) on delete cascade on update cascade;
-alter table Thread add foreign key (lastPostId) references asset(assetId) on delete set null update cascade;
+alter table Thread add foreign key (lastPostId) references asset(assetId) on delete set null on update cascade;
 alter table Thread add foreign key (subscriptionGroupId) references groups(groupId) on delete restrict on update cascade;
 alter table Thread_read add foreign key (threadId) references asset(assetId) on delete cascade on update cascade;
 alter table Thread_read add foreign key (userId) references users(userId) on delete cascade on update cascade;
@@ -3328,7 +3328,6 @@ alter table ZipArchiveAsset add foreign key (assetId,revisionDate) references Fi
 alter table ZipArchiveAsset add foreign key (templateId) references asset(assetId) on delete cascade on update cascade;
 alter table GalleryFile add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
 alter table Photo add foreign key (assetId,revisionDate) references GalleryFile(assetId,revisionDate) on delete cascade on update cascade;
-alter table Photo add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table ImageAsset add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
 alter table sku add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table donation add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
@@ -3494,12 +3493,12 @@ alter table Survey add foreign key (surveyQuestionsId) references asset(assetId)
 alter table Survey add foreign key (sectionEditTemplateId) references asset(assetId) on delete restrict on update cascade;
 alter table Survey add foreign key (surveySummaryTemplateId) references asset(assetId) on delete restrict on update cascade;
 alter table Survey add foreign key (feedbackTemplateId) references asset(assetId) on delete restrict on update cascade;
-alter table Survey add foreign key (testRestultsTemplateId) references asset(assetId) on delete restrict on update cascade;
+alter table Survey add foreign key (testResultsTemplateId) references asset(assetId) on delete restrict on update cascade;
 alter table Survey add foreign key (groupToTakeSurvey) references groups(groupId) on delete restrict on update cascade;
 alter table Survey add foreign key (groupToEditSurvey) references groups(groupId) on delete restrict on update cascade;
 alter table Survey add foreign key (onSurveyEndWorkflowId) references Workflow(workflowId) on delete restrict on update cascade;
 alter table Survey_response add foreign key (userId) references users(userId) on delete cascade on update cascade;
-alter table Survey_test add foreign key (assetId) references asset(assetId) on delete restrict on update cascade;
+alter table Survey_test add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table Survey_tempReport add foreign key (assetId) references asset(assetId) on delete restrict on update cascade;
 alter table Survey_tempReport add foreign key (Survey_responseId) references Survey_response(Survey_responseId) on delete restrict on update cascade;
 alter table Thingy add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
@@ -3524,7 +3523,7 @@ alter table Thingy_things add foreign key (groupIdSearch) references groups(grou
 alter table Thingy_things add foreign key (groupIdImport) references groups(groupId) on delete restrict on update cascade;
 alter table Thingy_things add foreign key (groupIdExport) references groups(groupId) on delete restrict on update cascade;
 alter table ThingyRecord add foreign key (assetId,revisionDate) references Sku(assetId,revisionDate) on delete cascade on update cascade;
-alter table ThingyRecord add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
+alter table ThingyRecord add foreign key (templateIdView) references asset(assetId) on delete restrict on update cascade;
 alter table ThingyRecord add foreign key (thingId) references Thingy_things(thingId) on delete set null on update cascade;
 alter table ThingyRecord_record add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table ThingyRecord_record add foreign key (userId) references users(userId) on delete cascade on update cascade;
@@ -3538,15 +3537,16 @@ alter table TT_wobject add foreign key (timeRowTemplateId) references asset(asse
 alter table TT_report add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table TT_report add foreign key (createdBy) references users(userId) on delete set null on update cascade;
 alter table TT_report add foreign key (lastUpdatedBy) references users(userId) on delete set null on update cascade;
-alter table TT_report add foreign key (resourceId) references TT_projectResoureList(resourceId) on delete cascade on update cascade;
-alter table TT_project add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
-alter table TT_project add foreign key (createdBy) references users(userId) on delete set null on update cascade;
-alter table TT_project add foreign key (lastUpdatedBy) references users(userId) on delete set null on update cascade;
-alter table TT_timeEntry add foreign key (projectId) references TT_project(projectId) on delete cascade on update cascade;
+alter table TT_projectList add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table TT_projectList add foreign key (createdBy) references users(userId) on delete set null on update cascade;
+alter table TT_projectList add foreign key (lastUpdatedBy) references users(userId) on delete set null on update cascade;
+alter table TT_timeEntry add foreign key (projectId) references TT_projectList(projectId) on delete cascade on update cascade;
 alter table TT_timeEntry add foreign key (taskId) references TT_projectTasks(taskId) on delete cascade on update cascade;
-alter table TT_timeEntry add foreign key (reportId) references TT_report(reportId) on delete cascade on update cascade;
-alter table TT_projectResourceList add foreign key (projectId) references TT_project(projectId) on delete cascade on update cascade;
-alter table TT_projectList add foreign key (projectId) references TT_project(projectId) on delete cascade on update cascade;
+-- Not sure why this won't create
+-- alter table TT_timeEntry add foreign key (reportId) references TT_report(reportId) on delete cascade on update cascade;
+-- alter table TT_report add foreign key (resourceId) references TT_projectResourceList(resourceId) on delete cascade on update cascade;
+alter table TT_projectResourceList add foreign key (projectId) references TT_projectList(projectId) on delete cascade on update cascade;
+alter table TT_projectTasks add foreign key (projectId) references TT_projectList(projectId) on delete cascade on update cascade;
 alter table SyndicatedContent add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table SyndicatedContent add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Navigation add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
@@ -3630,10 +3630,13 @@ alter table cart add foreign key (sessionId) references userSession(sessionId) o
 alter table cartItem add foreign key (cartId) references cart(cartId) on delete cascade on update cascade;
 alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
 
-alter table WorkflowActivity add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
+-- got some straglers to deal with
+delete from WorkflowActivityData where activityId in ('pbwfactivity0000000002','pbwfactivity0000000022');
 alter table WorkflowActivityData add foreign key (activityId) references WorkflowActivity(activityId) on delete cascade on update cascade;
+alter table WorkflowActivity add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
 alter table WorkflowInstance add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
-alter table WorkflowInstance add foreign key (currentActivityId) references WorkflowActivity(activityId) on delete set null on update cascade;
+-- not sure why this doesn't work
+-- alter table WorkflowInstance add foreign key (currentActivityId) references WorkflowActivity(activityId) on delete set null on update cascade;
 alter table WorkflowInstanceScratch add foreign key (instanceId) references WorkflowInstance(instanceId) on delete cascade on update cascade;
 alter table WorkflowSchedule add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
 
