@@ -25,6 +25,7 @@
  - fixed #11060: Some tables have latin1 as the default character set
  - fixed #2569: robots.txt issues
  - fixed #11104: Wrong name for request tracker post form template
+ - fixed #11077: Untested result in WebGUI::Storage->getFiles
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision

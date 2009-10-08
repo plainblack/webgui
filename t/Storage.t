@@ -32,7 +32,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 130; # increment this value for each test you create
+my $numTests = 134; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -81,7 +81,7 @@ $guidDir->mkpath();
 ok(-e $guidDir->stringify, 'created GUID storage location for backwards compatibility testing');
 
 my $guidStorage = WebGUI::Storage->get($session, $newGuid);
-WebGUI::Test->storagesToDelete($guidStorage);
+addToCleanup($guidStorage);
 isa_ok($guidStorage, 'WebGUI::Storage');
 is($guidStorage->getId, $newGuid, 'GUID storage has correct id');
 is($guidStorage->getDirectoryId, $newGuid, '... getDirectoryId');
@@ -116,7 +116,7 @@ undef $storage1;
 
 $storage1 = WebGUI::Storage->get($session, 'notAGUID');
 my $storage2 = WebGUI::Storage->get($session, 'notAGoodId');
-WebGUI::Test->storagesToDelete($storage2);
+addToCleanup($storage2);
 
 ok(! $storage2->getErrorCount, 'No errors due to a shared common root');
 
@@ -148,7 +148,7 @@ CHECKDIR: while ($dirOpt = pop @dirOptions) {
 	last CHECKDIR if !-e $dir3;
 }
 my $storage3 = WebGUI::Storage->get($session, $dirOpt);
-WebGUI::Test->storagesToDelete($storage3);
+addToCleanup($storage3);
 
 is( $storage3->getErrorCount, 1, 'Error during creation of object due to short GUID');
 
@@ -313,13 +313,13 @@ $storage1->copy($secondCopy);
 cmp_bag($secondCopy->getFiles(), $storage1->getFiles(), 'copy: passing explicit variable');
 
 my $s3copy = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($s3copy);
+addToCleanup($s3copy);
 my @filesToCopy = qw/WebGUI.pm testfile-hash-renamed.file/;
 $storage1->copy($s3copy, [@filesToCopy]);
 cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable and files to copy');
 {
     my $deepStorage = WebGUI::Storage->create($session);
-    WebGUI::Test->storagesToDelete($deepStorage);
+    addToCleanup($deepStorage);
     my $deepDir     = $deepStorage->getPathClassDir();
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
@@ -331,7 +331,7 @@ cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable 
         '... storage setup for deep clear test'
     );
     my $deepCopy = $deepStorage->copy();
-    WebGUI::Test->storagesToDelete($deepCopy);
+    addToCleanup($deepCopy);
     cmp_bag(
         $deepCopy->getFiles('all'),
         [ '.', 'deep', 'deep/file' ],
@@ -354,7 +354,7 @@ cmp_bag($storage1->getFiles, [$filename], 'deleteFile: storage1 has only 1 file'
 
 ##Test for out of object file deletion
 my $hackedStore = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($hackedStore);
+addToCleanup($hackedStore);
 $hackedStore->addFileFromScalar('fileToHack', 'Can this file be deleted from another object?');
 ok(-e $hackedStore->getPath('fileToHack'), 'set up a file for deleteFile to try and delete illegally');
 my $hackedPath = '../../../'.$hackedStore->getPathFrag().'/fileToHack';
@@ -437,7 +437,7 @@ cmp_bag(
 
 {
     my $deepStorage = WebGUI::Storage->create($session);
-    WebGUI::Test->storagesToDelete($deepStorage);
+    addToCleanup($deepStorage);
     my $deepDir     = $deepStorage->getPathClassDir();
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
@@ -502,7 +502,7 @@ foreach my $iconTest (@{ $fileIconTests }) {
 ####################################################
 
 my $shallowStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($shallowStorage);
+addToCleanup($shallowStorage);
 $shallowStorage->setPrivileges(3,3,3);
 my $shallowDir = $shallowStorage->getPathClassDir();
 ok(-e $shallowDir->file('.wgaccess')->stringify, 'setPrivilege: .wgaccess file created in shallow storage');
@@ -512,7 +512,7 @@ is ($privs, "3\n3\n3", '... correct group contents');
 $shallowStorage->deleteFile('.wgaccess');
 
 my $deepStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($deepStorage);
+addToCleanup($deepStorage);
 my $deepDir     = $deepStorage->getPathClassDir();
 my $deepDeepDir = $deepDir->subdir('deep');
 my $errorStr;
@@ -641,6 +641,23 @@ ok(! (-e $qFile), 'CDN: queue file removed');
 undef $cdnStorage;
 $session->config->delete('cdn');
 
+
+####################################################
+#
+# Test what happens when the directory for a
+# storage object does not exist.
+#
+####################################################
+
+my $zombieStorage = WebGUI::Storage->create($session);
+addToCleanup($zombieStorage);
+my $zombieDir = $zombieStorage->getPathClassDir;
+$zombieDir->remove;
+
+is( $zombieStorage->getPathClassDir,       undef, 'bad storage: getPathClassDir returns undef');
+cmp_deeply( $zombieStorage->getFiles,         [], '... getFiles returns an empty array ref');
+cmp_deeply( $zombieStorage->setPrivileges, undef, '... setPrivileges returns undef');
+cmp_deeply( $zombieStorage->clear,         undef, '... setPrivileges returns undef');
 
 ####################################################
 #
