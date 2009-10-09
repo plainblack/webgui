@@ -29,6 +29,7 @@ use WebGUI::Session::Id;
 use WebGUI::Session::Os;
 use WebGUI::Session::Output;
 use WebGUI::Session::Privilege;
+use WebGUI::Session::Request;
 use WebGUI::Session::Scratch;
 use WebGUI::Session::Setting;
 use WebGUI::Session::Stow;
@@ -463,7 +464,7 @@ sub open {
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
-	$self->{_request} = $request if (defined $request);
+	$self->{_request} = WebGUI::Session::Request->new( r => $request, env => {}, session => $self ) if $request;
 	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
