@@ -63,54 +63,6 @@ to the user, instead of displaying the Page Not Found page.
 sub handler {
     my ($request, $server, $config) = @_;
     
-    if ($request->isa('Plack::Request')) {
-#        my $session = $request->pnotes('wgSession');
-#        unless (defined $session) {
-#            my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
-#        }
-        my $env = $request->env;
-        my $session = WebGUI::Session->open($env->{'wg.WEBGUI_ROOT'}, $env->{'wg.WEBGUI_CONFIG'}, $request);
-        WEBGUI_FATAL: foreach my $handler (@{$config->get("contentHandlers")}) {
-            my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
-            if ( my $e = WebGUI::Error->caught ) {
-                $session->errorHandler->error($e->package.":".$e->line." - ".$e->error);
-                $session->errorHandler->debug($e->package.":".$e->line." - ".$e->trace);
-            }
-            elsif ( $@ ) {
-                $session->errorHandler->error( $@ );
-            }
-            else {
-                if ($output eq "chunked") {
-                    if ($session->errorHandler->canShowDebug()) {
-                        $session->output->print($session->errorHandler->showDebug(),1);
-                    }
-                    last;
-                }
-                if ($output eq "empty") {
-                    if ($session->errorHandler->canShowDebug()) {
-                        $session->output->print($session->errorHandler->showDebug(),1);
-                    }
-                    last;
-                }
-                elsif (defined $output && $output ne "") {
-                    $session->http->sendHeader;
-                    $session->output->print($output);
-                    if ($session->errorHandler->canShowDebug()) {
-                        $session->output->print($session->errorHandler->showDebug(),1);
-                    }
-                    last;
-                }
-                # Keep processing for success codes
-                elsif ($session->http->getStatus < 200 || $session->http->getStatus > 299) {
-                    $session->http->sendHeader;
-                    last;
-                }
-            }
-        }
-        $session->close;
-        return [ 200, [ 'Content-type' => 'text/html' ], [ 'Jah' ] ];
-    }
-    
     $request->push_handlers(PerlResponseHandler => sub {
         my $session = $request->pnotes('wgSession');
         unless (defined $session) {
