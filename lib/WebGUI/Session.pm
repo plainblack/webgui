@@ -463,11 +463,16 @@ sub open {
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
-	
-    # This does our Plack TODO logging
+    
     # $self->{_request} = $request if (defined $request);
-    use WebGUI::Session::Request;
-    $self->{_request} = WebGUI::Session::Request->new( r => $request, session => $self ) if $request;
+    if ($request && $request->isa('WebGUI::Session::Plack')) {
+        # Use our WebGUI::Session::Plack object that is supposed to do everything Apache2::* can
+        $self->{_request} = $request;
+    } else {
+        # Use WebGUI::Session::Request to wrap Apache2::* calls
+        require WebGUI::Session::Request;
+        $self->{_request} = WebGUI::Session::Request->new( r => $request, session => $self );
+    }
 	
 	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
