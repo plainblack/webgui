@@ -5,8 +5,8 @@ use warnings;
 
 =head1 DESCRIPTION
 
-This class wraps calls to $session->request and logs them so that we know 
-what is left to do to finish Plack support
+This class wraps calls to $session->request and logs them as a cute way of seeing
+what Apache2::* methods webgui is calling
 
 =cut
 
