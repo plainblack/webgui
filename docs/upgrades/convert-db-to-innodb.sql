@@ -3631,7 +3631,6 @@ alter table cartItem add foreign key (cartId) references cart(cartId) on delete 
 alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
 
 -- got some straglers to deal with
-delete from WorkflowActivityData where activityId in ('pbwfactivity0000000002','pbwfactivity0000000022');
 alter table WorkflowActivityData add foreign key (activityId) references WorkflowActivity(activityId) on delete cascade on update cascade;
 alter table WorkflowActivity add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
 alter table WorkflowInstance add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
