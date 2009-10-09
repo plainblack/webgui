@@ -24,7 +24,7 @@ use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
-plan tests => 46;
+plan tests => 51;
 use_ok('WebGUI::Shop::ShipDriver::USPS')
     or die 'Unable to load module WebGUI::Shop::ShipDriver::USPS';
 
@@ -42,8 +42,15 @@ $session->user({user => $user});
 # put your tests here
 
 
-my $storage;
 my ($driver, $cart);
+my $insuranceTable =  <<EOTABLE;
+5:1.00
+10:2.00
+15:3.00
+20:4.00
+25:50.00
+EOTABLE
+
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 my $home = WebGUI::Asset->getDefault($session);
@@ -92,8 +99,16 @@ my $nivBible = $bible->setCollateral('variantsJSON', 'variantId', 'new',
     }
 );
 
+my $gospels = $bible->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => 'Gospels from the new Testament',
+        price     => 1.50,       varSku    => 'gospels',
+        weight    => 2.0,        quantity  => 999999,
+    }
+);
+
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 
 #######################################################################
 #
@@ -283,6 +298,17 @@ $driver->update($properties);
 $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 my @shippableUnits = $driver->_getShippableUnits($cart);
 
+$properties = $driver->get();
+$properties->{addInsurance}   = 1;
+$properties->{insuranceRates} = $insuranceTable;
+$driver->update($properties);
+
+is($driver->_calculateInsurance(@shippableUnits), 1, '_calculateInsurance: one item in cart with quantity=1, calculates insurance');
+
+$properties->{addInsurance}   = 0;
+$driver->update($properties);
+is($driver->_calculateInsurance(@shippableUnits), 0, '_calculateInsurance: returns 0 if insurance is not enabled');
+
 my $xml = $driver->buildXML($cart, @shippableUnits);
 like($xml, qr/<RateV3Request USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the RateV3Request tag');
 like($xml, qr/<Package ID="0"/, 'buildXML: checking ID is an attribute of the Package tag');
@@ -359,8 +385,10 @@ is($cost, 5.25, '_calculateFromXML calculates shipping cost correctly for 1 item
 
 $bibleItem = $bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $nivBible));
 @shippableUnits = $driver->_getShippableUnits($cart);
-$xml = $driver->buildXML($cart, @shippableUnits);
 
+is(calculateInsurance($driver), 5, '_calculateInsurance: two items in cart with quantity=1, calculates insurance');
+
+$xml = $driver->buildXML($cart, @shippableUnits);
 $xmlData = XMLin( $xml,
     KeepRoot   => 1,
     ForceArray => ['Package'],
@@ -458,6 +486,8 @@ is($cost, 12.25, '_calculateFromXML calculates shipping cost correctly for 2 ite
 $bibleItem->setQuantity(2);
 @shippableUnits = $driver->_getShippableUnits($cart);
 
+is(calculateInsurance($driver), 51, '_calculateInsurance: two items in cart with quantity=2, calculates insurance');
+
 $cost = $driver->_calculateFromXML({
     Package => [
         {
@@ -481,6 +511,7 @@ is($cost, 19.25, '_calculateFromXML calculates shipping cost correctly for 2 ite
 $rockHammer2 = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
 $rockHammer2->update({shippingAddressId => $wucAddress->getId});
 @shippableUnits = $driver->_getShippableUnits($cart);
+is(calculateInsurance($driver), 54, '_calculateInsurance: calculates insurance');
 $xml = $driver->buildXML($cart, @shippableUnits);
 
 $xmlData = XMLin( $xml,
@@ -575,6 +606,12 @@ SKIP: {
 
 }
 
+#######################################################################
+#
+# Test Priority shipping setup
+#
+#######################################################################
+
 $cart->empty;
 $properties = $driver->get();
 $properties->{shipType} = 'PRIORITY';
@@ -637,6 +674,12 @@ SKIP: {
 
 }
 
+#######################################################################
+#
+# Test EXPRESS shipping setup
+#
+#######################################################################
+
 $properties = $driver->get();
 $properties->{shipType} = 'EXPRESS';
 $driver->update($properties);
@@ -695,6 +738,11 @@ SKIP: {
 
 }
 
+#######################################################################
+#
+# Test PRIORITY VARIABLE shipping setup
+#
+#######################################################################
 
 $properties = $driver->get();
 $properties->{shipType} = 'PRIORITY VARIABLE';
@@ -754,18 +802,11 @@ SKIP: {
 
 }
 
-
-$properties = $driver->get();
-$properties->{addInsurance} = 1;
-$properties->{insuranceTable} = <<EOTABLE;
-5:1.00
-10:2.00
-15:3.00
-20:4.00
-25:50.00
-EOTABLE
-$driver->update($properties);
-
+#######################################################################
+#
+# Test PRIORITY VARIABLE shipping setup
+#
+#######################################################################
 
 #----------------------------------------------------------------------------
 # Cleanup
@@ -778,4 +819,18 @@ END {
         $addressBook->delete if $addressBook;
         $cart->delete;
     }
+}
+
+sub calculateInsurance {
+    my $driver = shift;
+    $properties = $driver->get();
+    $properties->{addInsurance}   = 1;
+    $driver->update($properties);
+
+    my $insurance = $driver->_calculateInsurance(@shippableUnits);
+
+    $properties->{addInsurance}   = 0;
+    $driver->update($properties);
+
+    return $insurance;
 }

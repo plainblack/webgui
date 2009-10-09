@@ -221,22 +221,25 @@ The set of shippable units, which are required to do quantity and cost lookups.
 
 sub _calculateInsurance {
     my ($self, @shippableUnits) = @_;
-    my $cost = 0;
-    return $cost unless $self->get('addInsurance') && $self->get('insuranceRates');
+    my $insuranceCost  = 0;
+    return $insuranceCost unless $self->get('addInsurance') && $self->get('insuranceRates');
     my @insuranceTable = map { my ($value,$cost) = split /:/, $_; [$value, $cost]; }
                             split /\r?\n/, $self->get('insuranceRates');
     ##Sort by decreasing value for easy post processing
     @insuranceTable = sort { $b->[0] <=> $a->[0] } @insuranceTable;
-    my $insuranceCost  = 0;
     foreach my $package (@shippableUnits) {
+        my $value = 0;
         ITEM: foreach my $item (@{ $package }) {
-            $cost += $item->getSku->getPrice() * $item->get('quantity');
+            $value += $item->getSku->getPrice() * $item->get('quantity');
         }
         my $pricePoint;
-        POINT: foreach $pricePoint (@insuranceTable) {
-            last POINT if $cost <= $pricePoint->[0];
+        POINT: foreach my $point (@insuranceTable) {
+            if ($value > $point->[0]) {
+                $pricePoint = $point;
+                last POINT;
+            }
         }
-        $insuranceCost += $pricePoint->[1];
+        $insuranceCost += defined $pricePoint ? $pricePoint->[1] : 0;
     }
     return $insuranceCost;
 }
