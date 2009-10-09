@@ -62,7 +62,6 @@ to the user, instead of displaying the Page Not Found page.
 
 sub handler {
     my ($request, $server, $config) = @_;
-    
     $request->push_handlers(PerlResponseHandler => sub {
         my $session = $request->pnotes('wgSession');
         unless (defined $session) {

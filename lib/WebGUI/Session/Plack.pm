@@ -2,6 +2,7 @@ package WebGUI::Session::Plack;
 
 use strict;
 use warnings;
+use Carp;
 
 =head1 DESCRIPTION
 
@@ -58,7 +59,7 @@ sub pnotes {
 sub push_handlers {
     my $self = shift;
     my ($x, $sub) = @_;
-    warn "push_handlers on $x";
+    carp "push_handlers on $x";
     return $sub->();
 }
 #
@@ -78,6 +79,8 @@ sub new {
     bless { @_ }, $class;
 }
 
+sub env { shift->{env} }
+
 our $AUTOLOAD;
 sub AUTOLOAD {
     my $self = shift;
@@ -86,6 +89,12 @@ sub AUTOLOAD {
     
     warn "!!server->$what(@_)";
     return;
+}
+
+sub dir_config {
+    my $self = shift;
+    my $c = shift;
+    return $self->env->{"wg.DIR_CONFIG.$c"};
 }
 
 # --

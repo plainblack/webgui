@@ -13,6 +13,8 @@ my $app = sub {
     my $env = shift;
     $env->{'wg.WEBGUI_ROOT'} = $WEBGUI_ROOT;
     $env->{'wg.WEBGUI_CONFIG'} = "$WEBGUI_CONFIG.conf";
+    $env->{'wg.DIR_CONFIG.WebguiRoot'} = $env->{'wg.WEBGUI_ROOT'};
+    $env->{'wg.DIR_CONFIG.WebguiConfig'} = $env->{'wg.WEBGUI_CONFIG'};
     WebGUI::handle_psgi($env);
 };
 
