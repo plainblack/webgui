@@ -7,6 +7,7 @@
  - fixed #11104: Wrong name for request tracker post form template
  - fixed #11077: Untested result in WebGUI::Storage->getFiles
  - fixed #11080: Asset Manage Crumb Trail flyout menu
+ - fixed #10874: EMS Schedule displaying incorrectly
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code

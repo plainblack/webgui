@@ -288,23 +288,12 @@ sub getLocations {
 
     my %hash;
     my %hashDate;
+    my %h;
     my $tickets = $self->getTickets;
-    for my $ticket ( @$tickets ) {
-	my $name = $ticket->get('location');
-        my $date = $ticket->get('startDate');
-        $hash{$name} = 1 if defined $name;
-              # cut off the time from the startDate.
-        $date =~ s/\s*\d+:\d+(:\d+)?// if defined $date;
-        $hashDate{$date} = 1 if defined $date;
-    }
-    my @locations = sort keys %hash;
-    push @$dateRef, sort keys %hashDate ;
-#	@locations = $self->session->db->read(q{
-#                     select distinct(EMSTicket.location)
-#                       from EMSTicket join asset using (assetId)
-#                      where asset.parentId = ?
-#                      order by EMSTicket.location
-#                     },[$self->getId])->array;
+# this is a really compact 'uniq' operation
+    my @locations = map { $h{$_}++ == 0 ? $_ : () } ( map { $_->get('location') } ( @$tickets ) );
+# the dates have the time data removed with a pattern substitution
+    push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
 
     return @locations;
 }
@@ -1198,7 +1187,7 @@ sub www_getScheduleDataJSON {
                               and ( assetData.status = 'approved'
                                   or assetData.tagId = ? )
 	      )
-              order by EMSTicket.startDate
+              order by EMSTicket.startDate, eventNumber asc
                      },[  $self->getId,  $currentDate,
                            $session->scratch->get("versionTag")
                       ]);
@@ -1206,8 +1195,10 @@ sub www_getScheduleDataJSON {
     tie %hash, 'Tie::IxHash';
     while( my $row = $tickets->hashRef ) {
 	$row->{type} = 'ticket';
-        $hash{$row->{startDate}}{$row->{location}} = $row;
+        $row->{location} = '&nbsp;' if $row->{location} eq '';
+        push @{$hash{$row->{startDate}}{$row->{location}}}, $row;
     }
+    grep { $_ = '&nbsp;' if defined $_ && $_ eq '' } @ticketLocations;
     my %results = ();
     $results{records} = [];  ##Initialize to an empty array
     my $ctr = 0;
@@ -1215,20 +1206,25 @@ sub www_getScheduleDataJSON {
          # fill out the columns in the table
     while( $ctr < $locationsPerPage ) { $locationMap{ 'col' . ++$ctr } = '' };
     push @{$results{records}}, { colDate => '' , map { $_ , { type => 'label', title => $locationMap{$_} || '' } } ( keys %locationMap ) };
+    my $redo = 0;
     for my $startDate ( keys %hash ) {
+        $redo = 0;
         my $row = { colDate => $startDate };
 	my $empty = 1;
 	for my $col ( keys %locationMap ) {
 	    my $location = $locationMap{$col};
 	    if( exists $hash{$startDate}{$location} ) {
-	        $row->{$col} = $hash{$startDate}{$location};
+	        $row->{$col} = pop @{$hash{$startDate}{$location}};
 		$empty = 0;
+                $redo = 1 if scalar(@{$hash{$startDate}{$location}}) > 0;
+                delete $hash{$startDate}{$location} if scalar(@{$hash{$startDate}{$location}}) == 0;
 	    } else {
 	        $row->{$col} = { type => 'empty' };
 	    }
 	}
 	next if $empty;
 	push @{$results{records}}, $row;
+        redo if $redo;
     }
 
     my $rowCount = scalar(@{$results{records}});
