@@ -207,8 +207,36 @@ sub handler {
 	return Apache2::Const::DECLINED; 
 }
 
+sub handle_psgi {
+    my $env     = shift;
+    my $request = WebGUI::Session::Request->new( env => $env );
+    my $config  = WebGUI::Config->new( $env->{'wg.WEBGUI_ROOT'}, $env->{'wg.WEBGUI_CONFIG'} );
+    my $server;
+    my $error    = "";
+    my $matchUri = $request->plack->request_uri;
+    my $gateway  = $config->get("gateway");
+    $matchUri =~ s{^$gateway}{/};
 
+    # We should probably ditch URL Handlers altogether in favour of Plack::Middleware
+    WEBGUI_FATAL: foreach my $handler ( @{ $config->get("urlHandlers") } ) {
+        my ($regex) = keys %{$handler};
+        if ( $matchUri =~ m{$regex}i ) {
+            my $output = eval { WebGUI::Pluggable::run( $handler->{$regex}, "handler", [ $request, $server, $config ] ) };
+            if ($@) {
+                $error = $@;
+                last;
+            }
+            return $output if $output;
+        }
+    }
 
+    # can't handle the url due to error or misconfiguration
+    return [
+        500,
+        [ 'Content-Type' => 'text/html' ],
+        ["This server is unable to handle the url '$matchUri' that you requested. $error"]
+    ];
+}
 
 1;
 
