@@ -464,7 +464,7 @@ sub open {
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
-	$self->{_request} = WebGUI::Session::Request->new( r => $request, env => {}, session => $self ) if $request;
+	$self->{_request} = WebGUI::Session::Request->new( r => $request, session => $self ) if $request;
 	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
