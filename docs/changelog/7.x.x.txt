@@ -28,6 +28,7 @@
  - fixed #11077: Untested result in WebGUI::Storage->getFiles
  - fixed #11080: Asset Manage Crumb Trail flyout menu
  - fixed #10874: EMS Schedule displaying incorrectly
+ - fixed #10956: Account, Profile system bad rendering with lots of 
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
