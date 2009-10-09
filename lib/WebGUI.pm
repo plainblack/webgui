@@ -208,27 +208,48 @@ sub handler {
 }
 
 sub handle_psgi {
-    my $env     = shift;
-    my $request = WebGUI::Session::Request->new( env => $env );
+    my $env     = shift; # instead of an Apache2::Request object
+    require WebGUI::Session::Plack;
+    my $plack   = WebGUI::Session::Plack->new( env => $env );
+    my $server  = $plack->server;
     my $config  = WebGUI::Config->new( $env->{'wg.WEBGUI_ROOT'}, $env->{'wg.WEBGUI_CONFIG'} );
-    my $server;
     my $error    = "";
-    my $matchUri = $request->plack->request_uri;
+    my $matchUri = $plack->uri;
     my $gateway  = $config->get("gateway");
     $matchUri =~ s{^$gateway}{/};
-
-    # We should probably ditch URL Handlers altogether in favour of Plack::Middleware
+    
+#    # handle basic auth
+#    my $auth = $plack->headers_in->{'Authorization'};
+#    if ($auth =~ m/^Basic/) { # machine oriented
+#	    # Get username and password from Apache and hand over to authen
+#        $auth =~ s/Basic //;
+#        authen($plack, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
+#    }
+#    else { # realm oriented
+#	    $plack->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($plack, undef, undef, $config)});
+#    }
+    
+    
+    # url handlers
+    # TODO: We should probably ditch URL Handlers altogether in favour of Plack::Middleware
     WEBGUI_FATAL: foreach my $handler ( @{ $config->get("urlHandlers") } ) {
         my ($regex) = keys %{$handler};
         if ( $matchUri =~ m{$regex}i ) {
-            my $output = eval { WebGUI::Pluggable::run( $handler->{$regex}, "handler", [ $request, $server, $config ] ) };
+            my $output = eval { WebGUI::Pluggable::run( $handler->{$regex}, "handler", [ $plack, $server, $config ] ) };
             if ($@) {
                 $error = $@;
                 last;
             }
+#            else {
+#				$gotMatch = 1;
+#				if ($output ne Apache2::Const::DECLINED) {
+#					return $output;
+#				}
+#            }
             return $output if $output;
         }
     }
+#    return Apache2::Const::DECLINED if ($gotMatch);
 
     # can't handle the url due to error or misconfiguration
     return [
