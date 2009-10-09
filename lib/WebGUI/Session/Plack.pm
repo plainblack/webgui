@@ -48,6 +48,12 @@ sub AUTOLOAD {
 
 sub uri { shift->request->request_uri(@_) }
 sub headers_in { shift->request->headers(@_) }
+sub param { shift->request->param(@_) }
+sub params { shift->request->params(@_) }
+
+# TODO: I suppose this should do some sort of IO::Handle thing
+my @body;
+sub print { shift; push @body, @_ }
 
 sub pnotes {
     my ($self, $key) = (shift, shift);

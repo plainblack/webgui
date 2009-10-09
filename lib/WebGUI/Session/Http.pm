@@ -92,6 +92,10 @@ Retrieves the cookies from the HTTP header and returns a hash reference containi
 sub getCookies {
 	my $self = shift;
 	if ($self->session->request) {
+	    if ($self->session->request->isa('WebGUI::Session::Plack')) {
+	        return $self->session->request->request->cookies;
+	    }
+	    
 		# Have to require this instead of using it otherwise it causes problems for command-line scripts on some platforms (namely Windows)
 		require APR::Request::Apache2;
 		my $jarHashRef = APR::Request::Apache2->handle($self->session->request)->jar();
