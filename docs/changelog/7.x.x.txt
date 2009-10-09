@@ -26,6 +26,7 @@
  - fixed #2569: robots.txt issues
  - fixed #11104: Wrong name for request tracker post form template
  - fixed #11077: Untested result in WebGUI::Storage->getFiles
+ - fixed #11080: Asset Manage Crumb Trail flyout menu
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
