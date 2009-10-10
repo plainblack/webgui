@@ -1,42 +1,48 @@
 BEGIN {
-
-    # This is just a temporary hack
-    our $WEBGUI_ROOT    = '/data/WebGUI';
-    our $WEBGUI_DOMAINS = '/data/domains';
-    our $WEBGUI_CONFIG  = 'dev.localhost.localdomain';
+    # Define your site settings here
+    # These are the config values that normally appear in your wre's 
+    # site.modperl.conf and site.modproxy.conf
+    our $WEBGUI_ROOT   = '/data/WebGUI';
+    our $WEBGUI_CONFIG = 'dev.localhost.localdomain';
+    our $DOCUMENT_ROOT = '/data/domains/dev.localhost.localdomain/public';
 }
 use local::lib $WEBGUI_ROOT;
 use WebGUI;
-use Plack::Middleware;
 use Plack::Builder;
 
-my $app = sub {
+my %SETTINGS = (
+    'wg.WEBGUI_ROOT'             => $WEBGUI_ROOT,
+    'wg.WEBGUI_CONFIG'           => "$WEBGUI_CONFIG.conf",
+    'wg.DOCUMENT_ROOT'           => $DOCUMENT_ROOT,
+    'wg.DIR_CONFIG.WebguiRoot'   => $WEBGUI_ROOT,
+    'wg.DIR_CONFIG.WebguiConfig' => "$WEBGUI_CONFIG.conf",
+);
+
+my $wg = sub {
     my $env = shift;
-    $env->{'wg.WEBGUI_ROOT'}             = $WEBGUI_ROOT;
-    $env->{'wg.WEBGUI_CONFIG'}           = "$WEBGUI_CONFIG.conf";
-    $env->{'wg.DIR_CONFIG.WebguiRoot'}   = $env->{'wg.WEBGUI_ROOT'};
-    $env->{'wg.DIR_CONFIG.WebguiConfig'} = $env->{'wg.WEBGUI_CONFIG'};
+    @{$env}{ keys %SETTINGS } = values %SETTINGS;
     WebGUI::handle_psgi($env);
 };
 
-# Apply some Middleware
 builder {
 
-    # /extras
+    # /extras - deliver via Plack::Middleware::Static
     add 'Plack::Middleware::Static',
         path => qr{^/extras/},
-        root => "$WEBGUI_ROOT/www/";
+        root => "$SETTINGS{'wg.WEBGUI_ROOT'}/www/";
 
-    # /uploads (ignore .wgaccess for now..)
-    add 'Plack::Middleware::Static',
-        path => qr{^/uploads/},
-        root => "$WEBGUI_DOMAINS/dev.localhost.localdomain/public/";
+    # /uploads - deliver via Plack::Middleware::WGAccess
+    # This takes the place of WebGUI::URL::Uploads in handling .wgaccess and 
+    # delivery of static files in /uploads
+    add 'Plack::Middleware::WGAccess',
+        path     => qr{^/uploads/},
+        settings => {%SETTINGS};
 
     add 'Plack::Middleware::XFramework', framework => 'WebGUI';
 
-    # Already enabled by plackup script
+    # AccessLog already enabled by default if you are using the plackup script
     # add 'Plack::Middleware::AccessLog',
     #    format => "combined";
 
-    $app;
+    $wg;
 }
