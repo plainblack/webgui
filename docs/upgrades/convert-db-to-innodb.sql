@@ -1883,13 +1883,13 @@ CREATE TABLE `assetAspect_Subscribable_inno` (
 CREATE TABLE `assetData_inno` (
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL default '0',
-  `revisedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `revisedBy` char(22) character set utf8 collate utf8_bin,
   `tagId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `status` char(35) NOT NULL default 'pending',
   `title` char(255) NOT NULL default 'untitled',
   `menuTitle` char(255) NOT NULL default 'untitled',
   `url` char(255) NOT NULL,
-  `ownerUserId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `ownerUserId` char(22) character set utf8 collate utf8_bin,
   `groupIdView` char(22) character set utf8 collate utf8_bin NOT NULL,
   `groupIdEdit` char(22) character set utf8 collate utf8_bin NOT NULL,
   `synopsis` text,
@@ -1960,13 +1960,13 @@ CREATE TABLE `assetVersionTag_inno` (
   `name` char(255) NOT NULL,
   `isCommitted` int(11) NOT NULL default '0',
   `creationDate` bigint(20) NOT NULL default '0',
-  `createdBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `createdBy` char(22) character set utf8 collate utf8_bin,
   `commitDate` bigint(20) NOT NULL default '0',
-  `committedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `committedBy` char(22) character set utf8 collate utf8_bin,
   `isLocked` int(11) NOT NULL default '0',
-  `lockedBy` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `groupToUse` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `workflowId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `lockedBy` char(22) character set utf8 collate utf8_bin,
+  `groupToUse` char(22) character set utf8 collate utf8_bin,
+  `workflowId` char(22) character set utf8 collate utf8_bin,
   `workflowInstanceId` char(22) character set utf8 collate utf8_bin default NULL,
   `comments` text,
   `startTime` datetime default NULL,
@@ -1988,7 +1988,7 @@ CREATE TABLE `authentication_inno` (
 
 
 CREATE TABLE `bucketLog_inno` (
-  `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `userId` char(22) character set utf8 collate utf8_bin,
   `Bucket` char(22) character set utf8 collate utf8_bin NOT NULL,
   `duration` int(11) default NULL,
   `timeStamp` datetime default NULL
@@ -3278,16 +3278,16 @@ ALTER TABLE `vendor_inno` RENAME `vendor`;
 ALTER TABLE `webguiVersion_inno` RENAME `webguiVersion`; 
 ALTER TABLE `wobject_inno` RENAME `wobject`;
 
-alter table asset add foreign key (parentId) asset(assetId) on delete cascade on update cascade;
+-- alter table asset add foreign key (parentId) references asset(assetId) on delete cascade on update cascade;
 alter table asset add foreign key (createdBy) references users(userId) on delete set null on update cascade;
 alter table asset add foreign key (stateChangedBy) references users(userId) on delete set null on update cascade;
 alter table asset add foreign key (isLockedBy) references users(userId) on delete set null on update cascade;
 alter table assetVersionTag add foreign key (createdBy) references users(userId) on delete set null on update cascade;
 alter table assetVersionTag add foreign key (committedBy) references users(userId) on delete set null on update cascade;
-alter table assetVersionTag add foreign key (lockedBy) references users(userId) on delete set null on update cascade;
+-- alter table assetVersionTag add foreign key (lockedBy) references users(userId) on delete set null on update cascade;
 alter table assetVersionTag add foreign key (groupToUse) references groups(groupId) on delete set null on update cascade;
-alter table assetVersionTag add foreign key (workflowId) references Workflow(workflowId) on delete set null on update cascade;
-alter table assetVersionTag add foreign key (workflowInstanceId) references WorkflowInstance(instanceId) on delete set null on update cascade;
+-- alter table assetVersionTag add foreign key (workflowId) references Workflow(workflowId) on delete set null on update cascade;
+-- alter table assetVersionTag add foreign key (workflowInstanceId) references WorkflowInstance(instanceId) on delete set null on update cascade;
 alter table assetData add foreign key (tagId) references assetVersionTag(tagId) on delete cascade on update cascade;
 alter table assetData add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table assetData add foreign key (revisedBy) references users(userId) on delete set null on update cascade;
@@ -3645,12 +3645,12 @@ alter table userLoginLog add foreign key (userId) references users(userId) on de
 
 alter table userSessionScratch add foreign key (sessionId) references userSession(sessionId) on delete cascade on update cascade;
 alter table cart add foreign key (sessionId) references userSession(sessionId) on delete cascade on update cascade;
-alter table cart add foreign key (shippingAddressId) references address(addressId) on delete set null update cascade;
-alter table cart add foreign key (shipperId) references shipper(shipperId) on delete set null update cascade;
-alter table cart add foreign key (posUserId) references users(userId) on delete set null update cascade;
+alter table cart add foreign key (shippingAddressId) references address(addressId) on delete set null on update cascade;
+alter table cart add foreign key (shipperId) references shipper(shipperId) on delete set null on update cascade;
+alter table cart add foreign key (posUserId) references users(userId) on delete set null on update cascade;
 alter table cartItem add foreign key (cartId) references cart(cartId) on delete cascade on update cascade;
 alter table cartItem add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
-alter table cartItem add foreign key (shippingAddressId) references address(addressId) on delete set null update cascade;
+alter table cartItem add foreign key (shippingAddressId) references address(addressId) on delete set null on update cascade;
 alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
 alter table WorkflowActivityData add foreign key (activityId) references WorkflowActivity(activityId) on delete cascade on update cascade;
 alter table WorkflowActivity add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
@@ -3664,7 +3664,7 @@ alter table adSkuPurchase add foreign key (userId) references users(userId) on d
 alter table adSkuPurchase add foreign key (adId) references users(userId) on delete set null on update cascade;
 alter table address add foreign key (addressBookId) references addressBook(addressBookId) on delete cascade on update cascade;
 alter table addressBook add foreign key (sessionId) references userSession(sessionId) on delete set null on update cascade;
-alter table adresssBook add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table addressBook add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table addressBook add foreign key (defaultAddressId) references address(addressId) on delete set null on update cascade;
 alter table advertisement add foreign key (adSpaceId) references adSpace(adSpaceId) on delete cascade on update cascade;
 alter table advertisement add foreign key (ownerUserId) references users(userId) on delete cascade on update cascade;
