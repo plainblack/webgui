@@ -78,8 +78,13 @@ A reference to a WebGUI::Config object. One will be created if it isn't specifie
 
 sub authen {
     my ($request, $username, $password, $config) = @_;
-    $request = Apache2::Request->new($request);
-    my $server = Apache2::ServerUtil->server;
+    my $server;
+    if ($request->isa('WebGUI::Session::Plack')) {
+        $server  = $request->server;
+    } else {
+        $request = Apache2::Request->new($request);
+        $server  = Apache2::ServerUtil->server;	#instantiate the server api
+    }
 	my $status = Apache2::Const::OK;
 
 	# set username and password if it's an auth handler
@@ -173,15 +178,15 @@ sub handler {
 	my $gotMatch = 0;
 
     # handle basic auth
-#    my $auth = $request->headers_in->{'Authorization'};
-#    if ($auth =~ m/^Basic/) { # machine oriented
-#	    # Get username and password from Apache and hand over to authen
-#        $auth =~ s/Basic //;
-#        authen($request, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
-#    }
-#    else { # realm oriented
-#	    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
-#    }
+    my $auth = $request->headers_in->{'Authorization'};
+    if ($auth =~ m/^Basic/) { # machine oriented
+	    # Get username and password from Apache and hand over to authen
+        $auth =~ s/Basic //;
+        authen($request, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
+    }
+    else { # realm oriented
+	    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
+    }
 
 	
 	# url handlers
@@ -211,6 +216,8 @@ sub handler {
 	$request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
 	return Apache2::Const::DECLINED; 
 }
+
+
 
 sub handle_psgi {
     my $env = shift;
