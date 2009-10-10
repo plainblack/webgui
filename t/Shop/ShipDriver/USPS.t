@@ -24,7 +24,7 @@ use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
-plan tests => 51;
+plan tests => 53;
 use_ok('WebGUI::Shop::ShipDriver::USPS')
     or die 'Unable to load module WebGUI::Shop::ShipDriver::USPS';
 
@@ -48,7 +48,8 @@ my $insuranceTable =  <<EOTABLE;
 10:2.00
 15:3.00
 20:4.00
-25:50.00
+25:5.00
+30:6.00
 EOTABLE
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -303,11 +304,16 @@ $properties->{addInsurance}   = 1;
 $properties->{insuranceRates} = $insuranceTable;
 $driver->update($properties);
 
-is($driver->_calculateInsurance(@shippableUnits), 1, '_calculateInsurance: one item in cart with quantity=1, calculates insurance');
+is($driver->_calculateInsurance(@shippableUnits), 2, '_calculateInsurance: one item in cart with quantity=1, calculates insurance');
 
 $properties->{addInsurance}   = 0;
 $driver->update($properties);
 is($driver->_calculateInsurance(@shippableUnits), 0, '_calculateInsurance: returns 0 if insurance is not enabled');
+
+$properties->{addInsurance}   = 1;
+$properties->{insuranceRates} = '';
+$driver->update($properties);
+is($driver->_calculateInsurance(@shippableUnits), 0, '_calculateInsurance: returns 0 if rates are not set');
 
 my $xml = $driver->buildXML($cart, @shippableUnits);
 like($xml, qr/<RateV3Request USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the RateV3Request tag');
@@ -386,7 +392,7 @@ is($cost, 5.25, '_calculateFromXML calculates shipping cost correctly for 1 item
 $bibleItem = $bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $nivBible));
 @shippableUnits = $driver->_getShippableUnits($cart);
 
-is(calculateInsurance($driver), 5, '_calculateInsurance: two items in cart with quantity=1, calculates insurance');
+is(calculateInsurance($driver), 7, '_calculateInsurance: two items in cart with quantity=1, calculates insurance');
 
 $xml = $driver->buildXML($cart, @shippableUnits);
 $xmlData = XMLin( $xml,
@@ -804,9 +810,13 @@ SKIP: {
 
 #######################################################################
 #
-# Test PRIORITY VARIABLE shipping setup
+# _calculateInsurance edge case
 #
 #######################################################################
+$cart->empty;
+$bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $gospels));
+@shippableUnits = $driver->_getShippableUnits($cart);
+is(calculateInsurance($driver), 1, '_calculateInsurance: calculates insurance using the first bin');
 
 #----------------------------------------------------------------------------
 # Cleanup
@@ -823,8 +833,9 @@ END {
 
 sub calculateInsurance {
     my $driver = shift;
-    $properties = $driver->get();
+    my $properties = $driver->get();
     $properties->{addInsurance}   = 1;
+    $properties->{insuranceRates} = $insuranceTable;
     $driver->update($properties);
 
     my $insurance = $driver->_calculateInsurance(@shippableUnits);

@@ -223,10 +223,9 @@ sub _calculateInsurance {
     my ($self, @shippableUnits) = @_;
     my $insuranceCost  = 0;
     return $insuranceCost unless $self->get('addInsurance') && $self->get('insuranceRates');
-    my @insuranceTable = map { my ($value,$cost) = split /:/, $_; [$value, $cost]; }
-                            split /\r?\n/, $self->get('insuranceRates');
+    my @insuranceTable = _parseInsuranceRates($self->get('insuranceRates'));
     ##Sort by decreasing value for easy post processing
-    @insuranceTable = sort { $b->[0] <=> $a->[0] } @insuranceTable;
+    @insuranceTable = sort { $a->[0] <=> $b->[0] } @insuranceTable;
     foreach my $package (@shippableUnits) {
         my $value = 0;
         ITEM: foreach my $item (@{ $package }) {
@@ -234,14 +233,42 @@ sub _calculateInsurance {
         }
         my $pricePoint;
         POINT: foreach my $point (@insuranceTable) {
-            if ($value > $point->[0]) {
+            if ($value < $point->[0]) {
                 $pricePoint = $point;
                 last POINT;
             }
         }
-        $insuranceCost += defined $pricePoint ? $pricePoint->[1] : 0;
+        if (!defined $pricePoint) {
+            $pricePoint = $insuranceTable[-1];
+        }
+        $insuranceCost += $pricePoint->[1];
     }
     return $insuranceCost;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _parseInsuranceRates ( $rates )
+
+Take the user entered data, a string, and turn it into an array.
+
+=head3 $rates
+
+The rate data entered by the user.  One set of data per line.  Each line has the value of
+shipment, a colon, and the cost of insuring a shipment of that value.
+
+=cut
+
+sub _parseInsuranceRates {
+    my $rates = shift;
+    my @lines = split /\r?\n/, $rates;
+    my @table = ();
+    foreach my $line (@lines) {
+        $line =~ s/\s+//g;
+        my ($value, $cost) = split /:/, $line;
+        push @table, [ $value, $cost ];
+    }
+    return @table;
 }
 
 #-------------------------------------------------------------------
