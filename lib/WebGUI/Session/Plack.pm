@@ -19,7 +19,7 @@ sub new {
     require Plack::Response;
 
     my $request = Plack::Request->new( $p{env} );
-    my $response = $request->new_response;
+    my $response = $request->new_response(200);
     
     my $self = bless {
         %p,
@@ -59,9 +59,16 @@ sub protocol { shift->request->protocol(@_) }
 sub status { shift->response->status(@_) }
 sub status_line {}
 
+sub auth_type {
+    # should we support this?
+}
+
 # TODO: I suppose this should do some sort of IO::Handle thing
 my @body;
 sub print { shift; push @body, @_ }
+
+my $sendfile;
+sub sendfile { shift; $sendfile = shift; }
 
 sub dir_config {
     my $self = shift;
@@ -100,7 +107,11 @@ sub push_handlers {
 
 sub finalize {
     my $self = shift;
-    $self->response->body(\@body);
+    if ($sendfile && open my $fh, '<', $sendfile) {
+        $self->response->body( $fh );
+    } else {
+        $self->response->body( $sendfile || \@body);
+    }
     return $self->response->finalize;
 }
 
