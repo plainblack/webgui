@@ -21,13 +21,17 @@ sub new {
     my $request = Plack::Request->new( $p{env} );
     my $response = $request->new_response;
     
-    bless {
+    my $self = bless {
         %p,
         pnotes => {},
         request => $request,
         response => $response,
         server => WebGUI::Session::Plack::Server->new( env => $p{env} ),
     }, $class;
+    
+    $self->{headers_out} = WebGUI::Session::Plack::HeadersOut->new( plack => $self );
+    
+    return $self;
 }
 
 sub session { $_[0]{session} }
@@ -43,17 +47,27 @@ sub AUTOLOAD {
     my $what = $AUTOLOAD;
     $what =~ s/.*:://;
     
-    warn "!!plack->$what(@_)";
+    carp "!!plack->$what(@_)";
 }
 
 sub uri { shift->request->request_uri(@_) }
-sub headers_in { shift->request->headers(@_) }
 sub param { shift->request->param(@_) }
 sub params { shift->request->params(@_) }
+sub headers_in { shift->request->headers(@_) }
+sub headers_out { shift->{headers_out} }
+sub protocol { shift->request->protocol(@_) }
+sub status { shift->response->status(@_) }
+sub status_line {}
 
 # TODO: I suppose this should do some sort of IO::Handle thing
 my @body;
 sub print { shift; push @body, @_ }
+
+sub dir_config {
+    my $self = shift;
+    my $c = shift;
+    return $self->env->{"wg.DIR_CONFIG.$c"};
+}
 
 sub pnotes {
     my ($self, $key) = (shift, shift);
@@ -62,12 +76,36 @@ sub pnotes {
     return $self->{pnotes}{$key};
 }
 
+sub user {
+    my ($self, $user) = @_;
+    if (defined $user) {
+        $self->{user} = $user;
+    }
+    $self->{user};
+}
+
 sub push_handlers {
     my $self = shift;
     my ($x, $sub) = @_;
-    carp "push_handlers on $x";
-    return $sub->();
+    
+    # log it
+    carp "push_handlers($x)";
+    
+    # run it 
+    # returns something like Apache2::Const::OK, which we just ignore because we're not modperl
+    my $ret = $sub->($self);
+    
+    return;
 }
+
+sub finalize {
+    my $self = shift;
+    $self->response->body(\@body);
+    return $self->response->finalize;
+}
+
+sub content_type { shift->response->content_type(@_) }
+
 #
 #sub headers_in {
 #    my $self = shift;
@@ -79,6 +117,7 @@ package WebGUI::Session::Plack::Server;
 
 use strict;
 use warnings;
+use Carp;
 
 sub new {
     my $class = shift;
@@ -93,7 +132,7 @@ sub AUTOLOAD {
     my $what = $AUTOLOAD;
     $what =~ s/.*:://;
     
-    warn "!!server->$what(@_)";
+    carp "!!server->$what(@_)";
     return;
 }
 
@@ -102,6 +141,29 @@ sub dir_config {
     my $c = shift;
     return $self->env->{"wg.DIR_CONFIG.$c"};
 }
+
+package WebGUI::Session::Plack::HeadersOut;
+
+use strict;
+use warnings;
+use Carp;
+
+sub new {
+    my $class = shift;
+    bless { @_ }, $class;
+}
+
+our $AUTOLOAD;
+sub AUTOLOAD {
+    my $self = shift;
+    my $what = $AUTOLOAD;
+    $what =~ s/.*:://;
+    
+    carp "!!headers_out->$what(@_)";
+    return;
+}
+
+sub set { shift->{plack}->response->headers->header(@_) }
 
 # --
 

@@ -389,6 +389,16 @@ sub setCookie {
 	$ttl = (defined $ttl ? $ttl : '+10y');
 
 	if ($self->session->request) {
+	    if ($self->session->request->isa('WebGUI::Session::Plack')) {
+	        $self->session->request->response->cookies->{$name} = {
+	            value => $value,
+                path => '/',
+                expires => $ttl ne 'session' ? $ttl : undef,
+                domain => $domain,
+            };
+            return;
+	    }
+	    
 		require Apache2::Cookie;
 		my $cookie = Apache2::Cookie->new($self->session->request,
 			-name=>$name,
