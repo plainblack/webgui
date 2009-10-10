@@ -6,7 +6,8 @@ BEGIN {
     our $WEBGUI_CONFIG = 'dev.localhost.localdomain';
     our $DOCUMENT_ROOT = '/data/domains/dev.localhost.localdomain/public';
 }
-use local::lib $WEBGUI_ROOT;
+use lib "$WEBGUI_ROOT/lib";
+#use local::lib $WEBGUI_ROOT;
 use WebGUI;
 use Plack::Builder;
 
