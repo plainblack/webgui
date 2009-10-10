@@ -93,7 +93,7 @@ sub getCookies {
 	my $self = shift;
 	if ($self->session->request) {
 	    if ($self->session->request->isa('WebGUI::Session::Plack')) {
-	        return $self->session->request->request->cookies;
+	        return $self->session->request->request_cookies;
 	    }
 	    
 		# Have to require this instead of using it otherwise it causes problems for command-line scripts on some platforms (namely Windows)
@@ -390,7 +390,7 @@ sub setCookie {
 
 	if ($self->session->request) {
 	    if ($self->session->request->isa('WebGUI::Session::Plack')) {
-	        $self->session->request->response->cookies->{$name} = {
+	        $self->session->request->response_cookies->{$name} = {
 	            value => $value,
                 path => '/',
                 expires => $ttl ne 'session' ? $ttl : undef,

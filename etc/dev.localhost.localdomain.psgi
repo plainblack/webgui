@@ -7,7 +7,7 @@ BEGIN {
 }
 use local::lib $WEBGUI_ROOT;
 use WebGUI;
-use Plack::Middleware qw( Static XFramework AccessLog );
+use Plack::Middleware;
 use Plack::Builder;
 
 my $app = sub {
@@ -23,19 +23,21 @@ my $app = sub {
 builder {
 
     # /extras
-    enable Plack::Middleware::Static
+    add 'Plack::Middleware::Static',
         path => qr{^/extras/},
         root => "$WEBGUI_ROOT/www/";
 
     # /uploads (ignore .wgaccess for now..)
-    enable Plack::Middleware::Static
+    add 'Plack::Middleware::Static',
         path => qr{^/uploads/},
         root => "$WEBGUI_DOMAINS/dev.localhost.localdomain/public/";
 
-    enable Plack::Middleware::XFramework framework => 'WebGUI';
+    add 'Plack::Middleware::XFramework',
+        framework => 'WebGUI';
 
     # Already enabled by plackup script
-    # enable Plack::Middleware::AccessLog format => "combined";
+    # add 'Plack::Middleware::AccessLog', 
+    #    format => "combined";
 
     $app;
 }
