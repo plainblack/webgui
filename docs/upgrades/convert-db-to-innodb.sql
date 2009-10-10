@@ -1362,7 +1362,8 @@ CREATE TABLE `TT_projectList_inno` (
 CREATE TABLE `TT_projectResourceList_inno` (
   `projectId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `resourceId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  PRIMARY KEY  (`projectId`,`resourceId`)
+  PRIMARY KEY  (`projectId`,`resourceId`),
+  KEY (`resourceId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -1375,7 +1376,6 @@ CREATE TABLE `TT_projectTasks_inno` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-
 CREATE TABLE `TT_report_inno` (
   `reportId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
@@ -1386,7 +1386,8 @@ CREATE TABLE `TT_report_inno` (
   `creationDate` bigint(20) NOT NULL,
   `createdBy` char(22) character set utf8 collate utf8_bin,
   `lastUpdatedBy` char(22) character set utf8 collate utf8_bin,
-  `lastUpdateDate` bigint(20) NOT NULL
+  `lastUpdateDate` bigint(20) NOT NULL,
+  PRIMARY KEY (reportId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -3564,9 +3565,8 @@ alter table TT_projectList add foreign key (createdBy) references users(userId) 
 alter table TT_projectList add foreign key (lastUpdatedBy) references users(userId) on delete set null on update cascade;
 alter table TT_timeEntry add foreign key (projectId) references TT_projectList(projectId) on delete cascade on update cascade;
 alter table TT_timeEntry add foreign key (taskId) references TT_projectTasks(taskId) on delete cascade on update cascade;
--- Not sure why this won't create
--- alter table TT_timeEntry add foreign key (reportId) references TT_report(reportId) on delete cascade on update cascade;
--- alter table TT_report add foreign key (resourceId) references TT_projectResourceList(resourceId) on delete cascade on update cascade;
+alter table TT_timeEntry add foreign key (reportId) references TT_report(reportId) on delete cascade on update cascade;
+alter table TT_report add foreign key (resourceId) references TT_projectResourceList(resourceId) on delete cascade on update cascade;
 alter table TT_projectResourceList add foreign key (projectId) references TT_projectList(projectId) on delete cascade on update cascade;
 alter table TT_projectTasks add foreign key (projectId) references TT_projectList(projectId) on delete cascade on update cascade;
 alter table SyndicatedContent add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
