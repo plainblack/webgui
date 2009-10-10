@@ -47,12 +47,17 @@ sub headers_out  { shift->{headers_out} }
 sub protocol     { shift->{request}->protocol(@_) }
 sub status       { shift->{response}->status(@_) }
 sub sendfile     { $_[0]->{sendfile} = $_[1] }
-sub content_type { shift->{response}->content_type(@_) }
 sub server       { shift->{server} }
 sub method { shift->{request}->method }
 sub upload { shift->{request}->upload(@_) }
 sub status_line  { }
 sub auth_type    { }                                       # should we support this?
+sub handler { 'perl-script' } # or not..?
+
+sub content_type { 
+    my ($self, $ct) = @_;
+    $self->{headers_out}->set( 'Content-Type' => $ct );
+}
 
 # These two cookie subs are called from our wG Plack-specific code
 sub get_request_cookies {
