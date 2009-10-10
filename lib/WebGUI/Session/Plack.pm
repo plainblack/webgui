@@ -20,11 +20,11 @@ sub new {
 
     bless {
         %p,
-        pnotes      => {},
-        request     => $request,
-        response    => $response,
-        server      => WebGUI::Session::Plack::Server->new( env => $p{env} ),
-        headers_out => WebGUI::Session::Plack::HeadersOut->new( request => $request, response => $response ),
+        pnotes   => {},
+        request  => $request,
+        response => $response,
+        server   => WebGUI::Session::Plack::Server->new( env => $p{env} ),
+        headers_out => Plack::Util::headers( [] ),    # use Plack::Util to manage response headers
         body        => [],
         sendfile    => undef,
     }, $class;
@@ -49,16 +49,25 @@ sub status       { shift->{response}->status(@_) }
 sub sendfile     { $_[0]->{sendfile} = $_[1] }
 sub content_type { shift->{response}->content_type(@_) }
 sub server       { shift->{server} }
+sub method { shift->{request}->method }
+sub upload { shift->{request}->upload(@_) }
 sub status_line  { }
 sub auth_type    { }                                       # should we support this?
 
 # These two cookie subs are called from our wG Plack-specific code
-sub get_request_cookies { shift->{request}->cookies }      # returns hashref of all request cookies
+sub get_request_cookies {
+
+    # Get the hash of { name => CGI::Simple::Cookie }
+    my $cookies = shift->{request}->cookies;
+
+    # Convert into { name => value } as expected by wG
+    my %c = map { $_->name => $_->value } values %{$cookies};
+
+    return \%c;
+}
 
 sub set_response_cookie {
     my ( $self, $name, $val ) = @_;
-
-    #warn "setting cookies $name => " . Data::Dumper::Dumper($val);
     $self->{response}->cookies->{$name} = $val;
 }
 
@@ -111,16 +120,17 @@ sub finalize {
     else {
         $response->body( $self->{body} );
     }
+    $response->headers( $self->{headers_out}->headers );
     return $response->finalize;
 }
 
 sub no_cache {
     my ( $self, $doit ) = @_;
     if ($doit) {
-        $self->{response}->headers->push_header( 'Pragma' => 'no-cache', 'Cache-control' => 'no-cache' );
+        $self->{headers_out}->set( 'Pragma' => 'no-cache', 'Cache-control' => 'no-cache' );
     }
     else {
-        $self->{response}->headers->remove_header( 'Pragma', 'Cache-control' );
+        $self->{headers_out}->remove( 'Pragma', 'Cache-control' );
     }
 }
 
@@ -152,44 +162,8 @@ sub dir_config {
 
 ################################################
 
-package WebGUI::Session::Plack::HeadersOut;
+package Plack::Request::Upload;
 
-=head1 DESCRIPTION
-
-This class is required so that wG can call: 
-
- $session->response->headers_out->set('a' => 'b');
-
-But for code under out control we just use:
-
- $response->headers->push_header('a' => 'b');
- $repsonse->headers->remove_header('a');
-
-=cut
-
-use strict;
-use warnings;
-use Carp;
-
-sub new {
-    my $class = shift;
-    bless {@_}, $class;
-}
-
-our $AUTOLOAD;
-
-sub AUTOLOAD {
-    my $what = $AUTOLOAD;
-    $what =~ s/.*:://;
-    carp "!!headers_out->$what(@_)" unless $what eq 'DESTROY';
-}
-
-# This is the sub that wG calls
-sub set {
-    my $self = shift;
-    $self->{response}->headers->push_header(@_);
-}
-
-################################################
+sub link { shift->link_to(@_) }
 
 1;
