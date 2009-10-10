@@ -3645,9 +3645,13 @@ alter table userLoginLog add foreign key (userId) references users(userId) on de
 
 alter table userSessionScratch add foreign key (sessionId) references userSession(sessionId) on delete cascade on update cascade;
 alter table cart add foreign key (sessionId) references userSession(sessionId) on delete cascade on update cascade;
+alter table cart add foreign key (shippingAddressId) references address(addressId) on delete set null update cascade;
+alter table cart add foreign key (shipperId) references shipper(shipperId) on delete set null update cascade;
+alter table cart add foreign key (posUserId) references users(userId) on delete set null update cascade;
 alter table cartItem add foreign key (cartId) references cart(cartId) on delete cascade on update cascade;
+alter table cartItem add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table cartItem add foreign key (shippingAddressId) references address(addressId) on delete set null update cascade;
 alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
-
 alter table WorkflowActivityData add foreign key (activityId) references WorkflowActivity(activityId) on delete cascade on update cascade;
 alter table WorkflowActivity add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
 alter table WorkflowInstance add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
@@ -3664,7 +3668,7 @@ alter table adresssBook add foreign key (userId) references users(userId) on del
 alter table addressBook add foreign key (defaultAddressId) references address(addressId) on delete set null on update cascade;
 alter table advertisement add foreign key (adSpaceId) references adSpace(adSpaceId) on delete cascade on update cascade;
 alter table advertisement add foreign key (ownerUserId) references users(userId) on delete cascade on update cascade;
-alter table bucketLog add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table bucketLog add foreign key (userId) references users(userId) on delete set null on update cascade;
 
 
 
