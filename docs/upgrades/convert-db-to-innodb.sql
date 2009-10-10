@@ -3278,16 +3278,22 @@ ALTER TABLE `vendor_inno` RENAME `vendor`;
 ALTER TABLE `webguiVersion_inno` RENAME `webguiVersion`; 
 ALTER TABLE `wobject_inno` RENAME `wobject`;
 
--- alter table asset add foreign key (parentId) references asset(assetId) on delete cascade on update cascade;
+-- can't use a parentid that doesn't exist
+update asset set parentId='PBasset000000000000001' where assetId='PBasset000000000000001';
+alter table asset add foreign key (parentId) references asset(assetId) on delete cascade on update cascade;
 alter table asset add foreign key (createdBy) references users(userId) on delete set null on update cascade;
 alter table asset add foreign key (stateChangedBy) references users(userId) on delete set null on update cascade;
 alter table asset add foreign key (isLockedBy) references users(userId) on delete set null on update cascade;
 alter table assetVersionTag add foreign key (createdBy) references users(userId) on delete set null on update cascade;
 alter table assetVersionTag add foreign key (committedBy) references users(userId) on delete set null on update cascade;
--- alter table assetVersionTag add foreign key (lockedBy) references users(userId) on delete set null on update cascade;
+-- have to fix broken data to add the key
+update assetVersionTag set lockedBy=null where lockedBy='';
+alter table assetVersionTag add foreign key (lockedBy) references users(userId) on delete set null on update cascade;
 alter table assetVersionTag add foreign key (groupToUse) references groups(groupId) on delete set null on update cascade;
--- alter table assetVersionTag add foreign key (workflowId) references Workflow(workflowId) on delete set null on update cascade;
--- alter table assetVersionTag add foreign key (workflowInstanceId) references WorkflowInstance(instanceId) on delete set null on update cascade;
+update assetVersionTag set workflowId=null where workflowId='';
+alter table assetVersionTag add foreign key (workflowId) references Workflow(workflowId) on delete set null on update cascade;
+update assetVersionTag set workflowInstanceId=null where workflowInstanceId='';
+alter table assetVersionTag add foreign key (workflowInstanceId) references WorkflowInstance(instanceId) on delete set null on update cascade;
 alter table assetData add foreign key (tagId) references assetVersionTag(tagId) on delete cascade on update cascade;
 alter table assetData add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table assetData add foreign key (revisedBy) references users(userId) on delete set null on update cascade;
