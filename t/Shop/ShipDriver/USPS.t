@@ -42,7 +42,7 @@ $session->user({user => $user});
 # put your tests here
 
 
-my ($driver, $cart);
+my ($driver2, $cart);
 my $insuranceTable =  <<EOTABLE;
 5:1.00
 10:2.00
@@ -149,10 +149,11 @@ my $options = {
                 enabled => 1,
               };
 
-$driver = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
+$driver2 = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
+addToCleanup($driver2);
 
-isa_ok($driver, 'WebGUI::Shop::ShipDriver::USPS');
-isa_ok($driver, 'WebGUI::Shop::ShipDriver');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPS');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 
 #######################################################################
 #
@@ -168,13 +169,13 @@ is (WebGUI::Shop::ShipDriver::USPS->getName($session), 'U.S. Postal Service', 'g
 #
 #######################################################################
 
-my $driverId = $driver->getId;
-$driver->delete;
+my $driverId = $driver2->getId;
+$driver2->delete;
 
 my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driverId]);
 is($count, 0, 'delete deleted the object');
 
-undef $driver;
+undef $driver2;
 
 #######################################################################
 #
@@ -182,11 +183,12 @@ undef $driver;
 #
 #######################################################################
 
-$driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
+my $driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
     shipType => 'PARCEL',
 });
+addToCleanup($driver);
 
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
@@ -215,6 +217,7 @@ cmp_deeply(
 );
 
 $cart = WebGUI::Shop::Cart->newBySession($session);
+addToCleanup($cart);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',
@@ -850,16 +853,6 @@ cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with cr/newl
 
 #----------------------------------------------------------------------------
 # Cleanup
-END {
-    if (defined $driver && $driver->isa('WebGUI::Shop::ShipDriver')) {
-        $driver->delete;
-    }
-    if (defined $cart && $cart->isa('WebGUI::Shop::Cart')) {
-        my $addressBook = $cart->getAddressBook();
-        $addressBook->delete if $addressBook;
-        $cart->delete;
-    }
-}
 
 sub calculateInsurance {
     my $driver = shift;
