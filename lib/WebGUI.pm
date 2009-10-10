@@ -156,10 +156,15 @@ The Apache2::RequestRec object passed in by Apache's mod_perl.
 =cut
 
 sub handler {
-	my $request = shift;	#start with apache request object
-    $request = Apache2::Request->new($request);
+    my $request = shift; # either apache request object or PSGI env hash
+    my $server;
+    if ($request->isa('WebGUI::Session::Plack')) {
+        $server  = $request->server;
+    } else {
+        $request = Apache2::Request->new($request);
+        $server  = Apache2::ServerUtil->server;	#instantiate the server api
+    }
 	my $configFile = shift || $request->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
-	my $server = Apache2::ServerUtil->server;	#instantiate the server api
 	my $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
     my $error = "";
     my $matchUri = $request->uri;
@@ -168,15 +173,15 @@ sub handler {
 	my $gotMatch = 0;
 
     # handle basic auth
-    my $auth = $request->headers_in->{'Authorization'};
-    if ($auth =~ m/^Basic/) { # machine oriented
-	    # Get username and password from Apache and hand over to authen
-        $auth =~ s/Basic //;
-        authen($request, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
-    }
-    else { # realm oriented
-	    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
-    }
+#    my $auth = $request->headers_in->{'Authorization'};
+#    if ($auth =~ m/^Basic/) { # machine oriented
+#	    # Get username and password from Apache and hand over to authen
+#        $auth =~ s/Basic //;
+#        authen($request, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
+#    }
+#    else { # realm oriented
+#	    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
+#    }
 
 	
 	# url handlers
@@ -208,55 +213,15 @@ sub handler {
 }
 
 sub handle_psgi {
-    my $env     = shift; # instead of an Apache2::Request object
+    my $env = shift;
     require WebGUI::Session::Plack;
-    my $plack   = WebGUI::Session::Plack->new( env => $env );
-    my $server  = $plack->server;
-    my $config  = WebGUI::Config->new( $env->{'wg.WEBGUI_ROOT'}, $env->{'wg.WEBGUI_CONFIG'} );
-    my $error    = "";
-    my $matchUri = $plack->uri;
-    my $gateway  = $config->get("gateway");
-    $matchUri =~ s{^$gateway}{/};
+    my $plack = WebGUI::Session::Plack->new( env => $env );
     
-#    # handle basic auth
-#    my $auth = $plack->headers_in->{'Authorization'};
-#    if ($auth =~ m/^Basic/) { # machine oriented
-#	    # Get username and password from Apache and hand over to authen
-#        $auth =~ s/Basic //;
-#        authen($plack, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
-#    }
-#    else { # realm oriented
-#	    $plack->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($plack, undef, undef, $config)});
-#    }
+    # returns something like Apache2::Const::OK, which we ignore
+    my $ret = handler($plack);
     
-    
-    # url handlers
-    # TODO: We should probably ditch URL Handlers altogether in favour of Plack::Middleware
-    WEBGUI_FATAL: foreach my $handler ( @{ $config->get("urlHandlers") } ) {
-        my ($regex) = keys %{$handler};
-        if ( $matchUri =~ m{$regex}i ) {
-            my $output = eval { WebGUI::Pluggable::run( $handler->{$regex}, "handler", [ $plack, $server, $config ] ) };
-            if ($@) {
-                $error = $@;
-                last;
-            }
-#            else {
-#				$gotMatch = 1;
-#				if ($output ne Apache2::Const::DECLINED) {
-#					return $output;
-#				}
-#            }
-            return $output if $output;
-        }
-    }
-#    return Apache2::Const::DECLINED if ($gotMatch);
-
-    # can't handle the url due to error or misconfiguration
-    return [
-        500,
-        [ 'Content-Type' => 'text/html' ],
-        ["This server is unable to handle the url '$matchUri' that you requested. $error"]
-    ];
+    # let Plack::Response do its thing
+    return $plack->finalize;
 }
 
 1;
