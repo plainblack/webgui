@@ -32,11 +32,10 @@ builder {
         path => qr{^/uploads/},
         root => "$WEBGUI_DOMAINS/dev.localhost.localdomain/public/";
 
-    add 'Plack::Middleware::XFramework',
-        framework => 'WebGUI';
+    add 'Plack::Middleware::XFramework', framework => 'WebGUI';
 
     # Already enabled by plackup script
-    # add 'Plack::Middleware::AccessLog', 
+    # add 'Plack::Middleware::AccessLog',
     #    format => "combined";
 
     $app;
