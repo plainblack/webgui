@@ -24,7 +24,7 @@ use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
-plan tests => 53;
+plan tests => 64;
 use_ok('WebGUI::Shop::ShipDriver::USPS')
     or die 'Unable to load module WebGUI::Shop::ShipDriver::USPS';
 
@@ -492,7 +492,7 @@ is($cost, 12.25, '_calculateFromXML calculates shipping cost correctly for 2 ite
 $bibleItem->setQuantity(2);
 @shippableUnits = $driver->_getShippableUnits($cart);
 
-is(calculateInsurance($driver), 51, '_calculateInsurance: two items in cart with quantity=2, calculates insurance');
+is(calculateInsurance($driver), 8, '_calculateInsurance: two items in cart with quantity=2, calculates insurance');
 
 $cost = $driver->_calculateFromXML({
     Package => [
@@ -517,7 +517,7 @@ is($cost, 19.25, '_calculateFromXML calculates shipping cost correctly for 2 ite
 $rockHammer2 = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
 $rockHammer2->update({shippingAddressId => $wucAddress->getId});
 @shippableUnits = $driver->_getShippableUnits($cart);
-is(calculateInsurance($driver), 54, '_calculateInsurance: calculates insurance');
+is(calculateInsurance($driver), 12, '_calculateInsurance: calculates insurance');
 $xml = $driver->buildXML($cart, @shippableUnits);
 
 $xmlData = XMLin( $xml,
@@ -817,6 +817,36 @@ $cart->empty;
 $bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $gospels));
 @shippableUnits = $driver->_getShippableUnits($cart);
 is(calculateInsurance($driver), 1, '_calculateInsurance: calculates insurance using the first bin');
+
+#######################################################################
+#
+# _parseInsuranceRates
+#
+#######################################################################
+
+my @rates;
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("");
+cmp_deeply(\@rates, [], '_parseInsuranceRates: empty string returns empty array');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates();
+cmp_deeply(\@rates, [], '_parseInsuranceRates: undef returns empty array');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2");
+cmp_deeply(\@rates, [], '... bad rates #1');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates(":2");
+cmp_deeply(\@rates, [], '... bad rates #2');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("a:b");
+cmp_deeply(\@rates, [], '... bad rates #3');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2:2");
+cmp_deeply(\@rates, [ ['2', '2'] ], '... one line of good rates');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2.0:2.0");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with decimal points');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2.0:2.0\n");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with newline');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2.0:2.0\r\n");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with cr/newline');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2.0 : 2.0\r\n");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with cr/newline and spaces');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("  2.0 : 2.0  \r\n");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with cr/newline and more spaces');
 
 #----------------------------------------------------------------------------
 # Cleanup

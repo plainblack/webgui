@@ -261,7 +261,11 @@ shipment, a colon, and the cost of insuring a shipment of that value.
 
 sub _parseInsuranceRates {
     my $rates = shift;
-    my @lines = split /\r?\n/, $rates;
+    $rates =~ tr/\r//d;
+    my $number = qr/\d+(?:\.\d+)?/;
+    my $rate   = qr{ \s* $number \s* : \s* $number \s* }x;
+    return () if ($rates !~ m{ \A (?: $rate \r?\n )* $rate (?:\r\n)? \Z }x);
+    my @lines = split /\n/, $rates;
     my @table = ();
     foreach my $line (@lines) {
         $line =~ s/\s+//g;
