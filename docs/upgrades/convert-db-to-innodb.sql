@@ -1661,7 +1661,7 @@ CREATE TABLE `WorkflowActivityData_inno` (
 CREATE TABLE `WorkflowInstance_inno` (
   `instanceId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `workflowId` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `currentActivityId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `currentActivityId` char(22) character set utf8 collate utf8_bin,
   `priority` int(11) NOT NULL default '2',
   `className` char(255) default NULL,
   `methodName` char(255) default NULL,
@@ -3661,8 +3661,7 @@ alter table transactionItem add foreign key (transactionId) references transacti
 alter table WorkflowActivityData add foreign key (activityId) references WorkflowActivity(activityId) on delete cascade on update cascade;
 alter table WorkflowActivity add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
 alter table WorkflowInstance add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
--- not sure why this doesn't work
--- alter table WorkflowInstance add foreign key (currentActivityId) references WorkflowActivity(activityId) on delete set null on update cascade;
+alter table WorkflowInstance add foreign key (currentActivityId) references WorkflowActivity(activityId) on delete set null on update cascade;
 alter table WorkflowInstanceScratch add foreign key (instanceId) references WorkflowInstance(instanceId) on delete cascade on update cascade;
 alter table WorkflowSchedule add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
 alter table adSkuPurchase add foreign key (transactionItemId) references transactionItem(itemId) on delete cascade on update cascade;
