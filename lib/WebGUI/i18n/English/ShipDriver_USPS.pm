@@ -113,7 +113,7 @@ our $I18N = {
     },
 
     'insurance rates help' => {
-        message => q|Enter in one field per line with the format, value:cost.<br />value is the value of the contents.<br />cost is the cost of insurance at that value.|,
+        message => q|Enter in one field per line with the format, value:cost.<br />value is the value of the contents.<br />cost is the cost of insurance at that value.<br />value and cost should look like numbers with a decimal point, like 0.50 or 1.00|,
         lastUpdated => 1253988884,
         context => q|Help for the insurance rate field.|,
     },
