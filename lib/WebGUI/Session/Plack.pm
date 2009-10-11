@@ -39,23 +39,24 @@ sub AUTOLOAD {
 }
 
 # Emulate/delegate/fake Apache2::* subs
-sub uri          { shift->{request}->request_uri(@_) }
-sub param        { shift->{request}->param(@_) }
-sub params       { shift->{request}->params(@_) }
-sub headers_in   { shift->{request}->headers(@_) }
-sub headers_out  { shift->{headers_out} }
-sub protocol     { shift->{request}->protocol(@_) }
-sub status       { shift->{response}->status(@_) }
-sub sendfile     { $_[0]->{sendfile} = $_[1] }
-sub server       { shift->{server} }
-sub method { shift->{request}->method }
-sub upload { shift->{request}->upload(@_) }
-sub status_line  { }
-sub auth_type    { }                                       # should we support this?
-sub handler { 'perl-script' } # or not..?
+sub uri         { shift->{request}->request_uri(@_) }
+sub param       { shift->{request}->param(@_) }
+sub params      { shift->{request}->params(@_) }
+sub headers_in  { shift->{request}->headers(@_) }
+sub headers_out { shift->{headers_out} }
+sub protocol    { shift->{request}->protocol(@_) }
+sub status      { shift->{response}->status(@_) }
+sub sendfile    { $_[0]->{sendfile} = $_[1] }
+sub server      { shift->{server} }
+sub method      { shift->{request}->method }
+sub upload      { shift->{request}->upload(@_) }
+sub dir_config  { shift->{server}->dir_config(@_) }
+sub status_line { }
+sub auth_type   { }                                     # should we support this?
+sub handler     {'perl-script'}                         # or not..?
 
-sub content_type { 
-    my ($self, $ct) = @_;
+sub content_type {
+    my ( $self, $ct ) = @_;
     $self->{headers_out}->set( 'Content-Type' => $ct );
 }
 
@@ -80,11 +81,6 @@ sub set_response_cookie {
 sub print {
     my $self = shift;
     push @{ $self->{body} }, @_;
-}
-
-sub dir_config {
-    my ( $self, $c ) = @_;
-    return $self->{env}->{"wg.DIR_CONFIG.$c"};
 }
 
 sub pnotes {
@@ -162,6 +158,12 @@ sub AUTOLOAD {
 
 sub dir_config {
     my ( $self, $c ) = @_;
+
+    # Translate the legacy WebguiRoot and WebguiConfig PerlSetVar's into known values
+    return $self->{env}->{'wg.WEBGUI_ROOT'}   if $c eq 'WebguiRoot';
+    return $self->{env}->{'wg.WEBGUI_CONFIG'} if $c eq 'WebguiConfig';
+
+    # Otherwise, we might want to provide some sort of support (which Apache is still around)
     return $self->{env}->{"wg.DIR_CONFIG.$c"};
 }
 
