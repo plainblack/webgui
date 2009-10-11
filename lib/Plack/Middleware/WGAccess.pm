@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use base qw/Plack::Middleware::Static/;
 use Path::Class 'dir';
-__PACKAGE__->mk_accessors('settings');
 
 =head1 NAME
 
@@ -17,13 +16,6 @@ Plack Middleware that delivers static files with .wgaccess awareness
 
 sub _handle_static {
     my($self, $env) = @_;
-    
-    # Populate $env with $self->settings so that we get consistent wg API behaviour
-    my %settings = %{$self->settings};
-    @{$env}{keys %settings} = values %settings;
-    
-    # Populate $self->root from $SETTINGS so that it doesn't need to be specified in psgi file
-    $self->root($settings{'wg.DOCUMENT_ROOT'});
 
     #######################################
     # Copied from Plack::Middleware::Static::_handle_static

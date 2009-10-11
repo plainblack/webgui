@@ -1,49 +1,25 @@
-BEGIN {
-    # Define your site settings here
-    # These are the config values that normally appear in your wre's 
-    # site.modperl.conf and site.modproxy.conf
-    our $WEBGUI_ROOT   = '/data/WebGUI';
-    our $WEBGUI_CONFIG = 'dev.localhost.localdomain';
-    our $DOCUMENT_ROOT = '/data/domains/dev.localhost.localdomain/public';
-}
-use lib "$WEBGUI_ROOT/lib";
-#use local::lib $WEBGUI_ROOT;
-use WebGUI;
 use Plack::Builder;
-
-my %SETTINGS = (
-    'wg.WEBGUI_ROOT'             => $WEBGUI_ROOT,
-    'wg.WEBGUI_CONFIG'           => "$WEBGUI_CONFIG.conf",
-    'wg.DOCUMENT_ROOT'           => $DOCUMENT_ROOT,
-    'wg.DIR_CONFIG.WebguiRoot'   => $WEBGUI_ROOT,
-    'wg.DIR_CONFIG.WebguiConfig' => "$WEBGUI_CONFIG.conf",
-);
-
-my $wg = sub {
-    my $env = shift;
-    @{$env}{ keys %SETTINGS } = values %SETTINGS;
-    WebGUI::handle_psgi($env);
-};
+use lib '/data/WebGUI/lib';
+use WebGUI;
 
 builder {
+    
+    # Populate $env from site.conf
+    add 'Plack::Middleware::WebGUI', 
+        root => '/data/WebGUI',
+        config => 'dev.localhost.localdomain.conf';
 
-    # /extras - deliver via Plack::Middleware::Static
+    # Handle /extras via Plack::Middleware::Static
+    # (or Plack::Middleware::WebGUI could do this for us by looking up extrasPath and extrasURL in site.conf)
     add 'Plack::Middleware::Static',
         path => qr{^/extras/},
-        root => "$SETTINGS{'wg.WEBGUI_ROOT'}/www/";
+        root => '/data/WebGUI/www';
 
-    # /uploads - deliver via Plack::Middleware::WGAccess
-    # This takes the place of WebGUI::URL::Uploads in handling .wgaccess and 
-    # delivery of static files in /uploads
+    # Handle /uploads via Plack::Middleware::WGAccess (including .wgaccess)
+    # (or Plack::Middleware::WebGUI could do this for us by looking up uploadsPath and uploadsURL in site.conf)
     add 'Plack::Middleware::WGAccess',
         path     => qr{^/uploads/},
-        settings => {%SETTINGS};
+        root => '/data/domains/dev.localhost.localdomain/public';
 
-    add 'Plack::Middleware::XFramework', framework => 'WebGUI';
-
-    # AccessLog already enabled by default if you are using the plackup script
-    # add 'Plack::Middleware::AccessLog',
-    #    format => "combined";
-
-    $wg;
+    sub { WebGUI::handle_psgi(shift) };
 }
