@@ -537,7 +537,7 @@ sub getRssData {
 	my $self = shift;
     my $data = {
         title       => $self->get('headline') || $self->getTitle,
-        description => $self->get('subtitle'),
+        description => $self->get('story'),
         'link'      => $self->getUrl,
         author      => $self->get('byline'),
         date        => $self->get('lastModified'),

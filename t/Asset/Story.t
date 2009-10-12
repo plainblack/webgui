@@ -122,6 +122,7 @@ $story = $archive->addChild({
     title     => 'Story 1',
     subtitle  => 'The story of a CMS',
     byline    => 'JT Smith',
+    story     => 'WebGUI was originally called Web Done Right.',
 });
 
 isa_ok($story, 'WebGUI::Asset::Story', 'Created a Story asset');
@@ -276,7 +277,7 @@ cmp_deeply(
     $story->getRssData,
     {
         title       => 'Story 1',
-        description => 'The story of a CMS',
+        description => 'WebGUI was originally called Web Done Right.',
         'link'      => re('story-1$'),
         author      => 'JT Smith',
         date        => $story->get('lastModified'),
