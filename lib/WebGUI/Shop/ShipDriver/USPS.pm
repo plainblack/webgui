@@ -151,6 +151,7 @@ sub calculate {
     }
     ##Summarize costs from returned data
     $cost = $self->_calculateFromXML($xmlData, @shippableUnits);
+    $cost += $self->_calculateInsurance(@shippableUnits);
     return $cost;
 }
 
@@ -208,6 +209,74 @@ sub _calculateFromXML {
 
 #-------------------------------------------------------------------
 
+=head2 _calculateInsurance ( @shippableUnits )
+
+Takes data from the USPS and returns the calculated shipping price.
+
+=head3 @shippableUnits
+
+The set of shippable units, which are required to do quantity and cost lookups.
+
+=cut
+
+sub _calculateInsurance {
+    my ($self, @shippableUnits) = @_;
+    my $insuranceCost  = 0;
+    return $insuranceCost unless $self->get('addInsurance') && $self->get('insuranceRates');
+    my @insuranceTable = _parseInsuranceRates($self->get('insuranceRates'));
+    ##Sort by decreasing value for easy post processing
+    @insuranceTable = sort { $a->[0] <=> $b->[0] } @insuranceTable;
+    foreach my $package (@shippableUnits) {
+        my $value = 0;
+        ITEM: foreach my $item (@{ $package }) {
+            $value += $item->getSku->getPrice() * $item->get('quantity');
+        }
+        my $pricePoint;
+        POINT: foreach my $point (@insuranceTable) {
+            if ($value < $point->[0]) {
+                $pricePoint = $point;
+                last POINT;
+            }
+        }
+        if (!defined $pricePoint) {
+            $pricePoint = $insuranceTable[-1];
+        }
+        $insuranceCost += $pricePoint->[1];
+    }
+    return $insuranceCost;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _parseInsuranceRates ( $rates )
+
+Take the user entered data, a string, and turn it into an array.
+
+=head3 $rates
+
+The rate data entered by the user.  One set of data per line.  Each line has the value of
+shipment, a colon, and the cost of insuring a shipment of that value.
+
+=cut
+
+sub _parseInsuranceRates {
+    my $rates = shift;
+    $rates =~ tr/\r//d;
+    my $number = qr/\d+(?:\.\d+)?/;
+    my $rate   = qr{ \s* $number \s* : \s* $number \s* }x;
+    return () if ($rates !~ m{ \A (?: $rate \r?\n )* $rate (?:\r\n)? \Z }x);
+    my @lines = split /\n/, $rates;
+    my @table = ();
+    foreach my $line (@lines) {
+        $line =~ s/\s+//g;
+        my ($value, $cost) = split /:/, $line;
+        push @table, [ $value, $cost ];
+    }
+    return @table;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( $session )
 
 This subroutine returns an arrayref of hashrefs, used to validate data put into
@@ -261,6 +330,18 @@ sub definition {
             hoverHelp    => $i18n->get('ship type help'),
             options      => \%shippingTypes,
             defaultValue => 'PARCEL',
+        },
+        addInsurance => {
+            fieldType    => 'yesNo',
+            label        => $i18n->get('add insurance'),
+            hoverHelp    => $i18n->get('add insurance help'),
+            defaultValue => 0,
+        },
+        insuranceRates => {
+            fieldType    => 'textarea',
+            label        => $i18n->get('insurance rates'),
+            hoverHelp    => $i18n->get('insurance rates help'),
+            defaultValue => "50:1.75\n100:2.25",
         },
 ##Note, if a flat fee is added to this driver, then according to the license
 ##terms the website must display a note to the user (shop customer) that additional
