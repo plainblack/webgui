@@ -30,6 +30,7 @@
  - fixed #10874: EMS Schedule displaying incorrectly
  - fixed #10956: Account, Profile system bad rendering with lots of 
  - fixed #11112: story archive RSS feed
+ - fixed #11121: Syndicated Content search terms require both title and description match
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
