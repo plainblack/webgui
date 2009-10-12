@@ -29,6 +29,7 @@
  - fixed #11080: Asset Manage Crumb Trail flyout menu
  - fixed #10874: EMS Schedule displaying incorrectly
  - fixed #10956: Account, Profile system bad rendering with lots of 
+ - fixed #11112: story archive RSS feed
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
