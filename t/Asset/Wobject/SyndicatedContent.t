@@ -20,9 +20,11 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 20; # increment this value for each test you create
+use Test::More tests => 21; # increment this value for each test you create
+use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
+use WebGUI::Cache;
 
 my $session = WebGUI::Test->session;
 my %var;
@@ -36,7 +38,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Create a version tag to work in
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"SyndicatedContent Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 my $syndicated_content = $node->addChild({className=>'WebGUI::Asset::Wobject::SyndicatedContent'});
 
 ##############################
@@ -138,3 +140,39 @@ EOFEED
 
 my $vars = $syndicated_content->getTemplateVariables($feed);
 ok( defined $vars->{item_loop}->[0]->{description}, 'getTemplateVariables: description is not undefined');
+
+####################################################################
+#
+#  generateFeed, hasTerms
+#
+####################################################################
+
+my $tbbUrl = 'http://www.plainblack.com/tbb.rss';
+$syndicated_content->update({
+    rssUrl   => $tbbUrl,
+    hasTerms => 'WebGUI',
+});
+
+my $cache = WebGUI::Cache->new($session, $tbbUrl, 'RSS');
+open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('tbb.rss')
+    or die "Unable to get RSS file";
+my $rssContent = do { local $/; <$rssFile>; };
+close $rssFile;
+$cache->set($rssContent, 60);
+
+my $filteredFeed = $syndicated_content->generateFeed();
+
+use Data::Dumper;
+diag Dumper($filteredFeed->get_item());
+
+cmp_deeply(
+    [ map { $_->title } $filteredFeed->get_item() ],
+    [
+        'Google Picasa Plugin for WebGUI Gallery',
+        'WebGUI Roadmap',
+        'WebGUI 8 Performance',
+    ],
+    'generateFeed: filters items based on the terms being in title, or description'
+);
+
+$cache->delete;
