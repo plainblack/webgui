@@ -28,11 +28,13 @@ sub import {
     }
     my $definition = (@_ == 1 && ref $_[0]) ? $_[0] : { @_ };
     if ( my $properties = $definition->{properties} ) {
-        my $table = $definition->{table_name};
+        my $table = $definition->{tableName};
         for ( my $i = 1; $i < @{ $properties }; $i += 2) {
-            $propeties->[$i]{table_name} = $table;
+            $propeties->[$i]{tableName} = $table;
         }
     }
+
+    # WebGUI::Definition->import uses caller, so avoid the extra entry in the call stack
     my $next = $class->next::can;
     @_ = ($class, $definition);
     goto $next;
