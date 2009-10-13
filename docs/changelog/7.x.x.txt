@@ -34,6 +34,7 @@
  - fixed #11115: Matrix Default Screenshots Config
  - fixed #11106: linked image with caption
  - fixed #11057: Deleting wiki attachments
+ - fixed #11122: Survey icon is missing from admin console
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision

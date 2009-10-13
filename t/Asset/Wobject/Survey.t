@@ -266,6 +266,7 @@ like($storage->getFileContentsAsScalar($filename), qr{
 
 }
 
+$survey->getAdminConsole();
 my $adminConsole = $survey->getAdminConsole();
 cmp_deeply(
     $adminConsole->{_submenuItem},
