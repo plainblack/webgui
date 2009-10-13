@@ -33,6 +33,7 @@ removeOldITransactTables( $session );
 removeImportCruft( $session );
 removeAdminFromVisitorGroup( $session );
 fixPackageFlagOnOlder( $session );
+correctWikiAttachmentPermissions( $session );
 
 fixTableDefaultCharsets($session);
 
@@ -140,6 +141,28 @@ sub removeOldITransactTables {
     my $session = shift;
     print "\tRemoving tables leftover from the old 7.5 ITransact Plugin... " unless $quiet;
     $session->db->write('DROP TABLE IF EXISTS ITransact_recurringStatus');
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub correctWikiAttachmentPermissions {
+    my $session = shift;
+    print "\tCorrect group edit permission on wiki page attachments... " unless $quiet;
+    my $root         = WebGUI::Asset->getRoot($session);
+    my $pageIterator = $root->getLineageIterator(
+        ['descendants'],
+        {
+            includeOnlyClasses => ['WebGUI::Asset::WikiPage'],
+        }
+    );
+    PAGE: while (my $wikiPage = $pageIterator->()) {
+        my $wiki = $wikiPage->getWiki;
+        next PAGE unless $wiki && $wiki->get('allowAttachments') && $wikiPage->getChildCount;
+        foreach my $attachment (@{ $wikiPage->getLineage(['children'])}) {
+            $attachment->update({ groupIdEdit => $wiki->get('groupToEditPages') });
+        }
+    }
     print "Done.\n" unless $quiet;
 }
 
