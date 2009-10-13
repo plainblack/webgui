@@ -178,16 +178,24 @@ WebGUI::Definition - Define properties for a class
     use WebGUI::Definition (
         name => 'My Class',
         properties => [
-            'classProperty' => {
+            'myProperty' => {
                 label => "Class Property",
             },
         ],
     );
     my $object = MyClass->instantiate;
+
+    # property list
     $object->getProperties;
-    $object->getProperty('classProperty');
+
+    # property attributes
+    $object->getProperty('myProperty');
+
+    # attribute value
     $object->getAttribute('name');
-    $object->classProperty('value');
+
+    # generated accessor
+    $object->myProperty('value');
 
 =head1 DESCRIPTION
 
@@ -225,13 +233,22 @@ Returns a list of all of the properties for the class.
 
 Returns the attributes for the given property.
 
-=head2 get
+=head2 get ( [ $property ] )
 
-=head2 set
+Retrieves the value of the given property.  If no property is
+specified, returns all of the properties as a hash reference.
 
-=head2 update
+=head2 set ( $properties )
 
-=head2 instantiate
+Accepts a hash reference and sets all of the given properties.
+
+=head2 update ( $properties )
+
+Sets properties just as L</set> does, then calls the C<write> method if it is available in the class.
+
+=head2 instantiate ( $properties )
+
+Creates a new object instance, setting the given properties.
 
 =head2 $property
 
