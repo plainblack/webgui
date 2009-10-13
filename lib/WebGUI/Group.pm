@@ -152,7 +152,7 @@ is updated.
 
 =head3 users 
 
-An array reference containing a list of users.
+An array reference containing a list of userIds.
 
 =head3 expireOffset
 
