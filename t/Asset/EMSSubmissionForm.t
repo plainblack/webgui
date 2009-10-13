@@ -19,9 +19,9 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use JSON;
+use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Group;
 use WebGUI::User;
-use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::Activity;
 use WebGUI::Session;
 use WebGUI::Asset::Wobject::EventManagementSystem;
@@ -33,21 +33,22 @@ use WebGUI::Asset::Sku::EMSToken;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+my @cleanup = ();
 
 #----------------------------------------------------------------------------
 # Tests
 
 plan tests => 50;        # Increment this number for each test you create
 
-my $submitGroupA = WebGUI::Group->new($session,'new',{groupName=>'groupA'});
-my $submitGroupB = WebGUI::Group->new($session,'new',{groupName=>'groupB'});
-my $registrars = WebGUI::Group->new($session, 'new',{groupName=>'registrars'});
-my $attendees  = WebGUI::Group->new($session, 'new',{groupName=>'attendees'});
+(my $submitGroupA = WebGUI::Group->new($session,'new'))->name('groupA');
+(my $submitGroupB = WebGUI::Group->new($session,'new'))->name('groupB');
+(my $registrars = WebGUI::Group->new($session, 'new'))->name('registrars');
+(my $attendees  = WebGUI::Group->new($session, 'new'))->name('attendees');
 
-my $registrar = WebGUI::User->create($session,{username=>'registrar'});
-my $userA = WebGUI::User->create($session,{username=>'userA'});
-my $userB = WebGUI::User->create($session,{username=>'userB'});
-my $userC = WebGUI::User->create($session,{username=>'userC'});
+(my $registrar = WebGUI::User->new($session,'new'))->update({username=>'registrar'});
+(my $userA = WebGUI::User->new($session,'new'))->update({username=>'userA'});
+(my $userB = WebGUI::User->new($session,'new'))->update({username=>'userB'});
+(my $userC = WebGUI::User->new($session,'new'))->update({username=>'userC'});
 
 $registrars->addUsers([$registrar->getId]);
 $submitGroupA->addUsers([$userA->userId,$userC->userId]);
@@ -80,6 +81,8 @@ WebGUI::Test->tagsToRollback($versionTag);
 
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
+
+loginRgstr ;
 
 # Add an EMS asset
 my $ems = $node->addChild({
@@ -159,26 +162,32 @@ my $submission = {
    description => 'the description',
    startDate => '1255150800',
         };
-ok( $frmA->validateSubmission($submission)->{isValid}, 'a valid submission' );
+my $result = $frmA->validateSubmission($submission);
+ok( $result->{isValid}, 'a valid submission' );
+print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
 $submission = {
    title => 'titlea',
    description => 'the description',
    startDate => '1205150800',
         };
-ok( !$frmA->validateSubmission($submission)->{isValid}, 'not a valid submission: invalid value in startDate' );
+$result = $frmA->validateSubmission($submission);
+ok( !$result->{isValid}, 'not a valid submission: invalid value in startDate' );
+print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
 $submission = {
    title => 'titlea',
    duration => 3.0,
    description => 'the description',
    startDate => '1255150800',
         };
-ok( $frmA->validateSubmission($submission)->{isValid}, 'valid submission: readonly field ignored' );
+$result = $frmA->validateSubmission($submission);
+ok( $result->{isValid} && ! defined $result->{duration}, 'valid submission: readonly field ignored' );
+print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
 
 
 my $formBdesc = {
     title => { type => 'text' },
     description => { type => 'textarea' },
-    duration => { type => 'integer', default => 0.5, max => 0.5 },
+    duration => { type => 'float', default => 0.5, max => 0.5 },
     startDate => { default => '1255150800' },
     mfRequiredUrl => { type => 'url' },
 };
@@ -186,7 +195,7 @@ my $frmB = $ems->addSubmissionForm({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test B -- short',
     daysBeforeCleanup        => 0,
-    canSubmitGroup           => $submitGroupB->getId,
+    canSubmitGroupId         => $submitGroupB->getId,
     formDescription          => to_json($formBdesc),
 });
 $submission = {
@@ -194,21 +203,27 @@ $submission = {
    description => 'description',
    mfRequiredUrl => 'http://google.com/',
 };
-ok( $frmB->validateSubmission($submission)->{isValid},  'valid submission: test valid metafield value' );
+$result = $frmB->validateSubmission($submission);
+ok( $result->{isValid},  'valid submission: test valid metafield value' );
+print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
 $submission = {
    title => 'title',
    description => 'description',
    mfRequiredUrl => 'joe@sams.org',
 };
-ok( !$frmB->validateSubmission($submission)->{isValid}, 'invalid submission: test invalid metafield value' );
+$result = $frmB->validateSubmission($submission);
+ok( !$result->{isValid}, 'invalid submission: test invalid metafield value' );
+print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
 $submission = {
    title => 'titlea',
    duration => 0.6,
    description => 'the description',
-   adminOverride => to_json( { duration => 0.6 } ),
+   mfRequiredUrl => 'http://google.com/',
+   adminOverride => to_json( { duration => { value => 0.6, type => 'float' } } ),
         };
-ok( $frmB->validateSubmission($submission)->{isValid}, 'valid submission: field value override by admin' );
-
+$result = $frmB->validateSubmission($submission);
+ok( $result->{isValid}, 'valid submission: field value override by admin' );
+print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
 logout;
 
 ok( !$ems->canSubmit, 'Visitor cannot submit to this ems' );
@@ -219,19 +234,25 @@ loginUserA;
 ok( $ems->canSubmit, 'UserA can submit to this ems' );
 ok( $frmA->canSubmit, 'UserA can submit to formA' );
 ok( !$frmB->canSubmit, 'UserA cannot submit to formB' );
+#print 'press return to complete test' ; <>;
 ok( !$ems->hasSubmissions, 'UserA has no submissions' );
 # this one should work
 my $sub1 = $frmA->addSubmission({
     title => 'my favorite thing to talk about',
+    description => 'the description',
+    startDate => '1255150800',
 });
-isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "valid submission succeeded" );
+push @cleanup, sub  { $sub1->delete; };
+print join( "\n", @{$sub1->{errors}} ),"\n" if defined $sub1->{errors};
+isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "userA/formA valid submission succeeded" );
 is( $ems->hasSubmissions, 1, 'UserA has submissions on this ems' );
 
 #this one should fail
 my $sub2 = $frmB->addSubmission({
     title => 'why i like to be important',
 });
-ok( not defined $sub2, "UserA cannot submit to formB" );
+print join( "\n", @{$sub2->{errors}} ),"\n" if defined $sub2->{errors};
+ok( ref $sub2 eq 'HASH' && !$sub2->{isValid}, "UserA cannot submit to formB" );
 
 loginUserB;
 
@@ -239,33 +260,43 @@ ok( $ems->canSubmit, 'UserB can submit to this ems' );
 ok( !$frmA->canSubmit, 'UserB cannot submit to formA' );
 ok( $frmB->canSubmit, 'UserB can submit to formB' );
 
+$sub2 = $frmB->addSubmission({
+    title => 'why i like to be important',
+    description => 'the description',
+    mfRequiredUrl => 'http://google.com',
+});
+push @cleanup, sub  { $sub2->delete; };
+print join( "\n", @{$sub2->{errors}} ),"\n" if defined $sub2->{errors};
+isa_ok( $sub2, 'WebGUI::Asset::EMSSubmission', "userB/FormB valid submission succeeded" );
+
 loginUserC;
 
 ok( $ems->canSubmit, 'UserC can submit to this ems' );
 ok( $frmA->canSubmit, 'UserC can submit to formA' );
 ok( $frmB->canSubmit, 'UserC can submit to formB' );
 
-SKIP: { skip 'create submission failed', 8 unless defined $sub1;
+SKIP: { skip 'create submission failed', 8 unless ref $sub1 eq 'WebGUI::Asset::EMSSubmission' and ref $sub1 eq ref $sub2;
 
 loginUserA;
 
 $sub1->addComment( 'this is a test comment' );
 cmp_deeply($sub1->get('comments')->[0],{
       id => re( qr/.+/ ),
-      alias => '',
-      userId => $userC->userId,
+      alias => 'userA',
+      userId => $userA->userId,
       comment => 'this is a test comment',
       rating => 0,
       date => re( qr/\d{10}/ ),
       ip => undef,
 }, "successfully added comment" );
 
-ok($sub1->update({
+$sub1->update({
     title => 'the new title'
-}),'update submission');
+});
 
 is( $sub1->get('title'),'the new title','successfully changed the title');
 
+loginRgstr;
 
 $sub1->update({ status => 'approved' });
 is($sub1->get('status'),'approved','set status to approved');
@@ -281,23 +312,36 @@ my $cleanupSubmissions = WebGUI::Test::Activity->create( $session,
               "WebGUI::Workflow::Activity::CleanupEMSSubmissions"
 );
 
-WebGUI::Test->workflowsToDelete($approveSubmissions,$cleanupSubmissions);
+push @cleanup, sub  { $approveSubmissions->delete; $cleanupSubmissions->delete; };
 
 is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
-is( $sub1->get('status'),'created','submission has been created');
+is( $sub1->get('status'),'failed','submission failed to create');
 
-my $TODO = q{
-can we look for the EMSTicket asset for the created submission?
-	-- perhaps it should be assigned to the ticket somehow?
-run addpoval on a submission that is missing data
-    -- approval runs fine, but status should be failed
-update submissions to be more than a day old
-run submission cleanup activity
-    --  cleanup only denied entries
-    --  cleanup denied and created entries
-};
+# TODO fill in the rest of the data required by EMSTicket
+
+is($approveSubmissions->run, 'complete', 'approval complete');
+is($approveSubmissions->run, 'done', 'approval done');
+
+is( $sub1->get('status'),'created','approval successfull');
+
+my $ticket = WebGUI::Asset->newByDynamicClass($session, $sub1->get('ticketId'));
+isa_ok( $ticket, 'WebGUI::Asset::Sku::EMS_Ticket', 'approval created a ticket');
+push @cleanup, sub  { $ticket->delete; };
+ 
+$sub2->update({
+    lastModified => time - ( 60 * 60 * 72 ),   # last modified 3 days ago
+});
+my $submissionId = $sub2->get('assetId');
+
+is($cleanupSubmissions->run, 'complete', 'cleanup complete');
+is($cleanupSubmissions->run, 'done', 'cleanup done');
+
+$sub2 = WebGUI::Asset->newByDynamicClass($session, $submissionId);
+is( $sub2, undef, 'approval created a ticket');
+
+# TODO add a test to cleanup denied and created entries
 
 } # end of skip
 
@@ -308,6 +352,6 @@ print 'press return to complete test' ; <>;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-   # nothing to cleanup;
+   map { eval { $_->() } } ( @cleanup );
 }
 #vim:ft=perl

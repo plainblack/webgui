@@ -1902,6 +1902,42 @@ normal templates.|,
         context => q|Label for link to view submissions owned by current user.|,
     },
 
+        'event submission template' => {
+                message => q|Event Submission Template|,
+                lastUpdated => 1131394072,
+                context => q|Label for the template that is used to submit events.|
+        },
+
+        'event submission template help' => {
+                message => q|This template is used for event submission, most of its contents is composed by the submission form asset based on the description given by the admin who created it.|,
+                lastUpdated => 1131394072,
+                context => q|Help text for the event submission form template.|
+        },
+
+        'event submission queue template' => {
+                message => q|Event Submission Queue Template|,
+                lastUpdated => 1131394072,
+                context => q|Label for the Event Submission Queue template.|
+        },
+
+        'event submission queue template help' => {
+                message => q|This is the template used to display the Event Submission Queue, used for both submitters and admin.|,
+                lastUpdated => 1131394072,
+                context => q|Help text for the Event SUbmission Queue Template.|
+        },
+
+        'event submission form template' => {
+                message => q|Event Submission Form Template|,
+                lastUpdated => 1131394072,
+                context => q|Label for the event submission form template.|
+        },
+
+        'event submission form template help' => {
+                message => q|This template is used to describe the event submission form which will be used by submitters to entger their information. This template consists of a few standard fields and a list of optional fields which are turned on by selecting them from the list.|,
+                lastUpdated => 1131394072,
+                context => q|Help text for the event submission form template.|
+        },
+
 #    'TODO' => {
 #        message => q|TODO|,
 #        lastUpdated => 1147050475,

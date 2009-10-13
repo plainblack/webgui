@@ -196,6 +196,11 @@ sub definition {
 				fieldType               => "hidden",
 				defaultValue    => '{}',
 		},
+                ticketId => {
+				noFormPost              => 1,
+				fieldType               => "hidden",
+				defaultValue    => '',
+                },
     );
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),

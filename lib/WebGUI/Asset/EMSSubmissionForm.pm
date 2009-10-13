@@ -64,15 +64,14 @@ sub addSubmission {
     my $self = shift;
     my $session = $self->session;
     my $params = shift || {};
-    return undef if $self->canSubmit;
-    $params = $self->validateSubmission($params);
-    # TODO this whould return something so errors can be reported
-    return undef if ! $self->{isValid} ;
-    $params->{className} = 'WebGUI::Asset::EMSSubmission';
-    $params->{status} = 'pending';
-    $params->{submissionId} = $self->get('nextSubmissionId');
-    $self->update({nextSubmissionId => $params->{submissionId}+1 });
-    $self->addChild($params);
+    return { isValid => 0, errors => [ 'no permissions' ] } if ! $self->canSubmit;
+    my $newParams = $self->validateSubmission($params);
+    return $newParams if ! $newParams->{isValid} ;
+    $newParams->{className} = 'WebGUI::Asset::EMSSubmission';
+    $newParams->{status} = 'pending';
+    $newParams->{submissionId} = $self->get('nextSubmissionId');
+    $self->update({nextSubmissionId => $newParams->{submissionId}+1 });
+    $self->addChild($newParams);
 }
 
 #-------------------------------------------------------------------
@@ -322,11 +321,11 @@ sub validateSubmission {
     my $submission = shift;
     my $adminOverride = JSON->new->decode( $submission->{adminOverride} || ' { } ' );
     my $session = $self->session;
-    my $target = { isValid => 1 };
+    my $target = { isValid => 1, adminOverride => $adminOverride };
     my $form = $self->getFormDescription;
     for  my $field (keys %{$form}) {
-        my $value = $submission->{$field} || $form->{field}{default} || '';
-	next if defined $adminOverride->{$field} && ( $value == $adminOverride->{$field} || $value eq $adminOverride->{$field} );
+        next if not defined $form->{$field}{type};
+        my $value = $submission->{$field} || $form->{$field}{default} || '';
         $self->validateSubmissionField( $value, $form->{$field}, $field, $target );
     }
     return $target;
@@ -358,6 +357,24 @@ sub validateSubmissionField {
      my $fieldDef = shift;
      my $name = shift;
      my $target = shift;
+     if( exists $target->{adminOverride}{$name} ) {
+	 if( ( $target->{adminOverride}{$name}{type} =~ /(float|integer)/i 
+	      && $target->{adminOverride}{$name}{value} == $value ) 
+	    || $target->{adminOverride}{$name}{value} eq $value 
+	       ) {
+	     $target->{$name} = $value;
+	     return 1;
+	  }
+     }
+     if( $value eq '' ) {
+	 $target->{$name} = $value;
+	 return 1;
+     }
+     if( $fieldDef->{required} && $value eq '' ) {
+         $target->{isvalid} = 0;
+	 push @{$target->{errors}}, $name . ' is a required field';
+	 return 0;
+     }
      my $type = $fieldDef->{type};
      if( $type eq 'url' ) {
          if( $value !~ /^http:/ ) { # TODO get a better test for Earls
@@ -365,6 +382,10 @@ sub validateSubmissionField {
 	     push @{$target->{errors}}, $name . ' is not a valid Url';
 	     return 0;
 	 }
+     } elsif( $type eq 'integer' ) {
+         $value = int( $value );
+     } elsif( $type eq 'float' ) {
+         ;   # there is no test here...
      } elsif( $type eq 'text' ) {
          ;   # there is no test here...
      } elsif( $type eq 'textarea' ) {
@@ -372,7 +393,7 @@ sub validateSubmissionField {
      } elsif( $type eq 'selectList' ) {
          if( ! grep { $_ eq $value } @{$fieldDef->{options}} ) {
 	     $target->{isValid} = 0;
-	     push @{$target->{errors}}, $name . ' is not a valid Url';
+	     push @{$target->{errors}}, $name . ' is not a valid Selection';
 	     return 0;
 	 }
      } else {

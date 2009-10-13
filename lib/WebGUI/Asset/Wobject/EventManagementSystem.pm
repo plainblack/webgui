@@ -93,11 +93,7 @@ sub addSubmissionForm {
     $params->{className} = 'WebGUI::Asset::EMSSubmissionForm';
     $params->{canSubmitGroupId} ||= 2;
     $self->addGroupToSubmitList($params->{canSubmitGroupId});
-    # TODO re-edit the Badge view template and save it, see that it gets added after resets
-    # TODO  see how hard it would be to dump the whole template class to the file system
-    #--  ultimate goal is to figure out what is failing in the test battery...
-    # also add tests for Form_Div
-    $self->addChild($params);
+    return $self->addChild($params);
 }
 
 #-------------------------------------------------------------------
@@ -189,32 +185,32 @@ sub definition {
 		},
 		eventSubmissionTemplateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> 'eventSubmissionTmplt01',
-			tab				=> 'display',
-			label			=> $i18n->get('print ticket template'),
-			hoverHelp		=> $i18n->get('print ticket template help'),
-			namespace		=> 'EMS/SubmissionForm',
+			defaultValue 		=> '8tqyQx-LwYUHIWOlKPjJrA',
+			tab			=> 'display',
+			label			=> $i18n->get('event submission template'),
+			hoverHelp		=> $i18n->get('event submission template help'),
+			namespace		=> 'EMS/Submission',
 		},
 		viewEventSubmissionQueueTemplateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> 'eventQueueTmplate00001',
-			tab				=> 'display',
-			label			=> $i18n->get('print ticket template'),
-			hoverHelp		=> $i18n->get('print ticket template help'),
+			defaultValue 		=> 'ktSvKU8riGimhcsxXwqvPQ',
+			tab			=> 'display',
+			label			=> $i18n->get('event submission queue template'),
+			hoverHelp		=> $i18n->get('event submission queue template help'),
 			namespace		=> 'EMS/SubmissionQueue',
 		},
-		editEventSubmissionTemplateId => {
+		eventSubmissionFormTemplateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> 'editEventSubmissionT01',
-			tab				=> 'display',
-			label			=> $i18n->get('print ticket template'),
-			hoverHelp		=> $i18n->get('print ticket template help'),
-			namespace		=> 'EMS/EditSubmission',
+			defaultValue 		=> 'ylBSKblMdKpcDSIK2t_Ang',
+			tab			=> 'display',
+			label			=> $i18n->get('event submission form template'),
+			hoverHelp		=> $i18n->get('event submission form template help'),
+			namespace		=> 'EMS/SubmissionForm',
 		},
 		badgeInstructions => {
 			fieldType 		=> 'HTMLArea',
-			defaultValue 	=> $i18n->get('default badge instructions'),
-			tab				=> 'properties',
+			defaultValue 		=> $i18n->get('default badge instructions'),
+			tab			=> 'properties',
 			label			=> $i18n->get('badge instructions'),
 			hoverHelp		=> $i18n->get('badge instructions help'),
 		},
@@ -498,11 +494,11 @@ returns true if the current user has submission forms in this EMS
 sub hasSubmissions {
    my $self = shift;
    return 0 if ! $self->canSubmit;
-   my @res = $self->getLineage(['descendants'],{ limit => 1,
+   my $res = $self->getLineage(['descendants'],{ limit => 1,
 	 includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	 whereClause => q{createdBy='} . $self->session->user->userId . q/'/,
      } );
-   return scalar(@res);
+   return scalar(@$res);
 }
 
 #-------------------------------------------------------------------
@@ -636,6 +632,19 @@ sub www_addRibbonToBadge {
 		$ribbon->addToCart({badgeId=>$form->get('badgeId')});
 	}
 	return $self->www_getRegistrantAsJson();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_addSubmissionForm ()
+
+this will call the www_editSubmissionForm function with assetId == 'new'
+
+=cut
+
+sub www_addSubmissionForm {
+    my $self = shift;
+    $self->www_editSubmiossionForm( { assetId => 'new' } );
 }
 
 #-------------------------------------------------------------------
@@ -812,6 +821,54 @@ sub www_editBadgeGroupSave {
 		name			=> $form->get('name'),
 		});
 	return $self->www_manageBadgeGroups;
+}
+
+#-------------------------------------------------------------------
+
+=head2  www_editSubmissionForm 
+
+is assetId is 'new' edit a blank form, else edit a form with stuff filled in...
+
+=cut
+
+sub www_editSubmissionForm {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+# TODO add code to send a list of links if we are not creating a new form and trhere exist more
+# than one form
+#   -- getlineage for forms in this EMS
+#   if there is one form, then edit that form
+#   if there are more than one form then create a simple page with a link to each form that can be editted
+
+# this stuff below needs to be converted to use a template...
+	my ($form, $db) = $self->session->quick(qw(form db));
+	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
+	$f->hidden(name=>'func', value=>'editSubmissionFormSave');
+	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+	$f->hidden(name=>'assetId', value=>$form => 'new' );
+	$f->text(
+		name		=> 'name',	
+		value		=> '',
+		label		=> 'junk',
+		hoverHelp	=> 'help with junk',
+		);
+	$f->submit;
+	return $self->processStyle('<h1>the title </h1>'.$f->print);
+}
+
+#-------------------------------------------------------------------
+
+=head2  www_editSubmissionFormSave
+
+
+=cut
+
+sub www_editSubmissionFormSave {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	my $form = $self->session->form;
+  # TOOD call addSubmissionForm or update the submission form...
+	return $self->www_view;   # TODO where to go after this???
 }
 
 #-------------------------------------------------------------------
@@ -2085,6 +2142,22 @@ sub www_moveEventMetaFieldUp {
 	return $self->www_manageEventMetaFields;
 }
 
+#---------------------------------------------
+=head2 www_newSubmission
+
+if only one form is available to this user:
+call the viewSubmission with class and assetID = 'new'
+else create a list of link that will distinguish the form the userdesires to use.
+the links should refer to this function and include a formId parameter
+
+=cut
+
+sub www_newSubmission {
+
+# call viewSubmission or create a list of links
+
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_printBadge ( )
@@ -2236,6 +2309,27 @@ sub www_viewSchedule {
 sub www_viewSubmission {
 
 # fill the view submission template
+	my $self             = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+	my $db               = $self->session->db;
+    my $rowsPerPage      = 25;
+    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
+
+    my @columnNames = map { "'col" . $_ . "'" } ( 1..$locationsPerPage );
+    my $fieldList   = join ',', @columnNames;
+    my $dataColumns = join ",\n",  map {
+	    '{key:' . $_ . ',sortable:false,label:"",formatter:formatViewScheduleItem}'
+                     }  @columnNames;
+
+	return $self->processStyle(
+               $self->processTemplate({
+                      backUrl => $self->getUrl,
+                      rowsPerPage => $rowsPerPage,
+                      dataColumns => $dataColumns,
+                      fieldList => $fieldList,
+                      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
+                  },$self->get('scheduleTemplateId')));
+
 
 }
 
@@ -2247,6 +2341,31 @@ sub www_viewSubmission {
 sub www_viewSubmissionQueue {
 
 # fill the view submission queue template
+
+
+# fill the view submission template
+	my $self             = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+	my $db               = $self->session->db;
+    my $rowsPerPage      = 25;
+    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
+
+    my @columnNames = map { "'col" . $_ . "'" } ( 1..$locationsPerPage );
+    my $fieldList   = join ',', @columnNames;
+    my $dataColumns = join ",\n",  map {
+	    '{key:' . $_ . ',sortable:false,label:"",formatter:formatViewScheduleItem}'
+                     }  @columnNames;
+
+	return $self->processStyle(
+               $self->processTemplate({
+                      backUrl => $self->getUrl,
+                      rowsPerPage => $rowsPerPage,
+                      dataColumns => $dataColumns,
+                      fieldList => $fieldList,
+                      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
+                  },$self->get('scheduleTemplateId')));
+
+
 
 }
 
