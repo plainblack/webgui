@@ -137,18 +137,38 @@ sub moveCalendarFeedsToJSON {
 sub removeOrphanedVersionTags {
     my $session = shift;
     print "\tRemoving orphan version tags (this may take a while)... " unless $quiet;
+    
+    # Get all Version Tag ids
+    my %tags = map { $_ => 1 } @{$session->db->buildArrayRef("SELECT tagId FROM assetVersionTag")};
+    #print "\nSite has " . keys(%tags) . " Version Tags in total\n" unless $quiet;
+    
+    # Get all Version Tags with associated assetData
+    my %tags_with_data = map { $_ => 1 } @{$session->db->buildArrayRef("SELECT tagId FROM assetData")};
+    #print "* " . keys(%tags_with_data) . " with associated assetData\n" unless $quiet;
+    
+    # Figure out the set of ophans
+    my @orphans = grep { !$tags_with_data{$_} } keys %tags;
+    #print "* " . scalar(@orphans) . " orphans\n" unless $quiet;
+    
+    # Sanity check
+    if (keys(%tags) - keys(%tags_with_data) != scalar(@orphans)) { die "Something is broken in your Version Tag table" }
 
-    my $sth = $session->db->read(
-        "SELECT tagId FROM assetVersionTag",
-    );
-    while ( my ($tagId) = $sth->array ) {
-        if ( !$session->db->quickScalar( 
-            "SELECT COUNT(*) FROM assetData WHERE tagId=?", 
-            [ $tagId ] 
-        ) ) {
-            my $tag = WebGUI::VersionTag->new( $session, $tagId );
-            $tag->rollback;
+    # Remove the orphans
+    my $count = 0;
+    for my $tagId (@orphans) {
+        
+        # Progress
+        if ($count % 100 == 0) { print '*' unless $quiet; }
+        
+        # Double-check on reduced set (remove to speed up even further)
+        if ( $session->db->quickScalar("SELECT COUNT(*) FROM assetData WHERE tagId=?", [ $tagId ]) ) {
+            die "Version Tag was supposed to be an orphan, but had assetData: $tagId";
         }
+        
+        my $tag = WebGUI::VersionTag->new( $session, $tagId );
+        $tag->rollback;
+        
+        $count++;
     }
 
     print "DONE!\n" unless $quiet;
