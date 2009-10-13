@@ -36,6 +36,7 @@
  - fixed #11057: Deleting wiki attachments
  - fixed #11122: Survey icon is missing from admin console
  - fixed #11107: linked image with caption
+ - fixed #10914: Shop: No email notifications sent when the cart has net value 0
 
 7.7.21
  - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision

@@ -34,6 +34,7 @@ removeImportCruft( $session );
 removeAdminFromVisitorGroup( $session );
 fixPackageFlagOnOlder( $session );
 correctWikiAttachmentPermissions( $session );
+transactionsNotifications( $session );
 
 fixTableDefaultCharsets($session);
 
@@ -163,6 +164,30 @@ sub correctWikiAttachmentPermissions {
             $attachment->update({ groupIdEdit => $wiki->get('groupToEditPages') });
         }
     }
+    print "Done.\n" unless $quiet;
+}
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub transactionsNotifications {
+    my $session = shift;
+    print "\tMove Shop notifications from PayDriver to Transactions... " unless $quiet;
+    my $pay = WebGUI::Shop::Pay->new($session);
+    my $gateways = $pay->getPaymentGateways;
+    my $defaultNotificationGroup = '3';
+    my $defaultTemplate          = 'bPz1yk6Y9uwMDMBcmMsSCg';
+    if (@{ $gateways }) {
+        my $firstGateway = $gateways->[0];
+        $defaultNotificationGroup = $firstGateway->get('saleNotificationGroupId');
+        $defaultTemplate          = $firstGateway->get('receiptEmailTemplateId' );
+        foreach my $gateway (@{ $gateways }) {
+            my $properties = $gateway->get();
+            delete $properties->{ saleNotificationGroupId };
+            delete $properties->{ receiptEmailTemplateId  };
+            $gateway->update($properties);
+        }
+    }
+    $session->setting->add('shopSaleNotificationGroupId', $defaultNotificationGroup);
+    $session->setting->add('shopReceiptEmailTemplateId',  $defaultTemplate);
     print "Done.\n" unless $quiet;
 }
 

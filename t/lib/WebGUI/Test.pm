@@ -100,14 +100,18 @@ sub import {
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         ##Offset Sessions, and Scratch by 1 because 1 will exist at the start
         my @checkCount = (
-            Sessions  => 'userSession',
-            Scratch   => 'userSessionScratch',
-            Users     => 'users',
-            Groups    => 'groups',
-            mailQ     => 'mailQueue',
-            Tags      => 'assetVersionTag',
-            Assets    => 'assetData',
-            Workflows => 'Workflow',
+            Sessions            => 'userSession',
+            Scratch             => 'userSessionScratch',
+            Users               => 'users',
+            Groups              => 'groups',
+            mailQ               => 'mailQueue',
+            Tags                => 'assetVersionTag',
+            Assets              => 'assetData',
+            Workflows           => 'Workflow',
+            Carts               => 'cart',
+            Transactions        => 'transaction',
+            'Transaction Items' => 'transactionItem',
+            'Ship Drivers'      => 'shipper',
         );
         my %initCounts;
         for ( my $i = 0; $i < @checkCount; $i += 2) {
@@ -761,6 +765,9 @@ were passed in.  Currently able to destroy:
     WebGUI::User
     WebGUI::VersionTag
     WebGUI::Workflow
+    WebGUI::Shop::Cart
+    WebGUI::Shop::ShipDriver
+    WebGUI::Shop::Transaction
 
 Example call:
 
@@ -829,14 +836,21 @@ Example call:
     );
 
     my %cleanup = (
-        'WebGUI::User'       => 'delete',
-        'WebGUI::Group'      => 'delete',
-        'WebGUI::Storage'    => 'delete',
-        'WebGUI::Shop::Cart' => 'delete',
-        'WebGUI::Asset'      => 'purge',
-        'WebGUI::VersionTag' => 'rollback',
-        'WebGUI::Workflow'   => 'delete',
-        'WebGUI::Session'    => sub {
+        'WebGUI::User'              => 'delete',
+        'WebGUI::Group'             => 'delete',
+        'WebGUI::Storage'           => 'delete',
+        'WebGUI::Asset'             => 'purge',
+        'WebGUI::VersionTag'        => 'rollback',
+        'WebGUI::Workflow'          => 'delete',
+        'WebGUI::Shop::Transaction' => 'delete',
+        'WebGUI::Shop::ShipDriver'  => 'delete',
+        'WebGUI::Shop::Cart'        => sub {
+            my $cart        = shift;
+            my $addressBook = $cart->getAddressBook();
+            $addressBook->delete if $addressBook;  ##Should we call cleanupGuard instead???
+            $cart->delete;
+        },
+        'WebGUI::Session'          => sub {
             my $session = shift;
             $session->var->end;
             $session->close;

@@ -22,7 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::Shop::Pay;
+use WebGUI::Shop::PayDriver;
 
 my $toVersion = '7.7.20';
 my $quiet; # this line required
@@ -87,7 +88,6 @@ sub fixTemplateSettingsFromShunt {
     # and here's our code
     print "DONE!\n" unless $quiet;
 }
-
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
