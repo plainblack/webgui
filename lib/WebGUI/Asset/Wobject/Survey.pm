@@ -2005,6 +2005,7 @@ sub prepareShowSurveyTemplate {
     $section->{allowBackBtn} = $self->get('allowBackBtn');
 
     my $out = $self->processTemplate( $section, $self->get('surveyQuestionsId') );
+    WebGUI::Macro::process($self->session, \$out);
 
     $self->session->http->setMimeType('application/json');
     return to_json( { type => 'displayquestions', section => $section, questions => $questions, html => $out } );
