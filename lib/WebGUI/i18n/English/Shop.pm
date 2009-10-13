@@ -1671,6 +1671,31 @@ our $I18N = {
         context => q|Label to make the user choose a shipping method|,
     },
 
+	'receipt email template' => { 
+		message => q|Receipt Email Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'receipt email template help' => { 
+		message => q|Which template should be used to generate an email that will be sent to the user to acknowledge their purchase?|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'sale notification group' => { 
+		message => q|Sale Notification Group|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'sale notification group help' => { 
+		message => q|Who should be notified of new transactions?|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+
 };
 
 1;

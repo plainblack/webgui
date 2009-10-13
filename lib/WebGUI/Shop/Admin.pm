@@ -194,6 +194,19 @@ sub www_editSettings {
         label       => $i18n->get("my purchases detail template"),
         hoverHelp   => $i18n->get("my purchases detail template help"),
         );
+    $form->template(
+        name            => 'receiptEmailTemplateId',
+        namespace       => "Shop/EmailReceipt",
+        label           => $i18n->get("receipt email template"),
+        hoverHelp       => $i18n->get("receipt email template help"),
+        defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
+    );
+    $form->group(
+        name            => 'saleNotificationGroupId',
+        label           => $i18n->get("sale notification group"),
+        hoverHelp       => $i18n->get("sale notification group help"),
+        defaultValue    => '3',
+    );
     $form->submit;
     return $ac->render($form->print, $i18n->get("shop settings"));
 }
@@ -213,12 +226,12 @@ sub www_editSettingsSave {
 
     # Save shop templates
     foreach my $template (qw(shopMyPurchasesDetailTemplateId shopMyPurchasesTemplateId
-        shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId)) {
+        shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId shopReceiptEmailTemplateId)) {
         $setting->set($template, $form->get($template, "template"));
     }
 
     # Save group settings
-    foreach my $group (qw(groupIdCashier groupIdAdminCommerce)) {
+    foreach my $group (qw(groupIdCashier groupIdAdminCommerce shopSaleNotificationGroupId)) {
         $setting->set($group, $form->get($group, "group"));
     }
 
