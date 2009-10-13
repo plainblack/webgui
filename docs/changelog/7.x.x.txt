@@ -13,6 +13,7 @@
  - added Insurance estimator for the USPS shipping driver
  - fixed #11121: Syndicated Content search terms require both title and description match
  - fixed #11057: Deleting wiki attachments
+ - fixed #11122: Survey icon is missing from admin console
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
