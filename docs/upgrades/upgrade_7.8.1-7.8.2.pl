@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 fixTableDefaultCharsets($session);
+correctWikiAttachmentPermissions( $session );
 
 finish($session); # this line required
 
@@ -73,6 +74,28 @@ sub fixTableDefaultCharsets {
     }
     $session->db->write(sprintf 'ALTER DATABASE %s DEFAULT CHARACTER SET utf8', $db->dbh->quote_identifier($database));
 
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub correctWikiAttachmentPermissions {
+    my $session = shift;
+    print "\tCorrect group edit permission on wiki page attachments... " unless $quiet;
+    my $root         = WebGUI::Asset->getRoot($session);
+    my $pageIterator = $root->getLineageIterator(
+        ['descendants'],
+        {
+            includeOnlyClasses => ['WebGUI::Asset::WikiPage'],
+        }
+    );
+    PAGE: while (my $wikiPage = $pageIterator->()) {
+        my $wiki = $wikiPage->getWiki;
+        next PAGE unless $wiki && $wiki->get('allowAttachments') && $wikiPage->getChildCount;
+        foreach my $attachment (@{ $wikiPage->getLineage(['children'])}) {
+            $attachment->update({ groupIdEdit => $wiki->get('groupToEditPages') });
+        }
+    }
     print "Done.\n" unless $quiet;
 }
 
