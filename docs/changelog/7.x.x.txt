@@ -1,3 +1,5 @@
+7.7.23
+
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
  - fixed #11068: ITransact_recurringStatus
