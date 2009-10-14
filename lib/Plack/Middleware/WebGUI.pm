@@ -13,8 +13,6 @@ Plack::Middleware::WebGUI
 
 Plack Middleware that populates $env
 
-In the future we might want to read the site.conf here and then cache it
-
 =cut
 
 sub call {

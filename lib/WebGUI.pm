@@ -162,15 +162,17 @@ The Apache2::RequestRec object passed in by Apache's mod_perl.
 
 sub handler {
     my $request = shift; # either apache request object or PSGI env hash
-    my $server;
+    my ($server, $config);
     if ($request->isa('WebGUI::Session::Plack')) {
         $server  = $request->server;
+        $config = WebGUI->config;
     } else {
         $request = Apache2::Request->new($request);
         $server  = Apache2::ServerUtil->server;	#instantiate the server api
+        my $configFile = shift || $request->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
+        $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
     }
-	my $configFile = shift || $request->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
-	my $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
+	
     my $error = "";
     my $matchUri = $request->uri;
     my $gateway = $config->get("gateway");
@@ -230,6 +232,20 @@ sub handle_psgi {
     # let Plack::Response do its thing
     return $plack->finalize;
 }
+
+# Experimental speed boost
+my ($root, $config_file, $config);
+sub init {
+    my $class = shift;
+    my %opts = @_;
+    $root = $opts{root};
+    $config_file = $opts{config};
+    $config = WebGUI::Config->new($root, $config_file);
+    warn 'INIT';
+}
+sub config { $config }
+sub root { $root }
+sub config_file { $config_file }
 
 1;
 
