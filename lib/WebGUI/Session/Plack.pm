@@ -160,8 +160,8 @@ sub dir_config {
     my ( $self, $c ) = @_;
 
     # Translate the legacy WebguiRoot and WebguiConfig PerlSetVar's into known values
-    return $self->{env}->{'wg.WEBGUI_ROOT'}   if $c eq 'WebguiRoot';
-    return $self->{env}->{'wg.WEBGUI_CONFIG'} if $c eq 'WebguiConfig';
+    return WebGUI->root if $c eq 'WebguiRoot';
+    return WebGUI->config_file if $c eq 'WebguiConfig';
 
     # Otherwise, we might want to provide some sort of support (which Apache is still around)
     return $self->{env}->{"wg.DIR_CONFIG.$c"};

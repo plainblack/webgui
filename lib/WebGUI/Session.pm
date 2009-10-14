@@ -460,7 +460,7 @@ sub open {
 	my $configFile = shift;
 	my $request = shift;
 	my $server = shift;
-	my $config = WebGUI::Config->new($webguiRoot,$configFile);
+	my $config = WebGUI->config || WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
     
