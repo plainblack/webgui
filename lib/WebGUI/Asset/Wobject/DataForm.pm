@@ -31,6 +31,7 @@ use WebGUI::Utility;
 use WebGUI::Group;
 use WebGUI::AssetCollateral::DataForm::Entry;
 use WebGUI::Form::SelectRichEditor;
+use WebGUI::Paginator;
 use JSON ();
 
 our @ISA = qw(WebGUI::Asset::Wobject);
@@ -697,9 +698,10 @@ A hash reference.  New template variables will be appended to it.
 =cut
 
 sub getListTemplateVars {
-	my $self = shift;
-	my $var = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+	my $self    = shift;
+    my $session = $self->session;
+	my $var     = shift;
+	my $i18n    = WebGUI::International->new($session,"Asset_DataForm");
 	$var->{"back.url"} = $self->getFormUrl;
 	$var->{"back.label"} = $i18n->get('go to form');
     my $fieldConfig = $self->getFieldConfig;
@@ -713,7 +715,9 @@ sub getListTemplateVars {
     } @{ $self->getFieldOrder };
     $var->{field_loop} = \@fieldLoop;
     my @recordLoop;
-    my $entryIter = $self->entryClass->iterateAll($self);
+    my $p = WebGUI::Paginator->new($session);
+    $p->setDataByCallback(sub { return $self->entryClass->iterateAll($self, { offset => $_[0], limit => $_[1], }); });
+    my $entryIter = $p->getPageIterator();
     while ( my $entry = $entryIter->() ) {
         my $entryData = $entry->fields;
         my @dataLoop;
@@ -734,9 +738,9 @@ sub getListTemplateVars {
             %dataVars,
             "record.ipAddress"              => $entry->ipAddress,
             "record.edit.url"               => $self->getFormUrl("func=view;entryId=".$entry->getId),
-            "record.edit.icon"              => $self->session->icon->edit("func=view;entryId=".$entry->getId, $self->get('url')),
+            "record.edit.icon"              => $session->icon->edit("func=view;entryId=".$entry->getId, $self->get('url')),
             "record.delete.url"             => $self->getUrl("func=deleteEntry;entryId=".$entry->getId),
-            "record.delete.icon"            => $self->session->icon->delete("func=deleteEntry;entryId=".$entry->getId, $self->get('url'), $i18n->get('Delete entry confirmation')),
+            "record.delete.icon"            => $session->icon->delete("func=deleteEntry;entryId=".$entry->getId, $self->get('url'), $i18n->get('Delete entry confirmation')),
             "record.username"               => $entry->username,
             "record.userId"                 => $entry->userId,
             "record.submissionDate.epoch"   => $entry->submissionDate->epoch,
@@ -746,6 +750,7 @@ sub getListTemplateVars {
         };
     }
     $var->{record_loop} = \@recordLoop;
+    $p->appendTemplateVars($var);
     return $var;
 }
 

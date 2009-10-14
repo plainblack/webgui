@@ -25,7 +25,7 @@ use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
-plan tests => 26; # increment this value for each test you create
+plan tests => 32; # increment this value for each test you create
 
 my $startingRowNum =   0;
 my $endingRowNum   =  99;
@@ -107,6 +107,12 @@ is('100', $p->getPage(5), '(101) page 5 stringification okay');
 
 is($p->getPageNumber, 1, 'Default page number is 1'); ##Additional page numbers are specified at instantiation
 
+########################################################################
+#
+# getPageLinks with limits
+#
+########################################################################
+
 $expectedPages = [  map { +{ 
             'pagination.text'   => ( $_ + 1 ), 
             'pagination.range'  => ( 25 * $_ + 1 ) . "-" . ( $_ * 25 + 25 <= $endingRowNum + 1 ? $_ * 25 + 25 : $endingRowNum + 1 ), # First row number - Last row number
@@ -114,12 +120,6 @@ $expectedPages = [  map { +{
         } } (0..$NumberOfPages-1) ];
 
 $expectedPages->[0]->{'pagination.activePage'} = 'true';
-
-########################################################################
-#
-# getPageLinks with limits
-#
-########################################################################
 
 cmp_deeply(
     ($p->getPageLinks)[0], 
@@ -217,3 +217,65 @@ cmp_deeply(
     \@pageWindow,
     'set of last 10 pages selected correctly, (20/20)',
 );
+
+########################################################################
+#
+# iterator based paginator
+#
+########################################################################
+
+my $callback = sub {
+    my ($start, $rowsPerPage) = @_;
+    my $state   = $start * 2;
+    my $counter = 0;
+    my $iterator = sub {
+        return 50 if $_[0] eq 'rowCount';
+        return if ($counter >= $rowsPerPage);
+        $state += 2;
+        ++$counter;
+        return if $state > 50;
+        return $state;
+    };
+    return $iterator;
+};
+
+my $p1 = WebGUI::Paginator->new($session, '/neighborhood', 5);
+$p1->setDataByCallback($callback);
+my $pIterator = $p1->getPageIterator;
+isa_ok($pIterator, 'CODE', 'getPageIterator');
+is($pIterator->('rowCount'), 50, 'generated iterator returns the correct maximum number of rows');
+is($p1->getNumberOfPages, 10, 'getNumberOfPages works with an iterator');
+
+cmp_deeply(drainIterator($pIterator, 10), [2, 4, 6, 8, 10], 'setDataByCallback: iterator returned page 1 data');
+
+$p1->setPageNumber(2);
+$p1->setDataByCallback($callback);
+$pIterator = $p1->getPageIterator;
+
+cmp_deeply(drainIterator($pIterator, 10), [12, 14, 16, 18, 20], '... iterator returned page 2 data');
+
+$expectedPages = [  map { +{ 
+            'pagination.text'   => ( $_ + 1 ), 
+            'pagination.range'  => ( 5 * $_ + 1 ) . "-" . ( ($_+1) * 5 ), # First row number - Last row number
+            'pagination.url'    => ( $_ != 1 ? '/neighborhood' . '?pn=' . ( $_ + 1 ) : '' ), # Current page has no URL
+        } } (0..9) ];
+
+$expectedPages->[1]->{'pagination.activePage'} = 'true';
+
+cmp_deeply(
+    ($p1->getPageLinks())[0],
+    $expectedPages,
+    'getPageLinks works with a paginator'
+);
+
+sub drainIterator {
+    my $iterator      = shift;
+    my $terminalCount = shift; 
+    my $pageData = [];
+    my $infiniteLoopCount = 0;
+    while (defined(my $item = $pIterator->())) {
+        push @{ $pageData }, $item;
+        last if ++$infiniteLoopCount >= $terminalCount;
+    }
+    return $pageData;
+}
