@@ -24,6 +24,8 @@ use Sub::Name ();
 use Clone ();
 use mro ();
 
+my $gen_package = 0;
+
 sub import {
     my $class = shift;
     if (! @_) {
@@ -33,6 +35,9 @@ sub import {
     my $caller = caller;
     # ensure we are using c3 method resolution
     mro::set_mro($caller, 'c3');
+    $gen_package++;
+    my $super = __PACKAGE__ . '::_gen' . $gen_package;
+    mro::set_mro($super, 'c3');
 
     # construct an ordered list and hash of the properties
     my @propertyList;
@@ -52,26 +57,18 @@ sub import {
     # accessors for properties
     for my $property ( @propertyList ) {
         no strict 'refs';
-        $class->_install($caller, $property, sub {
+        $class->_install($super, $property, sub {
             if (@_ > 1) {
                 my $value = $_[1];
-                # call _set_$property with set value and use return value for actual value
-                if (my $set = $_[0]->can('_set_' . $property)) {
-                    $value = $_[0]->$set($value);
-                }
                 return $_[0]{properties}{$property} = $value;
             }
             else {
-                # call _get_$property and use return
-                if (my $get = $_[0]->can('_get_' . $property)) {
-                    return $_[0]->$get($_[1]);
-                }
                 return $_[0]{properties}{$property};
             }
         });
     }
 
-    $class->_install($caller, 'getProperty', sub {
+    $class->_install($super, 'getProperty', sub {
         my $self = shift;
         my $property = shift;
         if (exists $properties{$property}) {
@@ -89,7 +86,7 @@ sub import {
         return $self->maybe::next::method($property);
     });
 
-    $class->_install($caller, 'getProperties', sub {
+    $class->_install($super, 'getProperties', sub {
         my $self = shift;
         my %props = map { $_ => 1 } @propertyList;
         # remove any properties from superclass list that exist in this class
@@ -98,7 +95,7 @@ sub import {
         return @allProperties;
     });
 
-    $class->_install($caller, 'getAttribute', sub {
+    $class->_install($super, 'getAttribute', sub {
         my $self = shift;
         my $attribute = shift;
         if ( exists $definition->{$attribute} ) {
@@ -108,10 +105,12 @@ sub import {
     });
 
     no strict 'refs';
-    *{$caller . '::get'} = \&_get;
-    *{$caller . '::set'} = \&_set;
-    *{$caller . '::update'} = \&_update;
-    *{$caller . '::instantiate'} = \&_instantiate;
+    *{$super . '::get'} = \&_get;
+    *{$super . '::set'} = \&_set;
+    *{$super . '::update'} = \&_update;
+    *{$super . '::instantiate'} = \&_instantiate;
+    unshift @{$caller . '::ISA'}, $super;
+    return;
 }
 
 sub _install {

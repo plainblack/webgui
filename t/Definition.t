@@ -55,10 +55,10 @@ my $written;
         $written = 1;
     }
 
-    sub _set_a_property {
+    sub a_property {
         my $self = shift;
         my $value = shift;
-        return "$value - BLAH";
+        return $self->next::method("$value - BLAH");
     }
 }
 
@@ -85,7 +85,7 @@ is_deeply [ $subclass_object->getProperties ], ['property1', 'a_property', 'prop
 
 is_deeply $object->get, { property1 => 'property 1 value' },
     'get returns hash with correct properties';
-is_deeply $subclass_object->get, { property1 => undef, a_property => undef, property2 => 'property 2 value' },
+is_deeply $subclass_object->get, { property1 => undef, a_property => ' - BLAH', property2 => 'property 2 value' },
     'get returns hash with correct properties';
 
 is_deeply $object->getProperty('property1'), { label => 'property1 label', defaultValue => $object },
