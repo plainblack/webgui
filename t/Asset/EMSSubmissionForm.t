@@ -348,7 +348,7 @@ is( $sub2, undef, 'approval created a ticket');
 $versionTag->commit;
 
 #done_testing();
-print 'press return to complete test' ; <>;
+#print 'press return to complete test' ; <>;
 #----------------------------------------------------------------------------
 # Cleanup
 END {

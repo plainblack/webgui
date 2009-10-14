@@ -191,7 +191,7 @@ sub definition {
 			hoverHelp		=> $i18n->get('event submission template help'),
 			namespace		=> 'EMS/Submission',
 		},
-		viewEventSubmissionQueueTemplateId => {
+		eventSubmissionQueueTemplateId => {
 			fieldType 		=> 'template',
 			defaultValue 		=> 'ktSvKU8riGimhcsxXwqvPQ',
 			tab			=> 'display',
@@ -599,7 +599,7 @@ sub view {
 		newSubmissionUrl	=> $self->getUrl('func=newSubmission'),
 		viewSubmissionsUrl	=> $self->getUrl('func=viewSubmissions'),
 		viewSubmissionQueueUrl	=> $self->getUrl('func=viewSubmissionQueue'),
-		addSubmissionFormUrl	=> $self->getUrl('func=addSubmissionForm'),
+		addSubmissionFormUrl	=> $self->getUrl('func=editSubmissionForm'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
 		canEdit				=> $self->canEdit,
@@ -638,15 +638,16 @@ sub www_addRibbonToBadge {
 
 =head2 www_addSubmissionForm ()
 
-this will call the www_editSubmissionForm function with assetId == 'new'
+call www_editSubmissionForm with assetId == new
 
 =cut
 
 sub www_addSubmissionForm {
     my $self = shift;
-    $self->www_editSubmiossionForm( { assetId => 'new' } );
+    $self->www_editSubmissionForm( 'new' );
 }
 
+        my $params = shift || { };
 #-------------------------------------------------------------------
 
 =head2 www_addTicketsToBadge ()
@@ -832,28 +833,46 @@ is assetId is 'new' edit a blank form, else edit a form with stuff filled in...
 =cut
 
 sub www_editSubmissionForm {
-	my $self = shift;
+	my $self             = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-# TODO add code to send a list of links if we are not creating a new form and trhere exist more
-# than one form
-#   -- getlineage for forms in this EMS
-#   if there is one form, then edit that form
-#   if there are more than one form then create a simple page with a link to each form that can be editted
-
-# this stuff below needs to be converted to use a template...
-	my ($form, $db) = $self->session->quick(qw(form db));
-	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
-	$f->hidden(name=>'func', value=>'editSubmissionFormSave');
+	my $session = $self->session;
+	my $form = $session->form;
+        my $assetId = shift || $form->get('assetId');
+	my $asset;
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	$f->hidden(name=>'assetId', value=>$form => 'new' );
-	$f->text(
-		name		=> 'name',	
-		value		=> '',
-		label		=> 'junk',
-		hoverHelp	=> 'help with junk',
-		);
-	$f->submit;
-	return $self->processStyle('<h1>the title </h1>'.$f->print);
+
+        if( ! defined( $assetId ) ) {
+	   my $res = $self->getLineage(['children'],{ returnObjects => 1,
+		 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+	     } );
+	    if( scalar(@$res) == 1 ) {
+	        $asset = $res->[0];
+		$assetId = $asset->getId;
+	    } else {
+	        my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
+		            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
+	        my $listOfLinks = join '', ( map {
+		      $makeAnchorList->(
+		                $self->getUrl('func=editSubmissionForm;assetId=' . $_->getId ),
+				$_->get('title'),
+				WebGUI::HTML::filter($_->get('description'),'all')
+		             )
+		           } ( @$res ) );
+		return $self->processStyle( '<h1>' . $i18n->get('select form to edit') .
+		                            '</h1><ul>' . $listOfLinks . '</ul>' );
+	    }
+        } elsif( $assetId ne 'new' ) {
+	    $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+	    if (!defined $asset) { # won't catch everything, but it will help some if an asset blows up
+		$self->session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
+	    }
+	}
+	# TODO for new assets fill with blanks, otherwise get asset info to fill in template vars
+
+	return $self->processStyle(
+               $self->processTemplate({
+                      backUrl => $self->getUrl,
+                  },$self->get('eventSubmissionFormTemplateId')));
 }
 
 #-------------------------------------------------------------------
@@ -2310,25 +2329,13 @@ sub www_viewSubmission {
 
 # fill the view submission template
 	my $self             = shift;
-    return $self->session->privilege->insufficient() unless $self->canView;
+    return $self->session->privilege->insufficient() unless $self->canSubmit or $self->canEdit;
 	my $db               = $self->session->db;
-    my $rowsPerPage      = 25;
-    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
-
-    my @columnNames = map { "'col" . $_ . "'" } ( 1..$locationsPerPage );
-    my $fieldList   = join ',', @columnNames;
-    my $dataColumns = join ",\n",  map {
-	    '{key:' . $_ . ',sortable:false,label:"",formatter:formatViewScheduleItem}'
-                     }  @columnNames;
 
 	return $self->processStyle(
                $self->processTemplate({
                       backUrl => $self->getUrl,
-                      rowsPerPage => $rowsPerPage,
-                      dataColumns => $dataColumns,
-                      fieldList => $fieldList,
-                      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
-                  },$self->get('scheduleTemplateId')));
+                  },$self->get('eventSubmissionTemplateId')));
 
 
 }
@@ -2339,34 +2346,13 @@ sub www_viewSubmission {
 =cut
 
 sub www_viewSubmissionQueue {
-
-# fill the view submission queue template
-
-
-# fill the view submission template
 	my $self             = shift;
     return $self->session->privilege->insufficient() unless $self->canView;
-	my $db               = $self->session->db;
-    my $rowsPerPage      = 25;
-    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
-
-    my @columnNames = map { "'col" . $_ . "'" } ( 1..$locationsPerPage );
-    my $fieldList   = join ',', @columnNames;
-    my $dataColumns = join ",\n",  map {
-	    '{key:' . $_ . ',sortable:false,label:"",formatter:formatViewScheduleItem}'
-                     }  @columnNames;
 
 	return $self->processStyle(
                $self->processTemplate({
                       backUrl => $self->getUrl,
-                      rowsPerPage => $rowsPerPage,
-                      dataColumns => $dataColumns,
-                      fieldList => $fieldList,
-                      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
-                  },$self->get('scheduleTemplateId')));
-
-
-
+                  },$self->get('eventSubmissionQueueTemplateId')));
 }
 
 

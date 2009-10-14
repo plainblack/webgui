@@ -1938,6 +1938,12 @@ normal templates.|,
                 context => q|Help text for the event submission form template.|
         },
 
+    'select form to edit' => {
+        message => q|Select a Form to Edit|,
+        lastUpdated => 1147050475,
+        context => q|Label for list of submission forms; user must choose one to edit.|,
+    },
+
 #    'TODO' => {
 #        message => q|TODO|,
 #        lastUpdated => 1147050475,
