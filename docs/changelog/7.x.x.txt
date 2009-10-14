@@ -16,6 +16,7 @@
  - fixed #11122: Survey icon is missing from admin console
  - fixed #11107: linked image with caption
  - fixed #10914: Shop: No email notifications sent when the cart has net value 0
+ - fixed #11126: WebGUI database has varchar fields
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
