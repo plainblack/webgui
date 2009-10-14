@@ -35,7 +35,7 @@ sub import {
     mro::set_mro($caller, 'c3');
 
     # construct an ordered list and hash of the properties
-    my @property_list;
+    my @propertyList;
     my %properties;
     if ( my $properties = delete $definition->{properties} ) {
         # accept a hash and alphabetize it
@@ -44,13 +44,13 @@ sub import {
         }
         for (my $i = 0; $i < @{ $properties }; $i += 2) {
             my $property = $properties->[$i];
-            push @property_list, $property;
+            push @propertyList, $property;
             $properties{ $property } = $properties->[$i + 1];
         }
     }
 
     # accessors for properties
-    for my $property ( @property_list ) {
+    for my $property ( @propertyList ) {
         no strict 'refs';
         $class->_install($caller, $property, sub {
             if (@_ > 1) {
@@ -64,7 +64,7 @@ sub import {
             else {
                 # call _get_$property and use return
                 if (my $get = $_[0]->can('_get_' . $property)) {
-                    return $_[0]->$get($value);
+                    return $_[0]->$get($_[1]);
                 }
                 return $_[0]{properties}{$property};
             }
@@ -91,10 +91,10 @@ sub import {
 
     $class->_install($caller, 'getProperties', sub {
         my $self = shift;
-        my %props = map { $_ => 1 } @properties;
+        my %props = map { $_ => 1 } @propertyList;
         # remove any properties from superclass list that exist in this class
         my @allProperties = grep { ! $props{$_} } $self->maybe::next::method(@_);
-        push @allProperties, @properties;
+        push @allProperties, @propertyList;
         return @allProperties;
     });
 
