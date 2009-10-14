@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixBadVarCharColumns ( $session );
 
 finish($session); # this line required
 
@@ -43,6 +44,50 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixBadVarCharColumns {
+    my $session = shift;
+    print "\tGive all revisionDate columns the correct definition... " unless $quiet;
+    my @dataSets = (
+        [ 'AdSku',                  'assetId',              "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'AdSku',                  'purchaseTemplate',     "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'AdSku',                  'manageTemplate',       "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'AdSku',                  'adSpace',              "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'AdSku',                  'clickDiscounts',       "CHAR(22)  DEFAULT NULL"                            ],
+        [ 'AdSku',                  'impressionDiscounts',  "CHAR(22)  DEFAULT NULL"                            ],
+        [ 'Collaboration',          'replyRichEditor',      "CHAR(22)  BINARY DEFAULT 'PBrichedit000000000002'" ],
+        [ 'Collaboration',          'replyFilterCode',      "CHAR(30)  BINARY DEFAULT 'javascript'"             ],
+        [ 'DataForm',               'htmlAreaRichEditor',   "CHAR(22)  BINARY DEFAULT '**Use_Default_Editor**'" ],
+        [ 'MapPoint',               'website',              "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'address1',             "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'address2',             "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'city',                 "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'state',                "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'zipCode',              "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'country',              "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'phone',                "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'fax',                  "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'MapPoint',               'email',                "CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'Survey',                 'onSurveyEndWorkflowId',"CHAR(22)  BINARY DEFAULT NULL"                     ],
+        [ 'Survey_questionTypes',   'questionType',         "CHAR(56)  NOT NULL"                                ],
+        [ 'bucketLog',              'userId',               "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'bucketLog',              'Bucket',               "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'deltaLog',               'userId',               "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'deltaLog',               'assetId',              "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'deltaLog',               'url',                  "CHAR(255) NOT NULL"                                ],
+        [ 'passiveAnalyticsStatus', 'userId',               "CHAR(255) NOT NULL"                                ],
+        [ 'passiveLog',             'url',                  "CHAR(255) NOT NULL"                                ],
+        [ 'passiveLog',             'userId',               "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'passiveLog',             'assetId',              "CHAR(22)  BINARY NOT NULL"                         ],
+        [ 'passiveLog',             'sessionId',            "CHAR(22)  BINARY NOT NULL"                         ],
+    );
+    foreach my $dataSet (@dataSets) {
+        $session->db->write(sprintf "ALTER TABLE `%s` MODIFY COLUMN `%s` %s", @{ $dataSet });
+    }
+    print "Done.\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

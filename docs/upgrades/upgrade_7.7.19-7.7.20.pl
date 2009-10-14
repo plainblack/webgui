@@ -31,9 +31,15 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+<<<<<<< HEAD:docs/upgrades/upgrade_7.7.19-7.7.20.pl
 # upgrade functions go here
 fixTemplateSettingsFromShunt($session);
 addMatrixColumnDefaults($session);
+=======
+fixTableDefaultCharsets($session);
+correctWikiAttachmentPermissions( $session );
+transactionsNotifications( $session );
+>>>>>>> 27c1fe9... Convert varchar fields to char in the db.  Fixes bug #11126:docs/upgrades/upgrade_7.8.1-7.8.2.pl
 
 finish($session); # this line required
 

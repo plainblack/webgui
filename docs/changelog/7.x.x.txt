@@ -1,4 +1,5 @@
 7.7.23
+ - fixed #11126: WebGUI database has varchar fields
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
