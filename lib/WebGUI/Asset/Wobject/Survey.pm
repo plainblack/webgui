@@ -692,15 +692,18 @@ test suite.
 
 sub getAdminConsole {
     my $self = shift;
-    my $ac = WebGUI::AdminConsole->new( $self->session, 'Survey' );
-    my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
-    $ac->addSubmenuItem($self->session->url->page("func=edit"), WebGUI::International->new($self->session, "WebGUI")->get(575));
-    $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), $i18n->get('edit survey'));
-    $ac->addSubmenuItem($self->session->url->page("func=takeSurvey"), $i18n->get('take survey'));
-    $ac->addSubmenuItem($self->session->url->page("func=graph"), $i18n->get('visualize'));
-    $ac->addSubmenuItem($self->session->url->page("func=editTestSuite"), $i18n->get("test suite"));
-    $ac->addSubmenuItem($self->session->url->page("func=runTests"), $i18n->get("run all tests"));
-    $ac->addSubmenuItem($self->session->url->page("func=runTests;format=tap"), $i18n->get("run all tests") . " (TAP)");
+    my $ac = $self->SUPER::getAdminConsole;
+    unless ($self->{_modifiedAdminConsole}) {
+        my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
+        $ac->addSubmenuItem($self->session->url->page("func=edit"), WebGUI::International->new($self->session, "WebGUI")->get(575));
+        $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), $i18n->get('edit survey'));
+        $ac->addSubmenuItem($self->session->url->page("func=takeSurvey"), $i18n->get('take survey'));
+        $ac->addSubmenuItem($self->session->url->page("func=graph"), $i18n->get('visualize'));
+        $ac->addSubmenuItem($self->session->url->page("func=editTestSuite"), $i18n->get("test suite"));
+        $ac->addSubmenuItem($self->session->url->page("func=runTests"), $i18n->get("run all tests"));
+        $ac->addSubmenuItem($self->session->url->page("func=runTests;format=tap"), $i18n->get("run all tests") . " (TAP)");
+        $self->{_modifiedAdminConsole} = 1;
+    }
     return $ac;
 }
 
@@ -2002,6 +2005,7 @@ sub prepareShowSurveyTemplate {
     $section->{allowBackBtn} = $self->get('allowBackBtn');
 
     my $out = $self->processTemplate( $section, $self->get('surveyQuestionsId') );
+    WebGUI::Macro::process($self->session, \$out);
 
     $self->session->http->setMimeType('application/json');
     return to_json( { type => 'displayquestions', section => $section, questions => $questions, html => $out } );

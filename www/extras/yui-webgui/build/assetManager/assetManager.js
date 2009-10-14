@@ -13,6 +13,7 @@ if ( typeof WebGUI.AssetManager == "undefined" ) {
 
 // Keep track of the open more menus
 WebGUI.AssetManager.MoreMenusDisplayed = {};
+WebGUI.AssetManager.CrumbMoreMenu;
 // Append something to a url:
 WebGUI.AssetManager.appendToUrl = function ( url, params ) {
     var components = [ url ];
@@ -348,16 +349,20 @@ WebGUI.AssetManager.selectRow = function ( child ) {
 */
 WebGUI.AssetManager.showMoreMenu 
 = function ( url, linkTextId, isNotLocked ) {
-    var more    = document.getElementById(linkTextId);
 
-    var options = WebGUI.AssetManager.buildMoreMenu(url, more, isNotLocked);
-
-    var menu    = new YAHOO.widget.Menu( "crumbMoreMenu", options );
-    menu.render( document.getElementById( 'assetManager' ) );
+    var menu;
+    if ( typeof WebGUI.AssetManager.CrumbMoreMenu == "undefined" ) {
+        var more    = document.getElementById(linkTextId);
+        var options = WebGUI.AssetManager.buildMoreMenu(url, more, isNotLocked);
+        menu    = new YAHOO.widget.Menu( "crumbMoreMenu", options );
+        menu.render( document.getElementById( 'assetManager' ) );
+        WebGUI.AssetManager.CrumbMoreMenu = menu;
+    }
+    else {
+        menu = WebGUI.AssetManager.CrumbMoreMenu;
+    }
     menu.show();
     menu.focus();
-    //YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ) } );
-    //YAHOO.util.Event.addListener( more, "click", function (e) { menu.show(); menu.focus(); YAHOO.util.Event.stopEvent(e); }, null, menu );
 };
 
 /*---------------------------------------------------------------------------

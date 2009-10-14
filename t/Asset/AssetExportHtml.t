@@ -935,10 +935,12 @@ like($message, qr/Exported $numberCreatedAll pages/, "... returns correct messag
 $extrasSymlink          = Path::Class::File->new($exportPath, $extrasUrl);
 $uploadsSymlink         = Path::Class::File->new($exportPath, $uploadsUrl);
 
-ok(-e $extrasSymlink->absolute->stringify,                    "exportAsHtml writes extras symlink");
+ok(-e $extrasSymlink->absolute->stringify,                    "exportAsHtml writes extras symlink")
+    or diag "link not found at " . $extrasSymlink->absolute;
 is(readlink $extrasSymlink->absolute->stringify, $extrasPath, "exportAsHtml extras symlink points to right place");
 
-ok(-e $uploadsSymlink->absolute->stringify,                     "exportAsHtml writes uploads symlink");
+ok(-e $uploadsSymlink->absolute->stringify,                     "exportAsHtml writes uploads symlink")
+    or diag "link not found at " . $uploadsSymlink->absolute;
 is(readlink $uploadsSymlink->absolute->stringify, $uploadsPath, "exportAsHtml uploads symlink points to right place");
 
 # next, make sure the root URL symlinking works.
@@ -946,6 +948,7 @@ eval { ($message)    = $parent->exportAsHtml( { userId => 3, depth => 99, rootUr
 my $rootUrlSymlink      = Path::Class::File->new($exportPath, 'index.html');
 is($@, '', 'exportAsHtml does not throw an error when linking root URL');
 like($message, qr/Exported $numberCreatedAll pages/, "... returns correct message");
-ok(-l $rootUrlSymlink->absolute->stringify, "... writes root URL symlink");
+ok(-l $rootUrlSymlink->absolute->stringify, "... writes root URL symlink")
+    or diag "link not found at " . $rootUrlSymlink->absolute;
 is(readlink $rootUrlSymlink->absolute->stringify, WebGUI::Asset->getDefault($session)->exportGetUrlAsPath->absolute->stringify, "... root URL symlink points to right place");
 

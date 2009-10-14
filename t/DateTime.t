@@ -26,7 +26,7 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-plan tests => 23;
+plan tests => 25;
 
 my $timeZoneUser = addUser($session);
 
@@ -75,6 +75,14 @@ cmp_deeply($nowDt->epoch, num(time(),5), '... uses now as the epoch');
 my $dt1970 = WebGUI::DateTime->new($session, 0);
 isa_ok($dt1970, 'WebGUI::DateTime', 'constructed with 0');
 is($dt1970->epoch, 0, '... uses 0 for epoch');
+
+my $bday = WebGUI::DateTime->new($session, '2001-08-16');
+isa_ok($bday, 'WebGUI::DateTime', 'constructed with mysql date, no time');
+is(
+    $bday->epoch,
+    WebGUI::DateTime->new($session, WebGUI::Test->webguiBirthday)->truncate( to => 'day')->epoch,
+    '... has correct epoch'
+);
 
 sub addUser {
 	my $session = shift;

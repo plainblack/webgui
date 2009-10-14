@@ -24,7 +24,7 @@ use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
-plan tests => 46;
+plan tests => 64;
 use_ok('WebGUI::Shop::ShipDriver::USPS')
     or die 'Unable to load module WebGUI::Shop::ShipDriver::USPS';
 
@@ -42,8 +42,16 @@ $session->user({user => $user});
 # put your tests here
 
 
-my $storage;
-my ($driver, $cart);
+my ($driver2, $cart);
+my $insuranceTable =  <<EOTABLE;
+5:1.00
+10:2.00
+15:3.00
+20:4.00
+25:5.00
+30:6.00
+EOTABLE
+
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 my $home = WebGUI::Asset->getDefault($session);
@@ -92,8 +100,16 @@ my $nivBible = $bible->setCollateral('variantsJSON', 'variantId', 'new',
     }
 );
 
+my $gospels = $bible->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => 'Gospels from the new Testament',
+        price     => 1.50,       varSku    => 'gospels',
+        weight    => 2.0,        quantity  => 999999,
+    }
+);
+
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 
 #######################################################################
 #
@@ -133,10 +149,11 @@ my $options = {
                 enabled => 1,
               };
 
-$driver = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
+$driver2 = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
+addToCleanup($driver2);
 
-isa_ok($driver, 'WebGUI::Shop::ShipDriver::USPS');
-isa_ok($driver, 'WebGUI::Shop::ShipDriver');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPS');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 
 #######################################################################
 #
@@ -152,13 +169,13 @@ is (WebGUI::Shop::ShipDriver::USPS->getName($session), 'U.S. Postal Service', 'g
 #
 #######################################################################
 
-my $driverId = $driver->getId;
-$driver->delete;
+my $driverId = $driver2->getId;
+$driver2->delete;
 
 my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driverId]);
 is($count, 0, 'delete deleted the object');
 
-undef $driver;
+undef $driver2;
 
 #######################################################################
 #
@@ -166,11 +183,12 @@ undef $driver;
 #
 #######################################################################
 
-$driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
+my $driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
     shipType => 'PARCEL',
 });
+addToCleanup($driver);
 
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
@@ -199,6 +217,7 @@ cmp_deeply(
 );
 
 $cart = WebGUI::Shop::Cart->newBySession($session);
+addToCleanup($cart);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',
@@ -283,6 +302,22 @@ $driver->update($properties);
 $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 my @shippableUnits = $driver->_getShippableUnits($cart);
 
+$properties = $driver->get();
+$properties->{addInsurance}   = 1;
+$properties->{insuranceRates} = $insuranceTable;
+$driver->update($properties);
+
+is($driver->_calculateInsurance(@shippableUnits), 2, '_calculateInsurance: one item in cart with quantity=1, calculates insurance');
+
+$properties->{addInsurance}   = 0;
+$driver->update($properties);
+is($driver->_calculateInsurance(@shippableUnits), 0, '_calculateInsurance: returns 0 if insurance is not enabled');
+
+$properties->{addInsurance}   = 1;
+$properties->{insuranceRates} = '';
+$driver->update($properties);
+is($driver->_calculateInsurance(@shippableUnits), 0, '_calculateInsurance: returns 0 if rates are not set');
+
 my $xml = $driver->buildXML($cart, @shippableUnits);
 like($xml, qr/<RateV3Request USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the RateV3Request tag');
 like($xml, qr/<Package ID="0"/, 'buildXML: checking ID is an attribute of the Package tag');
@@ -359,8 +394,10 @@ is($cost, 5.25, '_calculateFromXML calculates shipping cost correctly for 1 item
 
 $bibleItem = $bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $nivBible));
 @shippableUnits = $driver->_getShippableUnits($cart);
-$xml = $driver->buildXML($cart, @shippableUnits);
 
+is(calculateInsurance($driver), 7, '_calculateInsurance: two items in cart with quantity=1, calculates insurance');
+
+$xml = $driver->buildXML($cart, @shippableUnits);
 $xmlData = XMLin( $xml,
     KeepRoot   => 1,
     ForceArray => ['Package'],
@@ -458,6 +495,8 @@ is($cost, 12.25, '_calculateFromXML calculates shipping cost correctly for 2 ite
 $bibleItem->setQuantity(2);
 @shippableUnits = $driver->_getShippableUnits($cart);
 
+is(calculateInsurance($driver), 8, '_calculateInsurance: two items in cart with quantity=2, calculates insurance');
+
 $cost = $driver->_calculateFromXML({
     Package => [
         {
@@ -481,6 +520,7 @@ is($cost, 19.25, '_calculateFromXML calculates shipping cost correctly for 2 ite
 $rockHammer2 = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
 $rockHammer2->update({shippingAddressId => $wucAddress->getId});
 @shippableUnits = $driver->_getShippableUnits($cart);
+is(calculateInsurance($driver), 12, '_calculateInsurance: calculates insurance');
 $xml = $driver->buildXML($cart, @shippableUnits);
 
 $xmlData = XMLin( $xml,
@@ -575,6 +615,12 @@ SKIP: {
 
 }
 
+#######################################################################
+#
+# Test Priority shipping setup
+#
+#######################################################################
+
 $cart->empty;
 $properties = $driver->get();
 $properties->{shipType} = 'PRIORITY';
@@ -637,6 +683,12 @@ SKIP: {
 
 }
 
+#######################################################################
+#
+# Test EXPRESS shipping setup
+#
+#######################################################################
+
 $properties = $driver->get();
 $properties->{shipType} = 'EXPRESS';
 $driver->update($properties);
@@ -695,6 +747,11 @@ SKIP: {
 
 }
 
+#######################################################################
+#
+# Test PRIORITY VARIABLE shipping setup
+#
+#######################################################################
 
 $properties = $driver->get();
 $properties->{shipType} = 'PRIORITY VARIABLE';
@@ -754,16 +811,60 @@ SKIP: {
 
 }
 
+#######################################################################
+#
+# _calculateInsurance edge case
+#
+#######################################################################
+$cart->empty;
+$bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $gospels));
+@shippableUnits = $driver->_getShippableUnits($cart);
+is(calculateInsurance($driver), 1, '_calculateInsurance: calculates insurance using the first bin');
+
+#######################################################################
+#
+# _parseInsuranceRates
+#
+#######################################################################
+
+my @rates;
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("");
+cmp_deeply(\@rates, [], '_parseInsuranceRates: empty string returns empty array');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates();
+cmp_deeply(\@rates, [], '_parseInsuranceRates: undef returns empty array');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2");
+cmp_deeply(\@rates, [], '... bad rates #1');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates(":2");
+cmp_deeply(\@rates, [], '... bad rates #2');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("a:b");
+cmp_deeply(\@rates, [], '... bad rates #3');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2:2");
+cmp_deeply(\@rates, [ ['2', '2'] ], '... one line of good rates');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2.0:2.0");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with decimal points');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2.0:2.0\n");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with newline');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2.0:2.0\r\n");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with cr/newline');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("2.0 : 2.0\r\n");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with cr/newline and spaces');
+@rates = WebGUI::Shop::ShipDriver::USPS::_parseInsuranceRates("  2.0 : 2.0  \r\n");
+cmp_deeply(\@rates, [ ['2.0', '2.0'] ], '... one line of good rates with cr/newline and more spaces');
 
 #----------------------------------------------------------------------------
 # Cleanup
-END {
-    if (defined $driver && $driver->isa('WebGUI::Shop::ShipDriver')) {
-        $driver->delete;
-    }
-    if (defined $cart && $cart->isa('WebGUI::Shop::Cart')) {
-        my $addressBook = $cart->getAddressBook();
-        $addressBook->delete if $addressBook;
-        $cart->delete;
-    }
+
+sub calculateInsurance {
+    my $driver = shift;
+    my $properties = $driver->get();
+    $properties->{addInsurance}   = 1;
+    $properties->{insuranceRates} = $insuranceTable;
+    $driver->update($properties);
+
+    my $insurance = $driver->_calculateInsurance(@shippableUnits);
+
+    $properties->{addInsurance}   = 0;
+    $driver->update($properties);
+
+    return $insurance;
 }

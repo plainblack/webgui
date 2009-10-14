@@ -74,8 +74,6 @@ our @EXPORT_OK = qw(session config);
 my $CLASS = __PACKAGE__;
 
 my @guarded;
-our @checkCount;
-our %initCounts;
 
 sub import {
     our $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
@@ -101,22 +99,34 @@ sub import {
 
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         ##Offset Sessions, and Scratch by 1 because 1 will exist at the start
-        @checkCount = (
-            Sessions  => userSession           => 1,
-            Scratch   => userSessionScratch    => 1,
-            Users     => users                 => 0,
-            Groups    => groups                => 0,
-            mailQ     => mailQueue             => 0,
-            Tags      => assetVersionTag       => 0,
-            Assets    => assetData             => 0,
-            Workflows => Workflow              => 0,
-            Carts     => cart                  => 0,
+        my @checkCount = (
+            Sessions            => 'userSession',
+            Scratch             => 'userSessionScratch',
+            Users               => 'users',
+            Groups              => 'groups',
+            mailQ               => 'mailQueue',
+            Tags                => 'assetVersionTag',
+            Assets              => 'assetData',
+            Workflows           => 'Workflow',
+            Carts               => 'cart',
+            Transactions        => 'transaction',
+            'Transaction Items' => 'transactionItem',
+            'Ship Drivers'      => 'shipper',
         );
-        for ( my $i = 0; $i < @checkCount; $i += 3) {
+        my %initCounts;
+        for ( my $i = 0; $i < @checkCount; $i += 2) {
             my ($label, $table) = @checkCount[$i, $i+1];
             $initCounts{$table} = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
         }
         push @guarded, Scope::Guard->new(sub {
+            for ( my $i = 0; $i < @checkCount; $i += 2) {
+                my ($label, $table) = @checkCount[$i, $i+1];
+                my $quant = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
+                my $delta = $quant - $initCounts{$table};
+                if ($delta) {
+                    $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, $delta);
+                }
+            }
         });
     }
 
@@ -133,24 +143,14 @@ sub cleanup {
     pop @guarded
         while @guarded;
 
-    if ( my $session = $CLASS->session ) {
-        $session->var->end;
-        my $db = delete $session->{_db};
-        $session->close;
-        ##Do this absolutely last, so that there's no session or other object pieces left over.
-        if ($ENV{WEBGUI_TEST_DEBUG}) {
-            for ( my $i = 0; $i < @checkCount; $i += 3) {
-                my ($label, $table, $offset) = @checkCount[$i, $i+1, $i+2];
-                my $quant = $db->quickScalar('SELECT COUNT(*) FROM ' . $table);
-                my $delta = $quant - $initCounts{$table} + $offset;
-                if ($delta) {
-                    $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, $delta);
-                }
-            }
-        }
-        $db->disconnect;
+    if ( our $SESSION ) {
+        $SESSION->var->end;
+        $SESSION->close;
+        undef $SESSION;
     }
 }
+
+#----------------------------------------------------------------------------
 
 =head2 newSession ( $noCleanup )
 
@@ -161,8 +161,6 @@ Builds a WebGUI session object for testing.
 If true, the session won't be registered for automatic deletion.
 
 =cut
-
-#----------------------------------------------------------------------------
 
 sub newSession {
     my $noCleanup = shift;
@@ -175,6 +173,8 @@ sub newSession {
     return $session;
 }
 
+
+#----------------------------------------------------------------------------
 
 =head2 mockAssetId ( $assetId, $object )
 
@@ -767,6 +767,9 @@ were passed in.  Currently able to destroy:
     WebGUI::User
     WebGUI::VersionTag
     WebGUI::Workflow
+    WebGUI::Shop::Cart
+    WebGUI::Shop::ShipDriver
+    WebGUI::Shop::Transaction
 
 Example call:
 
@@ -835,14 +838,21 @@ Example call:
     );
 
     my %cleanup = (
-        'WebGUI::User'       => 'delete',
-        'WebGUI::Group'      => 'delete',
-        'WebGUI::Storage'    => 'delete',
-        'WebGUI::Shop::Cart' => 'delete',
-        'WebGUI::Asset'      => 'purge',
-        'WebGUI::VersionTag' => 'rollback',
-        'WebGUI::Workflow'   => 'delete',
-        'WebGUI::Session'    => sub {
+        'WebGUI::User'              => 'delete',
+        'WebGUI::Group'             => 'delete',
+        'WebGUI::Storage'           => 'delete',
+        'WebGUI::Asset'             => 'purge',
+        'WebGUI::VersionTag'        => 'rollback',
+        'WebGUI::Workflow'          => 'delete',
+        'WebGUI::Shop::Transaction' => 'delete',
+        'WebGUI::Shop::ShipDriver'  => 'delete',
+        'WebGUI::Shop::Cart'        => sub {
+            my $cart        = shift;
+            my $addressBook = $cart->getAddressBook();
+            $addressBook->delete if $addressBook;  ##Should we call cleanupGuard instead???
+            $cart->delete;
+        },
+        'WebGUI::Session'          => sub {
             my $session = shift;
             $session->var->end;
             $session->close;

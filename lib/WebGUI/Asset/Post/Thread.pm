@@ -974,15 +974,17 @@ sub updateThreadRating {
     my $self        = shift;
     my $session     = $self->session;
 
-    my $calcRating  = 0; 
     my $postIds     = $self->getLineage(["descendants","self"], {
         includeOnlyClasses  => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
         includeArchived     => 1,
     });
 
-    $calcRating += $session->db->quickScalar(
-        "SELECT SUM(rating) FROM Post_rating WHERE assetId IN (".$session->db->quoteAndJoin($postIds).")"
-    );     
+    my $calcRating = 0;
+    if (scalar @{ $postIds }) {
+        $calcRating += $session->db->quickScalar(
+            "SELECT SUM(rating) FROM Post_rating WHERE assetId IN (".$session->db->quoteAndJoin($postIds).")"
+        );     
+    }
 
     $self->update({
         threadRating    => $calcRating
@@ -991,7 +993,8 @@ sub updateThreadRating {
     my $parent = $self->getParent;
     if (defined $parent) {
         $parent->recalculateRating;
-    } else {
+    }
+    else {
         $self->session->errorHandler->error("Couldn't get parent for thread ".$self->getId);
     }    
 }

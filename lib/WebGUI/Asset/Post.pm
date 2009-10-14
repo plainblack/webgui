@@ -1222,19 +1222,20 @@ An integer indicating either thumbss up (+1) or thumbs down (-1)
 =cut
 
 sub rate {
-	my $self = shift;
+	my $self   = shift;
 	my $rating = shift;
 	return undef unless ($rating == -1 || $rating == 1);
 	return undef if $self->hasRated;
+    my $session = $self->session;
 	$self->insertUserPostRating($rating);
 	$self->recalculatePostRating();
     my $thread = $self->getThread;
 	$thread->updateThreadRating();
-	if ($self->session->setting->get("useKarma")
-        && $self->session->user->karma > $thread->getParent->get('karmaSpentToRate')) {
-		$self->session->user->karma(-$self->getThread->getParent->get("karmaSpentToRate"), "Rated Post ".$self->getId, "Rated a CS Post.");
-		my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-		$u->karma($self->getThread->getParent->get("karmaRatingMultiplier"), "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
+	if ($session->setting->get("useKarma")
+        && $session->user->karma > $thread->getParent->get('karmaSpentToRate')) {
+		$session->user->karma(-$thread->getParent->get("karmaSpentToRate"), "Rated Post ".$self->getId, "Rated a CS Post.");
+		my $u = WebGUI::User->new($session, $self->get("ownerUserId"));
+		$u->karma($thread->getParent->get("karmaRatingMultiplier"), "Post ".$self->getId." Rated by ".$session->user->userId, "Had post rated.");
 	}
 }
 

@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
-use Test::More tests => 68; # increment this value for each test you create
+use Test::More tests => 74; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -379,6 +379,38 @@ $adminUserTag->rollback();
 setSiteVersionTagMode($session, q{multiPerUser});
 setUserVersionTagMode($user, q{inherited});
 
+my $andySession = WebGUI::Test->newSession();
+my $redSession  = WebGUI::Test->newSession();
+
+my $andy = WebGUI::User->create($andySession);
+my $red  = WebGUI::User->create($redSession);
+addToCleanup($andy, $red);
+
+my $andyTag = WebGUI::VersionTag->getWorking($andySession);
+addToCleanup($andyTag);
+my $redTag  = WebGUI::VersionTag->new($redSession, $andyTag->getId);
+$redTag->setWorking();
+is($andyTag->getId, $redTag->getId, 'users share the same version tag');
+
+$andyTag->leaveTag;
+{
+    my $andyTagCheck = WebGUI::VersionTag->getWorking($andySession, 'nocreate');
+    is($andyTagCheck, undef, 'leaveTag: user andy does not have tag');
+    my $redTagCheck  = WebGUI::VersionTag->getWorking($redSession, 'nocreate');
+    isa_ok($redTagCheck, 'WebGUI::VersionTag', '... user red does');
+    is($redTagCheck->getId, $redTag->getId, '... user red still has the same tag as before');
+}
+
+my $andyTag2 = WebGUI::VersionTag->new($session, $redTag->getId);
+$andyTag2->clearWorking;
+{
+    my $andyTagCheck = WebGUI::VersionTag->getWorking($andySession, 'nocreate');
+    is($andyTagCheck, undef, 'clearWorking: user andy does not have tag');
+    my $redSession2  = $redSession->duplicate;
+    addToCleanup($redSession2);
+    my $redTagCheck  = WebGUI::VersionTag->getWorking($redSession2, 'nocreate');
+    is($redTagCheck, undef, 'red does not either');
+}
 
 # Local variables:
 # mode: cperl

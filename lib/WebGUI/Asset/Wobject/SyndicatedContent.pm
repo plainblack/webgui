@@ -165,15 +165,17 @@ sub generateFeed {
 	if ($self->get('hasTerms') ne '') {
 		my @terms = split /,\s*/, $self->get('hasTerms'); # get the list of terms
 		my $termRegex = join("|", map quotemeta($_), @terms); # turn the terms into a regex string
-		my @items = $feed->match_item(title=>qr/$termRegex/msi, description=>qr/$termRegex/msi);
+		my @items =  $feed->match_item(title       => qr/$termRegex/msi);
+		push @items, $feed->match_item(description => qr/$termRegex/msi);
 		$feed->clear_item;
+        $feed->uniq_item;
 		foreach my $item (@items) {
 			$feed->add_item($item);
 		}
 	}
 	
-	# sort them by date
-	$feed->sort_item();
+	# sort them by date and remove any duplicate from the OR based term matching above
+	$feed->normalize();
 	
 	# limit the feed to the maximum number of headlines (or the feed generator limit).
 	$feed->limit_item($limit);

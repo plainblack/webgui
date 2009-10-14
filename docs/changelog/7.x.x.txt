@@ -1,3 +1,23 @@
+7.8.2
+ - fixed #11098: Leaving a version tag makes everyone leave
+ - fixed #11096: Error on deleting FAQ(CS)-item
+ - fixed #11060: Some tables have latin1 as the default character set
+ - fixed #11089: No message body in Notification
+ - fixed #2569: robots.txt issues
+ - fixed #11104: Wrong name for request tracker post form template
+ - fixed #11077: Untested result in WebGUI::Storage->getFiles
+ - fixed #11080: Asset Manage Crumb Trail flyout menu
+ - fixed #10874: EMS Schedule displaying incorrectly
+ - fixed #10956: Account, Profile system bad rendering with lots of 
+ - fixed #11112: story archive RSS feed
+ - added Insurance estimator for the USPS shipping driver
+ - fixed #11121: Syndicated Content search terms require both title and description match
+ - fixed #11057: Deleting wiki attachments
+ - fixed #11122: Survey icon is missing from admin console
+ - fixed #11107: linked image with caption
+ - fixed #10914: Shop: No email notifications sent when the cart has net value 0
+ - fixed #11126: WebGUI database has varchar fields
+
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
  - fixed: Wikis broken by 7.8.0 upgrade
@@ -41,6 +61,8 @@
  - fixed #11049: form caching incorrectly
  - fixed #11088: i18n Survey Section Information
  - fixed #11087: SC asset repeats its own description in feeds
+ - fixed #10916: png icon
+ - fixed #11100: syncToCdn's help is not proper POD
 
 7.8.0
  - upgraded YUI to 2.8.0r4

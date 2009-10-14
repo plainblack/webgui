@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+<title>The Black Blog</title>
+<link>/tbb</link>
+<copyright /><pubDate>Mon, 12 Oct 2009 11:54:28 -0500</pubDate>
+<description /><item><title>Google Picasa Plugin for WebGUI Gallery</title>
+<link>http://www.plainblack.com/tbb/google-picasa-plugin-for-webgui-gallery</link>
+<author>JT</author>
+<epochDate>1254854387</epochDate>
+<guid isPermaLink="true">http://www.plainblack.com/tbb/google-picasa-plugin-for-webgui-gallery</guid>
+<pubDate>Tue, 06 Oct 2009 13:39:47 -0500</pubDate>
+<userDefined1 /><userDefined2 /><userDefined3 /><userDefined4 /><userDefined5 /><description>Today we unveil the Google Picasa plugin for WebGUI Gallery.</description>
+</item>
+<item><title>WebGUI Roadmap</title>
+<link>http://www.plainblack.com/tbb/webgui-roadmap</link>
+<author>JT</author>
+<epochDate>1254325377</epochDate>
+<guid isPermaLink="true">http://www.plainblack.com/tbb/webgui-roadmap</guid>
+<pubDate>Wed, 30 Sep 2009 10:42:57 -0500</pubDate>
+<userDefined1 /><userDefined2 /><userDefined3 /><userDefined4 /><userDefined5 /><description>The new roadmap is online.</description>
+</item>
+<item><title>WebGUI 8 Performance</title>
+<link>http://www.plainblack.com/tbb/webgui-8-performance</link>
+<author>JT</author>
+<epochDate>1254236976</epochDate>
+<guid isPermaLink="true">http://www.plainblack.com/tbb/webgui-8-performance</guid>
+<pubDate>Tue, 29 Sep 2009 10:09:36 -0500</pubDate>
+<userDefined1 /><userDefined2 /><userDefined3 /><userDefined4 /><userDefined5 /><description>WebGUI 8 is going to be the fastest version of WebGUI ever released.</description>
+</item>
+<item><title>I have arrived in Lisboa!</title>
+<link>http://www.plainblack.com/tbb/i-have-arrived-in-lisboa</link>
+<author>JT</author>
+<epochDate>1249140064</epochDate>
+<guid isPermaLink="true">http://www.plainblack.com/tbb/i-have-arrived-in-lisboa</guid>
+<pubDate>Sat, 01 Aug 2009 10:21:04 -0500</pubDate>
+<userDefined1 /><userDefined2 /><userDefined3 /><userDefined4 /><userDefined5 /><description>I&apos;m in Lisbon, Portugal for YAPC::EU.</description>
+</item>
+</channel>
+</rss>

@@ -398,21 +398,22 @@ Extends the master method to handle properties and attachments.
 =cut
 
 sub processPropertiesFromFormPost {
-	my $self = shift;
-	$self->next::method(@_);
-	my $actionTaken = ($self->session->form->process("assetId") eq "new") ? "Created" : "Edited";
+    my $self    = shift;
+    my $session = $self->session;
+    $self->next::method(@_);
+    my $actionTaken = ($session->form->process("assetId") eq "new") ? "Created" : "Edited";
     my $wiki = $self->getWiki;
-	my $properties = {
-		groupIdView 	=> $wiki->get('groupIdView'),
-		groupIdEdit 	=> $wiki->get('groupToAdminister'),
-		actionTakenBy 	=> $self->session->user->userId,
-		actionTaken 	=> $actionTaken,
-	};
+    my $properties = {
+        groupIdView 	=> $wiki->get('groupIdView'),
+        groupIdEdit 	=> $wiki->get('groupToAdminister'),
+        actionTakenBy 	=> $self->session->user->userId,
+        actionTaken 	=> $actionTaken,
+    };
 
-	if ($wiki->canAdminister) {
-		$properties->{isProtected} = $self->session->form->get("isProtected");
-		$properties->{isFeatured} = $self->session->form->get("isFeatured");
-	}
+    if ($wiki->canAdminister) {
+        $properties->{isProtected} = $session->form->get("isProtected");
+        $properties->{isFeatured}  = $session->form->get("isFeatured");
+    }
 
 	$self->update($properties);
 
@@ -421,17 +422,17 @@ sub processPropertiesFromFormPost {
         maxImageSize    => $wiki->get('maxImageSize'),
         thumbnailSize   => $wiki->get('thumbnailSize'),
     };
-    my @attachments = $self->session->form->param("attachments");
+    my @attachments = $session->form->param("attachments");
     my @tags = ();
     foreach my $assetId (@attachments) {
-        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
         if (defined $asset) {
             unless ($asset->get("parentId") eq $self->getId) {
                 $asset->setParent($self);
                 $asset->update({
-                    ownerUserId => $self->get("ownerUserId"),
-                    groupIdEdit => $self->get("groupIdEdit"),
-                    groupIdView => $self->get("groupIdView"),
+                    ownerUserId => $self->get( "ownerUserId"      ),
+                    groupIdEdit => $wiki->get( "groupToEditPages" ),
+                    groupIdView => $self->get( "groupIdView"      ),
                     });
             }
             $asset->applyConstraints($options);
