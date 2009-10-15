@@ -26,7 +26,7 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-plan tests => 25;
+plan tests => 28;
 
 my $timeZoneUser = addUser($session);
 
@@ -84,6 +84,13 @@ is(
     '... has correct epoch'
 );
 
+my $badday = eval { WebGUI::DateTime->new($session, '2001-08-161'); };
+ok($@, 'new croaks on a bad date');
+my $badday = eval { WebGUI::DateTime->new($session, '2001-08-16 99:99:99'); };
+ok($@, 'new croaks on an out of range time');
+my $badday = eval { WebGUI::DateTime->new($session, '2001-08-16 99:199:99'); };
+ok($@, 'new croaks on an illegal time');
+
 sub addUser {
 	my $session = shift;
 	my $user = WebGUI::User->new($session, "new");
@@ -92,6 +99,6 @@ sub addUser {
 	##so the test will not fail in the summer
 	$user->profileField("timeZone","America/Hermosillo");
 	$user->username("Time Zone");
-    WebGUI::Test->usersToDelete($user);
+    addToCleanup($user);
 	return $user;
 }

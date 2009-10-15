@@ -220,9 +220,9 @@ Renders a date picker control.
 sub toHtml {
     my $self    = shift;
     my $session = $self->session;
-    my $value = WebGUI::DateTime->new($session, $self->getOriginalValue)
-              ->set_time_zone($self->get("timeZone"))
-              ->strftime("%Y-%m-%d %H:%M:%S");
+    my $value   = eval { WebGUI::DateTime->new($session, $self->getOriginalValue); };
+    $value      = WebGUI::DateTime->new($session,0) if $value eq '';
+    $value      = $value->set_time_zone($self->get("timeZone"))->strftime("%Y-%m-%d %H:%M:%S");
 
     my $style   = $session->style;
     my $url     = $session->url;

@@ -41,12 +41,13 @@ always taken from the field hashref.
 
 sub addField {
 
-    my $self = shift;
-    my $field = shift;
-    my $isImport = shift;
+    my $self       = shift;
+    my $field      = shift;
+    my $isImport   = shift;
     my $dbDataType = shift || $self->_getDbDataType($field->{fieldType});
-    my $db = $self->session->db;
-    my $error = $self->session->errorHandler;
+    my $session    = $self->session;
+    my $db         = $session->db;
+    my $error      = $session->errorHandler;
     my ($oldFieldId, $newFieldId,$useAssetId,$useSequence);
 
     $error->info("Adding Field, label: ".$field->{label}.", fieldId: ".$field->{fieldId}.",thingId: ".$field->{thingId});
@@ -970,14 +971,14 @@ sub getFormPlugin {
     my $i18n    = WebGUI::International->new($session,"Asset_Thingy");
 
     $param{name} = "field_".$data->{fieldId};
-    my $name = $param{name};
+    my $name     = $param{name};
     $name =~ s/\^.*?\;//xgs ; # remove macro's from user input
-    $param{value}  = $data->{value} || $data->{defaultValue};
-    $param{size}   = $data->{size};
-    $param{height} = $data->{height};
-    $param{width}  = $data->{width};
-    $param{extras} = $data->{extras};
-    $param{vertical} = $data->{vertical};
+    $param{value}     = $data->{value} || $data->{defaultValue};
+    $param{size}      = $data->{size};
+    $param{height}    = $data->{height};
+    $param{width}     = $data->{width};
+    $param{extras}    = $data->{extras};
+    $param{vertical}  = $data->{vertical};
     $param{fieldType} = $data->{fieldType};
 
     if ($data->{fieldType} eq "Checkbox") {
@@ -1034,14 +1035,14 @@ sub getFormPlugin {
     }
 
     if ($data->{fieldType} =~ m/^otherThing/x){
-        my $otherThingId = $data->{fieldType}; 
-        $otherThingId =~ s/^otherThing_(.*)/$1/x;
-        $param{fieldType} = "SelectList"; 
-        $class = 'WebGUI::Form::'. $param{fieldType};
+        my $otherThingId  =  $data->{fieldType}; 
+        $otherThingId     =~ s/^otherThing_(.*)/$1/x;
+        $param{fieldType} =  "SelectList"; 
+        $class      = 'WebGUI::Form::'. $param{fieldType};
         my $options = ();
 
-        my $tableName = 'Thingy_'.$otherThingId;
-        my $fieldName = 'field_'.$data->{fieldInOtherThingId};
+        my $tableName    = 'Thingy_'.$otherThingId;
+        my $fieldName    = 'field_'.$data->{fieldInOtherThingId};
         my $errorMessage = $self->badOtherThing($tableName, $fieldName);
         return $errorMessage if $errorMessage;
 
@@ -1060,10 +1061,10 @@ sub getFormPlugin {
             .$dbh->quote_identifier($fieldName)
             .' from '.$dbh->quote_identifier($tableName)
             .' where thingDataId = ?',[$value]);
-        $param{size} = 1;
+        $param{size}     = 1;
         $param{multiple} = 0;
-        $param{options} = $options;
-        $param{value} = $data->{value} || $data->{defaultValue};
+        $param{options}  = $options;
+        $param{value}    = $data->{value} || $data->{defaultValue};
     }
 
     my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$session, \%param ])};
@@ -2220,53 +2221,53 @@ Processes and saves a field. Returns the edited/added fieldId and the inner html
 
 sub www_editFieldSave {
 
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canEdit;
     my ($fieldId, $fieldTypeChanged, $newFieldId, $formClass, $dbDataType, $thingyTableName, $columnName);
     my (%properties,$listItemHTML,$formElement);
-    my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
-    my $label = $session->form->process("label");
-    my $thingId = $self->session->form->process("thingId");
-    my $error = $self->session->errorHandler;
+    my $i18n    = WebGUI::International->new($session, "Asset_Thingy");
+    my $label   = $session->form->process("label");
+    my $thingId = $session->form->process("thingId");
+    my $log     = $session->log;
     my $defaultValue = $session->form->process("defaultValue");
-    my $fieldType = $session->form->process("fieldType") || "ReadOnly";
+    my $fieldType    = $session->form->process("fieldType") || "ReadOnly";
 
     if ($fieldType =~ m/^otherThing/){
         $defaultValue = $session->form->process("defaultFieldInThing");
     }
     
-    $fieldId = $self->session->form->process("fieldId");
+    $fieldId = $session->form->process("fieldId");
     %properties = (
-        fieldId=>$fieldId,
-        thingId=>$thingId,
-        label=>$label,
-        fieldType=>$fieldType,
-        defaultValue=>$defaultValue,
-        possibleValues=>$self->session->form->process("possibleValues"),
-        pretext=>$self->session->form->process("pretext"),
-        subtext=>$self->session->form->process("subtext"),
-        status=>$self->session->form->process("status"),
-        size=>$self->session->form->process("size"),
-        width=>$self->session->form->process("width"),
-        height=>$self->session->form->process("height"),
-        vertical=>$self->session->form->process("vertical"),
-        extras=>$self->session->form->process("extras"),
-        display=>$self->session->form->process("display") || 1,
-        viewScreenTitle=>$self->session->form->process("viewScreenTitle") || 0,
-        fieldInOtherThingId=>$session->form->process("fieldInOtherThingId") || "",
+        fieldId             => $fieldId,
+        thingId             => $thingId,
+        label               => $label,
+        fieldType           => $fieldType,
+        defaultValue        => $defaultValue,
+        possibleValues      => $session->form->process("possibleValues"),
+        pretext             => $session->form->process("pretext"),
+        subtext             => $session->form->process("subtext"),
+        status              => $session->form->process("status"),
+        size                => $session->form->process("size"),
+        width               => $session->form->process("width"),
+        height              => $session->form->process("height"),
+        vertical            => $session->form->process("vertical"),
+        extras              => $session->form->process("extras"),
+        display             => $session->form->process("display")             || 1,
+        viewScreenTitle     => $session->form->process("viewScreenTitle")     || 0,
+        fieldInOtherThingId => $session->form->process("fieldInOtherThingId") || "",
     );
     # Get the field's data type
     $dbDataType = $self->_getDbDataType($properties{fieldType});
 
     if ($fieldId eq "new") {
         $properties{dateCreated} = time();
-        $properties{createdBy} = $self->session->user->userId;
+        $properties{createdBy} = $session->user->userId;
         $newFieldId = $self->addField(\%properties,0,$dbDataType);
     }
     else{
         $properties{dateUpdated} = time();
-        $properties{updatedBy} = $self->session->user->userId;
+        $properties{updatedBy} = $session->user->userId;
         # Check if column has to be altered for existing fields.
         $self->_updateFieldType($fieldType,$fieldId,$thingId,$self->get('assetId'),$dbDataType);
         $newFieldId = $self->setCollateral("Thingy_fields","fieldId",\%properties,1,1,"thingId",$thingId);
@@ -2290,13 +2291,13 @@ sub www_editFieldSave {
 
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
         ."<td style='width:370px;'>".$formElement."</td>\n"
-        ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
+        ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$session->url->page()
         ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
-        ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$newFieldId
+        ."<input onClick=\"deleteListItem('".$session->url->page()."','".$newFieldId
         ."','".$properties{thingId}."')\" value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>";
 
     # Make sure we send debug information along with the field.
-    $session->log->preventDebugOutput;
+    $log->preventDebugOutput;
 
     $session->output->print($newFieldId.$listItemHTML);
     return "chunked";

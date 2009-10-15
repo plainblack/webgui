@@ -50,7 +50,7 @@ my $testBlock = [
 
 my $formType = 'date';
 
-my $numTests = 25 + scalar @{ $testBlock } ;
+my $numTests = 26 + scalar @{ $testBlock } ;
 
 
 plan tests => $numTests;
@@ -141,6 +141,14 @@ is(
     '2008-08-01',
     "toHtml: defaultValue in epoch format, returns date in mysql format"
 );
+
+$date2 = WebGUI::Form::Date->new($session, {defaultValue => '2008-008-001'});
+is(
+    getValueFromForm($session, $date2->toHtml),
+    '1970-01-01',
+    "toHtml: defaultValue in bad mysql format returns date from epoch 0"
+);
+
 $date2 = WebGUI::Form::Date->new($session, {defaultValue => -1});
 is($date2->getValueAsHtml(), '12/31/1969', "getValueAsHtml: defaultValue as negative epoch, returns in users's format");
 

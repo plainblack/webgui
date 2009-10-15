@@ -594,23 +594,27 @@ sub _splitMysql
 
     @hash{ qw( year month day hour minute second ) } 	
         = $string =~ m{
-          (\d+)   # Year
+          ^
           \D*
-          (\d+)   # Month
-          \D*
-          (\d+)   # Day
-          (?: \D*
-              (\d+)   # Hours
-              \D*
-              (\d+)   # Minutes
-              \D*
-              (\d+)   # Seconds
+          (\d{1,4})   # Year
+          \D+
+          (\d{1,2})   # Month
+          \D+
+          (\d{1,2})   # Day
+          (?: \D+
+              (\d{1,2})   # Hours
+              \D+
+              (\d{1,2})   # Minutes
+              \D+
+              (\d{1,2})   # Seconds
           )?
+          \D*
+          $
         }x;
 
-    foreach my $unit (qw/hour minute second/) {
-        $hash{$unit} = 0 if ($hash{$unit} eq '');
-    }
+    $hash{ hour   } ||= 0;
+    $hash{ minute } ||= 0;
+    $hash{ second } ||= 0;
 	return %hash;
 }
 

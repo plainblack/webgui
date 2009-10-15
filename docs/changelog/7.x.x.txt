@@ -18,6 +18,7 @@
  - fixed #10914: Shop: No email notifications sent when the cart has net value 0
  - fixed #11126: WebGUI database has varchar fields
  - fixed #10989: DataForm List: No pagination
+ - fixed #11128: Thing breaks w/ default value for date field
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code

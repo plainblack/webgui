@@ -29,7 +29,7 @@ my $session = WebGUI::Test->session;
 
 my $formType = 'datetime';
 
-my $numTests = 34;
+my $numTests = 35;
 
 plan tests => $numTests;
 
@@ -181,6 +181,12 @@ is(
     getValueFromForm($session, $date2->toHtml),
     '2001-08-16 08:00:00',
     "toHtml: defaultValue in mysql format, value as mysql returns date in mysql format, adjusted for time zone"
+);
+$date2 = WebGUI::Form::DateTime->new($session, {defaultValue => '2008-081-01 11:34:26',});
+is(
+    getValueFromForm($session, $date2->toHtml),
+    '1969-12-31 18:00:00',
+    "toHtml: defaultValue in bad mysql format, returns value from epoch 0, adjusted for user time zone"
 );
 
 sub getValueFromForm {
