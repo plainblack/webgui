@@ -207,7 +207,7 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 iterateAll ( $asset )
+=head2 iterateAll ( $asset, [ $options ] )
 
 This class method returns an iterator set to iterate over all entries for a Dataform.
 
@@ -215,13 +215,33 @@ This class method returns an iterator set to iterate over all entries for a Data
 
 A reference to a Dataform object.
 
+=head3 $options
+
+A hashreference of options.
+
+=head4 offset
+
+The record number to start the iterator at.  Defaults to 0 if not set.
+
+=head4 limit
+
+The number of records for the iterator to return.  Defaults to a very large number if not set.
+
 =cut
 
 sub iterateAll {
-    my $class = shift;
-    my $asset = shift;
-    my $sth = $asset->session->dbSlave->read("SELECT `DataForm_entryId`, `userId`, `username`, `ipAddress`, `submissionDate`, `entryData` FROM `DataForm_entry` WHERE `assetId` = ? ORDER BY `submissionDate` DESC", [$asset->getId]);
-    my $sub = sub {
+    my $class   = shift;
+    my $asset   = shift;
+    my $options = shift;
+    my $sql = "SELECT SQL_CALC_FOUND_ROWS `DataForm_entryId`, `userId`, `username`, `ipAddress`, `submissionDate`, `entryData` FROM `DataForm_entry` WHERE `assetId` = ? ORDER BY `submissionDate` DESC LIMIT ?,?";
+    my $placeHolders = [ $asset->getId ];
+    push @{ $placeHolders }, exists $options->{offset} ? $options->{offset} : 0;
+    push @{ $placeHolders }, exists $options->{limit}  ? $options->{limit}  : 1234567890;
+    my $slave   = $asset->session->dbSlave;  ##Use the same slave to calculate the number of rows
+    my $sth     = $slave->read($sql, $placeHolders);
+    my $allRows = $slave->quickScalar('SELECT FOUND_ROWS()');
+    my $sub   = sub {
+        return $allRows if $_[0] eq 'rowCount';
         if (defined wantarray) {
             my $properties = $sth->hashRef;
             if ($properties) {
