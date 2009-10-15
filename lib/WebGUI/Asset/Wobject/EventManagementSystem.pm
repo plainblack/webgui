@@ -36,6 +36,88 @@ use Tie::IxHash;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
+=head2 _generateFields ( tabform, targetField )
+
+adds input fields to the tab based on the target field
+TODO: I should put this in the EMSSubmissionForm module instead
+
+=head3 tabform
+
+must be a tabform object
+
+=head3 targetField
+
+this is the definition of the field being described by the fields in the tab
+
+=cut
+
+sub _generateFields {
+    my $tabform = shift;
+    my $targetField = shift;
+    my $dummy == $generators->{dummy};
+    my $tab = $targetField->{fieldId};
+
+# TODO .. add any standard fields to top of tab
+   # hidden fieldID?
+   # activate field
+   # display order
+    ($generators{$targetField->{fieldType}} || $dummy)->($tabform,$targetField);
+# TODO .. add any standard fields to bottom of tab
+   # field label
+   # field help
+}
+
+# FUTURE: this list of functions shouldbe defined in the control classes themselves
+my %generators = {
+     dummy => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' is not defined in EMS Submission Form generators list';
+     },
+     checkList => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' needs work';
+     },
+     combo => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' needs work';
+     },
+     integer => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' needs work';
+     },
+     float => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' needs work';
+     },
+     vendor => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' needs work';
+     },
+     yesNo => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' needs work';
+     },
+     text => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' needs work';
+     },
+     HTMLArea => sub {
+         my $tabform = shift;
+	 my $field = shift;
+	 return $field->{fieldType} . ' needs work';
+     },
+     # TODO add all of the other control types
+};
+
+#-------------------------------------------------------------------
 =head2 addGroupToSubmitList ( groupId )
 
 adds the parameter to eventSubmissionGroups
@@ -599,7 +681,7 @@ sub view {
 		newSubmissionUrl	=> $self->getUrl('func=newSubmission'),
 		viewSubmissionsUrl	=> $self->getUrl('func=viewSubmissions'),
 		viewSubmissionQueueUrl	=> $self->getUrl('func=viewSubmissionQueue'),
-		addSubmissionFormUrl	=> $self->getUrl('func=editSubmissionForm'),
+		addSubmissionFormUrl	=> $self->getUrl('func=addSubmissionForm'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
 		canEdit				=> $self->canEdit,
@@ -836,8 +918,7 @@ sub www_editSubmissionForm {
 	my $self             = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $session = $self->session;
-	my $form = $session->form;
-        my $assetId = shift || $form->get('assetId');
+        my $assetId = shift || $session->form->get('assetId');
 	my $asset;
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 
@@ -863,15 +944,54 @@ sub www_editSubmissionForm {
 	    }
         } elsif( $assetId ne 'new' ) {
 	    $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
-	    if (!defined $asset) { # won't catch everything, but it will help some if an asset blows up
+	    if (!defined $asset) { 
 		$self->session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
 	    }
+        }
+	my $defs = reverse WebGUI::Asset::EMSSubmissionForm->definition($session);
+	my $tabform = WebGUI::TabForm->new($session,undef,undef,$self->getUrl());
+        for my $def ( @$defs ) {
+	    # depricated...by WebGUI 8 they all must autogen forms
+	    next unless ($definition->{autoGenerateForms});
+	    for my $fieldName ( qw/title meuTitle url description/ ) {
+	        if( defined $def->{properties}{$fieldName} ) {
+		    $def->{properties}{$fieldName}{value} = $asset ? $asset->get($fieldName) : '';
+		    $tabform->dynamicField(%{$def->{properties}{$fieldName});
+		}
+	    }
+        }
+	my $fields;
+	# fixed order for the regular tabs
+	my @fieldNames = qw/displayTitle startDate duration seatsAvailable
+		     location relatedBadgeGroups sku vendorId shipsSeparately price/;
+	$defs = reverse WebGUI::Asset::EMSSubmission->definition($session);
+	for my $def ( @$defs ) {
+	    foreach $fieldName ( @fieldNames ) {
+	        if( defined $def->{$fieldName} ) {
+		      $fields->{$fieldName} = { %{$def->{$fieldName}} }; # a simple first level copy
+		      # field definitions don't contain their own name, we will need it later on
+		      $fields->{$fieldName}{fieldId} = $fieldName;
+		  };
+	    }
 	}
-	# TODO for new assets fill with blanks, otherwise get asset info to fill in template vars
-
+	# add the meta field tabs
+	for my $metaField ( $self->getEventMetaFields ) {
+	    push @fieldNames, $metaField->{fieldId};
+	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
+	    # meta fields call it data type, we copy it to simplify later on
+	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
+	}
+        # create tabs
+        for my $tabname ( @fieldNames ) {
+                $tabform->addTab($tabname, $fields->{$tabname}{label}, $0 );
+        }
+        for my $field ( values %$fields ) {
+	    _generateFields($tabform, $field);
+	}
 	return $self->processStyle(
                $self->processTemplate({
                       backUrl => $self->getUrl,
+		      pageForm => $tabform->print,
                   },$self->get('eventSubmissionFormTemplateId')));
 }
 
