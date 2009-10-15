@@ -141,6 +141,9 @@ our $HELP = {
             {   namespace => "Asset_Template",
                 tag       => "template variables"
             },
+            {   namespace => "WebGUI",
+                tag       => "pagination template variables"
+            },
         ],
         fields    => [],
         variables => [
