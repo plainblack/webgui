@@ -1944,6 +1944,12 @@ normal templates.|,
         context => q|Label for list of submission forms; user must choose one to edit.|,
     },
 
+    'main tab label' => {
+        message => q|Main|,
+        lastUpdated => 1147050475,
+        context => q|This is the label for te main tab in the edit submissionnForm form|,
+    },
+
 #    'TODO' => {
 #        message => q|TODO|,
 #        lastUpdated => 1147050475,

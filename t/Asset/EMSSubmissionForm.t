@@ -347,6 +347,10 @@ is( $sub2, undef, 'approval created a ticket');
 
 $versionTag->commit;
 
+# TODO either remove this or make it a real test.
+loginAdmin;
+print $ems->www_addSubmissionForm;
+
 #done_testing();
 #print 'press return to complete test' ; <>;
 #----------------------------------------------------------------------------

@@ -51,24 +51,30 @@ this is the definition of the field being described by the fields in the tab
 
 =cut
 
+my $generators;
+
+use lib '/root/pb/lib'; use dav;
+
 sub _generateFields {
     my $tabform = shift;
     my $targetField = shift;
-    my $dummy == $generators->{dummy};
-    my $tab = $targetField->{fieldId};
+    my $dummy = $generators->{dummy};
+    my $tab = $tabform->getTab($targetField->{fieldId});
+
+dav::log '_generateFields::fieldId:', $targetField->{fieldId};
 
 # TODO .. add any standard fields to top of tab
    # hidden fieldID?
    # activate field
    # display order
-    ($generators{$targetField->{fieldType}} || $dummy)->($tabform,$targetField);
+    ($generators->{$targetField->{fieldType}} || $dummy)->($tabform,$targetField);
 # TODO .. add any standard fields to bottom of tab
    # field label
    # field help
 }
 
 # FUTURE: this list of functions shouldbe defined in the control classes themselves
-my %generators = {
+$generators = {
      dummy => sub {
          my $tabform = shift;
 	 my $field = shift;
@@ -918,6 +924,7 @@ sub www_editSubmissionForm {
 	my $self             = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $session = $self->session;
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
         my $assetId = shift || $session->form->get('assetId');
 	my $asset;
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
@@ -948,44 +955,50 @@ sub www_editSubmissionForm {
 		$self->session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
 	    }
         }
-	my $defs = reverse WebGUI::Asset::EMSSubmissionForm->definition($session);
 	my $tabform = WebGUI::TabForm->new($session,undef,undef,$self->getUrl());
-        for my $def ( @$defs ) {
-	    # depricated...by WebGUI 8 they all must autogen forms
-	    next unless ($definition->{autoGenerateForms});
-	    for my $fieldName ( qw/title meuTitle url description/ ) {
-	        if( defined $def->{properties}{$fieldName} ) {
-		    $def->{properties}{$fieldName}{value} = $asset ? $asset->get($fieldName) : '';
-		    $tabform->dynamicField(%{$def->{properties}{$fieldName});
-		}
-	    }
-        }
 	my $fields;
 	# fixed order for the regular tabs
 	my @fieldNames = qw/displayTitle startDate duration seatsAvailable
 		     location relatedBadgeGroups sku vendorId shipsSeparately price/;
-	$defs = reverse WebGUI::Asset::EMSSubmission->definition($session);
-	for my $def ( @$defs ) {
-	    foreach $fieldName ( @fieldNames ) {
-	        if( defined $def->{$fieldName} ) {
-		      $fields->{$fieldName} = { %{$def->{$fieldName}} }; # a simple first level copy
+	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
+dav::dump 'editSubmissionForm::definition:', [@defs];
+	for my $def ( @defs ) {
+	    foreach my $fieldName ( @fieldNames ) {
+                my $properties = $def->{properties};
+	        if( defined $properties->{$fieldName} ) {
+		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
 		      # field definitions don't contain their own name, we will need it later on
 		      $fields->{$fieldName}{fieldId} = $fieldName;
 		  };
 	    }
 	}
 	# add the meta field tabs
-	for my $metaField ( $self->getEventMetaFields ) {
+	for my $metaField ( @{$self->getEventMetaFields} ) {
 	    push @fieldNames, $metaField->{fieldId};
 	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
 	    # meta fields call it data type, we copy it to simplify later on
 	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
 	}
+        unshift @fieldNames, 'main';
+        $fields->{main} = { label => $i18n->get('main tab label'), fieldId => 'main' };
         # create tabs
         for my $tabname ( @fieldNames ) {
                 $tabform->addTab($tabname, $fields->{$tabname}{label}, $0 );
         }
+        my $maintab = $tabform->getTab('main');
+	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
+        for my $def ( @defs ) {
+	    my $properties = $def->{properties};
+	    for my $fieldName ( qw/title menuTitle url description/ ) {
+	        if( defined $properties->{$fieldName} ) {
+		    $properties->{$fieldName}{value} = $asset ? $asset->get($fieldName) : '';
+		    $maintab->dynamicField($properties->{$fieldName});
+		}
+	    }
+        }
+dav::dump 'editSubmissionForm::dump before generate:',$fields;
         for my $field ( values %$fields ) {
+            next if $field->{fieldId} eq 'main' ;
 	    _generateFields($tabform, $field);
 	}
 	return $self->processStyle(
