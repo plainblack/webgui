@@ -37,7 +37,9 @@ WebGUI.Map.editPoint
     var assetId = '';
     if ( !marker ) {
         marker = new GMarker( map.getCenter(), { draggable: true } );
-        mgr.addMarker( marker, 1 );
+        marker.infoWin = document.createElement("div");
+        marker.bindInfoWindow( marker.infoWin );
+        mgr.addMarker( marker, 0 );
         mgr.refresh();
         assetId         = "new";
         marker.assetId  = "new";
@@ -49,93 +51,110 @@ WebGUI.Map.editPoint
         assetId = marker.assetId;
     }
 
+    // Create a loading dialog
+    var loadingDialog = new YAHOO.widget.Panel("loading", { width:"240px", 
+			  fixedcenter:true, 
+			  close:false, 
+			  draggable:false, 
+			  zindex:4,
+			  modal:true,
+			  visible:false
+			} 
+		);
+
+    loadingDialog.setHeader("Loading, please wait...");
+    loadingDialog.setBody('<img src="' + map.extrasUrl + '/yui-webgui/build/map/assets/loading.gif" />');
+    loadingDialog.render(document.body);
+
     // Callback should open the window with the form
     var callback    = function (text, code) {
-        marker.infoWin.innerHTML = text;
-        var button = marker.infoWin.getElementsByTagName( "form" )[0].elements["save"];
-        marker.openInfoWindow( marker.infoWin );
-        YAHOO.util.Event.addListener( button, "click", function (e) {
-            // Closing the info window triggers infowindowbeforeclose
-            marker.closeInfoWindow();
-            YAHOO.util.Event.stopEvent(e);
-            return false;
-        } );
-        GEvent.addListener( marker, "infowindowbeforeclose", function () {
-            WebGUI.Map.editPointSave( map, mgr, mapUrl, marker );
-        });
+        YAHOO.util.Dom.addClass( document.body, "yui-skin-sam" );
+        var dialog = new YAHOO.widget.Dialog("editPoint");
+        
+        var handleCancel = function() {
+            if ( marker.assetId == "new" ) {
+                mgr.removeMarker( marker );
+            }
+            this.cancel();
+        }
+
+        var handleSubmit = function() {
+            // Add the lat/long to the form
+            var lat = marker.getLatLng().lat();
+            var lng = marker.getLatLng().lng();
+            this.form.elements['latitude'].value = lat;
+            this.form.elements['longitude'].value = lng;
+
+            this.submit();
+        }
+        
+        var myButtons = [ 
+            { text:"Submit", handler:handleSubmit, isDefault:true },
+            { text:"Cancel", handler:handleCancel } 
+        ];
+        dialog.cfg.queueProperty("buttons", myButtons);
+        dialog.cfg.queueProperty("constraintoviewport", true);
+        dialog.cfg.queueProperty("fixedcenter", true);
+        dialog.setBody( text );
+        dialog.render(document.body);
+        dialog.show();
+
+        dialog.callback = {
+            upload: function (o) {
+                // Update marker info
+                var point   = YAHOO.lang.JSON.parse( o.responseText );
+                marker.assetId  = point.assetId;
+                GEvent.clearListeners( marker, "click" );
+                GEvent.clearListeners( marker, "infowindowbeforeclose" );
+
+                // Decode HTML entities because JSON is being returned as text/html
+                // See WebGUI::Asset::Wobject::Map www_ajaxEditPointSave
+                var decoder = document.createElement( "textarea" );
+                decoder.innerHTML       = point.content;
+                point.content           = decoder.value;
+
+                var infoWin = document.createElement( "div" );
+                infoWin.innerHTML       = point.content;
+                marker.infoWin          = infoWin;
+
+                if ( point.canEdit ) {
+                    var divButton    = document.createElement('div');
+                    infoWin.appendChild( divButton );
+
+                    var editButton      = document.createElement("input");
+                    editButton.type     = "button";
+                    editButton.value    = "Edit";
+                    GEvent.addDomListener( editButton, "click", function () {
+                        WebGUI.Map.editPoint( map, mgr, mapUrl, marker );
+                    } );
+                    divButton.appendChild( editButton );
+
+                    var deleteButton    = document.createElement("input");
+                    deleteButton.type   = "button";
+                    deleteButton.value  = "Delete"; // Replace with i18n
+                    GEvent.addDomListener( deleteButton, "click", function () {
+                        if ( confirm("Are you sure you want to delete this point?") ) {
+                            WebGUI.Map.deletePoint( map, mgr, mapUrl, marker );
+                        }
+                    } );
+                    divButton.appendChild( deleteButton );
+                }
+                marker.bindInfoWindow( infoWin );
+                GEvent.addListener( marker, "dragend", function (latlng) {
+                    WebGUI.Map.setPointLocation( marker, latlng, mapUrl );
+                } );
+            }
+        };
+
+        // Hide the loading dialog
+        loadingDialog.hide();
     };
+
+    // Show the loading dialog
+    loadingDialog.show();
 
     // Get the form
     GDownloadUrl( mapUrl + '?func=ajaxEditPoint;assetId=' + assetId, callback );
-};
-
-/**
- * WebGUI.Map.editPointSave( map, mgr, mapUrl, marker )
- * Save the edit form.
- */
-WebGUI.Map.editPointSave
-= function ( map, mgr, mapUrl, marker ) {
-    var iwin    = map.getInfoWindow();
-    var form    = iwin.getContentContainers()[0].getElementsByTagName('form')[0];
-    
-    // Add the lat/long to the form
-    var lat = marker.getLatLng().lat();
-    var lng = marker.getLatLng().lng();
-    form.elements['latitude'].value = lat;
-    form.elements['longitude'].value = lng;
-
-    // Make ajax request
-    var callback = {
-        upload: function (o) {
-            // Update marker info
-            var point   = YAHOO.lang.JSON.parse( o.responseText );
-            marker.assetId  = point.assetId;
-            GEvent.clearListeners( marker, "click" );
-            GEvent.clearListeners( marker, "infowindowbeforeclose" );
-
-            // Decode HTML entities because JSON is being returned as text/html
-            // See WebGUI::Asset::Wobject::Map www_ajaxEditPointSave
-            var decoder = document.createElement( "textarea" );
-            decoder.innerHTML       = point.content;
-            point.content           = decoder.value;
-
-            var infoWin = document.createElement( "div" );
-            infoWin.innerHTML       = point.content;
-            marker.infoWin          = infoWin;
-
-            if ( point.canEdit ) {
-                var divButton    = document.createElement('div');
-                infoWin.appendChild( divButton );
-
-                var editButton      = document.createElement("input");
-                editButton.type     = "button";
-                editButton.value    = "Edit";
-                GEvent.addDomListener( editButton, "click", function () {
-                    WebGUI.Map.editPoint( map, mgr, mapUrl, marker );
-                } );
-                divButton.appendChild( editButton );
-
-                var deleteButton    = document.createElement("input");
-                deleteButton.type   = "button";
-                deleteButton.value  = "Delete"; // Replace with i18n
-                GEvent.addDomListener( deleteButton, "click", function () {
-                    if ( confirm("Are you sure you want to delete this point?") ) {
-                        WebGUI.Map.deletePoint( map, mgr, mapUrl, marker );
-                    }
-                } );
-                divButton.appendChild( deleteButton );
-            }
-            marker.bindInfoWindow( infoWin );
-            GEvent.addListener( marker, "dragend", function (latlng) {
-                WebGUI.Map.setPointLocation( marker, latlng, mapUrl );
-            } );
-        }
-    };
-    // In case our form does not have a file upload in it
-    callback["success"] = callback["upload"];
-
-    YAHOO.util.Connect.setForm( form, 1 );
-    YAHOO.util.Connect.asyncRequest( 'POST', mapUrl, callback );
 };
 
 /**
