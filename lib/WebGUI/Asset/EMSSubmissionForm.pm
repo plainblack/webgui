@@ -52,6 +52,167 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+=head2 _generateFields ( tabform, targetField )
+
+adds input fields to the tab based on the target field
+TODO: I should put this in the EMSSubmissionForm module instead
+
+=head3 tabform
+
+must be a tabform object
+
+=head3 targetField
+
+this is the definition of the field being described by the fields in the tab
+
+=cut
+
+my $generators;
+
+use lib '/root/pb/lib'; use dav;
+
+sub _generateFields {
+    my $tabform = shift;
+    my $targetField = shift;
+    my $formDescription = shift;
+    my $fieldId = $targetField->{fieldId};
+    my $fieldDescription = $formDescription->{$fieldId};
+    my $dummy = $generators->{dummy};
+    my $tab = $tabform->getTab($targetField->{fieldId});
+
+dav::log '_generateFields::fieldId:', $targetField->{fieldId};
+
+   $tab->checkbox(label => 'turn this field on',
+              name => 'fieldSwitchList',
+	      value => $fieldId,
+	      checked => $fieldDescription->{on} || 0,
+	  );
+   $tab->integer(label => 'display order',
+              name => $fieldId . '_displayOrder',
+	      value => $fieldDescription->{displayOrder} || 0,
+	  );
+    ($generators->{$targetField->{fieldType}} || $dummy)->($tab,$targetField,$fieldDescription);
+   $tab->checkbox(label => 'value is required',
+              name => 'requiredFields',
+	      value => $fieldId,
+	      checked => $fieldDescription->{required} || 0,
+	  );
+   $tab->text(label => 'default value',
+              name => $fieldId . '_defaultValue',
+	      value => $fieldDescription->{defaultValue} || '',
+	  );
+   $tab->text(label => 'override label',
+              name => $fieldId . '_overrideLabel',
+	      value => $fieldDescription->{overrideLabel} || '',
+	  );
+   $tab->textarea(label => 'override help',
+              name => $fieldId . '_overrideHelp',
+	      value => $fieldDescription->{overrideHelp} || '',
+	  );
+}
+
+# FUTURE: this list of functions shouldbe defined in the control classes themselves
+$generators = {
+     dummy => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'ERROR',
+		   value => $field->{fieldType} . ' is not defined in EMS Submission Form generators list',
+              );
+     },
+     dateTime => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work<br> 
+		   add selectlist, range or date-select options ',
+              );
+     },
+     checkList => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work<br>
+		   add textarea for a list of options',
+              );
+     },
+     combo => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work<br>
+		   hmmm, needs some thought...',
+              );
+     },
+     integer => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work<br>
+		   add max and min options (each needs a checkbox)',
+              );
+     },
+     float => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work<br>
+		   add max and min options (each needs a checkbox)<br>
+		   add precision default = 1',
+              );
+     },
+     vendor => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work -- this might get eliminated',
+              );
+     },
+     yesNo => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work -- possibly no extra options',
+              );
+     },
+     text => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work -- might get eliminated or have no options',
+              );
+     },
+     HTMLArea => sub {
+         my $tab = shift;
+	 my $field = shift;
+	 my $description = shift;
+	 $tab->readOnly( 
+	           label => 'TODO',
+		   value => $field->{fieldType} . ' needs work -- might get eliminated or have no options',
+              );
+     },
+     # TODO add all of the other control types
+};
+
+#-------------------------------------------------------------------
 
 =head2 addSubmission
 
@@ -421,6 +582,113 @@ sub www_edit {
     return $session->privilege->locked()       unless $self->canEditIfLocked;
     my $i18n = WebGUI::International->new( $session, 'Asset_EMSSubmissionForm' );
     return $self->getAdminConsole->render( $self->getEditForm->print, $i18n->get('edit asset') );
+}
+
+#-------------------------------------------------------------------
+
+=head2  www_editSubmissionForm 
+
+is assetId is 'new' edit a blank form, else edit a form with stuff filled in...
+
+=cut
+
+sub editSubmissionForm {
+	my $class             = shift;
+	my $parent             = shift;
+	my $session = $parent->session;
+	my $i18n = WebGUI::International->new($parent->session,'Asset_EventManagementSystem');
+	my $form = $session->form;
+        my $assetId = shift || $form->get('assetId');
+	my $self;
+
+        if( ! defined( $assetId ) ) {
+	   my $res = $parent->getLineage(['children'],{ returnObjects => 1,
+		 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+	     } );
+	    if( scalar(@$res) == 1 ) {
+	        $self = $res->[0];
+		$assetId = $self->getId;
+	    } else {
+	        my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
+		            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
+	        my $listOfLinks = join '', ( map {
+		      $makeAnchorList->(
+		                $parent->getUrl('func=editSubmissionForm;assetId=' . $_->getId ),
+				$_->get('title'),
+				WebGUI::HTML::filter($_->get('description'),'all')
+		             )
+		           } ( @$res ) );
+		return $parent->processStyle( '<h1>' . $i18n->get('select form to edit') .
+		                            '</h1><ul>' . $listOfLinks . '</ul>' );
+	    }
+        } elsif( $assetId ne 'new' ) {
+	    $self = WebGUI::Asset->newByDynamicClass($session,$assetId);
+	    if (!defined $self) { 
+		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
+	    }
+        }
+	my $tabform = WebGUI::TabForm->new($session,undef,undef,$parent->getUrl());
+	my $fields;
+	# fixed order for the regular tabs
+	my @fieldNames = qw/startDate duration seatsAvailable location
+		     relatedBadgeGroups sku vendorId shipsSeparately price/;
+	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
+dav::dump 'editSubmissionForm::definition:', [@defs];
+	for my $def ( @defs ) {
+	    foreach my $fieldName ( @fieldNames ) {
+                my $properties = $def->{properties};
+	        if( defined $properties->{$fieldName} ) {
+		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
+		      # field definitions don't contain their own name, we will need it later on
+		      $fields->{$fieldName}{fieldId} = $fieldName;
+		  };
+	    }
+	}
+	# add the meta field tabs
+	for my $metaField ( @{$parent->getEventMetaFields} ) {
+	    push @fieldNames, $metaField->{fieldId};
+	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
+	    # meta fields call it data type, we copy it to simplify later on
+	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
+	}
+        unshift @fieldNames, 'main';
+        $fields->{main} = { label => $i18n->get('main tab label'), fieldId => 'main' };
+        # create tabs
+        for my $tabname ( @fieldNames ) {
+                $tabform->addTab($tabname, $fields->{$tabname}{label}, $0 );
+        }
+        my $maintab = $tabform->getTab('main');
+	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
+dav::dump 'editSubmissionForm::dump submission form def', \@defs ;
+        for my $def ( @defs ) {
+	    my $properties = $def->{properties};
+	    for my $fieldName ( qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
+                               deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
+	        if( defined $properties->{$fieldName} ) {
+                    my %param = %{$properties->{$fieldName}};
+		    $param{value} = $form->get($fieldName) || $self ? $self->get($fieldName) : $param{defaultValue} || '';
+		    $param{name} = $fieldName;
+dav::dump 'editSubmissionForm::properties for ', $fieldName, \%param ;
+		    $maintab->dynamicField(%param);
+		}
+	    }
+        }
+dav::dump 'editSubmissionForm::dump before generate:',$fields;
+	my $formDescription;
+	if( $form->get('formDescription') ) {
+	    $formDescription = JSON->new->decode($form->get('formDescription'));
+	} else {
+	    $formDescription = $self ? $self->getFormDescription : { };
+	}
+        for my $field ( values %$fields ) {
+            next if $field->{fieldId} eq 'main' ;
+	    _generateFields($tabform, $field,$formDescription);
+	}
+	return $parent->processStyle(
+               $parent->processTemplate({
+                      backUrl => $parent->getUrl,
+		      pageForm => $tabform->print,
+                  },$parent->get('eventSubmissionFormTemplateId')));
 }
 
 1;

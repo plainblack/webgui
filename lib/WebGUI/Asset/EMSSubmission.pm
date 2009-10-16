@@ -144,7 +144,7 @@ sub definition {
 		},
 		startDate => {
 			    noFormPost      => 1,
-			    fieldType       => "hidden",
+			    fieldType       => "dateTime",
 			    defaultValue    => '',
 			    label           => $EMS_i18n->get("add/edit event start date"),
 			    hoverHelp       => $EMS_i18n->get("add/edit event start date help"),
