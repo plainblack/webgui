@@ -3353,6 +3353,7 @@ alter table Photo add foreign key (assetId,revisionDate) references GalleryFile(
 alter table ImageAsset add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
 alter table sku add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
 alter table donation add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
+alter table donation add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table AdSku add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table AdSku add foreign key (purchaseTemplate) references asset(assetId) on delete restrict on update cascade;
 alter table AdSku add foreign key (manageTemplate) references asset(assetId) on delete restrict on update cascade;
@@ -3675,6 +3676,9 @@ alter table addressBook add foreign key (defaultAddressId) references address(ad
 alter table advertisement add foreign key (adSpaceId) references adSpace(adSpaceId) on delete cascade on update cascade;
 alter table advertisement add foreign key (ownerUserId) references users(userId) on delete cascade on update cascade;
 alter table bucketLog add foreign key (userId) references users(userId) on delete set null on update cascade;
-
+alter table deltaLog add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table friendInvitation add foreign key (inviterId) references users(userId) on delete cascade on update cascade;
+alter table friendInvitation add foreign key (friendId) references users(userId) on delete cascade on update cascade;
+alter table friendInvitation add foreign key (messageId) references inbox(messageId) on delete cascade on update cascade;
 
 
