@@ -3679,5 +3679,19 @@ alter table deltaLog add foreign key (assetId) references asset(assetId) on dele
 alter table friendInvitation add foreign key (inviterId) references users(userId) on delete cascade on update cascade;
 alter table friendInvitation add foreign key (friendId) references users(userId) on delete cascade on update cascade;
 alter table friendInvitation add foreign key (messageId) references inbox(messageId) on delete cascade on update cascade;
+alter table groupGroupings add foreign key (inGroup) references groups(groupId) on delete cascade on update cascade;
+alter table groups add foreign key (databaseLinkId) references databaseLink(databaseLinkId) on delete set null on update cascade;
+alter table groups add foreign key (ldapLinkId) references ldapLink(ldapLinkId) on delete set null on update cascade;
+alter table groupings add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table imagePaletteColors add foreign key (colorId) references imageColor(colorId) on delete cascade on update cascade;
+alter table inbox add foreign key (completedBy) references users(userId) on delete set null on update cascade;
+alter table inbox add foreign key (userId) references users(userId) on delete set null on update cascade;
+alter table inbox add foreign key (inGroup) references groups(groupId) on delete set null on update cascade;
+alter table inbox add foreign key (sentBy) references users(userId) on delete set null on update cascade;
+alter table inbox_messageState add foreign key (messageId) references inbox(messageId) on delete cascade on update cascade;
+alter table inbox_messageState add foreign key (userId) references users(userId) on delete cascade on update cascade;
+
+
+
 
 
