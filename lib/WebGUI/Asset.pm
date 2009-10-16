@@ -326,7 +326,7 @@ sub checkView {
 		return "chunked";
 	} 
     elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
-        my $queryFrag = "func=manageTrash";
+        my $queryFrag = "func=manageClipboard";
         if ($self->session->form->process('revision')) {
             $queryFrag .= ";revision=".$self->session->form->process('revision');
         }
