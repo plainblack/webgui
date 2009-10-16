@@ -95,7 +95,8 @@ sub correctWikiAttachmentPermissions {
     PAGE: while (my $wikiPage = $pageIterator->()) {
         my $wiki = $wikiPage->getWiki;
         next PAGE unless $wiki && $wiki->get('allowAttachments') && $wikiPage->getChildCount;
-        foreach my $attachment (@{ $wikiPage->getLineage(['children'])}) {
+        ATTACHMENT: foreach my $attachment (@{ $wikiPage->getLineage(['children'], { returnObjects => 1, })}) {
+            next ATTACHMENT unless $attachment;
             $attachment->update({ groupIdEdit => $wiki->get('groupToEditPages') });
         }
     }
