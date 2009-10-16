@@ -63,15 +63,14 @@ $testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
 $testUsers{'canEdit group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canEdit group user'}->addToGroups([$testGroups{'canEdit asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Edit Group User');
-WebGUI::Test->groupsToDelete($testGroups{'canEdit asset'});
+addToCleanup($testGroups{'canEdit asset'});
 
 ##A group and user for groupIdEdit
 $testGroups{'canAdd asset'}     = WebGUI::Group->new($session, 'new');
 $testUsers{'canAdd group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canAdd group user'}->addToGroups([$testGroups{'canAdd asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Can Add Group User');
-WebGUI::Test->groupsToDelete($testGroups{'canAdd asset'});
-WebGUI::Test->usersToDelete(values %testUsers);
+addToCleanup($testGroups{'canAdd asset'}, values %testUsers);
 
 my $canAddMaker = WebGUI::Test::Maker::Permission->new();
 $canAddMaker->prepare({
@@ -104,7 +103,7 @@ $properties = {
 };
 
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag2);
+addToCleanup($versionTag2);
 
 my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
 
@@ -120,7 +119,7 @@ $canEditMaker->prepare({
 });
 
 my $versionTag3 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag3);
+addToCleanup($versionTag3);
 $properties = {
 	#            '1234567890123456789012'
 	id          => 'canViewAsset0000000010',
@@ -153,7 +152,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 116 
+plan tests => 126
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -303,7 +302,7 @@ $session->{_request} = $origRequest;
 ################################################################
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 $versionTag->set({name=>"Asset tests"});
 
 $properties = {
@@ -744,7 +743,7 @@ $product3->purge;
 ################################################################
 
 my $versionTag4 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag4);
+addToCleanup($versionTag4);
 $versionTag4->set( { name => 'inheritUrlFromParent tests' } );
 
 $properties = {
@@ -890,7 +889,6 @@ $session->log->warn('parent asset is now committed');
 is( $testVersionTag->get('isCommitted'), 1, 'parent asset is now committed' );
 
 $childVersionTag = WebGUI::VersionTag->new( $session, $childAsset->get('tagId') );
-$session->log->warn('child asset is now committed');
 is( $childVersionTag->get('isCommitted'), 1, 'child asset is now committed' );
 
 ################################################################
@@ -901,11 +899,57 @@ is( $childVersionTag->get('isCommitted'), 1, 'child asset is now committed' );
 
 my $assetToCommit = $defaultAsset->addChild({ className => 'WebGUI::Asset::Snippet', title => 'Snippet to commit and clone from db', });
 my $cloneTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($cloneTag);
+addToCleanup($cloneTag);
 $cloneTag->commit;
 is($assetToCommit->get('status'), 'pending', 'cloneFromDb: local asset is still pending');
 $assetToCommit = $assetToCommit->cloneFromDb;
 is($assetToCommit->get('status'), 'approved', '... returns fresh, commited asset from the db');
+
+################################################################
+#
+# checkView
+#
+################################################################
+
+my $trashedAsset = $defaultAsset->addChild({
+    className => 'WebGUI::Asset::Snippet', title     => 'Trashy',
+});
+
+my $clippedAsset = $defaultAsset->addChild({
+    className => 'WebGUI::Asset::Snippet', title     => 'Clippy',
+});
+
+my $checkTag = WebGUI::VersionTag->getWorking($session);
+$checkTag->commit;
+addToCleanup($checkTag);
+$trashedAsset = $trashedAsset->cloneFromDb;
+$clippedAsset = $clippedAsset->cloneFromDb;
+$trashedAsset->trash;
+$clippedAsset->cut;
+is $trashedAsset->get('state'), 'trash',     'checkView setup: trashed an asset';
+is $clippedAsset->get('state'), 'clipboard', '... clipped an asset';
+
+$session->var->switchAdminOff;
+$session->http->setRedirectLocation('');
+$session->http->setStatus(200, 'OK');
+
+$trashedAsset->checkView();
+is $session->http->getStatus, 410, '... status set to 410 for trashed asset';
+is $session->http->getRedirectLocation, '', '... no redirect set';
+
+$session->http->setStatus(200, 'OK');
+$clippedAsset->checkView();
+is $session->http->getStatus, 410, '... status set to 410 for cut asset';
+is $session->http->getRedirectLocation, '', '... no redirect set';
+
+$session->var->switchAdminOn;
+$session->http->setStatus(200, 'OK');
+is $trashedAsset->checkView(), 'chunked', '... returns "chunked" when admin is on for trashed asset';
+is $session->http->getRedirectLocation, $trashedAsset->getUrl('func=manageTrash'), '... trashed asset sets redirect to manageTrash';
+
+$session->http->setRedirectLocation('');
+is $clippedAsset->checkView(), 'chunked', 'checkView: returns "chunked" when admin is on for cut asset';
+is $session->http->getRedirectLocation, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
 
 ##Return an array of hashrefs.  Each hashref describes a test
 ##for the fixId method.

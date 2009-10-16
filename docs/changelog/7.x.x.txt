@@ -21,6 +21,7 @@
  - fixed #11128: Thing breaks w/ default value for date field
  - fixed #10888: Issues with adding points to Maps
  - fixed #10993: Editor drops last letter if s
+ - fixed #11139: referencing an item in the clipboard
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
