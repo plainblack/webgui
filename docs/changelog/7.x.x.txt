@@ -4,6 +4,7 @@
  - fixed #11128: Thing breaks w/ default value for date field
  - fixed #10888: Issues with adding points to Maps
  - fixed #11139: referencing an item in the clipboard
+ - fixed #11146: Upgrade Error 7.7.21 to 7.7.22 
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
