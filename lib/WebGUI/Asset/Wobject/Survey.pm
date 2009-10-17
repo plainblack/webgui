@@ -60,6 +60,13 @@ sub definition {
             label        => $i18n->get('Survey Exit URL'),
             hoverHelp    => $i18n->get('Survey Exit URL help'),
         },
+        maxResponsesPerUser => {
+            fieldType    => 'integer',
+            tab          => 'properties',
+            defaultValue => 1,
+            label        => $i18n->get('Max user responses'),
+            hoverHelp    => $i18n->get('Max user responses help'),
+        },
         timeLimit => {
             fieldType    => 'integer',
             defaultValue => 0,
@@ -235,13 +242,6 @@ sub definition {
             defaultValue => 4,
             label        => $i18n->get('Group to view reports'),
             hoverHelp    => $i18n->get('Group to view reports help'),
-        },
-        maxResponsesPerUser => {
-            fieldType    => 'integer',
-            tab          => 'security',
-            defaultValue => 1,
-            label        => $i18n->get('Max user responses'),
-            hoverHelp    => $i18n->get('Max user responses help'),
         },
         
         # Other
