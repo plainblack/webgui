@@ -2300,6 +2300,9 @@ END_SQL
     }
     $var->{response_loop} = \@responseloop;
     $paginator->appendTemplateVars($var);
+    
+    # Clean up
+    $self->clearTempReportTable;
 
     my $out = $self->processTemplate( $var, $self->get('gradebookTemplateId') );
     return $self->processStyle($out);
@@ -2390,6 +2393,9 @@ sub www_viewStatisticalOverview {
 
     $var->{question_loop} = \@questionloop;
     $paginator->appendTemplateVars($var);
+    
+    # Clean up
+    $self->clearTempReportTable;
 
     my $out = $self->processTemplate( $var, $self->get('overviewTemplateId') );
     return $self->processStyle($out);
@@ -2444,6 +2450,9 @@ sub export {
         my $method = $format eq 'csv' ? 'quickCSV' : 'quickTab';
         $content = $self->session->db->$method( $opts{sql}, $opts{sqlParams} );
     }
+    
+    # Clean up
+    $self->clearTempReportTable;
     
     my $filename = $self->session->url->escape( $self->get("title") . "_$opts{name}.$format" );
     $self->session->http->setFilename($filename,"text/$format");
@@ -2585,6 +2594,21 @@ END_HTML
 
 #-------------------------------------------------------------------
 
+=head2 clearTempReportTable
+
+Clears the Survey_tempReport table
+
+Typically called after L<loadTempReportTable> has been used
+
+=cut
+
+sub clearTempReportTable {
+    my $self = shift;
+    $self->session->db->write( 'delete from Survey_tempReport where assetId = ?', [ $self->getId() ] );
+}
+
+#-------------------------------------------------------------------
+
 =head2 loadTempReportTable
 
 Loads the responses from the survey into the Survey_tempReport table, so that other or custom reports can be ran against this data.
@@ -2607,7 +2631,7 @@ sub loadTempReportTable {
     my %opts = validate(@_, { ignoreRevisionDate => 0 });
 
     # Remove old temp report data
-    $self->session->db->write( 'delete from Survey_tempReport where assetId = ?', [ $self->getId() ] );
+    $self->clearTempReportTable;
     
     # Build the sql that will select all responses
     my $sql = 'select * from Survey_response where assetId = ?';
