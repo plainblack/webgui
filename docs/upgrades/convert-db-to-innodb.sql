@@ -2394,7 +2394,7 @@ CREATE TABLE `sku_inno` (
   `revisionDate` bigint(20) NOT NULL,
   `description` mediumtext,
   `sku` char(35) NOT NULL,
-  `vendorId` char(22) character set utf8 collate utf8_bin NOT NULL default 'defaultvendor000000000',
+  `vendorId` char(22) character set utf8 collate utf8_bin default 'defaultvendor000000000',
   `displayTitle` tinyint(1) NOT NULL default '1',
   `overrideTaxRate` tinyint(1) NOT NULL default '0',
   `taxRateOverride` float NOT NULL default '0',
@@ -3353,6 +3353,7 @@ alter table GalleryFile add foreign key (assetId,revisionDate) references FileAs
 alter table Photo add foreign key (assetId,revisionDate) references GalleryFile(assetId,revisionDate) on delete cascade on update cascade;
 alter table ImageAsset add foreign key (assetId,revisionDate) references FileAsset(assetId,revisionDate) on delete cascade on update cascade;
 alter table sku add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
+alter table sku add foreign key (vendorId) references vendor(vendorId) on delete set null on update cascade;
 alter table donation add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table donation add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table AdSku add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
@@ -3438,6 +3439,8 @@ alter table EMSRegistrantTicket add foreign key (ticketAssetId) references asset
 alter table EMSRegistrantTicket add foreign key (transactionItemId) references transactionItem(itemId) on delete cascade on update cascade;
 alter table EMSRegistrantToken add foreign key (tokenAssetId) references asset(assetId) on delete cascade on update cascade;
 alter table search add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
+alter table search add foreign key (searchRoot) references asset(assetId) on delete restrict on update cascade;
+alter table search add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Folder add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table Folder add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Gallery add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
@@ -3658,7 +3661,6 @@ alter table cart add foreign key (posUserId) references users(userId) on delete 
 alter table cartItem add foreign key (cartId) references cart(cartId) on delete cascade on update cascade;
 alter table cartItem add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table cartItem add foreign key (shippingAddressId) references address(addressId) on delete set null on update cascade;
-alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
 alter table WorkflowActivityData add foreign key (activityId) references WorkflowActivity(activityId) on delete cascade on update cascade;
 alter table WorkflowActivity add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
 alter table WorkflowInstance add foreign key (workflowId) references Workflow(workflowId) on delete cascade on update cascade;
@@ -3690,6 +3692,27 @@ alter table inbox add foreign key (inGroup) references groups(groupId) on delete
 alter table inbox add foreign key (sentBy) references users(userId) on delete set null on update cascade;
 alter table inbox_messageState add foreign key (messageId) references inbox(messageId) on delete cascade on update cascade;
 alter table inbox_messageState add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table karmaLog add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table ldapLink add foreign key (ldapLoginTemplate) references asset(assetId) on delete restrict on update cascade;
+alter table ldapLink add foreign key (ldapCreateAccountTemplate) references asset(assetId) on delete restrict on update cascade;
+alter table ldapLink add foreign key (ldapAccountTemplate) references asset(assetId) on delete restrict on update cascade;
+alter table mailQueue add foreign key (toGroup) references groups(groupId) on delete cascade on update cascade;
+alter table metaData_values add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
+alter table passiveAnalyticsStatus add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table passiveProfileAOI add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table shopCredit add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table tax_eu_vatNumbers add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table template_attachments add foreign key (templateId) references asset(assetId) on delete cascade on update cascade;
+alter table transaction add foreign key (originatingTransactionId) references transaction(transactionId) on delete set null on update cascade;
+alter table transaction add foreign key (userId) references users(userId) on delete set null on update cascade;
+alter table transaction add foreign key (shippingAddressId) references address(addressId) on delete set null on update cascade;
+alter table transaction add foreign key (shippingDriverId) references shipper(shipperId) on delete set null on update cascade;
+alter table transaction add foreign key (paymentAddressId) references address(addressId) on delete set null on update cascade;
+alter table transaction add foreign key (paymentDriverId) references paymentGateway(paymentGatewayId) on delete set null on update cascade;
+alter table transaction add foreign key (cashierUserId) references users(userId) on delete set null on update cascade;
+alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
+alter table transactionItem add foreign key (shippingAddressId) references address(addressId) on delete set null on update cascade;
+alter table transactionItem add foreign key (vendorId) references vendor(vendorId) on delete set null on update cascade;
 
 
 
