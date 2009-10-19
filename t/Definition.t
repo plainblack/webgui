@@ -13,7 +13,7 @@ use warnings;
 no warnings qw(uninitialized);
 
 use Test::More 'no_plan'; #tests => 1;
-
+my $called_getProperties;
 {
     package WGT::Class;
     use WebGUI::Definition (
@@ -30,6 +30,12 @@ use Test::More 'no_plan'; #tests => 1;
         my $class = shift;
         my $self = $class->instantiate;
         return $self;
+    }
+
+    sub getProperties {
+        $called_getProperties = 1;
+        my $self = shift;
+        return $self->next::method(@_);
     }
 }
 
@@ -80,8 +86,11 @@ is $subclass_object->property2, 'property 2 value',
 
 is_deeply [ $object->getProperties ], ['property1'],
     'class has correct properties';
+ok $called_getProperties, 'able to override getProperties';
+undef $called_getProperties;
 is_deeply [ $subclass_object->getProperties ], ['property1', 'a_property', 'property2'],
     'subclass has correct properties';
+ok $called_getProperties, 'subclass uses correctly overridden getProperties';
 
 is_deeply $object->get, { property1 => 'property 1 value' },
     'get returns hash with correct properties';

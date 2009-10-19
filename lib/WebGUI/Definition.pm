@@ -43,10 +43,6 @@ sub import {
     my @propertyList;
     my %properties;
     if ( my $properties = delete $definition->{properties} ) {
-        # accept a hash and alphabetize it
-        if (ref $properties eq 'HASH') {
-            $properties = [ map { $_ => $properties->{$_} } sort keys %{ $properties } ];
-        }
         for (my $i = 0; $i < @{ $properties }; $i += 2) {
             my $property = $properties->[$i];
             push @propertyList, $property;
@@ -109,7 +105,8 @@ sub import {
     *{$super . '::set'} = \&_set;
     *{$super . '::update'} = \&_update;
     *{$super . '::instantiate'} = \&_instantiate;
-    unshift @{$caller . '::ISA'}, $super;
+    @{$super . '::ISA'} = @{$caller . '::ISA'};
+    @{$caller . '::ISA'} = ($super);
     return;
 }
 
