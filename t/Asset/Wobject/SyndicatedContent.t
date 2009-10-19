@@ -20,7 +20,7 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 21; # increment this value for each test you create
+use Test::More tests => 22; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
@@ -173,3 +173,34 @@ cmp_deeply(
 );
 
 $cache->delete;
+
+####################################################################
+#
+#  Odd feeds
+#
+####################################################################
+
+
+##Feed with no links or pubDates.
+my $oncpUrl = 'http://www.oncp.gob.ve/oncp.xml';
+$syndicated_content->update({
+    rssUrl       => $oncpUrl,
+    hasTerms     => '',
+    maxHeadlines => 50,
+});
+
+my $cache = WebGUI::Cache->new($session, $oncpUrl, 'RSS');
+open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('oncp.xml')
+    or die "Unable to get RSS file: oncp.xml";
+my $rssContent = do { local $/; <$rssFile>; };
+close $rssFile;
+$cache->set($rssContent, 60);
+
+my $oddFeed1 = $syndicated_content->generateFeed();
+
+my @oddItems = $oddFeed1->get_item();
+is (@oddItems, 13, 'feed has items even without pubDates or links');
+
+$cache->delete;
+
+
