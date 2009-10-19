@@ -162,9 +162,6 @@ $cache->set($rssContent, 60);
 
 my $filteredFeed = $syndicated_content->generateFeed();
 
-use Data::Dumper;
-diag Dumper($filteredFeed->get_item());
-
 cmp_deeply(
     [ map { $_->title } $filteredFeed->get_item() ],
     [
