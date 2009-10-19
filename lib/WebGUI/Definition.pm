@@ -24,6 +24,7 @@ use Sub::Name ();
 use Clone ();
 use mro ();
 
+# used to generate unique packages
 my $gen_package = 0;
 
 sub import {
@@ -31,13 +32,24 @@ sub import {
     if (! @_) {
         return;
     }
+
     my $definition = (@_ == 1 && ref $_[0]) ? $_[0] : { @_ };
     my $caller = caller;
-    # ensure we are using c3 method resolution
-    mro::set_mro($caller, 'c3');
+
+    # generate superclass
     $gen_package++;
     my $super = __PACKAGE__ . '::_gen' . $gen_package;
+
+    # insert generated package as superclass
+    {
+        no strict 'refs';
+        @{$super . '::ISA'} = @{$caller . '::ISA'};
+        @{$caller . '::ISA'} = ($super);
+    }
+
+    # ensure we are using c3 method resolution
     mro::set_mro($super, 'c3');
+    mro::set_mro($caller, 'c3');
 
     # construct an ordered list and hash of the properties
     my @propertyList;
@@ -53,60 +65,16 @@ sub import {
     # accessors for properties
     for my $property ( @propertyList ) {
         no strict 'refs';
-        $class->_install($super, $property, sub {
-            if (@_ > 1) {
-                my $value = $_[1];
-                return $_[0]{properties}{$property} = $value;
-            }
-            else {
-                return $_[0]{properties}{$property};
-            }
-        });
+        $class->_install($super, $property, $class->_gen_accessor($property));
     }
 
-    $class->_install($super, 'getProperty', sub {
-        my $self = shift;
-        my $property = shift;
-        if (exists $properties{$property}) {
-            my $subattributes = Clone::clone $properties{$property};
-            if ( ref $self ) {
-                for my $subattribute ( keys %{ $subattributes } ) {
-                    my $attrValue = $subattributes->{$subattribute};
-                    if ( ref $attrValue && ref $attrValue eq 'CODE' ) {
-                        $subattributes->{$subattribute} = $self->$attrValue($property, $subattribute);
-                    }
-                }
-            }
-            return $subattributes;
-        }
-        return $self->maybe::next::method($property);
-    });
-
-    $class->_install($super, 'getProperties', sub {
-        my $self = shift;
-        my %props = map { $_ => 1 } @propertyList;
-        # remove any properties from superclass list that exist in this class
-        my @allProperties = grep { ! $props{$_} } $self->maybe::next::method(@_);
-        push @allProperties, @propertyList;
-        return @allProperties;
-    });
-
-    $class->_install($super, 'getAttribute', sub {
-        my $self = shift;
-        my $attribute = shift;
-        if ( exists $definition->{$attribute} ) {
-            return $definition->{$attribute};
-        }
-        return $self->maybe::next::method($attribute);
-    });
-
-    no strict 'refs';
-    *{$super . '::get'} = \&_get;
-    *{$super . '::set'} = \&_set;
-    *{$super . '::update'} = \&_update;
-    *{$super . '::instantiate'} = \&_instantiate;
-    @{$super . '::ISA'} = @{$caller . '::ISA'};
-    @{$caller . '::ISA'} = ($super);
+    $class->_install($super, 'getProperty',   $class->_gen_getProperty(\%properties));
+    $class->_install($super, 'getProperties', $class->_gen_getProperties(\@propertyList));
+    $class->_install($super, 'getAttribute',  $class->_gen_getAttribute($definition));
+    $class->_install($super, 'get',           $class->_gen_get);
+    $class->_install($super, 'set',           $class->_gen_set);
+    $class->_install($super, 'update',        $class->_gen_update);
+    $class->_install($super, 'instantiate',   $class->_gen_instantiate);
     return;
 }
 
@@ -118,47 +86,117 @@ sub _install {
     return $sub;
 }
 
-sub _set {
-    my $self = shift;
-    my $properties = ( @_ == 1 && ref $_[0] ) ? $_[0] : { @_ };
-    my %availProperties = map { $_ => 1 } $self->getProperties;
-    for my $property ( keys %{ $properties } ) {
-        if ( $availProperties{$property} ) {
-            $self->$property( $properties->{$property} );
-        }
-    }
-}
-
-sub _get {
-    my $self = shift;
-    if (@_) {
-        my $prop = shift;
-        return $self->$prop;
-    }
-    my @all_properties = $self->getProperties;
-    my %props;
-    for my $property ( @all_properties ) {
-        $props{$property} = $self->$property;
-    }
-    return \%props;
-}
-
-sub _update {
-    my $self = shift;
-    $self->set(@_);
-    if ($self->can('write')) {
-        $self->write;
-    }
-}
-
-sub _instantiate {
+sub _gen_accessor {
     my $class = shift;
-    my $self = bless {
-        properties => {},
-    }, $class;
-    $self->set(@_);
-    return $self;
-};
+    my $property = shift;
+    return sub {
+        if (@_ > 1) {
+            my $value = $_[1];
+            return $_[0]{properties}{$property} = $value;
+        }
+        else {
+            return $_[0]{properties}{$property};
+        }
+    };
+}
+
+sub _gen_getProperty {
+    my $class = shift;
+    my $properties = shift;
+    return sub {
+        my $self = shift;
+        my $property = shift;
+        if (exists $properties->{$property}) {
+            my $subattributes = Clone::clone($properties->{$property});
+            if ( ref $self ) {
+                for my $subattribute ( keys %{ $subattributes } ) {
+                    my $attrValue = $subattributes->{$subattribute};
+                    if ( ref $attrValue && ref $attrValue eq 'CODE' ) {
+                        $subattributes->{$subattribute} = $self->$attrValue($property, $subattribute);
+                    }
+                }
+            }
+            return $subattributes;
+        }
+        return $self->maybe::next::method($property);
+    };
+}
+
+sub _gen_getProperties {
+    my $class = shift;
+    my $propertyList = shift;
+    return sub {
+        my $self = shift;
+        my %props = map { $_ => 1 } @$propertyList;
+        # remove any properties from superclass list that exist in this class
+        my @allProperties = grep { ! $props{$_} } $self->maybe::next::method(@_);
+        push @allProperties, @$propertyList;
+        return @allProperties;
+    };
+}
+
+sub _gen_getAttribute {
+    my $class = shift;
+    my $definition = shift;
+    return sub {
+        my $self = shift;
+        my $attribute = shift;
+        if ( exists $definition->{$attribute} ) {
+            return $definition->{$attribute};
+        }
+        return $self->maybe::next::method($attribute);
+    };
+}
+
+sub _gen_set {
+    return sub {
+        my $self = shift;
+        my $properties = ( @_ == 1 && ref $_[0] ) ? $_[0] : { @_ };
+        my %availProperties = map { $_ => 1 } $self->getProperties;
+        for my $property ( keys %{ $properties } ) {
+            if ( $availProperties{$property} ) {
+                $self->$property( $properties->{$property} );
+            }
+        }
+    };
+}
+
+sub _gen_get {
+    return sub {
+        my $self = shift;
+        if (@_) {
+            my $prop = shift;
+            return $self->$prop;
+        }
+        my @all_properties = $self->getProperties;
+        my %props;
+        for my $property ( @all_properties ) {
+            $props{$property} = $self->$property;
+        }
+        return \%props;
+    };
+}
+
+sub _gen_update {
+    return sub {
+        my $self = shift;
+        $self->set(@_);
+        if ($self->can('write')) {
+            $self->write;
+        }
+    };
+}
+
+sub _gen_instantiate {
+    return sub {
+        my $class = shift;
+        my $self = bless {
+            properties => {},
+        }, $class;
+        $self->set(@_);
+        return $self;
+    };
+}
 
 1;
 

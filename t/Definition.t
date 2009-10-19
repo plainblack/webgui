@@ -45,7 +45,7 @@ my $written;
     use base qw(WGT::Class);
     use WebGUI::Definition (
         attribute2 => 'attribute 2 value',
-        properties => {
+        properties => [
             property2 => {
                 label => 'property2 label',
                 defaultValue => sub { return "dynamic value" },
@@ -53,7 +53,7 @@ my $written;
             a_property => {
                 defaultValue => 1,
             },
-        },
+        ],
     );
 
     sub write {
@@ -88,7 +88,7 @@ is_deeply [ $object->getProperties ], ['property1'],
     'class has correct properties';
 ok $called_getProperties, 'able to override getProperties';
 undef $called_getProperties;
-is_deeply [ $subclass_object->getProperties ], ['property1', 'a_property', 'property2'],
+is_deeply [ $subclass_object->getProperties ], ['property1', 'property2', 'a_property'],
     'subclass has correct properties';
 ok $called_getProperties, 'subclass uses correctly overridden getProperties';
 
