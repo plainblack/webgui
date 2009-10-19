@@ -133,7 +133,7 @@ sub generateFeed {
     my $limit = shift || $self->get('maxHeadlines');
 	my $feed = XML::FeedPP::Atom->new();
 	my $log = $self->session->log;
-	
+
 	# build one feed out of many
     my $newlyCached = 0;
 	foreach my $url (split(/\s+/, $self->get('rssUrl'))) {
@@ -154,35 +154,45 @@ sub generateFeed {
         utf8::downgrade($value, 1);
         eval {
             my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string');
-            $feed->merge($singleFeed);
+            $feed->merge_channel($singleFeed);
+            $feed->merge_item($singleFeed);
         };
         if ($@) {
             $log->error("Syndicated Content asset (".$self->getId.") has a bad feed URL (".$url."). Failed with ".$@);
         }
 	}
-	
+
+
 	# build a new feed that matches the term the user is interested in
 	if ($self->get('hasTerms') ne '') {
 		my @terms = split /,\s*/, $self->get('hasTerms'); # get the list of terms
 		my $termRegex = join("|", map quotemeta($_), @terms); # turn the terms into a regex string
 		my @items =  $feed->match_item(title       => qr/$termRegex/msi);
 		push @items, $feed->match_item(description => qr/$termRegex/msi);
-		$feed->clear_item;
-        $feed->uniq_item;
-		foreach my $item (@items) {
-			$feed->add_item($item);
-		}
+        $feed->clear_item;
+        ITEM: foreach my $item (@items) {
+            $feed->add_item($item);
+        }
 	}
-	
+
+    my %seen = {};
+    my @items = $feed->get_item;
+    $feed->clear_item;
+    ITEM: foreach my $item (@items) {
+        my $key = join "\n", $item->link, $item->pubDate, $item->description, $item->title;
+        next ITEM if $seen{$key}++;
+        $feed->add_item($item);
+    }
+
 	# sort them by date and remove any duplicate from the OR based term matching above
-	$feed->normalize();
-	
+	$feed->sort_item();
+
 	# limit the feed to the maximum number of headlines (or the feed generator limit).
 	$feed->limit_item($limit);
-	
+
 	# mark this asset as updated
 	$self->update({}) if ($newlyCached);
-	
+
 	return $feed;
 }
 
