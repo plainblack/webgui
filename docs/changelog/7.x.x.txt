@@ -6,6 +6,7 @@
  - fixed #11139: referencing an item in the clipboard
  - fixed #11146: Upgrade Error 7.7.21 to 7.7.22 
  - fixed #11147: fail safe template is missing embedded style
+ - fixed #11137: Customers see failed orders
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
