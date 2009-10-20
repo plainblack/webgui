@@ -165,7 +165,7 @@ CREATE TABLE `DataForm_inno` (
   `fieldConfiguration` longtext,
   `tabConfiguration` longtext,
   `workflowIdAddEntry` char(22) character set utf8 collate utf8_bin default NULL,
-  `htmlAreaRichEditor` char(22) character set utf8 collate utf8_bin default '**Use_Default_Editor**',
+  `htmlAreaRichEditor` char(22) character set utf8 collate utf8_bin default NULL,
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -3411,6 +3411,7 @@ alter table Dashboard add foreign key (assetId,revisionDate) references wobject(
 alter table Dashboard add foreign key (adminsGroupId) references groups(groupId) on delete restrict on update cascade;
 alter table Dashboard add foreign key (usersGroupId) references groups(groupId) on delete restrict on update cascade;
 alter table Dashboard add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
+update DataForm set htmlAreaRichEditor=null where htmlAreaRichEditor='**Use_Default_Editor**';
 alter table DataForm add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table DataForm add foreign key (emailTemplateId) references asset(assetId) on delete restrict on update cascade;
 alter table DataForm add foreign key (acknowlegementTemplateId) references asset(assetId) on delete restrict on update cascade;
@@ -3418,7 +3419,7 @@ alter table DataForm add foreign key (listTemplateId) references asset(assetId) 
 alter table DataForm add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table DataForm add foreign key (groupToViewEntries) references groups(groupId) on delete restrict on update cascade;
 alter table DataForm add foreign key (workflowIdAddEntry) references Workflow(workflowId) on delete set null on update cascade;
-alter table DataForm add foreign key (htmlAreaRichEditor) references asset(assetId) on delete restrict on update cascade;
+alter table DataForm add foreign key (htmlAreaRichEditor) references asset(assetId) on delete set null on update cascade;
 alter table DataForm_entry add foreign key (userId) references users(userId) on delete set null on update cascade;
 alter table DataForm_entry add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
 alter table DataTable add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
