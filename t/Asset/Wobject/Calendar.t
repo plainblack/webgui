@@ -57,7 +57,7 @@ use Data::Dumper;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
-plan tests => 15 + scalar @icalWrapTests;
+plan tests => 14 + scalar @icalWrapTests;
 
 my $session = WebGUI::Test->session;
 
@@ -221,6 +221,30 @@ my $justAfterwt = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
+my $coincident = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Coincident with the window start and window end',
+    startDate   => $startDt->toDatabaseDate,
+    endDate     => $endDt->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $coincidentLow = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Coincident with the window start',
+    startDate   => $startDt->toDatabaseDate,
+    endDate     => $endDt->clone->add(days => 1)->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $coincidentHigh = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Coincident with the window end',
+    startDate   => $startDt->clone->add( days => -1, )->toDatabaseDate,
+    endDate     => $endDt->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
 #    wt suffix = with times
 #                      inside
 #                      insidewt
@@ -228,6 +252,9 @@ my $justAfterwt = $windowCal->addChild({
 #          |-------------straddlewt---------------|
 #      straddleLowwt
 #                                           straddleHighwt
+#              |----------coincident-----------|
+#              |----------coincidentLow------------------|
+#    |--------------------coincidentHigh-------|
 # window:      |-------------------------------|
 #   justBeforewt                               justAfterwt
 #                                                 outside high
@@ -239,7 +266,7 @@ my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
 WebGUI::Test->tagsToRollback($tag2);
 
-is(scalar @{ $windowCal->getLineage(['children'])}, 10, 'added events to the window calendar');
+is(scalar @{ $windowCal->getLineage(['children'])}, 13, 'added events to the window calendar');
 
 my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
 
@@ -247,11 +274,14 @@ my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
 #note join "\n", map { join ' ', $_->get('title'), $_->get('startDate'), $_->get('startTime')} @window;
 #note $endDt->toDatabase;
 
-is(scalar @window, 6, 'getEventsIn returned 6 events');
 cmp_bag(
     [ map { $_->get('title') } @window ],
-    [ map { $_->get('title') } ($inside, $insidewt, $straddle, $straddleHighwt, $straddleLowwt, $straddlewt)],
-    '..returns correct 6 events'
+    [ map { $_->get('title') }
+        ($inside,     $insidewt,
+         $straddle,   $straddleHighwt, $straddleLowwt, $straddlewt,
+         $coincident, $coincidentLow,  $coincidentHigh, )
+    ],
+    '..returns correct set of events'
 );
 
 ######################################################################
