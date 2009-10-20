@@ -409,12 +409,8 @@ sub www_view {
     ) {
         my $check = $self->checkView;
         return $check if (defined $check);
-        my $cacheKey = "view_".$self->getId;
-        if ($session->env->sslRequest) {
-            $cacheKey .= '_ssl';
-        }
-        my $cache = WebGUI::Cache->new($session, $cacheKey);
-        my $out = $cache->get if defined $cache;
+        my $cache = $self->getCache;
+        my $out   = $cache->get if defined $cache;
         unless ($out) {
             $self->prepareView;
             $session->stow->set("cacheFixOverride", 1);

@@ -1681,8 +1681,9 @@ sub view {
     my $error = shift;
     my $session = $self->session;
     if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10){
-        my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
-        return $out if $out;
+        my $cache = $self->getCache;
+        my $out   = $cache->get if defined $cache;
+		return $out if $out;
     }
     my (%data, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
     tie %data, 'Tie::CPHash';

@@ -33,6 +33,7 @@
  - fixed #11157: calendar tool for entering add event date
  - fixed #11158: Calendar iCal feed doesn't show today's all-day events
  - added #10614: Force rich editor to use strong and em instead of b and i
+ - fixed #11131: https / http URLs still caching across secure/insecure boundary
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
