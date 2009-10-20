@@ -69,8 +69,10 @@ sub logout     { $session->user({userId => 1}); }
 #----------------------------------------------------------------------------
 # put your tests here
 
-use_ok 'WebGUI::Asset::EMSSubmissionForm';
-use_ok 'WebGUI::Asset::EMSSubmission';
+my $useform = use_ok 'WebGUI::Asset::EMSSubmissionForm';
+my $usesubmiss = use_ok 'WebGUI::Asset::EMSSubmission';
+
+SKIP: { skip 'package compile failed!', 50 unless $useform && $usesubmiss;
 
 loginAdmin;
 
@@ -343,13 +345,15 @@ is( $sub2, undef, 'approval created a ticket');
 
 # TODO add a test to cleanup denied and created entries
 
-} # end of skip
+} # end of create submission skip
 
 $versionTag->commit;
 
 # TODO either remove this or make it a real test.
-loginAdmin;
-print $ems->www_addSubmissionForm;
+#loginAdmin;
+#print $ems->www_addSubmissionForm;
+
+} # end of use packages skip
 
 #done_testing();
 #print 'press return to complete test' ; <>;

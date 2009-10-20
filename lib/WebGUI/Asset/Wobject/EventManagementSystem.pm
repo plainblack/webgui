@@ -850,7 +850,9 @@ sub www_editSubmissionFormSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $form = $self->session->form;
-  # TOOD call addSubmissionForm or update the submission form...
+	return WebGUI::Asset::EMSSubmissionForm->processForm($self,);  # TODO this function does not exist yet
+						   # it should read the form and verify the data
+  # TODO call addSubmissionForm or update the submission form...
   # call edit if it fails
 	return $self->www_view;   # TODO where to go after this???
 }
