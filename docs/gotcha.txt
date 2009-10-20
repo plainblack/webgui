@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.8.2
+--------------------------------------------------------------------
+ * WebGUI now requires Business::PayPal::API 0.62 or higher.
+
+
 7.8.1
 --------------------------------------------------------------------
 
@@ -30,6 +35,7 @@ save you many hours of grief.
       then WebGUI would throw an error.  Starting with 7.8.1, files
       that start with "thumb-" will be renamed by removing that
       prefix from the filename.
+
 
 
 7.8.0
