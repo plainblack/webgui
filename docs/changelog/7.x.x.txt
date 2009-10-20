@@ -1,4 +1,5 @@
 7.8.2
+ - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
  - fixed #11098: Leaving a version tag makes everyone leave
  - fixed #11096: Error on deleting FAQ(CS)-item
  - fixed #11060: Some tables have latin1 as the default character set
