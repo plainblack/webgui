@@ -10,6 +10,7 @@
  - fixed #11156: Syndicated Content doesn't show all headlines in feed
  - fixed #11138: RichEdit, upload image does not commit a version tag
  - refixed #2569: robots.txt issues
+ - fixed #11157: calendar tool for entering add event date
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
