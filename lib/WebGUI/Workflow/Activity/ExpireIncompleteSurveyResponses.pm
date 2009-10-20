@@ -159,6 +159,7 @@ Factored out into a separate subroutine for the sake of testability.
 
 sub getSql {
 
+    # Use a left outer join on userProfileData so that we still get back responses for users that have been deleted
     return <<END_SQL;
 select  
     r.Survey_responseId, r.username, r.userId, r.startDate, 
@@ -166,7 +167,7 @@ select
     s.timeLimit, s.doAfterTimeLimit, 
     ad.title, ad.url  
 from 
-    Survey_response r, Survey s, assetData ad, userProfileData upd
+    Survey_response r left outer join userProfileData upd on r.userId = upd.userId, Survey s, assetData ad
 where 
     r.isComplete = 0 
     and s.timeLimit > 0 
@@ -175,7 +176,6 @@ where
     and ad.assetId = s.assetId 
     and ad.revisionDate = s.revisionDate 
     and s.revisionDate = r.revisionDate
-    and upd.userId = r.userId
 END_SQL
 
 }

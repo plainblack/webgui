@@ -13,7 +13,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 25;
+plan tests => 26;
 
 use_ok('WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses');
 
@@ -126,6 +126,13 @@ $session->db->write('update Survey_response set endDate = 0, isComplete = 0 wher
 
 # Make sure SQL only returns 1 incomplete response
 is( scalar $session->db->buildArray($SQL), 1, 'Make sure SQL only returns 1 incomplete response');
+
+##
+# Make sure workflow handles responses for deleted users
+#
+$session->db->write('update Survey_response set userId = ? where Survey_responseId = ?', ['not-a-user-id', $responseId]);
+is( scalar $session->db->buildArray($SQL), 1, 'Still returns 1 row, even though user does not exist (sql left outer join)');
+$session->db->write('update Survey_response set userId = ? where Survey_responseId = ?', [$user->getId, $responseId]);
 
 ##
 # Delete Expired

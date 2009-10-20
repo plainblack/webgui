@@ -94,25 +94,28 @@ sub definition {
             hoverHelp   => $i18n->get("startZoom description"),
         },
         templateIdEditPoint => {
-            tab         => "display",
-            fieldType   => "template",
-            namespace   => "MapPoint/Edit",
-            label       => $i18n->get("templateIdEditPoint label"),
-            hoverHelp   => $i18n->get("templateIdEditPoint description"),
+            tab             => "display",
+            fieldType       => "template",
+            defaultValue    => "oHh0UqAJeY7u2n--WD-BAA",
+            namespace       => "MapPoint/Edit",
+            label           => $i18n->get("templateIdEditPoint label"),
+            hoverHelp       => $i18n->get("templateIdEditPoint description"),
         },
         templateIdView  => {
-            tab         => "display",
-            fieldType   => "template",
-            namespace   => "Map/View",
-            label       => $i18n->get("templateIdView label"),
-            hoverHelp   => $i18n->get("templateIdView description"),
+            tab             => "display",
+            fieldType       => "template",
+            defaultValue    => "9j0_Z1j3Jd0QBbY2akb6qw",
+            namespace       => "Map/View",
+            label           => $i18n->get("templateIdView label"),
+            hoverHelp       => $i18n->get("templateIdView description"),
         },
         templateIdViewPoint => {
-            tab         => "display",
-            fieldType   => "template",
-            namespace   => "MapPoint/View",
-            label       => $i18n->get("templateIdViewPoint label"),
-            hoverHelp   => $i18n->get("templateIdViewPoint description"),
+            tab             => "display",
+            fieldType       => "template",
+            defaultValue    => "u9vfx33XDk5la1-QC5FK7g",
+            namespace       => "MapPoint/View",
+            label           => $i18n->get("templateIdViewPoint label"),
+            hoverHelp       => $i18n->get("templateIdViewPoint description"),
         },
         workflowIdPoint => {
             tab         => "security",
@@ -309,6 +312,8 @@ sub loadMapApiTags {
     my $style   = $self->session->style;
     my $url     = $self->session->url;
 
+    $style->setLink($url->extras('yui/build/container/assets/skins/sam/container.css'),{type=>'text/css',rel=>'stylesheet'});
+    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),{type=>'text/css',rel=>'stylesheet'});
     $style->setScript("http://www.google.com/jsapi?key=" . $self->get('mapApiKey'),{type=>"text/javascript"});
     $style->setRawHeadTags(<<'ENDHTML');
 <script type="text/javascript">
@@ -318,6 +323,10 @@ ENDHTML
     $style->setScript('http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js', {type=>"text/javascript"});
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),{type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/connection/connection-min.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/element/element-min.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/button/button-min.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/container/container-min.js'),{type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/json/json-min.js'),{type=>'text/javascript'});
     $style->setScript($url->extras('yui-webgui/build/map/map.js'),{type=>'text/javascript'});
 
@@ -373,7 +382,7 @@ sub view {
                     ;
 
     # The script to load the map into the container
-    $mapHtml    .= sprintf <<'ENDHTML', $self->getId, $self->getUrl, $self->get('startLatitude'), $self->get('startLongitude'), $self->get('startZoom');
+    $mapHtml    .= sprintf <<'ENDHTML', $self->getId, $self->getUrl, $self->get('startLatitude'), $self->get('startLongitude'), $self->get('startZoom'), $session->url->extras;
 <script type="text/javascript">
     google.setOnLoadCallback( function() {
         var mapId           = "%s";
@@ -381,6 +390,7 @@ sub view {
         var map             = new GMap2( document.getElementById("map_" + mapId) );
         map.setCenter(new GLatLng(%s, %s), %s);
         map.setUIToDefault();
+        map.extrasUrl       = "%s";
 
         var markermanager   = new MarkerManager(map, {trackMarkers: true});
 ENDHTML
@@ -404,7 +414,7 @@ ENDHTML
         }
 
         $mapHtml    .= <<'ENDHTML';
-            markermanager.addMarkers( WebGUI.Map.preparePoints(map, markermanager, mapUrl, points), 1 );
+            markermanager.addMarkers( WebGUI.Map.preparePoints(map, markermanager, mapUrl, points), 0 );
 ENDHTML
     }
 
