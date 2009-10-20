@@ -11,6 +11,7 @@
  - fixed #11138: RichEdit, upload image does not commit a version tag
  - refixed #2569: robots.txt issues
  - fixed #11157: calendar tool for entering add event date
+ - fixed #11158: Calendar iCal feed doesn't show today's all-day events
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
