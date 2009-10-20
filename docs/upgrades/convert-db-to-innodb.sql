@@ -2122,7 +2122,7 @@ CREATE TABLE `groups_inno` (
   `scratchFilter` text,
   `autoAdd` int(11) NOT NULL default '0',
   `autoDelete` int(11) NOT NULL default '0',
-  `databaseLinkId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `databaseLinkId` char(22) character set utf8 collate utf8_bin,
   `groupCacheTimeout` int(11) NOT NULL default '3600',
   `dbQuery` text,
   `isEditable` int(11) NOT NULL default '1',
@@ -2188,7 +2188,7 @@ CREATE TABLE `inbox_inno` (
   `groupId` char(22) character set utf8 collate utf8_bin default NULL,
   `subject` char(255) NOT NULL default 'No Subject',
   `message` mediumtext,
-  `sentBy` char(22) character set utf8 collate utf8_bin NOT NULL default '3',
+  `sentBy` char(22) character set utf8 collate utf8_bin default '3',
   PRIMARY KEY  (`messageId`),
   KEY `completedOn_dateStamp` (`completedOn`,`dateStamp`),
   KEY `pb_userId` (`userId`),
@@ -2489,7 +2489,7 @@ CREATE TABLE `transaction_inno` (
   `transactionCode` char(100) default NULL,
   `statusCode` char(35) default NULL,
   `statusMessage` char(255) default NULL,
-  `userId` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `userId` char(22) character set utf8 collate utf8_bin,
   `username` char(35) NOT NULL,
   `amount` float default NULL,
   `shopCreditDeduction` float default NULL,
@@ -2550,7 +2550,7 @@ CREATE TABLE `transactionItem_inno` (
   `lastUpdated` datetime default NULL,
   `quantity` int(11) NOT NULL default '1',
   `price` float default NULL,
-  `vendorId` char(22) character set utf8 collate utf8_bin NOT NULL default 'defaultvendor000000000',
+  `vendorId` char(22) character set utf8 collate utf8_bin default 'defaultvendor000000000',
   `vendorPayoutStatus` char(10) default 'NotPaid',
   `vendorPayoutAmount` decimal(8,2) default '0.00',
   `taxRate` decimal(6,3) default NULL,
@@ -2708,8 +2708,8 @@ CREATE TABLE `users_inno` (
   `lastUpdated` int(11) NOT NULL default '1019867418',
   `karma` int(11) NOT NULL default '0',
   `status` char(35) NOT NULL default 'Active',
-  `referringAffiliate` char(22) character set utf8 collate utf8_bin NOT NULL,
-  `friendsGroup` char(22) character set utf8 collate utf8_bin NOT NULL,
+  `referringAffiliate` char(22) character set utf8 collate utf8_bin,
+  `friendsGroup` char(22) character set utf8 collate utf8_bin,
   PRIMARY KEY  (`userId`),
   UNIQUE KEY `username_unique` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -3377,6 +3377,11 @@ alter table FlatDiscount add foreign key (templateId) references asset(assetId) 
 alter table Product add foreign key (assetId,revisionDate) references sku(assetId,revisionDate) on delete cascade on update cascade;
 alter table Product add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table wobject add foreign key (assetId,revisionDate) references assetData(assetId,revisionDate) on delete cascade on update cascade;
+alter table wobject add foreign key (styleTemplateId) references asset(assetId) on delete restrict on update cascade;
+update wobject set printableStyleTemplateId='PBtmpl0000000000000060' where printableStyleTemplateId='';
+alter table wobject add foreign key (printableStyleTemplateId) references asset(assetId) on delete restrict on update cascade;
+update wobject set mobileStyleTemplateId='PBtmpl0000000000000060' where mobileStyleTemplateId='2p9ygcqH_Z11qOUvQ1uBvw';
+alter table wobject add foreign key (mobileStyleTemplateId) references asset(assetId) on delete restrict on update cascade;
 alter table Article add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
 alter table Article add foreign key (templateId) references asset(assetId) on delete restrict on update cascade;
 alter table Calendar add foreign key (assetId,revisionDate) references wobject(assetId,revisionDate) on delete cascade on update cascade;
@@ -3678,17 +3683,18 @@ alter table advertisement add foreign key (adSpaceId) references adSpace(adSpace
 alter table advertisement add foreign key (ownerUserId) references users(userId) on delete cascade on update cascade;
 alter table bucketLog add foreign key (userId) references users(userId) on delete set null on update cascade;
 alter table deltaLog add foreign key (assetId) references asset(assetId) on delete cascade on update cascade;
-alter table friendInvitation add foreign key (inviterId) references users(userId) on delete cascade on update cascade;
-alter table friendInvitation add foreign key (friendId) references users(userId) on delete cascade on update cascade;
-alter table friendInvitation add foreign key (messageId) references inbox(messageId) on delete cascade on update cascade;
+alter table friendInvitations add foreign key (inviterId) references users(userId) on delete cascade on update cascade;
+alter table friendInvitations add foreign key (friendId) references users(userId) on delete cascade on update cascade;
+alter table friendInvitations add foreign key (messageId) references inbox(messageId) on delete cascade on update cascade;
 alter table groupGroupings add foreign key (inGroup) references groups(groupId) on delete cascade on update cascade;
+update groups set databaseLinkId=null where databaseLinkId='';
 alter table groups add foreign key (databaseLinkId) references databaseLink(databaseLinkId) on delete set null on update cascade;
 alter table groups add foreign key (ldapLinkId) references ldapLink(ldapLinkId) on delete set null on update cascade;
 alter table groupings add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table imagePaletteColors add foreign key (colorId) references imageColor(colorId) on delete cascade on update cascade;
 alter table inbox add foreign key (completedBy) references users(userId) on delete set null on update cascade;
 alter table inbox add foreign key (userId) references users(userId) on delete set null on update cascade;
-alter table inbox add foreign key (inGroup) references groups(groupId) on delete set null on update cascade;
+alter table inbox add foreign key (groupId) references groups(groupId) on delete set null on update cascade;
 alter table inbox add foreign key (sentBy) references users(userId) on delete set null on update cascade;
 alter table inbox_messageState add foreign key (messageId) references inbox(messageId) on delete cascade on update cascade;
 alter table inbox_messageState add foreign key (userId) references users(userId) on delete cascade on update cascade;
@@ -3716,7 +3722,11 @@ alter table transactionItem add foreign key (vendorId) references vendor(vendorI
 alter table userInvitations add foreign key (userId) references users(userId) on delete cascade on update cascade;
 alter table userInvitations add foreign key (newUserId) references users(userId) on delete cascade on update cascade;
 alter table userProfileData add foreign key (userId) references users(userId) on delete cascade on update cascade;
-
+alter table userProfileField add foreign key (profileCategoryId) references userProfileCategory(profileCategoryId) on delete restrict on update cascade;
+update users set friendsGroup=null where friendsGroup='';
+alter table users add foreign key (friendsGroup) references groups(groupId) on delete set null on update cascade;
+alter table vendor add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table vendor add foreign key (paymentAddressId) references paymentGateway(paymentGatewayId) on delete cascade on update cascade;
 
 
 
