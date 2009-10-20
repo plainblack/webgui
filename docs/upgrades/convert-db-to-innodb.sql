@@ -3713,6 +3713,9 @@ alter table transaction add foreign key (cashierUserId) references users(userId)
 alter table transactionItem add foreign key (transactionId) references transaction(transactionId) on delete cascade on update cascade;
 alter table transactionItem add foreign key (shippingAddressId) references address(addressId) on delete set null on update cascade;
 alter table transactionItem add foreign key (vendorId) references vendor(vendorId) on delete set null on update cascade;
+alter table userInvitations add foreign key (userId) references users(userId) on delete cascade on update cascade;
+alter table userInvitations add foreign key (newUserId) references users(userId) on delete cascade on update cascade;
+alter table userProfileData add foreign key (userId) references users(userId) on delete cascade on update cascade;
 
 
 
