@@ -621,6 +621,12 @@ our $I18N = {
 		context => q|field label|
 	},
 
+	'Status' => { 
+		message => q|Status|,
+		lastUpdated => 0,
+		context => q|Whether a transaction was successful, or not.|
+	},
+
 	'payment method' => { 
 		message => q|Payment Method|,
 		lastUpdated => 0,
@@ -1695,6 +1701,17 @@ our $I18N = {
 		context => q|commerce setting help|
 	},
 
+	'Success' => { 
+		message => q|Success|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'Failed' => { 
+		message => q|Failure|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
 
 };
 

@@ -5,6 +5,7 @@
  - fixed #11060: Some tables have latin1 as the default character set
  - fixed #11089: No message body in Notification
  - fixed #2569: robots.txt issues
+ - refixed #2569: robots.txt issues
  - fixed #11104: Wrong name for request tracker post form template
  - fixed #11077: Untested result in WebGUI::Storage->getFiles
  - fixed #11080: Asset Manage Crumb Trail flyout menu
@@ -25,6 +26,10 @@
  - fixed #11139: referencing an item in the clipboard
  - fixed #11146: Upgrade Error 7.7.21 to 7.7.22 
  - fixed #11147: fail safe template is missing embedded style
+ - fixed #11137: Customers see failed orders
+ - fixed #11156: Syndicated Content doesn't show all headlines in feed
+ - fixed #11138: RichEdit, upload image does not commit a version tag
+ - fixed ExpireIncompleteSurveyResponses Workflow: process responses for deleted users
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code
