@@ -12,6 +12,7 @@
  - refixed #2569: robots.txt issues
  - fixed #11157: calendar tool for entering add event date
  - fixed #11158: Calendar iCal feed doesn't show today's all-day events
+ - fixed #11131: https / http URLs still caching across secure/insecure boundary
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude

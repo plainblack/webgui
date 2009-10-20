@@ -130,7 +130,8 @@ to be displayed within the page style
 sub view {
 	my $self = shift;	
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+        my $cache = $self->getCache;
+        my $out   = $cache->get if defined $cache;
 		return $out if $out;
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');

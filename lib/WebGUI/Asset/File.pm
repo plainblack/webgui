@@ -608,7 +608,8 @@ Generate the view method for the Asset, and handle caching.
 sub view {
 	my $self = shift;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+        my $cache = $self->getCache;
+        my $out   = $cache->get if defined $cache;
 		return $out if $out;
 	}
 	my %var = %{$self->get};
