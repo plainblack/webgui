@@ -51,389 +51,7 @@ These methods are available from this class:
 
 =cut
 
-#-------------------------------------------------------------------
-=head2 _generateFields ( tabform, targetField, formDescription )
-
-adds input fields to the tab based on the target field
-TODO: I should put this in the EMSSubmissionForm module instead
-
-=head3 tabform
-
-must be a tabform object
-
-=head3 targetField
-
-this is the definition of the field being described by the fields in the tab
-
-=head3 formDescription
-
-HASHREF to the current description
-
-=cut
-
-my $generators;
-
 use lib '/root/pb/lib'; use dav;
-
-sub _generateFields {
-    my $tabform = shift;
-    my $targetField = shift;
-    my $formDescription = shift;
-    my $fieldId = $targetField->{fieldId};
-    my $fieldDescription = $formDescription->{$fieldId};
-    my $dummy = $generators->{dummy}{generate};
-    my $tab = $tabform->getTab($targetField->{fieldId});
-
-dav::log '_generateFields::fieldId:', $targetField->{fieldId};
-
-# TODO internationalize these
-   $tab->checkbox(label => 'turn this field on',
-              name => 'activeFields',
-	      value => $fieldId,
-	      checked => $fieldDescription->{on} || 0,
-	  );
-   $tab->integer(label => 'display order',
-              name => $fieldId . '_displayOrder',
-	      value => $fieldDescription->{displayOrder} || 0,
-	  );
-    (($generators->{$targetField->{fieldType}}||{})->{generate} || $dummy)->($tab,$fieldId,$fieldDescription);
-   $tab->checkbox(label => 'value is required',
-              name => 'requiredFields',
-	      value => $fieldId,
-	      checked => $fieldDescription->{required} || 0,
-	  );
-   $tab->text(label => 'default value',
-              name => $fieldId . '_defaultValue',
-	      value => $fieldDescription->{defaultValue} || '',
-	  );
-   $tab->text(label => 'override label',
-              name => $fieldId . '_overrideLabel',
-	      value => $fieldDescription->{overrideLabel} || '',
-	  );
-   $tab->textarea(label => 'override help',
-              name => $fieldId . '_overrideHelp',
-	      value => $fieldDescription->{overrideHelp} || '',
-	  );
-   $tab->hidden(
-              name => $fieldId . '_fieldType',
-	      value => $targetField->{fieldType} || '',
-	  );
-}
-
-#-------------------------------------------------------------------
-=head2 _readFields ( form, fieldId, formDescription )
-
-copy field description values from session->form to description
-
-=head3 form
-
-the current session->form object
-
-=head3 fieldId
-
-fieldId for the field we are processing
-
-=head3 formDescription
-
-HASHREF to the current description
-
-=cut
-
-sub _readFields {
-    my $form = shift;
-    my $fieldId = shift;
-    my $formDescription = shift;
-    my $fieldDescription = $formDescription->{$fieldId} ||= {fieldType => $targetField->{fieldType}};
-    my $dummy = $generators->{dummy}{readForm};
-
-    # we get the default value even if the field is not active...
-    $fieldDescription->{defaultValue} = $form->get($fieldId . '_defaultValue');
-
-    return if ! grep $fieldId, ( @{$formDescription->{activeFields}} );
-
-    $fieldDescription->{on} = 1;
-    $fieldDescription->{required} = grep $fieldId, ( @{$formDescription->{requiredFields}} );
-    $fieldDescription->{displayOrder} = $form->get( $fieldId . '_displayOrder' );
-    $fieldDescription->{overrideLabel} = $form->get($fieldId . '_overrideLabel');
-    $fieldDescription->{overrideHelp} = $form->get($fieldId . '_overrideHelp');
-    $fieldDescription->{fieldType} = $form->get($fieldId . '_fieldType');
-    (($generators->{$description->{fieldType}}||{})->{readForm} || $dummy)->($form,$targetField,$fieldDescription);
-}
-
-
-# FUTURE: this list of functions shouldbe defined in the control classes themselves
-$generators = {
-     dummy => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $tab->readOnly( 
-	           label => 'ERROR',
-		   value => $description->{fieldType} . ' is not defined in EMS Submission Form generators list',
-              );
-     },
-     readForm => sub {
-         # nothing to do here...
-     } },
-     dateTime => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $tab->selectList( 
-		  name => $fieldId . '_dateSelect',
-	          multiple => 0,
-		  size => 2,
-		  options => {
-		  # TODO internationalize this
-		      selectList => 'select list',
-		      dateSelect => 'date select',
-		  },
-		  defaultValue => $description->{dateSelect} || ['dateSelect'],
-		  label => 'datetime selection label',
-		  hoverHelp => 'datetime selection help',
-              );
-	$tab->textarea( 
-		  name => $fieldId . '_dateTextArea',
-		  label => 'datetime textarea label',
-		  hoverHelp => 'datetime textarea help',
-		  defaultValue => $description->{dateTextArea} || '',
-              )
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $description->{dateSelect} = $form->get($fieldId . '_dateSelect');
-	 my @options;
-	 for my $item ( split( , $form->get($fieldId . '_dateTextArea') ) {
-	     push @options, WebGUI::DateTime->new($item)->epoch;
-	 }
-	 $description->{dateTextArea} = [ @options ];
-	 # TODO perhaps we need to verify the text area is valid?
-     }, },
-     checkList => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	$tab->textarea( 
-		  name => $fieldId . '_dateTextArea',
-		  label => 'checklist textarea label',
-		  hoverHelp => 'checklist textarea help',
-		  defaultValue => $description->{checkListTextArea} || '',
-              );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $description->{checkListTextArea} = $form->get($fieldId . '_checkListTextArea');
-     }, },
-     combo => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $tab->readOnly( 
-	           label => 'TODO',
-		   value => 'combo needs work<br>
-		   hmmm, needs some thought...',
-              );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # add the correct variables to the description hash that is passed in
-     }, },
-     integer => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $tab->text( 
-		   name => $fieldId . '_integerMin',
-	           label => 'integer min label',
-	           hoverHelp => 'integer min help',
-		   defaultValue => $description->{integerMin} || '',
-              );
-	 $tab->text( 
-		   name => $fieldId . '_integerMax',
-	           label => 'integer max label',
-	           hoverHelp => 'integer max help',
-		   defaultValue => $description->{integerMax} || '',
-              );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $description->{integerMax} = $form->get($fieldId . '_integerMax');
-	 $description->{integerMin} = $form->get($fieldId . '_integerMin');
-     }, },
-     float => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $tab->text( 
-		   name => $fieldId . '_floatMin',
-	           label => 'float min label',
-	           hoverHelp => 'float min help',
-		   defaultValue => $description->{floatMin} || '',
-              );
-	 $tab->text( 
-		   name => $fieldId . '_floatMax',
-	           label => 'float max label',
-	           hoverHelp => 'float max help',
-		   defaultValue => $description->{floatMax} || '',
-              );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $description->{floatMax} = $form->get($fieldId . '_floatMax');
-	 $description->{floatMin} = $form->get($fieldId . '_floatMin');
-     }, },
-     vendor => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $tab->readOnly( 
-	           label => 'TODO',
-		   value => 'vendor needs work -- this might get eliminated',
-              );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # add the correct variables to the description hash that is passed in
-     }, },
-     yesNo => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # nothing here...
-	 #$tab->readOnly( 
-	 #          label => 'TODO',
-	#	   value => $field->{fieldType} . ' needs work -- possibly no extra options',
-        #      );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # nothing here...
-     }, },
-     text => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $tab->list( 
-		  name => $fieldId . '_textSelect',
-	          multiple => 0,
-		  options => {
-		  # TODO internationalize this
-		      selectList => 'select list',
-		      freeText => 'free text',
-		  },
-		  defaultValue => $description->{dateSelect} || ['freeText'],
-		  label => 'text selection label',
-		  hoverHelp => 'text selection help',
-              );
-	$tab->textarea( 
-		  name => $fieldId . '_textTextArea',
-		  label => 'text textarea label',
-		  hoverHelp => 'text textarea help',
-		  defaultValue => $description->{textTextArea} || '',
-              );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-	 $description->{textSelect} = $form->get($fieldId . '_textSelect');
-	 $description->{textTextArea} = $form->get($fieldId . '_textTextArea');
-     }, },
-     textarea => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # nothing here...
-	 #$tab->readOnly( 
-	 #          label => 'TODO',
-	#	   value => $field->{fieldType} . ' needs work -- might get eliminated or have no options',
-        #      );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # nothing here...
-     }, },
-     file => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # nothing here...
-	 #$tab->readOnly( 
-	 #          label => 'TODO',
-	#	   value => $field->{fieldType} . ' needs work -- might get eliminated or have no options',
-        #      );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # nothing here...
-     }, },
-     HTMLArea => { generate => sub {
-         my $tab = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # nothing here...
-	 #$tab->readOnly( 
-	 #          label => 'TODO',
-	#	   value => $field->{fieldType} . ' needs work -- might get eliminated or have no options',
-        #      );
-     },
-     readForm => sub {
-         my $form = shift;
-	 my $fieldId = shift;
-	 my $description = shift;
-         # nothing here...
-     }, },
-     # TODO add all of the other control types
-};
-
-#-------------------------------------------------------------------
-
-=head2 _readForm ( parent, @fieldIds )
-
-reads the form description out of the session->form
-
-=head3 parent
-
-the parent of the form
-
-=head3 fieldIds
-
-list of fieldIds that are in the form
-
-=cut
-
-sub _readForm {
-    my $parent = shift;
-    my $form = shift;
-    my $fieldList = shift;
-    my $formDescription;
-
-    $formDescription->{activeFields} = [ split ' ', $form->get('activeFields') ];
-    $formDescription->{requiredFields} = [ split ' ', $form->get('requiredFields') ];
-
-    for my $fieldId ( split ' ', $fieldList ) {
-        _readFields($form,$fieldId,$formDescription);
-    }
-
-}
 
 #-------------------------------------------------------------------
 
@@ -446,11 +64,12 @@ Creates an EMSSubmission object based on the params
 
 sub addSubmission {
     my $self = shift;
-    my $session = $self->session;
-    my $params = shift || {};
-    return { isValid => 0, errors => [ 'no permissions' ] } if ! $self->canSubmit;
-    my $newParams = $self->validateSubmission($params);
-    return $newParams if ! $newParams->{isValid} ;
+    my $form = $self->session->form;
+    my $newParams = {};
+    my $fieldList = $self->getFormDescription->{_fieldList};
+    for  my $field ( @$fieldList ) {
+        $newParams->{$field} = $form->get($field);
+    }
     $newParams->{className} = 'WebGUI::Asset::EMSSubmission';
     $newParams->{status} = 'pending';
     $newParams->{submissionId} = $self->get('nextSubmissionId');
@@ -688,124 +307,6 @@ sub view {
     return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
-#-------------------------------------------------------------------
-
-=head2 validateSubmission ( submission )
-
-test submitted data against form description
-
-=head3 submission
-
-hash ref with the submitted data
-
-=cut
-
-sub validateSubmission {
-    my $self    = shift;
-    my $submission = shift;
-    my $adminOverride = JSON->new->decode( $submission->{adminOverride} || ' { } ' );
-    my $session = $self->session;
-    my $target = { isValid => 1, adminOverride => $adminOverride };
-    my $form = $self->getFormDescription;
-    for  my $field (keys %{$form}) {
-        next if not defined $form->{$field}{type};
-        my $value = $submission->{$field} || $form->{$field}{default} || '';
-        $self->validateSubmissionField( $value, $form->{$field}, $field, $target );
-    }
-    return $target;
-}
-
-#-------------------------------------------------------------------
-
-=head2 validateSubmissionField ( value, fieldDef, name )
-
-test field data against definition
-
-=head4 value
-
-value submitted
-
-=head4 fieldDef
-
-field definition
-
-=head4 name
-
-name of the field -- for error reporting
-
-=cut
-
-sub validateSubmissionField {
-     my $self = shift;
-     my $value = shift;
-     my $fieldDef = shift;
-     my $name = shift;
-     my $target = shift;
-     if( exists $target->{adminOverride}{$name} ) {
-	 if( ( $target->{adminOverride}{$name}{type} =~ /(float|integer)/i 
-	      && $target->{adminOverride}{$name}{value} == $value ) 
-	    || $target->{adminOverride}{$name}{value} eq $value 
-	       ) {
-	     $target->{$name} = $value;
-	     return 1;
-	  }
-     }
-     if( $value eq '' ) {
-	 $target->{$name} = $value;
-	 return 1;
-     }
-     if( $fieldDef->{required} && $value eq '' ) {
-         $target->{isvalid} = 0;
-	 push @{$target->{errors}}, $name . ' is a required field'; # TODO internationalize
-	 return 0;
-     }
-     my $type = $fieldDef->{type};
-     if( $type eq 'url' ) {
-         if( $value !~ /^http:/ ) { # TODO get a better test for Earls
-	     $target->{isValid} = 0;
-	     push @{$target->{errors}}, $name . ' is not a valid Url'; # TODO internationalize
-	     return 0;
-	 }
-     } elsif( $type eq 'integer' ) {
-         $value = int( $value );
-	 if( $fieldDef{integerMin} ne '' && $value < $fieldDef{integerMin} ) {
-	     $target->{isValid} = 0;
-	     push @{$target->{errors}}, $name . ' is less than the minimum allowed'; # TODO internationalize
-	     return 0;
-	 }
-	 if( $fieldDef{integerMax} ne '' && $value > $fieldDef{integerMax} ) {
-	     $target->{isValid} = 0;
-	     push @{$target->{errors}}, $name . ' is greater than the maximum allowed'; # TODO internationalize
-	     return 0;
-	 }
-     } elsif( $type eq 'float' ) {
-	 if( $fieldDef{floatMin} ne '' && $value < $fieldDef{floatMin} ) {
-	     $target->{isValid} = 0;
-	     push @{$target->{errors}}, $name . ' is less than the minimum allowed'; # TODO internationalize
-	     return 0;
-	 }
-	 if( $fieldDef{floatMax} ne '' && $value > $fieldDef{floatMax} ) {
-	     $target->{isValid} = 0;
-	     push @{$target->{errors}}, $name . ' is greater than the maximum allowed'; # TODO internationalize
-	     return 0;
-	 }
-     } elsif( $type eq 'text' ) {
-         ;   # there is no test here...
-     } elsif( $type eq 'textarea' ) {
-         ;   # there is no test here...
-     } elsif( $type eq 'selectList' ) {
-         if( ! grep { $_ eq $value } @{$fieldDef->{options}} ) {
-	     $target->{isValid} = 0;
-	     push @{$target->{errors}}, $name . ' is not a valid Selection';
-	     return 0;
-	 }
-     } else {
-	 push @{$target->{errors}}, $type . ' is not a valid data type';
-	 return 0;
-     }
-     $target->{$name} = $value;
-     return 1;
-}
 
 #-------------------------------------------------------------------
 
@@ -828,19 +329,27 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
-=head2  www_editSubmissionForm 
+=head2  editSubmissionForm  { parent, params }
 
-is assetId is 'new' edit a blank form, else edit a form with stuff filled in...
+create an html form for user to enter params for a new submissionForm asset
+
+=head3 parent
+
+the parent ems object
+
+=head3 params
+
+optional set of possibly incorrect submission form params
 
 =cut
 
 sub editSubmissionForm {
 	my $class             = shift;
 	my $parent             = shift;
+	my $params           = shift || { };
 	my $session = $parent->session;
 	my $i18n = WebGUI::International->new($parent->session,'Asset_EventManagementSystem');
-	my $form = $session->form;
-        my $assetId = shift || $form->get('assetId');
+        my $assetId = $params->{assetId} || $session->form->get('assetId');
 	my $self;
 
         if( ! defined( $assetId ) ) {
@@ -869,9 +378,119 @@ sub editSubmissionForm {
 		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
 	    }
         }
-	my $tabform = WebGUI::TabForm->new($session,undef,undef,$parent->getUrl());
+	my $newform = WebGUI::HTMLForm->new($session,action => $parent->getUrl('func=editSubmissionFormSave'));
+	$newform->submit; 
+	$newform->hidden(name => 'assetId', value => $assetId);
+	my @fieldNames = qw/title description startDate duration seatsAvailable location/;
 	my $fields;
-	# fixed order for the regular tabs
+	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
+dav::dump 'editSubmissionForm::definition:', [@defs];
+	for my $def ( @defs ) {
+	    foreach my $fieldName ( @fieldNames ) {
+                my $properties = $def->{properties};
+	        if( defined $properties->{$fieldName} ) {
+		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
+		      # field definitions don't contain their own name, we will need it later on
+		      $fields->{$fieldName}{fieldId} = $fieldName;
+		  };
+	    }
+	}
+	for my $metaField ( @{$parent->getEventMetaFields} ) {
+	    push @fieldNames, $metaField->{fieldId};
+	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
+	    # meta fields call it data type, we copy it to simplify later on
+	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
+	}
+	$newform->hidden( name => 'fieldNames', value => join( ' ', @fieldNames ) );
+	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
+dav::dump 'editSubmissionForm::dump submission form def', \@defs ;
+        for my $def ( @defs ) {
+	    my $properties = $def->{properties};
+	    for my $fieldName ( qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
+                               deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
+	        if( defined $properties->{$fieldName} ) {
+                    my %fieldParams = %{$properties->{$fieldName}};
+		    $fieldParams{name} = $fieldName;
+		    $fieldParams{value} = $params->{$fieldName} || $self ? $self->get($fieldName) : undef ;
+dav::dump 'editSubmissionForm::properties for ', $fieldName, \%fieldParams ;
+		    $newform->dynamicField(%fieldParams);
+		}
+	    }
+        }
+dav::dump 'editSubmissionForm::dump before generate:',$fields;
+
+	my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : { };
+        for my $fieldId ( @fieldNames ) {
+	    my $field = $fields->{$fieldId};
+	    $newform->yesNo(
+	             label => $field->{label},
+		     name => $field->{fieldId} . '_yesNo',
+		     defaultValue => 0,
+		     value => $formDescription->{$field->{fieldId}},
+	    );
+	}
+	return $parent->processStyle(
+               $parent->processTemplate({
+		      errors => $params->{errors} || [],
+                      backUrl => $parent->getUrl,
+		      pageForm => $newform->print,
+                  },$parent->get('eventSubmissionFormTemplateId')));
+}
+
+#----------------------------------------------------------------
+
+=head2 processForm ( $parent )
+
+pull data componenets out of $session->form
+
+=head3 parent
+
+reference to the EMS asset that is parent to the new submission form asset
+
+=cut
+
+use lib '/root/pb/lib'; use dav;
+
+sub processForm {
+    my $class = shift;
+    my $parent = shift;
+    my $form = $parent->session->form;
+    my $params = {_isValid=>1};
+    #if( $form->validToken ) {
+	for my $fieldName ( qw/assetId title menuTitle url description canSubmitGroupId daysBeforeCleanup
+			   deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
+	    $params->{$fieldName} = $form->get($fieldName);
+	}
+	my @fieldNames = split( ' ', $form->get('fieldNames') );
+	$params->{formDescription} = { map { $_ => $form->get($_ . '_yesNo') } ( @fieldNames ) };
+	$params->{formDescription}{_fieldList} = [ map { $params->{formDescription}{$_} ? $_ : () } ( @fieldNames ) ];
+	if( scalar( @{$params->{formDescription}{_fieldList}} ) == 0 ) {
+	    $params->{_isValid} = 0;
+	    push @{$params->{errors}}, {text => 'you should turn on at least one entry field' }; # TODO internationalize this
+	}
+dav::dump 'processForm::params:', $params;
+	return $params;
+    #} else {
+        #return {_isValid => 0, errors => [ { text => 'invalid form token' } ] };
+    #}
+}
+
+#----------------------------------------------------------------
+
+=head2 submitForm (... )
+
+creates the form for the submitter to enter data
+
+returns a form object
+
+=cut
+
+sub submitForm {
+# add the default items, then add items based on the fields in the def...
+
+=head TODO work on this code
+# this is a bunch of code that will likely be useful for this function...
+{
 	my @fieldNames = qw/startDate duration seatsAvailable location /;
 	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
 dav::dump 'editSubmissionForm::definition:', [@defs];
@@ -900,6 +519,7 @@ dav::dump 'editSubmissionForm::definition:', [@defs];
         }
         my $maintab = $tabform->getTab('main');
 	$maintab->hidden(name => 'fieldList', value => join( ' ', @fieldNames ) );
+	my @fieldNames = qw/startDate duration seatsAvailable location/;
 	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
 dav::dump 'editSubmissionForm::dump submission form def', \@defs ;
         for my $def ( @defs ) {
@@ -916,22 +536,26 @@ dav::dump 'editSubmissionForm::properties for ', $fieldName, \%param ;
 	    }
         }
 dav::dump 'editSubmissionForm::dump before generate:',$fields;
-	my $formDescription;
-	     # TODO move the fieldList to session scratch or something on the server... - this is a security issue...
-	if( my $fieldList = $form->get('fieldList') ) {  # if this form variable exists then the form was submitted...
-	    $formDescription = _readForm($parent,$form,$fieldList);  # so we get the description from the form
-	} else {
-	    $formDescription = $self ? $self->getFormDescription : { };
-	}
-        for my $field ( values %$fields ) {
-            next if $field->{fieldId} eq 'main' ;
-	    _generateFields($tabform, $field,$formDescription);
-	}
-	return $parent->processStyle(
-               $parent->processTemplate({
-                      backUrl => $parent->getUrl,
-		      pageForm => $tabform->print,
-                  },$parent->get('eventSubmissionFormTemplateId')));
+}
+=cut
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 update ( )
+
+We overload the update method from WebGUI::Asset in order to handle file system privileges.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $properties = shift;
+    if( ref $properties->{formDescription} eq 'HASH' ) {
+        $properties->{formDescription} = JSON->new->encode($properties->{formDescription}||{});
+    }
+    $self->SUPER::update({%$properties, isHidden => 1});
 }
 
 1;

@@ -20,9 +20,9 @@ use Test::More;
 use Test::Deep;
 use JSON;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::Activity;
 use WebGUI::Group;
 use WebGUI::User;
-use WebGUI::Test::Activity;
 use WebGUI::Session;
 use WebGUI::Asset::Wobject::EventManagementSystem;
 use WebGUI::Asset::Sku::EMSBadge;
@@ -68,11 +68,11 @@ sub logout     { $session->user({userId => 1}); }
 
 #----------------------------------------------------------------------------
 # put your tests here
+eval {
+my $use = use_ok 'WebGUI::Asset::EMSSubmissionForm';
+$use &&= use_ok 'WebGUI::Asset::EMSSubmission';
 
-my $useform = use_ok 'WebGUI::Asset::EMSSubmissionForm';
-my $usesubmiss = use_ok 'WebGUI::Asset::EMSSubmission';
-
-SKIP: { skip 'package compile failed!', 50 unless $useform && $usesubmiss;
+SKIP: { skip 'package compile failed!', 1 unless $use;
 
 loginAdmin;
 
@@ -142,90 +142,45 @@ is( $ems->hasForms, 0, 'ems currently has no forms' );
 #print 'press return to continue test' ; <>;
 
 my $formAdesc = {
-    title => { type => 'text' },
-    descrition => { type => 'textarea' },
-    duration => { default => 2.0 },
-    startDate => { type => 'selectList',
-               options =>  [ '1255150800', '1255237200', '1255323600' ],
-             },
+    _fieldList => [ qw/title description startDate/ ],
+    title => 1,
+    description => 1,
+    duration => 0,
+    startDate => 1,
+    seatsAvailable => 0,
+    location => 0,
 };
+
+use lib '/root/pb/lib'; use dav;
+dav::dump $session;
 
 my $frmA = $ems->addSubmissionForm({
     title                    => 'test A -- long',
     canSubmitGroupId         => $submitGroupA->getId,
     daysBeforeCleanup        => 1,
-    formDescription          => to_json( $formAdesc ),
+    formDescription          => $formAdesc,
 });
 isa_ok( $frmA, 'WebGUI::Asset::EMSSubmissionForm' );
 is( $ems->hasForms, 1, 'ems now has forms' );
 is_deeply( $frmA->getFormDescription, $formAdesc, 'form description matches' );
-my $submission = {
-   title => 'titlea',
-   description => 'the description',
-   startDate => '1255150800',
-        };
-my $result = $frmA->validateSubmission($submission);
-ok( $result->{isValid}, 'a valid submission' );
-print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
-$submission = {
-   title => 'titlea',
-   description => 'the description',
-   startDate => '1205150800',
-        };
-$result = $frmA->validateSubmission($submission);
-ok( !$result->{isValid}, 'not a valid submission: invalid value in startDate' );
-print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
-$submission = {
-   title => 'titlea',
-   duration => 3.0,
-   description => 'the description',
-   startDate => '1255150800',
-        };
-$result = $frmA->validateSubmission($submission);
-ok( $result->{isValid} && ! defined $result->{duration}, 'valid submission: readonly field ignored' );
-print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
-
 
 my $formBdesc = {
-    title => { type => 'text' },
-    description => { type => 'textarea' },
-    duration => { type => 'float', default => 0.5, max => 0.5 },
-    startDate => { default => '1255150800' },
-    mfRequiredUrl => { type => 'url' },
+    _fieldList => [ qw/title description duration mfRequiredUrl/ ],
+    title => 1,
+    description => 1,
+    duration => 1,
+    startDate => 0,
+    mfRequiredUrl => 1,
+    seatsAvailable => 0,
+    location => 0,
 };
 my $frmB = $ems->addSubmissionForm({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test B -- short',
     daysBeforeCleanup        => 0,
     canSubmitGroupId         => $submitGroupB->getId,
-    formDescription          => to_json($formBdesc),
+    formDescription          => $formBdesc,
 });
-$submission = {
-   title => 'title',
-   description => 'description',
-   mfRequiredUrl => 'http://google.com/',
-};
-$result = $frmB->validateSubmission($submission);
-ok( $result->{isValid},  'valid submission: test valid metafield value' );
-print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
-$submission = {
-   title => 'title',
-   description => 'description',
-   mfRequiredUrl => 'joe@sams.org',
-};
-$result = $frmB->validateSubmission($submission);
-ok( !$result->{isValid}, 'invalid submission: test invalid metafield value' );
-print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
-$submission = {
-   title => 'titlea',
-   duration => 0.6,
-   description => 'the description',
-   mfRequiredUrl => 'http://google.com/',
-   adminOverride => to_json( { duration => { value => 0.6, type => 'float' } } ),
-        };
-$result = $frmB->validateSubmission($submission);
-ok( $result->{isValid}, 'valid submission: field value override by admin' );
-print join( "\n", @{$result->{errors}} ),"\n" if defined $result->{errors};
 logout;
 
 ok( !$ems->canSubmit, 'Visitor cannot submit to this ems' );
@@ -238,23 +193,18 @@ ok( $frmA->canSubmit, 'UserA can submit to formA' );
 ok( !$frmB->canSubmit, 'UserA cannot submit to formB' );
 #print 'press return to complete test' ; <>;
 ok( !$ems->hasSubmissions, 'UserA has no submissions' );
-# this one should work
-my $sub1 = $frmA->addSubmission({
+
+my $submission = {
     title => 'my favorite thing to talk about',
     description => 'the description',
     startDate => '1255150800',
-});
+        };
+$session->request->setup_body($submission);
+my $sub1 = $frmA->addSubmission;
 push @cleanup, sub  { $sub1->delete; };
 print join( "\n", @{$sub1->{errors}} ),"\n" if defined $sub1->{errors};
-isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "userA/formA valid submission succeeded" );
-is( $ems->hasSubmissions, 1, 'UserA has submissions on this ems' );
-
-#this one should fail
-my $sub2 = $frmB->addSubmission({
-    title => 'why i like to be important',
-});
-print join( "\n", @{$sub2->{errors}} ),"\n" if defined $sub2->{errors};
-ok( ref $sub2 eq 'HASH' && !$sub2->{isValid}, "UserA cannot submit to formB" );
+my $isa1 = isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "userA/formA valid submission succeeded" );
+ok( $ems->hasSubmissions, 'UserA has submissions on this ems' );
 
 loginUserB;
 
@@ -262,14 +212,15 @@ ok( $ems->canSubmit, 'UserB can submit to this ems' );
 ok( !$frmA->canSubmit, 'UserB cannot submit to formA' );
 ok( $frmB->canSubmit, 'UserB can submit to formB' );
 
-$sub2 = $frmB->addSubmission({
+my $submission = {
     title => 'why i like to be important',
     description => 'the description',
     mfRequiredUrl => 'http://google.com',
-});
+        };
+$session->request->setup_body($submission);
+my $sub2 = $frmB->addSubmission;
 push @cleanup, sub  { $sub2->delete; };
-print join( "\n", @{$sub2->{errors}} ),"\n" if defined $sub2->{errors};
-isa_ok( $sub2, 'WebGUI::Asset::EMSSubmission', "userB/FormB valid submission succeeded" );
+my $isa2 = isa_ok( $sub2, 'WebGUI::Asset::EMSSubmission', "userB/FormB valid submission succeeded" );
 
 loginUserC;
 
@@ -277,7 +228,8 @@ ok( $ems->canSubmit, 'UserC can submit to this ems' );
 ok( $frmA->canSubmit, 'UserC can submit to formA' );
 ok( $frmB->canSubmit, 'UserC can submit to formB' );
 
-SKIP: { skip 'create submission failed', 8 unless ref $sub1 eq 'WebGUI::Asset::EMSSubmission' and ref $sub1 eq ref $sub2;
+# TODO fix num tests
+SKIP: { skip 'create submission failed', 8 unless $isa1 && $isa2;
 
 loginUserA;
 
@@ -349,11 +301,104 @@ is( $sub2, undef, 'approval created a ticket');
 
 $versionTag->commit;
 
-# TODO either remove this or make it a real test.
-#loginAdmin;
-#print $ems->www_addSubmissionForm;
+
+SKIP: { skip 'requires HTML::Form', 2 unless use_ok 'HTML::Form';
+# this is not the greatest testm but it does run through the basic create submissionForm code.
+loginAdmin;
+
+my %settings = (
+    assetId => 'new',
+    fieldNames => 'title description startDate duration seatsAvailable location nzymEeuHPQIsgXY0hZxDxA xlvMNwFi1FWwP0PrUAnxSQ',
+    title => 'Untitled',
+    menuTitle => 'Untitled',
+    url => '',
+    canSubmitGroupId => 2,
+    daysBeforeCleanup => 7,
+    deleteCreatedItems => 0,
+    submissionDeadline => '1991-06-21',
+    pastDeadlineMessage => 'The deadline for this submission is past, no more submissions will be taken at this time.',
+    title_yesNo => 1,
+    description_yesNo => 1,
+    startDate_yesNo => 1,
+    duration_yesNo => 1,
+    seatsAvailable_yesNo => 1,
+    location_yesNo => 1,
+    nzymEeuHPQIsgXY0hZxDxA_yesNo => 1,
+    xlvMNwFi1FWwP0PrUAnxSQ_yesNo => 1,
+);
+
+my $expected = {
+          'submissionDeadline' => '1991-06-21',
+          'menuTitle' => 'Untitled',
+          'pastDeadlineMessage' => 'The deadline for this submission is past, no more submissions will be taken at this time.',
+          'formDescription' => {
+                                 'location' => '1',
+                                 'nzymEeuHPQIsgXY0hZxDxA' => 'xlvMNwFi1FWwP0PrUAnxSQ',
+                                 'seatsAvailable' => '1',
+                                 'duration' => '1',
+                                 'title' => '1',
+                                 'startDate' => '1',
+                                 'description' => '1',
+                                 '_fieldList' => [
+                                                   'title',
+                                                   'description',
+                                                   'startDate',
+                                                   'duration',
+                                                   'seatsAvailable',
+                                                   'location',
+                                                   'nzymEeuHPQIsgXY0hZxDxA'
+                                                 ]
+                               },
+          'description' => undef,
+          '_isValid' => 1,
+          'deleteCreatedItems' => undef,
+          'canSubmitGroupId' => '2',
+          'assetId' => 'new',
+          'url' => undef,
+          'daysBeforeCleanup' => '7',
+          'title' => 'Untitled'
+        } ;
+
+my $htmlText = $ems->www_addSubmissionForm;
+my $form = HTML::Form->parse($htmlText,'http://localhost/');
+for my $input ( $form->inputs ) {
+    $input->value($settings{$input->name})if exists $settings{$input->name};
+}
+$session->request->setup_body( { $form->form } );
+my $result = WebGUI::Asset::EMSSubmissionForm->processForm($ems);
+dav::dump $result;
+cmp_deeply( $result, $expected , 'test process form' );
+$expected = {
+          'errors' => [
+                        {
+                          'text' => 'you should turn on at least one entry field'
+                        }
+                      ],
+          'submissionDeadline' => undef,
+          'menuTitle' => undef,
+          'pastDeadlineMessage' => undef,
+          'formDescription' => {
+                                 '_fieldList' => []
+                               },
+          'description' => undef,
+          '_isValid' => 0,
+          'deleteCreatedItems' => undef,
+          'canSubmitGroupId' => undef,
+          'assetId' => undef,
+          'url' => undef,
+          'daysBeforeCleanup' => undef,
+          'title' => undef,
+        };
+$session->request->setup_body( { } );
+$result = WebGUI::Asset::EMSSubmissionForm->processForm($ems);
+dav::dump $result;
+cmp_deeply( $result, $expected , 'test process form' );
+} # end of skip HTML::Form
 
 } # end of use packages skip
+
+}; # end of eval
+print $@ if $@;
 
 #done_testing();
 #print 'press return to complete test' ; <>;

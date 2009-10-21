@@ -81,15 +81,15 @@ default: 0
 
 =head4 formDescription
 
-a JSON description of the form data fields
-
-TODO: write a comprehensive doc for this field
+a JSON description of the form data fields -- a hash of the names of fields (each is 1 for active, 0 for inactive) plus
+'_fieldList' added as an ARRAYREF of the fields that are active
 
 =cut
 
 sub addSubmissionForm {
     my $self = shift;
     my $params = shift;
+    delete $params->{_isValid} if exists $params->{_isValid};
     $params->{className} = 'WebGUI::Asset::EMSSubmissionForm';
     $params->{canSubmitGroupId} ||= 2;
     $self->addGroupToSubmitList($params->{canSubmitGroupId});
@@ -644,7 +644,7 @@ call www_editSubmissionForm with assetId == new
 
 sub www_addSubmissionForm {
     my $self = shift;
-    $self->www_editSubmissionForm( 'new' );
+    $self->www_editSubmissionForm( { assetId => 'new' } );
 }
 
 #-------------------------------------------------------------------
@@ -827,14 +827,13 @@ sub www_editBadgeGroupSave {
 
 =head2  www_editSubmissionForm 
 
-is assetId is 'new' edit a blank form, else edit a form with stuff filled in...
+calls editSubmissionForm in WebGUI::Asset::EMSSubmissionForm
 
 =cut
 
 sub www_editSubmissionForm {
 	my $self             = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $session = $self->session;
 	return WebGUI::Asset::EMSSubmissionForm->editSubmissionForm($self,shift);
 }
 
@@ -843,6 +842,7 @@ sub www_editSubmissionForm {
 
 =head2  www_editSubmissionFormSave
 
+test and save data posted from editSubmissionForm...
 
 =cut
 
@@ -850,11 +850,13 @@ sub www_editSubmissionFormSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $form = $self->session->form;
-	return WebGUI::Asset::EMSSubmissionForm->processForm($self,);  # TODO this function does not exist yet
-						   # it should read the form and verify the data
-  # TODO call addSubmissionForm or update the submission form...
-  # call edit if it fails
-	return $self->www_view;   # TODO where to go after this???
+	my $formParams = WebGUI::Asset::EMSSubmissionForm->processForm($self);
+        if( $formParams->{_isValid} ) {
+	    $self->addSubmissionForm($formParams);
+	    return $self->www_view;
+        } else {
+	    return $self->www_editSubmissionForm($formParams);
+	}
 }
 
 #-------------------------------------------------------------------
