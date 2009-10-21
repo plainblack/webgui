@@ -3,6 +3,7 @@
  - fixed #11152: Image edits do not autocommit version tags
  - fixed template attachments are not cleaned up during purge
  - fixed #11150: matrix - search boxes all ticked
+ - fixed #11063: template_attachments
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
