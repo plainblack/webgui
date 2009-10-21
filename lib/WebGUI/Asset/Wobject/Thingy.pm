@@ -1282,7 +1282,7 @@ sub importAssetCollateralData {
     my $id = $data->{properties}{assetId};
     my $class = $data->{properties}{className};
     my $version = $data->{properties}{revisionDate};
-    my $assetExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
+    my $assetExists = WebGUI::Asset->new($self->session, $id, $class, $version);
     
     $error->info("Importing Things for Thingy ".$data->{properties}{title});
     my @importThings;

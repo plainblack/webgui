@@ -138,7 +138,7 @@ sub importAssetData {
     WebGUI::Asset->loadModule( $self->session, $class );
 
     my $asset;
-    my $revisionExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
+    my $revisionExists = WebGUI::Asset->new($self->session, $id, $class, $version);
     my %properties = %{ $data->{properties} };
     if ($options->{inheritPermissions}) {
         delete $properties{ownerUserId};

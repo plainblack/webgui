@@ -4,6 +4,7 @@ WebGUI 8 Migration Guide
 The information contained herein documents the API changes that have occurred in the WebGUI 8 development effort and how to migrate your code to accomodate the new APIs.
 
 
+
 WebGUI::Cache
 =============
 WebGUI::Cache has been completely rewritten. If you were using the cache API in the past, you'll need to update your code to reflect the changes. NOTE: you can get a cached reference to the cache object from WebGUI::Session, which will be substantially faster than instantiating the object yourself.
@@ -11,5 +12,61 @@ WebGUI::Cache has been completely rewritten. If you were using the cache API in 
 my $cache = $session->cache;
 
 
+
+WebGUI::Asset
+=============
+The Asset API has been changed in small, but significant ways. You'll need to make a few changes to your asset subclasses to support these changes.
+
+Definition
+----------
+You must migrate your asset to use the new WebGUI::Definition::Asset class instead of the definition() method. This executes several orders of magnitude faster, but is different in a few ways.
+
+1) You pass your definition into use WebGUI::Definition::Asset ( def goes here );
+
+2) You no longer have a reference to $session, so you'll need to make sub routine refs to to method calls.
+
+3) You no longer have customDrawMethod. You must make custom form controls.
+
+4) You no longer have filters. Instead, each property has a method called propertyName (so a property called 'title' would be title()). You can override that to achieve the same result.
+
+5) Because you don't have a reference to $session, you can't internationalize right in the definition. So property elements like "label" and "hoverHelp" are just i18n identifiers and will need to be run through internationalization on output.
+
+6) Definition's are now rigid. This means that every property needs to be defined in the definition, and it must at least have a "fieldType" element. If the field is to be displayed (ie: it doesn't have a noFormPost=>1 element) then it must also at minimum have label and hoverHelp elements. In addition, you must specify assetName, tableName, and properties attributes at minimum. Anything less is invalid.
+
+7) The properties attribute must be an array reference of properties. No more Tie::IxHash.
+
+Here's an example.
+
+use WebGUI::Definition::Asset (
+	assetName	=> 'Gadget',
+	tableName	=> 'gadget', 
+	properties	=> [
+		urlToJavascript	=> {
+			fieldType	=> 'url',
+			label		=> 'URL to Javascript Class',
+			hoverHelp	=> 'URL to Javascript Class help',
+		},
+		foo		=> {
+			fieldType	=> 'text',
+			noFormPost	=> 1,
+		},
+		bar		=> {
+			fieldType	=> 'codearea',
+			uiLevel		=> 9,
+			label		=> 'Bar',
+			hoverHelp	=> 'Bar help',
+			defaultValue	=> sub {
+						my $self = shift;
+						return $self->callSomeMethod;
+						}
+		},
+	],
+);
+
+Removed Methods
+---------------
+assetDbProperties - Simply instantiate the asset if you want it's properties.
+
+assetExists - Simply instantiate the asset if you want to know if it exists.
 
 

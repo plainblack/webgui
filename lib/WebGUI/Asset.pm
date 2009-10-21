@@ -39,6 +39,176 @@ use WebGUI::ProgressBar;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
+use WebGUI::Definition::Asset (
+        properties  => [
+                    title=>{
+					    tab             =>"properties",
+					    label           =>'99',
+					    hoverHelp       =>'99 description',
+                        fieldType       =>'text',
+                        defaultValue    =>'Untitled',
+					    filter          =>'fixTitle',
+                    },
+                    menuTitle=>{
+					    tab             =>"properties",
+					    label           =>'411',
+					    hoverHelp       =>'411 description',
+					    uiLevel         =>1,
+                        fieldType       =>'text',
+					    filter          =>'fixTitle',
+                        defaultValue    =>'Untitled',
+                    },
+                    url=>{
+					    tab             =>"properties",
+					    label           =>'104',
+					    hoverHelp       =>'104 description',
+					    uiLevel         =>3,
+                        fieldType       =>'text',
+                        defaultValue    =>'',
+					    filter          =>'fixUrl',
+                    },
+				    isHidden=>{
+					    tab             =>"display",
+					    label           =>'886',
+					    hoverHelp       =>'886 description',
+					    uiLevel         =>6,
+					    fieldType       =>'yesNo',
+					    defaultValue    =>0,
+					},
+				    newWindow=>{
+					    tab             =>"display",
+					    label           =>'940',
+					    hoverHelp       =>'940 description',
+					    uiLevel         =>9,
+					    fieldType       =>'yesNo',
+					    defaultValue    =>0,
+					},
+				    encryptPage=>{
+					    fieldType       => 
+                                sub { 
+                                    my $self = shift; 
+                                    return $self->session->config->get("sslEnabled") ? 'yesNo' : 'hidden';
+                                },
+					    tab             => "security",
+					    label           => 'encrypt page',
+					    hoverHelp       => 'encrypt page description',
+					    uiLevel         => 6,
+					    defaultValue    => 0,
+					},
+                    ownerUserId=>{
+					    tab             =>"security",
+					    label           =>108,
+					    hoverHelp       =>'108 description',
+					    uiLevel         =>6,
+                        fieldType       =>'user',
+					    filter          =>'fixId',
+                        defaultValue    =>'3',
+                    },
+                    groupIdView=>{
+					    tab             =>"security",
+					    label           =>872,
+					    hoverHelp       =>'872 description',
+					    uiLevel         =>6,
+                        fieldType       =>'group',
+					    filter          =>'fixId',
+                        defaultValue    =>'7',
+                    },
+                    groupIdEdit=>{
+					    tab             =>"security",
+					    label           =>871,
+					    excludeGroups   =>[1,7],
+					    hoverHelp       =>'871 description',
+					    uiLevel         =>6,
+                        fieldType       =>'group',
+					    filter          =>'fixId',
+                        defaultValue    =>'4',
+                    },
+                    synopsis=>{
+					    tab             =>"meta",
+					    label           =>412,
+					    hoverHelp       =>'412 description',
+					    uiLevel         =>3,
+                        fieldType       =>'textarea',
+                        defaultValue    =>undef,
+                    },
+                    extraHeadTags=>{
+					    tab             =>"meta",
+					    label           =>"extra head tags",
+					    hoverHelp       =>'extra head tags description',
+					    uiLevel         =>5,
+                        fieldType       =>'codearea',
+                        defaultValue    =>undef,
+                        customDrawMethod=> 'drawExtraHeadTags',
+                        filter          => 'packExtraHeadTags',
+                    },
+                    extraHeadTagsPacked => {
+                        fieldType       => 'hidden',
+                        defaultValue    => undef,
+                        noFormPost      => 1,
+                    },
+                    usePackedHeadTags => {
+                        tab             => "meta",
+                        label           => 'usePackedHeadTags label',
+                        hoverHelp       => 'usePackedHeadTags description',
+                        uiLevel         => 7,
+                        fieldType       => 'yesNo',
+                        defaultValue    => 0,
+                    },
+				    isPackage=>{
+					    label           =>"make package",
+					    tab             =>"meta",
+					    hoverHelp       =>'make package description',
+					    uiLevel         =>7,
+					    fieldType       =>'yesNo',
+					    defaultValue    =>0,
+					},
+				    isPrototype=>{
+					    tab             =>"meta",
+					    label           =>"make prototype",
+					    hoverHelp       =>'make prototype description',
+					    uiLevel         =>9,
+					    fieldType       =>'yesNo',
+					    defaultValue    =>0,
+					},
+                    isExportable=>{
+                        tab             =>'meta',
+                        label           =>'make asset exportable',
+                        hoverHelp       =>'make asset exportable description',
+                        uiLevel         =>9,
+                        fieldType       =>'yesNo',
+                        defaultValue    =>1,
+                    },
+                    inheritUrlFromParent=>{
+                        tab             =>'meta',
+                        label           =>'does asset inherit URL from parent',
+                        hoverHelp       =>'does asset inherit URL from parent description',
+                        uiLevel         =>9,
+                        fieldType       =>'yesNo',
+                        defaultValue    =>0,
+                    },
+				    status=>{
+					    noFormPost      =>1,
+					    fieldType       =>'text',
+					    defaultValue    =>'pending',
+					},
+				    lastModified=>{
+					    noFormPost      =>1,
+					    fieldType       =>'DateTime',
+					    defaultValue    => sub { return time() },
+					},
+				    assetSize=>{
+					    noFormPost      =>1,
+					    fieldType       =>'integer',
+					    defaultValue    =>0,
+					},
+                ],
+	    assetName   =>'asset',
+        tableName   =>'assetData',
+        className   =>'WebGUI::Asset',
+		icon        =>'assets.gif',
+        );
+
+
 
 =head1 NAME
 
@@ -106,79 +276,6 @@ sub addMissing {
 			</ul>';
 	return $ac->render($output);
 }
-
-#-------------------------------------------------------------------
-
-=head2 assetDbProperties ( session, assetId, className, revisionDate )
-
-Class method to return all properties in all tables used by a particular Asset.
-Returns a hash ref with data from the table.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 assetId
-
-The assetId of the asset you're creating an object reference for. Must not be blank.
-
-=head3 className
-
-By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
-
-=head3 revisionDate
-
-An epoch date that represents a specific version of an asset.
-
-=cut
-
-sub assetDbProperties {
-	my $class = shift;
-	my $session = shift;
-    my ($assetId, $className, $revisionDate) = @_;
-    my $sql = "select * from asset";
-    my $where = " where asset.assetId=?";
-    my $placeHolders = [$assetId];
-    foreach my $definition (@{$className->definition($session)}) {
-        $sql .= ",".$definition->{tableName};
-        $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
-    }
-    return $session->db->quickHashRef($sql.$where, $placeHolders);
-}
-
-#-------------------------------------------------------------------
-
-=head2 assetExists ( session, assetId, className, revisionDate )
-
-Class method that checks to see if an asset exists in all the proper tables for
-the requested asset class.  Returns true or false.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 assetId
-
-The assetId of the asset you're creating an object reference for. Must not be blank.
-
-=head3 className
-
-By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
-
-=head3 revisionDate
-
-An epoch date that represents a specific version of an asset.
-
-=cut
-
-sub assetExists {
-	my $class = shift;
-	my $session = shift;
-    my ($assetId, $className, $revisionDate) = @_;
-    my $dbProperties = $class->assetDbProperties($session, $assetId, $className, $revisionDate);
-    return exists $dbProperties->{assetId};
-}
-
 
 #-------------------------------------------------------------------
 
@@ -362,200 +459,6 @@ sub cloneFromDb {
         $self->get('revisionDate')
     );
 }
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, [ definition ] )
-
-Basic definition of an Asset. Properties, default values. Returns an array reference containing tableName,className,properties
-
-=head3 session
-
-The current session object.
-
-=head3 definition
-
-An array reference containing additional information to include with the default definition.
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session, "Asset");
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-                    title=>{
-					    tab=>"properties",
-					    label=>$i18n->get(99),
-					    hoverHelp=>$i18n->get('99 description'),
-                        fieldType=>'text',
-                        defaultValue=>'Untitled',
-					    filter=>'fixTitle',
-                    },
-                    menuTitle=>{
-					    tab=>"properties",
-					    label=>$i18n->get(411),
-					    hoverHelp=>$i18n->get('411 description'),
-					    uiLevel=>1,
-                        fieldType=>'text',
-					    filter=>'fixTitle',
-                        defaultValue=>'Untitled',
-                    },
-                    url=>{
-					    tab=>"properties",
-					    label=>$i18n->get(104),
-					    hoverHelp=>$i18n->get('104 description'),
-					    uiLevel=>3,
-                        fieldType=>'text',
-                        defaultValue=>'',
-					    filter=>'fixUrl',
-                    },
-				    isHidden=>{
-					    tab=>"display",
-					    label=>$i18n->get(886),
-					    hoverHelp=>$i18n->get('886 description'),
-					    uiLevel=>6,
-					    fieldType=>'yesNo',
-					    defaultValue=>0,
-					},
-				    newWindow=>{
-					    tab=>"display",
-					    label=>$i18n->get(940),
-					    hoverHelp=>$i18n->get('940 description'),
-					    uiLevel=>9,
-					    fieldType=>'yesNo',
-					    defaultValue=>0,
-					},
-				    encryptPage=>{
-					    fieldType       => ($session->config->get("sslEnabled") ? 'yesNo' : 'hidden'),
-					    tab             => "security",
-					    label           => $i18n->get('encrypt page'),
-					    hoverHelp       => $i18n->get('encrypt page description'),
-					    uiLevel         => 6,
-					    defaultValue    => 0,
-					},
-                    ownerUserId=>{
-					    tab=>"security",
-					    label=>$i18n->get(108),
-					    hoverHelp=>$i18n->get('108 description'),
-					    uiLevel=>6,
-                        fieldType=>'user',
-					    filter=>'fixId',
-                        defaultValue=>'3',
-                    },
-                    groupIdView=>{
-					    tab=>"security",
-					    label=>$i18n->get(872),
-					    hoverHelp=>$i18n->get('872 description'),
-					    uiLevel=>6,
-                        fieldType=>'group',
-					    filter=>'fixId',
-                        defaultValue=>'7',
-                    },
-                    groupIdEdit=>{
-					    tab=>"security",
-					    label=>$i18n->get(871),
-					    excludeGroups=>[1,7],
-					    hoverHelp=>$i18n->get('871 description'),
-					    uiLevel=>6,
-                        fieldType=>'group',
-					    filter=>'fixId',
-                        defaultValue=>'4',
-                    },
-                    synopsis=>{
-					    tab=>"meta",
-					    label=>$i18n->get(412),
-					    hoverHelp=>$i18n->get('412 description'),
-					    uiLevel=>3,
-                        fieldType=>'textarea',
-                        defaultValue=>undef,
-                    },
-                    extraHeadTags=>{
-					    tab=>"meta",
-					    label=>$i18n->get("extra head tags"),
-					    hoverHelp=>$i18n->get('extra head tags description'),
-					    uiLevel=>5,
-                        fieldType=>'codearea',
-                        defaultValue=>undef,
-                        customDrawMethod => 'drawExtraHeadTags',
-                        filter  => 'packExtraHeadTags',
-                    },
-                    extraHeadTagsPacked => {
-                        fieldType       => 'hidden',
-                        defaultValue    => undef,
-                        noFormPost      => 1,
-                    },
-                    usePackedHeadTags => {
-                        tab             => "meta",
-                        label           => $i18n->get('usePackedHeadTags label'),
-                        hoverHelp       => $i18n->get('usePackedHeadTags description'),
-                        uiLevel         => 7,
-                        fieldType       => 'yesNo',
-                        defaultValue    => 0,
-                    },
-				    isPackage=>{
-					    label=>$i18n->get("make package"),
-					    tab=>"meta",
-					    hoverHelp=>$i18n->get('make package description'),
-					    uiLevel=>7,
-					    fieldType=>'yesNo',
-					    defaultValue=>0,
-					},
-				    isPrototype=>{
-					    tab=>"meta",
-					    label=>$i18n->get("make prototype"),
-					    hoverHelp=>$i18n->get('make prototype description'),
-					    uiLevel=>9,
-					    fieldType=>'yesNo',
-					    defaultValue=>0,
-					},
-                    isExportable=>{
-                        tab=>'meta',
-                        label=>$i18n->get('make asset exportable'),
-                        hoverHelp=>$i18n->get('make asset exportable description'),
-                        uiLevel=>9,
-                        fieldType=>'yesNo',
-                        defaultValue=>1,
-                    },
-                    inheritUrlFromParent=>{
-                        tab=>'meta',
-                        label=>$i18n->get('does asset inherit URL from parent'),
-                        hoverHelp=>$i18n->get('does asset inherit URL from parent description'),
-                        uiLevel=>9,
-                        fieldType=>'yesNo',
-                        defaultValue=>0,
-                    },
-				    status=>{
-					    noFormPost=>1,
-					    fieldType=>'hidden',
-					    defaultValue=>'pending',
-					},
-				    lastModified=>{
-					    noFormPost=>1,
-					    fieldType=>'hidden',
-					    defaultValue=>time(),
-					},
-				    assetSize=>{
-					    noFormPost=>1,
-					    fieldType=>'hidden',
-					    defaultValue=>0,
-					},
-    );
-    push(@{$definition}, {
-	    assetName=>$i18n->get("asset"),
-        tableName=>'assetData',
-		autoGenerateForms=>1,
-        className=>'WebGUI::Asset',
-		icon=>'assets.gif',
-        properties=>\%properties
-        }
-    );
-    return $definition;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -1157,10 +1060,8 @@ If this evaluates to True, then the smaller extras/adminConsole/small/assets.gif
 =cut
 
 sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	my $definition = $self->definition($self->session);
-	my $icon = $definition->[0]{icon} || "assets.gif";
+	my ($self, $small) = @_;
+	my $icon = $self->getAttribute("icon");
 	return $self->session->url->extras('assets/small/'.$icon) if ($small);
 	return $self->session->url->extras('assets/'.$icon);
 }
@@ -1226,11 +1127,8 @@ returning results.  This allows very large sets of results to be handled in chun
 =cut
 
 sub getIsa {
-    my $class    = shift;
-    my $session  = shift;
-    my $offset   = shift;
-    my $def = $class->definition($session);
-    my $tableName = $def->[0]->{tableName};
+    my ($class, $session, $offset) = @_;
+    my $tableName = $self->getAttribute('tableName');
     my $sql = "select distinct(assetId) from $tableName";
     if (defined $offset) {
         $sql .= ' LIMIT '. $offset . ',1234567890';
@@ -1302,14 +1200,13 @@ sub getMenuTitle {
 
 =head2 getName ( )
 
-Returns the internationalization of the word "Asset".
+Returns the human readable name of the asset.
 
 =cut
 
 sub getName {
 	my $self = shift;
-	my $definition = $self->definition($self->session);
-	return $definition->[0]{assetName};
+    return WebGUI::International->new($self->session, 'Asset')->get($self->getAttribute('assetName'));
 }
 
 
@@ -1571,7 +1468,7 @@ sub getUiLevel {
 	my $className = $self->get("className");
 	return $uiLevel														# passed in
 		|| $self->session->config->get("assets/".$className."/uiLevel")	# from config
-		|| $self->definition($self->session)->[0]{uiLevel}				# from definition
+		|| $self->getAttribute('uiLevel')               				# from definition
 		|| 1;															# if all else fails
 }
 
@@ -1779,7 +1676,14 @@ sub new {
     
     my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
     unless (exists $properties->{assetId}) {
-        $properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
+        my $sql = "select * from asset";
+        my $where = " where asset.assetId=?";
+        my $placeHolders = [$assetId];
+        foreach my $definition (@{$class->definition($session)}) {
+            $sql .= ",".$definition->{tableName};
+            $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
+        }
+        $properties = $session->db->quickHashRef($sql.$where, $placeHolders);
         unless (exists $properties->{assetId}) {
             $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
             return undef;
