@@ -18,6 +18,7 @@ use strict;
 use warnings;
 use 5.010;
 use base qw(WebGUI::Definition);
+use WebGUI::International;
 
 our $VERSION = '0.0.1';
 
@@ -38,6 +39,22 @@ sub import {
     my $next = $class->next::can;
     @_ = ($class, $definition);
     goto $next;
+}
+
+sub _gen_getProperty {
+    my $class = shift;
+    my $superGetProperty = $class->next::method(@_);
+    return sub {
+        my $self = shift;
+        my $property = $self->$superGetProperty(@_);
+        for my $element (qw(label hoverHelp)) {
+            if ($property->{$element} && ref $property->{$element} eq 'ARRAY') {
+                $property->{$element}
+                    = WebGUI::International->new($self->session)->get(@{$property->{$element}});
+            }
+        }
+        return $property;
+    };
 }
 
 1;
