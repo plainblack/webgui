@@ -2,6 +2,7 @@
  - fixed #11074: Links to CS posts not working
  - fixed #11152: Image edits do not autocommit version tags
  - fixed template attachments are not cleaned up during purge
+ - fixed #11150: matrix - search boxes all ticked
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
