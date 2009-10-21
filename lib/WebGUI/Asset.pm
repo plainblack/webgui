@@ -680,38 +680,6 @@ sub fixUrlFromParent {
 
 #-------------------------------------------------------------------
 
-=head2 get ( [propertyName] )
-
-Returns a reference to a list of properties (or specified property) of an Asset.
-
-If C<propertyName> is omitted, it will return a safe copy of the entire property hash.
-
-=head3 propertyName
-
-Any of the values associated with the properties of an Asset. Default choices are "title", "menutTitle",
-"synopsis", "url", "groupIdEdit", "groupIdView", "ownerUserId",  "keywords", and "assetSize".
-
-=cut
-
-sub get {
-	my $self = shift;
-	my $propertyName = shift;
-	if (defined $propertyName) {
-        if ($propertyName eq "keywords") {
-            return WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset => $self});
-        }
-		return $self->{_properties}{$propertyName};
-	}
-	my %copyOfHashRef = %{$self->{_properties}};
-        my $keywords = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset => $self});
-        if( $keywords ne '' ) { $copyOfHashRef{ keywords } = $keywords ; }
-	return \%copyOfHashRef;
-}
-
-
-
-#-------------------------------------------------------------------
-
 =head2 getAdminConsole ( )
 
 Returns a reference to a WebGUI::AdminConsole object.
@@ -863,9 +831,7 @@ sub getEditForm {
 	}
 
 	# build the definition to the generate form
-	my @definitions = reverse @{$self->definition($session)};
-	tie my %baseProperties, 'Tie::IxHash';
-	%baseProperties = (
+    my @properties = (
 		assetId	=> {
 			fieldType	=> "guid",
 			label		=> $i18n->get("asset id"),
@@ -887,15 +853,12 @@ sub getEditForm {
 			value       => $self->get('keywords'),
 			fieldType	=> 'keywords',
 			tab			=> 'meta',
-		}
+		},
 	);
-	unshift @definitions, {
-		autoGenerateForms	=> 1,
-		properties			=> \%baseProperties
-		};
+    foreach my $property ($self->getProperties) {
+        push @properties, $property => $self->getProperty($property);
+    }
 
-	# extend the definition with metadata
-	tie my %extendedProperties, 'Tie::IxHash';
     if ($session->setting->get("metaDataEnabled")) {
 		my $meta = $self->getMetaDataFields();
 		foreach my $field (keys %$meta) {
@@ -906,7 +869,7 @@ sub getEditForm {
 			if("\l$fieldType" eq "selectBox") {
 				$options = "|" . $i18n->get("Select") . "\n" . $options;
 			}
-			$extendedProperties{"metadata_".$meta->{$field}{fieldId}} = {
+            push @properties, "metadata_".$meta->{$field}{fieldId} => {
 				tab				=> "meta",
 				label        	=> $meta->{$field}{fieldName},
 				uiLevel      	=> 5,
@@ -928,7 +891,6 @@ sub getEditForm {
 		}
     }
 	push @definitions, {
-		autoGenerateForms	=> 1,
 		properties			=> \%extendedProperties
 		};
 	
@@ -936,9 +898,6 @@ sub getEditForm {
 	foreach my $definition (@definitions) {
 		my $properties = $definition->{properties};
 		
-		# depricated...by WebGUI 8 they all must autogen forms
-		next unless ($definition->{autoGenerateForms});
-
 		foreach my $fieldName (keys %{$properties}) {
 			my %fieldHash = %{$properties->{$fieldName}};
 			my %params = (name => $fieldName, value => $self->getValue($fieldName));
@@ -1513,40 +1472,6 @@ which gets updated every time update() is called.
 sub getContentLastModified {
 	my $self = shift;
 	return $self->get("lastModified");
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getValue ( key )
-
-Tries to look up C<key> in the asset object's property cache.  If it can't find it in there, then it
-tries to look it up in the definition sub for the asset.
-
-Unlike get, it will not return the whole property hash if you omit the key.
-
-=head3 key
-
-An asset property name, or a propertyDefinition.
-
-=cut
-
-sub getValue {
-	my $self = shift;
-	my $key = shift;
-	if (defined $key) {
-		my $storedValue = $self->get($key);
-		return $storedValue if (defined $storedValue);
-		unless (exists $self->{_propertyDefinitions}) { # check to see if the definitions have been merged and cached
-			my %properties;
-			foreach my $definition (@{$self->definition($self->session)}) {
-				%properties = (%properties, %{$definition->{properties}});
-			}
-			$self->{_propertyDefinitions} = \%properties;
-		}
-		return $self->{_propertyDefinitions}{$key}{defaultValue};
-	}
-	return undef;
 }
 
 
