@@ -274,7 +274,8 @@ sub getRevisionCount {
 
 =head2 getRevisions ( [ status ] )
 
-Returns an array reference of the revision objects of this asset.
+Returns an array reference of the revision objects of this asset, sorted by revision date in descending
+order.  The most recent version will always be first.
 
 =head3 status
 
