@@ -719,9 +719,24 @@ sub processRaw {
 
 #-------------------------------------------------------------------
 
+=head2 purge ( )
+
+Extend the master to purge attachments in all revisions.
+
+=cut
+
+sub purgeRevision {
+    my $self = shift;
+    $self->removeAttachments;
+    $self->session->db->write('delete from template_attachments where templateId=?', [$self->getId]);
+    return $self->SUPER::purge(@_);
+}
+
+#-------------------------------------------------------------------
+
 =head2 purgeRevision ( )
 
-Override the master purgeRevision to purge attachments
+Extend the master purgeRevision to purge attachments
 
 =cut
 
