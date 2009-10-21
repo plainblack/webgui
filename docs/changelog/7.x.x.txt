@@ -1,5 +1,6 @@
 7.8.3
  - fixed #11074: Links to CS posts not working
+ - fixed #11152: Image edits do not autocommit version tags
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
