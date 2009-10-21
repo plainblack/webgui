@@ -14,6 +14,7 @@
  - fixed #11158: Calendar iCal feed doesn't show today's all-day events
  - fixed #11131: https / http URLs still caching across secure/insecure boundary
  - fixed #11093: Spectre cron can DoS server with many sites
+ - fixed #11074: Links to CS posts not working
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
