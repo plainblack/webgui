@@ -43,16 +43,16 @@ use WebGUI::Definition::Asset (
         properties  => [
                     title=>{
 					    tab             =>"properties",
-					    label           =>'99',
-					    hoverHelp       =>'99 description',
+					    label           =>['99','Asset'],
+					    hoverHelp       =>['99 description','Asset'],
                         fieldType       =>'text',
                         defaultValue    =>'Untitled',
 					    filter          =>'fixTitle',
                     },
                     menuTitle=>{
 					    tab             =>"properties",
-					    label           =>'411',
-					    hoverHelp       =>'411 description',
+					    label           =>['411','Asset'],
+					    hoverHelp       =>['411 description','Asset'],
 					    uiLevel         =>1,
                         fieldType       =>'text',
 					    filter          =>'fixTitle',
@@ -60,8 +60,8 @@ use WebGUI::Definition::Asset (
                     },
                     url=>{
 					    tab             =>"properties",
-					    label           =>'104',
-					    hoverHelp       =>'104 description',
+					    label           =>['104','Asset'],
+					    hoverHelp       =>['104 description','Asset'],
 					    uiLevel         =>3,
                         fieldType       =>'text',
                         defaultValue    =>'',
@@ -69,16 +69,16 @@ use WebGUI::Definition::Asset (
                     },
 				    isHidden=>{
 					    tab             =>"display",
-					    label           =>'886',
-					    hoverHelp       =>'886 description',
+					    label           =>['886','Asset'],
+					    hoverHelp       =>['886 description','Asset'],
 					    uiLevel         =>6,
 					    fieldType       =>'yesNo',
 					    defaultValue    =>0,
 					},
 				    newWindow=>{
 					    tab             =>"display",
-					    label           =>'940',
-					    hoverHelp       =>'940 description',
+					    label           =>['940','Asset'],
+					    hoverHelp       =>['940 description','Asset'],
 					    uiLevel         =>9,
 					    fieldType       =>'yesNo',
 					    defaultValue    =>0,
@@ -90,15 +90,15 @@ use WebGUI::Definition::Asset (
                                     return $self->session->config->get("sslEnabled") ? 'yesNo' : 'hidden';
                                 },
 					    tab             => "security",
-					    label           => 'encrypt page',
-					    hoverHelp       => 'encrypt page description',
+					    label           => ['encrypt page','Asset'],
+					    hoverHelp       => ['encrypt page description','Asset'],
 					    uiLevel         => 6,
 					    defaultValue    => 0,
 					},
                     ownerUserId=>{
 					    tab             =>"security",
-					    label           =>108,
-					    hoverHelp       =>'108 description',
+					    label           =>['108','Asset'],
+					    hoverHelp       =>['108 description','Asset'],
 					    uiLevel         =>6,
                         fieldType       =>'user',
 					    filter          =>'fixId',
@@ -106,8 +106,8 @@ use WebGUI::Definition::Asset (
                     },
                     groupIdView=>{
 					    tab             =>"security",
-					    label           =>872,
-					    hoverHelp       =>'872 description',
+					    label           =>['872','Asset'],
+					    hoverHelp       =>['872 description','Asset'],
 					    uiLevel         =>6,
                         fieldType       =>'group',
 					    filter          =>'fixId',
@@ -115,9 +115,9 @@ use WebGUI::Definition::Asset (
                     },
                     groupIdEdit=>{
 					    tab             =>"security",
-					    label           =>871,
+					    label           =>['871','Asset'],
 					    excludeGroups   =>[1,7],
-					    hoverHelp       =>'871 description',
+					    hoverHelp       =>['871 description','Asset'],
 					    uiLevel         =>6,
                         fieldType       =>'group',
 					    filter          =>'fixId',
@@ -125,16 +125,16 @@ use WebGUI::Definition::Asset (
                     },
                     synopsis=>{
 					    tab             =>"meta",
-					    label           =>412,
-					    hoverHelp       =>'412 description',
+					    label           =>['412','Asset'],
+					    hoverHelp       =>['412 description','Asset'],
 					    uiLevel         =>3,
                         fieldType       =>'textarea',
                         defaultValue    =>undef,
                     },
                     extraHeadTags=>{
 					    tab             =>"meta",
-					    label           =>"extra head tags",
-					    hoverHelp       =>'extra head tags description',
+					    label           =>["extra head tags",'Asset'],
+					    hoverHelp       =>['extra head tags description','Asset'],
 					    uiLevel         =>5,
                         fieldType       =>'codearea',
                         defaultValue    =>undef,
@@ -148,40 +148,40 @@ use WebGUI::Definition::Asset (
                     },
                     usePackedHeadTags => {
                         tab             => "meta",
-                        label           => 'usePackedHeadTags label',
-                        hoverHelp       => 'usePackedHeadTags description',
+                        label           => ['usePackedHeadTags label','Asset'],
+                        hoverHelp       => ['usePackedHeadTags description','Asset'],
                         uiLevel         => 7,
                         fieldType       => 'yesNo',
                         defaultValue    => 0,
                     },
 				    isPackage=>{
-					    label           =>"make package",
+					    label           =>["make package",'Asset'],
 					    tab             =>"meta",
-					    hoverHelp       =>'make package description',
+					    hoverHelp       =>['make package description','Asset'],
 					    uiLevel         =>7,
 					    fieldType       =>'yesNo',
 					    defaultValue    =>0,
 					},
 				    isPrototype=>{
 					    tab             =>"meta",
-					    label           =>"make prototype",
-					    hoverHelp       =>'make prototype description',
+					    label           =>["make prototype",'Asset'],
+					    hoverHelp       =>['make prototype description','Asset'],
 					    uiLevel         =>9,
 					    fieldType       =>'yesNo',
 					    defaultValue    =>0,
 					},
                     isExportable=>{
                         tab             =>'meta',
-                        label           =>'make asset exportable',
-                        hoverHelp       =>'make asset exportable description',
+                        label           =>['make asset exportable','Asset'],
+                        hoverHelp       =>['make asset exportable description','Asset'],
                         uiLevel         =>9,
                         fieldType       =>'yesNo',
                         defaultValue    =>1,
                     },
                     inheritUrlFromParent=>{
                         tab             =>'meta',
-                        label           =>'does asset inherit URL from parent',
-                        hoverHelp       =>'does asset inherit URL from parent description',
+                        label           =>['does asset inherit URL from parent','Asset'],
+                        hoverHelp       =>['does asset inherit URL from parent description','Asset'],
                         uiLevel         =>9,
                         fieldType       =>'yesNo',
                         defaultValue    =>0,
@@ -831,6 +831,7 @@ sub getEditForm {
 	}
 
 	# build the definition to the generate form
+    my (%extendedProperties,@definitions);
     my @properties = (
 		assetId	=> {
 			fieldType	=> "guid",
@@ -1087,7 +1088,7 @@ returning results.  This allows very large sets of results to be handled in chun
 
 sub getIsa {
     my ($class, $session, $offset) = @_;
-    my $tableName = $self->getAttribute('tableName');
+    my $tableName = $class->getAttribute('tableName');
     my $sql = "select distinct(assetId) from $tableName";
     if (defined $offset) {
         $sql .= ' LIMIT '. $offset . ',1234567890';

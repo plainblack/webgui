@@ -29,7 +29,7 @@ You must migrate your asset to use the new WebGUI::Definition::Asset class inste
 
 4) You no longer have filters. Instead, each property has a method called propertyName (so a property called 'title' would be title()). You can override that to achieve the same result.
 
-5) Because you don't have a reference to $session, you can't internationalize right in the definition. So property elements like "label" and "hoverHelp" are just i18n identifiers and will need to be run through internationalization on output.
+5) Because you don't have a reference to $session, you can't internationalize right in the definition. So property elements like "label" and "hoverHelp" are just i18n identifiers and will automatically be run through internationalization on calling the getProperty() method.
 
 6) Definition's are now rigid. This means that every property needs to be defined in the definition, and it must at least have a "fieldType" element. If the field is to be displayed (ie: it doesn't have a noFormPost=>1 element) then it must also at minimum have label and hoverHelp elements. In addition, you must specify assetName, tableName, and properties attributes at minimum. Anything less is invalid.
 
@@ -45,8 +45,8 @@ use WebGUI::Definition::Asset (
 	properties	=> [
 		urlToJavascript	=> {
 			fieldType	=> 'url',
-			label		=> 'URL to Javascript Class',
-			hoverHelp	=> 'URL to Javascript Class help',
+			label		=> ['URL to Javascript Class','Asset_Gadget'],
+			hoverHelp	=> ['URL to Javascript Class help','Asset_Gadget'],
 		},
 		foo		=> {
 			fieldType	=> 'text',
@@ -55,8 +55,8 @@ use WebGUI::Definition::Asset (
 		bar		=> {
 			fieldType	=> 'codearea',
 			uiLevel		=> 9,
-			label		=> 'Bar',
-			hoverHelp	=> 'Bar help',
+			label		=> ['Bar','Asset_Gadget'],
+			hoverHelp	=> ['Bar help','Asset_Gadget'],
 			defaultValue	=> sub {
 						my $self = shift;
 						return $self->callSomeMethod;

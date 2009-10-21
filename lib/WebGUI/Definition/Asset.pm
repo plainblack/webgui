@@ -30,7 +30,7 @@ sub import {
     if ( my $properties = $definition->{properties} ) {
         my $table = $definition->{tableName};
         for ( my $i = 1; $i < @{ $properties }; $i += 2) {
-            $propeties->[$i]{tableName} = $table;
+            $properties->[$i]{tableName} = $table;
         }
     }
 
