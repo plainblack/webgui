@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 fixBadVarCharColumns ( $session );
+reKeyTemplateAttachments($session);
 
 finish($session); # this line required
 
@@ -87,6 +88,25 @@ sub fixBadVarCharColumns {
         $session->db->write(sprintf "ALTER TABLE `%s` MODIFY COLUMN `%s` %s", @{ $dataSet });
     }
     print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub reKeyTemplateAttachments {
+    my $session = shift;
+    print "\tChanging the key structure for the template attachments table... " unless $quiet;
+    # and here's our code
+    $session->db->write('ALTER TABLE template_attachments ADD COLUMN attachId CHAR(22) BINARY NOT NULL');
+    my $rh = $session->db->read('select url, templateId, revisionDate from template_attachments');
+    my $wh = $session->db->prepare('update template_attachments set attachId=? where url=? and templateId=? and revisionDate=?');
+    while (my @key = $rh->array) {
+        $wh->execute([$session->id->generate, @key ]);
+    }
+    $rh->finish;
+    $wh->finish;
+    $session->db->write('ALTER TABLE template_attachments DROP PRIMARY KEY');
+    $session->db->write('ALTER TABLE template_attachments ADD PRIMARY KEY (attachId)');
+    print "DONE!\n" unless $quiet;
 }
 
 
