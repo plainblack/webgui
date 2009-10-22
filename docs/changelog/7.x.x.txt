@@ -5,6 +5,7 @@
  - fixed #11150: matrix - search boxes all ticked
  - fixed #11063: template_attachments
  - fixed #11002: Matrix shows backend stuff on load
+ - added #10082: Unarchive all collaboration posts
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)

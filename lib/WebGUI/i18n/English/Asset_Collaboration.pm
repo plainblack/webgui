@@ -1736,6 +1736,18 @@ the Collaboration Asset, the user will be notified.|,
         lastUpdated => 1229910435,
     },
 
+    'unarchive all' => {
+        message     => q{Unarchive All Threads},
+        context     => q{Label for link to unarchive all threads},
+        lastUpdated => 0,
+    },
+
+    'unarchive confirm' => {
+        message     => q{Are you sure? Any threads past the 'Archive After' interval will be re-archived.},
+        context     => q{Text for pop-up dialog to confirm unarchive all threads},
+        lastUpdated => 0,
+    },
+
 };
 
 1;
