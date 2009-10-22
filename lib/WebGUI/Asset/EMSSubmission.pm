@@ -219,14 +219,13 @@ sub definition {
 
 Draws the field for the location property.
 
-TODO: check form params for additional options
-
 =cut
 
 sub drawLocationField {
         my ($self, $params) = @_;
         my $options = $self->session->db->buildHashRef("select distinct(location) from EMSTicket left join asset using (assetId)
                 where parentId=? order by location",[$self->get('parentId')]);
+# TODO get additional params from the EMS location list
         return WebGUI::Form::combo($self->session, {
                 name    => 'location',
                 value   => $self->get('location'),
@@ -239,8 +238,6 @@ sub drawLocationField {
 =head2 drawRelatedBadgeGroupsField ()
 
 Draws the field for the relatedBadgeGroups property.
-
-TODO: check form params for additional options
 
 =cut
 
@@ -259,8 +256,6 @@ sub drawRelatedBadgeGroupsField {
 =head2 drawRelatedRibbonsField ()
 
 Draws the field for the relatedRibbons property.
-
-TODO: check form params for additional options
 
 =cut
 
@@ -293,6 +288,65 @@ whenever a copy action is executed
 #    my $newAsset = $self->next::method(@_);
 #    return $newAsset;
 #}
+
+#-------------------------------------------------------------------
+
+=head2 www_editSubmission ( parent, params )
+
+edit a submission
+
+=head3 parent
+
+ref to the EMSSubmissionForm that is parent to the new submission
+
+=head3 params
+
+parameters for the submission
+
+=cut
+
+sub www_editSubmission {
+        my $this             = shift;
+        my $self;
+        my $parent;
+        if( $this eq __PACKAGE__ ) {   # called as a constructor
+            $parent             = shift;
+        } else {
+            $self = $this;
+            $parent = $self->getParent;
+        }
+        my $params           = shift || { };
+        my $session = $parent->session;
+        my $i18n = WebGUI::International->new($parent->session,'Asset_EventManagementSystem');
+        my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId');
+
+        if( ! defined( $assetId ) ) {
+             # if somebody calls without an assetId then display the queue for the EMS (grandparent)
+            return $parent->getParent->www_viewSubmissionQueue;
+        } elsif( $assetId ne 'new' ) {
+            $self = WebGUI::Asset->newByDynamicClass($session,$assetId);
+            if (!defined $self) {
+                $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
+            }
+        }
+	my $url = ( $self | $parent )->getUrl('func=editSubmissionSave');
+        my $newform = WebGUI::HTMLForm->new($session,action => $url);
+        # DOING
+	# get the description from the parent
+	# for each field
+	   # if field is active
+	       # create a usable control
+	    # else
+	        # create a readonly control -- be sure to convert data where appropriate
+	# add the comment form
+        $newform->submit;
+        return $parent->processStyle(
+               $parent->processTemplate({
+                      errors => $params->{errors} || [],
+                      backUrl => $parent->getUrl,
+                      pageForm => $newform->print,
+                  },$parent->get('eventSubmissionFormTemplateId')));
+}
 
 #-------------------------------------------------------------------
 
@@ -365,6 +419,37 @@ sub prepareView {
     my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
+}
+
+#----------------------------------------------------------------
+
+=head2 processForm ( $parent )
+
+pull data componenets out of $session->form
+
+=head3 parent
+
+reference to the EMS asset that is parent to the new submission form asset
+
+=cut
+
+use lib '/root/pb/lib'; use dav;
+
+sub processForm {
+    my $this = shift;
+    my $form;
+    if( $this eq __PACKAGE__ ) {
+        my $parent = shift;
+        $form = $parent->session->form;
+    } elsif( ref $this eq __PACKAGE__ ) {
+        $form = $this->session->form;
+    } else {
+        return {_isValid => 0, errors => [ { text => 'invalid function call' } ] };
+    }
+    my $params = {_isValid=>1};
+    # get description from parent
+    # for each active field
+        # get data from session->form
 }
 
 #-------------------------------------------------------------------

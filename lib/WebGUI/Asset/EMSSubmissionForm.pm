@@ -206,6 +206,144 @@ whenever a copy action is executed
 
 #-------------------------------------------------------------------
 
+=head2  www_editSubmissionForm  ( [ parent, ] [ params ] )
+
+create an html form for user to enter params for a new submissionForm asset
+
+=head3 parent
+
+the parent ems object -- needs to be passed only if this is a class level call
+
+=head3 params
+
+optional set of possibly incorrect submission form params
+
+=cut
+
+sub www_editSubmissionForm {
+	my $this             = shift;
+        my $self;
+        my $parent;
+        if( $this eq __PACKAGE__ ) {  # called as constructor or menu
+	    $parent             = shift;
+        } else {
+            $self = $this;
+            $parent = $self->getParent;
+        }
+	my $params           = shift || { };
+	my $session = $parent->session;
+	my $i18n = WebGUI::International->new($parent->session,'Asset_EventManagementSystem');
+        my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId');
+
+        if( ! defined( $assetId ) ) {
+	   my $res = $parent->getLineage(['children'],{ returnObjects => 1,
+		 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+	     } );
+	    if( scalar(@$res) == 1 ) {
+	        $self = $res->[0];
+		$assetId = $self->getId;
+	    } else {
+	        my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
+		            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
+	        my $listOfLinks = join '', ( map {
+		      $makeAnchorList->(
+		                $parent->getUrl('func=editSubmissionForm;assetId=' . $_->getId ),
+				$_->get('title'),
+				WebGUI::HTML::filter($_->get('description'),'all')
+		             )
+		           } ( @$res ) );
+		return $parent->processStyle( '<h1>' . $i18n->get('select form to edit') .
+		                            '</h1><ul>' . $listOfLinks . '</ul>' );
+	    }
+        } elsif( $assetId ne 'new' ) {
+	    $self &&= WebGUI::Asset->newByDynamicClass($session,$assetId);
+	    if (!defined $self) { 
+		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
+	    }
+        }
+        my url = ( $self || $parent )->getUrl('func=editSubmissionFormSave');
+	my $newform = WebGUI::HTMLForm->new( $session, action => $url );
+	$newform->hidden(name => 'assetId', value => $assetId);
+	my @fieldNames = qw/title description startDate duration seatsAvailable location/;
+	my $fields;
+	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
+dav::dump 'editSubmissionForm::definition:', [@defs];
+	for my $def ( @defs ) {
+	    foreach my $fieldName ( @fieldNames ) {
+                my $properties = $def->{properties};
+	        if( defined $properties->{$fieldName} ) {
+		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
+		      # field definitions don't contain their own name, we will need it later on
+		      $fields->{$fieldName}{fieldId} = $fieldName;
+		  };
+	    }
+	}
+	for my $metaField ( @{$parent->getEventMetaFields} ) {
+	    push @fieldNames, $metaField->{fieldId};
+	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
+	    # meta fields call it data type, we copy it to simplify later on
+	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
+	}
+	$newform->hidden( name => 'fieldNames', value => join( ' ', @fieldNames ) );
+	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
+dav::dump 'editSubmissionForm::dump submission form def', \@defs ;
+        for my $def ( @defs ) {
+	    my $properties = $def->{properties};
+	    for my $fieldName ( qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
+                               deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
+	        if( defined $properties->{$fieldName} ) {
+                    my %fieldParams = %{$properties->{$fieldName}};
+		    $fieldParams{name} = $fieldName;
+		    $fieldParams{value} = $params->{$fieldName} || $self ? $self->get($fieldName) : undef ;
+dav::dump 'editSubmissionForm::properties for ', $fieldName, \%fieldParams ;
+		    $newform->dynamicField(%fieldParams);
+		}
+	    }
+        }
+dav::dump 'editSubmissionForm::dump before generate:',$fields;
+
+	my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : { };
+        for my $fieldId ( @fieldNames ) {
+	    my $field = $fields->{$fieldId};
+	    $newform->yesNo(
+	             label => $field->{label},
+		     name => $field->{fieldId} . '_yesNo',
+		     defaultValue => 0,
+		     value => $formDescription->{$field->{fieldId}},
+	    );
+	}
+	$newform->submit; 
+	return $parent->processStyle(
+               $parent->processTemplate({
+		      errors => $params->{errors} || [],
+                      backUrl => $parent->getUrl,
+		      pageForm => $newform->print,
+                  },$parent->get('eventSubmissionFormTemplateId')));
+}
+
+#-------------------------------------------------------------------
+
+=head2  www_editSubmissionFormSave  
+
+test and save new params
+
+=cut
+
+sub www_editSubmissionFormSave {
+        my $self = shift;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
+        my $formParams = $self->processForm();
+        if( $formParams->{_isValid} ) {
+            delete $formParams->{_isValid};
+            $self->update($formParams);
+            return $self->getParent->www_viewSubmissionQueue;
+        } else {
+            return $self->www_editSubmissionForm($formParams);
+        }
+}
+
+#-------------------------------------------------------------------
+
 =head2 getFormDescription
 
 returns a hash ref decoded from the JSON in the form description field
@@ -308,6 +446,19 @@ sub view {
 }
 
 
+#----------------------------------------------------------------
+
+=head2 www_addSubmission ( )
+
+calls www_editSubmission with assetId == new
+
+=cut
+
+sub www_addSubmission {
+    my $self = shift;
+    $self->www_editSubmission( { assetId => 'new' } );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_edit ( )
@@ -329,112 +480,37 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
-=head2  editSubmissionForm  { parent, params }
+=head2  www_editSubmission  { params }
 
-create an html form for user to enter params for a new submissionForm asset
-
-=head3 parent
-
-the parent ems object
-
-=head3 params
-
-optional set of possibly incorrect submission form params
+calls WebGUI::Asset::EMSSubmission->editSubmission
 
 =cut
 
-sub editSubmissionForm {
-	my $class             = shift;
-	my $parent             = shift;
-	my $params           = shift || { };
-	my $session = $parent->session;
-	my $i18n = WebGUI::International->new($parent->session,'Asset_EventManagementSystem');
-        my $assetId = $params->{assetId} || $session->form->get('assetId');
-	my $self;
+sub www_editSubmission {
+    my $self             = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return WebGUI::Asset::EMSSubmission->editSubmission($self,shift);
+}
 
-        if( ! defined( $assetId ) ) {
-	   my $res = $parent->getLineage(['children'],{ returnObjects => 1,
-		 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
-	     } );
-	    if( scalar(@$res) == 1 ) {
-	        $self = $res->[0];
-		$assetId = $self->getId;
-	    } else {
-	        my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
-		            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
-	        my $listOfLinks = join '', ( map {
-		      $makeAnchorList->(
-		                $parent->getUrl('func=editSubmissionForm;assetId=' . $_->getId ),
-				$_->get('title'),
-				WebGUI::HTML::filter($_->get('description'),'all')
-		             )
-		           } ( @$res ) );
-		return $parent->processStyle( '<h1>' . $i18n->get('select form to edit') .
-		                            '</h1><ul>' . $listOfLinks . '</ul>' );
-	    }
-        } elsif( $assetId ne 'new' ) {
-	    $self = WebGUI::Asset->newByDynamicClass($session,$assetId);
-	    if (!defined $self) { 
-		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
-	    }
-        }
-	my $newform = WebGUI::HTMLForm->new($session,action => $parent->getUrl('func=editSubmissionFormSave'));
-	$newform->submit; 
-	$newform->hidden(name => 'assetId', value => $assetId);
-	my @fieldNames = qw/title description startDate duration seatsAvailable location/;
-	my $fields;
-	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
-dav::dump 'editSubmissionForm::definition:', [@defs];
-	for my $def ( @defs ) {
-	    foreach my $fieldName ( @fieldNames ) {
-                my $properties = $def->{properties};
-	        if( defined $properties->{$fieldName} ) {
-		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
-		      # field definitions don't contain their own name, we will need it later on
-		      $fields->{$fieldName}{fieldId} = $fieldName;
-		  };
-	    }
-	}
-	for my $metaField ( @{$parent->getEventMetaFields} ) {
-	    push @fieldNames, $metaField->{fieldId};
-	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
-	    # meta fields call it data type, we copy it to simplify later on
-	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
-	}
-	$newform->hidden( name => 'fieldNames', value => join( ' ', @fieldNames ) );
-	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
-dav::dump 'editSubmissionForm::dump submission form def', \@defs ;
-        for my $def ( @defs ) {
-	    my $properties = $def->{properties};
-	    for my $fieldName ( qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
-                               deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
-	        if( defined $properties->{$fieldName} ) {
-                    my %fieldParams = %{$properties->{$fieldName}};
-		    $fieldParams{name} = $fieldName;
-		    $fieldParams{value} = $params->{$fieldName} || $self ? $self->get($fieldName) : undef ;
-dav::dump 'editSubmissionForm::properties for ', $fieldName, \%fieldParams ;
-		    $newform->dynamicField(%fieldParams);
-		}
-	    }
-        }
-dav::dump 'editSubmissionForm::dump before generate:',$fields;
+#-------------------------------------------------------------------
 
-	my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : { };
-        for my $fieldId ( @fieldNames ) {
-	    my $field = $fields->{$fieldId};
-	    $newform->yesNo(
-	             label => $field->{label},
-		     name => $field->{fieldId} . '_yesNo',
-		     defaultValue => 0,
-		     value => $formDescription->{$field->{fieldId}},
-	    );
-	}
-	return $parent->processStyle(
-               $parent->processTemplate({
-		      errors => $params->{errors} || [],
-                      backUrl => $parent->getUrl,
-		      pageForm => $newform->print,
-                  },$parent->get('eventSubmissionFormTemplateId')));
+=head2  www_editSubmissionSave
+
+validate and create a new submission
+
+=cut
+
+sub www_editSubmissionSave {
+        my $self = shift;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
+        my $formParams = WebGUI::Asset::EMSSubmission->processForm($self);
+        if( $formParams->{_isValid} ) {
+            delete $formParams->{_isValid};
+            $self->addSubmission($formParams);
+            return $self->www_viewSubmissionQueue;
+        } else {
+            return $self->www_editSubmission($formParams);
+        }
 }
 
 #----------------------------------------------------------------
@@ -452,32 +528,37 @@ reference to the EMS asset that is parent to the new submission form asset
 use lib '/root/pb/lib'; use dav;
 
 sub processForm {
-    my $class = shift;
-    my $parent = shift;
-    my $form = $parent->session->form;
+    my $this = shift;
+    my $form;
+    if( $this eq __PACKAGE__ ) {
+	my $parent = shift;
+	$form = $parent->session->form;
+    } elsif( ref $this eq __PACKAGE__ ) {
+	$form = $this->session->form;
+    } else {
+        return {_isValid => 0, errors => [ { text => 'invalid function call' } ] };
+    }
     my $params = {_isValid=>1};
-    #if( $form->validToken ) {
-	for my $fieldName ( qw/assetId title menuTitle url description canSubmitGroupId daysBeforeCleanup
-			   deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
-	    $params->{$fieldName} = $form->get($fieldName);
-	}
-	my @fieldNames = split( ' ', $form->get('fieldNames') );
-	$params->{formDescription} = { map { $_ => $form->get($_ . '_yesNo') } ( @fieldNames ) };
-	$params->{formDescription}{_fieldList} = [ map { $params->{formDescription}{$_} ? $_ : () } ( @fieldNames ) ];
-	if( scalar( @{$params->{formDescription}{_fieldList}} ) == 0 ) {
-	    $params->{_isValid} = 0;
-	    push @{$params->{errors}}, {text => 'you should turn on at least one entry field' }; # TODO internationalize this
-	}
+    for my $fieldName ( qw/assetId title menuTitle url description canSubmitGroupId daysBeforeCleanup
+		       deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
+	$params->{$fieldName} = $form->get($fieldName);
+    }
+    my @fieldNames = split( ' ', $form->get('fieldNames') );
+    $params->{formDescription} = { map { $_ => $form->get($_ . '_yesNo') } ( @fieldNames ) };
+    $params->{formDescription}{_fieldList} = [ map { $params->{formDescription}{$_} ? $_ : () } ( @fieldNames ) ];
+    if( scalar( @{$params->{formDescription}{_fieldList}} ) == 0 ) {
+	$params->{_isValid} = 0;
+	push @{$params->{errors}}, {text => 'you should turn on at least one entry field' }; # TODO internationalize this
+    }
 dav::dump 'processForm::params:', $params;
-	return $params;
-    #} else {
-        #return {_isValid => 0, errors => [ { text => 'invalid form token' } ] };
-    #}
+    return $params;
 }
 
 #----------------------------------------------------------------
 
 =head2 submitForm (... )
+
+this is going away, I am saving the code as an example of what the correct function in the emssubmission module will do
 
 creates the form for the submitter to enter data
 

@@ -89,7 +89,6 @@ a JSON description of the form data fields -- a hash of the names of fields (eac
 sub addSubmissionForm {
     my $self = shift;
     my $params = shift;
-    delete $params->{_isValid} if exists $params->{_isValid};
     $params->{className} = 'WebGUI::Asset::EMSSubmissionForm';
     $params->{canSubmitGroupId} ||= 2;
     $self->addGroupToSubmitList($params->{canSubmitGroupId});
@@ -469,13 +468,13 @@ sub getTokens {
 }
 
 #-------------------------------------------------------------------
-=head2 hasForms
+=head2 hasSubmissionForms
 
 returns true if the EMS has subission forms attached
 
 =cut
 
-sub hasForms {
+sub hasSubmissionForms {
    my $self = shift;
 		   # are there ~any~ forms attached to this ems?
    my $res = $self->getLineage(['children'],{ limit => 1,
@@ -605,7 +604,7 @@ sub view {
 		canEdit				=> $self->canEdit,
 		canSubmit			=> $self->canSubmit,
 		hasSubmissions			=> $self->hasSubmissions,
-		hasForms			=> $self->hasForms,
+		hasSubmissionForms			=> $self->hasSubmissionForms,
 		lookupRegistrantUrl	=> $self->getUrl('func=lookupRegistrant'),
 		);
 
@@ -849,11 +848,11 @@ test and save data posted from editSubmissionForm...
 sub www_editSubmissionFormSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $form = $self->session->form;
 	my $formParams = WebGUI::Asset::EMSSubmissionForm->processForm($self);
         if( $formParams->{_isValid} ) {
+            delete $formParams->{_isValid};
 	    $self->addSubmissionForm($formParams);
-	    return $self->www_view;
+	    return $self->www_viewSubmissionQueue;
         } else {
 	    return $self->www_editSubmissionForm($formParams);
 	}
@@ -1440,6 +1439,17 @@ sub www_getScheduleDataJSON {
 }
 
 
+
+#-------------------------------------------------------------------
+=head2 www_getSubmissionQueueData
+
+returns JSON data to fill a YUI table.
+
+=cut
+
+sub www_getSubmissionQueueData {
+
+}
 
 #-------------------------------------------------------------------
 
@@ -2268,7 +2278,6 @@ View the schedule table.
 sub www_viewSchedule {
 	my $self             = shift;
     return $self->session->privilege->insufficient() unless $self->canView;
-	my $db               = $self->session->db;
     my $rowsPerPage      = 25;
     my $locationsPerPage = $self->get('scheduleColumnsPerPage');
 
@@ -2290,40 +2299,25 @@ sub www_viewSchedule {
 }
 
 #---------------------------------------------
-=head2 www_viewSubmission
-
-=cut
-
-sub www_viewSubmission {
-
-# fill the view submission template
-	my $self             = shift;
-    return $self->session->privilege->insufficient() unless $self->canSubmit or $self->canEdit;
-	my $db               = $self->session->db;
-
-	return $self->processStyle(
-               $self->processTemplate({
-                      backUrl => $self->getUrl,
-                  },$self->get('eventSubmissionTemplateId')));
-
-
-}
-
-#---------------------------------------------
 =head2 www_viewSubmissionQueue
 
 =cut
 
 sub www_viewSubmissionQueue {
 	my $self             = shift;
-    return $self->session->privilege->insufficient() unless $self->canView;
+    return $self->session->privilege->insufficient() unless $self->canSubmit || $self->canEdit;
 
 	return $self->processStyle(
                $self->processTemplate({
                       backUrl => $self->getUrl,
+		      canEdit => $self->canEdit,
+		      hasSubmissionForms => $self->hasSubmissionForms,
+		      getSubmissionQueueDateUrl => $self->getUrl('func=getSubmissionQueueData'),
+		      addSumissionFormUrl => $self->getUrl('func=addSubmissionForm'),
+		      editSubmissionFormUrl =>  self->getUrl('func=editSubmissionForm'), 
+		      addSumissionUrl => $self->getUrl('func=addSubmission'),
                   },$self->get('eventSubmissionQueueTemplateId')));
 }
-
 
 1;
 

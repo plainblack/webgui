@@ -137,7 +137,7 @@ WebGUI::Test->tagsToRollback($versionTag);
 
 loginRgstr;
 
-is( $ems->hasForms, 0, 'ems currently has no forms' );
+is( $ems->hasSubmissionForms, 0, 'ems currently has no forms' );
 
 #print 'press return to continue test' ; <>;
 
@@ -161,7 +161,7 @@ my $frmA = $ems->addSubmissionForm({
     formDescription          => $formAdesc,
 });
 isa_ok( $frmA, 'WebGUI::Asset::EMSSubmissionForm' );
-is( $ems->hasForms, 1, 'ems now has forms' );
+is( $ems->hasSubmissionForms, 1, 'ems now has forms' );
 is_deeply( $frmA->getFormDescription, $formAdesc, 'form description matches' );
 
 my $formBdesc = {
