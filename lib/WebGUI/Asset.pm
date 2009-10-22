@@ -84,10 +84,11 @@ use WebGUI::Definition::Asset (
 					    defaultValue    =>0,
 					},
 				    encryptPage=>{
-					    fieldType       => 
+					    fieldType       => 'yesNo',
+                        noFormPost      => 
                                 sub { 
                                     my $self = shift; 
-                                    return $self->session->config->get("sslEnabled") ? 'yesNo' : 'hidden';
+                                    return $self->session->config->get("sslEnabled");
                                 },
 					    tab             => "security",
 					    label           => ['encrypt page','Asset'],
@@ -907,13 +908,9 @@ sub getEditForm {
 			$params{value} = [$params{value}];
 		}
 
-		if (exists $fieldHash{visible} and not $fieldHash{visible}) {
-			$params{fieldType} = 'hidden';
-		}
-		else {
-			%params = (%params, %fieldHash);
-			delete $params{tab};
-		}
+		%params = (%params, %fieldHash);
+		delete $params{tab};
+		delete $params{tableName};
 
 		# if there isnt a tab specified lets define one
 		my $tab = $fieldHash{tab} || "properties";
@@ -1585,10 +1582,11 @@ sub new {
     }
     
     my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
-    unless (exists $properties->{assetId}) {
+    unless (exists $properties->{assetId}) { # can we get it from cache?
         my $sql = "select * from asset";
         my $where = " where asset.assetId=?";
         my $placeHolders = [$assetId];
+        
         foreach my $definition (@{$class->definition($session)}) {
             $sql .= ",".$definition->{tableName};
             $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
