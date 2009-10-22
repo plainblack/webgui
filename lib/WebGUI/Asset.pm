@@ -831,26 +831,25 @@ sub getEditForm {
 	}
 
 	# build the definition to the generate form
-    my (%extendedProperties,@definitions);
     my @properties = (
 		assetId	=> {
 			fieldType	=> "guid",
-			label		=> $i18n->get("asset id"),
+			label		=> ["asset id",'Asset'],
 			value		=> $assetId,
-			hoverHelp	=> $i18n->get('asset id description'),
+			hoverHelp	=> ['asset id description','Asset'],
 			uiLevel		=> 9,
 			tab			=> "meta",
 		},
 		class	=> {
 			fieldType	=> "className",
-			label		=> $i18n->get("class name",'WebGUI'),
+			label		=> ["class name",'WebGUI'],
 			value		=> $class,
 			uiLevel		=> 9,
 			tab			=> "meta",
 		},
 		keywords => {
-			label       => $i18n->get('keywords'),
-			hoverHelp   => $i18n->get('keywords help'),
+			label       => ['keywords','Asset'],
+			hoverHelp   => ['keywords help','Asset'],
 			value       => $self->get('keywords'),
 			fieldType	=> 'keywords',
 			tab			=> 'meta',
@@ -883,7 +882,7 @@ sub getEditForm {
 		}
 		# add metadata management
 		if ($session->user->isAdmin) {
-			$extendedProperties{_metadatamanagement} = {
+			push @properties, '_metadatamanagement' => {
 				tab			=> "meta",
 				fieldType	=> "readOnly",
 				value		=> '<p><a href="'.$self->session->url->page("func=editMetaDataField;fid=new").'">'.$i18n->get('Add new field').'</a></p>',
@@ -891,51 +890,36 @@ sub getEditForm {
 			};
 		}
     }
-	push @definitions, {
-		properties			=> \%extendedProperties
-		};
 	
 	# generate the form	
-	foreach my $definition (@definitions) {
-		my $properties = $definition->{properties};
-		
-		foreach my $fieldName (keys %{$properties}) {
-			my %fieldHash = %{$properties->{$fieldName}};
-			my %params = (name => $fieldName, value => $self->getValue($fieldName));
-			next if exists $fieldHash{autoGenerate} and not $fieldHash{autoGenerate};
+    for (my $i = 0; $i < @properties; $i += 2) {
+	    my $fieldName = $properties[$i];	
+		my %fieldHash = %{$properties[$i+1]};
+		my %params = (name => $fieldName, value => $self->get($fieldName));
 
-			# apply config file changes
-			foreach my $key (keys %{$overrides->{fields}{$fieldName}}) {
-				$fieldHash{$key} = $overrides->{fields}{$fieldName}{$key};
-			}
-
-			# Kludge.
-			if (isIn($fieldHash{fieldType}, 'selectBox', 'workflow') and ref $params{value} ne 'ARRAY') {
-				$params{value} = [$params{value}];
-			}
-
-			if (exists $fieldHash{visible} and not $fieldHash{visible}) {
-				$params{fieldType} = 'hidden';
-			}
-			else {
-				%params = (%params, %fieldHash);
-				delete $params{tab};
-			}
-
-			# if there isnt a tab specified lets define one
-			my $tab = $fieldHash{tab} || "properties";
-
-            # use a custom draw method
-            my $drawMethod = $properties->{$fieldName}{customDrawMethod};
-            if ($drawMethod) {
-                $params{value} = $self->$drawMethod(\%params);
-                delete $params{name}; # don't want readOnly to generate a hidden field
-                $params{fieldType} = "readOnly";
-            }
-
-            #draw the field
-		    $tabform->getTab($tab)->dynamicField(%params);
+		# apply config file changes
+		foreach my $key (keys %{$overrides->{fields}{$fieldName}}) {
+			$fieldHash{$key} = $overrides->{fields}{$fieldName}{$key};
 		}
+
+		# Kludge.
+		if (isIn($fieldHash{fieldType}, 'selectBox', 'workflow') and ref $params{value} ne 'ARRAY') {
+			$params{value} = [$params{value}];
+		}
+
+		if (exists $fieldHash{visible} and not $fieldHash{visible}) {
+			$params{fieldType} = 'hidden';
+		}
+		else {
+			%params = (%params, %fieldHash);
+			delete $params{tab};
+		}
+
+		# if there isnt a tab specified lets define one
+		my $tab = $fieldHash{tab} || "properties";
+
+        #draw the field
+	    $tabform->getTab($tab)->dynamicField(%params);
 	}
 
 	# send back the rendered form
