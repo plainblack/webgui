@@ -1588,12 +1588,7 @@ sub new {
         my $placeHolders = [$assetId];
       
         # join all the tables
-        my %tables; 
-        foreach my $property ($class->getProperties) {
-            my $definition = $class->getProperty($property);
-            %tables{$definition->{tableName}} = 1;
-        }
-        foreach my $table (keys %tables) {
+        foreach my $table ($self->getTables) {
             $sql .= ",".$definition->{tableName};
             $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
         }
@@ -2439,12 +2434,11 @@ sub www_add {
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
 	if ($self->session->form->process('prototype')) {
 		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
-		foreach my $definition (@{$prototype->definition($self->session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
-			foreach my $property (keys %{$definition->{properties}}) {
-				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
-				next if ($definition->{properties}{$property}{noFormPost});
-				$prototypeProperties{$property} = $prototype->get($property);
-			}
+		foreach my $property ($prototype->getProperties) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
+            my $definition = $prototype->getProperty($property);
+			next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
+			next if ($definition->{noFormPost});
+			$prototypeProperties{$property} = $prototype->get($property);
 		}
 	}
 	my %properties = (

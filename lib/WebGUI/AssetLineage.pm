@@ -617,10 +617,9 @@ sub getLineageSql {
         if ( ! eval { require $module; 1 }) {
             $self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
         }
-		foreach my $definition (@{$className->definition($self->session)}) {
-            unless ($definition->{tableName} eq "asset" || $definition->{tableName} eq "assetData") {
-				my $tableName = $definition->{tableName};
-				$tables .= " left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
+        foreach my $table ($self->getTables) {
+            unless ($table eq "asset" || $table eq "assetData") {
+				$tables .= " left join $table on assetData.assetId=".$table.".assetId and assetData.revisionDate=".$table.".revisionDate";
 			}
 		}
 	}
