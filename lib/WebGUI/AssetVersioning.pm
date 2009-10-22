@@ -121,22 +121,19 @@ sub addRevision {
     ]);
     
 	my %defaults = ();
-    foreach my $definition (@{$self->definition($self->session)}) {
+	# get the default values of each property
+	foreach my $property ($self->getProperties) {
+        my $defintion = $self->getProperty($property);
+		$defaults{$property} = $definition->{defaultValue};
+        if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{serialize}) {
+            $defaults{$property} = $defaults{$property}->[0];
+        }
+	}
 		
-		# get the default values of each property
-		foreach my $property (keys %{$definition->{properties}}) {
-			$defaults{$property} = $definition->{properties}{$property}{defaultValue};
-            if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{properties}{$property}{serialize}) {
-                $defaults{$property} = $defaults{$property}->[0];
-            }
-		}
-		
-		# prime the tables
-        unless ($definition->{tableName} eq "assetData") {
-            $self->session->db->write(
-                "insert into ".$definition->{tableName}." (assetId,revisionDate) values (?,?)", 
-                [$self->getId, $now]
-            );
+	# prime the tables
+    foreach my $table ($self->getTables) {
+        unless ($table eq "assetData") {
+            $self->session->db->write( "insert into ".$table." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
         }
     }
     $self->session->db->commit;
@@ -356,18 +353,20 @@ Deletes a revision of an asset. If it's the last revision, it purges the asset a
 sub purgeRevision {
 	my $self = shift;
 	if ($self->getRevisionCount > 1) {
-		$self->session->db->beginTransaction;
-        	foreach my $definition (@{$self->definition($self->session)}) {
-			$self->session->db->write("delete from ".$definition->{tableName}." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
-        	}
-		my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=? and status='pending'",[$self->getId]);
+        my $db = $self->session->db;
+		$db->beginTransaction;
+       	foreach my $table ($self->getTables) {
+			$db->write("delete from ".$table." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
+       	}
+		my $count = $db->quickScalar("select count(*) from assetData where assetId=? and status='pending'",[$self->getId]);
 		if ($count < 1) {
-			$self->session->db->write("update asset set isLockedBy=null where assetId=?",[$self->getId]);
+			$db->write("update asset set isLockedBy=null where assetId=?",[$self->getId]);
 		}
-        	$self->session->db->commit;
+        $db->commit;
 		$self->purgeCache;
 		$self->updateHistory("purged revision ".$self->get("revisionDate"));
-	} else {
+	} 
+    else {
 		$self->purge;
 	}
 }

@@ -33,8 +33,6 @@ use Storable qw/dclone/;
 
 my $session = WebGUI::Test->session;
 
-my @fixIdTests    = getFixIdTests($session);
-my @fixTitleTests = getFixTitleTests($session);
 my @getTitleTests = getTitleTests($session);
 
 my $rootAsset = WebGUI::Asset->getRoot($session);
@@ -153,9 +151,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 116 
-            + scalar(@fixIdTests)
-            + scalar(@fixTitleTests)
+plan tests => 112
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             + $canAddMaker->plan
             + $canAddMaker2->plan
@@ -417,37 +413,6 @@ is($importNode->fixUrl('fixurl'), 'fixurl.html', 'Automatic adding of extensions
 is($importNode->fixUrl('fixurl.css'), 'fixurl.css', 'extensions aren\'t automatically added if there is already and extension');
 $session->setting->set('urlExtension', undef);
 
-################################################################
-#
-# fixId
-#
-################################################################
-
-my $ownerUserId = $importNode->getValue('ownerUserId');
-
-foreach my $test (@fixIdTests) {
-    my $fixedId    = $importNode->fixId($test->{id}, 'ownerUserId');
-    my $expectedId = $test->{pass} ? $test->{id} : $ownerUserId;
-    is($fixedId, $expectedId, $test->{comment});
-}
-
-################################################################
-#
-# fixTitle
-#
-################################################################
-
-my $importNodeTitle = $importNode->getTitle();
-
-foreach my $test (@fixTitleTests) {
-    my $fixedTitle    = $importNode->fixTitle($test->{title}, 'ownerUserId');
-    my $expectedTitle = defined $test->{fixed} ? $test->{fixed} : $importNodeTitle;
-    is($fixedTitle, $expectedTitle, $test->{comment});
-}
-
-$fixTitleAsset->update({'title' => 0});
-
-is($fixTitleAsset->fixTitle(''), 'Untitled', q{fixTitle: title is false, fixTitle returns 'Untitled'});
 
 ################################################################
 #
@@ -591,27 +556,6 @@ $session->config->set('assets/WebGUI::Asset::Snippet/uiLevel', 8);
 is($canEditAsset->getUiLevel,  8, 'getUiLevel: WebGUI::Asset has a configured uiLevel of 8');
 is($fixTitleAsset->getUiLevel, 8, 'getUiLevel: Snippet has a configured uiLevel of 8');
 
-
-################################################################
-#
-# assetExists
-#
-################################################################
-
-{
-
-    my $id    = $canViewAsset->getId;
-    my $class = 'WebGUI::Asset';
-    my $date  = $canViewAsset->get('revisionDate');
-
-    ok ( WebGUI::Asset->assetExists($session, $id, $class, $date), 'assetExists with proper class, id and revisionDate');
-    ok (!WebGUI::Asset->assetExists($session, $id, 'WebGUI::Asset::Snippet', $date), 'assetExists with wrong class does not exist');
-    my $id2 = $id;
-    ++$id2;
-    ok (!WebGUI::Asset->assetExists($session, $id2, $class, $date), 'assetExists with wrong id does not exist');
-    ok (!WebGUI::Asset->assetExists($session, $id,  $class, $date+1), 'assetExists with wrong revisionDate does not exist');
-
-}
 
 ################################################################
 #
@@ -892,118 +836,6 @@ $assetToCommit = $assetToCommit->cloneFromDb;
 is($assetToCommit->get('status'), 'approved', '... returns fresh, commited asset from the db');
 
 ##Return an array of hashrefs.  Each hashref describes a test
-##for the fixId method.
-
-sub getFixIdTests {
-    my $session = shift;
-    return (
-    {
-        id      => '0',
-        pass    => 1,
-        comment => 'digit zero',
-    },
-    {
-        id      => '1',
-        pass    => 1,
-        comment => 'digit one',
-    },
-    {
-        id      => '123',
-        pass    => 1,
-        comment => '3 digit integer',
-    },
-    {
-        id      => '12345678901'x2,
-        pass    => 1,
-        comment => '22 digit integer',
-    },
-    {
-        id      => '12345678901'x4,
-        pass    => 0,
-        comment => '44 digit integer',
-    },
-    {
-        id      => '',
-        pass    => 0,
-        comment => 'null string is rejected',
-    },
-    {
-        id      => 'a',
-        pass    => 0,
-        comment => 'single lower case character rejected',
-    },
-    {
-	  #            '1234567890123456789012'
-        id      => 'abc123ZYX098deadbeef()',
-        pass    => 0,
-        comment => 'illegal characters in length 22 string rejected',
-    },
-    {
-        id      => $session->id->generate,
-        pass    => 1,
-        comment => 'valid id accepted',
-    },
-    );
-}
-
-##Return an array of hashrefs.  Each hashref describes a test
-##for the fixTitle method.  If "fixed" != undef, it should
-##contain what the fixTitle method will return.
-
-sub getFixTitleTests {
-    my $session = shift;
-    return ({
-        title   => undef,
-        fixed   => undef,
-        comment => "undef returns the Asset's title",
-    },
-    {
-        title   => '',
-        fixed   => undef,
-        comment => "null string returns the Asset's title",
-    },
-    {
-        title   => 'untitled',
-        fixed   => undef,
-        comment => "'untitled' returns the Asset's title",
-    },
-    {
-        title   => 'UnTiTlEd',
-        fixed   => undef,
-        comment => "'untitled' in any case returns the Asset's title",
-    },
-    {
-        title   => 'Username: ^@;',
-        fixed   => 'Username: &#94;@;',
-        comment => "Macros are negated",
-    },
-    {
-        title   => '<b>A bold title</b>',
-        fixed   => 'A bold title',
-        comment => "Markup is stripped out",
-    },
-    {
-        title   => 'Javascript: <script>Evil code goes in here</script>',
-        fixed   => 'Javascript: ',
-        comment => "javascript removed",
-    },
-    {
-        title   => 'This is a good Title',
-        fixed   => 'This is a good Title',
-        comment => "Good titles are passed",
-    },
-    {
-        title   => '<b></b>',
-        fixed   => '',
-        comment => "If there is no title left after processing, then it is set to untitled.",
-    },
-    {
-        title   => q|Quotes '"|,
-        fixed   => q|Quotes '"|,
-        comment => "Quotes are not processed.",
-    },
-    );
-}
 
 ##Return an array of hashrefs.  Each hashref describes a test
 ##for the getTitle and getMenuTitle tests.  If "assetName"  != 0, they

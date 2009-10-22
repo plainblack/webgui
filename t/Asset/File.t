@@ -86,7 +86,7 @@ $versionTag->commit;
 
 my $fileStorage = WebGUI::Storage->create($session);
 my $guard2 = cleanupGuard($fileStorage);
-$mocker->set_always('getValue', $fileStorage->getId);
+$mocker->set_always('get', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
 

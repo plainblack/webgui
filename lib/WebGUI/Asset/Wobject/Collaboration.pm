@@ -905,7 +905,6 @@ sub definition {
             hoverHelp=>$i18n->get('group to edit hoverhelp'),
             uiLevel=>6,
             fieldType=>'group',
-            filter=>'fixId',
             defaultValue=>$groupIdEdit, # groupToEditPost should default to groupIdEdit
         },
         postReceivedTemplateId =>{

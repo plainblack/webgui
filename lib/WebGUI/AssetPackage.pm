@@ -284,7 +284,7 @@ sub www_deployPackage {
 	my $packageMasterAssetId = $self->session->form->param("assetId");
 	if (defined $packageMasterAssetId) {
 		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($self->session, $packageMasterAssetId);
-		unless ($packageMasterAsset->getValue('isPackage')) { #only deploy packages
+		unless ($packageMasterAsset->get('isPackage')) { #only deploy packages
 		 	$self->session->errorHandler->security('deploy an asset as a package which was not set as a package.');
 		 	return undef;
 		}

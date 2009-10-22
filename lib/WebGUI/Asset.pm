@@ -47,7 +47,6 @@ use WebGUI::Definition::Asset (
 					    hoverHelp       =>['99 description','Asset'],
                         fieldType       =>'text',
                         defaultValue    =>'Untitled',
-					    filter          =>'fixTitle',
                     },
                     menuTitle=>{
 					    tab             =>"properties",
@@ -55,7 +54,6 @@ use WebGUI::Definition::Asset (
 					    hoverHelp       =>['411 description','Asset'],
 					    uiLevel         =>1,
                         fieldType       =>'text',
-					    filter          =>'fixTitle',
                         defaultValue    =>'Untitled',
                     },
                     url=>{
@@ -64,8 +62,7 @@ use WebGUI::Definition::Asset (
 					    hoverHelp       =>['104 description','Asset'],
 					    uiLevel         =>3,
                         fieldType       =>'text',
-                        defaultValue    =>'',
-					    filter          =>'fixUrl',
+                        defaultValue    => sub { return $_[0]->getId; },
                     },
 				    isHidden=>{
 					    tab             =>"display",
@@ -85,11 +82,7 @@ use WebGUI::Definition::Asset (
 					},
 				    encryptPage=>{
 					    fieldType       => 'yesNo',
-                        noFormPost      => 
-                                sub { 
-                                    my $self = shift; 
-                                    return $self->session->config->get("sslEnabled");
-                                },
+                        noFormPost      => sub { return $_[0]->session->config->get("sslEnabled"); },
 					    tab             => "security",
 					    label           => ['encrypt page','Asset'],
 					    hoverHelp       => ['encrypt page description','Asset'],
@@ -102,7 +95,6 @@ use WebGUI::Definition::Asset (
 					    hoverHelp       =>['108 description','Asset'],
 					    uiLevel         =>6,
                         fieldType       =>'user',
-					    filter          =>'fixId',
                         defaultValue    =>'3',
                     },
                     groupIdView=>{
@@ -111,7 +103,6 @@ use WebGUI::Definition::Asset (
 					    hoverHelp       =>['872 description','Asset'],
 					    uiLevel         =>6,
                         fieldType       =>'group',
-					    filter          =>'fixId',
                         defaultValue    =>'7',
                     },
                     groupIdEdit=>{
@@ -121,7 +112,6 @@ use WebGUI::Definition::Asset (
 					    hoverHelp       =>['871 description','Asset'],
 					    uiLevel         =>6,
                         fieldType       =>'group',
-					    filter          =>'fixId',
                         defaultValue    =>'4',
                     },
                     synopsis=>{
@@ -502,58 +492,7 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 fixId ( id, fieldName )
-
-Returns the default Id for a field if we get an invalid Id, otherwise returns the id passed in. An valid id either looks like a GUID or is an integer.
-
-=head3 id
-
-The id to check.
-
-=head3 fieldName
-
-The name of the property we're checking. This is used to retrieve whatever the default is set to in the definition.
-
-=cut
-
-sub fixId {
-	my $self = shift;
-    my $id = shift;
-    my $field = shift;
-    if ($id =~ m/\A \d{1,22} \z/xms || $id =~ m/\A [A-Za-z0-9\-\_]{22} \z/xms) {
-        return $id;
-    }
-	return $self->getValue($field);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 fixTitle ( string )
-
-Fixes a title by eliminating HTML from it.
-
-=head3 string
-
-Any text string. Most likely will have been the Asset's name or title.  If
-no string is supplied, then it will fetch the default title for the asset,
-or the word Untitled.
-
-=cut
-
-sub fixTitle {
-	my $self = shift;
-    my $string = shift;
-    if (lc($string) eq "untitled" || $string eq "") {
-        $string = $self->getValue("title") || 'Untitled';
-    }
-	return WebGUI::HTML::filter($string, 'all');
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 fixUrl ( url )
+=head2 fixUrl ( [value] )
 
 Returns a URL, removing invalid characters and making it unique by
 adding a digit to the end if necessary.  URLs are not allowed to be
@@ -567,7 +506,7 @@ Assets have a maximum length of 250 characters.  Any URL longer than
 URLs will be passed through $session->url->urlize to make them WebGUI compliant.
 That includes any languages specific constraints set up in the default language pack.
 
-=head3 url
+=head3 value
 
 Any text string. Most likely will have been the Asset's name or title.  If the string is not passed
 in, then a url will be constructed from
@@ -580,14 +519,19 @@ sub fixUrl {
 
 	# build a URL from the parent
 	unless ($url) {
-		$url = $self->getParent->get("url");
+		$url = $self->getParent->url;
 		$url =~ s/(.*)\..*/$1/;
-		$url .= '/'.$self->getValue("menuTitle");
+		$url .= '/'.$self->menuTitle;
 	}
 
     # if we're inheriting the URL from our parent, set that appropriately
-    if($self->get('inheritUrlFromParent')) {
-       $url = $self->fixUrlFromParent($url); 
+    if ($self->inheritUrlFromParent) {
+        # if we're inheriting the URL from our parent, set that appropriately
+        my @parts = split(m{/}, $url);
+        # don't do anything unless we need to
+        if($url ne $self->getParent->get('url') . '/' . $parts[-1]) {
+            $url = $self->getParent->get('url') . '/' . $parts[-1];
+        }
     }
 	$url = $self->session->url->urlize($url);
 
@@ -646,35 +590,6 @@ sub fixUrl {
         $url = join(".",@parts);
         $url = $self->fixUrl($url);
     }
-    return $url;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 fixUrlFromParent ( url )
-
-URLs will be passed through $session->url->urlize to make them WebGUI compliant.
-That includes any languages specific constraints set up in the default language pack.
-
-=head3 url
-
-Any text string.
-
-=cut
-
-sub fixUrlFromParent {
-	my $self      = shift;
-	my $url       = shift;
-
-    # if we're inheriting the URL from our parent, set that appropriately
-    my @parts = split(m{/}, $url);
-
-    # don't do anything unless we need to
-    if($url ne $self->getParent->get('url') . '/' . $parts[-1]) {
-        $url = $self->getParent->get('url') . '/' . $parts[-1];
-    }
-
     return $url;
 }
 
@@ -1261,10 +1176,11 @@ Returns the title of this asset. If it's not specified or it's "Untitled" then t
 
 sub getTitle {
 	my $self = shift;
-	if ($self->get("title") eq "" || lc($self->get("title")) eq "untitled") {
+    my $title = $self->title;
+	if ($title eq "" || lc($title) eq "untitled") {
 		return $self->getName;
 	}
-	return $self->get("title");
+	return $title;
 }
 
 
@@ -1431,9 +1347,9 @@ Name value pairs to add to the URL in the form of:
 sub getUrl {
 	my $self = shift;
 	my $params = shift;
-	my $url = $self->get("url");
+	my $url = $self->url;
 	$url = $self->session->url->gateway($url,$params);
-	if ($self->get("encryptPage")) {
+	if ($self->encryptPage) {
 		$url = $self->session->url->getSiteURL().$url;
 		$url =~ s/http:/https:/;
 	}
@@ -1522,6 +1438,29 @@ sub logView {
 		WebGUI::PassiveProfiling::addPage($self->session,$self->getId) if ($self->get("className") eq "WebGUI::Asset::Wobject::Layout");
 	}
 	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 menuTitle ( [value] )
+
+Returns the menuTitle of the asset, which is used in navigations.
+
+=head3 value
+
+If specified this value will be used to set the title after it goes through some validation checking.
+
+=cut
+
+sub menuTitle {
+	my ($self, $title) = @_;
+    if (defined $title) {
+        if ($title eq "") {
+            $title = $self->title;
+        }
+	    $title = WebGUI::HTML::filter($title, 'all');
+    }
+    return $self->next::method($title);
 }
 
 #-------------------------------------------------------------------
@@ -2233,6 +2172,30 @@ sub setSize {
 
 #-------------------------------------------------------------------
 
+=head2 title ( [value] )
+
+Returns the title of the asset.
+
+=head3 value
+
+If specified this value will be used to set the title after it goes through some validation checking.
+
+=cut
+
+sub title {
+	my ($self, $title) = @_;
+    if (defined $title) {
+        if ($title eq "") {
+            $title = 'Untitled';
+        }
+	    $title = WebGUI::HTML::filter($title, 'all');
+    }
+    return $self->next::method($title);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 toggleToolbar ( )
 
 Toggles a toolbar to a special state so that custom toolbars can be rendered under special circumstances. This is mostly useful for macros that wish to proxy an asset but not display the toolbar.
@@ -2279,7 +2242,7 @@ sub update {
     ##If inheritUrlFromParent was sent, and it is true, then muck with the url
     ##The URL may have been sent too, so use it or the current Asset's URL.
     if (exists $properties->{inheritUrlFromParent} and $properties->{inheritUrlFromParent}) {
-        $properties->{'url'} = $self->fixUrlFromParent($properties->{'url'} || $self->get('url'));
+        $properties->{'url'} = $self->url($properties->{'url'} || $self->url);
     }
 
     # check the definition of all properties against what was given to us
@@ -2342,6 +2305,27 @@ sub update {
     # we've changed something so cache is no longer valid
 	$self->purgeCache;
 }
+
+#-------------------------------------------------------------------
+
+=head2 url ( [ value ] ) 
+
+Returns the asset's url without any site specific prefixes. If you want a browser friendly url see the getUrl() method.
+
+=head3 value
+
+The new value to set the URL to.
+
+=cut
+
+sub url {
+    my ($self, $url) = @_;
+    if (defined $url) {
+        $url = $self->fixUrl($url);
+    }
+    return $self->next::method($url);
+}
+
 
 #-------------------------------------------------------------------
 

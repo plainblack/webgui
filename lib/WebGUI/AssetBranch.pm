@@ -140,14 +140,14 @@ sub www_editBranch {
                 -name=>"displayTitle",
                 -label=>$i18n2->get(174),
 		-hoverHelp=>$i18n2->get('174 description'),
-                -value=>$self->getValue("displayTitle"),
+                -value=>$self->get("displayTitle"),
                 -uiLevel=>5,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_displayTitle"})
                 );
          $tabform->getTab("display")->template(
 		-name=>"styleTemplateId",
 		-label=>$i18n2->get(1073),
-		-value=>$self->getValue("styleTemplateId"),
+		-value=>$self->get("styleTemplateId"),
 		-hoverHelp=>$i18n2->get('1073 description'),
 		-namespace=>'style',
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_styleTemplateId"})
@@ -156,7 +156,7 @@ sub www_editBranch {
 		-name=>"printableStyleTemplateId",
 		-label=>$i18n2->get(1079),
 		-hoverHelp=>$i18n2->get('1079 description'),
-		-value=>$self->getValue("printableStyleTemplateId"),
+		-value=>$self->get("printableStyleTemplateId"),
 		-namespace=>'style',
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_printableStyleTemplateId"})
 		);
@@ -165,7 +165,7 @@ sub www_editBranch {
                 name        => 'mobileStyleTemplateId',
                 label       => $i18n2->get('mobileStyleTemplateId label'),
                 hoverHelp   => $i18n2->get('mobileStyleTemplateId description'),
-                value       => $self->getValue('mobileStyleTemplateId'),
+                value       => $self->get('mobileStyleTemplateId'),
                 namespace   => 'style',
                 subtext     => '<br />' . $i18n->get('change') . q{ }
                     . WebGUI::Form::yesNo($self->session,{name=>"change_mobileStyleTemplateId"}),

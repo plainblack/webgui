@@ -88,7 +88,6 @@ sub definition {
 		tab=>"display",
 		label=>$i18n->get(1073),
 		hoverHelp=>$i18n->get('1073 description'),
-	    filter=>'fixId',
 		namespace=>'style'
 	},
 	printableStyleTemplateId=>{
@@ -97,7 +96,6 @@ sub definition {
 		tab=>"display",
 		label=>$i18n->get(1079),
 		hoverHelp=>$i18n->get('1079 description'),
-	    filter=>'fixId',
 		namespace=>'style'
 	},
     mobileStyleTemplateId => {
@@ -106,7 +104,6 @@ sub definition {
         tab             => 'display',
         label           => $i18n->get('mobileStyleTemplateId label'),
         hoverHelp       => $i18n->get('mobileStyleTemplateId description'),
-        filter          => 'fixId',
         namespace       => 'style',
     },
 	);
