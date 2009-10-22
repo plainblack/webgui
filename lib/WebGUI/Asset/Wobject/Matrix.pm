@@ -647,7 +647,6 @@ sub view {
     
     my ($varStatistics,$varStatisticsEncoded);
 	my $var = $self->get;
-    $var->{listing_loop}            = $self->getListings;
     $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
