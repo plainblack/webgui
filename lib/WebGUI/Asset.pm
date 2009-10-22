@@ -908,7 +908,7 @@ sub getEditForm {
 			$params{value} = [$params{value}];
 		}
 
-		%params = (%params, %fieldHash);
+		%params = (%fieldHash, %params);
 		delete $params{tab};
 		delete $params{tableName};
 
@@ -1586,11 +1586,19 @@ sub new {
         my $sql = "select * from asset";
         my $where = " where asset.assetId=?";
         my $placeHolders = [$assetId];
-        
-        foreach my $definition (@{$class->definition($session)}) {
+      
+        # join all the tables
+        my %tables; 
+        foreach my $property ($class->getProperties) {
+            my $definition = $class->getProperty($property);
+            %tables{$definition->{tableName}} = 1;
+        }
+        foreach my $table (keys %tables) {
             $sql .= ",".$definition->{tableName};
             $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
         }
+
+        # fetch properties
         $properties = $session->db->quickHashRef($sql.$where, $placeHolders);
         unless (exists $properties->{assetId}) {
             $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
@@ -1602,11 +1610,10 @@ sub new {
     if (defined $properties) {
         my $object = { _session=>$session, _properties => $properties };
         bless $object, $class;
-        foreach my $definition (@{ $object->definition($session) }) {
-            foreach my $property (keys %{ $definition->{properties} }) {
-                if ($definition->{properties}->{$property}->{serialize} && $object->{_properties}->{$property} ne '') {
-                    $object->{_properties}->{$property} = JSON->new->canonical->decode($object->{_properties}->{$property});
-                }
+        foreach my $property ($object->getProperties) {
+            my $definition = $object->getProperty($property);
+            if ($definition->{serialize} && $object->{_properties}->{$property} ne '') {
+                $object->{_properties}->{$property} = JSON->new->canonical->decode($object->{_properties}->{$property});
             }
         }
         return $object;
@@ -2000,33 +2007,31 @@ sub processPropertiesFromFormPost {
     my $form = $self->session->form;
 	my $overrides = $self->session->config->get("assets/".$self->get("className")."/fields");
 
-	foreach my $definition (@{$self->definition($self->session)}) {
-		foreach my $property (keys %{$definition->{properties}}) {
-			my %params = %{$definition->{properties}{$property}};
+	foreach my $property ($self->getProperties) {
+		my %params = %{$self->getProperty($property)};
 
-			# apply config file changes
-			foreach my $key (keys %{$overrides->{$property}}) {
-				$params{$key} = $overrides->{$property}{$key};
-			}
-			
-			# deal with properties that can't be posted through the form
-			if ($params{noFormPost}) {
-				if ($form->process("assetId") eq "new" && $self->get($property) eq "") {
-					$data{$property} = $params{defaultValue};
-				}
-				next;
-			}
-			
-			# process the form element
-			$params{name} = $property;
-			$params{value} = $self->get($property);
-			$data{$property} = $form->process(
-				$property,
-				$params{fieldType},
-				$params{defaultValue},
-				\%params
-				);
+		# apply config file changes
+		foreach my $key (keys %{$overrides->{$property}}) {
+			$params{$key} = $overrides->{$property}{$key};
 		}
+		
+		# deal with properties that can't be posted through the form
+		if ($params{noFormPost}) {
+			if ($form->process("assetId") eq "new" && $self->get($property) eq "") {
+				$data{$property} = $params{defaultValue};
+			}
+			next;
+		}
+		
+		# process the form element
+		$params{name} = $property;
+		$params{value} = $self->get($property);
+		$data{$property} = $form->process(
+			$property,
+			$params{fieldType},
+			$params{defaultValue},
+			\%params
+			);
 	}
     $data{keywords} = $form->process("keywords");
     if ($self->session->setting->get("metaDataEnabled")) {
@@ -2283,75 +2288,58 @@ sub update {
     }
 
     # check the definition of all properties against what was given to us
-    foreach my $definition (reverse @{$self->definition($self->session)}) {
-		my %setPairs = ();
+	my %setPairs = ();
+	my %tableFields = ();
+	foreach my $property ($self->getProperties) {
+
+        # skip a property unless it was passed in to update
+		next unless (exists $properties->{$property});
+
+        # get the property definition
+        my $propertyDefinition = $self->getProperty($property);
 
 		# get a list of the fields available in this table so we don't try to insert
 		# something for a field that doesn't exist
-		my %tableFields = ();
-		my $sth = $self->session->db->read('DESCRIBE `'.$definition->{tableName}.'`');
-		while (my ($col) = $sth->array) {
-			$tableFields{$col} = 1;
-		}
+        my $table = $propertyDefinition->{tableName};
+        unless (exists $tableFields{$table}) {
+		    my $sth = $self->session->db->read('DESCRIBE `'.$table.'`');
+		    while (my ($col) = $sth->array) {
+			    $tableFields{$table}{$col} = 1;
+		    }
+        }
 
-        # deal with all the properties in this part of the definition
-		foreach my $property (keys %{$definition->{properties}}) {
+        # skip properties that aren't yet in the table
+        if (!exists $tableFields{$table}{$property}) {
+			$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$table."'");
+            next;
+        }
 
-#            # skip a property unless it was specified to be set by the properties field or has a default value
-#			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
-            # skip a property unless it was specified to be set by the properties field
-			next unless (exists $properties->{$property});
-            my $propertyDefinition = $definition->{properties}{$property};
-            # skip a property if it has the display only flag set
-            next if ($propertyDefinition->{displayOnly});
+        # use the update value
+		my $value = $properties->{$property};
+        # use the current value because the update value was undef
+        unless (defined $value) {
+            $value = $self->get($property);
+        }
 
-            # skip properties that aren't yet in the table
-            if (!exists $tableFields{$property}) {
-				$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$definition->{tableName}."'");
-                next;
-            }
-
-            # use the update value
-			my $value = $properties->{$property};
-            # use the current value because the update value was undef
-            unless (defined $value) {
-                $value = $self->get($property);
-            }
-
-            # apply filter logic on a property to validate or fix it's value
-            if (exists $propertyDefinition->{filter}) {
-                my $filter = $propertyDefinition->{filter};
-                $value = $self->$filter($value, $property);
-            }
-
-            # if the value is undefined, use the default if possible
-            # unless allowEmpty has been set, do this for empty strings as well
-            if ( ( !defined $value || ( $value eq q{} && ! $propertyDefinition->{allowEmpty} ) )
-                 && exists $propertyDefinition->{defaultValue} ) {
-                $value = $propertyDefinition->{defaultValue};
-                if (ref($value) eq 'ARRAY') {
-                    $value = $value->[0];
-                }
-            }
-
-            # set the property
-            if ($propertyDefinition->{serialize}) {
-                $setPairs{$property} = JSON->new->canonical->encode($value);
-            }
-            else {
-                $setPairs{$property} = $value;
-            }
-			$self->{_properties}{$property} = $value;
-		}
-
-        # if there's anything to update, then do so
-		if (scalar(keys %setPairs) > 0) {
-			my @values = values %setPairs;
-            my @columnNames = map { $_.'=?' } keys %setPairs;
-			push(@values, $self->getId, $self->get("revisionDate"));
-			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
+        # set the property
+        if ($propertyDefinition->{serialize}) {
+            $setPairs{$table}{$property} = JSON->new->canonical->encode($value);
+        }
+        else {
+            $setPairs{$table}{$property} = $value;
+        }
+		$self->{_properties}{$property} = $value;
 		}
 	}
+
+    # if there's anything to update, then do so
+    my $db = $self->session->db;
+    foreach my $table (keys %setPairs) {
+	    my @values = values %{$setPairs{$table}};
+        my @columnNames = map { $_.'=?' } keys %{$setPairs{$table}};
+	    push(@values, $self->getId, $self->get("revisionDate"));
+	    $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
+    }
 
     # we've changed something so we need to update our size
     $self->setSize();

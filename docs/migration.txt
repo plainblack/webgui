@@ -39,6 +39,10 @@ You must migrate your asset to use the new WebGUI::Definition::Asset class inste
 
 9) You no longer have the "visible" element. It was a duplicate of "noFormPost", so use "noFormPost" instead.
 
+10) You no longer have the "displayOnly" element. Make a custom form control instead.
+
+11) You no longer have the "allowEmpty" element. However, you can now specify an initial value in the "value" element, and set "defaultValue" to undef if you want to have an initial value but allow the field to become empty or undef.
+
 Here's an example.
 
 use WebGUI::Definition::Asset (

@@ -2,6 +2,12 @@ package WebGUI::i18n::English::WebGUI;
 use strict;
 
 our $I18N = {
+	'JSON Blob' => {
+		message => q|JSON Blob|,
+		context => q|The name of hte JSON Blob form control.|,
+		lastUpdated => 0,
+	},
+
 	'ok' => {
 		message => q|OK|,
 		context => q|used by database link and other things to give a message to the user that a test passed|,

@@ -405,6 +405,20 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 getValueAsScalar 
+
+Returns the value as a scalar, which means for complex types it's returned as a serialized string of some sort.
+
+=cut
+
+sub getValueAsScalar {
+    my $self = shift;
+    return $self->getValue;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getOriginalValue ( )
 
 Returns the either the "value" or "defaultValue" passed in to the object in that order, and doesn't take into account form processing.
