@@ -18,7 +18,9 @@ use strict;
 use warnings;
 use 5.010;
 use base qw(WebGUI::Definition);
+
 use WebGUI::International;
+use WebGUI::Exception;
 
 our $VERSION = '0.0.1';
 
@@ -28,10 +30,23 @@ sub import {
         return;
     }
     my $definition = (@_ == 1 && ref $_[0]) ? $_[0] : { @_ };
+
+    my $table = $definition->{tableName}
+        || WebGUI::Error::InvalidParam->throw(param => 'tableName');
+
     if ( my $properties = $definition->{properties} ) {
-        my $table = $definition->{tableName};
-        for ( my $i = 1; $i < @{ $properties }; $i += 2) {
-            $properties->[$i]{tableName} ||= $table;
+        for ( my $i = 0; $i < $#{ $properties }; $i += 2) {
+            my ($name, $value) = @{ $properties }[$i, $i + 1];
+            $value->{tableName} ||= $table;
+            if ( ! $value->{tableName}|| ref $value->{tableName}) {
+                WebGUI::Error::InvalidParam->throw(param => 'tableName');
+            }
+            elsif ( ! $value->{fieldType}  || ref $value->{fieldType}) {
+                WebGUI::Error::InvalidParam->throw(param => 'fieldType');
+            }
+            elsif ( ( ! $value->{noFormPost} || ref $value->{noFormPost} ) && ! $value->{label}) {
+                WebGUI::Error::InvalidParam->throw(param => 'label');
+            }
         }
     }
 
