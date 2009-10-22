@@ -130,7 +130,6 @@ use WebGUI::Definition::Asset (
                         fieldType       =>'codearea',
                         defaultValue    =>undef,
                         customDrawMethod=> 'drawExtraHeadTags',
-                        filter          => 'packExtraHeadTags',
                     },
                     extraHeadTagsPacked => {
                         fieldType       => 'hidden',
@@ -489,6 +488,33 @@ sub DESTROY {
 	$self = undef;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 extraHeadTags ( value )
+
+Returns extraHeadTags
+
+=head3 value
+
+If specified, stores it, but also updates extraHeadTagsPacked with the packed version.
+
+=cut
+
+sub extraHeadTags {
+    my ( $self, $unpacked ) = @_;
+    if (scalar(@_) > 1) {
+        my $packed  = $unpacked;
+        HTML::Packer::minify( \$packed, {
+            remove_comments     => 1,
+            remove_newlines     => 1,
+            do_javascript       => "shrink",
+            do_stylesheet       => "minify",
+            } );
+        $self->extraHeadTagsPacked($packed);
+    }
+    return $self->next::method($unpacked);
+}
 
 #-------------------------------------------------------------------
 
@@ -1856,29 +1882,6 @@ sub outputWidgetMarkup {
 </html>
 OUTPUT
     return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 packExtraHeadTags ( unpacked )
-
-Pack the extra head tags. Return the unpacked head tags (as per
-filter guidelines).
-
-=cut
-
-sub packExtraHeadTags {
-    my ( $self, $unpacked ) = @_;
-    return $unpacked if !$unpacked;
-    my $packed  = $unpacked;
-    HTML::Packer::minify( \$packed, {
-        remove_comments     => 1,
-        remove_newlines     => 1,
-        do_javascript       => "shrink",
-        do_stylesheet       => "minify",
-    } );
-    $self->update({ extraHeadTagsPacked => $packed });
-    return $unpacked;
 }
 
 #-------------------------------------------------------------------
