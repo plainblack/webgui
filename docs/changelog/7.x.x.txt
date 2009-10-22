@@ -8,6 +8,7 @@
  - added #10082: Unarchive all collaboration posts
  - fixed #11086: bad urls in wiki
  - fixed #11047: required field on dataform
+ - fixed #11162: Can't delete calendar Related Material Link
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
