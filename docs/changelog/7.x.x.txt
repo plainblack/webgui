@@ -7,6 +7,7 @@
  - fixed #11002: Matrix shows backend stuff on load
  - added #10082: Unarchive all collaboration posts
  - fixed #11086: bad urls in wiki
+ - fixed #11047: required field on dataform
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
