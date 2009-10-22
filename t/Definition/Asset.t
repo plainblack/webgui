@@ -22,12 +22,14 @@ use WebGUI::Test;
     package WGT::Class;
     use WebGUI::Definition::Asset (
         attribute1 => 'attribute 1 value',
+        tableName => 'mytable',
         properties => [
             showInForms => {
                 label => ['show in forms'],
             },
             confirmChange => {
                 label => ['confirm change', 'Asset'],
+                tableName => 'othertable',
             },
             noTrans => {
                 label => 'this label will not be translated',
@@ -42,10 +44,15 @@ use WebGUI::Test;
 
 my $object = WGT::Class->instantiate;
 
-is_deeply $object->getProperty('showInForms')->{label}, 'Show In Forms?',
+is $object->getProperty('showInForms')->{tableName}, 'mytable',
+    'properties copy tableName attribute';
+is $object->getProperty('confirmChange')->{tableName}, 'othertable',
+    'tableName property element not overwritten if manually specified';
+
+is $object->getProperty('showInForms')->{label}, 'Show In Forms?',
     'getProperty internationalizes label';
-is_deeply $object->getProperty('confirmChange')->{label}, 'Are you sure?',
+is $object->getProperty('confirmChange')->{label}, 'Are you sure?',
     'getProperty internationalizes label with namespace';
-is_deeply $object->getProperty('noTrans')->{label}, 'this label will not be translated',
+is $object->getProperty('noTrans')->{label}, 'this label will not be translated',
     q{getProperty doesn't internationalize plain scalars};
 
