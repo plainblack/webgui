@@ -13,6 +13,8 @@ use warnings;
 no warnings qw(uninitialized);
 
 use Test::More 'no_plan'; #tests => 1;
+use Test::Exception;
+
 my $called_getProperties;
 {
     package WGT::Class;
@@ -96,6 +98,12 @@ is_deeply $object->get, { property1 => 'property 1 value' },
     'get returns hash with correct properties';
 is_deeply $subclass_object->get, { property1 => undef, a_property => ' - BLAH', property2 => 'property 2 value' },
     'get returns hash with correct properties';
+
+is $object->get('property1'), 'property 1 value',
+    'get with parameter returns value from accessor';
+
+is $object->get('nonExistantProperty'), undef,
+    'get with non-existant parameter returns undef';
 
 is_deeply $object->getProperty('property1'), { label => 'property1 label', defaultValue => $object },
     'getProperty returns correct hash for object';
