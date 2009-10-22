@@ -20,6 +20,7 @@
  - fixed #11150: matrix - search boxes all ticked
  - fixed #11063: template_attachments
  - fixed #11002: Matrix shows backend stuff on load
+ - fixed #11086: bad urls in wiki
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
