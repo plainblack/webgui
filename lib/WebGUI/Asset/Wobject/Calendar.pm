@@ -810,7 +810,6 @@ sub getEventsIn {
 
     my $orderby = join ',', @order_priority;
 
-    $self->session->log->warn("sql clause: $where");
     my $events 
         = $self->getLineage(["descendants"], {
             returnObjects       => 1,
