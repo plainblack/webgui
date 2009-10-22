@@ -166,7 +166,10 @@ sub _gen_get {
         my $self = shift;
         if (@_) {
             my $prop = shift;
-            return $self->$prop;
+            if ($self->can($prop)) {
+                return $self->$prop;
+            }
+            return undef;
         }
         my @all_properties = $self->getProperties;
         my %props;
