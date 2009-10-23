@@ -828,6 +828,26 @@ sub getAdminConsole {
 
 #-------------------------------------------------------------------
 
+=head2 getCache ( )
+
+Returns a cache object specific to this asset, and whether or not the request is in SSL mode.
+
+=cut
+
+sub getCache {
+	my $self     = shift;
+    my $session  = $self->session;
+    my $cacheKey = "view_".$self->getId;
+    if ($session->env->sslRequest) {
+        $cacheKey .= '_ssl';
+    }
+    my $cache = WebGUI::Cache->new($session, $cacheKey);
+    return $cache;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getContainer ( )
 
 Returns a reference to the container asset. If this asset is a container it returns a reference to itself. If this asset is not attached to a container it returns its parent.

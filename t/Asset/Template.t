@@ -121,6 +121,10 @@ is($att4->[1]->{url}, 'bar', 'rev still has bar');
 is($att4->[2]->{url}, 'baz', 'rev does have new thing');
 is(@$att4, 3, 'rev is proper size');
 
+##This is a non-test.  Duplicate URLs will not cause the test to blow-up with
+##an untrappable error.
+$template3rev->addAttachments([{ type => 'headScript', sequence => 3, url => 'baz'}]);
+
 $template3rev->purgeRevision();
 
 ## Check how templates in the trash and clipboard are handled.
@@ -168,6 +172,7 @@ like($brokenOutput, qr/$brokenUrl/, '... and the template url');
 like($brokenOutput, qr/$brokenId/, '... and the template id');
 like($logError, qr/$brokenUrl/, 'process: logged error has the url');
 like($logError, qr/$brokenId/, '... and the template id');
+WebGUI::Test->restoreLogging;
 
 WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
 

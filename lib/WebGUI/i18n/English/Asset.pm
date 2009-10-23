@@ -1088,6 +1088,16 @@ Couldn't open %-s because %-s <br />
 	    lastUpdated => 1100463645,
 	},
 
+	'assetId' => {
+		message => q|The unique identifier for this Asset, in base64 encoding.|,
+		lastUpdated => 1256327617,
+	},
+
+	'assetIdHex' => {
+		message => q|The unique identifier for this Asset, in hexadecimal format.|,
+		lastUpdated => 1256327617,
+	},
+
 	'title' => {
 		message => q|The title of the Asset|,
 		lastUpdated => 1160773957,

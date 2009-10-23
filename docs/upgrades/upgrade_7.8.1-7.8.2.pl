@@ -35,18 +35,36 @@ fixTableDefaultCharsets($session);
 correctWikiAttachmentPermissions( $session );
 transactionsNotifications( $session );
 fixBadVarCharColumns ( $session );
+addVendorPayouts($session);
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub addVendorPayouts {
+    my $session = shift;
+    print "\tAdding vendor payouts... " unless $quiet;
+    my $db = $session->db;
+    $db->write(" create table if not exists vendorPayoutLog (
+        payoutId        char(22) binary not null primary key,
+            isSuccessful    tinyint(1) not null,
+                errorCode       char(10),
+                    errorMessage    char(255),
+                        paypalTimestamp char(20) not null,
+                            amount          decimal(7,2) not null,
+                                currency        char(3) not null,
+                                    correlationId   char(13) not null,
+                                        paymentInformation  char(255) not null
+                                        )");
+    $db->write(" create table if not exists vendorPayoutLog_items (
+        payoutId            char(22) binary not null,
+            transactionItemId   char(22) binary not null,
+                amount              decimal(7,2) not null,
+                    primary key( payoutId, transactionItemId )
+                    )");
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub fixTableDefaultCharsets {

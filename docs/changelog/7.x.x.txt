@@ -1,4 +1,18 @@
+7.8.3
+ - fixed #11074: Links to CS posts not working
+ - fixed #11152: Image edits do not autocommit version tags
+ - fixed template attachments are not cleaned up during purge
+ - fixed #11150: matrix - search boxes all ticked
+ - fixed #11063: template_attachments
+ - fixed #11002: Matrix shows backend stuff on load
+ - added #10082: Unarchive all collaboration posts
+ - fixed #11086: bad urls in wiki
+ - fixed #11047: required field on dataform
+ - fixed #11162: Can't delete calendar Related Material Link
+ - fixed #11154: vendor payouts screen borked ( Martin Kamerbeek / Oqapi )
+
 7.8.2
+ - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
  - fixed #11098: Leaving a version tag makes everyone leave
  - fixed #11096: Error on deleting FAQ(CS)-item
  - fixed #11060: Some tables have latin1 as the default character set
@@ -29,6 +43,11 @@
  - fixed #11156: Syndicated Content doesn't show all headlines in feed
  - fixed #11138: RichEdit, upload image does not commit a version tag
  - fixed ExpireIncompleteSurveyResponses Workflow: process responses for deleted users
+ - fixed #11157: calendar tool for entering add event date
+ - fixed #11158: Calendar iCal feed doesn't show today's all-day events
+ - added #10614: Force rich editor to use strong and em instead of b and i
+ - fixed #11131: https / http URLs still caching across secure/insecure boundary
+ - fixed #11093: Spectre cron can DoS server with many sites
 
 7.8.1
  - mark $session->datetime->time as deprecated and remove its use from core code

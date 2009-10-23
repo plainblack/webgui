@@ -644,7 +644,6 @@ sub view {
     
     my ($varStatistics,$varStatisticsEncoded);
 	my $var = $self->get;
-    $var->{listing_loop}            = $self->getListings;
     $var->{isLoggedIn}              = ($session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
@@ -1193,6 +1192,7 @@ sub www_getCompareFormData {
     if($form->process("search")) {
         if ($searchParamList) {
             RESULT: foreach my $result (@{$self->getListings}) {
+                my $checked = '';
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
                             select value, fieldType, attributeId from Matrix_attribute
                             left join MatrixListing_attribute as listing using(attributeId)
@@ -1203,24 +1203,21 @@ sub www_getCompareFormData {
                         my $fieldType       = $matrixListing_attributes->{$param->{attributeId}}->{fieldType};
                         my $listingValue    = $matrixListing_attributes->{$param->{attributeId}}->{value};
                         if(($fieldType eq 'MatrixCompare') && ($listingValue < $param->{value})){
-                            $result->{checked} = '';
                             last PARAM;
                         }
                         elsif(($fieldType ne 'MatrixCompare' && $fieldType ne '') && ($param->{value} ne $listingValue)){
-                            $result->{checked} = '';
                             last PARAM;
                         }
                         else{
-                            $result->{checked} = 'checked';
+                            $checked = 'checked';
                         }
                 }
                 $result->{assetId}  =~ s/-/_____/g;
-                push @results, $result if $result->{checked} eq 'checked';
+                push @results, $result if $checked eq 'checked';
             }
         }
         else {   
             foreach my $result (@{$self->getListings}) {
-                $result->{checked} = 'checked';
                 $result->{assetId}  =~ s/-/_____/g;
                 push @results, $result;
             }
@@ -1390,7 +1387,7 @@ sub www_listAttributes {
 
 =head2 www_search  (  )
 
-Returns the search screen.
+Returns the search screen.  Uses www_getCompareFormData with search=1 for doing AJAX requests.
 
 =cut
 

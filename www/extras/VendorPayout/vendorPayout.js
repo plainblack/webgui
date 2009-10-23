@@ -12,7 +12,7 @@ WebGUI.VendorPayout = function ( containerId ) {
                 'schedule all button', 'deschedule all button', 'submit scheduled payouts button',
                 'vendor id', 'vendor name', 'scheduled payout amount', 'not scheduled payout amount',
                 'vp item id', 'vp item title', 'vp item price', 'vp item quantity', 'vp item payout amount', 
-                'vp item payout status'
+                'vp item payout status', 'vp select vendor', 'vp vendors', 'vp payouts'
             ]
         },
         onpreload : {
@@ -30,15 +30,49 @@ WebGUI.VendorPayout = function ( containerId ) {
 
 //----------------------------------------------------------------------------
 WebGUI.VendorPayout.prototype.initialize = function (aaa, bbb,ccc,ddd) {
-    // Vendors data table
-    this.vendorList = document.createElement('div');
-    this.container.appendChild( this.vendorList );
+    // Vendor data table
+    this.vendorTable    = document.createElement( 'div' );
+    this.vendorButtons  = document.createElement( 'div' );
+
+    var vendor          = document.createElement( 'fieldset' );
+    var vendorLegend    = document.createElement( 'legend' );
+    vendor.appendChild( vendorLegend        ).innerHTML = this.i18n( 'vp vendors' ); 
+    vendor.appendChild( this.vendorTable    );
+    vendor.appendChild( this.vendorButtons  );
+
+    this.container.appendChild( vendor );
     
+    // Payout data table
+    this.payoutTable    = document.createElement( 'div' );
+    this.payoutButtons  = document.createElement( 'div' );
+
+    var payout          = document.createElement( 'fieldset' );
+    var payoutLegend    = document.createElement( 'legend' );
+    payout.appendChild( payoutLegend        ).innerHTML = this.i18n( 'vp payouts' );
+    payout.appendChild( this.payoutTable    );
+    payout.appendChild( this.payoutButtons  );
+
+    this.container.appendChild( payout );
+
     // (De)schedule buttons
-    this.buttonDiv  = document.createElement('div');
-    this.container.appendChild( this.buttonDiv );
-    this.scheduleAllButton      = new YAHOO.widget.Button({ label: this.i18n( 'schedule all button' ),   container: this.buttonDiv });
-    this.descheduleAllButton    = new YAHOO.widget.Button({ label: this.i18n( 'deschedule all button' ), container: this.buttonDiv });
+    this.scheduleAllPayoutsButton   = new YAHOO.widget.Button( { 
+        label       : this.i18n( 'schedule all button' ),
+        container   : this.payoutButtons,
+        disabled    : true
+    } );
+    this.descheduleAllPayoutsButton = new YAHOO.widget.Button( { 
+        label:      this.i18n( 'deschedule all button' ),
+        container:  this.payoutButtons,
+        disabled    : true
+    } );
+    this.scheduleAllVendorsButton   = new YAHOO.widget.Button( {
+        label       : this.i18n( 'schedule all button' ),
+        container   : this.vendorButtons
+    } );
+    this.descheduleAllVendorsButton = new YAHOO.widget.Button( {
+        label       : this.i18n( 'deschedule all button' ),
+        container   : this.vendorButtons
+    } );
 
     // Submit button
     this.submitPayoutsButton    = new YAHOO.widget.Button({ label: this.i18n( 'submit scheduled payouts button' ), container: this.buttonDiv });
@@ -80,7 +114,7 @@ WebGUI.VendorPayout.prototype.initVendorList = function () {
     };
 
     // initialize data table
-    this.vendorDataTable = new YAHOO.widget.DataTable( this.vendorList, this.vendorSchema, this.vendorDataSource, {
+    this.vendorDataTable = new YAHOO.widget.DataTable( this.vendorTable, this.vendorSchema, this.vendorDataSource, {
         selectionMode : 'single'
     } );
 
@@ -93,9 +127,12 @@ WebGUI.VendorPayout.prototype.initVendorList = function () {
     this.vendorDataTable.subscribe( "rowClickEvent", function (e) {
         var record  = this.getRecord( e.target );
         obj.currentVendorId     = record.getData( 'vendorId' );
-        obj.currentVendorRow    = record;
+        obj.currentVendorIndex  = this.getRecordIndex( record );
 
         obj.refreshItemDataTable();
+
+        obj.scheduleAllPayoutsButton.set(   'disabled', false );
+        obj.descheduleAllPayoutsButton.set( 'disabled', false );
     } );
 }
 
@@ -111,12 +148,19 @@ WebGUI.VendorPayout.prototype.refreshItemDataTable = function () {
 }
 
 //----------------------------------------------------------------------------
+WebGUI.VendorPayout.prototype.refreshVendorDataTable = function () {
+    this.vendorDataSource.sendRequest( '', {
+        success : this.vendorDataTable.onDataReturnUpdateRows, //ReplaceRows,
+        scope   : this.vendorDataTable
+    } );
+}
+
+//----------------------------------------------------------------------------
 WebGUI.VendorPayout.prototype.refreshVendorRow = function () {
     var obj = this;
     this.vendorDataSource.sendRequest( 'vendorId=' + this.currentVendorId, {
-        // onDataReturnUpdateRows is not available in yui 2.6.0...
-        success : function ( req, response , payload ) {
-            this.updateRow( obj.currentVendorRow, response.results[0] );
+        success : function ( req, response , payload ) { 
+            this.updateRow( obj.currentVendorIndex, response.results[0] );
         },
         scope   : this.vendorDataTable
     } );
@@ -156,11 +200,12 @@ WebGUI.VendorPayout.prototype.initPayoutDetails = function () {
     };
 
     // Instanciate the DataTable.
-    this.itemDataTable = new YAHOO.widget.DataTable( this.payoutDetails, this.itemSchema, this.itemDataSource, {
+    this.itemDataTable = new YAHOO.widget.DataTable( this.payoutTable, this.itemSchema, this.itemDataSource, {
         dynamicData : true,
         formatRow   : rowFormatter,
-        paginator   : new YAHOO.widget.Paginator({ rowsPerPage:10 } ) //, updateOnChange: true })
-    });
+        paginator   : new YAHOO.widget.Paginator({ rowsPerPage:10 } ),
+        MSG_EMPTY   : this.i18n( 'vp select vendor' ) //, updateOnChange: true })
+    } );
     this.itemDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) { 
         // For some reason oPayload is undefined when we're switch vendors. This is a hack to
         // still set the paginator correctly.
@@ -210,29 +255,38 @@ WebGUI.VendorPayout.prototype.initPayoutDetails = function () {
 WebGUI.VendorPayout.prototype.initButtons = function () {
     var obj = this;
 
-    var updateAll = function ( status ) {
+    var updateAll = function ( status, bulk ) {
         // TODO: Make this range based.
         var records = obj.itemDataTable.getRecordSet().getRecords();
-        var itemIds = new Array;
-        for (i = 0; i < records.length; i++) {
-            itemIds.push( 'itemId=' + records[i].getData( 'itemId' ) );
-        }
+
+        var postdata = 'shop=vendor&method=setPayoutStatus&status=' + status;
         
-        var postdata = itemIds.join('&');
-        var url      = '?shop=vendor&method=setPayoutStatus&status=' + status;
+        if ( bulk ) {
+            postdata += '&all=1';
+        }
+        else {
+            var itemIds = new Array;
+            for (i = 0; i < records.length; i++) {
+                itemIds.push( 'itemId=' + records[i].getData( 'itemId' ) );
+            }
+            postdata += '&' + itemIds.join('&');
+        }
+
         var callback = {
             success: function (o) {
                 this.refreshItemDataTable();
-                this.refreshVendorRow();
+                bulk ? this.refreshVendorDataTable() : this.refreshVendorRow();
             }, 
             scope: obj 
         };
 
-        YAHOO.util.Connect.asyncRequest( 'POST', url, callback, postdata );
+        YAHOO.util.Connect.asyncRequest( 'POST', '/', callback, postdata );
     }
 
-    this.scheduleAllButton.on(   'click', function () { updateAll( 'Scheduled' ) } );
-    this.descheduleAllButton.on( 'click', function () { updateAll( 'NotPaid'  ) } );   
+    this.scheduleAllVendorsButton.on(   'click', function () { updateAll( 'Scheduled',  true ) } );
+    this.descheduleAllVendorsButton.on( 'click', function () { updateAll( 'NotPaid',    true ) } );   
+    this.scheduleAllPayoutsButton.on(   'click', function () { updateAll( 'Scheduled'        ) } );
+    this.descheduleAllPayoutsButton.on( 'click', function () { updateAll( 'NotPaid'          ) } );   
         
 }
 

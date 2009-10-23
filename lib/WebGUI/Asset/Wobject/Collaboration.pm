@@ -1572,6 +1572,23 @@ sub view {
 
 #-------------------------------------------------------------------
 
+=head2 www_edit 
+
+Override the master class to add an "Unarchive All" link.
+
+=cut
+
+sub www_edit {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
+    $self->getAdminConsole->addConfirmedSubmenuItem($self->getUrl('func=unarchiveAll'),$i18n->get("unarchive all"),$i18n->get("unarchive confirm"));
+    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("assetName"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_search ( )
 
 The web method to display and use the forum search interface.
@@ -1625,6 +1642,35 @@ sub www_subscribe {
 	my $self = shift;
 	$self->subscribe if $self->canSubscribe;
         return $self->www_view;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_unarchiveAll ( )
+
+Unarchive all the threads in this collaboration system
+
+=cut
+
+sub www_unarchiveAll {
+    my ( $self ) = @_;
+    my $session     = $self->session;
+    return $session->privilege->insufficient() unless $self->canEdit;
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $i18n     = WebGUI::International->new($session, 'Asset_Collaboration');
+    $pb->start($i18n->get('unarchive all'), $self->getUrl('func=edit'));
+    my $threadIds = $self->getLineage(['children'],{
+        includeOnlyClasses      => [ 'WebGUI::Asset::Post::Thread' ],
+        statusToInclude         => [ 'archived' ],
+    } );
+    ASSET: foreach my $threadId (@$threadIds) {
+        my $thread = WebGUI::Asset->newPending($session, $threadId);
+        if (!$thread || !$thread->canEdit) {
+            next ASSET;
+        }
+        $thread->unarchive;
+    }
+    return $pb->finish( $self->getUrl('func=edit') );
 }
 
 #-------------------------------------------------------------------

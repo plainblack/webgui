@@ -128,20 +128,16 @@ sub addAttachments {
 
     my $db = $self->session->db;
 
-    my $sql = q{
-        INSERT INTO template_attachments
-            (templateId, revisionDate, url, type, sequence)
-        VALUES
-            (?,          ?,            ?,   ?,    ?)
-    };
-
     foreach my $a (@$attachments) {
-        my @params = (
-            $self->getId, 
-            $self->get('revisionDate'),
-            @{$a}{qw(url type sequence)}
+        my %params = (
+            templateId   => $self->getId, 
+            revisionDate => $self->get('revisionDate'),
+            url          => $a->{url},
+            type         => $a->{type},
+            sequence     => $a->{sequence},
+            attachId     => 'new',
         );
-        $db->write($sql, \@params);
+        $db->setRow('template_attachments', 'attachId', \%params);
     }
 }
 
@@ -719,9 +715,23 @@ sub processRaw {
 
 #-------------------------------------------------------------------
 
+=head2 purge ( )
+
+Extend the master to purge attachments in all revisions.
+
+=cut
+
+sub purge {
+    my $self = shift;
+    $self->session->db->write('delete from template_attachments where templateId=?', [$self->getId]);
+    return $self->SUPER::purge(@_);
+}
+
+#-------------------------------------------------------------------
+
 =head2 purgeRevision ( )
 
-Override the master purgeRevision to purge attachments
+Extend the master purgeRevision to purge attachments
 
 =cut
 

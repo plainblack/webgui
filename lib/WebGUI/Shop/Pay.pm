@@ -423,12 +423,16 @@ sub www_selectPaymentGateway {
     # TODO: If only one payOption exists, just send us there
     # In order to do this, the PayDriver must give us a direct URL to go to
 
-    my $output .= $i18n->get('choose payment gateway message');
+    my $var;
+    my @paymentGateways;
     foreach my $payOption ( values %{$payOptions} ) {
-        $output .= $payOption->{button} . '<br />';
+        push @paymentGateways, $payOption;
     }
-   
-    return $session->style->userStyle( $output );
+    $var->{ paymentGateways     }   = \@paymentGateways;
+    $var->{ choose              }   = $i18n->get('choose payment gateway message');
+  $session->log->warn('###'.$session->setting->get("selectGatewayTemplateId"));
+    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("selectGatewayTemplateId"));
+    return $session->style->userStyle($template->process($var));
 }
 
 1;
