@@ -1568,8 +1568,9 @@ sub new {
     }
 
     if (defined $properties) {
-        my $object = { _session=>$session, _properties => $properties };
-        bless $object, $class;
+        my $object = $class->instantiate;
+        $object->{_session} = $session;
+        $object->{_properties} = $properties;
         foreach my $property ($object->getProperties) {
             my $definition = $object->getProperty($property);
             if ($definition->{serialize} && $object->{_properties}->{$property} ne '') {

@@ -60,6 +60,7 @@ sub import {
 #-------------------------------------------------------------------
 sub _build {
     my ($class, $super, $caller, $definition) = @_;
+    $class->next::method($super, $caller, $definition);
     $class->_install($super, 'getTables', $class->_gen_getTables());
 }
 
@@ -68,12 +69,16 @@ sub _gen_getTables {
     my $class = shift;
     return sub {
         my $self = shift;
-        my %tables; 
+        my %found; 
+        my @tables;
         foreach my $property ($self->getProperties) {
             my $definition = $self->getProperty($property);
-            $tables{$definition->{tableName}} = 1;
+            unless ($found{$definition->{tableName}}) {
+                push @tables, $definition->{tableName};
+            }
+            $found{$definition->{tableName}} = 1;
         }
-        return keys %tables;
+        return @tables;
     };
 }
 

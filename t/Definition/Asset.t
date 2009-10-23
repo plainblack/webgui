@@ -48,6 +48,11 @@ use WebGUI::Test;
 
 my $object = WGT::Class->instantiate;
 
+can_ok($object, 'getTables');
+my @tables = $object->getTables;
+is $tables[0], 'mytable', 'found first table';
+is $tables[1], 'othertable', 'found second table';
+
 is $object->getProperty('showInForms')->{tableName}, 'mytable',
     'properties copy tableName attribute';
 is $object->getProperty('confirmChange')->{tableName}, 'othertable',
