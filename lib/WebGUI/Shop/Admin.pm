@@ -181,6 +181,13 @@ sub www_editSettings {
         hoverHelp   => $i18n->get("edit address template help"),
         );
     $form->template(
+        name        => "selectGatewayTemplateId",
+        value       => $setting->get("selectGatewayTemplateId"),
+        label       => $i18n->get("select gateway template"),
+        namespace   => "Shop/selectGateway",
+        hoverHelp   => $i18n->get("select gateway template help"),
+        );
+    $form->template(
         name        => "shopMyPurchasesTemplateId",
         value       => $setting->get("shopMyPurchasesTemplateId"),
         namespace   => "Shop/MyPurchases",
@@ -226,7 +233,7 @@ sub www_editSettingsSave {
 
     # Save shop templates
     foreach my $template (qw(shopMyPurchasesDetailTemplateId shopMyPurchasesTemplateId
-        shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId shopReceiptEmailTemplateId)) {
+        shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId selectGatewayTemplateId shopReceiptEmailTemplateId)) {
         $setting->set($template, $form->get($template, "template"));
     }
 

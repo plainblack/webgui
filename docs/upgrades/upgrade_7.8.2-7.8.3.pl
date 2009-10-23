@@ -32,7 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 reKeyTemplateAttachments($session);
-
+addSelectPaymentGatewayTemplateToSettings($session);
 finish($session); # this line required
 
 
@@ -53,6 +53,15 @@ sub reKeyTemplateAttachments {
     $session->db->write('ALTER TABLE template_attachments DROP PRIMARY KEY');
     $session->db->write('ALTER TABLE template_attachments ADD PRIMARY KEY (attachId)');
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# add default template for selectPaymentGateway
+sub addSelectPaymentGatewayTemplateToSettings {
+    my $session = shift;
+    print "\tAdding select payment gateway template to settings... " unless $quiet;
+    $session->db->write("insert into settings values ('selectGatewayTemplateId', '2GxjjkRuRkdUg_PccRPjpA');");
+    print "Done.\n" unless $quiet;
 }
 
 #sub exampleFunction {
