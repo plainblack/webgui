@@ -258,6 +258,8 @@ is($sub1->get('status'),'approved','set status to approved');
 $sub2->update({ status => 'denied' });
 is($sub2->get('status'),'denied','set status to denied');
 
+SKIP: { skip "workflow activities not coded yet", 10 unless 0;
+
 # create the workflows/activities for processing
 my $approveSubmissions = WebGUI::Test::Activity->create( $session,
               "WebGUI::Workflow::Activity::ProcessEMSApprovals"
@@ -296,6 +298,8 @@ $sub2 = WebGUI::Asset->newByDynamicClass($session, $submissionId);
 is( $sub2, undef, 'approval created a ticket');
 
 # TODO add a test to cleanup denied and created entries
+
+} # end of workflow skip
 
 } # end of create submission skip
 

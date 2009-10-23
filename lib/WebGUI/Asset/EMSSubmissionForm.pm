@@ -261,7 +261,7 @@ sub www_editSubmissionForm {
 		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
 	    }
         }
-        my url = ( $self || $parent )->getUrl('func=editSubmissionFormSave');
+        my $url = ( $self || $parent )->getUrl('func=editSubmissionFormSave');
 	my $newform = WebGUI::HTMLForm->new( $session, action => $url );
 	$newform->hidden(name => 'assetId', value => $assetId);
 	my @fieldNames = qw/title description startDate duration seatsAvailable location/;
@@ -489,7 +489,7 @@ calls WebGUI::Asset::EMSSubmission->editSubmission
 sub www_editSubmission {
     my $self             = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
-    return WebGUI::Asset::EMSSubmission->editSubmission($self,shift);
+    return WebGUI::Asset::EMSSubmission->www_editSubmission($self,shift);
 }
 
 #-------------------------------------------------------------------
@@ -554,57 +554,9 @@ dav::dump 'processForm::params:', $params;
     return $params;
 }
 
-#----------------------------------------------------------------
-
-=head2 submitForm (... )
-
-this is going away, I am saving the code as an example of what the correct function in the emssubmission module will do
-
-creates the form for the submitter to enter data
-
-returns a form object
-
-=cut
-
-sub submitForm {
-# add the default items, then add items based on the fields in the def...
-
 =head TODO work on this code
 # this is a bunch of code that will likely be useful for this function...
 {
-	my @fieldNames = qw/startDate duration seatsAvailable location /;
-	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
-dav::dump 'editSubmissionForm::definition:', [@defs];
-	for my $def ( @defs ) {
-	    foreach my $fieldName ( @fieldNames ) {
-                my $properties = $def->{properties};
-	        if( defined $properties->{$fieldName} ) {
-		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
-		      # field definitions don't contain their own name, we will need it later on
-		      $fields->{$fieldName}{fieldId} = $fieldName;
-		  };
-	    }
-	}
-	# add the meta field tabs
-	for my $metaField ( @{$parent->getEventMetaFields} ) {
-	    push @fieldNames, $metaField->{fieldId};
-	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
-	    # meta fields call it data type, we copy it to simplify later on
-	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
-	}
-        unshift @fieldNames, 'main';
-        $fields->{main} = { label => $i18n->get('main tab label'), fieldId => 'main' };
-        # create tabs
-        for my $tabname ( @fieldNames ) {
-                $tabform->addTab($tabname, $fields->{$tabname}{label}, $0 );
-        }
-        my $maintab = $tabform->getTab('main');
-	$maintab->hidden(name => 'fieldList', value => join( ' ', @fieldNames ) );
-	my @fieldNames = qw/startDate duration seatsAvailable location/;
-	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
-dav::dump 'editSubmissionForm::dump submission form def', \@defs ;
-        for my $def ( @defs ) {
-	    my $properties = $def->{properties};
 	    for my $fieldName ( qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
                                deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
 	        if( defined $properties->{$fieldName} ) {

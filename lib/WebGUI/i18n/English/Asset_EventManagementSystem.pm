@@ -1944,6 +1944,12 @@ normal templates.|,
         context => q|Label for list of submission forms; user must choose one to edit.|,
     },
 
+    'select form to submit' => {
+        message => q|Select a Form to Submit|,
+        lastUpdated => 1147050475,
+        context => q|Label for list of submission forms; user must choose one to proceed to a submission form.|,
+    },
+
     'main tab label' => {
         message => q|Main|,
         lastUpdated => 1147050475,

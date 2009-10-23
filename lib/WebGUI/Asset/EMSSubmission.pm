@@ -96,8 +96,8 @@ sub definition {
                         tab                             => "properties",
                         fieldType               => "HTMLArea",
                         defaultValue    => undef,
-                        label                   => $i18n->get("description"),
-                        hoverHelp               => $i18n->get("description help")
+                        label                   => $SKU_i18n->get("description"),
+                        hoverHelp               => $SKU_i18n->get("description help")
                         },
                 sku => {
                         tab                             => "shop",
@@ -331,14 +331,41 @@ sub www_editSubmission {
         }
 	my $url = ( $self | $parent )->getUrl('func=editSubmissionSave');
         my $newform = WebGUI::HTMLForm->new($session,action => $url);
-        # DOING
-	# get the description from the parent
+	my $formDescription = $parent->getFormDescription;
+	my @defs = reverse @{__PACKAGE__->definition($session)};
+        my $fields;
+        for my $def ( @defs ) {
+	    my $properties = $def->{properties};
+	    for my $fieldName ( %$properties ) {
+		if( defined $formDescription->{$fieldName} ) {
+		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
+		      $fields->{$fieldName}{fieldId} = $fieldName;
+		}
+	    }
+        }
+        # add the meta field
+        for my $metaField ( @{$parent->getEventMetaFields} ) {
+	    if( defined $formDescription->{$metaField->{fieldId}} ) {
+		$fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
+		# meta fields call it data type, we copy it to simplify later on
+		$fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
+	    }
+        }
+
 	# for each field
-	   # if field is active
-	       # create a usable control
-	    # else
-	        # create a readonly control -- be sure to convert data where appropriate
-	# add the comment form
+	for my $field ( keys %$fields ) {
+	    if( $formDescription->{$field->{fieldId}} ) {
+	        $newform->dynamicField(%$field);
+	    } else {
+	        # TODO see that the data gets formatted
+		$newform->readonly(
+		         label => $field->{label},
+			 value => $field->{value},
+			 fieldId => $field->{fieldId},
+	            );
+	    }
+	}
+	# TODO add the comment form
         $newform->submit;
         return $parent->processStyle(
                $parent->processTemplate({

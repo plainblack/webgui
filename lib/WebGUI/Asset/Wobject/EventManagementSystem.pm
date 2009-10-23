@@ -635,6 +635,53 @@ sub www_addRibbonToBadge {
 
 #-------------------------------------------------------------------
 
+=head2 www_addSubmission ()
+
+display a form or links to forms to create a new submission
+
+=cut
+
+sub www_addSubmission {
+    my $self = shift;
+    my $params = shift || {};
+    my $assetId = $params->{assetId} || $self->session->form->get('assetId');
+    my $parent = $self->getParent;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
+    my $asset;
+
+    if( ! defined $assetId ) {
+           my $res = $parent->getLineage(['children'],{ returnObjects => 1,
+                 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+             } );
+	    my @new = map { $_->canSubmit ? $_ : () } ( @$res);
+            if( scalar(@new) == 1 ) {
+                $asset = $new[0];
+                $assetId = $asset->getId;
+            } else {
+                my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
+                            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
+                my $listOfLinks = join '', ( map {
+                      $makeAnchorList->(
+                                $self->getUrl('func=addSubmission;assetId=' . $_->getId ),
+                                $_->get('title'),
+                                WebGUI::HTML::filter($_->get('description'),'all')
+                             )
+                           } ( @new ) );
+                return $parent->processStyle( '<h1>' . $i18n->get('select form to submit') .
+                                            '</h1><ul>' . $listOfLinks . '</ul>' );
+            }
+    } else {
+        $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+    }
+    if (!defined $asset) {
+	$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
+    }
+    return $asset->www_addSubmission;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_addSubmissionForm ()
 
 call www_editSubmissionForm with assetId == new
@@ -833,7 +880,7 @@ calls editSubmissionForm in WebGUI::Asset::EMSSubmissionForm
 sub www_editSubmissionForm {
 	my $self             = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return WebGUI::Asset::EMSSubmissionForm->editSubmissionForm($self,shift);
+	return WebGUI::Asset::EMSSubmissionForm->www_editSubmissionForm($self,shift);
 }
 
 
