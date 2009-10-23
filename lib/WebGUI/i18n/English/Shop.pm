@@ -669,6 +669,18 @@ our $I18N = {
 		context => q|commerce setting help|
 	},
 
+	'select gateway template' => { 
+		message => q|Select Gateway Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'select gateway template help' => { 
+		message => q|This template is the template for the Select Payment Gateway step.|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
 	'transactions' => { 
 		message => q|Transactions|,
 		lastUpdated => 0,
