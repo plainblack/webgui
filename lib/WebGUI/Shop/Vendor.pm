@@ -588,15 +588,25 @@ Returns the status to which the item(s) are set.
 =cut
 
 sub www_setPayoutStatus {
-    my $class   = shift;
-    my $session = shift;
+    my $class           = shift;
+    my $session         = shift;
+    my ( $form, $db )   = $session->quick( qw{ form db } );
 
     my $admin   = WebGUI::Shop::Admin->new($session);
     return $session->privilege->adminOnly() unless ($admin->canManage);
 
-    my @itemIds = $session->form->process('itemId');
-    my $status  = $session->form->process('status');
+    my $status  = $form->process('status');
     return "error: wrong status [$status]" unless isIn( $status, qw{ NotPaid Scheduled } );
+
+    my @itemIds;
+    if ( $form->process( 'all' ) ) {
+        @itemIds = $session->db->buildArray( 'select itemId from transactionItem where vendorPayoutStatus = ?' , [
+            ( $status eq 'NotPaid' ) ? 'Scheduled' : 'NotPaid'
+        ] );
+    }
+    else {
+        @itemIds = $form->process('itemId');
+    }
 
     foreach  my $itemId (@itemIds) {
        my $item = WebGUI::Shop::TransactionItem->newByDynamicTransaction( $session, $itemId );

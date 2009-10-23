@@ -1606,6 +1606,24 @@ our $I18N = {
         context => q|Table heading in the vendor payout manager.|,
     },
 
+    'vp select vendor' => {
+        message => q|Please select a vendor from the list above to manage individual payouts.|,
+        lastUpdated => 0,
+        context => q|Message in the vendor payouts manager when no vendor has been selected.|,
+    },
+
+    'vp vendors' => {
+        message => q|Vendors|,
+        lastUpdated => 0,
+        context => q|Label for the vendors section of the vendor payouts manager|,
+    },
+
+    'vp payouts' => {
+        message => q|Payouts|,
+        lastUpdated => 0,
+        context => q|Label for the vendors section of the vendor payouts manager|,
+    },
+   
     'vp item id'  => {
         message => q|Item ID|,
         lastUpdated => 0,
