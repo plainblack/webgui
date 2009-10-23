@@ -50,6 +50,12 @@ sub import {
     # ensure we are using c3 method resolution
     mro::set_mro($super, 'c3');
     mro::set_mro($caller, 'c3');
+    $class->_build($super, $caller, $definition);
+    return;
+}
+
+sub _build {
+    my ($class, $super, $caller, $definition) = @_;
 
     # construct an ordered list and hash of the properties
     my @propertyList;

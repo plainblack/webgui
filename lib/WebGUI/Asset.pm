@@ -1553,9 +1553,9 @@ sub new {
         my $placeHolders = [$assetId];
       
         # join all the tables
-        foreach my $table ($self->getTables) {
-            $sql .= ",".$definition->{tableName};
-            $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
+        foreach my $table ($class->getTables) {
+            $sql .= ",".$table;
+            $where .= " and (asset.assetId=".$table.".assetId and ".$table.".revisionDate=".$revisionDate.")";
         }
 
         # fetch properties
@@ -2290,7 +2290,6 @@ sub update {
             $setPairs{$table}{$property} = $value;
         }
 		$self->{_properties}{$property} = $value;
-		}
 	}
 
     # if there's anything to update, then do so

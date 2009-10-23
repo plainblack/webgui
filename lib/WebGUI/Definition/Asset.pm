@@ -50,12 +50,17 @@ sub import {
             }
         }
     }
-    $class->_install($super, 'getTables', $class->_gen_getTables());
 
     # WebGUI::Definition->import uses caller, so avoid the extra entry in the call stack
     my $next = $class->next::can;
     @_ = ($class, $definition);
     goto $next;
+}
+
+#-------------------------------------------------------------------
+sub _build {
+    my ($class, $super, $caller, $definition) = @_;
+    $class->_install($super, 'getTables', $class->_gen_getTables());
 }
 
 #-------------------------------------------------------------------
@@ -66,7 +71,7 @@ sub _gen_getTables {
         my %tables; 
         foreach my $property ($self->getProperties) {
             my $definition = $self->getProperty($property);
-            %tables{$definition->{tableName}} = 1;
+            $tables{$definition->{tableName}} = 1;
         }
         return keys %tables;
     };

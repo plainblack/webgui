@@ -123,7 +123,7 @@ sub addRevision {
 	my %defaults = ();
 	# get the default values of each property
 	foreach my $property ($self->getProperties) {
-        my $defintion = $self->getProperty($property);
+        my $definition = $self->getProperty($property);
 		$defaults{$property} = $definition->{defaultValue};
         if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{serialize}) {
             $defaults{$property} = $defaults{$property}->[0];
