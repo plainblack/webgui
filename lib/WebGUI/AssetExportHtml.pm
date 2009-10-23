@@ -22,7 +22,7 @@ use WebGUI::International;
 use WebGUI::Exception;
 use WebGUI::Utility ();
 use WebGUI::Session;
-use URI::URL;
+use URI::URL ();
 use Scope::Guard;
 
 =head1 NAME

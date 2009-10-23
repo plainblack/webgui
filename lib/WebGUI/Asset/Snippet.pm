@@ -15,7 +15,7 @@ package WebGUI::Asset::Snippet;
 =cut
 
 use strict;
-use WebGUI::Asset;
+use base 'WebGUI::Asset';
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use HTML::Packer;
@@ -69,11 +69,7 @@ use WebGUI::Definition::Asset (
 	uiLevel         => 5,
 	icon            =>'snippet.gif',
     tableName       =>'snippet',
-    );
-}
-
-
-our @ISA = qw(WebGUI::Asset);
+);
 
 
 =head1 NAME
