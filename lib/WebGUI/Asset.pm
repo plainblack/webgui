@@ -503,7 +503,7 @@ If specified, stores it, but also updates extraHeadTagsPacked with the packed ve
 
 sub extraHeadTags {
     my ( $self, $unpacked ) = @_;
-    if (scalar(@_) > 1) {
+    if (@_ > 1) {
         my $packed  = $unpacked;
         HTML::Packer::minify( \$packed, {
             remove_comments     => 1,
@@ -1480,7 +1480,7 @@ If specified this value will be used to set the title after it goes through some
 
 sub menuTitle {
 	my ($self, $title) = @_;
-    if (defined $title) {
+    if (@_ > 1) {
         if ($title eq "") {
             $title = $self->title;
         }
@@ -2187,7 +2187,7 @@ If specified this value will be used to set the title after it goes through some
 
 sub title {
 	my ($self, $title) = @_;
-    if (defined $title) {
+    if (@_ > 1) {
         if ($title eq "") {
             $title = 'Untitled';
         }
@@ -2323,7 +2323,7 @@ The new value to set the URL to.
 
 sub url {
     my ($self, $url) = @_;
-    if (defined $url) {
+    if (@_ > 1) {
         $url = $self->fixUrl($url);
     }
     return $self->next::method($url);
