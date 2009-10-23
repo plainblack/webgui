@@ -811,6 +811,7 @@
     "Page"             : "Page", 
     "PageTitle"        : "PageTitle", 
     "PageUrl"          : "PageUrl", 
+    "PickLanguage"     : "PickLanguage",
     "RandomAssetProxy" : "RandomAssetProxy", 
     "RandomThread"     : "RandomThread", 
     "RootTitle"        : "RootTitle", 
