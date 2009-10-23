@@ -496,8 +496,8 @@ sub www_managePayouts {
     $style->setScript($url->extras('yui/build/connection/connection-min.js'),       {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/paginator/paginator-min.js'),         {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'),       {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),         {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/datasource/datasource.js'),       {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable.js'),         {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/button/button-min.js'),               {type=>'text/javascript'});
     $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),                {type=>'text/javascript'});
     $style->setScript($url->extras('VendorPayout/vendorPayout.js'),                 {type=>'text/javascript'});
