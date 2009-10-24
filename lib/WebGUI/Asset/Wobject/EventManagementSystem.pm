@@ -644,8 +644,8 @@ display a form or links to forms to create a new submission
 sub www_addSubmission {
     my $self = shift;
     my $params = shift || {};
-    my $formId = $params->{formId} || $self->session->form->get('formId');
     my $session = $self->session;
+    my $formId = $params->{formId} || $session->form->get('formId');
     my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
     my $form;
 
