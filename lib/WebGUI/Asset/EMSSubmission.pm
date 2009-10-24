@@ -329,7 +329,7 @@ sub www_editSubmission {
                 $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
             }
         }
-	my $url = ( $self | $parent )->getUrl('func=editSubmissionSave');
+	my $url = ( $self || $parent )->getUrl('func=editSubmissionSave');
         my $newform = WebGUI::HTMLForm->new($session,action => $url);
 	my $formDescription = $parent->getFormDescription;
 	my @defs = reverse @{__PACKAGE__->definition($session)};
@@ -344,7 +344,7 @@ sub www_editSubmission {
 	    }
         }
         # add the meta field
-        for my $metaField ( @{$parent->getEventMetaFields} ) {
+        for my $metaField ( @{$parent->getParent->getEventMetaFields} ) {
 	    if( defined $formDescription->{$metaField->{fieldId}} ) {
 		$fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
 		# meta fields call it data type, we copy it to simplify later on
@@ -353,12 +353,12 @@ sub www_editSubmission {
         }
 
 	# for each field
-	for my $field ( keys %$fields ) {
+	for my $field ( values %$fields ) {
 	    if( $formDescription->{$field->{fieldId}} ) {
 	        $newform->dynamicField(%$field);
 	    } else {
 	        # TODO see that the data gets formatted
-		$newform->readonly(
+		$newform->readOnly(
 		         label => $field->{label},
 			 value => $field->{value},
 			 fieldId => $field->{fieldId},

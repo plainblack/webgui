@@ -1878,6 +1878,12 @@ normal templates.|,
         context => q|help text for the columns per page field|,
     },
 
+    'edit submission form' => {
+        message => q|Edit Submission Form|,
+        lastUpdated => 1147050475,
+        context => q|Label for the link to edit a submission form.|,
+    },
+
     'new submission form' => {
         message => q|New Submission Form|,
         lastUpdated => 1147050475,

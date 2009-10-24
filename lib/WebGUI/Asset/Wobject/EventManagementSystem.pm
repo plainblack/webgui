@@ -595,7 +595,7 @@ sub view {
 		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
 		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
-		newSubmissionUrl	=> $self->getUrl('func=newSubmission'),
+		addSubmissionUrl	=> $self->getUrl('func=addSubmission'),
 		viewSubmissionsUrl	=> $self->getUrl('func=viewSubmissions'),
 		viewSubmissionQueueUrl	=> $self->getUrl('func=viewSubmissionQueue'),
 		addSubmissionFormUrl	=> $self->getUrl('func=addSubmissionForm'),
@@ -644,40 +644,41 @@ display a form or links to forms to create a new submission
 sub www_addSubmission {
     my $self = shift;
     my $params = shift || {};
-    my $assetId = $params->{assetId} || $self->session->form->get('assetId');
-    my $parent = $self->getParent;
+    my $formId = $params->{formId} || $self->session->form->get('formId');
     my $session = $self->session;
     my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
-    my $asset;
+    my $form;
 
-    if( ! defined $assetId ) {
-           my $res = $parent->getLineage(['children'],{ returnObjects => 1,
+    if( ! defined $formId ) {
+           my $res = $self->getLineage(['children'],{ returnObjects => 1,
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
              } );
 	    my @new = map { $_->canSubmit ? $_ : () } ( @$res);
-            if( scalar(@new) == 1 ) {
-                $asset = $new[0];
-                $assetId = $asset->getId;
+            if( scalar(@new) == 0 ) {
+                return $self->www_view;
+            } elsif( scalar(@new) == 1 ) {
+                $form = $new[0];
+                $formId = $form->getId;
             } else {
                 my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
                             return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
                 my $listOfLinks = join '', ( map {
                       $makeAnchorList->(
-                                $self->getUrl('func=addSubmission;assetId=' . $_->getId ),
+                                $self->getUrl('func=addSubmission;formId=' . $_->getId ),
                                 $_->get('title'),
                                 WebGUI::HTML::filter($_->get('description'),'all')
                              )
                            } ( @new ) );
-                return $parent->processStyle( '<h1>' . $i18n->get('select form to submit') .
+                return $self->processStyle( '<h1>' . $i18n->get('select form to submit') .
                                             '</h1><ul>' . $listOfLinks . '</ul>' );
             }
     } else {
-        $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+        $form = WebGUI::Asset->newByDynamicClass($session,$formId);
     }
-    if (!defined $asset) {
-	$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
+    if (!defined $form) {
+	$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
     }
-    return $asset->www_addSubmission;
+    return $form->www_addSubmission;
 }
 
 #-------------------------------------------------------------------
@@ -2187,22 +2188,6 @@ sub www_moveEventMetaFieldUp {
 	return $self->www_manageEventMetaFields;
 }
 
-#---------------------------------------------
-=head2 www_newSubmission
-
-if only one form is available to this user:
-call the viewSubmission with class and assetID = 'new'
-else create a list of link that will distinguish the form the userdesires to use.
-the links should refer to this function and include a formId parameter
-
-=cut
-
-sub www_newSubmission {
-
-# call viewSubmission or create a list of links
-
-}
-
 #-------------------------------------------------------------------
 
 =head2 www_printBadge ( )
@@ -2358,10 +2343,11 @@ sub www_viewSubmissionQueue {
                $self->processTemplate({
                       backUrl => $self->getUrl,
 		      canEdit => $self->canEdit,
+		      canSubmit => $self->canSubmit,
 		      hasSubmissionForms => $self->hasSubmissionForms,
 		      getSubmissionQueueDateUrl => $self->getUrl('func=getSubmissionQueueData'),
 		      addSumissionFormUrl => $self->getUrl('func=addSubmissionForm'),
-		      editSubmissionFormUrl =>  self->getUrl('func=editSubmissionForm'), 
+		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
 		      addSumissionUrl => $self->getUrl('func=addSubmission'),
                   },$self->get('eventSubmissionQueueTemplateId')));
 }

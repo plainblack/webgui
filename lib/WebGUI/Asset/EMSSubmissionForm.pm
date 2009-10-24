@@ -247,7 +247,7 @@ sub www_editSubmissionForm {
 		            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
 	        my $listOfLinks = join '', ( map {
 		      $makeAnchorList->(
-		                $parent->getUrl('func=editSubmissionForm;assetId=' . $_->getId ),
+		                $_->getUrl('func=editSubmissionForm' ),
 				$_->get('title'),
 				WebGUI::HTML::filter($_->get('description'),'all')
 		             )
@@ -257,7 +257,7 @@ sub www_editSubmissionForm {
 	    }
         } elsif( $assetId ne 'new' ) {
 	    $self &&= WebGUI::Asset->newByDynamicClass($session,$assetId);
-	    if (!defined $self) { 
+	    if (!defined($self)) { 
 		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
 	    }
         }
@@ -552,26 +552,6 @@ sub processForm {
     }
 dav::dump 'processForm::params:', $params;
     return $params;
-}
-
-=head TODO work on this code
-# this is a bunch of code that will likely be useful for this function...
-{
-	    for my $fieldName ( qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
-                               deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
-	        if( defined $properties->{$fieldName} ) {
-                    my %param = %{$properties->{$fieldName}};
-		    $param{value} = $form->get($fieldName) || $self ? $self->get($fieldName) : $param{defaultValue} || '';
-		    $param{name} = $fieldName;
-dav::dump 'editSubmissionForm::properties for ', $fieldName, \%param ;
-		    $maintab->dynamicField(%param);
-		}
-	    }
-        }
-dav::dump 'editSubmissionForm::dump before generate:',$fields;
-}
-=cut
-
 }
 
 #-------------------------------------------------------------------
