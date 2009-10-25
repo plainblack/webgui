@@ -1,5 +1,6 @@
 package WebGUI::Asset::EMSSubmission;
 
+use lib '/root/pb/lib'; use dav;
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -191,11 +192,6 @@ sub definition {
 		    label        => $i18n->get("send email label"),
 		    hoverHelp    => $i18n->get("send email label help")
 		},
-		adminOverride => {
-				noFormPost              => 1,
-				fieldType               => "hidden",
-				defaultValue    => '{}',
-		},
                 ticketId => {
 				noFormPost              => 1,
 				fieldType               => "hidden",
@@ -247,7 +243,7 @@ sub drawRelatedBadgeGroupsField {
                 name            => $params->{name},
                 value           => $self->get($params->{name}),
                 vertical        => 1,
-                options         => $self->getParent->getBadgeGroups,
+                options         => $self->getParent->getParent->getBadgeGroups,
                 });
 }
 
@@ -262,7 +258,7 @@ Draws the field for the relatedRibbons property.
 sub drawRelatedRibbonsField {
         my ($self, $params) = @_;
         my %ribbons = ();
-        foreach my $ribbon (@{$self->getParent->getRibbons}) {
+        foreach my $ribbon (@{$self->getParent->getParent->getRibbons}) {
                 $ribbons{$ribbon->getId} = $ribbon->getTitle;
         }
         return WebGUI::Form::checkList($self->session, {
@@ -305,15 +301,18 @@ parameters for the submission
 
 =cut
 
+
 sub www_editSubmission {
         my $this             = shift;
         my $self;
         my $parent;
         if( $this eq __PACKAGE__ ) {   # called as a constructor
             $parent             = shift;
+dav::log 'EMSSubmission::www_editSubmission: got class/parent params';
         } else {
             $self = $this;
             $parent = $self->getParent;
+dav::log 'EMSSubmission::www_editSubmission: got self param';
         }
         my $params           = shift || { };
         my $session = $parent->session;
@@ -322,15 +321,19 @@ sub www_editSubmission {
 
         if( ! defined( $assetId ) ) {
              # if somebody calls without an assetId then display the queue for the EMS (grandparent)
+dav::log 'EMSSubmission::www_editSubmission: asseId not defined';
             return $parent->getParent->www_viewSubmissionQueue;
         } elsif( $assetId ne 'new' ) {
-            $self = WebGUI::Asset->newByDynamicClass($session,$assetId);
+dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
+            $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);
             if (!defined $self) {
                 $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
             }
         }
-	my $url = ( $self || $parent )->getUrl('func=editSubmissionSave');
+        my $asset = $self || $parent;
+	my $url = $asset->getUrl('func=editSubmissionSave');
         my $newform = WebGUI::HTMLForm->new($session,action => $url);
+        $newform->hidden(name => 'assetId', value => $assetId);
 	my $formDescription = $parent->getFormDescription;
 	my @defs = reverse @{__PACKAGE__->definition($session)};
         my $fields;
@@ -367,12 +370,31 @@ sub www_editSubmission {
 	}
 	# TODO add the comment form
         $newform->submit;
-        return $parent->processStyle(
-               $parent->processTemplate({
+        return $asset->processStyle(
+               $asset->processTemplate({
                       errors => $params->{errors} || [],
                       backUrl => $parent->getUrl,
                       pageForm => $newform->print,
-                  },$parent->get('eventSubmissionFormTemplateId')));
+                  },$parent->getParent->get('eventSubmissionTemplateId')));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editSubmissionSave
+
+=cut
+
+sub www_editSubmissionSave {
+        my $self = shift;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
+        my $formParams = WebGUI::Asset::EMSSubmission->processForm($self);
+        if( $formParams->{_isValid} ) {
+            delete $formParams->{_isValid};
+            $self->update($formParams);
+            return $self->getParent->getParent->www_viewSubmissionQueue;
+        } else {
+            return $self->www_editSubmission($formParams);
+        }
 }
 
 #-------------------------------------------------------------------

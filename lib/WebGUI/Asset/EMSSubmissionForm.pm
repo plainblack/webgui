@@ -1,5 +1,7 @@
 package WebGUI::Asset::EMSSubmissionForm;
 
+use lib '/root/pb/lib'; use dav;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -256,12 +258,13 @@ sub www_editSubmissionForm {
 		                            '</h1><ul>' . $listOfLinks . '</ul>' );
 	    }
         } elsif( $assetId ne 'new' ) {
-	    $self &&= WebGUI::Asset->newByDynamicClass($session,$assetId);
+	    $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);
 	    if (!defined($self)) { 
 		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
 	    }
         }
-        my $url = ( $self || $parent )->getUrl('func=editSubmissionFormSave');
+        my $asset = $self || $parent;
+        my $url = $asset->getUrl('func=editSubmissionFormSave');
 	my $newform = WebGUI::HTMLForm->new( $session, action => $url );
 	$newform->hidden(name => 'assetId', value => $assetId);
 	my @fieldNames = qw/title description startDate duration seatsAvailable location/;
@@ -313,8 +316,8 @@ dav::dump 'editSubmissionForm::dump before generate:',$fields;
 	    );
 	}
 	$newform->submit; 
-	return $parent->processStyle(
-               $parent->processTemplate({
+	return $asset->processStyle(
+               $asset->processTemplate({
 		      errors => $params->{errors} || [],
                       backUrl => $parent->getUrl,
 		      pageForm => $newform->print,
@@ -455,6 +458,7 @@ calls www_editSubmission with assetId == new
 =cut
 
 sub www_addSubmission {
+dav::log __PACKAGE__ . '::www_addSubmission';
     my $self = shift;
     $self->www_editSubmission( { assetId => 'new' } );
 }
@@ -487,6 +491,7 @@ calls WebGUI::Asset::EMSSubmission->editSubmission
 =cut
 
 sub www_editSubmission {
+dav::log __PACKAGE__ . '::www_addSubmission';
     my $self             = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return WebGUI::Asset::EMSSubmission->www_editSubmission($self,shift);
@@ -507,7 +512,7 @@ sub www_editSubmissionSave {
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};
             $self->addSubmission($formParams);
-            return $self->www_viewSubmissionQueue;
+            return $self->getParent->www_viewSubmissionQueue;
         } else {
             return $self->www_editSubmission($formParams);
         }

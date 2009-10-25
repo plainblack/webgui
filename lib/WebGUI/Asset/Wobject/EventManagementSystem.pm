@@ -1,5 +1,7 @@
 package WebGUI::Asset::Wobject::EventManagementSystem;
 
+use lib '/root/pb/lib'; use dav;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -596,7 +598,6 @@ sub view {
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
 		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
 		addSubmissionUrl	=> $self->getUrl('func=addSubmission'),
-		viewSubmissionsUrl	=> $self->getUrl('func=viewSubmissions'),
 		viewSubmissionQueueUrl	=> $self->getUrl('func=viewSubmissionQueue'),
 		addSubmissionFormUrl	=> $self->getUrl('func=addSubmissionForm'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
@@ -642,6 +643,7 @@ display a form or links to forms to create a new submission
 =cut
 
 sub www_addSubmission {
+dav::log __PACKAGE__ . '::www_addSubmission';
     my $self = shift;
     my $params = shift || {};
     my $session = $self->session;
@@ -664,7 +666,7 @@ sub www_addSubmission {
                             return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
                 my $listOfLinks = join '', ( map {
                       $makeAnchorList->(
-                                $self->getUrl('func=addSubmission;formId=' . $_->getId ),
+                                $_->getUrl('func=addSubmission' ),
                                 $_->get('title'),
                                 WebGUI::HTML::filter($_->get('description'),'all')
                              )
@@ -2346,9 +2348,9 @@ sub www_viewSubmissionQueue {
 		      canSubmit => $self->canSubmit,
 		      hasSubmissionForms => $self->hasSubmissionForms,
 		      getSubmissionQueueDateUrl => $self->getUrl('func=getSubmissionQueueData'),
-		      addSumissionFormUrl => $self->getUrl('func=addSubmissionForm'),
+		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
 		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
-		      addSumissionUrl => $self->getUrl('func=addSubmission'),
+		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
                   },$self->get('eventSubmissionQueueTemplateId')));
 }
 
