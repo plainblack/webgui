@@ -243,6 +243,13 @@ sub definition {
 			label			=> $i18n->get('registration staff group'),
 			hoverHelp		=> $i18n->get('registration staff group help'),
 		},
+		submittedLocationsList => {
+			fieldType 		=> 'text',
+			tab			=> 'properties',
+			defaultValue 	        => $i18n->get('default submitted location list'),
+			label			=> $i18n->get('submitted location list label'),
+			hoverHelp		=> $i18n->get('submitted location list help'),
+		},
 		eventSubmissionGroups => {
 			fieldType 		=> 'hidden',
 			defaultValue 	        => '',
@@ -391,7 +398,7 @@ may be SQL optimized for quick access
 
 sub getLocations {
     my $self = shift;
-    my $dateRef = shift || [ ];
+    my $dateRef = shift;
 
     my %hash;
     my %hashDate;
@@ -400,7 +407,9 @@ sub getLocations {
 # this is a really compact 'uniq' operation
     my @locations = map { $h{$_}++ == 0 ? $_ : () } ( map { $_->get('location') } ( @$tickets ) );
 # the dates have the time data removed with a pattern substitution
-    push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
+    if( $dateRef ) {
+        push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
+    }
 
     return @locations;
 }
@@ -433,6 +442,21 @@ Returns an array reference of ribbon objects.
 sub getRibbons {
 	my $self = shift;
 	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSRibbon']});
+}
+
+#-------------------------------------------------------------------
+=head2 getSubmissionLocations
+
+retuns an arrayref of the locations found in the submission location list
+
+=cut
+
+sub getSubmissionLocations {
+   my $self = shift;
+   my $text = $self->get('submittedLocationsList');
+dav::log 'getSubmissionLocations:"', $text, '"';
+   return undef if $text eq '';
+   return [ split( /\s+/, $text ) ];
 }
 
 #-------------------------------------------------------------------
@@ -1037,7 +1061,7 @@ sub www_editEventMetaField {
 	);
 	$f->textarea(
 		-name => "helpText",
-		-label => $i18n2->get('meta field help text),
+		-label => $i18n2->get('meta field help text'),
 		-hoverHelp => $i18n2->get('meta field help text description'),
 		-value => $data->{helpText},
 	);
@@ -1197,7 +1221,6 @@ sub www_getAllSubmissions {
     
     $sql = $self->getLineageSql(['descendants'], $rules);
 
-print $sql , "\n";
     my $startIndex        = $form->get( 'startIndex' ) || 1;
     my $rowsPerPage         = $form->get( 'rowsPerPage' ) || 25;
     my $currentPage         = int ( $startIndex / $rowsPerPage ) + 1;
@@ -1232,9 +1255,9 @@ print $sql , "\n";
             title         => $asset->get( "title" ),
             createdBy     => WebGUI::User->new($session,$asset->get( "createdBy" ))->username,
             creationDate  => $datetime->epochToSet($asset->get( "creationDate" )),
-            status        => $self->getStatus($asset->get( "submissionStatus" )),
-            lastReplyDate => $lastReplyDate,
-            lastReplyBy   => $lastReplyBy,
+            submissionStatus => $self->getStatus($asset->get( "submissionStatus" ) || 'pending' ),
+            lastReplyDate => $lastReplyDate || '',
+            lastReplyBy   => $lastReplyBy || '',
         );
 
         push @{ $tableInfo->{ records } }, \%fields;
@@ -1622,19 +1645,6 @@ sub www_getScheduleDataJSON {
     $results{dateRecords} = \@dateRecords;
     $session->http->setMimeType('application/json');
     return JSON->new->encode(\%results);
-}
-
-
-
-#-------------------------------------------------------------------
-=head2 www_getSubmissionQueueData
-
-returns JSON data to fill a YUI table.
-
-=cut
-
-sub www_getSubmissionQueueData {
-
 }
 
 #-------------------------------------------------------------------
@@ -2483,7 +2493,7 @@ sub www_viewSubmissionQueue {
 		      canEdit => $self->canEdit,
 		      canSubmit => $self->canSubmit,
 		      hasSubmissionForms => $self->hasSubmissionForms,
-		      getSubmissionQueueDateUrl => $self->getUrl('func=getSubmissionQueueData'),
+		      getSubmissionQueueDateUrl => $self->getUrl('func=getAllSubmissions'),
 		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
 		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
 		      addSubmissionUrl => $self->getUrl('func=addSubmission'),

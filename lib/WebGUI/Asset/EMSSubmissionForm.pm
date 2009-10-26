@@ -73,7 +73,7 @@ sub addSubmission {
         $newParams->{$field} = $form->get($field);
     }
     $newParams->{className} = 'WebGUI::Asset::EMSSubmission';
-    $newParams->{status} = 'pending';
+    $newParams->{submissionStatus} = 'pending';
     $newParams->{submissionId} = $self->get('nextSubmissionId');
     $self->update({nextSubmissionId => $newParams->{submissionId}+1 });
     $self->addChild($newParams);
@@ -205,6 +205,16 @@ whenever a copy action is executed
 #    my $newAsset = $self->SUPER::duplicate(@_);
 #    return $newAsset;
 #}
+
+#-------------------------------------------------------------------
+
+=head2 ems
+
+returns the ems ansestor of this asset
+
+=cut
+
+sub ems { $_[0]->getParent }
 
 #-------------------------------------------------------------------
 
@@ -348,6 +358,17 @@ sub www_editSubmissionFormSave {
 
 #-------------------------------------------------------------------
 
+=head2 www_view
+
+calles ems->view
+
+=cut
+
+sub www_view { $_[0]->ems->www_view }
+
+
+#-------------------------------------------------------------------
+
 =head2 getFormDescription
 
 returns a hash ref decoded from the JSON in the form description field
@@ -383,10 +404,11 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
-    $template->prepare($self->getMetaDataAsTemplateVariables);
-    $self->{_viewTemplate} = $template;
+    $self->ems->prepareView;
+    #$self->SUPER::prepareView();
+    #my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
+    #$template->prepare($self->getMetaDataAsTemplateVariables);
+    #$self->{_viewTemplate} = $template;
 }
 
 #-------------------------------------------------------------------
@@ -426,11 +448,9 @@ asset instances, you will need to purge them here.
 =head2 purgeRevision ( )
 
 This method is called when data is purged by the system.
-
 =cut
 
-#sub purgeRevision {
-#    my $self = shift;
+#sub purgeRevision { #    my $self = shift;
 #    return $self->SUPER::purgeRevision;
 #}
 
@@ -444,9 +464,10 @@ method called by the container www_view method.
 
 sub view {
     my $self = shift;
-    my $var  = $self->get;    # $var is a hash reference.
-    $var->{controls} = $self->getToolbar;
-    return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
+    return $self->ems->view;
+    #my $var  = $self->get;    # $var is a hash reference.
+    #$var->{controls} = $self->getToolbar;
+    #return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
 
@@ -492,7 +513,7 @@ calls WebGUI::Asset::EMSSubmission->editSubmission
 =cut
 
 sub www_editSubmission {
-dav::log __PACKAGE__ . '::www_addSubmission';
+dav::log __PACKAGE__ . '::www_editSubmission';
     my $self             = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return WebGUI::Asset::EMSSubmission->www_editSubmission($self,shift);

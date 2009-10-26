@@ -1,5 +1,5 @@
 
-/*** The WebGUI Help Desk 
+/*** The WebGUI EMS Submission system
  * Requires: YAHOO, Dom, Event, DataSource, DataTable, Paginator, Container
  *
  */

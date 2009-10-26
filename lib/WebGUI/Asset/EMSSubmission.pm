@@ -93,6 +93,13 @@ sub definition {
 			    fieldType       => "hidden",
 			    defaultValue => undef,
 		},
+		submissionStatus => {
+			    fieldType    =>"selectList",
+			    defaultValue => 'pending',
+			customDrawMethod=> 'drawStatusField',
+                        label                   => $i18n->get("submission status"),
+                        hoverHelp               => $i18n->get("submission status help")
+		},
                 description => {
                         tab                             => "properties",
                         fieldType               => "HTMLArea",
@@ -219,14 +226,13 @@ Draws the field for the location property.
 
 sub drawLocationField {
         my ($self, $params) = @_;
-        my $options = $self->session->db->buildHashRef("select distinct(location) from EMSTicket left join asset using (assetId)
-                where parentId=? order by location",[$self->get('parentId')]);
-# TODO get additional params from the EMS location list
+	my $ems = $self->ems;
+	my $options = { map { $_ => $_ } ( @{ $ems->getSubmissionLocations || [ $ems->getLocations ] } ) } ;
         return WebGUI::Form::combo($self->session, {
                 name    => 'location',
                 value   => $self->get('location'),
                 options => $options,
-                });
+	    });
 }
 
 #-------------------------------------------------------------------
@@ -271,6 +277,22 @@ sub drawRelatedRibbonsField {
 
 #-------------------------------------------------------------------
 
+=head2 drawStatusField
+
+=cut
+
+sub drawStatusField {
+        my ($self, $params) = @_;
+        return WebGUI::Form::SelectBox($self->session, {
+                name    => 'location',
+                value   => $self->get('submissionStatus'),
+                options => $self->ems->getStatus,
+                });
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 duplicate
 
 This method exists for demonstration purposes only.  The superclass
@@ -284,6 +306,16 @@ whenever a copy action is executed
 #    my $newAsset = $self->next::method(@_);
 #    return $newAsset;
 #}
+
+#-------------------------------------------------------------------
+
+=head2 ems
+
+returns the ems ansestor of this asset
+
+=cut
+
+sub ems { $_[0]->getParent->getParent }
 
 #-------------------------------------------------------------------
 
@@ -358,12 +390,21 @@ dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
 	# for each field
 	for my $field ( values %$fields ) {
 	    if( $formDescription->{$field->{fieldId}} ) {
+dav::dump 'drawing fields:', $field;
+                if( $field->{fieldId} eq 'submissionStatus' ) {
+		    $field->{options} = $parent->getParent->getStatus;
+    dav::log 'set options for status';
+		}
+                if( $field->{fieldId} eq 'location' ) {
+		    $field->{options} = [ split( /\s*/, $parent->getParent->getLocations ) ];
+		    delete $field->{options} if scalar( @{$field->{options}} ) == 0 ;
+		}
 	        $newform->dynamicField(%$field);
 	    } else {
 	        # TODO see that the data gets formatted
 		$newform->readOnly(
 		         label => $field->{label},
-			 value => $field->{value},
+			 value => $field->{value} || '[       ]',
 			 fieldId => $field->{fieldId},
 	            );
 	    }
@@ -396,6 +437,16 @@ sub www_editSubmissionSave {
             return $self->www_editSubmission($formParams);
         }
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_view
+
+calles ems->view
+
+=cut
+
+sub www_view { $_[0]->ems->www_view }
 
 #-------------------------------------------------------------------
 
@@ -464,10 +515,11 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
     my $self = shift;
-    $self->next::method();
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
-    $template->prepare($self->getMetaDataAsTemplateVariables);
-    $self->{_viewTemplate} = $template;
+    $self->ems->prepareView;
+    #$self->next::method();
+    #my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
+    #$template->prepare($self->getMetaDataAsTemplateVariables);
+    #$self->{_viewTemplate} = $template;
 }
 
 #----------------------------------------------------------------
@@ -556,9 +608,10 @@ method called by the container www_view method.
 
 sub view {
     my $self = shift;
-    my $var  = $self->get;    # $var is a hash reference.
-    $var->{controls} = $self->getToolbar;
-    return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
+    return $self->ems->view;
+    #my $var  = $self->get;    # $var is a hash reference.
+    #$var->{controls} = $self->getToolbar;
+    #return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
 #-------------------------------------------------------------------

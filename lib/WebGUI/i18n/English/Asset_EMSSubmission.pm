@@ -26,6 +26,18 @@ our $I18N = { ##hashref of hashes
 		context => q|Label for the comments tab.|
 	},
 
+	'submission status' => {
+		message => q|Submission Status|,
+		lastUpdated => 1131394072,
+		context => q|Label for the submission status field.|
+	},
+
+	'submission status help' => {
+		message => q|The status of the submission: pending is waiting for the registrar; feedback is waiting for the owner; denied is denied; approved is waiting to create a ticket; created means the ticket is created successfully, failed means ticket creation was not successfull.|,
+		lastUpdated => 1131394072,
+		context => q|Help text for the submission status field.|
+	},
+
 #	'TODO' => {
 #		message => q|TODO|,
 #		lastUpdated => 1131394072,

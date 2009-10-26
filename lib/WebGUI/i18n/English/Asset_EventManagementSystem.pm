@@ -1932,16 +1932,16 @@ normal templates.|,
                 context => q|Help text for the Event SUbmission Queue Template.|
         },
 
-        'event submission form template' => {
-                message => q|Event Submission Form Template|,
+        'event submission main template' => {
+                message => q|Event Submission Main Template|,
                 lastUpdated => 1131394072,
-                context => q|Label for the event submission form template.|
+                context => q|Label for the event submission main template.|
         },
 
-        'event submission form template help' => {
-                message => q|This template is used to describe the event submission form which will be used by submitters to entger their information. This template consists of a few standard fields and a list of optional fields which are turned on by selecting them from the list.|,
+        'event submission main template help' => {
+                message => q|This template is used to describe main page of the submission module. It has a dynamic tabset on it which is used to hold one or more pieces of the submission interface.|,
                 lastUpdated => 1131394072,
-                context => q|Help text for the event submission form template.|
+                context => q|Help text for the event submission main template.|
         },
 
     'select form to edit' => {
@@ -1954,12 +1954,6 @@ normal templates.|,
         message => q|Select a Form to Submit|,
         lastUpdated => 1147050475,
         context => q|Label for list of submission forms; user must choose one to proceed to a submission form.|,
-    },
-
-    'main tab label' => {
-        message => q|Main|,
-        lastUpdated => 1147050475,
-        context => q|This is the label for te main tab in the edit submissionnForm form|,
     },
 
     'pending' => {
@@ -1996,6 +1990,36 @@ normal templates.|,
         message => q|Failed|,
         lastUpdated => 1147050475,
         context => q|Label indicating ticket creation failed for submission.|,
+    },
+
+    'meta field help text' => {
+        message => q|Help Text|,
+        lastUpdated => 1147050475,
+        context => q|The label for the meta field help text field.|,
+    },
+
+    'meta field help text description' => {
+        message => q|This help text will be provided in the event submission interface.|,
+        lastUpdated => 1147050475,
+        context => q|Describes the help text that is attached to meta fields.|,
+    },
+
+    'default submitted location list' => {
+        message => q||,
+        lastUpdated => 1147050475,
+        context => q|This is the default value for the list of locations for event submission.|,
+    },
+
+    'submitted location list label' => {
+        message => q|Locations Available for Event Submissions|,
+        lastUpdated => 1147050475,
+        context => q|Label for the submitted location list|,
+    },
+
+    'submitted location list help' => {
+        message => q|Enter a listy of location names here, one name on a line.  This list will be available on the event submission form in the location select box. If this field is filled in then only these locations will be available.|,
+        lastUpdated => 1147050475,
+        context => q|This is help text for the submitted location list field.|,
     },
 
 #    'TODO' => {
