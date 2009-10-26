@@ -23,6 +23,7 @@
  - fixed #11086: bad urls in wiki
  - fixed #11047: required field on dataform
  - fixed #11162: Can't delete calendar Related Material Link
+ - fixed #11166: Documentation bug - addChild
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
