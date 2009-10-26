@@ -286,6 +286,7 @@ dav::dump 'editSubmissionForm::definition:', [@defs];
 	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
 	    # meta fields call it data type, we copy it to simplify later on
 	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
+	    $fields->{$metaField->{fieldId}}{hoverHelp} = $metaField->{helpText};
 	}
 	$newform->hidden( name => 'fieldNames', value => join( ' ', @fieldNames ) );
 	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
@@ -321,7 +322,7 @@ dav::dump 'editSubmissionForm::dump before generate:',$fields;
 		      errors => $params->{errors} || [],
                       backUrl => $parent->getUrl,
 		      pageForm => $newform->print,
-                  },$parent->get('eventSubmissionFormTemplateId')));
+                  },$parent->get('eventSubmissionTemplateId')));
 }
 
 #-------------------------------------------------------------------

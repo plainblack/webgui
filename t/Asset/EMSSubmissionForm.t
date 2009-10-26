@@ -399,8 +399,9 @@ dav::dump $result;
 cmp_deeply( $result, $expected , 'test process form' );
 } # end of skip HTML::Form
 
-} # end of use packages skip
+print $ems->www_getAllSubmissions;
 
+} # end of use packages skip
 }; # end of eval
 print $@ if $@;
 

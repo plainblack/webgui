@@ -184,6 +184,14 @@ sub definition {
 			hoverHelp		=> $i18n->get('print ticket template help'),
 			namespace		=> 'EMS/PrintTicket',
 		},
+		eventSubmissionMainTemplateId => {
+			fieldType 		=> 'template',
+			defaultValue 		=> 'ylBSKblMdKpcDSIK2t_Ang',
+			tab			=> 'display',
+			label			=> $i18n->get('event submission form template'),
+			hoverHelp		=> $i18n->get('event submission form template help'),
+			namespace		=> 'EMS/SubmissionMain',
+		},
 		eventSubmissionTemplateId => {
 			fieldType 		=> 'template',
 			defaultValue 		=> '8tqyQx-LwYUHIWOlKPjJrA',
@@ -199,14 +207,6 @@ sub definition {
 			label			=> $i18n->get('event submission queue template'),
 			hoverHelp		=> $i18n->get('event submission queue template help'),
 			namespace		=> 'EMS/SubmissionQueue',
-		},
-		eventSubmissionFormTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 		=> 'ylBSKblMdKpcDSIK2t_Ang',
-			tab			=> 'display',
-			label			=> $i18n->get('event submission form template'),
-			hoverHelp		=> $i18n->get('event submission form template help'),
-			namespace		=> 'EMS/SubmissionForm',
 		},
 		badgeInstructions => {
 			fieldType 		=> 'HTMLArea',
@@ -374,6 +374,7 @@ sub getEventFieldsForImport {
 			type			=> $field->{dataType},
 			options 		=> $field->{possibleValues},
 			defaultValue	=> $field->{defaultValues},
+			helpText	=> $field->{defaultValues},
 			});
 	}
 	return \@fields;
@@ -432,6 +433,34 @@ Returns an array reference of ribbon objects.
 sub getRibbons {
 	my $self = shift;
 	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSRibbon']});
+}
+
+#-------------------------------------------------------------------
+sub getStatus {
+    my $self  = shift;
+    my $key   = shift;
+
+    unless ($self->{_status}) {
+        tie my %hash, "Tie::IxHash";
+        my $i18n = $self->i18n;
+        for my $item (
+            'pending',
+            'feedback',
+            'denied',
+            'approved',
+            'created',
+            'failed',
+                        ) {
+            $hash{$item} = $i18n->get($item),
+        }
+        $self->{_status} = \%hash;
+    }
+
+    if($key) {
+        return $self->{_status}{$key};
+    }
+
+    return $self->{_status};
 }
 
 #-------------------------------------------------------------------
@@ -500,6 +529,19 @@ sub hasSubmissions {
 	 whereClause => q{createdBy='} . $self->session->user->userId . q/'/,
      } );
    return scalar(@$res);
+}
+
+#-------------------------------------------------------------------
+
+=head2 i18n
+
+returns the internationalisation object for this asset
+
+=cut
+
+sub i18n {
+    my $self = shift;
+    return $self->{_i18n} ||= WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 }
 
 #-------------------------------------------------------------------
@@ -936,6 +978,7 @@ sub www_editEventMetaField {
 			required => $self->session->form->process("required",'yesNo'),
 			possibleValues => $self->session->form->process("possibleValues",'textarea'),
 			defaultValues => $self->session->form->process("defaultValues",'textarea'),
+			helpText => $self->session->form->process("helpText",'textarea'),
 		};
 		$f->readOnly(
 			-name => 'error',
@@ -992,6 +1035,12 @@ sub www_editEventMetaField {
 		-hoverHelp => $i18n->get('488 description'),
 		-value => $data->{defaultValues},
 	);
+	$f->textarea(
+		-name => "helpText",
+		-label => $i18n2->get('meta field help text),
+		-hoverHelp => $i18n2->get('meta field help text description'),
+		-value => $data->{helpText},
+	);
 	$f->submit;
 	return $self->processStyle($f->print);
 }
@@ -1024,6 +1073,7 @@ sub www_editEventMetaFieldSave {
 		required => $self->session->form->process("required",'yesNo'),
 		possibleValues => $self->session->form->process("possibleValues",'textarea'),
 		defaultValues => $self->session->form->process("defaultValues",'textarea'),
+		helpText => $self->session->form->process("helpText",'textarea'),
 	},1,1);
 	return $self->www_manageEventMetaFields();
 }
@@ -1106,6 +1156,92 @@ sub www_exportEvents {
 	
 	# finished
 	return "chunked";
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_getAllSubmissions ( session )
+
+Get a page of Asset Manager data, ajax style. Returns a JSON array to be
+formatted in a WebGUI submission queue data table.
+
+=cut
+
+sub www_getAllSubmissions {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $datetime    = $session->datetime;
+    my $form        = $session->form;
+    my $rowsPerPage = 25;
+    my $tableInfo  = {};    
+
+    return $session->privilege->insufficient unless $self->canView;
+
+    my $orderByColumn    = $form->get( 'orderByColumn' ) || $self->get("sortColumn");
+    my $dir              = $form->get('orderByDirection') || $self->get('sortOrder');
+    my $orderByDirection = lc ($dir) eq "asc" ? "ASC" : "DESC";
+
+    my $whereClause ;
+    if(!$self->canEdit) {    
+        my $userId     = $session->user->userId;
+        $whereClause .= qq{ createdBy='$userId'};
+    }
+
+    my $rules;
+    $rules->{'joinClass'         } = "WebGUI::Asset::EMSSubmission";
+    $rules->{'whereClause'       } = $whereClause;
+    $rules->{'includeOnlyClasses'} = ['WebGUI::Asset::EMSSubmission'];
+    $rules->{'orderByClause'     } = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection if $orderByColumn;
+
+    my $sql  = "";
+    
+    $sql = $self->getLineageSql(['descendants'], $rules);
+
+print $sql , "\n";
+    my $startIndex        = $form->get( 'startIndex' ) || 1;
+    my $rowsPerPage         = $form->get( 'rowsPerPage' ) || 25;
+    my $currentPage         = int ( $startIndex / $rowsPerPage ) + 1;
+    
+    my $p = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
+    $p->setDataByQuery($sql);
+
+    $tableInfo->{'recordsReturned'} = $rowsPerPage;
+    $tableInfo->{'totalRecords'   } = $p->getRowCount; 
+    $tableInfo->{'startIndex'     } = $startIndex;
+    $tableInfo->{'sort'           } = $orderByColumn;
+    $tableInfo->{'dir'            } = $orderByDirection;
+    $tableInfo->{'records'        } = [];
+    
+    for my $record ( @{ $p->getPageData } ) {
+        my $asset = WebGUI::Asset->newByDynamicClass( $session, $record->{assetId} );
+        
+        my $lastReplyBy = $asset->get("lastReplyBy");
+        if ($lastReplyBy) {
+           $lastReplyBy = WebGUI::User->new($session,$lastReplyBy)->username;
+        }
+
+        # Populate the required fields to fill in
+        my $lastReplyDate = $asset->get("lastReplyDate");
+        if($lastReplyDate) {
+            $lastReplyDate = $datetime->epochToHuman($lastReplyDate,"%y-%m-%d @ %H:%n %p");
+        }
+
+        my %fields      = (
+            submissionId  => $asset->get("submissionId"),
+            url           => $asset->getUrl,
+            title         => $asset->get( "title" ),
+            createdBy     => WebGUI::User->new($session,$asset->get( "createdBy" ))->username,
+            creationDate  => $datetime->epochToSet($asset->get( "creationDate" )),
+            status        => $self->getStatus($asset->get( "submissionStatus" )),
+            lastReplyDate => $lastReplyDate,
+            lastReplyBy   => $lastReplyBy,
+        );
+
+        push @{ $tableInfo->{ records } }, \%fields;
+    }
+    
+    $session->http->setMimeType( 'application/json' );
+    return JSON->new->encode( $tableInfo );
 }
 
 #-------------------------------------------------------------------

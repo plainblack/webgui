@@ -1962,6 +1962,42 @@ normal templates.|,
         context => q|This is the label for te main tab in the edit submissionnForm form|,
     },
 
+    'pending' => {
+        message => q|Pending|,
+        lastUpdated => 1147050475,
+        context => q|Label for pending status on submission.|,
+    },
+
+    'feedback' => {
+        message => q|Feedback|,
+        lastUpdated => 1147050475,
+        context => q|Label for feedback requested on a submission.|,
+    },
+
+    'denied' => {
+        message => q|Denied|,
+        lastUpdated => 1147050475,
+        context => q|Label for denied status on a submission.|,
+    },
+
+    'approved' => {
+        message => q|Approved|,
+        lastUpdated => 1147050475,
+        context => q|Label for approved status on a submission.|,
+    },
+
+    'created' => {
+        message => q|Created|,
+        lastUpdated => 1147050475,
+        context => q|Label for status indicating ticket is created for submission.|,
+    },
+
+    'failed' => {
+        message => q|Failed|,
+        lastUpdated => 1147050475,
+        context => q|Label indicating ticket creation failed for submission.|,
+    },
+
 #    'TODO' => {
 #        message => q|TODO|,
 #        lastUpdated => 1147050475,
