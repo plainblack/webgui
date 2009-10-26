@@ -36,7 +36,6 @@ removeOldSubscriptionTables( $session );
 removeOldITransactTables( $session );
 removeSQLFormTables( $session );
 fixBadRevisionDateColumns( $session );
-addEMSSubmission( $session );
 removeImportCruft( $session );
 removeAdminFromVisitorGroup( $session );
 
