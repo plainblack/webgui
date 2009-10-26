@@ -24,6 +24,7 @@
  - fixed #11047: required field on dataform
  - fixed #11162: Can't delete calendar Related Material Link
  - fixed #11166: Documentation bug - addChild
+ - fixed #11116: Deleted user's version tags and revisions
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
