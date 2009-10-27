@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 fixBadVarCharColumns ( $session );
 reKeyTemplateAttachments($session);
+addSelectPaymentGatewayTemplateToSettings($session);
 
 finish($session); # this line required
 
@@ -109,6 +110,14 @@ sub reKeyTemplateAttachments {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# add default template for selectPaymentGateway
+sub addSelectPaymentGatewayTemplateToSettings {
+    my $session = shift;
+    print "\tAdding select payment gateway template to settings... " unless $quiet;
+    $session->setting->add('selectGatewayTemplateId', '2GxjjkRuRkdUg_PccRPjpA') unless $session->setting->has('selectGatewayTemplateId');
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
