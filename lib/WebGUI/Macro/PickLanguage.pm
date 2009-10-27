@@ -42,7 +42,7 @@ This macro takes a templateId to show the links
 #-------------------------------------------------------------------
 sub process {
 	my $session 	= shift;
-	my $templateId 	= shift;
+	my $templateId 	= shift || "_aE16Rr1-bXBf8SIaLZjCg";
 	my $template 	= WebGUI::Asset::Template->new($session, $templateId);
         return "Could not instanciate template with id [$templateId]" unless $template;
 	my $i18n 	= WebGUI::International->new($session);
