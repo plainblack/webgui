@@ -5,8 +5,9 @@ use strict;
 
 our $HELP = { 
 	'template variables' => {     
-		title => 'PickLanguage macro',
+		title => 'picklanguage title',
 		body => '',
+		fields =>[],
 		'variables' => [
 			{
 				name => "lang_loop",

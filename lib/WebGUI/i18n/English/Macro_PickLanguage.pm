@@ -3,6 +3,11 @@ package WebGUI::i18n::English::Macro_PickLanguage;  ##Be sure to change the pack
 use strict; ##Required for all good Perl::Critic compliant code
 
 our $I18N = { ##hashref of hashes
+	'picklanguage title' => {
+		message => q|PickLanguage macro template variables|,
+		lastUpdated => 1131394070,
+		context => q|Title of the help object|
+	},
 	'lang_loop' => { ##key that will be used to reference this entry.  Do not translate this.
 		message => q|A loop that contains all installed languages|,
 		lastUpdated => 1131394070, #seconds from the epoch
