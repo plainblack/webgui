@@ -14,6 +14,7 @@
  - fixed #11116: Deleted user's version tags and revisions
  - fixed #11168: Points do not work with uncommitted Map
  - fixed #10888: Add Point... how do I enter details?
+ - fixed #10887: Map Point dropdown doesn't update
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
