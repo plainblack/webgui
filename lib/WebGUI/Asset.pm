@@ -1263,7 +1263,11 @@ sub getIsa {
             $sth->finish;
             return undef;
         }
-        return WebGUI::Asset->newPending($session, $assetId);
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        if (!$asset) {
+            WebGUI::Error::ObjectNotFound->throw(id => $assetId);
+        }
+        return $asset;
     };
 }
 
