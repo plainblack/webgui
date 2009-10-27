@@ -356,20 +356,6 @@ WebGUI.EMS.formatTitle = function ( elCell, oRecord, oColumn, orderNumber ) {
 };
 
 //***********************************************************************************
-WebGUI.EMS.formatLastReply = function ( elCell, oRecord, oColumn, orderNumber ) {
-    var lastReplyDate = oRecord.getData('lastReplyDate');
-    if(lastReplyDate) {
-        elCell.innerHTML = oRecord.getData('lastReplyDate')
-            + ' by '+ '<a href="' + getWebguiProperty('pageURL') + "?op=viewProfile;uid=" + oRecord.getData('lastReplyById') + '" class="profile_link">'
-            + oRecord.getData( 'lastReplyBy' )
-            + '</a>';
-    }
-    else {
-        elCell.innerHTML = "";
-    }
-};
-
-//***********************************************************************************
 WebGUI.EMS.buildQueryString = function ( state, dt ) {
     var query = ";startIndex=" + state.pagination.startIndex 
         + ';orderByDirection=' + ((state.sortedBy.dir === DataTable.CLASS_ASC) ? "ASC" : "DESC")
