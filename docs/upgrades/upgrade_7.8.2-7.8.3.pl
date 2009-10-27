@@ -60,7 +60,7 @@ sub reKeyTemplateAttachments {
 sub addSelectPaymentGatewayTemplateToSettings {
     my $session = shift;
     print "\tAdding select payment gateway template to settings... " unless $quiet;
-    $session->db->write("insert into settings values ('selectGatewayTemplateId', '2GxjjkRuRkdUg_PccRPjpA');");
+    $session->setting->add('selectGatewayTemplateId', '2GxjjkRuRkdUg_PccRPjpA') unless $session->setting->has('selectGatewayTemplateId');
     print "Done.\n" unless $quiet;
 }
 
