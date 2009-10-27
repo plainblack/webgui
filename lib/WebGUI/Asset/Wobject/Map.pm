@@ -556,8 +556,19 @@ sub www_ajaxEditPointSave {
     my $errors  = $asset->processAjaxEditForm;
 
     # Commit!
-    if ($asset->getAutoCommitWorkflowId && $self->hasBeenCommitted) {
-        $asset->requestAutoCommit;
+    if ( $asset->getAutoCommitWorkflowId ) {
+        if ( $self->hasBeenCommitted) {
+            $asset->requestAutoCommit;
+        }
+        else {
+            # Add mappoint to map's version tag
+            my $oldTagId = $asset->get('tagId');
+            $asset->setVersionTag( $self->get('tagId') );
+            my $oldTag = WebGUI::VersionTag->new( $session, $oldTagId );
+            if ( $oldTag->getAssetCount <= 0 ) {
+                $oldTag->rollback;
+            }
+        }
     }
 
     # Encode entities because we're returning as HTML
