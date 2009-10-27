@@ -9,6 +9,9 @@ if (typeof WebGUI.Map == "undefined") {
 // Keep track of all points on all maps and how to focus on them
 WebGUI.Map.markers = {};
 
+// Keep a loading dialog
+WebGUI.Map.loadingDialog = undefined;
+
 /**
  * WebGUI.Map.deletePoint( map, mgr, mapUrl, marker )
  * Delete a point from the map. 
@@ -17,12 +20,14 @@ WebGUI.Map.markers = {};
 WebGUI.Map.deletePoint
 = function ( map, mgr, mapUrl, marker ) {
     var callback    = function ( text, code ) {
+        WebGUI.Map.hideLoading();
         var response    = YAHOO.lang.JSON.parse( text );
         // remove the marker from the map
         if ( !response.error ) {
             mgr.removeMarker( marker );
         }
     };
+    WebGUI.Map.showLoading();
     GDownloadUrl( mapUrl + '?func=ajaxDeletePoint;assetId=' + marker.assetId, callback);
 };
 
@@ -51,21 +56,6 @@ WebGUI.Map.editPoint
         assetId = marker.assetId;
     }
 
-    // Create a loading dialog
-    var loadingDialog = new YAHOO.widget.Panel("loading", { width:"240px", 
-			  fixedcenter:true, 
-			  close:false, 
-			  draggable:false, 
-			  zindex:4,
-			  modal:true,
-			  visible:false
-			} 
-		);
-
-    loadingDialog.setHeader("Loading, please wait...");
-    loadingDialog.setBody('<img src="' + map.extrasUrl + '/yui-webgui/build/map/assets/loading.gif" />');
-    loadingDialog.render(document.body);
-
     // Callback should open the window with the form
     var callback    = function (text, code) {
         YAHOO.util.Dom.addClass( document.body, "yui-skin-sam" );
@@ -84,7 +74,7 @@ WebGUI.Map.editPoint
             var lng = marker.getLatLng().lng();
             this.form.elements['latitude'].value = lat;
             this.form.elements['longitude'].value = lng;
-
+            WebGUI.Map.showLoading();
             this.submit();
         }
         
@@ -143,15 +133,16 @@ WebGUI.Map.editPoint
                 GEvent.addListener( marker, "dragend", function (latlng) {
                     WebGUI.Map.setPointLocation( marker, latlng, mapUrl );
                 } );
+                WebGUI.Map.hideLoading();
             }
         };
 
         // Hide the loading dialog
-        loadingDialog.hide();
+        WebGUI.Map.hideLoading();
     };
 
     // Show the loading dialog
-    loadingDialog.show();
+    WebGUI.Map.showLoading();
 
     // Get the form
     GDownloadUrl( mapUrl + '?func=ajaxEditPoint;assetId=' + assetId, callback );
@@ -172,6 +163,11 @@ WebGUI.Map.focusOn
     }
     map.panTo( marker.getLatLng() );
     marker.openInfoWindow( marker.infoWin );
+};
+
+WebGUI.Map.hideLoading
+= function () {
+    WebGUI.Map.loadingDialog.hide();
 };
 
 /**
@@ -251,7 +247,9 @@ WebGUI.Map.setCenter
                 ;
     var callback = function ( text, code ) {
         // TODO: Notify the poor user
+        WebGUI.Map.hideLoading();
     };
+    WebGUI.Map.showLoading();
     GDownloadUrl(url,callback);
 };
 
@@ -268,8 +266,31 @@ WebGUI.Map.setPointLocation
             ;
     var callback = function ( text, code ) {
         // TODO: Notify the poor user
+        WebGUI.Map.hideLoading();
     };
+    WebGUI.Map.showLoading();
     GDownloadUrl(url, callback);
 };
 
+WebGUI.Map.showLoading
+= function () {
+    // Create a loading dialog
+    if ( !WebGUI.Map.loadingDialog ) {
+        var loadingDialog = new YAHOO.widget.Panel("loading", { width:"240px", 
+                              fixedcenter:true, 
+                              close:false, 
+                              draggable:false, 
+                              zindex:4,
+                              modal:true,
+                              visible:false
+                            } 
+                    );
 
+        loadingDialog.setHeader("Loading, please wait...");
+        loadingDialog.setBody('<img src="' + getWebguiProperty('extrasURL') + '/yui-webgui/build/map/assets/loading.gif" />');
+        loadingDialog.render(document.body);
+        WebGUI.Map.loadingDialog = loadingDialog;
+    }
+
+    WebGUI.Map.loadingDialog.show();
+};
