@@ -28,6 +28,7 @@
  - fixed #11168: Points do not work with uncommitted Map
  - fixed #10888: Add Point... how do I enter details?
  - fixed #10887: Map Point dropdown doesn't update
+ - fixed #11172: Collaboration broken vars: isSecond, isThird etc.
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude
