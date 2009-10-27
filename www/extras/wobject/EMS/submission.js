@@ -38,7 +38,7 @@ WebGUI.EMS = function (configs) {
         this._configs = configs;
     }
 
-    if(!this._configs.initiRequestString) {
+    if(!this._configs.initRequestString) {
         this._configs.initRequestString = ';startIndex=0';
     }
 
@@ -307,7 +307,7 @@ WebGUI.EMS = function (configs) {
         var datasource  = new DataSource(this._configs.datasource);
         datasource.responseType   = DataSource.TYPE_JSON;
         datasource.responseSchema = {
-            resultsList : 'tickets',
+            resultsList : 'records',
             fields      : this._configs.fields,
             metaFields  : { totalRecords: 'totalRecords' }
         };
@@ -349,7 +349,7 @@ WebGUI.EMS = function (configs) {
 
 //***********************************************************************************
 WebGUI.EMS.formatTitle = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML = '<a href="' + oRecord.getData('url') + '" id="ticket_' + oRecord.getData( 'ticketId' ) + '" class="ticket_link">'
+    elCell.innerHTML = '<a href="' + oRecord.getData('url') + '>'
         + oRecord.getData( 'title' )
         + '</a>'
         ;

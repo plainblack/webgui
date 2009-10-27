@@ -2493,7 +2493,7 @@ sub www_viewSubmissionQueue {
 		      canEdit => $self->canEdit,
 		      canSubmit => $self->canSubmit,
 		      hasSubmissionForms => $self->hasSubmissionForms,
-		      getSubmissionQueueDateUrl => $self->getUrl('func=getAllSubmissions'),
+		      getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
 		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
 		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
 		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
