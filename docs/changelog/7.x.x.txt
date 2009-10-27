@@ -30,6 +30,7 @@
  - fixed #10887: Map Point dropdown doesn't update
  - fixed #11172: Collaboration broken vars: isSecond, isThird etc.
  - fixed #11154: vendor payouts screen borked ( Martin Kamerbeek / Oqapi )
+ - fixed #11165: DatePicker broken in IE7
 
 7.7.22
  - fixed #11070: i18n Asset_Navigation::assetsToInclude

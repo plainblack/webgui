@@ -130,11 +130,11 @@ YAHOO.WebGUI.Form.DatePicker = {
             ],
             NAVIGATOR: {
                 strings : {
-                    'submit'       : YAHOO.WebGUI.Form.DatePicker.i18n.get('WebGUI',    'submit'),
-                    'cancel'       : YAHOO.WebGUI.Form.DatePicker.i18n.get('WebGUI',    'cancel'),
-                    'month'        : YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime',  'Month'),
-                    'year'         : YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime',  'Year'),
-                    'invalid year' : YAHOO.WebGUI.Form.DatePicker.i18n.get('Form_Date', 'Invalid year')
+                    'submit'      : YAHOO.WebGUI.Form.DatePicker.i18n.get('WebGUI',    'submit'),
+                    'cancel'      : YAHOO.WebGUI.Form.DatePicker.i18n.get('WebGUI',    'cancel'),
+                    'month'       : YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime',  'Month'),
+                    'year'        : YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime',  'Year'),
+                    'invalidYear' : YAHOO.WebGUI.Form.DatePicker.i18n.get('Form_Date', 'Invalid year')
                 }
             }
         };
