@@ -73,17 +73,38 @@ $templateId = '';
 my $templateNoId = $templateMock->mock('process','');
 $templateMock->set_always('getId', $templateId);
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
-my $error;
-
 
 {
-      WebGUI::Test->mockAssetId($templateNoId, $templateMock);
-      $error = WebGUI::Macro::PickLanguage::process($session,$templateMock->getId);
 
-	is($error,'Could not instanciate template with id []',"Empty template Id should return error");
-	
-	WebGUI::Test->unmockAssetId($templateNoId);
+      WebGUI::Test->mockAssetId($templateId, $templateMock);
+      WebGUI::Macro::PickLanguage::process($session,$templateMock->getId);
+
+      cmp_deeply(
+          $templateVars,
+              {
+                      lang_loop => [
+                      {       'language_url' => '?op=setLanguage;language=English',
+                              'language_lang' => 'English',
+                              'language_langAbbr' => 'en',
+                              'language_langAbbrLoc' => 'US',
+                              'language_langEng' => 'English'
+                      },
+              ],
+              },
+              'some template variables are created, when no templateId is passed on with the macro'
+      );
+      WebGUI::Test->unmockAssetId($templateId);
 }
+
+
+#{
+#      WebGUI::Test->mockAssetId($templateNoId, $templateMock);
+#      $error = WebGUI::Macro::PickLanguage::process($session,$templateMock->getId);
+#
+#	is($error,'Could not instanciate template with id []',"Empty template Id should return error");
+#	
+#	WebGUI::Test->unmockAssetId($templateNoId);
+#}
 
 #test for an incorrect template Id 
 
