@@ -24,12 +24,12 @@ use WebGUI::Session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 20;        # Increment this number for each test you create
+plan tests => 21;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my @addChildArgs    = ( {skipAutoCommitWorkflows=>1} );
+my @addChildArgs    = ( {skipAutoCommitWorkflows=>1, skipNotification => 1, } );
 my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
     className        => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage   => 20,
@@ -54,7 +54,7 @@ my @threads = (
 $_->setSkipNotification for @threads; # 100+ messages later...
 my $versionTag = WebGUI::VersionTag->getWorking( $session );
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 
 my $templateVars;
 my $posts;
@@ -89,4 +89,51 @@ ok( !$posts->[0]->{'user.isVisitor'}, 'first post made by visitor');
 ok(  $posts->[0]->{'hideProfileUrl'}, 'hide profile url, and user is visitor');
 ok( !$posts->[0]->{'lastReply.user.isVisitor'}, 'lastReply not made by visitor');
 ok(  $posts->[0]->{'lastReply.hideProfileUrl'}, 'lastReply hide profile url, since user is visitor');
+
+
+###################################################################
+#
+#isSecond, isThird, etc.
+#
+###################################################################
+
+my @newThreads = ();
+foreach my $index (1 .. 5) {
+    $newThreads[$index] =  $collab->addChild( {
+        className       => 'WebGUI::Asset::Post::Thread',
+        title           => "X - Bar",
+        isSticky        => 0,
+        ownerUserId     => 3,
+    }, undef, 2+$index, @addChildArgs);
+    $newThreads[$index]->setSkipNotification;
+}
+my $vt2 = WebGUI::VersionTag->getWorking($session);
+$vt2->commit;
+addToCleanup($versionTag);
+
+$session->user({userId => 3});
+$templateVars = $collab->getViewTemplateVars();
+my $indexVars;
+foreach my $post (@{ $templateVars->{post_loop }}) {
+    push @{$indexVars}, {
+        isSecond => $post->{isSecond} ? 1 : 0,
+        isThird  => $post->{isThird}  ? 1 : 0,
+        isFourth => $post->{isFourth} ? 1 : 0,
+        isFifth  => $post->{isFifth}  ? 1 : 0,
+    };
+}
+
+cmp_deeply(
+    $indexVars,
+    [
+        { isSecond => 0, isThird => 0, isFourth => 0, isFifth => 0, },
+        { isSecond => 1, isThird => 0, isFourth => 0, isFifth => 0, },
+        { isSecond => 0, isThird => 1, isFourth => 0, isFifth => 0, },
+        { isSecond => 0, isThird => 0, isFourth => 1, isFifth => 0, },
+        { isSecond => 0, isThird => 0, isFourth => 0, isFifth => 1, },
+        { isSecond => 0, isThird => 0, isFourth => 0, isFifth => 0, },  ##No modulo
+        { isSecond => 0, isThird => 0, isFourth => 0, isFifth => 0, },  ##No modulo
+    ],
+    'checking isSecond, isThird, isFourth, isFifth'
+);
 #vim:ft=perl
