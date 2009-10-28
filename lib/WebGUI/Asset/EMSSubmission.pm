@@ -420,12 +420,20 @@ dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
 	}
 	# TODO add the comment form
         $newform->submit;
-        return $asset->processStyle(
+	my $title = $assetId eq 'new' ? $i18n->get('new submission') || 'new' : $asset->get('submissionId');
+        my $content =  $asset->processStyle(
                $asset->processTemplate({
                       errors => $params->{errors} || [],
                       backUrl => $parent->getUrl,
                       pageForm => $newform->print,
                   },$parent->getParent->get('eventSubmissionTemplateId')));
+    if( $session->form->get('asJson') ) {
+        $session->http->setMimeType( 'application/json' );
+	return JSON->new->encode( { text => $content, title => $title } );
+    } else {
+        $session->http->setMimeType( 'text/html' );
+        return $content;
+    }
 }
 
 #-------------------------------------------------------------------

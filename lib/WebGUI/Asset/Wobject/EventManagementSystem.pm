@@ -1349,8 +1349,8 @@ sub www_getSubmissionById {
        $result->{hasError} = 1;
        $result->{errors} = [ 'failed to load submission' ];
    } else {
-       $result->{itemText} = $res->[0]->www_editSubmission;
-       $result->{submissionId} = $submissionId;
+       $result->{text} = $res->[0]->www_editSubmission;
+       $result->{title} = $submissionId;
    }
     $self->session->http->setMimeType('application/json');
     return JSON->new->encode($result);

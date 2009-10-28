@@ -322,12 +322,21 @@ dav::dump 'editSubmissionForm::dump before generate:',$fields;
 	    );
 	}
 	$newform->submit; 
-	return $asset->processStyle(
+        my $title = $assetId eq 'new' ? $i18n->get('new form') || 'new' : $asset->get('title');
+	my $content = $asset->processStyle(
                $asset->processTemplate({
 		      errors => $params->{errors} || [],
                       backUrl => $parent->getUrl,
 		      pageForm => $newform->print,
                   },$parent->get('eventSubmissionTemplateId')));
+    if( $session->form->get('asJson') ) {
+        $session->http->setMimeType( 'application/json' );
+        return JSON->new->encode( { text => $content, title => $title } );
+    } else {
+        $session->http->setMimeType( 'text/html' );
+        return $content;
+    }
+
 }
 
 #-------------------------------------------------------------------

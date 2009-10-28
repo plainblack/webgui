@@ -128,6 +128,72 @@ WebGUI.EMS = function (configs) {
 
     //***********************************************************************************
     //This method is out here so it can be overridden.  The datatable uses this method to sort it's columns
+    WebGUI.EMS.newTab = function(url) {
+        //  the 'loading' 'indicator'
+        if( typeof(WebGUI.EMS.loadingIndicator) == "undefined" ) {
+            WebGUI.EMS.loadingIndicator = new YAHOO.widget.Overlay( "loadingIndicator", {  
+                fixedcenter         : true,
+                visible             : false
+           } );
+            WebGUI.EMS.loadingIndicator.setBody( "Loading ..." +
+		"<img id='loadingIndicator' title='Loading' src='/extras/wobject/EMS/indicator.gif'/>"
+		);
+	    WebGUI.EMS.loadingIndicator.render(document.body);
+        }
+        WebGUI.EMS.loadingIndicator.show();
+
+		// Create callback object for the request
+	var oCallback = {
+	    success: function(o) {
+		   var response = eval('(' + o.responseText + ')');
+		   var myTab;
+		   if(response.hasError){
+		       var message = "";
+		       for(var i = 0; i < response.errors.length; i++) {
+			   message += response.errors[i];
+		       }
+		       alert(message);
+		       return;
+		   } else if( typeof(WebGUI.EMS.Items[response.submissionId]) == "undefined" 
+			      || WebGUI.EMS.Items[response.submissionId] == null ) {
+		       // if there is a tab .. close it,
+		       // at least until I can get the JS/HTML re-written to handle multiple tabs
+		       //  there should only be one
+		       for( var ticketId in WebGUI.EMS.Tickets ) { WebGUI.EMS.closeTab(ticketId) }
+		       var myContent = document.createElement("div");
+		       myContent.innerHTML = response.itemText;
+		       myTab = new YAHOO.widget.Tab({
+			     label: response.submissionId + '<span class="close"><img src="/extras/wobject/EMS/close12_1.gif" alt="X" title="' +
+				    WebGUI.EMS.i18n.get('Asset_EMSSubmission','close tab') + '" /></span>',
+			     contentEl: myContent
+			 });
+		       WebGUI.EMS.Tabs.addTab( myTab );
+		       YAHOO.util.Event.on(myTab.getElementsByClassName('close')[0], 'click', WebGUI.EMS.closeTab , myTab);
+		       WebGUI.EMS.Items[response.submissionId] = new Object();
+		       WebGUI.EMS.Items[response.submissionId].Tab = myTab;
+		   } else {
+		       myTab = WebGUI.EMS.Tickets[response.submissionId].Tab;
+		       myTab.set('content', response.itemText);
+		   }
+		   // make sure the script on the ticket has run
+		   // if( typeof( WebGUI.ticketJScriptRun ) == "undefined" ) {
+		       // eval( document.getElementById("ticketJScript").innerHTML );
+		   // }
+		   // delete WebGUI.ticketJScriptRun;
+		   WebGUI.EMS.loadingIndicator.hide();
+		   WebGUI.EMS.lastTab = WebGUI.EMS.Tabs.get('activeTab');
+		   WebGUI.EMS.Tabs.set('activeTab',myTab);
+	       },
+	    failure: function(o) {
+		   WebGUI.EMS.loadingIndicator.hide();
+		    alert("AJAX call failed");
+	       }
+	};
+	var request = YAHOO.util.Connect.asyncRequest('GET', url + ';asJson=1' , oCallback); 
+    };
+
+    //***********************************************************************************
+    //This method is out here so it can be overridden.  The datatable uses this method to sort it's columns
     WebGUI.EMS.sortColumn = function(oColumn,sDir) {
         // Default ascending
         var sDir = "desc";
@@ -177,72 +243,11 @@ WebGUI.EMS = function (configs) {
     // This method does the actual work of loading an item into a tab
     //
     WebGUI.EMS.loadItem = function ( submissionId, pathname ) {
-        //  the 'loading' 'indicator'
-        if( typeof(WebGUI.EMS.loadingIndicator) == "undefined" ) {
-            WebGUI.EMS.loadingIndicator = new YAHOO.widget.Overlay( "loadingIndicator", {  
-                fixedcenter         : true,
-                visible             : false
-           } );
-            WebGUI.EMS.loadingIndicator.setBody( "Loading ..." +
-		"<img id='loadingIndicator' title='Loading' src='/extras/wobject/EMS/indicator.gif'/>"
-		);
-	    WebGUI.EMS.loadingIndicator.render(document.body);
-        }
-        WebGUI.EMS.loadingIndicator.show();
-
              if( typeof(pathname) == "undefined" ) {
 	          pathname =  WebGUI.EMS.url ;
              }
 		var url     = pathname + "?func=getSubmissionById;submissionId=" + submissionId;
-	     
-		// Create callback object for the request
-		var oCallback = {
-		    success: function(o) {
-			   var response = eval('(' + o.responseText + ')');
-			   var myTab;
-			   if(response.hasError){
-			       var message = "";
-			       for(var i = 0; i < response.errors.length; i++) {
-				   message += response.errors[i];
-			       }
-			       alert(message);
-			       return;
-			   } else if( typeof(WebGUI.EMS.Items[response.submissionId]) == "undefined" 
-				      || WebGUI.EMS.Items[response.submissionId] == null ) {
-			       // if there is a tab .. close it,
-			       // at least until I can get the JS/HTML re-written to handle multiple tabs
-			       //  there should only be one
-			       for( var ticketId in WebGUI.EMS.Tickets ) { WebGUI.EMS.closeTab(ticketId) }
-			       var myContent = document.createElement("div");
-			       myContent.innerHTML = response.itemText;
-			       myTab = new YAHOO.widget.Tab({
-				     label: response.submissionId + '<span class="close"><img src="/extras/wobject/EMS/close12_1.gif" alt="X" title="' +
-                                            WebGUI.EMS.i18n.get('Asset_EMSSubmission','close tab') + '" /></span>',
-				     contentEl: myContent
-				 });
-			       WebGUI.EMS.Tabs.addTab( myTab );
-			       YAHOO.util.Event.on(myTab.getElementsByClassName('close')[0], 'click', WebGUI.EMS.closeTab , myTab);
-			       WebGUI.EMS.Items[response.submissionId] = new Object();
-			       WebGUI.EMS.Items[response.submissionId].Tab = myTab;
-			   } else {
-			       myTab = WebGUI.EMS.Tickets[response.submissionId].Tab;
-			       myTab.set('content', response.itemText);
-			   }
-			   // make sure the script on the ticket has run
-			   // if( typeof( WebGUI.ticketJScriptRun ) == "undefined" ) {
-			       // eval( document.getElementById("ticketJScript").innerHTML );
-			   // }
-			   // delete WebGUI.ticketJScriptRun;
-			   WebGUI.EMS.loadingIndicator.hide();
-			   WebGUI.EMS.lastTab = WebGUI.EMS.Tabs.get('activeTab');
-			   WebGUI.EMS.Tabs.set('activeTab',myTab);
-		       },
-		    failure: function(o) {
-			   WebGUI.EMS.loadingIndicator.hide();
-			    alert("AJAX call failed");
-		       }
-		};
-		var request = YAHOO.util.Connect.asyncRequest('GET', url, oCallback); 
+	    WebGUI.EMS.newTab(submissionId, url );
     };
 
     //***********************************************************************************
