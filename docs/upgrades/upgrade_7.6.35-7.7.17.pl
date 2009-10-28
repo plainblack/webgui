@@ -45,6 +45,8 @@ my $session = start(); # this line required
 ###############################################################
 ##   7.6.14 - 7.7.0
 ###############################################################
+addTemplateAttachmentsTable($session);
+reKeyTemplateAttachments($session);
 addAccountActivationTemplateToSettings( $session );
 surveyDoAfterTimeLimit($session);
 surveyRemoveResponseTemplate($session);
@@ -120,7 +122,6 @@ addTemplatePacking( $session );
 ###############################################################
 ##   7.7.5 - 7.7.6
 ###############################################################
-addTemplateAttachmentsTable($session);
 addMobileStyleTemplate( $session );
 revertUsePacked( $session );
 addEuVatDbColumns( $session );
@@ -1437,6 +1438,22 @@ sub addTemplateAttachmentsTable {
     print "Done.\n" unless $quiet;
 }
 
+sub reKeyTemplateAttachments {
+    my $session = shift;
+    print "\tChanging the key structure for the template attachments table... " unless $quiet;
+    # and here's our code
+    $session->db->write('ALTER TABLE template_attachments ADD COLUMN attachId CHAR(22) BINARY NOT NULL');
+    my $rh = $session->db->read('select url, templateId, revisionDate from template_attachments');
+    my $wh = $session->db->prepare('update template_attachments set attachId=? where url=? and templateId=? and revisionDate=?');
+    while (my @key = $rh->array) {
+        $wh->execute([$session->id->generate, @key ]);
+    }
+    $rh->finish;
+    $wh->finish;
+    $session->db->write('ALTER TABLE template_attachments DROP PRIMARY KEY');
+    $session->db->write('ALTER TABLE template_attachments ADD PRIMARY KEY (attachId)');
+    print "DONE!\n" unless $quiet;
+}
 #----------------------------------------------------------------------------
 # Rollback usePacked. It should be carefully applied manually for now
 sub revertUsePacked {
