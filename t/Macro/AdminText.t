@@ -14,22 +14,14 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::AdminText;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-my $numTests = 6 + 1;
-
-plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::AdminText';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+plan tests => 6;
 
 my $output;
 
@@ -54,5 +46,3 @@ is($output, undef, 'undef text');
 $session->var->switchAdminOff;
 $output = WebGUI::Macro::AdminText::process($session, 'admin');
 is($output, '', 'user is admin, not in admin mode');
-
-}

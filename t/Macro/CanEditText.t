@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 use Test::More; # increment this value for each test you create
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
-my ($versionTag, $asset, $group, @users) = setupTest($session, $homeAsset);
+my ($asset, $group, @users) = setupTest($session, $homeAsset);
 
 my @testSets = (
 	{
@@ -111,17 +111,6 @@ sub setupTest {
 	$users[1]->addToGroups([$cm->getId]);
 	##User 2 is a member of a content manager sub-group
 	$users[2]->addToGroups([$editGroup->getId]);
-	return ($versionTag, $asset, $editGroup, @users);
-}
-
-END { ##Clean-up after yourself, always
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
-	foreach my $testGroup ($group) {
-		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
-	}
-	foreach my $dude (@users) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
+    addToCleanup($versionTag, $editGroup, @users);
+	return ($asset, $editGroup, @users);
 }
