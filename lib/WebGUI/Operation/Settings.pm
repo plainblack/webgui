@@ -520,6 +520,7 @@ sub definition {
         groupIdAdminActiveSessions
         groupIdAdminAdSpace
         groupIdAdminCache
+        groupIdAdminClipboard
         groupIdAdminCron
         groupIdAdminDatabaseLink
         groupIdAdminFilePump
@@ -534,6 +535,7 @@ sub definition {
         groupIdAdminReplacements
         groupIdAdminSpectre
         groupIdAdminStatistics
+        groupIdAdminTrash
         groupIdAdminUser
         groupIdAdminUserAdd
         groupIdAdminVersionTag

@@ -163,6 +163,11 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Success message',
     },
+    'select a point' => {
+        message     => "Select a point",
+        lastUpdated => 0,
+        context     => "Choose from the list of points that existon the map",
+    },
     'assetName' => {
         message     => "Map",
         lastUpdated => 0,

@@ -122,9 +122,7 @@ $mail = WebGUI::Mail::Send->create( $session, {
 });
 $mail->addHeaderField('List-ID', "H\x{00C4}ufige Fragen");
 my $messageId = $mail->queue;
-diag $messageId;
 my $dbMail = WebGUI::Mail::Send->retrieve($session, $messageId);
-diag ref $dbMail;
 is($dbMail->getMimeEntity->head->get('List-ID'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", 'addHeaderField: handles utf-8 correctly');
 
 # TODO: Test that addHtml creates a body with the right content type
@@ -337,7 +335,7 @@ $mail->send;
 is(scalar @mailIds, $startingMessages+2, 'sending a message with a group added two messages');
 
 @mailIds = $session->db->buildArray("select messageId from mailQueue where message like ?",['%Mail::Send test message%']);
-is(scalar @mailIds, $startingMessages+2, 'sending a message with a group added the right two messages');
+is(scalar @mailIds, 2, 'sending a message with a group added the right two messages');
 
 my @emailAddresses = ();
 foreach my $mailId (@mailIds) {

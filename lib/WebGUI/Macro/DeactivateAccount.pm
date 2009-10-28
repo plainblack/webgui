@@ -34,7 +34,7 @@ The text displayed to the user for this link.  If this is blank an international
 
 =head3 linkonly
 
-The url for a template from the Macro/DeactivateAccount namespace to use for formatting the link.
+If true, it will return only the URL for deactivating a user account.
 
 =cut
 

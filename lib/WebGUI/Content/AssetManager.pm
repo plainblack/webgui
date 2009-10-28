@@ -169,56 +169,56 @@ sub getMoreMenu {
     # These links are shown based on UI level
     if ( $userUiLevel >= $toolbarUiLevel->{ "changeUrl" } ) {
         push @more_fields, {
-            url     => '<url>?func=changeUrl;proceed=manageAssets', 
+            url     => 'func=changeUrl;proceed=manageAssets', 
             label   => $i18n->get( 'change url' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "editBranch" } ) {
         push @more_fields, {
-            url     => '<url>?func=editBranch', 
+            url     => 'func=editBranch', 
             label   => $i18n->get( 'edit branch' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "shortcut" } ) {
         push @more_fields, {
-            url     => '<url>?func=createShortcut;proceed=manageAssets', 
+            url     => 'func=createShortcut;proceed=manageAssets', 
             label   => $i18n->get( 'create shortcut' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "revisions" } ) {
         push @more_fields, {
-            url     => '<url>?func=manageRevisions',
+            url     => 'func=manageRevisions',
             label   => $i18n->get( 'revisions' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "view" } ) {
         push @more_fields, {
-            url     => '<url>',
+            url     => '',
             label   => $i18n->get( 'view' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "edit" } ) {
         push @more_fields, {
-            url     => '<url>?func=edit;proceed=manageAssets',
+            url     => 'func=edit;proceed=manageAssets',
             label   => $i18n->get( 'edit' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "lock" } ) {
         push @more_fields, {
-            url     => '<url>?func=lock;proceed=manageAssets',
+            url     => 'func=lock;proceed=manageAssets',
             label   => $i18n->get( 'lock' ),
         };
     }
 
     if ( $session->config->get("exportPath") && $userUiLevel >= $toolbarUiLevel->{"export"} ) {
         push @more_fields, {
-            url     => '<url>?func=export',
+            url     => 'func=export',
             label   => $i18n->get( 'Export Page' ),
         };
     }

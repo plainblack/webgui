@@ -3904,6 +3904,15 @@ LongTruncOk=1</p>
     },
 
 
+    'settings groupIdAdminClipboard label' => {
+        message     => q{Clipboard},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminClipboard hoverHelp' => {
+        message     => q{Group to manage the system clipboard.},
+        lastUpdated => 0,
+    },
+
 
     'settings groupIdAdminCron label' => {
         message     => q{Cron},
@@ -4048,6 +4057,15 @@ LongTruncOk=1</p>
     },
     'settings groupIdAdminStatistics hoverHelp' => {
         message     => q{Group to view statistics},
+        lastUpdated => 0,
+    },
+
+    'settings groupIdAdminTrash label' => {
+        message     => q{Trash},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminTrash hoverHelp' => {
+        message     => q{Group to manage the system trash.},
         lastUpdated => 0,
     },
 

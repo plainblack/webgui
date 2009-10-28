@@ -388,6 +388,8 @@ sub view {
         var mapId           = "%s";
         var mapUrl          = "%s";
         var map             = new GMap2( document.getElementById("map_" + mapId) );
+        map.url             = mapUrl;
+        map.assetId         = mapId;
         map.setCenter(new GLatLng(%s, %s), %s);
         map.setUIToDefault();
         map.extrasUrl       = "%s";
@@ -414,7 +416,7 @@ ENDHTML
         }
 
         $mapHtml    .= <<'ENDHTML';
-            markermanager.addMarkers( WebGUI.Map.preparePoints(map, markermanager, mapUrl, points), 0 );
+            markermanager.addMarkers( WebGUI.Map.preparePoints(map, markermanager, points), 0 );
 ENDHTML
     }
 
@@ -434,13 +436,13 @@ ENDHTML
         if ( document.getElementById( "setCenter_" + mapId ) ) {
             var button = document.getElementById( "setCenter_" + mapId );
             GEvent.addDomListener( button, "click", function () { 
-                WebGUI.Map.setCenter( map, mapUrl );
+                WebGUI.Map.setCenter( map );
             } );
         }
         if ( document.getElementById( "addPoint_" + mapId ) ) {
             var button = document.getElementById( "addPoint_" + mapId );
             GEvent.addDomListener( button, "click", function () {
-                WebGUI.Map.editPoint( map, markermanager, mapUrl );
+                WebGUI.Map.editPoint( map, markermanager );
             } );
         }
     });
@@ -461,6 +463,18 @@ ENDHTML
         = WebGUI::Form::Button( $session, {
             value       => $i18n->get("set default viewing area label"),
             id          => sprintf( 'setCenter_%s', $self->getId ),
+        } );
+
+    # Select box to choose a map point
+    tie my %selectPointOptions, 'Tie::IxHash', (
+        ""      => '-- ' . $i18n->get('select a point'),
+        map { $_->{assetId} => $_->{title} } sort { $a->{title} cmp $b->{title} } @{$var->{mapPoints}},
+    );
+    $var->{ selectPoint }
+        = WebGUI::Form::selectBox( $session, {
+            extras      => q{onchange="WebGUI.Map.focusOn(this.options[this.selectedIndex].value);"},
+            id          => sprintf( q{selectPoint_%s}, $self->getId ),
+            options     => \%selectPointOptions,
         } );
 
     return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
@@ -556,8 +570,19 @@ sub www_ajaxEditPointSave {
     my $errors  = $asset->processAjaxEditForm;
 
     # Commit!
-    if ($asset->getAutoCommitWorkflowId && $self->hasBeenCommitted) {
-        $asset->requestAutoCommit;
+    if ( $asset->getAutoCommitWorkflowId ) {
+        if ( $self->hasBeenCommitted) {
+            $asset->requestAutoCommit;
+        }
+        else {
+            # Add mappoint to map's version tag
+            my $oldTagId = $asset->get('tagId');
+            $asset->setVersionTag( $self->get('tagId') );
+            my $oldTag = WebGUI::VersionTag->new( $session, $oldTagId );
+            if ( $oldTag->getAssetCount <= 0 ) {
+                $oldTag->rollback;
+            }
+        }
     }
 
     # Encode entities because we're returning as HTML
