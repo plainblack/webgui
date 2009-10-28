@@ -96,7 +96,7 @@ sub fixBadVarCharColumns {
 sub reKeyTemplateAttachments {
     my $session = shift;
     print "\tChanging the key structure for the template attachments table... " unless $quiet;
-    my $columnExists = $session->db->dbh->column_info(undef, undef, 'template_attachments', 'attachId');
+    my $columnExists = $session->db->dbh->column_info(undef, undef, 'template_attachments', 'attachId')->fetchrow_hashref;
     if (! $columnExists) {
         # and here's our code
         $session->db->write('ALTER TABLE template_attachments ADD COLUMN attachId CHAR(22) BINARY NOT NULL');
