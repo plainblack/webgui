@@ -1,3 +1,5 @@
+7.7.24
+
 7.7.23
  - fixed #11126: WebGUI database has varchar fields
  - fixed #10989: DataForm List: No pagination
