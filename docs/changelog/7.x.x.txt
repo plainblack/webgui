@@ -17,6 +17,7 @@
  - fixed #10887: Map Point dropdown doesn't update
  - fixed #11172: Collaboration broken vars: isSecond, isThird etc.
  - fixed #11165: DatePicker broken in IE7
+ - added: Manage System Clipboard group setting
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)

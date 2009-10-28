@@ -520,6 +520,7 @@ sub definition {
         groupIdAdminActiveSessions
         groupIdAdminAdSpace
         groupIdAdminCache
+        groupIdAdminClipboard
         groupIdAdminCron
         groupIdAdminDatabaseLink
         groupIdAdminFilePump

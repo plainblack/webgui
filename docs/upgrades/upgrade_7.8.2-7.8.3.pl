@@ -33,7 +33,17 @@ my $session = start(); # this line required
 # upgrade functions go here
 reKeyTemplateAttachments($session);
 addSelectPaymentGatewayTemplateToSettings($session);
+addClipboardAdminSetting($session);
+
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addClipboardAdminSetting {
+    my $session = shift;
+    print "\tAdding clipboard admin setting... " unless $quiet;
+    $session->setting->add('groupIdAdminClipboard', 3);
+    print "Done.\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------

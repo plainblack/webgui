@@ -3904,6 +3904,15 @@ LongTruncOk=1</p>
     },
 
 
+    'settings groupIdAdminClipboard label' => {
+        message     => q{Clipboard},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminClipboard hoverHelp' => {
+        message     => q{Group to manage the system clipboard.},
+        lastUpdated => 0,
+    },
+
 
     'settings groupIdAdminCron label' => {
         message     => q{Cron},

@@ -444,7 +444,7 @@ sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));
-	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && $self->session->user->isAdmin))}) {
+	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && $self->session->user->isInGroup($self->session->setting->get('groupIdAdminClipboard'))))}) {
 		$asset->trash;
 	}
 	return $self->www_manageClipboard();
@@ -464,20 +464,29 @@ sub www_manageClipboard {
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my $i18n = WebGUI::International->new($self->session, "Asset");
-	my ($header,$limit);
-	if ($self->session->form->process("systemClipboard") && $self->session->user->isAdmin) {
-		$header = $i18n->get(966);
-		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), $i18n->get(949));
-		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), $i18n->get(959), 
-			'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
-	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageClipboard;systemClipboard=1'), $i18n->get(954));
-		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), $i18n->get(950),
-			'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
-		$limit = 1;
-	}
-$self->session->style->setLink($self->session->url->extras('assetManager/assetManager.css'), {rel=>"stylesheet",type=>"text/css"});
-        $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'), {type=>"text/javascript"});
+
+    my $header;
+    my $limit = 1;
+
+    my $canAdmin = $self->session->user->isInGroup($self->session->setting->get('groupIdAdminClipboard'));
+    if ($self->session->form->process("systemClipboard") && $canAdmin) {
+        $header = $i18n->get(966);
+        $ac->addSubmenuItem($self->getUrl('func=manageClipboard'), $i18n->get(949));
+        $ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), $i18n->get(959), 
+            'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
+        $limit = undef;
+    }
+    elsif ( $canAdmin ) {
+        $ac->addSubmenuItem($self->getUrl('func=manageClipboard;systemClipboard=1'), $i18n->get(954));
+        $ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), $i18n->get(950),
+            'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
+    }
+    else {
+        $ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), $i18n->get(950),
+            'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
+    }
+    $self->session->style->setLink($self->session->url->extras('assetManager/assetManager.css'), {rel=>"stylesheet",type=>"text/css"});
+    $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'), {type=>"text/javascript"});
         my $output = "
    <script type=\"text/javascript\">
    //<![CDATA[
