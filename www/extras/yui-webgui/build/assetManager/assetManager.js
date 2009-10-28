@@ -49,9 +49,9 @@ WebGUI.AssetManager.buildMoreMenu = function ( url, linkElement, isNotLocked ) {
     var menuItems   = [];
     var isLocked    = !isNotLocked;
     for ( var i = 0; i < rawItems.length; i++ ) {
-        var itemUrl     = rawItems[i].url.match( /<url>/ )
-                        ? rawItems[i].url.replace( /<url>(?:\?(.*))?/, WebGUI.AssetManager.appendToUrl(url, "$1") )
-                        : url + rawItems[i].url
+        var itemUrl     = rawItems[i].url
+                        ? WebGUI.AssetManager.appendToUrl(url, rawItems[i].url)
+                        : url
                         ;
         if (! (itemUrl.match( /func=edit;/) && isLocked )) {
             menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
