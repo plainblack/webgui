@@ -19,6 +19,7 @@
  - fixed #11165: DatePicker broken in IE7
  - added: Manage System Clipboard group setting
  - added: Manage System Trash group setting
+ - fixed #11069: "More" options menu in asset manager 
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
