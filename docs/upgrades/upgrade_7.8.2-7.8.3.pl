@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Utility;
 
 
 my $toVersion = '7.8.3';
@@ -35,6 +36,8 @@ reKeyTemplateAttachments($session);
 addSelectPaymentGatewayTemplateToSettings($session);
 addClipboardAdminSetting($session);
 addTrashAdminSetting($session);
+addPickLanguageMacro($session);
+installSetLanguage($session);
 
 finish($session); # this line required
 
@@ -90,6 +93,30 @@ sub addSelectPaymentGatewayTemplateToSettings {
 #    print "DONE!\n" unless $quiet;
 #}
 
+#------------------------------------------------------------------------
+sub addPickLanguageMacro {
+    my $session = shift;
+    print "\tAdding Pick Language macro... " unless $quiet;
+    $session->config->set('macros/PickLanguage', 'PickLanguage');
+    print "Done.\n" unless $quiet;
+}
+
+sub installSetLanguage {
+    my $session = shift;
+    print "\tAdding SetLanguage content handler... " unless $quiet;
+    ##Content Handler
+    my $contentHandlers = $session->config->get('contentHandlers');
+    if (!isIn('WebGUI::Content::SetLanguage', @{ $contentHandlers }) ) {
+        my @newHandlers = ();
+        foreach my $handler (@{ $contentHandlers }) {
+            push @newHandlers, $handler;
+            push @newHandlers, 'WebGUI::Content::SetLanguage' if
+                $handler eq 'WebGUI::Content::PassiveAnalytics';
+        }
+        $session->config->set('contentHandlers', \@newHandlers);
+    }
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
