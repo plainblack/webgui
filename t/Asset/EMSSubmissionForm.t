@@ -38,7 +38,7 @@ my @cleanup = ();
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 50;        # Increment this number for each test you create
+plan tests => 60;        # Increment this number for each test you create
 
 (my $submitGroupA = WebGUI::Group->new($session,'new'))->name('groupA');
 (my $submitGroupB = WebGUI::Group->new($session,'new'))->name('groupB');
@@ -248,10 +248,10 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           records => [
                          {
                            lastReplyDate => '',
-                           submissionId => '4',
+                           submissionId => '5',
                            creationDate => ignore(),
                            createdBy => 'userA',
-                           url => '/test-ems?func=viewSubmissionQueue#4',
+                           url => '/test-ems?func=viewSubmissionQueue#5',
                            submissionStatus => $i18n->get('pending'),
                            title => 'my favorite thing to talk about',
                            lastReplyBy => ''
@@ -261,6 +261,12 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           recordsReturned => 25,
           dir => 'DESC',
 }, 'test getAllSubmissions for UserA' );
+
+$session->request->setup_body({submissionId => 5});
+cmp_deeply( from_json($ems->www_getSubmissionById), {
+    submissionId => 5,
+    itemText => ignore(),
+}, 'test getSubmissionById');
 
 loginUserC;
 cmp_deeply( from_json($ems->www_getAllSubmissions), {
@@ -281,20 +287,20 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           records => [
                          {
                            lastReplyDate => '',
-                           submissionId => '5',
+                           submissionId => '6',
                            creationDate => ignore(),
                            createdBy => 'userB',
-                           url => '/test-ems?func=viewSubmissionQueue#5',
+                           url => '/test-ems?func=viewSubmissionQueue#6',
                            submissionStatus => $i18n->get('pending'),
                            title => 'why i like to be important',
                            lastReplyBy => ''
                          },
                          {
                            lastReplyDate => '',
-                           submissionId => '4',
+                           submissionId => '5',
                            creationDate => ignore(),
                            createdBy => 'userA',
-                           url => '/test-ems?func=viewSubmissionQueue#4',
+                           url => '/test-ems?func=viewSubmissionQueue#5',
                            submissionStatus => $i18n->get('pending'),
                            title => 'my favorite thing to talk about',
                            lastReplyBy => ''

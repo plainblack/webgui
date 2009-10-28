@@ -37,10 +37,12 @@ WebGUI.EMS = function (configs) {
     if(configs) {
         this._configs = configs;
     }
+    this.url = this._configs.url;
 
     if(!this._configs.initRequestString) {
         this._configs.initRequestString = ';startIndex=0';
     }
+    WebGUI.EMS.Items = new Object();
 
     ///////////////////////////////////////////////////////////////
     //              Internationalization
@@ -77,21 +79,22 @@ WebGUI.EMS = function (configs) {
         var index;
         if( typeof(e) == "string" || typeof(e) == "number" ) {
             index = e;
-            myTab = WebGUI.EMS.Tickets[index].Tab;
+            myTab = WebGUI.EMS.Items[index].Tab;
         } else {
             if( typeof(e) != "undefined" ) {
                 YAHOO.util.Event.preventDefault(e);
             }
             if( typeof(myTab) == "undefined" ) {
-                myTab = tabView.get('activeTab');
+                myTab = WebGUI.EMS.Tabs.get('activeTab');
 	    }
             index = parseInt( myTab.get('label') );
         }
-        delete WebGUI.EMS.Tickets[index];
+        delete WebGUI.EMS.Items[index];
         WebGUI.EMS.Tabs.removeTab(myTab);
         if( WebGUI.EMS.lastTab ) {
 	   WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.lastTab);
         }
+	window.location.hash = '';
     };
 
     //***********************************************************************************
@@ -171,47 +174,26 @@ WebGUI.EMS = function (configs) {
     }
 
     //***********************************************************************************
-    //  This method is subscribed to by the DataTable and thus becomes a member of the DataTable
-    //  class even though it is a member of the EMS Class.  For this reason, a EMS instance
-    //  is actually passed to the method as it's second parameter.
+    // This method does the actual work of loading an item into a tab
     //
-    WebGUI.EMS.loadTicket = function ( evt, obj ) {
-               // if the user pressed a modifier key we want to default
-        if( eventModifiers( evt ) ) { return }
-        var target = evt.target;
-	if( typeof(WebGUI.EMS.Tickets) == "undefined" ) {
-	    WebGUI.EMS.Tickets = new Object();
-	}
-        
-        //let the default action happen if the user clicks the last reply column
-        var links = YAHOO.util.Dom.getElementsByClassName ("profile_link","a",target);
-
+    WebGUI.EMS.loadItem = function ( submissionId, pathname ) {
         //  the 'loading' 'indicator'
-        if( typeof(WebGUI.EMS.ticketLoadingIndicator) == "undefined" ) {
-            WebGUI.EMS.ticketLoadingIndicator = new YAHOO.widget.Overlay( "ticketLoadingIndicator", {  
+        if( typeof(WebGUI.EMS.loadingIndicator) == "undefined" ) {
+            WebGUI.EMS.loadingIndicator = new YAHOO.widget.Overlay( "loadingIndicator", {  
                 fixedcenter         : true,
                 visible             : false
            } );
-            WebGUI.EMS.ticketLoadingIndicator.setBody( "Loading Ticket ..." +
-		"<img id='ticketLoadingIndicator' title='loading' src='/extras/wobject/EMS/indicator.gif'/>"
+            WebGUI.EMS.loadingIndicator.setBody( "Loading ..." +
+		"<img id='loadingIndicator' title='Loading' src='/extras/wobject/EMS/indicator.gif'/>"
 		);
-	    WebGUI.EMS.ticketLoadingIndicator.render(document.body);
+	    WebGUI.EMS.loadingIndicator.render(document.body);
         }
-        WebGUI.EMS.ticketLoadingIndicator.show();
-        
-        if (links.length == 0) {
-            YAHOO.util.Event.stopEvent(evt.event);
-        }
+        WebGUI.EMS.loadingIndicator.show();
 
-        var elCell = this.getTdEl(target);
-        if(elCell) {
-            var oRecord = this.getRecord(elCell);
-            
-            if( typeof( WebGUI.EMS.Tickets[oRecord.ticketId] ) != "undefined" ) {
-	        WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.Tickets[oRecord.ticketId].Tab);
-	        WebGUI.EMS.ticketLoadingIndicator.hide();
-	    }  else {
-		var url     = oRecord.getData('url') + "?func=view;caller=ticketMgr;view=" + obj._configs.view;
+             if( typeof(pathname) == "undefined" ) {
+	          pathname =  WebGUI.EMS.url ;
+             }
+		var url     = pathname + "?func=getSubmissionById;submissionId=" + submissionId;
 	     
 		// Create callback object for the request
 		var oCallback = {
@@ -225,42 +207,71 @@ WebGUI.EMS = function (configs) {
 			       }
 			       alert(message);
 			       return;
-			   } else if( typeof(WebGUI.EMS.Tickets[response.ticketId]) == "undefined" 
-				      || WebGUI.EMS.Tickets[response.ticketId] == null ) {
+			   } else if( typeof(WebGUI.EMS.Items[response.submissionId]) == "undefined" 
+				      || WebGUI.EMS.Items[response.submissionId] == null ) {
 			       // if there is a tab .. close it,
 			       // at least until I can get the JS/HTML re-written to handle multiple tabs
 			       //  there should only be one
 			       for( var ticketId in WebGUI.EMS.Tickets ) { WebGUI.EMS.closeTab(ticketId) }
 			       var myContent = document.createElement("div");
-			       myContent.innerHTML = response.ticketText;
+			       myContent.innerHTML = response.itemText;
 			       myTab = new YAHOO.widget.Tab({
-				     label: response.ticketId + '<span class="close"><img src="/extras/wobject/EMS/close12_1.gif" alt="X" title="' +
+				     label: response.submissionId + '<span class="close"><img src="/extras/wobject/EMS/close12_1.gif" alt="X" title="' +
                                             WebGUI.EMS.i18n.get('Asset_EMSSubmission','close tab') + '" /></span>',
 				     contentEl: myContent
 				 });
 			       WebGUI.EMS.Tabs.addTab( myTab );
 			       YAHOO.util.Event.on(myTab.getElementsByClassName('close')[0], 'click', WebGUI.EMS.closeTab , myTab);
-			       WebGUI.EMS.Tickets[response.ticketId] = new Object();
-			       WebGUI.EMS.Tickets[response.ticketId].Tab = myTab;
+			       WebGUI.EMS.Items[response.submissionId] = new Object();
+			       WebGUI.EMS.Items[response.submissionId].Tab = myTab;
 			   } else {
-			       myTab = WebGUI.EMS.Tickets[response.ticketId].Tab;
-			       myTab.set('content', response.ticketText);
+			       myTab = WebGUI.EMS.Tickets[response.submissionId].Tab;
+			       myTab.set('content', response.itemText);
 			   }
 			   // make sure the script on the ticket has run
-			   if( typeof( WebGUI.ticketJScriptRun ) == "undefined" ) {
-			       eval( document.getElementById("ticketJScript").innerHTML );
-			   }
-			   delete WebGUI.ticketJScriptRun;
-			   WebGUI.EMS.ticketLoadingIndicator.hide();
-			   WebGUI.EMS.lastTab = tabView.get('activeTab');
+			   // if( typeof( WebGUI.ticketJScriptRun ) == "undefined" ) {
+			       // eval( document.getElementById("ticketJScript").innerHTML );
+			   // }
+			   // delete WebGUI.ticketJScriptRun;
+			   WebGUI.EMS.loadingIndicator.hide();
+			   WebGUI.EMS.lastTab = WebGUI.EMS.Tabs.get('activeTab');
 			   WebGUI.EMS.Tabs.set('activeTab',myTab);
 		       },
 		    failure: function(o) {
-			   WebGUI.EMS.ticketLoadingIndicator.hide();
+			   WebGUI.EMS.loadingIndicator.hide();
+			    alert("AJAX call failed");
 		       }
 		};
 		var request = YAHOO.util.Connect.asyncRequest('GET', url, oCallback); 
-	    }
+    };
+
+    //***********************************************************************************
+    //  This method is subscribed to by the DataTable and thus becomes a member of the DataTable
+    //  class even though it is a member of the EMS Class.  For this reason, a EMS instance
+    //  is actually passed to the method as it's second parameter.
+    //
+    WebGUI.EMS.loadItemFromTable = function ( evt, obj ) {
+               // if the user pressed a modifier key we want to default
+        if( eventModifiers( evt ) ) { return }
+        var target = evt.target;
+        
+        //let the default action happen if the user clicks the last reply column
+        var links = YAHOO.util.Dom.getElementsByClassName ("profile_link","a",target);
+
+        if (links.length == 0) {
+            YAHOO.util.Event.stopEvent(evt.event);
+        }
+
+        var elCell = this.getTdEl(target);
+        if(elCell) {
+            var oRecord = this.getRecord(elCell);
+
+            if( typeof( WebGUI.EMS.Items[oRecord.submissionId] ) != "undefined" ) {
+	        WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.Items[oRecord.submissionId].Tab);
+	        WebGUI.EMS.loadingIndicator.hide();
+	    }  else {
+		WebGUI.EMS.loadItem( oRecord.submissionId );
+            }
         } else {
             alert("Could not get table cell for " + target);
         }
@@ -327,7 +338,7 @@ WebGUI.EMS = function (configs) {
         );
         this.EMSQ.subscribe("rowMouseoverEvent", this.EMSQ.onEventHighlightRow);
         this.EMSQ.subscribe("rowMouseoutEvent", this.EMSQ.onEventUnhighlightRow);
-        this.EMSQ.subscribe("cellClickEvent",WebGUI.EMS.loadTicket,this);
+        this.EMSQ.subscribe("cellClickEvent",WebGUI.EMS.loadItemFromTable,this);
         // Override function for custom server-side sorting
         this.EMSQ.sortColumn = WebGUI.EMS.sortColumn;
         this.EMSQ.handleDataReturnPayload = function (oReq, oRes, oPayload ) {

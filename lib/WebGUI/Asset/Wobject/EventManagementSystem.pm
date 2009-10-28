@@ -258,7 +258,7 @@ sub definition {
         nextSubmissionId => {
             tab          => "properties",
             fieldType    => "integer",
-            defaultValue => 0,
+            defaultValue => 1,
             label        => $i18n->get("next submission id label"),
             hoverHelp    => $i18n->get("next submission id label help")
         },
@@ -1275,7 +1275,7 @@ sub www_getAllSubmissions {
 
         my %fields      = (
             submissionId  => $asset->get("submissionId"),
-            url           => $asset->getUrl,
+            url           => $asset->getQueueUrl,
             title         => $asset->get( "title" ),
             createdBy     => WebGUI::User->new($session,$asset->get( "createdBy" ))->username,
             creationDate  => $datetime->epochToSet($asset->get( "creationDate" )),
@@ -1325,6 +1325,35 @@ sub www_getBadgesAsJson {
     $results{'dir'}        = "asc";
     $session->http->setMimeType('application/json');
     return JSON->new->encode(\%results);
+}
+
+#-------------------------------------------------------------------
+
+=head2  www_getSubmissionById
+
+returns a JSON dataset with info about the requested submission
+
+=cut
+
+
+sub www_getSubmissionById {
+   my $self = shift;
+   my $submissionId = $self->session->form->get('submissionId');
+   my $result;
+   my $res = $self->getLineage(['descendants'],{ limit => 1, returnObjects=>1,
+	 includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
+         joinClass          => "WebGUI::Asset::EMSSubmission",
+	 whereClause => q{submissionId='} . $submissionId . q/'/,
+     } );
+   if( scalar(@$res) == 0 ) {
+       $result->{hasError} = 1;
+       $result->{errors} = [ 'failed to load submission' ];
+   } else {
+       $result->{itemText} = $res->[0]->www_editSubmission;
+       $result->{submissionId} = $submissionId;
+   }
+    $self->session->http->setMimeType('application/json');
+    return JSON->new->encode($result);
 }
 
 #-------------------------------------------------------------------
@@ -2519,7 +2548,8 @@ sub www_viewSubmissionQueue {
                $self->processTemplate({
                       backUrl => $self->getUrl,
 		      isRegistrationStaff => $isRegistrationStaff,
-		canEdit						=> $canEdit,
+		      canEdit		=> $canEdit,
+		      mainUrl    => $self->getUrl,
 		      canSubmit => $canSubmit,
 		      hasSubmissionForms => $self->hasSubmissionForms,
 		      getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
@@ -2528,8 +2558,8 @@ sub www_viewSubmissionQueue {
 		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
                   },$self->get('eventSubmissionQueueTemplateId'));
 
-	return $self->processStyle(
-               $self->processTemplate({
+	return $self->processStyle( 
+               $self->processTemplate({ 
                       queueTabTitle   => $isRegistrationStaff ? $i18n->get('submission queue') : $i18n->get('my submissions'),
                       queueTabData   => $QueueTabData,
                       backUrl => $self->getUrl,

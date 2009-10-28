@@ -228,11 +228,19 @@ sub drawLocationField {
         my ($self, $params) = @_;
 	my $ems = $self->ems;
 	my $options = { map { $_ => $_ } ( @{ $ems->getSubmissionLocations || [ $ems->getLocations ] } ) } ;
-        return WebGUI::Form::combo($self->session, {
-                name    => 'location',
-                value   => $self->get('location'),
-                options => $options,
-	    });
+	if( $ems->isRegistrationStaff ) {
+	    return WebGUI::Form::combo($self->session, {
+		    name    => 'location',
+		    value   => $self->get('location'),
+		    options => $options,
+		});
+	} else {
+	    return WebGUI::Form::selectBox($self->session, {
+		    name    => 'location',
+		    value   => $self->get('location'),
+		    options => $options,
+		});
+	}
 }
 
 #-------------------------------------------------------------------
@@ -492,13 +500,13 @@ sub getEditTabs {
 }
 
 #-------------------------------------------------------------------
-=head2 getUrl
+=head2 getQueueUrl
 
 returns the URL for the submission queue page with the submisison id in the hash part
 
 =cut
 
-sub getUrl {
+sub getQueueUrl {
     my $self = shift;
     return $self->ems->getUrl('func=viewSubmissionQueue#' . $self->get('submissionId') );
 }
