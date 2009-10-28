@@ -392,15 +392,18 @@ sub www_manageTrash {
 	my $ac = WebGUI::AdminConsole->new($self->session,"trash");
 	my $i18n = WebGUI::International->new($self->session,"Asset");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
-	my ($header, $limit);
-        $ac->setHelp("trash manage");
-	if ($self->session->form->process("systemTrash") && $self->session->user->isAdmin) {
+    $ac->setHelp("trash manage");
+    my $header;
+    my $limit = 1;
+    my $canAdmin = $self->session->user->isInGroup($self->session->setting->get('groupIdAdminTrash'));
+    if ($self->session->form->process("systemTrash") && $canAdmin) {
 		$header = $i18n->get(965);
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), $i18n->get(10,"WebGUI"));
-	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), $i18n->get(964));
-		$limit = 1;
+        $limit = undef;
 	}
+    elsif ( $canAdmin ) {
+        $ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), $i18n->get(964));
+    }
   	$self->session->style->setLink($self->session->url->extras('assetManager/assetManager.css'), {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'), {type=>"text/javascript"});
 	my $output = "

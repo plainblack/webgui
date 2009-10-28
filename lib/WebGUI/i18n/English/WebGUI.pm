@@ -4060,6 +4060,15 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
+    'settings groupIdAdminTrash label' => {
+        message     => q{Trash},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminTrash hoverHelp' => {
+        message     => q{Group to manage the system trash.},
+        lastUpdated => 0,
+    },
+
     'settings groupIdAdminUser label' => {
         message     => q{Users},
         lastUpdated => 0,

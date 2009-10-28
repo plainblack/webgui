@@ -535,6 +535,7 @@ sub definition {
         groupIdAdminReplacements
         groupIdAdminSpectre
         groupIdAdminStatistics
+        groupIdAdminTrash
         groupIdAdminUser
         groupIdAdminUserAdd
         groupIdAdminVersionTag

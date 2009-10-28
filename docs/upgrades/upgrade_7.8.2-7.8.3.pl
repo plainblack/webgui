@@ -34,6 +34,7 @@ my $session = start(); # this line required
 reKeyTemplateAttachments($session);
 addSelectPaymentGatewayTemplateToSettings($session);
 addClipboardAdminSetting($session);
+addTrashAdminSetting($session);
 
 finish($session); # this line required
 
@@ -42,6 +43,14 @@ sub addClipboardAdminSetting {
     my $session = shift;
     print "\tAdding clipboard admin setting... " unless $quiet;
     $session->setting->add('groupIdAdminClipboard', 3);
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addTrashAdminSetting {
+    my $session = shift;
+    print "\tAdding trash admin setting... " unless $quiet;
+    $session->setting->add('groupIdAdminTrash', 3);
     print "Done.\n" unless $quiet;
 }
 
