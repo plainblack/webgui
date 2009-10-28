@@ -74,7 +74,7 @@ defaults to 2 -- registered users
 =head4 daysBeforeCleanup ( optional )
 
 number fo days to leave denied/created status items in the database before deleting
-defaults t0 7
+defaults to 7
 
 =head4 deleteCreatedItems ( optional )
 
@@ -186,10 +186,10 @@ sub definition {
 		},
 		eventSubmissionMainTemplateId => {
 			fieldType 		=> 'template',
-			defaultValue 		=> 'ylBSKblMdKpcDSIK2t_Ang',
+			defaultValue 		=> 'DoVNijm6lMDE0cYrtvEbDQ',
 			tab			=> 'display',
-			label			=> $i18n->get('event submission form template'),
-			hoverHelp		=> $i18n->get('event submission form template help'),
+			label			=> $i18n->get('event submission main template'),
+			hoverHelp		=> $i18n->get('event submission main template help'),
 			namespace		=> 'EMS/SubmissionMain',
 		},
 		eventSubmissionTemplateId => {
@@ -246,7 +246,7 @@ sub definition {
 		submittedLocationsList => {
 			fieldType 		=> 'text',
 			tab			=> 'properties',
-			defaultValue 	        => $i18n->get('default submitted location list'),
+			defaultValue 	        => '',
 			label			=> $i18n->get('submitted location list label'),
 			hoverHelp		=> $i18n->get('submitted location list help'),
 		},
@@ -255,6 +255,13 @@ sub definition {
 			defaultValue 	        => '',
                         noFormPost              => 1,
 		},
+        nextSubmissionId => {
+            tab          => "properties",
+            fieldType    => "integer",
+            defaultValue => 0,
+            label        => $i18n->get("next submission id label"),
+            hoverHelp    => $i18n->get("next submission id label help")
+        },
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -416,6 +423,22 @@ sub getLocations {
 
 #-------------------------------------------------------------------
 
+=head2 getNextSubmissionId
+
+get a sequence number for the submission id
+
+=cut
+
+sub getNextSubmissionId {
+    my $self = shift;
+    #my $submissionId = $self->get('nextSubmissionId');
+    my ($submissionId) = $self->session->db->read('select nextSubmissionId from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
+    $self->update( { nextSubmissionId => ($submissionId + 1) } );
+    return $submissionId;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRegistrant ( badgeId )
 
 Returns a hash reference containing the properties of a registrant.
@@ -460,7 +483,7 @@ dav::log 'getSubmissionLocations:"', $text, '"';
 }
 
 #-------------------------------------------------------------------
-sub getStatus {
+sub getSubmissionStatus {
     my $self  = shift;
     my $key   = shift;
 
@@ -668,7 +691,8 @@ sub view {
 		addSubmissionFormUrl	=> $self->getUrl('func=addSubmissionForm'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
-		canEdit				=> $self->canEdit,
+		isRegistrationStaff				=> $self->isRegistrationStaff,
+		canEdit						=> $self->canEdit,
 		canSubmit			=> $self->canSubmit,
 		hasSubmissions			=> $self->hasSubmissions,
 		hasSubmissionForms			=> $self->hasSubmissionForms,
@@ -948,7 +972,7 @@ calls editSubmissionForm in WebGUI::Asset::EMSSubmissionForm
 
 sub www_editSubmissionForm {
 	my $self             = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
 	return WebGUI::Asset::EMSSubmissionForm->www_editSubmissionForm($self,shift);
 }
 
@@ -963,7 +987,7 @@ test and save data posted from editSubmissionForm...
 
 sub www_editSubmissionFormSave {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
 	my $formParams = WebGUI::Asset::EMSSubmissionForm->processForm($self);
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};
@@ -1184,7 +1208,7 @@ sub www_exportEvents {
 
 #----------------------------------------------------------------------------
 
-=head2 www_getAllSubmissions ( session )
+=head2 www_getAllSubmissions ( )
 
 Get a page of Asset Manager data, ajax style. Returns a JSON array to be
 formatted in a WebGUI submission queue data table.
@@ -1199,14 +1223,14 @@ sub www_getAllSubmissions {
     my $rowsPerPage = 25;
     my $tableInfo  = {};    
 
-    return $session->privilege->insufficient unless $self->canView;
+    return $session->privilege->insufficient unless $self->canSubmit || $self->isRegistrationStaff;
 
     my $orderByColumn    = $form->get( 'orderByColumn' ) || $self->get("sortColumn");
     my $dir              = $form->get('orderByDirection') || $self->get('sortOrder');
     my $orderByDirection = lc ($dir) eq "asc" ? "ASC" : "DESC";
 
     my $whereClause ;
-    if(!$self->canEdit) {    
+    if(!$self->isRegistrationStaff) {    
         my $userId     = $session->user->userId;
         $whereClause .= qq{ createdBy='$userId'};
     }
@@ -1255,7 +1279,7 @@ sub www_getAllSubmissions {
             title         => $asset->get( "title" ),
             createdBy     => WebGUI::User->new($session,$asset->get( "createdBy" ))->username,
             creationDate  => $datetime->epochToSet($asset->get( "creationDate" )),
-            submissionStatus => $self->getStatus($asset->get( "submissionStatus" ) || 'pending' ),
+            submissionStatus => $self->getSubmissionStatus($asset->get( "submissionStatus" ) || 'pending' ),
             lastReplyDate => $lastReplyDate || '',
             lastReplyBy   => $lastReplyBy || '',
         );
@@ -2485,19 +2509,39 @@ sub www_viewSchedule {
 
 sub www_viewSubmissionQueue {
 	my $self             = shift;
-    return $self->session->privilege->insufficient() unless $self->canSubmit || $self->canEdit;
+        my $isRegistrationStaff = $self->isRegistrationStaff;
+        my $canSubmit = $self->canSubmit;
+        my $canEdit = $self->canEdit;
+	my $i18n = $self->i18n;
+    return $self->session->privilege->insufficient() unless $canSubmit || $isRegistrationStaff;
 
-	return $self->processStyle(
+	my $QueueTabData = 
                $self->processTemplate({
                       backUrl => $self->getUrl,
-		      canEdit => $self->canEdit,
-		      canSubmit => $self->canSubmit,
+		      isRegistrationStaff => $isRegistrationStaff,
+		canEdit						=> $canEdit,
+		      canSubmit => $canSubmit,
 		      hasSubmissionForms => $self->hasSubmissionForms,
 		      getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
 		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
 		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
 		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
-                  },$self->get('eventSubmissionQueueTemplateId')));
+                  },$self->get('eventSubmissionQueueTemplateId'));
+
+	return $self->processStyle(
+               $self->processTemplate({
+                      queueTabTitle   => $isRegistrationStaff ? $i18n->get('submission queue') : $i18n->get('my submissions'),
+                      queueTabData   => $QueueTabData,
+                      backUrl => $self->getUrl,
+		      isRegistrationStaff => $isRegistrationStaff,
+		      canEdit			=> $canEdit,
+		      canSubmit => $canSubmit,
+		      hasSubmissionForms => $self->hasSubmissionForms,
+		      getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
+		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
+		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
+		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
+                  },$self->get('eventSubmissionMainTemplateId')));
 }
 
 1;

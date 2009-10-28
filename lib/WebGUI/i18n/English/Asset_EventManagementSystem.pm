@@ -2022,6 +2022,18 @@ normal templates.|,
         context => q|This is help text for the submitted location list field.|,
     },
 
+    'submission queue' => {
+        message => q|Submission Queue|,
+        lastUpdated => 1147050475,
+        context => q|Label for the submission list tab for registration staff.|,
+    },
+
+    'my submissions' => {
+        message => q|My Submissions|,
+        lastUpdated => 1147050475,
+        context => q|Label for the submission list tab for event submitters.|,
+    },
+
 #    'TODO' => {
 #        message => q|TODO|,
 #        lastUpdated => 1147050475,

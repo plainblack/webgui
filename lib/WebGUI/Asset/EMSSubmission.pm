@@ -286,7 +286,7 @@ sub drawStatusField {
         return WebGUI::Form::SelectBox($self->session, {
                 name    => 'location',
                 value   => $self->get('submissionStatus'),
-                options => $self->ems->getStatus,
+                options => $self->ems->getSubmissionStatus,
                 });
 }
 
@@ -315,7 +315,10 @@ returns the ems ansestor of this asset
 
 =cut
 
-sub ems { $_[0]->getParent->getParent }
+sub ems {
+    my $self = shift;
+    $self->getParent->getParent
+}
 
 #-------------------------------------------------------------------
 
@@ -389,16 +392,14 @@ dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
 
 	# for each field
 	for my $field ( values %$fields ) {
-	    if( $formDescription->{$field->{fieldId}} ) {
-dav::dump 'drawing fields:', $field;
-                if( $field->{fieldId} eq 'submissionStatus' ) {
-		    $field->{options} = $parent->getParent->getStatus;
-    dav::log 'set options for status';
-		}
-                if( $field->{fieldId} eq 'location' ) {
-		    $field->{options} = [ split( /\s*/, $parent->getParent->getLocations ) ];
-		    delete $field->{options} if scalar( @{$field->{options}} ) == 0 ;
-		}
+	    if( $formDescription->{$field->{fieldId}} || $asset->ems->isRegistrationStaff ) {
+		    my $drawMethod = __PACKAGE__ . '::' . $field->{customDrawMethod};
+		    if ($asset->can( $drawMethod )) {
+			$field->{value} = $asset->$drawMethod($field);
+			delete $field->{name}; # don't want readOnly to generate a hidden field
+			$field->{fieldType} = "readOnly";
+		    }
+ 
 	        $newform->dynamicField(%$field);
 	    } else {
 	        # TODO see that the data gets formatted
@@ -490,6 +491,17 @@ sub getEditTabs {
         return ($self->SUPER::getEditTabs(), ['shop', $sku_i18n->get('shop'), 9], ['comments', $i18n->get('comments'), 9]);
 }
 
+#-------------------------------------------------------------------
+=head2 getUrl
+
+returns the URL for the submission queue page with the submisison id in the hash part
+
+=cut
+
+sub getUrl {
+    my $self = shift;
+    return $self->ems->getUrl('func=viewSubmissionQueue#' . $self->get('submissionId') );
+}
 
 #-------------------------------------------------------------------
 
@@ -548,6 +560,7 @@ sub processForm {
         return {_isValid => 0, errors => [ { text => 'invalid function call' } ] };
     }
     my $params = {_isValid=>1};
+    # TODO
     # get description from parent
     # for each active field
         # get data from session->form

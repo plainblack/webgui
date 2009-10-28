@@ -94,7 +94,8 @@ my $ems = $node->addChild({
     url                      => '/test-ems',
     workflowIdCommit         => 'pbworkflow000000000003', # Commit Content Immediately
     registrationStaffGroupId => $registrars->getId,
-    groupIdView              => $attendees->getId
+    groupIdView              => $attendees->getId,
+    submittedLocationsList   => join( "\n", my @submissionLocations = qw'loc1 loc2' ),
 });
 # I scooped this out ot WG::Asset::Wobject::EventManagementSystem
 # its not pretty, but there is no other way to add a meta field
@@ -118,7 +119,14 @@ my $ems = $node->addChild({
                 defaultValues => '',
         },1,1);
 
+my $i18n = $ems->i18n;
 $versionTag->commit;
+
+my $id1 = $ems->getNextSubmissionId;
+my $id2 = $ems->getNextSubmissionId;
+my $id3 = $ems->getNextSubmissionId;
+my $id4 = $ems->getNextSubmissionId;
+is( $id1 +3, $id4, ' test getNextSubmissionId' );
 
 # quick test of addGroupToSubmitList
 is($ems->get('eventSubmissionGroups'),'', 'event submission groups is blank');
@@ -131,6 +139,10 @@ is($ems->get('eventSubmissionGroups'),'joe frank', 'event submission groups stil
 $ems->update({eventSubmissionGroups => ''});
 is($ems->get('eventSubmissionGroups'),'', 'event submission groups is reset to blank');
 
+is_deeply($ems->getSubmissionLocations, \@submissionLocations, 'test getSubmissionLocations' );
+is_deeply( $ems->getSubmissionStatus, {
+     map { $_ => $i18n->get($_) } ( qw/pending feedback failed approved created denied/ )
+}, 'test getSubmissionStatus' );
 
 $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag);
@@ -163,6 +175,7 @@ my $frmA = $ems->addSubmissionForm({
 isa_ok( $frmA, 'WebGUI::Asset::EMSSubmissionForm' );
 is( $ems->hasSubmissionForms, 1, 'ems now has forms' );
 is_deeply( $frmA->getFormDescription, $formAdesc, 'form description matches' );
+is( $frmA->ems->getId, $ems->getId, 'test ems access function in form' );
 
 my $formBdesc = {
     _fieldList => [ qw/title description duration mfRequiredUrl/ ],
@@ -205,7 +218,7 @@ push @cleanup, sub  { $sub1->delete; };
 print join( "\n", @{$sub1->{errors}} ),"\n" if defined $sub1->{errors};
 my $isa1 = isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "userA/formA valid submission succeeded" );
 ok( $ems->hasSubmissions, 'UserA has submissions on this ems' );
-
+is( $sub1->ems->getId, $ems->getId, 'test ems access function in submission' );
 loginUserB;
 
 ok( $ems->canSubmit, 'UserB can submit to this ems' );
@@ -227,6 +240,70 @@ loginUserC;
 ok( $ems->canSubmit, 'UserC can submit to this ems' );
 ok( $frmA->canSubmit, 'UserC can submit to formA' );
 ok( $frmB->canSubmit, 'UserC can submit to formB' );
+
+loginUserA;
+cmp_deeply( from_json($ems->www_getAllSubmissions), {
+          sort => undef,
+          startIndex => 1,
+          records => [
+                         {
+                           lastReplyDate => '',
+                           submissionId => '4',
+                           creationDate => ignore(),
+                           createdBy => 'userA',
+                           url => '/test-ems?func=viewSubmissionQueue#4',
+                           submissionStatus => $i18n->get('pending'),
+                           title => 'my favorite thing to talk about',
+                           lastReplyBy => ''
+                         }
+                       ],
+          totalRecords => '1',
+          recordsReturned => 25,
+          dir => 'DESC',
+}, 'test getAllSubmissions for UserA' );
+
+loginUserC;
+cmp_deeply( from_json($ems->www_getAllSubmissions), {
+          sort => undef,
+          startIndex => 1,
+          records => [
+                       ],
+          totalRecords => '0',
+          recordsReturned => 25,
+          dir => 'DESC',
+}, 'test getAllSubmissions for UserC' );
+
+loginRgstr;
+$session->request->setup_body({ orderByColumn => 'submissionId' });
+cmp_deeply( from_json($ems->www_getAllSubmissions), {
+          sort => 'submissionId',
+          startIndex => 1,
+          records => [
+                         {
+                           lastReplyDate => '',
+                           submissionId => '5',
+                           creationDate => ignore(),
+                           createdBy => 'userB',
+                           url => '/test-ems?func=viewSubmissionQueue#5',
+                           submissionStatus => $i18n->get('pending'),
+                           title => 'why i like to be important',
+                           lastReplyBy => ''
+                         },
+                         {
+                           lastReplyDate => '',
+                           submissionId => '4',
+                           creationDate => ignore(),
+                           createdBy => 'userA',
+                           url => '/test-ems?func=viewSubmissionQueue#4',
+                           submissionStatus => $i18n->get('pending'),
+                           title => 'my favorite thing to talk about',
+                           lastReplyBy => ''
+                         },
+                       ],
+          totalRecords => '2',
+          recordsReturned => 25,
+          dir => 'DESC',
+}, 'test getAllSubmissions for Registrar' );
 
 # TODO fix num tests
 SKIP: { skip 'create submission failed', 8 unless $isa1 && $isa2;
@@ -305,10 +382,9 @@ is( $sub2, undef, 'approval created a ticket');
 
 $versionTag->commit;
 
-
 SKIP: { skip 'requires HTML::Form', 2 unless use_ok 'HTML::Form';
 # this is not the greatest testm but it does run through the basic create submissionForm code.
-loginAdmin;
+loginRgstr;
 
 my %settings = (
     assetId => 'new',
@@ -370,7 +446,6 @@ for my $input ( $form->inputs ) {
 }
 $session->request->setup_body( { $form->form } );
 my $result = WebGUI::Asset::EMSSubmissionForm->processForm($ems);
-dav::dump $result;
 cmp_deeply( $result, $expected , 'test process form' );
 $expected = {
           'errors' => [
@@ -399,7 +474,25 @@ dav::dump $result;
 cmp_deeply( $result, $expected , 'test process form' );
 } # end of skip HTML::Form
 
-print $ems->www_getAllSubmissions;
+# these run code to see that it runs, but do not check for correctness
+
+$ems->www_viewSubmissionQueue;
+$ems->www_addSubmission;
+$ems->www_addSubmissionForm;
+$ems->www_editSubmissionForm;
+$ems->www_editSubmissionFormSave;
+$frmA->www_editSubmissionForm;
+$frmA->www_addSubmission;
+$frmA->www_editSubmission;
+$frmA->www_editSubmissionSave;
+$frmA->processForm;
+$sub1->drawLocationField;
+$sub1->drawRelatedBadgeGroupsField;
+$sub1->drawRelatedRibbonsField;
+$sub1->drawStatusField;
+$sub1->www_editSubmission;
+$sub1->www_editSubmissionSave;
+$sub1->processForm;
 
 } # end of use packages skip
 }; # end of eval

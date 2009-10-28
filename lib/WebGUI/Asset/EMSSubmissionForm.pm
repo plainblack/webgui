@@ -74,8 +74,7 @@ sub addSubmission {
     }
     $newParams->{className} = 'WebGUI::Asset::EMSSubmission';
     $newParams->{submissionStatus} = 'pending';
-    $newParams->{submissionId} = $self->get('nextSubmissionId');
-    $self->update({nextSubmissionId => $newParams->{submissionId}+1 });
+    $newParams->{submissionId} = $self->ems->getNextSubmissionId;
     $self->addChild($newParams);
 }
 
@@ -129,13 +128,6 @@ sub definition {
     my $definition = shift;
     my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmissionForm" );
     tie my %properties, 'Tie::IxHash', (
-        nextSubmissionId => { 
-            tab          => "properties",
-            fieldType    => "integer",
-            defaultValue => 0,
-            label        => $i18n->get("next submission id label"),
-            hoverHelp    => $i18n->get("next submission id label help")
-        },
         canSubmitGroupId => { 
             tab          => "security",
             fieldType    => "group",
@@ -214,7 +206,10 @@ returns the ems ansestor of this asset
 
 =cut
 
-sub ems { $_[0]->getParent }
+sub ems {
+    my $self = shift;
+    $self->getParent
+}
 
 #-------------------------------------------------------------------
 
@@ -244,7 +239,7 @@ sub www_editSubmissionForm {
         }
 	my $params           = shift || { };
 	my $session = $parent->session;
-	my $i18n = WebGUI::International->new($parent->session,'Asset_EventManagementSystem');
+	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
         my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId');
 
         if( ! defined( $assetId ) ) {
@@ -360,7 +355,7 @@ sub www_editSubmissionFormSave {
 
 =head2 www_view
 
-calles ems->view
+calls ems->view
 
 =cut
 
@@ -399,13 +394,13 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
+we shouldn't get here, there is nothing to view...
 
 =cut
 
 sub prepareView {
     my $self = shift;
-    $self->ems->prepareView;
-    #$self->SUPER::prepareView();
+    $self->SUPER::prepareView();
     #my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
     #$template->prepare($self->getMetaDataAsTemplateVariables);
     #$self->{_viewTemplate} = $template;
@@ -421,10 +416,10 @@ when /yourAssetUrl?func=editSave is requested/posted.
 
 =cut
 
-sub processPropertiesFromFormPost {
-    my $self = shift;
-    $self->SUPER::processPropertiesFromFormPost;
-}
+#sub processPropertiesFromFormPost {
+#    my $self = shift;
+#    $self->SUPER::processPropertiesFromFormPost;
+#}
 
 #-------------------------------------------------------------------
 
@@ -593,7 +588,7 @@ sub update {
     my $self = shift;
     my $properties = shift;
     if( ref $properties->{formDescription} eq 'HASH' ) {
-        $properties->{formDescription} = JSON->new->encode($properties->{formDescription}||{});
+        $properties->{formDescription} = JSON->new->encode($properties->{formDescription});
     }
     $self->SUPER::update({%$properties, isHidden => 1});
 }
