@@ -16,12 +16,13 @@ use WebGUI::Session;
 use Test::More; # increment this value for each test you create
 use File::Copy;
 use File::Spec;
+use WebGUI::Content::SetLanguage;
 
 my $session = WebGUI::Test->session;
 
 my $numTests  = 1; ##For conditional load check
 my $langTests = 4; ##For language look-up tests
-$numTests    += 12 + $langTests;
+$numTests    += 20 + $langTests;
 
 plan tests => $numTests;
 
@@ -50,6 +51,16 @@ is($i18n->get('topicName', 'WebGUI'), 'WebGUI', 'get: test manual namespace over
 
 installPigLatin();
 
+#tests for sub new
+my $i18nNew1 = WebGUI::International->new($session);
+is($i18nNew1->{_language}, 'English', 'Calling new without parameters should return object with language English');
+is($i18nNew1->{_namespace}, 'WebGUI', 'Calling without parameters should give namespace WebgUI');
+my $i18nNew2 = WebGUI::International->new($session, 'WebGUI::Asset');
+is($i18nNew2->{_language}, 'English', 'Calling new with only namespace parameter should return object with language English');
+is($i18nNew2->{_namespace}, 'WebGUI::Asset', 'Calling with only parameter namespace should give requested namespace');
+my $i18nNew3 = WebGUI::International->new($session, undef , 'PigLatin');
+is($i18nNew3->{_language}, 'PigLatin', 'Calling new with only language parameter should return object with language PigLatin');
+is($i18nNew3->{_namespace}, 'WebGUI', 'Calling with only parameter namespace should give WebGUI ');
 my $languages = $i18n->getLanguages();
 
 my $gotPigLatin = exists $languages->{PigLatin};
@@ -102,6 +113,24 @@ sub installPigLatin {
 	);
 }
 
+#test for sub new with language overridden by scratch
+my $formvariables = {
+        'op' =>'setLanguage',
+        'language' => 'PigLatin'
+};
+$session->request->setup_body($formvariables);
+WebGUI::Content::SetLanguage::handler($session);
+my $newi18n = WebGUI::International->new($session);
+        is(
+                $newi18n->get('webgui','WebGUI','PigLatin'),
+                'ebGUIWay',
+                'if the piglatin language is in the scratch that messages should be retrieved'
+);
+	is(
+		$newi18n->get('104','Asset','PigLatin'),
+                $newi18n->get('104', 'WebGUI', 'English'),
+                'Language check after SetLanguage contentHandler : key from missing file return English key'
+);
 END {
 	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
 	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
