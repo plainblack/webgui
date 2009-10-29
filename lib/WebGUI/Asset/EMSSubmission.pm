@@ -360,13 +360,9 @@ dav::log 'EMSSubmission::www_editSubmission: got self param';
         my $params           = shift || { };
         my $session = $parent->session;
         my $i18n = WebGUI::International->new($parent->session,'Asset_EventManagementSystem');
-        my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId');
+        my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId') || 'new';
 
-        if( ! defined( $assetId ) ) {
-             # if somebody calls without an assetId then display the queue for the EMS (grandparent)
-dav::log 'EMSSubmission::www_editSubmission: asseId not defined';
-            return $parent->getParent->www_viewSubmissionQueue;
-        } elsif( $assetId ne 'new' ) {
+        if( $assetId ne 'new' ) {
 dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
             $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);
             if (!defined $self) {

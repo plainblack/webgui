@@ -259,8 +259,16 @@ sub www_editSubmissionForm {
 				WebGUI::HTML::filter($_->get('description'),'all')
 		             )
 		           } ( @$res ) );
-		return $parent->processStyle( '<h1>' . $i18n->get('select form to edit') .
+		my $title =  $i18n->get('select form to edit') ;
+		my $content = $parent->processStyle( '<h1>' . $title .
 		                            '</h1><ul>' . $listOfLinks . '</ul>' );
+    if( $session->form->get('asJson') ) {
+        $session->http->setMimeType( 'application/json' );
+        return JSON->new->encode( { text => $content, title => $title } );
+    } else {
+        $session->http->setMimeType( 'text/html' );
+        return $content;
+    }
 	    }
         } elsif( $assetId ne 'new' ) {
 	    $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);

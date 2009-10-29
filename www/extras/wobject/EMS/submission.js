@@ -154,26 +154,26 @@ WebGUI.EMS = function (configs) {
 		       }
 		       alert(message);
 		       return;
-		   } else if( typeof(WebGUI.EMS.Items[response.submissionId]) == "undefined" 
-			      || WebGUI.EMS.Items[response.submissionId] == null ) {
+		   } else if( typeof(WebGUI.EMS.Items[response.title]) == "undefined" 
+			      || WebGUI.EMS.Items[response.title] == null ) {
 		       // if there is a tab .. close it,
 		       // at least until I can get the JS/HTML re-written to handle multiple tabs
 		       //  there should only be one
-		       for( var ticketId in WebGUI.EMS.Tickets ) { WebGUI.EMS.closeTab(ticketId) }
+		       for( var item in WebGUI.EMS.Items ) { WebGUI.EMS.closeTab(item) }
 		       var myContent = document.createElement("div");
-		       myContent.innerHTML = response.itemText;
+		       myContent.innerHTML = response.text;
 		       myTab = new YAHOO.widget.Tab({
-			     label: response.submissionId + '<span class="close"><img src="/extras/wobject/EMS/close12_1.gif" alt="X" title="' +
+			     label: response.title + '<span class="close"><img src="/extras/wobject/EMS/close12_1.gif" alt="X" title="' +
 				    WebGUI.EMS.i18n.get('Asset_EMSSubmission','close tab') + '" /></span>',
 			     contentEl: myContent
 			 });
 		       WebGUI.EMS.Tabs.addTab( myTab );
 		       YAHOO.util.Event.on(myTab.getElementsByClassName('close')[0], 'click', WebGUI.EMS.closeTab , myTab);
-		       WebGUI.EMS.Items[response.submissionId] = new Object();
-		       WebGUI.EMS.Items[response.submissionId].Tab = myTab;
+		       WebGUI.EMS.Items[response.title] = new Object();
+		       WebGUI.EMS.Items[response.title].Tab = myTab;
 		   } else {
-		       myTab = WebGUI.EMS.Tickets[response.submissionId].Tab;
-		       myTab.set('content', response.itemText);
+		       myTab = WebGUI.EMS.Tickets[response.title].Tab;
+		       myTab.set('content', response.text);
 		   }
 		   // make sure the script on the ticket has run
 		   // if( typeof( WebGUI.ticketJScriptRun ) == "undefined" ) {

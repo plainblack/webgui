@@ -72,6 +72,44 @@ sub execute {
 	my $self    = shift;
     my $session = $self->session;
     my $root    = WebGUI::Asset->getRoot($session);
+
+    # keep track of how much time it's taking
+    my $start   = time;
+    my $limit   = 2_500;
+    my $timeLimit = 120;
+
+    my $list = $root->getLineage( ['children'], { returnObjects => 1,
+                 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+             } );
+    
+    for my $emsf ( @$list ) {
+       my whereClause = q{ ( submissionStatus='approved' }
+       my $res = $emsf->getLineage(['children'],{ 
+	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
+	     whereClause => $whereClause,
+	 } );
+        for my $submission ( @$res ) {
+            my %properties = $submission->get;
+            delete $properties{submissionId};
+            delete $properties{submissionStatus};
+            delete $properties{sendEmailOnChange};
+            delete $properties{ticketId};
+            my $ticketId = $emsf->ems->addChild(
+                className => 'WebGUI::Asset::Sku::EMSTicket',
+                %properties;
+            );
+            $submission->update({ ticketId => $ticketId });
+	    $limit--;
+	    return $self->WAITING(1) if ! $limit or time > $start + $timeLimit;
+	}
+    }
+    return $self->COMPLETE;
+}
+
+sub execute {
+	my $self    = shift;
+    my $session = $self->session;
+    my $root    = WebGUI::Asset->getRoot($session);
 return $self->ERROR;
     
     my $sth     = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::HelpDesk'");

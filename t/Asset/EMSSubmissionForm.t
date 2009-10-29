@@ -341,7 +341,7 @@ is($sub1->get('status'),'approved','set status to approved');
 $sub2->update({ status => 'denied' });
 is($sub2->get('status'),'denied','set status to denied');
 
-SKIP: { skip "workflow activities not coded yet", 10 unless 0;
+SKIP: { skip "workflow activities not coded yet", 10 if 0;
 
 # create the workflows/activities for processing
 my $approveSubmissions = WebGUI::Test::Activity->create( $session,

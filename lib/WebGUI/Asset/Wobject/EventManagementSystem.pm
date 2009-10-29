@@ -50,7 +50,7 @@ sub addGroupToSubmitList {
     my @ids = split(' ', $self->get('eventSubmissionGroups'));
     my %h;
     @ids = map { $h{$_}++ == 0 ? $_ : () } ( $groupId, @ids );
-    $self->update({eventSubmissionGroups => join( ' ', @ids ) });
+    $self->addRevision({eventSubmissionGroups => join( ' ', @ids ) });
 }
 
 #-------------------------------------------------------------------
@@ -107,6 +107,7 @@ returns true is the current user can submit to any form attached to this EMS
 sub canSubmit {
     my $self = shift;
     my $user = $self->session->user;
+    return 0 if ! $self->hasSubmissionForms;
     for my $groupId (split ' ', $self->get('eventSubmissionGroups')) {
         return 1 if $user->isInGroup($groupId);
     }
@@ -433,7 +434,7 @@ sub getNextSubmissionId {
     my $self = shift;
     #my $submissionId = $self->get('nextSubmissionId');
     my ($submissionId) = $self->session->db->read('select nextSubmissionId from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
-    $self->update( { nextSubmissionId => ($submissionId + 1) } );
+    $self->addRevision( { nextSubmissionId => ($submissionId + 1) } );
     return $submissionId;
 }
 
