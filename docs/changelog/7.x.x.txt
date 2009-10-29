@@ -1,4 +1,6 @@
 7.8.3
+ - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
+ - The auto add to group and auto delete from group operations that are used with the GroupAdd and GroupDelete macros were fixed to make the user log in if they aren't already.
  - fixed #11074: Links to CS posts not working
  - fixed #11152: Image edits do not autocommit version tags
  - fixed template attachments are not cleaned up during purge
@@ -22,6 +24,9 @@
  - fixed #11069: "More" options menu in asset manager 
  - rfe #10755: Adding SetLanguage bazaar item
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
+ - fixed #11181: ableToBeFriend label not i18n
+ - fixed #11179: user.CanStartThread missing from help
+ - fixed #11183: Calendar List View
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
