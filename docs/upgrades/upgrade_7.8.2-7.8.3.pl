@@ -23,6 +23,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Utility;
+use WebGUI::ProfileField;
 
 
 my $toVersion = '7.8.3';
@@ -38,8 +39,22 @@ addClipboardAdminSetting($session);
 addTrashAdminSetting($session);
 addPickLanguageMacro($session);
 installSetLanguage($session);
+i18nAbleToBeFriend($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub i18nAbleToBeFriend {
+    my $session = shift;
+    print "\tInternationalize the Able To Be Friend profile field... " unless $quiet;
+    my $field = WebGUI::ProfileField->new($session, 'ableToBeFriend');
+    if ($field) {
+        my $props = $field->get();
+        $props->{label} = q{WebGUI::International::get('user profile field friend availability','WebGUI')};
+        $field->set($props);
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addClipboardAdminSetting {

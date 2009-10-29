@@ -22,6 +22,7 @@
  - fixed #11069: "More" options menu in asset manager 
  - rfe #10755: Adding SetLanguage bazaar item
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
+ - fixed #11181: ableToBeFriend label not i18n
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
