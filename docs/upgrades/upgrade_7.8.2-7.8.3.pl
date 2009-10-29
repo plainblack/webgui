@@ -22,6 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Utility;
+use WebGUI::ProfileField;
 
 
 my $toVersion = '7.8.3';
@@ -35,8 +37,24 @@ reKeyTemplateAttachments($session);
 addSelectPaymentGatewayTemplateToSettings($session);
 addClipboardAdminSetting($session);
 addTrashAdminSetting($session);
+addPickLanguageMacro($session);
+installSetLanguage($session);
+i18nAbleToBeFriend($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub i18nAbleToBeFriend {
+    my $session = shift;
+    print "\tInternationalize the Able To Be Friend profile field... " unless $quiet;
+    my $field = WebGUI::ProfileField->new($session, 'ableToBeFriend');
+    if ($field) {
+        my $props = $field->get();
+        $props->{label} = q{WebGUI::International::get('user profile field friend availability','WebGUI')};
+        $field->set($props);
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addClipboardAdminSetting {
@@ -60,17 +78,20 @@ sub addTrashAdminSetting {
 sub reKeyTemplateAttachments {
     my $session = shift;
     print "\tChanging the key structure for the template attachments table... " unless $quiet;
-    # and here's our code
-    $session->db->write('ALTER TABLE template_attachments ADD COLUMN attachId CHAR(22) BINARY NOT NULL');
-    my $rh = $session->db->read('select url, templateId, revisionDate from template_attachments');
-    my $wh = $session->db->prepare('update template_attachments set attachId=? where url=? and templateId=? and revisionDate=?');
-    while (my @key = $rh->array) {
-        $wh->execute([$session->id->generate, @key ]);
+    my $columnExists = $session->db->dbh->column_info(undef, undef, 'template_attachments', 'attachId')->fetchrow_hashref;
+    if (! $columnExists) {
+        # and here's our code
+        $session->db->write('ALTER TABLE template_attachments ADD COLUMN attachId CHAR(22) BINARY NOT NULL');
+        my $rh = $session->db->read('select url, templateId, revisionDate from template_attachments');
+        my $wh = $session->db->prepare('update template_attachments set attachId=? where url=? and templateId=? and revisionDate=?');
+        while (my @key = $rh->array) {
+            $wh->execute([$session->id->generate, @key ]);
+        }
+        $rh->finish;
+        $wh->finish;
+        $session->db->write('ALTER TABLE template_attachments DROP PRIMARY KEY');
+        $session->db->write('ALTER TABLE template_attachments ADD PRIMARY KEY (attachId)');
     }
-    $rh->finish;
-    $wh->finish;
-    $session->db->write('ALTER TABLE template_attachments DROP PRIMARY KEY');
-    $session->db->write('ALTER TABLE template_attachments ADD PRIMARY KEY (attachId)');
     print "DONE!\n" unless $quiet;
 }
 
@@ -90,6 +111,30 @@ sub addSelectPaymentGatewayTemplateToSettings {
 #    print "DONE!\n" unless $quiet;
 #}
 
+#------------------------------------------------------------------------
+sub addPickLanguageMacro {
+    my $session = shift;
+    print "\tAdding Pick Language macro... " unless $quiet;
+    $session->config->set('macros/PickLanguage', 'PickLanguage');
+    print "Done.\n" unless $quiet;
+}
+
+sub installSetLanguage {
+    my $session = shift;
+    print "\tAdding SetLanguage content handler... " unless $quiet;
+    ##Content Handler
+    my $contentHandlers = $session->config->get('contentHandlers');
+    if (!isIn('WebGUI::Content::SetLanguage', @{ $contentHandlers }) ) {
+        my @newHandlers = ();
+        foreach my $handler (@{ $contentHandlers }) {
+            push @newHandlers, $handler;
+            push @newHandlers, 'WebGUI::Content::SetLanguage' if
+                $handler eq 'WebGUI::Content::PassiveAnalytics';
+        }
+        $session->config->set('contentHandlers', \@newHandlers);
+    }
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

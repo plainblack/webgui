@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::CanEditText;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
@@ -61,16 +62,9 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets + 2;
+my $numTests = scalar @testSets + 1;
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::CanEditText';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 is(
 	WebGUI::Macro::CanEditText::process($session,''),
@@ -83,8 +77,6 @@ foreach my $testSet (@testSets) {
 	$session->asset($testSet->{asset});
 	my $output = WebGUI::Macro::CanEditText::process($session, $testSet->{text});
 	is($output, $testSet->{output}, $testSet->{comment});
-}
-
 }
 
 sub setupTest {

@@ -15,12 +15,13 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::D_date;
 use Data::Dumper;
 # ---- END DO NOT EDIT ----
 
 use Test::More; # increment this value for each test you create
 
-my $wgbday = 997966800;
+my $wgbday = WebGUI::Test->webguiBirthday;
 
 my @testSets = (
 	{
@@ -33,16 +34,9 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets + 1 + 1;
+my $numTests = scalar @testSets + 1;
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::D_date';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $session = WebGUI::Test->session;
 
@@ -65,5 +59,3 @@ while ($time1 != $time2) {
 }
 
 is($output, $session->datetime->epochToHuman($time1), 'checking default time and format');
-
-}
