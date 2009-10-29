@@ -100,6 +100,7 @@ sub execute {
         my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
 
         CALENDAR: while (my $calendar = $getCalendar->()) {
+            next unless defined $calendar;
             my $calendarTitle = $calendar->getTitle;
             my $calendarId    = $calendar->getId;
             if ( $calendar->get( "state" ) ne "published" ) {

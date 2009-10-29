@@ -1,4 +1,5 @@
 7.8.3
+ - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
  - fixed #11074: Links to CS posts not working
  - fixed #11152: Image edits do not autocommit version tags
  - fixed template attachments are not cleaned up during purge
