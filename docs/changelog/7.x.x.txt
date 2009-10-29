@@ -1,5 +1,27 @@
 7.8.3
  - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
+ - The auto add to group and auto delete from group operations that are used with the GroupAdd and GroupDelete macros were fixed to make the user log in if they aren't already.
+
+7.7.24
+ - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
+ - fixed #11181: ableToBeFriend label not i18n
+
+7.7.23
+ - fixed #11126: WebGUI database has varchar fields
+ - fixed #10989: DataForm List: No pagination
+ - fixed #11128: Thing breaks w/ default value for date field
+ - fixed #10888: Issues with adding points to Maps
+ - fixed #11139: referencing an item in the clipboard
+ - fixed #11146: Upgrade Error 7.7.21 to 7.7.22 
+ - fixed #11147: fail safe template is missing embedded style
+ - fixed #11137: Customers see failed orders
+ - fixed #11156: Syndicated Content doesn't show all headlines in feed
+ - fixed #11138: RichEdit, upload image does not commit a version tag
+ - refixed #2569: robots.txt issues
+ - fixed #11157: calendar tool for entering add event date
+ - fixed #11158: Calendar iCal feed doesn't show today's all-day events
+ - fixed #11131: https / http URLs still caching across secure/insecure boundary
+ - fixed #11093: Spectre cron can DoS server with many sites
  - fixed #11074: Links to CS posts not working
  - fixed #11152: Image edits do not autocommit version tags
  - fixed template attachments are not cleaned up during purge
