@@ -22,17 +22,15 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-use WebGUI::ProfileField;
 
 
-my $toVersion = '7.7.24';
+my $toVersion = '7.7.25';
 my $quiet; # this line required
 
 
 my $session = start(); # this line required
 
 # upgrade functions go here
-i18nAbleToBeFriend($session);
 
 finish($session); # this line required
 
@@ -45,19 +43,6 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
-
-#----------------------------------------------------------------------------
-sub i18nAbleToBeFriend {
-    my $session = shift;
-    print "\tInternationalize the Able To Be Friend profile field... " unless $quiet;
-    my $field = WebGUI::ProfileField->new($session, 'ableToBeFriend');
-    if ($field) {
-        my $props = $field->get();
-        $props->{label} = q{WebGUI::International::get('user profile field friend availability','WebGUI')};
-        $field->set($props);
-    }
-    print "Done.\n" unless $quiet;
-}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

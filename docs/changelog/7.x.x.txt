@@ -2,6 +2,8 @@
  - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
 
 7.7.24
+ - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
+ - fixed #11181: ableToBeFriend label not i18n
 
 7.7.23
  - fixed #11126: WebGUI database has varchar fields
