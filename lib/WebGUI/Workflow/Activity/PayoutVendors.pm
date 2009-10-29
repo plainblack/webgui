@@ -81,7 +81,7 @@ sub definition {
         },
         paypalSubject   => {
             fieldType       => 'text',
-            label           => $i18n->get('Subject for vendor notication email'),
+            label           => $i18n->get('Subject for vendor notification email'),
             defaultValue    => $i18n->get('Vendor payout from').' ' . $session->setting->get('companyUrl'),
         },
         notificationGroupId => {
