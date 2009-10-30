@@ -1291,11 +1291,16 @@ sub viewList {
     my $session     = $self->session;
     my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
     my $var         = $self->getTemplateVars;
+    my $tz          = $session->datetime->getTimeZone();
 
     ### Get the events
-    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} )->truncate( to => "day" );
+    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} );
+    $dtStart->set_time_zone($tz);
+    $dtStart->truncate( to => 'day' );
     my $dtEnd       = $dtStart->clone->add( seconds => $self->get('listViewPageInterval') );
 
+    warn 'truncated: '.$dtStart->toDatabase;
+    warn 'end date: '.$dtEnd->toDatabase;
     my @events
         = $self->getEventsIn(
             $dtStart->toDatabase,

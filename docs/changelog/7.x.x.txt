@@ -2,6 +2,7 @@
  - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
  - The auto add to group and auto delete from group operations that are used with the GroupAdd and GroupDelete macros were fixed to make the user log in if they aren't already.
  - fixed #11179: user.CanStartThread missing from help
+ - fixed #11183: Calendar List View
 
 7.7.24
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
