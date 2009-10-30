@@ -94,6 +94,12 @@ cmp_deeply(
     '... retrieving assets in more than one state'
 );
 
+cmp_deeply(
+    $keyword->getTopKeywords(),
+    { 'webgui' => '2' },
+    'check getTopKeywords returns correctly'
+);
+
 $keyword->deleteKeywordsForAsset($home);
 is(scalar(@{$keyword->getKeywordsForAsset({ asset=>$home, asArrayRef=>1})}), 0, "getKeywordsForAsset()");
 
