@@ -61,6 +61,8 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
                               'language_langEng' => 'English'
                       },
               ],
+		delete_url 	=> '?op=setLanguage;language=delete;',
+		delete_label	=> 'Go back to profile language.',
               },
               'some template variables are created'
       );
@@ -90,6 +92,8 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
                               'language_langEng' => 'English'
                       },
               ],
+			delete_url => '?op=setLanguage;language=delete;',
+			delete_label => "Go back to profile language.",
               },
               'some template variables are created, when no templateId is passed on with the macro'
       );

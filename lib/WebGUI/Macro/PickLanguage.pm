@@ -11,6 +11,7 @@ package WebGUI::Macro::PickLanguage; # edit this line to match your own macro na
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Asset::Template;
 
 =head1 NAME
 
@@ -47,17 +48,23 @@ sub process {
         return "Could not instanciate template with id [$templateId]" unless $template;
 	my $i18n 	= WebGUI::International->new($session);
 	my $languages 	= $i18n->getLanguages();
-	my $vars 	= {'lang_loop' => []};
+	my @lang_loop 	= ();
 	foreach my $language ( keys %$languages ) {
-		my $langVars = {};
-		$langVars->{ 'language_url' } 		= '?op=setLanguage;language=' . $language ;
-		$langVars->{ 'language_lang' } 		= $i18n->getLanguage($language , 'label');
-		$langVars->{ 'language_langAbbr' } 	= $i18n->getLanguage($language, 'languageAbbreviation');
-		$langVars->{ 'language_langAbbrLoc' } 	= $i18n->getLanguage($language, 'locale');
-		$langVars->{ 'language_langEng' } 	= $language;
-		push(@{$vars->{lang_loop}}, $langVars);
+		push @lang_loop, {
+			language_url 		=> '?op=setLanguage;language=' . $language, 
+			language_lang		=> $i18n->getLanguage($language , 'label'),
+			language_langAbbr 	=> $i18n->getLanguage($language, 'languageAbbreviation'),
+			language_langAbbrLoc 	=> $i18n->getLanguage($language, 'locale'),
+			language_langEng 	=> $language,
+		};
 	}
-	return $template->process($vars);
+	my %vars = (
+		lang_loop	 	=> \@lang_loop,
+		delete_url		=> '?op=setLanguage;language=delete;',
+		delete_label		=> $i18n->get('delete',"Macro_PickLanguage"),
+	);
+
+	return $template->process(\%vars);
 }
 
 1;
