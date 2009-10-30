@@ -28,6 +28,7 @@
  - fixed #11179: user.CanStartThread missing from help
  - fixed #11183: Calendar List View
  - fixed #11135: Tree Navigation menu template shows a drop down fly-out menu
+ - fixed #10984: Edit Survey Screen isn't right in demo
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
