@@ -244,7 +244,6 @@ our $HELP = {
                 { 'name' => 'price'},
                 { 'name' => 'relatedRibbons'},
                 { 'name' => 'relatedBadgeGroups'},
-                { 'name' => 'eventMetaData'},
                 { 'name' => 'title'},
                 { 'name' => 'menuTitle'},
                 { 'name' => 'url'},

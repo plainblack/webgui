@@ -1991,7 +1991,6 @@ sub www_printRemainingTickets {
 				EMSTicket.location as ticketLocation,
 				EMSTicket.relatedBadgeGroups,
 				EMSTicket.relatedRibbons,
-				EMSTicket.eventMetaData,
 				(seatsAvailable - (select count(*) from EMSRegistrantTicket where ticketAssetId = asset.assetId)) as seatsRemaining
 		FROM 
 				asset 
