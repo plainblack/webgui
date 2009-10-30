@@ -40,8 +40,20 @@ addTrashAdminSetting($session);
 addPickLanguageMacro($session);
 installSetLanguage($session);
 i18nAbleToBeFriend($session);
+addEMSEnhancements($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addEMSEnhancements {
+    my $session = shift;
+    print "\tAdding EMS Enhancements, if needed... \n" unless $quiet;
+    my $sth = $session->db->read('describe EventManagementSystem printRemainingTicketsTemplateId');
+    if (! defined $sth->hashRef) {
+        $session->db->write("alter table EventManagementSystem add column printRemainingTicketsTemplateId char(22) not null default 'hreA_bgxiTX-EzWCSZCZJw' after printTicketTemplateId");
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub i18nAbleToBeFriend {

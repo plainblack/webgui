@@ -178,7 +178,7 @@ ok( $ems->can('www_printRemainingTickets'), 'Can call print remaining tickets' )
 
 #Test that the default template is correct
 my $printRemainingTicketsTemplateId = $ems->get('printRemainingTicketsTemplateId');
-ok($printRemainingTicketsTemplateId eq "hreA_bgxiTX-EzWCSZCZJw", 'Default print remaining tickets template id ok');
+is($printRemainingTicketsTemplateId, "hreA_bgxiTX-EzWCSZCZJw", 'Default print remaining tickets template id ok');
 
 #Make sure printRemainingTickets template returns the right data
 my $templateMock = Test::MockObject->new({});
