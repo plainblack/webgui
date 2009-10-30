@@ -24,7 +24,7 @@ my $session = WebGUI::Test->session;
 plan tests => 2;
 
 my $output = WebGUI::Macro::c_companyName::process($session);
-is($output, $originalCompanyName, "Testing companyName");
+is($output, $session->setting->get('companyName'), "Testing companyName");
 
 $session->setting->set('companyName', q|Gooey's Consulting, LLC|);
 $output = WebGUI::Macro::c_companyName::process($session);
