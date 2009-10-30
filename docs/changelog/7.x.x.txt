@@ -29,6 +29,8 @@
  - fixed #11183: Calendar List View
  - fixed #11135: Tree Navigation menu template shows a drop down fly-out menu
  - fixed #10984: Edit Survey Screen isn't right in demo
+ - added: getTopKeywords method to Keywords API
+ - added: print remaining tickets feature to EMS
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
