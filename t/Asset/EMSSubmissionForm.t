@@ -69,8 +69,10 @@ sub logout     { $session->user({userId => 1}); }
 #----------------------------------------------------------------------------
 # put your tests here
 eval {
-my $use = use_ok 'WebGUI::Asset::EMSSubmissionForm';
-$use &&= use_ok 'WebGUI::Asset::EMSSubmission';
+my $use = use_ok( 'WebGUI::Asset::EMSSubmissionForm' )
+       && use_ok( 'WebGUI::Asset::EMSSubmission' )
+       && use_ok( 'WebGUI::Workflow::Activity::CleanupEMSSubmissions' )
+       && use_ok( 'WebGUI::Workflow::Activity::ProcessEMSApprovals' );
 
 SKIP: { skip 'package compile failed!', 1 unless $use;
 
@@ -120,13 +122,14 @@ my $ems = $node->addChild({
         },1,1);
 
 my $i18n = $ems->i18n;
+
 $versionTag->commit;
+$versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($versionTag);
 
 my $id1 = $ems->getNextSubmissionId;
 my $id2 = $ems->getNextSubmissionId;
-my $id3 = $ems->getNextSubmissionId;
-my $id4 = $ems->getNextSubmissionId;
-is( $id1 +3, $id4, ' test getNextSubmissionId' );
+is( $id1 +1, $id2, ' test getNextSubmissionId' );
 
 # quick test of addGroupToSubmitList
 is($ems->get('eventSubmissionGroups'),'', 'event submission groups is blank');
@@ -139,13 +142,12 @@ is($ems->get('eventSubmissionGroups'),'joe frank', 'event submission groups stil
 $ems->update({eventSubmissionGroups => ''});
 is($ems->get('eventSubmissionGroups'),'', 'event submission groups is reset to blank');
 
+
 is_deeply($ems->getSubmissionLocations, \@submissionLocations, 'test getSubmissionLocations' );
 is_deeply( $ems->getSubmissionStatus, {
      map { $_ => $i18n->get($_) } ( qw/pending feedback failed approved created denied/ )
 }, 'test getSubmissionStatus' );
 
-$versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
 
 loginRgstr;
 
@@ -190,7 +192,7 @@ my $formBdesc = {
 my $frmB = $ems->addSubmissionForm({
     className                => 'WebGUI::Asset::EMSSubmissionForm',
     title                    => 'test B -- short',
-    daysBeforeCleanup        => 0,
+    daysBeforeCleanup        => 1,
     canSubmitGroupId         => $submitGroupB->getId,
     formDescription          => $formBdesc,
 });
@@ -248,10 +250,10 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           records => [
                          {
                            lastReplyDate => '',
-                           submissionId => '5',
+                           submissionId => '3',
                            creationDate => ignore(),
                            createdBy => 'userA',
-                           url => '/test-ems?func=viewSubmissionQueue#5',
+                           url => '/test-ems?func=viewSubmissionQueue#3',
                            submissionStatus => $i18n->get('pending'),
                            title => 'my favorite thing to talk about',
                            lastReplyBy => ''
@@ -262,10 +264,10 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           dir => 'DESC',
 }, 'test getAllSubmissions for UserA' );
 
-$session->request->setup_body({submissionId => 5});
+$session->request->setup_body({submissionId => 3});
 cmp_deeply( from_json($ems->www_getSubmissionById), {
-    submissionId => 5,
-    itemText => ignore(),
+    title => 3,
+    text => ignore(),
 }, 'test getSubmissionById');
 
 loginUserC;
@@ -287,20 +289,20 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           records => [
                          {
                            lastReplyDate => '',
-                           submissionId => '6',
+                           submissionId => '4',
                            creationDate => ignore(),
                            createdBy => 'userB',
-                           url => '/test-ems?func=viewSubmissionQueue#6',
+                           url => '/test-ems?func=viewSubmissionQueue#4',
                            submissionStatus => $i18n->get('pending'),
                            title => 'why i like to be important',
                            lastReplyBy => ''
                          },
                          {
                            lastReplyDate => '',
-                           submissionId => '5',
+                           submissionId => '3',
                            creationDate => ignore(),
                            createdBy => 'userA',
-                           url => '/test-ems?func=viewSubmissionQueue#5',
+                           url => '/test-ems?func=viewSubmissionQueue#3',
                            submissionStatus => $i18n->get('pending'),
                            title => 'my favorite thing to talk about',
                            lastReplyBy => ''
@@ -353,34 +355,46 @@ my $cleanupSubmissions = WebGUI::Test::Activity->create( $session,
 
 push @cleanup, sub  { $approveSubmissions->delete; $cleanupSubmissions->delete; };
 
-is($approveSubmissions->run, 'complete', 'approval complete');
+#is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
+$sub1 = $sub1->cloneFromDb;
 is( $sub1->get('status'),'failed','submission failed to create');
 
 # TODO fill in the rest of the data required by EMSTicket
 
-is($approveSubmissions->run, 'complete', 'approval complete');
+print "1\n";
+$approveSubmissions->rerun;
+print "2\n";
+#is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
+print "3\n";
+$sub1 = $sub1->cloneFromDb;
+print "4\n";
 is( $sub1->get('status'),'created','approval successfull');
+print "5\n";
 
 my $ticket = WebGUI::Asset->newByDynamicClass($session, $sub1->get('ticketId'));
-isa_ok( $ticket, 'WebGUI::Asset::Sku::EMS_Ticket', 'approval created a ticket');
+print "6\n";
+isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
+print "7\n";
 push @cleanup, sub  { $ticket->delete; };
+print "8\n";
  
 $sub2->update({
     lastModified => time - ( 60 * 60 * 72 ),   # last modified 3 days ago
 });
 my $submissionId = $sub2->get('assetId');
 
-is($cleanupSubmissions->run, 'complete', 'cleanup complete');
+$cleanupSubmissions->rerun;
+#is($cleanupSubmissions->run, 'complete', 'cleanup complete');
 is($cleanupSubmissions->run, 'done', 'cleanup done');
 
 $sub2 = WebGUI::Asset->newByDynamicClass($session, $submissionId);
-is( $sub2, undef, 'approval created a ticket');
+is( $sub2, undef, 'ticket deleted');
 
-# TODO add a test to cleanup denied and created entries
+# TODO add a test to cleanup created entries
 
 } # end of workflow skip
 

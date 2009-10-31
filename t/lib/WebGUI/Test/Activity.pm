@@ -66,6 +66,11 @@ sub create {
 		skipSpectreNotification => 1,
 	    }
 	);
+
+	my $tag = WebGUI::VersionTag->getWorking($session);
+	$tag->commit;
+	WebGUI::Test->tagsToRollback($tag);
+
     return bless { instance => $instance,
 		   session => $session,
                    workflow => $workflow }, __PACKAGE__;
@@ -84,6 +89,10 @@ sub rerun {
 	    skipSpectreNotification => 1,
 	}
     );
+	my $tag = WebGUI::VersionTag->getWorking($session);
+	$tag->commit;
+	WebGUI::Test->tagsToRollback($tag);
+
 }
 
 sub delete {

@@ -440,12 +440,15 @@ dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
 
 sub www_editSubmissionSave {
         my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
+        my $session = $self->session;
+        return $session->privilege->insufficient() unless $self->canEdit;
         my $formParams = WebGUI::Asset::EMSSubmission->processForm($self);
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};
-            $self->update($formParams);
-            return $self->getParent->getParent->www_viewSubmissionQueue;
+            $self->addRevision($formParams);
+	    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { override => 1, allowComments => 0 });
+	    $self = $self->cloneFromDb;
+            return $self->www_view;
         } else {
             return $self->www_editSubmission($formParams);
         }
@@ -489,7 +492,7 @@ sub getEditForm {
 
 =head2 getEditTabs ( )
 
-Not to be modified, just defines 2 new tabs.
+defines 2 new tabs.
 the shop tab is created here to mimic the function of the sku-created 
 shop tab.  this class holds data like Sku assets so that they can be assigned
 in the future when the sku asset is created from this data.

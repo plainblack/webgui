@@ -68,10 +68,13 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 =cut
 
+use lib '/root/pb/lib'; use dav;
+
 sub execute {
 	my $self    = shift;
     my $session = $self->session;
     my $root    = WebGUI::Asset->getRoot($session);
+dav::log __PACKAGE__ . " executing\n";
 
     # keep track of how much time it's taking
     my $start   = time;
@@ -83,12 +86,14 @@ sub execute {
              } );
     
     for my $emsf ( @$list ) {
-       my whereClause = q{ ( submissionStatus='denied' }
+       my $daysBeforeCleanup = $emsf->get('daysBeforeCleanup') ;
+       next if ! $daysBeforeCleanup;
+       my $whereClause = q{ submissionStatus='denied' };
        if( $emsf->get('deleteCreatedItems') ) {
-           $whereClause .= q{ or submissionStatus='created'};
+           $whereClause = ' ( ' . $whereClause . q{ or submissionStatus='created' } . ' ) ';
        }
-       my $checkDate = time - ( 60*60*24* $emsf->get('daysBeforeCleanup') );
-       $whereClause .= q{ ) and lastModifiedDate < } . $checkDate;
+       my $checkDate = time - ( 60*60*24* $daysBeforeCleanup );
+       $whereClause .= q{ and lastModifiedDate < } . $checkDate;
        my $res = $emsf->getLineage(['children'],{ 
 	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	     whereClause => $whereClause,

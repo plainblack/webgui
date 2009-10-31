@@ -2034,6 +2034,16 @@ normal templates.|,
         context => q|Label for the submission list tab for event submitters.|,
     },
 
+	'next submission id label' => {
+		message => q|Next Submission Id|,
+		lastUpdated => 1131394072,
+		context => q|Label for the field which indicates the next id used to create a submission.|
+	},
+	'next submission id label help' => {
+		message => q|This is the value that will be used to fill in the first submission, do not edit it.|,
+		lastUpdated => 1131394072,
+		context => q|This is the help text for the 'next submission id' field, the user should be reminded not to edit this field.|
+	},
 #    'TODO' => {
 #        message => q|TODO|,
 #        lastUpdated => 1147050475,

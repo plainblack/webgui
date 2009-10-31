@@ -68,11 +68,13 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 =cut
 
+use lib '/root/pb/lib'; use dav;
+
 sub execute {
 	my $self    = shift;
     my $session = $self->session;
     my $root    = WebGUI::Asset->getRoot($session);
-
+dav::log __PACKAGE__ . " executing\n";
     # keep track of how much time it's taking
     my $start   = time;
     my $limit   = 2_500;
@@ -83,7 +85,7 @@ sub execute {
              } );
     
     for my $emsf ( @$list ) {
-       my whereClause = q{ ( submissionStatus='approved' }
+       my $whereClause = q{ submissionStatus='approved' };
        my $res = $emsf->getLineage(['children'],{ 
 	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	     whereClause => $whereClause,
@@ -94,43 +96,20 @@ sub execute {
             delete $properties{submissionStatus};
             delete $properties{sendEmailOnChange};
             delete $properties{ticketId};
-            my $ticketId = $emsf->ems->addChild(
+            my $newAsset = $emsf->ems->addChild(
                 className => 'WebGUI::Asset::Sku::EMSTicket',
-                %properties;
+                %properties,
             );
-            $submission->update({ ticketId => $ticketId });
+            if( defined $newAsset ) {
+		$submission->update({ ticketId => $newAsset->getId, submissionStatus => 'created' });
+	    } else {
+		$submission->update({ submissionStatus => 'failed' });
+	    }
 	    $limit--;
 	    return $self->WAITING(1) if ! $limit or time > $start + $timeLimit;
 	}
     }
     return $self->COMPLETE;
-}
-
-sub execute {
-	my $self    = shift;
-    my $session = $self->session;
-    my $root    = WebGUI::Asset->getRoot($session);
-return $self->ERROR;
-    
-    my $sth     = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::HelpDesk'");
-    while (my ($assetId) = $sth->array) {
-        my $hd = WebGUI::Asset->new($session,$assetId,"WebGUI::Asset::Wobject::HelpDesk");
-        next unless defined $hd;
-
-        my $closeAfter = $hd->get("closeTicketsAfter");
-
-        my $rules                      = {};
-        $rules->{'joinClass'         } = "WebGUI::Asset::Ticket";
-        $rules->{'whereClause'       } = qq{Ticket.ticketStatus = 'resolved' and (Ticket.resolvedDate + $closeAfter <= UNIX_TIMESTAMP(NOW()))};
-        $rules->{'includeOnlyClasses'} = ['WebGUI::Asset::Ticket'];
-        $rules->{'returnObjects'     } = 1;
-        
-        my $tickets = $hd->getLineage(['children'], $rules);
-        foreach my $ticket (@{$tickets}) {
-            $ticket->setStatus("closed");
-        }   
-    }
-	return $self->COMPLETE;
 }
 
 1;

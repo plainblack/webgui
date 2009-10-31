@@ -41,12 +41,6 @@ and then become EMSTicket's.
 
 use WebGUI::Asset::EMSSubmissionForm;
 
-=head1 TODO
-
-add a lastSubmissionDate -- after that the submission form will be closed
-    the link will still exist but the form will just say '<title> submissions closed as of <date>'
-
-
 =head1 METHODS
 
 These methods are available from this class:
@@ -75,7 +69,10 @@ sub addSubmission {
     $newParams->{className} = 'WebGUI::Asset::EMSSubmission';
     $newParams->{submissionStatus} = 'pending';
     $newParams->{submissionId} = $self->ems->getNextSubmissionId;
-    $self->addChild($newParams);
+    my $newAsset = $self->addChild($newParams);
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, { override => 1, allowComments => 0 });
+    $self = $self->cloneFromDb;
+    return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -254,7 +251,7 @@ sub www_editSubmissionForm {
 		            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
 	        my $listOfLinks = join '', ( map {
 		      $makeAnchorList->(
-		                $_->getUrl('func=editSubmissionForm' ),
+		                $_->getQueueUrl,
 				$_->get('title'),
 				WebGUI::HTML::filter($_->get('description'),'all')
 		             )
@@ -361,7 +358,9 @@ sub www_editSubmissionFormSave {
         my $formParams = $self->processForm();
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};
-            $self->update($formParams);
+            $self->addRevision($formParams);
+            WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
+            $self = $self->cloneFromDb;
             return $self->getParent->www_viewSubmissionQueue;
         } else {
             return $self->www_editSubmissionForm($formParams);
@@ -391,6 +390,19 @@ sub getFormDescription {
     my $self = shift;
     return JSON->new->decode($self->get('formDescription'));
 }
+
+#-------------------------------------------------------------------
+=head2 getQueueUrl
+
+returns the URL for the submission queue page with the submisison id in the hash part
+
+=cut
+
+sub getQueueUrl {
+    my $self = shift;
+    return $self->ems->getUrl('func=viewSubmissionQueue#' . $self->getId );
+}
+
 
 #-------------------------------------------------------------------
 

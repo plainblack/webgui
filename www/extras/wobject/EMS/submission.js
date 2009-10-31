@@ -36,13 +36,14 @@ WebGUI.EMS = function (configs) {
     this._configs = {};    
     if(configs) {
         this._configs = configs;
+	WebGUI.EMS.url = configs.url;
+	WebGUI.EMS.tabContent = configs.tabContent;
     }
-    this.url = this._configs.url;
+    WebGUI.EMS.Items = new Object();
 
     if(!this._configs.initRequestString) {
         this._configs.initRequestString = ';startIndex=0';
     }
-    WebGUI.EMS.Items = new Object();
 
     ///////////////////////////////////////////////////////////////
     //              Internationalization
@@ -94,7 +95,7 @@ WebGUI.EMS = function (configs) {
         if( WebGUI.EMS.lastTab ) {
 	   WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.lastTab);
         }
-	window.location.hash = '';
+	window.location.hash = "";
     };
 
     //***********************************************************************************
@@ -172,7 +173,7 @@ WebGUI.EMS = function (configs) {
 		       WebGUI.EMS.Items[response.title] = new Object();
 		       WebGUI.EMS.Items[response.title].Tab = myTab;
 		   } else {
-		       myTab = WebGUI.EMS.Tickets[response.title].Tab;
+		       myTab = WebGUI.EMS.Items[response.title].Tab;
 		       myTab.set('content', response.text);
 		   }
 		   // make sure the script on the ticket has run
@@ -242,12 +243,24 @@ WebGUI.EMS = function (configs) {
     //***********************************************************************************
     // This method does the actual work of loading an item into a tab
     //
-    WebGUI.EMS.loadItem = function ( submissionId, pathname ) {
-             if( typeof(pathname) == "undefined" ) {
-	          pathname =  WebGUI.EMS.url ;
-             }
-		var url     = pathname + "?func=getSubmissionById;submissionId=" + submissionId;
-	    WebGUI.EMS.newTab(submissionId, url );
+    WebGUI.EMS.loadItem = function ( contentId ) {
+            var submissionId = parseInt( contentId, 10 );
+            var url;
+	    //  compare contentId with submissionId incase we get an assetId that starts with numeric chars
+            if( contentId == submissionId ) {
+	        url     = WebGUI.EMS.tabContent['editSubmission'] + ";submissionId=" + submissionId;
+            } else {
+	        url     = WebGUI.EMS.tabContent[contentId];
+            }
+	    WebGUI.EMS.newTab(url);
+    };
+
+    //***********************************************************************************
+    // Load an item when the user clicks on an anchor html element
+    //
+    WebGUI.EMS.loadItemFromAnchor = function ( anchorObject ) {
+	var tabContent = anchorObject.hash.substring(1);
+	WebGUI.EMS.loadItem(tabContent);
     };
 
     //***********************************************************************************
@@ -270,12 +283,13 @@ WebGUI.EMS = function (configs) {
         var elCell = this.getTdEl(target);
         if(elCell) {
             var oRecord = this.getRecord(elCell);
+	    var submissionId = oRecord.getData('submissionId');
 
-            if( typeof( WebGUI.EMS.Items[oRecord.submissionId] ) != "undefined" ) {
-	        WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.Items[oRecord.submissionId].Tab);
+            if( typeof( WebGUI.EMS.Items[submissionId] ) != "undefined" ) {
+	        WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.Items[submissionId].Tab);
 	        WebGUI.EMS.loadingIndicator.hide();
 	    }  else {
-		WebGUI.EMS.loadItem( oRecord.submissionId );
+		WebGUI.EMS.loadItem( submissionId );
             }
         } else {
             alert("Could not get table cell for " + target);

@@ -50,7 +50,7 @@ sub addGroupToSubmitList {
     my @ids = split(' ', $self->get('eventSubmissionGroups'));
     my %h;
     @ids = map { $h{$_}++ == 0 ? $_ : () } ( $groupId, @ids );
-    $self->addRevision({eventSubmissionGroups => join( ' ', @ids ) });
+    $self->update({eventSubmissionGroups => join( ' ', @ids ) });
 }
 
 #-------------------------------------------------------------------
@@ -94,7 +94,10 @@ sub addSubmissionForm {
     $params->{className} = 'WebGUI::Asset::EMSSubmissionForm';
     $params->{canSubmitGroupId} ||= 2;
     $self->addGroupToSubmitList($params->{canSubmitGroupId});
-    return $self->addChild($params);
+    my $newAsset = $self->addChild($params);
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
+    $self = $self->cloneFromDb;
+    return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -434,7 +437,7 @@ sub getNextSubmissionId {
     my $self = shift;
     #my $submissionId = $self->get('nextSubmissionId');
     my ($submissionId) = $self->session->db->read('select nextSubmissionId from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
-    $self->addRevision( { nextSubmissionId => ($submissionId + 1) } );
+    $self->update( { nextSubmissionId => ($submissionId + 1) } );
     return $submissionId;
 }
 
@@ -962,6 +965,27 @@ sub www_editBadgeGroupSave {
 		});
 	return $self->www_manageBadgeGroups;
 }
+
+#-------------------------------------------------------------------
+
+=head2  www_editSubmission 
+
+use getLineage to find the item to edit based on submissionId
+then call www_editSubmission on it
+
+=cut
+
+sub www_editSubmission {
+	my $self             = shift;
+        my $submissionId = $self->session->form->get('submissionId');
+        my $asset = $self->getLineage(['descendants'], { returnObjects => 1,
+		    joinClass          => "WebGUI::Asset::EMSSubmission",
+		    whereClause        => 'submissionId = ' . int($submissionId),
+		    includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
+           } );
+        return $asset->[0]->www_editSubmission;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -2545,6 +2569,15 @@ sub www_viewSubmissionQueue {
 	my $i18n = $self->i18n;
     return $self->session->privilege->insufficient() unless $canSubmit || $isRegistrationStaff;
 
+	         # this map returns an array of hash refs with an id,url pair to describe the submissionForm assets
+	my @submissionFormUrls = map { {
+			id => $_->getId,
+			url => $_->getUrl('func=editSubmissionForm')
+		} } (
+		       @{$self->getLineage( ['children'],{ returnObjects => 1,
+			     includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+	                  } ) }
+		  );
 	my $QueueTabData = 
                $self->processTemplate({
                       backUrl => $self->getUrl,
@@ -2555,8 +2588,10 @@ sub www_viewSubmissionQueue {
 		      hasSubmissionForms => $self->hasSubmissionForms,
 		      getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
 		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
+		      editSubmissionUrl =>  $self->getUrl('func=editSubmission'), 
 		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
 		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
+		      submissionFormUrls => \@submissionFormUrls,
                   },$self->get('eventSubmissionQueueTemplateId'));
 
 	return $self->processStyle( 
@@ -2571,6 +2606,7 @@ sub www_viewSubmissionQueue {
 		      getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
 		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
 		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
+		      editSubmissionUrl =>  $self->getUrl('func=editSubmission'), 
 		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
                   },$self->get('eventSubmissionMainTemplateId')));
 }
