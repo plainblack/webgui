@@ -57,6 +57,8 @@ my $numTests = scalar @testSets;
 $numTests += 1; ##testBlock has no name collisions
 $numTests += 3; ##TODO block
 
+plan tests => $numTests;
+
 auto_check($session, \@testSets);
 
 TODO: {
