@@ -336,13 +336,13 @@ A WebGUI::Session object
 =cut
 
 sub www_autoAddToGroup {
-	my $session = shift;
-        return $self->session->privilege->noAccess() if ($session->user->isVisitor);
-	my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
-	if ($group && $group->autoAdd) {
-		$group->addUsers([$session->user->userId],[$session->form->process("groupId")]);
-	}
-	return "";
+    my $session = shift;
+    return $session->privilege->noAccess() if ($session->user->isVisitor);
+    my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
+    if ($group && $group->autoAdd) {
+        $group->addUsers([$session->user->userId],[$session->form->process("groupId")]);
+    }
+    return "";
 }
 
 #-------------------------------------------------------------------
@@ -360,13 +360,13 @@ A WebGUI::Session object
 =cut
 
 sub www_autoDeleteFromGroup {
-	my $session = shift;
-        return $self->session->privilege->noAccess() if ($session->user->isVisitor);
-	my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
-	if ($group && $group->autoDelete) {
-		$group->deleteUsers([$session->user->userId],[$session->form->process("groupId")]);
-	}
-	return "";
+    my $session = shift;
+    return $session->privilege->noAccess() if ($session->user->isVisitor);
+    my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
+    if ($group && $group->autoDelete) {
+        $group->deleteUsers([$session->user->userId],[$session->form->process("groupId")]);
+    }
+    return "";
 }
 
 #-------------------------------------------------------------------
