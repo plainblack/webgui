@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::PageTitle;
 use Data::Dumper;
 
 use Test::More;
@@ -22,12 +23,8 @@ use Test::MockObject;
 my $session = WebGUI::Test->session;
 
 my $numTests = 7;
-$numTests += 1; #For the use_ok
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::PageTitle';
-my $loaded = use_ok($macro);
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
@@ -45,10 +42,7 @@ my $snippet = $homeAsset->addChild({
                         });
 
 $versionTag->commit;
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+addToCleanup($versionTag);
 
 is(
 	WebGUI::Macro::PageTitle::process($session),
@@ -65,7 +59,6 @@ is($output, $homeAsset->get('title'), 'fetching title for site default asset');
 $session->asset($snippet);
 my $macroOutput = WebGUI::Macro::PageTitle::process($session);
 is($macroOutput, $snippet->get('title'), "testing title returned from localy created asset with known title");
-
 
 my $origSessionRequest = $session->{_request};
 
@@ -105,9 +98,3 @@ $operation = 1;
 $function = 1;
 $output = WebGUI::Macro::PageTitle::process($session);
 is($output, $urlizedTitle, 'fetching urlized title via an operation and function');
-
-}
-
-END {
-	$versionTag->rollback;
-}

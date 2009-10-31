@@ -212,6 +212,14 @@ sub definition {
 			hoverHelp		=> $i18n->get('event submission queue template help'),
 			namespace		=> 'EMS/SubmissionQueue',
 		},
+		printRemainingTicketsTemplateId => {
+			fieldType 		=> 'template',
+			defaultValue 	=> 'hreA_bgxiTX-EzWCSZCZJw',
+			tab				=> 'display',
+			label			=> $i18n->get('print remaining ticket template'),
+			hoverHelp		=> $i18n->get('print remaining ticket template help'),
+			namespace		=> 'EMS/PrintRemainingTickets',
+		},
 		badgeInstructions => {
 			fieldType 		=> 'HTMLArea',
 			defaultValue 		=> $i18n->get('default badge instructions'),
@@ -854,6 +862,7 @@ sub www_buildBadge {
 		importTicketsUrl			=> $self->getUrl('func=importEvents'),
 		exportTicketsUrl			=> $self->getUrl('func=exportEvents'),
 		getTicketsUrl				=> $self->getUrl('func=getTicketsAsJson;badgeId='.$badgeId),
+		printRemainingTicketsUrl    => $self->getUrl('func=printRemainingTickets'),
 		canEdit						=> $self->canEdit,
 		hasBadge					=> ($badgeId ne ""),
 		badgeId						=> $badgeId,
@@ -2435,6 +2444,61 @@ sub www_printBadge {
 
 #-------------------------------------------------------------------
 
+=head2 www_printRemainingTickets ()
+
+Displays all of the remaining tickets for this EMS
+
+=cut
+
+sub www_printRemainingTickets {
+	my $self    = shift;
+	my $session = $self->session;
+	return $session->privilege->insufficient() unless ($self->isRegistrationStaff);
+
+	my $var     = $self->get;
+	my $sth     = $session->db->read(qq{
+		SELECT 
+				asset.creationDate,
+				assetData.*,
+				assetData.title as ticketTitle,
+				EMSTicket.price,
+				EMSTicket.seatsAvailable,
+				EMSTicket.startDate as ticketStart,
+				EMSTicket.duration as ticketDuration,
+				EMSTicket.eventNumber as ticketEventNumber,
+				EMSTicket.location as ticketLocation,
+				EMSTicket.relatedBadgeGroups,
+				EMSTicket.relatedRibbons,
+				(seatsAvailable - (select count(*) from EMSRegistrantTicket where ticketAssetId = asset.assetId)) as seatsRemaining
+		FROM 
+				asset 
+				join assetData using (assetId)
+				left join EMSTicket using (assetId) 
+		WHERE 
+				parentId=?
+				and className='WebGUI::Asset::Sku::EMSTicket'
+				and state='published'
+				and EMSTicket.revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId)
+				and (seatsAvailable - (select count(*) from EMSRegistrantTicket where ticketAssetId = asset.assetId)) > 0
+		GROUP BY
+				asset.assetId 
+		ORDER BY
+				title desc
+	},[$self->getId]);
+
+	$var->{'tickets_loop'} = [];
+	while (my $hash = $sth->hashRef) {
+		my $seatsRemaining = $hash->{seatsRemaining};
+		for (my $i = 0; $i < $seatsRemaining; $i++ ) {
+			push(@{$var->{'tickets_loop'}},$hash);
+		}
+	}
+
+	return $self->processTemplate($var,$self->get('printRemainingTicketsTemplateId'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_printTicket ( )
 
 Prints a ticket using a template.
@@ -2515,7 +2579,7 @@ Toggles the registrant checked in flag.
 
 sub www_toggleRegistrantCheckedIn {
 	my $self = shift;
-	return $self->session->privilege->insfufficient() unless ($self->isRegistrationStaff);
+	return $self->session->privilege->insufficient() unless ($self->isRegistrationStaff);
 	my $db = $self->session->db;
 	my $badgeId = $self->session->form->param('badgeId');
 	my $flag = $db->quickScalar("select hasCheckedIn from EMSRegistrant where badgeId=?",[$badgeId]);
@@ -2523,7 +2587,6 @@ sub www_toggleRegistrantCheckedIn {
 	$db->write("update EMSRegistrant set hasCheckedIn=? where badgeId=?",[$flag, $badgeId]);
 	return $self->www_manageRegistrant;
 }
-
 
 #-------------------------------------------------------------------
 

@@ -560,6 +560,25 @@ our $I18N = {
         context        => q|help for a property label|,
     },
 
+    
+    'print remaining ticket template' => {
+        message     => q|Print Remaining Tickets Template|,
+        lastUpdated    => 0,
+        context        => q|a property label|,
+    },
+
+    'print remaining ticket template help' => {
+        message     => q|Which template would you like to use for printing remaining tickets?|,
+        lastUpdated    => 0,
+        context        => q|help for a property label|,
+    },
+
+    'print remaining tickets' => {
+        message     => q|Print Remaining Tickets|,
+        lastUpdated    => 0,
+        context        => q|a link label on the builder page|,
+    },
+
     'badge builder template' => {
         message     => q|Badge Builder Template|,
         lastUpdated    => 0,
@@ -2044,11 +2063,199 @@ normal templates.|,
 		lastUpdated => 1131394072,
 		context => q|This is the help text for the 'next submission id' field, the user should be reminded not to edit this field.|
 	},
+    'print remaining ticket template help' => {
+        message => q|EMS Print Remaining Ticket Template|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'tickets_loop' => {
+        message => q|A loop containing all of the remaining tickets and their associated data|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'seatsRemaining' => {
+        message => q|Total number of seats remaining for the ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'seatsAvailable' => {
+        message => q|Total number of seats available for the ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+    
+    'relatedRibbons' => {
+        message => q|Ribbons related to the ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'relatedBadgeGroups' => {
+        message => q|Badge groups related to the ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'title' => {
+        message => q|The title of the ticket to be printed.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'menuTitle' => {
+        message => q|The title of the ticket to be displayed in the menu.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'synopsis' => {
+        message => q|Synopsis of the description for the ticket.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'assetId' => {
+        message => q|Asset Id of the ticket.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'assetSize' => {
+        message => q|Size of this ticket asset|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'creationDate' => {
+        message => q|Epoch value date for when the asset was created|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'encryptPage' => {
+        message => q|Whether or not to encrypt the page that the ticket is dipslayed on|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'extraHeadTags' => {
+        message => q|Extra tags that should be displayed in the header that this ticket is displayed on|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'extraHeadTagsPacked' => {
+        message => q|Extra tags that should be displayed in the header that this tikcet is displayed on minimized so no whitespace exists|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'groupIdEdit' => {
+        message => q|The id of the group that can edit this ticket.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'groupIdView' => {
+        message => q|The id of the group that can view this ticket.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'inheritUrlFromParent' => {
+        message => q|Whether or not to inherit the url from the parent|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'isExportable' => {
+        message => q|Whether or not this ticket is exportable|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'isHidden' => {
+        message => q|Whether or not this ticket should be hidden from the menu.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'isPrototype' => {
+        message => q|Whether or not this ticket asset is a prototype|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'isPackage' => {
+        message => q|Whether or not this ticket asset is a package|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'lastModified' => {
+        message => q|Epoch date for when this ticket was last modified|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'newWindow' => {
+        message => q|Whether this ticket should be displayed in a new window|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'ownerUserId' => {
+        message => q|User Id of the owner of this ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'revisedBy' => {
+        message => q|Id of the user who last modified this ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'revisionDate' => {
+        message => q|Epoch date for when this ticket was last revised|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'skipNotification' => {
+        message => q|Whether or not notifications for this ticket should be skipped.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'tagId' => {
+        message => q|Tag Id for this asset|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'usePackedHeadTags' => {
+        message => q|Whether or not packed head tags should be used for this ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'printRemainingTicketsUrl' => {
+        message => q|URL to the print remaining tickets page|,
+        lastUpdated => 1147050475,
+        context => q|Field Label|,
+    },
+
+    
 #    'TODO' => {
 #        message => q|TODO|,
 #        lastUpdated => 1147050475,
 #        context => q|TODO|,
 #    },
+
 
 };
 

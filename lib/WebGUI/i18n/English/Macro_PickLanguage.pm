@@ -40,6 +40,21 @@ our $I18N = { ##hashref of hashes
                 lastUpdated => 1131394072,
                 context => q|The url to change languages|
         },
+	'delete_url' => {
+		message => q|The url that deletes the scratch language from the session.|,
+		lastUpdated => 1131394072,
+		context => q|A template var to remove the scratch language|
+	},
+        'delete' => {
+                message => q|Go back to profile language.|,
+                lastUpdated => 1131394072,
+                context => q|An internationalized label to go back to the profile language|
+        },
+        'delete_label' => {
+                message => q|A label for the link to go back to the profile language.|,
+                lastUpdated => 1131394072,
+                context => q|Help for delete_label|
+        },
 
 
 };

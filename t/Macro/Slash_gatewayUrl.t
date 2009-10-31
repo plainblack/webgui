@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::Slash_gatewayUrl;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -24,17 +25,7 @@ my $session = WebGUI::Test->session;
 ##in t/Session/Url.t  All we need to do is make sure that the macro
 ##fetches the same thing as the method.
 
-my $numTests = 4;
-$numTests += 1; #For the use_ok
-
-plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::Slash_gatewayUrl';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+plan tests => 4;
 
 $session->setting->set('preventProxyCache', 0);
 
@@ -54,9 +45,3 @@ like($output, qr{/\?noCache=\d+:\d+$}, 'checking the cache settings in the URL')
 $output = WebGUI::Macro::Slash_gatewayUrl::process($session, '/foo/bar');
 like($output, qr{/foo/bar\?noCache=\d+:\d+$}, 'checking the cache settings in the URL are at the end of the URL');
 
-$session->setting->set('preventProxyCache', 0);
-
-}
-
-END {
-}

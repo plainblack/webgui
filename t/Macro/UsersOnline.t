@@ -29,130 +29,119 @@ my $template = setupJSONtemplate($session);
 my @users = setupUsers($session);
 my $i18n = WebGUI::International->new($session,'Macro_UsersOnline');
 
-my $numTests = 1;   # Module loading test
-$numTests += 30;    # Static tests
+plan tests => 30;
 
-plan tests => $numTests;
+# Basic testing -----------------------------------------------------------
 
-my $macro = 'WebGUI::Macro::UsersOnline';
-my $loaded = use_ok($macro);
+# Check for default template
+my $defTemplate = WebGUI::Asset->new($session, 'h_T2xtOxGRQ9QJOR6ebLpQ');
+ok(defined $defTemplate, 'default template is present');
 
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
-
-    # Basic testing -----------------------------------------------------------
-
-    # Check for default template
-    my $defTemplate = WebGUI::Asset->new($session, 'h_T2xtOxGRQ9QJOR6ebLpQ');
-    ok(defined $defTemplate, 'default template is present');
-
-    # Call with default values
- 	my $html = WebGUI::Macro::UsersOnline::process($session);
-    cmp_ok((length $html), '>', 0, 'call with default template and values returns some output');
+# Call with default values
+my $html = WebGUI::Macro::UsersOnline::process($session);
+cmp_ok((length $html), '>', 0, 'call with default template and values returns some output');
 
 
-    # Test labels -------------------------------------------------------------
+# Test labels -------------------------------------------------------------
 
-    $session->user({userId => 1});
- 	my $json = WebGUI::Macro::UsersOnline::process($session, $template->getId);
-	my $vars = JSON::from_json($json);
+$session->user({userId => 1});
+my $json = WebGUI::Macro::UsersOnline::process($session, $template->getId);
+my $vars = JSON::from_json($json);
 
-	is($vars->{'usersOnline_label'}, $i18n->get('Users Online'), 'usersOnline_label');
-	is($vars->{'members_label'}, $i18n->get('Members'), 'members_label');
-	is($vars->{'visitors_label'}, $i18n->get('Visitors'), 'visitors_label');
-	is($vars->{'total_label'}, $i18n->get('Total'), 'total_label');
-	is($vars->{'membersOnline_label'}, $i18n->get('Members Online'), 'membersOnline_label');
-	is($vars->{'visitorsOnline_label'}, $i18n->get('Visitors Online'), 'visitorsOnline_label');
-	is($vars->{'avatar_label'}, $i18n->get('Avatar'), 'avatar_label');
-	is($vars->{'name_label'}, $i18n->get('Name'), 'name_label');
-	is($vars->{'alias_label'}, $i18n->get('Alias'), 'alias_label');
-	is($vars->{'session_label'}, $i18n->get('Session'), 'session_label');
-	is($vars->{'ip_label'}, $i18n->get('IP'), 'ip_label');
-	is($vars->{'lastActivity_label'}, $i18n->get('Last Activity'), 'lastActivity_label');
+is($vars->{'usersOnline_label'}, $i18n->get('Users Online'), 'usersOnline_label');
+is($vars->{'members_label'}, $i18n->get('Members'), 'members_label');
+is($vars->{'visitors_label'}, $i18n->get('Visitors'), 'visitors_label');
+is($vars->{'total_label'}, $i18n->get('Total'), 'total_label');
+is($vars->{'membersOnline_label'}, $i18n->get('Members Online'), 'membersOnline_label');
+is($vars->{'visitorsOnline_label'}, $i18n->get('Visitors Online'), 'visitorsOnline_label');
+is($vars->{'avatar_label'}, $i18n->get('Avatar'), 'avatar_label');
+is($vars->{'name_label'}, $i18n->get('Name'), 'name_label');
+is($vars->{'alias_label'}, $i18n->get('Alias'), 'alias_label');
+is($vars->{'session_label'}, $i18n->get('Session'), 'session_label');
+is($vars->{'ip_label'}, $i18n->get('IP'), 'ip_label');
+is($vars->{'lastActivity_label'}, $i18n->get('Last Activity'), 'lastActivity_label');
 
 
-    # Test logic --------------------------------------------------------------
+# Test logic --------------------------------------------------------------
 
-	like($vars->{'visitors'},  qr/[0-9]+/, 'visitors is numeric');
+like($vars->{'visitors'},  qr/[0-9]+/, 'visitors is numeric');
 # Does not work in testing environments that run on the loopback interface,
 # since these queries are filtered out by the macro.
 #    is($vars->{'visitors'} > 0, 1, 'visitors > 0 when calling as visitor');
-	like($vars->{'members'}, qr/[0-9]+/, 'members is numeric');
-    cmp_ok($vars->{'members'}, '>', 0, 'members > 0 since we have created one visible active member');
-	is($vars->{'total'}, $vars->{'visitors'} + $vars->{'members'}, 'total == visitors + members');
-	ok($vars->{'isVisitor'}, 'isVisitor is true when calling as visitor');
-	ok(defined $vars->{'hasMembers'}, 'hasMembers is defined since we have created one visible active member');
+like($vars->{'members'}, qr/[0-9]+/, 'members is numeric');
+cmp_ok($vars->{'members'}, '>', 0, 'members > 0 since we have created one visible active member');
+is($vars->{'total'}, $vars->{'visitors'} + $vars->{'members'}, 'total == visitors + members');
+ok($vars->{'isVisitor'}, 'isVisitor is true when calling as visitor');
+ok(defined $vars->{'hasMembers'}, 'hasMembers is defined since we have created one visible active member');
 
 
-    # Check member loop -------------------------------------------------------
+# Check member loop -------------------------------------------------------
 
-    my $allFieldsSet = 1;
-    my $firstUserPresent = 0;
-    my $secondUserAbsent = 1;
+my $allFieldsSet = 1;
+my $firstUserPresent = 0;
+my $secondUserAbsent = 1;
 
-    foreach (@{$vars->{'member_loop'}}) {
-        # Check whether first user is present
-        if ($_->{'username'} eq 'tester1') {
-                # Indicate success
-                $firstUserPresent = 1;
-                # Check whether alias and name have been set correctly
-                $allFieldsSet = $_->{'alias'} eq 'alias1';
-                $allFieldsSet &&= $_->{'firstName'} eq 'first1';
-                $allFieldsSet &&= $_->{'middleName'} eq 'middle1';
-                $allFieldsSet &&= $_->{'lastName'} eq 'last1';
-        }
-
-        # Check whether second user is present
-        if ($_->{'username'} eq 'tester2') {
-                # Indicate failure
-                $secondUserAbsent = 0;
-        }        
-
-        # Check whether remaining fields have been set. Note that we cannot
-        # check for the alias, name or avatar, since these values may be 
-        # optional.
-        $allFieldsSet &&= $_->{'uid'} =~ /.*/;
-        $allFieldsSet &&= $_->{'sessionId'} =~ /.*/;
-#        $allFieldsSet &&= $_->{'ip'} =~ /.*/;  # IP is not set for our test user
-        $allFieldsSet &&= $_->{'lastActivity'} =~ /.*/;
-    }
-    # Check booleans indicating errors
-	ok($allFieldsSet,     'fields in the member loop have been set correctly');
-	ok($firstUserPresent, 'the first user is present in the member loop');
-	ok($secondUserAbsent, 'the second user is absent from the member loop');
-
-
-    # Check visitor loop ------------------------------------------------------
-
-    $allFieldsSet = 1;
-
-    foreach (@{$vars->{'visitor_loop'}}) {
-#        $allFieldsSet &&= $_->{'ip'} =~ /.*/;  # IP is not set for our test user
-        $allFieldsSet &&= $_->{'sessionId'} =~ /.*/;
-        $allFieldsSet &&= $_->{'lastActivity'} =~ /.*/;
+foreach (@{$vars->{'member_loop'}}) {
+    # Check whether first user is present
+    if ($_->{'username'} eq 'tester1') {
+            # Indicate success
+            $firstUserPresent = 1;
+            # Check whether alias and name have been set correctly
+            $allFieldsSet = $_->{'alias'} eq 'alias1';
+            $allFieldsSet &&= $_->{'firstName'} eq 'first1';
+            $allFieldsSet &&= $_->{'middleName'} eq 'middle1';
+            $allFieldsSet &&= $_->{'lastName'} eq 'last1';
     }
 
-    # Check booleans indicating errors
-	ok($allFieldsSet, 'fields in the visitor loop have been set correctly');
+    # Check whether second user is present
+    if ($_->{'username'} eq 'tester2') {
+            # Indicate failure
+            $secondUserAbsent = 0;
+    }        
 
-
-    # Test macro parameters ---------------------------------------------------
-    
-    # Call with zero max limits
- 	$json = WebGUI::Macro::UsersOnline::process($session, $template->getId, undef, 0, 0);
-	$vars = JSON::from_json($json);
-	ok(!defined $vars->{'hasMembers'},     'hasMembers undefined when display limit is set to zero');
-    is(@{$vars->{'member_loop'}}  == 0, 1, 'empty member loop when display limit is set to zero');
-    is(@{$vars->{'visitor_loop'}} == 0, 1, 'empty visitor loop when display limit is set to zero');
-    
-    # Call with zero max inactivity time
-    $json = WebGUI::Macro::UsersOnline::process($session, $template->getId, 0, undef, undef);
-    $vars = JSON::from_json($json);
-    ok(!defined $vars->{'hasMembers'},     'hasMembers undefined when max inactivity time is set to zero');
-    is(@{$vars->{'member_loop'}}  == 0, 1, 'empty member loop when max inactivity time is set to zero');
-    is(@{$vars->{'visitor_loop'}} == 0, 1, 'empty visitor loop when max inactivity time is set to zero');
+    # Check whether remaining fields have been set. Note that we cannot
+    # check for the alias, name or avatar, since these values may be 
+    # optional.
+    $allFieldsSet &&= $_->{'uid'} =~ /.*/;
+    $allFieldsSet &&= $_->{'sessionId'} =~ /.*/;
+#        $allFieldsSet &&= $_->{'ip'} =~ /.*/;  # IP is not set for our test user
+    $allFieldsSet &&= $_->{'lastActivity'} =~ /.*/;
 }
+# Check booleans indicating errors
+ok($allFieldsSet,     'fields in the member loop have been set correctly');
+ok($firstUserPresent, 'the first user is present in the member loop');
+ok($secondUserAbsent, 'the second user is absent from the member loop');
+
+
+# Check visitor loop ------------------------------------------------------
+
+$allFieldsSet = 1;
+
+foreach (@{$vars->{'visitor_loop'}}) {
+#        $allFieldsSet &&= $_->{'ip'} =~ /.*/;  # IP is not set for our test user
+    $allFieldsSet &&= $_->{'sessionId'} =~ /.*/;
+    $allFieldsSet &&= $_->{'lastActivity'} =~ /.*/;
+}
+
+# Check booleans indicating errors
+ok($allFieldsSet, 'fields in the visitor loop have been set correctly');
+
+
+# Test macro parameters ---------------------------------------------------
+
+# Call with zero max limits
+$json = WebGUI::Macro::UsersOnline::process($session, $template->getId, undef, 0, 0);
+$vars = JSON::from_json($json);
+ok(!defined $vars->{'hasMembers'},     'hasMembers undefined when display limit is set to zero');
+is(@{$vars->{'member_loop'}}  == 0, 1, 'empty member loop when display limit is set to zero');
+is(@{$vars->{'visitor_loop'}} == 0, 1, 'empty visitor loop when display limit is set to zero');
+
+# Call with zero max inactivity time
+$json = WebGUI::Macro::UsersOnline::process($session, $template->getId, 0, undef, undef);
+$vars = JSON::from_json($json);
+ok(!defined $vars->{'hasMembers'},     'hasMembers undefined when max inactivity time is set to zero');
+is(@{$vars->{'member_loop'}}  == 0, 1, 'empty member loop when max inactivity time is set to zero');
+is(@{$vars->{'visitor_loop'}} == 0, 1, 'empty visitor loop when max inactivity time is set to zero');
 
 
 sub setupUsers {
@@ -192,7 +181,7 @@ sub setupUsers {
         my $newSession = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
         $newSession->user({user => $_});
     }
-    WebGUI::Test->usersToDelete(@users);
+    addToCleanup(@users);
     return @users;
 }
 
@@ -246,10 +235,6 @@ sub setupJSONtemplate {
     }
 EOTMPL
     my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', namespace => 'Macro/UsersOnline', template=>$templateBody});
+    addToCleanup($template);
     return $template;
-}
-
-
-END { ##Clean-up after yourself, always
-	$template->purge;
 }
