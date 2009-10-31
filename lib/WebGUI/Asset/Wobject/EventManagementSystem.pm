@@ -938,6 +938,63 @@ sub www_editBadgeGroupSave {
 
 #-------------------------------------------------------------------
 
+=head2  www_editSubmission 
+
+use getLineage to find the item to edit based on submissionId
+then call www_editSubmission on it
+
+=cut
+
+sub www_editSubmission {
+	my $self             = shift;
+        my $submissionId = $self->session->form->get('submissionId');
+        my $asset = $self->getLineage(['descendants'], { returnObjects => 1,
+		    joinClass          => "WebGUI::Asset::EMSSubmission",
+		    whereClause        => 'submissionId = ' . int($submissionId),
+		    includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
+           } );
+        return $asset->[0]->www_editSubmission;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2  www_editSubmissionForm 
+
+calls editSubmissionForm in WebGUI::Asset::EMSSubmissionForm
+
+=cut
+
+sub www_editSubmissionForm {
+	my $self             = shift;
+	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
+	return WebGUI::Asset::EMSSubmissionForm->www_editSubmissionForm($self,shift);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2  www_editSubmissionFormSave
+
+test and save data posted from editSubmissionForm...
+
+=cut
+
+sub www_editSubmissionFormSave {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
+	my $formParams = WebGUI::Asset::EMSSubmissionForm->processForm($self);
+        if( $formParams->{_isValid} ) {
+            delete $formParams->{_isValid};
+	    $self->addSubmissionForm($formParams);
+	    return $self->www_viewSubmissionQueue;
+        } else {
+	    return $self->www_editSubmissionForm($formParams);
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_editEventMetaField ( )
 
 Displays the edit form for event meta fields.

@@ -68,10 +68,13 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 =cut
 
+use lib '/root/pb/lib'; use dav;
+
 sub execute {
 	my $self    = shift;
     my $session = $self->session;
     my $root    = WebGUI::Asset->getRoot($session);
+dav::log __PACKAGE__ . " executing\n";
 
     # keep track of how much time it's taking
     my $start   = time;

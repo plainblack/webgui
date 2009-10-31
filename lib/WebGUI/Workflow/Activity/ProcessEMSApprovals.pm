@@ -69,7 +69,6 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 =cut
 
-
 sub execute {
 	my $self    = shift;
     my $session = $self->session;
