@@ -13,8 +13,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::RootTitle;
 use WebGUI::Session;
+use WebGUI::Macro::RootTitle;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -32,6 +32,7 @@ my $session = WebGUI::Test->session;
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Adding assets for RootTitle tests"});
+addToCleanup($versionTag);
 
 my $root = WebGUI::Asset->getRoot($session);
 my %properties_A = (
@@ -160,16 +161,9 @@ my @testSets = (
 );
 
 my $numTests = scalar @testSets; 
-$numTests += 2;
+$numTests += 1;
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::RootTitle';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 is(
 	WebGUI::Macro::RootTitle::process($session),
@@ -182,13 +176,4 @@ foreach my $testSet (@testSets) {
 	$session->asset($testSet->{asset});
 	my $output =  WebGUI::Macro::RootTitle::process($session);
 	is($output, $testSet->{title}, $testSet->{comment});
-}
-
-}
-
-END { ##Clean-up after yourself, always
-	$session->db->write('update asset set lineage=? where assetId=?',[$origLineage, $asset_->getId]);
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
 }

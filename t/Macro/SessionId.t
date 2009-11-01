@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::SessionId;
 use HTML::TokeParser;
 use Data::Dumper;
 
@@ -21,16 +22,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $numTests =  1;
-$numTests    += 1; #For the use_ok
-plan tests   => 2;
+plan tests   => 1;
 
-my $macro = 'WebGUI::Macro::SessionId';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
-	my $output = WebGUI::Macro::SessionId::process( $session );
-    is($session->getId, $output, 'Session macro works');
-}
+my $output = WebGUI::Macro::SessionId::process( $session );
+is($session->getId, $output, 'Session macro works');
