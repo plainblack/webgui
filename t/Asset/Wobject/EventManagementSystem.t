@@ -78,7 +78,7 @@ isa_ok($ems, 'WebGUI::Asset::Wobject::EventManagementSystem');
 
 # Test to see if we can set new values
 my $newEMSSettings = {
-    timezone => 'America/New York',
+    timezone => 'America/New_York',
 };
 
 # update the new values for this instance
@@ -227,7 +227,8 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
         'revisedBy'             => ignore(),
         'isExportable'          => ignore(),
         'creationDate'          => ignore(),
-        'ticketStart'           => '2009-01-01 14:00:00'
+        'ticketStart'           => '2009-01-01 09:00',
+        'ticketStart_epoch'     => '1230818400',
     };
 
     my $ticket2 = {
@@ -266,7 +267,8 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
         'revisedBy'             => ignore(),
         'isExportable'          => ignore(),
         'creationDate'          => ignore(),
-        'ticketStart'           => '2009-01-01 14:00:00'
+        'ticketStart'           => '2009-01-01 09:00',
+        'ticketStart_epoch'     => '1230818400',
     };
     
     my @ticketArray = ();

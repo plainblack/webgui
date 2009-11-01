@@ -2084,6 +2084,17 @@ normal templates.|,
         context => q|Field Label|,
     },
 
+    'eventMetaData' => {
+        message => q|Meta data for the event returned as a JSON data structure|,
+        lastUpdated => 1147050475,
+        context => q|Field Label|,
+    },
+
+    'ticketMeta_[LABEL]' => {
+        message => q|Value for the meta data field [LABEL].  Non word and whitespace characters in [LABEL] should be replaced with an underscore.  <br/><br/>Ex: Meta Data Label: "First Name" should be referenced: &lt;tmpl_var ticketMeta_First_Name&gt; and so on|,
+        lastUpdated => 1147050475,
+        context => q|Field Label|,
+    },
     
 
 };
