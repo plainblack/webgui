@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
+use WebGUI::Macro::PickLanguage;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
@@ -24,12 +25,7 @@ my $session = WebGUI::Test->session;
  
 my $numTests = 3;
  
-$numTests += 1; #For the use_ok
- 
 plan tests => $numTests;
- 
-my $macro = 'WebGUI::Macro::PickLanguage';
-my $loaded = use_ok($macro);
  
 my $macroMock = Test::MockObject->new({});
 $macroMock->set_isa('WebGUI::Macro::PickLanguage');
