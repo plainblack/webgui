@@ -6,6 +6,7 @@
  - fixed #11135: Tree Navigation menu template shows a drop down fly-out menu
  - fixed #10984: Edit Survey Screen isn't right in demo
  - fixed: RSS feeds generated with incorrect link for channel
+ - fixed #11188: Incoherence in Navigation edit form
 
 7.7.24
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
