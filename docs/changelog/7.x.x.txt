@@ -8,6 +8,7 @@
  - fixed: RSS feeds generated with incorrect link for channel
  - fixed #11188: Incoherence in Navigation edit form
  - fixed #11189: Controls variable missing in image asset in AssetProxy
+ - fixed #11190: event tmpl_var in help but not available
 
 7.7.24
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17

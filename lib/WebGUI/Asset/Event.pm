@@ -2063,6 +2063,13 @@ sub www_edit {
             size        => 22,
         });
 
+    # synopsis
+    $var->{"formSynopsis"} 
+        = WebGUI::Form::textarea($session, {
+            name        => "synopsis",
+            value       => $form->process("synopsis") || $self->get("synopsis"),
+        });
+
     # Group to View
     $var->{"formGroupIdView"} 
         = WebGUI::Form::Group($session, {
