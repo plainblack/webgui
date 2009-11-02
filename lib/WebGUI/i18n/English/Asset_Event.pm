@@ -35,6 +35,11 @@ our $I18N = {
 		lastUpdated	=> 1171067211,
 	},
 
+	'formSynopsis'	=> {
+		message		=> q|HTML form for entering or editing the Event Synopsis.|,
+		lastUpdated	=> 1171067211,
+	},
+
 	'formLocation'	=> {
 		message		=> q|HTML form for entering or editing the Event Location.|,
 		lastUpdated	=> 1171067211,

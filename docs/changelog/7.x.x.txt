@@ -34,6 +34,7 @@
  - added: print remaining tickets feature to EMS
  - fixed #11188: Incoherence in Navigation edit form
  - fixed #11189: Controls variable missing in image asset in AssetProxy
+ - fixed #11190: event tmpl_var in help but not available
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
