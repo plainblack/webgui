@@ -32,6 +32,7 @@
  - fixed #10984: Edit Survey Screen isn't right in demo
  - added: getTopKeywords method to Keywords API
  - added: print remaining tickets feature to EMS
+ - fixed #11188: Incoherence in Navigation edit form
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
