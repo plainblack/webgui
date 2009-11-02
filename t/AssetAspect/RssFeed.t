@@ -103,7 +103,7 @@ cmp_deeply(
     methods(
         title        => 'Dummy Title',
         description  => 'Dummy Synopsis',  ##Not description
-        link         => '/home/shawshank',
+        link         => $session->url->getSiteURL . '/home/shawshank',
         copyright    => undef,
     ),
     '... title, description, link inherit from asset by default, copyright unset'
@@ -139,7 +139,7 @@ cmp_deeply(
     methods(
         title        => 'Rita Hayworth and the Shawshank Redemption',
         description  => 'A good movie, providing loads of testing collateral',
-        link         => '/home/shawshank',
+        link         => $session->url->getSiteURL . '/home/shawshank',
         copyright    => 'copyright 2009 Plain Black Corporation',
     ),
     '... feed settings override asset defaults, copyright'
