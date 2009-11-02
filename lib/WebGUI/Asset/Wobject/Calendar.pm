@@ -1296,11 +1296,8 @@ sub viewList {
     ### Get the events
     my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} );
     $dtStart->set_time_zone($tz);
-    $dtStart->truncate( to => 'day' );
     my $dtEnd       = $dtStart->clone->add( seconds => $self->get('listViewPageInterval') );
 
-    warn 'truncated: '.$dtStart->toDatabase;
-    warn 'end date: '.$dtEnd->toDatabase;
     my @events
         = $self->getEventsIn(
             $dtStart->toDatabase,
@@ -1910,8 +1907,6 @@ sub www_ical {
         $dt_start->set_time_zone( $session->datetime->getTimeZone );
     }
 
-    $session->log->warn("start1: ". $dt_start->toMysql);
-
     my $dt_end;
     my $end         = $form->param("end");
     if ($end) {
@@ -1925,10 +1920,6 @@ sub www_ical {
         $dt_end = $dt_start->clone->add( seconds => $self->get('icalInterval') );
     }
 
-    $session->log->warn("start2: ". $dt_start->toMysql);
-    $session->log->warn("end2:   ". $dt_end->toMysql);
-
-
     # Get all the events we're going to display
     my @events    = $self->getEventsIn($dt_start->toMysql,$dt_end->toMysql);
 
@@ -1938,11 +1929,8 @@ sub www_ical {
                 . qq{VERSION:2.0\r\n};
 
     # VEVENT:
-    $session->log->warn("before event processing");
     EVENT: for my $event (@events) {
-        $session->log->warn("have event: ");
         next EVENT unless $event->canView();
-        $session->log->warn($event->getTitle);
         $ical   .= qq{BEGIN:VEVENT\r\n};
 
         ### UID
