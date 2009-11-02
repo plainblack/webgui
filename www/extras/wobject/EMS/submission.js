@@ -95,7 +95,6 @@ WebGUI.EMS = function (configs) {
         if( WebGUI.EMS.lastTab ) {
 	   WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.lastTab);
         }
-	window.location.hash = "";
     };
 
     //***********************************************************************************
@@ -155,8 +154,9 @@ WebGUI.EMS = function (configs) {
 		       }
 		       alert(message);
 		       return;
-		   } else if( typeof(WebGUI.EMS.Items[response.title]) == "undefined" 
-			      || WebGUI.EMS.Items[response.title] == null ) {
+		        // currently only one tab exists, so instead of checking we just delete it and recreate
+		   } else { // if( typeof(WebGUI.EMS.Items[response.title]) == "undefined" 
+			      // || WebGUI.EMS.Items[response.title] == null ) {
 		       // if there is a tab .. close it,
 		       // at least until I can get the JS/HTML re-written to handle multiple tabs
 		       //  there should only be one
@@ -172,9 +172,9 @@ WebGUI.EMS = function (configs) {
 		       YAHOO.util.Event.on(myTab.getElementsByClassName('close')[0], 'click', WebGUI.EMS.closeTab , myTab);
 		       WebGUI.EMS.Items[response.title] = new Object();
 		       WebGUI.EMS.Items[response.title].Tab = myTab;
-		   } else {
-		       myTab = WebGUI.EMS.Items[response.title].Tab;
-		       myTab.set('content', response.text);
+		   //} else {
+		       //myTab = WebGUI.EMS.Items[response.title].Tab;
+		       //myTab.set('content', response.text);
 		   }
 		   // make sure the script on the ticket has run
 		   // if( typeof( WebGUI.ticketJScriptRun ) == "undefined" ) {

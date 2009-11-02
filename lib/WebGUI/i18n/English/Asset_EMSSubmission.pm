@@ -38,6 +38,12 @@ our $I18N = { ##hashref of hashes
 		context => q|Help text for the submission status field.|
 	},
 
+	'your submission has been updated' => {
+		message => q|Your event submission has been updated.|,
+		lastUpdated => 1131394072,
+		context => q|Message used to notify user when someone else changes their event submission.|
+	},
+
 #	'TODO' => {
 #		message => q|TODO|,
 #		lastUpdated => 1131394072,

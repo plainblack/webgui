@@ -698,9 +698,9 @@ sub view {
 		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
 		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
-		addSubmissionUrl	=> $self->getUrl('func=addSubmission'),
+		addSubmissionUrl	=> $self->getUrl('func=viewSubmissionQueue#addSubmission'),
 		viewSubmissionQueueUrl	=> $self->getUrl('func=viewSubmissionQueue'),
-		addSubmissionFormUrl	=> $self->getUrl('func=addSubmissionForm'),
+		addSubmissionFormUrl	=> $self->getUrl('func=viewSubmissionQueue#addSubmissionForm'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
 		isRegistrationStaff				=> $self->isRegistrationStaff,
@@ -1006,7 +1006,7 @@ calls editSubmissionForm in WebGUI::Asset::EMSSubmissionForm
 
 sub www_editSubmissionForm {
 	my $self             = shift;
-	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
+	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff || $self->canEdit;
 	return WebGUI::Asset::EMSSubmissionForm->www_editSubmissionForm($self,shift);
 }
 
@@ -2635,43 +2635,36 @@ sub www_viewSubmissionQueue {
 	         # this map returns an array of hash refs with an id,url pair to describe the submissionForm assets
 	my @submissionFormUrls = map { {
 			id => $_->getId,
-			url => $_->getUrl('func=editSubmissionForm')
+			title => $_->get('title'),
+			linkUrl => $self->getUrl('func=viewSubmissionQueue#' . $_->getId ),
+			ajaxUrl => $_->getUrl('func=editSubmissionForm'),
 		} } (
 		       @{$self->getLineage( ['children'],{ returnObjects => 1,
 			     includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
 	                  } ) }
 		  );
-	my $QueueTabData = 
-               $self->processTemplate({
-                      backUrl => $self->getUrl,
-		      isRegistrationStaff => $isRegistrationStaff,
-		      canEdit		=> $canEdit,
-		      mainUrl    => $self->getUrl,
-		      canSubmit => $canSubmit,
-		      hasSubmissionForms => $self->hasSubmissionForms,
-		      getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
-		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
-		      editSubmissionUrl =>  $self->getUrl('func=editSubmission'), 
-		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
-		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
-		      submissionFormUrls => \@submissionFormUrls,
-                  },$self->get('eventSubmissionQueueTemplateId'));
+	my $params = {
+		  backUrl => $self->getUrl,
+		  isRegistrationStaff => $isRegistrationStaff,
+		  canEdit		=> $canEdit,
+		  canSubmit => $canSubmit,
+		  hasSubmissionForms => $self->hasSubmissionForms,
+		  getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
+		  editSubmissionUrl =>  $self->getUrl('func=viewSubmissionQueue#editSubmission'), 
+		  editSubmissionFormUrl =>  $self->getUrl('func=viewSubmissionQueue#editSubmissionForm'), 
+		  addSubmissionFormUrl => $self->getUrl('func=viewSubmissionQueue#addSubmissionForm'),
+		  addSubmissionUrl => $self->getUrl('func=viewSubmissionQueue#addSubmission'),
+		  editSubmissionAjaxUrl =>  $self->getUrl('func=editSubmission'), 
+		  editSubmissionFormAjaxUrl =>  $self->getUrl('func=editSubmissionForm'), 
+		  addSubmissionFormAjaxUrl => $self->getUrl('func=addSubmissionForm'),
+		  addSubmissionAjaxUrl => $self->getUrl('func=addSubmission'),
+		  submissionFormUrls => \@submissionFormUrls,
+		  queueTabTitle   => $isRegistrationStaff ? $i18n->get('submission queue') : $i18n->get('my submissions'),
+	};
+	$params->{QueueTabData} = $self->processTemplate($params,$self->get('eventSubmissionQueueTemplateId'));
 
 	return $self->processStyle( 
-               $self->processTemplate({ 
-                      queueTabTitle   => $isRegistrationStaff ? $i18n->get('submission queue') : $i18n->get('my submissions'),
-                      queueTabData   => $QueueTabData,
-                      backUrl => $self->getUrl,
-		      isRegistrationStaff => $isRegistrationStaff,
-		      canEdit			=> $canEdit,
-		      canSubmit => $canSubmit,
-		      hasSubmissionForms => $self->hasSubmissionForms,
-		      getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
-		      addSubmissionFormUrl => $self->getUrl('func=addSubmissionForm'),
-		      editSubmissionFormUrl =>  $self->getUrl('func=editSubmissionForm'), 
-		      editSubmissionUrl =>  $self->getUrl('func=editSubmission'), 
-		      addSubmissionUrl => $self->getUrl('func=addSubmission'),
-                  },$self->get('eventSubmissionMainTemplateId')));
+               $self->processTemplate( $params, $self->get('eventSubmissionMainTemplateId')));
 }
 
 1;

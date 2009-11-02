@@ -216,7 +216,7 @@ my $submission = {
         };
 $session->request->setup_body($submission);
 my $sub1 = $frmA->addSubmission;
-push @cleanup, sub  { $sub1->delete; };
+push @cleanup, sub  { $sub1->puge; };
 print join( "\n", @{$sub1->{errors}} ),"\n" if defined $sub1->{errors};
 my $isa1 = isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "userA/formA valid submission succeeded" );
 ok( $ems->hasSubmissions, 'UserA has submissions on this ems' );
@@ -234,7 +234,7 @@ my $submission = {
         };
 $session->request->setup_body($submission);
 my $sub2 = $frmB->addSubmission;
-push @cleanup, sub  { $sub2->delete; };
+push @cleanup, sub  { $sub2->purge; };
 my $isa2 = isa_ok( $sub2, 'WebGUI::Asset::EMSSubmission', "userB/FormB valid submission succeeded" );
 
 loginUserC;
@@ -337,11 +337,11 @@ is( $sub1->get('title'),'the new title','successfully changed the title');
 
 loginRgstr;
 
-$sub1->update({ status => 'approved' });
-is($sub1->get('status'),'approved','set status to approved');
+$sub1->update({ submissionStatus => 'approved' });
+is($sub1->get('submissionStatus'),'approved','set status to approved');
 
-$sub2->update({ status => 'denied' });
-is($sub2->get('status'),'denied','set status to denied');
+$sub2->update({ submissionStatus => 'denied' });
+is($sub2->get('submissionStatus'),'denied','set status to denied');
 
 SKIP: { skip "workflow activities not coded yet", 10 if 0;
 
@@ -353,33 +353,33 @@ my $cleanupSubmissions = WebGUI::Test::Activity->create( $session,
               "WebGUI::Workflow::Activity::CleanupEMSSubmissions"
 );
 
-push @cleanup, sub  { $approveSubmissions->delete; $cleanupSubmissions->delete; };
+push @cleanup, sub  { $approveSubmissions->purge; $cleanupSubmissions->purge; };
 
-#is($approveSubmissions->run, 'complete', 'approval complete');
+is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
 $sub1 = $sub1->cloneFromDb;
-is( $sub1->get('status'),'failed','submission failed to create');
+is( $sub1->get('submissionStatus'),'failed','submission failed to create');
 
 # TODO fill in the rest of the data required by EMSTicket
 
 print "1\n";
 $approveSubmissions->rerun;
 print "2\n";
-#is($approveSubmissions->run, 'complete', 'approval complete');
+is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
 print "3\n";
 $sub1 = $sub1->cloneFromDb;
 print "4\n";
-is( $sub1->get('status'),'created','approval successfull');
+is( $sub1->get('submissionStatus'),'created','approval successfull');
 print "5\n";
 
 my $ticket = WebGUI::Asset->newByDynamicClass($session, $sub1->get('ticketId'));
 print "6\n";
 isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
 print "7\n";
-push @cleanup, sub  { $ticket->delete; };
+push @cleanup, sub  { $ticket->purge; };
 print "8\n";
  
 $sub2->update({
@@ -388,7 +388,7 @@ $sub2->update({
 my $submissionId = $sub2->get('assetId');
 
 $cleanupSubmissions->rerun;
-#is($cleanupSubmissions->run, 'complete', 'cleanup complete');
+is($cleanupSubmissions->run, 'complete', 'cleanup complete');
 is($cleanupSubmissions->run, 'done', 'cleanup done');
 
 $sub2 = WebGUI::Asset->newByDynamicClass($session, $submissionId);

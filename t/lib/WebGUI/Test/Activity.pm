@@ -82,16 +82,19 @@ sub run {
 
 sub rerun {
     my $self = shift;
+my $session = $self->{session};
     $self->{instance}->delete;
-    $self->{instance} = WebGUI::Workflow::Instance->create($self->{session},
+    $self->{instance} = WebGUI::Workflow::Instance->create($session,
 	{
 	    workflowId              => $self->{workflow}->getId,
 	    skipSpectreNotification => 1,
 	}
     );
-	my $tag = WebGUI::VersionTag->getWorking($session);
-	$tag->commit;
-	WebGUI::Test->tagsToRollback($tag);
+	my $tag = WebGUI::VersionTag->getWorking($session, 1);
+        if( $tag ) {
+	    $tag->commit;
+	    WebGUI::Test->tagsToRollback($tag);
+        }
 
 }
 

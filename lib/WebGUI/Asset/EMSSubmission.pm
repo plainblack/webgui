@@ -330,6 +330,29 @@ sub ems {
 
 #-------------------------------------------------------------------
 
+=head2 sendEmailUpdate
+
+if the sendEmail on change is turned on then send email to the owner
+
+=cut
+
+sub sendEmailUpdate {
+    my $self = shift;
+    my $session = $self->session;
+    my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmission" );
+    if( $self->get('sendEmailOnChange') ) {
+        WebGUI::Inbox->addMessage( $session,{
+           status => 'unread',
+	   message => $i18n->get('your submission has been updated') . "\n\n" .
+	                 $self->get('title'),
+	   userId => $self->createdBy,
+	   sentBy => $session->userId,
+        });
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_editSubmission ( parent, params )
 
 edit a submission
@@ -448,6 +471,7 @@ sub www_editSubmissionSave {
             $self->addRevision($formParams);
 	    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { override => 1, allowComments => 0 });
 	    $self = $self->cloneFromDb;
+            $self->sendEmailUpdate;
             return $self->www_view;
         } else {
             return $self->www_editSubmission($formParams);

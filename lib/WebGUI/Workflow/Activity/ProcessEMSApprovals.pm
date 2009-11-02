@@ -80,13 +80,14 @@ dav::log __PACKAGE__ . " executing\n";
     my $limit   = 2_500;
     my $timeLimit = 120;
 
-    my $list = $root->getLineage( ['children'], { returnObjects => 1,
+    my $list = $root->getLineage( ['descendants'], { returnObjects => 1,
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
              } );
     
     for my $emsf ( @$list ) {
        my $whereClause = q{ submissionStatus='approved' };
-       my $res = $emsf->getLineage(['children'],{ 
+       my $res = $emsf->getLineage(['children'],{  returnObjects => 1,
+	     joinClass => 'WebGUI::Asset::EMSSubmission',
 	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	     whereClause => $whereClause,
 	 } );
