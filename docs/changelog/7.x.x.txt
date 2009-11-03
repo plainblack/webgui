@@ -36,6 +36,7 @@
  - fixed #11189: Controls variable missing in image asset in AssetProxy
  - fixed #11190: event tmpl_var in help but not available
  - fixed #11194: Event Asset Recurrence form is not i18n'ed
+ - fixed #11192: newByLineage tries to instantiate asset even if no assetId found
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
