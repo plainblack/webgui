@@ -323,8 +323,9 @@ sub getNextInstance {
         foreach my $instance (@instances) {
             next unless $instance->{status} eq 'waiting';
             $waitingCount++;
-            if ($instance->{workingPriority} > $lowPriority) {
+            if ($instance->{workingPriority} < $lowPriority) {
                 $lowInstance = $instance;
+                $lowPriority = $instance->{workingPriority};
             }
         }
 		$self->debug("Total workflows waiting to run: ".$waitingCount);
@@ -478,7 +479,7 @@ A hash reference of the properties of the instance.
 sub updateInstance {
     my ($self, $instance) = @_;
     $self->debug("Updating ".$instance->{instanceId}."'s properties.");
-    $self->{_queue}{$instance->{instanceId}};
+    $self->{_queue}{$instance->{instanceId}} = $instance;
 }
 
 
