@@ -280,11 +280,45 @@ sub getInstances {
 
 =head2 getJsonStatus ( )
 
-Returns JSON report about the workflow engine.
+Returns JSON report about the workflow engine. Depricated, use getStatus() instead.
 
 =cut
 
 sub getJsonStatus {
+    my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
+    my ($sitename, $rsvp) = @$request;
+    my %queues = (
+            Waiting => [],
+            Suspended => [],
+            Running => [],
+            );
+    my %output;
+    if ($sitename) { #must have entry for each queue
+        $output{$sitename} = \%queues;
+    }
+    foreach my $instance ($self->getInstances) {
+        my $site = $instance->{sitename};
+        unless (exists $output{$site}) { # must have an entry for each queue in each site
+            $output{$site} = \%queues;
+        }
+        my $queue = ucfirst($instance->{status});
+        push @{$output{$site}{$queue}}, [$instance->{workingPriority}, $instance->{instanceId}, $instance];
+    }
+    if ($sitename) { # single sitename option
+        %output = %{$output{$sitename}};
+    }
+    $kernel->call(IKC=>post=>$rsvp, encode_json(\%output));
+}
+
+#-------------------------------------------------------------------
+
+=head2 getStatus ( )
+
+Returns JSON report about the workflow engine. Returns an array reference of hash references of instance data. Each instance contains the following fields: instanceId, status, lastState, sitename, priority, and workingPriority.
+
+=cut
+
+sub getStatus {
     my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
     my ($data, $rsvp) = @$request;
     my @instances = $self->getInstances;
@@ -337,32 +371,6 @@ sub getNextInstance {
 	$self->debug("Didn't see any workflow instances to run.");
 	return undef;
 }
-
-#-------------------------------------------------------------------
-
-=head2 getStatus ( )
-
-Returns a formatted text status report about the workflow engine.
-
-=cut
-
-sub getStatus {
- 	my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
-	my $pattern = "%8.8s  %-9.9s  %-30.30s  %-22.22s  %-15.15s %-20.20s\n";
-	my $summaryPattern = "%19.19s %4d\n";
-	my $total = 0;
-	my $output = sprintf $pattern, "Priority", "Status", "Sitename", "Instance Id", "Last State", "Last Run Time";
-    foreach my $instance ($self->getInstances) {
-		my $originalPriority = ($instance->{priority} - 1) * 10;
-        my $priority = $instance->{workingPriority}."/".$originalPriority;
-		$output .= sprintf $pattern, $priority, $instance->{status}, $instance->{sitename}, $instance->{instanceId}, $instance->{lastState}, $instance->{lastRunTime};
-        $total++;
-    }
-    $output .= sprintf "\n%19.19s %4d\n", "Total Workflows", $total;
-    my ($data, $rsvp) = @$request;
-    $kernel->call(IKC=>post=>$rsvp,$output);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -499,6 +507,10 @@ sub workerResponse {
 	my $instanceId = $request->header("X-instanceId");	# got to figure out how to get this from the request, cuz the response may die
 	$self->debug("Response retrieved is for $instanceId.");
 	my $instance = $self->getInstance($instanceId);
+    unless (defined $instance) {
+        $self->debug("Instance $instanceId no longer exist in my queue, so there's no reason to process the response.");
+        return;
+    }
 	if ($response->is_success) {
 		$self->debug("Response for $instanceId retrieved successfully.");
 		if ($response->header("Set-Cookie") ne "") {

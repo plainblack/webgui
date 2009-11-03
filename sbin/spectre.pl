@@ -24,6 +24,7 @@ use Getopt::Long;
 use POE::Component::IKC::ClientLite;
 use Spectre::Admin;
 use WebGUI::Config;
+use JSON;
 
 $|=1; # disable output buffering
 my $help;
@@ -158,7 +159,17 @@ sub getStatusReport {
 	return $POE::Component::IKC::ClientLite::error unless defined $result;
 	$remote->disconnect;
 	undef $remote;
-	return $result;
+	my $pattern = "%8.8s  %-9.9s  %-30.30s  %-22.22s  %-15.15s %-20.20s\n";
+	my $total = 0;
+	my $output = sprintf $pattern, "Priority", "Status", "Sitename", "Instance Id", "Last Run", "Last Run Time";
+    foreach my $instance (@{JSON->new->decode($result)}) {
+		my $originalPriority = ($instance->{priority} - 1) * 10;
+        my $priority = $instance->{workingPriority}."/".$originalPriority;
+		$output .= sprintf $pattern, $priority, $instance->{status}, $instance->{sitename}, $instance->{instanceId}, $instance->{lastState}, $instance->{lastRunTime};
+        $total++;
+    }
+    $output .= sprintf "\n%19.19s %4d\n", "Total Workflows", $total;
+	return $output;
 }
 
 __END__
