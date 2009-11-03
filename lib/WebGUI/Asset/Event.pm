@@ -2063,6 +2063,13 @@ sub www_edit {
             size        => 22,
         });
 
+    # synopsis
+    $var->{"formSynopsis"} 
+        = WebGUI::Form::textarea($session, {
+            name        => "synopsis",
+            value       => $form->process("synopsis") || $self->get("synopsis"),
+        });
+
     # Group to View
     $var->{"formGroupIdView"} 
         = WebGUI::Form::Group($session, {
@@ -2202,22 +2209,23 @@ sub www_edit {
                 : $self->isAllDay
                 ;
 
+    my $i18n = WebGUI::International->new($session, 'Asset_Event');
     $var->{"formTime"}
         = q|<input id="allday_yes" type="radio" name="allday" value="yes" |
         . ($allday ? 'checked="checked"' : '')
         . q| />
-        <label for="allday_yes">No specific time (All day event)</label>
+        <label for="allday_yes">|. $i18n->get('No specific time'). q|</label>
         <br/>
         <input id="allday_no" type="radio" name="allday" value="" |
         . (!$allday ? 'checked="checked"' : '')
         . q| />
-        <label for="allday_no">Specific start/end time</label>
+        <label for="allday_no">|. $i18n->get('Specific start/end time'). q|</label>
         <br />
         <div id="times">|
-        . q|Start: |.$var->{"formStartTime"}
-        . q|<br/>End: |.$var->{"formEndTime"}
-        . q|<br/>Time Zone: |.$var->{formTimeZone}
-        . q|</div>|;
+        . $i18n->get('start')               . q|: | . $var->{"formStartTime"} . q|<br/>|
+        . $i18n->get('end')                 . q|: | . $var->{"formEndTime"}   . q|<br/>|
+        . $i18n->get('timezone', 'DateTime'). q|: | . $var->{formTimeZone}    . q|</div>|
+        ;
 
     ###### related links
     my $relatedLinks = $self->getRelatedLinks();
@@ -2234,8 +2242,8 @@ sub www_edit {
             value        => $form->process("rel_group_id_".$_->{eventlinkId}) || $_->{groupIdView} || $self->getParent->get("groupIdView"),
             defaultValue => $self->getParent->get("groupIdView"),
         });
-       $_->{seq_num_name} = "rel_seq_".$_->{eventlinkId};
-       $_->{seq_num_id} = "rel_seq_id_".$_->{eventlinkId};
+       $_->{seq_num_name}  = "rel_seq_".$_->{eventlinkId};
+       $_->{seq_num_id}    = "rel_seq_id_".$_->{eventlinkId};
        $_->{seq_num_value} = $seqNum++;
     }
     $var->{"relatedLinks"} = $relatedLinks;
@@ -2258,90 +2266,88 @@ sub www_edit {
         = q|
         <div id="recurPattern">
         <p><input type="radio" name="recurType" id="recurType_none" value="none" onclick="toggleRecur()" />
-        <label for="recurType_none">None</label></p>
+        <label for="recurType_none">|. $i18n->get(881,'WebGUI'). q|</label></p>
 
 
         <p><input type="radio" name="recurType" id="recurType_daily" value="daily" onclick="toggleRecur()"  |.($recur{recurType} =~ /^(daily|weekday)$/ ? q|checked="checked"| : q||).q|/>
-        <label for="recurType_daily">Daily</label></p>
+        <label for="recurType_daily">|. $i18n->get('Daily'). q|</label></p>
         <div style="margin-left: 4em;" id="recurPattern_daily">
-            Every <input type="text" name="recurDay" size="3" value="|.$recur{every}.q|" /><br/>
+            |. $i18n->get('Every'). q| <input type="text" name="recurDay" size="3" value="|.$recur{every}.q|" /><br/>
             <input type="radio" name="recurSubType" id="recurSubType_daily" value="daily" |.($recur{recurType} eq "daily" ? q|checked="checked"| : q||).q|/>
-            <label for="recurSubType_daily">Day(s)</label><br />
+            <label for="recurSubType_daily">|. $i18n->get(700, 'WebGUI'). q|</label><br />
             <input type="radio" name="recurSubType" id="recurSubType_weekday" value="weekday" |.($recur{recurType} eq "weekday" ? q|checked="checked"| : q||).q|/>
-            <label for="recurSubType_weekday">Weekday(s)</label>
+            <label for="recurSubType_weekday">|. $i18n->get('Weekday(s)'). q|</label>
         </div>
-
 
         <p><input type="radio" name="recurType" id="recurType_weekly" value="weekly" onclick="toggleRecur()" |.($recur{recurType} eq "weekly" ? q|checked="checked"| : q||).q|/>
-        <label for="recurType_weekly">Weekly</label></p>
+        <label for="recurType_weekly">|. $i18n->get('Weekly'). q|</label></p>
         <div style="margin-left: 4em;" id="recurPattern_weekly">
-            Every <input type="text" name="recurWeek" size="3" value="|.$recur{every}.q|" /> week(s) on<br/>
+            |. sprintf($i18n->get('Every N weeks on'), q|<input type="text" name="recurWeek" size="3" value="|.$recur{every}.q|" />|). q|<br/>
             <input type="checkbox" name="recurWeekDay" value="u" id="recurWeekDay_U" |.(grep(/u/,@{$recur{dayNames}}) ? 'checked="checked"' : '' ).q|/>
-            <label for="recurWeekDay_U">Sunday</label><br/>
+            <label for="recurWeekDay_U">|. $i18n->get('sunday', 'DateTime'). q|</label><br/>
             <input type="checkbox" name="recurWeekDay" value="m" id="recurWeekDay_M" |.(grep(/m/,@{$recur{dayNames}}) ? 'checked="checked"' : '' ).q|/>
-            <label for="recurWeekDay_M">Monday</label><br/>
+            <label for="recurWeekDay_M">|. $i18n->get('monday', 'DateTime'). q|</label><br/>
             <input type="checkbox" name="recurWeekDay" value="t" id="recurWeekDay_T" |.(grep(/t/,@{$recur{dayNames}}) ? 'checked="checked"' : '' ).q|/>
-            <label for="recurWeekDay_T">Tuesday</label><br/>
+            <label for="recurWeekDay_T">|. $i18n->get('tuesday', 'DateTime'). q|</label><br/>
             <input type="checkbox" name="recurWeekDay" value="w" id="recurWeekDay_W" |.(grep(/w/,@{$recur{dayNames}}) ? 'checked="checked"' : '' ).q|/>
-            <label for="recurWeekDay_W">Wednesday</label><br/>
+            <label for="recurWeekDay_W">|. $i18n->get('wednesday', 'DateTime'). q|</label><br/>
             <input type="checkbox" name="recurWeekDay" value="r" id="recurWeekDay_R" |.(grep(/r/,@{$recur{dayNames}}) ? 'checked="checked"' : '' ).q|/>
-            <label for="recurWeekDay_R">Thursday</label><br/>
+            <label for="recurWeekDay_R">|. $i18n->get('thursday', 'DateTime'). q|</label><br/>
             <input type="checkbox" name="recurWeekDay" value="f" id="recurWeekDay_F" |.(grep(/f/,@{$recur{dayNames}}) ? 'checked="checked"' : '' ).q|/>
-            <label for="recurWeekDay_F">Friday</label><br/>
+            <label for="recurWeekDay_F">|. $i18n->get('friday', 'DateTime'). q|</label><br/>
             <input type="checkbox" name="recurWeekDay" value="s" id="recurWeekDay_S" |.(grep(/s/,@{$recur{dayNames}}) ? 'checked="checked"' : '' ).q|/>
-            <label for="recurWeekDay_S">Saturday</label><br/>
+            <label for="recurWeekDay_S">|. $i18n->get('saturday', 'DateTime'). q|</label><br/>
         </div>
 
-
         <p><input type="radio" name="recurType" id="recurType_monthly" value="monthly" onclick="toggleRecur()" |.($recur{recurType} =~ /^month/ ? q|checked="checked"| : q||).q|/>
-        <label for="recurType_monthly">Monthly</label></p>
+        <label for="recurType_monthly">|. $i18n->get('Monthly'). q|</label></p>
         <div style="margin-left: 4em;" id="recurPattern_monthly">
-            <p>Every <input type="text" name="recurMonth" size="3" value="|.$recur{every}.q|" /> month(s) on</p>
+            <p>|. sprintf($i18n->get('Every N months on'), q|<input type="text" name="recurMonth" size="3" value="|.$recur{every}.q|" />|). q|</p>
             <p><input type="radio" name="recurSubType" id="recurSubType_monthDay" value="monthDay" |.($recur{recurType} eq "monthDay" ? q|checked="checked"| : q||).q|/>
-            <label for="recurSubType_monthDay">day </label>
+            <label for="recurSubType_monthDay">|. $i18n->get('day'). q| </label>
             <input type="text" name="recurMonthDay" size="3" value="|.$recur{dayNumber}.q|"></p>
 
             <p>
             <input style="vertical-align: top;" type="radio" name="recurSubType" id="recurSubType_monthWeek" value="monthWeek" |.($recur{recurType} eq "monthWeek" ? q|checked="checked"| : q||).q|/>
             <select style="vertical-align: top;" name="recurMonthWeekNumber">
-                <option |.(grep(/first/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>first</option>
-                <option |.(grep(/second/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>second</option>
-                <option |.(grep(/third/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>third</option>
-                <option |.(grep(/fourth/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>fourth</option>
-                <option |.(grep(/fifth/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>last</option>
-            </select> week on
+                <option value="first"  |.(grep(/first/,  @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('first').  q|</option>
+                <option value="second" |.(grep(/second/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('second'). q|</option>
+                <option value="third"  |.(grep(/third/,  @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('third').  q|</option>
+                <option value="fourth" |.(grep(/fourth/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('fourth'). q|</option>
+                <option value="fifth"  |.(grep(/fifth/,  @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('last').   q|</option>
+            </select> |. $i18n->get('week on'). q|
             <select style="vertical-align: top;" name="recurMonthWeekDay">
-                <option value="u" |.(grep(/u/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Sunday</option>
-                <option value="m" |.(grep(/m/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Monday</option>
-                <option value="t" |.(grep(/t/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Tuesday</option>
-                <option value="w" |.(grep(/w/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Wednesday</option>
-                <option value="r" |.(grep(/r/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Thursday</option>
-                <option value="f" |.(grep(/f/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Friday</option>
-                <option value="s" |.(grep(/s/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Saturday</option>
+                <option value="u" |.(grep(/u/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('sunday', 'DateTime'). q|</option>
+                <option value="m" |.(grep(/m/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('monday', 'DateTime').    q|</option>
+                <option value="t" |.(grep(/t/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('tuesday', 'DateTime').   q|</option>
+                <option value="w" |.(grep(/w/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('wednesday', 'DateTime'). q|</option>
+                <option value="r" |.(grep(/r/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('thursday', 'DateTime').  q|</option>
+                <option value="f" |.(grep(/f/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('friday', 'DateTime').    q|</option>
+                <option value="s" |.(grep(/s/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('saturday', 'DateTime').  q|</option>
             </select>
             </p>
         </div>
 
 
         <p><input type="radio" name="recurType" id="recurType_yearly" value="yearly" onclick="toggleRecur()" |.($recur{recurType} =~ /^year/ ? q|checked="checked"| : q||).q|/>
-        <label for="recurType_yearly">Yearly</label></p>
+        <label for="recurType_yearly">|. $i18n->get('Yearly'). q|</label></p>
         <div style="margin-left: 4em;" id="recurPattern_yearly">
-            <p>Every <input type="text" name="recurYear" size="3" value="|.$recur{every}.q|" /> years(s) on</p>
+            <p>|. sprintf($i18n->get('Every N years on'),q|<input type="text" name="recurYear" size="3" value="|.$recur{every}.q|" />|). q|</p>
             <p>
             <input type="radio" name="recurSubType" id="recurSubType_yearDay" value="yearDay" |.($recur{recurType} eq "yearDay" ? q|checked="checked"| : q||).q|/>
             <select name="recurYearDayMonth">
-                <option value="jan" |.(grep(/jan/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>January</option>
-                <option value="feb" |.(grep(/feb/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>February</option>
-                <option value="mar" |.(grep(/mar/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>March</option>
-                <option value="apr" |.(grep(/apr/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>April</option>
-                <option value="may" |.(grep(/may/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>May</option>
-                <option value="jun" |.(grep(/jun/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>June</option>
-                <option value="jul" |.(grep(/jul/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>July</option>
-                <option value="aug" |.(grep(/aug/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>August</option>
-                <option value="sep" |.(grep(/sep/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>September</option>
-                <option value="oct" |.(grep(/oct/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>October</option>
-                <option value="nov" |.(grep(/nov/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>November</option>
-                <option value="dec" |.(grep(/dec/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>December</option>
+                <option value="jan" |.(grep(/jan/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('january','DateTime').   q|</option>
+                <option value="feb" |.(grep(/feb/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('february','DateTime').  q|</option>
+                <option value="mar" |.(grep(/mar/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('march','DateTime').     q|</option>
+                <option value="apr" |.(grep(/apr/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('april','DateTime').     q|</option>
+                <option value="may" |.(grep(/may/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('may','DateTime').       q|</option>
+                <option value="jun" |.(grep(/jun/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('june','DateTime').      q|</option>
+                <option value="jul" |.(grep(/jul/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('july','DateTime').      q|</option>
+                <option value="aug" |.(grep(/aug/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('august','DateTime').    q|</option>
+                <option value="sep" |.(grep(/sep/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('september','DateTime'). q|</option>
+                <option value="oct" |.(grep(/oct/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('october','DateTime').   q|</option>
+                <option value="nov" |.(grep(/nov/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('november','DateTime').  q|</option>
+                <option value="dec" |.(grep(/dec/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('december','DateTime').  q|</option>
             </select>
             <input type="text" name="recurYearDay" size="3" value="|.$recur{dayNumber}.q|"/>
             </p>
@@ -2349,34 +2355,34 @@ sub www_edit {
             <p>
             <input style="vertical-align: top;" type="radio" name="recurSubType" id="recurSubType_yearWeek" value="yearWeek" |.($recur{recurType} eq "yearWeek" ? q|checked="checked"| : q||).q|/>
             <select style="vertical-align: top;" name="recurYearWeekNumber">
-                <option |.(grep(/first/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>first</option>
-                <option |.(grep(/second/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>second</option>
-                <option |.(grep(/third/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>third</option>
-                <option |.(grep(/fourth/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>fourth</option>
-                <option |.(grep(/fifth/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>last</option>
+                <option value="first"  |.(grep(/first/,  @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('first').  q|</option>
+                <option value="second" |.(grep(/second/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('second'). q|</option>
+                <option value="third"  |.(grep(/third/,  @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('third').  q|</option>
+                <option value="fourth" |.(grep(/fourth/, @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('fourth'). q|</option>
+                <option value="fifth"  |.(grep(/fifth/,  @{$recur{weeks}}) ? 'selected="selected"' : '').q|>|. $i18n->get('last').   q|</option>
             </select> 
             <select style="vertical-align: top;" name="recurYearWeekDay">
-                <option value="u" |.(grep(/u/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Sunday</option>
-                <option value="m" |.(grep(/m/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Monday</option>
-                <option value="t" |.(grep(/t/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Tuesday</option>
-                <option value="w" |.(grep(/w/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Wednesday</option>
-                <option value="r" |.(grep(/r/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Thursday</option>
-                <option value="f" |.(grep(/f/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Friday</option>
-                <option value="s" |.(grep(/s/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>Saturday</option>
-            </select> of 
+                <option value="u" |.(grep(/u/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('sunday', 'DateTime'). q|</option>
+                <option value="m" |.(grep(/m/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('monday', 'DateTime').    q|</option>
+                <option value="t" |.(grep(/t/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('tuesday', 'DateTime').   q|</option>
+                <option value="w" |.(grep(/w/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('wednesday', 'DateTime'). q|</option>
+                <option value="r" |.(grep(/r/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('thursday', 'DateTime').  q|</option>
+                <option value="f" |.(grep(/f/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('friday', 'DateTime').    q|</option>
+                <option value="s" |.(grep(/s/,@{$recur{dayNames}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('saturday', 'DateTime').  q|</option>
+            </select> |. $i18n->get('of'). q|
             <select name="recurYearWeekMonth">
-                <option value="jan" |.(grep(/jan/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>January</option>
-                <option value="feb" |.(grep(/feb/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>February</option>
-                <option value="mar" |.(grep(/mar/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>March</option>
-                <option value="apr" |.(grep(/apr/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>April</option>
-                <option value="may" |.(grep(/may/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>May</option>
-                <option value="jun" |.(grep(/jun/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>June</option>
-                <option value="jul" |.(grep(/jul/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>July</option>
-                <option value="aug" |.(grep(/aug/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>August</option>
-                <option value="sep" |.(grep(/sep/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>September</option>
-                <option value="oct" |.(grep(/oct/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>October</option>
-                <option value="nov" |.(grep(/nov/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>November</option>
-                <option value="dec" |.(grep(/dec/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>December</option>
+                <option value="jan" |.(grep(/jan/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('january','DateTime').   q|</option>
+                <option value="feb" |.(grep(/feb/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('february','DateTime').  q|</option>
+                <option value="mar" |.(grep(/mar/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('march','DateTime').     q|</option>
+                <option value="apr" |.(grep(/apr/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('april','DateTime').     q|</option>
+                <option value="may" |.(grep(/may/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('may','DateTime').       q|</option>
+                <option value="jun" |.(grep(/jun/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('june','DateTime').      q|</option>
+                <option value="jul" |.(grep(/jul/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('july','DateTime').      q|</option>
+                <option value="aug" |.(grep(/aug/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('august','DateTime').    q|</option>
+                <option value="sep" |.(grep(/sep/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('september','DateTime'). q|</option>
+                <option value="oct" |.(grep(/oct/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('october','DateTime').   q|</option>
+                <option value="nov" |.(grep(/nov/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('november','DateTime').  q|</option>
+                <option value="dec" |.(grep(/dec/,@{$recur{months}}) ? 'selected="selected"' : '' ).q|>|. $i18n->get('december','DateTime').  q|</option>
             </select>
             </p>
         </div>
@@ -2396,18 +2402,18 @@ sub www_edit {
     $var->{"formRecurEnd"} 
         = q|
         <div><input type="radio" name="recurEndType" id="recurEndType_none" value="none" |.(!$recur{endDate} && !$recur{endAfter} ? 'checked="checked"' : '').q|/>
-        <label for="recurEndType_none">No end</label><br />
+        <label for="recurEndType_none">|. $i18n->get('No end'). q|</label><br />
 
         <input type="radio" name="recurEndType" id="recurEndType_date" value="date" |.($recur{endDate} ? 'checked="checked"' : '' ).q| />
-        <label for="recurEndType_date">By date </label>|
+        <label for="recurEndType_date">|. $i18n->get('By date'). q| </label>|
         . WebGUI::Form::date($session,{ name => "recurEndDate", value => $recur{endDate}, defaultValue => $recur{endDate} })
         . q|
         <br />
 
         <input type="radio" name="recurEndType" id="recurEndType_after" value="after" |.($recur{endAfter} ? 'checked="checked"' : '' ).q| />
-        <label for="recurEndType_after">After </label>
+        <label for="recurEndType_after">|. $i18n->get('After'). q| </label>
         <input type="text" size="3" name="recurEndAfter" value="|.$recur{endAfter}.q|" /> 
-        occurences.
+        |. $i18n->get('occurences'). q|.
         </div>
     |;
 
@@ -2423,14 +2429,14 @@ sub www_edit {
     $var->{"formSave"}
         = WebGUI::Form::submit($session, {
             name    => "save",
-            value   => "save",
+            value   => $i18n->get('62', 'WebGUI'),
         });
 
     # Cancel button
     $var->{"formCancel"}
         = WebGUI::Form::button($session, {
             name    => "cancel",
-            value   => "cancel",
+            value   => $i18n->get('cancel', 'WebGUI'),
             extras  => 'onClick="window.history.go(-1)"',
         });
 
