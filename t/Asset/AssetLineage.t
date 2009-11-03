@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 90; # increment this value for each test you create
+use Test::More tests => 92; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -388,16 +388,19 @@ my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'
 is ($snippet4->getId, $snippets[4]->getId, 'newByLineage returns correct Asset');
 
 $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
-is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: cached lookup');
+is ($snippet4->getId, $snippets[4]->getId, '... cached lookup');
 
 my $cachedLineage = $session->stow->get('assetLineage');
 delete $cachedLineage->{$snippet4->get('lineage')}->{id};
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
-is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing id cache forces lookup');
+is ($snippet4->getId, $snippets[4]->getId, '... failing id cache forces lookup');
 
 delete $cachedLineage->{$snippet4->get('lineage')}->{class};
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
-is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing class cache forces lookup');
+is ($snippet4->getId, $snippets[4]->getId, '... failing class cache forces lookup');
+
+is(WebGUI::Asset->newByLineage($session, 'notALineage'), undef, '... returns undef');
+ok(!exists $session->stow->get('assetLineage')->{assetLineage}, '... no entry for the bad lineage in stow');
 
 ####################################################
 #
