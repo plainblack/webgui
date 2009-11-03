@@ -409,7 +409,7 @@ sub www_selectPaymentGateway {
     
     # Complete Transaction if it's a $0 transaction.
     my $total = $cart->calculateTotal;
-    if (($total + $cart->calculateShopCreditDeduction($total)) == 0) {
+    if (sprintf('%.2f', $total + $cart->calculateShopCreditDeduction($total)) eq '0.00') {
         my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $cart});
         $transaction->completePurchase('zero', 'success', 'success');
         $cart->onCompletePurchase;
