@@ -85,7 +85,7 @@ sub addInstance {
         $instance->{workingPriority} = ($instance->{priority} -1) * 10;
 	    $instance->{lastState} = "never run";
 	    $self->debug("Adding workflow instance ".$instance->{instanceId}." from ".$instance->{sitename}." to queue at priority ".$priority.".");
-        push @{$self->{queue}}, $instance; 
+        $self->{queue}{$instance->{instanceId}} = $instance; 
     }
 }
 
@@ -133,7 +133,7 @@ Returns an integer representing the number of running instances.
 sub countRunningInstances {
 	my $self = shift;
     my $count = 0;
-    foreach my $instance (@{$self->{queue}}) {
+    foreach my $instance (values %{$self->{queue}}) {
         if ($instance->{status} eq 'running') {
             $count++; 
         }
@@ -174,15 +174,7 @@ Removes a workflow instance from the processing queue.
 sub deleteInstance {
 	my ($self, $instanceId,$kernel, $session ) = @_[OBJECT, ARG0, KERNEL, SESSION];
 	$self->debug("Deleting workflow instance $instanceId from queue.");
-    my $index;
-    foreach my $i (0..$#{$self->{queue}}) {
-        if ($self->{queue}[$i]{instanceId} eq $instanceId) {
-           $index = $i;
-        }
-    }
-    if ($index) {
-        splice @{$self->{queue}}, $index, 1;
-    }
+    delete $self->{queue}{$instanceId};
 }
 
 #-------------------------------------------------------------------
@@ -264,12 +256,7 @@ The id of the instance to retrieve.
 
 sub getInstance {
     my ($self, $instanceId) = @_;
-    foreach my $instance (@{$self->{queue}}) {
-        if ($instance->{instanceId} eq $instanceId) {
-            return $instance;
-        }
-    }
-    return undef;
+    return $self->{queue}{$instanceId};
 }
 
 
@@ -311,11 +298,11 @@ Returns the next available instance.
 sub getNextInstance {
 	my $self = shift;
 	$self->debug("Looking for a workflow instance to run.");
-	if (scalar(@{$self->{queue}}) > 0) {
+	if (scalar(keys %{$self->{queue}}) > 0) {
         my $lowInstance = {};
         my $lowPriority = 999999999999;
         my $waitingCount = 0;
-        foreach my $instance (@{$self->{queue}}) {
+        foreach my $instance (values %{$self->{queue}}) {
             next unless $instance->{status} eq 'waiting';
             $waiting++;
             if ($instance->{workingPriority} > $lowPriority) {
@@ -346,7 +333,7 @@ sub getStatus {
 	my $summaryPattern = "%19.19s %4d\n";
 	my $total = 0;
 	my $output = sprintf $pattern, "Priority", "Status", "Sitename", "Instance Id", "Last State", "Last Run Time";
-    foreach my $instance (@{$self->{queue}}) {
+    foreach my $instance (values %{$self->{queue}}) {
 		my $originalPriority = ($instance->{priority} - 1) * 10;
         my $priority = $instance->{workingPriority}."/".$originalPriority;
 		$output .= sprintf $pattern, $priority, $instance->{status}, $instance->{sitename}, $instance->{instanceId}, $instance->{lastState}, $instance->{lastRunTime};
@@ -396,7 +383,7 @@ sub new {
 		Alias => 'workflow-ua',
 		CookieJar => $cookies
   		);
-	$self->{queue} = [];
+	$self->{queue} = {};
 }
 
 
@@ -473,15 +460,7 @@ A hash reference of the properties of the instance.
 sub updateInstance {
     my ($self, $instance) = @_;
     $self->debug("Updating ".$instance->{instanceId}."'s properties.");
-    my $index;
-    foreach my $i (0..$#{$self->{queue}}) {
-        if ($self->{queue}[$i]{instanceId} eq $instance->{instanceId}) {
-           $index = $i;
-        }
-    }
-    if ($index) {
-        $self->{queue}[$index] = $instance;
-    }
+    $self->{queue}{$instance->{instanceId}};
 }
 
 
