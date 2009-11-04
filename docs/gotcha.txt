@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.8.3
+--------------------------------------------------------------------
+ * WebGUI now requires Locales::Country 0.05 or higher to use
+   the UPS shipping driver.
+
 7.8.2
 --------------------------------------------------------------------
  * WebGUI now requires Business::PayPal::API 0.62 or higher.
