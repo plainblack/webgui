@@ -44,11 +44,6 @@ sub definition {
             label           => $i18n->get("Email Template"),
             hoverHelp       => $i18n->get("Email Template help"),
         },
-        skipNotification => {
-            autoGenerate    => 0,
-            noFormPost      => 1,
-            fieldType       => 'yesNo',
-        },
     );
 
     push @{ $definition }, {
@@ -435,27 +430,6 @@ sub purge {
     my $group   = $self->getSubscriptionGroup();
     $group->delete;
     $self->next::method($options);
-
-    return;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 setSkipNotification ( )
-
-Set a flag so that this asset does not send out notifications for this 
-revision.
-
-=cut
-
-sub setSkipNotification {
-    my $self    = shift;
-    my $value   = shift;
-    $value      = defined $value ? $value : 1;
-
-    $self->update( {
-        skipNotification        => $value,
-    } );
 
     return;
 }

@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+dropSkipNotification($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,14 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#------------------------------------------------------------------------
+sub dropSkipNotification {
+    my $session = shift;
+    print "\tRemoving duplicate skipNotification field from the Subscribable aspect... " unless $quiet;
+    $session->db->write('alter table assetAspect_Subscribable drop column skipNotification');
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

@@ -29,7 +29,11 @@ addToCleanup($versionTag);
 
 my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster'});
 $versionTag->commit;
-my $wikipage = $wiki->addChild({className=>'WebGUI::Asset::WikiPage'}, undef, undef, {skipAutoCommitWorkflows => 1});
+my $wikipage = $wiki->addChild(
+    {className=>'WebGUI::Asset::WikiPage'},
+    undef, undef,
+    {skipAutoCommitWorkflows => 1, skipNotification => 1}
+);
 
 # Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
 my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
