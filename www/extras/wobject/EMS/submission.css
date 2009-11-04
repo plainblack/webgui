@@ -1,0 +1,114 @@
+legend {
+    font-weight: bold;    
+}
+
+form {
+    margin: 0;
+    padding: 0
+}
+.submission_title {
+    background: #d8d8d8 url(../../yui/build/assets/skins/sam/sprite.png) repeat-x;
+    border: solid #a3a3a3;
+    border-width: 0 1px 0;
+    font-family: arial;
+    font-weight: bold;
+    font-size: 14pt;
+}   
+.submission_body {
+    background: #FFFFFF;
+    border: 1px solid #000000;
+}   
+.submission_desc {
+    background: #d8d8d8;
+}
+.userArea {
+    font-family: arial;
+    font-size: 9pt;
+    color: black;
+    background-color: white;
+    overflow: auto;
+    height: 310px;   
+}   
+.hd_searchBtn {
+    background-color:silver;
+    color:white;
+    border:solid gray 1px;
+    text-decoration:none;
+    font-weight:bold;	
+    text-align:center;
+    cursor:pointer;
+    font-size:9pt;
+}   
+.inputBox {
+    border:solid gray 1px;
+    font-size:9pt;
+}    
+.grayArea {
+    background-color:#F2F2F2;
+    border:solid #E8E8E8 1px;
+    padding:3px;
+    -moz-box-sizing:border-box;
+}
+#solutionDialog {
+    background-color: #FFFFFF;
+}
+.whiteArea {
+    font-family: arial;
+    font-size: 9pt;
+    color: black;
+}
+.solutionArea {
+    font-family: arial;
+    font-size: 9pt;
+    color: black;
+    background-color:#FFFFFF;
+    overflow: auto;
+    height: 160px;   
+}
+#userList_div {
+    overflow: auto;
+    width: 100%;
+    height: auto;
+    font-family: arial;
+    font-size: 10pt;
+    border: solid #CACACA 1px;
+}
+* html #userList_div {
+    overflow: hidden;
+    overflow-y: auto;
+}
+#userList_div img {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+#userList_div td {
+    background-color: #F2F2F2;
+    border-top: solid #F9F9F9 1px;
+    border-bottom: solid #E0E0E0 1px;
+    text-align: left;
+    vertical-align: top;
+}
+#userList_div tr.odd td {
+    background-color: #EAEAEA;
+}
+.submission_private {
+    background-color:#AA0002;
+    border:solid #E8E8E8 1px;
+    color:white;
+    font-size: 9pt;
+    font-weight: bold;
+    text-align:center;
+    -moz-box-sizing:border-box;
+}
+.submission_public {
+    background-color:#00FF00;
+    border:solid #E8E8E8 1px;
+    color:white;
+    font-size: 0pt;
+    font-weight: bold;
+    text-align:center;
+    -moz-box-sizing:border-box;
+}
+.dyn_form_field {
+    width: 120px;
+}
