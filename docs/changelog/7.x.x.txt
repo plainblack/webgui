@@ -2,6 +2,7 @@
  - Fixed a compatibility problem between WRE and new Spectre code.
  - fixed #11198: Typo in i18n
  - fixed #11202: USPS driver does not log authentication errors
+ - fixed #10985: Survey: can't add multiple choice answer
 
 7.8.3
  - Rewrote Spectre's workflow queues to prevent it from "forgetting" about some workflows.
