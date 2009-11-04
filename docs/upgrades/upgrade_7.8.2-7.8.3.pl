@@ -41,6 +41,7 @@ addPickLanguageMacro($session);
 installSetLanguage($session);
 i18nAbleToBeFriend($session);
 addEMSEnhancements($session);
+installUPSDriver($session);
 
 finish($session); # this line required
 
@@ -52,6 +53,16 @@ sub addEMSEnhancements {
     if (! defined $sth->hashRef) {
         $session->db->write("alter table EventManagementSystem add column printRemainingTicketsTemplateId char(22) not null default 'hreA_bgxiTX-EzWCSZCZJw' after printTicketTemplateId");
     }
+    print "Done.\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+sub installUPSDriver {
+    my $session = shift;
+    print "\tAdding UPS Shipping Driver... " unless $quiet;
+    $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::UPS');
+
     print "Done.\n" unless $quiet;
 }
 
@@ -131,6 +142,7 @@ sub addPickLanguageMacro {
     print "Done.\n" unless $quiet;
 }
 
+#------------------------------------------------------------------------
 sub installSetLanguage {
     my $session = shift;
     print "\tAdding SetLanguage content handler... " unless $quiet;

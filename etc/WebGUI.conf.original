@@ -190,7 +190,8 @@
 
 "shippingDrivers" : [
     "WebGUI::Shop::ShipDriver::FlatRate",
-    "WebGUI::Shop::ShipDriver::USPS"
+    "WebGUI::Shop::ShipDriver::USPS",
+    "WebGUI::Shop::ShipDriver::UPS"
     ],
 
 # Specify the list of template parsers available in the system.
