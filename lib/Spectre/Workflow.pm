@@ -294,18 +294,21 @@ sub getJsonStatus {
             );
     my %output;
     if ($sitename) { #must have entry for each queue
-        $output{$sitename} = \%queues;
-    }
-    foreach my $instance ($self->getInstances) {
-        my $site = $instance->{sitename};
-        unless (exists $output{$site}) { # must have an entry for each queue in each site
-            $output{$site} = \%queues;
+        %output = %queues;
+        foreach my $instance ($self->getInstances) {
+            my $queue = ucfirst($instance->{status});
+            push @{$output{$queue}}, [$instance->{workingPriority}, $instance->{instanceId}, $instance];
         }
-        my $queue = ucfirst($instance->{status});
-        push @{$output{$site}{$queue}}, [$instance->{workingPriority}, $instance->{instanceId}, $instance];
     }
-    if ($sitename) { # single sitename option
-        %output = %{$output{$sitename}};
+    else {
+        foreach my $instance ($self->getInstances) {
+            my $site = $instance->{sitename};
+            unless (exists $output{$site}) { # must have an entry for each queue in each site
+                $output{$site} = \%queues;
+            }
+            my $queue = ucfirst($instance->{status});
+            push @{$output{$site}{$queue}}, $instance;
+        }
     }
     $kernel->call(IKC=>post=>$rsvp, encode_json(\%output));
 }

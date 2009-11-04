@@ -1,4 +1,5 @@
 7.8.4
+ - Fixed a compatibility problem between WRE and new Spectre code.
 
 7.8.3
  - Rewrote Spectre's workflow queues to prevent it from "forgetting" about some workflows.
