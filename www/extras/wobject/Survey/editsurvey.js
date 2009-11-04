@@ -161,6 +161,8 @@ Survey.Data = (function(){
                 });
                 qButton.on("click", this.addQuestion, d.buttons.question);
 			}
+            qButton.removeListener("click", this.addQuestion);
+            qButton.on("click", this.addQuestion, d.buttons.question);
 
             if (d.buttons.answer) {
                 YAHOO.util.Dom.setStyle('addAnswer', 'display', 'inline');
@@ -170,8 +172,9 @@ Survey.Data = (function(){
                         id: "addAnswer",
                         container: "addAnswer"
                     });
-                aButton.on("click", this.addAnswer, d.buttons.answer);
 				}
+                aButton.removeListener("click", this.addAnswer);
+                aButton.on("click", this.addAnswer, d.buttons.answer);
             }else{
                 YAHOO.util.Dom.setStyle('addAnswer', 'display', 'none');
             }
