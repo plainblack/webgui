@@ -1983,8 +1983,8 @@ normal templates.|,
     },
 
     'extraHeadTagsPacked' => {
-        message => q|Extra tags that should be displayed in the header that this tikcet is displayed on minimized so no whitespace exists|,
-        lastUpdated => 1147050475,
+        message => q|Extra tags that should be displayed in the header that this ticket is displayed on minimized so no whitespace exists|,
+        lastUpdated => 1257349398,
         context => q|help text label|,
     },
 
