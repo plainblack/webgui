@@ -2154,8 +2154,8 @@ normal templates.|,
     },
 
     'extraHeadTagsPacked' => {
-        message => q|Extra tags that should be displayed in the header that this tikcet is displayed on minimized so no whitespace exists|,
-        lastUpdated => 1147050475,
+        message => q|Extra tags that should be displayed in the header that this ticket is displayed on minimized so no whitespace exists|,
+        lastUpdated => 1257349398,
         context => q|help text label|,
     },
 
@@ -2255,6 +2255,17 @@ normal templates.|,
         context => q|Field Label|,
     },
 
+    'eventMetaData' => {
+        message => q|Meta data for the event returned as a JSON data structure|,
+        lastUpdated => 1147050475,
+        context => q|Field Label|,
+    },
+
+    'ticketMeta_[LABEL]' => {
+        message => q|Value for the meta data field [LABEL].  Non word and whitespace characters in [LABEL] should be replaced with an underscore.  <br/><br/>Ex: Meta Data Label: "First Name" should be referenced: &lt;tmpl_var ticketMeta_First_Name&gt; and so on|,
+        lastUpdated => 1147050475,
+        context => q|Field Label|,
+    },
     
 #    'TODO' => {
 #        message => q|TODO|,

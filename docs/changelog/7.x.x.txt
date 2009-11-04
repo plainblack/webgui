@@ -1,4 +1,13 @@
+7.8.4
+ - Fixed a compatibility problem between WRE and new Spectre code.
+ - fixed #11198: Typo in i18n
+ - fixed #11202: USPS driver does not log authentication errors
+ - fixed #10985: Survey: can't add multiple choice answer
+ - fixed #11197: Survey Edit Console is not i18n'ed
+
 7.8.3
+ - Rewrote Spectre's workflow queues to prevent it from "forgetting" about some workflows.
+ - fixed: RSS feeds generated with incorrect link for channel
  - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
  - The auto add to group and auto delete from group operations that are used with the GroupAdd and GroupDelete macros were fixed to make the user log in if they aren't already.
  - fixed #11074: Links to CS posts not working
@@ -31,6 +40,13 @@
  - fixed #10984: Edit Survey Screen isn't right in demo
  - added: getTopKeywords method to Keywords API
  - added: print remaining tickets feature to EMS
+ - fixed #11188: Incoherence in Navigation edit form
+ - fixed #11189: Controls variable missing in image asset in AssetProxy
+ - fixed #11190: event tmpl_var in help but not available
+ - fixed #11194: Event Asset Recurrence form is not i18n'ed
+ - fixed #11192: newByLineage tries to instantiate asset even if no assetId found
+ - fixed #11195: Shop, sometimes free checkout does not work
+ - added: UPS Shipping Driver
 
 7.8.2
  - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)

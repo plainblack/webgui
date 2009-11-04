@@ -99,7 +99,7 @@ Survey.Data = (function(){
                     draggable: true
                 });
                 
-                Survey.Data.ddContainer.setHeader("Survey Objects...");
+                Survey.Data.ddContainer.setHeader(Survey.i18n.get('Asset_Survey','Survey Objects');
                 Survey.Data.ddContainer.setBody(d.ddhtml);
                 Survey.Data.ddContainer.setFooter(document.getElementById("buttons"));
                 Survey.Data.ddContainer.render();
@@ -146,7 +146,7 @@ Survey.Data = (function(){
 
 			if (!sButton) {
                 sButton = new YAHOO.widget.Button({
-                    label: "Add Section",
+                    label: Survey.i18n.get('Asset_Survey','Add Section'),
                     id: "addSection",
                     container: "addSection"
                 });
@@ -155,12 +155,14 @@ Survey.Data = (function(){
 
 			if (!qButton) {
                 qButton = new YAHOO.widget.Button({
-                    label: "Add Question",
+                    label: Survey.i18n.get('Asset_Survey', 'Add Question'),
                     id: "addQuestion",
                     container: "addQuestion"
                 });
                 qButton.on("click", this.addQuestion, d.buttons.question);
 			}
+            qButton.removeListener("click", this.addQuestion);
+            qButton.on("click", this.addQuestion, d.buttons.question);
 
             if (d.buttons.answer) {
                 YAHOO.util.Dom.setStyle('addAnswer', 'display', 'inline');
@@ -170,8 +172,9 @@ Survey.Data = (function(){
                         id: "addAnswer",
                         container: "addAnswer"
                     });
-                aButton.on("click", this.addAnswer, d.buttons.answer);
 				}
+                aButton.removeListener("click", this.addAnswer);
+                aButton.on("click", this.addAnswer, d.buttons.answer);
             }else{
                 YAHOO.util.Dom.setStyle('addAnswer', 'display', 'none');
             }
@@ -209,6 +212,20 @@ Survey.Data = (function(){
 //  Initialize survey
 YAHOO.util.Event.onDOMReady(function(){
 	//var ddTarget = new YAHOO.util.DDTarget("sections", "sections");
-    Survey.Comm.loadSurvey();
-    Survey.ObjectTemplate.initObjectEditor();
+    Survey.i18n = new WebGUI.i18n( {
+        'namespaces' : {
+            'Asset_Survey' : [
+                'Add Question',
+                'Add Answer',
+                'Add Section',
+                'Survey Objects'
+            ]
+        },
+        onpreload   : {
+            fn       : function () {
+                            Survey.Comm.loadSurvey();
+                            Survey.ObjectTemplate.initObjectEditor();
+                       }
+        }
+    } );
 });

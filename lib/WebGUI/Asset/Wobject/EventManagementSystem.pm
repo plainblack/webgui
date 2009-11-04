@@ -2491,6 +2491,7 @@ sub www_printRemainingTickets {
 				EMSTicket.location as ticketLocation,
 				EMSTicket.relatedBadgeGroups,
 				EMSTicket.relatedRibbons,
+				EMSTicket.eventMetaData,
 				(seatsAvailable - (select count(*) from EMSRegistrantTicket where ticketAssetId = asset.assetId)) as seatsRemaining
 		FROM 
 				asset 
@@ -2511,6 +2512,19 @@ sub www_printRemainingTickets {
 	$var->{'tickets_loop'} = [];
 	while (my $hash = $sth->hashRef) {
 		my $seatsRemaining = $hash->{seatsRemaining};
+		#Put start time in the correct timezone
+		my $startTime 		       = WebGUI::DateTime->new($hash->{ticketStart})->set_time_zone($self->get('timezone'));
+		$hash->{ticketStart}       = $startTime->strftime('%F %R');
+		$hash->{ticketStart_epoch} = $startTime->epoch;
+		#Add meta data fields
+		my $data = $hash->{eventMetaData} || '{}';
+        my $meta = JSON->new->decode($data);
+        foreach my $key (keys %{$meta}) {
+			my $tmplKey = $key;
+			$tmplKey =~ s/[\s\W]/_/g;
+			$hash->{'ticketMeta_'.$tmplKey} = $meta->{$key};
+        }
+		#Add to the loop
 		for (my $i = 0; $i < $seatsRemaining; $i++ ) {
 			push(@{$var->{'tickets_loop'}},$hash);
 		}

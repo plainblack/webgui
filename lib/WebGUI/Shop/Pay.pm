@@ -409,7 +409,7 @@ sub www_selectPaymentGateway {
     
     # Complete Transaction if it's a $0 transaction.
     my $total = $cart->calculateTotal;
-    if (($total + $cart->calculateShopCreditDeduction($total)) == 0) {
+    if (sprintf('%.2f', $total + $cart->calculateShopCreditDeduction($total)) eq '0.00') {
         my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $cart});
         $transaction->completePurchase('zero', 'success', 'success');
         $cart->onCompletePurchase;
@@ -430,7 +430,6 @@ sub www_selectPaymentGateway {
     }
     $var->{ paymentGateways     }   = \@paymentGateways;
     $var->{ choose              }   = $i18n->get('choose payment gateway message');
-  $session->log->warn('###'.$session->setting->get("selectGatewayTemplateId"));
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("selectGatewayTemplateId"));
     return $session->style->userStyle($template->process($var));
 }

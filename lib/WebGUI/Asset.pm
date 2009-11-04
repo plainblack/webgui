@@ -1096,7 +1096,7 @@ sub getEditForm {
 		}
 	}
 
-	# send back the rendered form
+	# send back the object
 	return $tabform;
 }
 

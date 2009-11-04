@@ -821,6 +821,11 @@ sub newByLineage {
 	$class = $assetLineage->{$lineage}{class};
     unless ($id && $class) {
         ($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=?",[$lineage]);
+        if (!$id || !$class) {
+            $session->errorHandler->error("Couldn't instantiate asset from lineage: ".$lineage. ": class name or assetId missing");
+            return undef;
+        }
+        return undef if !$id || !$class;
         $assetLineage->{$lineage}{id} = $id;
         $assetLineage->{$lineage}{class} = $class;
         $session->stow->set("assetLineage",$assetLineage);

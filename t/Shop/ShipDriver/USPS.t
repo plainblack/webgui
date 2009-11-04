@@ -24,7 +24,7 @@ use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
-plan tests => 64;
+plan tests => 65;
 use_ok('WebGUI::Shop::ShipDriver::USPS')
     or die 'Unable to load module WebGUI::Shop::ShipDriver::USPS';
 
@@ -377,15 +377,18 @@ SKIP: {
 
 }
 
-my $cost = $driver->_calculateFromXML({
-    Package => [
-        {
-            ID => 0,
-            Postage => {
-                Rate => 5.25,
-            },
+my $cost = $driver->_calculateFromXML(
+    {
+        RateV3Response => {
+            Package => [
+                {
+                    ID => 0,
+                    Postage => {
+                        Rate => 5.25,
+                    },
+                },
+            ],
         },
-    ],
     },
     @shippableUnits
 );
@@ -471,21 +474,24 @@ SKIP: {
 
 }
 
-$cost = $driver->_calculateFromXML({
-    Package => [
-        {
-            ID => 0,
-            Postage => {
-                Rate => 7.00,
-            },
+$cost = $driver->_calculateFromXML(
+    {
+        RateV3Response => {
+            Package => [
+                {
+                    ID => 0,
+                    Postage => {
+                        Rate => 7.00,
+                    },
+                },
+                {
+                    ID => 1,
+                    Postage => {
+                        Rate => 5.25,
+                    },
+                },
+            ],
         },
-        {
-            ID => 1,
-            Postage => {
-                Rate => 5.25,
-            },
-        },
-    ],
     },
     @shippableUnits
 );
@@ -497,21 +503,24 @@ $bibleItem->setQuantity(2);
 
 is(calculateInsurance($driver), 8, '_calculateInsurance: two items in cart with quantity=2, calculates insurance');
 
-$cost = $driver->_calculateFromXML({
-    Package => [
-        {
-            ID => 0,
-            Postage => {
-                Rate => 7.00,
-            },
+$cost = $driver->_calculateFromXML(
+    {
+        RateV3Response => {
+            Package => [
+                {
+                    ID => 0,
+                    Postage => {
+                        Rate => 7.00,
+                    },
+                },
+                {
+                    ID => 1,
+                    Postage => {
+                        Rate => 5.25,
+                    },
+                },
+            ],
         },
-        {
-            ID => 1,
-            Postage => {
-                Rate => 5.25,
-            },
-        },
-    ],
     },
     @shippableUnits
 );
@@ -810,6 +819,24 @@ SKIP: {
     );
 
 }
+
+#######################################################################
+#
+# Check for throwing an exception
+#
+#######################################################################
+
+my $userId  = $driver->get('userId');
+$properties = $driver->get();
+$properties->{userId} = '__NEVER_GOING_TO_HAPPEN__';
+$driver->update($properties);
+
+$cost = eval { $driver->calculate($cart); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate', 'calculate throws an exception when a bad userId is used');
+
+$properties->{userId} = $userId;
+$driver->update($properties);
 
 #######################################################################
 #
