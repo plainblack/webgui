@@ -39,7 +39,7 @@ WebGUI.EMS = function (configs) {
 	WebGUI.EMS.url = configs.url;
 	WebGUI.EMS.tabContent = configs.tabContent;
     }
-    WebGUI.EMS.Items = new Object();
+    WebGUI.EMS.items = new Object();
 
     if(!this._configs.initRequestString) {
         this._configs.initRequestString = ';startIndex=0';
@@ -55,6 +55,7 @@ WebGUI.EMS = function (configs) {
                 ''
             ],
             'Asset_EventManagementSystem' : [
+	        'close tab',
                 ''
             ]
         }
@@ -70,6 +71,18 @@ WebGUI.EMS = function (configs) {
     ///////////////////////////////////////////////////////////////
     
     //***********************************************************************************
+    //    This Method updates the window.location.hash when the user changes tabs
+    WebGUI.EMS.changeTab = function ( e ) {
+	 alert('tab changed');
+	 var index = WebGUI.EMS.tabs.getTabIndex( e.newValue );
+         if( index == 0 ) {
+	     window.location.hash = '';
+	 }  else {
+	     window.location.hash = WebGUI.EMS.Tabs[index].id;
+	 }
+    };
+
+    //***********************************************************************************
     //  This method closes the active tab
     //
     //   Parameters:   ( integer ) -- if a ticket id is passed in then remove the tab for that ticket
@@ -80,20 +93,20 @@ WebGUI.EMS = function (configs) {
         var index;
         if( typeof(e) == "string" || typeof(e) == "number" ) {
             index = e;
-            myTab = WebGUI.EMS.Items[index].Tab;
+            myTab = WebGUI.EMS.items[index].tab;
         } else {
             if( typeof(e) != "undefined" ) {
                 YAHOO.util.Event.preventDefault(e);
             }
             if( typeof(myTab) == "undefined" ) {
-                myTab = WebGUI.EMS.Tabs.get('activeTab');
+                myTab = WebGUI.EMS.tabs.get('activeTab');
 	    }
-            index = parseInt( myTab.get('label') );
+	    index = WebGUI.EMS.tabs.getTabIndex(myTab);
         }
-        delete WebGUI.EMS.Items[index];
-        WebGUI.EMS.Tabs.removeTab(myTab);
+        delete WebGUI.EMS.items[index];
+        WebGUI.EMS.tabs.removeTab(myTab);
         if( WebGUI.EMS.lastTab ) {
-	   WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.lastTab);
+	   WebGUI.EMS.tabs.set('activeTab',WebGUI.EMS.lastTab);
         }
     };
 
@@ -155,25 +168,29 @@ WebGUI.EMS = function (configs) {
 		       alert(message);
 		       return;
 		        // currently only one tab exists, so instead of checking we just delete it and recreate
-		   } else { // if( typeof(WebGUI.EMS.Items[response.title]) == "undefined" 
-			      // || WebGUI.EMS.Items[response.title] == null ) {
+			//  this condition is going to have to search for the id in the list
+		   } else { // if( typeof(WebGUI.EMS.items[response.title]) == "undefined" 
+			      // || WebGUI.EMS.items[response.title] == null ) { // }
 		       // if there is a tab .. close it,
 		       // at least until I can get the JS/HTML re-written to handle multiple tabs
 		       //  there should only be one
-		       for( var item in WebGUI.EMS.Items ) { WebGUI.EMS.closeTab(item) }
+		       for( var item in WebGUI.EMS.items ) { WebGUI.EMS.closeTab(item) }
 		       var myContent = document.createElement("div");
 		       myContent.innerHTML = response.text;
 		       myTab = new YAHOO.widget.Tab({
 			     label: response.title + '<span class="close"><img src="/extras/wobject/EMS/close12_1.gif" alt="X" title="' +
-				    WebGUI.EMS.i18n.get('Asset_EMSSubmission','close tab') + '" /></span>',
+				    WebGUI.EMS.i18n.get('Asset_EventManagementSystem','close tab') + '" /></span>',
 			     contentEl: myContent
 			 });
-		       WebGUI.EMS.Tabs.addTab( myTab );
+		       WebGUI.EMS.tabs.addTab( myTab );
+		       var index = WebGUI.EMS.tabs.getTabIndex(myTab);
 		       YAHOO.util.Event.on(myTab.getElementsByClassName('close')[0], 'click', WebGUI.EMS.closeTab , myTab);
-		       WebGUI.EMS.Items[response.title] = new Object();
-		       WebGUI.EMS.Items[response.title].Tab = myTab;
+		       WebGUI.EMS.items[index] = new Object();
+		       WebGUI.EMS.items[index].tab = myTab;
+		       WebGUI.EMS.items[index].id = response.id;
+		       WebGUI.EMS.items[index].title = response.title;
 		   //} else {
-		       //myTab = WebGUI.EMS.Items[response.title].Tab;
+		       //myTab = WebGUI.EMS.items[response.title].tab;
 		       //myTab.set('content', response.text);
 		   }
 		   // make sure the script on the ticket has run
@@ -182,8 +199,9 @@ WebGUI.EMS = function (configs) {
 		   // }
 		   // delete WebGUI.ticketJScriptRun;
 		   WebGUI.EMS.loadingIndicator.hide();
-		   WebGUI.EMS.lastTab = WebGUI.EMS.Tabs.get('activeTab');
-		   WebGUI.EMS.Tabs.set('activeTab',myTab);
+		   WebGUI.EMS.lastTab = WebGUI.EMS.tabs.get('activeTab');
+		   //initHoverHelp(myTab);
+		   WebGUI.EMS.tabs.set('activeTab',myTab);
 	       },
 	    failure: function(o) {
 		   WebGUI.EMS.loadingIndicator.hide();
@@ -272,21 +290,14 @@ WebGUI.EMS = function (configs) {
                // if the user pressed a modifier key we want to default
         if( eventModifiers( evt ) ) { return }
         var target = evt.target;
-        
-        //let the default action happen if the user clicks the last reply column
-        var links = YAHOO.util.Dom.getElementsByClassName ("profile_link","a",target);
-
-        if (links.length == 0) {
-            YAHOO.util.Event.stopEvent(evt.event);
-        }
-
+	YAHOO.util.Event.stopEvent(evt.event);
         var elCell = this.getTdEl(target);
         if(elCell) {
             var oRecord = this.getRecord(elCell);
 	    var submissionId = oRecord.getData('submissionId');
 
-            if( typeof( WebGUI.EMS.Items[submissionId] ) != "undefined" ) {
-	        WebGUI.EMS.Tabs.set('activeTab',WebGUI.EMS.Items[submissionId].Tab);
+            if( typeof( WebGUI.EMS.items[submissionId] ) != "undefined" ) {
+	        WebGUI.EMS.tabs.set('activeTab',WebGUI.EMS.items[submissionId].tab);
 	        WebGUI.EMS.loadingIndicator.hide();
 	    }  else {
 		WebGUI.EMS.loadItem( submissionId );

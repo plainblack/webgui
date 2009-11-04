@@ -1,6 +1,5 @@
 package WebGUI::Asset::EMSSubmissionForm;
 
-use lib '/root/pb/lib'; use dav;
 
 =head1 LEGAL
 
@@ -22,11 +21,6 @@ use base 'WebGUI::Asset';
 use JSON;
 use WebGUI::Utility;
 
-# TODO:
-# To get an installer for your wobject, add the Installable AssetAspect
-# See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
-# details
-
 =head1 NAME
 
 Package WebGUI::Asset::EMSSubmissionForm
@@ -47,7 +41,6 @@ These methods are available from this class:
 
 =cut
 
-use lib '/root/pb/lib'; use dav;
 
 #-------------------------------------------------------------------
 
@@ -257,15 +250,14 @@ sub www_editSubmissionForm {
 		             )
 		           } ( @$res ) );
 		my $title =  $i18n->get('select form to edit') ;
-		my $content = $parent->processStyle( '<h1>' . $title .
-		                            '</h1><ul>' . $listOfLinks . '</ul>' );
-    if( $session->form->get('asJson') ) {
-        $session->http->setMimeType( 'application/json' );
-        return JSON->new->encode( { text => $content, title => $title } );
-    } else {
-        $session->http->setMimeType( 'text/html' );
-        return $content;
-    }
+		my $content = '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
+		if( $session->form->get('asJson') ) {
+		    $session->http->setMimeType( 'application/json' );
+		    return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
+		} else {
+		    $session->http->setMimeType( 'text/html' );
+		    return $parent->ems->processStyle( $content );
+		}
 	    }
         } elsif( $assetId ne 'new' ) {
 	    $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);
@@ -280,7 +272,6 @@ sub www_editSubmissionForm {
 	my @fieldNames = qw/title description startDate duration seatsAvailable location/;
 	my $fields;
 	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
-dav::dump 'editSubmissionForm::definition:', [@defs];
 	for my $def ( @defs ) {
 	    foreach my $fieldName ( @fieldNames ) {
                 my $properties = $def->{properties};
@@ -300,7 +291,6 @@ dav::dump 'editSubmissionForm::definition:', [@defs];
 	}
 	$newform->hidden( name => 'fieldNames', value => join( ' ', @fieldNames ) );
 	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
-dav::dump 'editSubmissionForm::dump submission form def', \@defs ;
         for my $def ( @defs ) {
 	    my $properties = $def->{properties};
 	    for my $fieldName ( qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
@@ -309,15 +299,14 @@ dav::dump 'editSubmissionForm::dump submission form def', \@defs ;
                     my %fieldParams = %{$properties->{$fieldName}};
 		    $fieldParams{name} = $fieldName;
 		    $fieldParams{value} = $params->{$fieldName} || $self ? $self->get($fieldName) : undef ;
-dav::dump 'editSubmissionForm::properties for ', $fieldName, \%fieldParams ;
 		    $newform->dynamicField(%fieldParams);
 		}
 	    }
         }
-dav::dump 'editSubmissionForm::dump before generate:',$fields;
 
 	my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : { };
         for my $fieldId ( @fieldNames ) {
+            next if $fieldId eq 'submissionStatus';
 	    my $field = $fields->{$fieldId};
 	    $newform->yesNo(
 	             label => $field->{label},
@@ -328,19 +317,23 @@ dav::dump 'editSubmissionForm::dump before generate:',$fields;
 	}
 	$newform->submit; 
         my $title = $assetId eq 'new' ? $i18n->get('new form') || 'new' : $asset->get('title');
-	my $content = $asset->processStyle(
-               $asset->processTemplate({
+	if( $session->form->get('asJson') ) {
+	    $session->http->setMimeType( 'application/json' );
+	} else {
+	    $session->http->setMimeType( 'text/html' );
+	}
+	my $content = $asset->processTemplate({
 		      errors => $params->{errors} || [],
                       backUrl => $parent->getUrl,
+		      pageTitle => $title,
 		      pageForm => $newform->print,
-                  },$parent->get('eventSubmissionTemplateId')));
-    if( $session->form->get('asJson') ) {
-        $session->http->setMimeType( 'application/json' );
-        return JSON->new->encode( { text => $content, title => $title } );
-    } else {
-        $session->http->setMimeType( 'text/html' );
-        return $content;
-    }
+                  },$parent->get('eventSubmissionTemplateId'));
+         WebGUI::Macro::process( $session, \$content );
+	if( $session->form->get('asJson') ) {
+	    return JSON->new->encode( { text => $content, title => $title, id => $assetId ne 'new' ? $assetId : 'new' . rand } );
+	} else {
+	    return $asset->ems->processStyle( $content );
+	}
 
 }
 
@@ -375,7 +368,7 @@ calls ems->view
 
 =cut
 
-sub www_view { $_[0]->ems->www_view }
+sub www_view { $_[0]->ems->www_viewSubmissionQueue }
 
 
 #-------------------------------------------------------------------
@@ -483,6 +476,7 @@ This method is called when data is purged by the system.
 =head2 view ( )
 
 method called by the container www_view method. 
+Note: this really shouldn't get called, all views are redirected elsewhere
 
 =cut
 
@@ -504,7 +498,6 @@ calls www_editSubmission with assetId == new
 =cut
 
 sub www_addSubmission {
-dav::log __PACKAGE__ . '::www_addSubmission';
     my $self = shift;
     $self->www_editSubmission( { assetId => 'new' } );
 }
@@ -537,7 +530,6 @@ calls WebGUI::Asset::EMSSubmission->editSubmission
 =cut
 
 sub www_editSubmission {
-dav::log __PACKAGE__ . '::www_editSubmission';
     my $self             = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return WebGUI::Asset::EMSSubmission->www_editSubmission($self,shift);
@@ -576,16 +568,18 @@ reference to the EMS asset that is parent to the new submission form asset
 
 =cut
 
-use lib '/root/pb/lib'; use dav;
 
 sub processForm {
     my $this = shift;
     my $form;
+    my $session;
     if( $this eq __PACKAGE__ ) {
 	my $parent = shift;
-	$form = $parent->session->form;
+	$session = $parent->session;
+	$form = $session->form;
     } elsif( ref $this eq __PACKAGE__ ) {
-	$form = $this->session->form;
+	$session = $this->session;
+	$form = $session->form;
     } else {
         return {_isValid => 0, errors => [ { text => 'invalid function call' } ] };
     }
@@ -597,11 +591,12 @@ sub processForm {
     my @fieldNames = split( ' ', $form->get('fieldNames') );
     $params->{formDescription} = { map { $_ => $form->get($_ . '_yesNo') } ( @fieldNames ) };
     $params->{formDescription}{_fieldList} = [ map { $params->{formDescription}{$_} ? $_ : () } ( @fieldNames ) ];
+    $params->{formDescription}{submissionStatus} = 0;
     if( scalar( @{$params->{formDescription}{_fieldList}} ) == 0 ) {
 	$params->{_isValid} = 0;
-	push @{$params->{errors}}, {text => 'you should turn on at least one entry field' }; # TODO internationalize this
+        my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmissionForm" );
+	push @{$params->{errors}}, {text => $i18n->get('turn on one field') };
     }
-dav::dump 'processForm::params:', $params;
     return $params;
 }
 

@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Test::Warn;
 use JSON;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::Activity;
@@ -33,12 +34,11 @@ use WebGUI::Asset::Sku::EMSToken;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my @cleanup = ();
 
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 60;        # Increment this number for each test you create
+plan tests => 52;        # Increment this number for each test you create
 
 (my $submitGroupA = WebGUI::Group->new($session,'new'))->name('groupA');
 (my $submitGroupB = WebGUI::Group->new($session,'new'))->name('groupB');
@@ -165,8 +165,6 @@ my $formAdesc = {
     location => 0,
 };
 
-use lib '/root/pb/lib'; use dav;
-dav::dump $session;
 
 my $frmA = $ems->addSubmissionForm({
     title                    => 'test A -- long',
@@ -216,7 +214,7 @@ my $submission = {
         };
 $session->request->setup_body($submission);
 my $sub1 = $frmA->addSubmission;
-push @cleanup, sub  { $sub1->puge; };
+WebGUI::Test->assetsToPurge( $sub1 );
 print join( "\n", @{$sub1->{errors}} ),"\n" if defined $sub1->{errors};
 my $isa1 = isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "userA/formA valid submission succeeded" );
 ok( $ems->hasSubmissions, 'UserA has submissions on this ems' );
@@ -227,14 +225,14 @@ ok( $ems->canSubmit, 'UserB can submit to this ems' );
 ok( !$frmA->canSubmit, 'UserB cannot submit to formA' );
 ok( $frmB->canSubmit, 'UserB can submit to formB' );
 
-my $submission = {
+$submission = {
     title => 'why i like to be important',
     description => 'the description',
     mfRequiredUrl => 'http://google.com',
         };
 $session->request->setup_body($submission);
 my $sub2 = $frmB->addSubmission;
-push @cleanup, sub  { $sub2->purge; };
+WebGUI::Test->assetsToPurge( $sub2 );
 my $isa2 = isa_ok( $sub2, 'WebGUI::Asset::EMSSubmission', "userB/FormB valid submission succeeded" );
 
 loginUserC;
@@ -267,6 +265,7 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
 $session->request->setup_body({submissionId => 3});
 cmp_deeply( from_json($ems->www_getSubmissionById), {
     title => 3,
+    id => 3,
     text => ignore(),
 }, 'test getSubmissionById');
 
@@ -313,7 +312,6 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           dir => 'DESC',
 }, 'test getAllSubmissions for Registrar' );
 
-# TODO fix num tests
 SKIP: { skip 'create submission failed', 8 unless $isa1 && $isa2;
 
 loginUserA;
@@ -353,48 +351,30 @@ my $cleanupSubmissions = WebGUI::Test::Activity->create( $session,
               "WebGUI::Workflow::Activity::CleanupEMSSubmissions"
 );
 
-push @cleanup, sub  { $approveSubmissions->purge; $cleanupSubmissions->purge; };
-
 is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
 $sub1 = $sub1->cloneFromDb;
-is( $sub1->get('submissionStatus'),'failed','submission failed to create');
-
-# TODO fill in the rest of the data required by EMSTicket
-
-print "1\n";
-$approveSubmissions->rerun;
-print "2\n";
-is($approveSubmissions->run, 'complete', 'approval complete');
-is($approveSubmissions->run, 'done', 'approval done');
-
-print "3\n";
-$sub1 = $sub1->cloneFromDb;
-print "4\n";
 is( $sub1->get('submissionStatus'),'created','approval successfull');
-print "5\n";
 
 my $ticket = WebGUI::Asset->newByDynamicClass($session, $sub1->get('ticketId'));
-print "6\n";
 isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
-print "7\n";
-push @cleanup, sub  { $ticket->purge; };
-print "8\n";
+WebGUI::Test->assetsToPurge( $ticket ) if $ticket ;
  
+my $newDate = time - ( 60 * 60 * 24 * ( $sub2->getParent->get('daysBeforeCleanup') + 1 ) ),
 $sub2->update({
-    lastModified => time - ( 60 * 60 * 72 ),   # last modified 3 days ago
+    submissionStatus => 'denied',
+    # lastModified => $newDate,  -- update overrides this...
 });
-my $submissionId = $sub2->get('assetId');
+my $sub2Id = $sub2->getId;
+$session->db->write('update assetData set lastModified = ' . $newDate . ' where assetId = "' . $sub2Id . '"' );
 
 $cleanupSubmissions->rerun;
 is($cleanupSubmissions->run, 'complete', 'cleanup complete');
 is($cleanupSubmissions->run, 'done', 'cleanup done');
 
-$sub2 = WebGUI::Asset->newByDynamicClass($session, $submissionId);
-is( $sub2, undef, 'ticket deleted');
-
-# TODO add a test to cleanup created entries
+$sub2 = WebGUI::Asset->newByDynamicClass($session, $sub2Id);
+is( $sub2, undef, 'submission deleted');
 
 } # end of workflow skip
 
@@ -439,6 +419,7 @@ my $expected = {
                                  'title' => '1',
                                  'startDate' => '1',
                                  'description' => '1',
+				 'submissionStatus' => '0',
                                  '_fieldList' => [
                                                    'title',
                                                    'description',
@@ -470,14 +451,15 @@ cmp_deeply( $result, $expected , 'test process form' );
 $expected = {
           'errors' => [
                         {
-                          'text' => 'you should turn on at least one entry field'
+                          'text' => ignore(),
                         }
                       ],
           'submissionDeadline' => undef,
           'menuTitle' => undef,
           'pastDeadlineMessage' => undef,
           'formDescription' => {
-                                 '_fieldList' => []
+                                 '_fieldList' => [],
+				 'submissionStatus' => 0,
                                },
           'description' => undef,
           '_isValid' => 0,
@@ -490,11 +472,12 @@ $expected = {
         };
 $session->request->setup_body( { } );
 $result = WebGUI::Asset::EMSSubmissionForm->processForm($ems);
-dav::dump $result;
 cmp_deeply( $result, $expected , 'test process form' );
 } # end of skip HTML::Form
 
 # these run code to see that it runs, but do not check for correctness
+
+warnings_are {
 
 $ems->www_viewSubmissionQueue;
 $ems->www_addSubmission;
@@ -513,6 +496,10 @@ $sub1->drawStatusField;
 $sub1->www_editSubmission;
 $sub1->www_editSubmissionSave;
 $sub1->processForm;
+# test comments
+$sub1->getFormattedComments;
+
+} [], 'no warnings from calling a bunch of functions';
 
 } # end of use packages skip
 }; # end of eval
@@ -523,6 +510,7 @@ print $@ if $@;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-   map { eval { $_->() } } ( @cleanup );
+
+
 }
 #vim:ft=perl

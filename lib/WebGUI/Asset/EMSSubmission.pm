@@ -1,6 +1,5 @@
 package WebGUI::Asset::EMSSubmission;
 
-use lib '/root/pb/lib'; use dav;
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -20,6 +19,7 @@ use strict;
 use Tie::IxHash;
 use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
 use WebGUI::Utility;
+use WebGUI::Inbox;
 
 =head1 NAME
 
@@ -292,7 +292,7 @@ sub drawRelatedRibbonsField {
 sub drawStatusField {
         my ($self, $params) = @_;
         return WebGUI::Form::SelectBox($self->session, {
-                name    => 'location',
+                name    => 'submissionStatus',
                 value   => $self->get('submissionStatus'),
                 options => $self->ems->getSubmissionStatus,
                 });
@@ -341,12 +341,12 @@ sub sendEmailUpdate {
     my $session = $self->session;
     my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmission" );
     if( $self->get('sendEmailOnChange') ) {
-        WebGUI::Inbox->addMessage( $session,{
+        WebGUI::Inbox->new($session)->addMessage( $session,{
            status => 'unread',
 	   message => $i18n->get('your submission has been updated') . "\n\n" .
 	                 $self->get('title'),
-	   userId => $self->createdBy,
-	   sentBy => $session->userId,
+	   userId => $self->get('createdBy'),
+	   sentBy => $session->user->userId,
         });
     }
 }
@@ -374,19 +374,17 @@ sub www_editSubmission {
         my $parent;
         if( $this eq __PACKAGE__ ) {   # called as a constructor
             $parent             = shift;
-dav::log 'EMSSubmission::www_editSubmission: got class/parent params';
         } else {
             $self = $this;
             $parent = $self->getParent;
-dav::log 'EMSSubmission::www_editSubmission: got self param';
         }
         my $params           = shift || { };
         my $session = $parent->session;
         my $i18n = WebGUI::International->new($parent->session,'Asset_EventManagementSystem');
+        my $i18n_WG = WebGUI::International->new($parent->session,'WebGUI');
         my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId') || 'new';
 
         if( $assetId ne 'new' ) {
-dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
             $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);
             if (!defined $self) {
                 $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
@@ -398,27 +396,39 @@ dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
         $newform->hidden(name => 'assetId', value => $assetId);
 	my $formDescription = $parent->getFormDescription;
 	my @defs = reverse @{__PACKAGE__->definition($session)};
+        my @fieldNames = qw/title submissionStatus startDate duration seatsAvailable location description/;
         my $fields;
         for my $def ( @defs ) {
 	    my $properties = $def->{properties};
 	    for my $fieldName ( %$properties ) {
 		if( defined $formDescription->{$fieldName} ) {
 		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
+		      if( $fieldName eq 'description' ) {
+		          $fields->{description}{height} = 200;
+		          $fields->{description}{width} = 350;
+		      }
 		      $fields->{$fieldName}{fieldId} = $fieldName;
+		      $fields->{$fieldName}{name} = $fieldName;
+		      $fields->{$fieldName}{value} = $self->get($fieldName) if $self;
 		}
 	    }
         }
         # add the meta field
         for my $metaField ( @{$parent->getParent->getEventMetaFields} ) {
-	    if( defined $formDescription->{$metaField->{fieldId}} ) {
-		$fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
+	    my $fieldId = $metaField->{fieldId};
+	    if( defined $formDescription->{$fieldId} ) {
+		push @fieldNames, $fieldId;
+		$fields->{$fieldId} = { %$metaField }; # a simple first level copy
 		# meta fields call it data type, we copy it to simplify later on
-		$fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
+		$fields->{$fieldId}{fieldType} = $metaField->{dataType};
+		$fields->{$fieldId}{name} = $fieldId;
+		$fields->{$fieldId}{value} = $self->get($fieldId) if $self;
 	    }
         }
 
 	# for each field
-	for my $field ( values %$fields ) {
+	for my $fieldId ( @fieldNames ) {
+	    my $field = $fields->{$fieldId};
 	    if( $formDescription->{$field->{fieldId}} || $asset->ems->isRegistrationStaff ) {
 		    my $drawMethod = __PACKAGE__ . '::' . $field->{customDrawMethod};
 		    if ($asset->can( $drawMethod )) {
@@ -437,18 +447,21 @@ dav::log 'EMSSubmission::www_editSubmission: asseId ne new';
 	            );
 	    }
 	}
-	# TODO add the comment form
         $newform->submit;
-	my $title = $assetId eq 'new' ? $i18n->get('new submission') || 'new' : $asset->get('submissionId');
+	my $title = $assetId eq 'new' ? $i18n_WG->get(99) : $asset->get('title');
         my $content =  $asset->processStyle(
                $asset->processTemplate({
                       errors => $params->{errors} || [],
                       backUrl => $parent->getUrl,
+                      pageTitle => $title,
                       pageForm => $newform->print,
+		      commentForm => $self ? $self->getFormattedComments : '',
+		      commentFlag => $self ? 1 : 0 ,
                   },$parent->getParent->get('eventSubmissionTemplateId')));
+	   WebGUI::Macro::process( $session, \$content );
     if( $session->form->get('asJson') ) {
         $session->http->setMimeType( 'application/json' );
-	return JSON->new->encode( { text => $content, title => $title } );
+	return JSON->new->encode( { text => $content, title => $title, id => $assetId ne 'new' ? $assetId : 'new' . rand } );
     } else {
         $session->http->setMimeType( 'text/html' );
         return $content;
@@ -465,14 +478,14 @@ sub www_editSubmissionSave {
         my $self = shift;
         my $session = $self->session;
         return $session->privilege->insufficient() unless $self->canEdit;
-        my $formParams = WebGUI::Asset::EMSSubmission->processForm($self);
+        my $formParams = $self->processForm;
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};
             $self->addRevision($formParams);
 	    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { override => 1, allowComments => 0 });
 	    $self = $self->cloneFromDb;
             $self->sendEmailUpdate;
-            return $self->www_view;
+            return $self->ems->www_viewSubmissionQueue;
         } else {
             return $self->www_editSubmission($formParams);
         }
@@ -486,7 +499,7 @@ calles ems->view
 
 =cut
 
-sub www_view { $_[0]->ems->www_view }
+sub www_view { $_[0]->ems->www_viewSubmissionQueue }
 
 #-------------------------------------------------------------------
 
@@ -505,9 +518,10 @@ sub getEditForm {
     my $comments        = $tabform->getTab( 'comments' );
 
     #add the comments...
-    $comments->div({name => 'comments',
-      contentCallback => sub { $self->getFormattedComments },
-    });
+    # TODO once comments can be submitted using AJAX this will work...
+#    $comments->div({name => 'comments',
+#      contentCallback => sub { $self->getFormattedComments },
+#    });
 
     return $tabform;
 }
@@ -585,24 +599,36 @@ reference to the EMS asset that is parent to the new submission form asset
 
 =cut
 
-use lib '/root/pb/lib'; use dav;
 
 sub processForm {
     my $this = shift;
     my $form;
+    my $asset;
+    my $parent;
+    my $self;
     if( $this eq __PACKAGE__ ) {
-        my $parent = shift;
+        $parent = shift;
         $form = $parent->session->form;
-    } elsif( ref $this eq __PACKAGE__ ) {
-        $form = $this->session->form;
+	$asset = $parent;
     } else {
-        return {_isValid => 0, errors => [ { text => 'invalid function call' } ] };
+	$self = $this;
+	$parent = $self->getParent;
+        $form = $self->session->form;
+	$asset = $self;
     }
     my $params = {_isValid=>1};
-    # TODO
-    # get description from parent
-    # for each active field
-        # get data from session->form
+    my $formDescription = $parent->getFormDescription;
+    my @idList;
+    if( $asset->ems->isRegistrationStaff ) {
+	@idList = ( 'submissionStatus', keys %$formDescription );
+    } else {
+	@idList = @{$formDescription->{_fieldList}} ;
+    }
+    for my $fieldId ( @idList ) {
+	next if $fieldId =~ /^_/;
+	$params->{$fieldId} = $form->get($fieldId);
+    }
+    return $params;
 }
 
 #-------------------------------------------------------------------
@@ -655,6 +681,7 @@ This method is called when data is purged by the system.
 =head2 view ( )
 
 method called by the container www_view method. 
+NOTE: this should net get called, all views are redirected elsewhere.
 
 =cut
 

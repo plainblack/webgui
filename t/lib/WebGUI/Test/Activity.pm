@@ -2,6 +2,8 @@ package WebGUI::Test::Activity;
 
 use WebGUI::Workflow;
 
+my @cleanup; # TODO fix WebGUI::Text::assetsToPurge so that it works with workflows and activities
+
 =head Name
 
 package WebGUI::Test::Activity;
@@ -70,6 +72,8 @@ sub create {
 	my $tag = WebGUI::VersionTag->getWorking($session);
 	$tag->commit;
 	WebGUI::Test->tagsToRollback($tag);
+	# WebGUI::Test->assetsToPurge($instance,$workflow); -- does not work...
+        push @cleanup, $instance, $workflow,
 
     return bless { instance => $instance,
 		   session => $session,
@@ -82,14 +86,15 @@ sub run {
 
 sub rerun {
     my $self = shift;
-my $session = $self->{session};
-    $self->{instance}->delete;
+    my $session = $self->{session};
     $self->{instance} = WebGUI::Workflow::Instance->create($session,
 	{
 	    workflowId              => $self->{workflow}->getId,
 	    skipSpectreNotification => 1,
 	}
     );
+	# WebGUI::Test->assetsToPurge($self->{instance}); -- does not work
+        push @cleanup, $self->{instance};
 	my $tag = WebGUI::VersionTag->getWorking($session, 1);
         if( $tag ) {
 	    $tag->commit;
@@ -98,10 +103,10 @@ my $session = $self->{session};
 
 }
 
-sub delete {
-    my $self = shift;
-    $self->{instance}->delete;
-    $self->{workflow}->delete;
+END {
+
+    map { $_->delete; } ( @cleanup );
+
 }
 
 1;

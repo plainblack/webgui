@@ -1915,6 +1915,12 @@ normal templates.|,
         context => q|Label for link to view submission queue.|,
     },
 
+    'add submission' => {
+        message => q|New|,
+        lastUpdated => 1147050475,
+        context => q|This is appended to the title of a submission form when user is submitting a new event.|,
+    },
+
     'new submission' => {
         message => q|New Submission|,
         lastUpdated => 1147050475,

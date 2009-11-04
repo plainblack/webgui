@@ -1,6 +1,5 @@
 package WebGUI::Asset::Wobject::EventManagementSystem;
 
-use lib '/root/pb/lib'; use dav;
 
 =head1 LEGAL
 
@@ -47,7 +46,8 @@ adds the parameter to eventSubmissionGroups
 sub addGroupToSubmitList {
     my $self = shift;
     my $groupId = shift;
-    my @ids = split(' ', $self->get('eventSubmissionGroups'));
+    my ($idString) = $self->session->db->read('select eventSubmissionGroups from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
+    my @ids = split(' ', $idString);
     my %h;
     @ids = map { $h{$_}++ == 0 ? $_ : () } ( $groupId, @ids );
     $self->update({eventSubmissionGroups => join( ' ', @ids ) });
@@ -304,6 +304,21 @@ sub deleteEventMetaField {
 
 #-------------------------------------------------------------------
 
+=head2 ems
+
+this is called by the submission sub-system
+it is for compatability and ensures that the ems
+object is used for certain calls
+
+=cut
+
+sub ems {
+    my $self = shift;
+    return $self;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getBadges ()
 
 Returns an array reference of badge objects.
@@ -443,7 +458,6 @@ get a sequence number for the submission id
 
 sub getNextSubmissionId {
     my $self = shift;
-    #my $submissionId = $self->get('nextSubmissionId');
     my ($submissionId) = $self->session->db->read('select nextSubmissionId from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
     $self->update( { nextSubmissionId => ($submissionId + 1) } );
     return $submissionId;
@@ -489,7 +503,6 @@ retuns an arrayref of the locations found in the submission location list
 sub getSubmissionLocations {
    my $self = shift;
    my $text = $self->get('submittedLocationsList');
-dav::log 'getSubmissionLocations:"', $text, '"';
    return undef if $text eq '';
    return [ split( /\s+/, $text ) ];
 }
@@ -745,7 +758,6 @@ display a form or links to forms to create a new submission
 =cut
 
 sub www_addSubmission {
-dav::log __PACKAGE__ . '::www_addSubmission';
     my $self = shift;
     my $params = shift || {};
     my $session = $self->session;
@@ -765,20 +777,31 @@ dav::log __PACKAGE__ . '::www_addSubmission';
                 $formId = $form->getId;
             } else {
                 my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
-                            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
+                            return qq{<li><a href='$u' onclick='WebGUI.EMS.loadItemFromAnchor(this)' title='$d'>$n</a></li>} } ;
                 my $listOfLinks = join '', ( map {
                       $makeAnchorList->(
-                                $_->getUrl('func=addSubmission' ),
+                                $self->getUrl('func=viewSubmissionQueue#' . $_->getId . '_new' ), # _new has to match same in sub www_viewSubmissionQueue in this module
                                 $_->get('title'),
                                 WebGUI::HTML::filter($_->get('description'),'all')
                              )
                            } ( @new ) );
-                return $self->processStyle( '<h1>' . $i18n->get('select form to submit') .
-                                            '</h1><ul>' . $listOfLinks . '</ul>' );
+                my $title =  $i18n->get('select form to submit') ;
+		my $asJson = $session->form->get('asJson');
+                if( $asJson ) {
+                    $session->http->setMimeType( 'application/json' );
+                } else {
+                    $session->http->setMimeType( 'text/html' );
+                }
+                my $content =  '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
+use lib '/root/pb/lib'; use dav; dav::log $content;
+                if( $asJson ) {
+                    return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
+                } else {
+                    return $self->ProcessStyle( $content );
+                }
             }
-    } else {
-        $form = WebGUI::Asset->newByDynamicClass($session,$formId);
     }
+    $form = WebGUI::Asset->newByDynamicClass($session,$formId);
     if (!defined $form) {
 	$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
     }
@@ -1009,7 +1032,6 @@ sub www_editSubmissionForm {
 	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff || $self->canEdit;
 	return WebGUI::Asset::EMSSubmissionForm->www_editSubmissionForm($self,shift);
 }
-
 
 #-------------------------------------------------------------------
 
@@ -1254,7 +1276,6 @@ sub www_getAllSubmissions {
     my $session     = $self->session;
     my $datetime    = $session->datetime;
     my $form        = $session->form;
-    my $rowsPerPage = 25;
     my $tableInfo  = {};    
 
     return $session->privilege->insufficient unless $self->canSubmit || $self->isRegistrationStaff;
@@ -1385,6 +1406,7 @@ sub www_getSubmissionById {
    } else {
        $result->{text} = $res->[0]->www_editSubmission;
        $result->{title} = $submissionId;
+       $result->{id} = $submissionId;
    }
     $self->session->http->setMimeType('application/json');
     return JSON->new->encode($result);
@@ -2633,11 +2655,17 @@ sub www_viewSubmissionQueue {
     return $self->session->privilege->insufficient() unless $canSubmit || $isRegistrationStaff;
 
 	         # this map returns an array of hash refs with an id,url pair to describe the submissionForm assets
-	my @submissionFormUrls = map { {
+	my @submissionFormUrls = map { {   # edit form
 			id => $_->getId,
+			edit => 1,
 			title => $_->get('title'),
 			linkUrl => $self->getUrl('func=viewSubmissionQueue#' . $_->getId ),
 			ajaxUrl => $_->getUrl('func=editSubmissionForm'),
+		},{ # new submission ( _new has to match same in sub www_addSubmission in this module
+			id => $_->getId . '_new',
+			title => $_->get('title') . ' - ' . $i18n->get('add submission'),
+			linkUrl => $self->getUrl('func=viewSubmissionQueue#' . $_->getId . '_new' ),
+			ajaxUrl => $_->getUrl('func=addSubmission'),
 		} } (
 		       @{$self->getLineage( ['children'],{ returnObjects => 1,
 			     includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],

@@ -19,6 +19,7 @@ use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset;
 use WebGUI::International;
+use WebGUI::VersionTag;
 
 =head1 NAME
 
@@ -68,48 +69,52 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 =cut
 
-use lib '/root/pb/lib'; use dav;
 
 sub execute {
 	my $self    = shift;
     my $session = $self->session;
     my $root    = WebGUI::Asset->getRoot($session);
-dav::log __PACKAGE__ . " executing\n";
     # keep track of how much time it's taking
     my $start   = time;
     my $limit   = 2_500;
-    my $timeLimit = 120;
+    my $timeLimit = 60;
 
     my $list = $root->getLineage( ['descendants'], { returnObjects => 1,
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
              } );
     
-    for my $emsf ( @$list ) {
+    for my $emsForm ( @$list ) {
        my $whereClause = q{ submissionStatus='approved' };
-       my $res = $emsf->getLineage(['children'],{  returnObjects => 1,
+       my $res = $emsForm->getLineage(['children'],{  returnObjects => 1,
 	     joinClass => 'WebGUI::Asset::EMSSubmission',
 	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	     whereClause => $whereClause,
 	 } );
         for my $submission ( @$res ) {
-            my %properties = $submission->get;
-            delete $properties{submissionId};
-            delete $properties{submissionStatus};
-            delete $properties{sendEmailOnChange};
-            delete $properties{ticketId};
-            my $newAsset = $emsf->ems->addChild(
-                className => 'WebGUI::Asset::Sku::EMSTicket',
-                %properties,
-            );
-            if( defined $newAsset ) {
+	    my $properties = { className => 'WebGUI::Asset::Sku::EMSTicket' };
+            for my $name ( qw{title description seatsAvailable price vendorId
+                               synopsis location duration startDate sku relatedRibbons
+                                relatedBadgeGroups eventMetaData shipsSeparately} ) {
+		    $properties->{$name} = $submission->get($name);
+            }
+            $properties->{eventNumber} = $self->session->db->quickScalar(
+                    "select max(eventNumber)+1
+                       from EMSTicket left join asset using (assetId)
+			 where parentId=?",[$emsForm->ems->getId]) || 0;
+            my $newAsset = $emsForm->ems->addChild( $properties );
+            if( $newAsset ) {
+                     # TODO this should be addRevision
 		$submission->update({ ticketId => $newAsset->getId, submissionStatus => 'created' });
+		WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { override => 1, allowComments => 0 });
 	    } else {
+                $submission->addComment($@) if $@;
 		$submission->update({ submissionStatus => 'failed' });
 	    }
 	    $limit--;
-	    return $self->WAITING(1) if ! $limit or time > $start + $timeLimit;
+	    last if ! $limit or time > $start + $timeLimit;
 	}
     }
+    return $self->WAITING(1) if ! $limit or time > $start + $timeLimit;
     return $self->COMPLETE;
 }
 

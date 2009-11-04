@@ -87,6 +87,18 @@ our $I18N = { ##hashref of hashes
 		context => q|Help text for the submission deadline field.  After this date this submission form will not accept any more entries.|
 	},
 
+	'new form' => {
+		message => q|New Form|,
+		lastUpdated => 1131394072,
+		context => q|This is the label for the tab when creating a new submission form.|
+	},
+
+	'turn on one field' => {
+		message => q|You should turn on at least one entry field.|,
+		lastUpdated => 1131394072,
+		context => q|Remind the registrar to allow at least one field to be editted by the event submitter.|
+	},
+
 #	'TODO' => {
 #		message => q|TODO|,
 #		lastUpdated => 1131394072,

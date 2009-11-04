@@ -79,26 +79,29 @@ dav::log __PACKAGE__ . " executing\n";
     # keep track of how much time it's taking
     my $start   = time;
     my $limit   = 2_500;
-    my $timeLimit = 120;
+    my $timeLimit = 60;
 
-    my $list = $root->getLineage( ['children'], { returnObjects => 1,
+    my $list = $root->getLineage( ['descendants'], { returnObjects => 1,
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
              } );
     
-    for my $emsf ( @$list ) {
-       my $daysBeforeCleanup = $emsf->get('daysBeforeCleanup') ;
+    for my $emsForm ( @$list ) {
+dav::log __PACKAGE__ . "::executing::emsForm loop\n";
+       my $daysBeforeCleanup = $emsForm->get('daysBeforeCleanup') ;
        next if ! $daysBeforeCleanup;
        my $whereClause = q{ submissionStatus='denied' };
-       if( $emsf->get('deleteCreatedItems') ) {
+       if( $emsForm->get('deleteCreatedItems') ) {
            $whereClause = ' ( ' . $whereClause . q{ or submissionStatus='created' } . ' ) ';
        }
        my $checkDate = time - ( 60*60*24* $daysBeforeCleanup );
-       $whereClause .= q{ and lastModifiedDate < } . $checkDate;
-       my $res = $emsf->getLineage(['children'],{ 
+       $whereClause .= q{ and assetData.lastModified < } . $checkDate;
+       my $res = $emsForm->getLineage(['children'],{ returnObjects => 1,
+	     joinClass => 'WebGUI::Asset::EMSSubmission',
 	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	     whereClause => $whereClause,
 	 } );
         for my $submission ( @$res ) {
+dav::log __PACKAGE__ . "::executing::submission loop\n";
 	    $submission->purge;
 	    $limit--;
 	    return $self->WAITING(1) if ! $limit or time > $start + $timeLimit;
