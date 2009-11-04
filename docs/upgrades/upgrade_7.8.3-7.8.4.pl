@@ -53,6 +53,7 @@ finish($session); # this line required
 sub configEMSActivities {
     my $session = shift;
     print "\tConfigure EMS Activities... " unless $quiet;
+    my $config = $session->config;
     $config->addToArray('workflowActivities/None', 'WebGUI::Workflow::Activity::CleanupEMSSubmissions');
     $config->addToArray('workflowActivities/None', 'WebGUI::Workflow::Activity::ProcessEMSApprovals');
     my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');  # Daily
@@ -61,13 +62,13 @@ sub configEMSActivities {
        }
        my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::CleanupEMSSubmissions');
        $activity->set('title',       'Purge Denied EMS Submissions');
-       $activity->set('description', 'Purges EMS Submissions that were denied and are aged according to parameters'');
+       $activity->set('description', 'Purges EMS Submissions that were denied and are aged according to parameters.');
     } # end of BREAK block
     $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000004'); # Hourly
     BREAK: { foreach my $activity (@{ $workflow->getActivities }) {
            last BREAK if $activity->getName() eq 'WebGUI::Workflow::Activity::ProcessEMSApprovals';
        }
-       $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ProcessEMSApprovals');
+       my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ProcessEMSApprovals');
        $activity->set('title',       'Process Approves EMS Submissions');
        $activity->set('description', 'Create EMS Ticket Assets for approved submissions.');
     } # end of BREAK block
@@ -80,6 +81,7 @@ sub configEMSActivities {
 sub addEMSSubmissionTables {
     my $session = shift;
     print "\tCreate EMS Submission Tables... " unless $quiet;
+    my $db = $session->db;
 
     $db->write(<<ENDSQL);
 CREATE TABLE EMSSubmissionForm (
