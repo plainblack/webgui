@@ -23,6 +23,7 @@ use Data::Dumper;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Shop::ShipDriver::USPS;
 
 #----------------------------------------------------------------------------
 # Init
@@ -34,16 +35,11 @@ $session->user({user => $user});
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 41;
-plan tests => 1 + $tests;
+plan tests => 42;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::ShipDriver::USPS');
-
-my $storage;
-my ($driver, $cart);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 my $home = WebGUI::Asset->getDefault($session);
@@ -93,10 +89,7 @@ my $nivBible = $bible->setCollateral('variantsJSON', 'variantId', 'new',
 );
 
 $versionTag->commit;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::ShipDriver::USPS', $tests unless $loaded;
+addToCleanup($versionTag);
 
 #######################################################################
 #
@@ -136,10 +129,11 @@ my $options = {
                 enabled => 1,
               };
 
-$driver = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
+my $driver2 = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
+addToCleanup($driver2);
 
-isa_ok($driver, 'WebGUI::Shop::ShipDriver::USPS');
-isa_ok($driver, 'WebGUI::Shop::ShipDriver');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPS');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 
 #######################################################################
 #
@@ -155,13 +149,13 @@ is (WebGUI::Shop::ShipDriver::USPS->getName($session), 'U.S. Postal Service', 'g
 #
 #######################################################################
 
-my $driverId = $driver->getId;
-$driver->delete;
+my $driverId = $driver2->getId;
+$driver2->delete;
 
 my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driverId]);
 is($count, 0, 'delete deleted the object');
 
-undef $driver;
+undef $driver2;
 
 #######################################################################
 #
@@ -169,7 +163,7 @@ undef $driver;
 #
 #######################################################################
 
-$driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
+my $driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
     shipType => 'PARCEL',
@@ -201,7 +195,8 @@ cmp_deeply(
     '... checking error message',
 );
 
-$cart = WebGUI::Shop::Cart->newBySession($session);
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+addToCleanup($cart);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',
@@ -345,15 +340,18 @@ SKIP: {
 
 }
 
-my $cost = $driver->_calculateFromXML({
-    Package => [
-        {
-            ID => 0,
-            Postage => {
-                Rate => 5.25,
-            },
+my $cost = $driver->_calculateFromXML(
+    {
+        RateV3Response => {
+            Package => [
+                {
+                    ID => 0,
+                    Postage => {
+                        Rate => 5.25,
+                    },
+                },
+            ],
         },
-    ],
     },
     @shippableUnits
 );
@@ -437,21 +435,24 @@ SKIP: {
 
 }
 
-$cost = $driver->_calculateFromXML({
-    Package => [
-        {
-            ID => 0,
-            Postage => {
-                Rate => 7.00,
-            },
+$cost = $driver->_calculateFromXML(
+    {
+        RateV3Response => {
+            Package => [
+                {
+                    ID => 0,
+                    Postage => {
+                        Rate => 7.00,
+                    },
+                },
+                {
+                    ID => 1,
+                    Postage => {
+                        Rate => 5.25,
+                    },
+                },
+            ],
         },
-        {
-            ID => 1,
-            Postage => {
-                Rate => 5.25,
-            },
-        },
-    ],
     },
     @shippableUnits
 );
@@ -461,21 +462,24 @@ is($cost, 12.25, '_calculateFromXML calculates shipping cost correctly for 2 ite
 $bibleItem->setQuantity(2);
 @shippableUnits = $driver->_getShippableUnits($cart);
 
-$cost = $driver->_calculateFromXML({
-    Package => [
-        {
-            ID => 0,
-            Postage => {
-                Rate => 7.00,
-            },
+$cost = $driver->_calculateFromXML(
+    {
+        RateV3Response => {
+            Package => [
+                {
+                    ID => 0,
+                    Postage => {
+                        Rate => 7.00,
+                    },
+                },
+                {
+                    ID => 1,
+                    Postage => {
+                        Rate => 5.25,
+                    },
+                },
+            ],
         },
-        {
-            ID => 1,
-            Postage => {
-                Rate => 5.25,
-            },
-        },
-    ],
     },
     @shippableUnits
 );
@@ -699,20 +703,20 @@ SKIP: {
 }
 
 
-}
+#######################################################################
+#
+# Check for throwing an exception
+#
+#######################################################################
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    if (defined $driver && $driver->isa('WebGUI::Shop::ShipDriver')) {
-        $driver->delete;
-    }
-    if (defined $cart && $cart->isa('WebGUI::Shop::Cart')) {
-        my $addressBook = $cart->getAddressBook();
-        $addressBook->delete if $addressBook;
-        $cart->delete;
-    }
-    if (defined $versionTag) {
-        $versionTag->rollback;
-    }
-}
+my $userId  = $driver->get('userId');
+$properties = $driver->get();
+$properties->{userId} = '__NEVER_GOING_TO_HAPPEN__';
+$driver->update($properties);
+
+$cost = eval { $driver->calculate($cart); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate', 'calculate throws an exception when a bad userId is used');
+
+$properties->{userId} = $userId;
+$driver->update($properties);

@@ -6,6 +6,7 @@ use WebGUI::Exception;
 use XML::Simple;
 use LWP;
 use Tie::IxHash;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -136,12 +137,12 @@ sub calculate {
     my $response = $self->_doXmlRequest($xml);
     ##Error handling
     if (! $response->is_success) {
-        WebGUI::Error::RemoteShippingRate->throw(error => 'Problem connecting to USPS Web Tools: '. $response->status_line);
+        WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Problem connecting to USPS Web Tools: '. $response->status_line);
     }
     my $returnedXML = $response->content;
-    my $xmlData     = XMLin($returnedXML, ForceArray => [qw/Package/]);
+    my $xmlData     = XMLin($returnedXML, KeepRoot => 1, ForceArray => [qw/Package/]);
     if (exists $xmlData->{Error}) {
-        WebGUI::Error::RemoteShippingRate->throw(error => 'Problem with USPS Web Tools XML: '. $xmlData->{Description});
+        WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Problem with USPS Web Tools XML: '. $xmlData->{Error}->{Description});
     }
     ##Summarize costs from returned data
     $cost = $self->_calculateFromXML($xmlData, @shippableUnits);
@@ -160,14 +161,16 @@ Processed XML data from an XML rate request, processed in perl data structure.  
 have this structure:
 
     {
-        Package => [
-            {
-                ID => 0,
-                Postage => {
-                    Rate => some_number
-                }
-            },
-        ]
+        RateV3Response => {
+            Package => [
+                {
+                    ID => 0,
+                    Postage => {
+                        Rate => some_number
+                    }
+                },
+            ]
+        }
     }
 
 =head3 @shippableUnits
@@ -179,12 +182,12 @@ The set of shippable units, which are required to do quantity lookups.
 sub _calculateFromXML {
     my ($self, $xmlData, @shippableUnits) = @_;
     my $cost = 0;
-    foreach my $package (@{ $xmlData->{Package} }) {
+    foreach my $package (@{ $xmlData->{RateV3Response}->{Package} }) {
         my $id   = $package->{ID};
         my $rate = $package->{Postage}->{Rate};
         ##Error check for invalid index
         if ($id < 0 || $id > $#shippableUnits) {
-            WebGUI::Error::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
         }
         my $unit = $shippableUnits[$id];
         if ($unit->[0]->getSku->shipsSeparately) {

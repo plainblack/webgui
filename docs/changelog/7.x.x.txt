@@ -12,6 +12,7 @@
  - fixed #11194: Event Asset Recurrence form is not i18n'ed
  - fixed #11192: newByLineage tries to instantiate asset even if no assetId found
  - fixed #11195: Shop, sometimes free checkout does not work
+ - fixed #11202: USPS driver does not log authentication errors
 
 7.7.24
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
