@@ -14,6 +14,7 @@
  - fixed #11195: Shop, sometimes free checkout does not work
  - fixed #11202: USPS driver does not log authentication errors
  - fixed #10985: Survey: can't add multiple choice answer
+ - fixed #11197: Survey Edit Console is not i18n'ed
 
 7.7.24
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
