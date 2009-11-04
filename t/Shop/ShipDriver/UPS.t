@@ -434,7 +434,7 @@ SKIP: {
     my $xmlData = XMLin($response->content, ForceArray => [qw/RatedPackage/],);
     ok($xmlData->{Response}->{ResponseStatusCode}, '... responseCode is successful');
     ok($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue}, '... total charges returned');
-    diag($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue});
+    #diag($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue});
 
 }
 
@@ -451,7 +451,7 @@ SKIP: {
     my $xmlData = XMLin($response->content, ForceArray => [qw/RatedPackage/],);
     ok($xmlData->{Response}->{ResponseStatusCode}, '... responseCode is successful');
     ok($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue}, '... total charges returned');
-    diag($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue});
+    #diag($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue});
 
 }
 
@@ -475,7 +475,7 @@ $xmlRate = XMLin( $xmlR,
     ForceArray => ['Package'],
 );
 
-diag Dumper $xmlRate;
+#diag Dumper $xmlRate;
 
 cmp_deeply(
     $xmlRate, {
@@ -517,7 +517,7 @@ SKIP: {
     my $xmlData = XMLin($response->content, ForceArray => [qw/RatedPackage/],);
     ok($xmlData->{Response}->{ResponseStatusCode}, '... responseCode is successful');
     ok($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue}, '... total charges returned');
-    diag $xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue};
+    #diag $xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue};
 
 }
 
