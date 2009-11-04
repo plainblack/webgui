@@ -561,7 +561,7 @@ throughout the site.  Check yes if you want this Asset to be available as a pack
 	'asset' => {
 		message => q|Asset|,
         	lastUpdated => 1100463645,
-		context => 'The default name of all assets.'
+		context => 'The default name of all assets.  Asset, as in resource, part, object, item, or piece'
 	},
 
 	'extra head tags' => {
