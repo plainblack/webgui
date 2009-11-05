@@ -25,6 +25,8 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPS;
 
+plan tests => 43;
+
 #----------------------------------------------------------------------------
 # Init
 my $session   = WebGUI::Test->session;
@@ -34,8 +36,6 @@ $session->user({user => $user});
 
 #----------------------------------------------------------------------------
 # Tests
-
-plan tests => 42;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -203,14 +203,14 @@ my $workAddress = $addressBook->addAddress({
     organization => 'Plain Black Corporation',
     address1 => '1360 Regent St. #145',
     city => 'Madison', state => 'WI', code => '53715',
-    country => 'USA',
+    country => 'United States',
 });
 my $wucAddress = $addressBook->addAddress({
     label => 'wuc',
     organization => 'Madison Concourse Hotel',
     address1 => '1 W Dayton St',
     city => 'Madison', state => 'WI', code => '53703',
-    country => 'USA',
+    country => 'United States',
 });
 $cart->update({shippingAddressId => $workAddress->getId});
 
@@ -720,3 +720,18 @@ isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate', 'calculate throws an excep
 
 $properties->{userId} = $userId;
 $driver->update($properties);
+
+my $dutchAddress = $addressBook->addAddress({
+    label => 'dutch',
+    address1 => 'Rotterdamseweg 183C',
+    city => 'Delft', code => '2629HD',
+    country => 'Netherlands',
+});
+
+$cart->update({shippingAddressId => $dutchAddress->getId});
+$cost = eval { $driver->calculate($cart); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', "calculate won't calculate for foreign countries");
+
+$cart->update({shippingAddressId => $workAddress->getId});
+
