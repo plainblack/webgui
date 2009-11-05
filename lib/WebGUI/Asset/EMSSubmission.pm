@@ -367,7 +367,6 @@ parameters for the submission
 
 =cut
 
-
 sub www_editSubmission {
         my $this             = shift;
         my $self;
@@ -436,7 +435,7 @@ sub www_editSubmission {
 			delete $field->{name}; # don't want readOnly to generate a hidden field
 			$field->{fieldType} = "readOnly";
 		    }
- 
+
 	        $newform->dynamicField(%$field);
 	    } else {
 	        # TODO see that the data gets formatted
@@ -545,6 +544,7 @@ sub getEditTabs {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getQueueUrl
 
 returns the URL for the submission queue page with the submisison id in the hash part

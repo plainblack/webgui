@@ -37,6 +37,7 @@ use Tie::IxHash;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
+
 =head2 addGroupToSubmitList ( groupId )
 
 adds the parameter to eventSubmissionGroups
