@@ -16,6 +16,8 @@
  - fixed #10985: Survey: can't add multiple choice answer
  - fixed #11197: Survey Edit Console is not i18n'ed
  - fixed USPS driver only works on domestic addresses.
+ - Set a minimum package weight of 1 oz for the USPS driver.
+ - Handle per package errors in USPS response data.
 
 7.7.24
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17

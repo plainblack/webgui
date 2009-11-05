@@ -71,6 +71,9 @@ sub buildXML {
         }
         my $pounds = int($weight);
         my $ounces = int(16 * ($weight - $pounds));
+        if ($pounds == 0 && $ounces == 0 ) {
+            $ounces = 1;
+        }
         my $destination = $package->[0]->getShippingAddress;
         my $destZipCode = $destination->get('code');
         $packageData{ID}              = $packageIndex;
@@ -191,6 +194,9 @@ sub _calculateFromXML {
         ##Error check for invalid index
         if ($id < 0 || $id > $#shippableUnits) {
             WebGUI::Error::Shop::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
+        }
+        if (exists $package->{Error}) {
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => $package->{Description});
         }
         my $unit = $shippableUnits[$id];
         if ($unit->[0]->getSku->shipsSeparately) {
