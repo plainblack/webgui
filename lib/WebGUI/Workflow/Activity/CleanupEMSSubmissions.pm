@@ -68,13 +68,10 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 =cut
 
-use lib '/root/pb/lib'; use dav;
-
 sub execute {
 	my $self    = shift;
     my $session = $self->session;
     my $root    = WebGUI::Asset->getRoot($session);
-dav::log __PACKAGE__ . " executing\n";
 
     # keep track of how much time it's taking
     my $start   = time;
@@ -86,7 +83,6 @@ dav::log __PACKAGE__ . " executing\n";
              } );
     
     for my $emsForm ( @$list ) {
-dav::log __PACKAGE__ . "::executing::emsForm loop\n";
        my $daysBeforeCleanup = $emsForm->get('daysBeforeCleanup') ;
        next if ! $daysBeforeCleanup;
        my $whereClause = q{ submissionStatus='denied' };
@@ -101,7 +97,6 @@ dav::log __PACKAGE__ . "::executing::emsForm loop\n";
 	     whereClause => $whereClause,
 	 } );
         for my $submission ( @$res ) {
-dav::log __PACKAGE__ . "::executing::submission loop\n";
 	    $submission->purge;
 	    $limit--;
 	    return $self->WAITING(1) if ! $limit or time > $start + $timeLimit;

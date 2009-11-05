@@ -119,7 +119,7 @@ sub fixEmptyCalendarIcalFeeds {
 
     print "DONE!\n" unless $quiet;
 }
-[
+
 #----------------------------------------------------------------------------
 # Add tables for the EMS Submission feature
 sub addEMSSubmission {
@@ -172,7 +172,7 @@ ESQL
 
     print "DONE!\n" unless $quiet;
 }
-]
+
 #----------------------------------------------------------------------------
 # Add the column for featured wiki pages
 sub addFeaturedPageWiki {

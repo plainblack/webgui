@@ -793,7 +793,6 @@ sub www_addSubmission {
                     $session->http->setMimeType( 'text/html' );
                 }
                 my $content =  '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
-use lib '/root/pb/lib'; use dav; dav::log $content;
                 if( $asJson ) {
                     return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
                 } else {
