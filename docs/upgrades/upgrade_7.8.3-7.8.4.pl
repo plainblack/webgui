@@ -34,6 +34,7 @@ my $session = start(); # this line required
 dropSkipNotification($session);
 addEMSSubmissionTables($session);
 configEMSActivities($session);
+resetShopNotificationGroup($session);
 
 finish($session); # this line required
 
@@ -167,6 +168,14 @@ sub dropSkipNotification {
     my $session = shift;
     print "\tRemoving duplicate skipNotification field from the Subscribable aspect... " unless $quiet;
     $session->db->write('alter table assetAspect_Subscribable drop column skipNotification');
+    print "Done.\n" unless $quiet;
+}
+
+#------------------------------------------------------------------------
+sub resetShopNotificationGroup {
+    my $session = shift;
+    print "\tResetting the shop reciept notification group to Admins if it is set to Everyone... " unless $quiet;
+    $session->db->write(q{update settings set value='3' where name='shopSaleNotificationGroupId' and value='7'});
     print "Done.\n" unless $quiet;
 }
 
