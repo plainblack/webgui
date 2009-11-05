@@ -14,7 +14,7 @@ Package WebGUI::Shop::ShipDriver::USPS
 
 =head1 DESCRIPTION
 
-Shipping driver for the United States Postal Service.
+Shipping driver for the United States Postal Service, domestic shipping services.
 
 =head1 SYNOPSIS
 
@@ -126,6 +126,9 @@ sub calculate {
     }
     if (! $self->get('userId')) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a USPS userId.});
+    }
+    if ($cart->getShippingAddress->get('country') ne 'United States') {
+        WebGUI::Error::InvalidParam->throw(error => q{Driver only handles domestic shipping});
     }
     my $cost = 0;
     ##Sort the items into shippable bundles.
@@ -428,6 +431,9 @@ sub _getShippableUnits {
         }
         else {
             my $zip = $item->getShippingAddress->get('code');
+            if ($item->getShippingAddress->get('country') ne 'United States') {
+                WebGUI::Error::InvalidParam->throw(error => q{Driver only handles domestic shipping});
+            }
             push @{ $looseUnits{$zip} }, $item;
         }
     }
