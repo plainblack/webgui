@@ -850,6 +850,13 @@ $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', "calculate won't calculate for foreign countries");
 
 $cart->update({shippingAddressId => $workAddress->getId});
+
+#<?xml version="1.0"?>
+#<RateV3Response><Package ID="0"><Error><Number>-2147219500</Number>
+#<Source>DomesticRatesV3;clsRateV3.ValidateWeight;RateEngineV3.ProcessRequest</Source>
+#<Description>Please enter the package weight.  </Description>
+#<HelpFile></HelpFile><HelpContext>1000440</HelpContext></Error></Package></RateV3Response>
+
 #######################################################################
 #
 # _calculateInsurance edge case
