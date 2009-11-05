@@ -334,7 +334,7 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
@@ -414,14 +414,14 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '2',        Ounces => '0',
+                    Pounds         => '2',        Ounces         => '0.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
                 {
                     ID => 1,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
@@ -445,7 +445,7 @@ SKIP: {
                 {
                     ID             => 0,
                     ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => 0,
+                    Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 2,        Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -457,7 +457,7 @@ SKIP: {
                 {
                     ID             => 1,
                     ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => 8,
+                    Machinable     => ignore(), Ounces         => '8.0',
                     Pounds         => 1,        Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -545,21 +545,21 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '2',        Ounces => '0',
+                    Pounds         => '2',        Ounces         => '0.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
                 {
                     ID => 1,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
                 {
                     ID => 2,
                     ZipDestination => '53703',    ZipOrigination => '97123',
-                    Pounds         => '12',       Ounces => '0',
+                    Pounds         => '12',       Ounces         => '0.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
@@ -583,7 +583,7 @@ SKIP: {
                 {
                     ID             => 0,
                     ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => 0,
+                    Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 2,        Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -595,7 +595,7 @@ SKIP: {
                 {
                     ID             => 1,
                     ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => 8,
+                    Machinable     => ignore(), Ounces         => '8.0',
                     Pounds         => 1,        Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -607,7 +607,7 @@ SKIP: {
                 {
                     ID             => 2,
                     ZipOrigination => ignore(), ZipDestination => 53703,
-                    Machinable     => ignore(), Ounces         => 0,
+                    Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 12,       Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -650,7 +650,7 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PRIORITY',
                     Machinable     => 'true',     Container      => 'FLAT RATE BOX',
                 },
@@ -715,7 +715,7 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'EXPRESS',
                     Machinable     => 'true',
                 },
@@ -779,7 +779,7 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PRIORITY',
                     Machinable     => 'true',#     Container      => 'VARIABLE',
                 },

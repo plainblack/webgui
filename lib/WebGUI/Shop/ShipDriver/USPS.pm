@@ -73,9 +73,9 @@ sub buildXML {
             $weight += $itemWeight;
         }
         my $pounds = int($weight);
-        my $ounces = int(16 * ($weight - $pounds));
-        if ($pounds == 0 && $ounces == 0 ) {
-            $ounces = 1;
+        my $ounces = sprintf '%3.1f', (16 * ($weight - $pounds));
+        if ($pounds == 0 && $ounces eq '0.0' ) {
+            $ounces = 0.1;
         }
         my $destination = $package->[0]->getShippingAddress;
         my $destZipCode = $destination->get('code');
