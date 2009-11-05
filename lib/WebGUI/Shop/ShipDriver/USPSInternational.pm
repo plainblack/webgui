@@ -130,8 +130,8 @@ sub calculate {
     if (! $self->get('userId')) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a USPS userId.});
     }
-    if ($cart->getShippingAddress->get('country') ne 'United States') {
-        WebGUI::Error::InvalidParam->throw(error => q{Driver only handles domestic shipping});
+    if ($cart->getShippingAddress->get('country') eq 'United States') {
+        WebGUI::Error::InvalidParam->throw(error => q{Driver only handles international shipping});
     }
     my $cost = 0;
     ##Sort the items into shippable bundles.
@@ -263,6 +263,12 @@ sub definition {
             options      => \%shippingTypes,
             defaultValue => 'PARCEL',
         },
+        addInsurance => {
+            fieldType    => 'yesNo',
+            label        => $i18n->get('add insurance'),
+            hoverHelp    => $i18n->get('add insurance help'),
+            defaultValue => 0,
+        },
 ##Note, if a flat fee is added to this driver, then according to the license
 ##terms the website must display a note to the user (shop customer) that additional
 ##fees have been added.
@@ -345,8 +351,8 @@ sub _getShippableUnits {
         }
         else {
             my $zip = $item->getShippingAddress->get('code');
-            if ($item->getShippingAddress->get('country') ne 'United States') {
-                WebGUI::Error::InvalidParam->throw(error => q{Driver only handles domestic shipping});
+            if ($item->getShippingAddress->get('country') eq 'United States') {
+                WebGUI::Error::InvalidParam->throw(error => q{Driver only handles international shipping});
             }
             push @{ $looseUnits{$zip} }, $item;
         }
