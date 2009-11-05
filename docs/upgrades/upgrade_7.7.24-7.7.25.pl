@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+resetShopNotificationGroup($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,14 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#------------------------------------------------------------------------
+sub resetShopNotificationGroup {
+    my $session = shift;
+    print "\tResetting the shop reciept notification group to Admins if it is set to Everyone... " unless $quiet;
+    $session->db->write(q{update settings set value='3' where name='shopSaleNotificationGroupId' and value='7'});
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

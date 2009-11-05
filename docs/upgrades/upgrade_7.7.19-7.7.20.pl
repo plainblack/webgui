@@ -34,6 +34,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 fixTemplateSettingsFromShunt($session);
 addMatrixColumnDefaults($session);
+resetShopNotificationGroup($session);
 
 finish($session); # this line required
 
@@ -45,18 +46,6 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
-
-#----------------------------------------------------------------------------
-# Describe what our function does
-sub reorganizeAdSpaceProperties {
-    my $session = shift;
-    print "\tReorganize AdSpace and Ad Sales properties... " unless $quiet;
-    $session->db->write(q|ALTER TABLE adSpace DROP COLUMN costPerClick|);
-    $session->db->write(q|ALTER TABLE adSpace DROP COLUMN costPerImpression|);
-    $session->db->write(q|ALTER TABLE adSpace DROP COLUMN groupToPurchase|);
-    # and here's our code
-    print "DONE!\n" unless $quiet;
-}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -86,6 +75,14 @@ sub fixTemplateSettingsFromShunt {
     }
     # and here's our code
     print "DONE!\n" unless $quiet;
+}
+
+#------------------------------------------------------------------------
+sub resetShopNotificationGroup {
+    my $session = shift;
+    print "\tResetting the shop reciept notification group to Admins if it is set to Everyone... " unless $quiet;
+    $session->db->write(q{update settings set value='3' where name='shopSaleNotificationGroupId' and value='7'});
+    print "Done.\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

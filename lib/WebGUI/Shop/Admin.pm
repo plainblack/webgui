@@ -209,7 +209,7 @@ sub www_editSettings {
         defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
     );
     $form->group(
-        name            => 'saleNotificationGroupId',
+        name            => 'shopSaleNotificationGroupId',
         label           => $i18n->get("sale notification group"),
         hoverHelp       => $i18n->get("sale notification group help"),
         defaultValue    => '3',

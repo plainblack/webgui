@@ -7,6 +7,16 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.25
+--------------------------------------------------------------------
+
+     * A bug introduced in 7.7.22 could cause the Shop sale notification
+       group to be reset to the group Everyone.  The bug has been fixed,
+       and the group has been reset to Admins.  If you were using a different
+       group, you will need to edit the Shop Settings and reselect the
+       proper group.
+
+
 7.7.22
 --------------------------------------------------------------------
 
