@@ -33,8 +33,8 @@ our $I18N = {
     },
 
     'usps instructions' => {
-        lastUpdated => 1241028258,
-        message => q|<p>In order to use the USPS Shipping Driver, you must first register with the United States Postal Service as a <a href="https://secure.shippingapis.com/registration/">USPS Web Tools User</a>.  Fill out the form, submit it, and within a few days the USPS will send you a username and password to use this service.  Enter your username and password in the form fields below.</p><p>This driver supports three kinds of shipping with one preset size for each kind.  Package sizes, and shipping services outside of those choices, are currently not supported.</p><p>For the purpose of calculating weight, the weight property of a Product is considered to be in pounds.|,
+        lastUpdated => 1257399744,
+        message => q|<p>In order to use the USPS Shipping Driver, you must first register with the United States Postal Service as a <a href="https://secure.shippingapis.com/registration/">USPS Web Tools User</a>.  Fill out the form, submit it, and within a few days the USPS will send you a username and password to use this service.  After receiving your username, call 1-800-344-7779 to have the USPS authorize your username.  Enter your username and password in the form fields below.</p><p>This driver supports three kinds of shipping with one preset size for each kind.  Package sizes, and shipping services outside of those choices, are currently not supported.</p><p>For the purpose of calculating weight, the weight property of a Product is considered to be in pounds.|,
     },
 
     'ship type' => {
