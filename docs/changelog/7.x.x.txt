@@ -6,6 +6,8 @@
  - fixed #11197: Survey Edit Console is not i18n'ed
  - fixed USPS driver only works on domestic addresses.
  - fixed Shop is not sending notification emails to the user, or to the notification group.
+ - Set a minimum package weight of 1 oz for the USPS driver.
+ - Handle per package errors in USPS response data.
 
 7.8.3
  - Rewrote Spectre's workflow queues to prevent it from "forgetting" about some workflows.
