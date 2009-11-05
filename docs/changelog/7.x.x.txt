@@ -16,6 +16,7 @@
  - fixed #10985: Survey: can't add multiple choice answer
  - fixed #11197: Survey Edit Console is not i18n'ed
  - fixed USPS driver only works on domestic addresses.
+ - fixed Shop is not sending notification emails to the user, or to the notification group.
  - Set a minimum package weight of 1 oz for the USPS driver.
  - Handle per package errors in USPS response data.
 

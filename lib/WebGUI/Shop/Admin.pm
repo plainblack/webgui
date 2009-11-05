@@ -202,7 +202,7 @@ sub www_editSettings {
         hoverHelp   => $i18n->get("my purchases detail template help"),
         );
     $form->template(
-        name            => 'receiptEmailTemplateId',
+        name            => 'shopReceiptEmailTemplateId',
         namespace       => "Shop/EmailReceipt",
         label           => $i18n->get("receipt email template"),
         hoverHelp       => $i18n->get("receipt email template help"),
