@@ -1,4 +1,5 @@
 7.8.5
+ - The captcha form control had it's built in styles removed in favor of two classes: "wg-captchaForm" and "wg-captchaImage"
 
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.
