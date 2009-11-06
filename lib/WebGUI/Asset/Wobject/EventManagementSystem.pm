@@ -55,6 +55,7 @@ sub addGroupToSubmitList {
 }
 
 #-------------------------------------------------------------------
+
 =head2 addSubmissionForm
 
 creates a child of class WG::Asset::EMSSubmissionForm
@@ -102,6 +103,7 @@ sub addSubmissionForm {
 }
 
 #-------------------------------------------------------------------
+
 =head2 canSubmit
 
 returns true is the current user can submit to any form attached to this EMS
@@ -495,6 +497,7 @@ sub getRibbons {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getSubmissionLocations
 
 retuns an arrayref of the locations found in the submission location list
@@ -572,6 +575,7 @@ sub getTokens {
 }
 
 #-------------------------------------------------------------------
+
 =head2 hasSubmissionForms
 
 returns true if the EMS has subission forms attached
@@ -588,6 +592,7 @@ sub hasSubmissionForms {
 }
 
 #-------------------------------------------------------------------
+
 =head2 hasSubmissions
 
 returns true if the current user has submission forms in this EMS
@@ -2656,6 +2661,7 @@ sub www_viewSchedule {
 }
 
 #---------------------------------------------
+
 =head2 www_viewSubmissionQueue
 
 =cut
