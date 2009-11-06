@@ -292,7 +292,7 @@ sub www_addGroupsToGroupSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")) && $session->form->validToken);
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
-	my @groups = $session->form->group('groups');
+	my @groups = $session->form->process('groups', 'group', []);
 	$group->addGroups(\@groups);
 	return www_manageGroupsInGroup($session);
 }
