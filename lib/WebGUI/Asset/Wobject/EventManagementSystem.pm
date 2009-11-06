@@ -1,6 +1,5 @@
 package WebGUI::Asset::Wobject::EventManagementSystem;
 
-
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -36,86 +35,6 @@ use WebGUI::Workflow::Instance;
 use Tie::IxHash;
 use Data::Dumper;
 
-#-------------------------------------------------------------------
-=head2 addGroupToSubmitList ( groupId )
-
-adds the parameter to eventSubmissionGroups
-
-=cut
-
-sub addGroupToSubmitList {
-    my $self = shift;
-    my $groupId = shift;
-    my ($idString) = $self->session->db->read('select eventSubmissionGroups from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
-    my @ids = split(' ', $idString);
-    my %h;
-    @ids = map { $h{$_}++ == 0 ? $_ : () } ( $groupId, @ids );
-    $self->update({eventSubmissionGroups => join( ' ', @ids ) });
-}
-
-#-------------------------------------------------------------------
-=head2 addSubmissionForm
-
-creates a child of class WG::Asset::EMSSubmissionForm
-
-=head3 params
-
-parameters that define the form
-
-=head4 title
-
-the title for the form
-
-=head4 canSubmitGroupId ( optional )
-
-group id for the users that are allowed to submit via this form
-defaults to 2 -- registered users
-
-=head4 daysBeforeCleanup ( optional )
-
-number fo days to leave denied/created status items in the database before deleting
-defaults to 7
-
-=head4 deleteCreatedItems ( optional )
-
-1 indicates that items with status 'created' should be deleted as well as denied
-default: 0
-
-=head4 formDescription
-
-a JSON description of the form data fields -- a hash of the names of fields (each is 1 for active, 0 for inactive) plus
-'_fieldList' added as an ARRAYREF of the fields that are active
-
-=cut
-
-sub addSubmissionForm {
-    my $self = shift;
-    my $params = shift;
-    $params->{className} = 'WebGUI::Asset::EMSSubmissionForm';
-    $params->{canSubmitGroupId} ||= 2;
-    $self->addGroupToSubmitList($params->{canSubmitGroupId});
-    my $newAsset = $self->addChild($params);
-    WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
-    $self = $self->cloneFromDb;
-    return $newAsset;
-}
-
-#-------------------------------------------------------------------
-=head2 canSubmit
-
-returns true is the current user can submit to any form attached to this EMS
-
-=cut
-
-sub canSubmit {
-    my $self = shift;
-    my $user = $self->session->user;
-    return 0 if ! $self->hasSubmissionForms;
-    for my $groupId (split ' ', $self->get('eventSubmissionGroups')) {
-        return 1 if $user->isInGroup($groupId);
-    }
-    return 0;
-}
 
 #-------------------------------------------------------------------
 sub definition {
@@ -188,30 +107,6 @@ sub definition {
 			hoverHelp		=> $i18n->get('print ticket template help'),
 			namespace		=> 'EMS/PrintTicket',
 		},
-		eventSubmissionMainTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 		=> 'DoVNijm6lMDE0cYrtvEbDQ',
-			tab			=> 'display',
-			label			=> $i18n->get('event submission main template'),
-			hoverHelp		=> $i18n->get('event submission main template help'),
-			namespace		=> 'EMS/SubmissionMain',
-		},
-		eventSubmissionTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 		=> '8tqyQx-LwYUHIWOlKPjJrA',
-			tab			=> 'display',
-			label			=> $i18n->get('event submission template'),
-			hoverHelp		=> $i18n->get('event submission template help'),
-			namespace		=> 'EMS/Submission',
-		},
-		eventSubmissionQueueTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 		=> 'ktSvKU8riGimhcsxXwqvPQ',
-			tab			=> 'display',
-			label			=> $i18n->get('event submission queue template'),
-			hoverHelp		=> $i18n->get('event submission queue template help'),
-			namespace		=> 'EMS/SubmissionQueue',
-		},
 		printRemainingTicketsTemplateId => {
 			fieldType 		=> 'template',
 			defaultValue 	=> 'hreA_bgxiTX-EzWCSZCZJw',
@@ -222,8 +117,8 @@ sub definition {
 		},
 		badgeInstructions => {
 			fieldType 		=> 'HTMLArea',
-			defaultValue 		=> $i18n->get('default badge instructions'),
-			tab			=> 'properties',
+			defaultValue 	=> $i18n->get('default badge instructions'),
+			tab				=> 'properties',
 			label			=> $i18n->get('badge instructions'),
 			hoverHelp		=> $i18n->get('badge instructions help'),
 		},
@@ -255,25 +150,6 @@ sub definition {
 			label			=> $i18n->get('registration staff group'),
 			hoverHelp		=> $i18n->get('registration staff group help'),
 		},
-		submittedLocationsList => {
-			fieldType 		=> 'text',
-			tab			=> 'properties',
-			defaultValue 	        => '',
-			label			=> $i18n->get('submitted location list label'),
-			hoverHelp		=> $i18n->get('submitted location list help'),
-		},
-		eventSubmissionGroups => {
-			fieldType 		=> 'hidden',
-			defaultValue 	        => '',
-                        noFormPost              => 1,
-		},
-        nextSubmissionId => {
-            tab          => "properties",
-            fieldType    => "integer",
-            defaultValue => 1,
-            label        => $i18n->get("next submission id label"),
-            hoverHelp    => $i18n->get("next submission id label help")
-        },
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -301,21 +177,6 @@ sub deleteEventMetaField {
 	$self->reorderCollateral('EMSEventMetaField', 'fieldId');
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 ems
-
-this is called by the submission sub-system
-it is for compatability and ensures that the ems
-object is used for certain calls
-
-=cut
-
-sub ems {
-    my $self = shift;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 
@@ -415,7 +276,6 @@ sub getEventFieldsForImport {
 			type			=> $field->{dataType},
 			options 		=> $field->{possibleValues},
 			defaultValue	=> $field->{defaultValues},
-			helpText	=> $field->{defaultValues},
 			});
 	}
 	return \@fields;
@@ -432,7 +292,7 @@ may be SQL optimized for quick access
 
 sub getLocations {
     my $self = shift;
-    my $dateRef = shift;
+    my $dateRef = shift || [ ];
 
     my %hash;
     my %hashDate;
@@ -441,26 +301,9 @@ sub getLocations {
 # this is a really compact 'uniq' operation
     my @locations = map { $h{$_}++ == 0 ? $_ : () } ( map { $_->get('location') } ( @$tickets ) );
 # the dates have the time data removed with a pattern substitution
-    if( $dateRef ) {
-        push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
-    }
+    push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
 
     return @locations;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getNextSubmissionId
-
-get a sequence number for the submission id
-
-=cut
-
-sub getNextSubmissionId {
-    my $self = shift;
-    my ($submissionId) = $self->session->db->read('select nextSubmissionId from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
-    $self->update( { nextSubmissionId => ($submissionId + 1) } );
-    return $submissionId;
 }
 
 #-------------------------------------------------------------------
@@ -491,48 +334,6 @@ Returns an array reference of ribbon objects.
 sub getRibbons {
 	my $self = shift;
 	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSRibbon']});
-}
-
-#-------------------------------------------------------------------
-=head2 getSubmissionLocations
-
-retuns an arrayref of the locations found in the submission location list
-
-=cut
-
-sub getSubmissionLocations {
-   my $self = shift;
-   my $text = $self->get('submittedLocationsList');
-   return undef if $text eq '';
-   return [ split( /\s+/, $text ) ];
-}
-
-#-------------------------------------------------------------------
-sub getSubmissionStatus {
-    my $self  = shift;
-    my $key   = shift;
-
-    unless ($self->{_status}) {
-        tie my %hash, "Tie::IxHash";
-        my $i18n = $self->i18n;
-        for my $item (
-            'pending',
-            'feedback',
-            'denied',
-            'approved',
-            'created',
-            'failed',
-                        ) {
-            $hash{$item} = $i18n->get($item),
-        }
-        $self->{_status} = \%hash;
-    }
-
-    if($key) {
-        return $self->{_status}{$key};
-    }
-
-    return $self->{_status};
 }
 
 #-------------------------------------------------------------------
@@ -568,52 +369,6 @@ Returns an array reference of badge objects.
 sub getTokens {
 	my $self = shift;
 	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSToken']});
-}
-
-#-------------------------------------------------------------------
-=head2 hasSubmissionForms
-
-returns true if the EMS has subission forms attached
-
-=cut
-
-sub hasSubmissionForms {
-   my $self = shift;
-		   # are there ~any~ forms attached to this ems?
-   my $res = $self->getLineage(['children'],{ limit => 1,
-	 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
-     } );
-   return scalar(@$res);
-}
-
-#-------------------------------------------------------------------
-=head2 hasSubmissions
-
-returns true if the current user has submission forms in this EMS
-
-=cut
-
-sub hasSubmissions {
-   my $self = shift;
-   return 0 if ! $self->canSubmit;
-   my $res = $self->getLineage(['descendants'],{ limit => 1,
-	 includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
-	 whereClause => q{createdBy='} . $self->session->user->userId . q/'/,
-     } );
-   return scalar(@$res);
-}
-
-#-------------------------------------------------------------------
-
-=head2 i18n
-
-returns the internationalisation object for this asset
-
-=cut
-
-sub i18n {
-    my $self = shift;
-    return $self->{_i18n} ||= WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 }
 
 #-------------------------------------------------------------------
@@ -711,16 +466,9 @@ sub view {
 		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
 		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
-		addSubmissionUrl	=> $self->getUrl('func=viewSubmissionQueue#addSubmission'),
-		viewSubmissionQueueUrl	=> $self->getUrl('func=viewSubmissionQueue'),
-		addSubmissionFormUrl	=> $self->getUrl('func=viewSubmissionQueue#addSubmissionForm'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
-		isRegistrationStaff				=> $self->isRegistrationStaff,
-		canEdit						=> $self->canEdit,
-		canSubmit			=> $self->canSubmit,
-		hasSubmissions			=> $self->hasSubmissions,
-		hasSubmissionForms			=> $self->hasSubmissionForms,
+		canEdit				=> $self->canEdit,
 		lookupRegistrantUrl	=> $self->getUrl('func=lookupRegistrant'),
 		);
 
@@ -747,77 +495,6 @@ sub www_addRibbonToBadge {
 		$ribbon->addToCart({badgeId=>$form->get('badgeId')});
 	}
 	return $self->www_getRegistrantAsJson();
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_addSubmission ()
-
-display a form or links to forms to create a new submission
-
-=cut
-
-sub www_addSubmission {
-    my $self = shift;
-    my $params = shift || {};
-    my $session = $self->session;
-    my $formId = $params->{formId} || $session->form->get('formId');
-    my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
-    my $form;
-
-    if( ! defined $formId ) {
-           my $res = $self->getLineage(['children'],{ returnObjects => 1,
-                 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
-             } );
-	    my @new = map { $_->canSubmit ? $_ : () } ( @$res);
-            if( scalar(@new) == 0 ) {
-                return $self->www_view;
-            } elsif( scalar(@new) == 1 ) {
-                $form = $new[0];
-                $formId = $form->getId;
-            } else {
-                my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
-                            return qq{<li><a href='$u' onclick='WebGUI.EMS.loadItemFromAnchor(this)' title='$d'>$n</a></li>} } ;
-                my $listOfLinks = join '', ( map {
-                      $makeAnchorList->(
-                                $self->getUrl('func=viewSubmissionQueue#' . $_->getId . '_new' ), # _new has to match same in sub www_viewSubmissionQueue in this module
-                                $_->get('title'),
-                                WebGUI::HTML::filter($_->get('description'),'all')
-                             )
-                           } ( @new ) );
-                my $title =  $i18n->get('select form to submit') ;
-		my $asJson = $session->form->get('asJson');
-                if( $asJson ) {
-                    $session->http->setMimeType( 'application/json' );
-                } else {
-                    $session->http->setMimeType( 'text/html' );
-                }
-                my $content =  '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
-                if( $asJson ) {
-                    return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
-                } else {
-                    return $self->ProcessStyle( $content );
-                }
-            }
-    }
-    $form = WebGUI::Asset->newByDynamicClass($session,$formId);
-    if (!defined $form) {
-	$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
-    }
-    return $form->www_addSubmission;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_addSubmissionForm ()
-
-call www_editSubmissionForm with assetId == new
-
-=cut
-
-sub www_addSubmissionForm {
-    my $self = shift;
-    $self->www_editSubmissionForm( { assetId => 'new' } );
 }
 
 #-------------------------------------------------------------------
@@ -999,62 +676,6 @@ sub www_editBadgeGroupSave {
 
 #-------------------------------------------------------------------
 
-=head2  www_editSubmission 
-
-use getLineage to find the item to edit based on submissionId
-then call www_editSubmission on it
-
-=cut
-
-sub www_editSubmission {
-	my $self             = shift;
-        my $submissionId = $self->session->form->get('submissionId');
-        my $asset = $self->getLineage(['descendants'], { returnObjects => 1,
-		    joinClass          => "WebGUI::Asset::EMSSubmission",
-		    whereClause        => 'submissionId = ' . int($submissionId),
-		    includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
-           } );
-        return $asset->[0]->www_editSubmission;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2  www_editSubmissionForm 
-
-calls editSubmissionForm in WebGUI::Asset::EMSSubmissionForm
-
-=cut
-
-sub www_editSubmissionForm {
-	my $self             = shift;
-	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff || $self->canEdit;
-	return WebGUI::Asset::EMSSubmissionForm->www_editSubmissionForm($self,shift);
-}
-
-#-------------------------------------------------------------------
-
-=head2  www_editSubmissionFormSave
-
-test and save data posted from editSubmissionForm...
-
-=cut
-
-sub www_editSubmissionFormSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
-	my $formParams = WebGUI::Asset::EMSSubmissionForm->processForm($self);
-        if( $formParams->{_isValid} ) {
-            delete $formParams->{_isValid};
-	    $self->addSubmissionForm($formParams);
-	    return $self->www_viewSubmissionQueue;
-        } else {
-	    return $self->www_editSubmissionForm($formParams);
-	}
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_editEventMetaField ( )
 
 Displays the edit form for event meta fields.
@@ -1081,7 +702,6 @@ sub www_editEventMetaField {
 			required => $self->session->form->process("required",'yesNo'),
 			possibleValues => $self->session->form->process("possibleValues",'textarea'),
 			defaultValues => $self->session->form->process("defaultValues",'textarea'),
-			helpText => $self->session->form->process("helpText",'textarea'),
 		};
 		$f->readOnly(
 			-name => 'error',
@@ -1138,12 +758,6 @@ sub www_editEventMetaField {
 		-hoverHelp => $i18n->get('488 description'),
 		-value => $data->{defaultValues},
 	);
-	$f->textarea(
-		-name => "helpText",
-		-label => $i18n2->get('meta field help text'),
-		-hoverHelp => $i18n2->get('meta field help text description'),
-		-value => $data->{helpText},
-	);
 	$f->submit;
 	return $self->processStyle($f->print);
 }
@@ -1176,7 +790,6 @@ sub www_editEventMetaFieldSave {
 		required => $self->session->form->process("required",'yesNo'),
 		possibleValues => $self->session->form->process("possibleValues",'textarea'),
 		defaultValues => $self->session->form->process("defaultValues",'textarea'),
-		helpText => $self->session->form->process("helpText",'textarea'),
 	},1,1);
 	return $self->www_manageEventMetaFields();
 }
@@ -1261,90 +874,6 @@ sub www_exportEvents {
 	return "chunked";
 }
 
-#----------------------------------------------------------------------------
-
-=head2 www_getAllSubmissions ( )
-
-Get a page of Asset Manager data, ajax style. Returns a JSON array to be
-formatted in a WebGUI submission queue data table.
-
-=cut
-
-sub www_getAllSubmissions {
-    my $self        = shift;
-    my $session     = $self->session;
-    my $datetime    = $session->datetime;
-    my $form        = $session->form;
-    my $tableInfo  = {};    
-
-    return $session->privilege->insufficient unless $self->canSubmit || $self->isRegistrationStaff;
-
-    my $orderByColumn    = $form->get( 'orderByColumn' ) || $self->get("sortColumn");
-    my $dir              = $form->get('orderByDirection') || $self->get('sortOrder');
-    my $orderByDirection = lc ($dir) eq "asc" ? "ASC" : "DESC";
-
-    my $whereClause ;
-    if(!$self->isRegistrationStaff) {    
-        my $userId     = $session->user->userId;
-        $whereClause .= qq{ createdBy='$userId'};
-    }
-
-    my $rules;
-    $rules->{'joinClass'         } = "WebGUI::Asset::EMSSubmission";
-    $rules->{'whereClause'       } = $whereClause;
-    $rules->{'includeOnlyClasses'} = ['WebGUI::Asset::EMSSubmission'];
-    $rules->{'orderByClause'     } = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection if $orderByColumn;
-
-    my $sql  = "";
-    
-    $sql = $self->getLineageSql(['descendants'], $rules);
-
-    my $startIndex        = $form->get( 'startIndex' ) || 1;
-    my $rowsPerPage         = $form->get( 'rowsPerPage' ) || 25;
-    my $currentPage         = int ( $startIndex / $rowsPerPage ) + 1;
-    
-    my $p = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
-    $p->setDataByQuery($sql);
-
-    $tableInfo->{'recordsReturned'} = $rowsPerPage;
-    $tableInfo->{'totalRecords'   } = $p->getRowCount; 
-    $tableInfo->{'startIndex'     } = $startIndex;
-    $tableInfo->{'sort'           } = $orderByColumn;
-    $tableInfo->{'dir'            } = $orderByDirection;
-    $tableInfo->{'records'        } = [];
-    
-    for my $record ( @{ $p->getPageData } ) {
-        my $asset = WebGUI::Asset->newByDynamicClass( $session, $record->{assetId} );
-        
-        my $lastReplyBy = $asset->get("lastReplyBy");
-        if ($lastReplyBy) {
-           $lastReplyBy = WebGUI::User->new($session,$lastReplyBy)->username;
-        }
-
-        # Populate the required fields to fill in
-        my $lastReplyDate = $asset->get("lastReplyDate");
-        if($lastReplyDate) {
-            $lastReplyDate = $datetime->epochToHuman($lastReplyDate,"%y-%m-%d @ %H:%n %p");
-        }
-
-        my %fields      = (
-            submissionId  => $asset->get("submissionId"),
-            url           => $asset->getQueueUrl,
-            title         => $asset->get( "title" ),
-            createdBy     => WebGUI::User->new($session,$asset->get( "createdBy" ))->username,
-            creationDate  => $datetime->epochToSet($asset->get( "creationDate" )),
-            submissionStatus => $self->getSubmissionStatus($asset->get( "submissionStatus" ) || 'pending' ),
-            lastReplyDate => $lastReplyDate || '',
-            lastReplyBy   => $lastReplyBy || '',
-        );
-
-        push @{ $tableInfo->{ records } }, \%fields;
-    }
-    
-    $session->http->setMimeType( 'application/json' );
-    return JSON->new->encode( $tableInfo );
-}
-
 #-------------------------------------------------------------------
 
 =head2 www_getBadgesAsJson ()
@@ -1379,36 +908,6 @@ sub www_getBadgesAsJson {
     $results{'dir'}        = "asc";
     $session->http->setMimeType('application/json');
     return JSON->new->encode(\%results);
-}
-
-#-------------------------------------------------------------------
-
-=head2  www_getSubmissionById
-
-returns a JSON dataset with info about the requested submission
-
-=cut
-
-
-sub www_getSubmissionById {
-   my $self = shift;
-   my $submissionId = $self->session->form->get('submissionId');
-   my $result;
-   my $res = $self->getLineage(['descendants'],{ limit => 1, returnObjects=>1,
-	 includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
-         joinClass          => "WebGUI::Asset::EMSSubmission",
-	 whereClause => q{submissionId='} . $submissionId . q/'/,
-     } );
-   if( scalar(@$res) == 0 ) {
-       $result->{hasError} = 1;
-       $result->{errors} = [ 'failed to load submission' ];
-   } else {
-       $result->{text} = $res->[0]->www_editSubmission;
-       $result->{title} = $submissionId;
-       $result->{id} = $submissionId;
-   }
-    $self->session->http->setMimeType('application/json');
-    return JSON->new->encode($result);
 }
 
 #-------------------------------------------------------------------
@@ -1754,6 +1253,8 @@ sub www_getScheduleDataJSON {
     $session->http->setMimeType('application/json');
     return JSON->new->encode(\%results);
 }
+
+
 
 #-------------------------------------------------------------------
 
@@ -2634,6 +2135,7 @@ View the schedule table.
 sub www_viewSchedule {
 	my $self             = shift;
     return $self->session->privilege->insufficient() unless $self->canView;
+	my $db               = $self->session->db;
     my $rowsPerPage      = 25;
     my $locationsPerPage = $self->get('scheduleColumnsPerPage');
 
@@ -2652,60 +2154,6 @@ sub www_viewSchedule {
                       dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
                   },$self->get('scheduleTemplateId')));
 
-}
-
-#---------------------------------------------
-=head2 www_viewSubmissionQueue
-
-=cut
-
-sub www_viewSubmissionQueue {
-	my $self             = shift;
-        my $isRegistrationStaff = $self->isRegistrationStaff;
-        my $canSubmit = $self->canSubmit;
-        my $canEdit = $self->canEdit;
-	my $i18n = $self->i18n;
-    return $self->session->privilege->insufficient() unless $canSubmit || $isRegistrationStaff;
-
-	         # this map returns an array of hash refs with an id,url pair to describe the submissionForm assets
-	my @submissionFormUrls = map { {   # edit form
-			id => $_->getId,
-			edit => 1,
-			title => $_->get('title'),
-			linkUrl => $self->getUrl('func=viewSubmissionQueue#' . $_->getId ),
-			ajaxUrl => $_->getUrl('func=editSubmissionForm'),
-		},{ # new submission ( _new has to match same in sub www_addSubmission in this module
-			id => $_->getId . '_new',
-			title => $_->get('title') . ' - ' . $i18n->get('add submission'),
-			linkUrl => $self->getUrl('func=viewSubmissionQueue#' . $_->getId . '_new' ),
-			ajaxUrl => $_->getUrl('func=addSubmission'),
-		} } (
-		       @{$self->getLineage( ['children'],{ returnObjects => 1,
-			     includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
-	                  } ) }
-		  );
-	my $params = {
-		  backUrl => $self->getUrl,
-		  isRegistrationStaff => $isRegistrationStaff,
-		  canEdit		=> $canEdit,
-		  canSubmit => $canSubmit,
-		  hasSubmissionForms => $self->hasSubmissionForms,
-		  getSubmissionQueueDataUrl => $self->getUrl('func=getAllSubmissions'),
-		  editSubmissionUrl =>  $self->getUrl('func=viewSubmissionQueue#editSubmission'), 
-		  editSubmissionFormUrl =>  $self->getUrl('func=viewSubmissionQueue#editSubmissionForm'), 
-		  addSubmissionFormUrl => $self->getUrl('func=viewSubmissionQueue#addSubmissionForm'),
-		  addSubmissionUrl => $self->getUrl('func=viewSubmissionQueue#addSubmission'),
-		  editSubmissionAjaxUrl =>  $self->getUrl('func=editSubmission'), 
-		  editSubmissionFormAjaxUrl =>  $self->getUrl('func=editSubmissionForm'), 
-		  addSubmissionFormAjaxUrl => $self->getUrl('func=addSubmissionForm'),
-		  addSubmissionAjaxUrl => $self->getUrl('func=addSubmission'),
-		  submissionFormUrls => \@submissionFormUrls,
-		  queueTabTitle   => $isRegistrationStaff ? $i18n->get('submission queue') : $i18n->get('my submissions'),
-	};
-	$params->{QueueTabData} = $self->processTemplate($params,$self->get('eventSubmissionQueueTemplateId'));
-
-	return $self->processStyle( 
-               $self->processTemplate( $params, $self->get('eventSubmissionMainTemplateId')));
 }
 
 1;

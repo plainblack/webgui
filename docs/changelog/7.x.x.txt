@@ -1,3 +1,9 @@
+7.8.5
+ - The captcha form control had it's built in styles removed in favor of two classes: "wg-captchaForm" and "wg-captchaImage"
+ - fixed #11134: Tree Navigation menu colapses sub items of current page
+ - fixed #11203: Manage groups in group: everyone added on save
+ - fixed #11101: 7.6.35-7.7 upgrade leaves packages
+
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.
  - fixed #11198: Typo in i18n
@@ -9,6 +15,7 @@
  - Set a minimum package weight of 0.1 oz for the USPS driver.
  - Handle per package errors in USPS response data.
  - fixed #11207: Shop Email receipts going out to everyone.
+ - fixed tag-caching bug in Survey ExpressionEngine
 
 7.8.3
  - Rewrote Spectre's workflow queues to prevent it from "forgetting" about some workflows.

@@ -32,8 +32,6 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 dropSkipNotification($session);
-addEMSSubmissionTables($session);
-configEMSActivities($session);
 resetShopNotificationGroup($session);
 
 finish($session); # this line required
@@ -47,120 +45,6 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
-
-
-#----------------------------------------------------------------------------
-# Describe what our function does
-sub configEMSActivities {
-    my $session = shift;
-    print "\tConfigure EMS Activities... " unless $quiet;
-    my $config = $session->config;
-    $config->addToArray('workflowActivities/None', 'WebGUI::Workflow::Activity::CleanupEMSSubmissions');
-    $config->addToArray('workflowActivities/None', 'WebGUI::Workflow::Activity::ProcessEMSApprovals');
-    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');  # Daily
-    BREAK: { foreach my $activity (@{ $workflow->getActivities }) {
-           last BREAK if $activity->getName() eq 'WebGUI::Workflow::Activity::CleanupEMSSubmissions';
-       }
-       my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::CleanupEMSSubmissions');
-       $activity->set('title',       'Purge Denied EMS Submissions');
-       $activity->set('description', 'Purges EMS Submissions that were denied and are aged according to parameters.');
-    } # end of BREAK block
-    $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000004'); # Hourly
-    BREAK: { foreach my $activity (@{ $workflow->getActivities }) {
-           last BREAK if $activity->getName() eq 'WebGUI::Workflow::Activity::ProcessEMSApprovals';
-       }
-       my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ProcessEMSApprovals');
-       $activity->set('title',       'Process Approves EMS Submissions');
-       $activity->set('description', 'Create EMS Ticket Assets for approved submissions.');
-    } # end of BREAK block
-    print "DONE!\n" unless $quiet;
-}
-
-
-#----------------------------------------------------------------------------
-# make database changes relevant to EMS Submission system
-sub addEMSSubmissionTables {
-    my $session = shift;
-    print "\tCreate EMS Submission Tables... " unless $quiet;
-    my $db = $session->db;
-
-    $db->write(<<ENDSQL);
-CREATE TABLE EMSSubmissionForm (
-    assetId CHAR(22) BINARY NOT NULL,
-    revisionDate BIGINT NOT NULL,
-    canSubmitGroupId CHAR(22) BINARY,
-    daysBeforeCleanup INT,
-    deleteCreatedItems INT(1),
-    formDescription TEXT,
-    submissionDeadline Date,
-    pastDeadlineMessage TEXT,
-    PRIMARY KEY ( assetId, revisionDate )
-)
-ENDSQL
-
-    $db->write(<<ENDSQL);
-CREATE TABLE EMSSubmission (
-    assetId CHAR(22) BINARY NOT NULL,
-    revisionDate BIGINT NOT NULL,
-    submissionId INT NOT NULL,
-    submissionStatus CHAR(30),
-    ticketId CHAR(22) BINARY,
-    description mediumtext,
-    sku char(35),
-    vendorId char(22) BINARY,
-    displayTitle tinyint(1),
-    shipsSeparately tinyint(1),
-    price FLOAT,
-    seatsAvailable INT,
-    startDate DATETIME,
-    duration FLOAT,
-    eventNumber INT,
-    location CHAR(100),
-    relatedBadgeGroups MEDIUMTEXT,
-    relatedRibbons MEDIUMTEXT,
-    eventMetaData MEDIUMTEXT,
-    sendEmailOnChange INT(1),
-    PRIMARY KEY ( assetId, revisionDate )
-)
-ENDSQL
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EventManagementSystem
-            ADD COLUMN eventSubmissionTemplateId CHAR(22) BINARY;
-ENDSQL
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EventManagementSystem
-            ADD COLUMN eventSubmissionQueueTemplateId CHAR(22) BINARY;
-ENDSQL
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EventManagementSystem
-            ADD COLUMN eventSubmissionMainTemplateId CHAR(22) BINARY;
-ENDSQL
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EventManagementSystem
-            ADD COLUMN eventSubmissionGroups MEDIUMTEXT;
-ENDSQL
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EventManagementSystem
-            ADD COLUMN submittedLocationsList MEDIUMTEXT;
-ENDSQL
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EventManagementSystem
-            ADD COLUMN nextSubmissionId INT;
-ENDSQL
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EMSEventMetaField
-            ADD COLUMN helpText MEDIUMTEXT;
-ENDSQL
-
-    print "DONE!\n" unless $;
-}
 
 
 #------------------------------------------------------------------------

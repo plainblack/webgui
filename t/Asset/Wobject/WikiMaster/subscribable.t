@@ -83,7 +83,7 @@ ok(
 #----------------------------------------------------------------------------
 # skip notification
 ok( !$wiki->get('skipNotification'), 'skipNotification defaults to false' );
-$wiki->setSkipNotification(1);
+$wiki->setSkipNotification();
 ok( $wiki->get('skipNotification'), 'setSkipNotification sets skipNotification' );
 
 # add revision
