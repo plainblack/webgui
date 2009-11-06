@@ -11,6 +11,7 @@
  - Set a minimum package weight of 0.1 oz for the USPS driver.
  - Handle per package errors in USPS response data.
  - fixed #11207: Shop Email receipts going out to everyone.
+ - fixed tag-caching bug in Survey ExpressionEngine
 
 7.8.3
  - Rewrote Spectre's workflow queues to prevent it from "forgetting" about some workflows.
