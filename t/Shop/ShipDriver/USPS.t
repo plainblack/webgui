@@ -23,10 +23,9 @@ use Data::Dumper;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Shop::ShipDriver::USPS;
 
 plan tests => 65;
-use_ok('WebGUI::Shop::ShipDriver::USPS')
-    or die 'Unable to load module WebGUI::Shop::ShipDriver::USPS';
 
 #----------------------------------------------------------------------------
 # Init
@@ -224,14 +223,14 @@ my $workAddress = $addressBook->addAddress({
     organization => 'Plain Black Corporation',
     address1 => '1360 Regent St. #145',
     city => 'Madison', state => 'WI', code => '53715',
-    country => 'USA',
+    country => 'United States',
 });
 my $wucAddress = $addressBook->addAddress({
     label => 'wuc',
     organization => 'Madison Concourse Hotel',
     address1 => '1 W Dayton St',
     city => 'Madison', state => 'WI', code => '53703',
-    country => 'USA',
+    country => 'United States',
 });
 $cart->update({shippingAddressId => $workAddress->getId});
 
@@ -335,7 +334,7 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
@@ -415,14 +414,14 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '2',        Ounces => '0',
+                    Pounds         => '2',        Ounces         => '0.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
                 {
                     ID => 1,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
@@ -446,7 +445,7 @@ SKIP: {
                 {
                     ID             => 0,
                     ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => 0,
+                    Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 2,        Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -458,7 +457,7 @@ SKIP: {
                 {
                     ID             => 1,
                     ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => 8,
+                    Machinable     => ignore(), Ounces         => '8.0',
                     Pounds         => 1,        Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -546,21 +545,21 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '2',        Ounces => '0',
+                    Pounds         => '2',        Ounces         => '0.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
                 {
                     ID => 1,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
                 {
                     ID => 2,
                     ZipDestination => '53703',    ZipOrigination => '97123',
-                    Pounds         => '12',       Ounces => '0',
+                    Pounds         => '12',       Ounces         => '0.0',
                     Size           => 'REGULAR',  Service        => 'PARCEL',
                     Machinable     => 'true',
                 },
@@ -584,7 +583,7 @@ SKIP: {
                 {
                     ID             => 0,
                     ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => 0,
+                    Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 2,        Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -596,7 +595,7 @@ SKIP: {
                 {
                     ID             => 1,
                     ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => 8,
+                    Machinable     => ignore(), Ounces         => '8.0',
                     Pounds         => 1,        Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -608,7 +607,7 @@ SKIP: {
                 {
                     ID             => 2,
                     ZipOrigination => ignore(), ZipDestination => 53703,
-                    Machinable     => ignore(), Ounces         => 0,
+                    Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 12,       Size           => ignore(),
                     Zone           => ignore(),
                     Postage        => {
@@ -651,7 +650,7 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PRIORITY',
                     Machinable     => 'true',     Container      => 'FLAT RATE BOX',
                 },
@@ -716,7 +715,7 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'EXPRESS',
                     Machinable     => 'true',
                 },
@@ -780,7 +779,7 @@ cmp_deeply(
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8',
+                    Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PRIORITY',
                     Machinable     => 'true',#     Container      => 'VARIABLE',
                 },
@@ -837,6 +836,26 @@ isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate', 'calculate throws an excep
 
 $properties->{userId} = $userId;
 $driver->update($properties);
+
+my $dutchAddress = $addressBook->addAddress({
+    label => 'dutch',
+    address1 => 'Rotterdamseweg 183C',
+    city => 'Delft', code => '2629HD',
+    country => 'Netherlands',
+});
+
+$cart->update({shippingAddressId => $dutchAddress->getId});
+$cost = eval { $driver->calculate($cart); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', "calculate won't calculate for foreign countries");
+
+$cart->update({shippingAddressId => $workAddress->getId});
+
+#<?xml version="1.0"?>
+#<RateV3Response><Package ID="0"><Error><Number>-2147219500</Number>
+#<Source>DomesticRatesV3;clsRateV3.ValidateWeight;RateEngineV3.ProcessRequest</Source>
+#<Description>Please enter the package weight.  </Description>
+#<HelpFile></HelpFile><HelpContext>1000440</HelpContext></Error></Package></RateV3Response>
 
 #######################################################################
 #

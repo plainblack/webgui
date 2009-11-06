@@ -481,6 +481,7 @@ Sets a flag so that developers know whether to send notifications out on certain
 sub setSkipNotification {
 	my $self = shift;
 	$self->session->db->write("update assetData set skipNotification=1 where assetId=? and revisionDate=?", [$self->getId, $self->get("revisionDate")]);
+    $self->{_properties}->{skipNotification} = 1;
 }
 
 #-------------------------------------------------------------------

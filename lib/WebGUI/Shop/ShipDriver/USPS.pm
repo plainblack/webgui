@@ -14,7 +14,7 @@ Package WebGUI::Shop::ShipDriver::USPS
 
 =head1 DESCRIPTION
 
-Shipping driver for the United States Postal Service.
+Shipping driver for the United States Postal Service, domestic shipping services.
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,10 @@ sub buildXML {
             $weight += $itemWeight;
         }
         my $pounds = int($weight);
-        my $ounces = int(16 * ($weight - $pounds));
+        my $ounces = sprintf '%3.1f', (16 * ($weight - $pounds));
+        if ($pounds == 0 && $ounces eq '0.0' ) {
+            $ounces = 0.1;
+        }
         my $destination = $package->[0]->getShippingAddress;
         my $destZipCode = $destination->get('code');
         $packageData{ID}              = $packageIndex;
@@ -126,6 +129,9 @@ sub calculate {
     }
     if (! $self->get('userId')) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a USPS userId.});
+    }
+    if ($cart->getShippingAddress->get('country') ne 'United States') {
+        WebGUI::Error::InvalidParam->throw(error => q{Driver only handles domestic shipping});
     }
     my $cost = 0;
     ##Sort the items into shippable bundles.
@@ -195,6 +201,9 @@ sub _calculateFromXML {
         ##Error check for invalid index
         if ($id < 0 || $id > $#shippableUnits) {
             WebGUI::Error::Shop::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
+        }
+        if (exists $package->{Error}) {
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => $package->{Description});
         }
         my $unit = $shippableUnits[$id];
         if ($unit->[0]->getSku->shipsSeparately) {
@@ -428,6 +437,9 @@ sub _getShippableUnits {
         }
         else {
             my $zip = $item->getShippingAddress->get('code');
+            if ($item->getShippingAddress->get('country') ne 'United States') {
+                WebGUI::Error::InvalidParam->throw(error => q{Driver only handles domestic shipping});
+            }
             push @{ $looseUnits{$zip} }, $item;
         }
     }

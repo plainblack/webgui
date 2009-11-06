@@ -202,17 +202,19 @@ sub www_editSettings {
         hoverHelp   => $i18n->get("my purchases detail template help"),
         );
     $form->template(
-        name            => 'receiptEmailTemplateId',
-        namespace       => "Shop/EmailReceipt",
-        label           => $i18n->get("receipt email template"),
-        hoverHelp       => $i18n->get("receipt email template help"),
-        defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
+        name          => 'shopReceiptEmailTemplateId',
+        namespace     => "Shop/EmailReceipt",
+        label         => $i18n->get("receipt email template"),
+        hoverHelp     => $i18n->get("receipt email template help"),
+        defaultValue  => 'bPz1yk6Y9uwMDMBcmMsSCg',
+        value         => $setting->get("shopReceiptEmailTemplateId"),
     );
     $form->group(
-        name            => 'saleNotificationGroupId',
-        label           => $i18n->get("sale notification group"),
-        hoverHelp       => $i18n->get("sale notification group help"),
-        defaultValue    => '3',
+        name          => 'shopSaleNotificationGroupId',
+        label         => $i18n->get("sale notification group"),
+        hoverHelp     => $i18n->get("sale notification group help"),
+        defaultValue  => '3',
+        value         => $setting->get("shopSaleNotificationGroupId"),
     );
     $form->submit;
     return $ac->render($form->print, $i18n->get("shop settings"));

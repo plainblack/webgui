@@ -132,8 +132,8 @@ sub transactionsNotifications {
     my $defaultTemplate          = 'bPz1yk6Y9uwMDMBcmMsSCg';
     if (@{ $gateways }) {
         my $firstGateway = $gateways->[0];
-        $defaultNotificationGroup = $firstGateway->get('saleNotificationGroupId');
-        $defaultTemplate          = $firstGateway->get('receiptEmailTemplateId' );
+        $defaultNotificationGroup ||= $firstGateway->get('saleNotificationGroupId');
+        $defaultTemplate          ||= $firstGateway->get('receiptEmailTemplateId' );
         foreach my $gateway (@{ $gateways }) {
             my $properties = $gateway->get();
             delete $properties->{ saleNotificationGroupId };
