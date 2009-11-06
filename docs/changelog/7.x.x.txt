@@ -22,6 +22,7 @@
  - Set a minimum package weight of 0.1 oz for the USPS driver.
  - Handle per package errors in USPS response data.
  - fixed #11207: Shop Email receipts going out to everyone.
+ - fixed tag-caching bug in Survey ExpressionEngine
 
 7.7.24
  - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
