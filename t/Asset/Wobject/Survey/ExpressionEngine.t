@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 60;
+my $tests = 58;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -236,34 +236,8 @@ SKIP: {
         { jump => 'target', tags => {} }, 'external score resolves ok too' );
     cmp_deeply( $e->run( $session, qq{jump {scoreX('$url', ext_s0) == 200} target}, {userId => $user->userId} ),
         { jump => 'target', tags => {} }, 'external score section totals work too' );
-    cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 199} target}, {userId => $user->userId} ),
+    cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag, 1) == 199} target}, {userId => $user->userId} ),
         { jump => 'target', tags => {} }, 'external tag lookups work too' );
-    
-    # Test for nasty bugs caused by file-scoped lexicals not being properly initialised in L<ExpressionEngine::run>
-    {
-        # Create a second test user
-        my $survey2 = WebGUI::Asset::Wobject::Survey->new($session, $survey->getId);
-        my $user2 = WebGUI::User->new( $session, 'new' );
-        WebGUI::Test->usersToDelete($user2);
-        $session->user({userId => $user2->userId});
-        my $responseId2 = $survey2->responseId( { userId => $user2->userId } );
-        my $rJSON2 = $survey2->responseJSON(undef, $responseId2);
-        $rJSON2->recordResponses({
-            '0-0-0'        => 'My ext_s0q0a0 answer',
-            '0-1-0'        => 'My ext_s0q1a0 answer',
-        });
-        $rJSON2->processExpression(q{ tag(ext_tag, 299) });
-        # Remember to persist our changes..
-        $survey2->persistSurveyJSON();
-        $survey2->persistResponseJSON();
-        $survey2->surveyEnd;
-        
-        cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 299} target}, {userId => $user2->userId} ),
-            { jump => 'target', tags => {} }, 'external tag not cached' );
-        
-        cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 199} target}, {userId => $user->userId} ),
-            { jump => 'target', tags => {} }, 'first external tag lookups still works' );
-    }
 }
 
 #----------------------------------------------------------------------------
