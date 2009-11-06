@@ -545,6 +545,7 @@ sub getEditTabs {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getQueueUrl
 
 returns the URL for the submission queue page with the submisison id in the hash part

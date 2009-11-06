@@ -385,6 +385,7 @@ sub getFormDescription {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getQueueUrl
 
 returns the URL for the submission queue page with the submisison id in the hash part
@@ -465,6 +466,7 @@ asset instances, you will need to purge them here.
 =head2 purgeRevision ( )
 
 This method is called when data is purged by the system.
+
 =cut
 
 #sub purgeRevision { #    my $self = shift;

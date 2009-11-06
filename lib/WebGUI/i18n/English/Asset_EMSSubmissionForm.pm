@@ -99,6 +99,12 @@ our $I18N = { ##hashref of hashes
 		context => q|Remind the registrar to allow at least one field to be editted by the event submitter.|
 	},
 
+	'edit form' => {
+		message => q|Edit Form|,
+		lastUpdated => 1131394072,
+		context => q|The label for the default edit form.|
+	},
+
 #	'TODO' => {
 #		message => q|TODO|,
 #		lastUpdated => 1131394072,

@@ -44,6 +44,12 @@ our $I18N = { ##hashref of hashes
 		context => q|Message used to notify user when someone else changes their event submission.|
 	},
 
+	'edit asset' => {
+		message => q|Edit Asset|,
+		lastUpdated => 1131394072,
+		context => q|The label for the default edit page.|
+	},
+
 #	'TODO' => {
 #		message => q|TODO|,
 #		lastUpdated => 1131394072,

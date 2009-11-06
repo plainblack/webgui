@@ -2267,6 +2267,12 @@ normal templates.|,
         context => q|Field Label|,
     },
     
+    'new form' => {
+        message => q|New Form|,
+        lastUpdated => 1147050475,
+        context => q|The label for the link to create a new submission form.|,
+    },
+
 #    'TODO' => {
 #        message => q|TODO|,
 #        lastUpdated => 1147050475,

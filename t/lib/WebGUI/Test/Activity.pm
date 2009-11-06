@@ -72,8 +72,7 @@ sub create {
 	my $tag = WebGUI::VersionTag->getWorking($session);
 	$tag->commit;
 	WebGUI::Test->tagsToRollback($tag);
-	# WebGUI::Test->assetsToPurge($instance,$workflow); -- does not work...
-        push @cleanup, $instance, $workflow,
+	WebGUI::Test->workflowsToDelete($instance,$workflow);
 
     return bless { instance => $instance,
 		   session => $session,

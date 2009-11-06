@@ -37,6 +37,7 @@ use Tie::IxHash;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
+
 =head2 addGroupToSubmitList ( groupId )
 
 adds the parameter to eventSubmissionGroups
@@ -54,6 +55,7 @@ sub addGroupToSubmitList {
 }
 
 #-------------------------------------------------------------------
+
 =head2 addSubmissionForm
 
 creates a child of class WG::Asset::EMSSubmissionForm
@@ -101,6 +103,7 @@ sub addSubmissionForm {
 }
 
 #-------------------------------------------------------------------
+
 =head2 canSubmit
 
 returns true is the current user can submit to any form attached to this EMS
@@ -494,6 +497,7 @@ sub getRibbons {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getSubmissionLocations
 
 retuns an arrayref of the locations found in the submission location list
@@ -571,6 +575,7 @@ sub getTokens {
 }
 
 #-------------------------------------------------------------------
+
 =head2 hasSubmissionForms
 
 returns true if the EMS has subission forms attached
@@ -587,6 +592,7 @@ sub hasSubmissionForms {
 }
 
 #-------------------------------------------------------------------
+
 =head2 hasSubmissions
 
 returns true if the current user has submission forms in this EMS
@@ -793,7 +799,6 @@ sub www_addSubmission {
                     $session->http->setMimeType( 'text/html' );
                 }
                 my $content =  '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
-use lib '/root/pb/lib'; use dav; dav::log $content;
                 if( $asJson ) {
                     return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
                 } else {
@@ -2656,6 +2661,7 @@ sub www_viewSchedule {
 }
 
 #---------------------------------------------
+
 =head2 www_viewSubmissionQueue
 
 =cut

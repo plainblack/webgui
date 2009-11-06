@@ -340,6 +340,12 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
             'tokenInstructions'                 => ignore(),
             'printableStyleTemplateId'          => ignore(),
             'ticketInstructions'                => ignore(),
+            'eventSubmissionGroups'             => ignore(),
+            'eventSubmissionMainTemplateId'     => ignore(),
+            'eventSubmissionQueueTemplateId'    => ignore(),
+            'eventSubmissionTemplateId'         => ignore(),
+            'nextSubmissionId'                  => ignore(),
+            'submittedLocationsList'            => ignore(),
             'tickets_loop'                      => \@ticketArray,
          },
         "www_printRemainingTickets: template variables valid"
