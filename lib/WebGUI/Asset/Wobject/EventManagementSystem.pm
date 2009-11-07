@@ -375,7 +375,7 @@ may be SQL optimized for quick access
 
 sub getLocations {
     my $self = shift;
-    my $dateRef = shift || [ ];
+    my $dateRef = shift ;
 
     my %hash;
     my %hashDate;
@@ -384,9 +384,26 @@ sub getLocations {
 # this is a really compact 'uniq' operation
     my @locations = map { $h{$_}++ == 0 ? $_ : () } ( map { $_->get('location') } ( @$tickets ) );
 # the dates have the time data removed with a pattern substitution
-    push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
+    if( $dateRef ) {
+        push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
+    }
 
     return @locations;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getNextSubmissionId
+
+get a sequence number for the submission id
+
+=cut
+
+sub getNextSubmissionId {
+    my $self = shift;
+    my ($submissionId) = $self->session->db->read('select nextSubmissionId from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
+    $self->update( { nextSubmissionId => ($submissionId + 1) } );
+    return $submissionId;
 }
 
 #-------------------------------------------------------------------
