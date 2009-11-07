@@ -192,7 +192,7 @@ sub _calculateFromXML {
     foreach my $package (@{ $xmlData->{IntlRateResponse}->{Package} }) {
         my $id   = $package->{ID};
         ##Error check for invalid index
-        if ($id < 0 || $id > $#shippableUnits) {
+        if ($id < 0 || $id > $#shippableUnits || $id !~ /^\d+$/) {
             WebGUI::Error::Shop::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
         }
         if (exists $package->{Error}) {

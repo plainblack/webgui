@@ -25,7 +25,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPSInternational;
 
-plan tests => 37;
+plan tests => 40;
 
 #----------------------------------------------------------------------------
 # Init
@@ -96,6 +96,14 @@ my $gospels = $bible->setCollateral('variantsJSON', 'variantId', 'new',
         shortdesc => 'Gospels from the new Testament',
         price     => 1.50,       varSku    => 'gospels',
         weight    => 2.0,        quantity  => 999999,
+    }
+);
+
+my $singlePage = $bible->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => 'Single page from bible',
+        price     => 0.01,       varSku    => 'page',
+        weight    => 0.0001,     quantity  => 999999,
     }
 );
 
@@ -545,18 +553,54 @@ SKIP: {
 
 #######################################################################
 #
-# Check too heavy for my shipping type
+# Check for minimum weight allowed
 #
 #######################################################################
 
 $cart->empty;
 $properties = $driver->get();
-$properties->{shipType} = '9';
+$properties->{shipType}     = '9';
+$properties->{addInsurance} = 0;
 $driver->update($properties);
+my $page1 = $bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $singlePage));
+@shippableUnits = $driver->_getShippableUnits($cart);
+$xml = $driver->buildXML($cart, @shippableUnits);
+$xmlData = XMLin($xml,
+    KeepRoot   => 1,
+    ForceArray => ['Package'],
+);
+cmp_deeply(
+    $xmlData,
+    {
+        IntlRateRequest => {
+            USERID => $userId,
+            Package => [
+                {
+                    ID => 0,
+                    Pounds      => '0',        Ounces          => '0.1',
+                    Machinable  => 'true',     Country         => 'Netherlands',
+                    MailType    => 'Package',
+                },
+            ],
+        }
+    },
+    'buildXML: minimum weight'
+);
+
+#######################################################################
+#
+# Check too heavy for my shipping type
+#
+#######################################################################
 
 SKIP: {
 
     skip 'No userId for testing', 2 unless $hasRealUserId;
+
+    $cart->empty;
+    $properties = $driver->get();
+    $properties->{shipType} = '9';
+    $driver->update($properties);
 
     my $heavyHammer = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
     $heavyHammer->setQuantity(2);
@@ -636,11 +680,55 @@ SKIP: {
 
 #######################################################################
 #
+# _calculateFromXML
+#
+#######################################################################
+
+$cart->empty;
+$properties                 = $driver->get();
+$properties->{shipType}     = '9';
+$properties->{addInsurance} = 1;
+$driver->update($properties);
+$rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
+@shippableUnits = $driver->_getShippableUnits($cart);
+
+$cost = eval { $driver->_calculateFromXML(
+    {
+        IntlRateResponse => {
+            Package => [
+                {
+                    ID => 11,
+                    Service => [
+                        {
+                            ID        => '9',
+                            Postage   => '5.25',
+                            MaxWeight => '70'
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    @shippableUnits
+); };
+
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate', '_calculateFromXML throws an exception for illegal package ids');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Illegal package index returned by USPS: 11',
+    ),
+    '... checking error message',
+);
+
+#######################################################################
+#
 # Check for throwing an exception
 #
 #######################################################################
 
-my $userId  = $driver->get('userId');
+$userId  = $driver->get('userId');
 $properties = $driver->get();
 $properties->{userId} = '_NO_NO_NO_NO';
 $driver->update($properties);
