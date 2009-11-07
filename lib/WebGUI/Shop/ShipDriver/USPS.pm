@@ -203,7 +203,7 @@ sub _calculateFromXML {
             WebGUI::Error::Shop::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
         }
         if (exists $package->{Error}) {
-            WebGUI::Error::Shop::RemoteShippingRate->throw(error => $package->{Description});
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => $package->{Error}->{Description});
         }
         my $unit = $shippableUnits[$id];
         if ($unit->[0]->getSku->shipsSeparately) {
