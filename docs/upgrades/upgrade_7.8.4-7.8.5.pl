@@ -157,7 +157,7 @@ ENDSQL
             ADD COLUMN helpText MEDIUMTEXT;
 ENDSQL
 
-    print "DONE!\n" unless $;
+    print "DONE!\n" unless $quiet;
 }
 
 
