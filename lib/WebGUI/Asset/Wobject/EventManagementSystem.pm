@@ -190,6 +190,30 @@ sub definition {
 			hoverHelp		=> $i18n->get('print ticket template help'),
 			namespace		=> 'EMS/PrintTicket',
 		},
+                eventSubmissionMainTemplateId => {
+                        fieldType               => 'template',
+                        defaultValue            => 'DoVNijm6lMDE0cYrtvEbDQ',
+                        tab                     => 'display',
+                        label                   => $i18n->get('event submission main template'),
+                        hoverHelp               => $i18n->get('event submission main template help'),
+                        namespace               => 'EMS/SubmissionMain',
+                },
+                eventSubmissionTemplateId => {
+                        fieldType               => 'template',
+                        defaultValue            => '8tqyQx-LwYUHIWOlKPjJrA',
+                        tab                     => 'display',
+                        label                   => $i18n->get('event submission template'),
+                        hoverHelp               => $i18n->get('event submission template help'),
+                        namespace               => 'EMS/Submission',
+                },
+                eventSubmissionQueueTemplateId => {
+                        fieldType               => 'template',
+                        defaultValue            => 'ktSvKU8riGimhcsxXwqvPQ',
+                        tab                     => 'display',
+                        label                   => $i18n->get('event submission queue template'),
+                        hoverHelp               => $i18n->get('event submission queue template help'),
+                        namespace               => 'EMS/SubmissionQueue',
+                },
 		printRemainingTicketsTemplateId => {
 			fieldType 		=> 'template',
 			defaultValue 	=> 'hreA_bgxiTX-EzWCSZCZJw',
@@ -233,6 +257,25 @@ sub definition {
 			label			=> $i18n->get('registration staff group'),
 			hoverHelp		=> $i18n->get('registration staff group help'),
 		},
+                submittedLocationsList => {
+                        fieldType               => 'text',
+                        tab                     => 'properties',
+                        defaultValue            => '',
+                        label                   => $i18n->get('submitted location list label'),
+                        hoverHelp               => $i18n->get('submitted location list help'),
+                },
+                eventSubmissionGroups => {
+                        fieldType               => 'hidden',
+                        defaultValue            => '',
+                        noFormPost              => 1,
+                },
+        nextSubmissionId => {
+            tab          => "properties",
+            fieldType    => "integer",
+            defaultValue => 1,
+            label        => $i18n->get("next submission id label"),
+            hoverHelp    => $i18n->get("next submission id label help")
+        },
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -934,63 +977,6 @@ sub www_editBadgeGroupSave {
 		name			=> $form->get('name'),
 		});
 	return $self->www_manageBadgeGroups;
-}
-
-#-------------------------------------------------------------------
-
-=head2  www_editSubmission 
-
-use getLineage to find the item to edit based on submissionId
-then call www_editSubmission on it
-
-=cut
-
-sub www_editSubmission {
-	my $self             = shift;
-        my $submissionId = $self->session->form->get('submissionId');
-        my $asset = $self->getLineage(['descendants'], { returnObjects => 1,
-		    joinClass          => "WebGUI::Asset::EMSSubmission",
-		    whereClause        => 'submissionId = ' . int($submissionId),
-		    includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
-           } );
-        return $asset->[0]->www_editSubmission;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2  www_editSubmissionForm 
-
-calls editSubmissionForm in WebGUI::Asset::EMSSubmissionForm
-
-=cut
-
-sub www_editSubmissionForm {
-	my $self             = shift;
-	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
-	return WebGUI::Asset::EMSSubmissionForm->www_editSubmissionForm($self,shift);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2  www_editSubmissionFormSave
-
-test and save data posted from editSubmissionForm...
-
-=cut
-
-sub www_editSubmissionFormSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
-	my $formParams = WebGUI::Asset::EMSSubmissionForm->processForm($self);
-        if( $formParams->{_isValid} ) {
-            delete $formParams->{_isValid};
-	    $self->addSubmissionForm($formParams);
-	    return $self->www_viewSubmissionQueue;
-        } else {
-	    return $self->www_editSubmissionForm($formParams);
-	}
 }
 
 #-------------------------------------------------------------------
