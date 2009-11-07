@@ -191,6 +191,7 @@
 "shippingDrivers" : [
     "WebGUI::Shop::ShipDriver::FlatRate",
     "WebGUI::Shop::ShipDriver::USPS",
+    "WebGUI::Shop::ShipDriver::USPSInternational",
     "WebGUI::Shop::ShipDriver::UPS"
     ],
 

@@ -30,6 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 fixPackageFlagOnOlder( $session );
+addUSPSInternationalShippingDriver( $session );
 
 # upgrade functions go here
 
@@ -44,6 +45,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addUSPSInternationalShippingDriver {
+    my $session = shift;
+    print "\tAdd the USPS International shipping driver... " unless $quiet;
+    # and here's our code
+    $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::USPSInternational');
+    print "DONE!\n" unless $quiet;
+}
 
 sub fixPackageFlagOnOlder {
     my $session = shift;
