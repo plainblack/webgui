@@ -199,7 +199,7 @@ sub _calculateFromXML {
         my $id   = $package->{ID};
         my $rate = $package->{Postage}->{Rate};
         ##Error check for invalid index
-        if ($id < 0 || $id > $#shippableUnits) {
+        if ($id < 0 || $id > $#shippableUnits || $id !~ /^\d+$/) {
             WebGUI::Error::Shop::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
         }
         if (exists $package->{Error}) {
