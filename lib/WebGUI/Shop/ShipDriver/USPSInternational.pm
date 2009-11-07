@@ -48,15 +48,12 @@ result by the quantity, rather than doing several identical checks.
 sub buildXML {
     my ($self, $cart, @packages) = @_;
     tie my %xmlHash, 'Tie::IxHash';
-    %xmlHash = ( RateV3Request => {}, );
-    my $xmlTop = $xmlHash{RateV3Request};
+    %xmlHash = ( IntlRateRequest => {}, );
+    my $xmlTop = $xmlHash{IntlRateRequest};
     $xmlTop->{USERID}  = $self->get('userId');
     $xmlTop->{Package} = [];
     ##Do a request for each package.
     my $packageIndex;
-    my $shipType = $self->get('shipType');
-    my $service  = $shipType eq 'PRIORITY VARIABLE' ? 'PRIORITY'
-                 : $shipType;
     PACKAGE: for(my $packageIndex = 0; $packageIndex < scalar @packages; $packageIndex++) {
         my $package = $packages[$packageIndex];
         next PACKAGE unless scalar @{ $package };
@@ -78,21 +75,13 @@ sub buildXML {
             $ounces = 0.1;
         }
         my $destination = $package->[0]->getShippingAddress;
-        my $destZipCode = $destination->get('code');
-        $packageData{ID}              = $packageIndex;
-        $packageData{Service}         = [ $service                ];
-        $packageData{ZipOrigination}  = [ $self->get('sourceZip') ];
-        $packageData{ZipDestination}  = [ $destZipCode            ];
-        $packageData{Pounds}          = [ $pounds                 ];
-        $packageData{Ounces}          = [ $ounces                 ];
-        if ($shipType eq 'PRIORITY') {
-            $packageData{Container}   = [ 'FLAT RATE BOX'         ];
-        }
-        elsif ($shipType eq 'PRIORITY VARIABLE') {
-            #$packageData{Container}   = [ 'VARIABLE'           ];
-        }
-        $packageData{Size}            = [ 'REGULAR'               ];
-        $packageData{Machinable}      = [ 'true'                  ];
+        my $country     = $destination->get('country');
+        $packageData{ID}         = $packageIndex;
+        $packageData{Pounds}     = [ $pounds   ];
+        $packageData{Ounces}     = [ $ounces   ];
+        $packageData{Machinable} = [ 'true'    ];
+        $packageData{MailType}   = [ 'Package' ];
+        $packageData{Country}    = [ $country  ];
         push @{ $xmlTop->{Package} }, \%packageData;
     }
     my $xml = XMLout(\%xmlHash,
@@ -124,9 +113,6 @@ costs are assessed.
 
 sub calculate {
     my ($self, $cart) = @_;
-    if (! $self->get('sourceZip')) {
-        WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a source zipcode.});
-    }
     if (! $self->get('userId')) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a USPS userId.});
     }
@@ -173,7 +159,7 @@ Processed XML data from an XML rate request, processed in perl data structure.  
 have this structure:
 
     {
-        RateV3Response => {
+        IntlRateResponse => {
             Package => [
                 {
                     ID => 0,
@@ -194,17 +180,24 @@ The set of shippable units, which are required to do quantity lookups.
 sub _calculateFromXML {
     my ($self, $xmlData, @shippableUnits) = @_;
     my $cost = 0;
-    foreach my $package (@{ $xmlData->{RateV3Response}->{Package} }) {
+    foreach my $package (@{ $xmlData->{IntlRateResponse}->{Package} }) {
         my $id   = $package->{ID};
-        my $rate = $package->{Postage}->{Rate};
         ##Error check for invalid index
         if ($id < 0 || $id > $#shippableUnits) {
             WebGUI::Error::Shop::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
         }
         if (exists $package->{Error}) {
-            WebGUI::Error::Shop::RemoteShippingRate->throw(error => $package->{Description});
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => $package->{Error}->{Description});
         }
         my $unit = $shippableUnits[$id];
+        my $rate;
+        SERVICE: foreach my $service (@{ $package->{Service} }) {
+            next SERVICE unless $service->{ID} eq $self->get('shipType');
+            $rate = $service->{Postage};
+        }
+        if (!$rate) {
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Selected shipping service not available');
+        }
         if ($unit->[0]->getSku->shipsSeparately) {
             ##This is a single item due to ships separately.  Since in reality there will be
             ## N things being shipped, multiply the rate by the quantity.
@@ -238,10 +231,14 @@ sub definition {
     my $i18n2 = WebGUI::International->new($session, 'ShipDriver_USPSInternational');
     tie my %shippingTypes, 'Tie::IxHash';
     ##Note, these keys are used by buildXML
-    $shippingTypes{'PRIORITY VARIABLE'} = $i18n->get('priority variable');
-    $shippingTypes{'PRIORITY'}          = $i18n->get('priority');
-    $shippingTypes{'EXPRESS' }          = $i18n->get('express');
-    $shippingTypes{'PARCEL'  }          = $i18n->get('parcel post');
+    $shippingTypes{1}     = $i18n2->get('express mail international');
+    $shippingTypes{2}     = $i18n2->get('priority mail international');
+    $shippingTypes{6}     = $i18n2->get('global express guaranteed rectangular');
+    $shippingTypes{7}     = $i18n2->get('global express guaranteed non-rectangular');
+    $shippingTypes{9}     = $i18n2->get('priority mail flat rate box');
+    $shippingTypes{11}    = $i18n2->get('priority mail large flat rate box');
+    $shippingTypes{15}    = $i18n2->get('first class mail international parcels');
+    $shippingTypes{16}    = $i18n2->get('priority mail small flat rate box');
     tie my %fields, 'Tie::IxHash';
     %fields = (
         instructions => {

@@ -25,7 +25,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPSInternational;
 
-plan tests => 53;
+plan tests => 34;
 
 #----------------------------------------------------------------------------
 # Init
@@ -124,7 +124,7 @@ cmp_deeply(
 
 
 isa_ok(
-    $definition = WebGUI::Shop::ShipDriver::USPS->definition($session),
+    $definition = WebGUI::Shop::ShipDriver::USPSInternational->definition($session),
     'ARRAY'
 );
 
@@ -136,14 +136,14 @@ isa_ok(
 #######################################################################
 
 my $options = {
-                label   => 'USPS Driver',
+                label   => 'Intl USPS Driver',
                 enabled => 1,
               };
 
-$driver2 = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
+$driver2 = WebGUI::Shop::ShipDriver::USPSInternational->create($session, $options);
 addToCleanup($driver2);
 
-isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPS');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPSInternational');
 isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 
 #######################################################################
@@ -152,7 +152,7 @@ isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 #
 #######################################################################
 
-is (WebGUI::Shop::ShipDriver::USPS->getName($session), 'U.S. Postal Service', 'getName returns the human readable name of this driver');
+is (WebGUI::Shop::ShipDriver::USPSInternational->getName($session), 'U.S. Postal Service, International', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
@@ -174,27 +174,11 @@ undef $driver2;
 #
 #######################################################################
 
-my $driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
+my $driver = WebGUI::Shop::ShipDriver::USPSInternational->create($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
-    shipType => 'PARCEL',
 });
 addToCleanup($driver);
-
-eval { $driver->calculate() };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no zipcode has been set');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Driver configured without a source zipcode.',
-    ),
-    '... checking error message',
-);
-
-my $properties = $driver->get();
-$properties->{sourceZip} = '97123';
-$driver->update($properties);
 
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
@@ -212,17 +196,15 @@ addToCleanup($cart);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',
-    organization => 'Plain Black Corporation',
-    address1 => '1360 Regent St. #145',
-    city => 'Madison', state => 'WI', code => '53715',
-    country => 'United States',
+    organization => 'ProcoliX',
+    address1 => 'Rotterdamseweg 183C',
+    city => 'Delft', code => '2629HD',
+    country => 'Netherlands',
 });
-my $wucAddress = $addressBook->addAddress({
-    label => 'wuc',
-    organization => 'Madison Concourse Hotel',
-    address1 => '1 W Dayton St',
-    city => 'Madison', state => 'WI', code => '53703',
-    country => 'United States',
+my $sdhAddress = $addressBook->addAddress({
+    label => 'other side of planet',
+    organization => 'SDH',
+    country => 'Australia',
 });
 $cart->update({shippingAddressId => $workAddress->getId});
 
@@ -262,7 +244,7 @@ cmp_bag(
 );
 
 my $rockHammer2 = $bible->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
-$rockHammer2->update({shippingAddressId => $wucAddress->getId});
+$rockHammer2->update({shippingAddressId => $sdhAddress->getId});
 cmp_bag(
     [$driver->_getShippableUnits($cart)],
     [[ ignore(), ignore() ], [ ignore() ], [ ignore() ], [ ignore() ], ],
@@ -285,31 +267,16 @@ if (! $userId) {
     $hasRealUserId = 0;
     $userId = "blahBlahBlah";
 }
-$properties = $driver->get();
-$properties->{userId}    = $userId;
-$properties->{sourceZip} = '97123';
+my $properties = $driver->get();
+$properties->{userId}   = $userId;
+$properties->{shipType} = '9';
 $driver->update($properties);
 
 $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 my @shippableUnits = $driver->_getShippableUnits($cart);
 
-$properties = $driver->get();
-$properties->{addInsurance}   = 1;
-$driver->update($properties);
-
-is($driver->_calculateInsurance(@shippableUnits), 2, '_calculateInsurance: one item in cart with quantity=1, calculates insurance');
-
-$properties->{addInsurance}   = 0;
-$driver->update($properties);
-is($driver->_calculateInsurance(@shippableUnits), 0, '_calculateInsurance: returns 0 if insurance is not enabled');
-
-$properties->{addInsurance}   = 1;
-$properties->{insuranceRates} = '';
-$driver->update($properties);
-is($driver->_calculateInsurance(@shippableUnits), 0, '_calculateInsurance: returns 0 if rates are not set');
-
 my $xml = $driver->buildXML($cart, @shippableUnits);
-like($xml, qr/<RateV3Request USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the RateV3Request tag');
+like($xml, qr/<IntlRateRequest USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the IntlRateRequest tag');
 like($xml, qr/<Package ID="0"/, 'buildXML: checking ID is an attribute of the Package tag');
 
 my $xmlData = XMLin($xml,
@@ -319,23 +286,22 @@ my $xmlData = XMLin($xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        IntlRateRequest => {
             USERID => $userId,
             Package => [
                 {
                     ID => 0,
-                    ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Pounds      => '1',        Ounces         => '8.0',
+                    Machinable  => 'true',     Country        => 'Netherlands',
+                    MailType    => 'Package',  
                 },
             ],
         }
     },
-    'buildXML: PARCEL service, 1 item in cart'
+    'buildXML: 1 item in cart'
 );
 
-like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
+like($xml, qr/IntlRateRequest USERID.+?Package ID=.+?Pounds.+?Ounces.+?Machinable.+?MailType.+?Country.+?/, '... and tag order');
 
 SKIP: {
 
@@ -350,15 +316,25 @@ SKIP: {
             Package => [
                 {
                     ID             => 0,
-                    ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => ignore(),
-                    Pounds         => ignore(), Size           => ignore(),
-                    Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(10,10),  ##A number around 10...
-                    }
+                    AreasServed    => ignore(), Prohibitions   => ignore(),
+                    ExpressMail    => ignore(), CustomsForms   => ignore(),
+                    Observations   => ignore(), Restrictions   => ignore(),
+                    Service        => [
+                        {
+                            ID             => ignore(),
+                            MaxWeight      => ignore(),
+                            MaxDimensions  => ignore(),
+                            MailType       => 'Package',
+                            Ounces         => '8',
+                            Pounds         => '1',
+                            Country        => 'NETHERLANDS',
+                            Machinable     => 'true',
+                            Postage        => num(100,99),
+                            SvcCommitments => ignore(),
+                            SvcDescription => ignore(),
+                        },
+                        (ignore())x12,
+                    ],
                 },
             ],
         },
@@ -369,13 +345,22 @@ SKIP: {
 
 my $cost = $driver->_calculateFromXML(
     {
-        RateV3Response => {
+        IntlRateResponse => {
             Package => [
                 {
                     ID => 0,
-                    Postage => {
-                        Rate => 5.25,
-                    },
+                    Service => [
+                        {
+                            ID        => '9',
+                            Postage   => '5.25',
+                            MaxWeight => '70'
+                        },
+                        {
+                            ID        => '11',
+                            Postage   => '7.25',
+                            MaxWeight => '70'
+                        },
+                    ],
                 },
             ],
         },
@@ -388,8 +373,6 @@ is($cost, 5.25, '_calculateFromXML calculates shipping cost correctly for 1 item
 $bibleItem = $bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $nivBible));
 @shippableUnits = $driver->_getShippableUnits($cart);
 
-is(calculateInsurance($driver), 7, '_calculateInsurance: two items in cart with quantity=1, calculates insurance');
-
 $xml = $driver->buildXML($cart, @shippableUnits);
 $xmlData = XMLin( $xml,
     KeepRoot   => 1,
@@ -399,22 +382,20 @@ $xmlData = XMLin( $xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        IntlRateRequest => {
             USERID => $userId,
             Package => [
                 {
                     ID => 0,
-                    ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '2',        Ounces         => '0.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Pounds      => '2',        Ounces         => '0.0',
+                    Machinable  => 'true',     Country        => 'Netherlands',
+                    MailType    => 'Package',  
                 },
                 {
                     ID => 1,
-                    ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Pounds      => '1',        Ounces         => '8.0',
+                    Machinable  => 'true',     Country        => 'Netherlands',
+                    MailType    => 'Package',  
                 },
             ],
         }
@@ -428,57 +409,41 @@ SKIP: {
 
     my $response = $driver->_doXmlRequest($xml);
     ok($response->is_success, '_doXmlRequest to USPS successful for 2 items in cart');
-    my $xmlData = XMLin($response->content, ForceArray => [qw/Package/],);
-    cmp_deeply(
-        $xmlData,
-        {
-            Package => [
-                {
-                    ID             => 0,
-                    ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => '0.0',
-                    Pounds         => 2,        Size           => ignore(),
-                    Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(10,10),  ##A number around 10...
-                    }
-                },
-                {
-                    ID             => 1,
-                    ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => '8.0',
-                    Pounds         => 1,        Size           => ignore(),
-                    Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(10,10),  ##A number around 10...
-                    }
-                },
-            ],
-        },
-        '... returned data from USPS in correct format for 2 items in cart.  If this test fails, the driver may need to be updated'
-    );
-
 }
 
 $cost = $driver->_calculateFromXML(
     {
-        RateV3Response => {
+        IntlRateResponse => {
             Package => [
                 {
                     ID => 0,
-                    Postage => {
-                        Rate => 7.00,
-                    },
+                    Service => [
+                        {
+                            ID        => '9',
+                            Postage   => '7.00',
+                            MaxWeight => '70'
+                        },
+                        {
+                            ID        => '11',
+                            Postage   => '9.00',
+                            MaxWeight => '70'
+                        },
+                    ],
                 },
                 {
                     ID => 1,
-                    Postage => {
-                        Rate => 5.25,
-                    },
+                    Service => [
+                        {
+                            ID        => '9',
+                            Postage   => '5.25',
+                            MaxWeight => '70'
+                        },
+                        {
+                            ID        => '11',
+                            Postage   => '7.25',
+                            MaxWeight => '70'
+                        },
+                    ],
                 },
             ],
         },
@@ -491,23 +456,39 @@ is($cost, 12.25, '_calculateFromXML calculates shipping cost correctly for 2 ite
 $bibleItem->setQuantity(2);
 @shippableUnits = $driver->_getShippableUnits($cart);
 
-is(calculateInsurance($driver), 8, '_calculateInsurance: two items in cart with quantity=2, calculates insurance');
-
 $cost = $driver->_calculateFromXML(
     {
-        RateV3Response => {
+        IntlRateResponse => {
             Package => [
                 {
                     ID => 0,
-                    Postage => {
-                        Rate => 7.00,
-                    },
+                    Service => [
+                        {
+                            ID        => '9',
+                            Postage   => '7.00',
+                            MaxWeight => '70'
+                        },
+                        {
+                            ID        => '11',
+                            Postage   => '9.00',
+                            MaxWeight => '70'
+                        },
+                    ],
                 },
                 {
                     ID => 1,
-                    Postage => {
-                        Rate => 5.25,
-                    },
+                    Service => [
+                        {
+                            ID        => '9',
+                            Postage   => '5.25',
+                            MaxWeight => '70'
+                        },
+                        {
+                            ID        => '11',
+                            Postage   => '7.25',
+                            MaxWeight => '70'
+                        },
+                    ],
                 },
             ],
         },
@@ -517,9 +498,8 @@ $cost = $driver->_calculateFromXML(
 is($cost, 19.25, '_calculateFromXML calculates shipping cost correctly for 2 items in the cart, with quantity of 2');
 
 $rockHammer2 = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
-$rockHammer2->update({shippingAddressId => $wucAddress->getId});
+$rockHammer2->update({shippingAddressId => $sdhAddress->getId});
 @shippableUnits = $driver->_getShippableUnits($cart);
-is(calculateInsurance($driver), 12, '_calculateInsurance: calculates insurance');
 $xml = $driver->buildXML($cart, @shippableUnits);
 
 $xmlData = XMLin( $xml,
@@ -530,29 +510,26 @@ $xmlData = XMLin( $xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
-            USERID => $userId,
+        IntlRateRequest => {
+            USERID  => $userId,
             Package => [
                 {
                     ID => 0,
-                    ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '2',        Ounces         => '0.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Pounds      => '2',        Ounces         => '0.0',
+                    Machinable  => 'true',     Country        => 'Netherlands',
+                    MailType    => 'Package',  
                 },
                 {
                     ID => 1,
-                    ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Pounds      => '12',       Ounces         => '0.0',
+                    Machinable  => 'true',     Country        => 'Australia',
+                    MailType    => 'Package',  
                 },
                 {
                     ID => 2,
-                    ZipDestination => '53703',    ZipOrigination => '97123',
-                    Pounds         => '12',       Ounces         => '0.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Pounds      => '1',        Ounces         => '8.0',
+                    Machinable  => 'true',     Country        => 'Netherlands',
+                    MailType    => 'Package',  
                 },
             ],
         }
@@ -561,252 +538,44 @@ cmp_deeply(
 );
 
 SKIP: {
-
     skip 'No userId for testing', 2 unless $hasRealUserId;
 
     my $response = $driver->_doXmlRequest($xml);
     ok($response->is_success, '_doXmlRequest to USPS successful for 3 items in cart');
-    my $xmlData = XMLin($response->content, ForceArray => [qw/Package/],);
-    cmp_deeply(
-        $xmlData,
-        {
-            Package => [
-                {
-                    ID             => 0,
-                    ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => '0.0',
-                    Pounds         => 2,        Size           => ignore(),
-                    Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(10,10),  ##A number around 10...
-                    }
-                },
-                {
-                    ID             => 1,
-                    ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Machinable     => ignore(), Ounces         => '8.0',
-                    Pounds         => 1,        Size           => ignore(),
-                    Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(10,10),  ##A number around 10...
-                    }
-                },
-                {
-                    ID             => 2,
-                    ZipOrigination => ignore(), ZipDestination => 53703,
-                    Machinable     => ignore(), Ounces         => '0.0',
-                    Pounds         => 12,       Size           => ignore(),
-                    Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(20,20),  ##A number around 20...
-                    }
-                },
-            ],
-        },
-        '... returned data from USPS in correct format for 3 items in cart.  If this test fails, the driver may need to be updated'
-    );
-
 }
 
 #######################################################################
 #
-# Test Priority shipping setup
+# Check too heavy for my shipping type
 #
 #######################################################################
 
 $cart->empty;
 $properties = $driver->get();
-$properties->{shipType} = 'PRIORITY';
+$properties->{shipType} = '9';
 $driver->update($properties);
-
-$rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
-@shippableUnits = $driver->_getShippableUnits($cart);
-$xml = $driver->buildXML($cart, @shippableUnits);
-my $xmlData = XMLin($xml,
-    KeepRoot   => 1,
-    ForceArray => ['Package'],
-);
-cmp_deeply(
-    $xmlData,
-    {
-        RateV3Request => {
-            USERID => $userId,
-            Package => [
-                {
-                    ID => 0,
-                    ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'PRIORITY',
-                    Machinable     => 'true',     Container      => 'FLAT RATE BOX',
-                },
-            ],
-        }
-    },
-    'buildXML: PRIORITY service, 1 item in cart'
-);
-like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Container.+?Size.+?Machinable/, '... and tag order');
 
 SKIP: {
 
     skip 'No userId for testing', 2 unless $hasRealUserId;
 
-    my $response = $driver->_doXmlRequest($xml);
-    ok($response->is_success, '_doXmlRequest to USPS successful');
-    my $xmlData = XMLin($response->content, ForceArray => [qw/Package/],);
+    my $heavyHammer = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
+    $heavyHammer->setQuantity(2);
+    $cost = eval { $driver->calculate($cart); };
+    $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate', "USPS returns error when package is too heavy for the selected service");
     cmp_deeply(
-        $xmlData,
-        {
-            Package => [
-                {
-                    ID             => 0,
-                    ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Container      => ignore(), Ounces         => ignore(), ##Machinable missing, added Container
-                    Pounds         => ignore(), Size           => ignore(),
-                    Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(10,10),  ##A number around 10...
-                    }
-                },
-            ],
-        },
-        '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
+        $e,
+        methods(
+            error => 'Selected shipping service not available',
+        ),
+        '... checking error message',
     );
 
-}
-
-#######################################################################
-#
-# Test EXPRESS shipping setup
-#
-#######################################################################
-
-$properties = $driver->get();
-$properties->{shipType} = 'EXPRESS';
-$driver->update($properties);
-
-$xml = $driver->buildXML($cart, @shippableUnits);
-my $xmlData = XMLin($xml,
-    KeepRoot   => 1,
-    ForceArray => ['Package'],
-);
-cmp_deeply(
-    $xmlData,
-    {
-        RateV3Request => {
-            USERID => $userId,
-            Package => [
-                {
-                    ID => 0,
-                    ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'EXPRESS',
-                    Machinable     => 'true',
-                },
-            ],
-        }
-    },
-    'buildXML: EXPRESS service, 1 item in cart'
-);
-like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
-
-SKIP: {
-
-    skip 'No userId for testing', 2 unless $hasRealUserId;
-
-    my $response = $driver->_doXmlRequest($xml);
-    ok($response->is_success, '... _doXmlRequest to USPS successful');
-    my $xmlData = XMLin($response->content, ForceArray => [qw/Package/],);
-    cmp_deeply(
-        $xmlData,
-        {
-            Package => [
-                {
-                    ID             => 0,
-                    ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Ounces         => ignore(), Pounds         => ignore(),
-                    Size           => ignore(), Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(30,30),  ##A number around 10...
-                    }
-                },
-            ],
-        },
-        '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
-    );
-
-}
-
-#######################################################################
-#
-# Test PRIORITY VARIABLE shipping setup
-#
-#######################################################################
-
-$properties = $driver->get();
-$properties->{shipType} = 'PRIORITY VARIABLE';
-$driver->update($properties);
-
-$xml = $driver->buildXML($cart, @shippableUnits);
-my $xmlData = XMLin($xml,
-    KeepRoot   => 1,
-    ForceArray => ['Package'],
-);
-cmp_deeply(
-    $xmlData,
-    {
-        RateV3Request => {
-            USERID => $userId,
-            Package => [
-                {
-                    ID => 0,
-                    ZipDestination => '53715',    ZipOrigination => '97123',
-                    Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'PRIORITY',
-                    Machinable     => 'true',#     Container      => 'VARIABLE',
-                },
-            ],
-        }
-    },
-    'buildXML: PRIORITY, VARIABLE service, 1 item in cart'
-);
-like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
-
-SKIP: {
-
-    skip 'No userId for testing', 2 unless $hasRealUserId;
-
-    my $response = $driver->_doXmlRequest($xml);
-    ok($response->is_success, '... _doXmlRequest to USPS successful');
-    my $xmlData = XMLin($response->content, ForceArray => [qw/Package/],);
-    cmp_deeply(
-        $xmlData,
-        {
-            Package => [
-                {
-                    ID             => 0,
-                    ZipOrigination => ignore(), ZipDestination => ignore(),
-                    Ounces         => ignore(), Pounds         => ignore(),
-                    Size           => ignore(), Zone           => ignore(),
-                    Postage        => {
-                        CLASSID     => ignore(),
-                        MailService => ignore(),
-                        Rate        => num(8,8),  ##A number around 10...
-                    }
-                },
-            ],
-        },
-        '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
-    );
+    $heavyHammer->setQuantity(20);
+    $cost = eval { $driver->calculate($cart); };
+    $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate', "USPS returns error when package is too heavy for any service");
 
 }
 
@@ -818,7 +587,7 @@ SKIP: {
 
 my $userId  = $driver->get('userId');
 $properties = $driver->get();
-$properties->{userId} = '__NEVER_GOING_TO_HAPPEN__';
+$properties->{userId} = '_NO_NO_NO_NO';
 $driver->update($properties);
 
 $cost = eval { $driver->calculate($cart); };
@@ -829,33 +598,17 @@ $properties->{userId} = $userId;
 $driver->update($properties);
 
 my $dutchAddress = $addressBook->addAddress({
-    label => 'dutch',
-    address1 => 'Rotterdamseweg 183C',
-    city => 'Delft', code => '2629HD',
-    country => 'Netherlands',
+    label        => 'american',
+    organization => 'Plain Black Corporation',
+    address1     => '1360 Regent St. #145',
+    city         => 'Madison', state => 'WI', code => '53715',
+    country      => 'United States',
 });
 
 $cart->update({shippingAddressId => $dutchAddress->getId});
 $cost = eval { $driver->calculate($cart); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', "calculate won't calculate for foreign countries");
+isa_ok($e, 'WebGUI::Error::InvalidParam', "calculate won't calculate for domestic countries");
 
 $cart->update({shippingAddressId => $workAddress->getId});
-
-#<?xml version="1.0"?>
-#<RateV3Response><Package ID="0"><Error><Number>-2147219500</Number>
-#<Source>DomesticRatesV3;clsRateV3.ValidateWeight;RateEngineV3.ProcessRequest</Source>
-#<Description>Please enter the package weight.  </Description>
-#<HelpFile></HelpFile><HelpContext>1000440</HelpContext></Error></Package></RateV3Response>
-
-#######################################################################
-#
-# _calculateInsurance edge case
-#
-#######################################################################
-$cart->empty;
-$bible->addToCart($bible->getCollateral('variantsJSON', 'variantId', $gospels));
-@shippableUnits = $driver->_getShippableUnits($cart);
-is(calculateInsurance($driver), 1, '_calculateInsurance: calculates insurance using the first bin');
-
 
