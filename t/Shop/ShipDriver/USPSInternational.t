@@ -25,7 +25,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPSInternational;
 
-plan tests => 34;
+plan tests => 37;
 
 #----------------------------------------------------------------------------
 # Init
@@ -340,7 +340,6 @@ SKIP: {
         },
         '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
     );
-
 }
 
 my $cost = $driver->_calculateFromXML(
@@ -576,6 +575,62 @@ SKIP: {
     $cost = eval { $driver->calculate($cart); };
     $e = Exception::Class->caught();
     isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate', "USPS returns error when package is too heavy for any service");
+
+}
+
+#######################################################################
+#
+# Insurance
+#
+#######################################################################
+
+SKIP: {
+
+    skip 'No userId for testing', 3 unless $hasRealUserId;
+
+
+    $cart->empty;
+    $properties              = $driver->get();
+    $properties->{shipType}  = '9';
+    $driver->update($properties);
+    $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
+
+    my $noInsuranceCost = $driver->calculate($cart);
+
+    $properties->{addInsurance} = 1;
+    $driver->update($properties);
+
+    @shippableUnits = $driver->_getShippableUnits($cart);
+    my $xml = $driver->buildXML($cart, @shippableUnits);
+    my $xmlData = XMLin($xml,
+        KeepRoot   => 1,
+        ForceArray => ['Package'],
+    );
+
+    cmp_deeply(
+        $xmlData,
+        {
+            IntlRateRequest => {
+                USERID => $userId,
+                Package => [
+                    {
+                        ID => 0,
+                        Pounds      => '12',       Ounces          => '0.0',
+                        Machinable  => 'true',     Country         => 'Netherlands',
+                        MailType    => 'Package',  ValueOfContents => '19.99',
+                    },
+                ],
+            }
+        },
+        'buildXML: 1 item in cart'
+    );
+    like($xml, qr/IntlRateRequest USERID.+?Package ID=.+?Pounds.+?Ounces.+?Machinable.+?MailType.+?ValueOfContents.+?Country.+?/, '... and tag order');
+
+    my $insuredCost = $driver->calculate($cart);
+    cmp_ok $noInsuranceCost, '<', $insuredCost, 'insured cost is higher than uninsured cost';
+
+    $properties->{addInsurance} = 0;
+    $driver->update($properties);
 
 }
 

@@ -59,21 +59,26 @@ sub buildXML {
         next PACKAGE unless scalar @{ $package };
         tie my %packageData, 'Tie::IxHash';
         my $weight = 0;
+        my $value  = 0;
         foreach my $item (@{ $package }) {
             my $sku = $item->getSku;
             my $itemWeight = $sku->getWeight();
+            my $itemValue  = $sku->getPrice();
             ##Items that ship separately with a quantity > 1 are rate estimated as 1 item and then the
             ##shipping cost is multiplied by the quantity.
             if (! $sku->shipsSeparately ) {
                 $itemWeight *= $item->get('quantity');
+                $itemValue  *= $item->get('quantity');
             }
             $weight += $itemWeight;
+            $value  += $itemValue;
         }
         my $pounds = int($weight);
         my $ounces = sprintf '%3.1f', (16 * ($weight - $pounds));
         if ($pounds == 0 && $ounces eq '0.0' ) {
             $ounces = 0.1;
         }
+        $value = sprintf '%.2f', $value;
         my $destination = $package->[0]->getShippingAddress;
         my $country     = $destination->get('country');
         $packageData{ID}         = $packageIndex;
@@ -81,6 +86,9 @@ sub buildXML {
         $packageData{Ounces}     = [ $ounces   ];
         $packageData{Machinable} = [ 'true'    ];
         $packageData{MailType}   = [ 'Package' ];
+        if ($self->get('addInsurance')) {
+            $packageData{ValueOfContents} = [ $value ];
+        }
         $packageData{Country}    = [ $country  ];
         push @{ $xmlTop->{Package} }, \%packageData;
     }
@@ -138,6 +146,7 @@ sub calculate {
         WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Problem connecting to USPS Web Tools: '. $response->status_line);
     }
     my $returnedXML = $response->content;
+    #warn $returnedXML;
     my $xmlData     = XMLin($returnedXML, KeepRoot => 1, ForceArray => [qw/Package/]);
     if (exists $xmlData->{Error}) {
         WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Problem with USPS Web Tools XML: '. $xmlData->{Error}->{Description});
@@ -194,6 +203,12 @@ sub _calculateFromXML {
         SERVICE: foreach my $service (@{ $package->{Service} }) {
             next SERVICE unless $service->{ID} eq $self->get('shipType');
             $rate = $service->{Postage};
+            if ($self->get('addInsurance')) {
+                if (exists $service->{InsComment}) {
+                    WebGUI::Error::Shop::RemoteShippingRate->throw(error => "No insurance because of: ".$service->{InsComment});
+                }
+                $rate += $service->{Insurance};
+            }
         }
         if (!$rate) {
             WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Selected shipping service not available');
