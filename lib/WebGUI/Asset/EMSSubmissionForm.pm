@@ -385,19 +385,6 @@ sub getFormDescription {
 }
 
 #-------------------------------------------------------------------
-=head2 getQueueUrl
-
-returns the URL for the submission queue page with the submisison id in the hash part
-
-=cut
-
-sub getQueueUrl {
-    my $self = shift;
-    return $self->ems->getUrl('func=viewSubmissionQueue#' . $self->getId );
-}
-
-
-#-------------------------------------------------------------------
 
 =head2 getQueueUrl
 

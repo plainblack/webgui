@@ -38,7 +38,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 52;        # Increment this number for each test you create
+plan tests => 49;        # Increment this number for each test you create
 
 (my $submitGroupA = WebGUI::Group->new($session,'new'))->name('groupA');
 (my $submitGroupB = WebGUI::Group->new($session,'new'))->name('groupB');
@@ -68,13 +68,6 @@ sub logout     { $session->user({userId => 1}); }
 
 #----------------------------------------------------------------------------
 # put your tests here
-eval {
-my $use = use_ok( 'WebGUI::Asset::EMSSubmissionForm' )
-       && use_ok( 'WebGUI::Asset::EMSSubmission' )
-       && use_ok( 'WebGUI::Workflow::Activity::CleanupEMSSubmissions' )
-       && use_ok( 'WebGUI::Workflow::Activity::ProcessEMSApprovals' );
-
-SKIP: { skip 'package compile failed!', 1 unless $use;
 
 loginAdmin;
 
@@ -358,8 +351,11 @@ $sub1 = $sub1->cloneFromDb;
 is( $sub1->get('submissionStatus'),'created','approval successfull');
 
 my $ticket = WebGUI::Asset->newByDynamicClass($session, $sub1->get('ticketId'));
-isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
 WebGUI::Test->assetsToPurge( $ticket ) if $ticket ;
+SKIP: {
+skip 'no ticket created', 1 unless isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
+is( $ticket->get('title'), $sub1->get('title'), 'Ticket title matches submission title' );
+}
  
 my $newDate = time - ( 60 * 60 * 24 * ( $sub2->getParent->get('daysBeforeCleanup') + 1 ) ),
 $sub2->update({
@@ -500,10 +496,6 @@ $sub1->processForm;
 $sub1->getFormattedComments;
 
 } [], 'no warnings from calling a bunch of functions';
-
-} # end of use packages skip
-}; # end of eval
-print $@ if $@;
 
 #done_testing();
 #print 'press return to complete test' ; <>;
