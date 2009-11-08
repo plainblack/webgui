@@ -11,6 +11,7 @@ package WebGUI::Macro::NewMail;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Inbox;
 
 =head1 NAME
 
@@ -48,15 +49,13 @@ optional css class to assign to the hyperlink
 
 sub process {
     my $session = shift;
-    my @param   = @_;
-    my $class   = $param[0];
+    my $class   = $_[0];
     
-    my $db      = $session->db;
-    my $i18n    = WebGUI::International->new($session);
     my $count   = WebGUI::Inbox->new($session)->getUnreadMessageCount;
     my $output  = "";
     
     if($count > 0) {
+       my $i18n    = WebGUI::International->new($session);
        $output = sprintf($i18n->get("private message unread display message"),$count);
        $output = _createURL($session,$output,$class);
     }
@@ -64,6 +63,4 @@ sub process {
     return $output;
 }
 
-
 1;
-
