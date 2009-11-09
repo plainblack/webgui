@@ -787,7 +787,9 @@ sub setDataByQuery {
 =head2 setAlphabeticalKey ( string, abInitialOnly )
 
 Provide the paginator with a key of your data so it can display 
-alphabetic helpers in the "alt" tag of the page links.
+alphabetic helpers in the "alt" tag of the page links.  This only works well
+when _all_ the data is provided to the Paginator.  This means that the
+setDataByQuery and setDataByCallback methods cannot use this.
 
 =head3 keyName
 
