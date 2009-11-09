@@ -2,6 +2,7 @@
  - fixed #11134: Tree Navigation menu colapses sub items of current page
  - fixed #11203: Manage groups in group: everyone added on save
  - fixed #11209: Form::HTMLArea uses invalid javascript identifier
+ - fixed #11186: Template Attachments i18n
 
 7.7.25
  - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.

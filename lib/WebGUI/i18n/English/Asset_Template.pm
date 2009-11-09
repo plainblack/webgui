@@ -379,6 +379,17 @@ Any scratch variables will be available in the template with this syntax:<br/>
         message     => q|Template in clipboard|,
         lastUpdated => 0,
     },
+
+    'Already attached!' => {
+        message     => q|Already attached!|,
+        lastUpdated => 0,
+    },
+
+    'No url!' => {
+        message     => q|No url!|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
