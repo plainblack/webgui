@@ -206,6 +206,7 @@ my $dbLinkParams = {
                    };
 
 $dbLink = WebGUI::DatabaseLink->create($session, $dbLinkParams);
+addToCleanup($dbLink);
 $dbLinkParams->{databaseLinkId} = ignore();
 
 cmp_deeply(
@@ -282,9 +283,3 @@ cmp_deeply($dbs, $dbsAfter, 'delete cleaned up all temporarily created DatabaseL
 # delete
 #
 ####################################################
-
-END {
-    foreach my $link ($dbLink, $wgDbLink) {
-        $link->delete if (defined $link and ref $link eq 'WebGUI::DatabaseLink');
-    }
-}

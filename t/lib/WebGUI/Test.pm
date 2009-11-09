@@ -112,6 +112,7 @@ sub import {
             Transactions        => 'transaction',
             'Transaction Items' => 'transactionItem',
             'Ship Drivers'      => 'shipper',
+            'Database Links'    => 'databaseLink',
         );
         my %initCounts;
         for ( my $i = 0; $i < @checkCount; $i += 2) {
@@ -768,6 +769,7 @@ were passed in.  Currently able to destroy:
     WebGUI::Shop::Cart
     WebGUI::Shop::ShipDriver
     WebGUI::Shop::Transaction
+    WebGUI::DatabaseLink
 
 Example call:
 
@@ -809,6 +811,11 @@ Example call:
             die "Refusing to clean up vital user @{[ $user->username ]}!\n"
                 if any { $userId eq $_ } (1, 3);
         },
+        'WebGUI::DatabaseLink' => sub {
+            my $db_link = shift;
+            die "Refusing to clean up database link @{[ $db_link->get('title') ]}!\n"
+                if $db_link->getId eq '0';
+        },
         'WebGUI::Group' => sub {
             my $group = shift;
             die "Refusing to clean up vital group @{[ $group->name ]}!\n"
@@ -842,6 +849,7 @@ Example call:
         'WebGUI::Asset'             => 'purge',
         'WebGUI::VersionTag'        => 'rollback',
         'WebGUI::Workflow'          => 'delete',
+        'WebGUI::DatabaseLink'      => 'delete',
         'WebGUI::Shop::Transaction' => 'delete',
         'WebGUI::Shop::ShipDriver'  => 'delete',
         'WebGUI::Shop::Cart'        => sub {
