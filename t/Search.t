@@ -71,10 +71,10 @@ ok(! $search->_isStopword('private.+'),      '_isStopword: regex metacharacters 
     WebGUI::Test->tagsToRollback($tag);
     WebGUI::Search::Index->create( $article );
     my $searcher = WebGUI::Search->new($session);
-    my $assetIds = $searcher->search({ keywords => "甲", })->getAssetIds;
+    my $assetIds = $searcher->search({ keywords => "Chinese", })->getAssetIds;
     cmp_deeply( $assetIds, [ $article->getId ], 'basic test for search works');
     my $searcher = WebGUI::Search->new($session);
-    my $assetIds = $searcher->search({ keywords => "Chinese", })->getAssetIds;
+    my $assetIds = $searcher->search({ keywords => "甲", })->getAssetIds;
     cmp_deeply( $assetIds, [ $article->getId ], 'ideograph search works');
 }
 
