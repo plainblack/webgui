@@ -118,10 +118,10 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets;
-
-++$numTests; ##For the allow macro access test;
-
+my $numTests = scalar @testSets
+             + 2
+             ;
+ 
 plan tests => $numTests;
 
 $WebGUIdbLink->set({allowMacroAccess=>0});
@@ -144,6 +144,15 @@ foreach my $testSet (@testSets) {
 # reset allowMacroAccess to original value
 $WebGUIdbLink->set({allowMacroAccess=>$originalMacroAccessValue});
 
+my $newLinkId = $WebGUIdbLink->copy;
+addToCleanup(WebGUI::DatabaseLink->new($session, $newLinkId));
+my $output = WebGUI::Macro::SQL::process(
+    $session,
+    q{show columns from testTable like 'zero'},
+    q{^0;},
+    $newLinkId,
+);
+is($output, 'zero', 'alternate linkId works');
 
 END {
 	$session->db->dbh->do('DROP TABLE testTable');
