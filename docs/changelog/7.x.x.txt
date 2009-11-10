@@ -6,6 +6,7 @@
  - fixed #11218: LDAPS does not create users automatically
  - fixed #11205: DataTable borked in IE
  - fixed #11215: Los Angeles cannot be default timezone
+ - fixed #11220: Map asset badly broken
 
 7.7.25
  - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
