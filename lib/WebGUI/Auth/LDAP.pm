@@ -64,7 +64,7 @@ sub _isValidLDAPUser {
     }
 
     # Create an LDAP object
-    if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
+    if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port,scheme=>$uri->scheme))) {
 
         # Bind as a proxy user to search for the user trying to login
         if($connection->{connectDn}) {
@@ -312,7 +312,7 @@ sub createAccountSave {
     }
     #Get connectDN from settings   
     my $uri = URI->new($connection->{ldapUrl});
-    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
+    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port,scheme=>$uri->scheme));
     my $auth;
     if($connection->{connectDn}) {
         $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});

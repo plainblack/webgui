@@ -5,6 +5,7 @@
  - fixed #11101: 7.6.35-7.7 upgrade leaves packages
  - fixed #11209: Form::HTMLArea uses invalid javascript identifier
  - fixed #11186: Template Attachments i18n
+ - fixed #11218: LDAPS does not create users automatically
 
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.
