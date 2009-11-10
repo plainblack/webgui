@@ -246,7 +246,7 @@ MBZK_LPVzqhb4TV4mMRTJg PBtmpl0000000000000088
             $data->{isDefault} = 1;
         }
         if (scalar keys %{ $data }) {
-            print "\n\t\tUpdating ".$asset->getTitle." ... ";
+            print "\n\t\tUpdating ".$asset->getTitle." ... " unless $quiet;
             $asset->update($data);
         }
     }
