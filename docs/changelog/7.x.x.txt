@@ -5,6 +5,7 @@
  - fixed #11186: Template Attachments i18n
  - fixed #11218: LDAPS does not create users automatically
  - fixed #11205: DataTable borked in IE
+ - fixed #11215: Los Angeles cannot be default timezone
 
 7.7.25
  - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.

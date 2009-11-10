@@ -24,7 +24,6 @@ use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Pluggable;
 
-
 =head1 NAME
 
 Package WebGUI::ProfileField
@@ -281,16 +280,22 @@ A WebGUI::User object reference to use instead of the currently logged in user.
 
 =head3 skipDefault
 
-If true, this causes the default value set up for the form field to be ignored.
+If true, this causes the default value set up for the form field to be ignored.  In choosing default,
+skipDefault has the highest priority.
 
 =head3 assignedValue
 
 If assignedValue is defined, it will be used to override the default value set up for the
-form.
+form.  assignedValue has the next highest priority.
 
 =head3 returnObject
 
 If true, it returns a WebGUI::Form object, instead of returning HTML.
+
+=head3 useFieldDefault
+
+If true, it uses the default setup for the ProfileField, instead of the user's default.  useFieldDefault
+has the lowest priority.
 
 =cut
 
@@ -299,20 +304,24 @@ If true, it returns a WebGUI::Form object, instead of returning HTML.
 # And refactor to not require all these arguments HERE but rather in the 
 # constructor or something...
 sub formField {
-    my $self          = shift;
-    my $session       = $self->session;
-    my $properties    = $self->formProperties(shift);
-    my $withWrapper   = shift;
-    my $u             = shift || $session->user;
-    my $skipDefault   = shift;
-    my $assignedValue = shift;
-    my $returnObject  = shift;
+    my $self             = shift;
+    my $session          = $self->session;
+    my $properties       = $self->formProperties(shift);
+    my $withWrapper      = shift;
+    my $u                = shift || $session->user;
+    my $skipDefault      = shift;
+    my $assignedValue    = shift;
+    my $returnObject     = shift;
+    my $useFieldDefault  = shift;
     
     if ($skipDefault) {
         $properties->{value} = undef;
     }
     elsif (defined $assignedValue) {
         $properties->{value} = $assignedValue;
+    }
+    elsif ($useFieldDefault) {
+        $properties->{value} = WebGUI::Operation::Shared::secureEval($session,$properties->{dataDefault});
     }
     else {
         # start with specified (or current) user's data.  previous data needed by some form types as well (file).

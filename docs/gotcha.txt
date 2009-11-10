@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.26
+--------------------------------------------------------------------
+
+     * Users, no matter if they are created via anonymous registration,
+       via the Admin Console Users screen, or via code, now always get
+       their default values from the Profile Fields instead of via
+       the Visitor account.  Previously, based on how the user was created,
+       they would get default values from different places.
+
 7.7.25
 --------------------------------------------------------------------
 
