@@ -468,8 +468,12 @@ ENDHTML
     # Select box to choose a map point
     tie my %selectPointOptions, 'Tie::IxHash', (
         ""      => '-- ' . $i18n->get('select a point'),
-        map { $_->{assetId} => $_->{title} } sort { $a->{title} cmp $b->{title} } @{$var->{mapPoints}},
     );
+    if ( $var->{mapPoints} ) {
+        for my $point ( sort { $a->{title} cmp $b->{title} } @{$var->{mapPoints}} ) {
+            $selectPointOptions{ $point->{assetId} } = $point->{title}; 
+        }
+    }
     $var->{ selectPoint }
         = WebGUI::Form::selectBox( $session, {
             extras      => q{onchange="WebGUI.Map.focusOn(this.options[this.selectedIndex].value);"},
