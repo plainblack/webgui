@@ -3,6 +3,7 @@
  - fixed #11203: Manage groups in group: everyone added on save
  - fixed #11209: Form::HTMLArea uses invalid javascript identifier
  - fixed #11186: Template Attachments i18n
+ - fixed #11218: LDAPS does not create users automatically
 
 7.7.25
  - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
