@@ -135,7 +135,7 @@ WebGUI.Form.DataTable
         /* If we set the focus now, something might (and sometimes does) set
          * it later in the event handling chain.  Let's defer the focus set
          * until this chain is finished. */
-        setTimeout(function() { obj.editor.focus() }, 0);
+        setTimeout(function() { obj.editor.focus(); }, 0);
     };
 
     /************************************************************************
@@ -475,7 +475,7 @@ WebGUI.Form.DataTable
             // Find the last indexed column
             var newIdx  = cols.length;
             // create a new column object
-            cols[newIdx] = new YAHOO.widget.Column;
+            cols[newIdx] = new YAHOO.widget.Column();
             // add it to the dialog box
             this.appendChild( createTableColumn(newIdx,cols) );
         };
@@ -526,13 +526,13 @@ WebGUI.Form.DataTable
                         fixedcenter : true
                     } );
                     dialog.setBody( this.i18n.get( "Form_DataTable", "save success" ) + "<br/>" );
-                    new YAHOO.widget.Button( {
+                    var button = new YAHOO.widget.Button( {
                         id          : "ok",
                         type        : "push",
                         label       : this.i18n.get( "Form_DataTable", "ok" ),
                         container   : dialog.body,
                         onclick     : {
-                            fn          : function () { this.destroy() },
+                            fn          : function () { this.destroy(); },
                             scope       : dialog
                         }
                     } );
@@ -544,13 +544,13 @@ WebGUI.Form.DataTable
                         fixedcenter : true
                     } );
                     dialog.setBody( this.i18n.get( "Form_DataTable", "save failure" ) + "<br/>" );
-                    new YAHOO.widget.Button( {
+                    var button = new YAHOO.widget.Button( {
                         id          : "ok",
                         type        : "push",
                         label       : this.i18n.get( "Form_DataTable", "ok" ),
                         container   : dialog.body,
                         onclick     : {
-                            fn          : function () { this.destroy() },
+                            fn          : function () { this.destroy(); },
                             scope       : dialog
                         }
                     } );
@@ -656,6 +656,6 @@ WebGUI.Form.DataTable
 
         this.dataTable.render();
         this.schemaDialog.cancel();
-    }
+    };
 
 };
