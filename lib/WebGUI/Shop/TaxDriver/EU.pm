@@ -16,7 +16,6 @@ package WebGUI::Shop::TaxDriver::EU;
 
 use strict;
 
-use SOAP::Lite;
 use WebGUI::Content::Account;
 use WebGUI::TabForm;
 use WebGUI::Utility qw{ isIn };

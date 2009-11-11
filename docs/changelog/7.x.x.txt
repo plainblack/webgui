@@ -1,5 +1,6 @@
 7.7.27
  - fixed #11134: Tree Navigation menu colapses sub items of current page, missing JS files added
+ - fixed #11222: testEnvironment.pl Missing Dependencies
 
 7.7.26
  - fixed #11134: Tree Navigation menu colapses sub items of current page
