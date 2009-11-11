@@ -442,11 +442,12 @@ TV.prototype = {
 				if (el.nodeType == 1) {
 					switch (el.tagName.toUpperCase()) {
 						case 'LI':
+                            var expanded = Dom.hasClass(el, 'expanded');
 							for (child = el.firstChild; child; child = child.nextSibling) {
 								if (child.nodeType == 3) {
 									text = Lang.trim(child.nodeValue);
 									if (text.length) {
-										node = new Widget.TextNode(text, parent, false);
+										node = new Widget.TextNode(text, parent, expanded);
 									}
 								} else {
 									switch (child.tagName.toUpperCase()) {
@@ -460,7 +461,7 @@ TV.prototype = {
 												href: child.href,
 												target:child.target,
 												title:child.title ||child.alt
-											},parent,false);
+											},parent,expanded);
 											break;
 										default:
 											node = new Widget.HTMLNode(child.parentNode.innerHTML, parent, false, true);
