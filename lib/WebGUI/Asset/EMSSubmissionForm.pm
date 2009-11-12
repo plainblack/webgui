@@ -142,7 +142,7 @@ sub definition {
         submissionDeadline => { 
             tab          => "properties",
             fieldType    => "Date",
-            defaultValue => '677496912', # far in the future...
+            defaultValue => time , # + ( 30 * 24 * 60 * 60 ) , # 30 days
             label        => $i18n->get("submission deadline label"),
             hoverHelp    => $i18n->get("submission deadline label help")
         },
@@ -251,7 +251,9 @@ sub www_editSubmissionForm {
 		           } ( @$res ) );
 		my $title =  $i18n->get('select form to edit') ;
 		my $content = '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
-		if( $session->form->get('asJson') ) {
+                if( $params->{asHashRef} ) {
+		    return { text => $content, title => $title, } ;
+		} elsif( $session->form->get('asJson') ) {
 		    $session->http->setMimeType( 'application/json' );
 		    return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
 		} else {
@@ -317,7 +319,9 @@ sub www_editSubmissionForm {
 	}
 	$newform->submit; 
         my $title = $assetId eq 'new' ? $i18n->get('new form') || 'new' : $asset->get('title');
-	if( $session->form->get('asJson') ) {
+	if( $params->{asHashRef} ) {
+              ; # not setting mimie type
+	} elsif( $session->form->get('asJson') ) {
 	    $session->http->setMimeType( 'application/json' );
 	} else {
 	    $session->http->setMimeType( 'text/html' );
@@ -329,7 +333,9 @@ sub www_editSubmissionForm {
 		      pageForm => $newform->print,
                   },$parent->get('eventSubmissionTemplateId'));
          WebGUI::Macro::process( $session, \$content );
-	if( $session->form->get('asJson') ) {
+	if( $params->{asHashRef} ) {
+	    return { text => $content, title => $title };
+	} elsif( $session->form->get('asJson') ) {
 	    return JSON->new->encode( { text => $content, title => $title, id => $assetId ne 'new' ? $assetId : 'new' . rand } );
 	} else {
 	    return $asset->ems->processStyle( $content );
@@ -501,7 +507,8 @@ calls www_editSubmission with assetId == new
 
 sub www_addSubmission {
     my $self = shift;
-    $self->www_editSubmission( { assetId => 'new' } );
+    my $params = shift || { };
+    $self->www_editSubmission( { assetId => 'new', %$params } );
 }
 
 #-------------------------------------------------------------------
@@ -533,7 +540,7 @@ calls WebGUI::Asset::EMSSubmission->editSubmission
 
 sub www_editSubmission {
     my $self             = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->insufficient() unless $self->canSubmit;
     return WebGUI::Asset::EMSSubmission->www_editSubmission($self,shift);
 }
 
@@ -547,7 +554,7 @@ validate and create a new submission
 
 sub www_editSubmissionSave {
         my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canSubmit;
         my $formParams = WebGUI::Asset::EMSSubmission->processForm($self);
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};

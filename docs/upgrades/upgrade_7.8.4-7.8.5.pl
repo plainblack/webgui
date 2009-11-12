@@ -83,6 +83,10 @@ sub addEMSSubmissionTables {
     my $db = $session->db;
 
     $db->write(<<ENDSQL);
+INSERT INTO incrementer (incrementerId,nextValue) VALUES ('submissionId',1);
+ENDSQL
+
+    $db->write(<<ENDSQL);
 CREATE TABLE EMSSubmissionForm (
     assetId CHAR(22) BINARY NOT NULL,
     revisionDate BIGINT NOT NULL,
@@ -145,11 +149,6 @@ ENDSQL
     $db->write(<<ENDSQL);
     ALTER TABLE EventManagementSystem
             ADD COLUMN submittedLocationsList MEDIUMTEXT;
-ENDSQL
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EventManagementSystem
-            ADD COLUMN nextSubmissionId INT;
 ENDSQL
 
     $db->write(<<ENDSQL);

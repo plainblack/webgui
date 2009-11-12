@@ -1904,7 +1904,7 @@ normal templates.|,
     },
 
     'new submission form' => {
-        message => q|New Submission Form|,
+        message => q|Manage Event Submissions|,
         lastUpdated => 1147050475,
         context => q|Label for the link to create a new submission form.|,
     },
@@ -1922,7 +1922,7 @@ normal templates.|,
     },
 
     'new submission' => {
-        message => q|New Submission|,
+        message => q|Submit an Event|,
         lastUpdated => 1147050475,
         context => q|Label for link to create a new submission for an event.|,
     },
@@ -2042,7 +2042,7 @@ normal templates.|,
     },
 
     'submitted location list help' => {
-        message => q|Enter a listy of location names here, one name on a line.  This list will be available on the event submission form in the location select box. If this field is filled in then only these locations will be available.|,
+        message => q|Enter a list of location names here, one name on a line.  This list will be available on the event submission form in the location select box. If this field is filled in then only these locations will be available.|,
         lastUpdated => 1147050475,
         context => q|This is help text for the submitted location list field.|,
     },

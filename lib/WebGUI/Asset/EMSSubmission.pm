@@ -449,7 +449,7 @@ sub www_editSubmission {
 	}
         $newform->submit;
 	my $title = $assetId eq 'new' ? $i18n_WG->get(99) : $asset->get('title');
-        my $content =  $asset->processStyle(
+        my $content = 
                $asset->processTemplate({
                       errors => $params->{errors} || [],
                       backUrl => $parent->getUrl,
@@ -457,14 +457,16 @@ sub www_editSubmission {
                       pageForm => $newform->print,
 		      commentForm => $self ? $self->getFormattedComments : '',
 		      commentFlag => $self ? 1 : 0 ,
-                  },$parent->getParent->get('eventSubmissionTemplateId')));
+                  },$parent->getParent->get('eventSubmissionTemplateId'));
 	   WebGUI::Macro::process( $session, \$content );
-    if( $session->form->get('asJson') ) {
+    if( $params->{asHashRef} ) {
+	return { text => $content, title => $title, };
+    } elsif( $session->form->get('asJson') ) {
         $session->http->setMimeType( 'application/json' );
 	return JSON->new->encode( { text => $content, title => $title, id => $assetId ne 'new' ? $assetId : 'new' . rand } );
     } else {
         $session->http->setMimeType( 'text/html' );
-        return $content;
+        return $asset->processStyle( $content );
     }
 }
 

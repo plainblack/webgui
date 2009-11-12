@@ -270,13 +270,6 @@ sub definition {
 			defaultValue 	        => '',
                         noFormPost              => 1,
 		},
-        nextSubmissionId => {
-            tab          => "properties",
-            fieldType    => "integer",
-            defaultValue => 1,
-            label        => $i18n->get("next submission id label"),
-            hoverHelp    => $i18n->get("next submission id label help")
-        },
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -461,9 +454,7 @@ get a sequence number for the submission id
 
 sub getNextSubmissionId {
     my $self = shift;
-    my ($submissionId) = $self->session->db->read('select nextSubmissionId from EventManagementSystem where assetId = ?', [ $self->getId ] )->array;
-    $self->update( { nextSubmissionId => ($submissionId + 1) } );
-    return $submissionId;
+    return $self->session->db->getNextId( 'SubmissionId' );
 }
 
 #-------------------------------------------------------------------
@@ -512,6 +503,37 @@ sub getSubmissionLocations {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getSubmissionForms
+
+returns a list of objects; one for each submission form related to this EMS
+
+this function is called twice in just a few lines of code so the results are cached
+to prevent extra hits to the database
+
+=cut
+
+sub getSubmissionForms {
+    my $self = shift;
+
+    return $self->{_submissionForms} if $self->{_submissionFormTime} > time;
+
+    $self->{_submissionForms} = $self->getLineage( ['children'], { returnObjects => 1,
+                 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+	    } );
+    $self->{_submissionFormTime} = time + 60;
+
+    return $self->{_submissionForms};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSubmissionStatus
+
+returns internationalized hash of submission status values or one internationalized name if a status is passed in
+
+=cut
+
 sub getSubmissionStatus {
     my $self  = shift;
     my $key   = shift;
@@ -724,7 +746,7 @@ sub view {
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
 		isRegistrationStaff				=> $self->isRegistrationStaff,
 		canEdit						=> $self->canEdit,
-		canSubmit			=> $self->canSubmit,
+		canSubmit			=> $self->canSubmit && ! $self->isRegistrationStaff,
 		hasSubmissions			=> $self->hasSubmissions,
 		hasSubmissionForms			=> $self->hasSubmissionForms,
 		lookupRegistrantUrl	=> $self->getUrl('func=lookupRegistrant'),
@@ -772,9 +794,7 @@ sub www_addSubmission {
     my $form;
 
     if( ! defined $formId ) {
-           my $res = $self->getLineage(['children'],{ returnObjects => 1,
-                 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
-             } );
+           my $res = $self->getSubmissionForms;
 	    my @new = map { $_->canSubmit ? $_ : () } ( @$res);
             if( scalar(@new) == 0 ) {
                 return $self->www_view;
@@ -2669,7 +2689,7 @@ sub www_viewSchedule {
 sub www_viewSubmissionQueue {
 	my $self             = shift;
         my $isRegistrationStaff = $self->isRegistrationStaff;
-        my $canSubmit = $self->canSubmit;
+        my $canSubmit = $self->canSubmit && ! $isRegistrationStaff;
         my $canEdit = $self->canEdit;
 	my $i18n = $self->i18n;
     return $self->session->privilege->insufficient() unless $canSubmit || $isRegistrationStaff;
@@ -2687,9 +2707,7 @@ sub www_viewSubmissionQueue {
 			linkUrl => $self->getUrl('func=viewSubmissionQueue#' . $_->getId . '_new' ),
 			ajaxUrl => $_->getUrl('func=addSubmission'),
 		} } (
-		       @{$self->getLineage( ['children'],{ returnObjects => 1,
-			     includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
-	                  } ) }
+		       @{$self->getSubmissionForms}
 		  );
 	my $params = {
 		  backUrl => $self->getUrl,
@@ -2707,9 +2725,26 @@ sub www_viewSubmissionQueue {
 		  addSubmissionFormAjaxUrl => $self->getUrl('func=addSubmissionForm'),
 		  addSubmissionAjaxUrl => $self->getUrl('func=addSubmission'),
 		  submissionFormUrls => \@submissionFormUrls,
-		  queueTabTitle   => $isRegistrationStaff ? $i18n->get('submission queue') : $i18n->get('my submissions'),
 	};
-	$params->{QueueTabData} = $self->processTemplate($params,$self->get('eventSubmissionQueueTemplateId'));
+        push( @{$params->{tabs}}, {
+	      title => $isRegistrationStaff ? $i18n->get('submission queue') : $i18n->get('my submissions'),
+	      text => $self->processTemplate($params,$self->get('eventSubmissionQueueTemplateId')),
+        } );
+        if( $isRegistrationStaff ) {
+	     for my $tabSource ( @{$self->getSubmissionForms} ) {
+	         push @{$params->{tabs}}, $tabSource->www_editSubmissionForm( { asHashRef => 1 } );
+	     }
+	     $params->{tabs}[0]{selected} = 1; # the submission queue tab
+        }
+        elsif( $canSubmit ) {
+	     for my $tabSource ( @{$self->getSubmissionForms} ) {
+		 next unless $tabSource->canSubmit;
+	         push @{$params->{tabs}}, $tabSource->www_addSubmission( { asHashRef => 1 } );
+	     }
+	     $params->{tabs}[$#{$params->{tabs}}]{selected} = 1;
+        }
+	my $tabid = 'tab01';
+	for my $tab ( @{$params->{tabs}} ) { $tab->{id} = $tabid ++; }
 
 	return $self->processStyle( 
                $self->processTemplate( $params, $self->get('eventSubmissionMainTemplateId')));
