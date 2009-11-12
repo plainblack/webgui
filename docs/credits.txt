@@ -33,6 +33,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Greg Fast / Brunswick
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
+                                     Tessa Harmon / Knowmad Technologies
                                      Chris Jackson
                                      Roy Johnson / Plain Black
                                      Bart Jol / ProcoliX
@@ -61,10 +62,11 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Tera Runde / Plain Black
                                      Steve Simms
                                      Ben Simpson
-                                     Andy Smith / SDH Consulting
+                                     Andrew Smith / SDH Consulting
                                      Alan Smithee
                                      Steve Swanson / Plain Black
                                      Jeff Szpak / Plain Black
+                                     Henry Tang / Long Term Results B.V.
                                      Sean Tu / WDI
                                      Vladimir Vitkovsky / WebGUI Worldwide
                                      Rogier Voogt / United Knowledge
@@ -76,7 +78,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Zhou Xiaopeng / WebGUI Worldwide
                                      Gerald Young
                                      Tabitha Zipperer / Plain Black
-                                     Henry Tang / Long Term Results B.V.
+                                     Rory Zweistra / Oqapi
 
 The following are people/companies who didn't directly contribute
 to WebGUI, but whose work has made WebGUI possible:
