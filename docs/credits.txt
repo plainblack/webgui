@@ -21,6 +21,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Flavio Curti
                                      John Dagitz / Plain Black
                                      Joeri de Bruin / Oqapi
+                                     David Delikat
                                      Michele Dell'Aquila / CSU
                                      Jeff Depons / Adaptive Dynamics
                                      Frank Dillon / Plain Black
