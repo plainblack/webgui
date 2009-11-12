@@ -14,6 +14,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Leendert Bottelberghs / United Knowledge
                                      Richard Caelius / 100 World
                                      Irving Carrion
+                                     N. Hao Ching / Plain Black
                                      Richard Clark
                                      Doug Collinge
                                      Misja Op de Coul / E-Wise
@@ -25,6 +26,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Frank Dillon / Plain Black
                                      Arne Dokken
                                      Patrick Donelan / SDH Consulting
+                                     Paul Driver / Plain Black
                                      Junying Du / Brunswick
                                      Ed Van Duinen / UNC
                                      Greg Fast / Brunswick
@@ -32,6 +34,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Andy Grundman
                                      Chris Jackson
                                      Roy Johnson / Plain Black
+                                     Bart Jol / ProcoliX
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / Oqapi
                                      Yung Han Khoe
@@ -47,6 +50,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Kaleb Murphy / Plain Black
                                      Chris Nehren / Plain Black
                                      Ernesto Hernández-Novich / itverx C.A.
+                                     Stephen Opal / Plain Black
                                      Tavis Parker / Plain Black
                                      Daniel Quinlan
                                      Jukka Raimovaara / Axxion Oy
@@ -56,11 +60,13 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Tera Runde / Plain Black
                                      Steve Simms
                                      Ben Simpson
+                                     Andy Smith / SDH Consulting
                                      Alan Smithee
                                      Steve Swanson / Plain Black
                                      Jeff Szpak / Plain Black
                                      Sean Tu / WDI
                                      Vladimir Vitkovsky / WebGUI Worldwide
+                                     Rogier Voogt / United Knowledge
                                      Jamie Vrbsky / Plain Black
                                      Arjan Widlak / United Knowledge
                                      Madsen Wikholm
