@@ -11,6 +11,7 @@
  - fixed #11215: Los Angeles cannot be default timezone
  - fixed #11220: Map asset badly broken
  - fixed #11222: testEnvironment.pl Missing Dependencies
+ - fixed #11226: New stylesheet (wg-base.css), new style templates (from the TWG)
 
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.
