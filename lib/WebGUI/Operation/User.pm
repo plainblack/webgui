@@ -626,27 +626,27 @@ sub www_editUser {
 	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
-	%tabs = (
-		"account"=> { label=>$i18n->get("account")},
-		"profile"=> { label=>$i18n->get("profile")},
-		"groups"=> { label=>$i18n->get('89')},
-		);
+    %tabs = (
+        "account"=> { label=>$i18n->get("account")},
+        "profile"=> { label=>$i18n->get("profile")},
+        "groups"=> { label=>$i18n->get('89')},
+    );
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	$tabform->formHeader({extras=>'autocomplete="off"'});	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
 	my $username = ($u->isVisitor && $uid ne "1") ? '' : $u->username;
-    	$tabform->hidden({name=>"op",value=>"editUserSave"});
-    	$tabform->hidden({name=>"uid",value=>$uid});
-    	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
-	$tabform->getTab("account")->readOnly(value=>$uid,label=>$i18n->get(378));
-    	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
-    	$tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
-    	$tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
-    	$tabform->getTab("account")->text(
-		-name=>"username",
-		-label=>$i18n->get(50),
-		-value=>$username
-		);
+    $tabform->hidden({name=>"op",value=>"editUserSave"});
+    $tabform->hidden({name=>"uid",value=>$uid});
+    $tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
+    $tabform->getTab("account")->readOnly(value=>$uid,label=>$i18n->get(378));
+    $tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
+    $tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
+    $tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
+    $tabform->getTab("account")->text(
+        -name=>"username",
+        -label=>$i18n->get(50),
+        -value=>$username
+    );
 	my %status;
 	tie %status, 'Tie::IxHash';
 	%status = (
@@ -659,7 +659,8 @@ sub www_editUser {
 			-name => "status",
 			-value => $u->status
 			);
-	} else {
+	}
+    else {
 		$tabform->getTab("account")->selectBox(
 			-name => "status",
 			-options => \%status,
@@ -676,7 +677,7 @@ sub www_editUser {
 		-options=>$options,
 		-label=>$i18n->get(164),
 		-value=>$u->authMethod,
-		);
+    );
 	foreach (@{$session->config->get("authMethods")}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,$u->userId);
         my $editUserForm = $authInstance->editUserForm;
@@ -690,9 +691,10 @@ sub www_editUser {
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
-			if ($field->getId eq "alias" && $u->isVisitor) {
-				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,undef,1));
-			} else {
+			if ($u->isVisitor) {
+				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,undef,undef,undef,undef,'useFormDefault'));
+			}
+            else {
 				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
 			}
 		}
@@ -777,7 +779,7 @@ sub www_editUserSave {
 	#
 	# Also verify that the posted username is not blank (we need a username)
 	#
-	
+
 	my $postedUsername = $session->form->process("username");
 	$postedUsername = WebGUI::HTML::filter($postedUsername, "all");
 
@@ -794,16 +796,15 @@ sub www_editUserSave {
 	   	$u->authMethod($session->form->process("authMethod"));
 	   	$u->status($session->form->process("status"));
 
-	   	# Loop through all of this users authentication methods
-	   	foreach (@{$session->config->get("authMethods")}) {
-
-	   		# Instantiate each auth object and call it's save method.  These methods are responsible for
-	   		# updating authentication information with values supplied by the www_editUser form.
-	      		my $authInstance = WebGUI::Operation::Auth::getInstance($session, $_, $actualUserId);
-	      		$authInstance->editUserFormSave();
-       		}
+        # Loop through all of this users authentication methods
+        foreach (@{$session->config->get("authMethods")}) {
+            # Instantiate each auth object and call it's save method.  These methods are responsible for
+            # updating authentication information with values supplied by the www_editUser form.
+                my $authInstance = WebGUI::Operation::Auth::getInstance($session, $_, $actualUserId);
+                $authInstance->editUserFormSave();
+        }
        		
-       		# Loop through all profile fields, and update them with new values.
+        # Loop through all profile fields, and update them with new values.
 		foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
 			next if $field->getId =~ /contentPositions/;
 			$u->profileField($field->getId,$field->formProcess($u));
