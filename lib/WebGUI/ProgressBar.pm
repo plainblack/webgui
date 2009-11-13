@@ -147,7 +147,8 @@ A message to be displayed in the status bar.
 
 sub update {
 	my $self    = shift;
-	my $message = shift; ##JS string escaping?
+	my $message = shift;
+    $message    =~ s/'/\\'/g; ##Encode single quotes for JSON;
     $self->session->log->preventDebugOutput;
     $self->{_counter} += 1;
     
