@@ -113,6 +113,7 @@ sub import {
             'Transaction Items' => 'transactionItem',
             'Ship Drivers'      => 'shipper',
             'Database Links'    => 'databaseLink',
+            'LDAP Links'        => 'ldapLink',
         );
         my %initCounts;
         for ( my $i = 0; $i < @checkCount; $i += 2) {
@@ -495,6 +496,27 @@ sub webguiBirthday {
 
 #----------------------------------------------------------------------------
 
+=head2 getSmokeLDAPProps ( )
+
+Returns a hashref of properties for connecting to smoke's LDAP server.
+
+=cut
+
+sub getSmokeLDAPProps {
+    my $ldapProps   = {
+        ldapLinkName    => "Test LDAP Link",
+        ldapUrl         => "ldaps://smoke.plainblack.com/ou=Convicts,o=shawshank", # Always test ldaps
+        connectDn       => "cn=Samuel Norton,ou=Warden,o=shawshank",
+        identifier      => "gooey",
+        ldapUserRDN     => "dn",
+        ldapIdentity    => "cn",
+        ldapLinkId      => sprintf( '%022s', "testlink" ),
+    };
+    return $ldapProps;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 prepareMailServer ( )
 
 Prepare a Net::SMTP::Server to use for testing mail.
@@ -770,6 +792,7 @@ were passed in.  Currently able to destroy:
     WebGUI::Shop::ShipDriver
     WebGUI::Shop::Transaction
     WebGUI::DatabaseLink
+    WebGUI::LDAPLink
 
 Example call:
 
@@ -862,6 +885,10 @@ Example call:
             my $session = shift;
             $session->var->end;
             $session->close;
+        },
+        'WebGUI::LDAPLink'         => sub {
+            my $link = shift;
+            $link->session->db->write("delete from ldapLink where ldapLinkId=?", [$link->{ldapLinkId}]);
         },
     );
 
