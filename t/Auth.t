@@ -33,7 +33,7 @@ my ($request, $oldRequest, $output);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 2;        # Increment this number for each test you create
+plan tests => 3;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test createAccountSave and returnUrl together
@@ -71,12 +71,14 @@ $session->{_request} = $request;
 $auth           = WebGUI::Auth->new( $session, $AUTH_METHOD, 3 );
 my $username    = $session->id->generate;
 push @cleanupUsernames, $username;
+$session->setting->set('showMessageOnLogin', 0);
 $output         = $auth->login; 
 
 is(
     $session->http->getRedirectLocation, 'REDIRECT_LOGIN_URL',
     "returnUrl field is used to set redirect after login",
 );
+is $output, undef, 'login returns undef when showMessageOnLogin is false';
 
 # Session Cleanup
 $session->{_request} = $oldRequest;
