@@ -343,10 +343,22 @@ our $I18N = {
 		context => q|To skip, to move over, to not process|
 	},
 
+	'Processing form data' => {
+		message => q|Processing form data|,
+		lastUpdated => 1245343280,
+		context => q|To edit or change|
+	},
+
 	'editing %s' => {
 		message => q|editing %s|,
 		lastUpdated => 1245343280,
 		context => q|To edit or change|
+	},
+
+	'Attempting to commit changes' => {
+		message => q|Attempting to commit changes|,
+		lastUpdated => 1245343280,
+		context => q||,
 	},
 
 	'this asset only' => {
