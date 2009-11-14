@@ -15,6 +15,7 @@
  - fixed #11216: LDAP Connections status incorrect
  - fixed #11229: ProgressBar throws errors on some messages.
  - fixed #11217: LDAP authentication fails if user DN changes
+ - fixed #11228: Gallery image upload to other users folder permission denied
 
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.

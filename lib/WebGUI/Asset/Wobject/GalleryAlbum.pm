@@ -306,10 +306,7 @@ sub canEdit {
     my $form        = $self->session->form;
 
     # Handle adding a photo
-    if ( $form->get("func") eq "add" ) {
-        return $self->canAddFile;
-    }
-    elsif ( $form->get("func") eq "editSave" && $form->get("className") eq __PACKAGE__ ) {
+    if ( $form->get("func") eq "add" || $form->get("func") eq "editSave" ) {
         return $self->canAddFile;
     }
     else {
