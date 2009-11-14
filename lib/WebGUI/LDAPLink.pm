@@ -49,8 +49,9 @@ These subroutines are available from this package:
 
 =head2 bind ( )
 
-Authenticates against the ldap server with the parameters stored in the class, returning a valid ldap connection, or 0 if a connection
-cannot be established
+Authenticates against the ldap server with the parameters stored in the
+class, returning a valid ldap connection, or 0 if a connection cannot
+be established
 
 =cut
 
