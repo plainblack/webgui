@@ -14,6 +14,7 @@
  - fixed #11226: New stylesheet (wg-base.css), new style templates (from the TWG)
  - fixed #11216: LDAP Connections status incorrect
  - fixed #11229: ProgressBar throws errors on some messages.
+ - fixed #11217: LDAP authentication fails if user DN changes
 
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.
