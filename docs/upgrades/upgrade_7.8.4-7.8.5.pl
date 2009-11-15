@@ -33,7 +33,7 @@ fixPackageFlagOnOlder( $session );
 addEMSSubmissionTables($session);
 configEMSActivities($session);
 removeOldWebGUICSS($session);
-
+addUSPSInternationalShippingDriver( $session );
 
 # upgrade functions go here
 
@@ -173,6 +173,14 @@ ENDSQL
     print "DONE!\n" unless $quiet;
 }
 
+
+sub addUSPSInternationalShippingDriver {
+    my $session = shift;
+    print "\tAdd the USPS International shipping driver... " unless $quiet;
+    # and here's our code
+    $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::USPSInternational');
+    print "DONE!\n" unless $quiet;
+}
 
 sub fixPackageFlagOnOlder {
     my $session = shift;
