@@ -20,7 +20,9 @@ use WebGUI::Form::File;
 use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 use Data::Dumper;
+use WebGUI::Asset::Wobject::Thingy::ThingRecord;
 
+my $THING_RECORD_CLASS = 'WebGUI::Asset::Wobject::Thingy::ThingRecord';
 
 #-------------------------------------------------------------------
 
@@ -132,12 +134,13 @@ sub addThing {
 
     $db->write("create table ".$db->dbh->quote_identifier("Thingy_".$newThingId)."(
         thingDataId CHAR(22) binary not null,
-        dateCreated int not null,
+        dateCreated datetime not null,
         createdById CHAR(22) not null,
         updatedById CHAR(22) not null,
         updatedByName CHAR(255) not null,
-        lastUpdated int not null,
+        lastUpdated datetime not null,
         ipAddress CHAR(255),
+        sequenceNumber int,
         primary key (thingDataId)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8");
     
@@ -480,7 +483,8 @@ sub deleteThingData {
         $self->triggerWorkflow($onDeleteWorkflowId, $thingId,$thingDataId);
     }
 
-    $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
+    my $thingRecord = $THING_RECORD_CLASS->new($self->session,$thingDataId,$thingId);
+    $thingRecord->delete;
 
     return undef;
 }
@@ -542,23 +546,18 @@ sub editThingDataSave {
     my $session = $self->session;
     my (%thingData,$fields,@errors,$hadErrors,$newThingDataId);
     my $i18n = WebGUI::International->new($session, 'Asset_Thingy');
-    
+
+=cut    
     if ($thingDataId eq "new"){
         $thingData{dateCreated} = time();
         $thingData{createdById} = $session->user->userId;
         $thingData{ipAddress} = $session->env->getIp;
     }
-    else {
+=cut
+    unless ($thingDataId eq "new") {
         %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
             ." where thingDataId = ?",[$thingDataId]);
     }
-
-    %thingData = ( %thingData, 
-        thingDataId=>$thingDataId,
-        updatedById=>$session->user->userId,
-        updatedByName=>$session->user->username,
-        lastUpDated=>time(),
-    );
     
     $fields = $session->db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber',
         [$self->get("assetId"),$thingId]);
@@ -592,16 +591,24 @@ sub editThingDataSave {
         $thingData{$fieldName} = $fieldValue;
     }
 
-    $newThingDataId = $self->setCollateral("Thingy_".$thingId,"thingDataId",\%thingData,0,0);
+    #$newThingDataId = $self->setCollateral("Thingy_".$thingId,"thingDataId",\%thingData,0,0);
 
     # trigger workflow
+    my $thingRecord;
     if($thingDataId eq "new"){
+        #$self->session->errorHandler->info('creating thing record, thingId: '.$thingId);
+        $thingRecord = $THING_RECORD_CLASS->create($session,$thingId,\%thingData); 
         my ($onAddWorkflowId) = $session->db->quickArray("select onAddWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
         if ($onAddWorkflowId){
             $self->triggerWorkflow($onAddWorkflowId,$thingId,$newThingDataId);
         }
-    }else{
+    }
+    else{
+        $thingRecord = $THING_RECORD_CLASS->new($session,$thingDataId,$thingId);
+        #$self->session->errorHandler->info('updating properties');
+        $thingRecord->update(\%thingData);
+        #$self->session->errorHandler->info('properties updated');
         my ($onEditWorkflowId) = $session->db->quickArray("select onEditWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
         if ($onEditWorkflowId){
@@ -609,7 +616,7 @@ sub editThingDataSave {
         }
     }
 
-    return($newThingDataId,\@errors);	
+    return($thingRecord->getId,\@errors);	
 }
 
 #-------------------------------------------------------------------
@@ -1146,12 +1153,17 @@ If a tmpl var hashref is supplied tmpl_var's will be appended to that.
 sub getViewThingVars {
     my ($self, $thingId, $thingDataId,$var) = @_;
     my $db = $self->session->db;
-    my (@field_loop, @viewScreenTitleFields, $viewScreenTitle);
+    my (@field_loop, @viewScreenTitleFields, $viewScreenTitle, %thingData);
 
     return undef unless ($thingId && $thingDataId);
-    
-    my %thingData = $db->quickHash("select * from ".$db->dbh->quote_identifier("Thingy_".$thingId)
-        ." where thingDataId = ?",[$thingDataId]);
+
+    my $thingRecord = $THING_RECORD_CLASS->new($self->session,$thingDataId,$thingId);    
+    if (defined $thingRecord){
+        %thingData   = %{$thingRecord->get};
+    }
+    else{
+        return undef;
+    }
 
     if (%thingData) {
         my $fields = $db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber',
