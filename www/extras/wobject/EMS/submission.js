@@ -182,7 +182,7 @@ WebGUI.EMS = function (configs) {
 				    WebGUI.EMS.i18n.get('Asset_EventManagementSystem','close tab') + '" /></span>',
 			     contentEl: myContent
 			 });
-		       initHoverHelp( myTab );
+		       // initHoverHelp( myTab );
 		       WebGUI.EMS.tabs.addTab( myTab );
 		       var index = WebGUI.EMS.tabs.getTabIndex(myTab);
 		       YAHOO.util.Event.on(myTab.getElementsByClassName('close')[0], 'click', WebGUI.EMS.closeTab , myTab);

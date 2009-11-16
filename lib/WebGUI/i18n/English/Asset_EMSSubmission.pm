@@ -12,7 +12,7 @@ our $I18N = { ##hashref of hashes
 	'send email label' => {
 		message => q|Send Email when Submission Editted|,
 		lastUpdated => 1131394072,
-		context => q|This is the lable for the flag for setting the option to send email to the owner when the submission is eddited.|
+		context => q|This is the lable for the flag for setting the option to send email to the owner when the submission is edited.|
 	},
 	'send email label help' => {
 		message => q|Check this box if you would like to recieve email for all changes made to your submission|,

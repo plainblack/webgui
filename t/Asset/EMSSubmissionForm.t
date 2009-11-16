@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Test::Warn;
+use HTML::Form;
 use JSON;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::Activity;
@@ -96,7 +97,7 @@ my $ems = $node->addChild({
 });
 # I scooped this out ot WG::Asset::Wobject::EventManagementSystem
 # its not pretty, but there is no other way to add a meta field
-        $ems->setCollateral("EMSEventMetaField", "fieldId",{
+my $mf1Id = $ems->setCollateral("EMSEventMetaField", "fieldId",{
                 fieldId=> 'new',
                 label => 'mfRequiredUrl',
                 dataType => 'url',
@@ -106,7 +107,7 @@ my $ems = $node->addChild({
                 defaultValues => '',
         },1,1);
 
-        $ems->setCollateral("EMSEventMetaField", "fieldId",{
+my $mf2Id = $ems->setCollateral("EMSEventMetaField", "fieldId",{
                 fieldId=> 'new',
                 label => 'mfDate',
                 dataType => 'date',
@@ -243,10 +244,10 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           records => [
                          {
                            lastReplyDate => '',
-                           submissionId => '3',
+                           submissionId => $sub1->get('submissionId'),
                            creationDate => ignore(),
                            createdBy => 'userA',
-                           url => '/test-ems?func=viewSubmissionQueue#3',
+                           url => ignore(),
                            submissionStatus => $i18n->get('pending'),
                            title => 'my favorite thing to talk about',
                            lastReplyBy => ''
@@ -257,10 +258,10 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           dir => 'DESC',
 }, 'test getAllSubmissions for UserA' );
 
-$session->request->setup_body({submissionId => 3});
+$session->request->setup_body({submissionId => $sub1->get('submissionId')});
 cmp_deeply( from_json($ems->www_getSubmissionById), {
-    title => 3,
-    id => 3,
+    title => $sub1->get('submissionId'),
+    id => $sub1->get('submissionId'),
     text => ignore(),
 }, 'test getSubmissionById');
 
@@ -283,20 +284,20 @@ cmp_deeply( from_json($ems->www_getAllSubmissions), {
           records => [
                          {
                            lastReplyDate => '',
-                           submissionId => '4',
+                           submissionId => $sub2->get('submissionId'),
                            creationDate => ignore(),
                            createdBy => 'userB',
-                           url => '/test-ems?func=viewSubmissionQueue#4',
+                           url => ignore(),
                            submissionStatus => $i18n->get('pending'),
                            title => 'why i like to be important',
                            lastReplyBy => ''
                          },
                          {
                            lastReplyDate => '',
-                           submissionId => '3',
+                           submissionId => $sub1->get('submissionId'),
                            creationDate => ignore(),
                            createdBy => 'userA',
-                           url => '/test-ems?func=viewSubmissionQueue#3',
+                           url => ignore(),
                            submissionStatus => $i18n->get('pending'),
                            title => 'my favorite thing to talk about',
                            lastReplyBy => ''
@@ -380,13 +381,12 @@ is( $sub2, undef, 'submission deleted');
 
 $versionTag->commit;
 
-SKIP: { skip 'requires HTML::Form', 2 unless use_ok 'HTML::Form';
-# this is not the greatest testm but it does run through the basic create submissionForm code.
+# this is not the greatest test but it does run through the basic create submissionForm code.
 loginRgstr;
 
 my %settings = (
     assetId => 'new',
-    fieldNames => 'title description startDate duration seatsAvailable location nzymEeuHPQIsgXY0hZxDxA xlvMNwFi1FWwP0PrUAnxSQ',
+    fieldNames => "title description startDate duration seatsAvailable location $mf1Id $mf2Id",
     title => 'Untitled',
     menuTitle => 'Untitled',
     url => '',
@@ -401,23 +401,25 @@ my %settings = (
     duration_yesNo => 1,
     seatsAvailable_yesNo => 1,
     location_yesNo => 1,
-    nzymEeuHPQIsgXY0hZxDxA_yesNo => 1,
-    xlvMNwFi1FWwP0PrUAnxSQ_yesNo => 1,
+    $mf1Id . '_yesNo' => 1,
+    $mf2Id . '_yesNo' => 1,
 );
 
 my $expected = {
           'submissionDeadline' => '1991-06-21',
           'menuTitle' => 'Untitled',
-          'pastDeadlineMessage' => 'The deadline for this submission is past, no more submissions will be taken at this time.',
+          'pastDeadlineMessage' => $settings{pastDeadlineMessage},
           'formDescription' => {
                                  'location' => '1',
-                                 'nzymEeuHPQIsgXY0hZxDxA' => 'xlvMNwFi1FWwP0PrUAnxSQ',
+                                 $mf1Id => 1,
+                                 $mf2Id => 1,
                                  'seatsAvailable' => '1',
                                  'duration' => '1',
                                  'title' => '1',
                                  'startDate' => '1',
                                  'description' => '1',
 				 'submissionStatus' => '0',
+				  sendEmailOnChange => 1,
                                  '_fieldList' => [
                                                    'title',
                                                    'description',
@@ -425,7 +427,8 @@ my $expected = {
                                                    'duration',
                                                    'seatsAvailable',
                                                    'location',
-                                                   'nzymEeuHPQIsgXY0hZxDxA'
+                                                   $mf1Id,
+						   $mf2Id,
                                                  ]
                                },
           'description' => undef,
@@ -435,17 +438,21 @@ my $expected = {
           'assetId' => 'new',
           'url' => undef,
           'daysBeforeCleanup' => '7',
-          'title' => 'Untitled'
+          'title' => 'Untitled',
         } ;
 
 my $htmlText = $ems->www_addSubmissionForm;
 my $form = HTML::Form->parse($htmlText,'http://localhost/');
-for my $input ( $form->inputs ) {
-    $input->value($settings{$input->name})if exists $settings{$input->name};
+isnt( $form, undef, 'form created successfully' );
+my $result;
+SKIP: { skip 'failed to create form', 1 unless $form;
+    for my $input ( $form->inputs ) {
+        $input->value($settings{$input->name})if exists $settings{$input->name};
+    }
+    $session->request->setup_body( { $form->form } );
+    $result = WebGUI::Asset::EMSSubmissionForm->processForm($ems);
+    cmp_deeply( $result, $expected , 'test process form -- with data' );
 }
-$session->request->setup_body( { $form->form } );
-my $result = WebGUI::Asset::EMSSubmissionForm->processForm($ems);
-cmp_deeply( $result, $expected , 'test process form' );
 $expected = {
           'errors' => [
                         {
@@ -458,6 +465,7 @@ $expected = {
           'formDescription' => {
                                  '_fieldList' => [],
 				 'submissionStatus' => 0,
+				  sendEmailOnChange => 1,
                                },
           'description' => undef,
           '_isValid' => 0,
@@ -470,8 +478,7 @@ $expected = {
         };
 $session->request->setup_body( { } );
 $result = WebGUI::Asset::EMSSubmissionForm->processForm($ems);
-cmp_deeply( $result, $expected , 'test process form' );
-} # end of skip HTML::Form
+cmp_deeply( $result, $expected , 'test process form -- no data' );
 
 # these run code to see that it runs, but do not check for correctness
 

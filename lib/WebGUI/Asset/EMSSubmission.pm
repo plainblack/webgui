@@ -52,6 +52,21 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 addComment ( comment [, rating, user ] )
+
+send email when a comment is added
+
+=cut
+
+sub addComment {
+    my $self = shift;
+    $self->next::method(@_);
+    $self->sendEmailUpdate;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 addRevision
 
 This method exists for demonstration purposes only.  The superclass
@@ -341,7 +356,7 @@ sub sendEmailUpdate {
     my $session = $self->session;
     my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmission" );
     if( $self->get('sendEmailOnChange') ) {
-        WebGUI::Inbox->new($session)->addMessage( $session,{
+        WebGUI::Inbox->new($session)->addMessage( {
            status => 'unread',
 	   message => $i18n->get('your submission has been updated') . "\n\n" .
 	                 $self->get('title'),
@@ -366,7 +381,6 @@ ref to the EMSSubmissionForm that is parent to the new submission
 parameters for the submission
 
 =cut
-
 
 sub www_editSubmission {
         my $this             = shift;
@@ -396,11 +410,11 @@ sub www_editSubmission {
         $newform->hidden(name => 'assetId', value => $assetId);
 	my $formDescription = $parent->getFormDescription;
 	my @defs = reverse @{__PACKAGE__->definition($session)};
-        my @fieldNames = qw/title submissionStatus startDate duration seatsAvailable location description/;
+        my @fieldNames = qw/title submissionStatus sendEmailOnChange startDate duration seatsAvailable location description/;
         my $fields;
         for my $def ( @defs ) {
 	    my $properties = $def->{properties};
-	    for my $fieldName ( %$properties ) {
+	    for my $fieldName ( keys %$properties ) {
 		if( defined $formDescription->{$fieldName} ) {
 		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
 		      if( $fieldName eq 'description' ) {
@@ -448,10 +462,11 @@ sub www_editSubmission {
 	    }
 	}
         $newform->submit;
-	my $title = $assetId eq 'new' ? $i18n_WG->get(99) : $asset->get('title');
+	my $title = $assetId eq 'new' ? $i18n->get('new submission') : $asset->get('title');
         my $content = 
                $asset->processTemplate({
                       errors => $params->{errors} || [],
+                      isDynamic => $session->form->get('asJson') || 0,
                       backUrl => $parent->getUrl,
                       pageTitle => $title,
                       pageForm => $newform->print,
@@ -517,10 +532,10 @@ sub getEditForm {
 
     my $tabform = $self->SUPER::getEditForm;
 
-    my $comments        = $tabform->getTab( 'comments' );
-
-    #add the comments...
     # TODO once comments can be submitted using AJAX this will work...
+       # be sure to uncomment the tab in the next function also...
+    #my $comments        = $tabform->getTab( 'comments' );
+
 #    $comments->div({name => 'comments',
 #      contentCallback => sub { $self->getFormattedComments },
 #    });
@@ -543,7 +558,10 @@ sub getEditTabs {
         my $self = shift;
         my $i18n = WebGUI::International->new($self->session,"Asset_EMSSubmission");
         my $sku_i18n = WebGUI::International->new($self->session,"Asset_Sku");
-        return ($self->SUPER::getEditTabs(), ['shop', $sku_i18n->get('shop'), 9], ['comments', $i18n->get('comments'), 9]);
+        return ($self->SUPER::getEditTabs(), ['shop', $sku_i18n->get('shop'), 9],
+            # The comment tab is not available because comments are not AJAX yet...
+          # ['comments', $i18n->get('comments'), 9]
+          );
 }
 
 #-------------------------------------------------------------------
