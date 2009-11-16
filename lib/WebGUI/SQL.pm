@@ -484,7 +484,7 @@ The value to search for in the key column.
 
 sub deleteRow {
 	my ($self, $table, $key, $keyValue) = @_;
-	my $sth = $self->write("delete from $table where ".$key."=?", [$keyValue]);
+	my $sth = $self->write("delete from ".$self->dbh->quote_identifier($table)." where ".$key."=?", [$keyValue]);
 }
 
 
@@ -606,7 +606,7 @@ The value to search for in the key column.
 
 sub getRow {
         my ($self, $table, $key, $keyValue) = @_;
-        my $row = $self->quickHashRef("select * from $table where ".$key."=?",[$keyValue]);
+        my $row = $self->quickHashRef("select * from ".$self->dbh->quote_identifier($table)." where ".$key."=?",[$keyValue]);
         return $row;
 }
 
@@ -946,7 +946,8 @@ sub setRow {
 	my ($self, $table, $keyColumn, $data, $id) = @_;
 	if ($data->{$keyColumn} eq "new" || $id) {
 		$data->{$keyColumn} = $id || $self->session->id->generate();
-		$self->write("replace into $table (" . $self->dbh->quote_identifier($keyColumn) . ") values (?)",[$data->{$keyColumn}]);
+		$self->write("replace into ".$self->dbh->quote_identifier($table)
+            ." (" . $self->dbh->quote_identifier($keyColumn) . ") values (?)",[$data->{$keyColumn}]);
 	}
 	my @fields = ();
 	my @data = ();
@@ -958,7 +959,7 @@ sub setRow {
 	}
 	if ($fields[0] ne "") {
 		push(@data,$data->{$keyColumn});
-		$self->write("update $table set " . join(", ", @fields)
+		$self->write("update ".$self->dbh->quote_identifier($table)." set " . join(", ", @fields)
             . " where " . $self->dbh->quote_identifier($keyColumn) . "=?", \@data);
 	}
 	return $data->{$keyColumn};
