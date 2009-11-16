@@ -419,6 +419,7 @@ my $expected = {
                                  'startDate' => '1',
                                  'description' => '1',
 				 'submissionStatus' => '0',
+				  sendEmailOnChange => 1,
                                  '_fieldList' => [
                                                    'title',
                                                    'description',
@@ -437,7 +438,7 @@ my $expected = {
           'assetId' => 'new',
           'url' => undef,
           'daysBeforeCleanup' => '7',
-          'title' => 'Untitled'
+          'title' => 'Untitled',
         } ;
 
 my $htmlText = $ems->www_addSubmissionForm;
@@ -464,6 +465,7 @@ $expected = {
           'formDescription' => {
                                  '_fieldList' => [],
 				 'submissionStatus' => 0,
+				  sendEmailOnChange => 1,
                                },
           'description' => undef,
           '_isValid' => 0,
