@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 28; # increment this value for each test you create
+use Test::More tests => 32; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
@@ -82,6 +82,10 @@ my $isValidId = $session->id->valid($thingId);
 
 is($isValidId,1,"addThing returned a valid id: ".$thingId);
 
+# Test for a sane object type
+my $thing = WebGUI::Asset::Wobject::Thingy::Thing->new($session,$thingId);
+isa_ok($thing, 'WebGUI::Asset::Wobject::Thingy::Thing');
+
 my $thingTableName = "Thingy_".$thingId;
 
 my ($thingTableNameCheck) = $session->db->quickArray("show tables like ".$session->db->quote($thingTableName));
@@ -127,6 +131,9 @@ cmp_deeply(
             field_loop=>[],
             exportMetaData=>undef,
             maxEntriesPerUser=>undef,
+            dateCreated=>$thing->get('dateCreated'),
+            lastUpdated=>$thing->get('lastUpdated'),
+            sequenceNumber=>$thing->get('sequenceNumber'),
         },
         'Getting newly added thing as JSON: www_getThingViaAjax returns correct data as JSON.'
     );
@@ -137,9 +144,7 @@ cmp_deeply(
 $json = $thingy->www_getThingsViaAjax();
 $dataFromJSON = JSON->new->decode($json);
 
-cmp_deeply(
-        $dataFromJSON,
-        [{
+my $thingPropertiesHashRef = {            
             assetId=>$thingy->getId,
             thingId=>$thingId,
             label=>$i18n->get('assetName'),
@@ -170,10 +175,19 @@ cmp_deeply(
             canSearch=>1,
             exportMetaData=>undef,
             maxEntriesPerUser=>undef,
-        }],
+            dateCreated=>$thing->get('dateCreated'),
+            lastUpdated=>$thing->get('lastUpdated'),
+            sequenceNumber=>$thing->get('sequenceNumber'),
+        };
+
+cmp_deeply(
+        $dataFromJSON,
+        [$thingPropertiesHashRef
+        ],
         'Getting all things in Thingy as JSON: www_getThingsViaAjax returns correct data as JSON.'
     );
 
+    
 
 # Test adding a field
 
@@ -200,18 +214,62 @@ my ($fieldLabel, $columnType, $Null, $Key, $Default, $Extra) = $session->db->qui
 is($fieldLabel,"field_".$fieldId,"A column for the new field Field_$fieldId exists.");
 is($columnType,"longtext","The columns is the right type");
 
-# Test duplicating a Thing
+# Test export function
 
-my $copyThingId = $thingy->duplicateThing($thingId);
+my $exportData = $thingy->exportAssetData;
 
-$isValidId = $session->id->valid($copyThingId);
+delete $exportData->{properties};
+delete $exportData->{storage};
 
-ok($isValidId, "duplicating a Thing: duplicateThing returned a valid id: ".$copyThingId);
+my $thingDatabasePropertiesHashRef = $thingPropertiesHashRef;
+delete $thingDatabasePropertiesHashRef->{canAdd};
+delete $thingDatabasePropertiesHashRef->{canEdit};
+delete $thingDatabasePropertiesHashRef->{canSearch};
+
+my $field = $session->db->quickHashRef('select * from Thingy_fields where fieldId=?',[$fieldId]);
+
+cmp_deeply(
+        $exportData,
+        {
+            things=>[
+                $thingDatabasePropertiesHashRef
+            ],
+            fields=>[
+                $field
+            ]
+        },
+        'Export returns correct data.'
+    );
+
+
+# Test duplicating and deleting a Thing
+
+my $duplicateThingId = $thingy->duplicateThing($thingId);
+
+$isValidId = $session->id->valid($duplicateThingId);
+
+is($isValidId,1,"duplicating a Thing: duplicateThing returned a valid id: ".$duplicateThingId);
+
+my $duplicateThing = WebGUI::Asset::Wobject::Thingy::Thing->new($session, $duplicateThingId);
+if (defined $duplicateThing) {
+    $duplicateThing->delete;
+}
+
+my @things = @{ WebGUI::Asset::Wobject::Thingy::Thing->getAllIds($session,{constraints => [
+                    {"assetId=?" => $thingy->getId},
+                ]}) };
+is(scalar @things,1,'Duplicated thing was deleted succesfully');
+
+my ($thingTableCheck) = $session->db->quickArray("show tables like ?",['Thingy_'.$duplicateThingId]);
+
+is($thingTableCheck,undef,"New table for duplicate Thing was deleted.");
 
 # Test adding, editing, getting and deleting thing data
 
+is($thing->hasEnteredMaxPerUser,0,"hasEnteredMaxPerUser returns 0 before adding a record");
+
 my ($newThingDataId,$errors) = $thingy->editThingDataSave($thingId,'new',{"field_".$fieldId => 'test value'});
-ok( ! $thingy->hasEnteredMaxPerUser($thingId), 'hasEnteredMaxPerUser: returns false when maxEntriesPerUser=0 and 1 entry added');
+ok( ! $thing->hasEnteredMaxPerUser, 'hasEnteredMaxPerUser: returns false when maxEntriesPerUser=0 and 1 entry added');
 
 my $isValidThingDataId = $session->id->valid($newThingDataId);
 
@@ -314,11 +372,12 @@ cmp_deeply(
 my %otherThingProperties = %thingProperties;
 $otherThingProperties{maxEntriesPerUser} = 1;
 $otherThingProperties{editTemplateId   } = $templateId;
-my $otherThingId = $thingy->addThing(\%otherThingProperties, 0); 
+my $otherThingId = $thingy->addThing(\%otherThingProperties, 0);
+my $otherThing = WebGUI::Asset::Wobject::Thingy::Thing->new($session,$otherThingId); 
 my %otherFieldProperties = %fieldProperties;
 $otherFieldProperties{thingId} = $otherThingId;
 my $otherFieldId = $thingy->addField(\%otherFieldProperties, 0);
-ok( ! $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser: returns false with no data entered');
+ok( ! $otherThing->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser: returns false with no data entered');
 
 my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
 
@@ -340,7 +399,7 @@ my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
 }
 
 $thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'other test value'} );
-ok( $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser returns true with one row entered, and maxEntriesPerUser=1');
+ok( $otherThing->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser returns true with one row entered, and maxEntriesPerUser=1');
 
 {
     WebGUI::Test->mockAssetId($templateId, $templateMock);
@@ -363,7 +422,7 @@ ok( $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser returns 
 #
 #################################################################
 
-$thingy->deleteThing($otherThingId);
+$otherThing->delete;
 my $count;
 $count = $session->db->quickScalar('select count(*) from Thingy_things where thingId=?',[$otherThingId]);
 is($count, 0, 'deleteThing: clears thing from Thingy_things');
