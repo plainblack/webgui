@@ -412,7 +412,7 @@ cmp_deeply(
 
 SKIP: {
 
-    skip 'No userId for testing', 2 unless $hasRealUserId;
+    skip 'No userId for testing', 1 unless $hasRealUserId;
 
     my $response = $driver->_doXmlRequest($xml);
     ok($response->is_success, '_doXmlRequest to USPS successful for 2 items in cart');
