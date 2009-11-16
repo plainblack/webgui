@@ -32,7 +32,8 @@ my $session = start(); # this line required
 fixPackageFlagOnOlder( $session );
 addEMSSubmissionTables($session);
 configEMSActivities($session);
-
+removeOldWebGUICSS($session);
+addUSPSInternationalShippingDriver( $session );
 
 # upgrade functions go here
 
@@ -47,6 +48,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub removeOldWebGUICSS {
+    my $session = shift;
+    print "\tRemoving the old webgui.css file... " unless $quiet;
+    my $snippet = WebGUI::Asset->newByDynamicClass($session, 'PcRRPhh-0KfvLLNIPdxJTw');
+    if ($snippet) {
+        $snippet->purge;
+    }
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -159,6 +173,14 @@ ENDSQL
     print "DONE!\n" unless $quiet;
 }
 
+
+sub addUSPSInternationalShippingDriver {
+    my $session = shift;
+    print "\tAdd the USPS International shipping driver... " unless $quiet;
+    # and here's our code
+    $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::USPSInternational');
+    print "DONE!\n" unless $quiet;
+}
 
 sub fixPackageFlagOnOlder {
     my $session = shift;

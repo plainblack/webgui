@@ -740,6 +740,19 @@ sub update {
 
 #----------------------------------------------------------------------------
 
+=head2 validParent ( )
+
+Override validParent to only allow GalleryAlbums to hold GalleryFiles.
+
+=cut
+
+sub validParent {
+    my ($class, $session) = @_;
+    return $session->asset->isa('WebGUI::Asset::Wobject::GalleryAlbum');
+}
+
+#----------------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the container www_view method. 

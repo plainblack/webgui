@@ -14,24 +14,29 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Leendert Bottelberghs / United Knowledge
                                      Richard Caelius / 100 World
                                      Irving Carrion
+                                     N. Hao Ching / Plain Black
                                      Richard Clark
                                      Doug Collinge
                                      Misja Op de Coul / E-Wise
                                      Flavio Curti
                                      John Dagitz / Plain Black
                                      Joeri de Bruin / Oqapi
+                                     David Delikat
                                      Michele Dell'Aquila / CSU
                                      Jeff Depons / Adaptive Dynamics
                                      Frank Dillon / Plain Black
                                      Arne Dokken
                                      Patrick Donelan / SDH Consulting
+                                     Paul Driver / Plain Black
                                      Junying Du / Brunswick
                                      Ed Van Duinen / UNC
                                      Greg Fast / Brunswick
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
+                                     Tessa Harmon / Knowmad Technologies
                                      Chris Jackson
                                      Roy Johnson / Plain Black
+                                     Bart Jol / ProcoliX
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / Oqapi
                                      Yung Han Khoe
@@ -47,6 +52,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Kaleb Murphy / Plain Black
                                      Chris Nehren / Plain Black
                                      Ernesto Hernández-Novich / itverx C.A.
+                                     Stephen Opal / Plain Black
                                      Tavis Parker / Plain Black
                                      Daniel Quinlan
                                      Jukka Raimovaara / Axxion Oy
@@ -56,11 +62,14 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Tera Runde / Plain Black
                                      Steve Simms
                                      Ben Simpson
+                                     Andrew Smith / SDH Consulting
                                      Alan Smithee
                                      Steve Swanson / Plain Black
                                      Jeff Szpak / Plain Black
+                                     Henry Tang / Long Term Results B.V.
                                      Sean Tu / WDI
                                      Vladimir Vitkovsky / WebGUI Worldwide
+                                     Rogier Voogt / United Knowledge
                                      Jamie Vrbsky / Plain Black
                                      Arjan Widlak / United Knowledge
                                      Madsen Wikholm
@@ -69,7 +78,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Zhou Xiaopeng / WebGUI Worldwide
                                      Gerald Young
                                      Tabitha Zipperer / Plain Black
-                                     Henry Tang / Long Term Results B.V.
+                                     Rory Zweistra / Oqapi
 
 The following are people/companies who didn't directly contribute
 to WebGUI, but whose work has made WebGUI possible:

@@ -317,6 +317,8 @@ sub www_editBranchSave {
     my %data;
     my $pb      = WebGUI::ProgressBar->new($session);
     my $i18n    = WebGUI::International->new($session, 'Asset');
+    $pb->start($i18n->get('edit branch'), $session->url->extras('adminConsole/assets.gif'));
+    $pb->update($i18n->get('Processing form data'));
     $data{isHidden}      = $form->yesNo("isHidden")        if ($form->yesNo("change_isHidden"));
     $data{newWindow}     = $form->yesNo("newWindow")       if ($form->yesNo("change_newWindow"));
     $data{encryptPage}   = $form->yesNo("encryptPage")     if ($form->yesNo("change_encryptPage"));
@@ -353,7 +355,6 @@ sub www_editBranchSave {
         $urlBase   = $form->text("baseUrl");
         $endOfUrl  = $form->selectBox("endOfUrl");
     }
-    $pb->start($i18n->get('edit branch'), $session->url->extras('adminConsole/assets.gif'));
     my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1});	
     DESCENDANT: foreach my $descendant (@{$descendants}) {
         if ( !$descendant->canEdit ) {
@@ -401,6 +402,7 @@ sub www_editBranchSave {
             }
         }
     }
+    $pb->update(sprintf $i18n->get('Attempting to commit changes'));
     if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,

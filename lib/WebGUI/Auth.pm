@@ -701,8 +701,8 @@ Returns a hash reference with the user's authentication information.  This metho
 =cut
 
 sub getParams {
-	my $self = shift;
-	my $userId = $_[0] || $self->userId;
+	my $self       = shift;
+	my $userId     = $_[0] || $self->userId;
 	my $authMethod = $_[1] || $self->authMethod;
 	return $self->session->db->buildHashRef("select fieldName, fieldData from authentication where userId=".$self->session->db->quote($userId)." and authMethod=".$self->session->db->quote($authMethod));
 }
