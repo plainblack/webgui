@@ -112,21 +112,44 @@ The current WebGUI::Session object.
 
 sub handler {
 	my $session = shift;
+    my $form    = $session->form;
     unless ($session->setting->get("specialState") eq "init") {
         return undef;
     }
 	$session->http->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
     my ($output,$legend) = "";
-	if ($session->form->process("step") eq "2") {
+	if ($form->process("step") eq "2") {
 		$legend = $i18n->get('company information');
+
+        my $timezone = $form->timeZone("timeZone");
+        my $language = $form->selectBox("language");
+
+        ##update Admin and Visitor users
 		my $u = WebGUI::User->new($session,"3");
-		$u->username($session->form->process("username","text","Admin"));
-		$u->profileField("email",$session->form->email("email"));
-		$u->profileField("timeZone",$session->form->timeZone("timeZone"));
-		$u->identifier(Digest::MD5::md5_base64($session->form->process("identifier","password","123qwe")));
+		$u->username($form->process("username","text","Admin"));
+		$u->profileField("email",$form->email("email"));
+		$u->profileField("timeZone",$timezone);
+		$u->profileField("language",$language);
+		$u->identifier(Digest::MD5::md5_base64($form->process("identifier","password","123qwe")));
+
 		$u = WebGUI::User->new($session,"1");
-		$u->profileField("timeZone",$session->form->timeZone("timeZone"));
+		$u->profileField("timeZone",$timezone);
+		$u->profileField("language",$language);
+
+        ##update ProfileField defaults so new users the get the defaults, too
+        my $properties;
+
+        my $zoneField     = WebGUI::ProfileField->new($session, 'timeZone');
+        $properties       = $zoneField->get();
+        $properties->{dataDefault} = $timezone;
+        $zoneField->set($properties);
+
+        my $languageField = WebGUI::ProfileField->new($session, 'language');
+        $properties       = $languageField->get();
+        $properties->{dataDefault} = $language;
+        $languageField->set($properties);
+
 		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
 		$f->hidden( name=>"step", value=>"3");
 		$f->text(
@@ -516,9 +539,17 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 			-hoverHelp=>$i18n->get('56 description'),
 			);
 		$f->timeZone(
-			-name=>"timeZone",
-			-value=>$u->profileField("timeZone"),
-			-label=>$i18n->get('timezone','DateTime'),
+			-name      => "timeZone",
+			-value     => $u->profileField("timeZone"),
+			-label     => $i18n->get('timezone','DateTime'),
+			-hoverHelp => $i18n->get('timezone help'),
+			);
+		$f->selectBox(
+			-name      => "language",
+			-value     => $u->profileField("language"),
+			-label     => $i18n->get('304'),
+			-hoverHelp => $i18n->get('language help'),
+            -options   => $i18n->getLanguages(),
 			);
 		$f->submit;
 		$output .= $f->print; 

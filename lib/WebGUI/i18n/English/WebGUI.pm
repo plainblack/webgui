@@ -174,6 +174,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+	'language help' => {
+		message => q|Select the default language for users on the site.|,
+		lastUpdated => 1258340387,
+	},
+
 	'559' => {
 		message => q|On Create User (User)|,
 		lastUpdated => 1185738895
@@ -4647,6 +4652,11 @@ Users may override this setting in their profile.
 
     'Comments' => {
         message => 'Comments',
+        lastUpdated => 0,
+    },
+
+    'timezone help' => {
+        message => 'Set up the default time zone for the site.',
         lastUpdated => 0,
     },
 
