@@ -259,7 +259,7 @@ sub definition {
 			hoverHelp		=> $i18n->get('registration staff group help'),
 		},
 		submittedLocationsList => {
-			fieldType 		=> 'text',
+			fieldType 		=> 'textarea',
 			tab			=> 'properties',
 			defaultValue 	        => '',
 			label			=> $i18n->get('submitted location list label'),
@@ -499,7 +499,7 @@ sub getSubmissionLocations {
    my $self = shift;
    my $text = $self->get('submittedLocationsList');
    return undef if $text eq '';
-   return [ split( /\s+/, $text ) ];
+   return [ split( /[\s\n]+/, $text ) ];
 }
 
 #-------------------------------------------------------------------
@@ -659,7 +659,7 @@ A WebGUI::User object. Defaults to $session->user.
 sub isRegistrationStaff {
 	my $self = shift;
 	my $user = shift || $self->session->user;
-	$user->isInGroup($self->get('registrationStaffGroupId'));
+	$user->isInGroup($self->get('registrationStaffGroupId')) || $self->canEdit;
 }
 
 #-------------------------------------------------------------------
@@ -739,9 +739,11 @@ sub view {
 		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
 		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
-		addSubmissionUrl	=> $self->getUrl('func=viewSubmissionQueue#addSubmission'),
+		addSubmissionUrl	=> $self->getUrl('func=viewSubmissionQueue'),
+		# addSubmissionUrl	=> $self->getUrl('func=viewSubmissionQueue#addSubmission'),
 		viewSubmissionQueueUrl	=> $self->getUrl('func=viewSubmissionQueue'),
-		addSubmissionFormUrl	=> $self->getUrl('func=viewSubmissionQueue#addSubmissionForm'),
+		addSubmissionFormUrl	=> $self->getUrl('func=viewSubmissionQueue'),
+		# addSubmissionFormUrl	=> $self->getUrl('func=viewSubmissionQueue#addSubmissionForm'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
 		isRegistrationStaff				=> $self->isRegistrationStaff,
@@ -842,8 +844,9 @@ call www_editSubmissionForm with assetId == new
 =cut
 
 sub www_addSubmissionForm {
-    my $self = shift;
-    $self->www_editSubmissionForm( { assetId => 'new' } );
+    my $self = shift;  
+    my $params = shift || { };
+    $self->www_editSubmissionForm( { assetId => 'new', %$params } );
 }
 
 #-------------------------------------------------------------------
@@ -1068,7 +1071,7 @@ test and save data posted from editSubmissionForm...
 
 sub www_editSubmissionFormSave {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff;
+	return $self->session->privilege->insufficient() unless $self->isRegistrationStaff || $self->canEdit;
 	my $formParams = WebGUI::Asset::EMSSubmissionForm->processForm($self);
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};
@@ -2734,7 +2737,12 @@ sub www_viewSubmissionQueue {
 	     for my $tabSource ( @{$self->getSubmissionForms} ) {
 	         push @{$params->{tabs}}, $tabSource->www_editSubmissionForm( { asHashRef => 1 } );
 	     }
-	     $params->{tabs}[0]{selected} = 1; # the submission queue tab
+             if( scalar( @{$params->{tabs}} ) == 1 ) {  # there were no existing forms
+	         push @{$params->{tabs}}, $self->www_addSubmissionForm( { asHashRef => 1 } );
+		 $params->{tabs}[1]{selected} = 1; # the new submission form tab
+             } else {
+		 $params->{tabs}[0]{selected} = 1; # the submission queue tab
+             }
         }
         elsif( $canSubmit ) {
 	     for my $tabSource ( @{$self->getSubmissionForms} ) {

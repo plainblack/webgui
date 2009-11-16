@@ -142,7 +142,7 @@ sub definition {
         submissionDeadline => { 
             tab          => "properties",
             fieldType    => "Date",
-            defaultValue => time , # + ( 30 * 24 * 60 * 60 ) , # 30 days
+            defaultValue => time + ( 30 * 24 * 60 * 60 ) , # 30 days
             label        => $i18n->get("submission deadline label"),
             hoverHelp    => $i18n->get("submission deadline label help")
         },
@@ -308,7 +308,7 @@ sub www_editSubmissionForm {
 
 	my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : { };
         for my $fieldId ( @fieldNames ) {
-            next if $fieldId eq 'submissionStatus';
+            next if $fieldId =~ /^(submissionStatus|sendEmailOnChange)$/;
 	    my $field = $fields->{$fieldId};
 	    $newform->yesNo(
 	             label => $field->{label},
@@ -328,6 +328,7 @@ sub www_editSubmissionForm {
 	}
 	my $content = $asset->processTemplate({
 		      errors => $params->{errors} || [],
+                      isDynamic => $session->form->get('asJson') || 0,
                       backUrl => $parent->getUrl,
 		      pageTitle => $title,
 		      pageForm => $newform->print,
@@ -599,8 +600,9 @@ sub processForm {
     }
     my @fieldNames = split( ' ', $form->get('fieldNames') );
     $params->{formDescription} = { map { $_ => $form->get($_ . '_yesNo') } ( @fieldNames ) };
-    $params->{formDescription}{_fieldList} = [ map { $params->{formDescription}{$_} ? $_ : () } ( @fieldNames ) ];
     $params->{formDescription}{submissionStatus} = 0;
+    $params->{formDescription}{sendEmailOnChange} = 1;
+    $params->{formDescription}{_fieldList} = [ map { $params->{formDescription}{$_} ? $_ : () } ( @fieldNames ) ];
     if( scalar( @{$params->{formDescription}{_fieldList}} ) == 0 ) {
 	$params->{_isValid} = 0;
         my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmissionForm" );
