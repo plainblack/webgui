@@ -503,8 +503,8 @@ my $listCal = $node->addChild({
 $allDayDt     = $bday->cloneToUserTimeZone->truncate( to => 'day' );
 my $prevDayDt = $bday->cloneToUserTimeZone->truncate( to => 'day' )->subtract(days => 1)->add(hours => 19);
 
-diag $allDayDt->toDatabase;
-diag $prevDayDt->toDatabase;
+note $allDayDt->toDatabase;
+note $prevDayDt->toDatabase;
 
 $allDay = $listCal->addChild({
     className   => 'WebGUI::Asset::Event',
