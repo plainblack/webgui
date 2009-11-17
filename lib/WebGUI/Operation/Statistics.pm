@@ -94,6 +94,8 @@ sub www_disableSendWebguiStats {
     return $session->privilege->adminOnly() unless canView($session);
     my $task = WebGUI::Workflow::Cron->new($session, 'send_webgui_statistics');
     $task->delete;
+    my $workflow = WebGUI::Workflow->new($session, 'send_webgui_statistics');
+    $workflow->set({enabled => 0});
     return www_viewStatistics($session);
 }
 
@@ -123,6 +125,8 @@ sub www_enableSendWebguiStats {
         priority        => 3,
         title           => 'Send WebGUI Statistics',
         }, 'send_webgui_statistics');
+    my $workflow = WebGUI::Workflow->new($session, 'send_webgui_statistics');
+    $workflow->set({enabled => 1});
     return www_viewStatistics($session);
 }
 
