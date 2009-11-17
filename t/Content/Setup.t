@@ -69,7 +69,7 @@ $languageField->set($properties);
 $session->setting->remove("specialState");
 
 my $u1 = WebGUI::User->new($session, '1');
-diag $u1->get('language');
+note $u1->get('language');
 
 my $u3 = WebGUI::User->new($session, '3');
-diag $u3->get('language');
+note $u3->get('language');
