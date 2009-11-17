@@ -19,6 +19,7 @@
  - added USPS International driver.
  - added #10727: language choice during site adding
  - added file globbing to preload.exclude
+ - fixed #11242: Macros not executing in Download Templates
 
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.
