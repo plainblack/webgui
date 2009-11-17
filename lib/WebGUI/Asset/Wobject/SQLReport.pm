@@ -270,9 +270,9 @@ sub getEditForm {
 	# Download Type
 	my %downloadTypes;
 	tie %downloadTypes, 'Tie::IxHash', 
-		"none" 		=> "No Download",
-		"csv"		=> "CSV",
-		"template"	=> "Template",
+		"none" 		=> $i18n->get("No Download"),
+		"csv"		=> $i18n->get("CSV"),
+		"template"	=> $i18n->get("Template"),
 		;
 		
 	$tabform->getTab("properties")->radioList(
@@ -798,12 +798,10 @@ sub www_download {
 		unless $self->session->user->isInGroup($self->getValue("downloadUserGroup"));
 	
 	# Set filename and mimetype
-	if ($self->getValue("downloadType") eq "csv")
-	{
+	if ($self->getValue("downloadType") eq "csv") {
 		$self->session->http->setFilename($self->getValue("downloadFilename"),"application/octet-stream");
 	}
-	else
-	{
+	else {
 		$self->session->http->setFilename($self->getValue("downloadFilename"),$self->getValue("downloadMimeType"));
 	}
 	

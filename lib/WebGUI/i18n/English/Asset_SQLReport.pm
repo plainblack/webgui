@@ -301,8 +301,24 @@ will always be false for query5.|,
 	},
 
 	'download type description' => {
-		message => "The type of download to create.",
-		lastUpdated => 0,
+		message => "The type of download to create.  No download will prevent a download from being created.  CSV will cause a CSV file to be returned.  Template will use the Download Template to generate the file to download.",
+		lastUpdated => 1258417417,
+	},
+
+	'No Download' => {
+		message => "No Download",
+		lastUpdated => 1258417417,
+	},
+
+	'CSV' => {
+		message => "CSV",
+		lastUpdated => 1258417417,
+        context => q|Short for Comma Separated Variables|,
+	},
+
+	'Template' => {
+		message => "Template",
+		lastUpdated => 1258417417,
 	},
 
 	'download filename' => {
@@ -311,8 +327,8 @@ will always be false for query5.|,
 	},
 
 	'download filename description' => {
-		message => "The filename of the file to download. If left blank, will autogenerate.",
-		lastUpdated => 0,
+		message => "The filename of the file to download. If left blank, a name will be created.",
+		lastUpdated => 1258417288,
 	},
 
 	'download template' => {
