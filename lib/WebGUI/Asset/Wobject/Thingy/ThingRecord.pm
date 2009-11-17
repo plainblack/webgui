@@ -190,7 +190,7 @@ sub new {
         WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
     }
     # Set class definition unless new() is called by create() in which case definition is already set.
-    unless (defined %definition){
+    unless (%definition){
         unless (defined $thingId && $thingId =~ m/^[A-Za-z0-9_-]{22}$/) {
             WebGUI::Error::InvalidParam->throw(error=>'need a thingId');
         }
