@@ -104,6 +104,7 @@ my $templateId = 'FILE_IMAGE_TEMPLATE___';
 my $templateMock = Test::MockObject->new({});
 $templateMock->set_isa('WebGUI::Asset::Template');
 $templateMock->set_always('getId', $templateId);
+$templateMock->set_true('prepare');
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
