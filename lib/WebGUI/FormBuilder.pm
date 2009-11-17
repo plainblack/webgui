@@ -119,18 +119,21 @@ Return the HTML for the form
 
 =cut
 
-override 'toHtml' => sub {
+sub toHtml {
     my ( $self ) = @_;
     
     my @attrs   = qw{ action method name enctype };
     my $attrs   = join " ", map { qq{$_="} . $self->$_ . qq{"} } grep { $self->$_ } @attrs;
 
     my $html    = sprintf '<form %s>', $attrs;
-    $html   .= super();
+
+    # Add individual objects
+    $html   .= join "", map { $_->toHtml } @{$self->objects};
+
     $html   .= '</form>';
 
     return $html;
-};
+}
 
 #----------------------------------------------------------------------------
 

@@ -11,6 +11,7 @@ has 'fields' => (
     default => sub { [] },
 );
 
+with 'WebGUI::FormBuilder::Role::HasObjects';
 
 =head1 METHODS
 
@@ -119,23 +120,5 @@ sub getFieldsRecursive {
     return $fields;
 }
 
-#----------------------------------------------------------------------------
-
-=head2 toHtml ( )
-
-Render the fields in this part of the form.
-
-=cut
-
-override 'toHtml' => sub {
-    my ( $orig, $self ) = @_;
-
-    my $html    = super();
-    for my $field ( @{$self->fields} ) {
-        $html .= $field->toHtmlWithWrapper;
-    }
-
-    return $html;
-};
 
 1;

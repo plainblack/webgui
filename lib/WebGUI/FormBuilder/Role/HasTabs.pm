@@ -3,6 +3,7 @@ package WebGUI::FormBuilder::Role::HasTabs;
 use strict;
 use Moose::Role;
 
+with 'WebGUI::FormBuilder::Role::HasObjects';
 requires 'session', 'pack', 'unpack';
 
 has 'tabs' => (
@@ -93,22 +94,5 @@ sub getTab {
     my ( $self, $name ) = @_;
     return $self->{_tabsByName}{$name};
 }
-
-#----------------------------------------------------------------------------
-
-=head2 toHtml ( ) 
-
-Render the tabs in this part of the form
-
-=cut
-
-override 'toHtml' => sub {
-    my ( $self ) = @_;
-    my $html    = super();
-    for my $tab ( @{$self->tabs} ) {
-        $html .= $tab->toHtml;
-    }
-    return $html;
-};
 
 1;
