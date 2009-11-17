@@ -58,7 +58,7 @@ sub changeThingyThingTables {
     my $db      = $session->db; 
     print "\tChanging Thingy's Thing tables to conform with CRUD ... " unless $quiet;
 
-    $db->write('ALTER TABLE Thingy_things ADD `sequenceNumber` INT(11)');
+    $db->write('ALTER TABLE Thingy_things ADD `sequencenumber` INT(11)');
     $db->write('ALTER TABLE Thingy_things ADD `dateCreated` DATETIME');
     $db->write('ALTER TABLE Thingy_things ADD `lastUpdated` DATETIME');
 
