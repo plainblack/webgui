@@ -41,12 +41,12 @@ of name => value pairs to override properties in the C<object> (such as name and
 =cut
 
 sub addFieldset {
+    my ( $fieldset, $self );
     if ( blessed( $_[1] ) ) {
-        my ( $self, $object, %properties ) = @_;
+        ( $self, my $object, my %properties ) = @_;
         $properties{ name   } ||= $object->can('name')      ? $object->name     : "";
         $properties{ label  } ||= $object->can('label')     ? $object->label    : "";
-        my $fieldset = WebGUI::FormBuilder::Fieldset->new( $self->session, %properties );
-        push @{$self->fieldsets}, $fieldset;
+        $fieldset = WebGUI::FormBuilder::Fieldset->new( $self->session, %properties );
         if ( $object->DOES('WebGUI::FormBuilder::Role::HasTabs') ) {
             for my $objectTab ( @{$object->tabs} ) {
                 $fieldset->addTab( $objectTab );
@@ -62,35 +62,14 @@ sub addFieldset {
                 $fieldset->addField( $objectField );
             }
         }
-        return $fieldset;
     }
     else {
-        my ( $self, @properties ) = @_;
-        my $fieldset = WebGUI::FormBuilder::Fieldset->new( $self->session, @properties );
-        push @{$self->fieldsets}, $fieldset;
-        $self->{_fieldsetsByName}{ $fieldset->name } = $fieldset;
-        return $fieldset;
+        ( $self, my @properties ) = @_;
+        $fieldset = WebGUI::FormBuilder::Fieldset->new( $self->session, @properties );
     }
-}
-
-#----------------------------------------------------------------------------
-
-=head2 addFromHashRef( hashRef )
-
-Add the fieldsets from the given serialized hashRef. See C<toHashRef> for more
-information.
-
-=cut
-
-sub addFromHashRef {
-    my ( $self, $hashref ) = @_;
-
-    for my $fieldset ( @{$hashref->{fieldsets}} ) {
-        my $fs  = WebGUI::FormBuilder::Fieldset->newFromHashref( $self->session, $fieldset );
-        $self->addFieldset( $fs );
-    }
-
-    $self->maybe::next::method;
+    push @{$self->fieldsets}, $fieldset;
+    $self->{_fieldsetsByName}{ $fieldset->name } = $fieldset;
+    return $fieldset;
 }
 
 #----------------------------------------------------------------------------
@@ -134,13 +113,13 @@ Render the fieldsets in this part of the form
 
 =cut
 
-sub toHtml {
+override 'toHtml' => sub {
     my ( $self ) = @_;
-    my $html    = $self->maybe::next::method;
+    my $html    = super();
     for my $fieldset ( @{$self->fieldsets} ) {
         $html .= $fieldset->toHtml;
     }
     return $html;
-}
+};
 
 1;

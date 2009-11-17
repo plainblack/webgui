@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 53;        # Increment this number for each test you create
+plan tests => 66;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Constructor and properties
@@ -108,7 +108,22 @@ ok( $newTab->fieldsets->[0], 'fieldset exists' );
 is( $newTab->fieldsets->[0]->name, 'advanced', 'fieldset has same name' );
 ok( $newTab->tabs->[0], 'subtab exists' );
 is( $newTab->tabs->[0]->name, 'more', 'subtab has same name' );
+cmp_deeply( 
+    $fb->tabs,
+    [ $tab, $newTab ],
+    'added tab',
+);
+is( $fb->getTab('newname'), $newTab, 'new tab can be gotten' );
 
+# deleteTab
+my $deletedTab = $fb->deleteTab( 'newname' );
+is( $deletedTab, $newTab, 'deleteTab returns object' );
+cmp_deeply(
+    $fb->tabs,
+    [ $tab ],
+    'deleted tab',
+);
+ok( !$fb->getTab('newname'), 'deleted tab cannot be gotten' );
 
 # addFieldset with properties
 $fb     = WebGUI::FormBuilder->new( $session );
@@ -151,6 +166,22 @@ ok( $newFset->fieldsets->[0], 'subfieldset exists' );
 is( $newFset->fieldsets->[0]->name, 'advanced', 'subfieldset has same name' );
 ok( $newFset->tabs->[0], 'tab exists' );
 is( $newFset->tabs->[0]->name, 'more', 'tab has same name' );
+cmp_deeply( 
+    $fb->fieldsets,
+    [ $fset, $newFset],
+    'added fieldset',
+);
+is( $fb->getFieldset('newname'), $newFset, 'new fieldset can be gotten' );
+
+# deletefieldset
+my $deletedFieldset = $fb->deleteFieldset( 'newname' );
+is( $deletedFieldset, $newFset, 'deletefieldset returns object' );
+cmp_deeply(
+    $fb->fieldsets,
+    [ $fset ],
+    'deleted fieldset',
+);
+ok( !$fb->getFieldset('newname'), 'deleted fieldset cannot be gotten' );
 
 # addField with properties
 $fb         = WebGUI::FormBuilder->new( $session );
@@ -185,8 +216,30 @@ cmp_deeply(
     'fields 2',
 );
 
+# deleteField
+my $field3 = $fb->deleteField( 'type' );
+is( $field3, $field2, 'deleteField returns same field' );
+ok( !$fb->getField('type'), 'field is deleted' );
+cmp_deeply(
+    $fb->fields,
+    [ $field ],
+    'field is deleted from fields',
+);
+
+
 #----------------------------------------------------------------------------
 # Serialize and deserialize
 
+my $fb      = WebGUI::FormBuilder->new( $session );
+my $fset    = $fb->addFieldset( name => 'search', label => 'Search' );
+$fset->addField( 'text', name => 'keywords', label => 'Keywords' );
+my $tab     = $fb->addTab( name => 'advanced', label => 'Advanced Search' );
+$tab->addField( 'text', name => 'type', label => 'Type' );
+$fb->addField( 'submit', name => 'submit', label => 'Submit' );
+
+#----------------------------------------------------------------------------
+# toHtml
+
+print $fb->toHtml;
 
 #vim:ft=perl

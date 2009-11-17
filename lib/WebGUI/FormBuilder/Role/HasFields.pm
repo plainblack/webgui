@@ -48,18 +48,38 @@ sub addField {
         # Is $type a class name?
         eval { WebGUI::Pluggable::load( $type ) };
         if ( $@ ) {
-            eval { WebGUI::Pluggable::load( "WebGUI::Form::$type" ) };
+            eval { WebGUI::Pluggable::load( "WebGUI::Form::" . ucfirst( $type ) ) };
             if ( $@ ) {
                 $self->session->error("Could not load field type '$type'. Try loading it manually." );
                 confess "Could not load field type '$type'. Try loading it manually.";
             }
-            $type = "WebGUI::Form::$type";
+            $type = "WebGUI::Form::" . ucfirst( $type );
         }
         $field = $type->new( $self->session, { @properties } );
     }
 
     push @{$self->fields}, $field;
     $self->{_fieldsByName}{ $field->get('name') } = $field; # TODO: Must allow multiple fields per name
+    return $field;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 deleteField ( name )
+
+Delete a field by name. Returns the field deleted.
+
+=cut
+
+sub deleteField {
+    my ( $self, $name ) = @_;
+    my $field    = delete $self->{_fieldsByName}{$name};
+    for ( my $i = 0; $i < scalar @{$self->fields}; $i++ ) {
+        my $testField    = $self->fields->[$i];
+        if ( $testField->get('name') eq $name ) {
+            splice @{$self->fields}, $i, 1;
+        }
+    }
     return $field;
 }
 
@@ -107,16 +127,15 @@ Render the fields in this part of the form.
 
 =cut
 
-sub toHtml {
-    my ( $self ) = @_;
+override 'toHtml' => sub {
+    my ( $orig, $self ) = @_;
 
-    # This will always be the first one called, so no maybe::next::method
-    my $html    = '';
+    my $html    = super();
     for my $field ( @{$self->fields} ) {
         $html .= $field->toHtmlWithWrapper;
     }
 
     return $html;
-}
+};
 
 1;

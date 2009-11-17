@@ -30,12 +30,12 @@ Any sub-tabs or fieldsets will also be included.
 =cut
 
 sub addTab {
+    my ($tab, $self);
     if ( blessed( $_[1] ) ) {
-        my ( $self, $object, %properties ) = @_;
+        ( $self, my $object, my %properties ) = @_;
         $properties{ name   } ||= $object->can('name')      ? $object->name     : "";
         $properties{ label  } ||= $object->can('label')     ? $object->label    : "";
-        my $tab = WebGUI::FormBuilder::Tab->new( $self->session, %properties );
-        push @{ $self->tabs }, $tab;
+        $tab = WebGUI::FormBuilder::Tab->new( $self->session, %properties );
         if ( $object->DOES('WebGUI::FormBuilder::Role::HasTabs') ) {
             for my $objectTab ( @{$object->tabs} ) {
                 $tab->addTab( $objectTab );
@@ -51,15 +51,14 @@ sub addTab {
                 $tab->addField( $objectField );
             }
         }
-        return $tab;
     }
     else {
-        my ( $self, @properties ) = @_;
-        my $tab = WebGUI::FormBuilder::Tab->new( $self->session, @properties );
-        push @{$self->tabs}, $tab;
-        $self->{_tabsByName}{$tab->name} = $tab;
-        return $tab;
+        ( $self, my @properties ) = @_;
+        $tab = WebGUI::FormBuilder::Tab->new( $self->session, @properties );
     }
+    push @{$self->tabs}, $tab;
+    $self->{_tabsByName}{$tab->name} = $tab;
+    return $tab;
 }
 
 #----------------------------------------------------------------------------
@@ -97,32 +96,19 @@ sub getTab {
 
 #----------------------------------------------------------------------------
 
-=head2 getTabs ( )
-
-Get all tab objects. Returns the arrayref of tabs.
-
-=cut
-
-sub getTabs {
-    my ( $self ) = @_;
-    return $self->tabs;
-}
-
-#----------------------------------------------------------------------------
-
 =head2 toHtml ( ) 
 
 Render the tabs in this part of the form
 
 =cut
 
-sub toHtml {
+override 'toHtml' => sub {
     my ( $self ) = @_;
-    my $html    = $self->maybe::next::method;
+    my $html    = super();
     for my $tab ( @{$self->tabs} ) {
         $html .= $tab->toHtml;
     }
     return $html;
-}
+};
 
 1;

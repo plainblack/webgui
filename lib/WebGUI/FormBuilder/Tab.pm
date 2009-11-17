@@ -98,7 +98,7 @@ sub toHtml {
     my $html    = '<div class="yui-tab">'
                 . '<div class="yui-tab-label">' . $self->label . '</div>'
                 ;
-    $html   .= $self->maybe::next::method;
+    $html   .= inner();
     $html   .= '</div>';
 
     return $html;

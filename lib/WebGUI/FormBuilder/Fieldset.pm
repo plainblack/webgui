@@ -114,8 +114,8 @@ Returns the HTML to render the fieldset.
 sub toHtml {
     my ( $self ) = @_;
 
-    my $html = '<fieldset><legend>' . $self->legend . '</legend>';
-    $html   .= $self->maybe::next::method;
+    my $html = '<fieldset><legend>' . $self->label . '</legend>';
+    $html   .= inner();
     $html   .= '</fieldset>';
 
     return $html;
