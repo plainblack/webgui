@@ -55,7 +55,7 @@ is($copiedDt->toUserTimeZoneTime(), "14:12:45",            "toUserTimeZoneTime o
 $copiedDt->add(hours => 1);
 
 isa_ok($copiedDt,          "WebGUI::DateTime", "add returns itself");
-isa_ok($copiedDt->session, "WebGUI::Session",  "add does not nuke $session");
+isa_ok($copiedDt->session, "WebGUI::Session",  "add does not nuke its session");
 
 is($copiedDt->time_zone()->name, "America/Hermosillo",  "add does not change the time zone");
 is($copiedDt->toUserTimeZone(),  "2006-11-06 15:12:45", "add returns the correct time");
