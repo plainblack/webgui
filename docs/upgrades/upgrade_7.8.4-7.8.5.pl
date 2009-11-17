@@ -34,7 +34,6 @@ addEMSSubmissionTables($session);
 configEMSActivities($session);
 removeOldWebGUICSS($session);
 addUSPSInternationalShippingDriver( $session );
-changeThingyThingTables( $session );
 
 # upgrade functions go here
 
@@ -49,35 +48,6 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
-
-#----------------------------------------------------------------------------
-# Changing Thingy's Thing tables to conform with CRUD 
-
-sub changeThingyThingTables {
-    my $session = shift;
-    my $db      = $session->db; 
-    print "\tChanging Thingy's Thing tables to conform with CRUD ... " unless $quiet;
-    my $things = $db->read('select thingId from Thingy_things');
-    while (my @thing = $things->array) {
-        my $tableName = 'Thingy_'.$thing[0];
-        if($db->quickArray('show tables like "'.$tableName.'"')){
-        # Change lastUpdated column
-        $db->write('ALTER TABLE `'.$tableName.'` CHANGE `lastUpdated` `lastUpdated_unix_time` int(11) NOT NULL');
-        $db->write('ALTER TABLE `'.$tableName.'` ADD `lastUpdated` DATETIME NOT NULL');
-        $db->write('UPDATE `'.$tableName.'` SET `lastUpdated`=FROM_UNIXTIME(lastUpdated_unix_time)');
-        $db->write('ALTER TABLE `'.$tableName.'` DROP `lastUpdated_unix_time`');
-        # Change dateCreated column
-        $db->write('ALTER TABLE `'.$tableName.'` CHANGE `dateCreated` `dateCreated_unix_time` int(11) NOT NULL');
-        $db->write('ALTER TABLE `'.$tableName.'` ADD `dateCreated` DATETIME NOT NULL');
-        $db->write('UPDATE `'.$tableName.'` SET `dateCreated`=FROM_UNIXTIME(dateCreated_unix_time)');
-        $db->write('ALTER TABLE `'.$tableName.'` DROP `dateCreated_unix_time`');
-        # Add sequencenumber column
-        $db->write('ALTER TABLE `'.$tableName.'` ADD `sequencenumber` int(11) NOT NULL');
-        }
-    }
-    print "DONE!\n" unless $quiet;
-}
-
 
 #----------------------------------------------------------------------------
 # Describe what our function does

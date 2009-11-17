@@ -283,14 +283,10 @@ cmp_deeply(
         'Getting updated thing data: getViewThingVars returns correct field_loop with updated value.'
     );
 
-
 $thingy->deleteThingData($thingId,$newThingDataId);
 
-my @thingDataIds = @{WebGUI::Asset::Wobject::Thingy::ThingRecord->getAllIds($session)};
+is($thingy->getViewThingVars($thingId,$newThingDataId),undef,'Thing data was succesfully deleted, getViewThingVars returns undef.');
 
-is(WebGUI::Utility::isIn(@thingDataIds,$newThingDataId),'0','Thing data was succesfully deleted');
-
-=cut
 $json = $thingy->www_viewThingDataViaAjax($thingId,$newThingDataId);
 $dataFromJSON = JSON->new->decode($json);
 
@@ -303,7 +299,6 @@ cmp_deeply(
     );
 
 ($newThingDataId,$errors) = $thingy->editThingDataSave($thingId,'new',{"field_".$fieldId => 'second test value'});
-=cut
 
 #################################################################
 #
