@@ -20,10 +20,14 @@ use Test::More;
 use Test::Deep;
 use XML::Simple;
 use Data::Dumper;
-use Locales::Country qw/en/;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Shop::ShipDriver::UPS;
+use Locales;
+#my $locales = Locales->new('en');
+#diag Dumper [ $locales->get_territory_names() ];
+#diag $locales->get_code_from_territory('United States');
 
 #----------------------------------------------------------------------------
 # Init
@@ -35,16 +39,13 @@ $session->user({user => $user});
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 41;
-plan tests => 1 + $tests;
+plan tests => 41;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::ShipDriver::UPS');
-
 my $storage;
-my ($driver, $cart);
+my ($driver);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 my $home = WebGUI::Asset->getDefault($session);
@@ -108,11 +109,7 @@ my $blueFeather = $feather->setCollateral('variantsJSON', 'variantId', 'new',
 );
 
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::ShipDriver::UPS', $tests unless $loaded;
+addToCleanup($versionTag);
 
 #######################################################################
 #
@@ -190,6 +187,7 @@ $driver = WebGUI::Shop::ShipDriver::UPS->create($session, {
     enabled  => 1,
     shipType => 'PARCEL',
 });
+addToCleanup($driver);
 
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
@@ -258,21 +256,22 @@ cmp_deeply(
     '... checking error message',
 );
 
-$cart = WebGUI::Shop::Cart->newBySession($session);
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+addToCleanup($cart);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',
     organization => 'Plain Black Corporation',
     address1 => '1360 Regent St. #145',
     city => 'Madison', state => 'WI', code => '53715',
-    country => 'USA',
+    country => 'United States',
 });
 my $wucAddress = $addressBook->addAddress({
     label => 'wuc',
     organization => 'Madison Concourse Hotel',
     address1 => '1 W Dayton St',
     city => 'Madison', state => 'WI', code => '53703',
-    country => 'USA',
+    country => 'United States',
 });
 $cart->update({shippingAddressId => $workAddress->getId});
 
@@ -517,8 +516,6 @@ SKIP: {
     my $xmlData = XMLin($response->content, ForceArray => [qw/RatedPackage/],);
     ok($xmlData->{Response}->{ResponseStatusCode}, '... responseCode is successful');
     ok($xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue}, '... total charges returned');
-    #diag $xmlData->{RatedShipment}->{TotalCharges}->{MonetaryValue};
-
 }
 
 ok($driver->getEditForm(), 'getEditForm');
@@ -540,17 +537,3 @@ is (
 );
 
 $cart->empty;
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    if (defined $driver && $driver->isa('WebGUI::Shop::ShipDriver')) {
-        $driver->delete;
-    }
-    if (defined $cart && $cart->isa('WebGUI::Shop::Cart')) {
-        my $addressBook = $cart->getAddressBook();
-        $addressBook->delete if $addressBook;
-        $cart->delete;
-    }
-}

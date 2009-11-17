@@ -9,30 +9,33 @@ save you many hours of grief.
 
 7.8.5
 --------------------------------------------------------------------
+    * WebGUI now requires Locales 0.10 or higher, to replace the deprecated
+      modules Locales::Country.
+
     * Users, no matter if they are created via anonymous registration,
       via the Admin Console Users screen, or via code, now always get
       their default values from the Profile Fields instead of via
       the Visitor account.  Previously, based on how the user was created,
       they would get default values from different places.
 
-*	The following style templates have been cleaned up by the TWG:
-	- WebGUI 6 Blank Style, Style 01; Style 02, Style 03:
-		- no structural changes
-	- Fail safe:
-		- added new CSS that is more robust and validates (in external file: style.css);
-		- it was also necessary to update the css to work with the new navigation templates
-		- changed the markup and the order of the home/login/user/admin controls at the bottom
-	- All of the above templates:
-		- added a link tag to wg-base.css
-		- added conditional comments at the top and bottom of the body tag to be able to target
-		  IE versions easily with css
+    *	The following style templates have been cleaned up by the TWG:
+        - WebGUI 6 Blank Style, Style 01; Style 02, Style 03:
+            - no structural changes
+        - Fail safe:
+            - added new CSS that is more robust and validates (in external file: style.css);
+            - it was also necessary to update the css to work with the new navigation templates
+            - changed the markup and the order of the home/login/user/admin controls at the bottom
+        - All of the above templates:
+            - added a link tag to wg-base.css
+            - added conditional comments at the top and bottom of the body tag to be able to target
+              IE versions easily with css
 
-*	Added wg-base.css, which is linked to in each style template. This stylesheet is for css that
-	is used in more than one tempalte, like pagination inline icons etc. Inline styles that are
-	removed from templates, will be replaced with styles in wg-base.css (and example is RFE 11182).
-	Elements that are styled in wg-base.css have a classname that starts with "wg-".
+    *	Added wg-base.css, which is linked to in each style template. This stylesheet is for css that
+        is used in more than one tempalte, like pagination inline icons etc. Inline styles that are
+        removed from templates, will be replaced with styles in wg-base.css (and example is RFE 11182).
+        Elements that are styled in wg-base.css have a classname that starts with "wg-".
 
-    wg-base.css replaces webgui.css, which will be removed from the site.
+        wg-base.css replaces webgui.css, which will be removed from the site.
 
 7.8.4
 --------------------------------------------------------------------

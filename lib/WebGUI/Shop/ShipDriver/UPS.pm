@@ -7,7 +7,7 @@ use WebGUI::Exception::Shop;
 use XML::Simple;
 use LWP;
 use Tie::IxHash;
-use Locales::Country qw/ en   /; 
+use Locales; 
 use Class::InsideOut qw/ :std /;
 use Data::Dumper;
 
@@ -64,7 +64,7 @@ sub buildXML {
     $xmlAcc->{AccessLicenseNumber} = [ $self->get('licenseNo') ]; 
     $xmlAcc->{UserId}              = [ $self->get('userId')    ];
     $xmlAcc->{Password}            = [ $self->get('password')  ];
-    my $localizedCountry = Locales::Country->new('en');
+    my $localizedCountry = Locales->new('en');
     my $xml = XMLout(\%xmlHash,
         KeepRoot    => 1,
         NoSort      => 1,
@@ -95,14 +95,14 @@ sub buildXML {
     $xmlRate->{Shipment} = {
         Shipper => {
             Address => [ {
-                PostalCode  => [ $self->get('sourceZip'    ) ],
-                CountryCode => [ $localizedCountry->country2code($self->get('sourceCountry'), 'alpha2') ],
+                PostalCode  => [ $self->get('sourceZip') ],
+                CountryCode => [ $localizedCountry->get_code_from_territory($self->get('sourceCountry')) ],
             }, ],
         },
         ShipTo => {
             Address => [ {
                 PostalCode  => [ $destination->get('code') ],
-                CountryCode => [ $localizedCountry->country2code($destination->get('country'), 'alpha2') ],
+                CountryCode => [ $localizedCountry->get_code_from_territory($destination->get('country')) ],
             } ],
         },
         Service => {
@@ -301,9 +301,9 @@ sub definition {
     $customerClassification{'03'} = $i18n->get('customer classification 03');
     $customerClassification{'04'} = $i18n->get('customer classification 04');
 
-    my $localizedCountries = Locales::Country->new('en'); ##Note, for future i18n change the locale
+    my $localizedCountries = Locales->new('en'); ##Note, for future i18n change the locale
     tie my %localizedCountries, 'Tie::IxHash';
-    %localizedCountries = map { $_ => $_ } grep { !ref $_ } $localizedCountries->all_country_names();
+    %localizedCountries = map { $_ => $_ } grep { !ref $_ } $localizedCountries->get_territory_names();
 
     tie my %fields, 'Tie::IxHash';
     %fields = (
