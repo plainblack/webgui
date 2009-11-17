@@ -99,7 +99,7 @@ Survey.Data = (function(){
                     draggable: true
                 });
                 
-                Survey.Data.ddContainer.setHeader(Survey.i18n.get('Asset_Survey','Survey Objects');
+                Survey.Data.ddContainer.setHeader(Survey.i18n.get('Asset_Survey','Survey Objects'));
                 Survey.Data.ddContainer.setBody(d.ddhtml);
                 Survey.Data.ddContainer.setFooter(document.getElementById("buttons"));
                 Survey.Data.ddContainer.render();

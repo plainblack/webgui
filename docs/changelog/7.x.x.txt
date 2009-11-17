@@ -8,6 +8,7 @@
  - fixed #11242: Macros not executing in Download Templates
  - added TimeZone form controls accepts spaces or underscores in zone names.
  - fixed #11245: send stats
+ - fixed #11247: Survey edit screen broken
 
 7.7.26
  - fixed #11134: Tree Navigation menu colapses sub items of current page
