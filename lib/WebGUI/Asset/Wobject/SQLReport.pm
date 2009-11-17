@@ -474,7 +474,9 @@ sub download {
 	} 
     elsif ($self->getValue("downloadType") eq "template") { 
         my $data	= $self->_processQuery(1,0);
-		return $self->processTemplate($data,$self->get("downloadTemplateId"));
+        my $output  = $self->processTemplate($data,$self->get("downloadTemplateId"));
+        WebGUI::Macro::process($self->session, \$output);
+		return $output;
 	} 
     else {
 		# I don't know what to do
