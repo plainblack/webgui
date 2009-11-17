@@ -23,6 +23,7 @@
  - added TimeZone form controls accepts spaces or underscores in zone names.
  - fixed #11245: send stats
  - fixed #11247: Survey edit screen broken
+ - fixed #11246: Image.pm - Validation error
 
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.

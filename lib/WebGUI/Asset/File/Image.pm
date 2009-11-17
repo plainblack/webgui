@@ -221,8 +221,9 @@ Renders this asset.
 =cut
 
 sub view {
-	my $self = shift;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	my $self    = shift;
+    my $session = $self->session;
+	if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
         my $cache = $self->getCache;
         my $out   = $cache->get if defined $cache;
 		return $out if $out;
@@ -231,7 +232,7 @@ sub view {
     my ($crop_js, $domMe) = $self->annotate_js({ just_image => 1 });
 
     if ($crop_js) {
-        my ($style, $url) = $self->session->quick(qw(style url));
+        my ($style, $url) = $session->quick(qw(style url));
 
         $style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
         $style->setLink($url->extras('yui/container/assets/container.css'), {rel=>'stylesheet', type=>'text/css'});
@@ -239,18 +240,17 @@ sub view {
         $style->setScript($url->extras('yui/build/container/container-min.js'), {type=>'text/javascript'});
     }
 
-	$var{controls} = $self->getToolbar;
-	$var{fileUrl} = $self->getFileUrl;
-	$var{fileIcon} = $self->getFileIconUrl;
-	$var{thumbnail} = $self->getThumbnailUrl;
-	$var{annotateJs} = "$crop_js$domMe";
-    $var{parameters} = sprintf("id=%s", $self->getId());
-	my $form = $self->session->form;
+    $var{controls}    = $self->getToolbar;
+    $var{fileUrl}     = $self->getFileUrl;
+    $var{fileIcon}    = $self->getFileIconUrl;
+    $var{thumbnail}   = $self->getThumbnailUrl;
+    $var{annotateJs}  = "$crop_js$domMe";
+    $var{parameters} .= sprintf(q{ id="%s"}, $self->getId());
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
-	}
-       	return $out;
+    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+        WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+    }
+    return $out;
 }
 
 
