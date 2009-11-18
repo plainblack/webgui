@@ -10,6 +10,7 @@
  - fixed #11245: send stats
  - fixed #11247: Survey edit screen broken
  - fixed #11246: Image.pm - Validation error
+ - fixed #11251: perload.perl tries to load t/lib/WebGUI/Test.pm
 
 7.7.26
  - fixed #11134: Tree Navigation menu colapses sub items of current page
