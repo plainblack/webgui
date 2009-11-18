@@ -162,7 +162,7 @@ sub toHtml {
         my $pubKey = $self->session->setting->get('recaptchaPublicKey');
         my $server = "http://api.recaptcha.net";
         if ($env->sslRequest) {
-            $server = "http://api-secure.recaptcha.net";
+            $server = "https://api-secure.recaptcha.net";
         }
         return
             '<script type="text/javascript" src="' . $server . '/challenge?k=' . $pubKey . '"></script>'
