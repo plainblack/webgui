@@ -25,6 +25,7 @@
  - fixed #11247: Survey edit screen broken
  - fixed #11246: Image.pm - Validation error
  - fixed #11221: wrong version of Locales::Country in testEnvironment
+ - Net::Subnets has been deprecated.
 
 7.8.4
  - Fixed a compatibility problem between WRE and new Spectre code.
