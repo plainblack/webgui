@@ -70,21 +70,6 @@ sub addSubmission {
 
 #-------------------------------------------------------------------
 
-=head2 addRevision
-
-This me>thod exists for demonstration purposes only.  The superclass
-handles revisions to NewAsset Assets.
-
-=cut
-
-#sub addRevision {
-#    my $self    = shift;
-#    my $newSelf = $self->SUPER::addRevision(@_);
-#    return $newSelf;
-#}
-
-#-------------------------------------------------------------------
-
 =head2 canSubmit
 
 returns true if current user can submit using this form
@@ -171,22 +156,6 @@ sub definition {
     };
     return $class->SUPER::definition( $session, $definition );
 } ## end sub definition
-
-#-------------------------------------------------------------------
-
-=head2 duplicate
-
-This method exists for demonstration purposes only.  The superclass
-handles duplicating NewAsset Assets.  This method will be called 
-whenever a copy action is executed
-
-=cut
-
-#sub duplicate {
-#    my $self     = shift;
-#    my $newAsset = $self->SUPER::duplicate(@_);
-#    return $newAsset;
-#}
 
 #-------------------------------------------------------------------
 
@@ -405,80 +374,6 @@ sub getQueueUrl {
 }
 
 
-#-------------------------------------------------------------------
-
-=head2 indexContent ( )
-
-Making private. See WebGUI::Asset::indexContent() for additonal details. 
-
-=cut
-
-#sub indexContent {
-#    my $self    = shift;
-#    my $indexer = $self->SUPER::indexContent;
-#    $indexer->setIsPublic(0);
-#}
-
-#-------------------------------------------------------------------
-
-=head2 prepareView ( )
-
-See WebGUI::Asset::prepareView() for details.
-we shouldn't get here, there is nothing to view...
-
-=cut
-
-sub prepareView {
-    my $self = shift;
-    $self->SUPER::prepareView();
-    #my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
-    #$template->prepare($self->getMetaDataAsTemplateVariables);
-    #$self->{_viewTemplate} = $template;
-}
-
-#-------------------------------------------------------------------
-
-=head2 processPropertiesFromFormPost ( )
-
-Used to process properties from the form posted.  Do custom things with
-noFormPost fields here, or do whatever you want.  This method is called
-when /yourAssetUrl?func=editSave is requested/posted.
-
-=cut
-
-#sub processPropertiesFromFormPost {
-#    my $self = shift;
-#    $self->SUPER::processPropertiesFromFormPost;
-#}
-
-#-------------------------------------------------------------------
-
-=head2 purge ( )
-
-This method is called when data is purged by the system.
-removes collateral data associated with a NewAsset when the system
-purges it's data.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-asset instances, you will need to purge them here.
-
-=cut
-
-#sub purge {
-#    my $self = shift;
-#    return $self->SUPER::purge;
-#}
-
-#-------------------------------------------------------------------
-
-=head2 purgeRevision ( )
-
-This method is called when data is purged by the system.
-
-=cut
-
-#sub purgeRevision { #    my $self = shift;
-#    return $self->SUPER::purgeRevision;
-#}
 
 #-------------------------------------------------------------------
 
@@ -492,9 +387,6 @@ Note: this really shouldn't get called, all views are redirected elsewhere
 sub view {
     my $self = shift;
     return $self->ems->view;
-    #my $var  = $self->get;    # $var is a hash reference.
-    #$var->{controls} = $self->getToolbar;
-    #return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
 
@@ -510,25 +402,6 @@ sub www_addSubmission {
     my $self = shift;
     my $params = shift || { };
     $self->www_editSubmission( { assetId => 'new', %$params } );
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page.  Unless the method needs
-special handling or formatting, it does not need to be included in
-the module.
-
-=cut
-
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new( $session, 'Asset_EMSSubmissionForm' );
-    return $self->getAdminConsole->render( $self->getEditForm->print, $i18n->get('edit asset') );
 }
 
 #-------------------------------------------------------------------
