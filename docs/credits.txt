@@ -52,6 +52,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Jukka Raimovaara / Axxion Oy
                                      Alan Ritari / DonorWare
                                      Hal Roberts / Harvard
+                                     Luke Robinson / Orchard Solutions
                                      Laura Rummage / Plain Black
                                      Tera Runde / Plain Black
                                      Steve Simms
