@@ -1,3 +1,5 @@
+7.8.6
+
 7.8.5
  - added the EMS submission subsystem
  - The captcha form control had it's built in styles removed in favor of two classes: "wg-captchaForm" and "wg-captchaImage"
