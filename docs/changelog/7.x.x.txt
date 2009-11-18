@@ -1,6 +1,7 @@
 7.8.6
  - fixed #11250: i18n Asset_EMSSubmissionForm::delete created items label help
  - fixed #11251: perload.perl tries to load t/lib/WebGUI/Test.pm
+ - fixed #11249: Recaptcha https bug
 
 7.8.5
  - added the EMS submission subsystem
