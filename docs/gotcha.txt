@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.27
+--------------------------------------------------------------------
+
+     * One of the modules that WebGUI uses, Net::Subnets, has been
+       removed from CPAN.  Starting with 7.7.27, WebGUI will use either
+       that module, or Net::CIDR::Lite.  New installations of WebGUI
+       require Net::CIDR::Lite if the WRE is not used.
+
 7.7.26
 --------------------------------------------------------------------
 

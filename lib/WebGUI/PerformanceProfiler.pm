@@ -126,18 +126,6 @@ Handler that adds the results to the body of the outgoing page.
 sub output {
 	my $f = shift;
 	return Apache2::Const::DECLINED unless($f->r->content_type =~ 'text/html');
-    my $server = Apache2::ServerUtil->server;
-    my $sn = $server->dir_config('ProfileSubnet');
-    my $subnet = [ $sn ];
-    if ($sn) {
-        my $conn = $f->c;
-        my $ipAddress = $conn->remote_ip;
-        my $net = Net::Subnets->new();
-        $net->subnets($subnet);
-        if (!$net->check(\$ipAddress)) {
-            return Apache2::Const::DECLINED;
-        }
-    }
 	while($f->read(my $buffer, 1024)) {
 		my $content .= $buffer;
 		if ($content =~ /(<\/body)/i) {

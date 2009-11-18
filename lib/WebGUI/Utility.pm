@@ -19,7 +19,6 @@ package WebGUI::Utility;
 use Exporter;
 use strict;
 use Tie::IxHash;
-use Net::Subnets;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray &isInSubnet
@@ -188,7 +187,20 @@ An array reference containing subnets in CIDR format. Example: 127.0.0.1/32
 
 =cut
 
-sub isInSubnet {
+BEGIN {
+
+    my $hasSubnets = eval {require Net::Subnets};
+    if ($hasSubnets) {
+        *isInSubnet = *_isInSubnet_subnet;
+    }
+    else {
+        require Net::CIDR::Lite;
+        *isInSubnet = *_isInSubnet_cidr;
+    }
+
+}
+
+sub _isInSubnet_subnet {
 	my $ip = shift;
 	my $subnets = shift;
 	# some validation
@@ -207,6 +219,31 @@ sub isInSubnet {
 	my $net = Net::Subnets->new;
 	$net->subnets($subnets);
 	if ($net->check(\$ip)) {
+		return 1;
+	}
+    else {
+		return 0;
+	}
+}
+
+sub _isInSubnet_cidr {
+	my $ip      = shift;
+	my $subnets = shift;
+    return 0 unless @{ $subnets };
+	for my $cidr ( @{ $subnets } ) {
+        my @parts = $cidr =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/;
+        unless ( 5 == @parts ) { # cidr has 5 parts
+            return undef;
+        }
+        unless ( 4 == grep { $_ <= 255 } @parts[0..3] ) { # each octet needs to be between 0 and 255
+            return undef;
+        }
+        unless ( $parts[4] <= 32 ) { # the subnet needs to be less than or equal to 32, as 32 represents only 1 ip address
+            return undef;
+        }
+	}
+	my $net   = Net::CIDR::Lite->new(@{ $subnets });
+	if ($net->find($ip)) {
 		return 1;
 	} else {
 		return 0;

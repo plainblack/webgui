@@ -101,6 +101,7 @@ checkModule("JSON",                         2.12         );
 checkModule("Config::JSON",                 "1.3.1"      );
 checkModule("Text::CSV_XS",                 "0.64"       );
 checkModule("Net::Subnets",                 0.21         );
+checkModule("Net::CIDR::Lite",              0.20,      2 );
 checkModule("Finance::Quote",               1.15         );
 checkModule("POE",                          1.005        );
 checkModule("POE::Component::IKC::Server",  0.2001       );
