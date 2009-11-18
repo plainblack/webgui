@@ -25,7 +25,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPS;
 
-plan tests => 65;
+plan tests => 66;
 
 #----------------------------------------------------------------------------
 # Init
@@ -622,6 +622,13 @@ SKIP: {
     );
 
 }
+
+my $xmlData = XMLin(q{<?xml version="1.0"?>
+<RateV3Response><Package ID="0"><ZipOrigination>97123</ZipOrigination><ZipDestination>53715</ZipDestination><Pounds>2</Pounds><Ounces>0.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>7.62</Rate></Postage></Package><Package ID="1"><ZipOrigination>97123</ZipOrigination><ZipDestination>53715</ZipDestination><Pounds>1</Pounds><Ounces>8.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>7.62</Rate></Postage></Package><Package ID="2"><ZipOrigination>97123</ZipOrigination><ZipDestination>53703</ZipDestination><Pounds>12</Pounds><Ounces>0.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>16.67</Rate></Postage></Package></RateV3Response>
+}, KeepRoot => 1, ForceArray => [qw/Package/],);
+
+my $cost = $driver->_calculateFromXML($xmlData, @shippableUnits);
+is $cost, "39.53", 'calculating shipping cost for separate shipping addreses in 1 transaction';
 
 #######################################################################
 #
