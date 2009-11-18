@@ -41,7 +41,7 @@ use WebGUI::Pluggable;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 11;        # Increment this number for each test you create
+plan tests => 12;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -103,13 +103,19 @@ is($dumper->Dump, q|$VAR1 = {
 
     cmp_deeply(
         [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English::WebGUI*' ] } ) ],
-        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' || $_ ne 'WebGUI::i18n::English::WebGUIProfile' } @testFiles ),
+        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' && $_ ne 'WebGUI::i18n::English::WebGUIProfile' } @testFiles ),
         "find() with exclude with glob",
     );
 
     cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English*' ] } ) ],
+        [], 
+        "find() with exclude with massive glob",
+    );
+
+    cmp_deeply(
         [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English::WebGUI.*' ] } ) ],
-        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' || $_ ne 'WebGUI::i18n::English::WebGUIProfile' } @testFiles ),
+        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' && $_ ne 'WebGUI::i18n::English::WebGUIProfile' } @testFiles ),
         "find() with exclude with regex",
     );
 
@@ -117,9 +123,9 @@ is($dumper->Dump, q|$VAR1 = {
         [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ qw/WebGUI::i18n::English::WebGUI.* WebGUI::i18n::English::ShipDriver_USPS*/ ] } ) ],
         bag( grep {
             $_ ne 'WebGUI::i18n::English::WebGUI'
-         || $_ ne 'WebGUI::i18n::English::WebGUIProfile'
-         || $_ ne 'WebGUI::i18n::English::ShipDriver_USPS'
-         || $_ ne 'WebGUI::i18n::English::ShipDriver_USPSInternational'
+         && $_ ne 'WebGUI::i18n::English::WebGUIProfile'
+         && $_ ne 'WebGUI::i18n::English::ShipDriver_USPS'
+         && $_ ne 'WebGUI::i18n::English::ShipDriver_USPSInternational'
         } @testFiles ),
         "find() with multiple excludes",
     );

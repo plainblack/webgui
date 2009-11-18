@@ -110,9 +110,10 @@ sub find {
         @modulesHash{ @modules } = ( 1 ) x @modules;
         delete @modulesHash{ @{ $options->{exclude} } };
         @modules    = keys %modulesHash;
-        my @excludePatterns = map { s/(?<!\.)\*/.*/g; $_; } grep { /\*/ } @modules;
+        my @excludePatterns = map { s/(?<!\.)\*/.*/g; $_; } grep { /\*/ } @{ $options->{exclude} };
         if (@excludePatterns) {
             my $pattern         = join q{|}, @excludePatterns;
+            warn $pattern;
             my $exclusions      = qr/$pattern/;
             @modules = grep { ! m/$exclusions/ } @modules;
         }
