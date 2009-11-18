@@ -54,10 +54,11 @@ sub create {
 	my $workflow  = WebGUI::Workflow->create($session,
 	    {
 		enabled    => 1,
-		objectType => 'None',
+		objectType => $activityParams->{objectType} || 'None',
 		mode       => 'realtime',
 	    },
 	);
+        delete $activityParams->{objectType};
 	my $activity = $workflow->addActivity($activityClass);
     if( scalar( keys %$activityParams ) > 0 ) {
 	$activity->set(%$activityParams);
