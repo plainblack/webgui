@@ -368,7 +368,7 @@ $sub2->update({
 my $sub2Id = $sub2->getId;
 $session->db->write('update assetData set lastModified = ' . $newDate . ' where assetId = "' . $sub2Id . '"' );
 
-$cleanupSubmissions->rerun;
+$cleanupSubmissions->reset;
 is($cleanupSubmissions->run, 'complete', 'cleanup complete');
 is($cleanupSubmissions->run, 'done', 'cleanup done');
 

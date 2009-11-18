@@ -22,12 +22,14 @@ my $instance = WebGUI::Test::Activity->create( $session, 'WebGUI::Workflow::Acti
 
 is( $instance->run, 'complete', 'activity complete' );
 is( $instance->run, 'done', 'activity done' );
-$instance->rerun;
+$instance->reset;
 is( $instance->run, 'complete', 'activity complete' );
 is( $instance->run, 'done', 'activity done' );
 $instance->delete;
 
-=head create
+=head methods
+
+=head2 create
 
 =params
 
@@ -75,11 +77,23 @@ sub create {
                    workflow => $workflow }, __PACKAGE__;
 }
 
+=head2 run
+
+calls run on the instance of the workflow
+
+=cut
+
 sub run {
     return $_[0]{instance}->run;
 }
 
-sub rerun {
+=head2 reset
+
+creates a new instance of the workflow so that it can be re-run
+
+=cut
+
+sub reset {
     my $self = shift;
     my $session = $self->{session};
     $self->{instance} = WebGUI::Workflow::Instance->create($session,
