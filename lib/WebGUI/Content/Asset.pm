@@ -114,7 +114,7 @@ sub handler {
         # display from cache if page hasn't been modified.
         if ($var->get("userId") eq "1"
          && defined $asset
-         && !$http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) { 
+         && !$http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
             $http->setStatus("304","Content Not Modified");
             $http->sendHeader;
             $session->close;
