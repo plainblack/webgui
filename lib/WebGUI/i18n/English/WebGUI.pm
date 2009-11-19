@@ -4632,6 +4632,16 @@ Users may override this setting in their profile.
         lastUpdated => 0,
     },
 
+    'Maximum cache timeout' => {
+        message => 'Maximum cache timeout',
+        lastUpdated => 0,
+    },
+
+    'Maximum cache timeout description' => {
+        message => 'This timeout will override the content check that is done before generating a page.  It can help with caching problems for macros and Navigations.  Setting it to 0 will disable the timeout.  A setting of several hours is recommended.',
+        lastUpdated => 0,
+    },
+
 };
 
 1;

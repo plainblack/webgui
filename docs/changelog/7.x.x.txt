@@ -12,6 +12,7 @@
  - fixed #11246: Image.pm - Validation error
  - fixed #11251: perload.perl tries to load t/lib/WebGUI/Test.pm
  - fixed #11249: Recaptcha https bug
+ - fixed #11200: Navigation in AssetProxy cached in browser
 
 7.7.26
  - fixed #11134: Tree Navigation menu colapses sub items of current page
