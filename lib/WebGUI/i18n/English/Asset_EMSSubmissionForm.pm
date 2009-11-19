@@ -35,8 +35,8 @@ our $I18N = { ##hashref of hashes
 		context => q|This is the label for the 'delete created items' field.  The value will indicate if the EMSCleanup will delete items that have been converted to EMSTicket assets.|
 	},
 	'delete created items label help' => {
-		message => q|Set this to 'Yes' if you want submissions to be deleted after they have been converted into EMSTisket assets.|,
-		lastUpdated => 1131394072,
+		message => q|Set this to 'Yes' if you want submissions to be deleted after they have been converted into EMSTicket assets.|,
+		lastUpdated => 1258563620,
 		context => q|This is the help text for the delete created items field, if it is set to yes the EMSCleanup activity will delete approved items after EMSTickets have been created from them.  This field depends on the 'days before cleanup' field and the EMSCleanup activity also.|
 	},
 	'form dscription label' => {
