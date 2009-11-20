@@ -16,14 +16,14 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 16; # increment this value for each test you create
+use Test::More tests => 18; # increment this value for each test you create
 use WebGUI::Asset::Snippet;
 
 my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Snippet Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 my $snippet = $node->addChild({className=>'WebGUI::Asset::Snippet'});
 
 # Test for a sane object type
@@ -85,6 +85,21 @@ is($snippet->view(), 'WebGUI', 'Interpolating macros in works with template in t
 
 my $empty = $node->addChild( { className => 'WebGUI::Asset::Snippet', } );
 is($empty->www_view, 'empty', 'www_view: snippet with no content returns "empty"');
+
+#----------------------------------------------------------------------
+#Check caching
+
+##Set up the snippet to do caching
+$snippet->update({
+    cacheTimeout   => 100,
+    snippet        => 'Cache test: ^#;',
+});
+
+$versionTag->commit;
+
+is $snippet->view, 'Cache test: 1', 'validate snippet content and set cache';
+$session->user({userId => 3});
+is $snippet->view(1), 'Cache test: 3', 'receive uncached content since view was passed the webMethod flag';
 
 TODO: {
     local $TODO = "Tests to make later";
