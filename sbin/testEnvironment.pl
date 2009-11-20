@@ -60,7 +60,7 @@ if ($] >= 5.008) {
 ##Doing this as a global is not nice, but it works
 my $missingModule = 0;
 
-checkModule("LWP",                          5.824        );
+checkModule("LWP",                          5.833        );
 checkModule("HTTP::Request",                1.40         );
 checkModule("HTTP::Headers",                1.61         );
 checkModule("Test::More",                   0.61,      2 );

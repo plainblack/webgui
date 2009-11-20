@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.8.6
+--------------------------------------------------------------------
+    * WebGUI now requires LWP 5.833 or higher, to fix a bug in that module.
+
 7.8.5
 --------------------------------------------------------------------
     * WebGUI now requires Locales 0.10 or higher, to replace the deprecated
