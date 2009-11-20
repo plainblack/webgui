@@ -176,6 +176,30 @@ sub exportGetUrlAsPath {
 
 #-------------------------------------------------------------------
 
+=head2 getCache ( $calledAsWebMethod )
+
+Overrides the base method to handle Snippet specific caching.
+
+=head3 $calledAsWebMethod
+
+If this is true, then change the cache key.
+
+=cut
+
+sub getCache {
+	my $self              = shift;
+	my $calledAsWebMethod = shift;
+    my $session           = $self->session;
+    my $cacheKey = "view_".$calledAsWebMethod.'_'.$self->getId;
+    if ($session->env->sslRequest) {
+        $cacheKey .= '_ssl';
+    }
+    my $cache = WebGUI::Cache->new($session, $cacheKey);
+    return $cache;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getToolbar ( )
 
 Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
@@ -253,6 +277,8 @@ sub purgeCache {
 
 	WebGUI::Cache->new($self->session,"view__".$self->getId)->delete;
 	WebGUI::Cache->new($self->session,"view_1_".$self->getId)->delete;	
+	WebGUI::Cache->new($self->session,"view__".$self->getId."_ssl")->delete;
+	WebGUI::Cache->new($self->session,"view_1_".$self->getId."_ssl")->delete;	
 	$self->SUPER::purgeCache();
 }
 
@@ -270,16 +296,16 @@ toolbar if in adminMode.
 =cut
 
 sub view {
-	my $self = shift;
+	my $self              = shift;
 	my $calledAsWebMethod = shift;
-    my $session = $self->session;
+    my $session    = $self->session;
     my $versionTag = WebGUI::VersionTag->getWorking($session, 1);
     my $noCache =
         $session->var->isAdminOn
         || $self->get("cacheTimeout") <= 10
         || ($versionTag && $versionTag->getId eq $self->get("tagId"));
     unless ($noCache) {
-        my $cache = $self->getCache;
+        my $cache = $self->getCache($calledAsWebMethod);
         my $out   = $cache->get if defined $cache;
 		return $out if $out;
 	}
@@ -293,7 +319,8 @@ sub view {
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-		WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
+        my $cache = $self->getCache($calledAsWebMethod);
+		$cache->set($output,$self->get("cacheTimeout"));
 	}
     return $output;
 }

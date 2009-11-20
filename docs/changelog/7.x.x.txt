@@ -14,6 +14,7 @@
  - fixed #11249: Recaptcha https bug
  - fixed #11200: Navigation in AssetProxy cached in browser
  - fixed #11143: cancel button
+ - fixed #11259: Snippet content never cached
 
 7.7.26
  - fixed #11134: Tree Navigation menu colapses sub items of current page
