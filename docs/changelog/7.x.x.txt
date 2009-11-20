@@ -3,6 +3,7 @@
  - fixed #11251: perload.perl tries to load t/lib/WebGUI/Test.pm
  - fixed #11249: Recaptcha https bug
  - fixed #11200: Navigation in AssetProxy cached in browser
+ - fixed #11143: cancel button
 
 7.8.5
  - added the EMS submission subsystem
