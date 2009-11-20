@@ -9,6 +9,7 @@ save you many hours of grief.
 
 7.7.27
 --------------------------------------------------------------------
+     * WebGUI now requires LWP 5.833 or higher, to fix a bug in that module.
 
      * One of the modules that WebGUI uses, Net::Subnets, has been
        removed from CPAN.  Starting with 7.7.27, WebGUI will use either
