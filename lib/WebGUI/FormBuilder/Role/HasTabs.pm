@@ -6,11 +6,13 @@ use Moose::Role;
 with 'WebGUI::FormBuilder::Role::HasObjects';
 requires 'session', 'pack', 'unpack';
 
-has 'tabs' => (
+has 'tabsets' => (
     is      => 'rw',
-    isa     => 'ArrayRef[WebGUI::FormBuilder::Tab]',
+    isa     => 'ArrayRef[WebGUI::FormBuilder::Tabset]',
     default => sub { [] },
 );
+
+
 
 =head1 METHODS
 
@@ -31,15 +33,17 @@ Any sub-tabs or fieldsets will also be included.
 =cut
 
 sub addTab {
-    my ($tab, $self);
+    my ($tab, $self, %properties);
     if ( blessed( $_[1] ) ) {
-        ( $self, my $object, my %properties ) = @_;
+        ( $self, my $object, %properties ) = @_;
         $properties{ name   } ||= $object->can('name')      ? $object->name     : "";
         $properties{ label  } ||= $object->can('label')     ? $object->label    : "";
         $tab = WebGUI::FormBuilder::Tab->new( $self->session, %properties );
         if ( $object->DOES('WebGUI::FormBuilder::Role::HasTabs') ) {
-            for my $objectTab ( @{$object->tabs} ) {
-                $tab->addTab( $objectTab );
+            for my $objectTabset ( @{$object->tabsets} ) {
+                for my $objectTab ( @{$objectTabset->tabs} ) {
+                    $tab->addTab( $objectTab, tabset => $objectTabset->name );
+                }
             }
         }
         if ( $object->DOES('WebGUI::FormBuilder::Role::HasFieldsets') ) {
@@ -54,12 +58,37 @@ sub addTab {
         }
     }
     else {
-        ( $self, my @properties ) = @_;
-        $tab = WebGUI::FormBuilder::Tab->new( $self->session, @properties );
+        ( $self, %properties ) = @_;
+        $tab = WebGUI::FormBuilder::Tab->new( $self->session, %properties );
     }
-    push @{$self->tabs}, $tab;
+    my $tabsetName  = delete $properties{ tabset } || "default";
+    my $tabset      = $self->getTabset( $tabsetName )
+                    || $self->addTabset( name => $tabsetName )
+                    ;
+    $tabset->addTab( $tab );
     $self->{_tabsByName}{$tab->name} = $tab;
     return $tab;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 addTabset ( properties )
+
+Add a tabset. A tabset holds a bunch of tabs. Returns the WebGUI::FormBuilder::Tabset
+object.
+
+=cut
+
+sub addTabset {
+    my ( $self, %properties ) = @_;
+    if ( $self->{_tabsetsByName}{$properties{name}} ) {
+        confess "Cannot add another tabset of the same name: $properties{name}\n";
+    }
+    my $tabset  = WebGUI::FormBuilder::Tabset->new( $self->session, %properties );
+    $self->{_tabsetsByName}{$tabset->name} = $tabset;
+    push @{$self->tabsets}, $tabset;
+    $self->addObject( $tabset );
+    return $tabset;
 }
 
 #----------------------------------------------------------------------------
@@ -73,10 +102,12 @@ Delete a tab by name. Returns the tab deleted.
 sub deleteTab {
     my ( $self, $name ) = @_;
     my $tab    = delete $self->{_tabsByName}{$name};
-    for ( my $i = 0; $i < scalar @{$self->tabs}; $i++ ) {
-        my $testTab    = $self->tabs->[$i];
-        if ( $testTab->name eq $name ) {
-            splice @{$self->tabs}, $i, 1;
+    for my $tabset ( @{ $self->tabsets } ) {
+        for ( my $i = 0; $i < scalar @{$tabset->tabs}; $i++ ) {
+            my $testTab    = $tabset->tabs->[$i];
+            if ( $testTab->name eq $name ) {
+                splice @{$tabset->tabs}, $i, 1;
+            }
         }
     }
     return $tab;
@@ -93,6 +124,19 @@ Get a tab object by name
 sub getTab {
     my ( $self, $name ) = @_;
     return $self->{_tabsByName}{$name};
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getTabset ( name )
+
+Get a tabset object by name
+
+=cut
+
+sub getTabset {
+    my ( $self, $name ) = @_;
+    return $self->{_tabsetsByName}{$name};
 }
 
 1;

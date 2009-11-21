@@ -21,6 +21,10 @@ with 'WebGUI::FormBuilder::Role::HasFields';
 with 'WebGUI::FormBuilder::Role::HasFieldsets'; 
 with 'WebGUI::FormBuilder::Role::HasTabs';
 
+use WebGUI::FormBuilder::Tab;
+use WebGUI::FormBuilder::Tabset;
+use WebGUI::FormBuilder::Fieldset;
+
 =head1 METHODS
 
 #----------------------------------------------------------------------------
@@ -75,8 +79,7 @@ Create a clone of this Form
 =cut
 
 sub clone {
-    my ( $self ) = @_;
-    return (ref $self)->newFromHashRef( $self->toHashRef );
+    # TODO
 }
 
 #----------------------------------------------------------------------------

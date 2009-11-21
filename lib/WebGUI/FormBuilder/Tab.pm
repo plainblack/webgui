@@ -87,20 +87,13 @@ Get the WebGUI::Session attached to this object
 
 =head2 toHtml ( )
 
-Render this Tab.
+Render the objects in this tab
 
 =cut
 
 sub toHtml {
     my ( $self ) = @_;
-    
-    # Whatever YUI Tabs wants
-    my $html    = '<div class="yui-tab">'
-                . '<div class="yui-tab-label">' . $self->label . '</div>'
-                ;
-    $html   .= inner();
-    $html   .= '</div>';
-
+    my $html    = join "", map { $_->toHtml } @{$self->objects};
     return $html;
 }
 

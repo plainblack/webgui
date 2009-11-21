@@ -29,13 +29,11 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 66;        # Increment this number for each test you create
+plan tests => 69;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Constructor and properties
 use_ok( 'WebGUI::FormBuilder' );
-use WebGUI::FormBuilder::Tab;
-use WebGUI::FormBuilder::Fieldset;
 
 my $fb = WebGUI::FormBuilder->new( $session );
 isa_ok( $fb, 'WebGUI::FormBuilder' );
@@ -74,9 +72,14 @@ is( $fb->name, 'myname' );
 my $tab = $fb->addTab( name => "mytab", label => "My Tab" );
 isa_ok( $tab, 'WebGUI::FormBuilder::Tab' );
 is( $fb->getTab('mytab'), $tab, 'getTab returns exact object' );
-is( $fb->tabs, $fb->tabs, 'tabs always returns same arrayref' );
+is( $fb->tabsets, $fb->tabsets, 'tabsets always returns same arrayref' );
 cmp_deeply(
-    $fb->tabs,
+    $fb->tabsets,
+    [ $fb->getTabset( "default" ) ],
+    'tabsets',
+);
+cmp_deeply( 
+    $fb->tabsets->[0]->tabs,
     [ $tab ],
     'tabs',
 );
@@ -106,10 +109,13 @@ ok( $newTab->fields->[0], 'field exists' );
 is( $newTab->fields->[0]->get('name'), 'search', 'field has same name' );
 ok( $newTab->fieldsets->[0], 'fieldset exists' );
 is( $newTab->fieldsets->[0]->name, 'advanced', 'fieldset has same name' );
-ok( $newTab->tabs->[0], 'subtab exists' );
-is( $newTab->tabs->[0]->name, 'more', 'subtab has same name' );
+ok( $newTab->tabsets->[0], 'subtabset exists' );
+is( $newTab->tabsets->[0]->name, 'default', 'subtabset has correct name' );
+ok( $newTab->tabsets->[0]->tabs->[0], 'subtab exists' );
+is( $newTab->tabsets->[0]->tabs->[0]->name, 'more', 'subtab has correct name' );
+
 cmp_deeply( 
-    $fb->tabs,
+    $fb->tabsets->[0]->tabs,
     [ $tab, $newTab ],
     'added tab',
 );
@@ -119,7 +125,7 @@ is( $fb->getTab('newname'), $newTab, 'new tab can be gotten' );
 my $deletedTab = $fb->deleteTab( 'newname' );
 is( $deletedTab, $newTab, 'deleteTab returns object' );
 cmp_deeply(
-    $fb->tabs,
+    $fb->tabsets->[0]->tabs,
     [ $tab ],
     'deleted tab',
 );
@@ -164,8 +170,8 @@ ok( $newFset->fields->[0], 'field exists' );
 is( $newFset->fields->[0]->get('name'), 'search', 'field has same name' );
 ok( $newFset->fieldsets->[0], 'subfieldset exists' );
 is( $newFset->fieldsets->[0]->name, 'advanced', 'subfieldset has same name' );
-ok( $newFset->tabs->[0], 'tab exists' );
-is( $newFset->tabs->[0]->name, 'more', 'tab has same name' );
+ok( $newFset->tabsets->[0]->tabs->[0], 'tab exists' );
+is( $newFset->tabsets->[0]->tabs->[0]->name, 'more', 'tab has same name' );
 cmp_deeply( 
     $fb->fieldsets,
     [ $fset, $newFset],
@@ -236,6 +242,7 @@ $fset->addField( 'text', name => 'keywords', label => 'Keywords' );
 my $tab     = $fb->addTab( name => 'advanced', label => 'Advanced Search' );
 $tab->addField( 'text', name => 'type', label => 'Type' );
 $fb->addField( 'submit', name => 'submit', label => 'Submit' );
+
 
 #----------------------------------------------------------------------------
 # toHtml

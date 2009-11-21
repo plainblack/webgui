@@ -115,7 +115,7 @@ sub toHtml {
     my ( $self ) = @_;
 
     my $html = '<fieldset><legend>' . $self->label . '</legend>';
-    $html   .= inner();
+    $html   .= join "", map { $_->toHtml } @{$self->objects};
     $html   .= '</fieldset>';
 
     return $html;

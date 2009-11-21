@@ -48,8 +48,10 @@ sub addFieldset {
         $properties{ label  } ||= $object->can('label')     ? $object->label    : "";
         $fieldset = WebGUI::FormBuilder::Fieldset->new( $self->session, %properties );
         if ( $object->DOES('WebGUI::FormBuilder::Role::HasTabs') ) {
-            for my $objectTab ( @{$object->tabs} ) {
-                $fieldset->addTab( $objectTab );
+            for my $objectTabset ( @{$object->tabsets} ) {
+                for my $objectTab ( @{$objectTabset->tabs} ) {
+                    $fieldset->addTab( $objectTab, tabset => $objectTabset->name );
+                }
             }
         }
         if ( $object->DOES('WebGUI::FormBuilder::Role::HasFieldsets') ) {
@@ -68,6 +70,7 @@ sub addFieldset {
         $fieldset = WebGUI::FormBuilder::Fieldset->new( $self->session, @properties );
     }
     push @{$self->fieldsets}, $fieldset;
+    $self->addObject( $fieldset );
     $self->{_fieldsetsByName}{ $fieldset->name } = $fieldset;
     return $fieldset;
 }
