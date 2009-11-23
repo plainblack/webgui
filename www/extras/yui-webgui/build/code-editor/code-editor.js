@@ -43,7 +43,7 @@
             this._getDoc().getElementsByTagName('head')[0].appendChild(link);
             // Highlight the initial value
             if ( this.getEditorText() != this.old_text ) {
-                Lang.later(10, this, this.highlight);
+                Lang.later(10, this, function () { this.highlight(true) } );
                 if ( this.status ) {
                     Lang.later(100, this, this._writeStatus);
                 }
