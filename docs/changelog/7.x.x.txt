@@ -16,6 +16,7 @@
  - fixed #11143: cancel button
  - fixed #11259: Snippet content never cached
  - fixed #11254: RTF files are streamed with the wrong content-type
+ - fixed #10932: code showing
  - fixed #11263: CleanLoginHistory can cause workflow errors
 
 7.7.26
