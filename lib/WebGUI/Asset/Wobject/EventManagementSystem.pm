@@ -499,7 +499,7 @@ sub getSubmissionLocations {
    my $self = shift;
    my $text = $self->get('submittedLocationsList');
    return undef if $text eq '';
-   return [ split( /[\s\n]+/, $text ) ];
+   return [ split( /[\n]+/, $text ) ];
 }
 
 #-------------------------------------------------------------------
@@ -2737,8 +2737,8 @@ sub www_viewSubmissionQueue {
 	     for my $tabSource ( @{$self->getSubmissionForms} ) {
 	         push @{$params->{tabs}}, $tabSource->www_editSubmissionForm( { asHashRef => 1 } );
 	     }
-             if( scalar( @{$params->{tabs}} ) == 1 ) {  # there were no existing forms
-	         push @{$params->{tabs}}, $self->www_addSubmissionForm( { asHashRef => 1 } );
+	     push @{$params->{tabs}}, $self->www_addSubmissionForm( { asHashRef => 1 } );
+             if( scalar( @{$params->{tabs}} ) == 2 ) {  # there were no existing forms
 		 $params->{tabs}[1]{selected} = 1; # the new submission form tab
              } else {
 		 $params->{tabs}[0]{selected} = 1; # the submission queue tab
@@ -2749,7 +2749,7 @@ sub www_viewSubmissionQueue {
 		 next unless $tabSource->canSubmit;
 	         push @{$params->{tabs}}, $tabSource->www_addSubmission( { asHashRef => 1 } );
 	     }
-	     $params->{tabs}[$#{$params->{tabs}}]{selected} = 1;
+	     $params->{tabs}[0]{selected} = 1;
         }
 	my $tabid = 'tab01';
 	for my $tab ( @{$params->{tabs}} ) { $tab->{id} = $tabid ++; }

@@ -277,7 +277,7 @@ sub www_editSubmissionForm {
 
 	my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : { };
         for my $fieldId ( @fieldNames ) {
-            next if $fieldId =~ /^(submissionStatus|sendEmailOnChange)$/;
+            next if $fieldId eq 'submissionStatus';
 	    my $field = $fields->{$fieldId};
 	    $newform->yesNo(
 	             label => $field->{label},
@@ -474,7 +474,6 @@ sub processForm {
     my @fieldNames = split( ' ', $form->get('fieldNames') );
     $params->{formDescription} = { map { $_ => $form->get($_ . '_yesNo') } ( @fieldNames ) };
     $params->{formDescription}{submissionStatus} = 0;
-    $params->{formDescription}{sendEmailOnChange} = 1;
     $params->{formDescription}{_fieldList} = [ map { $params->{formDescription}{$_} ? $_ : () } ( @fieldNames ) ];
     if( scalar( @{$params->{formDescription}{_fieldList}} ) == 0 ) {
 	$params->{_isValid} = 0;

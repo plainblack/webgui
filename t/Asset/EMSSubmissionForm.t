@@ -419,7 +419,6 @@ my $expected = {
                                  'startDate' => '1',
                                  'description' => '1',
 				 'submissionStatus' => '0',
-				  sendEmailOnChange => 1,
                                  '_fieldList' => [
                                                    'title',
                                                    'description',
@@ -465,7 +464,6 @@ $expected = {
           'formDescription' => {
                                  '_fieldList' => [],
 				 'submissionStatus' => 0,
-				  sendEmailOnChange => 1,
                                },
           'description' => undef,
           '_isValid' => 0,

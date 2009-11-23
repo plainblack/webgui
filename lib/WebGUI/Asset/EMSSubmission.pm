@@ -60,6 +60,7 @@ send email when a comment is added
 
 sub addComment {
     my $self = shift;
+    $self->update(lastReplyBy => $self->session->user->userId);
     $self->next::method(@_);
     $self->sendEmailUpdate;
 }
@@ -207,13 +208,6 @@ sub definition {
 				fieldType               => "hidden",
 				defaultValue    => '{}',
 		},
-		sendEmailOnChange => {
-		    tab          => "properties",
-		    fieldType    => "yesNo",
-		    defaultValue => 1,
-		    label        => $i18n->get("send email label"),
-		    hoverHelp    => $i18n->get("send email label help")
-		},
                 ticketId => {
 				noFormPost              => 1,
 				fieldType               => "hidden",
@@ -355,15 +349,13 @@ sub sendEmailUpdate {
     my $self = shift;
     my $session = $self->session;
     my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmission" );
-    if( $self->get('sendEmailOnChange') ) {
-        WebGUI::Inbox->new($session)->addMessage( {
-           status => 'unread',
+	WebGUI::Inbox->new($session)->addMessage( {
+	   status => 'unread',
 	   message => $i18n->get('your submission has been updated') . "\n\n" .
-	                 $self->get('title'),
+			 $self->get('title'),
 	   userId => $self->get('createdBy'),
 	   sentBy => $session->user->userId,
-        });
-    }
+	});
 }
 
 #-------------------------------------------------------------------
@@ -410,7 +402,7 @@ sub www_editSubmission {
         $newform->hidden(name => 'assetId', value => $assetId);
 	my $formDescription = $parent->getFormDescription;
 	my @defs = reverse @{__PACKAGE__->definition($session)};
-        my @fieldNames = qw/title submissionStatus sendEmailOnChange startDate duration seatsAvailable location description/;
+        my @fieldNames = qw/title submissionStatus startDate duration seatsAvailable location description/;
         my $fields;
         for my $def ( @defs ) {
 	    my $properties = $def->{properties};
@@ -462,7 +454,7 @@ sub www_editSubmission {
 	    }
 	}
         $newform->submit;
-	my $title = $assetId eq 'new' ? $i18n->get('new submission') : $asset->get('title');
+	my $title = $asset->get('title');
         my $content = 
                $asset->processTemplate({
                       errors => $params->{errors} || [],
