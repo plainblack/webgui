@@ -8,6 +8,7 @@
  - fixed #11254: RTF files are streamed with the wrong content-type
  - fixed #10932: code showing
  - fixed #11265: typo i18n
+ - fixed #11263: CleanLoginHistory can cause workflow errors
 
 7.8.5
  - added the EMS submission subsystem
