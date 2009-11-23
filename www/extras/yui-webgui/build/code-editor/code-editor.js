@@ -42,38 +42,28 @@
             link.href = this.get('css_url');
             this._getDoc().getElementsByTagName('head')[0].appendChild(link);
             // Highlight the initial value
-            if ( !this.browser.ie ) { // IE puts "!!CURSOR HERE!!" in the main doc, not the iframe...
-                this.highlight(false);
+            if ( this.getEditorText() != this.old_text ) {
+                Lang.later(10, this, this.highlight);
+                if ( this.status ) {
+                    Lang.later(100, this, this._writeStatus);
+                }
+                this.old_text = this.getEditorText();
             }
             // Setup resize
             if ( this.status ) {
-                this._writeStatus();
                 this._setupResize();
             }
         }, this, true);
+
         this.on('editorKeyUp', function(ev) {
-
-            // Don't highlight arrows or modifiers
-            if ( ( ev.ev.keyCode > 36 && ev.ev.keyCode < 41 )
-                || ev.ev.keyCode == 16 || ev.ev.keyCode == 17 
-                || ev.ev.keyCode == 18 || ev.ev.keyCode == 91 // Safari "command"
-                || ev.ev.keyCode == 224 // Firefox "command"
-                ) {
-                return;
+            // Highlight only if content has changed
+            if ( this.getEditorText() != this.old_text ) {
+                Lang.later(10, this, this.highlight);
+                if ( this.status ) {
+                    Lang.later(100, this, this._writeStatus);
+                }
+                this.old_text = this.getEditorText();
             }
-
-            // TODO: Don't re-highlight if there is a selection
-            // That is the problem we're trying to avoid with disabling
-            // highlighting for arrows and modifiers
-
-            // Don't highlight Ctrl, Alt, or Meta key combinations
-            if ( ev.ev.ctrlKey || ev.ev.altKey || ev.ev.metaKey ) {
-                return;
-            }
-
-            // Highlight every keypress
-            Lang.later(10, this, this.highlight);
-            Lang.later(100, this, this._writeStatus);
         }, this, true);
         
         //Borrowed this from CodePress: http://codepress.sourceforge.net
@@ -107,10 +97,14 @@
         str = str.replace(/{/gi, 'RIGHT_BRACKET');
         str = str.replace(/}/gi, 'LEFT_BRACKET');
 
-        // &nbsp; before <br> for IE7 so lines show up correctly
-        if ( this.browser.ie && this.browser.ie <= 7 ) {
+        // &nbsp; before <br> for IE8 so lines show up correctly
+        if ( this.browser.ie && this.browser.ie <= 8 ) {
             str = str.replace(/\r?\n/g, "&nbsp;<br>");
         }
+
+        // Fix tabs into softtabs
+        str = str.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;'); // TODO: Make softtabs configurable
+
         return str;
     };
 
@@ -167,6 +161,7 @@
         if (!html) { 
             html = this.getEditorHTML();
         }
+        html = html.replace(/(&nbsp;){4}/g,"\t");   // TODO: make softtabs configurable
         html = html.replace(/&nbsp;/g," ");
         html = html.replace(/ ?<br>/gi,'\n');
         html = html.replace(/<[^>]+>/g,'');
@@ -211,7 +206,7 @@
                 this._getSelection().getRangeAt(0).insertNode(this._getDoc().createTextNode(this.cc));
             } else if (this.browser.webkit || this.browser.ie || this.browser.opera) {
                 try {
-                    this.execCommand('inserthtml', '!!CURSOR_HERE!!');
+                    this.execCommand('inserthtml', '<span class="cursor_here"></span>');
                 }
                 catch (e) {}
             }
@@ -236,18 +231,18 @@
             }
             YAHOO.log(html);
             // &nbsp; before <br> for IE7
-            html = html.replace(/(&nbsp;|!!CURSOR_HERE!!)?<br[^>]*>/gi,'$1\n');
+            html = html.replace(/(&nbsp;|<span class="cursor_here"><\/span>)?<br[^>]*>/gi,'$1\n');
             html = html.replace(/<[^>]*>/g,'');
             html = html.replace(/\r?\n/g,'<br>');
             // &nbsp; between <br> for IE6
-            html = html.replace(/<br[^>]*>(!!CURSOR_HERE!!)?<br[^>]*>/gi, '<br>$1&nbsp;<br>');
+            html = html.replace(/<br[^>]*>(<span class="cursor_here"><\/span>)?<br[^>]*>/gi, '<br>$1&nbsp;<br>');
             YAHOO.log(html);
         }
         for (var i = 0; i < this.keywords.length; i++) {
             html = html.replace(this.keywords[i].code, this.keywords[i].tag);
         }
         YAHOO.log("AFTER HIGHLIGHT:" + html);
-        html = html.replace('!!CURSOR_HERE!!', '<span id="cur">|</span>');
+        html = html.replace('<span class="cursor_here"></span>', '<span id="cur">|</span>');
 
         this._getDoc().body.innerHTML = html;
         if (!focus) {

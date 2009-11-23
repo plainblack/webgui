@@ -9,6 +9,7 @@
  - fixed #10932: code showing
  - fixed #11265: typo i18n
  - fixed #11263: CleanLoginHistory can cause workflow errors
+ - fixed #11185: Code editor broken in IE8 for SQLReport
 
 7.8.5
  - added the EMS submission subsystem
