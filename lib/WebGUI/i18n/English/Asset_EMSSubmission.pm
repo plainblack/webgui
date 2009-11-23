@@ -10,8 +10,8 @@ our $I18N = { ##hashref of hashes
                 context => q|Then name of the Asset ( Event Management System - Event Submission ).|
         },
 	'send email label' => {
-		message => q|Send Email when Submission Editted|,
-		lastUpdated => 1131394072,
+		message => q|Send Email when Submission Edited|,
+		lastUpdated => 1258993281,
 		context => q|This is the lable for the flag for setting the option to send email to the owner when the submission is edited.|
 	},
 	'send email label help' => {
