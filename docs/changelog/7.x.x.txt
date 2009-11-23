@@ -18,6 +18,7 @@
  - fixed #11254: RTF files are streamed with the wrong content-type
  - fixed #10932: code showing
  - fixed #11263: CleanLoginHistory can cause workflow errors
+ - fixed #11185: Code editor broken in IE8 for SQLReport
 
 7.7.26
  - fixed #11134: Tree Navigation menu colapses sub items of current page
