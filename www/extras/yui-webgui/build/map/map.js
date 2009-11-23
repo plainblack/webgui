@@ -46,6 +46,7 @@ WebGUI.Map.editPoint
         marker = new GMarker( map.getCenter(), { draggable: true } );
         marker.infoWin = document.createElement("div");
         marker.bindInfoWindow( marker.infoWin );
+        marker.map = map;
         mgr.addMarker( marker, 0 );
         mgr.refresh();
         assetId         = "new";
