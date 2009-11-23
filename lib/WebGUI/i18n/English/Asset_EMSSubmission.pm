@@ -40,6 +40,42 @@ our $I18N = { ##hashref of hashes
 		context => q|The label for the default edit page.|
 	},
 
+	'submission id' => {
+		message => q|Submission Id|,
+		lastUpdated => 1131394072,
+		context => q|The label for the submission id column in the submission queue data table.|
+	},
+
+	'subject' => {
+		message => q|Subject|,
+		lastUpdated => 1131394072,
+		context => q|The label for the title or subject column in the submission queue data table.|
+	},
+
+	'submitted by' => {
+		message => q|Submitted By|,
+		lastUpdated => 1131394072,
+		context => q|The label for the 'submitted by' column in the submission queue data table.|
+	},
+
+	'creation date' => {
+		message => q|Creation Date|,
+		lastUpdated => 1131394072,
+		context => q|The label for the creation date column in the submission queue data table.|
+	},
+
+	'submission status' => {
+		message => q|Submission Status|,
+		lastUpdated => 1131394072,
+		context => q|The label for the status column in the submission queue data table.|
+	},
+
+	'last reply by' => {
+		message => q|Last Reply By|,
+		lastUpdated => 1131394072,
+		context => q|The label for the 'last reply by' column in the submission queue data table.|
+	},
+
 #	'TODO' => {
 #		message => q|TODO|,
 #		lastUpdated => 1131394072,

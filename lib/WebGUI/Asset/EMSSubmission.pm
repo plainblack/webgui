@@ -60,7 +60,7 @@ send email when a comment is added
 
 sub addComment {
     my $self = shift;
-    $self->update(lastReplyBy => $self->session->user->userId);
+    $self->update({lastReplyBy => $self->session->user->userId});
     $self->next::method(@_);
     $self->sendEmailUpdate;
 }
