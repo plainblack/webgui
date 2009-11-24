@@ -1370,6 +1370,12 @@ Couldn't open %-s because %-s <br />
         context     => q{},
     },
 
+    'cut asset' => {
+        message     => q{Asset %s was cut to the clipboard.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
 };
 
 1;
