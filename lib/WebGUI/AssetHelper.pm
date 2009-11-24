@@ -49,17 +49,23 @@ A WebGUI::Asset object.
 
 =head3 Hashref Payload
 
+Sending all hash keys at the same time may cause unpredictable results.
+
 =head4 error
 
-Displays an error message to the user.  Should always be internationalized.
+An error message to the user.  Should always be internationalized.
 
 =head4 message
 
-Displays an informational message to the user.  Should always be internationalized.
+An informational message to the user.  Should always be internationalized.
+
+=head4 open_tab
+
+A URL. Will open a tab in the Admin Console.  Anything returned by the URL will be displayed in the tab.
 
 =head4 redirect
 
-Will open a tab in the Admin Console.  Anything returned by the URL will be displayed in the tab.
+A URL.  Puts new content into the View tab from the requested URL.
 
 =head4 scriptFile
 
@@ -83,7 +89,8 @@ sub process {
     return {
         error           => q{User, we have a problem.},
         message         => q{A friendly informational method},
-        redirect        => '?op=assetHelper;className=WebGUI::AssetHelper;method=editBranch',
+        open_tab        => '?op=assetHelper;className=WebGUI::AssetHelper;method=editBranch',
+        redirect        => '/home',
         scriptFile      => q{URL},
         scriptMethod    => q{methodName},
         scriptArgs      => [ 'arg1', { another => 'argument' } ],
