@@ -19,17 +19,20 @@ Gets a select box to choose a class name.
 
 sub getClassSelectBox {
     my $session     = shift;
+    my $i18n        = WebGUI::International->new($session, 'Asset');
     
     tie my %classes, "Tie::IxHash", (
-        ""  => "Any Class", 
+        ""  => $i18n->get("Any Class"), 
         $session->db->buildHash("select distinct(className) from asset"),
     );
     delete $classes{"WebGUI::Asset"}; # don't want to search for the root asset
 
+    my $className = $session->scratch->get('assetManagerSearchClassName') || $session->form->process("class","className");
+    $session->scratch->set('assetManagerSearchClassName', $className);
     return WebGUI::Form::selectBox( $session, {
-        name            => "class", 
-        value           => $session->form->process("class","className"), 
-        defaultValue    => "", 
+        name            => "class",
+        value           => $className,
+        defaultValue    => "",
         options         => \%classes,
     });
 }
@@ -142,8 +145,10 @@ sub getSearchPaginator {
         $queryString    .= ';class=' . $class;
     }
 
-    my $p           = $s->getPaginatorResultSet( $session->url->page( $queryString ) );
+    my $pageNumber  = $session->scratch->get('assetManagerSearchPageNumber') || $session->form->get('pn');
+    my $p           = $s->getPaginatorResultSet( $session->url->page( $queryString ), undef, $pageNumber );
 
+    $session->scratch->set('assetManagerSearchPageNumber', $pageNumber);
     return $p;
 }
 
@@ -533,64 +538,36 @@ sub www_search {
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
+    my $keywords = $session->scratch->get('assetManagerSearchKeywords') || $session->form->get('keywords');
 
     ### Show the form
     $output     .= q{<form method="post" enctype="multipart/form-data" action="} . $currentAsset->getUrl . q{"><p>}
                 . q{<input type="hidden" name="op" value="assetManager" />}
                 . q{<input type="hidden" name="method" value="search" />}
-                . q{<input type="text" size="45" name="keywords" value="} . $session->form->get('keywords') . q{" />}
+                . q{<input type="text" size="45" name="keywords" value="} . $keywords . q{" />}
                 . getClassSelectBox( $session )
                 . q{<input type="submit" name="action" value="}.$i18n->get( "search" ).q{" />}
                 . q{</p></form>}
                 ;
 
-    ### Actions
-    if ( my $action = lc $session->form->get( 'action' ) ) {
-        my @assetIds = $session->form->get( 'assetId' );
-
-        if ( $action eq "delete" ) { ##aka trash
-            for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-                next unless $asset;
-                $asset->trash;
-            }
-        }
-        elsif ( $action eq "cut" ) {
-            for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-                next unless $asset;
-                $asset->cut;
-            }
-        }
-        elsif ( $action eq "copy" ) {
-            for my $assetId ( @assetIds ) {
-                # Copy == Duplicate + Cut
-		my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId);
-                my $newAsset    = $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
-                $newAsset->update( { title => $newAsset->getTitle . ' (copy)' } );
-                $newAsset->cut;
-            }
-        }
-    }
-
     ### Run the search
-    if ( $session->form->get( 'keywords' ) || $session->form->get( 'class' ) ) {
-        my $keywords        = $session->form->get( 'keywords' );
-        my @classes         = $session->form->get( 'class' );
+    if ( $keywords || $session->form->get( 'class' ) ) {
+        my @classes          = $session->form->get( 'class' );
+        my $keywordsScrubbed = $keywords;
 
         # Detect a helper word key
         my @assetIds        = ($keywords =~ /assetid:\s*([^\s]+)/gi);
 
         # purge helper word keys
         if (@assetIds) {
-            $keywords =~ s/\bassetid:\s*[^\s]+//gi;
+            $keywordsScrubbed =~ s/\bassetid:\s*[^\s]+//gi;
         }
-        $keywords =~ s/^\s+//g;
-        $keywords =~ s/\s+$//g;
+        $keywordsScrubbed =~ s/^\s+//g;
+        $keywordsScrubbed =~ s/\s+$//g;
 
         my $p       = getSearchPaginator( $session, {
             assetIds            => \@assetIds,
-            keywords            => $keywords,
+            keywords            => $keywordsScrubbed,
             classes             => \@classes,
             orderByColumn       => $session->form->get( 'orderByColumn' ),
             orderByDirection    => $session->form->get( 'orderByDirection' ),
@@ -601,9 +578,10 @@ sub www_search {
         }
         else {
             ### Display the search results 
-            $output         .= q{<form method="post" enctype="multipart/form-data">}
-                            . q{<input type="hidden" name="op" value="assetManager" />}
-                            . q{<input type="hidden" name="method" value="search" />}
+            $output         .= q{<form method="post" enctype="multipart/form-data" action="}.$currentAsset->getUrl.q{">}
+                            . q{<input type="hidden" name="func"    value="searchAssets" />}
+                            . q{<input type="hidden" name="proceed" value="searchAssets" />}
+                            . WebGUI::Form::CsrfToken->new($session)->toHtml
                             . q{<input type="hidden" name="pn" value="} . $session->form->get('pn') . q{" />}
                             . q{<input type="hidden" name="keywords" value="} . $keywords . q{" />}
                             ;
@@ -707,9 +685,9 @@ sub www_search {
             $output     .= q{</tbody>}
                         . q{</table>}
                         . q{<p class="actions">} . $i18n->get( 'with selected' )
-                        . q{<input type="submit" name="action" value="}.$i18n->get( 'delete' ) . q{" />}
-                        . q{<input type="submit" name="action" value="}.$i18n->get( "cut" )    . q{" />}
-                        . q{<input type="submit" name="action" value="}.$i18n->get( "Copy" )    .q{" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( 'delete' ) . q[" onclick="if(confirm('].$i18n->get('43').q[')){this.form.func.value='deleteList'; this.form.submit();}{ return false; }" />]
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "cut" )    . q{" onclick="this.form.func.value='cutList'; this.form.submit();" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "Copy" )    .q{" onclick="this.form.func.value='copyList'; this.form.submit();" />}
                         . q{</p>}
                         . q{</form>}
                         ;
@@ -730,6 +708,7 @@ sub www_search {
 
     $output         .= '</div>';
 
+    $session->scratch->set('assetManagerSearchKeywords',  $keywords);
     return $ac->render( $output );
 }
 

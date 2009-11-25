@@ -1392,6 +1392,12 @@ Couldn't open %-s because %-s <br />
         context     => q{},
     },
 
+    'Any Class' => {
+        message     => q{Any Class},
+        lastUpdated => 0,
+        context     => q{Class, as in name of class, or type of asset},
+    },
+
 };
 
 1;
