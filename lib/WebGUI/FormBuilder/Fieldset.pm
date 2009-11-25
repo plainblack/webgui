@@ -66,6 +66,16 @@ sub new {
     return $class->SUPER::new( %properties );
 }
 
+sub getFooter {
+    my ( $self ) = @_;
+    return '</fieldset>';
+}
+
+sub getHeader {
+    my ( $self ) = @_;
+    return '<fieldset><legend>' . $self->label . '</legend>';
+}
+
 #----------------------------------------------------------------------------
 
 =head2 label ( newLabel )
@@ -114,11 +124,21 @@ Returns the HTML to render the fieldset.
 sub toHtml {
     my ( $self ) = @_;
 
-    my $html = '<fieldset><legend>' . $self->label . '</legend>';
+    my $html = $self->getHeader;
     $html   .= join "", map { $_->toHtml } @{$self->objects};
-    $html   .= '</fieldset>';
+    $html   .= $self->getFooter;
 
     return $html;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 toTemplateVars ( )
+
+=cut
+
+sub toTemplateVars {
+
 }
 
 1;

@@ -92,6 +92,41 @@ Get or set the enctype property / HTML attribute.
 
 #----------------------------------------------------------------------------
 
+=head2 getFooter ( )
+
+Get the footer for this form.
+
+=cut
+
+sub getFooter {
+    my ( $self ) = @_;
+
+    my $html    = '</form>';
+
+    return $html;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getHeader ( )
+
+Get the header for this form. 
+
+=cut
+
+sub getHeader {
+    my ( $self ) = @_;
+
+    my @attrs   = qw{ action method name enctype };
+    my $attrs   = join " ", map { qq{$_="} . $self->$_ . qq{"} } grep { $self->$_ } @attrs;
+
+    my $html    = sprintf '<form %s>', $attrs;
+    
+    return $html;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 method ( [ newMethod ] )
 
 Get or set the method property / HTML attribute.
@@ -125,15 +160,10 @@ Return the HTML for the form
 sub toHtml {
     my ( $self ) = @_;
     
-    my @attrs   = qw{ action method name enctype };
-    my $attrs   = join " ", map { qq{$_="} . $self->$_ . qq{"} } grep { $self->$_ } @attrs;
-
-    my $html    = sprintf '<form %s>', $attrs;
-
+    my $html = $self->getHeader;
     # Add individual objects
     $html   .= join "", map { $_->toHtml } @{$self->objects};
-
-    $html   .= '</form>';
+    $html   .= $self->getFooter;
 
     return $html;
 }
@@ -152,10 +182,11 @@ sub toTemplateVars {
     $prefix ||= "form";
     $var ||= {};
 
-    # TODO
     # $prefix_header
+    $var->{ "${prefix}_header" } = $self->getHeader;
     # $prefix_footer
-    # $prefix_field_loop
+    $var->{ "${prefix}_footer" } = $self->getFooter;
+    # $prefix_fieldloop
     #   name    -- for comparisons
     #   field
     #   label   -- includes hoverhelp
@@ -164,30 +195,72 @@ sub toTemplateVars {
     #   subtext
     #   hoverhelp   -- The text. For use with label_nohover
     # $prefix_field_$fieldName
-    # $prefix_label_$fieldName
-    # $prefix_fieldset_loop
+    if ( @{$self->fields} ) {
+        my $fieldLoop = [];
+        $var->{ "${prefix}_fieldloop" } = $fieldLoop;
+        for my $field ( @{$self->fields} ) {
+            my $name  = $field->get('name');
+            my $props = {
+                name            => $name,
+                field           => $field->toHtml,
+                label           => $field->getLabel,
+                label_nohover   => $field->get('label'),
+                pretext         => $field->get('pretext'),
+                subtext         => $field->get('subtext'),
+                hoverhelp       => $field->get('hoverhelp'),
+            };
+            for my $key ( keys %{$props} ) {
+                $var->{ "${prefix}_field_${name}_${key}" } = $props->{$key};
+            }
+            push @{$fieldLoop}, $props;
+        }
+    }
+    # $prefix_fieldsetloop
     #   name
     #   legend
     #   label       -- same as legend
-    #   $prefix_field_loop
+    #   fieldloop
     #       ...
-    #   $prefix_fieldset_loop
+    #   fieldsetloop
     #       ...
-    #   $prefix_tab_loop
+    #   tabloop
     #       ...
     # $prefix_fieldset_$fieldsetName
-    #   ...
-    # $prefix_tab_loop
+    if ( @{$self->fieldsets} ) {
+        my $fieldsetLoop = [];
+        $var->{ "${prefix}_fieldsetLoop" } = $fieldsetLoop;
+        for my $fieldset ( @{$self->fieldsets} ) {
+            my $name    = $fieldset->name;
+            my $props   = $fieldset->toTemplateVars;
+            for my $key ( keys %{$props} ) {
+                $var->{ "${prefix}_fieldset_${name}_${key}" } = $props->{key};
+            }
+            push @{$fieldsetLoop}, $props;
+        }
+    }
+    # $prefix_tabloop
     #   name
     #   label
-    #   $prefix_field_loop
+    #   fieldloop
     #       ...
-    #   $prefix_fieldset_loop
+    #   fieldsetloop
     #       ...
-    #   $prefix_tab_loop
+    #   tabloop
     #       ...
     # $prefix_tab_$tabName
-    #   ...
+    if ( @{$self->tabs} ) {
+        my $tabLoop = [];
+        $var->{ "${prefix}_tabLoop" } = $tabLoop;
+        for my $tab ( @{$self->tabs} ) {
+            my $name    = $tab->name;
+            my $props   = $tab->toTemplateVars;
+            for my $key ( keys %{$props} ) {
+                $var->{ "${prefix}_tab_${name}_${key}" } = $props->{key};
+            }
+            push @{$tabLoop}, $props;
+        }
+    }
+
     return $var;
 }
 
