@@ -12,6 +12,7 @@
  - fixed #11185: Code editor broken in IE8 for SQLReport
  - fixed #11177: Code editor steals focus on load
  - fixed #10888: Final touches on map point bugs
+ - fixed #11274: Add attachment broken in template
 
 7.8.5
  - added the EMS submission subsystem
