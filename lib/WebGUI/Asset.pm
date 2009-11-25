@@ -2285,16 +2285,18 @@ sub processTemplate {
     my $var = shift;
     my $templateId = shift;
     my $template = shift;
+    my $session  = $self->session;
 
     # Sanity checks
     if (ref $var ne "HASH") {
-        $self->session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
+        $session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
-    $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
+    $template = WebGUI::Asset->new($session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
     if (defined $template) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-        $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
+        $var->{'controls'}   = $self->getToolbar if $session->var->isAdminOn;
+        $var->{'assetIdHex'} = $session->id->toHex($self->getId);
         my %vars = (
             %{$self->{_properties}},
             'title'     => $self->getTitle,
@@ -2304,7 +2306,7 @@ sub processTemplate {
         return $template->process(\%vars);
     }
     else {
-        $self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
+        $session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
         my $i18n = WebGUI::International->new($self->session, 'Asset');
         return $i18n->get('Error: Cannot instantiate template').' '.$templateId;
     }
