@@ -1310,6 +1310,21 @@ sub getRoot {
 
 #-------------------------------------------------------------------
 
+=head2 getSearchUrl ( )
+
+Returns the URL for the search screen of the asset manager.
+
+=cut
+
+sub getSearchUrl {
+	my $self = shift;
+	return $self->getUrl( 'op=assetManager;method=search' );
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 getSeparator
 
 Returns a very unique string that can be used for splitting head and body apart
@@ -2752,14 +2767,28 @@ sub www_editSave {
 
 =head2 www_manageAssets ( )
 
-Redirect to the asset manager content handler (for backwards 
-compatibility)
+Redirect to the asset manager content handler (for backwards compatibility)
 
 =cut
 
 sub www_manageAssets {
     my $self = shift;
     $self->session->http->setRedirect( $self->getUrl( 'op=assetManager' ) );
+    return "redirect";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_searchAssets ( )
+
+Redirect to the asset manager content handler (for backwards 
+compatibility)
+
+=cut
+
+sub www_searchAssets {
+    my $self = shift;
+    $self->session->http->setRedirect( $self->getSearchUrl );
     return "redirect";
 }
 

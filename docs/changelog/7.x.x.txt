@@ -1,3 +1,6 @@
+7.6.35-2
+ - fixed #11272: Security issue with asset manager search
+
 7.6.35-1
  - fixed #10831: Graphing tab in Poll is not i18n'ed
  - fixed #10829: Extra field in Poll Property tab
@@ -8,6 +11,7 @@
  - fixed #10761: Two i18n issues on LDAP page
  - fixed i18n message for delete assets doesn't mention children.
  - fixed #10830 Pie Chart broken. (Martin Kamerbeek / Oqapi)
+ - fixed #11272: Security issue with asset manager search
 
 7.6.35
  - fixed #10751: Only users in Content Managers group can make Shortcuts
