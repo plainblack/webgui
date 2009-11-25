@@ -1,7 +1,8 @@
 7.5.40+
-These bug fixes have been added to SVN after the 7.5.40 bug release.
+These bug fixes have been added after the 7.5.40 bug release.
  - fixed #9942: Upgrade script fails with ITransact driver (William McKee, Knowmad Technologies)
  - fixed #9943: Upgrade script fails with Payment Gateways
+ - fixed #11272: Security issue with asset manager search
 
 7.5.40
  - fixed #9596: Articles now use a semi-unique pagination variable based on asset id
