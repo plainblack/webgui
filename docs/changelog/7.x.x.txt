@@ -13,6 +13,7 @@
  - fixed #11177: Code editor steals focus on load
  - fixed #10888: Final touches on map point bugs
  - fixed #11274: Add attachment broken in template
+ - fixed #11272: Security issue with asset manager search
 
 7.8.5
  - added the EMS submission subsystem
