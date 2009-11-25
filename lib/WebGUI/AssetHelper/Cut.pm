@@ -1,8 +1,8 @@
 package WebGUI::AssetHelper::Cut;
 
+use strict;
 use Class::C3;
 use base qw/WebGUI::AssetHelper/;
-use WebGUI::Asset;
 
 =head1 LEGAL
 
