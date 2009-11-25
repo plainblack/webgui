@@ -1,4 +1,5 @@
 7.8.7
+ - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl
 
 7.8.6
  - fixed #11250: i18n Asset_EMSSubmissionForm::delete created items label help
