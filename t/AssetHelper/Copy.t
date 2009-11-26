@@ -39,35 +39,37 @@ plan tests => 3;        # Increment this number for each test you create
 my $output;
 my $home = WebGUI::Asset->getDefault($session);
 
-$output = WebGUI::AssetHelper::Copy->process($home);
-cmp_deeply(
-    $output, 
-    {
-        message  => re('was copied to the clipboard'),
-    },
-    'AssetHelper/Copy redirects the back to the copied asset'
-);
+{ 
 
-my $clippies = $home->getAssetsInClipboard();
-is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
+    $output = WebGUI::AssetHelper::Copy->process($home);
+    cmp_deeply(
+        $output, 
+        {
+            message  => re('was copied to the clipboard'),
+        },
+        'AssetHelper/Copy redirects the back to the copied asset'
+    );
 
-foreach my $asset (@{ $clippies }) {
-    $asset->purge;
+    my $clippies = $home->getAssetsInClipboard();
+    is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
+    addToCleanup(@{ $clippies });
 }
 
-$session->setting->set('skipCommitComments', 0);
+{
+    $session->setting->set('skipCommitComments', 0);
 
-$output = WebGUI::AssetHelper::Copy->process($home);
-cmp_deeply(
-    $output, 
-    {
-        message  => re('was copied to the clipboard'),
-        open_tab => $home->getUrl,
-    },
-    'AssetHelper/Copy opens a tab for commit comments'
-);
+    $output = WebGUI::AssetHelper::Copy->process($home);
+    cmp_deeply(
+        $output, 
+        {
+            message  => re('was copied to the clipboard'),
+            open_tab => re('^'.$home->getUrl),
+        },
+        'AssetHelper/Copy opens a tab for commit comments'
+    );
 
-foreach my $asset (@{ $clippies }) {
-    $asset->purge;
+    my $clippies = $home->getAssetsInClipboard();
+    addToCleanup(@{ $clippies });
 }
+
 #vim:ft=perl
