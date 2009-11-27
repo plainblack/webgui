@@ -50,7 +50,7 @@ $session->user({userId => 3});
         {
             message  => re('was copied to the clipboard with its children'),
         },
-        'AssetHelper/Copy redirects the back to the copied asset'
+        'AssetHelper/Copy/WithChildren redirects the back to the copied asset'
     );
 
     my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
