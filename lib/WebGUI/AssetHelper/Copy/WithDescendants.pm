@@ -1,4 +1,4 @@
-package WebGUI::AssetHelper::Copy::WithChildren;
+package WebGUI::AssetHelper::Copy::WithDescendants;
 
 use strict;
 use Class::C3;
@@ -18,11 +18,11 @@ use base qw/WebGUI::AssetHelper::Copy/;
 
 =head1 NAME
 
-Package WebGUI::AssetHelper::Copy::WithChildren
+Package WebGUI::AssetHelper::Copy::WithDescendants
 
 =head1 DESCRIPTION
 
-Copy an Asset to the Clipboard, with children only.
+Copy an Asset to the Clipboard, with all descendants.
 
 =head1 METHODS
 
@@ -34,13 +34,13 @@ These methods are available from this class:
 
 =head2 duplicate ( $class, $asset )
 
-Duplicates the asset with children,
+Duplicates the asset with descendants.
 
 =cut
 
 sub duplicate {
     my ($class, $asset) = @_;
-    return $asset->duplicateBranch(1);
+    return $asset->duplicateBranch();
 }
 
 #-------------------------------------------------------------------
@@ -52,7 +52,7 @@ Returns the name of the i18n message to use
 =cut
 
 sub getMessage {
-    return 'copied asset with children';
+    return 'copied asset with descendants';
 }
 
 1;

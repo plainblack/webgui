@@ -1388,6 +1388,12 @@ Couldn't open %-s because %-s <br />
         context     => q{%s will be replaced by the title of the asset.},
     },
 
+    'copied asset with descendants' => {
+        message     => q{Asset %s was copied to the clipboard with all descendants.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
 };
 
 1;
