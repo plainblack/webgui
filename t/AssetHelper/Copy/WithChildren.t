@@ -15,13 +15,13 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
-use WebGUI::AssetHelper::Copy;
+use WebGUI::AssetHelper::Copy::WithChildren;
 
 #----------------------------------------------------------------------------
 # Init
@@ -40,36 +40,38 @@ my $output;
 my $home = WebGUI::Asset->getDefault($session);
 my $root = WebGUI::Asset->getRoot($session);
 
+$session->user({userId => 3});
+
 { 
 
-    $output = WebGUI::AssetHelper::Copy->process($home);
+    $output = WebGUI::AssetHelper::Copy::WithChildren->process($home);
     cmp_deeply(
         $output, 
         {
-            message  => re('was copied to the clipboard'),
+            message  => re('was copied to the clipboard with its children'),
         },
         'AssetHelper/Copy redirects the back to the copied asset'
     );
 
     my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
-    is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
+    is @{ $clippies }, 10, '... only copied the asset to the clipboard with children';
     addToCleanup(@{ $clippies });
 }
 
 {
     $session->setting->set('skipCommitComments', 0);
 
-    $output = WebGUI::AssetHelper::Copy->process($home);
+    $output = WebGUI::AssetHelper::Copy::WithChildren->process($home);
     cmp_deeply(
         $output, 
         {
-            message  => re('was copied to the clipboard'),
+            message  => re('was copied to the clipboard with its children'),
             open_tab => re('^'.$home->getUrl),
         },
-        'AssetHelper/Copy opens a tab for commit comments'
+        'AssetHelper/Copy/WithChildren opens a tab for commit comments'
     );
 
-    my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
+    my $clippies = $home->getAssetsInClipboard();
     addToCleanup(@{ $clippies });
 }
 

@@ -1382,6 +1382,12 @@ Couldn't open %-s because %-s <br />
         context     => q{%s will be replaced by the title of the asset.},
     },
 
+    'copied asset with children' => {
+        message     => q{Asset %s was copied to the clipboard with its children.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
 };
 
 1;
