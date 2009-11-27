@@ -1,1 +1,15 @@
 This is a WebGUI 8 development branch for the creation of Asset Helpers.
+
+Top level Asset Helpers
+
+* Promote
+* Demote
+* Copy
+* Copy with children
+* Copy with descendants
+* Cut
+Manage
+* Revisions
+Edit Branch
+Edit Url
+Export
