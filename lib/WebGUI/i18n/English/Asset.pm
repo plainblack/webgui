@@ -1394,6 +1394,30 @@ Couldn't open %-s because %-s <br />
         context     => q{%s will be replaced by the title of the asset.},
     },
 
+    'promoted asset' => {
+        message     => q{Asset %s was promoted.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'unable to promote asset' => {
+        message     => q{Unable to promote asset %s.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'demoted asset' => {
+        message     => q{Asset %s was demoted.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'unable to demote asset' => {
+        message     => q{Unable to demote asset %s.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
 };
 
 1;
