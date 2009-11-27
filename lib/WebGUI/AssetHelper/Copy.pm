@@ -46,6 +46,18 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
+=head2 getMessage ( )
+
+Returns the name of the i18n message to use
+
+=cut
+
+sub getMessage {
+    return 'copied asset';
+}
+
+#-------------------------------------------------------------------
+
 =head2 process ( $class, $asset )
 
 Copies the asset to the clipboard.  There are no privilege or safety checks, since all operations
@@ -62,7 +74,7 @@ sub process {
     $newAsset->update({ title=>sprintf("%s (%s)",$asset->getTitle,$i18n->get('copy'))});
     $newAsset->cut;
 
-    my $message = sprintf($i18n->get('copied asset'), $asset->getTitle);
+    my $message = sprintf($i18n->get($class->getMessage()), $asset->getTitle);
 
     my $payload = {
         message => $message,
