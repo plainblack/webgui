@@ -15,50 +15,43 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More;
+use WebGUI::Macro::DeactivateAccount;
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 5+1;
-plan tests => $numTests;
+plan tests => 7;
 
-my $macro = 'WebGUI::Macro::DeactivateAccount';
-my $loaded = use_ok($macro);
+my $defaultText = 'Please deactivate my account permanently.';
+my $testText = 'Deactivate account';
 
-SKIP: {
-  skip "Unable to load $macro", $numTests-1 unless $loaded;
+# Test 1: User is admin: return nothing
+$session->user({userId => 3});
+my $out1 = WebGUI::Macro::DeactivateAccount::process($session);
+is( $out1, '', "User is admin: return nothing" );
 
-  my $defaultText = 'Please deactivate my account permanently.';
-  my $testText = 'Deactivate account';
+# Test 2: User is not admin, but can't self-deactivate: return nothing
+$session->user({userId => 1});
+$session->setting->set("selfDeactivation", 0);
+my $out2 = WebGUI::Macro::DeactivateAccount::process($session);
+is( $out2, '', "User can't self-deactivate: return nothing" );
 
-  # Test 1: User is admin: return nothing
-  $session->user({userId => 3});
-  my $out1 = WebGUI::Macro::DeactivateAccount::process($session);
-  is( $out1, '', "User is admin: return nothing" );
-
-  # Test 2: User is not admin, but can't self-deactivate: return nothing
-  $session->user({userId => 1});
-  $session->setting->set("selfDeactivation", 0);
-  my $out2 = WebGUI::Macro::DeactivateAccount::process($session);
-  is( $out2, '', "User can't self-deactivate: return nothing" );
-
-  # Test 3: linkonly
-  $session->setting->set("selfDeactivation", 1);
-  my $out3 = WebGUI::Macro::DeactivateAccount::process($session, $testText, 1);
+# Test 3: linkonly
+$session->setting->set("selfDeactivation", 1);
+my $out3 = WebGUI::Macro::DeactivateAccount::process($session, $testText, 1);
 #  my ($url3, $text3) = simpleHTMLParser($out3);
-  is( $out3, '/?op=auth;method=deactivateAccount', 'Link only - URL check');
+is( $out3, '/?op=auth;method=deactivateAccount', 'Link only - URL check');
 
-  # Test 4: full deactivation link with default text
-  my $out4 = WebGUI::Macro::DeactivateAccount::process($session);
-  my ($url4, $text4) = simpleHTMLParser($out4);
-  is( $url4, '/?op=auth;method=deactivateAccount', 'Full test - URL check');
-  is( $text4, $defaultText, 'Full test - text check');
+# Test 4: full deactivation link with default text
+my $out4 = WebGUI::Macro::DeactivateAccount::process($session);
+my ($url4, $text4) = simpleHTMLParser($out4);
+is( $url4, '/?op=auth;method=deactivateAccount', 'Full test - URL check');
+is( $text4, $defaultText, 'Full test - text check');
 
-  # Test 5: full deactivation link with custom text
-  my $out5 = WebGUI::Macro::DeactivateAccount::process($session, $testText);
-  my ($url5, $text5) = simpleHTMLParser($out5);
-  is( $url5, '/?op=auth;method=deactivateAccount', 'Full test with custom text - URL check');
-  is( $text5, $testText, 'Full test with custom text - text check');
-}
+# Test 5: full deactivation link with custom text
+my $out5 = WebGUI::Macro::DeactivateAccount::process($session, $testText);
+my ($url5, $text5) = simpleHTMLParser($out5);
+is( $url5, '/?op=auth;method=deactivateAccount', 'Full test with custom text - URL check');
+is( $text5, $testText, 'Full test with custom text - text check');
 
 sub simpleHTMLParser {
   my ($text) = @_;
