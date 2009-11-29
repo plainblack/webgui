@@ -54,6 +54,9 @@ sub buildXML {
     $xmlTop->{Package} = [];
     ##Do a request for each package.
     my $packageIndex;
+    my $shipType  = $self->get('shipType');
+    my $sourceZip = $self->get('sourceZip');
+    $sourceZip    =~ s/^(\d{5}).*$/$1/;
     PACKAGE: for(my $packageIndex = 0; $packageIndex < scalar @packages; $packageIndex++) {
         my $package = $packages[$packageIndex];
         next PACKAGE unless scalar @{ $package };
@@ -76,9 +79,10 @@ sub buildXML {
         }
         my $destination = $package->[0]->getShippingAddress;
         my $destZipCode = $destination->get('code');
+        $destZipCode    =~ s/^(\d{5}).*$/$1/;
         $packageData{ID}              = $packageIndex;
-        $packageData{Service}         = [ $self->get('shipType')  ];
-        $packageData{ZipOrigination}  = [ $self->get('sourceZip') ];
+        $packageData{Service}         = [ $shipType  ];
+        $packageData{ZipOrigination}  = [ $sourceZip ];
         $packageData{ZipDestination}  = [ $destZipCode            ];
         $packageData{Pounds}          = [ $pounds                 ];
         $packageData{Ounces}          = [ $ounces                 ];

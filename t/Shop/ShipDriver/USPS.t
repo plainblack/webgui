@@ -25,7 +25,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPS;
 
-plan tests => 44;
+plan tests => 47;
 
 #----------------------------------------------------------------------------
 # Init
@@ -211,6 +211,13 @@ my $wucAddress = $addressBook->addAddress({
     organization => 'Madison Concourse Hotel',
     address1 => '1 W Dayton St',
     city => 'Madison', state => 'WI', code => '53703',
+    country => 'United States',
+});
+my $zip4Address = $addressBook->addAddress({
+    label => 'work-zip4',
+    organization => 'Plain Black Corporation',
+    address1 => '1360 Regent St. #145',
+    city => 'Madison', state => 'WI', code => '53715-1255',
     country => 'United States',
 });
 $cart->update({shippingAddressId => $workAddress->getId});
@@ -716,6 +723,48 @@ SKIP: {
 
 }
 
+#######################################################################
+#
+# Test ZIP+4 format domestic code
+#
+#######################################################################
+$cart->update({shippingAddressId => $zip4Address->getId});
+
+my $xmlData = XMLin($driver->buildXML($cart, @shippableUnits),
+    KeepRoot   => 1,
+    ForceArray => ['Package'],
+);
+cmp_deeply(
+    $xmlData,
+    {
+        RateV3Request => {
+            USERID => $userId,
+            Package => [
+                {
+                    ID => 0,
+                    ZipDestination => '53715',    ZipOrigination => '97123',
+                    Pounds         => '1',        Ounces         => '8.0',
+                    Size           => 'REGULAR',  Service        => 'EXPRESS',
+                    Machinable     => 'true',
+                },
+            ],
+        }
+    },
+    'buildXML: removed plus4 part of zipcode'
+);
+
+SKIP: {
+
+    skip 'No userId for testing', 2 unless $hasRealUserId;
+
+    my $cost = eval { $driver->calculate($cart); };
+    my $e    = Exception::Class->caught();
+    ok( ! ref $e, 'no exception thrown for zip+4 address');
+    cmp_ok($cost, '>', 0, 'zip+4 address returns a valid cost');
+
+}
+
+$cart->update({shippingAddressId => $workAddress->getId});
 #######################################################################
 #
 # Check for throwing an exception

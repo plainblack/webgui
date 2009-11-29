@@ -1,5 +1,6 @@
 7.7.28
  - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl
+ - fixed #11282: USPS Shipping Driver does not accept ZIP+4
 
 7.7.27
  - fixed #11134: Tree Navigation menu colapses sub items of current page, missing JS files added
