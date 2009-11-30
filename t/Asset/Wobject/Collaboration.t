@@ -8,19 +8,6 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# XXX I (chrisn) started this file to test the features I added to the
-# Collaboration / Post system for 7.5, but didn't have the time available to me
-# to do a full test suite for the Collaboration Wobject. This means that this
-# test suite is *largely incomplete* and should be finished. What is here *is*
-# the following:
-#
-#
-# 1. The basic framework for a test suite for the Collaboration Wobject.
-# Includes setup, cleanup, boilerplate, etc. Basically the really boring,
-# repetitive parts of the test that you don't want to write yourself.
-# 2. The tests for the features I've implemented; namely, the groupToEditPost
-# functionality.
-
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/../../lib";
@@ -32,7 +19,7 @@ use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Wobject::Layout;
 use Data::Dumper;
-use Test::More tests => 10; # increment this value for each test you create
+use Test::More tests => 13; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -41,6 +28,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 # grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+addToCleanup($versionTag);
 $versionTag->set({name => 'Collaboration => groupToEditPost test'});
 
 # place the collab system under a layout to ensure we're using the inherited groupIdEdit value
@@ -54,6 +42,10 @@ my $collab  = $layout->addChild({
     className => 'WebGUI::Asset::Wobject::Collaboration',
     url       => 'collab',
 });
+
+$versionTag->commit;
+$collab = $collab->cloneFromDb;
+ok($session->id->valid($collab->get('getMailCronId')), 'commited CS has a cron job created for it');
 
 # Test for a sane object type
 isa_ok($collab, 'WebGUI::Asset::Wobject::Collaboration');
@@ -99,12 +91,13 @@ is($collab->getRssFeedUrl,  '/collab?func=viewRss',  'getRssFeedUrl');
 is($collab->getRdfFeedUrl,  '/collab?func=viewRdf',  'getRdfFeedUrl');
 is($collab->getAtomFeedUrl, '/collab?func=viewAtom', 'getAtomFeedUrl');
 
+note "Mail Cron job tests";
+my $dupedCollab = $collab->duplicate();
+addToCleanup(WebGUI::VersionTag->new($session, $dupedCollab->get('tagId')));
+ok($dupedCollab->get('getMailCronId'), 'Duplicated CS has a cron job');
+isnt($dupedCollab->get('getMailCronId'), $collab->get('getMailCronId'), '... and it is different from its source asset');
+
 TODO: {
     local $TODO = "Tests to make later";
     ok(0, 'A whole lot more work to do here');
-}
-
-END {
-    # Clean up after thyself
-    $versionTag->rollback();
 }

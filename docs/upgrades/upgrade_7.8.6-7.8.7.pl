@@ -22,6 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Workflow::Cron;
+use WebGUI::Asset::Wobject::Collaboration;
 
 
 my $toVersion = '7.8.7';
@@ -31,6 +33,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+clearOrphanedCSMailCronJobs($session);
+deleteExtraCronJobsForCS($session);
 
 finish($session); # this line required
 
@@ -43,6 +47,46 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub clearOrphanedCSMailCronJobs {
+    my $session = shift;
+    print "\tClear orphaned csworkflow000000000001 Cron Jobs with no CS attached... " unless $quiet;
+    my $crons = WebGUI::Workflow::Cron->getAllTasks($session);
+    ##This section of code handles cron jobs created for CS'es where the revision of the
+    ##CS with the cron has been deleted.
+    CRON: foreach my $cron (@{ $crons }) {
+        next CRON unless $cron->get('workflowId') eq 'csworkflow000000000001';
+        my $assetId = $cron->get('parameters');
+        my $asset   = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        next CRON if $asset;
+        print "\n\t\tDeleting ".$cron->get('title') unless $quiet;
+        $cron->delete;
+    }
+    print "\tDONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub deleteExtraCronJobsForCS {
+    my $session = shift;
+    print "\tGuarantee that each CS has one and only one Cron job.  Older jobs will be deleted... " unless $quiet;
+    my $cses = WebGUI::Asset::Wobject::Collaboration->getIsa($session);
+    CS: while( my $cs = $cses->() ) {
+        my @cronIds = $session->db->buildArray('select distinct(getMailCronId) from Collaboration where assetId=?',[$cs->getId]);
+        next CS unless @cronIds > 1;
+        my @oldCronIds = grep { $_ ne $cs->get('getMailCronId') } @cronIds;
+        CRON: foreach my $cronId (@oldCronIds) {
+            my $cron = WebGUI::Workflow::Cron->new($session, $cronId);
+            next CRON unless $cron;
+            print "\n\t\tDeleting ".$cron->get('title') unless $quiet;
+            $cron->delete;
+        }
+        $session->db->write('update Collaboration set getMailCronId=? where assetId=?', [$cs->get('getMailCronId'), $cs->getId]);
+    }
+    print "\tDONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
