@@ -946,6 +946,16 @@ sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->next::method(@_);
 	$newAsset->createSubscriptionGroup;
+    my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
+    my $newCron = WebGUI::Workflow::Cron->create($self->session, {
+            title=>$self->getTitle." ".$i18n->get("mail"),
+            minuteOfHour=>"*/".($self->get("getMailInterval")/60),
+            className=>(ref $self),
+            methodName=>"new",
+            parameters=>$self->getId,
+            workflowId=>"csworkflow000000000001"
+    });
+    $self->update({getMailCronId=>$newCron->getId});
 	return $newAsset;
 }
 
