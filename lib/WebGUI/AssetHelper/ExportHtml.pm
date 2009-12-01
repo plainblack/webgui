@@ -142,7 +142,7 @@ sub www_exportStatus {
     my $session = $asset->session;
     return $session->privilege->insufficient() unless ($session->user->isInGroup(13));
     my $i18n        = WebGUI::International->new($session, "Asset");
-    my $iframeUrl   = $self->getUrl('func=exportGenerate');
+    my $iframeUrl   = $asset->getUrl('func=exportGenerate');
     foreach my $formVar (qw/index depth userId extrasUploadsAction rootUrlAction exportUrl/) {
         $iframeUrl  = $session->url->append($iframeUrl, $formVar . '=' . $session->form->process($formVar));
     }
