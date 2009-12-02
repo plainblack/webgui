@@ -34,7 +34,7 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets + 1;
+my $numTests = scalar @testSets + 2;
 
 plan tests => $numTests;
 
@@ -59,3 +59,8 @@ while ($time1 != $time2) {
 }
 
 is($output, $session->datetime->epochToHuman($time1), 'checking default time and format');
+
+##Checking for edge case, time=0
+is WebGUI::Macro::D_date::process($session, '', 0),
+'12/31/1969  6:00 pm',
+'...checking for handling time=0';
