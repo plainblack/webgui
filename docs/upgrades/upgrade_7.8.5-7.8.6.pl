@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addMaxCacheOverrideSetting($session);
 
 finish($session); # this line required
 
@@ -59,6 +60,16 @@ ENDSQL
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addMaxCacheOverrideSetting {
+    my $session = shift;
+    print "\tAdding maximum cache timeout setting... " unless $quiet;
+    # and here's our code
+    $session->setting->add('maxCacheTimeout', 86400) unless $session->setting->has('maxCacheTimeout');
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

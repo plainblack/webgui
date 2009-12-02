@@ -60,16 +60,9 @@ time - time component formatted as HH:MM:SS
 sub process {
     my ( $session, $toTZ, $format, $date, $time ) = @_;
 
-    my $uTZ     = 'UTC';
-    my $uFormat = '%F %T';
+    my $uTZ     = $session->user->profileField("timeZone");
+    my $uFormat = $session->user->profileField("dateFormat");
 
-    # Change defaults only if we have a user defined and they have these set.
-    eval { $session->user };
-    unless ($@) {
-        $uTZ     = $session->user->profileField("timeZone");
-        $uFormat = $session->user->profileField("dateFormat");
-    }
-    
     $toTZ   ||= $uTZ;
     $format ||= $uFormat;
 

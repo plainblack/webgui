@@ -60,6 +60,15 @@ use Exception::Class (
         },
 );
 
+sub WebGUI::Error::full_message {
+    my $self = shift;
+    my $message = $self->message ? $self->message : $self->description;
+    my @fields = map { defined $self->$_ ? ($_ . ': ' . $self->$_) : () } $self->Fields;
+    if (@fields) {
+        $message .= ' (' . join( q{, }, @fields ) . ')';
+    }
+    return $message;
+}
 
 =head1 NAME
 

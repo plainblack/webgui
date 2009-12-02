@@ -60,10 +60,10 @@ if ($] >= 5.008) {
 ##Doing this as a global is not nice, but it works
 my $missingModule = 0;
 
-checkModule("LWP",                          5.824        );
+checkModule("LWP",                          5.833        );
 checkModule("HTTP::Request",                1.40         );
 checkModule("HTTP::Headers",                1.61         );
-checkModule("Test::More",                   0.61,      2 );
+checkModule("Test::More",                   0.82,      2 );
 checkModule("Test::MockObject",             1.02,      2 );
 checkModule("Test::Deep",                   0.095,     2 );
 checkModule("Test::Exception",              0.27,      2 );
@@ -95,7 +95,7 @@ checkModule("HTML::Highlight",              0.20         );
 checkModule("HTML::TagFilter",              1.03         );
 checkModule("HTML::Template",               2.9          );
 checkModule("HTML::Template::Expr",         0.07,      2 );
-checkModule("Template::Toolkit",            2.20,      2 );
+checkModule("Template",                     2.20,      2 );
 checkModule("XML::FeedPP",                  0.40         );
 checkModule("JSON",                         2.12         );
 checkModule("Config::JSON",                 "1.3.1"      );

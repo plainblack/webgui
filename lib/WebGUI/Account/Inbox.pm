@@ -336,7 +336,7 @@ sub getInboxNotificationTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getInboxSMSNotificationTemplateId ( )
+=head2 getInboxSmsNotificationTemplateId ( )
 
 This method returns the template ID for inbox SMS notifications.
 

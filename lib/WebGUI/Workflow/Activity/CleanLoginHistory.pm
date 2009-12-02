@@ -115,7 +115,7 @@ sub execute {
             # Stop if there are no records preceding ageToDelete
             next USERLOOP unless @deleteTimes;
 
-            my $inTimes = WebGUI::SQL::quoteAndJoin( \@deleteTimes );
+            my $inTimes = $db->quoteAndJoin( \@deleteTimes );
             $db->write( "DELETE FROM userLoginLog WHERE userId = ? AND timeStamp IN ($inTimes)", [$userId] );
         } ## end while ( my (@userIdData) ...
     } ## end else [ if ( not $self->get("retainLastAlways"...

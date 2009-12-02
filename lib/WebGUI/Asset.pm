@@ -1404,6 +1404,21 @@ sub getRoot {
 
 #-------------------------------------------------------------------
 
+=head2 getSearchUrl ( )
+
+Returns the URL for the search screen of the asset manager.
+
+=cut
+
+sub getSearchUrl {
+	my $self = shift;
+	return $self->getUrl( 'op=assetManager;method=search' );
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 getSeparator
 
 Returns a very unique string that can be used for splitting head and body apart
@@ -2285,16 +2300,18 @@ sub processTemplate {
     my $var = shift;
     my $templateId = shift;
     my $template = shift;
+    my $session  = $self->session;
 
     # Sanity checks
     if (ref $var ne "HASH") {
-        $self->session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
+        $session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
-    $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
+    $template = WebGUI::Asset->new($session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
     if (defined $template) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-        $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
+        $var->{'controls'}   = $self->getToolbar if $session->var->isAdminOn;
+        $var->{'assetIdHex'} = $session->id->toHex($self->getId);
         my %vars = (
             %{$self->{_properties}},
             'title'     => $self->getTitle,
@@ -2304,7 +2321,7 @@ sub processTemplate {
         return $template->process(\%vars);
     }
     else {
-        $self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
+        $session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
         my $i18n = WebGUI::International->new($self->session, 'Asset');
         return $i18n->get('Error: Cannot instantiate template').' '.$templateId;
     }
@@ -2889,14 +2906,28 @@ sub www_editSave {
 
 =head2 www_manageAssets ( )
 
-Redirect to the asset manager content handler (for backwards 
-compatibility)
+Redirect to the asset manager content handler (for backwards compatibility)
 
 =cut
 
 sub www_manageAssets {
     my $self = shift;
     $self->session->http->setRedirect( $self->getManagerUrl );
+    return "redirect";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_searchAssets ( )
+
+Redirect to the asset manager content handler (for backwards 
+compatibility)
+
+=cut
+
+sub www_searchAssets {
+    my $self = shift;
+    $self->session->http->setRedirect( $self->getSearchUrl );
     return "redirect";
 }
 

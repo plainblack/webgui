@@ -298,6 +298,7 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
             'ownerUserId'                       => ignore(),
             'extraHeadTags'                     => ignore(),
             'assetId'                           => ignore(),
+            'assetIdHex'                        => ignore(),
             'url'                               => 'test-ems',
             'isHidden'                          => ignore(),
             'isPrototype'                       => ignore(),

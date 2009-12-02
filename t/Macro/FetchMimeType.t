@@ -42,6 +42,11 @@ my @testSets = (
 		comment => q|Null path returns application/octet-stream|,
 	},
 	{
+		input  => 'foo.rtf',
+		output => 'application/rtf',
+		comment => q|RTF file|, ##Added test due to a bug on some operating systems.
+	},
+	{
 		input  => undef,
 		output => undef,
 		comment => q|Undef path returns undef|,

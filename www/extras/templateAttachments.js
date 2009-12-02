@@ -7,20 +7,6 @@ if ( typeof WebGUI == "undefined" ) {
 if ( typeof WebGUI.TemplateAttachments == "undefined" ) {
     WebGUI.TemplateAttachments = {};
 }
-if ( typeof WebGUI.TemplateAttachments.i18n == "undefined" ) {
-    WebGUI.TemplateAttachments.i18n = new WebGUI.i18n( { 
-        namespaces  : {
-            'Asset_Template' : [
-                "attachment header remove",
-                "Already attached!",
-                "No url!"
-            ]
-        },
-        onpreload   : {
-            fn       : function(){}
-        }
-    } );
-}
 
 var addClick = (function() {
     var uniqueId     = 1;
@@ -181,7 +167,21 @@ var addClick = (function() {
         addAnchor.appendChild(tr);
     }
 
-    init();
+    if ( typeof WebGUI.TemplateAttachments.i18n == "undefined" ) {
+        WebGUI.TemplateAttachments.i18n = new WebGUI.i18n( { 
+            namespaces  : {
+                'Asset_Template' : [
+                    "attachment header remove",
+                    "Already attached!",
+                    "No url!"
+                ]
+            },
+            onpreload   : {
+                fn       : init
+            }
+        } );
+    }
+
     return function() {
         var d = {
             index: nodes.index.value,
