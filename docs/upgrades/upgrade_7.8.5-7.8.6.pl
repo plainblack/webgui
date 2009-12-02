@@ -38,22 +38,6 @@ finish($session); # this line required
 
 #----------------------------------------------------------------------------
 # Describe what our function does
-sub deleteFieldFromEMSSubmission {
-    my $session = shift;
-    print "\tDrop collumn from EMS Submission Table... " unless $quiet;
-    my $db = $session->db;
-
-    $db->write(<<ENDSQL);
-    ALTER TABLE EMSSubmission
-            DROP COLUMN sendEmailOnChange;
-ENDSQL
-
-
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-# Describe what our function does
 #sub exampleFunction {
 #    my $session = shift;
 #    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
