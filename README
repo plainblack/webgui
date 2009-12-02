@@ -8,6 +8,7 @@ Top level Asset Helpers
 * Copy with children
 * Copy with descendants
 * Cut
+* Lock
 * Manage
 * Revisions
 * Edit Branch
