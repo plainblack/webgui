@@ -1418,6 +1418,18 @@ Couldn't open %-s because %-s <br />
         context     => q{%s will be replaced by the title of the asset.},
     },
 
+    'already locked' => {
+        message     => q{The asset %s is already locked.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'locked asset' => {
+        message     => q{Locked the asset %s.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
 };
 
 1;
