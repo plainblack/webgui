@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+deleteFieldFromEMSSubmission($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,20 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Drop send mail on change collumn from ems submission table
+sub deleteFieldFromEMSSubmission {
+    my $session = shift;
+    print "\tDrop collumn from EMS Submission Table... " unless $quiet;
+    my $db = $session->db;
+
+    $db->write(<<ENDSQL);
+    ALTER TABLE EMSSubmission
+            DROP COLUMN sendEmailOnChange;
+ENDSQL
+
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
