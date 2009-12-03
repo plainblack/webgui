@@ -303,7 +303,7 @@ The name of the vendor.
 
 =head4 userId
 
-The name of the vendor.
+The unique GUID of the vendor.
 
 =head4 url
 
