@@ -19,7 +19,7 @@ use Moose::Role;
 use namespace::autoclean;
 no warnings qw(uninitialized);
 
-with 'WebGUI::Definition::Role::Asset'
+with 'WebGUI::Definition::Role::Asset';
 
 our $VERSION = '0.0.1';
 
