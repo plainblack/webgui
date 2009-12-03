@@ -300,10 +300,15 @@ sub drawRelatedRibbonsField {
 
 sub drawStatusField {
         my ($self, $params) = @_;
+        my $options = $self->ems->getSubmissionStatus;
+        my $currentStatus = $self->get('submissionStatus');
+        for my $key ( qw/pending created failed/ ) {
+            delete $options->{$key} unless $currentStatus eq $key;
+        }
         return WebGUI::Form::SelectBox($self->session, {
                 name    => 'submissionStatus',
-                value   => $self->get('submissionStatus'),
-                options => $self->ems->getSubmissionStatus,
+                value   => $currentStatus,
+                options => $options,
                 });
 }
 
@@ -433,6 +438,9 @@ sub www_editSubmission {
         }
 
 	# for each field
+        if( $fields->{submissionStatus}{value} eq 'created' ) {
+             $formDescription = { } ; # no editable fields once the ticket is created.
+        }
 	for my $fieldId ( @fieldNames ) {
 	    my $field = $fields->{$fieldId};
 	    if( $formDescription->{$field->{fieldId}} || $asset->ems->isRegistrationStaff ) {
@@ -445,10 +453,17 @@ sub www_editSubmission {
  
 	        $newform->dynamicField(%$field);
 	    } else {
+	        my $value;
 	        # TODO see that the data gets formatted
+                if( $fieldId eq 'submissionStatus' ) {
+                    $value = $field->{value} || 'pending';
+                    $value = $i18n->get($value);
+                } else {
+                    $value = $field->{value} || '[ ]';
+                }
 		$newform->readOnly(
 		         label => $field->{label},
-			 value => $field->{value} || '[       ]',
+			 value => $value,
 			 fieldId => $field->{fieldId},
 	            );
 	    }
