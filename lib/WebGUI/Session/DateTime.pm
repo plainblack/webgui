@@ -298,8 +298,11 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 =cut
 
 sub epochToHuman {
-	my $self = shift;
-	my $epoch = shift || time();
+	my $self  = shift;
+	my $epoch = shift;
+    if (!defined $epoch || $epoch eq '') {
+        $epoch = time();
+    }
 	my $i18n = WebGUI::International->new($self->session);
 	my $language = $i18n->getLanguage($self->session->user->profileField('language'));
 	my $locale = $language->{languageAbbreviation} || 'en';
