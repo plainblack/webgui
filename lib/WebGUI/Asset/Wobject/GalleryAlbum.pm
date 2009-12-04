@@ -311,8 +311,7 @@ sub canEdit {
     }
     else {
         return 1 if $userId eq $self->get("ownerUserId");
-            
-        return $gallery->canEdit($userId);
+        return $gallery && $gallery->canEdit($userId);
     }
 }
 

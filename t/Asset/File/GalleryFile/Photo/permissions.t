@@ -27,10 +27,9 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my $maker           = WebGUI::Test::Maker::Permission->new;
 
 $session->user({ userId => 3 });
-my @versionTags = ();
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-$versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
-WebGUI::Test->tagsToRollback(@versionTags);
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
+WebGUI::Test->tagsToRollback($versionTag);
 
 # Add a new user to the test user's friends list
 my $friend  = WebGUI::User->new($session, "new");
@@ -73,7 +72,18 @@ my $photo
     {
         skipAutoCommitWorkflows => 1,
     });
-$versionTags[-1]->commit;
+
+my $photo2 = $photo->cloneFromDb;
+my $album2 = $album->cloneFromDb;
+
+$session->stow->delete('assetRevision');
+$versionTag->leaveTag;
+
+$session->user({userId => $notFriend->userId});
+diag $album2->canEdit;
+$session->user({userId => 1});
+
+$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
