@@ -38,6 +38,8 @@ sub set {
     my $self = shift;
     my $properties = shift;
     for my $key ( keys %$properties ) {
+        return undef
+            unless $self->can($key);
         $self->$key($properties->{$key});
     }
     return 1;

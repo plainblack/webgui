@@ -22,7 +22,6 @@ use WebGUI::Definition::Meta::Asset;
 use namespace::autoclean;
 no warnings qw(uninitialized);
 
-
 our $VERSION = '0.0.1';
 
 =head1 NAME
@@ -84,7 +83,7 @@ meta class into the options for each property.
 
 sub property {
     my ($meta, $name, %options) = @_;
-    $options{table} = $meta->table;
+    $options{table} //= $meta->table;
     return WebGUI::Definition::property($meta, $name, %options);
 }
 

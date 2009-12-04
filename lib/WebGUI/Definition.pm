@@ -79,7 +79,7 @@ Sets the metaclass to WebGUI::Definition::Meta::Class.
 
 sub init_meta {
     my $class = shift;
-    my %options = @_; 
+    my %options = @_;
     $options{metaclass} = 'WebGUI::Definition::Meta::Class';
     return Moose->init_meta(%options);
 }
