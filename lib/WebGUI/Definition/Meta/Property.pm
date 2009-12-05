@@ -42,5 +42,13 @@ has 'form' => (
     is  => 'ro',
 );
 
+#-------------------------------------------------------------------
+
+=head2 form ( )
+
+Returns a hashref of propertes that are specific to WebGUI::Forms.
+
+=cut
+
 1;
 
