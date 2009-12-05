@@ -21,6 +21,21 @@ no warnings qw(uninitialized);
 
 our $VERSION = '0.0.1';
 
+=head1 NAME
+
+Package WebGUI::Definition::Meta::Property
+
+=head1 DESCRIPTION
+
+Moose-based meta class for all properties in WebGUI::Definition.
+
+=head1 SYNOPSIS
+
+WebGUI::Definition::Meta::Property extends Moose::Meta::Attribute to include
+a read-only form method, that provides the form properties for the attribute.
+
+=cut
+
 extends 'Moose::Meta::Attribute';
 
 has 'form' => (
