@@ -24,6 +24,35 @@ extends 'Moose::Meta::Class';
 
 our $VERSION = '0.0.1';
 
+=head1 NAME
+
+Package WebGUI::Definition::Meta::Class
+
+=head1 DESCRIPTION
+
+Moose-based meta class for all definitions in WebGUI.
+
+=head1 SYNOPSIS
+
+A definition contains all the information needed to build an object.
+Information required to build forms are added as optional roles and
+sub metaclasses.  Database persistance is handled similarly.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 get_property_list ( )
+
+Returns the name of all properties, in the order they were created in the Definition.
+
+=cut
+
+
 has 'get_property_list' => (
     is => 'ro',
     default => sub {
@@ -37,9 +66,16 @@ has 'get_property_list' => (
     },
 );
 
+#-------------------------------------------------------------------
+
+=head2 property_meta ( )
+
+Returns the name of the class for properties.
+
+=cut
+
 sub property_meta {
     return 'WebGUI::Definition::Meta::Property';
 }
 
 1;
-
