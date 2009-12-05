@@ -24,12 +24,41 @@ no warnings qw(uninitialized);
 
 our $VERSION = '0.0.1';
 
+=head1 NAME
+
+Package WebGUI::Definition
+
+=head1 DESCRIPTION
+
+Moose-based meta class for all definitions in WebGUI.
+
+=head1 SYNOPSIS
+
+A definition contains all the information needed to build an object.
+Information required to build forms are added as optional roles and
+sub metaclasses.  Database persistance is handled similarly.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
 my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
     install         => [ 'unimport' ],
     with_meta       => [ 'property', 'attribute' ],
     also            => 'Moose',
     roles           => [ 'WebGUI::Definition::Role::Object' ],
 );
+
+#-------------------------------------------------------------------
+
+=head2 import ( )
+
+A custom import method is provided so that uninitialized properties do not
+generate warnings.
+
+=cut
 
 sub import {
     my $class = shift;
@@ -40,12 +69,30 @@ sub import {
     return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 init_meta ( )
+
+Sets the metaclass to WebGUI::Definition::Meta::Class.
+
+=cut
+
 sub init_meta {
     my $class = shift;
     my %options = @_; 
     $options{metaclass} = 'WebGUI::Definition::Meta::Class';
     return Moose->init_meta(%options);
 }
+
+#-------------------------------------------------------------------
+
+=head2 attribute ( )
+
+An attribute of the definition, typically static data which is never processed from a form
+or persisted to the database.  In an Asset-style definition, an attribute would
+be the table name, the asset's name, or the path to the asset's icon.
+
+=cut
 
 sub attribute {
     my ($meta, $name, $value) = @_;
@@ -58,6 +105,12 @@ sub attribute {
     }
     return 1;
 }
+
+#-------------------------------------------------------------------
+
+=head2 property ( )
+
+=cut
 
 sub property {
     my ($meta, $name, %options) = @_;
