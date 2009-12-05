@@ -24,6 +24,33 @@ extends 'WebGUI::Definition::Meta::Class';
 
 our $VERSION = '0.0.1';
 
+=head1 NAME
+
+Package WebGUI::Definition::Meta::Property::Asset
+
+=head1 DESCRIPTION
+
+Extends WebGUI::Definition::Meta::Class to provide
+
+=head1 SYNOPSIS
+
+Extends 'WebGUI::Definition::Meta::Class' to provide attributes specific to Assets.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 property_meta ( )
+
+Asset Definitions use WebGUI::Definition::Meta::Property::Asset as the base class
+for properties.
+
+=cut
+
 sub property_meta {
     return 'WebGUI::Definition::Meta::Property::Asset';
 }
@@ -39,6 +66,33 @@ has 'icon' => (
 has 'assetName' => (
     is => 'rw',
 );
+
+#-------------------------------------------------------------------
+
+=head2 table ( )
+
+The table that this asset stores its properties in.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 icon ( )
+
+The filename of the icon for this Asset.  Icons are stored in
+www/extras/assets and are 48 x 48 pixels in size.  A smaller version of
+the icon, 16x16, is found in www/extras/assets/small.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 assetName ( )
+
+????
+
+=cut
+
 
 1;
 
