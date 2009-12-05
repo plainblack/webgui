@@ -88,7 +88,7 @@ sub init_meta {
 
 =head2 attribute ( )
 
-An attribute of the definition, typically static data which is never processed from a form
+An attribute of the definition is typically static data which is never processed from a form
 or persisted to the database.  In an Asset-style definition, an attribute would
 be the table name, the asset's name, or the path to the asset's icon.
 
@@ -108,7 +108,21 @@ sub attribute {
 
 #-------------------------------------------------------------------
 
-=head2 property ( )
+=head2 property ( $name, %options )
+
+A property is a special object attribute with it's type constraints set by
+HTML form properties, such as base type (Text, Integer, Float, SelectList),
+default value, value, etc.
+
+=head3 $name
+
+The name of the property.
+
+=head3 %options
+
+An options hashref [need list of base options].  Any option which belongs to a form
+is relegated to the form attribute of the property and removed from the list of
+regular attributes.
 
 =cut
 
