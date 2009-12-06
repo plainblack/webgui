@@ -145,7 +145,7 @@ sub getSearchPaginator {
         $queryString    .= ';class=' . $class;
     }
 
-    my $pageNumber  = $session->scratch->get('assetManagerSearchPageNumber') || $session->form->get('pn');
+    my $pageNumber  = $session->form->get('pn') || $session->scratch->get('assetManagerSearchPageNumber');
     my $p           = $s->getPaginatorResultSet( $session->url->page( $queryString ), undef, $pageNumber );
 
     $session->scratch->set('assetManagerSearchPageNumber', $pageNumber);
@@ -538,7 +538,7 @@ sub www_search {
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
-    my $keywords = $session->scratch->get('assetManagerSearchKeywords') || $session->form->get('keywords');
+    my $keywords =  $session->form->get('keywords') || $session->scratch->get('assetManagerSearchKeywords');
 
     ### Show the form
     $output     .= q{<form method="post" enctype="multipart/form-data" action="} . $currentAsset->getUrl . q{"><p>}
