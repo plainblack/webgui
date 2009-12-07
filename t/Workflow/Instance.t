@@ -69,6 +69,7 @@ my $wf = WebGUI::Workflow->create(
     }
 );
 isa_ok($wf, 'WebGUI::Workflow', 'workflow created for test');
+addToCleanup($wf);
 
 # create an instance of $wfId
 my $properties = {
@@ -179,6 +180,7 @@ my $wf2 = WebGUI::Workflow->create(
         type => 'None',
     }
 );
+addToCleanup($wf2);
 
 my $wf2Instance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf2->getId});
 cmp_deeply($wf2Instance->get('parameters'), {}, 'get returns {} for parameters when there are no parameters stored');
@@ -221,11 +223,4 @@ cmp_deeply($wf2Instance->get('parameters'), {}, 'get returns {} for parameters w
     lives_and {
         is $wf3Instance->getObject, $return;
     } 'getObject is able to retrieve correct object';
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $wf->delete;  ##Deleting a Workflow deletes its instances, too.
-    $wf2->delete;
 }

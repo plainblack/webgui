@@ -314,7 +314,8 @@ sub getList {
 
 =head2 getNextActivity ( [ activityId ] )
 
-Returns the next activity in the workflow after the activity specified. If no activity id is specified, then the first workflow will be returned.
+Returns the next activity in the workflow after the activity specified.
+If no activity id is specified, then the first workflow will be returned.
 
 =head3 activityId
 
@@ -323,13 +324,53 @@ The unique id of an activity in this workflow.
 =cut
 
 sub getNextActivity {
-	my $self = shift;
+	my $self       = shift;
+	my $activityId = shift;
+    my $id         = $self->getNextActivityId($activityId);
+	return $self->getActivity($id);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getNextActivityId ( [ activityId ] )
+
+Returns the ID of the next activity in the workflow after the activity specified.
+If no activity id is specified, then the first workflow will be returned.
+
+=head3 activityId
+
+The unique id of an activity in this workflow.
+
+=cut
+
+sub getNextActivityId {
+	my $self       = shift;
 	my $activityId = shift;
 	my ($sequenceNumber) = $self->session->db->quickArray("select sequenceNumber from WorkflowActivity where activityId=?", [$activityId]);
 	$sequenceNumber++;
 	my ($id) = $self->session->db->quickArray("select activityId from WorkflowActivity where workflowId=? 
 		and sequenceNumber>=? order by sequenceNumber", [$self->getId, $sequenceNumber]);
-	return $self->getActivity($id);
+    return $id;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 hasNextActivity ( [ activityId ] )
+
+Returns true if there is an activity after the specified activity.
+If no activity id is specified, then the first workflow will be returned.
+
+=head3 activityId
+
+The unique id of an activity in this workflow.
+
+=cut
+
+sub hasNextActivity {
+	my $self       = shift;
+    return $self->getNextActivityId(@_) ? 1 : 0;
 }
 
 
