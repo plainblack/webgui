@@ -48,7 +48,6 @@ my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
     install         => [ 'unimport' ],
     with_meta       => [ 'property', 'attribute' ],
     also            => 'Moose',
-    roles           => [ 'WebGUI::Definition::Role::Object' ],
 );
 
 #-------------------------------------------------------------------
@@ -80,8 +79,10 @@ Sets the metaclass to WebGUI::Definition::Meta::Class.
 sub init_meta {
     my $class = shift;
     my %options = @_;
-    $options{metaclass} = 'WebGUI::Definition::Meta::Class';
-    return Moose->init_meta(%options);
+    $options{metaclass} //= 'WebGUI::Definition::Meta::Class';
+    my $meta = Moose->init_meta(%options);
+    Moose::Util::apply_all_roles($meta, 'WebGUI::Definition::Role::Object');
+    return $meta;
 }
 
 #-------------------------------------------------------------------

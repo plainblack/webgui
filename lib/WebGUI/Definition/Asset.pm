@@ -48,7 +48,6 @@ my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
     install         => [ 'unimport' ],
     also            => 'WebGUI::Definition',
     with_meta       => [ 'property' ],
-    roles           => [ 'WebGUI::Definition::Role::Asset' ],
 );
 
 sub import {
@@ -63,8 +62,10 @@ sub import {
 sub init_meta {
     my $class = shift;
     my %options = @_;
-    $options{metaclass} = 'WebGUI::Definition::Meta::Asset';
-    return Moose->init_meta(%options);
+    $options{metaclass} //= 'WebGUI::Definition::Meta::Asset';
+    my $meta = WebGUI::Definition->init_meta(%options);
+    Moose::Util::apply_all_roles($meta, 'WebGUI::Definition::Role::Asset');
+    return $meta;
 }
 
 #-------------------------------------------------------------------
