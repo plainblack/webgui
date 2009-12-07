@@ -36,7 +36,7 @@ sub get {
 
 sub set {
     my $self = shift;
-    my $properties = shift;
+    my $properties = @_ % 2 ? shift : { @_ };
     for my $key ( keys %$properties ) {
         return undef
             unless $self->can($key);
@@ -46,11 +46,22 @@ sub set {
 }
 
 sub update {
-    my $self;
+    my $self = shift;
     $self->set(@_);
     if ($self->can('write')) {
         $self->write;
     }
+    return 1;
+}
+
+sub getProperty {
+    my $self = shift;
+    return $self->meta->find_attribute_by_name(@_);
+}
+
+sub getProperties {
+    my $self = shift;
+    return $self->meta->get_all_properties;
 }
 
 1;

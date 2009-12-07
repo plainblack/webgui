@@ -130,9 +130,7 @@ regular attributes.
 sub property {
     my ($meta, $name, %options) = @_;
     my %form_options;
-    my $prop_meta = 
-    $meta->property_meta;
-    #'WebGUI::Definition::Meta::Property';
+    my $prop_meta = $meta->property_meta;
     for my $key ( keys %options ) {
         if ( ! $prop_meta->meta->find_attribute_by_name($key) ) {
             $form_options{$key} = delete $options{$key};
