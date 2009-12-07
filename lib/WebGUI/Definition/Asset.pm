@@ -72,7 +72,7 @@ sub init_meta {
 
 =head2 property ( $name, %options )
 
-Extends WebGUI::Definition::property to copy the table attribute from the
+Extends WebGUI::Definition::property to copy the tableName attribute from the
 meta class into the options for each property.
 
 =head3 $name
@@ -84,7 +84,7 @@ meta class into the options for each property.
 
 sub property {
     my ($meta, $name, %options) = @_;
-    $options{table} //= $meta->table;
+    $options{tableName} //= $meta->tableName;
     return WebGUI::Definition::property($meta, $name, %options);
 }
 

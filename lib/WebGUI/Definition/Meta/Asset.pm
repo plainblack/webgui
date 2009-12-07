@@ -55,7 +55,7 @@ sub property_meta {
     return 'WebGUI::Definition::Meta::Property::Asset';
 }
 
-has 'table' => (
+has 'tableName' => (
     is  => 'rw',
 );
 
@@ -69,7 +69,7 @@ has 'assetName' => (
 
 #-------------------------------------------------------------------
 
-=head2 table ( )
+=head2 tableName ( )
 
 The table that this asset stores its properties in.
 

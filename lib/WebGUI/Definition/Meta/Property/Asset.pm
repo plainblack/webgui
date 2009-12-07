@@ -38,7 +38,7 @@ The following methods are added.
 
 extends 'WebGUI::Definition::Meta::Property';
 
-has 'table' => (
+has 'tableName' => (
     is  => 'ro',
 );
 
@@ -52,11 +52,11 @@ has 'noFormPost' => (
 
 #-------------------------------------------------------------------
 
-=head2 table ( )
+=head2 tableName ( )
 
 Previously, properties were storied in arrays of definitions, with each definition
 providing its own attributes like table.  This Moose based implementation stores
-the properties flat, so the table attribute is copied into the property so we
+the properties flat, so the tableName attribute is copied into the property so we
 know where to store it.
 
 =cut
