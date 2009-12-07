@@ -16,7 +16,7 @@ use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 67; # increment this value for each test you create
+use Test::More tests => 75; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -143,6 +143,28 @@ is($wf3->get('mode'),        'parallel', 'Default mode is parallel');
 my $decayKarma = $wf3->addActivity('WebGUI::Workflow::Activity::DecayKarma');
 my $cleanTemp  = $wf3->addActivity('WebGUI::Workflow::Activity::CleanTempStorage');
 my $oldTrash   = $wf3->addActivity('WebGUI::Workflow::Activity::PurgeOldTrash');
+
+#####################################################################
+#
+# getNextActivityId
+#
+#####################################################################
+
+is $wf3->getNextActivityId($decayKarma->getId), $cleanTemp->getId,  'getNextActivityId: first activity to second';
+is $wf3->getNextActivityId($cleanTemp->getId),  $oldTrash->getId,   '... second activity to third';
+is $wf3->getNextActivityId($oldTrash->getId),   undef,              '... last returns undef';
+is $wf3->getNextActivityId(),                   $decayKarma->getId, '... with no activityId, returns the first';
+
+#####################################################################
+#
+# hasNextActivity
+#
+#####################################################################
+
+ok  $wf3->hasNextActivity($decayKarma->getId), 'hasNextActivityId: first activity to second';
+ok  $wf3->hasNextActivity($cleanTemp->getId),  '... second activity to third';
+ok  $wf3->hasNextActivity(),                   '... with no activityId, returns the first';
+ok !$wf3->hasNextActivity($oldTrash->getId),   '... last returns undef';
 
 #####################################################################
 #

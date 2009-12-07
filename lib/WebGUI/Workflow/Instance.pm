@@ -260,6 +260,21 @@ sub getWorkflow {
 
 #-------------------------------------------------------------------
 
+=head2 hasNextActivity ( )
+
+Returns true if the instance has a workflow activity after the current one.
+
+=cut
+
+sub hasNextActivity {
+	my $self = shift;
+	my $workflow = $self->getWorkflow;
+	return undef unless defined $workflow;
+	return $workflow->hasNextActivity($self->get("currentActivityId"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, instanceId, [isNew] )
 
 Constructor.
@@ -315,8 +330,9 @@ B>NOTE:> You should normally never run this method. The workflow engine will use
 =cut
 
 sub run {
-	my $self = shift;
+	my $self     = shift;
 	my $workflow = $self->getWorkflow;
+    my $session  = $self->session;
 	unless (defined $workflow) {
 		$self->set({lastStatus=>"undefined"}, 1);
 		return "undefined";
@@ -326,7 +342,7 @@ sub run {
 		return "disabled";
 	}
 	if ($workflow->isSerial) {
-		my ($firstId) = $self->session->db->quickArray(
+		my ($firstId) = $session->db->quickArray(
             "select instanceId from WorkflowInstance where workflowId=? order by runningSince",
             [$workflow->getId]
         );
@@ -335,22 +351,33 @@ sub run {
 			return "waiting";
 		}
 	}
+    ##Undef if returned if there is an error, or if there is not a next activity.
+    ##Use hasNextActivity to tell the difference and handle the cases differently.
+    if (! $self->hasNextActivity) {
+        $self->delete(1);
+        return "done";
+    }
     my $activity = $self->getNextActivity;
 	unless  (defined $activity)  {
-		$self->delete(1);
-		return "done";
+        $session->errorHandler->error(
+            sprintf q{Unable to load Workflow Activity for activity after id %s in workflow %s},
+                $self->get('currentActivityId'),
+                $workflow->getId
+        );
+        $self->set({lastStatus=>"error"}, 1);
+        return "error";
 	}
-	$self->session->errorHandler->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
+	$session->errorHandler->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
     my $object = eval { $self->getObject };
     if ( my $e = WebGUI::Error::ObjectNotFound->caught ) {
-        $self->session->log->warn(
+        $session->log->warn(
             q{The object for this workflow does not exist.  Type: } . $self->get('className') . q{, ID: } . $e->id
         );
         $self->delete(1);
         return "done";
     }
     elsif ($@) {
-        $self->session->errorHandler->error(
+        $session->errorHandler->error(
             q{Error on workflow instance '} . $self->getId . q{': }. $@
         );
         $self->set({lastStatus=>"error"}, 1);
@@ -359,7 +386,7 @@ sub run {
 
 	my $status = eval { $activity->execute($object, $self) };
 	if ($@) {
-		$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
+		$session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
 		$self->set({lastStatus=>"error"}, 1);
 		return "error";
 	}
