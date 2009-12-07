@@ -20,8 +20,22 @@ my $called_getProperties;
     package WGT::Class;
     use WebGUI::Definition;
 
-    property 'property1' => ();
+    attribute 'attribute1' => 'attribute1 value';
+    property 'property1' => (
+        arbitrary_key => 'arbitrary_value',
+    );
 
+    # attributes create methods
+    ::can_ok +__PACKAGE__, 'attribute1';
+
+    # propeties create methods
+    ::can_ok +__PACKAGE__, 'property1';
+
+    # role applied
+    ::can_ok +__PACKAGE__, 'update';
+
+    # can retreive property metadata
+    ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value';
 }
 
 {
@@ -31,7 +45,24 @@ my $called_getProperties;
     attribute table => 'asset';
     property 'property1' => ();
 
+    my $written;
+    sub write {
+        $written++;
+    }
+
     ::is +__PACKAGE__->meta->get_attribute('property1')->table, 'asset';
+
+    ::can_ok +__PACKAGE__, 'update';
+
+    my $object = __PACKAGE__->new;
+    $object->set({property1 => 'property value'});
+
+    ::is $object->property1, 'property value';
+
+    # write called
+    $object->update;
+    ::is $written, 1;
+
 }
 
 
