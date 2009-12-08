@@ -125,7 +125,7 @@ sub addToGroups {
 	foreach my $groupId (@{$groups}) {
 		WebGUI::Group->new($self->session,$groupId)->addUsers([$self->userId],$expireOffset);
 	}
-	$self->session->stow->delete("gotGroupsForUser");
+	$self->session->cache->delete("gotGroupsForUser");
 }
 
 #-------------------------------------------------------------------
@@ -444,7 +444,7 @@ sub deleteFromGroups {
 	foreach my $groupId (@{$groups}) {
 		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
 	}
-	$self->session->stow->delete("gotGroupsForUser");
+	$self->session->cache->delete("gotGroupsForUser");
 }
 
 #-------------------------------------------------------------------
@@ -642,7 +642,7 @@ sub getGroups {
     if ($withoutExpired) {
         $clause = "and expireDate>".$self->session->datetime->time();
     }
-    my $gotGroupsForUser = $self->session->stow->get("gotGroupsForUser");
+    my $gotGroupsForUser = $self->session->cache->get("gotGroupsForUser");
     if (exists $gotGroupsForUser->{$self->userId}) {
         my $cachedGroups = $gotGroupsForUser->{$self->userId};
         my @safeCopy = @{ $cachedGroups };
@@ -650,13 +650,13 @@ sub getGroups {
     }
     else {
         my @groups = $self->session->db->buildArray("select groupId from groupings where userId=? $clause", [$self->userId]);
-        my $isInGroup = $self->session->stow->get("isInGroup");
+        my $isInGroup = $self->session->cache->get("isInGroup");
         foreach my $gid (@groups) {
             $isInGroup->{$self->userId}{$gid} = 1;
         }
-        $self->session->stow->set("isInGroup",$isInGroup);
+        $self->session->cache->set("isInGroup",$isInGroup);
         $gotGroupsForUser->{$self->userId} = \@groups;
-        $self->session->stow->set("gotGroupsForUser",$gotGroupsForUser);
+        $self->session->cache->set("gotGroupsForUser",$gotGroupsForUser);
         my @safeGroups = @groups;
         return \@safeGroups;
     }
@@ -918,7 +918,7 @@ sub isInGroup {
    return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
    return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
    ### Get data for auxillary checks.
-   my $isInGroup = $self->session->stow->get("isInGroup", { noclone => 1 });
+   my $isInGroup = $self->session->cache->get("isInGroup");
    ### Look to see if we've already looked up this group. 
    return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
    ### Lookup the actual groupings.
@@ -931,12 +931,12 @@ sub isInGroup {
    foreach my $user (@{$users}) {
       $isInGroup->{$user}{$gid} = 1;
 	  if ($uid eq $user) {
-	     $self->session->stow->set("isInGroup",$isInGroup);
+	     $self->session->cache->set("isInGroup",$isInGroup);
 		 return 1;
 	  }
    }
    $isInGroup->{$uid}{$gid} = 0;
-   $self->session->stow->set("isInGroup",$isInGroup);
+   $self->session->cache->set("isInGroup",$isInGroup);
    return 0;
 }
 

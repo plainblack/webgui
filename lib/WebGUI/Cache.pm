@@ -29,7 +29,7 @@ Params::Validate::validation_options( on_fail => sub {
         WebGUI::Error::InvalidParam->throw( error => $error );
         } );
 
-
+use Carp;
 
 =head1 NAME
 
@@ -321,6 +321,10 @@ sub new {
     bless {_memcached => $memcached, _namespace => $namespace, _session => $session, _withDebug=>$withDebug}, $class;
 }
 
+sub getMemcached {
+    return $_[0]->{_memcached};
+}
+
 #-------------------------------------------------------------------
 
 =head2 parseKey ( key ) 
@@ -399,7 +403,10 @@ sub set {
     if ($debug) {
         $self->session->log->debug("Called set() on cache key $key with $value as the value.");
     }
-    my $frozenValue = Storable::nfreeze(\(scalar $value)); # Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
+
+    my $frozenValue;
+    eval { $frozenValue = Storable::nfreeze(\(scalar $value)); }; # Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
+    Carp::confess $@ if $@;
     my $memcached = $self->getMemcached;
     Memcached::libmemcached::memcached_set($memcached, $key, $frozenValue, $ttl);
     if ($debug) {

@@ -52,6 +52,7 @@ Remove content from the filesystem cache.
 
 sub delete {
 	my $self = shift;
+        $self->{_key} = shift;
 	my $folder = $self->getFolder;
 	if (-e $folder) {
 		File::Path::rmtree($folder);
@@ -88,7 +89,6 @@ Remove all objects from the filecache system.
 
 sub flush {
 	my $self = shift;
-	$self->SUPER::flush();
 	my $folder = $self->getNamespaceRoot;
 	if (-e $folder) {
 		File::Path::rmtree($folder);
@@ -106,6 +106,7 @@ Retrieve content from the filesystem cache.
 sub get {
 	my $self = shift;
 	return undef if ($self->session->config->get("disableCache"));
+        $self->{_key} = shift;
 	my $folder = $self->getFolder;
 	if (-e $folder."/expires" && -e $folder."/cache" && open(my $FILE,"<",$folder."/expires")) {
 		my $expires = <$FILE>;
@@ -216,9 +217,8 @@ sub new {
 	my $cache;
 	my $class = shift;
 	my $session = shift;
-	my $key = $class->parseKey(shift);
 	my $namespace = shift || $session->config->getFilename;
-	bless {_session=>$session, _key=>$key, _namespace=>$namespace}, $class;
+	bless {_session=>$session, _namespace=>$namespace}, $class;
 }
 
 
@@ -240,6 +240,7 @@ The time to live for this content. This is the amount of time (in seconds) that 
 
 sub set {
 	my $self = shift;
+        $self->{_key} = shift;
 	my $content = shift;
 	my $ttl = shift || 60;
 	my $oldumask = umask();

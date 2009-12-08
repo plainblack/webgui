@@ -169,7 +169,7 @@ sub addUsers {
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [$self->getId, $uid]);
 		unless ($isIn) {
 			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, ($self->session->datetime->time()+$expireOffset)]);
-			$self->session->stow->delete("gotGroupsForUser");
+			$self->session->cache->delete("gotGroupsForUser");
 		} else {
 			$self->userGroupExpireDate($uid,($self->session->datetime->time()+$expireOffset));
 		}
@@ -236,10 +236,10 @@ sub clearCaches {
 	foreach my $group ( $self->getId, @{ $groups } ) {
 		eval{$cache->delete($group)};
 	}
-    my $stow = $self->session->stow;
-	$stow->delete("groupObj");
-	$stow->delete("isInGroup");
-	$stow->delete("gotGroupsInGroup");
+    my $cache = $self->session->cache;
+	$cache->delete("groupObj");
+	$cache->delete("isInGroup");
+	$cache->delete("gotGroupsInGroup");
 }
 
 #-------------------------------------------------------------------
@@ -672,7 +672,7 @@ sub getGroupsIn {
 	my $self = shift;
         my $isRecursive = shift;
         my $loopCount = shift;
-	my $gotGroupsInGroup = $self->session->stow->get("gotGroupsInGroup");
+	my $gotGroupsInGroup = $self->session->cache->get("gotGroupsInGroup");
 	if ($isRecursive && exists($gotGroupsInGroup->{recursive}{$self->getId})) {
 		return $gotGroupsInGroup->{recursive}{$self->getId};
 	}
@@ -695,11 +695,11 @@ sub getGroupsIn {
 		my %unique = map { $_ => 1 } @groupsOfGroups;
 		@groupsOfGroups = keys %unique;
 		$gotGroupsInGroup->{recursive}{$self->getId} = \@groupsOfGroups;
-		$self->session->stow->set("gotGroupsInGroup", $gotGroupsInGroup);
+		$self->session->cache->set("gotGroupsInGroup", $gotGroupsInGroup);
                 return \@groupsOfGroups;
 	}
 	$gotGroupsInGroup->{direct}{$self->getId} = $groups;
-	$self->session->stow->set("gotGroupsInGroup",$gotGroupsInGroup);
+	$self->session->cache->set("gotGroupsInGroup",$gotGroupsInGroup);
         return $groups;
 }
 
@@ -1117,7 +1117,7 @@ sub new {
     my $noAdmin         = shift;
     my $session         = $self->{_session};
 
-    my $cached = $session->stow->get("groupObj", { noclone => 1});
+    my $cached = $session->cache->get("groupObj");
 	return $cached->{$self->{_groupId}} if ($cached->{$self->{_groupId}});
 
 	bless $self, $class;
@@ -1140,7 +1140,6 @@ sub new {
     }
 
 	$cached->{$self->{_groupId}} = $self;
-	$session->stow->set("groupObj", $cached);
 	return $self;
 }
 

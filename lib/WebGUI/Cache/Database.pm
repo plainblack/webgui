@@ -49,6 +49,7 @@ Remove content from the filesystem cache.
 
 sub delete {
 	my $self = shift;
+        $self->{_key} = shift;
 	$self->session->db->write("delete from cache where namespace=? and cachekey=?",[$self->{_namespace}, $self->{_key}]);
 }
 
@@ -80,7 +81,6 @@ Remove all objects from the filecache system.
 
 sub flush {
 	my $self = shift;
-	$self->SUPER::flush();
 	$self->session->db->write("delete from cache where namespace=?",[$self->{_namespace}]);
 }
 
@@ -96,6 +96,7 @@ sub get {
 	my $self = shift;
     my $session = $self->session;
 	return undef if ($session->config->get("disableCache"));
+        $self->{_key} = shift;
     my $sth = $session->db->dbh->prepare("select content from cache where namespace=? and cachekey=? and expires>?");
 	$sth->execute($self->{_namespace},$self->{_key},time());
 	my $data = $sth->fetchrow_arrayref;
@@ -150,9 +151,8 @@ sub new {
 	my $cache;
 	my $class = shift;
 	my $session = shift;
-	my $key = $class->parseKey(shift);
 	my $namespace = shift || $session->config->getFilename;
-	bless {_session=>$session, _key=>$key, _namespace=>$namespace}, $class;
+	bless {_session=>$session, _namespace=>$namespace}, $class;
 }
 
 
@@ -174,6 +174,7 @@ The time to live for this content. This is the amount of time (in seconds) that 
 
 sub set {
 	my $self = shift;
+        $self->{_key} = shift;
 	# Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
 	my $content = Storable::nfreeze(\(scalar shift));
 	my $ttl = shift || 60;
