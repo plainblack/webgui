@@ -1,0 +1,11 @@
+To run the benchmark test:
+
+Install the following CPAN modules:
+
+*) CHI
+*) CHI::Driver::Memcached
+*) CHI::Driver::DBI
+
+cd /data/WebGUI/sbin
+perl benchCache.pl --configFile=<config>
+
