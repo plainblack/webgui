@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 deleteFieldFromEMSSubmission($session);
+tenVoteMinimumForMatrixRatings($session);
 
 finish($session); # this line required
 
@@ -58,6 +59,15 @@ sub deleteFieldFromEMSSubmission {
 ENDSQL
 
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub tenVoteMinimumForMatrixRatings {
+    my $session = shift;
+    print "\tRestrict Matrix Listing Statistics to those with more than 10 ratings..." unless $quiet;
+    $session->db->write('update MatrixListing_ratingSummary set meanValue=0, medianValue=0 where countValue < 10');
+    print "\tDONE!\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

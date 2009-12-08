@@ -631,16 +631,11 @@ sub view {
     $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
         {type =>'text/css', rel=>'stylesheet'});
 
-    $style->setScript($url->extras('yui/build/utilities/utilities.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'),
-        {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/utilities/utilities.js'),       {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/json/json-min.js'),             {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),   {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/button/button-min.js'),         {type => 'text/javascript'});
     
     my ($varStatistics,$varStatisticsEncoded);
 	my $var = $self->get;
@@ -763,7 +758,7 @@ sub view {
             push (@{ $varStatistics->{last_updated_loop} }, {
                         url         => $lastUpdatedListing->getUrl,
                         name        => $lastUpdatedListing->get('title'),
-                        lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
+                        lastUpdated => $session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
                     });
         }
         $varStatistics->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>"
@@ -806,21 +801,21 @@ sub view {
         
         $data = $db->quickHashRef($sql." desc limit 1",[$category,$self->getId]);
         push(@{ $varStatistics->{best_rating_loop} },{
-            url=>'/'.$data->{url},
-            category=>$category,
-            name=>$data->{productName},
-            mean=>$data->{meanValue},
-            median=>$data->{medianValue},
-            count=>$data->{countValue}
+            url      => $session->url->gateway($data->{url}),
+            category => $category,
+            name     => $data->{productName},
+            mean     => 0+$data->{meanValue},
+            median   => 0+$data->{medianValue},
+            count    => 0+$data->{countValue}
             });
         $data = $db->quickHashRef($sql." asc limit 1",[$category,$self->getId]);
         push(@{ $varStatistics->{worst_rating_loop} },{
-            url=>'/'.$data->{url},
-            category=>$category,
-            name=>$data->{productName},
-            mean=>$data->{meanValue},
-            median=>$data->{medianValue},
-            count=>$data->{countValue}
+            url      => $session->url->gateway($data->{url}),
+            category => $category,
+            name     => $data->{productName},
+            mean     => 0+$data->{meanValue},
+            median   => 0+$data->{medianValue},
+            count    => 0+$data->{countValue}
             });
         }
 

@@ -608,9 +608,11 @@ sub setRatings {
         my $mean    = $sum / ($count || 1);
         my $median  = $db->quickScalar("select rating $sql order by rating limit $half,1",[$self->getId,$category]);
         
-        $db->write("replace into MatrixListing_ratingSummary 
-            (listingId, category, meanValue, medianValue, countValue, assetId) 
-            values (?,?,?,?,?,?)",[$self->getId,$category,$mean,$median,$count,$matrixId]);
+        if ($count >= 10) {
+            $db->write("replace into MatrixListing_ratingSummary 
+                (listingId, category, meanValue, medianValue, countValue, assetId) 
+                values (?,?,?,?,?,?)",[$self->getId,$category,$mean,$median,$count,$matrixId]);
+        }
     }
     return undef;
 }
