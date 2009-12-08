@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 9;        # Increment this number for each test you create
 
 
 ###########################################################################
@@ -79,4 +79,5 @@ plan tests => 8;        # Increment this number for each test you create
     isa_ok $connection, 'Net::LDAP', 'returned by bind';
     is $ldap->{_error}, 104, 'auth error due to bad identifier';
     is $ldap->getErrorCode, 104, 'getErrorCode returns the stored error code';
+    ok $ldap->getErrorMessage, 'getErrorMessage returns an error message';
 }
