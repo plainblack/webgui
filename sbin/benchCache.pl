@@ -53,7 +53,7 @@ my $groupIds = $session->db->buildArrayRef(
 my $count   = 0;
 my $repeats = 100;
 my $total   = scalar( @$userIds ) * scalar( @$groupIds ) * $repeats;
-my $test_cache = sub {
+my $test_cache1 = sub {
     my $session = shift;
     for my $userId ( @$userIds ) {
         for my $groupId ( @$groupIds ) {
@@ -62,7 +62,18 @@ my $test_cache = sub {
             }
             $count++;
         }
-        printf '%8i/%8i' . "\r", $count, $total;
+        printf '%9i/%9i' . "\r", $count, $total;
+    }
+};
+my $test_cache2 = sub {
+    my $session = shift;
+    for my $userId ( @$userIds ) {
+        my $user = WebGUI::User->new( $session, $userId );
+        for my $groupId ( @$groupIds ) {
+            $user->isInGroup( $groupId );
+            $count++;
+        }
+        printf '%9i/%9i' . "\r", $count, $total;
     }
 };
 
@@ -71,6 +82,7 @@ my %test;
 my %results;
 
 $test{ 'CHI Memcached' } = sub {
+    my ( $test ) = @_;
     finish($session);
     $session = start( $webguiRoot, $configFile );
     my $cMemcached      = WebGUI::CHI->new( $session, 
@@ -82,20 +94,22 @@ $test{ 'CHI Memcached' } = sub {
     $cWebGUI->flush;
     $count = 0;
     my %results;
-    return timethis( $repeats, sub { $test_cache->($session) },undef,  'none'  );
+    return timethis( $repeats, sub { $test->($session) },undef,  'none'  );
 };
 
 $test{ 'WebGUI Memcached' } = sub {
+    my ( $test ) = @_;
     finish($session);
     $session = start( $webguiRoot, $configFile );
     my $cWebGUI = WebGUI::Cache->new( $session );
     $session->{_cache} = $cWebGUI;
     $cWebGUI->flush;
     $count = 0;
-    return timethis( $repeats, sub { $test_cache->($session) },undef,  'none'  );
+    return timethis( $repeats, sub { $test->($session) },undef,  'none'  );
 };
 
 $test{ 'CHI FastMmap' } = sub {
+    my ( $test ) = @_;
     finish($session);
     $session = start( $webguiRoot, $configFile );
     my $cFastmmap       = WebGUI::CHI->new( $session,
@@ -106,10 +120,11 @@ $test{ 'CHI FastMmap' } = sub {
     $session->{_cache} = $cFastmmap;
     $cFastmmap->{chi}->remove_multi( [$cFastmmap->{chi}->get_keys] );
     $count = 0;
-    return timethis( $repeats, sub { $test_cache->($session) },undef,  'none'  );
+    return timethis( $repeats, sub { $test->($session) },undef,  'none'  );
 };
 
 $test{ 'CHI Null' } = sub {
+    my ( $test ) = @_;
     finish($session);
     $session = start( $webguiRoot, $configFile );
     my $cNull   = WebGUI::CHI->new( $session,
@@ -117,35 +132,42 @@ $test{ 'CHI Null' } = sub {
     );
     $session->{_cache} = $cNull;
     $count = 0;
-    return timethis( $repeats, sub { $test_cache->($session) }, undef, 'none'  );
+    return timethis( $repeats, sub { $test->($session) }, undef, 'none'  );
 };
 
 $test{ 'WebGUI DB' } = sub {
+    my ( $test ) = @_;
     finish($session);
     $session = start( $webguiRoot, $configFile );
     my $c = WebGUI::Cache::Database->new( $session );
     $session->{_cache} = $c;
     $c->flush;
     $count = 0;
-    return timethis( $repeats, sub { $test_cache->($session) },undef,  'none' );
+    return timethis( $repeats, sub { $test->($session) },undef,  'none' );
 };
 
 $test{ 'WebGUI File' } = sub {
+    my ( $test ) = @_;
     finish($session);
     $session = start( $webguiRoot, $configFile );
     my $c = WebGUI::Cache::FileCache->new( $session );
     $session->{_cache} = $c;
     $c->flush;
     $count = 0;
-    return timethis( $repeats, sub { $test_cache->($session) }, undef, 'none'  );
+    return timethis( $repeats, sub { $test->($session) }, undef, 'none'  );
 };
 
 
 for my $test ( keys %test ) {
-    printf "\%17s\n", $test;
-    $results{ $test } = $test{ $test }->();
+    printf "1:\%17s\n", "$test";
+    $results{ $test } = $test{ $test }->($test_cache1);
 }
+cmpthese( \%results );
 
+for my $test ( keys %test ) {
+    printf "2: \%17s\n", "$test";
+    $results{ $test } = $test{ $test }->($test_cache2);
+}
 cmpthese( \%results );
 
 finish($session);
