@@ -36,7 +36,7 @@ require WebGUI::Config;
 require WebGUI::Pluggable;
 
 # these modules should always be skipped
-my @excludes = qw(WebGUI::i18n::English::Automated_Information WebGUI::PerformanceProfiler);
+my @excludes;
 push @excludes, readLines($webguiRoot."/sbin/preload.exclude");
 
 WebGUI::Pluggable::findAndLoad( "WebGUI", 
