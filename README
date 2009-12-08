@@ -1,5 +1,7 @@
 To run the benchmark test:
 
+Install and run memcached
+
 Install the following CPAN modules:
 
 *) CHI
