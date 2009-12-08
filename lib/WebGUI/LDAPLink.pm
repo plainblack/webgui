@@ -107,9 +107,10 @@ sub connectToLDAP {
     $self->{_uri} = $uri;
     my $ldap = Net::LDAP->new($uri->host,
         port   => $uri->port,   #Port will default to 389 or 636
-        scheme => $uri->scheme
+        scheme => $uri->scheme,
+        timeout => 15,
     );
-    
+
     unless($ldap) {
         $self->{_error} = 103;
         return undef;
@@ -167,7 +168,7 @@ A valid ldap error code.
 
 sub getErrorMessage {
    my $self = shift;
-   my $errorCode = shift || $self->getErrorMessage;
+   my $errorCode = shift || $self->getErrorCode;
    return "" unless $errorCode;
    my $i18nCode = "LDAPLink_".$errorCode;
    my $i18n = WebGUI::International->new($self->session,"AuthLDAP");
@@ -231,9 +232,7 @@ Disconnect cleanly from the current databaseLink.
 =cut
 
 sub unbind {
-	my ($self, $value);
-	$self = shift;
-	$value = shift;
+	my $self = shift;
 	if (defined $self->{_connection}) {
 		$self->{_connection}->unbind;
 	}

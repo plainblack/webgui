@@ -2,6 +2,7 @@
  - fixed #11289: Gallery with pending version tag causes search engine indexer to puke.
  - fixed #11292: Search function limited to onje search?
  - fixed #11286: Workflow Instance deleted when reaching an Activity that fails to load
+ - fixed #11296: listLDAPLinks op permissions problems
 
 7.8.7
  - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl

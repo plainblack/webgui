@@ -380,13 +380,14 @@ sub www_listLDAPLinks {
 	  
 		my $ldapLink = WebGUI::LDAPLink->new($session,$data->{ldapLinkId});
 		my $status = $i18n->get("LDAPLink_1078");
-		if ($ldapLink->bind && $ldapLink->getErrorCode == 0) {
-			$status = $i18n->get("LDAPLink_1079");
-		} else {
-			$session->errorHandler->warn($ldapLink->getErrorMessage());
+        if ($ldapLink->bind && $ldapLink->getErrorCode == 0) {
+            $status = $i18n->get("LDAPLink_1079");
+            $ldapLink->unbind;
+        }
+        else {
+            $session->errorHandler->warn($ldapLink->getErrorMessage());
             $status .= ": ".$ldapLink->getErrorMessage();
-		}
-		$ldapLink->unbind;
+        }
 		$row[$i] .= '<td valign="top" class="tableData">'.$status.'</td>';
 		$row[$i] .= '</tr>';
 		$i++;
