@@ -626,28 +626,19 @@ sub view {
     my $i18n    = WebGUI::International->new($session, 'Asset_Matrix');
 
     # javascript and css files for compare form datatable
-    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
-        {type =>'text/css', rel=>'stylesheet'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/get/get-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-beta-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'), {type =>
-    'text/javascript'});
+    $session->style->setLink(  $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type =>'text/css', rel=>'stylesheet'});
+    $session->style->setScript($session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/get/get-min.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/element/element-beta-min.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/button/button-min.js'), {type => 'text/javascript'});
     
     my ($varStatistics,$varStatisticsEncoded);
 	my $var = $self->get;
-    $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
+    $var->{isLoggedIn}              = ($session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
     $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
@@ -655,10 +646,10 @@ sub view {
     $var->{matrix_url}              = $self->getUrl();
 
     my $maxComparisons;
-    if($self->session->user->isVisitor){
+    if($session->user->isVisitor){
         $maxComparisons = $self->get('maxComparisons');
     }
-    elsif($self->session->user->isInGroup( $self->get("maxComparisonsGroup") )) {
+    elsif($session->user->isInGroup( $self->get("maxComparisonsGroup") )) {
         $maxComparisons = $self->get('maxComparisonsGroupInt');
     }
     else{
@@ -766,7 +757,7 @@ sub view {
             push (@{ $varStatistics->{last_updated_loop} }, {
                         url         => $lastUpdatedListing->getUrl,
                         name        => $lastUpdatedListing->get('title'),
-                        lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
+                        lastUpdated => $session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
                     });
         }
         $varStatistics->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>"
@@ -809,21 +800,21 @@ sub view {
         
         $data = $db->quickHashRef($sql." desc limit 1",[$category,$self->getId]);
         push(@{ $varStatistics->{best_rating_loop} },{
-            url=>'/'.$data->{url},
-            category=>$category,
-            name=>$data->{productName},
-            mean=>$data->{meanValue},
-            median=>$data->{medianValue},
-            count=>$data->{countValue}
+            url      => $session->url->gateway($data->{url}),
+            category => $category,
+            name     => $data->{productName},
+            mean     => 0+$data->{meanValue},
+            median   => 0+$data->{medianValue},
+            count    => 0+$data->{countValue}
             });
         $data = $db->quickHashRef($sql." asc limit 1",[$category,$self->getId]);
         push(@{ $varStatistics->{worst_rating_loop} },{
-            url=>'/'.$data->{url},
-            category=>$category,
-            name=>$data->{productName},
-            mean=>$data->{meanValue},
-            median=>$data->{medianValue},
-            count=>$data->{countValue}
+            url      => $session->url->gateway($data->{url}),
+            category => $category,
+            name     => $data->{productName},
+            mean     => 0+$data->{meanValue},
+            median   => 0+$data->{medianValue},
+            count    => 0+$data->{countValue}
             });
         }
 

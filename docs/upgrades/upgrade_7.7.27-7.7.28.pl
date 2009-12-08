@@ -35,6 +35,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 clearOrphanedCSMailCronJobs($session);
 deleteExtraCronJobsForCS($session);
+tenVoteMinimumForMatrixRatings($session);
 
 finish($session); # this line required
 
@@ -85,6 +86,15 @@ sub deleteExtraCronJobsForCS {
         }
         $session->db->write('update Collaboration set getMailCronId=? where assetId=?', [$cs->get('getMailCronId'), $cs->getId]);
     }
+    print "\tDONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub tenVoteMinimumForMatrixRatings {
+    my $session = shift;
+    print "\tRestrict Matrix Listing Statistics to those with more than 10 ratings..." unless $quiet;
+    $session->db->write('update MatrixListing_ratingSummary set meanValue=0, medianValue=0 where countValue < 10');
     print "\tDONE!\n" unless $quiet;
 }
 

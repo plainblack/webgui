@@ -8,6 +8,7 @@
  - fixed #11292: Search function limited to onje search?
  - fixed #11286: Workflow Instance deleted when reaching an Activity that fails to load
  - fixed #11296: listLDAPLinks op permissions problems
+ - fixed #11294: Matrix - Best/Worse Rated Calculations
 
 7.7.27
  - fixed #11134: Tree Navigation menu colapses sub items of current page, missing JS files added
