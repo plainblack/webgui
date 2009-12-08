@@ -108,7 +108,6 @@ sub connectToLDAP {
     my $ldap = Net::LDAP->new($uri->host,
         port   => $uri->port,   #Port will default to 389 or 636
         scheme => $uri->scheme,
-        timeout => 15,
     );
 
     unless($ldap) {
