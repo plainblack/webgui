@@ -786,6 +786,7 @@ sub view {
             rating.category =? 
             and asset.parentId=? 
             and asset.state='published' 
+            and rating.countValue >= 10
             and assetData.revisionDate=(
                 select
                     max(revisionDate)
