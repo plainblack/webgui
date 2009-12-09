@@ -112,7 +112,7 @@ sub moveCalendarFeedsToJSON {
     my $session = shift;
     print "\tMoveing Calendar feeds from database collateral to JSON... " unless $quiet;
     $session->db->write(q|ALTER TABLE Calendar ADD COLUMN icalFeeds LONGTEXT|);
-    my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
+    my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session, 0, { returnAll => 1 } );
     while (my $calendar = $getCalendar->()) {
         my $feeds = $session->db->buildHashRefOfHashRefs(
             "select * from Calendar_feeds where assetId=?",

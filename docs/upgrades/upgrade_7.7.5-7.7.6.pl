@@ -158,7 +158,7 @@ sub addTemplateAttachmentsTable {
 sub revertUsePacked {
     my $session = shift;
     print "\tReverting use packed... " unless $quiet;
-    my $iter    = WebGUI::Asset->getIsa( $session );
+    my $iter    = WebGUI::Asset->getIsa( $session, 0, { returnAll => 1 }  );
     while ( my $asset = $iter->() ) {
         $asset->update({ usePackedHeadTags => 0 });
         if ( $asset->isa('WebGUI::Asset::Template') || $asset->isa('WebGUI::Asset::Snippet') ) {
