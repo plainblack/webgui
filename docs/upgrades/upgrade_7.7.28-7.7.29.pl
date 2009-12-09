@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Utility;
 
 
 my $toVersion = '7.7.29';
@@ -31,6 +32,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+recalculateMatrixListingStatistics($session);
 
 finish($session); # this line required
 
@@ -43,6 +45,32 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub recalculateMatrixListingStatistics {
+    my $session = shift;
+    my $db      = $session->db;
+    print "\tRecalculating Matrix Listing Statistics that were erased in the 7.7.28 upgrade.  This could take a long time... " unless $quiet;
+    # and here's our code
+    my $sumSth = $db->read('select assetId, listingId, countValue, category from MatrixListing_ratingSummary where countValue < 10');
+    while (my ($assetId, $listingId, $countvalue, $category) = $sumSth->array) {
+        my $sql     = "from MatrixListing_rating where listingId=? and category=?";
+        my $sum     = $db->quickScalar("select sum(rating) $sql", [$listingId, $category]);
+        my $count   = $db->quickScalar("select count(*) $sql",    [$listingId, $category]);
+        
+        my $half    = round($count/2);
+        my $mean    = $sum / ($count || 1);
+        my $median  = $db->quickScalar("select rating $sql order by rating limit $half,1",[$listingId, $category]);
+        
+        $db->write("replace into MatrixListing_ratingSummary 
+            (listingId, category, meanValue, medianValue, countValue, assetId) 
+            values (?,?,?,?,?,?)",[$listingId,$category,$mean,$median,$count,$assetId]);
+ 
+    }
+    $sumSth->finish;
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
