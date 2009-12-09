@@ -73,7 +73,7 @@ sub clearOrphanedCSMailCronJobs {
 sub deleteExtraCronJobsForCS {
     my $session = shift;
     print "\tGuarantee that each CS has one and only one Cron job.  Older jobs will be deleted... " unless $quiet;
-    my $cses = WebGUI::Asset::Wobject::Collaboration->getIsa($session);
+    my $cses = WebGUI::Asset::Wobject::Collaboration->getIsa($session, 0, { returnAll => 1 });
     CS: while( my $cs = $cses->() ) {
         my @cronIds = $session->db->buildArray('select distinct(getMailCronId) from Collaboration where assetId=?',[$cs->getId]);
         next CS unless @cronIds > 1;
