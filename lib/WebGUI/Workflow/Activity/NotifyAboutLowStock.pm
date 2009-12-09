@@ -98,7 +98,7 @@ sub execute {
     my $warningLimit = $self->get('warningLimit');
     my $finishTime = time() + $self->getTTL;
     my $expired = 0;
-    PRODUCT: foreach my $product ($productIterator->()) {
+    PRODUCT: while (my $product = $productIterator->()) {
         VARIANT: foreach my $collateral ( @{ $product->getAllCollateral('variantsJSON') }) {
             if ($collateral->{quantity} <= $warningLimit) {
                 ##Build message

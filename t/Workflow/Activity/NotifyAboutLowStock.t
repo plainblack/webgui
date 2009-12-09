@@ -35,7 +35,11 @@ my $posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'cell_posters',
     title     => "Red's Posters",
-});
+}, undef, undef, { skipAutoCommitWorkflows => 1, });
+
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->commit();
+addToCleanup($versionTag);
 
 my $ritaVarId = $posters->setCollateral('variantsJSON', 'variantId', 'new',
     {
@@ -74,6 +78,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
+addToCleanup($workflow);
 
 my $threshold = $workflow->addActivity('WebGUI::Workflow::Activity::NotifyAboutLowStock');
 $threshold->set('className'    , 'WebGUI::Activity::NotifyAboutLowStock');
