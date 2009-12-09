@@ -1224,7 +1224,7 @@ sub getImportNode {
 
 =head2 getIsa ( $session, [ $offset ] )
 
-A class method to return an iterator for getting all Assets by class (and all sub-classes)
+A class method to return an iterator for getting all committed Assets by class (and all sub-classes)
 as Asset objects, one at a time.  When the end of the assets is reached, then the iterator
 will close the database handle that it uses and return undef.
 
@@ -1235,6 +1235,10 @@ while (my $product = $productIterator->()) {
   ##Do something useful with $product
 }
 
+If the iterator cannot instanciate an asset, it will not return undef.  Instead, it
+will throw an exception.  This allows the error condition to be distinguished
+from the end of the set of assets.
+
 =head3 $session
 
 A reference to a WebGUI::Session object.
@@ -1244,26 +1248,44 @@ A reference to a WebGUI::Session object.
 An offset, from the beginning of the results returned from the query, to really begin
 returning results.  This allows very large sets of results to be handled in chunks.
 
+=head3 $options
+
+A hashref of options to change how getIsa works.
+
+=head4 returnAll
+
+If set to true, then all assets will be returned, regardless of status and state.
+
 =cut
 
 sub getIsa {
     my $class    = shift;
     my $session  = shift;
     my $offset   = shift;
+    my $options  = shift;
     my $def = $class->definition($session);
     my $tableName = $def->[0]->{tableName};
-    my $sql = "select distinct(assetId) from $tableName";
-    if (defined $offset) {
-        $sql .= ' LIMIT '. $offset . ',1234567890';
+    #Strategy, generate the correct set of assetIds
+    my $sql = "select assetId from assetData as ad ";
+    if ($tableName ne 'assetData') {
+        $sql .= "join `$tableName` using (assetId, revisionDate) ";
     }
-    my $sth = $session->db->read($sql);
+    $sql .= 'WHERE ';
+    if (! $options->{returnAll}) {
+        $sql .= q{(status='approved' OR status='archived') AND };
+    }
+    $sql .= q{revisionDate = (SELECT MAX(revisionDate) FROM assetData AS a WHERE a.assetId = ad.assetId) };
+    if (defined $offset) {
+        $sql .= 'LIMIT '. $offset . ',1234567890 ';
+    }
+    my $sth    = $session->db->read($sql);
     return sub {
-        my ($assetId) = $sth->array;
+        my ($assetId, $revisionDate) = $sth->array;
         if (!$assetId) {
             $sth->finish;
             return undef;
         }
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        my $asset = eval { WebGUI::Asset->newPending($session, $assetId); };
         if (!$asset) {
             WebGUI::Error::ObjectNotFound->throw(id => $assetId);
         }

@@ -4,6 +4,7 @@
  - fixed #11286: Workflow Instance deleted when reaching an Activity that fails to load
  - fixed #11296: listLDAPLinks op permissions problems
  - fixed #11294: Matrix - Best/Worse Rated Calculations
+ - fixed getIsa returns undef for pending assets
 
 7.8.7
  - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl
