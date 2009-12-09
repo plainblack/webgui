@@ -1,3 +1,5 @@
+7.7.29
+
 7.7.28
  - fixed #11289: Gallery with pending version tag causes search engine indexer to puke.
  - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl
