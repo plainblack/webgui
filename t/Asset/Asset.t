@@ -152,7 +152,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 126
+plan tests => 127
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -707,9 +707,14 @@ isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Ass
 #
 ################################################################
 my $node = WebGUI::Asset->getRoot($session);
-my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
-my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
-my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
+my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
+my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
+my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
+my $pTag = WebGUI::VersionTag->getWorking($session);
+$pTag->commit;
+addToCleanup($pTag);
+my $product4 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
+addToCleanup($product4);
 
 my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
 isa_ok($getAProduct, 'CODE', 'getIsa returns a sub ref');
@@ -732,9 +737,17 @@ while( my $sku = $getASku->()) {
 is($counter, 3, 'getIsa: returned only 3 Products for a parent class');
 cmp_bag($skuIds, [$product1->getId, $product2->getId, $product3->getId], 'getIsa returned the correct 3 products for a parent class');
 
+my $getAnotherSku = WebGUI::Asset::Sku->getIsa($session, 0, { returnAll => 1, });
+$counter = 0;
+while( my $sku = $getAnotherSku->()) {
+    ++$counter;
+}
+is($counter, 4, 'getIsa: returned all 4 skus with returnAll => 1');
+
 $product1->purge;
 $product2->purge;
 $product3->purge;
+$product4->purge;
 
 ################################################################
 #
