@@ -858,14 +858,14 @@ selectBox.</p>|
     },
 
     'too many message' => {
-        lastUpdated => 0,
-        message => q|You tried to compare more than your maximum number of listings.|,
+        lastUpdated => 1260478380,
+        message => q|You can only compare up to %d items at a time. Please adjust your selections and try again.|,
         context => q|A message shown to the user when they have selected too many listings to compare.|,
     },
 
     'too few message' => {
-        lastUpdated => 1250141046,
-        message => q|To compare, at least two listing must be selected. If you want to view just one listing, click on its name.|,
+        lastUpdated => 1260478343,
+        message => q|To compare, at least two listings must be selected. If you want to view just one listing, click on its name.|,
         context => q|A message shown to the user when they have selected only one listing to compare.|,
     },
 
