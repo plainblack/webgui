@@ -52,19 +52,15 @@ Returns the name of all properties, in the order they were created in the Defini
 
 =cut
 
-
-has 'get_property_list' => (
-    is => 'ro',
-    default => sub {
-        my $self   = shift;
-        my @properties =
-            map { $_->name }
-            sort { $a->insertion_order <=> $b->insertion_order }
-            grep { $_->meta->isa('WebGUI::Definition::Meta::Property') }
-            $self->meta->get_all_attributes;
-        return \@properties;
-    },
-);
+sub get_property_list {
+    my $self   = shift;
+    my @properties =
+        map { $_->name }
+        sort { $a->insertion_order <=> $b->insertion_order }
+        grep { $_->meta->isa('WebGUI::Definition::Meta::Property') }
+        $self->meta->get_all_attributes;
+    return \@properties;
+}
 
 #-------------------------------------------------------------------
 
