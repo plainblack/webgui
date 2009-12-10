@@ -6,6 +6,7 @@
  - fixed #11294: Matrix - Best/Worse Rated Calculations
  - fixed getIsa returns undef for pending assets
  - fixed #11299: Matrix - Cannot hide title
+ - fixed #11293: Matrix - Search not working correctly
 
 7.8.7
  - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl

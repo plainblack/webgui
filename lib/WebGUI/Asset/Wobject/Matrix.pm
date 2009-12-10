@@ -1195,13 +1195,16 @@ sub www_getCompareFormData {
                             where listing.matrixListingId = ? 
                             and attributeId IN(".$searchParamList.")",
                             [$result->{assetId}],'attributeId');
+                ##Searching is AND based.
                 PARAM: foreach my $param (@searchParams_sorted) {
                         my $fieldType       = $matrixListing_attributes->{$param->{attributeId}}->{fieldType};
                         my $listingValue    = $matrixListing_attributes->{$param->{attributeId}}->{value};
                         if(($fieldType eq 'MatrixCompare') && ($listingValue < $param->{value})){
+                            $checked = '';
                             last PARAM;
                         }
                         elsif(($fieldType ne 'MatrixCompare' && $fieldType ne '') && ($param->{value} ne $listingValue)){
+                            $checked = '';
                             last PARAM;
                         }
                         else{
