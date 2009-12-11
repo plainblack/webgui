@@ -26,6 +26,9 @@ my $called_getProperties;
     property 'property1' => (
         arbitrary_key => 'arbitrary_value',
     );
+    property 'property2' => (
+        nother_key => 'nother_value',
+    );
 
     # attributes create methods
     ::can_ok +__PACKAGE__, 'attribute1';
@@ -40,6 +43,12 @@ my $called_getProperties;
 
     # can retreive property metadata
     ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
+
+    ::cmp_deeply(
+        +__PACKAGE__->getProperties,
+        [qw/property1 property2/],
+        'getProperties works as a class method'
+    );
 
 }
 
@@ -74,7 +83,13 @@ my $called_getProperties;
     ::cmp_deeply(
         $object->meta->get_property_list,
         [qw/property2 property1/],
-        'get_property_list returns properties in insertion order'
+        '->meta->get_property_list returns properties in insertion order'
+    );
+
+    ::cmp_deeply(
+        $object->getProperties,
+        [qw/property2 property1/],
+        'getProperties is an alias for ->meta->get_property_list'
     );
 
 }
