@@ -11,7 +11,6 @@
 use strict;
 use warnings;
 no warnings qw(uninitialized);
-use Data::Dumper;
 
 use Test::More 'no_plan'; #tests => 1;
 use Test::Deep;
