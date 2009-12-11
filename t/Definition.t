@@ -35,14 +35,14 @@ my $called_getProperties;
     ::can_ok +__PACKAGE__, 'update';
 
     # can retreive property metadata
-    ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value';
+    ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
 }
 
 {
     package WGT::Class::Asset;
     use WebGUI::Definition::Asset;
 
-    attribute table => 'asset';
+    attribute tableName => 'asset';
     property 'property1' => ();
 
     my $written;
@@ -50,18 +50,18 @@ my $called_getProperties;
         $written++;
     }
 
-    ::is +__PACKAGE__->meta->get_attribute('property1')->table, 'asset';
+    ::is +__PACKAGE__->meta->get_attribute('property1')->tableName, 'asset', 'tableName copied from attribute into property';
 
     ::can_ok +__PACKAGE__, 'update';
 
     my $object = __PACKAGE__->new;
     $object->set({property1 => 'property value'});
 
-    ::is $object->property1, 'property value';
+    ::is $object->property1, 'property value', 'checking set';
 
     # write called
     $object->update;
-    ::is $written, 1;
+    ::is $written, 1, 'update calls write';
 
 }
 
