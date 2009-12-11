@@ -117,13 +117,13 @@ sub update {
 
 #-------------------------------------------------------------------
 
-=head2 getProperty ( dataSpec )
+=head2 getProperty ( $name )
 
-Returns a list of all properties of the object, as set by the Definition.
+Returns the requested property, which will be a subclass of Moose::Meta::Attribute.
 
-=head3 dataSpec
+=head3 $name
 
-See L<set>.
+The name of the property to return.
 
 =cut
 
