@@ -48,7 +48,7 @@ These methods are available from this class:
 
 =head2 get_property_list ( )
 
-Returns the name of all properties, in the order they were created in the Definition.
+Returns an array reference of the names of all properties, in the order they were created in the Definition.
 
 =cut
 
@@ -57,8 +57,8 @@ sub get_property_list {
     my @properties =
         map { $_->name }
         sort { $a->insertion_order <=> $b->insertion_order }
-        grep { $_->meta->isa('WebGUI::Definition::Meta::Property') }
-        $self->meta->get_all_attributes;
+        grep { $_->isa('WebGUI::Definition::Meta::Property') }
+        $self->get_all_attributes;
     return \@properties;
 }
 

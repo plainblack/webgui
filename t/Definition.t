@@ -11,8 +11,10 @@
 use strict;
 use warnings;
 no warnings qw(uninitialized);
+use Data::Dumper;
 
 use Test::More 'no_plan'; #tests => 1;
+use Test::Deep;
 #use Test::Exception;
 
 my $called_getProperties;
@@ -33,9 +35,12 @@ my $called_getProperties;
 
     # role applied
     ::can_ok +__PACKAGE__, 'update';
+    ::can_ok +__PACKAGE__, 'get';
+    ::can_ok +__PACKAGE__, 'set';
 
     # can retreive property metadata
     ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
+
 }
 
 {
@@ -43,6 +48,7 @@ my $called_getProperties;
     use WebGUI::Definition::Asset;
 
     attribute tableName => 'asset';
+    property 'property2' => ();
     property 'property1' => ();
 
     my $written;
@@ -56,12 +62,20 @@ my $called_getProperties;
 
     my $object = __PACKAGE__->new;
     $object->set({property1 => 'property value'});
+    ::is $object->property1, 'property value', 'checking set, hashref form';
 
-    ::is $object->property1, 'property value', 'checking set';
+    $object->set('property1',  'newer property value');
+    ::is $object->property1, 'newer property value', '... hash form';
 
     # write called
     $object->update;
     ::is $written, 1, 'update calls write';
+
+    ::cmp_deeply(
+        $object->meta->get_property_list,
+        [qw/property2 property1/],
+        'get_property_list returns properties in insertion order'
+    );
 
 }
 
