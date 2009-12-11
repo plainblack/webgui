@@ -44,6 +44,7 @@ my $called_getProperties;
     # can retreive property metadata
     ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
 
+
     ::cmp_deeply(
         +__PACKAGE__->getProperties,
         [qw/property1 property2/],
@@ -94,4 +95,30 @@ my $called_getProperties;
 
 }
 
+{
 
+    package WGT::Class::AlsoAsset;
+    use WebGUI::Definition::Asset;
+
+    attribute tableName => 'asset';
+    property 'property1' => ();
+    property 'property2' => ();
+    property 'property3' => ();
+
+    package WGT::Class::Asset::Snippet;
+    use WebGUI::Definition::Asset;
+    extends 'WGT::Class::AlsoAsset';
+
+    attribute tableName => 'snippet';
+    property 'property10' => ();
+    property 'property11' => ();
+
+    package main;
+
+    cmp_deeply(
+        WGT::Class::Asset::Snippet->getProperties,
+        [qw/property1 property2 property3 property10 property11/],
+        'checking inheritance of properties by name, insertion order'
+    );
+
+}

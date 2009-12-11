@@ -46,6 +46,20 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 get_attributes ( )
+
+Returns an array of all attributes, but only for this class.  This
+is the API-safe way of doing $self->_attribute_map;
+
+=cut
+
+sub get_attributes {
+    my $self   = shift;
+    return map { $self->find_attribute_by_name($_) } $self->get_attribute_list;
+}
+
+#-------------------------------------------------------------------
+
 =head2 get_property_list ( )
 
 Returns an array reference of the names of all properties, in the order they were created in the Definition.
@@ -54,11 +68,17 @@ Returns an array reference of the names of all properties, in the order they wer
 
 sub get_property_list {
     my $self   = shift;
-    my @properties =
-        map { $_->name }
-        sort { $a->insertion_order <=> $b->insertion_order }
-        grep { $_->isa('WebGUI::Definition::Meta::Property') }
-        $self->get_all_attributes;
+    my @properties = ();
+    CLASS: foreach my $className (reverse $self->linearized_isa()) {
+        my $meta = $self->initialize($className);
+        next CLASS unless $meta->isa('WebGUI::Definition::Meta::Class');
+        push @properties, 
+            map  { $_->name }                                      # Just the name
+            sort { $a->insertion_order <=> $b->insertion_order }   # In insertion order
+            grep { $_->isa('WebGUI::Definition::Meta::Property') } # that are Meta::Properties
+            $meta->get_attributes                                  # All attributes
+        ;
+    }
     return \@properties;
 }
 
