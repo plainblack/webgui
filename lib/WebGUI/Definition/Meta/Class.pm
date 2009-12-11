@@ -67,12 +67,14 @@ Returns an array reference of the names of all properties, in the order they wer
 =cut
 
 sub get_property_list {
-    my $self   = shift;
+    my $self       = shift;
     my @properties = ();
+    my %seen       = ();
     CLASS: foreach my $className (reverse $self->linearized_isa()) {
         my $meta = $self->initialize($className);
         next CLASS unless $meta->isa('WebGUI::Definition::Meta::Class');
         push @properties, 
+            grep { ! $seen{$_}++ }                                 # Uniqueness check
             map  { $_->name }                                      # Just the name
             sort { $a->insertion_order <=> $b->insertion_order }   # In insertion order
             grep { $_->isa('WebGUI::Definition::Meta::Property') } # that are Meta::Properties

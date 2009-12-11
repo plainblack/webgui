@@ -115,10 +115,42 @@ my $called_getProperties;
 
     package main;
 
+    cmp_bag(
+        [ map {$_->name} WGT::Class::AlsoAsset->meta->get_attributes ],
+        [qw/property1 property2 property3/],
+        'get_attributes returns attributes for my class'
+    );
+
+    cmp_bag(
+        [ map {$_->name} WGT::Class::Asset::Snippet->meta->get_attributes ],
+        [qw/property10 property11/],
+        '...even in a subclass'
+    );
+
     cmp_deeply(
         WGT::Class::Asset::Snippet->getProperties,
         [qw/property1 property2 property3 property10 property11/],
         'checking inheritance of properties by name, insertion order'
+    );
+
+}
+
+{
+
+    package WGT::Class::Asset::NotherOne;
+    use WebGUI::Definition::Asset;
+    extends 'WGT::Class::AlsoAsset';
+
+    attribute tableName => 'snippet';
+    property 'property10' => ();
+    property 'property1'  => ();
+
+    package main;
+
+    cmp_deeply(
+        WGT::Class::Asset::NotherOne->getProperties,
+        [qw/property1 property2 property3 property10/],
+        'checking inheritance of properties by name, insertion order with an overridden property'
     );
 
 }
