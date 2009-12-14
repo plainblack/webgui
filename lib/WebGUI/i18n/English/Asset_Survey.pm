@@ -1690,18 +1690,18 @@ section/answer.|,
         lastUpdated => 0,
     },
 
-    'Add Question' => {
-        message => q{Add Question},
-        lastUpdated => 0,
-    },
-
-    'Add Answer' => {
-        message => q{Add Answer},
-        lastUpdated => 0,
-    },
-
     'Survey Objects' => {
         message => q{Survey Objects},
+        lastUpdated => 0,
+    },
+
+    'Make Default Type' => {
+        message => q{Make Default Type},
+        lastUpdated => 0,
+    },
+
+    'Remove Default Type' => {
+        message => q{Remove Default Type},
         lastUpdated => 0,
     },
 

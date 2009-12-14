@@ -146,7 +146,7 @@ Survey.Data = (function(){
 
 			if (!sButton) {
                 sButton = new YAHOO.widget.Button({
-                    label: Survey.i18n.get('Asset_Survey','Add Section'),
+                    label: Survey.i18n.get('Asset_Survey','add section'),
                     id: "addSection",
                     container: "addSection"
                 });
@@ -155,7 +155,7 @@ Survey.Data = (function(){
 
 			if (!qButton) {
                 qButton = new YAHOO.widget.Button({
-                    label: Survey.i18n.get('Asset_Survey', 'Add Question'),
+                    label: Survey.i18n.get('Asset_Survey', 'add question'),
                     id: "addQuestion",
                     container: "addQuestion"
                 });
@@ -168,7 +168,7 @@ Survey.Data = (function(){
                 YAHOO.util.Dom.setStyle('addAnswer', 'display', 'inline');
 				if (!aButton) {
                     aButton = new YAHOO.widget.Button({
-                        label: "Add Answer",
+                        label: Survey.i18n.get('Asset_Survey',"Add Answer"),
                         id: "addAnswer",
                         container: "addAnswer"
                     });
@@ -215,10 +215,21 @@ YAHOO.util.Event.onDOMReady(function(){
     Survey.i18n = new WebGUI.i18n( {
         'namespaces' : {
             'Asset_Survey' : [
-                'Add Question',
-                'Add Answer',
-                'Add Section',
+                'Make Default Type',
+                'Remove Default Type',
+                'cancel',
+                'add question',
+                'add answer',
+                'add section',
                 'Survey Objects'
+            ],
+            'Asset' : [
+                'Copy'
+            ],
+            'WebGUI' : [
+                'submit',
+                'preview',
+                '576'
             ]
         },
         onpreload   : {
