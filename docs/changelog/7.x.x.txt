@@ -9,6 +9,7 @@
  - fixed #11293: Matrix - Search not working correctly
  - fixed #11301: Matrix - Comparing too many products error message
  - fixed #11297: YUI Rich Editor fails to load when editing Survey in 7.7.27
+ - fixed #11306: Survey i18n: Loading....
 
 7.8.7
  - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl

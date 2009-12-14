@@ -4670,6 +4670,12 @@ Users may override this setting in their profile.
         lastUpdated => 0,
     },
 
+    'Loading...' => {
+        message => 'Loading...',
+        lastUpdated => 0,
+        context => 'Message shown to the user when data is being loaded, typically via AJAX, like in the Survey.'
+    },
+
 };
 
 1;
