@@ -75,7 +75,7 @@ Survey.ObjectTemplate = (function(){
             document.getElementById('edit').innerHTML = html;
             
             var btns = [{
-                text: "Submit",
+                text: Survey.i18n.get('WebGUI',"submit"),
                 handler: function(){
                     editor.saveHTML();
                     YAHOO.util.Dom.get('texteditortarget').value = editor.getEditorHTML();
@@ -84,25 +84,25 @@ Survey.ObjectTemplate = (function(){
                 },
                 isDefault: true
             }, {
-                text: "Copy",
+                text: Survey.i18n.get('Asset',"Copy"),
                 handler: function(){
                     document.getElementById('copy').value = 1;
                     this.submit();
                 }
             }, {
-                text: "Cancel",
+                text: Survey.i18n.get('Asset_Survey',"cancel"),
                 handler: function(){
                     this.cancel();
                     Survey.Comm.loadSurvey('-');
                 }
             }, {
-                text: "Delete",
+                text: Survey.i18n.get('WebGUI',"576"),
                 handler: function(){
                     document.getElementById('delete').value = 1;
                     this.submit();
                 }
             }, {
-                text: "Preview",
+                text: Survey.i18n.get('WebGUI',"preview"),
                 handler: function(){
                     if (type === 'answer') {
                         alert('Sorry, preview is only supported for Sections and Questions, not Answers');
@@ -119,7 +119,7 @@ Survey.ObjectTemplate = (function(){
             }];
             if(type === 'question'){
                 btns[btns.length] = {
-                    text: "Make Default Type",
+                    text: Survey.i18n.get('Asset_Survey',"Make Default Type"),
                         handler: function(){
                             var name = prompt("Please change name to new type, or leave to update current type",document.forms[0].questionType.value);
                             if(name != null){
@@ -129,10 +129,10 @@ Survey.ObjectTemplate = (function(){
                     }
                 };
                 btns[btns.length] = {
-                    text: "Remove Default Type",
-                        handler: function(){
-                                document.getElementById('removetype').value = 1;
-                                this.submit();
+                    text: Survey.i18n.get('Asset_Survey',"Remove Default Type"),
+                    handler: function(){
+                            document.getElementById('removetype').value = 1;
+                            this.submit();
                     }
                 };
 
