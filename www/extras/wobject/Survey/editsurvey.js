@@ -223,8 +223,8 @@ YAHOO.util.Event.onDOMReady(function(){
         },
         onpreload   : {
             fn       : function () {
-                            Survey.Comm.loadSurvey();
                             Survey.ObjectTemplate.initObjectEditor();
+                            Survey.Comm.loadSurvey();
                        }
         }
     } );
