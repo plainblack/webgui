@@ -176,7 +176,20 @@ sub addVATNumber {
         0,
     ] );
 
-    return $numberIsValid ? undef : $i18n->get('vies unavailable');
+    if ( $numberIsValid ) {
+        return undef;
+    }
+    else {
+        my $workflow = WebGUI::Workflow::Instance->create( $self->session, {
+            workflowId  => 'taxeurecheckworkflow01',
+            parameters  => { 
+                userId      => $user->userId,
+                vatNumber   => $number,
+            },
+        } )->start();
+
+        return $i18n->get('vies unavailable');
+    }
 }
 
 #-------------------------------------------------------------------
@@ -819,6 +832,45 @@ sub isUsableVATNumber {
     return 1 if $vat->{ viesValidated }         && $self->get('automaticViesApproval');
     return 1 if $vat->{ viesErrorCode } > 16    && $self->get('acceptOnViesUnavailable');
     return 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 recheckVATNumber ( vatNumber, user )
+
+=cut
+
+sub recheckVATNumber {
+    my $self    = shift;
+    my $number  = shift;
+    my $user    = shift || $self->session->user;
+
+    my $validator   = Business::Tax::VAT::Validation->new;
+
+    my $isValid     = $validator->check( $number );
+    my $errorCode   = $validator->get_last_error_code;
+
+    if ( $isValid ) {
+        $self->session->db->write( 
+            'update tax_eu_vatNumbers set viesValidated=?, viesErrorCode=? where vatNumber=? and userId=?',
+            [
+                1,
+                undef,
+                $number,
+                $user->userId,
+            ],
+        );
+
+        return 'VALID';
+    }
+    elsif ( $errorCode < 17 ) {
+        $self->deleteVATNumber( $number, $user );
+
+        return 'INVALID';
+    }
+    else {
+        return 'UNKNOWN';
+    }        
 }
 
 #-------------------------------------------------------------------
