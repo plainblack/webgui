@@ -92,7 +92,7 @@ sub addRevision {
 
     my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
 
-    my $workingTag;
+    my ($workingTag, $oldWorking);
     if ( $autoCommitId ) {
         $workingTag  
             = WebGUI::VersionTag->create( $self->session, { 
@@ -109,7 +109,9 @@ sub addRevision {
             $workingTag = WebGUI::VersionTag->getWorking( $self->session );
         }
         else {
+            my $oldWorking = WebGUI::VersionTag->getWorking($self->session, 'noCreate');
             $workingTag = WebGUI::VersionTag->new( $self->session, $parentAsset->get('tagId') );
+            $workingTag->setWorking();
         }
     }
     
@@ -163,6 +165,7 @@ sub addRevision {
     $newVersion->setVersionLock;
     $newVersion->update(\%mergedProperties);
     $newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
+    $oldWorking->setWorking if $oldWorking;
     
     return $newVersion;
 }
