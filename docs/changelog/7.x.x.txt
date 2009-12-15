@@ -11,6 +11,7 @@
  - fixed #11297: YUI Rich Editor fails to load when editing Survey in 7.7.27
  - fixed #11306: Survey i18n: Loading....
  - fixed #11307: Survey i18n #2
+ - fixed #11295: asset addChild failure when parent is not committed
 
 7.8.7
  - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl
