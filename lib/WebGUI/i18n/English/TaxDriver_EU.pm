@@ -9,7 +9,8 @@ our $I18N = {
     },
 
     'vies unavailable' => {
-        message => q|Number validation currently not available. Check later.|,
+        message => q|Number validation is currently not available. Your number will be rechecked automatically
+after some time.|,
         lastUpdated => 0,
         context => q|An error message|,
     },

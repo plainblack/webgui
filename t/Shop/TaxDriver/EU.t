@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
+use Test::MockObject::Extends;
 use Exception::Class;
 use Data::Dumper;
 
@@ -46,7 +47,7 @@ my $cart;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 55;
+my $tests = 58;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -114,8 +115,14 @@ SKIP: {
 
     $session->user( {userId=>$taxUser->userId} );
 
+    # Mock the Validation module
+    my $validator = Test::MockObject::Extends->new( Business::Tax::VAT::Validation->new );
+    local *Business::Tax::VAT::Validation::new;
+    $validator->fake_new( 'Business::Tax::VAT::Validation' );
+
     my $testVAT_NL  = 'NL123456789B12';
     my $testVAT_BE  = 'BE0123456789';
+    my $noServiceVAT= 'NotGonnaWork';
     my $invalidVAT  = 'ByNoMeansAllowed';
     my $visitorUser = WebGUI::User->new( $session, 1 );
 
@@ -134,13 +141,31 @@ SKIP: {
     isa_ok( $e, 'WebGUI::Error::InvalidParam', 'User may not be visitor' );
     is( $e, 'Visitor cannot add VAT numbers', 'addVATNumber returns correct message when user is visitor' );
 
-    my $response = $taxer->addVATNumber( $invalidVAT, $taxUser, 1 ); 
+    #----- invalid vat number
+    $validator->set_always( 'check', 0 );
+    $validator->set_always( 'get_last_error_code', 1 );
+    my $response = $taxer->addVATNumber( $invalidVAT, $taxUser );
     is( $response, 'The entered VAT number is invalid.', 'Invalid VAT numbers return an error message' );
 
-    my $responseNL = $taxer->addVATNumber( $testVAT_NL, $taxUser, 1 );
-    my $responseBE = $taxer->addVATNumber( $testVAT_BE, $taxUser, 1 );
+    #----- service unavailable 
+    $validator->set_always( 'check', 0 );
+    $validator->set_always( 'get_last_error_code', 17 );
+    my $response = $taxer->addVATNumber( $noServiceVAT, $taxUser );
+    ok( $response =~ m{^Number validation is currently not available.}, 'When VIES is down a message is returned' );
 
-    ok( !defined $responseNL && !defined $responseBE, 'Valid VAT numbers return undef.' );
+    my $workflows = WebGUI::Workflow::Instance->getAllInstances( $session );
+    my ($workflow) = grep { $_->get('parameters')->{ vatNumber } eq $noServiceVAT } @{ $workflows };
+    ok( defined $workflow , 'A recheck workflow has been fired' );
+
+    #----- valid number
+    $validator->set_always( 'check', 1 );
+    $validator->set_always( 'get_last_error_code', undef );
+    my $response = $taxer->addVATNumber( $testVAT_NL, $taxUser );
+    ok( !defined $response , 'Valid VAT numbers return undef.' );
+
+    # Add another number for later testing purposes.
+    my $responseBE = $taxer->addVATNumber( $testVAT_BE, $taxUser );
+
 
     #######################################################################
     #
