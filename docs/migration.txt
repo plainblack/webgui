@@ -83,3 +83,4 @@ fixTitle - The title() method does what this used to do as the title is set.
 
 fixUrlFromParent - This functionality is built into fixUrl, so that all fixes happen and can't cause breakages.
 
+fixId - Never assign the asset anything other than a GUID.
