@@ -45,7 +45,7 @@ my $called_getProperties;
 
 
     ::cmp_deeply(
-        +__PACKAGE__->getProperties,
+        [ +__PACKAGE__->getProperties ],
         [qw/property1 property2/],
         'getProperties works as a class method'
     );
@@ -81,13 +81,13 @@ my $called_getProperties;
     ::is $written, 1, 'update calls write';
 
     ::cmp_deeply(
-        $object->meta->get_property_list,
+        [ $object->meta->get_property_list ],
         [qw/property2 property1/],
-        '->meta->get_property_list returns properties in insertion order'
+        '->meta->get_property_list returns properties as a list in insertion order'
     );
 
     ::cmp_deeply(
-        $object->getProperties,
+        [$object->getProperties ],
         [qw/property2 property1/],
         'getProperties is an alias for ->meta->get_property_list'
     );
@@ -127,7 +127,7 @@ my $called_getProperties;
     );
 
     cmp_deeply(
-        WGT::Class::Asset::Snippet->getProperties,
+        [ WGT::Class::Asset::Snippet->getProperties ],
         [qw/property1 property2 property3 property10 property11/],
         'checking inheritance of properties by name, insertion order'
     );
@@ -147,7 +147,7 @@ my $called_getProperties;
     package main;
 
     cmp_deeply(
-        WGT::Class::Asset::NotherOne->getProperties,
+        [WGT::Class::Asset::NotherOne->getProperties],
         [qw/property1 property2 property3 property10/],
         'checking inheritance of properties by name, insertion order with an overridden property'
     );

@@ -81,7 +81,7 @@ sub get_property_list {
             $meta->get_attributes                                  # All attributes
         ;
     }
-    return \@properties;
+    return @properties;
 }
 
 #-------------------------------------------------------------------
