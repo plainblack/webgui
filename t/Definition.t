@@ -43,6 +43,11 @@ my $called_getProperties;
     # can retreive property metadata
     ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
 
+    # can retreive property metadata
+    ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
+
+    # can retreive property metadata
+    ::isa_ok +__PACKAGE__->getProperty('property1'), 'WebGUI::Definition::Meta::Property';
 
     ::cmp_deeply(
         [ +__PACKAGE__->getProperties ],
@@ -66,6 +71,7 @@ my $called_getProperties;
     }
 
     ::is +__PACKAGE__->meta->get_attribute('property1')->tableName, 'asset', 'tableName copied from attribute into property';
+    ::isa_ok +__PACKAGE__->getProperty('property1'), 'WebGUI::Definition::Meta::Property::Asset';
 
     ::can_ok +__PACKAGE__, 'update';
 
@@ -87,9 +93,21 @@ my $called_getProperties;
     );
 
     ::cmp_deeply(
+        [ $object->meta->get_all_properties ],
+        ::array_each(::isa('WebGUI::Definition::Meta::Property::Asset')),
+        '->meta->get_all_properties returns a list of Properties'
+    );
+
+    ::cmp_deeply(
         [$object->getProperties ],
         [qw/property2 property1/],
         'getProperties is an alias for ->meta->get_property_list'
+    );
+
+    ::cmp_deeply(
+        [$object->meta->get_tables ],
+        [qw/asset/],
+        'get_tables returns a list of all tables used by this class'
     );
 
 }
@@ -150,6 +168,12 @@ my $called_getProperties;
         [WGT::Class::Asset::NotherOne->getProperties],
         [qw/property1 property2 property3 property10/],
         'checking inheritance of properties by name, insertion order with an overridden property'
+    );
+
+    cmp_deeply(
+        [WGT::Class::Asset::NotherOne->meta->get_tables],
+        [qw/asset snippet/],
+        'get_tables returns both tables'
     );
 
 }

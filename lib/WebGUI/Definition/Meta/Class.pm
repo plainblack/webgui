@@ -46,6 +46,30 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 get_all_properties ( )
+
+Returns an array of all Properties, in all classes, in the
+order they were created in the Definition.
+
+=cut
+
+sub get_all_properties {
+    my $self       = shift;
+    my @properties = ();
+    CLASS: foreach my $className (reverse $self->linearized_isa()) {
+        my $meta = $self->initialize($className);
+        next CLASS unless $meta->isa('WebGUI::Definition::Meta::Class');
+        push @properties, 
+            sort { $a->insertion_order <=> $b->insertion_order }   # In insertion order
+            grep { $_->isa('WebGUI::Definition::Meta::Property') } # that are Meta::Properties
+            $meta->get_attributes                                  # All attributes
+        ;
+    }
+    return @properties;
+}
+
+#-------------------------------------------------------------------
+
 =head2 get_attributes ( )
 
 Returns an array of all attributes, but only for this class.  This
@@ -62,7 +86,9 @@ sub get_attributes {
 
 =head2 get_property_list ( )
 
-Returns an array reference of the names of all properties, in the order they were created in the Definition.
+Returns an array of the names of all Properties, in all classes, in the
+order they were created in the Definition.  Duplicate names are filtered
+out.
 
 =cut
 
@@ -70,17 +96,32 @@ sub get_property_list {
     my $self       = shift;
     my @properties = ();
     my %seen       = ();
-    CLASS: foreach my $className (reverse $self->linearized_isa()) {
-        my $meta = $self->initialize($className);
-        next CLASS unless $meta->isa('WebGUI::Definition::Meta::Class');
-        push @properties, 
-            grep { ! $seen{$_}++ }                                 # Uniqueness check
-            map  { $_->name }                                      # Just the name
-            sort { $a->insertion_order <=> $b->insertion_order }   # In insertion order
-            grep { $_->isa('WebGUI::Definition::Meta::Property') } # that are Meta::Properties
-            $meta->get_attributes                                  # All attributes
-        ;
-    }
+    push @properties, 
+        grep { ! $seen{$_}++ }                                 # Uniqueness check
+        map  { $_->name }                                      # Just the name
+        $self->get_all_properties
+    ;
+    return @properties;
+}
+
+#-------------------------------------------------------------------
+
+=head2 get_tables ( )
+
+Returns an array of the names of all tables in every class used by
+this Class.
+
+=cut
+
+sub get_tables {
+    my $self       = shift;
+    my @properties = ();
+    my %seen       = ();
+    push @properties, 
+        grep { ! $seen{$_}++ }
+        map  { $_->tableName }
+        $self->get_all_properties
+    ;
     return @properties;
 }
 
