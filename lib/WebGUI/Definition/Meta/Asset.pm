@@ -89,7 +89,8 @@ the icon, 16x16, is found in www/extras/assets/small.
 
 =head2 assetName ( )
 
-????
+An array reference containing two items.  The first is the i18n key for the asset's name.
+The second is the i18n namespace to find the asset's name.
 
 =cut
 
