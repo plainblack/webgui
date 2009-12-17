@@ -39,11 +39,13 @@ The following methods are added.
 extends 'WebGUI::Definition::Meta::Property';
 
 has 'tableName' => (
-    is  => 'ro',
+    is       => 'ro',
+    required => 1,
 );
 
 has 'fieldType' => (
-    is => 'ro',
+    is       => 'ro',
+    required => 1,
 );
 
 has 'noFormPost' => (

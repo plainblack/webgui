@@ -14,7 +14,7 @@ no warnings qw(uninitialized);
 
 use Test::More 'no_plan'; #tests => 1;
 use Test::Deep;
-#use Test::Exception;
+use Test::Exception;
 
 my $called_getProperties;
 {
@@ -58,12 +58,25 @@ my $called_getProperties;
 }
 
 {
+    package WGT::Class::Atset;
+    use WebGUI::Definition::Asset;
+
+    attribute tableName => 'asset';
+    ::dies_ok { property 'property1' => (); } 'must have a fieldType';
+
+}
+
+{
     package WGT::Class::Asset;
     use WebGUI::Definition::Asset;
 
     attribute tableName => 'asset';
-    property 'property2' => ();
-    property 'property1' => ();
+    property 'property2' => (
+        fieldType => 'text',
+    );
+    property 'property1' => (
+        fieldType => 'text',
+    );
 
     my $written;
     sub write {
@@ -129,17 +142,27 @@ my $called_getProperties;
     use WebGUI::Definition::Asset;
 
     attribute tableName => 'asset';
-    property 'property1' => ();
-    property 'property2' => ();
-    property 'property3' => ();
+    property 'property1' => (
+        fieldType => 'text'
+    );
+    property 'property2' => (
+        fieldType => 'text'
+    );
+    property 'property3' => (
+        fieldType => 'text'
+    );
 
     package WGT::Class::Asset::Snippet;
     use WebGUI::Definition::Asset;
     extends 'WGT::Class::AlsoAsset';
 
     attribute tableName => 'snippet';
-    property 'property10' => ();
-    property 'property11' => ();
+    property 'property10' => (
+        fieldType => 'text'
+    );
+    property 'property11' => (
+        fieldType => 'text'
+    );
 
     package main;
 
@@ -175,8 +198,12 @@ my $called_getProperties;
     extends 'WGT::Class::AlsoAsset';
 
     attribute tableName => 'snippet';
-    property 'property10' => ();
-    property 'property1'  => ();
+    property 'property10' => (
+        fieldType => 'text',
+    );
+    property 'property1'  => (
+        fieldType => 'text',
+    );
 
     package main;
 
