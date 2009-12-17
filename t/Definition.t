@@ -74,6 +74,10 @@ my $called_getProperties;
     ::isa_ok +__PACKAGE__->getProperty('property1'), 'WebGUI::Definition::Meta::Property::Asset';
 
     ::can_ok +__PACKAGE__, 'update';
+    ::can_ok +__PACKAGE__, 'tableName';
+
+    ::can_ok +__PACKAGE__->getProperty('property1'), 'tableName';
+    ::is +__PACKAGE__->getProperty('property1')->tableName, 'asset', 'tableName set on property to asset';
 
     my $object = __PACKAGE__->new;
     $object->set({property1 => 'property value'});
@@ -85,6 +89,13 @@ my $called_getProperties;
     # write called
     $object->update;
     ::is $written, 1, 'update calls write';
+
+    ::is $object->tableName, 'asset', 'tableName set for object';
+    $object->tableName('not asset');
+    ::is $object->tableName, 'asset', 'tableName may not be set from the object';
+    $object->meta->tableName('not asset');
+    ::is $object->tableName, 'not asset', 'object can access meta and change the table';
+    $object->meta->tableName('asset');
 
     ::cmp_deeply(
         [ $object->meta->get_property_list ],
@@ -131,6 +142,11 @@ my $called_getProperties;
     property 'property11' => ();
 
     package main;
+
+    is +WGT::Class::AlsoAsset->getProperty('property1')->tableName, 'asset', 'tableName set in base class';
+
+    is +WGT::Class::Asset::Snippet->getProperty('property10')->tableName, 'snippet', 'tableName set in subclass';
+    is +WGT::Class::Asset::Snippet->getProperty('property1')->tableName,  'asset',   '... but inherited properties keep their tableName';
 
     cmp_bag(
         [ map {$_->name} WGT::Class::AlsoAsset->meta->get_attributes ],
