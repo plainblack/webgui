@@ -125,10 +125,22 @@ An options hashref [need list of base options].  Any option which belongs to a f
 is relegated to the form attribute of the property and removed from the list of
 regular attributes.
 
+=head4 fieldType
+
+The type of field to be created by the form builder.  This is required, and should be the name of
+a WebGUI::Form plugin, with the initial letter lowercased.
+
+=head4 noFormPost, label
+
+Either or both of these must be passed in.
+
 =cut
 
 sub property {
     my ($meta, $name, %options) = @_;
+    if (! (exists $options{noFormPost} || exists $options{label}) ) {
+        Moose->throw_error("Must pass either noFormPost or label when making a property");
+    }
     my %form_options;
     my $prop_meta = $meta->property_meta;
     for my $key ( keys %options ) {

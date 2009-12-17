@@ -28,7 +28,7 @@ Package WebGUI::Definition::Meta::Property::Asset
 =head1 DESCRIPTION
 
 Extends WebGUI::Definition::Meta::Property to provide Asset properties with
-specific methods.
+specific methods.  The tableName and fieldType class properties must be defined.
 
 =head1 METHODS
 

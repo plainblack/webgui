@@ -24,9 +24,11 @@ my $called_getProperties;
     attribute 'attribute1' => 'attribute1 value';
     property 'property1' => (
         arbitrary_key => 'arbitrary_value',
+        label         => 'property1',
     );
     property 'property2' => (
         nother_key => 'nother_value',
+        label         => 'property2',
     );
 
     # attributes create methods
@@ -62,7 +64,18 @@ my $called_getProperties;
     use WebGUI::Definition::Asset;
 
     attribute tableName => 'asset';
-    ::dies_ok { property 'property1' => (); } 'must have a fieldType';
+    ::dies_ok  { property 'property1' => (); } 'must have a fieldType';
+    ::dies_ok  { property 'property1' => (fieldType => 'text'); } 'must pass either a label or noFormPost flag';
+    ::lives_ok { property 'property1' => (
+                                            fieldType  => 'YUI Super Form',
+                                            noFormPost => '1',
+                                         );
+               }  '... pass noFormPost flag';
+    ::lives_ok { property 'property1' => (
+                                            fieldType  => 'YUI Super Form',
+                                            label      => 'JSON Powered Uber Widget',
+                                         );
+               }  '... pass label';
 
 }
 
@@ -73,9 +86,11 @@ my $called_getProperties;
     attribute tableName => 'asset';
     property 'property2' => (
         fieldType => 'text',
+        label     => 'property2',
     );
     property 'property1' => (
         fieldType => 'text',
+        label     => 'property1',
     );
 
     my $written;
@@ -143,13 +158,16 @@ my $called_getProperties;
 
     attribute tableName => 'asset';
     property 'property1' => (
-        fieldType => 'text'
+        fieldType => 'text',
+        label     => 'property1',
     );
     property 'property2' => (
-        fieldType => 'text'
+        fieldType => 'text',
+        label     => 'property2',
     );
     property 'property3' => (
-        fieldType => 'text'
+        fieldType => 'text',
+        label     => 'property3',
     );
 
     package WGT::Class::Asset::Snippet;
@@ -158,10 +176,12 @@ my $called_getProperties;
 
     attribute tableName => 'snippet';
     property 'property10' => (
-        fieldType => 'text'
+        fieldType => 'text',
+        label     => 'property10',
     );
     property 'property11' => (
-        fieldType => 'text'
+        fieldType => 'text',
+        label     => 'property11',
     );
 
     package main;
@@ -200,9 +220,11 @@ my $called_getProperties;
     attribute tableName => 'snippet';
     property 'property10' => (
         fieldType => 'text',
+        label     => 'property10',
     );
     property 'property1'  => (
         fieldType => 'text',
+        label     => 'property1',
     );
 
     package main;
