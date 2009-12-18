@@ -67,20 +67,20 @@ property  url => (
             defaultValue    =>  sub { return $_[0]->getId; },
           );
 property  isHidden => (
-            tab             =>"display",
-            label           =>['886','Asset'],
-            hoverHelp       =>['886 description','Asset'],
-            uiLevel         =>6,
-            fieldType       =>'yesNo',
-            defaultValue    =>0,
+            tab             => "display",
+            label           => ['886','Asset'],
+            hoverHelp       => ['886 description','Asset'],
+            uiLevel         => 6,
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
           );
 property  newWindow => (
-            tab             =>"display",
-            label           =>['940','Asset'],
-            hoverHelp       =>['940 description','Asset'],
-            uiLevel         =>9,
-            fieldType       =>'yesNo',
-            defaultValue    =>0,
+            tab             => "display",
+            label           => ['940','Asset'],
+            hoverHelp       => ['940 description','Asset'],
+            uiLevel         => 9,
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
           );
 property  encryptPage => (
             fieldType       => 'yesNo',
@@ -134,17 +134,17 @@ property  extraHeadTags => (
             customDrawMethod=>  'drawExtraHeadTags',
           ); 
 property  extraHeadTagsPacked  => (
-            fieldType       =>  'hidden',
-            defaultValue    =>  undef,
-            noFormPost      =>  1,
+            fieldType       => 'hidden',
+            defaultValue    => undef,
+            noFormPost      => 1,
           );
-property  usePackedHeadTags =>  (
-            tab             =>  "meta",
-            label           =>  ['usePackedHeadTags label','Asset'],
-            hoverHelp       =>  ['usePackedHeadTags description','Asset'],
-            uiLevel         =>  7,
-            fieldType       =>  'yesNo',
-            defaultValue    =>  0,
+property  usePackedHeadTags => (
+            tab             => "meta",
+            label           => ['usePackedHeadTags label','Asset'],
+            hoverHelp       => ['usePackedHeadTags description','Asset'],
+            uiLevel         => 7,
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
           );
 property  isPackage => (
             label           => ["make package",'Asset'],
@@ -179,9 +179,9 @@ property  inheritUrlFromParent  => (
             defaultValue    => 0,
           );
 property  status => (
-            noFormPost      =>1,
-            fieldType       =>'text',
-            defaultValue    =>'pending',
+            noFormPost      => 1,
+            fieldType       => 'text',
+            defaultValue    => 'pending',
           );
 property  lastModified => (
             noFormPost      => 1,
