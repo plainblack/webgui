@@ -8,6 +8,7 @@
  - fixed #11307: Survey i18n #2
  - fixed #11295: asset addChild failure when parent is not committed
  - fixed #10679: i18n TaxDriver_EU::accept when vies unavailable help ( Martin Kamerbeek / Oqapi )
+ - fixed #11235: wiki search
 
 7.7.28
  - fixed #11289: Gallery with pending version tag causes search engine indexer to puke.

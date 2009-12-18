@@ -204,7 +204,7 @@ sub canEdit {
     my $album       = $self->getParent;
 
     return 1 if $userId eq $self->get("ownerUserId");
-    return $album->canEdit($userId);
+    return $album && $album->canEdit($userId);
 }
 
 #----------------------------------------------------------------------------
@@ -239,7 +239,7 @@ sub canView {
     my $userId      = shift || $self->session->user->userId;
 
     my $album       = $self->getParent;
-    return 0 unless $album->canView($userId);
+    return 0 unless $album && $album->canView($userId);
 
     if ($self->isFriendsOnly && $userId ne $self->get("ownerUserId") ) {
         my $owner       = WebGUI::User->new( $self->session, $self->get("ownerUserId") );
@@ -416,7 +416,14 @@ sub getParent {
         return $album;
     }
     # Only get the pending version if we're allowed to see this photo in its pending status
-    elsif ( $self->getGallery->canEdit || $self->get( 'ownerUserId' ) eq $self->session->user->userId ) {
+    my $gallery
+        = $self->getLineage( ['ancestors'], {
+            includeOnlyClasses  => [ 'WebGUI::Asset::Wobject::Gallery' ],
+            returnObjects       => 1,
+            statusToInclude     => [ 'pending', 'approved' ],
+            invertTree          => 1,
+        } )->[ 0 ];
+    if ( ($gallery && $gallery->canEdit) || $self->get( 'ownerUserId' ) eq $self->session->user->userId ) {
         my $album
             = $self->getLineage( ['ancestors'], {
                 includeOnlyClasses  => [ 'WebGUI::Asset::Wobject::GalleryAlbum' ],
@@ -426,6 +433,7 @@ sub getParent {
             } )->[ 0 ];
         return $album;
     }
+    return undef;
 }
 
 #----------------------------------------------------------------------------

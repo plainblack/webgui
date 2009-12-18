@@ -80,7 +80,8 @@ $session->stow->delete('assetRevision');
 $versionTag->leaveTag;
 
 $session->user({userId => $notFriend->userId});
-diag $album2->canEdit;
+note "If you get stuck here, then there is an infinite loop in getParent/getGallery";
+my $album2a = WebGUI::Asset->new($session, $photo2->getId);
 $session->user({userId => 1});
 
 $versionTag->commit;
