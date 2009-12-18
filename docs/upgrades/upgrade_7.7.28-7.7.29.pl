@@ -32,19 +32,31 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-recalculateMatrixListingStatistics($session);
+recalculateMatrixListingStatistics( $session );
+addEuTaxRecheckWorkflow( $session );
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub addEuTaxRecheckWorkflow {
+    my $session = shift;
+ 
+    print "\tAdding EU Tax plugin VAT number recheck workflow..." unless $quiet;
+ 
+    my $workflow = WebGUI::Workflow->create( $session, {
+        title => 'Recheck unverified EU VAT numbers',
+        description =>
+            'Utility workflow that automatically rechecks VAT numbers that could not be checked when they were submitted',
+        enabled => 1,
+        type => 'None',
+        mode => 'parallel',
+    }, 'taxeurecheckworkflow01' );
+    $workflow->addActivity( 'WebGUI::Workflow::Activity::RecheckVATNumber', 'taxeurecheckactivity01' );
+ 
+    print "Done\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 # Describe what our function does
