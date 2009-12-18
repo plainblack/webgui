@@ -50,6 +50,16 @@ property  title => (
             fieldType       => 'text',
             defaultValue    => 'Untitled',
           );
+around title => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 1) {
+        my $title = $_[0];
+        $title    = 'Untitled' if $title eq '';
+        $title = WebGUI::HTML::filter($title, 'all');
+    }
+    $self->$orig(@_);
+};
 property  menuTitle => (
             tab             => "properties",
             label           => ['411','Asset'],
@@ -58,6 +68,16 @@ property  menuTitle => (
             fieldType       => 'text',
             defaultValue    => 'Untitled',
          );
+around menuTitle => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 1) {
+        my $title = $_[0];
+        $title    = $self->title if $title eq '';
+        $title    = WebGUI::HTML::filter($title, 'all');
+    }
+    $self->$orig(@_);
+};
 property  url => (
             tab             => "properties",
             label           => ['104','Asset'],
@@ -66,6 +86,15 @@ property  url => (
             fieldType       => 'text',
             defaultValue    =>  sub { return $_[0]->getId; },
           );
+around url => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 1) {
+        my $url = $_[0];
+        $url    = $self->fixUrl($url);
+    }
+    $self->$orig(@_);
+};
 property  isHidden => (
             tab             => "display",
             label           => ['886','Asset'],
@@ -133,6 +162,22 @@ property  extraHeadTags => (
             defaultValue    => undef,
             customDrawMethod=>  'drawExtraHeadTags',
           ); 
+around extraHeadTags => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 1) {
+        my $unpacked = $_[0];
+        my $packed   = $unpacked;  ##Undo magic aliasing since a reference is passed below
+        HTML::Packer::minify( \$packed, {
+            remove_comments     => 1,
+            remove_newlines     => 1,
+            do_javascript       => "shrink",
+            do_stylesheet       => "minify",
+            } );
+        $self->extraHeadTagsPacked($packed);
+    }
+    $self->$orig(@_);
+};
 property  extraHeadTagsPacked  => (
             fieldType       => 'hidden',
             defaultValue    => undef,
@@ -494,21 +539,6 @@ Returns extraHeadTags
 If specified, stores it, but also updates extraHeadTagsPacked with the packed version.
 
 =cut
-
-sub extraHeadTags {
-    my ( $self, $unpacked ) = @_;
-    if (@_ > 1) {
-        my $packed  = $unpacked;
-        HTML::Packer::minify( \$packed, {
-            remove_comments     => 1,
-            remove_newlines     => 1,
-            do_javascript       => "shrink",
-            do_stylesheet       => "minify",
-            } );
-        $self->extraHeadTagsPacked($packed);
-    }
-    return $self->next::method($unpacked);
-}
 
 #-------------------------------------------------------------------
 
@@ -1462,6 +1492,18 @@ sub logView {
 
 #-------------------------------------------------------------------
 
+=head2 title ( [value] )
+
+Returns the title of the asset.
+
+=head3 value
+
+If specified this value will be used to set the title after it goes through some validation checking.
+
+=cut
+
+#-------------------------------------------------------------------
+
 =head2 menuTitle ( [value] )
 
 Returns the menuTitle of the asset, which is used in navigations.
@@ -1471,17 +1513,6 @@ Returns the menuTitle of the asset, which is used in navigations.
 If specified this value will be used to set the title after it goes through some validation checking.
 
 =cut
-
-sub menuTitle {
-	my ($self, $title) = @_;
-    if (@_ > 1) {
-        if ($title eq "") {
-            $title = $self->title;
-        }
-	    $title = WebGUI::HTML::filter($title, 'all');
-    }
-    return $self->next::method($title);
-}
 
 #-------------------------------------------------------------------
 
@@ -1723,7 +1754,7 @@ The asset's id
 =cut
 
 sub newPending {
-    my $class = shift;
+    my $class   = shift;
     my $session = shift;
     my $assetId = shift;
     croak "First parameter to newPending needs to be a WebGUI::Session object"
@@ -2169,30 +2200,6 @@ sub setSize {
 
 #-------------------------------------------------------------------
 
-=head2 title ( [value] )
-
-Returns the title of the asset.
-
-=head3 value
-
-If specified this value will be used to set the title after it goes through some validation checking.
-
-=cut
-
-sub title {
-	my ($self, $title) = @_;
-    if (@_ > 1) {
-        if ($title eq "") {
-            $title = 'Untitled';
-        }
-	    $title = WebGUI::HTML::filter($title, 'all');
-    }
-    return $self->next::method($title);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 toggleToolbar ( )
 
 Toggles a toolbar to a special state so that custom toolbars can be rendered under special circumstances. This is mostly useful for macros that wish to proxy an asset but not display the toolbar.
@@ -2314,17 +2321,7 @@ The new value to set the URL to.
 
 =cut
 
-sub url {
-    my ($self, $url) = @_;
-    if (@_ > 1) {
-        $url = $self->fixUrl($url);
-    }
-    return $self->next::method($url);
-}
-
-
 #-------------------------------------------------------------------
-
 
 =head2 urlExists ( session, url [, options] )
 

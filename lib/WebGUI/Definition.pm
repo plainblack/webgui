@@ -115,6 +115,10 @@ A property is a special object attribute with it's type constraints set by
 HTML form properties, such as base type (Text, Integer, Float, SelectList),
 default value, value, etc.
 
+By default, the Moose option C<is => 'rw'> is added to all properties to make
+sure the accessors are generated.  If you want to prevent that from happening,
+pass an explicit C<is => 'ro'> along with %options.
+
 =head3 $name
 
 The name of the property.

@@ -91,11 +91,20 @@ my $called_getProperties;
     property 'property2' => (
         fieldType => 'text',
         label     => 'property2',
+        writer    => '_set_property_2',
     );
     property 'property1' => (
         fieldType => 'text',
         label     => 'property1',
     );
+
+    my $filter2 = 0;
+    around 'property2' => sub {
+        my $orig = shift;
+        my $self = shift;
+        $filter2 = 1;
+        $self->$orig(@_);
+    };
 
     my $written;
     sub write {
@@ -121,6 +130,9 @@ my $called_getProperties;
     # write called
     $object->update;
     ::is $written, 1, 'update calls write';
+
+    $object->property2('foo');
+    ::is $filter2, 1, 'around modifier works';
 
     ::is $object->tableName, 'asset', 'tableName set for object';
     $object->tableName('not asset');
