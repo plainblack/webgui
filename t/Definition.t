@@ -8,136 +8,243 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use FindBin;
 use strict;
 use warnings;
 no warnings qw(uninitialized);
+use lib "$FindBin::Bin/lib";
+
+use WebGUI::Test;
 
 use Test::More 'no_plan'; #tests => 1;
+use Test::Deep;
 use Test::Exception;
 
 my $called_getProperties;
 {
     package WGT::Class;
-    use WebGUI::Definition (
-        attribute1 => 'attribute 1 value',
-        properties => [
-            property1 => {
-                label => 'property1 label',
-                defaultValue => sub { return shift },
-            },
-        ],
+    use WebGUI::Definition;
+
+    attribute 'attribute1' => 'attribute1 value';
+    property 'property1' => (
+        arbitrary_key => 'arbitrary_value',
+        label         => 'property1',
+    );
+    property 'property2' => (
+        nother_key => 'nother_value',
+        label         => 'property2',
     );
 
-    sub new {
-        my $class = shift;
-        my $self = $class->instantiate;
-        return $self;
-    }
+    # attributes create methods
+    ::can_ok +__PACKAGE__, 'attribute1';
 
-    sub getProperties {
-        $called_getProperties = 1;
-        my $self = shift;
-        return $self->next::method(@_);
-    }
+    # propeties create methods
+    ::can_ok +__PACKAGE__, 'property1';
+
+    # role applied
+    ::can_ok +__PACKAGE__, 'update';
+    ::can_ok +__PACKAGE__, 'get';
+    ::can_ok +__PACKAGE__, 'set';
+
+    # can retreive property metadata
+    ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
+
+    # can retreive property metadata
+    ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
+
+    # can retreive property metadata
+    ::isa_ok +__PACKAGE__->getProperty('property1'), 'WebGUI::Definition::Meta::Property';
+
+    ::cmp_deeply(
+        [ +__PACKAGE__->getProperties ],
+        [qw/property1 property2/],
+        'getProperties works as a class method'
+    );
+
 }
 
-my $written;
 {
-    package WGT::SubClass;
-    use base qw(WGT::Class);
-    use WebGUI::Definition (
-        attribute2 => 'attribute 2 value',
-        properties => [
-            property2 => {
-                label => 'property2 label',
-                defaultValue => sub { return "dynamic value" },
-            },
-            a_property => {
-                defaultValue => 1,
-            },
-        ],
-    );
+    package WGT::Class::Atset;
+    use WebGUI::Definition::Asset;
 
-    sub write {
-        my $self = shift;
-        $written = 1;
-    }
+    attribute tableName => 'asset';
+    ::dies_ok  { property 'property1' => (); } 'must have a fieldType';
+    ::dies_ok  { property 'property1' => (fieldType => 'text'); } 'must pass either a label or noFormPost flag';
+    ::lives_ok { property 'property1' => (
+                                            fieldType  => 'YUI Super Form',
+                                            noFormPost => '1',
+                                         );
+               }  '... pass noFormPost flag';
+    ::lives_ok { property 'property1' => (
+                                            fieldType  => 'YUI Super Form',
+                                            label      => 'JSON Powered Uber Widget',
+                                         );
+               }  '... pass label';
 
-    sub a_property {
-        my $self = shift;
-        my $value = shift;
-        return $self->next::method("$value - BLAH");
-    }
 }
 
-my $object = WGT::Class->new;
-my $subclass_object = WGT::SubClass->new;
+{
+    package WGT::Class::Asset;
+    use WebGUI::Definition::Asset;
 
-can_ok $object, qw(getProperties getProperty get update getAttribute instantiate property1);
-can_ok $subclass_object, qw(getProperties getProperty get update getAttribute instantiate property1 property2 a_property);
+    attribute tableName => 'asset';
+    property 'property2' => (
+        fieldType => 'text',
+        label     => 'property2',
+    );
+    property 'property1' => (
+        fieldType => 'text',
+        label     => 'property1',
+    );
 
-is $object->property1('property 1 value'), 'property 1 value',
-    'property mutator returns newly set value';
-is $object->property1, 'property 1 value',
-    'property accessor returns correct value';
+    my $written;
+    sub write {
+        $written++;
+    }
 
-is $subclass_object->property2('property 2 value'), 'property 2 value',
-    'property mutator returns newly set value';
-is $subclass_object->property2, 'property 2 value',
-    'property accessor returns correct value';
+    ::is +__PACKAGE__->meta->get_attribute('property1')->tableName, 'asset', 'tableName copied from attribute into property';
+    ::isa_ok +__PACKAGE__->getProperty('property1'), 'WebGUI::Definition::Meta::Property::Asset';
 
-is_deeply [ $object->getProperties ], ['property1'],
-    'class has correct properties';
-ok $called_getProperties, 'able to override getProperties';
-undef $called_getProperties;
-is_deeply [ $subclass_object->getProperties ], ['property1', 'property2', 'a_property'],
-    'subclass has correct properties';
-ok $called_getProperties, 'subclass uses correctly overridden getProperties';
+    ::can_ok +__PACKAGE__, 'update';
+    ::can_ok +__PACKAGE__, 'tableName';
 
-is_deeply $object->get, { property1 => 'property 1 value' },
-    'get returns hash with correct properties';
-is_deeply $subclass_object->get, { property1 => undef, a_property => ' - BLAH', property2 => 'property 2 value' },
-    'get returns hash with correct properties';
+    ::can_ok +__PACKAGE__->getProperty('property1'), 'tableName';
+    ::is +__PACKAGE__->getProperty('property1')->tableName, 'asset', 'tableName set on property to asset';
 
-is $object->get('property1'), 'property 1 value',
-    'get with parameter returns value from accessor';
+    my $object = __PACKAGE__->new;
+    $object->set({property1 => 'property value'});
+    ::is $object->property1, 'property value', 'checking set, hashref form';
 
-is $object->get('nonExistantProperty'), undef,
-    'get with non-existant parameter returns undef';
+    $object->set('property1',  'newer property value');
+    ::is $object->property1, 'newer property value', '... hash form';
 
-is_deeply $object->getProperty('property1'), { label => 'property1 label', defaultValue => $object },
-    'getProperty returns correct hash for object';
-is_deeply $subclass_object->getProperty('property2'), { label => 'property2 label', defaultValue => 'dynamic value' },
-    'getProperty returns correct hash for subclass object';
+    # write called
+    $object->update;
+    ::is $written, 1, 'update calls write';
 
-is $object->getAttribute('attribute1'), 'attribute 1 value',
-    'object has correct attribute';
-is $subclass_object->getAttribute('attribute1'), 'attribute 1 value',
-    'subclass object has correct inherited attribute';
-is $subclass_object->getAttribute('attribute2'), 'attribute 2 value',
-    'subclass object has correct own value';
+    ::is $object->tableName, 'asset', 'tableName set for object';
+    $object->tableName('not asset');
+    ::is $object->tableName, 'asset', 'tableName may not be set from the object';
+    $object->meta->tableName('not asset');
+    ::is $object->tableName, 'not asset', 'object can access meta and change the table';
+    $object->meta->tableName('asset');
 
-ok eval { $object->update; 1},
-    'update works when no write sub available';
-ok eval { $subclass_object->update; 1},
-    'update works when write sub available';
-ok $written,
-    'update calls write';
+    ::cmp_deeply(
+        [ $object->meta->get_property_list ],
+        [qw/property2 property1/],
+        '->meta->get_property_list returns properties as a list in insertion order'
+    );
 
-$object->update({ property1 => 'new value', nonproperty => 'other value' });
+    ::cmp_deeply(
+        [ $object->meta->get_all_properties ],
+        ::array_each(::isa('WebGUI::Definition::Meta::Property::Asset')),
+        '->meta->get_all_properties returns a list of Properties'
+    );
 
-is $object->property1, 'new value', 'update sets all properties';
+    ::cmp_deeply(
+        [$object->getProperties ],
+        [qw/property2 property1/],
+        'getProperties is an alias for ->meta->get_property_list'
+    );
 
-$object->property1(undef);
+    ::cmp_deeply(
+        [$object->meta->get_tables ],
+        [qw/asset/],
+        'get_tables returns a list of all tables used by this class'
+    );
 
-is $object->property1, undef, 'able to set undef as property value';
+    my $object2 = __PACKAGE__->new(tableName => 'notAsset');
+    ::is $object2->tableName, 'asset', 'tableName ignored in constructor';
+}
 
-is +WGT::Class->instantiate(property1 => 'property value')->property1, 'property value',
-    'instantiate sets correct values';
+{
 
-is $subclass_object->a_property('value'), 'value - BLAH', 'accessor calls custom filter if needed';
+    package WGT::Class::AlsoAsset;
+    use WebGUI::Definition::Asset;
 
+    attribute tableName => 'asset';
+    property 'property1' => (
+        fieldType => 'text',
+        label     => 'property1',
+    );
+    property 'property2' => (
+        fieldType => 'text',
+        label     => 'property2',
+    );
+    property 'property3' => (
+        fieldType => 'text',
+        label     => 'property3',
+    );
 
-#->update
-#->new
+    package WGT::Class::Asset::Snippet;
+    use WebGUI::Definition::Asset;
+    extends 'WGT::Class::AlsoAsset';
 
+    attribute tableName => 'snippet';
+    property 'property10' => (
+        fieldType => 'text',
+        label     => 'property10',
+    );
+    property 'property11' => (
+        fieldType => 'text',
+        label     => 'property11',
+    );
+
+    package main;
+
+    is +WGT::Class::AlsoAsset->getProperty('property1')->tableName, 'asset', 'tableName set in base class';
+
+    is +WGT::Class::Asset::Snippet->getProperty('property10')->tableName, 'snippet', 'tableName set in subclass';
+    is +WGT::Class::Asset::Snippet->getProperty('property1')->tableName,  'asset',   '... but inherited properties keep their tableName';
+
+    cmp_bag(
+        [ map {$_->name} WGT::Class::AlsoAsset->meta->get_attributes ],
+        [qw/property1 property2 property3/],
+        'get_attributes returns attributes for my class'
+    );
+
+    cmp_bag(
+        [ map {$_->name} WGT::Class::Asset::Snippet->meta->get_attributes ],
+        [qw/property10 property11/],
+        '...even in a subclass'
+    );
+
+    cmp_deeply(
+        [ WGT::Class::Asset::Snippet->getProperties ],
+        [qw/property1 property2 property3 property10 property11/],
+        'checking inheritance of properties by name, insertion order'
+    );
+
+}
+
+{
+
+    package WGT::Class::Asset::NotherOne;
+    use WebGUI::Definition::Asset;
+    extends 'WGT::Class::AlsoAsset';
+
+    attribute tableName => 'snippet';
+    property 'property10' => (
+        fieldType => 'text',
+        label     => 'property10',
+    );
+    property 'property1'  => (
+        fieldType => 'text',
+        label     => 'property1',
+    );
+
+    package main;
+
+    cmp_deeply(
+        [WGT::Class::Asset::NotherOne->getProperties],
+        [qw/property1 property2 property3 property10/],
+        'checking inheritance of properties by name, insertion order with an overridden property'
+    );
+
+    cmp_deeply(
+        [WGT::Class::Asset::NotherOne->meta->get_tables],
+        [qw/asset snippet/],
+        'get_tables returns both tables'
+    );
+
+}

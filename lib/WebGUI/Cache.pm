@@ -226,19 +226,6 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 flush ( )
-
-Flushes the caching system. Must be overridden.
-
-=cut
-
-sub flush {
-	my $self = shift;
-	File::Path::rmtree($self->session->config->get("uploadsPath")."/temp");
-}
-
-#-------------------------------------------------------------------
-
 =head2 mget ( names )
 
 Retrieves multiple values from cache at once, which is much faster than retrieving one at a time. Returns an array reference containing the values in the order they were requested.

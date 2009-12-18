@@ -39,166 +39,160 @@ use WebGUI::ProgressBar;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
-use WebGUI::Definition::Asset (
-        properties  => [
-                    title=>{
-					    tab             =>"properties",
-					    label           =>['99','Asset'],
-					    hoverHelp       =>['99 description','Asset'],
-                        fieldType       =>'text',
-                        defaultValue    =>'Untitled',
-                    },
-                    menuTitle=>{
-					    tab             =>"properties",
-					    label           =>['411','Asset'],
-					    hoverHelp       =>['411 description','Asset'],
-					    uiLevel         =>1,
-                        fieldType       =>'text',
-                        defaultValue    =>'Untitled',
-                    },
-                    url=>{
-					    tab             =>"properties",
-					    label           =>['104','Asset'],
-					    hoverHelp       =>['104 description','Asset'],
-					    uiLevel         =>3,
-                        fieldType       =>'text',
-                        defaultValue    => sub { return $_[0]->getId; },
-                    },
-				    isHidden=>{
-					    tab             =>"display",
-					    label           =>['886','Asset'],
-					    hoverHelp       =>['886 description','Asset'],
-					    uiLevel         =>6,
-					    fieldType       =>'yesNo',
-					    defaultValue    =>0,
-					},
-				    newWindow=>{
-					    tab             =>"display",
-					    label           =>['940','Asset'],
-					    hoverHelp       =>['940 description','Asset'],
-					    uiLevel         =>9,
-					    fieldType       =>'yesNo',
-					    defaultValue    =>0,
-					},
-				    encryptPage=>{
-					    fieldType       => 'yesNo',
-                        noFormPost      => sub { return $_[0]->session->config->get("sslEnabled"); },
-					    tab             => "security",
-					    label           => ['encrypt page','Asset'],
-					    hoverHelp       => ['encrypt page description','Asset'],
-					    uiLevel         => 6,
-					    defaultValue    => 0,
-					},
-                    ownerUserId=>{
-					    tab             =>"security",
-					    label           =>['108','Asset'],
-					    hoverHelp       =>['108 description','Asset'],
-					    uiLevel         =>6,
-                        fieldType       =>'user',
-                        defaultValue    =>'3',
-                    },
-                    groupIdView=>{
-					    tab             =>"security",
-					    label           =>['872','Asset'],
-					    hoverHelp       =>['872 description','Asset'],
-					    uiLevel         =>6,
-                        fieldType       =>'group',
-                        defaultValue    =>'7',
-                    },
-                    groupIdEdit=>{
-					    tab             =>"security",
-					    label           =>['871','Asset'],
-					    excludeGroups   =>[1,7],
-					    hoverHelp       =>['871 description','Asset'],
-					    uiLevel         =>6,
-                        fieldType       =>'group',
-                        defaultValue    =>'4',
-                    },
-                    synopsis=>{
-					    tab             =>"meta",
-					    label           =>['412','Asset'],
-					    hoverHelp       =>['412 description','Asset'],
-					    uiLevel         =>3,
-                        fieldType       =>'textarea',
-                        defaultValue    =>undef,
-                    },
-                    extraHeadTags=>{
-					    tab             =>"meta",
-					    label           =>["extra head tags",'Asset'],
-					    hoverHelp       =>['extra head tags description','Asset'],
-					    uiLevel         =>5,
-                        fieldType       =>'codearea',
-                        defaultValue    =>undef,
-                        customDrawMethod=> 'drawExtraHeadTags',
-                    },
-                    extraHeadTagsPacked => {
-                        fieldType       => 'hidden',
-                        defaultValue    => undef,
-                        noFormPost      => 1,
-                    },
-                    usePackedHeadTags => {
-                        tab             => "meta",
-                        label           => ['usePackedHeadTags label','Asset'],
-                        hoverHelp       => ['usePackedHeadTags description','Asset'],
-                        uiLevel         => 7,
-                        fieldType       => 'yesNo',
-                        defaultValue    => 0,
-                    },
-				    isPackage=>{
-					    label           =>["make package",'Asset'],
-					    tab             =>"meta",
-					    hoverHelp       =>['make package description','Asset'],
-					    uiLevel         =>7,
-					    fieldType       =>'yesNo',
-					    defaultValue    =>0,
-					},
-				    isPrototype=>{
-					    tab             =>"meta",
-					    label           =>["make prototype",'Asset'],
-					    hoverHelp       =>['make prototype description','Asset'],
-					    uiLevel         =>9,
-					    fieldType       =>'yesNo',
-					    defaultValue    =>0,
-					},
-                    isExportable=>{
-                        tab             =>'meta',
-                        label           =>['make asset exportable','Asset'],
-                        hoverHelp       =>['make asset exportable description','Asset'],
-                        uiLevel         =>9,
-                        fieldType       =>'yesNo',
-                        defaultValue    =>1,
-                    },
-                    inheritUrlFromParent=>{
-                        tab             =>'meta',
-                        label           =>['does asset inherit URL from parent','Asset'],
-                        hoverHelp       =>['does asset inherit URL from parent description','Asset'],
-                        uiLevel         =>9,
-                        fieldType       =>'yesNo',
-                        defaultValue    =>0,
-                    },
-				    status=>{
-					    noFormPost      =>1,
-					    fieldType       =>'text',
-					    defaultValue    =>'pending',
-					},
-				    lastModified=>{
-					    noFormPost      =>1,
-					    fieldType       =>'DateTime',
-					    defaultValue    => sub { return time() },
-					},
-				    assetSize=>{
-					    noFormPost      =>1,
-					    fieldType       =>'integer',
-					    defaultValue    =>0,
-					},
-                ],
-	    assetName   =>'asset',
-        tableName   =>'assetData',
-        className   =>'WebGUI::Asset',
-		icon        =>'assets.gif',
-        );
-
-
+use WebGUI::Definition::Asset;
+attribute assetName  => 'asset',
+attribute tableName  => 'assetData',
+attribute icon       => 'assets.gif',
+property  title => (
+            tab             => "properties",
+            label           => ['99','Asset'],
+            hoverHelp       => ['99 description','Asset'],
+            fieldType       => 'text',
+            defaultValue    => 'Untitled',
+          );
+property  menuTitle => (
+            tab             => "properties",
+            label           => ['411','Asset'],
+            hoverHelp       => ['411 description','Asset'],
+            uiLevel         => 1,
+            fieldType       => 'text',
+            defaultValue    => 'Untitled',
+         );
+property  url => (
+            tab             => "properties",
+            label           => ['104','Asset'],
+            hoverHelp       => ['104 description','Asset'],
+            uiLevel         => 3,
+            fieldType       => 'text',
+            defaultValue    =>  sub { return $_[0]->getId; },
+          );
+property  isHidden => (
+            tab             =>"display",
+            label           =>['886','Asset'],
+            hoverHelp       =>['886 description','Asset'],
+            uiLevel         =>6,
+            fieldType       =>'yesNo',
+            defaultValue    =>0,
+          );
+property  newWindow => (
+            tab             =>"display",
+            label           =>['940','Asset'],
+            hoverHelp       =>['940 description','Asset'],
+            uiLevel         =>9,
+            fieldType       =>'yesNo',
+            defaultValue    =>0,
+          );
+property  encryptPage => (
+            fieldType       => 'yesNo',
+            noFormPost      => sub { return $_[0]->session->config->get("sslEnabled"); },
+            tab             => "security",
+            label           => ['encrypt page','Asset'],
+            hoverHelp       => ['encrypt page description','Asset'],
+            uiLevel         => 6,
+            defaultValue    => 0,
+          );
+property  ownerUserId => (
+            tab             => "security",
+            label           => ['108','Asset'],
+            hoverHelp       => ['108 description','Asset'],
+            uiLevel         => 6,
+            fieldType       => 'user',
+            defaultValue    => '3',
+          );
+property  groupIdView  => (
+            tab             => "security",
+            label           => ['872','Asset'],
+            hoverHelp       => ['872 description','Asset'],
+            uiLevel         => 6,
+            fieldType       => 'group',
+            defaultValue    => '7',
+          );
+property  groupIdEdit => (
+            tab             => "security",
+            label           => ['871','Asset'],
+            excludeGroups   => [1,7],
+            hoverHelp       => ['871 description','Asset'],
+            uiLevel         => 6,
+            fieldType       => 'group',
+            defaultValue    => '4',
+          );
+property  synopsis => (
+            tab             => "meta",
+            label           => ['412','Asset'],
+            hoverHelp       => ['412 description','Asset'],
+            uiLevel         => 3,
+            fieldType       => 'textarea',
+            defaultValue    => undef,
+          );
+property  extraHeadTags => (
+            tab             => "meta",
+            label           => ["extra head tags",'Asset'],
+            hoverHelp       => ['extra head tags description','Asset'],
+            uiLevel         => 5,
+            fieldType       => 'codearea',
+            defaultValue    => undef,
+            customDrawMethod=>  'drawExtraHeadTags',
+          ); 
+property  extraHeadTagsPacked  => (
+            fieldType       =>  'hidden',
+            defaultValue    =>  undef,
+            noFormPost      =>  1,
+          );
+property  usePackedHeadTags =>  (
+            tab             =>  "meta",
+            label           =>  ['usePackedHeadTags label','Asset'],
+            hoverHelp       =>  ['usePackedHeadTags description','Asset'],
+            uiLevel         =>  7,
+            fieldType       =>  'yesNo',
+            defaultValue    =>  0,
+          );
+property  isPackage => (
+            label           => ["make package",'Asset'],
+            tab             => "meta",
+            hoverHelp       => ['make package description','Asset'],
+            uiLevel         => 7,
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
+          );
+property  isPrototype => (
+            tab             => "meta",
+            label           => ["make prototype",'Asset'],
+            hoverHelp       => ['make prototype description','Asset'],
+            uiLevel         => 9,
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
+          );
+property  isExportable => (
+            tab             => 'meta',
+            label           => ['make asset exportable','Asset'],
+            hoverHelp       => ['make asset exportable description','Asset'],
+            uiLevel         => 9,
+            fieldType       => 'yesNo',
+            defaultValue    => 1,
+          );
+property  inheritUrlFromParent  => (
+            tab             => 'meta',
+            label           => ['does asset inherit URL from parent','Asset'],
+            hoverHelp       => ['does asset inherit URL from parent description','Asset'],
+            uiLevel         => 9,
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
+          );
+property  status => (
+            noFormPost      =>1,
+            fieldType       =>'text',
+            defaultValue    =>'pending',
+          );
+property  lastModified => (
+            noFormPost      => 1,
+            fieldType       => 'DateTime',
+            defaultValue    =>  sub { return time() },
+          );
+property  assetSize => (
+            noFormPost      => 1,
+            fieldType       => 'integer',
+            defaultValue    => 0,
+          );
 
 =head1 NAME
 
