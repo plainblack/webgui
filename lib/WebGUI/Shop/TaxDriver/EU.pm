@@ -122,9 +122,9 @@ sub addGroup {
 
 #-------------------------------------------------------------------
 
-=head2 addVATNumber ( VATNumber, localCheckOnly )
+=head2 addVATNumber ( VATNumber, user, localCheckOnly )
 
-Adds a VAT number to the database. Checks the number through the VIES database. Returns and error message if a
+Adds a VAT number to the database for user, using updateVATNumber. Returns and error message if a
 validation error occurred. If the number validates undef is returned.
 
 =head3 VATNumber
@@ -170,49 +170,6 @@ sub addVATNumber {
         return $i18n->get('vies unavailable');
     }
 }
-
-
-sub updateVATNumber {
-    my $self            = shift;
-    my $number          = shift;
-    my $user            = shift || $self->session->user; 
-    my $localCheckOnly  = shift;
-    my $db              = $self->session->db;
-
-    WebGUI::Error::InvalidParam->throw( 'A VAT number is required' )
-        unless $number;
-    WebGUI::Error::InvalidParam->throw( 'The second argument must be an instanciated WebGUI::User object' )
-        unless ref $user eq 'WebGUI::User';
-    WebGUI::Error::InvalidParam->throw( 'Visitor cannot add VAT numbers' )
-        if $user->isVisitor;
-
-    # Check number
-    my $validator       = Business::Tax::VAT::Validation->new;
-    my $numberIsValid   = $localCheckOnly ? $validator->local_check( $number ) : $validator->check( $number );
-
-    # Number contains syntax error does not exist. Do not write the code to the db.
-    if ( !$numberIsValid && $validator->get_last_error_code <= 16 ) {
-        return 'INVALID';
-    }
-
-    # Write the code to the db.
-    $db->write( 'replace into tax_eu_vatNumbers (userId,countryCode,vatNumber,viesValidated,viesErrorCode,approved) values (?,?,?,?,?,?)', [
-        $user->userId,
-        substr( $number, 0 , 2 ),
-        $number,
-        $numberIsValid ? 1 : 0,
-        $numberIsValid ? undef : $validator->get_last_error_code,
-        0,
-    ] );
-
-    if ( $numberIsValid ) {
-        return 'VALID';
-    }
-    else {
-        return 'UNKNOWN';
-    }
-}
-
 
 #-------------------------------------------------------------------
 
@@ -860,6 +817,17 @@ sub isUsableVATNumber {
 
 =head2 recheckVATNumber ( vatNumber, user )
 
+Uses updateVATNumber to check and store the given number for the given user. Returns INVALID od VALID for invalid
+and valid number respectively. If VIES is unavailable returns UNKNOWN.
+
+=head3 vatNumber
+
+The VAT number to be rechecked.
+
+=head3 user
+
+An instanciated WebGUI::User object for the user belonging to the VAT number.
+
 =cut
 
 sub recheckVATNumber {
@@ -901,6 +869,73 @@ sub skuFormDefinition {
     );
         
     return \%definition;
+}
+
+#-------------------------------------------------------------------
+
+=head2 updateVATNumber( VATNumber, user, localCheckOnly )
+
+Validates the VAT number with the VIES service. If the number is incorrect, INVALID will be returned. Otherwise the
+number is added to the db. If the number cannot be validated 'UNKNOWN' is returned, if the number is valid 'VALID'
+will be returned.
+
+=head3 VATNumber
+
+The number that is to be added.
+
+=head3 user
+
+The user for which the number should be added. Defaults to the session user.
+
+=head3 localCheckOnly
+
+If set to a true value the the remote VAT number validation in the VIES database will not be preformed. The VAT
+number will be checked against regexes, however. Mostly convenient for testing purposes. 
+
+=cut
+
+
+sub updateVATNumber {
+    my $self            = shift;
+    my $number          = shift;
+    my $user            = shift || $self->session->user; 
+    my $localCheckOnly  = shift;
+    my $db              = $self->session->db;
+
+    WebGUI::Error::InvalidParam->throw( 'A VAT number is required' )
+        unless $number;
+    WebGUI::Error::InvalidParam->throw( 'The second argument must be an instanciated WebGUI::User object' )
+        unless ref $user eq 'WebGUI::User';
+    WebGUI::Error::InvalidParam->throw( 'Visitor cannot add VAT numbers' )
+        if $user->isVisitor;
+
+    # Check number
+    my $validator       = Business::Tax::VAT::Validation->new;
+    my $numberIsValid   = $localCheckOnly ? $validator->local_check( $number ) : $validator->check( $number );
+
+    # Number contains syntax error does not exist. Do not write the code to the db.
+    if ( !$numberIsValid && $validator->get_last_error_code <= 16 ) {
+        $self->deleteVATNumber( $number, $user );
+
+        return 'INVALID';
+    }
+
+    # Write the code to the db.
+    $db->write( 'replace into tax_eu_vatNumbers (userId,countryCode,vatNumber,viesValidated,viesErrorCode,approved) values (?,?,?,?,?,?)', [
+        $user->userId,
+        substr( $number, 0 , 2 ),
+        $number,
+        $numberIsValid ? 1 : 0,
+        $numberIsValid ? undef : $validator->get_last_error_code,
+        0,
+    ] );
+
+    if ( $numberIsValid ) {
+        return 'VALID';
+    }
+    else {
+        return 'UNKNOWN';
+    }
 }
 
 #-------------------------------------------------------------------
