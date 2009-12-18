@@ -212,7 +212,7 @@ property  status => (
 property  lastModified => (
             noFormPost      => 1,
             fieldType       => 'DateTime',
-            defaultValue    =>  sub { return time() },
+            defaultValue    => sub { return time() },
           );
 property  assetSize => (
             noFormPost      => 1,
@@ -2232,7 +2232,7 @@ to set the keywords for this asset.
 
 =cut
 
-sub update {
+sub willWriteDataToDbSomeday {
 	my $self = shift;
 	my $requestedProperties = shift;
     my $properties = clone($requestedProperties);
