@@ -91,7 +91,6 @@ my $called_getProperties;
     property 'property2' => (
         fieldType => 'text',
         label     => 'property2',
-        writer    => '_set_property_2',
     );
     property 'property1' => (
         fieldType => 'text',
