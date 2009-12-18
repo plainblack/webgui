@@ -150,34 +150,13 @@ sub addVATNumber {
     my $db              = $self->session->db;
     my $i18n            = WebGUI::International->new( $self->session, 'TaxDriver_EU' );
 
-    WebGUI::Error::InvalidParam->throw( 'A VAT number is required' )
-        unless $number;
-    WebGUI::Error::InvalidParam->throw( 'The second argument must be an instanciated WebGUI::User object' )
-        unless ref $user eq 'WebGUI::User';
-    WebGUI::Error::InvalidParam->throw( 'Visitor cannot add VAT numbers' )
-        if $user->isVisitor;
-
-    # Check number
-    my $validator       = Business::Tax::VAT::Validation->new;
-    my $numberIsValid   = $localCheckOnly ? $validator->local_check( $number ) : $validator->check( $number );
-
-    # Number contains syntax error does not exist. Do not write the code to the db.
-    if ( !$numberIsValid && $validator->get_last_error_code <= 16 ) {
+    my $result = $self->updateVATNumber( $number, $user, $localCheckOnly );
+    
+    if ( $result eq 'INVALID' ) {
         return $i18n->get('vat number invalid');
     }
-
-    # Write the code to the db.
-    $db->write( 'replace into tax_eu_vatNumbers (userId,countryCode,vatNumber,viesValidated,viesErrorCode,approved) values (?,?,?,?,?,?)', [
-        $user->userId,
-        substr( $number, 0 , 2 ),
-        $number,
-        $numberIsValid ? 1 : 0,
-        $numberIsValid ? undef : $validator->get_last_error_code,
-        0,
-    ] );
-
-    if ( $numberIsValid ) {
-        return undef;
+    elsif ( $result eq 'VALID' ) {
+        return;
     }
     else {
         my $workflow = WebGUI::Workflow::Instance->create( $self->session, {
@@ -191,6 +170,49 @@ sub addVATNumber {
         return $i18n->get('vies unavailable');
     }
 }
+
+
+sub updateVATNumber {
+    my $self            = shift;
+    my $number          = shift;
+    my $user            = shift || $self->session->user; 
+    my $localCheckOnly  = shift;
+    my $db              = $self->session->db;
+
+    WebGUI::Error::InvalidParam->throw( 'A VAT number is required' )
+        unless $number;
+    WebGUI::Error::InvalidParam->throw( 'The second argument must be an instanciated WebGUI::User object' )
+        unless ref $user eq 'WebGUI::User';
+    WebGUI::Error::InvalidParam->throw( 'Visitor cannot add VAT numbers' )
+        if $user->isVisitor;
+
+    # Check number
+    my $validator       = Business::Tax::VAT::Validation->new;
+    my $numberIsValid   = $localCheckOnly ? $validator->local_check( $number ) : $validator->check( $number );
+
+    # Number contains syntax error does not exist. Do not write the code to the db.
+    if ( !$numberIsValid && $validator->get_last_error_code <= 16 ) {
+        return 'INVALID';
+    }
+
+    # Write the code to the db.
+    $db->write( 'replace into tax_eu_vatNumbers (userId,countryCode,vatNumber,viesValidated,viesErrorCode,approved) values (?,?,?,?,?,?)', [
+        $user->userId,
+        substr( $number, 0 , 2 ),
+        $number,
+        $numberIsValid ? 1 : 0,
+        $numberIsValid ? undef : $validator->get_last_error_code,
+        0,
+    ] );
+
+    if ( $numberIsValid ) {
+        return 'VALID';
+    }
+    else {
+        return 'UNKNOWN';
+    }
+}
+
 
 #-------------------------------------------------------------------
 
@@ -845,32 +867,9 @@ sub recheckVATNumber {
     my $number  = shift;
     my $user    = shift || $self->session->user;
 
-    my $validator   = Business::Tax::VAT::Validation->new;
+    my $result  = $self->updateVATNumber( $number, $user );
 
-    my $isValid     = $validator->check( $number );
-    my $errorCode   = $validator->get_last_error_code;
-
-    if ( $isValid ) {
-        $self->session->db->write( 
-            'update tax_eu_vatNumbers set viesValidated=?, viesErrorCode=? where vatNumber=? and userId=?',
-            [
-                1,
-                undef,
-                $number,
-                $user->userId,
-            ],
-        );
-
-        return 'VALID';
-    }
-    elsif ( $errorCode < 17 ) {
-        $self->deleteVATNumber( $number, $user );
-
-        return 'INVALID';
-    }
-    else {
-        return 'UNKNOWN';
-    }        
+    return $result;
 }
 
 #-------------------------------------------------------------------
