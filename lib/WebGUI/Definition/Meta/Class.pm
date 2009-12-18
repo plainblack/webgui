@@ -48,8 +48,8 @@ These methods are available from this class:
 
 =head2 get_all_properties ( )
 
-Returns an array of all Properties, in all classes, in the
-order they were created in the Definition.
+Returns an array of all Properties, in all classes, in the order they were
+created in the Definition.
 
 =cut
 
@@ -72,8 +72,8 @@ sub get_all_properties {
 
 =head2 get_attributes ( )
 
-Returns an array of all attributes, but only for this class.  This
-is the API-safe way of doing $self->_attribute_map;
+Returns an array of all attributes, but only for this class.  This is the
+API-safe way of doing $self->_attribute_map;
 
 =cut
 

@@ -149,6 +149,8 @@ my $called_getProperties;
         'get_tables returns a list of all tables used by this class'
     );
 
+    my $object2 = __PACKAGE__->new(tableName => 'notAsset');
+    ::is $object2->tableName, 'asset', 'tableName ignored in constructor';
 }
 
 {

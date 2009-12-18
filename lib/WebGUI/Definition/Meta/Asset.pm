@@ -55,16 +55,8 @@ sub property_meta {
     return 'WebGUI::Definition::Meta::Property::Asset';
 }
 
-has 'tableName' => (
-    is  => 'rw',
-);
-
-has 'icon' => (
-    is => 'rw',
-);
-
-has 'assetName' => (
-    is => 'rw',
+has [ qw{tableName icon assetName} ] => (
+    is       => 'rw',
 );
 
 #-------------------------------------------------------------------
