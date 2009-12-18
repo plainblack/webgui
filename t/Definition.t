@@ -61,3 +61,38 @@ my $called_getProperties;
 
 }
 
+{
+    package WGT::Class2;
+    use WebGUI::Definition;
+
+    attribute 'attribute1' => 'attribute1 value';
+    property  'property3' => ( label => 'label' );
+    property  'property1' => ( label => 'label' );
+    property  'property2' => ( label => 'label' );
+
+    my @set_order = ();
+
+    before 'property1' => sub {
+        my $self = shift;
+        push @set_order, '1';
+    };
+
+    before 'property2' => sub {
+        my $self = shift;
+        push @set_order, '2';
+    };
+
+    before 'property3' => sub {
+        my $self = shift;
+        push @set_order, '3';
+    };
+
+    my $object = WGT::Class2->new();
+    $object->set(property1 => 1, property2 => 0, property3 => 1);
+    ::cmp_deeply( [ @set_order ], [3,1,2], 'properties set in insertion order');
+
+    @set_order = ();
+    $object->set(property2 => 1, property3 => 0, property1 => 1);
+    ::cmp_deeply( [ @set_order ], [3,1,2], '... and again');
+}
+

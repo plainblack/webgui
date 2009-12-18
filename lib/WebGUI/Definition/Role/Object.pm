@@ -86,9 +86,10 @@ is not an attribute of the object, then it is silently ignored.
 sub set {
     my $self = shift;
     my $properties = @_ % 2 ? shift : { @_ };
-    KEY: for my $key ( keys %$properties ) {
-        next KEY unless $self->meta->find_attribute_by_name($key);
-        $self->$key($properties->{$key});
+    my @orderedProperties = $self->getProperties;
+    KEY: for my $property ( @orderedProperties ) {
+        next KEY unless exists $properties->{$property};
+        $self->$property($properties->{$property});
     }
     return 1;
 }
