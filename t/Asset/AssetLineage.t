@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 92; # increment this value for each test you create
+use Test::More tests => 93; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -525,6 +525,26 @@ $vTag2->commit;
 
 is($deepAsset[41]->getParent->getId, $deepAsset[40]->getId, 'addChild will not create an asset with a lineage deeper than 42 levels');
 like($WebGUI::Test::logger_warns, qr/Adding it as a sibling instead/, 'addChild logged a warning about deep assets');
+
+{
+    my $tag = WebGUI::VersionTag->getWorking($session);
+    addToCleanup($tag);
+    my $uncommittedParent = $root->addChild({
+        className   => "WebGUI::Asset::Wobject::Layout",
+        groupIdView => 7,
+        ownerUserId => 3,
+        title       => "Uncommitted Parent",
+    });
+    $tag->leaveTag;
+    my $parent = WebGUI::Asset->newPending($session, $uncommittedParent->getId);
+    my $floater = $parent->addChild({
+        className   => "WebGUI::Asset::Snippet",
+        groupIdView => 7,
+        ownerUserId => 3, #For coverage on addChild properties
+        title       => "Child of uncommitted parent",
+    });
+    is $parent->get('tagId'), $floater->get('tagId'), 'addChild: with uncommitted parent, adds child and puts it into the same tag as the parent';
+}
 
 TODO: {
     local $TODO = "Tests to make later";
