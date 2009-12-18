@@ -14,31 +14,12 @@ package WebGUI::Asset;
 
 =cut
 
-use Carp qw( croak confess );
+use Carp;
 use Scalar::Util qw( blessed );
 use Clone qw(clone);
 use JSON;
 use HTML::Packer;
 
-use WebGUI::AssetBranch;
-use WebGUI::AssetClipboard;
-use WebGUI::AssetExportHtml;
-use WebGUI::AssetLineage;
-use WebGUI::AssetMetaData;
-use WebGUI::AssetPackage;
-use WebGUI::AssetTrash;
-use WebGUI::AssetVersioning;
-use strict;
-use Tie::IxHash;
-use WebGUI::AdminConsole;
-use WebGUI::Form;
-use WebGUI::HTML;
-use WebGUI::HTMLForm;
-use WebGUI::Keyword;
-use WebGUI::ProgressBar;
-use WebGUI::Search::Index;
-use WebGUI::TabForm;
-use WebGUI::Utility;
 use WebGUI::Definition::Asset;
 attribute assetName  => 'asset',
 attribute tableName  => 'assetData',
@@ -238,6 +219,26 @@ property  assetSize => (
             fieldType       => 'integer',
             defaultValue    => 0,
           );
+
+use WebGUI::AssetBranch;
+use WebGUI::AssetClipboard;
+use WebGUI::AssetExportHtml;
+use WebGUI::AssetLineage;
+use WebGUI::AssetMetaData;
+use WebGUI::AssetPackage;
+use WebGUI::AssetTrash;
+use WebGUI::AssetVersioning;
+use strict;
+use Tie::IxHash;
+use WebGUI::AdminConsole;
+use WebGUI::Form;
+use WebGUI::HTML;
+use WebGUI::HTMLForm;
+use WebGUI::Keyword;
+use WebGUI::ProgressBar;
+use WebGUI::Search::Index;
+use WebGUI::TabForm;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -1757,16 +1758,16 @@ sub newPending {
     my $class   = shift;
     my $session = shift;
     my $assetId = shift;
-    croak "First parameter to newPending needs to be a WebGUI::Session object"
+    Carp::croak "First parameter to newPending needs to be a WebGUI::Session object"
         unless $session && $session->isa('WebGUI::Session');
-    croak "Second parameter to newPending needs to be an assetId"
+    Carp::croak "Second parameter to newPending needs to be an assetId"
         unless $assetId;
     my ($className, $revisionDate) = $session->db->quickArray("SELECT asset.className, assetData.revisionDate FROM asset INNER JOIN assetData ON asset.assetId = assetData.assetId WHERE asset.assetId = ? ORDER BY assetData.revisionDate DESC LIMIT 1", [ $assetId ]);
     if ($className ne "" || $revisionDate ne "") {
         return WebGUI::Asset->new($session, $assetId, $className, $revisionDate);
     }
     else {
-        croak "Invalid asset id '$assetId' requested!";
+        Carp::croak "Invalid asset id '$assetId' requested!";
     }
 }
 
