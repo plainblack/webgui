@@ -17,6 +17,7 @@ package WebGUI::Definition;
 use 5.010;
 use Moose;
 use Moose::Exporter;
+use feature ();
 use namespace::autoclean;
 use WebGUI::Definition::Meta::Class;
 use WebGUI::Definition::Meta::Property;
@@ -64,6 +65,7 @@ sub import {
     my $caller = caller;
     $class->$import({ into_level => 1 });
     warnings->unimport('uninitialized');
+    feature->import(':5.10');
     namespace::autoclean->import( -cleanee => $caller );
     return 1;
 }
