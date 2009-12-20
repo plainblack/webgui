@@ -918,7 +918,7 @@ sub responseValues {
         # Find out what we're indexing responses by
         my $identifier 
             = $opts{indexBy} eq 'variable' ? $question && $question->{variable} 
-                                           : $self->questionId($address);
+                                           : $self->questionId(@address);
         next unless $identifier;
         
         my $answer = $self->survey->answer([@address]);
