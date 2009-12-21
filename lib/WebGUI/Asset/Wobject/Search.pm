@@ -195,7 +195,7 @@ sub view {
 		$search->search(\%rules);
 		
         #Instantiate the highlighter
-        my @words     = split(/\s+/,$keywords);
+        my @words     = grep { $_ ne '' } map { tr/+?*//d; $_; } split(/\s+/,$keywords);
         my @wildcards = map { "%" } @words;
         my $hl = HTML::Highlight->new(
             words     => \@words,

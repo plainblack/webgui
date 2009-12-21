@@ -16,8 +16,9 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 6; # increment this value for each test you create
+use Test::More tests => 9; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Search;
+use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
@@ -26,6 +27,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Search Test"});
+addToCleanup($versionTag);
 my $search = $node->addChild({className=>'WebGUI::Asset::Wobject::Search'});
 
 # Test for a sane object type
@@ -43,15 +45,53 @@ foreach my $newSetting (keys %{$newSearchSettings}) {
 	is ($search->get($newSetting), $newSearchSettings->{$newSetting}, "updated $newSetting is ".$newSearchSettings->{$newSetting});
 }
 
+                 #1234567890123456789012#
+my $templateId = '_FAUX_SEARCH_TEMPLATE_';
+
+my $templateMock = Test::MockObject->new({});
+$templateMock->set_isa('WebGUI::Asset::Template');
+$templateMock->set_always('getId', $templateId);
+$templateMock->set_true('prepare');
+my $templateVars;
+$templateMock->mock('process', sub { $templateVars = $_[1]; } );
+
+$search->update({
+    searchRoot   => WebGUI::Asset->getDefault($session)->getId,
+    classLimiter => '',
+    templateId   => $templateId,
+});
+
+{
+
+    $session->request->setup_body({
+        doit     => 1,
+        keywords => 'building + applications',
+    });
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $search->prepareView;
+    eval { $search->view; };
+    ok(! $@, 'view did now error out on standalone regexp wildcard')
+        or diag $@;
+    $session->request->setup_body({
+        keywords => 'building +applications',
+    });
+    eval { $search->view; };
+    ok(! $@, 'view did now error out on prefix regexp wildcard')
+        or diag $@;
+    $session->request->setup_body({
+        keywords => 'building applications*',
+    });
+    eval { $search->view; };
+    ok(! $@, 'view did now error out on prefix regexp wildcard')
+        or diag $@;
+    WebGUI::Test->unmockAssetId($templateId);
+
+}
+
+$session->request->setup_body({});
 
 TODO: {
         local $TODO = "Tests to make later";
         ok(0, 'Test prepareView method');
 	ok(0, 'Test view method');
 }
-
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-}
-
