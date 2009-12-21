@@ -143,8 +143,7 @@ property  extraHeadTags => (
             defaultValue    => undef,
             customDrawMethod=>  'drawExtraHeadTags',
           ); 
-around extraHeadTags => sub {
-    my $orig = shift;
+after extraHeadTags => sub {
     my $self = shift;
     if (@_ > 1) {
         my $unpacked = $_[0];
@@ -157,7 +156,6 @@ around extraHeadTags => sub {
             } );
         $self->extraHeadTagsPacked($packed);
     }
-    $self->$orig(@_);
 };
 property  extraHeadTagsPacked  => (
             fieldType       => 'hidden',
@@ -218,6 +216,10 @@ property  assetSize => (
             noFormPost      => 1,
             fieldType       => 'integer',
             defaultValue    => 0,
+          );
+has       session => (
+            noFormPost      => 1,
+            is              => 'ro',
           );
 
 use WebGUI::AssetBranch;
@@ -1671,7 +1673,8 @@ sub newByDynamicClass {
 
 =head2 newByPropertyHashRef ( session,  properties )
 
-Constructor.  This creates a standalone asset with no parent.  It does not update the database.
+Constructor.  This creates a standalone asset with no parent.  It does not persist that object
+to the database.
 
 =head3 session
 
@@ -1679,19 +1682,23 @@ A reference to the current session.
 
 =head3 properties
 
-A properties hash reference. The className of the properties hash must be valid.
+A hash reference of Asset properties.
+
+=head4 className
+
+If className is not passed, the class used to call this method will be used in its place.
 
 =cut
 
 sub newByPropertyHashRef {
-	my $class = shift;
-	my $session = shift;
-	my $properties = shift;
-	return undef unless defined $properties;
-	return undef unless exists $properties->{className};
+    my $class      = shift;
+    my $session    = shift;
+    my $properties = shift || {};
+    $properties->{className} //= $class;
     my $className = $class->loadModule($session, $properties->{className});
     return undef unless (defined $className);
-	bless {_session=>$session, _properties => $properties}, $className;
+    my $object = $className->new($session, $properties);
+    return $object;
 }
 
 #-------------------------------------------------------------------
