@@ -1,3 +1,5 @@
+7.7.30
+
 7.7.29
  - fixed #11299: Matrix - Cannot hide title
  - fixed #11300: Matrix - rating statistics cleared
