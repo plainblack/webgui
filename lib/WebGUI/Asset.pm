@@ -30,6 +30,7 @@ property  title => (
             hoverHelp       => ['99 description','Asset'],
             fieldType       => 'text',
             defaultValue    => 'Untitled',
+            default         => 'Untitled',
           );
 around title => sub {
     my $orig = shift;
@@ -218,9 +219,60 @@ property  assetSize => (
             defaultValue    => 0,
           );
 has       session => (
-            noFormPost      => 1,
             is              => 'ro',
           );
+
+around BUILDARGS => sub {
+    my $orig            = shift;
+    my $className       = shift;
+    return $className->$orig(@_);
+    ##Original arguments start here.
+    if (ref $_[0] eq 'HASH') {
+        return $className->$orig(@_);
+    }
+    my $session         = shift;
+    my $assetId         = shift;
+    my $revisionDate    = shift;
+
+    unless (defined $assetId) {
+        $session->errorHandler->error("Asset constructor new() requires an assetId.");
+        return undef;
+    }
+
+    if ( !$revisionDate ) {
+        $revisionDate   = $className->getCurrentRevisionDate( $session, $assetId );
+        return undef unless $revisionDate;
+    }
+    
+    my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
+    unless (exists $properties->{assetId}) { # can we get it from cache?
+        my $sql = "select * from asset";
+        my $where = " where asset.assetId=?";
+        my $placeHolders = [$assetId];
+      
+        # join all the tables
+        foreach my $table ($className->getTables) {
+            $sql .= ",".$table;
+            $where .= " and (asset.assetId=".$table.".assetId and ".$table.".revisionDate=".$revisionDate.")";
+        }
+
+        # fetch properties
+        $properties = $session->db->quickHashRef($sql.$where, $placeHolders);
+        unless (exists $properties->{assetId}) {
+            $session->errorHandler->error("Asset $assetId $className $revisionDate is missing properties. Consult your database tables for corruption. ");
+            return undef;
+        }
+        eval{ $session->cache->set(["asset",$assetId,$revisionDate], $properties, 60*60*24) };
+    }
+
+    if (defined $properties) {
+        $properties->{session} = $session;
+        return $className->$orig($properties);
+    }	
+    $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
+    return undef;
+};
+
 
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
@@ -1519,7 +1571,7 @@ If specified this value will be used to set the title after it goes through some
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, assetId [, className, revisionDate ] )
+=head2 new ( session, assetId [, revisionDate ] )
 
 Constructor. This does not create an asset.
 
@@ -1531,84 +1583,12 @@ A reference to the current session.
 
 The assetId of the asset you're creating an object reference for. Must not be blank.
 
-=head3 className
-
-By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
-
 =head3 revisionDate
 
 An epoch date that represents a specific version of an asset. By default the most recent version will be used.  If
 no revision date is available it will return undef.
 
 =cut
-
-sub new {
-    my $class           = shift;
-    my $session         = shift;
-    my $assetId         = shift;
-    my $className       = shift;
-    my $revisionDate    = shift;
-
-    unless (defined $assetId) {
-        $session->errorHandler->error("Asset constructor new() requires an assetId.");
-        return undef;
-    }
-
-    if ($class eq 'WebGUI::Asset' && !$className) {
-        ($className) = $session->db->quickArray("select className from asset where assetId=?", [$assetId]);
-        unless ($className) {
-            $session->errorHandler->error("Couldn't instantiate asset: ".$assetId. ": couldn't find class name");
-            return undef;
-        }
-    }
-
-    if ($className) {
-        $class = $class->loadModule($session, $className);        
-        return undef unless (defined $class);
-    }
-    
-    if ( !$revisionDate ) {
-        $revisionDate   = $className
-                        ? $className->getCurrentRevisionDate( $session, $assetId )
-                        : $class->getCurrentRevisionDate( $session, $assetId );
-        return undef unless $revisionDate;
-    }
-    
-    my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
-    unless (exists $properties->{assetId}) { # can we get it from cache?
-        my $sql = "select * from asset";
-        my $where = " where asset.assetId=?";
-        my $placeHolders = [$assetId];
-      
-        # join all the tables
-        foreach my $table ($class->getTables) {
-            $sql .= ",".$table;
-            $where .= " and (asset.assetId=".$table.".assetId and ".$table.".revisionDate=".$revisionDate.")";
-        }
-
-        # fetch properties
-        $properties = $session->db->quickHashRef($sql.$where, $placeHolders);
-        unless (exists $properties->{assetId}) {
-            $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
-            return undef;
-        }
-        eval{ $session->cache->set(["asset",$assetId,$revisionDate], $properties, 60*60*24) };
-    }
-
-    if (defined $properties) {
-        my $object = $class->instantiate($properties);
-        $object->{_session} = $session;
-        foreach my $property ($object->getProperties) {
-            my $definition = $object->getProperty($property);
-            if ($definition->{serialize} && $object->{_properties}->{$property} ne '') {
-                $object->{_properties}->{$property} = JSON->new->canonical->decode($object->{_properties}->{$property});
-            }
-        }
-        return $object;
-    }	
-    $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
-    return undef;
-}
 
 #-------------------------------------------------------------------
 
@@ -2173,12 +2153,6 @@ sub purgeCache {
 Returns a reference to the current session.
 
 =cut
-
-sub session {
-	my ($self) = @_;
-	return $self->{_session};
-}
-
 
 #-------------------------------------------------------------------
 
