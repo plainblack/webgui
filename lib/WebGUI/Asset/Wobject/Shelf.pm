@@ -310,7 +310,7 @@ sub view {
 	my @productIds = List::MoreUtils::uniq(@childSkus, @{$keywordBasedAssetIds});
     my @products = ();
     PRODUCT: foreach my $id (@productIds) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+		my $asset = WebGUI::Asset->newById($session, $id);
         if (!defined $asset) {
 			$session->errorHandler->error(q|Couldn't instanciate SKU with assetId |.$id.q| on shelf with assetId |.$self->getId);
             next PRODUCT;

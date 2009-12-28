@@ -204,7 +204,7 @@ sub execute {
 		my $post = undef;
 		if ($message->{inReplyTo} && $message->{inReplyTo} =~ m/cs\-([\w_-]{22})\@/) {
 			my $id = $1;
-            my $repliedPost = WebGUI::Asset->newByDynamicClass($self->session, $id);
+            my $repliedPost = WebGUI::Asset->newById($self->session, $id);
             if ($repliedPost
                 && $repliedPost->isa('WebGUI::Asset::Post')
                 && $repliedPost->getThread->getParent->getId eq $cs->getId) {

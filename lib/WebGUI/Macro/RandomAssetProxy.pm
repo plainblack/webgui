@@ -42,7 +42,7 @@ sub process {
 		my $children = $asset->getLineage(["children"]);
 		#randomize;
 		my $randomAssetId = $children->[int(rand(scalar(@{$children})))];	
-		my $randomAsset = WebGUI::Asset->newByDynamicClass($session,$randomAssetId);
+		my $randomAsset = WebGUI::Asset->newById($session,$randomAssetId);
 		if (defined $randomAsset) {
 			if ($randomAsset->canView) {
 				$randomAsset->toggleToolbar;

@@ -338,7 +338,7 @@ sub view {
 		}
 	}
 	my $i = 1;
-	my $templateAsset = WebGUI::Asset->newByDynamicClass($self->session, $templateId) || WebGUI::Asset->getImportNode($self->session);
+	my $templateAsset = WebGUI::Asset->newById($self->session, $templateId) || WebGUI::Asset->getImportNode($self->session);
 	my $template = $templateAsset->get("template");
 	my $numPositions = 1;
 	foreach my $j (2..15) {

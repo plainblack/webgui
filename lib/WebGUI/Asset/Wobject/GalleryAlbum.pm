@@ -198,7 +198,7 @@ sub appendTemplateVarsFileLoop {
     my $session     = $self->session;
 
     for my $assetId (@$assetIds) {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        my $asset = WebGUI::Asset->newById($session, $assetId);
         # Set the parent
         $asset->{_parent} = $self;
         push @{$var->{file_loop}}, $asset->getTemplateVars;
@@ -477,7 +477,7 @@ sub getNextAlbum {
     return $self->{_nextAlbum} if $self->{_nextAlbum};
     my $nextId      = $self->getParent->getNextAlbumId( $self->getId );
     return undef unless $nextId;
-    $self->{_nextAlbum } = WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    $self->{_nextAlbum } = WebGUI::Asset->newById( $self->session, $nextId );
     return $self->{_nextAlbum};
 }
 
@@ -495,7 +495,7 @@ sub getPreviousAlbum {
     return $self->{_previousAlbum} if $self->{_previousAlbum};
     my $previousId  = $self->getParent->getPreviousAlbumId( $self->getId );
     return undef unless $previousId;
-    $self->{_previousAlbum} = WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    $self->{_previousAlbum} = WebGUI::Asset->newById( $self->session, $previousId );
     return $self->{_previousAlbum};
 }
 
@@ -626,7 +626,7 @@ sub getThumbnailUrl {
     
     # Try to get the asset
     if ( $self->get("assetIdThumbnail") ) {
-        $asset      = WebGUI::Asset->newByDynamicClass( $self->session, $self->get("assetIdThumbnail") );
+        $asset      = WebGUI::Asset->newById( $self->session, $self->get("assetIdThumbnail") );
     }
     elsif ( $self->getFirstChild ) {
         $asset      = $self->getFirstChild;
@@ -720,7 +720,7 @@ sub processFileSynopsis {
         ( my $assetId ) = $key =~ /^fileSynopsis_(.+)$/;
         my $synopsis    = $form->get( $key );
     
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset->newById( $session, $assetId );
         if ( $asset->get("synopsis") ne $synopsis ) {
             my $properties  = $asset->get;
             $properties->{ synopsis } = $synopsis;
@@ -878,7 +878,7 @@ sub view_thumbnails {
     # Add direct vars for the requested file
     my $asset;
     if ($fileId) {
-        $asset  = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        $asset  = WebGUI::Asset->newById( $session, $fileId );
     }
     # If no fileId given or fileId does not exist
     if (!$asset) {
@@ -1173,7 +1173,7 @@ sub www_edit {
     elsif ( grep { $_ =~ /^promote-(.{22})$/ } $form->param ) {
         my $assetId     = ( grep { $_ =~ /^promote-(.{22})$/ } $form->param )[0];
         $assetId        =~ s/^promote-//;
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset->newById( $session, $assetId );
         if ( $asset ) {
             $asset->promote;
         }
@@ -1185,7 +1185,7 @@ sub www_edit {
     elsif ( grep { $_ =~ /^demote-(.{22})$/ } $form->param ) {
         my $assetId     = ( grep { $_ =~ /^demote-(.{22})$/ } $form->param )[0];
         $assetId        =~ s/^demote-//;
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset->newById( $session, $assetId );
         if ( $asset ) {
             $asset->demote;
         }
@@ -1196,7 +1196,7 @@ sub www_edit {
     elsif ( grep { $_ =~ /^delete-(.{22})$/ } $form->param ) {
         my $assetId     = ( grep { $_ =~ /^delete-(.{22})$/ } $form->param )[0];
         $assetId        =~ s/^delete-//;
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset->newById( $session, $assetId );
         if ( $asset ) {
             $asset->purge;
         }

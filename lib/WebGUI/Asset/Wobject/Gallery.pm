@@ -950,7 +950,7 @@ sub hasSpaceAvailable {
         } );
 
     for my $assetId ( @{ $fileIds } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $self->session, $assetId );
+        my $asset       = WebGUI::Asset->newById( $self->session, $assetId );
         next unless $asset;
         $spaceUsed += $asset->get( 'assetSize' );
 
@@ -976,7 +976,7 @@ sub prepareView {
     if ( $self->get("viewDefault") eq "album" && $self->get("viewAlbumAssetId") && $self->get("viewAlbumAssetId")
 ne 'PBasset000000000000001') {
         my $asset
-            = WebGUI::Asset->newByDynamicClass( $self->session, $self->get("viewAlbumAssetId") );
+            = WebGUI::Asset->newById( $self->session, $self->get("viewAlbumAssetId") );
         if ($asset) {
             $asset->prepareView;
             $self->{_viewAsset} = $asset;
@@ -1478,7 +1478,7 @@ sub www_search {
 
         $p->appendTemplateVars( $var );
         for my $result ( @{ $p->getPageData } ) {
-            my $asset   = WebGUI::Asset->newByDynamicClass( $session, $result->{assetId} );
+            my $asset   = WebGUI::Asset->newById( $session, $result->{assetId} );
             push @{ $var->{search_results} }, {
                 %{ $asset->getTemplateVars },
                 isAlbum     => $asset->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ),
@@ -1514,7 +1514,7 @@ sub www_listFilesForUser {
     # Get all the albums
     my $albumIds    = $self->getUserAlbumIds( $userId );
     for my $albumId ( @$albumIds ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $albumId );
+        my $asset       = WebGUI::Asset->newById( $session, $albumId );
         push @{ $var->{user_albums} }, $asset->getTemplateVars;
     }
 
@@ -1527,7 +1527,7 @@ sub www_listFilesForUser {
     $p->appendTemplateVars( $var );
 
     for my $fileId ( @{ $p->getPageData } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        my $asset       = WebGUI::Asset->newById( $session, $fileId );
         push @{ $var->{user_files} }, $asset->getTemplateVars;
     }
 
@@ -1556,7 +1556,7 @@ sub www_listFilesForUserRss {
     # Get all the albums
     my $albumIds    = $self->getUserAlbumIds( $userId );
     for my $albumId ( @$albumIds ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $albumId );
+        my $asset       = WebGUI::Asset->newById( $session, $albumId );
         my $assetVar    = $asset->getTemplateVars;
 
         for my $key ( qw( url ) ) {
@@ -1569,7 +1569,7 @@ sub www_listFilesForUserRss {
     # Get all the files
     my $fileIds     = $self->getUserFileIds( $userId );
     for my $fileId ( @$fileIds ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        my $asset       = WebGUI::Asset->newById( $session, $fileId );
         my $assetVar    = $asset->getTemplateVars;
 
         for my $key ( qw( url ) ) {

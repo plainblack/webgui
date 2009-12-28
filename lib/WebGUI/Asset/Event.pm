@@ -478,7 +478,7 @@ sub getEventNext {
 
 
     return undef unless $events->[0]; 
-    return WebGUI::Asset->newByDynamicClass($self->session,$events->[0]);
+    return WebGUI::Asset->newById($self->session,$events->[0]);
 }
 
 
@@ -534,7 +534,7 @@ sub getEventPrev {
             });
 
     return undef unless $events->[0];
-    return WebGUI::Asset->newByDynamicClass($self->session,$events->[0]);
+    return WebGUI::Asset->newById($self->session,$events->[0]);
 }
 
 
@@ -1722,7 +1722,7 @@ sub processPropertiesFromFormPost {
             });
 
             for my $eventId (@{$events}) {
-                my $event   = WebGUI::Asset->newByDynamicClass($session, $eventId);
+                my $event   = WebGUI::Asset->newById($session, $eventId);
 
                 # Add a revision
                 $properties{ startDate  } = $event->get("startDate");

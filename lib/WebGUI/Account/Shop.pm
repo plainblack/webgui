@@ -271,7 +271,7 @@ sub www_viewSales {
         my $data = $row;
 
         # Add asset properties to tmpl_vars.
-        my $asset = WebGUI::Asset->newByDynamicClass( $session, $row->{ assetId } );
+        my $asset = WebGUI::Asset->newById( $session, $row->{ assetId } );
         $row = { %{ $row }, %{ $asset->get } } if $asset;
         
         push @products, $row;

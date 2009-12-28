@@ -264,7 +264,7 @@ sub exportAssetCollateral {
         });
         my $listOfStories = [];
         STORYID: foreach my $storyId (@{ $storyIds }) {
-            my $story = WebGUI::Asset->newByDynamicClass($session, $storyId);
+            my $story = WebGUI::Asset->newById($session, $storyId);
             next STORYID unless $story;
             push @{ $listOfStories }, {
                 title => $story->getTitle,

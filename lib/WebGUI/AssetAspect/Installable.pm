@@ -120,7 +120,7 @@ sub uninstall {
     ### Remove all assets contained in the table
     my $sth = $session->db->read("SELECT assetId FROM `$installDef->{tableName}`");
     while ( my ($assetId) = $sth->array ) {
-        my $asset = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset = WebGUI::Asset->newById( $session, $assetId );
         $asset->purge;
     }
 

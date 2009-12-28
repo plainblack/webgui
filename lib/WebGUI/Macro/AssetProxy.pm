@@ -45,7 +45,7 @@ sub process {
     my $t = ($session->errorHandler->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
     my $asset;
     if ($type eq 'assetId') {
-        $asset = WebGUI::Asset->newByDynamicClass($session, $identifier);
+        $asset = WebGUI::Asset->newById($session, $identifier);
     }
     else {
         $asset = WebGUI::Asset->newByUrl($session,$identifier);

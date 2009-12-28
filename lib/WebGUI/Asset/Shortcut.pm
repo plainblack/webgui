@@ -591,7 +591,7 @@ sub getShortcutByCriteria {
 		$scratchId = "Shortcut_" . $assetId;
 		if($self->session->scratch->get($scratchId) && !$self->getValue("disableContentLock")) {
 			unless ($self->session->var->isAdminOn) {
-				return WebGUI::Asset->newByDynamicClass($self->session, $self->session->scratch->get($scratchId));
+				return WebGUI::Asset->newById($self->session, $self->session->scratch->get($scratchId));
 			}
 		}
 	}
@@ -675,7 +675,7 @@ sub getShortcutByCriteria {
 	# Store the matching assetId in user scratch. 
 	$self->session->scratch->set($scratchId,$id) if ($scratchId);
 
-	return WebGUI::Asset->newByDynamicClass($self->session, $id);
+	return WebGUI::Asset->newById($self->session, $id);
 }
 
 #-------------------------------------------------------------------
@@ -688,7 +688,7 @@ Return the asset that this Shortcut points to.
 
 sub getShortcutDefault {
 	my $self = shift;
-	return WebGUI::Asset->newByDynamicClass($self->session, $self->get("shortcutToAssetId"));
+	return WebGUI::Asset->newById($self->session, $self->get("shortcutToAssetId"));
 }
 
 #-------------------------------------------------------------------
@@ -1163,7 +1163,7 @@ sub www_editOverride {
 	$params{label} = $params{label} || $i18n->get("Edit Field Directly");
 	$params{hoverHelp} = $params{hoverHelp} || $i18n->get("Use this field to edit the override using the native form handler for this field type");
 
-	if ($params{fieldType} eq 'template') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($self->session, $origValue)->get("namespace");}
+	if ($params{fieldType} eq 'template') {$params{namespace} = $params{namespace} || WebGUI::Asset->newById($self->session, $origValue)->get("namespace");}
 
 	$f->dynamicField(%params);
 	$f->textarea(

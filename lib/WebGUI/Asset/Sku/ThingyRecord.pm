@@ -393,7 +393,7 @@ sub getThingy {
         "SELECT assetId FROM Thingy_things WHERE thingId=?",
         [ $self->get('thingId') ],
     );
-    return WebGUI::Asset->newByDynamicClass( $self->session, $thingyId );
+    return WebGUI::Asset->newById( $self->session, $thingyId );
 }
 
 #-------------------------------------------------------------------

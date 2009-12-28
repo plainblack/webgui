@@ -394,7 +394,7 @@ ENDHTML
 ENDHTML
 
         for my $pointId ( @{$pointIds} ) {
-            my $point   = WebGUI::Asset->newByDynamicClass( $session, $pointId );
+            my $point   = WebGUI::Asset->newById( $session, $pointId );
             next unless $point;
             $mapHtml    .= sprintf '        points.push(%s);'."\n", 
                             JSON->new->encode($point->getMapInfo),
@@ -469,7 +469,7 @@ sub www_ajaxDeletePoint {
     my $session = $self->session;
     my $i18n    = WebGUI::International->new( $session, 'Asset_Map' );
     my $assetId = $session->form->get('assetId');
-    my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+    my $asset   = WebGUI::Asset->newById( $session, $assetId );
     $session->http->setMimeType('application/json');
     return JSON->new->encode({error => $i18n->get('error delete unauthorized')})
         unless $asset && $asset->canEdit;
@@ -498,7 +498,7 @@ sub www_ajaxEditPoint {
         } );
     }
     else {
-        $asset  = WebGUI::Asset->newByDynamicClass( $session, $form->get('assetId') );
+        $asset  = WebGUI::Asset->newById( $session, $form->get('assetId') );
     }
     
     my $output  = $self->getEditPointTemplate->process( $asset->getTemplateVarsEditForm );
@@ -537,7 +537,7 @@ sub www_ajaxEditPointSave {
         } );
     }
     else {
-        $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        $asset  = WebGUI::Asset->newById( $session, $assetId );
         return JSON->new->encode({message => $i18n->get("error edit unauthorized")})
             unless $asset && $asset->canEdit;
         $asset  = $asset->addRevision;
@@ -599,7 +599,7 @@ sub www_ajaxSetPointLocation {
     $session->http->setMimeType("application/json");
     
     my $assetId = $form->get('assetId');
-    my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+    my $asset   = WebGUI::Asset->newById( $session, $assetId );
     return JSON->new->encode({message => $i18n->get("error edit unauthorized")})
         unless $asset && $asset->canEdit;
     $asset->update( {

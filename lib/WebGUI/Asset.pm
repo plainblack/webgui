@@ -750,7 +750,7 @@ A reference to the current session.
 sub getDefault {
 	my $class = shift;
 	my $session = shift;
-	return $class->newByDynamicClass($session, $session->setting->get("defaultPage"));
+	return $class->newById($session, $session->setting->get("defaultPage"));
 }
 
 
@@ -1056,7 +1056,7 @@ A reference to the current session.
 sub getImportNode {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->newByDynamicClass($session, "PBasset000000000000002");
+	return WebGUI::Asset->newById($session, "PBasset000000000000002");
 }
 
 
@@ -1136,7 +1136,7 @@ A reference to the current session.
 sub getMedia {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->newByDynamicClass($session, "PBasset000000000000003");
+	return WebGUI::Asset->newById($session, "PBasset000000000000003");
 }
 
 
@@ -1186,7 +1186,7 @@ A reference to the current session.
 sub getNotFound {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->newByDynamicClass($session, $session->setting->get("notFoundPage"));
+	return WebGUI::Asset->newById($session, $session->setting->get("notFoundPage"));
 }
 
 
@@ -1206,7 +1206,7 @@ sub getPrototypeList {
     my $userUiLevel = $session->user->profileField('uiLevel');
     my @assets;
     ID: foreach my $id (@prototypeIds) {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        my $asset = WebGUI::Asset->newById($session, $id);
         next ID unless defined $asset;
         next ID unless $asset->get('isPrototype');
         next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
@@ -1267,7 +1267,7 @@ A reference to the current session.
 sub getTempspace {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->newByDynamicClass($session, "tempspace0000000000000");
+	return WebGUI::Asset->newById($session, "tempspace0000000000000");
 }
 
 
@@ -1592,7 +1592,7 @@ no revision date is available it will return undef.
 
 #-------------------------------------------------------------------
 
-=head2 newByDynamicClass ( session, assetId [ , revisionDate ] )
+=head2 newById ( session, assetId [ , revisionDate ] )
 
 Instances an existing Asset, by looking up the classname of the asset specified by the assetId, and then calling new.
 Returns undef if it can't find the classname.
@@ -1611,16 +1611,16 @@ A specific revision date for the asset to retrieve. If not specified, the most r
 
 =cut
 
-sub newByDynamicClass {
+sub newById {
     my $class           = shift;
     my $session         = shift;
     my $assetId         = shift;
     my $revisionDate    = shift;
  
 # Some code requires that these situations not die.
-#    confess "newByDynamicClass requires WebGUI::Session" 
+#    confess "newById requires WebGUI::Session" 
 #        unless $session && blessed $session eq 'WebGUI::Session';
-#    confess "newByDynamicClass requires assetId"
+#    confess "newById requires assetId"
 #        unless $assetId;
 # So just return instead
     return undef unless ( $session && blessed $session eq 'WebGUI::Session' ) 
@@ -2109,7 +2109,7 @@ sub publish {
         
 	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
         foreach my $id (@{$assetIds}) {
-                my $asset = WebGUI::Asset->newByDynamicClass($self->session, $id);
+                my $asset = WebGUI::Asset->newById($self->session, $id);
                 if (defined $asset) {
                     $asset->purgeCache;
                 }

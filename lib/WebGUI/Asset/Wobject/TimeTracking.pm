@@ -702,7 +702,7 @@ sub www_buildTimeTable {
 	   #Build project list and task lists from project management app
 	   my ($pmAssetId) = $db->quickArray("select a.assetId from PM_wobject a, asset b where a.assetId=b.assetId and b.state not like 'trash%'");   
 	   if($pmAssetId) {
-	      $pmAsset = WebGUI::Asset->newByDynamicClass($session,$pmAssetId);
+	      $pmAsset = WebGUI::Asset->newById($session,$pmAssetId);
 	      my %pmProjectList = %{$pmAsset->getProjectList($user->userId)};
 		  %projectList = WebGUI::Utility::sortHash((%projectList,%pmProjectList));
 	   }

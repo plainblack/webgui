@@ -174,7 +174,7 @@ Returns an instanciated WebGUI::Asset::Sku object for this cart item.
 sub getSku {
     my ($self) = @_;
     my $asset = '';
-    $asset = WebGUI::Asset->newByDynamicClass($self->cart->session, $self->get("assetId"));
+    $asset = WebGUI::Asset->newById($self->cart->session, $self->get("assetId"));
     $asset->applyOptions($self->get("options")) if $asset;
     return $asset;
 }

@@ -92,7 +92,7 @@ sub getPackageList {
     my @packageIds = $db->buildArray("select distinct assetId from assetData where isPackage=1");
     my @assets;
     ID: foreach my $id (@packageIds) {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        my $asset = WebGUI::Asset->newById($session, $id);
         next ID unless defined $asset;
         next ID unless $asset->get('isPackage');
         next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
@@ -283,7 +283,7 @@ sub www_deployPackage {
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
 	my $packageMasterAssetId = $self->session->form->param("assetId");
 	if (defined $packageMasterAssetId) {
-		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($self->session, $packageMasterAssetId);
+		my $packageMasterAsset = WebGUI::Asset->newById($self->session, $packageMasterAssetId);
 		unless ($packageMasterAsset->get('isPackage')) { #only deploy packages
 		 	$self->session->errorHandler->security('deploy an asset as a package which was not set as a package.');
 		 	return undef;

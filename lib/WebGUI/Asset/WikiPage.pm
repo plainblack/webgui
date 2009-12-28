@@ -424,7 +424,7 @@ sub processPropertiesFromFormPost {
     my @attachments = $self->session->form->param("attachments");
     my @tags = ();
     foreach my $assetId (@attachments) {
-        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+        my $asset = WebGUI::Asset->newById($self->session, $assetId);
         if (defined $asset) {
             unless ($asset->get("parentId") eq $self->getId) {
                 $asset->setParent($self);

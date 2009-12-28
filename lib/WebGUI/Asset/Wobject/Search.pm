@@ -187,7 +187,7 @@ sub view {
 		my %rules   = (
 			keywords =>$keywords, 
 			lineage  =>[
-                WebGUI::Asset->newByDynamicClass($session,$self->getValue("searchRoot"))->get("lineage")
+                WebGUI::Asset->newById($session,$self->getValue("searchRoot"))->get("lineage")
             ],
 		);
 		my @classes     = split("\n",$self->get("classLimiter"));

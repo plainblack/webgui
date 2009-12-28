@@ -103,7 +103,7 @@ sub getRssFeedItems {
     });
     my $storyData = [];
     STORY: foreach my $storyId (@{ $storyIds }) {
-        my $story = WebGUI::Asset->newByDynamicClass($session, $storyId);
+        my $story = WebGUI::Asset->newById($session, $storyId);
         next STORY unless $story;
         push @{ $storyData }, $story->getRssData;
     }

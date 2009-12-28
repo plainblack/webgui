@@ -238,7 +238,7 @@ sub exportAssetCollateral {
         );
 
         # open another session as the user doing the exporting...
-        my $selfdupe = WebGUI::Asset->newByDynamicClass( $exportSession, $self->getId );
+        my $selfdupe = WebGUI::Asset->newById( $exportSession, $self->getId );
 
         # next, get the contents, open the file, and write the contents to the file.
         my $fh = eval { $dest->open('>:utf8') };

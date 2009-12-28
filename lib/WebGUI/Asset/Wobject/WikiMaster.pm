@@ -471,7 +471,7 @@ sub getRssFeedItems {
     $self->appendRecentChanges( $vars, $self->get('itemsPerFeed') );
     my $var = [];
     foreach my $item ( @{ $vars->{recentChanges} } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $self->session, $item->{assetId} );
+        my $asset       = WebGUI::Asset->newById( $self->session, $item->{assetId} );
         push @{ $var }, {
             'link'          => $asset->getUrl,
             'guid'          => $item->{ 'assetId' } . $asset->get( 'revisionDate' ),
@@ -597,7 +597,7 @@ sub view {
     # Get a random featured page
     my $featuredIds = $self->getFeaturedPageIds;
     my $featuredId  = $featuredIds->[ int( rand @$featuredIds ) - 1 ]; 
-    my $featured    = WebGUI::Asset->newByDynamicClass( $session, $featuredId );
+    my $featured    = WebGUI::Asset->newById( $session, $featuredId );
     if ( $featured ) {
         $self->appendFeaturedPageVars( $var, $featured );
     }
@@ -628,7 +628,7 @@ sub www_byKeyword {
         });
     $p->setBaseUrl($self->getUrl("func=byKeyword;keyword=".$keyword));
     foreach my $assetData (@{$p->getPageData}) {
-        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetData->{assetId});
+        my $asset = WebGUI::Asset->newById($self->session, $assetData->{assetId});
         next unless defined $asset;
         push(@pages, {
             title   => $asset->getTitle,

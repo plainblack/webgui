@@ -1794,7 +1794,7 @@ sub view {
         $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
                  . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get('url'));
-        my $accessory = WebGUI::Asset->newByDynamicClass($session, $collateral->{accessoryAssetId});
+        my $accessory = WebGUI::Asset->newById($session, $collateral->{accessoryAssetId});
         push(@accessoryloop,{
                            'accessory_URL'      => $accessory->getUrl,
                            'accessory_title'    => $accessory->getTitle,
@@ -1811,7 +1811,7 @@ sub view {
         $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id, $self->get('url'),$i18n->get(4))
                  . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id, $self->get('url'))
                  . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id, $self->get('url'));
-        my $related = WebGUI::Asset->newByDynamicClass($session, $collateral->{relatedAssetId});
+        my $related = WebGUI::Asset->newById($session, $collateral->{relatedAssetId});
         push(@relatedloop,{
                           'relatedproduct_URL'      => $related->getUrl,
                           'relatedproduct_title'    => $related->getTitle,

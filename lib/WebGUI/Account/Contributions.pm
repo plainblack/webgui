@@ -197,7 +197,7 @@ sub www_view {
     my @contribs = ();
     foreach my $row ( @{$p->getPageData} ) {
         my $assetId    = $row->{assetId};
-        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset      = WebGUI::Asset->newById( $session, $assetId );
         my $props      = $asset->get;
         $props->{url}  = $asset->getUrl;
         if (ref $asset eq "WebGUI::Asset::Post") {

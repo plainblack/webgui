@@ -312,7 +312,7 @@ sub newFromHash {
         my $session     = $asset;
         my $assetId     = shift;
         my $properties  = shift;
-        $asset          = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        $asset          = WebGUI::Asset->newById( $session, $assetId );
         $self           = $class->new( $asset );
         $self->setFromHash( $properties );
     }

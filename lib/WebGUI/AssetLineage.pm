@@ -153,7 +153,7 @@ sub cascadeLineage {
     else {
         my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage . '%']);
         while (my ($assetId, $lineage) = $descendants->array) {
-            my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+            my $asset = WebGUI::Asset->newById($self->session, $assetId);
             if (defined $asset) {
                 $asset->purgeCache;
             }
@@ -725,7 +725,7 @@ sub getParent {
     return $self if ($self->getId eq "PBasset000000000000001");
 
     unless ( $self->{_parent} ) {
-        $self->{_parent} = WebGUI::Asset->newByDynamicClass($self->session,$self->get("parentId"));
+        $self->{_parent} = WebGUI::Asset->newById($self->session,$self->get("parentId"));
     }
 
     return $self->{_parent};
@@ -1025,7 +1025,7 @@ Returns a www_manageAssets() method. Sets a new parent via the results of a form
 sub www_setParent {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $newParent = WebGUI::Asset->newByDynamicClass($self->session->form->process("assetId"));
+	my $newParent = WebGUI::Asset->newById($self->session->form->process("assetId"));
 	if (defined $newParent) {
 		my $success = $self->setParent($newParent);
 		return $self->session->privilege->insufficient() unless $success;
@@ -1076,7 +1076,7 @@ sub www_setRanks {
     $pb->start($i18n->get('Set Rank'), $session->url->extras('adminConsole/assets.gif'));
     my @assetIds    = $form->get( 'assetId' );
     ASSET: for my $assetId ( @assetIds ) {
-        my $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset  = WebGUI::Asset->newById( $session, $assetId );
         next ASSET unless $asset;
         my $rank   = $form->get( $assetId . '_rank' );
         next ASSET unless $rank; # There's no such thing as zero

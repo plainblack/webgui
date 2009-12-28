@@ -196,7 +196,7 @@ sub paste {
 	my $assetId      = shift;
     my $outputSub    = shift;
     my $session      = $self->session;
-	my $pastedAsset  = WebGUI::Asset->newByDynamicClass($session,$assetId);
+	my $pastedAsset  = WebGUI::Asset->newById($session,$assetId);
 	return 0 unless ($self->get("state") eq "published");
     return 0 unless ($pastedAsset->canPaste());  ##Allow pasted assets to have a say about pasting.
 
@@ -279,7 +279,7 @@ sub www_copyList {
     my $session = $self->session;
 	return $self->session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
 	foreach my $assetId ($session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+		my $asset = WebGUI::Asset->newById($session,$assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate({skipAutoCommitWorkflows => 1});
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
@@ -386,7 +386,7 @@ sub www_cutList {
     my $session = $self->session;
 	return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
 	foreach my $assetId ($session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+		my $asset = WebGUI::Asset->newById($session,$assetId);
 		if ($asset->canEdit && !$asset->get('isSystem')) {
 			$asset->cut;
 		}
@@ -419,7 +419,7 @@ sub www_duplicateList {
 	my $session = $self->session;
 	return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
 	foreach my $assetId ($session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+		my $asset = WebGUI::Asset->newById($session,$assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});

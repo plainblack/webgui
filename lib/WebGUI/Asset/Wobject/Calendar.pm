@@ -711,7 +711,7 @@ sub getEvent {
     
     # ? Perhaps use Stow to cache events ?
     
-    my $event = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+    my $event = WebGUI::Asset->newById($self->session, $assetId);
     
     unless ( $event ) {
         $self->session->errorHandler->warn("Event '$assetId' doesn't exist!");

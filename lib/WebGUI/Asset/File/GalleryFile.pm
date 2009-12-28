@@ -541,7 +541,7 @@ sub makeShortcut {
     croak "GalleryFile->makeShortcut: parentId must be defined"
         unless $parentId;
 
-    my $parent      = WebGUI::Asset->newByDynamicClass($session, $parentId)
+    my $parent      = WebGUI::Asset->newById($session, $parentId)
                     || croak "GalleryFile->makeShortcut: Could not instanciate asset '$parentId'";
 
     my $shortcut
@@ -1013,7 +1013,7 @@ sub www_makeShortcut {
     my $albums          = $self->getGallery->getAlbumIds;
     my %albumOptions;
     for my $assetId ( @$albums ) {
-        my $asset   = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        my $asset   = WebGUI::Asset->newById($session, $assetId);
         if ($asset->canAddFile) {
             $albumOptions{ $assetId } = $asset->get("title");
         }

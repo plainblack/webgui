@@ -132,7 +132,7 @@ sub execute {
         my $asset;
         if ( !$asset{$record->get('assetId')} ) {
             $asset = $asset{$record->get('assetId')} 
-                = WebGUI::Asset->newByDynamicClass( $self->session, $record->get('assetId') );
+                = WebGUI::Asset->newById( $self->session, $record->get('assetId') );
         }
         else {
             $asset = $asset{$record->get('assetId')};
