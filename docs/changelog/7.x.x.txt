@@ -1,4 +1,5 @@
 7.7.30
+ - fixed #11314: hover help clarity
 
 7.7.29
  - fixed #11299: Matrix - Cannot hide title

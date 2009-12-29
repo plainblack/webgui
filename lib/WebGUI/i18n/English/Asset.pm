@@ -21,8 +21,8 @@ our $I18N = {
 	},
 
 	'keywords help' => {
-		message => q|Add some keywords here for this asset. They'll automatically be added to the search index, and as the keywords metatag.|,
-		lastUpdated => 0,
+		message => q|Keywords are automatically added to the keywords metatag for this asset, and are also put into the WebGUI search index.  Multiple keywords should be separated by commas.|,
+		lastUpdated => 1262117316,
 		context => q|help for the keywords property|
 	},
 
