@@ -84,6 +84,7 @@ around url => sub {
     if (@_ > 0) {
         my $url = $_[0];
         $url    = $self->fixUrl($url);
+        unshift @_, $url;
     }
     $self->$orig(@_);
 };
@@ -213,6 +214,11 @@ property  inheritUrlFromParent  => (
             fieldType       => 'yesNo',
             defaultValue    => 0,
           );
+after inheritUrlFromParent => sub {
+    my $self = shift;
+    return unless $self->inheritUrlFromParent;
+    $self->url($self->url);
+};
 property  status => (
             noFormPost      => 1,
             fieldType       => 'text',
