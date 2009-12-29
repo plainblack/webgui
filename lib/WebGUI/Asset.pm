@@ -35,13 +35,15 @@ property  title => (
 around title => sub {
     my $orig = shift;
     my $self = shift;
-    if (@_ > 1) {
-        my $title = $_[0];
-        $title    = 'Untitled' if $title eq '';
-        $title = WebGUI::HTML::filter($title, 'all');
+    if (@_ > 0) {
+        my $title = shift;
+        $title    = WebGUI::HTML::filter($title, 'all');
+        $title    = $self->meta->get_attribute('title')->default if $title eq '';
+        unshift @_, $title;
     }
     $self->$orig(@_);
 };
+
 property  menuTitle => (
             tab             => "properties",
             label           => ['411','Asset'],
@@ -49,17 +51,25 @@ property  menuTitle => (
             uiLevel         => 1,
             fieldType       => 'text',
             defaultValue    => 'Untitled',
+            builder         => '_default_menuTitle',
+            lazy            => 1,
          );
+sub _default_menuTitle {
+    my $self = shift;
+    return $self->title;
+}
 around menuTitle => sub {
     my $orig = shift;
     my $self = shift;
-    if (@_ > 1) {
-        my $title = $_[0];
-        $title    = $self->title if $title eq '';
+    if (@_ > 0) {
+        my $title = shift;
         $title    = WebGUI::HTML::filter($title, 'all');
+        $title    = $self->title if $title eq '';
+        unshift @_, $title;
     }
     $self->$orig(@_);
 };
+
 property  url => (
             tab             => "properties",
             label           => ['104','Asset'],
@@ -71,7 +81,7 @@ property  url => (
 around url => sub {
     my $orig = shift;
     my $self = shift;
-    if (@_ > 1) {
+    if (@_ > 0) {
         my $url = $_[0];
         $url    = $self->fixUrl($url);
     }
