@@ -20,7 +20,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 16;
+plan tests => 17;
 
 my $session = WebGUI::Test->session;
 
@@ -43,6 +43,8 @@ my $session = WebGUI::Test->session;
     is $asset->title, 'Headertext', '... HTML is filtered out';
     $asset->title('<h1></h1>');
     is $asset->title, 'Untitled', '... if HTML filters out all, returns default';
+
+    is $asset->get('title'), $asset->title, '... get(title) works';
 
     is $asset->menuTitle, 'Untitled', 'menuTitle: default is untitled';
 }
