@@ -64,7 +64,7 @@ around menuTitle => sub {
     if (@_ > 0) {
         my $title = shift;
         $title    = WebGUI::HTML::filter($title, 'all');
-        $title    = $self->title if $title eq '';
+        $title    = $self->_default_menuTitle if $title eq '';
         unshift @_, $title;
     }
     $self->$orig(@_);
