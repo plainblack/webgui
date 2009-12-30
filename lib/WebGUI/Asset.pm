@@ -236,6 +236,12 @@ property  assetSize => (
           );
 has       session => (
             is              => 'ro',
+            required        => 1,
+          );
+has       assetId => (
+            is              => 'ro',
+            lazy            => 1,
+            default         => sub { shift->session->id->generate() },
           );
 
 around BUILDARGS => sub {
@@ -1054,7 +1060,7 @@ Returns the assetId of an Asset.
 
 sub getId {
 	my $self = shift;
-	return $self->get("assetId");
+	return $self->assetId;
 }
 
 #-------------------------------------------------------------------
