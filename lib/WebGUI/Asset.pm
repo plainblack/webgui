@@ -243,6 +243,16 @@ has       assetId => (
             lazy            => 1,
             default         => sub { shift->session->id->generate() },
           );
+has       [qw/parentId     lineage   className
+              creationDate createdBy
+              state stateChanged stateChangedBy
+              isLockedBy isSystem lastExportedAs/] => (
+            is              => 'rw',
+          );
+has       className  => (
+            is              => 'ro',
+            default         => sub { ref shift; },
+          );
 
 around BUILDARGS => sub {
     my $orig            = shift;
