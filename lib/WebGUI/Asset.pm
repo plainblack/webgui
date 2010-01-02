@@ -243,6 +243,11 @@ has       assetId => (
             lazy            => 1,
             default         => sub { shift->session->id->generate() },
           );
+property  revisionDate => (
+            is              => 'rw',
+            noFormPost      => 1,
+            fieldType       => 'time',
+          );
 has       [qw/parentId     lineage   className
               creationDate createdBy
               state stateChanged stateChangedBy
