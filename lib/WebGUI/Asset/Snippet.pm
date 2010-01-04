@@ -15,60 +15,87 @@ package WebGUI::Asset::Snippet;
 =cut
 
 use strict;
-use base 'WebGUI::Asset';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use HTML::Packer;
 use JavaScript::Packer;
 use CSS::Packer;
-use WebGUI::Definition::Asset (
-    properties  => [
- 			snippet=>{
-                fieldType       =>'codearea',
-				tab             =>"properties",
-				label           =>['assetName','Asset_Snippet'],
-				hoverHelp       =>['snippet description','Asset_Snippet'],
-                defaultValue    =>undef,
-            },
-            snippetPacked => {
-                fieldType       => "hidden",
-                defaultValue    => undef,
-                noFormPost      => 1,
-            },
-            usePacked => {
-                tab             => 'properties',
-                fieldType       => 'yesNo',
-                label           => ['usePacked label','Asset_Snippet'],
-                hoverHelp       => ['usePacked description','Asset_Snippet'],
-                defaultValue    => 0,
-            },
-			cacheTimeout => {
-				tab             => "display",
-				fieldType       => "interval",
-				defaultValue    => 3600,
-				uiLevel         => 8,
-				label           => ["cache timeout",'Asset_Snippet'],
-				hoverHelp       => ["cache timeout help",'Asset_Snippet'],
-			},
- 			processAsTemplate=>{
-               	fieldType       =>'yesNo',
-				label           =>['process as template','Asset_Snippet'],
-				hoverHelp       =>['process as template description','Asset_Snippet'],
-				tab             =>"properties",
-                defaultValue    =>0
-            },
-			mimeType=>{
-				tab             =>"properties",
-				hoverHelp       =>['mimeType description','Asset_Snippet'],
-				label           =>['mimeType','Asset_Snippet'],
-               	fieldType       =>'mimeType',
-                defaultValue    =>'text/html'
-            },
-        ],
-	assetName       =>['assetName','Asset_Snippet'],
-	uiLevel         => 5,
-	icon            =>'snippet.gif',
-    tableName       =>'snippet',
+
+attribute assetName  => ['assetName','Asset_Snippet'],
+attribute uiLevel    =>  5,
+attribute icon       => 'snippet.gif',
+attribute tableName  => 'snippet',
+
+property snippet => (
+    fieldType       => 'codearea',
+	tab             => "properties",
+	label           => ['assetName','Asset_Snippet'],
+	hoverHelp       => ['snippet description','Asset_Snippet'],
+    defaultValue    => undef,
+);
+around snippet => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 1) {
+        my $packed  = $_[0];
+        if ( $self->mimeType eq "text/html" ) {
+            HTML::Packer::minify( \$packed, {
+                remove_comments     => 1,
+                remove_newlines     => 1,
+                do_javascript       => "shrink",
+                do_stylesheet       => "minify",
+            } );
+        }
+        elsif ( $self->mimeType eq "text/css" ) {
+            CSS::Packer::minify( \$packed, {
+                compress            => 'minify',
+            });
+        }
+        elsif ( $self->mimeType eq 'text/javascript' ) {
+            JavaScript::Packer::minify( \$packed, {
+                compress            => "shrink",
+            });
+        }
+        $self->snippetPacked($packed);
+    }
+    $self->$orig(@_);
+};
+
+property snippetPacked => (
+    fieldType       => "hidden",
+    defaultValue    => undef,
+    noFormPost      => 1,
+);
+property usePacked => (
+    tab             => 'properties',
+    fieldType       => 'yesNo',
+    label           => ['usePacked label','Asset_Snippet'],
+    hoverHelp       => ['usePacked description','Asset_Snippet'],
+    defaultValue    => 0,
+);
+property cacheTimeout => (
+	tab             => "display",
+	fieldType       => "interval",
+	defaultValue    => 3600,
+	uiLevel         => 8,
+	label           => ["cache timeout",'Asset_Snippet'],
+	hoverHelp       => ["cache timeout help",'Asset_Snippet'],
+);
+property processAsTemplate => (
+   	fieldType       => 'yesNo',
+	label           => ['process as template','Asset_Snippet'],
+	hoverHelp       => ['process as template description','Asset_Snippet'],
+	tab             => "properties",
+    defaultValue    => 0,
+);
+property mimeType => (
+	tab             => "properties",
+	hoverHelp       => ['mimeType description','Asset_Snippet'],
+	label           => ['mimeType','Asset_Snippet'],
+   	fieldType       => 'mimeType',
+    defaultValue    => 'text/html',
 );
 
 
@@ -78,12 +105,15 @@ Package WebGUI::Asset::Snippet
 
 =head1 DESCRIPTION
 
-Provides a mechanism to publish arbitrary code snippets to WebGUI for reuse in other pages. Can be used for things like HTML segments, javascript, and cascading style sheets. You can also specify the MIME type of the snippet, allowing you to serve XML, CSS and other text files directly from the WebGUI asset system and have browsers recognize them correctly.
+Provides a mechanism to publish arbitrary code snippets to WebGUI for reuse
+in other pages. Can be used for things like HTML segments, javascript, and
+cascading style sheets. You can also specify the MIME type of the snippet,
+allowing you to serve XML, CSS and other text files directly from the WebGUI
+asset system and have browsers recognize them correctly.
 
 =head1 SYNOPSIS
 
 use WebGUI::Asset::Snippet;
-
 
 =head1 METHODS
 
@@ -204,33 +234,6 @@ If specified, sets the value, and also packs the content and inserts it into pac
 
 =cut
 
-sub snippet {
-    my ( $self, $unpacked ) = @_;
-    if (@_ > 1) {
-        my $packed  = $unpacked;
-        if ( $self->mimeType eq "text/html" ) {
-            HTML::Packer::minify( \$packed, {
-                remove_comments     => 1,
-                remove_newlines     => 1,
-                do_javascript       => "shrink",
-                do_stylesheet       => "minify",
-            } );
-        }
-        elsif ( $self->mimeType eq "text/css" ) {
-            CSS::Packer::minify( \$packed, {
-                compress            => 'minify',
-            });
-        }
-        elsif ( $self->mimeType eq 'text/javascript' ) {
-            JavaScript::Packer::minify( \$packed, {
-                compress            => "shrink",
-            });
-        }
-        $self->snippetPacked($packed);
-    }
-    return $self->next::method($unpacked);
-}
-
 #-------------------------------------------------------------------
 
 =head2 view ( $calledAsWebMethod )
@@ -257,10 +260,10 @@ sub view {
 		my $out = eval{$session->cache->get("view_".$calledAsWebMethod."_".$self->getId)};
 		return $out if $out;
 	}
-	my $output = $self->get('usePacked')
-                ? $self->get("snippetPacked")
-                : $self->get('snippet')
-                ;
+	my $output = $self->usePacked
+               ? $self->snippetPacked
+               : $self->snippet
+               ;
 	$output = $self->getToolbar.$output if ($session->var->isAdminOn && !$calledAsWebMethod);
 	if ($self->processAsTemplate) {
 		$output = WebGUI::Asset::Template->processRaw($session, $output, $self->get);
