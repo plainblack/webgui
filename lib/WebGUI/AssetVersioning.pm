@@ -131,7 +131,7 @@ sub addRevision {
 	}
 		
 	# prime the tables
-    foreach my $table ($self->getTables) {
+    foreach my $table ($self->meta->get_tables) {
         unless ($table eq "assetData") {
             $self->session->db->write( "insert into ".$table." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
         }
@@ -355,7 +355,7 @@ sub purgeRevision {
 	if ($self->getRevisionCount > 1) {
         my $db = $self->session->db;
 		$db->beginTransaction;
-       	foreach my $table ($self->getTables) {
+       	foreach my $table ($self->meta->get_tables) {
 			$db->write("delete from ".$table." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
        	}
 		my $count = $db->quickScalar("select count(*) from assetData where assetId=? and status='pending'",[$self->getId]);

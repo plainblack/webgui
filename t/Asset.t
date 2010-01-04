@@ -20,13 +20,13 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 26;
+plan tests => 29;
 
 my $session = WebGUI::Test->session;
 
 {
 
-    note "session and title";
+    note "new, session and title";
     my $asset = WebGUI::Asset->new({session => $session, });
 
     isa_ok $asset, 'WebGUI::Asset';
@@ -103,6 +103,24 @@ my $session = WebGUI::Test->session;
 }
 
 {
+    note "Property inspection";
+    my $asset = WebGUI::Asset->new({
+        session   => $session,
+    });
+
+    cmp_deeply(
+        [$asset->meta->get_all_properties],
+        array_each(
+            methods(
+                tableName => 'assetData',
+            )
+        ),
+        'all properties have the right tableName'
+    );
+
+}
+
+{
     note "getClassById";
     my $class;
     $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
@@ -113,4 +131,12 @@ my $session = WebGUI::Test->session;
     is $class, 'WebGUI::Asset::Wobject::Folder', '... retrieve another class';
     $class = WebGUI::Asset->getClassById($session, 'noIdHereBoss');
     is $class, undef, '... returns undef if the class cannot be found';
+}
+
+{
+    note "new, fetching from db";
+    my $asset;
+    $asset = WebGUI::Asset->new($session, 'PBasset000000000000001');
+    isa_ok $asset, 'WebGUI::Asset';
+    is $asset->title, 'Root', 'got the right asset';
 }

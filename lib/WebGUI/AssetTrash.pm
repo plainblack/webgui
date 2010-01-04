@@ -197,7 +197,7 @@ sub purge {
     $outputSub->($i18n->get('Clearing asset tables'));
 	$session->db->beginTransaction;
 	$session->db->write("delete from metaData_values where assetId = ?",[$self->getId]);
-	foreach my $table ($self->getTables) {
+	foreach my $table ($self->meta->get_tables) {
 		$session->db->write("delete from ".$table." where assetId=?", [$self->getId]);
 	}
 	$session->db->write("delete from asset where assetId=?", [$self->getId]);

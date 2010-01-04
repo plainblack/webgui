@@ -128,6 +128,12 @@ use WebGUI::Test;
 
     my $object2 = __PACKAGE__->new(tableName => 'notAsset');
     ::is $object2->tableName, 'asset', 'tableName ignored in constructor';
+
+    ::cmp_deeply(
+        [ __PACKAGE__->meta->get_tables ],
+        [qw/asset/],
+        'get_tables works for a simple asset'
+    );
 }
 
 {
@@ -188,6 +194,18 @@ use WebGUI::Test;
         'checking inheritance of properties by name, insertion order'
     );
 
+    ::cmp_deeply(
+        [ WGT::Class::AlsoAsset->meta->get_tables ],
+        [qw/asset/],
+        'get_tables: checking inheritance'
+    );
+
+    ::cmp_deeply(
+        [ WGT::Class::Asset::Snippet->meta->get_tables ],
+        [qw/asset snippet/],
+        'get_tables: checking inheritance on subclass'
+    );
+
 }
 
 {
@@ -212,12 +230,6 @@ use WebGUI::Test;
         [WGT::Class::Asset::NotherOne->getProperties],
         [qw/property1 property2 property3 property10/],
         'checking inheritance of properties by name, insertion order with an overridden property'
-    );
-
-    cmp_deeply(
-        [WGT::Class::Asset::NotherOne->meta->get_tables],
-        [qw/asset snippet/],
-        'get_tables returns both tables'
     );
 
 }

@@ -21,9 +21,9 @@ use JSON;
 use HTML::Packer;
 
 use WebGUI::Definition::Asset;
-attribute assetName  => 'asset',
-attribute tableName  => 'assetData',
-attribute icon       => 'assets.gif',
+attribute assetName  => 'asset';
+attribute tableName  => 'assetData';
+attribute icon       => 'assets.gif';
 property  title => (
             tab             => "properties",
             label           => ['99','Asset'],
@@ -288,7 +288,7 @@ around BUILDARGS => sub {
         my $placeHolders = [$assetId];
       
         # join all the tables
-        foreach my $table ($className->getTables) {
+        foreach my $table ($className->meta->get_tables) {
             $sql .= ",".$table;
             $where .= " and (asset.assetId=".$table.".assetId and ".$table.".revisionDate=".$revisionDate.")";
         }
