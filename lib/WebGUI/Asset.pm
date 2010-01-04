@@ -260,16 +260,16 @@ has       className  => (
           );
 
 around BUILDARGS => sub {
-    my $orig            = shift;
-    my $className       = shift;
-    return $className->$orig(@_);
+    my $orig       = shift;
+    my $className  = shift;
+
     ##Original arguments start here.
     if (ref $_[0] eq 'HASH') {
         return $className->$orig(@_);
     }
-    my $session         = shift;
-    my $assetId         = shift;
-    my $revisionDate    = shift;
+    my $session       = shift;
+    my $assetId       = shift;
+    my $revisionDate  = shift;
 
     unless (defined $assetId) {
         $session->errorHandler->error("Asset constructor new() requires an assetId.");
@@ -1268,7 +1268,7 @@ A reference to the current session.
 sub getRoot {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->new($session, "PBasset000000000000001");
+	return WebGUI::Asset->newById($session, "PBasset000000000000001");
 }
 
 
@@ -1608,9 +1608,21 @@ If specified this value will be used to set the title after it goes through some
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, assetId [, revisionDate ] )
+=head2 new ( propertyHashRef )
 
-Constructor. This does not create an asset.
+Asset Constructor.  This does not create an asset in the database, or look up
+properties in the database, but creates a WebGUI::Asset object.
+
+=head3 propertyHashRef
+
+A hash reference of properties to assign to the object.
+
+=cut
+
+=head2 new ( session, assetId [, className, revisionDate ] )
+
+Instanciator. This does not create an asset in the database, but looks up the object's
+properties in the database and returns an object with the correct WebGUI::Asset subclass.
 
 =head3 session
 
@@ -1631,7 +1643,7 @@ no revision date is available it will return undef.
 
 =head2 newById ( session, assetId [ , revisionDate ] )
 
-Instances an existing Asset, by looking up the classname of the asset specified by the assetId, and then calling new.
+Instances an existing Asset, by looking up the className of the asset specified by the assetId, and then calling new.
 Returns undef if it can't find the classname.
 
 =head3 session
@@ -1682,7 +1694,7 @@ sub newById {
         return undef;
     }
 
-    return WebGUI::Asset->new($session,$assetId,$className,$revisionDate);
+    return $className->new($session, $assetId, $revisionDate);
 }
 
 

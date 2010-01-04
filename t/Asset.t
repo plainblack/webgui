@@ -20,7 +20,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 20;
+plan tests => 22;
 
 my $session = WebGUI::Test->session;
 
@@ -79,4 +79,22 @@ my $session = WebGUI::Test->session;
         menuTitle => 'menuTitle asset',
     });
     is $asset->menuTitle, 'menuTitle asset', '... set via constructor';
+}
+
+{
+    my $asset = WebGUI::Asset->new({
+        session   => $session,
+        title     => 'testing snippet',
+        className => 'WebGUI::Asset::Snippet',
+    });
+
+    isa_ok $asset, 'WebGUI::Asset';
+
+    use WebGUI::Asset::Snippet;
+    $asset = WebGUI::Asset::Snippet->new({
+        session   => $session,
+        title     => 'testing snippet',
+    });
+
+    isa_ok $asset, 'WebGUI::Asset::Snippet';
 }
