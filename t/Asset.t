@@ -20,12 +20,13 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 22;
+plan tests => 26;
 
 my $session = WebGUI::Test->session;
 
 {
 
+    note "session and title";
     my $asset = WebGUI::Asset->new({session => $session, });
 
     isa_ok $asset, 'WebGUI::Asset';
@@ -55,6 +56,7 @@ my $session = WebGUI::Test->session;
 
 {
 
+    note "menuTitle";
     my $asset = WebGUI::Asset->new({
         session => $session,
         title   => 'asset title',
@@ -82,6 +84,7 @@ my $session = WebGUI::Test->session;
 }
 
 {
+    note "Class dispatch";
     my $asset = WebGUI::Asset->new({
         session   => $session,
         title     => 'testing snippet',
@@ -97,4 +100,17 @@ my $session = WebGUI::Test->session;
     });
 
     isa_ok $asset, 'WebGUI::Asset::Snippet';
+}
+
+{
+    note "getClassById";
+    my $class;
+    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
+    is $class, 'WebGUI::Asset', 'getClassById: retrieve a class';
+    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
+    is $class, 'WebGUI::Asset', '... cache check';
+    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000002');
+    is $class, 'WebGUI::Asset::Wobject::Folder', '... retrieve another class';
+    $class = WebGUI::Asset->getClassById($session, 'noIdHereBoss');
+    is $class, undef, '... returns undef if the class cannot be found';
 }

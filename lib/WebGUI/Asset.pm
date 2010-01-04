@@ -756,6 +756,47 @@ sub getAdminConsole {
 
 #-------------------------------------------------------------------
 
+=head2 getClassById ( $session, $assetId )
+
+Class method that looks up a className for an object in the database, using it's assetId.
+
+=head3 $session
+
+A WebGUI::Session object.
+
+=head3 $assetId
+
+The assetId of the object to lookup in the database.
+
+=cut
+
+sub getClassById {
+	my $class   = shift;
+    my $session = shift;
+    my $assetId = shift;
+    # Cache the className lookup
+    my $assetClass  = $session->stow->get("assetClass");
+    my $className   = $assetClass->{$assetId};
+
+    return $className if $className;
+
+    $className = $session->db->quickScalar(
+            "select className from asset where assetId=?",
+            [$assetId]
+    );
+    $assetClass->{ $assetId } = $className;
+    $session->stow->set("assetClass", $assetClass);
+
+    return $className if $className;
+
+    $session->errorHandler->error("Couldn't find className for asset '$assetId'");
+    return undef;
+
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getContainer ( )
 
 Returns a reference to the container asset. If this asset is a container it returns a reference to itself. If this asset is not attached to a container it returns its parent.
@@ -1661,7 +1702,7 @@ A specific revision date for the asset to retrieve. If not specified, the most r
 =cut
 
 sub newById {
-    my $class           = shift;
+    my $requestedClass  = shift;
     my $session         = shift;
     my $assetId         = shift;
     my $revisionDate    = shift;
@@ -1675,26 +1716,10 @@ sub newById {
     return undef unless ( $session && blessed $session eq 'WebGUI::Session' ) 
         && $assetId;
 
-    # Cache the className lookup
-    my $assetClass  = $session->stow->get("assetClass");
-    my $className   = $assetClass->{$assetId};
-
-    unless ($className) {
-        $className 
-            = $session->db->quickScalar(
-                "select className from asset where assetId=?",
-                [$assetId]
-            );
-        $assetClass->{ $assetId } = $className;
-        $session->stow->set("assetClass", $assetClass);
-    }
-        
-    unless ( $className ) {
-        $session->errorHandler->error("Couldn't find className for asset '$assetId'");
-        return undef;
-    }
-
-    return $className->new($session, $assetId, $revisionDate);
+    my $className = WebGUI::Asset->getClassById($session, $assetId);
+    my $class     = WebGUI::Asset->loadModule($session, $className);
+    return undef unless $class;
+    return $class->new($session, $assetId, $revisionDate);
 }
 
 
@@ -1753,20 +1778,20 @@ A specific revision to instanciate. By default we instanciate the newest publish
 =cut
 
 sub newByUrl {
-	my $class = shift;
-	my $session = shift;
-	my $url = shift || $session->url->getRequestedUrl;
+	my $class        = shift;
+	my $session      = shift;
+	my $url          = shift || $session->url->getRequestedUrl;
 	my $revisionDate = shift;
-	$url = lc($url);
+	$url =  lc($url);
 	$url =~ s/\/$//;
 	$url =~ s/^\///;
-	$url =~ s/\'//;
-	$url =~ s/\"//;
+    $url =~ tr/'"//d;
 	if ($url ne "") {
-		my ($id, $class) = $session->db->quickArray("select asset.assetId, asset.className from assetData join asset using (assetId) where assetData.url = ? limit 1", [ $url ]);
+		my ($id) = $session->db->quickArray("select assetId from assetData where url = ? limit 1", [ $url ]);
 		if ($id ne "" || $class ne "") {
-			return WebGUI::Asset->new($session,$id, $class, $revisionDate);
-		} else {
+			return WebGUI::Asset->newById($session, $id, $revisionDate);
+		}
+        else {
 			$session->errorHandler->warn("The URL $url was requested, but does not exist in your asset tree.");
 			return undef;
 		}
