@@ -140,3 +140,8 @@ my $session = WebGUI::Test->session;
     isa_ok $asset, 'WebGUI::Asset';
     is $asset->title, 'Root', 'got the right asset';
 }
+
+{
+    note "uiLevel";
+    is +WebGUI::Asset->meta->uiLevel, 1, 'uiLevel: default for assets is 1';
+}

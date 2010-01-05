@@ -134,6 +134,7 @@ use WebGUI::Test;
         [qw/asset/],
         'get_tables works for a simple asset'
     );
+
 }
 
 {

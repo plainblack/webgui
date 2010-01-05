@@ -24,6 +24,7 @@ use WebGUI::Definition::Asset;
 attribute assetName  => 'asset';
 attribute tableName  => 'assetData';
 attribute icon       => 'assets.gif';
+attribute uiLevel    => 1;
 property  title => (
             tab             => "properties",
             label           => ['99','Asset'],
@@ -2274,89 +2275,74 @@ sub toggleToolbar {
 
 #-------------------------------------------------------------------
 
-=head2 update ( properties )
+=head2 write ( )
 
-Updates the properties of an existing revision. If you want to create a new revision, please use addRevision().
-
-=head3 properties
-
-Hash reference of properties and values to set.
-
-NOTE: C<keywords> is a special property that uses the WebGUI::Keyword API
-to set the keywords for this asset.
+Stores the current properties of the asset in the database.
 
 =cut
 
-sub willWriteDataToDbSomeday {
+sub write {
 	my $self = shift;
-	my $requestedProperties = shift;
-    my $properties = clone($requestedProperties);
-	$properties->{lastModified} = time();
+    $self->lastModified(time());
 	
     # if keywords were specified, then let's set them the right way
-    if (exists $properties->{keywords}) {
-        WebGUI::Keyword->new($self->session)->setKeywordsForAsset(
-            {keywords=>$properties->{keywords}, asset=>$self});
-    }
-
-    ##If inheritUrlFromParent was sent, and it is true, then muck with the url
-    ##The URL may have been sent too, so use it or the current Asset's URL.
-    if (exists $properties->{inheritUrlFromParent} and $properties->{inheritUrlFromParent}) {
-        $properties->{'url'} = $self->url($properties->{'url'} || $self->url);
-    }
+    #if (exists $properties->{keywords}) {
+    #    WebGUI::Keyword->new($self->session)->setKeywordsForAsset(
+    #        {keywords=>$properties->{keywords}, asset=>$self});
+    #}
 
     # check the definition of all properties against what was given to us
-	my %setPairs = ();
-	my %tableFields = ();
-	foreach my $property ($self->getProperties) {
-
-        # skip a property unless it was passed in to update
-		next unless (exists $properties->{$property});
-
-        # get the property definition
-        my $propertyDefinition = $self->getProperty($property);
-
-		# get a list of the fields available in this table so we don't try to insert
-		# something for a field that doesn't exist
-        my $table = $propertyDefinition->{tableName};
-        unless (exists $tableFields{$table}) {
-		    my $sth = $self->session->db->read('DESCRIBE `'.$table.'`');
-		    while (my ($col) = $sth->array) {
-			    $tableFields{$table}{$col} = 1;
-		    }
-        }
-
-        # skip properties that aren't yet in the table
-        if (!exists $tableFields{$table}{$property}) {
-			$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$table."'");
-            next;
-        }
-
-        # use the update value
-		my $value = $properties->{$property};
-        # use the current value because the update value was undef
-        unless (defined $value) {
-            $value = $self->get($property);
-        }
-
-        # set the property
-        if ($propertyDefinition->{serialize}) {
-            $setPairs{$table}{$property} = JSON->new->canonical->encode($value);
-        }
-        else {
-            $setPairs{$table}{$property} = $value;
-        }
-		$self->{_properties}{$property} = $value;
-	}
-
-    # if there's anything to update, then do so
-    my $db = $self->session->db;
-    foreach my $table (keys %setPairs) {
-	    my @values = values %{$setPairs{$table}};
-        my @columnNames = map { $_.'=?' } keys %{$setPairs{$table}};
-	    push(@values, $self->getId, $self->get("revisionDate"));
-	    $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
-    }
+#	my %setPairs = ();
+#	my %tableFields = ();
+#	foreach my $property ($self->getProperties) {
+#
+#        # skip a property unless it was passed in to update
+#		next unless (exists $properties->{$property});
+#
+#        # get the property definition
+#        my $propertyDefinition = $self->getProperty($property);
+#
+#		# get a list of the fields available in this table so we don't try to insert
+#		# something for a field that doesn't exist
+#        my $table = $propertyDefinition->{tableName};
+#        unless (exists $tableFields{$table}) {
+#		    my $sth = $self->session->db->read('DESCRIBE `'.$table.'`');
+#		    while (my ($col) = $sth->array) {
+#			    $tableFields{$table}{$col} = 1;
+#		    }
+#        }
+#
+#        # skip properties that aren't yet in the table
+#        if (!exists $tableFields{$table}{$property}) {
+#			$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$table."'");
+#            next;
+#        }
+#
+#        # use the update value
+#		my $value = $properties->{$property};
+#        # use the current value because the update value was undef
+#        unless (defined $value) {
+#            $value = $self->get($property);
+#        }
+#
+#        # set the property
+#        if ($propertyDefinition->{serialize}) {
+#            $setPairs{$table}{$property} = JSON->new->canonical->encode($value);
+#        }
+#        else {
+#            $setPairs{$table}{$property} = $value;
+#        }
+#		$self->{_properties}{$property} = $value;
+#	}
+#
+#    # if there's anything to update, then do so
+#    my $db = $self->session->db;
+#    foreach my $table (keys %setPairs) {
+#	    my @values = values %{$setPairs{$table}};
+#        my @columnNames = map { $_.'=?' } keys %{$setPairs{$table}};
+#	    push(@values, $self->getId, $self->get("revisionDate"));
+#	    $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
+#    }
 
     # we've changed something so we need to update our size
     $self->setSize();
