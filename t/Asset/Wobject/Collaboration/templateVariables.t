@@ -24,7 +24,7 @@ use WebGUI::Session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 21;        # Increment this number for each test you create
+plan tests => 23;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Init
@@ -89,6 +89,8 @@ ok( !$posts->[0]->{'user.isVisitor'}, 'first post made by visitor');
 ok(  $posts->[0]->{'hideProfileUrl'}, 'hide profile url, and user is visitor');
 ok( !$posts->[0]->{'lastReply.user.isVisitor'}, 'lastReply not made by visitor');
 ok(  $posts->[0]->{'lastReply.hideProfileUrl'}, 'lastReply hide profile url, since user is visitor');
+is(  $posts->[0]->{'lastReply.url'}, $threads[1]->getUrl.'#id'.$threads[1]->getId, 'lastReply url has a query fragment prefixed by "id"');
+is(  $posts->[0]->{'url'}, $threads[1]->getUrl.'#id'.$threads[1]->getId, 'url has a query fragment prefixed by "id"');
 
 
 ###################################################################
