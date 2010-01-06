@@ -497,6 +497,33 @@ sub getDeleteUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getDirectLinkUrl ( )
+
+Returns the URL for this Post, which links directly to its anchor and page.
+
+=cut
+
+sub getDirectLinkUrl {
+	my $self = shift;
+    my $url;
+    my $page_size = $self->getThread->getParent->get('postsPerPage');
+    my $place     = $self->getRank+1;
+    my $page      = int($place/$page_size) + 1;
+    my $page_frag = 'pn='.$page;
+    if ($self->get("status") eq "pending") {
+        $url = $self->getUrl($page_frag.";revision=".$self->get("revisionDate"));
+    }
+    else {
+        $url = $self->getUrl($page_frag);
+    }
+    $url .= "#id".$self->getId;
+
+    return $url;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getEditUrl ( )
 
 Formats the url to edit a post.
