@@ -130,7 +130,7 @@ sub appendPostListTemplateVars {
 			if ($self->get("displayLastReply")) {
 				my $lastPost = $post->getLastPost();
 				%lastReply = (
-					"lastReply.url"                 => $lastPost->getUrl.'#id'.$lastPost->getId,
+					"lastReply.url"                 => $lastPost->getDirectLinkUrl,
                     "lastReply.title"               => $lastPost->get("title"),
                     "lastReply.user.isVisitor"      => $lastPost->get("ownerUserId") eq "1",
                     "lastReply.username"            => $lastPost->get("username"),
@@ -142,17 +142,10 @@ sub appendPostListTemplateVars {
 			}
 			$hasRead = $post->isMarkedRead;
 		}
-        my $url;
-        if ($post->get("status") eq "pending") {
-            $url = $post->getUrl("revision=".$post->get("revisionDate"))."#id".$post->getId;
-        }
-        else {
-            $url = $post->getUrl."#id".$post->getId;
-        }
 		my %postVars = (
 			%{$post->get},
             "id"                    => $post->getId,
-            "url"                   => $url,
+            "url"                   => $post->getDirectLinkUrl,
 			rating_loop             => \@rating_loop,
 			"content"               => $post->formatContent,
             "status"                => $post->getStatus,
