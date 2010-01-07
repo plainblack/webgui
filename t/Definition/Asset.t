@@ -234,3 +234,29 @@ use WebGUI::Test;
     );
 
 }
+
+{
+
+    package WGT::Class::Asset::Tertiary;
+    use WebGUI::Definition::Asset;
+    extends 'WGT::Class::AlsoAsset';
+
+    attribute tableName => 'tertius';
+    property 'defaulted' => (
+        fieldType => 'text',
+        label     => 'defaulted',
+        default   => 'a sane default',
+    );
+    property 'no_default'  => (
+        fieldType => 'text',
+        label     => 'noDefault',
+    );
+
+    package main;
+    my $object = WGT::Class::Asset::Tertiary->new;
+    is $object->defaulted(), 'a sane default', 'setup: checking default';
+    is $object->no_default(), undef, '... and one without default';
+
+    $object->defaulted(undef);
+    is $object->defaulted(), undef, 'Moose setters accept undef';
+}
