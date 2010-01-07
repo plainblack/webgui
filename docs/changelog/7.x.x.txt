@@ -2,6 +2,7 @@
  - fixed #11314: hover help clarity
  - fixed #11317: wrong error message in AssetProxy
  - fixed #11318: searching in a collaborationsystem
+ - fixed #11332: Pagination in webgui.org forum urls
 
 7.7.29
  - fixed #11299: Matrix - Cannot hide title

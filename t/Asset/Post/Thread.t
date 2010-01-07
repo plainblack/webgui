@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 2; # increment this value for each test you create
+use Test::More tests => 5; # increment this value for each test you create
 use Test::MockObject::Extends;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post::Thread;
@@ -44,6 +44,8 @@ my $thread = $collab->addChild($props, @addArgs);
 
 $versionTag->commit();
 
+my $uncommittedThread = $collab->addChild($props, @addArgs);
+
 # Test for a sane object type
 isa_ok($thread, 'WebGUI::Asset::Post::Thread');
 
@@ -60,5 +62,9 @@ $session->user({userId => 3});
 $thread->rate(1);
 $thread->trash;
 is($thread->get('threadRating'), 0, 'trash does not die, and updates the threadRating to 0');
+
+unlike $thread->getDirectLinkUrl, qr/\?pn=\d+/, 'threads do not need pagination url query fragments';
+unlike $uncommittedThread->getDirectLinkUrl, qr/\?pn=\d+/, 'uncommitted threads, too';
+like $uncommittedThread->getDirectLinkUrl, qr/\?revision=\d+/, 'uncommitted threads do have a revision query param';
 
 # vim: syntax=perl filetype=perl

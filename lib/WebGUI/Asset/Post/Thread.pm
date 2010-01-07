@@ -338,6 +338,26 @@ sub getAutoCommitWorkflowId {
 
 #-------------------------------------------------------------------
 
+=head2 getDirectLinkUrl ( )
+
+Extend the base method from Post to remove the pagination query fragment
+
+=cut
+
+sub getDirectLinkUrl {
+	my $self = shift;
+    my $url = $self->SUPER::getDirectLinkUrl();
+    $url =~ s/\?pn=\d+//;
+    if ($url =~ m{;revision=\d+}) {
+        $url =~ s/;revision/?revision/;
+    }
+
+    return $url;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getLastPost 
 
 Fetches the last post in this thread, otherwise, returns itself.
