@@ -1,4 +1,5 @@
 7.8.10
+ - fixed #11332: Pagination in webgui.org forum urls
 
 7.8.9
  - fixed #11235: wiki search
