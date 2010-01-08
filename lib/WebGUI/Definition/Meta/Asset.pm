@@ -95,25 +95,4 @@ An integer, representing how difficult the Asset will be to use.  The default ui
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 get_tables ( )
-
-Returns an array of the names of all tables in every class used by
-this Class.
-
-=cut
-
-sub get_tables {
-    my $self       = shift;
-    my @properties = ();
-    my %seen       = ();
-    push @properties, 
-        grep { ! $seen{$_}++ }
-        map  { $_->tableName }
-        $self->get_all_properties
-    ;
-    return @properties;
-}
-
 1;

@@ -124,6 +124,26 @@ sub get_property_list {
 
 #-------------------------------------------------------------------
 
+=head2 get_tables ( )
+
+Returns an array of the names of all tables in every class used by this class.
+
+=cut
+
+sub get_tables {
+    my $self       = shift;
+    my @properties = ();
+    my %seen       = ();
+    push @properties, 
+        grep { ! $seen{$_}++ }
+        map  { $_->tableName }
+        $self->get_all_class_metas
+    ;
+    return @properties;
+}
+
+#-------------------------------------------------------------------
+
 =head2 property_meta ( )
 
 Returns the name of the class for properties.
