@@ -2343,6 +2343,12 @@ sub write {
 #	    push(@values, $self->getId, $self->get("revisionDate"));
 #	    $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
 #    }
+    ##Get list of classes
+    ##Get properties for only that class
+    ##Write them to the db.
+    CLASS: foreach my $meta (reverse $self->meta->get_all_class_metas()) {
+        my $table      = $meta->tableName;
+    }
 
     # we've changed something so we need to update our size
     $self->setSize();
