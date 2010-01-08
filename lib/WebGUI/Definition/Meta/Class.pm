@@ -46,6 +46,26 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 get_all_class_metas ( )
+
+Returns an array of all class meta objects for the classes in this class,
+in the order they were created in the Definition.
+
+=cut
+
+sub get_all_class_metas {
+    my $self  = shift;
+    my @metas = ();
+    CLASS: foreach my $class_name (reverse $self->linearized_isa()) {
+        my $meta = $self->initialize($class_name);
+        next CLASS unless $meta->isa('WebGUI::Definition::Meta::Class');
+        push @metas, $meta;
+    }
+    return @metas;
+}
+
+#-------------------------------------------------------------------
+
 =head2 get_all_properties ( )
 
 Returns an array of all Properties, in all classes, in the order they were
@@ -56,9 +76,7 @@ created in the Definition.
 sub get_all_properties {
     my $self       = shift;
     my @properties = ();
-    CLASS: foreach my $className (reverse $self->linearized_isa()) {
-        my $meta = $self->initialize($className);
-        next CLASS unless $meta->isa('WebGUI::Definition::Meta::Class');
+    CLASS: foreach my $meta ($self->get_all_class_metas) {
         push @properties, 
             sort { $a->insertion_order <=> $b->insertion_order }   # In insertion order
             grep { $_->isa('WebGUI::Definition::Meta::Property') } # that are Meta::Properties
