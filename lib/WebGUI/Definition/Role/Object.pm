@@ -143,7 +143,7 @@ Returns a list of the names of all properties of the object, as set by the Defin
 
 sub getProperties {
     my $self = shift;
-    return $self->meta->get_property_list;
+    return $self->meta->get_all_property_list;
 }
 
 1;

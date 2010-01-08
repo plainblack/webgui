@@ -76,14 +76,31 @@ created in the Definition.
 sub get_all_properties {
     my $self       = shift;
     my @properties = ();
-    CLASS: foreach my $meta ($self->get_all_class_metas) {
-        push @properties, 
-            sort { $a->insertion_order <=> $b->insertion_order }   # In insertion order
-            grep { $_->isa('WebGUI::Definition::Meta::Property') } # that are Meta::Properties
-            $meta->get_attributes                                  # All attributes
-        ;
+    foreach my $meta ($self->get_all_class_metas) {
+        push @properties, $meta->get_properties;
     }
     return @properties;
+}
+
+#-------------------------------------------------------------------
+
+=head2 get_all_property_list ( )
+
+Returns an array of the names of all Properties, in all classes, in the order they were
+created in the Definition.
+
+=cut
+
+sub get_all_property_list {
+    my $self       = shift;
+    my @names = ();
+    my %seen  = ();
+    foreach my $meta ($self->get_all_class_metas) {
+        push @names,
+             grep { !$seen{$_}++ }
+             $meta->get_property_list;
+    }
+    return @names;
 }
 
 #-------------------------------------------------------------------
@@ -102,24 +119,31 @@ sub get_attributes {
 
 #-------------------------------------------------------------------
 
+=head2 get_properties ( )
+
+Returns an array of all properties, but only for this class.
+
+=cut
+
+sub get_properties {
+    my $self = shift;
+    return grep { $_->isa('WebGUI::Definition::Meta::Property') } $self->get_attributes;
+}
+
+#-------------------------------------------------------------------
+
 =head2 get_property_list ( )
 
-Returns an array of the names of all Properties, in all classes, in the
-order they were created in the Definition.  Duplicate names are filtered
-out.
+Returns an array of the names of all Properties, in this class, sorted by the order they
+were added to the Definition.  This guarantees repeatable, reliable handling of properties.
 
 =cut
 
 sub get_property_list {
-    my $self       = shift;
-    my @properties = ();
-    my %seen       = ();
-    push @properties, 
-        grep { ! $seen{$_}++ }                                 # Uniqueness check
-        map  { $_->name }                                      # Just the name
-        $self->get_all_properties
-    ;
-    return @properties;
+    my $self = shift;
+    return map  { $_->name }
+           sort { $a->insertion_order <=> $b->insertion_order }   # In insertion order
+           $self->get_properties
 }
 
 #-------------------------------------------------------------------
