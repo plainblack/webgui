@@ -2346,8 +2346,14 @@ sub write {
     ##Get list of classes
     ##Get properties for only that class
     ##Write them to the db.
+    my $db = $self->session->db;
     CLASS: foreach my $meta (reverse $self->meta->get_all_class_metas()) {
-        my $table      = $meta->tableName;
+        my $table       = $db->quote_identifier($meta->tableName);
+        my @properties  = $meta->get_property_list;
+        my @values      = map { $self->$_ } @properties;      
+        my @columnNames = map { $db->quote_identifier($_).'=?' } @properties;
+        push @values, $self->getId, $self->revisionDate;
+ 	    $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
     }
 
     # we've changed something so we need to update our size
