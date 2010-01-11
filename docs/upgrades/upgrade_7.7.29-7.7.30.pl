@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Collaboration;
 
 
 my $toVersion = '7.7.30';
@@ -31,6 +32,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+recountCsThreads($session);
 
 finish($session); # this line required
 
@@ -43,6 +45,20 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub recountCsThreads {
+    my $session = shift;
+    print "\tRecount all threads in each CS on the site.  This may take a long time... " unless $quiet;
+    # and here's our code
+    my $iterator = WebGUI::Asset::Wobject::Collaboration->getIsa($session);
+    while ( my $cs = $iterator->() ) {
+        print "\n\t\tRecounting ".$cs->getTitle." ..." unless $quiet;
+        $cs->incrementReplies($cs->get('lastPostDate'), $cs->get('lastPostId'));
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
