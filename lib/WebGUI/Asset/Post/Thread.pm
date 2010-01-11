@@ -41,7 +41,7 @@ sub addRevision {
 
 =head2 archive 
 
-Archives all posts under this thread.
+Archives all posts under this thread.  Update the thread count in the parent CS.
 
 =cut
 
@@ -50,6 +50,8 @@ sub archive {
 	foreach my $post (@{$self->getPosts}) {
 		$post->setStatusArchived;
 	}
+    my $cs = $self->getParent;
+    $cs->incrementThreads($cs->get("lastPostId"), $cs->get("lastPostDate"));
 }
 
 #-------------------------------------------------------------------

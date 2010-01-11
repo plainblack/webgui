@@ -19,9 +19,15 @@ use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Wobject::Layout;
 use Data::Dumper;
-use Test::More tests => 13; # increment this value for each test you create
+use Test::More tests => 16; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
+my @addChildCoda = (undef, undef,
+        {
+            skipAutoCommitWorkflows => 1,
+            skipNotification        => 1,
+        }
+);
 
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
@@ -62,26 +68,23 @@ my $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'hello, world!',
 };
-my $post = $collab->addChild($props,
-        undef,
-        undef,
-        {
-            skipAutoCommitWorkflows => 1,
-        });
+my $thread = $collab->addChild($props, @addChildCoda);
+my $tag1 = WebGUI::VersionTag->getWorking($session);
+$tag1->commit;
+addToCleanup($tag1);
 
 # Test for a sane object type
-isa_ok($post, 'WebGUI::Asset::Post::Thread');
+isa_ok($thread, 'WebGUI::Asset::Post::Thread');
 
 $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'jello, world!',
 };
-$post = $collab->addChild($props,
-        undef,
-        undef,
-        {
-            skipAutoCommitWorkflows => 1,
-        });
+
+my $thread2 = $collab->addChild($props, @addChildCoda);
+my $tag2 = WebGUI::VersionTag->getWorking($session);
+$tag2->commit;
+addToCleanup($tag2);
 
 my $rssitems = $collab->getRssFeedItems();
 is(scalar @{ $rssitems }, 2, 'rssitems set to number of posts added');
@@ -97,7 +100,19 @@ addToCleanup(WebGUI::VersionTag->new($session, $dupedCollab->get('tagId')));
 ok($dupedCollab->get('getMailCronId'), 'Duplicated CS has a cron job');
 isnt($dupedCollab->get('getMailCronId'), $collab->get('getMailCronId'), '... and it is different from its source asset');
 
-TODO: {
-    local $TODO = "Tests to make later";
-    ok(0, 'A whole lot more work to do here');
-}
+note "Thread and Post count tests";
+$collab = $collab->cloneFromDb;
+is $collab->get('threads'), 2, 'CS has 2 thread';
+is $collab->get('replies'), 0, '... and no replies (posts)';
+
+$thread2->archive();
+$collab = $collab->cloneFromDb;
+is $collab->get('threads'), 1, 'CS lost 1 thread due to archiving';
+
+my $thread3 = $collab->addChild($props, @addChildCoda);
+my $tag3 = WebGUI::VersionTag->getWorking($session);
+$tag3->commit;
+addToCleanup($tag3);
+$collab = $collab->cloneFromDb;
+is $collab->get('threads'), 2, '... added 1 thread';
+

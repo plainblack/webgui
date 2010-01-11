@@ -93,8 +93,8 @@ our $I18N = {
 	},
 
 	'forum.threads' => {
-		message => q|The total number of threads in this forum.|,
-		lastUpdated => 1149632734,
+		message => q|The total number of threads in this forum.  This does not include those that have been archived.|,
+		lastUpdated => 1263239637,
 	},
 
 	'forum.url' => {
