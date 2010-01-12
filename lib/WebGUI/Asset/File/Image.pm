@@ -68,12 +68,8 @@ sub applyConstraints {
     $self->SUPER::applyConstraints($options);
     my $maxImageSize = $options->{maxImageSize} || $self->get('maxImageSize') || $self->session->setting->get("maxImageSize");
     my $thumbnailSize = $options->{thumbnailSize} || $self->get('thumbnailSize') || $self->session->setting->get("thumbnailSize");
-	my $parameters = $self->get("parameters");
-    my $storage = $self->getStorageLocation;
-	unless ($parameters =~ /alt\=/) {
-		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
-	}
-    my $file = $self->get("filename");
+    my $storage    = $self->getStorageLocation;
+    my $file       = $self->get("filename");
     $storage->adjustMaxImageSize($file, $maxImageSize);
     $self->generateThumbnail($thumbnailSize);
     $self->setSize;
@@ -111,6 +107,7 @@ sub definition {
             parameters => {
                 fieldType       => 'textarea',
                 defaultValue    => 'style="border-style:none;"',
+                allowEmpty      => 1,
             },
             annotations => {
                 fieldType       => 'hidden',
