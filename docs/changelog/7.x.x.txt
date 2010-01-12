@@ -3,6 +3,7 @@
  - fixed #11341: tmpl_var forum.threads
  - fixed #11337: Parameters persist
  - fixed #11343: Notify About Low Stock workflow activity not sending out emails
+ - fixed #11345: New Image Asset template does now work well with AssetProxy macro and some layouts
 
 7.8.9
  - fixed #11235: wiki search
