@@ -5,6 +5,7 @@
  - fixed #11332: Pagination in webgui.org forum urls
  - fixed #11334: Survey missing Add Answer label
  - fixed #11341: tmpl_var forum.threads
+ - fixed #11337: Parameters persist
 
 7.7.29
  - fixed #11299: Matrix - Cannot hide title
