@@ -2,6 +2,7 @@
  - fixed #11332: Pagination in webgui.org forum urls
  - fixed #11341: tmpl_var forum.threads
  - fixed #11337: Parameters persist
+ - fixed #11343: Notify About Low Stock workflow activity not sending out emails
 
 7.8.9
  - fixed #11235: wiki search

@@ -91,14 +91,21 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my ($self, undef, $instance) = @_;
+    my $session         = $self->session;
 	my $message         = $instance->getScratch('LowStockMessage') || '';
 	my $counter         = $instance->getScratch('LowStockLast')    || 0;
 	my $belowThreshold  = $instance->getScratch('LowStockBelow')   || 0;
-    my $productIterator = WebGUI::Asset::Sku::Product->getIsa($self->session, $counter);
+    my $productIterator = WebGUI::Asset::Sku::Product->getIsa($session, $counter);
     my $warningLimit = $self->get('warningLimit');
     my $finishTime = time() + $self->getTTL;
     my $expired = 0;
-    PRODUCT: while (my $product = $productIterator->()) {
+    PRODUCT: while (1) {
+        my $product = eval { $productIterator->() };
+        if (my $e = Exception::Class->caught()) {
+            $session->log->error($@);
+            next PRODUCT;
+        }
+        last PRODUCT unless $product;
         VARIANT: foreach my $collateral ( @{ $product->getAllCollateral('variantsJSON') }) {
             if ($collateral->{quantity} <= $warningLimit) {
                 ##Build message
@@ -126,7 +133,7 @@ sub execute {
     $instance->deleteScratch('LowStockLast');
     $instance->deleteScratch('LowStockBelow');
     if ($belowThreshold) {
-        my $inbox = WebGUI::Inbox->new($self->session);
+        my $inbox = WebGUI::Inbox->new($session);
         $inbox->addMessage({
             status  => 'unread',
             subject => $self->get('subject'),
