@@ -1224,20 +1224,31 @@ sub getImportNode {
 
 =head2 getIsa ( $session, [ $offset ] )
 
-A class method to return an iterator for getting all committed Assets by class (and all sub-classes)
-as Asset objects, one at a time.  When the end of the assets is reached, then the iterator
-will close the database handle that it uses and return undef.
+A class method to return an iterator for getting all committed Assets by
+class (and all sub-classes) as Asset objects, one at a time.  When the end
+of the assets is reached, then the iterator will close the database handle
+that it uses and return undef.
+
+Assets are processed in order by revisionDate.  If the iterator cannot
+instanciate an asset, it will not return undef.  Instead, it will throw
+an exception.  This allows the error condition to be distinguished from the
+end of the set of assets.
 
 It should be used like this:
 
-my $productIterator = WebGUI::Asset::Product->getIsa($session);
-while (my $product = $productIterator->()) {
-  ##Do something useful with $product
-}
+    my $productIterator = WebGUI::Asset::Product->getIsa($session);
+    ASSET: while (1) {
+        my $product = eval { $productIterator->() };
+        if (my $e = Exception::Class->caught()) {
+            $session->log->error($@);
+            next ASSET;
+        }
+        last ASSET unless $product;
+        ##Do something useful with $product
+    }
 
-If the iterator cannot instanciate an asset, it will not return undef.  Instead, it
-will throw an exception.  This allows the error condition to be distinguished
-from the end of the set of assets.
+In upgrade scripts, the eval and exception handling are best left off, because it is a good time
+to make the user aware that they have broken assets in their database.
 
 =head3 $session
 
@@ -1274,7 +1285,7 @@ sub getIsa {
     if (! $options->{returnAll}) {
         $sql .= q{(status='approved' OR status='archived') AND };
     }
-    $sql .= q{revisionDate = (SELECT MAX(revisionDate) FROM assetData AS a WHERE a.assetId = ad.assetId) };
+    $sql .= q{revisionDate = (SELECT MAX(revisionDate) FROM assetData AS a WHERE a.assetId = ad.assetId) order by revisionDate };
     if (defined $offset) {
         $sql .= 'LIMIT '. $offset . ',1234567890 ';
     }
@@ -1287,6 +1298,7 @@ sub getIsa {
         }
         my $asset = eval { WebGUI::Asset->newPending($session, $assetId); };
         if (!$asset) {
+            warn "got an error\n";
             WebGUI::Error::ObjectNotFound->throw(id => $assetId);
         }
         return $asset;
