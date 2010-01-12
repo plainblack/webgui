@@ -6,6 +6,7 @@
  - fixed #11334: Survey missing Add Answer label
  - fixed #11341: tmpl_var forum.threads
  - fixed #11337: Parameters persist
+ - fixed #11343: Notify About Low Stock workflow activity not sending out emails
 
 7.7.29
  - fixed #11299: Matrix - Cannot hide title
