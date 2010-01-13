@@ -210,7 +210,7 @@ my $expectValues  = {
     lastName        => "Lumberg",
     status          => "Deactivated",
     timeZone        => 'America/Chicago',
-    gender          => 'other',
+    gender          => 'neuter',
     toolbar         => 'useLanguageDefault',
 };
 
