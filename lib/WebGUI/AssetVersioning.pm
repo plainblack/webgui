@@ -85,47 +85,48 @@ Posts) will know not to send them under certain conditions.
 =cut
 
 sub addRevision {
-    my $self             = shift;
-    my $properties       = shift || {};
-    my $now              = shift     || $self->session->datetime->time();
-    my $options          = shift;
+    my $self          = shift;
+    my $session       = $self->session;
+    my $properties    = shift || {};
+    my $now           = shift || $session->datetime->time();
+    my $options       = shift;
 
-    my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
+    my $autoCommitId  = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
 
     my $workingTag;
     if ( $autoCommitId ) {
         $workingTag  
-            = WebGUI::VersionTag->create( $self->session, { 
+            = WebGUI::VersionTag->create( $session, { 
                 groupToUse  => '12',            # Turn Admin On (for lack of something better)
                 workflowId  => $autoCommitId,
             } ); 
     }
     else {
-        $workingTag = WebGUI::VersionTag->getWorking($self->session);
+        $workingTag = WebGUI::VersionTag->getWorking($session);
     }
     
     #Create a dummy revision to be updated with real data later
-    $self->session->db->beginTransaction;
+    $session->db->beginTransaction;
 	
     my $sql = "insert into assetData"
             . " (assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView)"
             . " values (?, ?, ?, ?, 'pending', ?, '3','3','7')"
             ;
                   
-    $self->session->db->write($sql,[
+    $session->db->write($sql,[
         $self->getId, 
         $now, 
-        $self->session->user->userId, 
+        $session->user->userId, 
         $workingTag->getId, 
         $self->getId,
     ]);
     
 	my %defaults = ();
 	# get the default values of each property
-	foreach my $property ($self->getProperties) {
-        my $definition = $self->getProperty($property);
-		$defaults{$property} = $definition->{defaultValue};
-        if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{serialize}) {
+	foreach my $property ($self->meta->get_all_properties) {
+		$defaults{$property} = $property->form->{defaultValue};
+        #if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{serialize}) {
+        if (ref($defaults{$property}) eq 'ARRAY') {
             $defaults{$property} = $defaults{$property}->[0];
         }
 	}
@@ -133,10 +134,10 @@ sub addRevision {
 	# prime the tables
     foreach my $table ($self->meta->get_tables) {
         unless ($table eq "assetData") {
-            $self->session->db->write( "insert into ".$table." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
+            $session->db->write( "insert into ".$table." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
         }
     }
-    $self->session->db->commit;
+    $session->db->commit;
 	
 	# merge the defaults, current values, and the user set properties
 	my %mergedProperties = (%defaults, %{$self->get}, %{$properties}, (status => 'pending'));
@@ -145,7 +146,7 @@ sub addRevision {
     delete $mergedProperties{extraHeadTagsPacked};
 
     #Instantiate new revision and fill with real data
-    my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
+    my $newVersion = WebGUI::Asset->new($session, $self->getId, $self->className, $now);
     $newVersion->setSkipNotification if ($options->{skipNotification});
     $newVersion->updateHistory("created revision");
     $newVersion->setVersionLock;
