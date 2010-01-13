@@ -66,29 +66,30 @@ If this is set to 1 assets that normally autocommit their workflows (like CS Pos
 
 sub addChild {
 	my $self        = shift;
+    my $session     = $self->session;
 	my $properties  = shift;
-	my $id          = shift || $self->session->id->generate();
-	my $now         = shift || $self->session->datetime->time();
+	my $id          = shift || $session->id->generate();
+	my $now         = shift || $session->datetime->time();
 	my $options     = shift;
 
 	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
 	if (length($self->get("lineage")) >= 252) {
-		$self->session->errorHandler->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
+		$session->errorHandler->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
 		return $self->getParent->addChild($properties, $id, $now, $options);
 	}
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
-	$self->session->db->beginTransaction;
-	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (?,?,?,?,?,?,'published')",
-		[$id,$self->getId,$lineage,$now,$self->session->user->userId,$properties->{className}]);
-	$self->session->db->commit;
-	$properties->{assetId} = $id;
+	$session->db->beginTransaction;
+	$session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (?,?,?,?,?,?,'published')",
+		[$id,$self->getId,$lineage,$now,$session->user->userId,$properties->{className}]);
+	$session->db->commit;
+	$properties->{assetId}  = $id;
 	$properties->{parentId} = $self->getId;
-	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,$properties) || croak "Couldn't create a new $properties->{className} asset!";
+	my $temp = WebGUI::Asset->new($session,$properties) || croak "Couldn't create a new $properties->{className} asset!";
 	$temp->{_parent} = $self;
 	my $newAsset = $temp->addRevision($properties, $now, $options); 
 	$self->updateHistory("added child ".$id);
-	$self->session->http->setStatus(201,"Asset Creation Successful");
+	$session->http->setStatus(201,"Asset Creation Successful");
 	return $newAsset;
 }
 
