@@ -104,15 +104,15 @@ sub addRevision {
     else {
         $workingTag = WebGUI::VersionTag->getWorking($session);
     }
-    
+
     #Create a dummy revision to be updated with real data later
     $session->db->beginTransaction;
-	
+
     my $sql = "insert into assetData"
             . " (assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView)"
             . " values (?, ?, ?, ?, 'pending', ?, '3','3','7')"
             ;
-                  
+
     $session->db->write($sql,[
         $self->getId, 
         $now, 
@@ -120,17 +120,7 @@ sub addRevision {
         $workingTag->getId, 
         $self->getId,
     ]);
-    
-	my %defaults = ();
-	# get the default values of each property
-	foreach my $property ($self->meta->get_all_properties) {
-		$defaults{$property} = $property->form->{defaultValue};
-        #if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{serialize}) {
-        if (ref($defaults{$property}) eq 'ARRAY') {
-            $defaults{$property} = $defaults{$property}->[0];
-        }
-	}
-		
+
 	# prime the tables
     foreach my $table ($self->meta->get_tables) {
         unless ($table eq "assetData") {
@@ -138,10 +128,10 @@ sub addRevision {
         }
     }
     $session->db->commit;
-	
-	# merge the defaults, current values, and the user set properties
-	my %mergedProperties = (%defaults, %{$self->get}, %{$properties}, (status => 'pending'));
-    
+
+	# current values, and the user set properties
+	my %mergedProperties = (%{$self->get}, %{$properties}, (status => 'pending'));
+
     # Force the packed head block to be regenerated
     delete $mergedProperties{extraHeadTagsPacked};
 
@@ -152,7 +142,7 @@ sub addRevision {
     $newVersion->setVersionLock;
     $newVersion->update(\%mergedProperties);
     $newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
-    
+
     return $newVersion;
 }
 
@@ -401,7 +391,7 @@ sub moveAssetToVersionTag {
     $self->setVersionTag($moveToTagId);
 
     my $versionTag = $self->session->db->quickScalar("SELECT tagId FROM assetData WHERE assetId=? AND revisionDate=?",[$self->getId,$self->get('revisionDate')]);
-    
+
     # If no revisions remain, delete the version tag
     if ( $tag->getRevisionCount <= 0 ) {
         $tag->rollback;
