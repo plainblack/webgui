@@ -30,7 +30,6 @@ property  title => (
             label           => ['99','Asset'],
             hoverHelp       => ['99 description','Asset'],
             fieldType       => 'text',
-            defaultValue    => 'Untitled',
             default         => 'Untitled',
           );
 around title => sub {
@@ -51,7 +50,6 @@ property  menuTitle => (
             hoverHelp       => ['411 description','Asset'],
             uiLevel         => 1,
             fieldType       => 'text',
-            defaultValue    => 'Untitled',
             builder         => '_default_menuTitle',
             lazy            => 1,
          );
@@ -77,8 +75,13 @@ property  url => (
             hoverHelp       => ['104 description','Asset'],
             uiLevel         => 3,
             fieldType       => 'text',
-            defaultValue    =>  sub { return $_[0]->getId; },
+            lazy            => 1,
+            builder         => '_default_url',
           );
+sub _default_url {
+    return $_[0]->assetId;
+}
+
 around url => sub {
     my $orig = shift;
     my $self = shift;
@@ -95,7 +98,7 @@ property  isHidden => (
             hoverHelp       => ['886 description','Asset'],
             uiLevel         => 6,
             fieldType       => 'yesNo',
-            defaultValue    => 0,
+            default         => 0,
           );
 property  newWindow => (
             tab             => "display",
@@ -103,7 +106,7 @@ property  newWindow => (
             hoverHelp       => ['940 description','Asset'],
             uiLevel         => 9,
             fieldType       => 'yesNo',
-            defaultValue    => 0,
+            default         => 0,
           );
 property  encryptPage => (
             fieldType       => 'yesNo',
@@ -112,7 +115,7 @@ property  encryptPage => (
             label           => ['encrypt page','Asset'],
             hoverHelp       => ['encrypt page description','Asset'],
             uiLevel         => 6,
-            defaultValue    => 0,
+            default         => 0,
           );
 property  ownerUserId => (
             tab             => "security",
@@ -120,7 +123,7 @@ property  ownerUserId => (
             hoverHelp       => ['108 description','Asset'],
             uiLevel         => 6,
             fieldType       => 'user',
-            defaultValue    => '3',
+            default         => '3',
           );
 property  groupIdView  => (
             tab             => "security",
@@ -128,7 +131,7 @@ property  groupIdView  => (
             hoverHelp       => ['872 description','Asset'],
             uiLevel         => 6,
             fieldType       => 'group',
-            defaultValue    => '7',
+            default         => '7',
           );
 property  groupIdEdit => (
             tab             => "security",
@@ -137,7 +140,7 @@ property  groupIdEdit => (
             hoverHelp       => ['871 description','Asset'],
             uiLevel         => 6,
             fieldType       => 'group',
-            defaultValue    => '4',
+            default         => '4',
           );
 property  synopsis => (
             tab             => "meta",
@@ -145,7 +148,7 @@ property  synopsis => (
             hoverHelp       => ['412 description','Asset'],
             uiLevel         => 3,
             fieldType       => 'textarea',
-            defaultValue    => undef,
+            default         => undef,
           );
 property  extraHeadTags => (
             tab             => "meta",
@@ -153,7 +156,7 @@ property  extraHeadTags => (
             hoverHelp       => ['extra head tags description','Asset'],
             uiLevel         => 5,
             fieldType       => 'codearea',
-            defaultValue    => undef,
+            default         => undef,
             customDrawMethod=>  'drawExtraHeadTags',
           ); 
 after extraHeadTags => sub {
@@ -172,7 +175,7 @@ after extraHeadTags => sub {
 };
 property  extraHeadTagsPacked  => (
             fieldType       => 'hidden',
-            defaultValue    => undef,
+            default         => undef,
             noFormPost      => 1,
           );
 property  usePackedHeadTags => (
@@ -181,7 +184,7 @@ property  usePackedHeadTags => (
             hoverHelp       => ['usePackedHeadTags description','Asset'],
             uiLevel         => 7,
             fieldType       => 'yesNo',
-            defaultValue    => 0,
+            default         => 0,
           );
 property  isPackage => (
             label           => ["make package",'Asset'],
@@ -189,7 +192,7 @@ property  isPackage => (
             hoverHelp       => ['make package description','Asset'],
             uiLevel         => 7,
             fieldType       => 'yesNo',
-            defaultValue    => 0,
+            default         => 0,
           );
 property  isPrototype => (
             tab             => "meta",
@@ -197,7 +200,7 @@ property  isPrototype => (
             hoverHelp       => ['make prototype description','Asset'],
             uiLevel         => 9,
             fieldType       => 'yesNo',
-            defaultValue    => 0,
+            default         => 0,
           );
 property  isExportable => (
             tab             => 'meta',
@@ -205,7 +208,7 @@ property  isExportable => (
             hoverHelp       => ['make asset exportable description','Asset'],
             uiLevel         => 9,
             fieldType       => 'yesNo',
-            defaultValue    => 1,
+            default         => 1,
           );
 property  inheritUrlFromParent  => (
             tab             => 'meta',
@@ -213,7 +216,7 @@ property  inheritUrlFromParent  => (
             hoverHelp       => ['does asset inherit URL from parent description','Asset'],
             uiLevel         => 9,
             fieldType       => 'yesNo',
-            defaultValue    => 0,
+            default         => 0,
           );
 after inheritUrlFromParent => sub {
     my $self = shift;
@@ -223,17 +226,17 @@ after inheritUrlFromParent => sub {
 property  status => (
             noFormPost      => 1,
             fieldType       => 'text',
-            defaultValue    => 'pending',
+            default         => 'pending',
           );
 property  lastModified => (
             noFormPost      => 1,
             fieldType       => 'DateTime',
-            defaultValue    => sub { return time() },
+            default         => sub { return time() },
           );
 property  assetSize => (
             noFormPost      => 1,
             fieldType       => 'integer',
-            defaultValue    => 0,
+            default         => 0,
           );
 has       session => (
             is              => 'ro',
@@ -249,7 +252,7 @@ property  revisionDate => (
             noFormPost      => 1,
             fieldType       => 'time',
           );
-has       [qw/parentId     lineage   className
+has       [qw/parentId     lineage
               creationDate createdBy
               state stateChanged stateChangedBy
               isLockedBy isSystem lastExportedAs/] => (
