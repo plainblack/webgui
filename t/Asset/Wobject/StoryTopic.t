@@ -31,14 +31,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 18;
-plan tests => 1 + $tests;
+plan tests => 18;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 my $class  = 'WebGUI::Asset::Wobject::StoryTopic';
-my $loaded = use_ok($class);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 
@@ -72,13 +70,12 @@ STORY: foreach my $name (@characters) {
 
 $storyHandler->{bogs}->update({subtitle => 'drinking his food through a straw'});
 
-my $topic;
-
-SKIP: {
-
-    skip "Unable to load module $class", $tests unless $loaded;
-
-$topic = WebGUI::Asset->getDefault($session)->addChild({ className => 'WebGUI::Asset::Wobject::StoryTopic', title => 'Popular inmates in Shawshank Prison', keywords => join(',', @inmates)});
+my $topic = WebGUI::Asset->getDefault($session)->addChild({
+    className   => 'WebGUI::Asset::Wobject::StoryTopic',
+    title       => 'Popular inmates in Shawshank Prison',
+    keywords    => join(',', @inmates),
+    description => 'News from Shawshank',
+});
 
 isa_ok($topic, 'WebGUI::Asset::Wobject::StoryTopic', 'made a Story Topic');
 $topic->update({
@@ -87,6 +84,7 @@ $topic->update({
 });
 
 $versionTag->commit;
+addToCleanup($versionTag);
 
 ################################################################
 #
@@ -100,8 +98,9 @@ $templateVars = $topic->viewTemplateVariables();
 cmp_deeply(
     $templateVars,
     superhashof({
-        rssUrl  => $topic->getRssFeedUrl,
-        atomUrl => $topic->getAtomFeedUrl,
+        rssUrl      => $topic->getRssFeedUrl,
+        atomUrl     => $topic->getAtomFeedUrl,
+        description => 'News from Shawshank',
     }),
     'viewTemplateVars: RSS and Atom feed template variables'
 );
@@ -311,15 +310,3 @@ cmp_deeply(
     ],
     'rssFeedItems'
 );
-
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $archive->purge if $archive;
-    $topic->purge   if $topic;
-    if ($versionTag) {
-        $versionTag->rollback;
-    }
-}
