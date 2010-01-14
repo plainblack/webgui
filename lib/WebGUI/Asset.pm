@@ -159,7 +159,7 @@ property  extraHeadTags => (
             default         => undef,
             customDrawMethod=>  'drawExtraHeadTags',
           ); 
-after extraHeadTags => sub {
+around extraHeadTags => sub {
     my $self = shift;
     if (@_ > 1) {
         my $unpacked = $_[0];
@@ -218,10 +218,13 @@ property  inheritUrlFromParent  => (
             fieldType       => 'yesNo',
             default         => 0,
           );
-after inheritUrlFromParent => sub {
+around inheritUrlFromParent => sub {
+    my $orig = shift;
     my $self = shift;
-    return unless $self->inheritUrlFromParent;
-    $self->url($self->url);
+    $self->$orig(@_);
+    if (@_ > 0 && $_[0]) {
+        $self->url($self->url);
+    }
 };
 property  status => (
             noFormPost      => 1,
@@ -284,7 +287,7 @@ around BUILDARGS => sub {
         $revisionDate   = $className->getCurrentRevisionDate( $session, $assetId );
         return undef unless $revisionDate;
     }
-    
+
     my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
     unless (exists $properties->{assetId}) { # can we get it from cache?
         my $sql = "select * from asset";
@@ -2351,7 +2354,7 @@ sub write {
     ##Write them to the db.
     my $db = $self->session->db;
     CLASS: foreach my $meta (reverse $self->meta->get_all_class_metas()) {
-        my $table       = $db->quote_identifier($meta->tableName);
+        my $table       = $db->quoteIdentifier($meta->tableName);
         my @properties  = $meta->get_property_list;
         my @values      = map { $self->$_ } @properties;      
         my @columnNames = map { $db->quote_identifier($_).'=?' } @properties;
