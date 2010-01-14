@@ -20,7 +20,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 34;
+plan tests => 38;
 
 my $session = WebGUI::Test->session;
 
@@ -153,11 +153,13 @@ my $session = WebGUI::Test->session;
 }
 
 {
-    note "write";
-    my $testId = 'wg8TestAsset0000000001';
-    $session->db->write("replace into asset (assetId) VALUES (?)", [$testId]);
+    note "write, update";
+
+    my $testId       = 'wg8TestAsset0000000001';
     my $revisionDate = time();
+    $session->db->write("replace into asset (assetId) VALUES (?)", [$testId]);
     $session->db->write("replace into assetData (assetId, revisionDate) VALUES (?,?)", [$testId, $revisionDate]);
+
     my $testAsset = WebGUI::Asset->new($session, $testId, $revisionDate);
     $testAsset->title('wg8 test title');
     $testAsset->lastModified(0);
@@ -165,8 +167,22 @@ my $session = WebGUI::Test->session;
     $testAsset->write();
     isnt $testAsset->lastModified, 0, 'lastModified updated on write';
     isnt $testAsset->assetSize,    0, 'assetSize    updated on write';
+
     my $testData = $session->db->quickHashRef('select * from assetData where assetId=? and revisionDate=?',[$testId, $revisionDate]);
     is $testData->{title}, 'wg8 test title', 'data written correctly to db';
+
+    $testAsset->update({
+        isHidden    => 1,
+        encryptPage => 1,
+    });
+
+    is $testAsset->isHidden,    1, 'isHidden set via update';
+    is $testAsset->encryptPage, 1, 'encryptPage set via update';
+
+    $testData = $session->db->quickHashRef('select * from assetData where assetId=? and revisionDate=?',[$testId, $revisionDate]);
+    is $testData->{isHidden},    1, 'isHidden written correctly to db';
+    is $testData->{encryptPage}, 1, 'encryptPage written correctly to db';
+
     $session->db->write("delete from asset where assetId=?", [$testId]);
     $session->db->write("delete from assetData where assetId=?", [$testId]);
 }
