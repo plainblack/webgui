@@ -649,14 +649,15 @@ sub _processQuery {
 	$page		= 1 unless defined $page;	
 	my $nr 		= shift || 1;
         my ($query, %var, $prefix);
+	my $i18n = WebGUI::International->new($self->session,"Asset_SQLReport");
 
 	if($nr > 1) {
 		$prefix = 'query'.$nr.'.';
 	}
 
-    if (! $self->{_query}{$nr}{dbQuery}) {
+    if (! $self->{_query}{$nr}{dbQuery} || $self->{_query}{$nr}{dbQuery} =~ m{\A \s* \Z}msx) {
         $self->session->errorHandler->warn("No query specified for query $nr on '" . $self->getId . "'");
-        push @{$self->{_debug_loop}}, { 'debug.output' => "No query specfied for query $nr" };
+        push @{$self->{_debug_loop}}, { 'debug.output' => sprintf($i18n->get('No query specified for query'), $nr) };
         return \%var;
     }
 
@@ -671,7 +672,6 @@ sub _processQuery {
                 $query = $self->{_query}{$nr}{dbQuery};
         }
 
-	my $i18n = WebGUI::International->new($self->session,"Asset_SQLReport");
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get(17).$query});
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get('debug placeholder parameters').join(",",@$placeholderParams)});
         my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->{_query}{$nr}{databaseLinkId});

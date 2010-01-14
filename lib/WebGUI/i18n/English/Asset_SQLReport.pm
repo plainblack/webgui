@@ -74,6 +74,10 @@ while the second question mark will contain the form variable "field1".</p>
 		message => q|<b>Debug:</b> Query:|,
 		lastUpdated => 1031514049
 	},
+    'No query specified for query' => {
+        message => q|No query specified for query %s|,
+        lastUpdated => 1263483624,
+    },
 	'debug placeholder parameters' => {
                 message => q|<b>Debug:</b> Processed Placeholder parameters:|,
                 lastUpdated => 1031514049
