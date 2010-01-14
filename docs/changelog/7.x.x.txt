@@ -7,6 +7,7 @@
  - fixed #11344: Badge Builder doesn't allow pagination
  - fixed #11348: Typ-o in debug notice SQLReport
  - fixed #11350: Story Topic asset missing description...
+ - fixed #11351: Double submits on ITransact checkout
 
 7.8.9
  - fixed #11235: wiki search
