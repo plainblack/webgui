@@ -2116,7 +2116,7 @@ sub processTemplate {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
         $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
         my %vars = (
-            %{$self->{_properties}},
+            %{$self->get},
             'title'     => $self->getTitle,
             'menuTitle' => $self->getMenuTitle,
             %{$var},
@@ -2195,7 +2195,7 @@ sub publish {
                     $asset->purgeCache;
                 }
         }
-	$self->{_properties}{state} = "published";
+	$self->state("published");
 
     # Also publish any shortcuts to this asset that are in the trash
     my $shortcuts 
@@ -2546,7 +2546,7 @@ sub www_editSave {
         $object = $self->addChild({className=>$session->form->process("class","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
-        $object->{_properties}{url} = undef;
+        $object->url(undef);
     } 
     else {
         if ($self->canEditIfLocked) {
