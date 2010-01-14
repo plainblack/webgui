@@ -250,10 +250,8 @@ has       assetId => (
             lazy            => 1,
             default         => sub { shift->session->id->generate() },
           );
-property  revisionDate => (
+has       revisionDate => (
             is              => 'rw',
-            noFormPost      => 1,
-            fieldType       => 'time',
           );
 has       [qw/parentId     lineage
               creationDate createdBy
