@@ -154,5 +154,15 @@ my $session = WebGUI::Test->session;
 
 {
     note "write";
-    is +WebGUI::Asset->meta->uiLevel, 1, 'uiLevel: default for assets is 1';
+    my $testId = 'wg8TestAsset0000000001';
+    $session->db->write("replace into asset (assetId) VALUES (?)", [$testId]);
+    my $revisionDate = time();
+    $session->db->write("replace into assetData (assetId, revisionDate) VALUES (?,?)", [$testId, $revisionDate]);
+    my $testAsset = WebGUI::Asset->new($session, $testId, $revisionDate);
+    $testAsset->title('wg8 test title');
+    $testAsset->write();
+    my $testTitle = $session->db->quickScalar('select title from assetData where assetId=? and revisionDate=?',[$testId, $revisionDate]);
+    is $testTitle, 'wg8 test title', 'data written correctly to db';
+    $session->db->write("delete from asset where assetId=?", [$testId]);
+    $session->db->write("delete from assetData where assetId=?", [$testId]);
 }
