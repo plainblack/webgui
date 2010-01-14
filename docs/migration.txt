@@ -21,7 +21,7 @@ Definition
 ----------
 You must migrate your asset to use the new WebGUI::Definition::Asset class instead of the definition() method. This executes several orders of magnitude faster, but is different in a few ways.
 
-1) You pass your definition into use WebGUI::Definition::Asset ( def goes here );
+1) You define your definition using property and attribute calls, as well as standard Moose syntax.
 
 2) You no longer have a reference to $session, so you'll need to make sub routine refs to to method calls. However, you cannot use sub refs on any attributes or the following property elements: tableName, fieldType.
 
