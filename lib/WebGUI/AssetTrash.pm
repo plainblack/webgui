@@ -292,7 +292,7 @@ sub trash {
     $db->commit;
 
     # Update ourselves since we didn't use update()
-    $self->{_properties}{state} = "trash";
+    $self->state("trash");
     return 1;
 }
 

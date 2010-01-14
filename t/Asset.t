@@ -185,4 +185,11 @@ my $session = WebGUI::Test->session;
 
     $session->db->write("delete from asset where assetId=?", [$testId]);
     $session->db->write("delete from assetData where assetId=?", [$testId]);
+
+    $testData->{hashAccess} = 'stuffed value';
+    diag $testData->{hashAccess};
+}
+
+{
+    my $home = WebGUI::Asset->getDefault($session);
 }
