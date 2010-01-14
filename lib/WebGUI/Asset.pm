@@ -2255,9 +2255,9 @@ sub setSize {
 		$sizetest .= $self->get($key);
 	}
     my $size = length($sizetest) + $extra;
-	$self->session->db->write("update assetData set assetSize=".$size." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
+	$self->session->db->write("update assetData set assetSize=? where assetId=? and revisionDate=?",[$size, $self->getId, $self->revisionDate]);
 	$self->purgeCache;
-    $self->{_properties}{assetSize} = $size;
+    $self->assetSize($size);
 }
 	
 
@@ -2291,82 +2291,19 @@ sub write {
 	my $self = shift;
     $self->lastModified(time());
 	
-    # if keywords were specified, then let's set them the right way
-    #if (exists $properties->{keywords}) {
-    #    WebGUI::Keyword->new($self->session)->setKeywordsForAsset(
-    #        {keywords=>$properties->{keywords}, asset=>$self});
-    #}
-
-    # check the definition of all properties against what was given to us
-#	my %setPairs = ();
-#	my %tableFields = ();
-#	foreach my $property ($self->getProperties) {
-#
-#        # skip a property unless it was passed in to update
-#		next unless (exists $properties->{$property});
-#
-#        # get the property definition
-#        my $propertyDefinition = $self->getProperty($property);
-#
-#		# get a list of the fields available in this table so we don't try to insert
-#		# something for a field that doesn't exist
-#        my $table = $propertyDefinition->{tableName};
-#        unless (exists $tableFields{$table}) {
-#		    my $sth = $self->session->db->read('DESCRIBE `'.$table.'`');
-#		    while (my ($col) = $sth->array) {
-#			    $tableFields{$table}{$col} = 1;
-#		    }
-#        }
-#
-#        # skip properties that aren't yet in the table
-#        if (!exists $tableFields{$table}{$property}) {
-#			$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$table."'");
-#            next;
-#        }
-#
-#        # use the update value
-#		my $value = $properties->{$property};
-#        # use the current value because the update value was undef
-#        unless (defined $value) {
-#            $value = $self->get($property);
-#        }
-#
-#        # set the property
-#        if ($propertyDefinition->{serialize}) {
-#            $setPairs{$table}{$property} = JSON->new->canonical->encode($value);
-#        }
-#        else {
-#            $setPairs{$table}{$property} = $value;
-#        }
-#		$self->{_properties}{$property} = $value;
-#	}
-#
-#    # if there's anything to update, then do so
-#    my $db = $self->session->db;
-#    foreach my $table (keys %setPairs) {
-#	    my @values = values %{$setPairs{$table}};
-#        my @columnNames = map { $_.'=?' } keys %{$setPairs{$table}};
-#	    push(@values, $self->getId, $self->get("revisionDate"));
-#	    $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
-#    }
-    ##Get list of classes
-    ##Get properties for only that class
-    ##Write them to the db.
     my $db = $self->session->db;
     CLASS: foreach my $meta (reverse $self->meta->get_all_class_metas()) {
         my $table       = $db->quoteIdentifier($meta->tableName);
         my @properties  = $meta->get_property_list;
         my @values      = map { $self->$_ } @properties;      
-        my @columnNames = map { $db->quote_identifier($_).'=?' } @properties;
+        my @columnNames = map { $db->quoteIdentifier($_).'=?' } @properties;
         push @values, $self->getId, $self->revisionDate;
  	    $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
     }
 
-    # we've changed something so we need to update our size
+    # update the asset's size, which also purges the cache.
     $self->setSize();
 
-    # we've changed something so cache is no longer valid
-	$self->purgeCache;
 }
 
 #-------------------------------------------------------------------

@@ -20,7 +20,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 31;
+plan tests => 34;
 
 my $session = WebGUI::Test->session;
 
@@ -160,9 +160,13 @@ my $session = WebGUI::Test->session;
     $session->db->write("replace into assetData (assetId, revisionDate) VALUES (?,?)", [$testId, $revisionDate]);
     my $testAsset = WebGUI::Asset->new($session, $testId, $revisionDate);
     $testAsset->title('wg8 test title');
+    $testAsset->lastModified(0);
+    is $testAsset->assetSize, 0, 'assetSize is 0 by default';
     $testAsset->write();
-    my $testTitle = $session->db->quickScalar('select title from assetData where assetId=? and revisionDate=?',[$testId, $revisionDate]);
-    is $testTitle, 'wg8 test title', 'data written correctly to db';
+    isnt $testAsset->lastModified, 0, 'lastModified updated on write';
+    isnt $testAsset->assetSize,    0, 'assetSize    updated on write';
+    my $testData = $session->db->quickHashRef('select * from assetData where assetId=? and revisionDate=?',[$testId, $revisionDate]);
+    is $testData->{title}, 'wg8 test title', 'data written correctly to db';
     $session->db->write("delete from asset where assetId=?", [$testId]);
     $session->db->write("delete from assetData where assetId=?", [$testId]);
 }
