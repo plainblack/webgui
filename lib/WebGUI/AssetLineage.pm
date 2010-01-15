@@ -184,7 +184,7 @@ sub demote {
 		where parentId=? and state='published' and lineage>?",[$self->get('parentId'), $self->get('lineage')]);
 	if (defined $sisterLineage) {
 		$self->swapRank($sisterLineage, undef, $outputSub);
-		$self->{_properties}{lineage} = $sisterLineage;
+		$self->lineage($sisterLineage);
 		return 1;
 	}
 	return 0;
@@ -851,7 +851,7 @@ sub promote {
 		where parentId=? and state='published' and lineage<?",[$self->get("parentId"), $self->get("lineage")]);
 	if (defined $sisterLineage) {
 		$self->swapRank($sisterLineage, undef, $outputSub);
-		$self->{_properties}{lineage} = $sisterLineage;
+		$self->lineage($sisterLineage);
 		return 1;
 	}
 	return 0;
@@ -885,8 +885,8 @@ sub setParent {
     $self->cascadeLineage($lineage);
     $self->session->db->commit;
     $self->updateHistory("moved to parent ".$newParent->getId);
-    $self->{_properties}{lineage}  = $lineage;
-    $self->{_properties}{parentId} = $newParent->getId;
+    $self->lineage($lineage);
+    $self->parentId($newParent->getId);
     $self->purgeCache;
     $self->{_parent} = $newParent;
     return 1;
@@ -934,7 +934,7 @@ sub setRank {
 	}
     $outputSub->('moving %s back', $self->getTitle);
 	$self->cascadeLineage($previous,$temp);
-	$self->{_properties}{lineage} = $previous;
+	$self->lineage($previous);
 	$self->session->db->commit;
 	$self->purgeCache;
 	$self->updateHistory("changed rank");
