@@ -20,7 +20,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 38;
+plan tests => 46;
 
 my $session = WebGUI::Test->session;
 
@@ -98,6 +98,7 @@ my $session = WebGUI::Test->session;
     });
 
     isa_ok $asset, 'WebGUI::Asset';
+    is $asset->className, 'WebGUI::Asset', 'passing className is ignored';
 
     use WebGUI::Asset::Snippet;
     $asset = WebGUI::Asset::Snippet->new({
@@ -106,6 +107,7 @@ my $session = WebGUI::Test->session;
     });
 
     isa_ok $asset, 'WebGUI::Asset::Snippet';
+    is $asset->className, 'WebGUI::Asset::Snippet', 'className is set by the invoking class';
 }
 
 {
@@ -157,8 +159,8 @@ my $session = WebGUI::Test->session;
 
     my $testId       = 'wg8TestAsset0000000001';
     my $revisionDate = time();
-    $session->db->write("replace into asset (assetId) VALUES (?)", [$testId]);
-    $session->db->write("replace into assetData (assetId, revisionDate) VALUES (?,?)", [$testId, $revisionDate]);
+    $session->db->write("insert into asset (assetId) VALUES (?)", [$testId]);
+    $session->db->write("insert into assetData (assetId, revisionDate) VALUES (?,?)", [$testId, $revisionDate]);
 
     my $testAsset = WebGUI::Asset->new($session, $testId, $revisionDate);
     $testAsset->title('wg8 test title');
@@ -188,5 +190,53 @@ my $session = WebGUI::Test->session;
 }
 
 {
-    my $home = WebGUI::Asset->getDefault($session);
+    note "getParent";
+    my $testId1      = 'wg8TestAsset0000000001';
+    my $testId2      = 'wg8TestAsset0000000002';
+    my $now          = time();
+    my $baseLineage  = $session->db->quickScalar('select lineage from asset where assetId=?',['PBasset000000000000002']);
+    my $testLineage  = $baseLineage. '909090';
+    $session->db->write("insert into asset (assetId, className, lineage) VALUES (?,?,?)",       [$testId1, 'WebGUI::Asset', $testLineage]);
+    $session->db->write("insert into assetData (assetId, revisionDate, status) VALUES (?,?,?)", [$testId1, $now, 'approved']);
+    my $testLineage2 = $testLineage . '000001';
+    $session->db->write("insert into asset (assetId, className, parentId, lineage) VALUES (?,?,?,?)", [$testId2, 'WebGUI::Asset', $testId1, $testLineage2]);
+    $session->db->write("insert into assetData (assetId, revisionDate) VALUES (?,?)", [$testId2, $now]);
+
+    my $testAsset = WebGUI::Asset->new($session, $testId2, $now);
+    is $testAsset->parentId, $testId1, 'parentId assigned correctly on db fetch in new';
+    my $testParent = $testAsset->getParent();
+    isa_ok $testParent, 'WebGUI::Asset';
+
+    $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");
+    $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
+}
+
+{
+    note "addRevision";
+    my $testId1      = 'wg8TestAsset0000000001';
+    my $testId2      = 'wg8TestAsset0000000002';
+    my $now          = time();
+    my $revisionDate = $now - 50;
+    my $baseLineage  = $session->db->quickScalar('select lineage from asset where assetId=?',['PBasset000000000000002']);
+    my $testLineage  = $baseLineage. '909090';
+    $session->db->write("insert into asset (assetId, className, lineage) VALUES (?,?,?)",       [$testId1, 'WebGUI::Asset', $testLineage]);
+    $session->db->write("insert into assetData (assetId, revisionDate, status) VALUES (?,?,?)", [$testId1, $revisionDate, 'approved']);
+    my $testLineage2 = $testLineage . '000001';
+    $session->db->write("insert into asset (assetId, className, parentId, lineage) VALUES (?,?,?,?)", [$testId2, 'WebGUI::Asset', $testId1, $testLineage2]);
+    $session->db->write("insert into assetData (assetId, revisionDate) VALUES (?,?)", [$testId2, $revisionDate]);
+
+    my $testAsset = WebGUI::Asset->new($session, $testId2, $revisionDate);
+    $testAsset->title('test title 43');
+    $testAsset->write();
+    my $revAsset  = $testAsset->addRevision({}, $now);
+    isa_ok $revAsset, 'WebGUI::Asset';
+    is $revAsset->revisionDate, $now, 'revisionDate set correctly on new revision';
+    is $revAsset->title, 'test title 43', 'data fetch from database correct';
+    my $count = $session->db->quickScalar('SELECT COUNT(*) from assetData where assetId=?',[$testId2]);
+    is $count, 2, 'two records in the database';
+    my $tag = WebGUI::VersionTag->getWorking($session);
+    addToCleanup($tag);
+
+    $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");
+    $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
 }
