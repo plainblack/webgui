@@ -160,6 +160,7 @@ property  extraHeadTags => (
             customDrawMethod=>  'drawExtraHeadTags',
           ); 
 around extraHeadTags => sub {
+    my $orig = shift;
     my $self = shift;
     if (@_ > 1) {
         my $unpacked = $_[0];
@@ -172,11 +173,13 @@ around extraHeadTags => sub {
             } );
         $self->extraHeadTagsPacked($packed);
     }
+    $self->$orig(@_);
 };
 property  extraHeadTagsPacked  => (
             fieldType       => 'hidden',
             default         => undef,
             noFormPost      => 1,
+            init_args       => undef,
           );
 property  usePackedHeadTags => (
             tab             => "meta",
@@ -261,8 +264,13 @@ has       [qw/parentId     lineage
           );
 has       className  => (
             is              => 'ro',
-            default         => sub { ref shift; },
+            builder         => '_build_className',
+            init_arg        => undef,
           );
+sub _build_className {
+    my $self = shift;
+    return ref $self;
+}
 
 around BUILDARGS => sub {
     my $orig       = shift;
