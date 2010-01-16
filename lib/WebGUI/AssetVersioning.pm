@@ -108,35 +108,26 @@ sub addRevision {
     #Create a dummy revision to be updated with real data later
     $session->db->beginTransaction;
 
-    my $sql = "insert into assetData"
-            . " (assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView)"
-            . " values (?, ?, ?, ?, 'pending', ?, '3','3','7')"
-            ;
-
-    $session->db->write($sql,[
-        $self->getId, 
-        $now, 
-        $session->user->userId, 
-        $workingTag->getId, 
-        $self->getId,
-    ]);
-
 	# prime the tables
     foreach my $table ($self->meta->get_tables) {
-        unless ($table eq "assetData") {
-            $session->db->write( "insert into ".$table." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
-        }
+        $session->db->write( "insert into ".$table." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
     }
     $session->db->commit;
+
+    my $sql = "update assetData set revisedBy=?, tagId=? where assetId=? and revisionDate=?";
+
+    $session->db->write($sql,[
+        $session->user->userId, 
+        $workingTag->getId, 
+        $self->getId, 
+        $now, 
+    ]);
 
 	# current values, and the user set properties
 	my %mergedProperties = (%{$self->get}, %{$properties}, (status => 'pending'));
 
-    # Force the packed head block to be regenerated
-    delete $mergedProperties{extraHeadTagsPacked};
-
     #Instantiate new revision and fill with real data
-    my $newVersion = WebGUI::Asset->new($session, $self->getId, $self->className, $now);
+    my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);
     $newVersion->setSkipNotification if ($options->{skipNotification});
     $newVersion->updateHistory("created revision");
     $newVersion->setVersionLock;
