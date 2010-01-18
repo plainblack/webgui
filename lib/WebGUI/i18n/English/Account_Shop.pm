@@ -44,6 +44,11 @@ our $I18N = {
         lastUpdated => 1119068809,
     },
 
+    'userIsVendor' => {
+        message     => q{A boolean that is true if the current user is a vendor.},
+        lastUpdated => 1263833421,
+    },
+
     'common account variables' => {
         message     => q{Common Account, Shop Plugin, Template Variables.},
         lastUpdated => 1230867169,

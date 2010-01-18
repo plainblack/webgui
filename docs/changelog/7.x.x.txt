@@ -8,6 +8,7 @@
  - fixed #11348: Typ-o in debug notice SQLReport
  - fixed #11350: Story Topic asset missing description...
  - fixed #11351: Double submits on ITransact checkout
+ - fixed #11353: shop - sales - error
 
 7.8.9
  - fixed #11235: wiki search
