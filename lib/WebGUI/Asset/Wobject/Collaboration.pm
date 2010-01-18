@@ -932,7 +932,8 @@ sub definition {
 
 =head2 duplicate 
 
-Extend the base method to handle making a subscription group for the new CS.
+Extend the base method to handle making a subscription group for the new CS, and
+to build a new Cron job.  It also recalculates the number of threads and replies.
 
 =cut
 
@@ -949,8 +950,24 @@ sub duplicate {
             parameters=>$self->getId,
             workflowId=>"csworkflow000000000001"
     });
-    $self->update({getMailCronId=>$newCron->getId});
-	return $newAsset;
+    $newAsset->update({getMailCronId=>$newCron->getId});
+    $newAsset->incrementReplies('','');
+    return $newAsset;
+}
+
+#-------------------------------------------------------------------
+
+=head2 duplicateBranch.
+
+Extend the base method to recalculate the number of threads and replies.
+
+=cut
+
+sub duplicateBranch {
+    my $self = shift;
+    my $newAsset = $self->next::method(@_);
+    $newAsset->incrementReplies('','');
+    return $newAsset;
 }
 
 #-------------------------------------------------------------------

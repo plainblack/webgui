@@ -10,6 +10,7 @@
  - fixed #11351: Double submits on ITransact checkout
  - fixed #11353: shop - sales - error
  - fixed #11355: Duplicate template error
+ - fixed #11347: copy forum
 
 7.8.9
  - fixed #11235: wiki search
