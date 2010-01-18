@@ -18,6 +18,7 @@ our $HELP = {
         variables => [
             { name => "manage_purchases_url", },
             { name => "managePurchasesIsActive", },
+            { name => "userIsVendor", },
         ],
         related => [ ],
     },
