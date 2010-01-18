@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 43; # increment this value for each test you create
+use Test::More tests => 44; # increment this value for each test you create
 use Test::Deep;
 use JSON qw{ from_json };
 
@@ -102,6 +102,14 @@ ok(exists $session->style->{_javascript}->{$_}, "$_ in style") for qw(foo bar bo
 
 # sleep so the revisiondate isn't duplicated
 sleep 1;
+
+my $template3dup = $template3->duplicate;
+my @atts3dup = map { delete @{ $_ }{qw/attachId templateId revisionDate/}; $_; } @{ $template3dup->getAttachments };
+cmp_bag(
+    [@atts3dup],
+    [@atts],
+    'attachments are duplicated'
+);
 
 my $template3rev = $template3->addRevision();
 my $att4 = $template3rev->getAttachments('headScript');

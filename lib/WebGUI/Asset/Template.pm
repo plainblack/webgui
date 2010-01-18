@@ -189,6 +189,7 @@ sub duplicate {
 	my $self = shift;
 	my $newTemplate = $self->SUPER::duplicate;
     $newTemplate->update({isDefault => 0});
+    $newTemplate->addAttachments($self->getAttachments);
     return $newTemplate;
 }
 

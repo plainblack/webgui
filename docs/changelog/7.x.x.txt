@@ -9,6 +9,7 @@
  - fixed #11350: Story Topic asset missing description...
  - fixed #11351: Double submits on ITransact checkout
  - fixed #11353: shop - sales - error
+ - fixed #11355: Duplicate template error
 
 7.8.9
  - fixed #11235: wiki search
