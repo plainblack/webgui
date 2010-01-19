@@ -33,7 +33,7 @@ property snippet => (
 	tab             => "properties",
 	label           => ['assetName','Asset_Snippet'],
 	hoverHelp       => ['snippet description','Asset_Snippet'],
-    defaultValue    => undef,
+    default         => undef,
 );
 around snippet => sub {
     my $orig = shift;
@@ -65,7 +65,7 @@ around snippet => sub {
 
 property snippetPacked => (
     fieldType       => "hidden",
-    defaultValue    => undef,
+    default         => undef,
     noFormPost      => 1,
 );
 property usePacked => (
@@ -73,12 +73,12 @@ property usePacked => (
     fieldType       => 'yesNo',
     label           => ['usePacked label','Asset_Snippet'],
     hoverHelp       => ['usePacked description','Asset_Snippet'],
-    defaultValue    => 0,
+    default         => 0,
 );
 property cacheTimeout => (
 	tab             => "display",
 	fieldType       => "interval",
-	defaultValue    => 3600,
+	default         => 3600,
 	uiLevel         => 8,
 	label           => ["cache timeout",'Asset_Snippet'],
 	hoverHelp       => ["cache timeout help",'Asset_Snippet'],
@@ -88,14 +88,14 @@ property processAsTemplate => (
 	label           => ['process as template','Asset_Snippet'],
 	hoverHelp       => ['process as template description','Asset_Snippet'],
 	tab             => "properties",
-    defaultValue    => 0,
+    default         => 0,
 );
 property mimeType => (
 	tab             => "properties",
 	hoverHelp       => ['mimeType description','Asset_Snippet'],
 	label           => ['mimeType','Asset_Snippet'],
    	fieldType       => 'mimeType',
-    defaultValue    => 'text/html',
+    default         => 'text/html',
 );
 
 
