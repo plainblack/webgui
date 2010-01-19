@@ -73,15 +73,15 @@ sub addChild {
 	my $options     = shift;
 
 	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
-	if (length($self->get("lineage")) >= 252) {
+	if (length($self->lineage) >= 252) {
 		$session->errorHandler->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
 		return $self->getParent->addChild($properties, $id, $now, $options);
 	}
-	my $lineage = $self->get("lineage").$self->getNextChildRank;
+	my $lineage = $self->lineage.$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	$session->db->beginTransaction;
 	$session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (?,?,?,?,?,?,'published')",
-		[$id,$self->getId,$lineage,$now,$session->user->userId,$properties->{className}]);
+		[$id, $self->getId, $lineage, $now, $session->user->userId, $properties->{className}]);
 	$session->db->commit;
 	$properties->{assetId}  = $id;
 	$properties->{parentId} = $self->getId;
@@ -874,10 +874,10 @@ sub setParent {
 	my $self = shift;
 	my $newParent = shift;
 	return 0 unless (defined $newParent); # can't move it if a parent object doesn't exist
-	return 0 if ($newParent->getId eq $self->get("parentId")); # don't move it to where it already is
+	return 0 if ($newParent->getId eq $self->parentId); # don't move it to where it already is
 	return 0 if ($newParent->getId eq $self->getId); # don't move it to itself
-    my $oldLineage = $self->get("lineage");
-    my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
+    my $oldLineage = $self->lineage;
+    my $lineage    = $newParent->lineage.$newParent->getNextChildRank; 
     return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
     $self->session->db->beginTransaction;
     $self->session->db->write("update asset set parentId=? where assetId=?",
@@ -921,7 +921,7 @@ sub setRank {
 	my $siblings = $self->getLineage(["siblings"],{returnObjects=>1, invertTree=>$reverse});
 
 	my $temp = substr($self->session->id->generate(),0,6);
-	my $previous = $self->get("lineage");
+	my $previous = $self->lineage;
 	$self->session->db->beginTransaction;
     $outputSub->('moving %s aside', $self->getTitle);
 	$self->cascadeLineage($temp);
@@ -929,7 +929,7 @@ sub setRank {
 		if (isBetween($sibling->getRank, $newRank, $currentRank)) {
             $outputSub->('moving %s', $sibling->getTitle);
 			$sibling->cascadeLineage($previous);
-			$previous = $sibling->get("lineage");
+			$previous = $sibling->lineage;
 		}
 	}
     $outputSub->('moving %s back', $self->getTitle);
@@ -957,7 +957,7 @@ no in the objects.
 sub swapRank {
 	my $self      = shift;
 	my $second    = shift;
-	my $first     = shift || $self->get("lineage");
+	my $first     = shift || $self->lineage;
     my $outputSub = shift || sub {};
 	my $temp = substr($self->session->id->generate(),0,6); # need a temp in order to do the swap
 	$self->session->db->beginTransaction;

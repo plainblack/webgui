@@ -200,7 +200,7 @@ Indexing the content of the snippet. See WebGUI::Asset::indexContent() for addit
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("snippet"));
+	$indexer->addKeywords($self->snippet);
 	$indexer->setIsPublic(0);
 }
 
@@ -254,8 +254,8 @@ sub view {
     my $versionTag = WebGUI::VersionTag->getWorking($session, 1);
     my $noCache =
         $session->var->isAdminOn
-        || $self->get("cacheTimeout") <= 10
-        || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+        || $self->cacheTimeout <= 10
+        || ($versionTag && $versionTag->getId eq $self->tagId);
     unless ($noCache) {
 		my $out = eval{$session->cache->get("view_".$calledAsWebMethod."_".$self->getId)};
 		return $out if $out;
@@ -270,7 +270,7 @@ sub view {
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-		eval{$session->cache->set("view_".$calledAsWebMethod."_".$self->getId, $output, $self->get("cacheTimeout"))};
+		eval{$session->cache->set("view_".$calledAsWebMethod."_".$self->getId, $output, $self->cacheTimeout)};
 	}
     return $output;
 }

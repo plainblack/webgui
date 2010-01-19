@@ -23,55 +23,50 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::SQL;
 use WebGUI::Utility;
-use WebGUI::Definition::Asset (
-    properties  => [
-	    description=>{
-		    fieldType       =>'HTMLArea',
-		    defaultValue    =>undef,
-		    tab             =>"properties",
-		    label           =>[85,'Asset_Wobject'],
-		    hoverHelp       =>['85 description','Asset_Wobject'],
-	    },
-	    displayTitle=>{
-		    fieldType       =>'yesNo',
-		    defaultValue    =>1,
-		    tab             =>"display",
-		    label           =>[174,'Asset_Wobject'],
-		    hoverHelp       =>['174 description','Asset_Wobject'],
-		    uiLevel         =>5
-	    },
-	    styleTemplateId=>{
-    		fieldType       =>'template',
-    		defaultValue    =>'PBtmpl0000000000000060',
-    		tab             =>"display",
-    		label           =>[1073,'Asset_Wobject'],
-    		hoverHelp       =>['1073 description','Asset_Wobject'],
-    		namespace       =>'style'
-    	},
-    	printableStyleTemplateId=>{
-    		fieldType       =>'template',
-    		defaultValue    =>'PBtmpl0000000000000060',
-    		tab             =>"display",
-    		label           =>[1079,'Asset_Wobject'],
-    		hoverHelp       =>['1079 description','Asset_Wobject'],
-    		namespace       =>'style'
-    	},
-        mobileStyleTemplateId => {
+use WebGUI::Definition::Asset;
+extends WebGUI::Asset;
+attribute tableName   => 'wobject',
+attribute assetName   => 'Wobject',
+property description => (
+            fieldType       => 'HTMLArea',
+            defaultValue    => undef,
+            tab             => "properties",
+            label           => [85,'Asset_Wobject'],
+            hoverHelp       => ['85 description','Asset_Wobject'],
+         );
+property displayTitle => (
+            fieldType       => 'yesNo',
+            defaultValue    => 1,
+            tab             => "display",
+            label           => [174,'Asset_Wobject'],
+            hoverHelp       => ['174 description','Asset_Wobject'],
+            uiLevel         => 5
+         );
+property styleTemplateId => (
             fieldType       => 'template',
-            noFormPost      => sub { return !$_[0]->session->setting->get('useMobileStyle'); },
             defaultValue    => 'PBtmpl0000000000000060',
-            tab             => 'display',
-            label           => ['mobileStyleTemplateId label','Asset_Wobject'],
-            hoverHelp       => ['mobileStyleTemplateId description','Asset_Wobject'],
-            namespace       => 'style',
-        },
-    ],
-	tableName   =>'wobject',
-    assetName   => 'Wobject',
-);
-
-
-our @ISA = qw(WebGUI::Asset);
+            tab             => "display",
+            label           => [1073,'Asset_Wobject'],
+            hoverHelp       => ['1073 description','Asset_Wobject'],
+            namespace       => 'style'
+         );
+property printableStyleTemplateId => (
+            fieldType       => 'template',
+            defaultValue    => 'PBtmpl0000000000000060',
+            tab             => "display",
+            label           => [1079,'Asset_Wobject'],
+            hoverHelp       => ['1079 description','Asset_Wobject'],
+            namespace       => 'style'
+         );
+property mobileStyleTemplateId => (
+            fieldType       =>  'template',
+            noFormPost      =>  sub { return !$_[0]->session->setting->get('useMobileStyle'); },
+            defaultValue    =>  'PBtmpl0000000000000060',
+            tab             =>  'display',
+            label           =>  ['mobileStyleTemplateId label','Asset_Wobject'],
+            hoverHelp       =>  ['mobileStyleTemplateId description','Asset_Wobject'],
+            namespace       =>  'style',
+         );
 
 =head1 NAME
 
