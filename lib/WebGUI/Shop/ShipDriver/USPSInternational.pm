@@ -80,7 +80,7 @@ sub buildXML {
         }
         $value = sprintf '%.2f', $value;
         my $destination = $package->[0]->getShippingAddress;
-        my $country     = $destination->get('country');
+        my $country     = $self->correctCountry($destination->get('country'));
         $packageData{ID}         = $packageIndex;
         $packageData{Pounds}     = [ $pounds   ];
         $packageData{Ounces}     = [ $ounces   ];
@@ -224,6 +224,40 @@ sub _calculateFromXML {
         }
     }
     return $cost;
+}
+
+#-------------------------------------------------------------------
+
+=head2 correctCountry ( $country )
+
+Correct country names to be compliant with USPS International's ICL.
+
+=cut
+
+sub correctCountry {
+    my $self    = shift;
+    my $country = shift;
+    return $country eq q{United Kingdom}                         ? q{United Kingdom (Great Britain)} 
+         : $country eq q{Congo, the Democratic Republic of the}  ? q{Congo, Democratic Republic of the} 
+         : $country eq q{Cocos (Keeling) Islands}                ? q{Cocos Island (Australia)} 
+         : $country eq q{Congo}                                  ? q{Congo, Republic of the} 
+         : $country eq q{Christmas Island}                       ? q{Christmas Island (Australia)} 
+         : $country eq q{Georgia}                                ? q{Georgia, Republic of} 
+         : $country eq q{Heard and Mc Donald Islands}            ? q{Australia} 
+         : $country eq q{Korea (South)}                          ? q{South Korea} 
+         : $country eq q{Korea, Republic of}                     ? q{Democratic People's Republic of Korea} 
+         : $country eq q{Lao People's Democratic Republic}       ? q{Laos} 
+         : $country eq q{Macedonia}                              ? q{Macedonia, Republic of} 
+         : $country eq q{Moldova, Republic of}                   ? q{Moldova} 
+         : $country eq q{Pitcairn}                               ? q{Pitcairn Island} 
+         : $country eq q{Russian Federation}                     ? q{Russia} 
+         : $country eq q{Slovakia}                               ? q{Slovak Republic} 
+         : $country eq q{Tokelau}                                ? q{Tokelau (Union) Group (Western Samoa)} 
+         : $country eq q{Trinidad}                               ? q{Trinidad and Tobago} 
+         : $country eq q{Vatican City State (Holy See)}          ? q{Vatican City} 
+         : $country eq q{Viet Nam}                               ? q{Vietnam} 
+         : $country eq q{Virgin Islands (U.S.)}                  ? q{Virgin Islands U.S.} 
+         : $country;
 }
 
 #-------------------------------------------------------------------
