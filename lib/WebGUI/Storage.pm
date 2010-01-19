@@ -1247,14 +1247,15 @@ sub getThumbnailUrl {
 	my $self = shift;
 	my $filename = shift;
 	if (! defined $filename) {
-		$self->session->errorHandler->error("Can't make a thumbnail url without a filename.");
+		$self->session->errorHandler->error("Can't find a thumbnail url without a filename.");
 		return '';
 	}
-    if (! isIn($filename, @{ $self->getFiles() })) {
-        $self->session->errorHandler->error("Can't make a thumbnail for a file named '$filename' that is not in my storage location.");
+    my $thumbname = 'thumb-' . $filename;
+    if (! -e $self->getPath($thumbname)) {
+        $self->session->errorHandler->error("Can't find a thumbnail for a file named '$filename' that is not in my storage location.");
         return '';
     }
-	return $self->getUrl("thumb-".$filename);
+	return $self->getUrl($thumbname);
 }
 
 #-------------------------------------------------------------------
