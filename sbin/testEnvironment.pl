@@ -125,7 +125,7 @@ checkModule("Class::C3",                    "0.21"       );
 checkModule("Params::Validate",             "0.91"       );
 checkModule("Clone",                        "0.31"       );
 checkModule('HTML::Packer',                 "0.4"        );
-checkModule('JavaScript::Packer',           '0.02'       );
+checkModule('JavaScript::Packer',           '0.04'       );
 checkModule('CSS::Packer',                  '0.2'        );
 checkModule('Business::Tax::VAT::Validation', '0.20'     );
 checkModule('Crypt::SSLeay',                '0.57'       );

@@ -12,6 +12,7 @@
  - fixed #11355: Duplicate template error
  - fixed #11347: copy forum
  - fixed #11359: USPS International shipping does not work on United Kingdom
+ - fixed #11034: Upgrade errors -- 7.6.35 to 7.7.17
 
 7.8.9
  - fixed #11235: wiki search
