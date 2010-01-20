@@ -44,18 +44,24 @@ property templateId => (
         );
 property thankYouMessage => (
             tab             => "properties",
-            default         => $i18n->get("default thank you message"),
+            default         => '_default_thankYouMessage',
             fieldType       => "HTMLArea",
             label           => ["thank you message", 'Asset_Product'],
             hoverHelp       => ["thank you message help", 'Asset_Product'],
+            lazy            => 1,
         );
+sub _default_thankYouMessage {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Product');
+    return $i18n->get("default thank you message");
+}
 property image1 => (
             tab            => "properties",
             fieldType      => "image",
             default        => undef,
             maxAttachments => 1,
             label          => ['7', 'Asset_Product'],
-            deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image1;filename="),
+            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image1;filename="),
             persist        =>  1,
         );
 property image2 => (
@@ -63,7 +69,7 @@ property image2 => (
             fieldType      => "image",
             maxAttachments => 1,
             label          => ['8', 'Asset_Product'],
-            deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image2;filename="),
+            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image2;filename="),
             default        => undef,
             persist        => 1,
         );
@@ -72,7 +78,7 @@ property image3 => (
             fieldType      => "image",
             maxAttachments => 1,
             label          => ['9', 'Asset_Product'],
-            deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image3;filename="),
+            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image3;filename="),
             default        => undef,
             persist        => 1,
         );
@@ -81,7 +87,7 @@ property brochure => (
             fieldType      => "file",
             maxAttachments => 1,
             label          => ['13', 'Asset_Product'],
-            deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=brochure;filename="),
+            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=brochure;filename="),
             default        => undef,
             persist        => 1,
         );
@@ -90,7 +96,7 @@ property manual => (
             fieldType      => "file",
             maxAttachments => 1,
             label          => ['14', 'Asset_Product'],
-            deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=manual;filename="),
+            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=manual;filename="),
             default        => undef,
             persist        => 1,
         );
@@ -106,7 +112,7 @@ property warranty => (
             fieldType      => "file",
             maxAttachments => 1,
             label          => ['15', 'Asset_Product'],
-            deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=warranty;filename="),
+            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=warranty;filename="),
             default        => undef,
             persist        => 1,
         );
