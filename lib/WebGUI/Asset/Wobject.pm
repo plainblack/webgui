@@ -24,7 +24,7 @@ use WebGUI::Macro;
 use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Definition::Asset;
-extends WebGUI::Asset;
+extends 'WebGUI::Asset';
 attribute tableName   => 'wobject',
 attribute assetName   => 'Wobject',
 property description => (
