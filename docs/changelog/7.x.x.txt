@@ -1,4 +1,5 @@
 7.8.11
+ - fixed #11362: Unable to checkout with ITransact plugin
 
 7.8.10
  - fixed #11332: Pagination in webgui.org forum urls
