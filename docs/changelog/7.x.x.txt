@@ -8,6 +8,7 @@
  - fixed #11359: USPS International shipping does not work on United Kingdom
  - fixed #11034: Upgrade errors -- 7.6.35 to 7.7.17
  - fixed #11346: Slow rendering of Thread asset with a lot of attachments
+ - fixed #11362: Unable to checkout with ITransact plugin
 
 7.7.30
  - fixed #11314: hover help clarity
