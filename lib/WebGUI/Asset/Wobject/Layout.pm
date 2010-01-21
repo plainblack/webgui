@@ -16,10 +16,45 @@ package WebGUI::Asset::Wobject::Layout;
 
 use strict;
 use WebGUI::AdSpace;
-use WebGUI::Asset::Wobject;
-use WebGUI::Utility;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+attribute assetName => ["assetName", 'Asset_Layout'];
+attribute icon      => 'layout.gif';
+attribute tableName => 'Layout';
+
+property templateId => (
+             fieldType    => "template",
+             namespace    => "Layout",
+             default      => 'PBtmpl0000000000000054',
+             label        => ['layout template title', 'Asset_Layout'],
+             hoverHelp    => ['template description', 'Asset_Layout'],
+         );
+property mobileTemplateId => (
+             #fieldType    => ( $session->style->useMobileStyle ? 'template' : 'hidden' ),
+             fieldType    => 'template',
+             namespace    => 'Layout',
+             default      => 'PBtmpl0000000000000054',
+             noFormPost   => 1,
+         );
+property contentPositions => (
+             noFormPost   => 1,
+             default      => undef,
+             fieldType    => "hidden",
+             noFormPost   => 1,
+         );
+property assetsToHide => (
+             default      => undef,
+             fieldType    => "checkList",
+             noFormPost   => 1,
+         );
+property assetOrder => (
+             default      => 'asc',
+             fieldType    => 'selectBox',
+             noFormPost   => 1,
+         );
+
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -61,34 +96,7 @@ sub definition {
     my $i18n = WebGUI::International->new($session,"Asset_Layout");
     
     push(@{$definition}, {
-        assetName=>$i18n->get("assetName"),
-        icon=>'layout.gif',
-        tableName=>'Layout',
-        className=>'WebGUI::Asset::Wobject::Layout',
         properties=>{
-            templateId =>{
-                fieldType    =>"template",
-                namespace    => "Layout",
-                defaultValue =>'PBtmpl0000000000000054',
-            },
-            mobileTemplateId => {
-                fieldType    => ( $session->style->useMobileStyle ? 'template' : 'hidden' ),
-                namespace    => 'Layout',
-                defaultValue => 'PBtmpl0000000000000054',
-            },
-            contentPositions => {
-                noFormPost   =>1,
-                defaultValue =>undef,
-                fieldType    =>"hidden"
-            },
-            assetsToHide => {
-                defaultValue =>undef,
-                fieldType    =>"checkList"
-            },
-            assetOrder => {
-                defaultValue =>'asc',
-                fieldType    =>'selectBox',
-            }
         }
     });
     return $class->SUPER::definition($session, $definition);
