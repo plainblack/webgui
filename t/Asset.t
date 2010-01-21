@@ -268,3 +268,9 @@ my $session = WebGUI::Test->session;
     my $asset = WebGUI::Asset->getDefault($session);
     $asset->isa('WebGUI::Asset::Wobject::Layout');
 }
+
+{
+    note "calling new with no assetId";
+    my $asset = WebGUI::Asset->new($session, '');
+    is $asset, undef, 'new returns undef without an assetId';
+}
