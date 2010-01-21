@@ -111,9 +111,12 @@ my $message = $messages->[0];
 
 my $body = $message->get('message');
 is($message->get('subject'), 'Threshold=15', 'Message has the right subject');
-my @urls = split /\n/, $body;
+my @table = split /\n/, $body;
+my @urls = @table[2..$#table];
+pop @urls;
 is (scalar @urls, 1, 'Only one variant is below the threshold');
 my $url = pop @urls;
+$url =~ s/^.+?href="([^"]+)".+$/$1/;
 my $uri = URI->new($url);
 is($uri->path,  $posters->getUrl, 'Link in message has correct URL path');
 is($uri->query, 'func=editVariant;vid='.$marilynVarId, 'Link in message has function and variant id');
