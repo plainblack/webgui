@@ -15,10 +15,53 @@ package WebGUI::Asset::Wobject::Folder;
 =cut
 
 use strict;
-use WebGUI::Asset::Wobject;
-use WebGUI::Utility;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+attribute assetName   => ["assetName", 'Asset_Folder'];
+attribute uiLevel     => 5;
+attribute icon        => 'folder.gif';
+attribute tableName   => 'Folder';
+
+property visitorCacheTimeout => (
+             tab             => "display",
+             fieldType       => "interval",
+             default         => 3600,
+             uiLevel         => 8,
+             label           => ["visitor cache timeout",      'Asset_Folder'],
+             hoverHelp       => ["visitor cache timeout help", 'Asset_Folder'],
+         );
+         # TODO: This should probably be a proper "sortBy" with multiple possible fields
+property sortAlphabetically => (
+             fieldType       => "yesNo",
+             default         => 0,
+             tab             => 'display',
+             label           => ['sort alphabetically',      'Asset_Folder'],
+             hoverHelp       => ['sort alphabetically help', 'Asset_Folder'],
+         );
+
+#    my %optionsSortOrder = (
+#        ASC     => $i18n->get( "editForm sortOrder ascending" ),
+#        DESC    => $i18n->get( "editForm sortOrder descending" ),
+#    );
+property sortOrder => (
+             tab             => 'display',
+             fieldType       => "selectBox",
+             #options         => \%optionsSortOrder,
+             default         => "ASC",
+             label           => [ "editForm sortOrder label" ,       'Asset_Folder'],
+             hoverHelp       => [ "editForm sortOrder description" , 'Asset_Folder'],
+         );
+property templateId => (
+             fieldType       => "template",
+             default         => 'PBtmpl0000000000000078',
+             namespace       => 'Folder',
+             tab             => 'display',
+             label           => ['folder template title',       'Asset_Folder'],
+             hoverHelp       => ['folder template description', 'Asset_Folder'],
+         );
+
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -40,75 +83,6 @@ These methods are available from this class:
 =cut
 
 
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-	my $session     = shift;
-    my $definition  = shift;
-	my $i18n        = WebGUI::International->new($session,"Asset_Folder");
-
-    my %optionsSortOrder = (
-        ASC     => $i18n->get( "editForm sortOrder ascending" ),
-        DESC    => $i18n->get( "editForm sortOrder descending" ),
-    );
-
-    push @{ $definition }, {
-		assetName   => $i18n->get("assetName"),
-		uiLevel     => 5,
-		icon        => 'folder.gif',
-        tableName   => 'Folder',
-        className   => 'WebGUI::Asset::Wobject::Folder',
-		autoGenerateForms => 1,
-        properties  => {
-			visitorCacheTimeout => {
-				tab             => "display",
-				fieldType       => "interval",
-				defaultValue    => 3600,
-				uiLevel         => 8,
-				label           => $i18n->get("visitor cache timeout"),
-				hoverHelp       => $i18n->get("visitor cache timeout help"),
-            },
-            # TODO: This should probably be a proper "sortBy" with multiple possible fields
-			sortAlphabetically => {
-				fieldType       => "yesNo",
-				defaultValue    => 0,
-				tab             => 'display',
-				label           => $i18n->get('sort alphabetically'),
-                hoverHelp       => $i18n->get('sort alphabetically help'),
-            },
-            sortOrder => {
-                tab             => 'display',
-                fieldType       => "selectBox",
-                options         => \%optionsSortOrder,
-                defaultValue    => "ASC",
-                label           => $i18n->get( "editForm sortOrder label" ),
-                hoverHelp       => $i18n->get( "editForm sortOrder description" ),
-            },
-			templateId => {
-				fieldType       => "template",
-				defaultValue    => 'PBtmpl0000000000000078',
-                namespace       => 'Folder',
-				tab             => 'display',
-				label           => $i18n->get('folder template title'),
-				hoverHelp       => $i18n->get('folder template description'),
-            },
-        },
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
 
 #-------------------------------------------------------------------
 
