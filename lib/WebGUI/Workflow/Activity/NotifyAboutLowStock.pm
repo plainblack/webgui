@@ -92,7 +92,11 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my ($self, undef, $instance) = @_;
     my $session         = $self->session;
-	my $message         = $instance->getScratch('LowStockMessage') || '';
+    my $messageHeader   =<<EOHEAD;
+<table>
+<tr><th>Quantity</th><th>Product</th></tr>
+EOHEAD
+	my $message         = $instance->getScratch('LowStockMessage') || $messageHeader;
 	my $counter         = $instance->getScratch('LowStockLast')    || 0;
 	my $belowThreshold  = $instance->getScratch('LowStockBelow')   || 0;
     my $productIterator = WebGUI::Asset::Sku::Product->getIsa($session, $counter);
@@ -110,8 +114,10 @@ sub execute {
             if ($collateral->{quantity} <= $warningLimit) {
                 ##Build message
                 $belowThreshold = 1;
-                $message .= $product->getUrl(sprintf 'func=editVariant;vid=%s', $collateral->{variantId})
-                         .  "\n";
+                $message .= sprintf qq{<tr><td>%d</td><td><a href="%s">%s</a></td></tr>\n},
+                    $collateral->{quantity},
+                    $session->url->getSiteURL.$session->url->gateway($product->getUrl(sprintf 'func=editVariant;vid=%s', $collateral->{variantId})),
+                    $collateral->{shortdesc};
             }
         }
         $counter++;
@@ -133,6 +139,7 @@ sub execute {
     $instance->deleteScratch('LowStockLast');
     $instance->deleteScratch('LowStockBelow');
     if ($belowThreshold) {
+        $message .= '</table>';
         my $inbox = WebGUI::Inbox->new($session);
         $inbox->addMessage({
             status  => 'unread',
