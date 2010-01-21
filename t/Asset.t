@@ -262,3 +262,9 @@ my $session = WebGUI::Test->session;
         'get_tables works on inherited classes'
     );
 }
+
+{
+    note "getDefault";
+    my $asset = WebGUI::Asset->getDefault($session);
+    $asset->isa('WebGUI::Asset::Wobject::Layout');
+}
