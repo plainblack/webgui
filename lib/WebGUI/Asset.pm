@@ -1740,8 +1740,10 @@ sub newById {
 
 =head2 newByPropertyHashRef ( session,  properties )
 
-Constructor.  This creates a standalone asset with no parent.  It does not persist that object
-to the database.
+Constructor.  This is a class method.  It creates a standalone asset with no parent, with a
+varying class, determined by the className entry in the properties hash ref.
+
+The object created is not persisted to the database.
 
 =head3 session
 
@@ -1751,10 +1753,6 @@ A reference to the current session.
 
 A hash reference of Asset properties.
 
-=head4 className
-
-If className is not passed, the class used to call this method will be used in its place.
-
 =cut
 
 sub newByPropertyHashRef {
@@ -1762,9 +1760,10 @@ sub newByPropertyHashRef {
     my $session    = shift;
     my $properties = shift || {};
     $properties->{className} //= $class;
+    $properties->{session}     = $session;
     my $className = $class->loadModule($session, $properties->{className});
     return undef unless (defined $className);
-    my $object = $className->new($session, $properties);
+    my $object = $className->new($properties);
     return $object;
 }
 

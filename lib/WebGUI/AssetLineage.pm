@@ -85,7 +85,7 @@ sub addChild {
 	$session->db->commit;
 	$properties->{assetId}  = $id;
 	$properties->{parentId} = $self->getId;
-	my $temp = WebGUI::Asset->new($session,$properties) || croak "Couldn't create a new $properties->{className} asset!";
+	my $temp = WebGUI::Asset->newByPropertyHashRef($session, $properties) || croak "Couldn't create a new $properties->{className} asset!";
 	my $newAsset = $temp->addRevision($properties, $now, $options); 
 	$self->updateHistory("added child ".$id);
 	$session->http->setStatus(201,"Asset Creation Successful");

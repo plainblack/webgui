@@ -20,7 +20,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 46;
+plan tests => 49;
 
 my $session = WebGUI::Test->session;
 
@@ -139,6 +139,17 @@ my $session = WebGUI::Test->session;
     is $class, 'WebGUI::Asset::Wobject::Folder', '... retrieve another class';
     $class = WebGUI::Asset->getClassById($session, 'noIdHereBoss');
     is $class, undef, '... returns undef if the class cannot be found';
+}
+
+{
+    note "newByPropertyHashRef";
+    my $asset;
+    $asset = WebGUI::Asset->newByPropertyHashRef($session, {className => 'WebGUI::Asset::Snippet', title => 'The Shawshank Snippet'});
+    isa_ok $asset, 'WebGUI::Asset::Snippet';
+    is $asset->title, 'The Shawshank Snippet', 'title is assigned from the property hash';
+
+    my $a2 = WebGUI::Asset::Snippet->newByPropertyHashRef($session, {});
+    isa_ok $asset, 'WebGUI::Asset::Snippet';
 }
 
 {
