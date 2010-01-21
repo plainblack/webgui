@@ -167,7 +167,7 @@ is(ref $defaultAsset, 'WebGUI::Asset::Wobject::Layout','default constructor');
 my $assetId = "PBnav00000000000000001"; # one of the default nav assets
 
 # - explicit class
-my $asset = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Navigation');
+my $asset = WebGUI::Asset->newById($session, $assetId);
 is (ref $asset, 'WebGUI::Asset::Wobject::Navigation','new constructor explicit - ref check');
 is ($asset->getId, $assetId, 'new constructor explicit - returns correct asset');
 
@@ -190,7 +190,7 @@ is ($asset->getId, $assetId, 'new constructor implicit - returns correct asset')
 my $deadAsset = 1;
 
 # -- no asset id
-$deadAsset = WebGUI::Asset->new($session, '', 'WebGUI::Asset::Wobject::Navigation');
+$deadAsset = WebGUI::Asset->new($session, '');
 is ($deadAsset, undef,'new constructor with no assetId returns undef');
 
 # -- no class
