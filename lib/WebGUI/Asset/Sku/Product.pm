@@ -118,37 +118,37 @@ property warranty => (
         );
 property variantsJSON => (
             ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
+            noFormPost   => 0,
             default      => '[]',
             fieldType    => "textarea",
         );
 property accessoryJSON => (
             ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
+            noFormPost   => 0,
             default      => '[]',
             fieldType    => "textarea",
         );
 property relatedJSON => (
             ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
+            noFormPost   => 0,
             default      => '[]',
             fieldType    => "textarea",
         );
 property specificationJSON => (
             ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
+            noFormPost   => 0,
             default      => '[]',
             fieldType    => "textarea",
         );
 property featureJSON => (
             ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
+            noFormPost   => 0,
             default      => '[]',
             fieldType    => "textarea",
         );
 property benefitJSON => (
             ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
+            noFormPost   => 0,
             default      => '[]',
             fieldType    => "textarea",
         );
@@ -550,20 +550,6 @@ sub getWeight {
     my $self = shift;
     return $self->getOptions->{weight};
 }
-
-#-------------------------------------------------------------------
-
-=head2 isShippingRequired
-
-Overriding the method from Sku so that the user can configure it.
-
-=cut
-
-sub isShippingRequired {
-    my $self = shift;
-    return $self->get('isShippingRequired');
-}
-
 
 #-------------------------------------------------------------------
 
