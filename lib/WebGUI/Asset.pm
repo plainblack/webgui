@@ -1298,7 +1298,6 @@ sub getIsa {
         }
         my $asset = eval { WebGUI::Asset->newPending($session, $assetId); };
         if (!$asset) {
-            warn "got an error\n";
             WebGUI::Error::ObjectNotFound->throw(id => $assetId);
         }
         return $asset;
