@@ -284,7 +284,7 @@ around BUILDARGS => sub {
     my $assetId       = shift;
     my $revisionDate  = shift;
 
-    unless (defined $assetId) {
+    unless ($assetId) {
         $session->errorHandler->error("Asset constructor new() requires an assetId.");
         return undef;
     }
