@@ -308,11 +308,11 @@ sub getAssets {
 	if ($options->{onlyPending}) {
 		$pending = " and assetData.status='pending' ";
 	}
-	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? ".$pending." order by ".$sort." ".$direction, [$self->getId]);
-	while (my ($id,$class,$version) = $sth->array) {
-		my $asset = WebGUI::Asset->new($self->session,$id,$class,$version);
+	my $sth = $self->session->db->read("select asset.assetId,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? ".$pending." order by ".$sort." ".$direction, [$self->getId]);
+	while (my ($id,$version) = $sth->array) {
+		my $asset = WebGUI::Asset->newById($self->session,$id,$version);
                 unless (defined $asset) {
-                        $self->session->errorHandler->error("Asset $id $class $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
+                        $self->session->errorHandler->error("Asset $id $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
                         next;
                 }
                 push(@assets, $asset);
