@@ -20,7 +20,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-plan tests => 49;
+plan tests => 50;
 
 my $session = WebGUI::Test->session;
 
@@ -250,4 +250,15 @@ my $session = WebGUI::Test->session;
 
     $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");
     $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
+}
+
+{
+    note "get_tables, with inheritance";
+    use WebGUI::Asset::Snippet;
+    my @tables = WebGUI::Asset::Snippet->meta->get_tables;
+    cmp_deeply(
+        \@tables,
+        [qw/assetData snippet/],
+        'get_tables works on inherited classes'
+    );
 }

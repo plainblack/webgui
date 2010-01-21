@@ -11,9 +11,62 @@ package WebGUI::Asset::Shortcut;
 #-------------------------------------------------------------------
 
 use strict;
-use Carp;
+use Carp qw/croak/;
 use Tie::IxHash;
-use WebGUI::Asset;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+attribute assetName => ['assetName', 'Asset_Shortcut'];
+attribute icon      => 'shortcut.gif';
+attribute tableName => 'Shortcut';
+
+property  shortcutToAssetId => (
+              noFormPost => 1,
+              fieldType  => "hidden",
+              default    => undef,
+              noFormPost => 1,
+          );
+property  shortcutByCriteria => (
+              fieldType  => "yesNo",
+              default    => 0,
+              noFormPost => 1,
+          );
+property  disableContentLock => (
+              fieldType  => "yesNo",
+              default    => 0,
+              noFormPost => 1,
+          );
+property  resolveMultiples => (
+              fieldType  => "selectBox",
+              default    => "mostRecent",
+              noFormPost => 1,
+          );
+property  shortcutCriteria => (
+              fieldType  => "textarea",
+              default    => "",
+              noFormPost => 1,
+          );
+property  templateId => (
+              fieldType  => "template",
+              default    => "PBtmpl0000000000000140",
+              noFormPost => 1,
+          );
+property  prefFieldsToShow => (
+              fieldType  => "checkList",
+              default    => undef,
+              noFormPost => 1,
+          );
+property  prefFieldsToImport => (
+              fieldType  => "checkList",
+              default    => undef,
+              noFormPost => 1,
+          );
+property  showReloadIcon => (
+              fieldType  => "yesNo",
+              default    => 1,
+              noFormPost => 1,
+          );
+
 use WebGUI::International;
 use WebGUI::Operation::Profile;
 use WebGUI::ProfileField;
@@ -21,8 +74,6 @@ use WebGUI::ProfileCategory;
 use WebGUI::Macro;
 use HTML::Entities qw(encode_entities);
 use Data::Dumper;
-
-our @ISA = qw(WebGUI::Asset);
 
 #-------------------------------------------------------------------
 sub _drawQueryBuilder {
@@ -174,48 +225,7 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Shortcut");
 	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'shortcut.gif',
-		tableName=>'Shortcut',
-		className=>'WebGUI::Asset::Shortcut',
 		properties=>{
-			shortcutToAssetId=>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-			},
-			shortcutByCriteria=>{
-				fieldType=>"yesNo",
-				defaultValue=>0,
-			},
-			disableContentLock=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-			},
-			resolveMultiples=>{
-				fieldType=>"selectBox",
-				defaultValue=>"mostRecent",
-			},
-			shortcutCriteria=>{
-				fieldType=>"textarea",
-				defaultValue=>"",
-			},
-			templateId=>{
-				fieldType=>"template",
-				defaultValue=>"PBtmpl0000000000000140"
-			},
-			prefFieldsToShow=>{
-				fieldType=>"checkList",
-				defaultValue=>undef
-			},
-			prefFieldsToImport=>{
-				fieldType=>"checkList",
-				defaultValue=>undef
-			},
-			showReloadIcon=>{
-				fieldType=>"yesNo",
-				defaultValue=>1
-			}
 		}
 	});
 	return $class->SUPER::definition($session,$definition);
@@ -836,7 +846,7 @@ sub setOverride {
     my $self        = shift;
     my $override    = shift;
 
-    croak "Shortcut->setOverride - first argument must be hash reference" 
+    Carp::croak "Shortcut->setOverride - first argument must be hash reference" 
         unless $override && ref $override eq "HASH";
     
     for my $key ( %$override ) {
@@ -1271,11 +1281,11 @@ sub getShortcutsForAssetId {
     my $assetId     = shift;
     my $properties  = shift || {};
     
-    croak "First argument to getShortcutsForAssetId must be WebGUI::Session"
+    Carp::croak "First argument to getShortcutsForAssetId must be WebGUI::Session"
         unless $session && $session->isa("WebGUI::Session");
-    croak "Second argument to getShortcutsForAssetId must be assetId"
+    Carp::croak "Second argument to getShortcutsForAssetId must be assetId"
         unless $assetId;
-    croak "Third argument to getShortcutsForAssetId must be hash reference"
+    Carp::croak "Third argument to getShortcutsForAssetId must be hash reference"
         if $properties && !ref $properties eq "HASH";
 
     my $db      = $session->db;
