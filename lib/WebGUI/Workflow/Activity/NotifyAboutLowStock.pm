@@ -117,7 +117,7 @@ EOHEAD
                 $message .= sprintf qq{<tr><td>%d</td><td><a href="%s">%s</a></td></tr>\n},
                     $collateral->{quantity},
                     $session->url->getSiteURL.$session->url->gateway($product->getUrl(sprintf 'func=editVariant;vid=%s', $collateral->{variantId})),
-                    $collateral->{shortdesc};
+                    $collateral->{varSku};
             }
         }
         $counter++;
