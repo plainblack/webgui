@@ -12,82 +12,78 @@ package WebGUI::Asset::Wobject::Navigation;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::Asset::Wobject;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+attribute assetName => ["assetName", 'Asset_Navigation'];
+attribute icon      => 'navigation.gif';
+attribute tableName => 'Navigation';
 
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Navigation");
-	push(@{$definition}, {
-		assetName=>$i18n->get("assetName"),
-		icon=>'navigation.gif',
-		tableName=>'Navigation',
-		className=>'WebGUI::Asset::Wobject::Navigation',
-		properties=>{
-            templateId => {
-                label        => $i18n->get(1096),
+property    templateId => (
+                label        => ['1096', 'Asset_Navigation'],
+                hoverHelp    => ['1096 description', 'Asset_Navigation'],
                 fieldType    => "template",
-                defaultValue => 'PBtmpl0000000000000048'
-            },
-            mimeType => {
-                label        => $i18n->get('mimeType'),
+                default      => 'PBtmpl0000000000000048',
+            );
+property    mimeType => (
+                label        => ['mimeType', 'Asset_Navigation'],
+                hoverHelp    => ['mimeType description', 'Asset_Navigation'],
                 fieldType    => "mimeType",
-                defaultValue => 'text/html'
-            },
-            assetsToInclude => {
-                fieldType    =>'checkList',
-                defaultValue =>"descendants"
-            },
-			startType => {
-				fieldType=>'selectBox',
-				defaultValue=>"relativeToCurrentUrl"
-				},
-			startPoint=>{
-				fieldType=>'text',
-				defaultValue=>0
-				},
-			ancestorEndPoint=>{
-				fieldType=>'selectBox',
-				defaultValue=>55
-				},
-			descendantEndPoint=>{
-				fieldType=>'selectBox',
-				defaultValue=>55
-				},
-			showSystemPages => {
-                label        => $i18n->get(30),
-				fieldType    => 'yesNo',
-				defaultValue => 0,
-            },
-			showHiddenPages => {
-                label        => $i18n->get(31),
-				fieldType    => 'yesNo',
-				defaultValue => 0,
-            },
-			showUnprivilegedPages => {
-                label        => $i18n->get(32),
-				fieldType    => 'yesNo',
-				defaultValue => 0,
-            },
-			reversePageLoop => {
-                label        => $i18n->get('reverse page loop'),
-				fieldType    => 'yesNo',
-				defaultValue => 0,
-            },
-			}
-		});
-        return $class->SUPER::definition($session, $definition);
-}
+                default      => 'text/html',
+            );
+property    assetsToInclude => (
+                fieldType    => 'checkList',
+                default      => "descendants",
+                label        => ["Relatives To Include", 'Asset_Navigation'],
+                hoverHelp    => ["Relatives To Include description", 'Asset_Navigation'],
+            );
+property    startType => (
+                fieldType    => 'selectBox',
+                default      => "relativeToCurrentUrl",
+                label        => ["Start Point Type", 'Asset_Navigation'],
+                hoverHelp    => ["Start Point Type description", 'Asset_Navigation'],
+            );
+property    startPoint => (
+                fieldType   => 'text',
+                default     => 0,
+                label       => ["Start Point", 'Asset_Navigation'],
+                hoverHelp   => ["Start Point description", 'Asset_Navigation'],
+            );
+property    ancestorEndPoint => (
+                noFormPost  => 1,
+                fieldType   => 'selectBox',
+                default     => 55,
+            );
+property    descendantEndPoint => (
+                noFormPost  => 1,
+                fieldType   => 'selectBox',
+                default     => 55,
+            );
+property    showSystemPages => (
+                label        => [30, 'Asset_Navigation'],
+                fieldType    => 'yesNo',
+                default      => 0,
+            );
+property    showHiddenPages => (
+                label        => [31, 'Asset_Navigation'],
+                fieldType    => 'yesNo',
+                default      => 0,
+            );
+property    showUnprivilegedPages => (
+                label        => [32, 'Asset_Navigation'],
+                fieldType    => 'yesNo',
+                default      => 0,
+            );
+property    reversePageLoop => (
+                label        => ['reverse page loop', 'Asset_Navigation'],
+                fieldType    => 'yesNo',
+                default      => 0,
+            );
 
 #-------------------------------------------------------------------
 
