@@ -66,7 +66,7 @@ sub buildXML {
             my $itemWeight = $sku->getWeight();
             ##Items that ship separately with a quantity > 1 are rate estimated as 1 item and then the
             ##shipping cost is multiplied by the quantity.
-            if (! $sku->shipsSeparately ) {
+            if (! $sku->isShippingSeparately ) {
                 $itemWeight *= $item->get('quantity');
             }
             $weight += $itemWeight;
@@ -193,7 +193,7 @@ sub _calculateFromXML {
             WebGUI::Error::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
         }
         my $unit = $shippableUnits[$id];
-        if ($unit->[0]->getSku->shipsSeparately) {
+        if ($unit->[0]->getSku->isShippingSeparately) {
             ##This is a single item due to ships separately.  Since in reality there will be
             ## N things being shipped, multiply the rate by the quantity.
             $cost += $rate * $unit->[0]->get('quantity');
@@ -339,7 +339,7 @@ sub _getShippableUnits {
     ITEM: foreach my $item (@{$cart->getItems}) {
         my $sku = $item->getSku;
         next ITEM unless $sku->isShippingRequired;
-        if ($sku->shipsSeparately) {
+        if ($sku->isShippingSeparately) {
             push @shippableUnits, [ $item ];
         }
         else {

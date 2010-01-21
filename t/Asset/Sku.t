@@ -30,16 +30,18 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 21;        # Increment this number for each test you create
+plan tests => 22;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
 my $root = WebGUI::Asset->getRoot($session);
+warn "Make sku\n";
 my $sku = $root->addChild({
         className=>"WebGUI::Asset::Sku",
         title=>"Test Sku",
         });
 isa_ok($sku, "WebGUI::Asset::Sku");
+addToCleanup($sku);
 
 $sku->addToCart;
 
@@ -64,13 +66,14 @@ is($sku->isRecurring, 0, "skus are not recurring by default");
 is($sku->isShippingRequired, 0, "skus are not shippable by default");
 is($sku->getConfiguredTitle, $sku->getTitle, "configured title and title should be the same by default");
 is($sku->shipsSeparately, 0, 'shipsSeparately return 0 by default');
+is($sku->isShippingSeparately, 0, 'isShippingSeparately return 0 by default');
 
-$sku->update({shipsSeparately => 1,});
-is($sku->shipsSeparately, 0, 'shipsSeparately only returns true when isShippingRequired AND shipsSeparately');
+$sku->shipsSeparately(1);
+is($sku->isShippingSeparately, 0, 'isShippingSeparately only returns true when isShippingRequired AND shipsSeparately');
 
 {
     local *WebGUI::Asset::Sku::isShippingRequired = sub { return 1};
-    is($sku->shipsSeparately, 1, 'shipsSeparately only returns true when isShippingRequired AND shipsSeparately');
+    is($sku->isShippingSeparately, 1, 'isShippingSeparately only returns true when isShippingRequired AND shipsSeparately');
 }
 
 ok(! $sku->isShippingRequired, 'Making sure that GLOB is no longer in effect');
@@ -82,13 +85,3 @@ $item->cart->delete;
 
 my $loadSku = WebGUI::Asset::Sku->newBySku($session, $sku->get("sku"));
 is($loadSku->getId, $sku->getId, "newBySku() works.");
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-$sku->purge;
-
-}
-
-1;

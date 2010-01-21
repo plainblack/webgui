@@ -634,7 +634,7 @@ sub setTaxConfiguration {
 
 #-------------------------------------------------------------------
 
-=head2 shipsSeparately
+=head2 isShippingSeparately
 
 Returns a boolean indicating whether this item must be shipped separately from other items.
 If the shipsSeparately property is true, but isShippingRequired is false, this will return
@@ -642,7 +642,7 @@ false.
 
 =cut
 
-sub shipsSeparately {
+sub isShippingSeparately {
     my ($self) = @_;
     return $self->isShippingRequired && $self->shipsSeparately;
 }
