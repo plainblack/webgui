@@ -777,6 +777,9 @@ sub getAdminConsole {
 
 Class method that looks up a className for an object in the database, using it's assetId.
 
+If a class cannot be found for the requested assetId, then it throws a WebGUI::Error::InvalidParam
+exception.
+
 =head3 $session
 
 A WebGUI::Session object.
@@ -1608,6 +1611,10 @@ Loads an asset module if it's not already in memory. This is a class method. Ret
 undef on failure to load, otherwise returns the classname.  Will only load classes
 in the WebGUI::Asset namespace.
 
+Throws a WebGUI::Invalid::Param error if a non-WebGUI::Asset class is requested to be
+loaded.  If there are compilation problems, it will throw a WebGUI::Error::Compile
+exception.
+
 =cut
 
 sub loadModule {
@@ -1712,7 +1719,9 @@ A reference to the current session.
 
 =head3 assetId
 
-Must be a valid assetId
+Must be a valid assetId.
+
+Throws a WebGUI::Error::InvalidParam exception if the assetId is not passed.
 
 =head3 revisionDate
 
@@ -1823,7 +1832,9 @@ A reference to the current session.
 
 =head3 assetId
 
-The asset's id
+The asset's id.  If an assetId is not passed, throws a WebGUI::Error::InvalidParam exception.  If
+a revision cannot be found for the requested assetId, then it throws a WebGUI::Error::InvalidParam
+exception.
 
 =cut
 
