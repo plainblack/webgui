@@ -118,7 +118,7 @@ note "getClassById";
     cmp_deeply(
         $e,
         methods(
-            error => "Couldn't lookup classname",
+            error => "Couldn't lookup className",
             param => 'RoysNonExistantAssetId',
         ),
         '... checking error message',
@@ -519,13 +519,14 @@ isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Ass
 # getIsa
 #
 ################################################################
+note "getIsa";
 my $node = WebGUI::Asset->getRoot($session);
 my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
 my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
 my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
 
 my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
-isa_ok($getAProduct, 'CODE', 'getIsa returns a sub ref');
+isa_ok($getAProduct, 'CODE');
 my $counter = 0;
 my $productIds = [];
 while( my $product = $getAProduct->()) {

@@ -804,7 +804,7 @@ sub getClassById {
 
     return $className if $className;
 
-    WebGUI::Error::InvalidParam->throw(error => "Couldn't lookup classname", param => $assetId);
+    WebGUI::Error::InvalidParam->throw(error => "Couldn't lookup className", param => $assetId);
 
 }
 
@@ -1829,16 +1829,15 @@ sub newPending {
     my $class   = shift;
     my $session = shift;
     my $assetId = shift;
-    Carp::croak "First parameter to newPending needs to be a WebGUI::Session object"
-        unless $session && $session->isa('WebGUI::Session');
-    Carp::croak "Second parameter to newPending needs to be an assetId"
-        unless $assetId;
-    my ($className, $revisionDate) = $session->db->quickArray("SELECT asset.className, assetData.revisionDate FROM asset INNER JOIN assetData ON asset.assetId = assetData.assetId WHERE asset.assetId = ? ORDER BY assetData.revisionDate DESC LIMIT 1", [ $assetId ]);
-    if ($className ne "" || $revisionDate ne "") {
-        return WebGUI::Asset->new($session, $assetId, $className, $revisionDate);
+    if (!$assetId) {
+        WebGUI::Error::InvalidParam->throw(error => 'newPending must get an assetId');
+    }
+    my $revisionDate = $session->db->quickScalar("SELECT revisionDate FROM assetData WHERE assetId = ? ORDER BY revisionDate DESC LIMIT 1", [ $assetId ]);
+    if ($revisionDate ne "") {
+        return WebGUI::Asset->newById($session, $assetId, $revisionDate);
     }
     else {
-        Carp::croak "Invalid asset id '$assetId' requested!";
+        WebGUI::Error::InvalidParam->throw(error => "Couldn't lookup revisionDate", param => $assetId);
     }
 }
 
