@@ -1259,7 +1259,7 @@ Returns the human readable name of the asset.
 
 sub getName {
 	my $self = shift;
-    return WebGUI::International->new($self->session, 'Asset')->get($self->getAttribute('assetName'));
+    return WebGUI::International->new($self->session, 'Asset')->get(@{ $self->assetName });
 }
 
 

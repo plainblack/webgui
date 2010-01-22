@@ -35,128 +35,8 @@ my $session = WebGUI::Test->session;
 
 my @getTitleTests = getTitleTests($session);
 
-my $rootAsset = WebGUI::Asset->getRoot($session);
-
-##Test users.
-##All users in here will be deleted at the end of the test.  DO NOT PUT
-##Visitor or Admin in here!
-my %testUsers = ();
-##Just a regular user
-$testUsers{'regular user'} = WebGUI::User->new($session, 'new');
-$testUsers{'regular user'}->username('regular user');
-##Users in group 12 can add Assets
-$testUsers{'canAdd turnOnAdmin'} = WebGUI::User->new($session, 'new');
-$testUsers{'canAdd turnOnAdmin'}->addToGroups(['12']);
-$testUsers{'canAdd turnOnAdmin'}->username('Turn On Admin user');
-
-##Just a user for owning assets
-$testUsers{'owner'} = WebGUI::User->new($session, 'new');
-$testUsers{'owner'}->username('Asset Owner');
-
-##Test Groups
-##All groups in here will be deleted at the end of the test
-my %testGroups = ();
-##A group and user for groupIdEdit
-$testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
-$testUsers{'canEdit group user'} = WebGUI::User->new($session, 'new');
-$testUsers{'canEdit group user'}->addToGroups([$testGroups{'canEdit asset'}->getId]);
-$testUsers{'canEdit group user'}->username('Edit Group User');
-WebGUI::Test->groupsToDelete($testGroups{'canEdit asset'});
-
-##A group and user for groupIdEdit
-$testGroups{'canAdd asset'}     = WebGUI::Group->new($session, 'new');
-$testUsers{'canAdd group user'} = WebGUI::User->new($session, 'new');
-$testUsers{'canAdd group user'}->addToGroups([$testGroups{'canAdd asset'}->getId]);
-$testUsers{'canEdit group user'}->username('Can Add Group User');
-WebGUI::Test->groupsToDelete($testGroups{'canAdd asset'});
-WebGUI::Test->usersToDelete(values %testUsers);
-
-my $canAddMaker = WebGUI::Test::Maker::Permission->new();
-$canAddMaker->prepare({
-    'className' => 'WebGUI::Asset',
-    'session'   => $session,
-    'method'    => 'canAdd',
-    #'pass'      => [3, $testUsers{'canAdd turnOnAdmin'}, $testUsers{'canAdd group user'} ],
-    'pass'      => [3, $testUsers{'canAdd group user'} ],
-    'fail'      => [1, $testUsers{'regular user'},                                       ],
-});
-
-my $canAddMaker2 = WebGUI::Test::Maker::Permission->new();
-$canAddMaker2->prepare({
-    'className' => 'WebGUI::Asset',
-    'session'   => $session,
-    'method'    => 'canAdd',
-    'fail'      => [$testUsers{'canAdd turnOnAdmin'},],
-});
-
-my $properties;
-$properties = {
-	#            '1234567890123456789012'
-	id          => 'canEditAsset0000000010',
-	title       => 'canEdit Asset Test',
-	url         => 'canEditAsset1',
-	className   => 'WebGUI::Asset',
-    ownerUserId => $testUsers{'owner'}->userId,
-    groupIdEdit => $testGroups{'canEdit asset'}->getId,
-    groupIdView => 7,
-};
-
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag2);
-
-my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
-
-$versionTag2->commit;
-$properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
-
-my $canEditMaker = WebGUI::Test::Maker::Permission->new();
-$canEditMaker->prepare({
-    'object' => $canEditAsset,
-    'method' => 'canEdit',
-    'pass'   => [3, $testUsers{'owner'},        $testUsers{'canEdit group user'}, ],
-    'fail'   => [1, $testUsers{'regular user'},                                   ],
-});
-
-my $versionTag3 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag3);
-$properties = {
-	#            '1234567890123456789012'
-	id          => 'canViewAsset0000000010',
-	title       => 'canView Asset Test',
-	url         => 'canViewAsset1',
-	className   => 'WebGUI::Asset',
-    ownerUserId => $testUsers{'owner'}->userId,
-    groupIdEdit => $testGroups{'canEdit asset'}->getId,
-    groupIdView => $testGroups{'canEdit asset'}->getId,
-};
-
-
-my $canViewAsset = $rootAsset->addChild($properties, $properties->{id});
-
-$versionTag3->commit;
-$properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
-
-my $canViewMaker = WebGUI::Test::Maker::Permission->new();
-$canViewMaker->prepare(
-    {
-        'object' => $canEditAsset,
-        'method' => 'canView',
-        'pass'   => [1, 3, $testUsers{'owner'}, $testUsers{'canEdit group user'}, $testUsers{'regular user'},],
-    },
-    {
-        'object' => $canViewAsset,
-        'method' => 'canView',
-        'pass'   => [3, $testUsers{'owner'},        $testUsers{'canEdit group user'}, ],
-        'fail'   => [1, $testUsers{'regular user'},                                   ],
-    },
-);
-
 plan tests => 114
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
-            + $canAddMaker->plan
-            + $canAddMaker2->plan
-            + $canEditMaker->plan
-            + $canViewMaker->plan
             ;
 
 note "loadModule";
@@ -230,10 +110,6 @@ $asset = WebGUI::Asset::Wobject::Navigation->new($session, $assetId);
 isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
 is ($asset->getId, $assetId, 'new constructor - returns correct asset when invoked with correct class');
 
-# - die gracefully
-my $deadAsset = 1;
-
-# -- invalid asset id
 note "getClassById";
 {
     my $deadAsset = eval { WebGUI::Asset->getClassById($session, 'RoysNonExistantAssetId'); };
@@ -265,6 +141,7 @@ note "newById";
 
 # -- no session
 # Root Asset
+my $rootAsset = WebGUI::Asset->getRoot($session);
 isa_ok($rootAsset, 'WebGUI::Asset');
 is($rootAsset->getId, 'PBasset000000000000001', 'Root Asset ID check');
 
@@ -309,11 +186,19 @@ ok(  WebGUI::Asset->urlExists($session, $importUrl,     {assetId => 'notAnWebGUI
 
 ################################################################
 #
-# addEditLabel
+# getName
 #
 ################################################################
 
 my $i18n = WebGUI::International->new($session, 'Asset_Wobject');
+is($importNode->getName,    $i18n->get('assetName', 'Asset_Folder'),  'getName: Returns the internationalized name of the Asset, core Asset');
+#is($canEditAsset->getName,  $i18n->get('asset', 'Asset'),             'getName: Returns the internationalized name of the Asset, core Asset');
+################################################################
+#
+# addEditLabel
+#
+################################################################
+
 is($importNode->addEditLabel, $i18n->get('edit').' '.$importNode->getName, 'addEditLabel, default mode is edit mode');
 
 my $origRequest = $session->{_request};
@@ -336,7 +221,7 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag);
 $versionTag->set({name=>"Asset tests"});
 
-$properties = {
+my $properties = {
 	#            '1234567890123456789012'
 	id        => 'fixUrlAsset00000000012',
 	title     => 'fixUrl Asset Test',
@@ -491,46 +376,16 @@ TODO: {
 
 ################################################################
 #
-# canAdd
-#
-################################################################
-
-$session->config->set('assets/WebGUI::Asset/addGroup', $testGroups{'canAdd asset'}->getId );
-
-$canAddMaker->run;
-
-#Without proper group setup, Turn On Admin is excluded from adding assets via assetAddPrivilege
-
-$canAddMaker2->run;
-
-################################################################
-#
-# canEdit
-#
-################################################################
-
-$canEditMaker->run;
-
-################################################################
-#
-# canView
-#
-################################################################
-
-$canViewMaker->run;
-
-################################################################
-#
 # addMissing
 #
 ################################################################
 
 $session->user({ userId => 3 });
 $session->var->switchAdminOff;
-is($canEditAsset->addMissing('/nowhereMan'), undef, q{addMissing doesn't return anything unless use is in Admin Mode});
+is($rootAsset->addMissing('/nowhereMan'), undef, q{addMissing doesn't return anything unless use is in Admin Mode});
 
 $session->var->switchAdminOn;
-my $addMissing = $canEditAsset->addMissing('/nowhereMan');
+my $addMissing = $rootAsset->addMissing('/nowhereMan');
 ok($addMissing, 'addMissing returns some output when in Admin Mode');
 
 {
@@ -553,16 +408,6 @@ is($fixTitleAsset->getContainer->getId, $defaultAsset->getId, 'getContainer: A s
 
 ################################################################
 #
-# getName
-#
-################################################################
-
-is($fixTitleAsset->getName, $i18n->get('assetName', 'Asset_Snippet'), 'getName: Returns the internationalized name of the Asset, Snippet');
-is($importNode->getName,    $i18n->get('assetName', 'Asset_Folder'),  'getName: Returns the internationalized name of the Asset, Folder');
-is($canEditAsset->getName,  $i18n->get('asset', 'Asset'),             'getName: Returns the internationalized name of the Asset, core Asset');
-
-################################################################
-#
 # getToolbarState
 # toggleToolbar
 #
@@ -580,14 +425,14 @@ is($getTitleAsset->getToolbarState, 0, 'getToolbarState: toggleToolbarState togg
 #
 ################################################################
 
-is($canEditAsset->getUiLevel,  1, 'getUiLevel: WebGUI::Asset uses the default uiLevel of 1');
+#is($canEditAsset->getUiLevel,  1, 'getUiLevel: WebGUI::Asset uses the default uiLevel of 1');
 is($fixTitleAsset->getUiLevel, 5, 'getUiLevel: Snippet has an uiLevel of 5');
 
 my $origAssetUiLevel = $session->config->get('assetUiLevel');
 $session->config->set('assets/WebGUI::Asset/uiLevel', 8);
 $session->config->set('assets/WebGUI::Asset::Snippet/uiLevel', 8);
 
-is($canEditAsset->getUiLevel,  8, 'getUiLevel: WebGUI::Asset has a configured uiLevel of 8');
+#is($canEditAsset->getUiLevel,  8, 'getUiLevel: WebGUI::Asset has a configured uiLevel of 8');
 is($fixTitleAsset->getUiLevel, 8, 'getUiLevel: Snippet has a configured uiLevel of 8');
 
 
@@ -597,7 +442,7 @@ is($fixTitleAsset->getUiLevel, 8, 'getUiLevel: Snippet has a configured uiLevel 
 #
 ################################################################
 
-is($canViewAsset->isValidRssItem, 1, 'isValidRssItem: By default, all Assets are valid RSS items');
+#is($canViewAsset->isValidRssItem, 1, 'isValidRssItem: By default, all Assets are valid RSS items');
 
 ################################################################
 #
@@ -605,8 +450,8 @@ is($canViewAsset->isValidRssItem, 1, 'isValidRssItem: By default, all Assets are
 #
 ################################################################
 
-my @tabs = $canViewAsset->getEditTabs;
-is(scalar(@tabs), 4, 'getEditTabs: 4 tabs by default');
+#my @tabs = $canViewAsset->getEditTabs;
+#is(scalar(@tabs), 4, 'getEditTabs: 4 tabs by default');
 
 ################################################################
 #
@@ -617,7 +462,7 @@ is(scalar(@tabs), 4, 'getEditTabs: 4 tabs by default');
 $session->style->sent(0); ##Prevent extra output from being generated by session->style
                           ##At some point, a test will need to tie STDOUT and make sure
                           ##that the output is correct.
-isa_ok($canViewAsset->getEditForm, 'WebGUI::TabForm', 'getEditForm: Returns a tabForm');
+#isa_ok($canViewAsset->getEditForm, 'WebGUI::TabForm', 'getEditForm: Returns a tabForm');
 
 TODO: {
     local $TODO = 'More getEditForm tests';
