@@ -666,8 +666,8 @@ $properties2 = {
     url         => 'moveVersionToParent_03',
 };
 
-my $childAsset = $parentAsset->addChild($properties, $properties2->{id});
-my $testAsset = WebGUI::Asset->newPending($session, $childAsset->parentId);
+my $childAsset     = $parentAsset->addChild($properties, $properties2->{id});
+my $testAsset      = WebGUI::Asset->newPending($session, $childAsset->parentId);
 my $testVersionTag = WebGUI::VersionTag->new($session, $testAsset->tagId);
 
 my $childVersionTag;

@@ -371,7 +371,7 @@ sub moveAssetToVersionTag {
     #
     my $moveToTagId = $moveToTag;
     if ( ref($moveToTag) eq "WebGUI::VersionTag" ) {
-        $moveToTagId = $moveToTag->get('tagId');
+        $moveToTagId = $moveToTag->tagId;
     }
     else {
         $moveToTag = WebGUI::VersionTag->new( $self->session, $moveToTagId );
@@ -400,15 +400,15 @@ Requests an autocommit tag be commited. See also getAutoCommitWorkflowId() and s
 sub requestAutoCommit {
     my $self = shift;
 
-    my $parentAsset;
-    if ( not defined( $parentAsset = $self->getParent ) ) {
-        $parentAsset = WebGUI::Asset->newPending( $self->session, $self->get('parentId') );
+    my $parentAsset = eval { $self->getParent; };
+    if ( Exception::Class->caught() ) {
+        $parentAsset = WebGUI::Asset->newPending( $self->session, $self->parentId );
     }
     unless ( $parentAsset->hasBeenCommitted ) {
-        my $tagId = $parentAsset->get('tagId');
+        my $tagId = $parentAsset->tagId;
 
         if ($tagId) {
-            if ( $tagId ne $self->get('tagId') ) {
+            if ( $tagId ne $self->tagId ) {
                 $self->moveAssetToVersionTag($tagId);
                 return;
             }
@@ -486,7 +486,7 @@ A new version tag id.
 sub setVersionTag {
     my $self  = shift;
     my $tagId = shift;
-    $self->session->db->write("update assetData set tagId=? where assetId=? and tagId = ?", [$tagId, $self->getId,$self->get('tagId')]);
+    $self->session->db->write("update assetData set tagId=? where assetId=? and tagId = ?", [$tagId, $self->getId,$self->tagId]);
     $self->tagId($tagId);
     $self->updateHistory("changed version tag to $tagId");
     $self->purgeCache;
