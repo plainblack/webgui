@@ -225,6 +225,13 @@ use Exception::Class (
         },
 
 
+    'WebGUI::Error::Compile' => {
+        isa             => 'WebGUI::Error',
+        description     => "Unable to compile the requested class",
+        fields          => ["class", "cause"],
+        },
+
+
     'WebGUI::Error::ObjectNotFound' => {
         isa             => 'WebGUI::Error',
         description     => "The object you were trying to retrieve does not exist.",
