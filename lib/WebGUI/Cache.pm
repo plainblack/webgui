@@ -224,6 +224,10 @@ sub get {
     return (ref $content) ? ${$content} : undef;
 }
 
+sub getMemcached {
+    return shift->{_memcached};
+}
+
 #-------------------------------------------------------------------
 
 =head2 mget ( names )
