@@ -21,7 +21,7 @@ use Test::Deep;
 use Test::Exception;
 use WebGUI::Exception;
 
-plan tests => 50;
+plan tests => 51;
 
 my $session = WebGUI::Test->session;
 
@@ -265,7 +265,7 @@ my $session = WebGUI::Test->session;
 {
     note "getDefault";
     my $asset = WebGUI::Asset->getDefault($session);
-    $asset->isa('WebGUI::Asset::Wobject::Layout');
+    isa_ok $asset, 'WebGUI::Asset::Wobject::Layout';
 }
 
 {
