@@ -38,7 +38,7 @@ around title => sub {
     if (@_ > 0) {
         my $title = shift;
         $title    = WebGUI::HTML::filter($title, 'all');
-        $title    = $self->meta->get_attribute('title')->default if $title eq '';
+        $title    = $self->meta->find_attribute_by_name('title')->default if $title eq '';
         unshift @_, $title;
     }
     $self->$orig(@_);
@@ -1114,7 +1114,7 @@ If this evaluates to True, then the smaller extras/adminConsole/small/assets.gif
 
 sub getIcon {
 	my ($self, $small) = @_;
-	my $icon = $self->getAttribute("icon");
+	my $icon = $self->icon;
 	return $self->session->url->extras('assets/small/'.$icon) if ($small);
 	return $self->session->url->extras('assets/'.$icon);
 }
@@ -1181,7 +1181,7 @@ returning results.  This allows very large sets of results to be handled in chun
 
 sub getIsa {
     my ($class, $session, $offset) = @_;
-    my $tableName = $class->getAttribute('tableName');
+    my $tableName = $class->tableName;
     my $sql = "select distinct(assetId) from $tableName";
     if (defined $offset) {
         $sql .= ' LIMIT '. $offset . ',1234567890';
@@ -1522,7 +1522,7 @@ sub getUiLevel {
 	my $className = $self->get("className");
 	return $uiLevel														# passed in
 		|| $self->session->config->get("assets/".$className."/uiLevel")	# from config
-		|| $self->getAttribute('uiLevel')               				# from definition
+		|| $self->uiLevel               				                # from definition
 		|| 1;															# if all else fails
 }
 

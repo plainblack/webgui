@@ -56,7 +56,7 @@ note "loadModule";
 
 # Test the default constructor
 my $defaultAsset = WebGUI::Asset->getDefault($session);
-is($defaultAsset, 'WebGUI::Asset::Wobject::Layout');
+isa_ok($defaultAsset, 'WebGUI::Asset::Wobject::Layout');
 
 # Test the new constructor
 my $assetId = "PBnav00000000000000001"; # one of the default nav assets
@@ -192,7 +192,7 @@ ok(  WebGUI::Asset->urlExists($session, $importUrl,     {assetId => 'notAnWebGUI
 
 my $i18n = WebGUI::International->new($session, 'Asset_Wobject');
 is($importNode->getName,    $i18n->get('assetName', 'Asset_Folder'),  'getName: Returns the internationalized name of the Asset, core Asset');
-#is($canEditAsset->getName,  $i18n->get('asset', 'Asset'),             'getName: Returns the internationalized name of the Asset, core Asset');
+
 ################################################################
 #
 # addEditLabel
@@ -382,7 +382,7 @@ TODO: {
 
 $session->user({ userId => 3 });
 $session->var->switchAdminOff;
-is($rootAsset->addMissing('/nowhereMan'), undef, q{addMissing doesn't return anything unless use is in Admin Mode});
+is($rootAsset->addMissing('/nowhereMan'), undef, q{addMissing doesn't return anything unless user is in Admin Mode});
 
 $session->var->switchAdminOn;
 my $addMissing = $rootAsset->addMissing('/nowhereMan');
