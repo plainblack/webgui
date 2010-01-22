@@ -385,12 +385,13 @@ The maximum amount of entries to return
 =cut
 
 sub getLineage {
-	my $self = shift;
-	my $relatives = shift;
-	my $rules = shift;
-	my $lineage = $self->get("lineage");
+    my $self      = shift;
+    my $session   = $self->session;
+    my $relatives = shift;
+    my $rules     = shift;
+    my $lineage   = $self->lineage;
 	
-    my $sql = $self->getLineageSql($relatives,$rules);
+    my $sql = $self->getLineageSql($relatives, $rules);
 
     unless ($sql) {
         return [];
@@ -398,7 +399,7 @@ sub getLineage {
 
 	my @lineage;
 	my %relativeCache;
-	my $sth = $self->session->db->read($sql);
+	my $sth = $session->db->read($sql);
 	while (my ($id, $class, $parentId, $version) = $sth->array) {
 		# create whatever type of object was requested
 		my $asset;
@@ -406,9 +407,9 @@ sub getLineage {
 			if ($self->getId eq $id) { # possibly save ourselves a hit to the database
 				$asset =  $self;
 			} else {
-				$asset = WebGUI::Asset->new($self->session,$id, $class, $version);
+				$asset = WebGUI::Asset->newById($session, $id, $version);
 				if (!defined $asset) { # won't catch everything, but it will help some if an asset blows up
-					$self->session->errorHandler->error("AssetLineage::getLineage - failed to instanciate asset with assetId $id, className $class, and revision $version");
+					$session->errorHandler->error("AssetLineage::getLineage - failed to instanciate asset with assetId $id, className $class, and revision $version");
 					next;
 				}
 			}
@@ -455,8 +456,8 @@ sub getLineageIterator {
         my $assetInfo = $sth->hashRef;
         return
             if !$assetInfo;
-        my $asset = WebGUI::Asset->new(
-            $self->session, $assetInfo->{assetId}, $assetInfo->{className}, $assetInfo->{revisionDate}
+        my $asset = WebGUI::Asset->newById(
+            $self->session, $assetInfo->{assetId}, $assetInfo->{revisionDate}
         );
         if (!$asset) {
             WebGUI::Error::ObjectNotFound->throw(id => $assetInfo->{assetId});

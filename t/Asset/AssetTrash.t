@@ -57,6 +57,7 @@ my $folder1a2 = $folder1a->addChild({
 
 $versionTag->commit;
 
+
 ####################################################
 #
 # trash
@@ -64,11 +65,11 @@ $versionTag->commit;
 ####################################################
 
 is( $topFolder->trash, 1, 'trash: returns 1 if successful' );
-is($topFolder->get('state'),              'trash', '... state set to trash on the trashed asset object');
-is($topFolder->cloneFromDb->get('state'), 'trash', '... state set to trash in db on object');
-is($folder1a->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on child #1');
-is($folder1b->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on child #2');
-is($folder1a2->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on grandchild #1-1');
+is($topFolder->state,              'trash', '... state set to trash on the trashed asset object');
+is($topFolder->cloneFromDb->state, 'trash', '... state set to trash in db on object');
+is($folder1a->cloneFromDb->state, 'trash-limbo', '... state set to trash-limbo on child #1');
+is($folder1b->cloneFromDb->state, 'trash-limbo', '... state set to trash-limbo on child #2');
+is($folder1a2->cloneFromDb->state, 'trash-limbo', '... state set to trash-limbo on grandchild #1-1');
 
 ####################################################
 #
