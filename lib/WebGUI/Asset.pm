@@ -220,12 +220,11 @@ property  inheritUrlFromParent  => (
             uiLevel         => 9,
             fieldType       => 'yesNo',
             default         => 0,
+            trigger         => \&_set_inheritUrlFromParent,
           );
-around inheritUrlFromParent => sub {
-    my $orig = shift;
-    my $self = shift;
-    $self->$orig(@_);
-    if (@_ > 0 && $_[0]) {
+sub _set_inheritUrlFromParent {
+    my ($self, $new, $old) = @_;
+    if ($new && ($new != $old)) {
         $self->url($self->url);
     }
 };
@@ -686,9 +685,8 @@ sub fixUrl {
         # if we're inheriting the URL from our parent, set that appropriately
         my @parts = split(m{/}, $url);
         # don't do anything unless we need to
-        if($url ne $self->getParent->get('url') . '/' . $parts[-1]) {
-            $url = $self->getParent->get('url') . '/' . $parts[-1];
-        }
+        my $inheritUrl = $self->getParent->get('url') . '/' . $parts[-1];
+        $url = $inheritUrl if $url ne $inheritUrl;
     }
 	$url = $self->session->url->urlize($url);
 

@@ -499,15 +499,17 @@ is($rootAsset->get('isExportable'), 1, 'isExportable exists, defaults to 1');
 # getSeparator
 #
 ################################################################
-is($rootAsset->getSeparator,      '~~~PBasset000000000000001~~~', 'getSeparator, known assetId');
-is($rootAsset->getSeparator('!'), '!!!PBasset000000000000001!!!', 'getSeparator, given pad character');
-isnt($rootAsset->getSeparator, $mediaFolder->getSeparator, 'getSeparator: unique string');
+note "getSeparator";
+is($rootAsset->getSeparator,      '~~~PBasset000000000000001~~~', '... known assetId');
+is($rootAsset->getSeparator('!'), '!!!PBasset000000000000001!!!', '... given pad character');
+isnt($rootAsset->getSeparator, $mediaFolder->getSeparator, '... unique string');
 
 ################################################################
 #
 # get
 #
 ################################################################
+note "get";
 my $assetProps = $rootAsset->get();
 my $funkyTitle = q{Miss Annie's Whoopie Emporium and Sasparilla Shop};
 $assetProps->{title} = $funkyTitle;
@@ -555,6 +557,7 @@ $product3->purge;
 # inheritUrlFromParent
 #
 ################################################################
+note "inheritUrlFromParent";
 
 my $versionTag4 = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag4);
@@ -581,6 +584,7 @@ $properties2 = {
 
 my $iufpAsset2 = $iufpAsset->addChild($properties2, $properties2->{id});
 $iufpAsset2->update( { inheritUrlFromParent => 1 } );
+is $iufpAsset2->inheritUrlFromParent, 1, 'inheritUrlFromParent set';
 $iufpAsset2->commit;
 is($iufpAsset2->get('url'), 'inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
 
