@@ -35,7 +35,7 @@ my $session = WebGUI::Test->session;
 
 my @getTitleTests = getTitleTests($session);
 
-plan tests => 114
+plan tests => 105
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             ;
 
@@ -586,7 +586,7 @@ my $iufpAsset2 = $iufpAsset->addChild($properties2, $properties2->{id});
 $iufpAsset2->update( { inheritUrlFromParent => 1 } );
 is $iufpAsset2->inheritUrlFromParent, 1, 'inheritUrlFromParent set';
 $iufpAsset2->commit;
-is($iufpAsset2->get('url'), 'inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
+is($iufpAsset2->url, 'inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
 
 my $properties2a = {
     #                       '1234567890123456789012'
@@ -599,12 +599,12 @@ my $properties2a = {
 
 my $iufpAsset2a = $iufpAsset->addChild($properties2a, $properties2a->{id});
 $iufpAsset2a->commit;
-is($iufpAsset2a->get('url'), 'inheriturlfromparent01/inheriturlfromparent2a', '... works when created with the property');
+is($iufpAsset2a->url, 'inheriturlfromparent01/inheriturlfromparent2a', '... works when created with the property');
 
 # works for setting, now try disabling. Should not change the URL.
 $iufpAsset2->update( { inheritUrlFromParent => 0 } );
 $iufpAsset2->commit;
-is($iufpAsset2->get('url'), 'inheriturlfromparent01/inheriturlfromparent02', '... setting inheritUrlFromParent to 0 works');
+is($iufpAsset2->url, 'inheriturlfromparent01/inheriturlfromparent02', '... setting inheritUrlFromParent to 0 works');
 
 # also make sure that it is actually disabled
 is($iufpAsset2->get('inheritUrlFromParent'), 0, "... disabling inheritUrlFromParent actually works");
@@ -624,10 +624,10 @@ $iufpAsset2->update( { inheritUrlFromParent => 1 } );
 $iufpAsset2->commit;
 $iufpAsset3->update( { inheritUrlFromParent => 1 } );
 $iufpAsset3->commit;
-is($iufpAsset3->get('url'), 'inheriturlfromparent01/inheriturlfromparent02/inheriturlfromparent03', '... recurses properly');
+is($iufpAsset3->url, 'inheriturlfromparent01/inheriturlfromparent02/inheriturlfromparent03', '... recurses properly');
 
 $iufpAsset2->update({url => 'iufp2'});
-is($iufpAsset2->get('url'), 'inheriturlfromparent01/iufp2', '... update works propertly when iUFP is not passed');
+is($iufpAsset2->url, 'inheriturlfromparent01/iufp2', '... update works propertly when iUFP is not passed');
 
 
 ################################################################
@@ -648,9 +648,9 @@ $properties = {
     url         => 'moveVersionToParent_01',
 };
 
-my $parentAsset = $defaultAsset->addChild($properties, $properties->{id});
-my $parentVersionTag = WebGUI::VersionTag->new($session, $parentAsset->get('tagId'));
-is($parentVersionTag->get('isCommitted'),0, 'built non-committed parent asset');
+my $parentAsset      = $defaultAsset->addChild($properties, $properties->{id});
+my $parentVersionTag = WebGUI::VersionTag->new($session, $parentAsset->tagId);
+is($parentVersionTag->get('isCommitted'), 0, 'built non-committed parent asset');
 
 
 my $versionTag6 = WebGUI::VersionTag->create($session, {});
@@ -667,23 +667,23 @@ $properties2 = {
 };
 
 my $childAsset = $parentAsset->addChild($properties, $properties2->{id});
-my $testAsset = WebGUI::Asset->newPending($session, $childAsset->get('parentId'));
-my $testVersionTag = WebGUI::VersionTag->new($session, $testAsset->get('tagId'));
+my $testAsset = WebGUI::Asset->newPending($session, $childAsset->parentId);
+my $testVersionTag = WebGUI::VersionTag->new($session, $testAsset->tagId);
 
 my $childVersionTag;
-$childVersionTag = WebGUI::VersionTag->new($session, $childAsset->get('tagId'));
-is($childVersionTag->get('isCommitted'),0, 'built non-committed child asset');
+$childVersionTag = WebGUI::VersionTag->new($session, $childAsset->tagId);
+is($childVersionTag->get('isCommitted'), 0, 'built non-committed child asset');
 
-isnt($testAsset->get('tagId'),$childAsset->get('tagId'),'parent asset and child asset have different version tags');
-isnt($testVersionTag->getId,$childVersionTag->getId,'parent asset and child asset version tags unmatched');
+isnt($testAsset->tagId,      $childAsset->tagId,      'parent asset and child asset have different version tags');
+isnt($testVersionTag->getId, $childVersionTag->getId, 'parent asset and child asset version tags unmatched');
 
 eval {
     $childAsset->requestAutoCommit;
-    $childVersionTag = WebGUI::VersionTag->new($session, $childAsset->get('tagId'));
+    $childVersionTag = WebGUI::VersionTag->new($session, $childAsset->tagId);
 };
-is($childVersionTag->get('isCommitted'),0, 'confirm non-committed child asset');
+is($childVersionTag->get('isCommitted'), 0, 'confirm non-committed child asset');
 
-is($testAsset->get('tagId'),$childAsset->get('tagId'),'parent asset and child asset have same version tags');
+is($testAsset->tagId, $childAsset->tagId, 'parent asset and child asset have same version tags');
 
 eval {
     $testVersionTag->commit;

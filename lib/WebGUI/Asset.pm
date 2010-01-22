@@ -243,6 +243,11 @@ property  assetSize => (
             fieldType       => 'integer',
             default         => 0,
           );
+property  tagId => (
+            noFormPost      => 1,
+            fieldType       => 'guid',
+            default         => 0,
+          );
 has       session => (
             is              => 'ro',
             required        => 1,
@@ -588,10 +593,9 @@ Returns the new Asset object.
 
 sub cloneFromDb {
 	my $self = shift;
-    return WebGUI::Asset->new($self->session,
+    return WebGUI::Asset->newById($self->session,
         $self->getId,
-        $self->get('className'),
-        $self->get('revisionDate')
+        $self->revisionDate
     );
 }
 
