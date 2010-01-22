@@ -176,14 +176,14 @@ note "loadModule";
 
 # Test the default constructor
 my $defaultAsset = WebGUI::Asset->getDefault($session);
-is(ref $defaultAsset, 'WebGUI::Asset::Wobject::Layout', 'default constructor');
+is($defaultAsset, 'WebGUI::Asset::Wobject::Layout');
 
 # Test the new constructor
 my $assetId = "PBnav00000000000000001"; # one of the default nav assets
 
 # - explicit class
 my $asset = WebGUI::Asset->newById($session, $assetId);
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation','new constructor explicit - ref check');
+isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
 is ($asset->getId, $assetId, 'new constructor explicit - returns correct asset');
 
 # - new by hashref properties
@@ -192,13 +192,13 @@ $asset = WebGUI::Asset->newByPropertyHashRef($session, {
                                                           className=>"WebGUI::Asset::Wobject::Navigation",
 		                                                  assetId=>$assetId
 													    });
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'new constructor newByHashref - ref check');
+isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
 is ($asset->getId, $assetId, 'new constructor newByHashref - returns correct asset');
 
 # - implicit class
 $asset = undef;
 $asset = WebGUI::Asset::Wobject::Navigation->new($session, $assetId);
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'new constructor implicit - ref check');
+isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
 is ($asset->getId, $assetId, 'new constructor implicit - returns correct asset');
 
 # - die gracefully
@@ -224,37 +224,46 @@ isa_ok ($primevalAsset, 'WebGUI::Asset');
 # Test the newById Constructor
 $asset = undef;
 
-note "newById";
-$asset = WebGUI::Asset->newById($session, $assetId);
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'newById constructor - ref check');
-is ($asset->getId, $assetId, 'newById constructor - returns correct asset');
+note "new";
+use WebGUI::Asset::Wobject::Navigation;
+$asset = WebGUI::Asset::Wobject::Navigation->new($session, $assetId);
+isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
+is ($asset->getId, $assetId, 'new constructor - returns correct asset when invoked with correct class');
 
 # - die gracefully
 my $deadAsset = 1;
 
 # -- invalid asset id
-$deadAsset = WebGUI::Asset->newById($session, 'RoysNonExistantAssetId');
-is ($deadAsset, undef,'newByDynamicClass constructor with invalid assetId returns undef');
+note "getClassById";
+{
+    my $deadAsset = eval { WebGUI::Asset->getClassById($session, 'RoysNonExistantAssetId'); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'getClassById must have a valid assetId');
+    cmp_deeply(
+        $e,
+        methods(
+            error => "Couldn't lookup classname",
+            param => 'RoysNonExistantAssetId',
+        ),
+        '... checking error message',
+    );
+}
 
-# -- no assetId
-is(
-    WebGUI::Asset->newByDynamicClass( $session ),
-    undef,
-    "newByDynamicClass constructor returns 'undef' with no assetId",
-);
+note "newById";
+{
+    my $deadAsset = eval { WebGUI::Asset->newById($session); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::InvalidParam', "newById won't work without an assetId");
+    cmp_deeply(
+        $e,
+        methods(
+            error => "newById must get an assetId",
+        ),
+        '... checking error message',
+    );
+}
 
 # -- no session
-is(
-    WebGUI::Asset->newByDynamicClass( ),
-    undef,
-    "newByDynamicClass constructor returns 'undef' with no valid WebGUI::Session",
-);
-is(
-    WebGUI::Asset->newByDynamicClass( "nothing" ),
-    undef,
-    "newByDynamicClass constructor returns 'undef' with no valid WebGUI::Session",
-);
-
 # Root Asset
 isa_ok($rootAsset, 'WebGUI::Asset');
 is($rootAsset->getId, 'PBasset000000000000001', 'Root Asset ID check');

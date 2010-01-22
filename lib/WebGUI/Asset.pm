@@ -804,8 +804,7 @@ sub getClassById {
 
     return $className if $className;
 
-    $session->errorHandler->error("Couldn't find className for asset '$assetId'");
-    return undef;
+    WebGUI::Error::InvalidParam->throw(error => "Couldn't lookup classname", param => $assetId);
 
 }
 
@@ -1715,7 +1714,7 @@ Must be a valid assetId
 
 =head3 revisionDate
 
-A specific revision date for the asset to retrieve. If not specified, the most recent one will be used.
+An optional, specific revision date for the asset to retrieve. If not specified, the most recent one will be used.
 
 =cut
 
@@ -1723,19 +1722,14 @@ sub newById {
     my $requestedClass  = shift;
     my $session         = shift;
     my $assetId         = shift;
+    if (!$assetId) {
+        WebGUI::Error::InvalidParam->throw(error => 'newById must get an assetId');
+    }
     my $revisionDate    = shift;
- 
-# Some code requires that these situations not die.
-#    confess "newById requires WebGUI::Session" 
-#        unless $session && blessed $session eq 'WebGUI::Session';
-#    confess "newById requires assetId"
-#        unless $assetId;
-# So just return instead
-    return undef unless ( $session && blessed $session eq 'WebGUI::Session' ) 
-        && $assetId;
 
     my $className = WebGUI::Asset->getClassById($session, $assetId);
     my $class     = WebGUI::Asset->loadModule($className);
+
     return $class->new($session, $assetId, $revisionDate);
 }
 
