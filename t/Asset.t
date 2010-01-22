@@ -19,6 +19,7 @@ use WebGUI::Test;
 use Test::More;
 use Test::Deep;
 use Test::Exception;
+use WebGUI::Exception;
 
 plan tests => 50;
 
@@ -137,8 +138,6 @@ my $session = WebGUI::Test->session;
     is $class, 'WebGUI::Asset', '... cache check';
     $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000002');
     is $class, 'WebGUI::Asset::Wobject::Folder', '... retrieve another class';
-    $class = WebGUI::Asset->getClassById($session, 'noIdHereBoss');
-    is $class, undef, '... returns undef if the class cannot be found';
 }
 
 {
@@ -270,7 +269,8 @@ my $session = WebGUI::Test->session;
 }
 
 {
-    note "calling new with no assetId";
-    my $asset = WebGUI::Asset->new($session, '');
-    is $asset, undef, 'new returns undef without an assetId';
+    note "calling new with no assetId throws an exception";
+    my $asset = eval { WebGUI::Asset->new($session, ''); };
+    my $e = Exception::Class->caught;
+    isa_ok $e, 'WebGUI::Error';
 }
