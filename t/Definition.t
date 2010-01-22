@@ -16,9 +16,11 @@ use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 
-use Test::More 'no_plan'; #tests => 1;
+use Test::More tests => 10;
 use Test::Deep;
 use Test::Exception;
+
+my $session = WebGUI::Test->session;
 
 my $called_getProperties;
 {
@@ -45,13 +47,6 @@ my $called_getProperties;
     ::can_ok +__PACKAGE__, 'update';
     ::can_ok +__PACKAGE__, 'get';
     ::can_ok +__PACKAGE__, 'set';
-
-    # can retreive property metadata
-    ::isa_ok +__PACKAGE__->getProperty('property1'), 'WebGUI::Definition::Meta::Property';
-
-    ::is +__PACKAGE__->getProperty('property1')->form->{'arbitrary_key'}, 'arbitrary_value', 'arbitrary keys mapped into the form attribute';
-
-    ::is +__PACKAGE__->getProperty('property2')->form->{'nother_key'}, 'nother_value', '... and again';
 
     ::cmp_deeply(
         [ +__PACKAGE__->getProperties ],
@@ -94,5 +89,41 @@ my $called_getProperties;
     @set_order = ();
     $object->set(property2 => 1, property3 => 0, property1 => 1);
     ::cmp_deeply( [ @set_order ], [3,1,2], '... and again');
+
+    ::cmp_deeply(
+        $object->getFormProperties('property1'),
+        { label => 'label' },
+        'getFormProperties works for a simple set of properties'
+    );
+
 }
 
+{
+    package WGT::Class3;
+    use WebGUI::Definition;
+
+    attribute 'attribute1' => 'attribute1 value';
+    property  'property1' => (
+        label   => ['webgui', 'WebGUI'],
+        options => \&property1_options,
+    );
+    has session => (
+        is       => 'ro',
+        required => 1,
+    );
+    sub property1_options {
+        return { one => 1, two => 2, three => 3 };
+    }
+
+    my $object = WGT::Class3->new({session => $session});
+
+    ::cmp_deeply(
+        $object->getFormProperties('property1'),
+        {
+            label   => 'WebGUI',
+            options => { one => 1, two => 2, three => 3 },
+        },
+        'getFormProperties handles i18n and subroutines'
+    );
+
+}
