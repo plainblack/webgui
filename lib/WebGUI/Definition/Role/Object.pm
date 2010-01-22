@@ -118,9 +118,13 @@ sub update {
 
 #-------------------------------------------------------------------
 
-=head2 getProperty ( $name )
+=head2 getFormProperties ( $name )
 
-Returns the requested property, which will be a subclass of Moose::Meta::Attribute.
+Returns the form properties for the requested property.  Handles resolving i18n and
+calling subroutines for values.
+
+Each subroutine is invoked as a method of the object, and is passed the entire set of
+form properties and the name of the property.
 
 =head3 $name
 
@@ -128,9 +132,20 @@ The name of the property to return.
 
 =cut
 
-sub getProperty {
-    my $self = shift;
-    return $self->meta->find_attribute_by_name(@_);
+sub getFormProperties {
+    my $self     = shift;
+    my $property = $self->meta->find_attribute_by_name(@_);
+    my $form     = $property->form;
+    PROPERTY: while (my ($property_name, $property) = each %{ $form }) {
+        next PROPERTY unless ref $property;
+        if (($property_name eq 'label' || $property_name eq 'hoverHelp') and ref $property eq 'ARRAY') {
+            $form->{$property_name} = WebGUI::International->new($self->session)->get(@{$property});
+        }
+        elsif (ref $property eq 'CODE') {
+            $form->{$property_name} = $self->$property($form, $property_name);
+        }
+    }
+    return $form;
 }
 
 #-------------------------------------------------------------------
