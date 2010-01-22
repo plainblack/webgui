@@ -151,7 +151,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 112
+plan tests => 114
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             + $canAddMaker->plan
             + $canAddMaker2->plan
@@ -159,9 +159,24 @@ plan tests => 112
             + $canViewMaker->plan
             ;
 
+note "loadModule";
+{
+    my $className = eval { WebGUI::Asset->loadModule('Moose::Asset'); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'loadModule must get a WebGUI::Asset class');
+    cmp_deeply(
+        $e,
+        methods(
+            error => 'Not a WebGUI::Asset class',
+            param => 'Moose::Asset',
+        ),
+        '... checking error message',
+    );
+}
+
 # Test the default constructor
 my $defaultAsset = WebGUI::Asset->getDefault($session);
-is(ref $defaultAsset, 'WebGUI::Asset::Wobject::Layout','default constructor');
+is(ref $defaultAsset, 'WebGUI::Asset::Wobject::Layout', 'default constructor');
 
 # Test the new constructor
 my $assetId = "PBnav00000000000000001"; # one of the default nav assets
@@ -187,28 +202,38 @@ is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'new constructor implicit 
 is ($asset->getId, $assetId, 'new constructor implicit - returns correct asset');
 
 # - die gracefully
-my $deadAsset = 1;
-
 # -- no asset id
-$deadAsset = WebGUI::Asset->new($session, '');
-is ($deadAsset, undef,'new constructor with no assetId returns undef');
+note "new, constructor fails";
+{
+    my $deadAsset = eval { WebGUI::Asset->new($session, ''); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'new must get an assetId');
+    cmp_deeply(
+        $e,
+        methods(
+            error => 'Asset constructor new() requires an assetId.',
+        ),
+        '... checking error message',
+    );
+}
 
 # -- no class
 my $primevalAsset = WebGUI::Asset->new($session, $assetId);
 isa_ok ($primevalAsset, 'WebGUI::Asset');
 
-# Test the newByDynamicClass Constructor
+# Test the newById Constructor
 $asset = undef;
 
-$asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'newByDynamicClass constructor - ref check');
-is ($asset->getId, $assetId, 'newByDynamicClass constructor - returns correct asset');
+note "newById";
+$asset = WebGUI::Asset->newById($session, $assetId);
+is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'newById constructor - ref check');
+is ($asset->getId, $assetId, 'newById constructor - returns correct asset');
 
 # - die gracefully
-$deadAsset = 1;
+my $deadAsset = 1;
 
 # -- invalid asset id
-$deadAsset = WebGUI::Asset->newByDynamicClass($session, 'RoysNonExistantAssetId');
+$deadAsset = WebGUI::Asset->newById($session, 'RoysNonExistantAssetId');
 is ($deadAsset, undef,'newByDynamicClass constructor with invalid assetId returns undef');
 
 # -- no assetId

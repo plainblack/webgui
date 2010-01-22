@@ -285,13 +285,14 @@ around BUILDARGS => sub {
     my $revisionDate  = shift;
 
     unless ($assetId) {
-        $session->errorHandler->error("Asset constructor new() requires an assetId.");
-        return undef;
+        WebGUI::Error::InvalidParam->throw(error => "Asset constructor new() requires an assetId.");
     }
 
-    if ( !$revisionDate ) {
+    if ( $revisionDate eq '' ) {
         $revisionDate   = $className->getCurrentRevisionDate( $session, $assetId );
-        return undef unless $revisionDate;
+        if ($revisionDate eq '') {
+            WebGUI::Error::InvalidParam->throw(error => "Cannot find revision date for assetId", param => $assetId);
+        }
     }
 
     my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
@@ -332,6 +333,7 @@ use WebGUI::AssetMetaData;
 use WebGUI::AssetPackage;
 use WebGUI::AssetTrash;
 use WebGUI::AssetVersioning;
+use WebGUI::Exception;
 use strict;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
@@ -1599,22 +1601,25 @@ sub isValidRssItem { 1 }
 
 #-------------------------------------------------------------------
 
-=head2 loadModule ( $session, $className ) 
+=head2 loadModule ( $className ) 
 
-Loads an asset module if it's not already in memory. This is a class method. Returns undef on failure to load, otherwise returns the classname.  Will only load classes in the WebGUI::Asset namespace.
+Loads an asset module if it's not already in memory. This is a class method. Returns
+undef on failure to load, otherwise returns the classname.  Will only load classes
+in the WebGUI::Asset namespace.
 
 =cut
 
 sub loadModule {
-    my ($class, $session, $className) = @_;
+    my ($class, $className) = @_;
     if ($className !~ /^WebGUI::Asset(?:::\w+)*$/ ) {
-        return undef;
+        WebGUI::Error::InvalidParam->throw(param => $className, error => "Not a WebGUI::Asset class",);
     }
     (my $module = $className . '.pm') =~ s{::}{/}g;
     if (eval { require $module; 1 }) {
         return $className;
     }
-    $session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+
+    WebGUI::Error::Compile->throw(class => $className, cause => $@);
     return undef;
 }
 
@@ -1730,8 +1735,7 @@ sub newById {
         && $assetId;
 
     my $className = WebGUI::Asset->getClassById($session, $assetId);
-    my $class     = WebGUI::Asset->loadModule($session, $className);
-    return undef unless $class;
+    my $class     = WebGUI::Asset->loadModule($className);
     return $class->new($session, $assetId, $revisionDate);
 }
 
@@ -1761,7 +1765,7 @@ sub newByPropertyHashRef {
     my $properties = shift || {};
     $properties->{className} //= $class;
     $properties->{session}     = $session;
-    my $className = $class->loadModule($session, $properties->{className});
+    my $className = $class->loadModule($properties->{className});
     return undef unless (defined $className);
     my $object = $className->new($properties);
     return $object;
@@ -2408,7 +2412,7 @@ new Asset will inherit security and style properties from the current asset, the
 sub www_add {
 	my $self = shift;
 	my %prototypeProperties;
-    my $class = $self->loadModule($self->session, $self->session->form->process("class","className"));
+    my $class = $self->loadModule($self->session->form->process("class","className"));
     return undef unless (defined $class);
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
 	if ($self->session->form->process('prototype')) {
