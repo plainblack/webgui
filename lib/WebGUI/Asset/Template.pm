@@ -15,7 +15,66 @@ package WebGUI::Asset::Template;
 =cut
 
 use strict;
-use base 'WebGUI::Asset';
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+attribute assetName   => ['assetName', 'Asset_Template'],
+attribute icon        => 'template.gif',
+attribute tableName   => 'template',
+
+property template => (
+             fieldType       => 'codearea',
+             syntax          => "html",
+             default         => undef,
+             filter          => 'packTemplate',
+             label           => ['assetName', 'Asset_Template'],
+             hoverHelp       => ['template description', 'Asset_Template'],
+         );
+property isEditable => (
+             noFormPost      => 1,
+             fieldType       => 'hidden',
+             default         => 1,
+         );
+property isDefault => (
+             noFormPost      => 1,
+             fieldType       => 'hidden',
+             default         => 0,
+         );
+property showInForms => (
+             fieldType       => 'yesNo',
+             default         => 1,
+             label           => ['show in forms', 'Asset_Template'],
+             hoverHelp       => ['show in forms description', 'Asset_Template'],
+         );
+property parser => (
+             noFormPost      => 1,
+             fieldType       => 'selectBox',
+             lazy            => 1,
+             builder         => '_default_parser',
+         );
+sub _default_parser {
+    my $self = shift;
+    return $self->session->config->get('defaultTemplateParser');
+}
+property namespace => (
+             fieldType       => 'combo',
+             default         => undef,
+			 label           => ['namespace', 'Asset_Template'],
+			 hoverHelp       => ['namespace description', 'Asset_Template'],
+         );
+property templatePacked => (
+             fieldType       => 'hidden',
+             default         => undef,
+             noFormPost      => 1,
+         );
+property usePacked => (
+             fieldType       => 'yesNo',
+             default         => 0,
+             label           => ['usePacked label', 'Asset_Template'],
+             hoverHelp       => ['usePacked description', 'Asset_Template'],
+         );
+
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
@@ -44,75 +103,6 @@ use WebGUI::Asset::Template;
 These methods are available from this class:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-Defines the properties of this asset.
-
-=head3 session
-
-A reference to an existing session.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-	my $session     = shift;
-    my $definition  = shift;
-	my $i18n        = WebGUI::International->new($session,"Asset_Template");
-    push @{$definition}, {
-		assetName   => $i18n->get('assetName'),
-		icon        => 'template.gif',
-        tableName   => 'template',
-        className   => 'WebGUI::Asset::Template',
-        properties  => {
-            template => {
-                fieldType       => 'codearea',
-                syntax          => "html",
-                defaultValue    => undef,
-                filter          => 'packTemplate',
-            },
-            isEditable => {
-                noFormPost      => 1,
-                fieldType       => 'hidden',
-                defaultValue    => 1,
-            },
-            isDefault => {
-                fieldType       => 'hidden',
-                defaultValue    => 0,
-            },
-            showInForms => {
-                fieldType       => 'yesNo',
-                defaultValue    => 1,
-            },
-            parser => {
-                noFormPost      => 1,
-                fieldType       => 'selectBox',
-                defaultValue    => [$session->config->get("defaultTemplateParser")],
-            },	
-            namespace => {
-                fieldType       => 'combo',
-                defaultValue    => undef,
-            },
-            templatePacked => {
-                fieldType       => 'hidden',
-                defaultValue    => undef,
-                noFormPost      => 1,
-            },
-            usePacked => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-        },
-    };
-    return $class->SUPER::definition($session,$definition);
-}
 
 #-------------------------------------------------------------------
 
