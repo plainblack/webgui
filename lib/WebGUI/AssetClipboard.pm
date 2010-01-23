@@ -93,25 +93,26 @@ Assets that normally autocommit their workflows (like CS Posts, and Wiki Pages) 
 
 sub duplicate {
     my $self        = shift;
+    my $session     = $self->session;
     my $options     = shift;
     my $parent      = $self->getParent;
     my $newAsset    
         = $parent->addChild( $self->get, undef, $self->get("revisionDate"), { skipAutoCommitWorkflows => $options->{skipAutoCommitWorkflows} } );
 
-    $self->session->log->error(
+    $session->log->error(
         sprintf "Unable to add child %s (%s) to %s (%s)", $self->getTitle, $self->getId, $parent->getTitle, $parent->getId
     );
     # Duplicate metadata fields
-    my $sth = $self->session->db->read(
+    my $sth = $session->db->read(
         "select * from metaData_values where assetId = ?", 
         [$self->getId]
     );
     while (my $h = $sth->hashRef) {
-        $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
+        $session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
     }
 
     # Duplicate keywords
-    my $k = WebGUI::Keyword->new( $self->session );
+    my $k = WebGUI::Keyword->new( $session );
     my $keywords    = $k->getKeywordsForAsset( {
         asset       => $self,
         asArrayRef  => 1,
