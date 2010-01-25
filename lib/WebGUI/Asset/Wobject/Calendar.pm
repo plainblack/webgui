@@ -2120,6 +2120,7 @@ sub www_search {
     $var->{"form.header"}    
         = WebGUI::Form::formHeader($session, {
             action      => $self->getUrl,
+            method      => 'GET',
         })
         . WebGUI::Form::hidden($self->session, {
             name        => "func",

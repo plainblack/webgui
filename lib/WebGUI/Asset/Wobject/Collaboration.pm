@@ -1624,7 +1624,8 @@ sub www_search {
 	
     my $query   = $self->session->form->process("query","text");
     $var->{'form.header'} = WebGUI::Form::formHeader($self->session,{
-        action=>$self->getUrl("func=search;doit=1")
+        action=> $self->getUrl("func=search;doit=1"),
+        method=> 'GET',
     });
     $var->{'query.form'}  = WebGUI::Form::text($self->session,{
         name  => 'query',

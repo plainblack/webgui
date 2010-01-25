@@ -196,7 +196,7 @@ sub getGroupSearchForm {
 	}
 	my $output = '<div align="center">';
 	my $i18n = WebGUI::International->new($session);
-	my $f = WebGUI::HTMLForm->new($session,1);
+	my $f = WebGUI::HTMLForm->new($session, method => 'GET', );
 	foreach my $key (keys %{$params}) {
                 $f->hidden(
                         -name=>$key,
@@ -1012,7 +1012,7 @@ sub www_manageUsersInGroup {
 	my $session = shift;
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
-	my $output = WebGUI::Form::formHeader($session,)
+	my $output = WebGUI::Form::formHeader($session,{ method => 'GET', })
 		.WebGUI::Form::hidden($session,{
 			name=>"gid",
 			value=>$session->form->process("gid")

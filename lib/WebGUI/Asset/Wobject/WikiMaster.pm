@@ -148,7 +148,7 @@ sub appendSearchBoxVars {
 	my $queryText = shift;
 	my $submitText = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('searchLabel');
 	$var->{'searchFormHeader'} = join '',
-	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl}),
+	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl, method => 'GET', }),
 	     WebGUI::Form::hidden($self->session, { name => 'func', value => 'search' }));
 	$var->{'searchQuery'} = WebGUI::Form::text($self->session, { name => 'query', value => $queryText });
 	$var->{'searchSubmit'} = WebGUI::Form::submit($self->session, { value => $submitText });
