@@ -150,6 +150,7 @@ sub create {
     $properties->{fieldType} ||= "ReadOnly";
     return undef if $class->exists($session,$fieldName);
     return undef if $class->isReservedFieldName($fieldName);
+    return undef if $fieldName =~ m{\s};
 
     ### Data okay, create the field
     # Add the record
