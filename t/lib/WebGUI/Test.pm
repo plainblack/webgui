@@ -112,6 +112,7 @@ sub import {
             Transactions        => 'transaction',
             'Transaction Items' => 'transactionItem',
             'Ship Drivers'      => 'shipper',
+            'Payment Drivers'   => 'paymentGateway',
             'Database Links'    => 'databaseLink',
             'LDAP Links'        => 'ldapLink',
         );
@@ -792,6 +793,7 @@ were passed in.  Currently able to destroy:
     WebGUI::Workflow
     WebGUI::Shop::Cart
     WebGUI::Shop::ShipDriver
+    WebGUI::Shop::PayDriver
     WebGUI::Shop::Transaction
     WebGUI::DatabaseLink
     WebGUI::LDAPLink
@@ -877,6 +879,7 @@ Example call:
         'WebGUI::DatabaseLink'      => 'delete',
         'WebGUI::Shop::Transaction' => 'delete',
         'WebGUI::Shop::ShipDriver'  => 'delete',
+        'WebGUI::Shop::PayDriver'   => 'delete',
         'WebGUI::Shop::Cart'        => sub {
             my $cart        = shift;
             my $addressBook = $cart->getAddressBook();
