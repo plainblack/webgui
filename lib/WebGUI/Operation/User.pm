@@ -277,7 +277,7 @@ sub getUserSearchForm {
 	$session->scratch->set("userSearchModifier",$session->form->process("modifier")) if defined($session->form->process("modifier"));
 	my $i18n = WebGUI::International->new($session);
 	my $output = '<div align="center">'
-		.WebGUI::Form::formHeader($session,)
+		.WebGUI::Form::formHeader($session,{ method => 'GET'}, )
 		.WebGUI::Form::hidden($session,
 			name => "op",
 			value => $op

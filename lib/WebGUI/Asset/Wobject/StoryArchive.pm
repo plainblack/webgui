@@ -598,7 +598,7 @@ sub viewTemplateVariables {
     }
     $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud($cloudOptions);
     if (! $exporting) {
-        $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
+        $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl, method => 'GET',  })
                              . WebGUI::Form::hidden($session, { name   => 'func',   value => 'view' });
         $var->{searchFooter} = WebGUI::Form::formFooter($session);
         $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search','Asset')});

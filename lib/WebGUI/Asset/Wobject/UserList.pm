@@ -602,7 +602,7 @@ sub view {
 	$var{user_loop}             = \@users;
     $var{alphabetSearch_loop}   = $self->getAlphabetSearchLoop($self->get("alphabetSearchField"),$self->get("alphabet"));
 
-	$var{searchFormHeader}      = WebGUI::Form::formHeader($self->session,{action => $self->getUrl});
+	$var{searchFormHeader}      = WebGUI::Form::formHeader($self->session,{action => $self->getUrl, method => 'GET', });
     $var{searchFormSubmit}      = WebGUI::Form::submit($self->session,{value => $i18n->get('submit search label')});
     $var{searchFormFooter}      = WebGUI::Form::formFooter($self->session);
 
