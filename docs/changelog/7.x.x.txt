@@ -1,6 +1,7 @@
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin
  - fixed #11364: Notify About Low Stock workflow activity email is not user friendly
+ - fixed #11371: Spaces in the names of custom profile fields
 
 7.8.10
  - fixed #11332: Pagination in webgui.org forum urls
