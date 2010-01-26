@@ -16,9 +16,9 @@ use Tie::IxHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 
-attribute assetName => ['assetName', 'Asset_Shortcut'];
-attribute icon      => 'shortcut.gif';
-attribute tableName => 'Shortcut';
+aspect assetName => ['assetName', 'Asset_Shortcut'];
+aspect icon      => 'shortcut.gif';
+aspect tableName => 'Shortcut';
 
 property  shortcutToAssetId => (
               noFormPost => 1,

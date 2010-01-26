@@ -19,9 +19,9 @@ use WebGUI::AdSpace;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
-attribute assetName => ["assetName", 'Asset_Layout'];
-attribute icon      => 'layout.gif';
-attribute tableName => 'Layout';
+aspect assetName => ["assetName", 'Asset_Layout'];
+aspect icon      => 'layout.gif';
+aspect tableName => 'Layout';
 
 property templateId => (
              fieldType    => "template",

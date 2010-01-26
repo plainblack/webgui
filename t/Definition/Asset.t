@@ -24,7 +24,7 @@ use WebGUI::Test;
     package WGT::Class::Atset;
     use WebGUI::Definition::Asset;
 
-    attribute tableName => 'asset';
+    aspect tableName => 'asset';
     ::dies_ok  { property 'property1' => (); } 'must have a fieldType';
     ::dies_ok  { property 'property1' => (fieldType => 'text'); } 'must pass either a label or noFormPost flag';
     ::lives_ok { property 'property1' => (
@@ -44,7 +44,7 @@ use WebGUI::Test;
     package WGT::Class::Asset;
     use WebGUI::Definition::Asset;
 
-    attribute tableName => 'asset';
+    aspect tableName => 'asset';
     property 'property2' => (
         fieldType => 'text',
         label     => 'property2',
@@ -142,7 +142,7 @@ use WebGUI::Test;
     package WGT::Class::AlsoAsset;
     use WebGUI::Definition::Asset;
 
-    attribute tableName => 'asset';
+    aspect tableName => 'asset';
     property 'property1' => (
         fieldType => 'text',
         label     => 'property1',
@@ -160,7 +160,7 @@ use WebGUI::Test;
     use WebGUI::Definition::Asset;
     extends 'WGT::Class::AlsoAsset';
 
-    attribute tableName => 'snippet';
+    aspect tableName => 'snippet';
     property 'property10' => (
         fieldType => 'text',
         label     => 'property10',
@@ -215,7 +215,7 @@ use WebGUI::Test;
     use WebGUI::Definition::Asset;
     extends 'WGT::Class::AlsoAsset';
 
-    attribute tableName => 'snippet';
+    aspect tableName => 'snippet';
     property 'property10' => (
         fieldType => 'text',
         label     => 'property10',
@@ -241,7 +241,7 @@ use WebGUI::Test;
     use WebGUI::Definition::Asset;
     extends 'WGT::Class::AlsoAsset';
 
-    attribute tableName => 'tertius';
+    aspect tableName => 'tertius';
     property 'defaulted' => (
         fieldType => 'text',
         label     => 'defaulted',

@@ -20,9 +20,9 @@ use WebGUI::Utility;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-attribute assetName => ["assetName", 'Asset_Navigation'];
-attribute icon      => 'navigation.gif';
-attribute tableName => 'Navigation';
+aspect assetName => ["assetName", 'Asset_Navigation'];
+aspect icon      => 'navigation.gif';
+aspect tableName => 'Navigation';
 
 property    templateId => (
                 label        => ['1096', 'Asset_Navigation'],

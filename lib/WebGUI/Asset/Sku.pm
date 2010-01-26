@@ -23,9 +23,9 @@ use WebGUI::Inbox;
 use WebGUI::Shop::Cart;
 use JSON qw{ from_json to_json };
 
-attribute assetName => ['assetName', 'Asset_Sku'];
-attribute icon      => 'Sku.gif';
-attribute tableName => 'sku';
+aspect assetName => ['assetName', 'Asset_Sku'];
+aspect icon      => 'Sku.gif';
+aspect tableName => 'sku';
 
 property description => (
             tab             => "properties",

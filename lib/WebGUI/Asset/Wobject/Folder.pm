@@ -18,10 +18,10 @@ use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
-attribute assetName   => ["assetName", 'Asset_Folder'];
-attribute uiLevel     => 5;
-attribute icon        => 'folder.gif';
-attribute tableName   => 'Folder';
+aspect assetName   => ["assetName", 'Asset_Folder'];
+aspect uiLevel     => 5;
+aspect icon        => 'folder.gif';
+aspect tableName   => 'Folder';
 
 property visitorCacheTimeout => (
              tab             => "display",

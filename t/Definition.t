@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 use Test::Deep;
 use Test::Exception;
 
@@ -27,7 +27,7 @@ my $called_getProperties;
     package WGT::Class;
     use WebGUI::Definition;
 
-    attribute 'attribute1' => 'attribute1 value';
+    aspect 'aspect1' => 'aspect1 value';
     property 'property1' => (
         arbitrary_key => 'arbitrary_value',
         label         => 'property1',
@@ -37,8 +37,8 @@ my $called_getProperties;
         label         => 'property2',
     );
 
-    # attributes create methods
-    ::can_ok +__PACKAGE__, 'attribute1';
+    # aspects create methods
+    ::can_ok +__PACKAGE__, 'aspect1';
 
     # propeties create methods
     ::can_ok +__PACKAGE__, 'property1';
@@ -60,7 +60,7 @@ my $called_getProperties;
     package WGT::Class2;
     use WebGUI::Definition;
 
-    attribute 'attribute1' => 'attribute1 value';
+    aspect 'aspect1' => 'aspect1 value';
     property  'property3' => ( label => 'label' );
     property  'property1' => ( label => 'label' );
     property  'property2' => ( label => 'label' );
@@ -102,7 +102,7 @@ my $called_getProperties;
     package WGT::Class3;
     use WebGUI::Definition;
 
-    attribute 'attribute1' => 'attribute1 value';
+    aspect 'aspect1' => 'aspect1 value';
     property  'property1' => (
         label   => ['webgui', 'WebGUI'],
         options => \&property1_options,
@@ -126,4 +126,33 @@ my $called_getProperties;
         'getFormProperties handles i18n and subroutines'
     );
 
+}
+
+{
+    package WGT::Class4;
+    use WebGUI::Definition;
+    extends 'WGT::Class3';
+
+    aspect 'aspect41' => 'aspect41 value';
+    property  'property41' => (
+        label   => ['webgui', 'WebGUI'],
+    );
+    has something => (
+        is       => 'rw',
+    );
+
+    my $object3 = WGT::Class3->new({session => $session});
+    my $object4 = WGT::Class4->new({session => $session});
+
+    ::cmp_bag (
+        [WGT::Class3->meta->get_all_attributes_list],
+        [qw/ property1 session /],
+        'get_all_aspects_list returns all aspects in all metaclasses for the class'
+    );
+
+    ::cmp_bag (
+        [WGT::Class4->meta->get_all_attributes_list],
+        [qw/ property41 something property1 session /],
+        '... checking inherited class'
+    );
 }
