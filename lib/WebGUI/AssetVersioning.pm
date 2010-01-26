@@ -114,17 +114,8 @@ sub addRevision {
     }
     $session->db->commit;
 
-    my $sql = "update assetData set revisedBy=?, tagId=? where assetId=? and revisionDate=?";
-
-    $session->db->write($sql,[
-        $session->user->userId, 
-        $workingTag->getId, 
-        $self->getId, 
-        $now, 
-    ]);
-
 	# current values, and the user set properties
-	my %mergedProperties = (%{$self->get}, %{$properties}, (status => 'pending'));
+	my %mergedProperties = (%{$self->get}, %{$properties}, (status => 'pending', revisedBy => $session->user->userId, tagId => $workingTag->getId), );
 
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);

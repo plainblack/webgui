@@ -21,7 +21,7 @@ use Test::Deep;
 use Test::Exception;
 use WebGUI::Exception;
 
-plan tests => 57;
+plan tests => 59;
 
 my $session = WebGUI::Test->session;
 
@@ -238,13 +238,15 @@ my $session = WebGUI::Test->session;
     my $testAsset = WebGUI::Asset->new($session, $testId2, $revisionDate);
     $testAsset->title('test title 43');
     $testAsset->write();
+    my $tag = WebGUI::VersionTag->getWorking($session);
     my $revAsset  = $testAsset->addRevision({}, $now);
     isa_ok $revAsset, 'WebGUI::Asset';
     is $revAsset->revisionDate, $now, 'revisionDate set correctly on new revision';
     is $revAsset->title, 'test title 43', 'data fetch from database correct';
+    is $revAsset->revisedBy, $session->user->userId, 'revisedBy is current session user';
+    is $revAsset->tagId, $tag->getId, 'tagId is current working tagId';
     my $count = $session->db->quickScalar('SELECT COUNT(*) from assetData where assetId=?',[$testId2]);
     is $count, 2, 'two records in the database';
-    my $tag = WebGUI::VersionTag->getWorking($session);
     addToCleanup($tag);
 
     $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");

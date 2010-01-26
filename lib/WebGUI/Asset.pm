@@ -260,6 +260,11 @@ has       assetId => (
 has       revisionDate => (
             is              => 'rw',
           );
+property  revisedBy => (
+            is              => 'rw',
+            noFormPost      => 1,
+            fieldType       => 'guid',
+          );
 has       [qw/parentId     lineage
               creationDate createdBy
               state stateChanged stateChangedBy
@@ -2313,7 +2318,7 @@ sub write {
         my @values      = map { $self->$_ } @properties;      
         my @columnNames = map { $db->quoteIdentifier($_).'=?' } @properties;
         push @values, $self->getId, $self->revisionDate;
- 	    $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
+        $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
     }
 
     # update the asset's size, which also purges the cache.
