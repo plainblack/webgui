@@ -21,10 +21,10 @@ use JSON;
 use HTML::Packer;
 
 use WebGUI::Definition::Asset;
-attribute assetName  => 'asset';
-attribute tableName  => 'assetData';
-attribute icon       => 'assets.gif';
-attribute uiLevel    => 1;
+aspect assetName  => 'asset';
+aspect tableName  => 'assetData';
+aspect icon       => 'assets.gif';
+aspect uiLevel    => 1;
 property  title => (
             tab             => "properties",
             label           => ['99','Asset'],
