@@ -397,10 +397,10 @@ sub getLineage {
         return [];
     }
 
-	my @lineage;
-	my %relativeCache;
-	my $sth = $session->db->read($sql);
-	while (my ($id, $class, $parentId, $version) = $sth->array) {
+    my @lineage;
+    my %relativeCache;
+    my $sth = $session->db->read($sql);
+    ASSET: while (my ($id, $class, $parentId, $version) = $sth->array) {
 		# create whatever type of object was requested
 		my $asset;
 		if ($rules->{returnObjects}) {
@@ -410,23 +410,24 @@ sub getLineage {
 				$asset = WebGUI::Asset->newById($session, $id, $version);
 				if (!defined $asset) { # won't catch everything, but it will help some if an asset blows up
 					$session->errorHandler->error("AssetLineage::getLineage - failed to instanciate asset with assetId $id, className $class, and revision $version");
-					next;
+					next ASSET;
 				}
 			}
-		} else {
-			$asset = $id;
 		}
+        else {
+            $asset = $id;
+        }
 		# since we have the relatives info now, why not cache it
-		if ($rules->{returnObjects}) {
-			$relativeCache{$id} = $asset;
-			if (my $parent = $relativeCache{$parentId}) {
-				$asset->{_parent} = $parent; 
-				unless ($parent->cacheChild('first')) {
-					$parent->cacheChild(first => $asset);
-				}
-				$parent->cacheChild(last => $asset);
-			}
-		}
+ 		if ($rules->{returnObjects}) {
+ 			$relativeCache{$id} = $asset;
+ 			if (my $parent = $relativeCache{$parentId}) {
+ 				$asset->{_parent} = $parent; 
+ 				unless ($parent->cacheChild('first')) {
+ 					$parent->cacheChild(first => $asset);
+ 				}
+ 				$parent->cacheChild(last => $asset);
+ 			}
+ 		}
 		push(@lineage,$asset);
 	}
 	$sth->finish;
@@ -586,7 +587,7 @@ sub getLineageSql {
 	}
 	# we need to include descendants
 	if (isIn("descendants",@{$relatives})) {
-		my $mod = "(asset.lineage like ".$db->quote($lineage.'%')." and asset.lineage<>".$db->quote($lineage); 
+		my $mod = "(asset.lineage like ".$db->quote($lineage.'_%'); 
 		if (exists $rules->{endingLineageLength}) {
 			$mod .= " and length(asset.lineage) <= ".($rules->{endingLineageLength}*6);
 		}

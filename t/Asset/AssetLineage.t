@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 90; # increment this value for each test you create
+use Test::More tests => 91; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -86,6 +86,115 @@ my $snippet2 = $folder2->addChild( {
 $versionTag->commit;
 my @snipIds;
 my $lineageIds;
+
+####################################################
+#
+# getLineage
+#
+####################################################
+
+my $ids = $folder->getLineage(['self']);
+cmp_deeply(
+    [$folder->getId],
+    $ids,
+    'getLineage: get self'
+);
+
+@snipIds = map { $_->getId } @snippets;
+$lineageIds = $folder->getLineage(['descendants']);
+
+cmp_deeply($lineageIds, \@snipIds, 'default order returned by getLineage is lineage order');
+
+@snipIds = map { $_->getId } @snippets;
+$ids = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $ids,
+    '... get descendants of folder'
+);
+
+$ids = $folder->getLineage(['self','descendants']);
+unshift @snipIds, $folder->getId;
+cmp_bag(
+    \@snipIds,
+    $ids,
+    '... get descendants of folder and self'
+);
+
+$ids = $folder->getLineage(['self','children']);
+cmp_bag(
+    \@snipIds,
+    $ids,
+    '... descendants == children if there are no grandchildren'
+);
+
+$ids = $topFolder->getLineage(['self','children']);
+cmp_bag(
+    [$topFolder->getId, $folder->getId, $folder2->getId, ],
+    $ids,
+    '... children (no descendants) of topFolder',
+);
+
+$ids = $topFolder->getLineage(['self','descendants']);
+cmp_bag(
+    [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
+    $ids,
+    '... descendants of topFolder',
+);
+
+####################################################
+#
+# getLineageIterator
+#
+####################################################
+
+sub getListFromIterator {
+    my $iterator = shift;
+    my @items;
+    while (my $item = $iterator->()) {
+        push @items, $item->getId;
+    }
+    return \@items;
+}
+
+@snipIds = map { $_->getId } @snippets;
+my $ids = getListFromIterator($folder->getLineageIterator(['descendants']));
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineageIterator: get descendants of folder'
+);
+
+$ids = getListFromIterator($folder->getLineageIterator(['self','descendants']));
+unshift @snipIds, $folder->getId;
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineageIterator: get descendants of folder and self'
+);
+shift @snipIds;
+
+$ids = getListFromIterator($folder->getLineageIterator(['self','children']));
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineageIterator: descendants == children if there are no grandchildren'
+);
+
+$ids = getListFromIterator($topFolder->getLineageIterator(['self','children']));
+cmp_bag(
+    [$topFolder->getId, $folder->getId, $folder2->getId, ],
+    $ids,
+    'getLineageIterator: children (no descendants) of topFolder',
+);
+
+$ids = getListFromIterator($topFolder->getLineageIterator(['self','descendants']));
+cmp_bag(
+    [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
+    $ids,
+    'getLineageIterator: descendants of topFolder',
+);
+
 
 ####################################################
 #
@@ -182,12 +291,12 @@ is(
 #
 ####################################################
 
-#note $snippets[0]->get('lineage');
-#note $snippet2->get('lineage');
+#note $snippets[0]->lineage;
+#note $snippet2->lineage;
 ##Uncomment me to crash the test
-#$snippet2->cascadeLineage($snippets[0]->get('lineage'));
-#note $snippets[0]->get('lineage');
-#note $snippet2->get('lineage');
+#$snippet2->cascadeLineage($snippets[0]->lineage);
+#note $snippets[0]->lineage;
+#note $snippet2->lineage;
 
 ####################################################
 #
@@ -238,17 +347,19 @@ is($folder2->getNextChildRank, '000002',  "getNextChildRank: empty folder");
 #
 ####################################################
 
-is($snippets[0]->swapRank($snippets[1]->get('lineage')),  1, 'swapRank: self and adjacent');
+is($snippets[0]->swapRank($snippets[1]->lineage),  1, 'swapRank: self and adjacent');
+
+$folder->cloneFromDb;
 
 @snipIds[0,1] = @snipIds[1,0];
 $lineageIds = $folder->getLineage(['descendants']);
 cmp_bag(
     \@snipIds,
     $lineageIds,
-    'swapRank: swapped first and second snippets'
+    '... swapped first and second snippets'
 );
 
-@snippets[0..1] = map { WebGUI::Asset->newByUrl($session, "snippet$_") } 0..1;
+@snippets[0..1] = map { $_->cloneFromDb } @snippets[0..1];
 
 is(
     $snippets[1]->swapRank($snippets[0]->get('lineage'), $snippets[1]->get('lineage'), ), 
@@ -272,10 +383,10 @@ is(scalar @snippets, $folder->getChildCount,  'changing lineage does not change 
 is(1               , $folder2->getChildCount, 'changing lineage does not change relationship in folder2');
 
 ##Reinstance the asset object due to db manipulation
-$folder  = WebGUI::Asset->newById($session, $folder->getId);
-$folder2 = WebGUI::Asset->newById($session, $folder2->getId);
-@snippets = map { WebGUI::Asset->newById($session, $snippets[$_]->getId) } 0..6;
-$snippet2 = WebGUI::Asset->newById($session, $snippet2->getId);
+$folder   = $folder->cloneFromDb;
+$folder2  = $folder2->cloneFromDb;
+@snippets = map { $_->cloneFromDb } @snippets;
+$snippet2 = $snippet2->cloneFromDb;
 
 ####################################################
 #
@@ -396,113 +507,6 @@ is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing id cache force
 delete $cachedLineage->{$snippet4->get('lineage')}->{class};
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
 is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing class cache forces lookup');
-
-####################################################
-#
-# getLineage
-#
-####################################################
-
-@snipIds = map { $_->getId } @snippets;
-$lineageIds = $folder->getLineage(['descendants']);
-
-cmp_bag($lineageIds, \@snipIds, 'default order returned by getLineage is lineage order');
-
-my $ids = $folder->getLineage(['self']);
-cmp_bag(
-    [$folder->getId],
-    $ids,
-    'getLineage: get self'
-);
-
-@snipIds = map { $_->getId } @snippets;
-$ids = $folder->getLineage(['descendants']);
-cmp_bag(
-    \@snipIds,
-    $ids,
-    '... get descendants of folder'
-);
-
-$ids = $folder->getLineage(['self','descendants']);
-unshift @snipIds, $folder->getId;
-cmp_bag(
-    \@snipIds,
-    $ids,
-    '... get descendants of folder and self'
-);
-
-$ids = $folder->getLineage(['self','children']);
-cmp_bag(
-    \@snipIds,
-    $ids,
-    '... descendants == children if there are no grandchildren'
-);
-
-$ids = $topFolder->getLineage(['self','children']);
-cmp_bag(
-    [$topFolder->getId, $folder->getId, $folder2->getId, ],
-    $ids,
-    '... children (no descendants) of topFolder',
-);
-
-$ids = $topFolder->getLineage(['self','descendants']);
-cmp_bag(
-    [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
-    $ids,
-    '... descendants of topFolder',
-);
-
-####################################################
-#
-# getLineageIterator
-#
-####################################################
-
-sub getListFromIterator {
-    my $iterator = shift;
-    my @items;
-    while (my $item = $iterator->()) {
-        push @items, $item->getId;
-    }
-    return \@items;
-}
-
-@snipIds = map { $_->getId } @snippets;
-my $ids = getListFromIterator($folder->getLineageIterator(['descendants']));
-cmp_bag(
-    \@snipIds,
-    $ids,
-    'getLineageIterator: get descendants of folder'
-);
-
-$ids = getListFromIterator($folder->getLineageIterator(['self','descendants']));
-unshift @snipIds, $folder->getId;
-cmp_bag(
-    \@snipIds,
-    $ids,
-    'getLineageIterator: get descendants of folder and self'
-);
-
-$ids = getListFromIterator($folder->getLineageIterator(['self','children']));
-cmp_bag(
-    \@snipIds,
-    $ids,
-    'getLineageIterator: descendants == children if there are no grandchildren'
-);
-
-$ids = getListFromIterator($topFolder->getLineageIterator(['self','children']));
-cmp_bag(
-    [$topFolder->getId, $folder->getId, $folder2->getId, ],
-    $ids,
-    'getLineageIterator: children (no descendants) of topFolder',
-);
-
-$ids = getListFromIterator($topFolder->getLineageIterator(['self','descendants']));
-cmp_bag(
-    [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
-    $ids,
-    'getLineageIterator: descendants of topFolder',
-);
 
 ####################################################
 #
