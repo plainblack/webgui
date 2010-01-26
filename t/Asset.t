@@ -21,7 +21,7 @@ use Test::Deep;
 use Test::Exception;
 use WebGUI::Exception;
 
-plan tests => 51;
+plan tests => 57;
 
 my $session = WebGUI::Test->session;
 
@@ -273,4 +273,16 @@ my $session = WebGUI::Test->session;
     my $asset = eval { WebGUI::Asset->new($session, ''); };
     my $e = Exception::Class->caught;
     isa_ok $e, 'WebGUI::Error';
+}
+
+{
+    note "get gets WebGUI::Definition properties, and standard attributes";
+    my $asset = WebGUI::Asset->new({session => $session, parentId => 'I have a parent'});
+    is $asset->get('className'), 'WebGUI::Asset', 'get(property) works on className';
+    is $asset->get('assetId'),  $asset->assetId,   '... works on assetId';
+    is $asset->get('parentId'), 'I have a parent',  '... works on parentId';
+    my $properties = $asset->get();
+    is $properties->{className}, 'WebGUI::Asset', 'get() works on className';
+    is $properties->{assetId},  $asset->assetId,   '... works on assetId';
+    is $properties->{parentId}, 'I have a parent',  '... works on parentId';
 }
