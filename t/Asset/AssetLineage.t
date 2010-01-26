@@ -166,17 +166,15 @@ cmp_bag(
 );
 
 $ids = getListFromIterator($folder->getLineageIterator(['self','descendants']));
-unshift @snipIds, $folder->getId;
 cmp_bag(
-    \@snipIds,
+    [$folder->getId, @snipIds],
     $ids,
     'getLineageIterator: get descendants of folder and self'
 );
-shift @snipIds;
 
 $ids = getListFromIterator($folder->getLineageIterator(['self','children']));
 cmp_bag(
-    \@snipIds,
+    [$folder->getId, @snipIds],
     $ids,
     'getLineageIterator: descendants == children if there are no grandchildren'
 );
@@ -190,11 +188,10 @@ cmp_bag(
 
 $ids = getListFromIterator($topFolder->getLineageIterator(['self','descendants']));
 cmp_bag(
-    [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
+    [$topFolder->getId, $folder->getId, @snipIds, $folder2->getId, $snippet2->getId],
     $ids,
     'getLineageIterator: descendants of topFolder',
 );
-
 
 ####################################################
 #
