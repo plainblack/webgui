@@ -46,9 +46,26 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 get_all_attributes_list ( )
+
+Returns an array of all attribute names across all meta classes.
+
+=cut
+
+sub get_all_attributes_list {
+    my $self  = shift;
+    my @attributes = ();
+    CLASS: foreach my $meta ($self->get_all_class_metas) {
+        push @attributes, $meta->get_attribute_list;
+    }
+    return @attributes;
+}
+
+#-------------------------------------------------------------------
+
 =head2 get_all_class_metas ( )
 
-Returns an array of all class meta objects for the classes in this class,
+Returns an array of all WebGUI::Definition::Meta::Class objects for the classes in this class,
 in the order they were created in the Definition.
 
 =cut
@@ -108,7 +125,7 @@ sub get_all_property_list {
 =head2 get_attributes ( )
 
 Returns an array of all attributes, but only for this class.  This is the
-API-safe way of doing $self->_attribute_map;
+API-safe way of doing values %{ $self->_attribute_map };
 
 =cut
 

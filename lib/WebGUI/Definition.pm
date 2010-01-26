@@ -46,7 +46,7 @@ These methods are available from this class:
 
 my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
     install         => [ 'unimport' ],
-    with_meta       => [ 'property', 'attribute' ],
+    with_meta       => [ 'property', 'aspect' ],
     also            => 'Moose',
 );
 
@@ -87,15 +87,15 @@ sub init_meta {
 
 #-------------------------------------------------------------------
 
-=head2 attribute ( )
+=head2 aspect ( )
 
-An attribute of the definition is typically static data which is never processed from a form
-or persisted to the database.  In an Asset-style definition, an attribute would
+An aspect of the definition is typically static data which is never processed from a form
+or persisted to the database.  In an Asset-style definition, an aspect would
 be the table name, the asset's name, or the path to the asset's icon.
 
 =cut
 
-sub attribute {
+sub aspect {
     my ($meta, $name, $value) = @_;
     if ($meta->can($name)) {
         $meta->$name($value);
