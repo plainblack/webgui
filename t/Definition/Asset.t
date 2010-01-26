@@ -68,13 +68,9 @@ use WebGUI::Test;
     }
 
     ::is +__PACKAGE__->meta->get_attribute('property1')->tableName, 'asset', 'tableName copied from attribute into property';
-    ::isa_ok +__PACKAGE__->getProperty('property1'), 'WebGUI::Definition::Meta::Property::Asset';
 
     ::can_ok +__PACKAGE__, 'update';
     ::can_ok +__PACKAGE__, 'tableName';
-
-    ::can_ok +__PACKAGE__->getProperty('property1'), 'tableName';
-    ::is +__PACKAGE__->getProperty('property1')->tableName, 'asset', 'tableName set on property to asset';
 
     my $object = __PACKAGE__->new;
     $object->set({property1 => 'property value'});
@@ -172,10 +168,10 @@ use WebGUI::Test;
 
     package main;
 
-    is +WGT::Class::AlsoAsset->getProperty('property1')->tableName, 'asset', 'tableName set in base class';
+    is +WGT::Class::AlsoAsset->tableName, 'asset', 'tableName set in base class';
 
-    is +WGT::Class::Asset::Snippet->getProperty('property10')->tableName, 'snippet', 'tableName set in subclass';
-    is +WGT::Class::Asset::Snippet->getProperty('property1')->tableName,  'asset',   '... but inherited properties keep their tableName';
+    is +WGT::Class::Asset::Snippet->meta->find_attribute_by_name('property10')->tableName, 'snippet', 'tableName set in subclass';
+    is +WGT::Class::Asset::Snippet->meta->find_attribute_by_name('property1')->tableName,  'asset',   '... but inherited properties keep their tableName';
 
     cmp_bag(
         [ map {$_->name} WGT::Class::AlsoAsset->meta->get_attributes ],
