@@ -396,6 +396,7 @@ sub _doXmlRequest {
     my $userAgent = LWP::UserAgent->new;
     $userAgent->env_proxy;
     $userAgent->agent('WebGUI');
+    $userAgent->timeout('45');
     my $url = 'http://production.shippingapis.com/ShippingAPI.dll?API=RateV3&XML=';
     $url .= $xml;
     my $request = HTTP::Request->new(GET => $url);
