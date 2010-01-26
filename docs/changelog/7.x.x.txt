@@ -13,6 +13,7 @@
  - fixed #11371: Spaces in the names of custom profile fields
  - fixed #11372: All Search Forms should use GET
  - fixed #11373: Problem creating FilePump bundles
+ - fixed #11374: USPS shipping drivers take 3 minutes to timeout
 
 7.7.30
  - fixed #11314: hover help clarity
