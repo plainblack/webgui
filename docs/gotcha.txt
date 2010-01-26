@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.31
+--------------------------------------------------------------------
+     * WebGUI now requires DateTime::Format::HTTP, to handle parsing HTTP dates.
+
 7.7.27
 --------------------------------------------------------------------
      * WebGUI now requires LWP 5.833 or higher, to fix a bug in that module.

@@ -10,6 +10,7 @@ use File::Basename;
 use CSS::Minifier::XS;
 use JavaScript::Minifier::XS;
 use LWP;
+use DateTime::Format::HTTP;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
@@ -105,6 +106,8 @@ sub build {
         }
         $concatenatedJS .= $results->{content};
         $jsFile->{lastModified} = $results->{lastModified};
+        $self->session->log->warn($jsFile->{uri});
+        $self->session->log->warn($jsFile->{lastModified});
     }
     return (0, $error) if ($error);
 
@@ -161,6 +164,7 @@ sub build {
 
     ##Minimize files, and write them out.
 
+    $self->session->log->warn($concatenatedJS);
     my $minimizedJS  =  JavaScript::Minifier::XS::minify($concatenatedJS);
     undef $concatenatedJS;
 
@@ -618,9 +622,10 @@ sub fetchHttp {
     if (! $response->is_success) {
         return {};
     }
+    my $lastModified = 
     my $guts = {
         content      => $response->content,
-        lastModified => $response->header('last-modified'),
+        lastModified => DateTime::Format::HTTP->parse_datetime($response->header('last-modified'))->epoch,
     };
     return $guts;
 }
