@@ -19,6 +19,7 @@ use WebGUI::User;
 use WebGUI::Asset;
 use Test::More tests => 90; # increment this value for each test you create
 use Test::Deep;
+use Data::Dumper;
 
 # Test the methods in WebGUI::AssetLineage
 
@@ -83,11 +84,8 @@ my $snippet2 = $folder2->addChild( {
 });
 
 $versionTag->commit;
-
-my @snipIds = map { $_->getId } @snippets;
-my $lineageIds = $folder->getLineage(['descendants']);
-
-cmp_bag(\@snipIds, $lineageIds, 'default order returned by getLineage is lineage order');
+my @snipIds;
+my $lineageIds;
 
 ####################################################
 #
@@ -274,10 +272,10 @@ is(scalar @snippets, $folder->getChildCount,  'changing lineage does not change 
 is(1               , $folder2->getChildCount, 'changing lineage does not change relationship in folder2');
 
 ##Reinstance the asset object due to db manipulation
-$folder  = WebGUI::Asset->newByDynamicClass($session, $folder->getId);
-$folder2 = WebGUI::Asset->newByDynamicClass($session, $folder2->getId);
-@snippets = map { WebGUI::Asset->newByDynamicClass($session, $snippets[$_]->getId) } 0..6;
-$snippet2 = WebGUI::Asset->newByDynamicClass($session, $snippet2->getId);
+$folder  = WebGUI::Asset->newById($session, $folder->getId);
+$folder2 = WebGUI::Asset->newById($session, $folder2->getId);
+@snippets = map { WebGUI::Asset->newById($session, $snippets[$_]->getId) } 0..6;
+$snippet2 = WebGUI::Asset->newById($session, $snippet2->getId);
 
 ####################################################
 #
@@ -406,11 +404,23 @@ is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing class cache fo
 ####################################################
 
 @snipIds = map { $_->getId } @snippets;
-my $ids = $folder->getLineage(['descendants']);
+$lineageIds = $folder->getLineage(['descendants']);
+
+cmp_bag($lineageIds, \@snipIds, 'default order returned by getLineage is lineage order');
+
+my $ids = $folder->getLineage(['self']);
+cmp_bag(
+    [$folder->getId],
+    $ids,
+    'getLineage: get self'
+);
+
+@snipIds = map { $_->getId } @snippets;
+$ids = $folder->getLineage(['descendants']);
 cmp_bag(
     \@snipIds,
     $ids,
-    'getLineage: get descendants of folder'
+    '... get descendants of folder'
 );
 
 $ids = $folder->getLineage(['self','descendants']);
@@ -418,28 +428,28 @@ unshift @snipIds, $folder->getId;
 cmp_bag(
     \@snipIds,
     $ids,
-    'getLineage: get descendants of folder and self'
+    '... get descendants of folder and self'
 );
 
 $ids = $folder->getLineage(['self','children']);
 cmp_bag(
     \@snipIds,
     $ids,
-    'getLineage: descendants == children if there are no grandchildren'
+    '... descendants == children if there are no grandchildren'
 );
 
 $ids = $topFolder->getLineage(['self','children']);
 cmp_bag(
     [$topFolder->getId, $folder->getId, $folder2->getId, ],
     $ids,
-    'getLineage: children (no descendants) of topFolder',
+    '... children (no descendants) of topFolder',
 );
 
 $ids = $topFolder->getLineage(['self','descendants']);
 cmp_bag(
     [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
     $ids,
-    'getLineage: descendants of topFolder',
+    '... descendants of topFolder',
 );
 
 ####################################################

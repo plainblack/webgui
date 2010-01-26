@@ -260,13 +260,13 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 =cut
 
 sub getFirstChild {
-	my $self = shift;
+	my $self  = shift;
 	my $child = $self->cacheChild('first');
 	unless ($child) {
 		my $assetLineage = $self->session->stow->get("assetLineage");
-		my $lineage = $assetLineage->{firstChild}{$self->getId};
+		my $lineage      = $assetLineage->{firstChild}{$self->getId};
 		unless ($lineage) {
-			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=? and asset.assetId=assetData.assetId and asset.state='published'",[$self->getId]);
+			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset where asset.parentId=? and asset.state='published'",[$self->getId]);
 			$assetLineage->{firstChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
@@ -556,36 +556,37 @@ The maximum amount of entries to return
 =cut
 
 sub getLineageSql {
-	my $self = shift;
-	my $relatives = shift;
-	my $rules = shift;
-	my $lineage = $self->get("lineage");
-	my @whereModifiers;
-	# let's get those siblings
-	if (isIn("siblings",@{$relatives})) {
-		push(@whereModifiers, " (asset.parentId=".$self->session->db->quote($self->get("parentId"))." and asset.assetId<>".$self->session->db->quote($self->getId).")");
-	}
-	# ancestors too
-	my @specificFamilyMembers = ();
-	if (isIn("ancestors",@{$relatives})) {
-		my $i = 1;
-		my @familyTree = ($lineage =~ /(.{6})/g);
-                while (pop(@familyTree)) {
-                        push(@specificFamilyMembers,join("",@familyTree)) if (scalar(@familyTree));
-			last if ($i >= $rules->{ancestorLimit} && exists $rules->{ancestorLimit});
-			$i++;
-                }
+    my $self      = shift;
+    my $db        = $self->session->db;
+    my $relatives = shift;
+    my $rules     = shift;
+    my $lineage   = $self->lineage;
+    my @whereModifiers;
+    # let's get those siblings
+    if (isIn("siblings",@{$relatives})) {
+        push(@whereModifiers, " (asset.parentId=".$db->quote($self->parentId)." and asset.assetId<>".$db->quote($self->getId).")");
+    }
+    # ancestors too
+    my @specificFamilyMembers = ();
+    if (isIn("ancestors",@{$relatives})) {
+        my $i = 1;
+        my @familyTree = ($lineage =~ /(.{6})/g);
+        while (pop(@familyTree)) {
+            push(@specificFamilyMembers,join("",@familyTree)) if (scalar(@familyTree));
+            last if ($i >= $rules->{ancestorLimit} && exists $rules->{ancestorLimit});
+            $i++;
+        }
 	}
 	# let's add ourself to the list
 	if (isIn("self",@{$relatives})) {
-		push(@specificFamilyMembers,$self->get("lineage"));
+		push(@specificFamilyMembers, $self->lineage);
 	}
 	if (scalar(@specificFamilyMembers) > 0) {
-		push(@whereModifiers,"(asset.lineage in (".$self->session->db->quoteAndJoin(\@specificFamilyMembers)."))");
+		push(@whereModifiers,"(asset.lineage in (".$db->quoteAndJoin(\@specificFamilyMembers)."))");
 	}
 	# we need to include descendants
 	if (isIn("descendants",@{$relatives})) {
-		my $mod = "(asset.lineage like ".$self->session->db->quote($lineage.'%')." and asset.lineage<>".$self->session->db->quote($lineage); 
+		my $mod = "(asset.lineage like ".$db->quote($lineage.'%')." and asset.lineage<>".$db->quote($lineage); 
 		if (exists $rules->{endingLineageLength}) {
 			$mod .= " and length(asset.lineage) <= ".($rules->{endingLineageLength}*6);
 		}
@@ -594,17 +595,17 @@ sub getLineageSql {
 	}
 	# we need to include children
 	if (isIn("children",@{$relatives})) {
-		push(@whereModifiers,"(asset.parentId=".$self->session->db->quote($self->getId).")");
+		push(@whereModifiers,"(asset.parentId=".$db->quote($self->getId).")");
 	}
 	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
 	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
-        my $pedigreeLineage = $rules->{assetToPedigree}->get("lineage");
+        my $pedigreeLineage = $rules->{assetToPedigree}->lineage;
         if (substr($pedigreeLineage,0,length($lineage)) eq $lineage) {
             my @mods;
 		    my $length = $rules->{assetToPedigree}->getLineageLength;
             for (my $i = $length; $i > 0; $i--) {
 			    my $line = substr($pedigreeLineage,0,$i*6);
-			    push(@mods,"( asset.lineage like ".$self->session->db->quote($line.'%')." and  length(asset.lineage)=".(($i+1)*6).")");
+			    push(@mods,"( asset.lineage like ".$db->quote($line.'%')." and  length(asset.lineage)=".(($i+1)*6).")");
 			    last if ($self->getLineageLength == $i);
 		    }
 		    push(@whereModifiers, "(".join(" or ",@mods).")") if (scalar(@mods));
@@ -628,7 +629,7 @@ sub getLineageSql {
 	my $where;
 	## custom states
 	if (exists $rules->{statesToInclude}) {
-		$where = "asset.state in (".$self->session->db->quoteAndJoin($rules->{statesToInclude}).")";
+		$where = "asset.state in (".$db->quoteAndJoin($rules->{statesToInclude}).")";
 	} else {
 		$where = "asset.state='published'";
 	}
@@ -641,25 +642,25 @@ sub getLineageSql {
     
     my $status = "assetData.status='approved'";
     if(scalar(@{$statusCodes})) {
-       $status = "assetData.status in (".$self->session->db->quoteAndJoin($statusCodes).")";
+       $status = "assetData.status in (".$db->quoteAndJoin($statusCodes).")";
     }
     
-	$where .= " and ($status or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")";
+	$where .= " and ($status or assetData.tagId=".$db->quote($self->session->scratch->get("versionTag")).")";
 	## class exclusions
 	if (exists $rules->{excludeClasses}) {
 		my @set;
 		foreach my $className (@{$rules->{excludeClasses}}) {
-			push(@set,"asset.className not like ".$self->session->db->quote($className.'%'));
+			push(@set,"asset.className not like ".$db->quote($className.'%'));
 		}
 		$where .= ' and ('.join(" and ",@set).')';
 	}
 	## class inclusions
 	if (exists $rules->{includeOnlyClasses}) {
-		$where .= ' and (asset.className in ('.$self->session->db->quoteAndJoin($rules->{includeOnlyClasses}).'))';
+		$where .= ' and (asset.className in ('.$db->quoteAndJoin($rules->{includeOnlyClasses}).'))';
 	}
 	## isa
 	if (exists $rules->{isa}) {
-		$where .= ' and (asset.className like '.$self->session->db->quote($rules->{isa}.'%').')';
+		$where .= ' and (asset.className like '.$db->quote($rules->{isa}.'%').')';
 	}
 	## finish up our where clause
 	if (!scalar(@whereModifiers)) {
@@ -671,7 +672,7 @@ sub getLineageSql {
 	}
 	# based upon all available criteria, let's get some assets
 	my $columns = "asset.assetId, asset.className, asset.parentId, assetData.revisionDate";
-	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and ($status or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")) ";
+	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and ($status or assetData.tagId=".$db->quote($self->session->scratch->get("versionTag")).")) ";
 	my $sortOrder = ($rules->{invertTree}) ? "asset.lineage desc" : "asset.lineage asc"; 
 	if (exists $rules->{orderByClause}) {
 		$sortOrder = $rules->{orderByClause};
@@ -814,19 +815,17 @@ Lineage string.
 =cut
 
 sub newByLineage {
-	my $class = shift;
-	my $session = shift;
-    my $lineage = shift;
+	my $class        = shift;
+	my $session      = shift;
+    my $lineage      = shift;
 	my $assetLineage = $session->stow->get("assetLineage");
-	my $id = $assetLineage->{$lineage}{id};
-	$class = $assetLineage->{$lineage}{class};
-    unless ($id && $class) {
-        ($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=?",[$lineage]);
+	my $id           = $assetLineage->{$lineage}{id};
+    unless ($id) {
+        ($id) = $session->db->quickArray("select assetId from asset where lineage=?",[$lineage]);
         $assetLineage->{$lineage}{id} = $id;
-        $assetLineage->{$lineage}{class} = $class;
         $session->stow->set("assetLineage",$assetLineage);
 	}
-	return WebGUI::Asset->new($session, $id, $class);
+	return WebGUI::Asset->newById($session, $id);
 }
 
 
