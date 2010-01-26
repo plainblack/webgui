@@ -3,6 +3,7 @@
  - fixed #11364: Notify About Low Stock workflow activity email is not user friendly
  - fixed #11371: Spaces in the names of custom profile fields
  - fixed #11372: All Search Forms should use GET
+ - fixed #11373: Problem creating FilePump bundles
 
 7.8.10
  - fixed #11332: Pagination in webgui.org forum urls
