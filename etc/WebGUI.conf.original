@@ -1067,4 +1067,10 @@
       "Opera Mini"
    ],
 
+#A list of UserAgents of recognized mobile platforms.  If useMobileStyle is set in the
+#Admin settings, then the mobile style will be used for these browsers.
+   "siteIndex" : {
+      "showHiddenPages" : 0
+   }
+
 }

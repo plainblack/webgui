@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addSiteIndexToConfig($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addSiteIndexToConfig {
+    my $session = shift;
+    print "\tAdd Site Config indexing section to config file... " unless $quiet;
+    $session->config->set('siteIndex', { showHiddenPages => 0 });
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
