@@ -14,7 +14,58 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Asset::Wobject;
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_Article'];
+aspect icon      => 'article.gif';
+aspect tableName => 'Article';
+property cacheTimeout => (
+                tab       => "display",
+                fieldType => "interval",
+                default   => 3600,
+                uiLevel   => 8,
+                label     => ["cache timeout", 'Asset_Article'],
+                hoverHelp => ["cache timeout help", 'Asset_Article'],
+         );
+property templateId => (
+                tab        => "display",
+                fieldType  => "template",
+                default    => 'PBtmpl0000000000000002',    
+                namespace  => "Article",
+                hoverHelp  => ['article template description', 'Asset_Article'],
+                label      => ['72', 'Asset_Article'],
+         );
+property linkTitle => (
+                tab       => "properties",
+                fieldType => 'text',
+                default   => undef,
+                label     => ['7', 'Asset_Article'],
+                hoverHelp => ['link title description', 'Asset_Article'],
+                uiLevel   => 3
+         );
+property linkURL => (
+                tab       => "properties",
+                fieldType => 'url',
+                default   => undef,
+                label     => ['8', 'Asset_Article'],
+                hoverHelp => ['link url description', 'Asset_Article'],
+                uiLevel   => 3
+         );
+property storageId => (
+                tab            => "properties",
+                fieldType      => "image",
+                deleteFileUrl  => \&_storageId_deleteFileUrl,
+                maxAttachments => 2,
+                persist        =>  1,
+                default        => undef,
+                label          => ["attachments", 'Asset_Article'],
+                hoverHelp      => ["attachments help", 'Asset_Article'],
+         );
+sub _storageid_deleteFileUrl {
+    return shift->session->url->page("func=deleteFile;filename=");
+}
+
 use WebGUI::Storage;
 use WebGUI::HTML;
 
@@ -78,70 +129,6 @@ sub addRevision {
     }
     return $newSelf;
 }
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_Article');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-			cacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("cache timeout"),
-				hoverHelp => $i18n->get("cache timeout help")
-				},
-			templateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000002',	
-				tab=>"display",
-				namespace=>"Article",
-                		hoverHelp=>$i18n->get('article template description'),
-                		label=>$i18n->get(72)
-				},
-			linkTitle=>{
-				tab=>"properties",
-				fieldType=>'text',
-				defaultValue=>undef,
-				label=>$i18n->get(7),
-                		hoverHelp=>$i18n->get('link title description'),
-                		uiLevel=>3
-				},
-			linkURL=>{
-				tab=>"properties",
-				fieldType=>'url',
-				defaultValue=>undef,
-				label=>$i18n->get(8),
-                		hoverHelp=>$i18n->get('link url description'),
-                		uiLevel=>3
-				},
-			storageId=>{
-				tab=>"properties",
-				fieldType=>"image",
-				deleteFileUrl=>$session->url->page("func=deleteFile;filename="),
-				maxAttachments=>2,
-                persist => 1,
-				defaultValue=>undef,
-				label=>$i18n->get("attachments"),
-				hoverHelp=>$i18n->get("attachments help")
-				}
-		);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'article.gif',
-		autoGenerateForms=>1,
-		tableName=>'Article',
-		className=>'WebGUI::Asset::Wobject::Article',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 
