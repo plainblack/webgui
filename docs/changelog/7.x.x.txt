@@ -5,6 +5,7 @@
  - fixed #11372: All Search Forms should use GET
  - fixed #11373: Problem creating FilePump bundles
  - fixed #11374: USPS shipping drivers take 3 minutes to timeout
+ - fixed #11044: Optionally include hidden pages in sitemap.xml
 
 7.8.10
  - fixed #11332: Pagination in webgui.org forum urls

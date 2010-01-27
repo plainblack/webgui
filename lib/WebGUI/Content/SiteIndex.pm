@@ -16,6 +16,7 @@ package WebGUI::Content::SiteIndex;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Exception;
 use XML::Simple;
 
 =head1 NAME
@@ -53,17 +54,28 @@ sub handler {
     unless ($p =~ m/sitemap\.xml$/i) {
         return undef;
     }
+
+    my $whereClause = "assetData.groupIdView = 7";
+    if (! $session->config->get("siteIndex")->{showHiddenPages}) {
+        $whereClause .= ' AND assetData.isHidden=0';
+    }
     
-    my $pages  = WebGUI::Asset->getRoot($session)->getLineage(["self","descendants"],{
+    my $pages  = WebGUI::Asset->getRoot($session)->getLineageIterator(["self","descendants"],{
         returnObjects      => 1,
         includeOnlyClasses => ["WebGUI::Asset::Wobject::Layout"],
-        whereClause        => "assetData.groupIdView = 7",
+        whereClause        => $whereClause,
         limit              => 20000
     });
     
     
     my $url          = [];
-    foreach my $page (@{$pages}) {
+    ASSET: while (1) {
+        my $page = eval { $pages->() };
+        if (my $e = Exception::Class->caught()) {
+            $session->log->error($@);
+            next ASSET;
+        }
+        last ASSET unless $page;
         push(@{$url},{
             loc     => $session->url->getSiteURL().formatXML($page->getUrl),
             lastmod => $session->datetime->epochToSet($page->get("revisionDate")),
@@ -112,4 +124,3 @@ sub formatXML {
 
 
 1;
-

@@ -11,6 +11,11 @@ save you many hours of grief.
 --------------------------------------------------------------------
      * WebGUI now requires DateTime::Format::HTTP, to handle parsing HTTP dates.
 
+     * The Google sitemap generator in WebGUI was including hidden pages in the list of
+       pages.  This is now configurable, with the default being to NOT show hidden pages.
+       If you wish hidden pages to be shown, then in the config file set showHiddenPages
+       to 1.
+
 7.8.6
 --------------------------------------------------------------------
     * WebGUI now requires LWP 5.833 or higher, to fix a bug in that module.
