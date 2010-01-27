@@ -1100,6 +1100,23 @@ sub getEditForm {
 	return $tabform;
 }
 
+sub setupFormField {
+  my ($self, $tabform, $fieldName, $extraFields, $overrides) = @_;
+  my %params = %{$extraFields->{$fieldName}};
+  my $tab = delete $params{tab};
+
+  if (exists $overrides->{fields}{$fieldName}) {
+    my %overrideParams = %{$overrides->{fields}{$fieldName}};
+    my $overrideTab = delete $overrideParams{tab};
+    $tab = $overrideTab if defined $overrideTab;
+    foreach my $key (keys %overrideParams) {
+      $params{"-$key"} = $overrideParams{$key};
+    }
+  }
+
+  $tab ||= 'properties';
+  return $tabform->getTab($tab)->dynamicField(%params);
+}
 
 #-------------------------------------------------------------------
 

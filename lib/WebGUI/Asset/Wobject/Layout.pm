@@ -115,27 +115,36 @@ sub getEditForm {
     } else {
         $templateId = $self->getValue('templateId');
     }
-    $tabform->getTab("display")->template(
-            -value=>$templateId,
-            -label=>$i18n->get('layout template title'),
-            -hoverHelp=>$i18n->get('template description'),
-            -namespace=>"Layout"
-        );
+
+    tie my %extraFields, "Tie::IxHash";
+    %extraFields = (
+      templateId => {
+        fieldType => 'template',
+        tab => 'display',
+        -value=>$templateId,
+        -label=>$i18n->get('layout template title'),
+        -hoverHelp=>$i18n->get('template description'),
+        -namespace=>"Layout",
+      });
 
     if ( $self->session->setting->get('useMobileStyle') ) {
-        $tabform->getTab("display")->template(
-            name        => 'mobileTemplateId',
-            value       => $self->getValue('mobileTemplateId'),
-            label       => $i18n->get('mobileTemplateId label'),
-            hoverHelp   => $i18n->get('mobileTemplateId description'),
-            namespace   => 'Layout',
-        );
+      $extraFields{mobileTemplateId} = {
+        fieldType   => 'template',
+        tab         => 'display',
+        name        => 'mobileTemplateId',
+        value       => $self->getValue('mobileTemplateId'),
+        label       => $i18n->get('mobileTemplateId label'),
+        hoverHelp   => $i18n->get('mobileTemplateId description'),
+        namespace   => 'Layout',
+      };
     }
     else {
-        $tabform->getTab("display")->hidden(
-            name        => 'mobileTemplateId',
-            value       => $self->getValue('mobileTemplateId'),
-        );
+      $extraFields{mobileTemplateId} = {
+        fieldType   => 'hidden',
+        tab         => 'display',
+        name        => 'mobileTemplateId',
+        value       => $self->getValue('mobileTemplateId'),
+      };
     }
 
 	tie my %assetOrder, "Tie::IxHash";
@@ -143,21 +152,25 @@ sub getEditForm {
 		"asc"  =>$i18n->get("asset order asc"),
 		"desc" =>$i18n->get("asset order desc"),
 	);
-	$tabform->getTab("display")->selectBox(
-		-name      => 'assetOrder',
-		-label     => $i18n->get('asset order label'),
-		-hoverHelp => $i18n->get('asset order hoverHelp'),
-		-value     => $self->getValue('assetOrder'),
-		-options   => \%assetOrder
-	);
+      $extraFields{assetOrder} = {
+        tab         => 'display',
+        fieldType   => 'selectBox',
+        -name      => 'assetOrder',
+        -label     => $i18n->get('asset order label'),
+        -hoverHelp => $i18n->get('asset order hoverHelp'),
+        -value     => $self->getValue('assetOrder'),
+        -options   => \%assetOrder,
+      };
+
     if ($self->get("assetId") eq "new") {
-                $tabform->getTab("properties")->whatNext(
-                        -options=>{
-                                view=>$i18n->get(823),
-                            viewParent=>$i18n->get(847)
-                                },
-            -value=>"view"
-            );
+      $extraFields{whatNext} = {
+        fieldType   => 'whatNext',
+        -options=>{
+          view=>$i18n->get(823),
+          viewParent=>$i18n->get(847)
+        },
+        -value=>"view",
+      };
     } else {
         my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
         my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
@@ -165,16 +178,24 @@ sub getEditForm {
         foreach my $child (@{$children}) {
             $childIds{$child->getId} = $child->getTitle;    
         }
-        $tabform->getTab("display")->checkList(
-            -name=>"assetsToHide",
-            -value=>\@assetsToHide,
-            -options=>\%childIds,
-            -label=>$i18n->get('assets to hide'),
-            -hoverHelp=>$i18n->get('assets to hide description'),
-            -vertical=>1,
-            -uiLevel=>9
-            );
+        $extraFields{assetsToHide} = {
+          fieldType => 'checkList',
+          tab => 'display',
+          -name=>"assetsToHide",
+          -value=>\@assetsToHide,
+          -options=>\%childIds,
+          -label=>$i18n->get('assets to hide'),
+          -hoverHelp=>$i18n->get('assets to hide description'),
+          -vertical=>1,
+          -uiLevel=>9,
+        };
     }
+
+    my $overrides = $self->session->config->get("assets/".$self->get("className"));
+    foreach my $fieldName (keys %extraFields) {
+      $self->setupFormField($tabform, $fieldName, \%extraFields, $overrides);
+    }
+
     return $tabform;
 }
 
