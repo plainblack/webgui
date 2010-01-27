@@ -61,7 +61,14 @@ property storageId => (
                 default        => undef,
                 label          => ["attachments", 'Asset_Article'],
                 hoverHelp      => ["attachments help", 'Asset_Article'],
+                trigger        => \&_set_storageId,
          );
+sub _set_storageId {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+        delete $self->{_storageLocation};
+    }
+}
 sub _storageid_deleteFileUrl {
     return shift->session->url->page("func=deleteFile;filename=");
 }
@@ -123,8 +130,8 @@ Override the default method in order to deal with attachments.
 sub addRevision {
     my $self = shift;
     my $newSelf = $self->SUPER::addRevision(@_);
-    if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
-        my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+    if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
+        my $newStorage = WebGUI::Storage->get($self->session,$self->storageId)->copy;
         $newSelf->update({storageId => $newStorage->getId});
     }
     return $newSelf;
@@ -140,7 +147,7 @@ Extend the super class to duplicate the storage location.
 
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset   = $self->SUPER::duplicate(@_);
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
 	return $newAsset;
@@ -157,7 +164,7 @@ See WebGUI::AssetPackage::exportAssetData() for details.
 sub exportAssetData {
 	my $self = shift;
 	my $data = $self->SUPER::exportAssetData;
-	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
+	push(@{$data->{storage}}, $self->storageId) if ($self->storageId ne "");
 	return $data;
 }
 
@@ -174,11 +181,11 @@ then make one.  Build an internal cache of the storage object.
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
-		if ($self->get("storageId") eq "") {
+		if ($self->storageId eq "") {
 			$self->{_storageLocation} = WebGUI::Storage->create($self->session);
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
-			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
+			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->storageId);
 		}
 	}
 	return $self->{_storageLocation};
@@ -195,8 +202,8 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("linkTitle"));
-	$indexer->addKeywords($self->get("linkUrl"));
+	$indexer->addKeywords($self->linkTitle);
+	$indexer->addKeywords($self->linkUrl);
 	my $storage = $self->getStorageLocation;
 	foreach my $file (@{$storage->getFiles}) {
                $indexer->addFile($storage->getPath($file));
@@ -214,7 +221,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $templateId = $self->get("templateId");
+    my $templateId = $self->templateId;
     if ($self->session->form->process("overrideTemplateId") ne "") {
         $templateId = $self->session->form->process("overrideTemplateId");
     }
@@ -262,12 +269,7 @@ Storage object.
 
 sub update {
     my $self = shift;
-    my $previousStorageId = $self->get('storageId');
     $self->SUPER::update(@_);
-    ##update may have entered a new storageId.  Reset the cached one just in case.
-    if ($self->get("storageId") ne $previousStorageId) {
-        delete $self->{_storageLocation};
-    }
     $self->getStorageLocation->setPrivileges(
         $self->get("ownerUserId"),
         $self->get("groupIdView"),
@@ -335,13 +337,13 @@ returns the output.
 sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
 	my %var;
-	if ($self->get("storageId")) {
+	if ($self->storageId) {
 		my $storage = $self->getStorageLocation;
 		my @loop = ();
 		foreach my $file (@{$storage->getFiles}) {
@@ -362,7 +364,7 @@ sub view {
 				});
 		}
 	}
-    $var{description} = $self->get("description");
+    $var{description} = $self->description;
 	$var{"new.template"} = $self->getUrl("func=view").";overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
@@ -399,7 +401,7 @@ sub view {
 	}
 	$p->appendTemplateVars(\%var);
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
 	}
@@ -431,7 +433,7 @@ Deletes and attached file.
 sub www_deleteFile {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
-	if ($self->get("storageId") ne "") {
+	if ($self->storageId ne "") {
 		my $storage = $self->getStorageLocation;
 		$storage->deleteFile($self->session->form->param("filename"));
 	}
@@ -448,7 +450,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
+	$self->session->http->setCacheControl($self->cacheTimeout);
 	$self->SUPER::www_view(@_);
 }
 
