@@ -1,3 +1,5 @@
+7.7.32
+
 7.7.31
  - fixed #11348: Typ-o in debug notice SQLReport
  - fixed #11350: Story Topic asset missing description...
