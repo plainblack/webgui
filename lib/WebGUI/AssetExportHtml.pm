@@ -280,10 +280,9 @@ sub exportAsHtml {
     $exportSession->scratch->set('exportUrl',   $exportUrl);
     $exportSession->style->setMobileStyle(0);
 
-    my $asset = WebGUI::Asset->new(
+    my $asset = WebGUI::Asset->newById(
         $exportSession,
         $self->getId,
-        $self->get('className'),
         $self->get('revisionDate'),
     );
 
@@ -328,7 +327,7 @@ sub exportBranch {
             $outputSession->close;
         });
 
-        my $asset       = WebGUI::Asset->new($outputSession, $assetId);
+        my $asset       = WebGUI::Asset->newById($outputSession, $assetId);
         my $fullPath    = $asset->exportGetUrlAsPath;
 
         # skip this asset if we can't view it as this user.
@@ -509,10 +508,9 @@ sub exportGetDescendants {
                 $session->close;
             });
             # clone self in the new session
-            $asset = WebGUI::Asset->new(
+            $asset = WebGUI::Asset->newById(
                 $session,
                 $self->getId,
-                $self->get('className'),
                 $self->get('revisionDate'),
             );
         }
