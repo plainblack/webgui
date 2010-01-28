@@ -160,33 +160,31 @@ sub getEditForm {
 
     tie my %extraFields, "Tie::IxHash";
 
-    $extraFields = {
-        thumbnailSize => {
-            fieldType => "integer",
-            name      => "thumbnailSize",
-            label     => $i18n->get('thumbnail size'),
-            hoverHelp => $i18n->get('Thumbnail size description'),
-            value     => $self->getValue("thumbnailSize"),
-        },
-        parameters => {
-            fieldType => "textarea",
-            name      => "parameters",
-            label     => $i18n->get('parameters'),
-            hoverHelp => $i18n->get('Parameters description'),
-            value     => $self->getValue("parameters"),
-        },
+    $extraFields{thumbnailSize} = {
+        fieldType => "integer",
+        name      => "thumbnailSize",
+        label     => $i18n->get('thumbnail size'),
+        hoverHelp => $i18n->get('Thumbnail size description'),
+        value     => $self->getValue("thumbnailSize"),
+    };
+    $extraFields{parameters} = {
+        fieldType => "textarea",
+        name      => "parameters",
+        label     => $i18n->get('parameters'),
+        hoverHelp => $i18n->get('Parameters description'),
+        value     => $self->getValue("parameters"),
     };
 
     if ($self->get("filename") ne "") {
           my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
 
-          $extraFields->{thumbnail} = {
+          $extraFields{thumbnail} = {
               fieldType => "readOnly",
               label     => $i18n->get('thumbnail'),
               hoverHelp => $i18n->get('Thumbnail description'),
               value     => '<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.$self->session->datetime->time().'" alt="thumbnail" /></a>'
           };
-          $extraFields->{imageSize} = {
+          $extraFields{imageSize} = {
               fieldType => "readOnly",
               label     => $i18n->get('image size'),
               value     => $x.' x '.$y,
@@ -195,8 +193,8 @@ sub getEditForm {
 
     my $overrides = $self->session->config->get("assets/".$self->get("className"));
 
-    foreach my $fieldName (keys %{$extraFields}) {
-        $self->setupFormField($tabform, $fieldName, $extraFields, $overrides);
+    foreach my $fieldName (keys %extraFields) {
+        $self->setupFormField($tabform, $fieldName, \%extraFields, $overrides);
     }
 
     return $tabform;
