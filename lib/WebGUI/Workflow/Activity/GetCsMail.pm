@@ -204,8 +204,8 @@ sub execute {
 		my $post = undef;
 		if ($message->{inReplyTo} && $message->{inReplyTo} =~ m/cs\-([\w_-]{22})\@/) {
 			my $id = $1;
-            my $repliedPost = WebGUI::Asset->newById($self->session, $id);
-            if ($repliedPost
+            my $repliedPost = eval { WebGUI::Asset->newById($self->session, $id); };
+            if (! Exception::Class->caught()
                 && $repliedPost->isa('WebGUI::Asset::Post')
                 && $repliedPost->getThread->getParent->getId eq $cs->getId) {
                 $post = $repliedPost;
