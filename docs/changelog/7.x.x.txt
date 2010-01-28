@@ -1,6 +1,7 @@
 7.7.32
  - fixed #11044: Optionally include hidden pages in sitemap.xml
  - fixed #11379: Certain fields in some Assets cannot be overridden in the config file
+ - fixed #11380: "Use this Address" button in Shop needs to be green!
 
 7.7.31
  - fixed #11348: Typ-o in debug notice SQLReport
