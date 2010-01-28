@@ -14,6 +14,7 @@ use strict;
 use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::International;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -45,12 +46,12 @@ sub process {
     my $t = ($session->errorHandler->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
     my $asset;
     if ($type eq 'assetId') {
-        $asset = WebGUI::Asset->newById($session, $identifier);
+        $asset = eval { WebGUI::Asset->newById($session, $identifier); };
     }
     else {
-        $asset = WebGUI::Asset->newByUrl($session,$identifier);
+        $asset = eval { WebGUI::Asset->newByUrl($session,$identifier); };
     }
-    if (!defined $asset) {
+    if (WebGUI::Exception->caught()) {
         $session->errorHandler->warn('AssetProxy macro called invalid asset: '.$identifier
             .'. The macro was called through this url: '.$session->asset->get('url'));
         if ($session->var->isAdminOn) {
