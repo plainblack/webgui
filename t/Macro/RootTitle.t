@@ -32,6 +32,7 @@ my $session = WebGUI::Test->session;
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Adding assets for RootTitle tests"});
+addToCleanup($versionTag);
 
 my $root = WebGUI::Asset->getRoot($session);
 my %properties_A = (
@@ -117,7 +118,7 @@ my $asset_ = $root->addChild(\%properties__, $properties__{id});
 
 $versionTag->commit;
 
-my $origLineage = $asset_->get('lineage');
+my $origLineage = $asset_->lineage;
 my $newLineage = substr $origLineage, 0, length($origLineage)-1; 
 $session->db->write('update asset set lineage=? where assetId=?',[$newLineage, $asset_->getId]);
 
@@ -160,16 +161,11 @@ my @testSets = (
 );
 
 my $numTests = scalar @testSets; 
-$numTests += 2;
+$numTests += 1;
 
 plan tests => $numTests;
 
-my $macro = 'WebGUI::Macro::RootTitle';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+use WebGUI::Macro::RootTitle;
 
 is(
 	WebGUI::Macro::RootTitle::process($session),
@@ -184,11 +180,6 @@ foreach my $testSet (@testSets) {
 	is($output, $testSet->{title}, $testSet->{comment});
 }
 
-}
-
 END { ##Clean-up after yourself, always
 	$session->db->write('update asset set lineage=? where assetId=?',[$origLineage, $asset_->getId]);
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
 }
