@@ -394,7 +394,7 @@ sub execute {
         # If this event already exists, update
         if ($assetId) {
             $session->log->info( "Updating existing asset $assetId" );
-            my $event   = WebGUI::Asset->newById($session,$assetId);
+            my $event   = eval { WebGUI::Asset->newById($session,$assetId); };
 
             if ($event) {
                 $event->update($properties);
