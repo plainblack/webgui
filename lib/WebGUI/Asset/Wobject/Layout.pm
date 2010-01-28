@@ -119,12 +119,12 @@ sub getEditForm {
     tie my %extraFields, "Tie::IxHash";
     %extraFields = (
       templateId => {
-        fieldType => 'template',
-        tab => 'display',
-        -value=>$templateId,
-        -label=>$i18n->get('layout template title'),
-        -hoverHelp=>$i18n->get('template description'),
-        -namespace=>"Layout",
+          fieldType => 'template',
+          tab       => 'display',
+          value     => $templateId,
+          label     => $i18n->get('layout template title'),
+          hoverHelp => $i18n->get('template description'),
+          namespace => "Layout",
       });
 
     if ( $self->session->setting->get('useMobileStyle') ) {
@@ -139,12 +139,12 @@ sub getEditForm {
       };
     }
     else {
-      $extraFields{mobileTemplateId} = {
-        fieldType   => 'hidden',
-        tab         => 'display',
-        name        => 'mobileTemplateId',
-        value       => $self->getValue('mobileTemplateId'),
-      };
+        $extraFields{mobileTemplateId} = {
+            fieldType   => 'hidden',
+            tab         => 'display',
+            name        => 'mobileTemplateId',
+            value       => $self->getValue('mobileTemplateId'),
+        };
     }
 
 	tie my %assetOrder, "Tie::IxHash";
