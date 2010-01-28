@@ -126,13 +126,17 @@ sub execute {
                     { "isHidden != ?" => 1 },
                 ],
             });
-    while ( my $record = $iter->() ) {
+    RECORD: while ( my $record = $iter->() ) {
         # Record is hidden
         $record->update({ isHidden => 1 }); 
         my $asset;
         if ( !$asset{$record->get('assetId')} ) {
             $asset = $asset{$record->get('assetId')} 
-                = WebGUI::Asset->newById( $self->session, $record->get('assetId') );
+                = eval { WebGUI::Asset->newById( $self->session, $record->get('assetId') ); };
+            if (Exception::Class->caught()) {
+                $self->session->log->error('Unable to instanciate asset with assetId '.$record->get('assetId').": $@");
+                next RECORD;
+            }
         }
         else {
             $asset = $asset{$record->get('assetId')};
@@ -140,7 +144,7 @@ sub execute {
 
         $asset->deleteThingRecord( $asset->get('thingId'), $record->getId );
 
-        if ( time - $time > 60 ) {
+        if ( time - $time > $self->getTTL ) {
             return $self->WAITING(1);
         }
     }
