@@ -128,7 +128,10 @@ sub findKeywords {
         $parentAsset = $options->{asset};
     }
     if ($options->{assetId}) {
-        $parentAsset = WebGUI::Asset->new($self->session, $options->{assetId});
+        $parentAsset = eval { WebGUI::Asset->newById($self->session, $options->{assetId}); };
+        if (Exception::Class->caught()) {
+            $self->session->log->error("Keywords: error instanciating parentAsset by assetId ". $options->{assetId}.": $@");
+        }
     }
     if ($parentAsset) {
         $sql .= ' INNER JOIN asset USING (assetId)';
