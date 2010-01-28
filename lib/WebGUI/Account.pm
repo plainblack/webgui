@@ -482,9 +482,11 @@ sub processTemplate {
         return sprintf($i18n->get('Error: Cannot instantiate template'),$templateId,$className);
     }
 
-    $template = WebGUI::Asset->new($session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
+    if (!defined $template) {
+        $template = eval { WebGUI::Asset->newById($session, $templateId); };
+    }
 
-    unless (defined $template) {
+    if (Exception::Class->caught()) {
         $session->log->error("Can't instantiate template $templateId for class ".$className);
         my $i18n = WebGUI::International->new($session, 'Account');
         return sprintf($i18n->get('Error: Cannot instantiate template'),$templateId,$className);
