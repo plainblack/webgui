@@ -44,6 +44,14 @@ my $noServiceVAT= 'NotGonnaWork';
 my $invalidVAT  = 'ByNoMeansAllowed';
 my $visitorUser = WebGUI::User->new( $session, 1 );
 
+my @EU_COUNTRIES = ( 
+    'Austria', 'Belgium', 'Bulgaria', 'Cyprus', 'Czech Republic',
+    'Germany', 'Denmark', 'Estonia', 'Greece', 'Spain', 'Finland',
+    'France', 'United Kingdom', 'Hungary', 'Ireland', 'Italy',
+    'Lithuania', 'Luxembourg', 'Latvia', 'Malta', 'Netherlands',
+    'Poland', 'Portugal', 'Romania', 'Sweden', 'Slovenia', 'Slovakia',
+);
+
 # Test SKU
 my $sku  = WebGUI::Asset->getRoot($session)->addChild( {
     className => 'WebGUI::Asset::Sku::Donation',
@@ -79,7 +87,7 @@ my $cart;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 317;
+my $tests = 342;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -428,8 +436,15 @@ SKIP: {
     $taxer->deleteVATNumber( $testVAT_BE, $taxUser );
 
     # Addresses inside EU without VAT number
-    is( $taxer->getTaxRate( $sku, $beAddress ), 100, 'getTaxRate: shipping addresses inside EU w/o VAT number pay tax' );
+    foreach my $country ( @EU_COUNTRIES ) {
+        next if $country eq $nlAddress->get('country');     # Residents of merchant country should be checked separately.
+
+        $beAddress->update( { country => $country } );
+        is( $taxer->getTaxRate( $sku, $beAddress ), 100, "getTaxRate: shipping addresses in $country w/o VAT number pay tax" );
+    }
+    $beAddress->update( { country => 'Belgium' } );
     is( $taxer->getTaxRate( $sku, $nlAddress ), 100, 'getTaxRate: shipping addresses in country of merchant w/o VAT number pay tax' );
+
     
     # Address outside EU
     is( $taxer->getTaxRate( $sku, $usAddress ), 0, 'getTaxRate: shipping addresses outside EU are tax exempt' );

@@ -62,7 +62,7 @@ tie my %EU_COUNTRIES, 'Tie::IxHash', (
     EL => 'Greece',
     ES => 'Spain',
     FI => 'Finland',
-    FR => 'France ',
+    FR => 'France',
     GB => 'United Kingdom',
     HU => 'Hungary',
     IE => 'Ireland',
