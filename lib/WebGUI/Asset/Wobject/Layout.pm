@@ -149,29 +149,30 @@ sub getEditForm {
 
 	tie my %assetOrder, "Tie::IxHash";
 	%assetOrder = (
-		"asc"  =>$i18n->get("asset order asc"),
-		"desc" =>$i18n->get("asset order desc"),
+		"asc"  => $i18n->get("asset order asc"),
+		"desc" => $i18n->get("asset order desc"),
 	);
-      $extraFields{assetOrder} = {
+    $extraFields{assetOrder} = {
         tab         => 'display',
         fieldType   => 'selectBox',
-        -name      => 'assetOrder',
-        -label     => $i18n->get('asset order label'),
-        -hoverHelp => $i18n->get('asset order hoverHelp'),
-        -value     => $self->getValue('assetOrder'),
-        -options   => \%assetOrder,
-      };
+        name        => 'assetOrder',
+        label       => $i18n->get('asset order label'),
+        hoverHelp   => $i18n->get('asset order hoverHelp'),
+        value       => $self->getValue('assetOrder'),
+        options     => \%assetOrder,
+    };
 
     if ($self->get("assetId") eq "new") {
-      $extraFields{whatNext} = {
-        fieldType   => 'whatNext',
-        -options=>{
-          view=>$i18n->get(823),
-          viewParent=>$i18n->get(847)
-        },
-        -value=>"view",
-      };
-    } else {
+        $extraFields{whatNext} = {
+            fieldType   => 'whatNext',
+            value       => "view",
+            options     => {
+                view       => $i18n->get(823),
+                viewParent => $i18n->get(847)
+            },
+        };
+    }
+    else {
         my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
         my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
         my %childIds;
@@ -179,21 +180,21 @@ sub getEditForm {
             $childIds{$child->getId} = $child->getTitle;    
         }
         $extraFields{assetsToHide} = {
-          fieldType => 'checkList',
-          tab => 'display',
-          -name=>"assetsToHide",
-          -value=>\@assetsToHide,
-          -options=>\%childIds,
-          -label=>$i18n->get('assets to hide'),
-          -hoverHelp=>$i18n->get('assets to hide description'),
-          -vertical=>1,
-          -uiLevel=>9,
+            fieldType => 'checkList',
+            tab       => 'display',
+            name      => "assetsToHide",
+            value     => \@assetsToHide,
+            options   => \%childIds,
+            label     => $i18n->get('assets to hide'),
+            hoverHelp => $i18n->get('assets to hide description'),
+            vertical  => 1,
+            uiLevel   => 9,
         };
     }
 
     my $overrides = $self->session->config->get("assets/".$self->get("className"));
     foreach my $fieldName (keys %extraFields) {
-      $self->setupFormField($tabform, $fieldName, \%extraFields, $overrides);
+        $self->setupFormField($tabform, $fieldName, \%extraFields, $overrides);
     }
 
     return $tabform;
