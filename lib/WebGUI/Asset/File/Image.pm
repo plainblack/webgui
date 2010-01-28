@@ -154,31 +154,51 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+
+# Add the fields defined locally and apply any overrides from the config file
 	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
-        $tabform->getTab("properties")->integer(
-               	-name=>"thumbnailSize",
-		-label=>$i18n->get('thumbnail size'),
-		-hoverHelp=>$i18n->get('Thumbnail size description'),
-		-value=>$self->getValue("thumbnailSize")
-               	);
-	$tabform->getTab("properties")->textarea(
-		-name=>"parameters",
-		-label=>$i18n->get('parameters'),
-		-hoverHelp=>$i18n->get('Parameters description'),
-		-value=>$self->getValue("parameters")
-		);
+
+        tie my %extraFields, "Tie::IxHash";
+
+        my $extraFields = {
+          thumbnailSize => {
+            fieldType=>"integer",
+            -name=>"thumbnailSize",
+            -label=>$i18n->get('thumbnail size'),
+            -hoverHelp=>$i18n->get('Thumbnail size description'),
+            -value=>$self->getValue("thumbnailSize"),
+          },
+          parameters => {
+            fieldType=>"textarea",
+            -name=>"parameters",
+            -label=>$i18n->get('parameters'),
+            -hoverHelp=>$i18n->get('Parameters description'),
+            -value=>$self->getValue("parameters")
+          },
+        };
+
 	if ($self->get("filename") ne "") {
-		$tabform->getTab("properties")->readOnly(
-			-label=>$i18n->get('thumbnail'),
-			-hoverHelp=>$i18n->get('Thumbnail description'),
-			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.$self->session->datetime->time().'" alt="thumbnail" /></a>'
-			);
-		my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
-        	$tabform->getTab("properties")->readOnly(
-			-label=>$i18n->get('image size'),
-			-value=>$x.' x '.$y
-			);
+          my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
+
+          $extraFields->{thumbnail} = {
+            fieldType=>"readOnly",
+            -label=>$i18n->get('thumbnail'),
+            -hoverHelp=>$i18n->get('Thumbnail description'),
+            -value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.$self->session->datetime->time().'" alt="thumbnail" /></a>'
+          };
+          $extraFields->{imageSize} = {
+            fieldType=>"readOnly",
+            -label=>$i18n->get('image size'),
+            -value=>$x.' x '.$y,
+          };
 	}
+
+	my $overrides = $self->session->config->get("assets/".$self->get("className"));
+
+        foreach my $fieldName (keys %{$extraFields}) {
+          $self->setupFormField($tabform, $fieldName, $extraFields, $overrides);
+        }
+
 	return $tabform;
 }
 
