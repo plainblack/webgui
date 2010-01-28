@@ -160,7 +160,7 @@ sub getEditForm {
 
     tie my %extraFields, "Tie::IxHash";
 
-    my $extraFields = {
+    $extraFields = {
         thumbnailSize => {
             fieldType => "integer",
             name      => "thumbnailSize",
