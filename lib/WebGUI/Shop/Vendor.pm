@@ -687,10 +687,13 @@ sub www_vendorTotalsAsJSON {
     foreach my $vendorId (keys %{ $vendorPayoutData }) {
         my $vendor = WebGUI::Shop::Vendor->new( $session, $vendorId );
 
-        push @dataset, {
+        my $dataset = {
             %{ $vendor->get },
             %{ $vendorPayoutData->{ $vendorId } },
-        }
+        };
+        my $user = WebGUI::User->new($session, $vendor->get('userId'));
+        $dataset->{name} .= ' ('.$user->username.')';
+        push @dataset, $dataset;
     }
 
     $session->http->setMimeType( 'application/json' );
