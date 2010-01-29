@@ -27,7 +27,7 @@ sub getClassSelectBox {
     );
     delete $classes{"WebGUI::Asset"}; # don't want to search for the root asset
 
-    my $className = $session->scratch->get('assetManagerSearchClassName') || $session->form->process("class","className");
+    my $className = $session->form->process("class","className") || $session->scratch->get('assetManagerSearchClassName');
     $session->scratch->set('assetManagerSearchClassName', $className);
     return WebGUI::Form::selectBox( $session, {
         name            => "class",

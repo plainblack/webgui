@@ -10,6 +10,7 @@
  - fixed #11380: "Use this Address" button in Shop needs to be green!
  - fixed: Due to a typo France was not considered part of the EU by the EU
    TaxDriver. ( Martin Kamerbeek / Oqapi )
+ - fixed #11292: Made search less sticky
 
 7.8.10
  - fixed #11332: Pagination in webgui.org forum urls
