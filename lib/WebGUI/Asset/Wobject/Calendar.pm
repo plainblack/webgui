@@ -27,7 +27,7 @@ property defaultView => (
             label           => ["defaultView label", 'Asset_Calendar'],
             hoverHelp       => ["defaultView description", 'Asset_Calendar'],
         );
-        
+
 property defaultDate => (
             fieldType       => "SelectBox",
             default         => 'current',
@@ -36,7 +36,7 @@ property defaultDate => (
             label           => ["defaultDate label", 'Asset_Calendar'],
             hoverHelp       => ["defaultDate description", 'Asset_Calendar'],
         );
-        
+
         ##### GROUPS / ACCESS #####
         # Edit events
 property groupIdEventEdit => (
@@ -50,8 +50,8 @@ property groupIdEventEdit => (
 property groupIdSubscribed => (
             fieldType       => 'hidden',
         );
-        
-        
+
+
         ##### TEMPLATES - DISPLAY #####
         # Month
 property templateIdMonth => (
@@ -62,7 +62,7 @@ property templateIdMonth => (
             hoverHelp       => ['templateIdMonth description', 'Asset_Calendar'],
             label           => ['templateIdMonth label', 'Asset_Calendar'],
         );
-        
+
         # Week
 property templateIdWeek => (
             fieldType       => "template",  
@@ -72,7 +72,7 @@ property templateIdWeek => (
             hoverHelp       => ['templateIdWeek description', 'Asset_Calendar'],
             label           => ['templateIdWeek label', 'Asset_Calendar'],
         );
-        
+
         # Day
 property templateIdDay => (
             fieldType       => "template",  
@@ -82,7 +82,7 @@ property templateIdDay => (
             hoverHelp       => ['templateIdDay description', 'Asset_Calendar'],
             label           => ['templateIdDay label', 'Asset_Calendar'],
         );
-        
+
         # List
 property templateIdList => (
             fieldType       => "template",  
@@ -102,7 +102,7 @@ property templateIdEvent => (
             hoverHelp       => ['templateIdEvent description', 'Asset_Calendar'],
             label           => ['templateIdEvent label', 'Asset_Calendar'],
         );
-        
+
         # Event Edit
 property templateIdEventEdit => (
             fieldType       => "template",  
@@ -112,7 +112,7 @@ property templateIdEventEdit => (
             hoverHelp       => ['templateIdEventEdit description', 'Asset_Calendar'],
             label           => ['templateIdEventEdit label', 'Asset_Calendar'],
         );
-        
+
         # Search
 property templateIdSearch => (
             fieldType       => "template",  
@@ -122,8 +122,8 @@ property templateIdSearch => (
             hoverHelp       => ['templateIdSearch description', 'Asset_Calendar'],
             label           => ['templateIdSearch label', 'Asset_Calendar'],
         );
-        
-        
+
+
         ##### TEMPLATES - PRINT #####
         # Month
 property templateIdPrintMonth => (
@@ -134,7 +134,7 @@ property templateIdPrintMonth => (
             hoverHelp       => ['templateIdPrintMonth description', 'Asset_Calendar'],
             label           => ['templateIdPrintMonth label', 'Asset_Calendar'],
         );
-        
+
         # Week
 property templateIdPrintWeek => (
             fieldType       => "template",  
@@ -144,7 +144,7 @@ property templateIdPrintWeek => (
             hoverHelp       => ['templateIdPrintWeek description', 'Asset_Calendar'],
             label           => ['templateIdPrintWeek label', 'Asset_Calendar'],
         );
-        
+
         # Day
 property templateIdPrintDay => (
             fieldType       => "template",  
@@ -154,7 +154,7 @@ property templateIdPrintDay => (
             hoverHelp       => ['templateIdPrintDay description', 'Asset_Calendar'],
             label           => ['templateIdPrintDay label', 'Asset_Calendar'],
         );
-        
+
         # List
 property templateIdPrintList => (
             fieldType       => "template",  
@@ -174,8 +174,8 @@ property templateIdPrintEvent => (
             hoverHelp       => ['templateIdPrintEvent description', 'Asset_Calendar'],
             label           => ['templateIdPrintEvent label', 'Asset_Calendar'],
         );
-        
-        
+
+
         ##### Miscellany #####
 property visitorCacheTimeout => (
             fieldType       => "integer",
@@ -260,9 +260,9 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift || [];
-    
+
     my $i18n        = WebGUI::International->new($session, 'Asset_Calendar');
-    
+
     ### Set up list options ###
     tie my %optionsDefaultView, 'Tie::IxHash', (
         month   => $i18n->get("defaultView value month"),
@@ -270,30 +270,30 @@ sub definition {
         day     => $i18n->get("defaultView value day"),
         list    => $i18n->get('defaultView value list'),
     );
-    
+
     tie my %optionsDefaultDate, 'Tie::IxHash', (
         current => $i18n->get("defaultDate value current"),
         first   => $i18n->get("defaultDate value first"),
         last    => $i18n->get("defaultDate value last"),
     );
-    
+
     tie my %optionsEventSort, 'Tie::IxHash', (
         time            => $i18n->get("sortEventsBy value time"),
         sequencenumber  => $i18n->get("sortEventsBy value sequencenumber"),
     );
 
-    
+
     ### Build properties hash ###
     tie my %properties, 'Tie::IxHash', (
         ##### DEFAULTS #####
     );
-    
+
     push @{$definition}, {
         className           => 'WebGUI::Asset::Wobject::Calendar',
         properties          => \%properties,
         autoGenerateForms   => 1,
     };
-    
+
     return $class->SUPER::definition($session, $definition);
 }
 
@@ -309,7 +309,7 @@ sub addChild {
     my $self        = shift;
     my $properties  = shift;
     my @other       = @_;
-    
+
     if ($properties->{className} ne "WebGUI::Asset::Event") {
         $self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
         return undef;
@@ -402,7 +402,7 @@ sub appendTemplateVarsDateTime {
             $var->{ $name } = $dt->can( $fields{ $name } )->( $dt );
         }
     }
-    
+
     # Special fields
     if ( $prefix ) {
         $var->{ $prefix . "Second"      } = sprintf "%02d", $dt->second;
@@ -415,7 +415,7 @@ sub appendTemplateVarsDateTime {
         $var->{ "minute"      } = sprintf "%02d", $dt->minute;
         $var->{ "meridiem"    } = ( $dt->hour < 12 ? "AM" : "PM" );
     }
-    
+
     return $var;
 }
 
@@ -434,7 +434,7 @@ sub canEdit {
     my $self    = shift;
     my $userId  = shift     || $self->session->user->userId;
     my $form    = $self->session->form;
-    
+
     # Account for new events
     return 1 if (
         $self->canAddEvent( $userId ) 
@@ -493,14 +493,14 @@ Creates the group for users that are subscribed to the Calendar.
 # Copied from WebGUI::Asset::Wobject::Collaboration.
 sub createSubscriptionGroup {
     my $self    = shift;
-    
+
     my $group   = WebGUI::Group->new($self->session, "new");
     $group->name($self->getId);
     $group->description("The group to store subscriptions for the calendar ".$self->getId);
     $group->isEditable(0);
     $group->showInForms(0);
     $group->deleteGroups([3]); # admins don't want to be auto subscribed to this thing
-    
+
     $self->update({
         groupIdSubscription => $group->getId
     });
@@ -543,35 +543,35 @@ sub getEditForm {
     my $session = $self->session;
     my $form    = $self->SUPER::getEditForm;
     my $i18n    = WebGUI::International->new($session,"Asset_Calendar");
-    
+
     my $tab     = $form->addTab("feeds",$i18n->get("feeds"), 6);
     $tab->raw("<tr><td>");
-    
+
     $tab->raw(<<'ENDJS');
     <script type="text/javascript">
     var FeedsManager    = new Object();
-    
+
     FeedsManager.addFeed = function (table,rowId,params) {
         // TODO: Verify that feed URL is valid
-        
+
         var table    = document.getElementById(table);
-        
+
         // If id is "new"
         //  Add a number on the end.
         if (rowId == "new")
             rowId = "new" + Math.round(Math.random() * 10000000000000000);
-        
+
         // Create 5 cells
         var cells    = new Array();
         for (var i = 0; i < 5; i++)
             cells[i]    = document.createElement("td");
-        
-        
+
+
         /*** [0] - Delete button */
         var button    = document.createElement("img");
         button.setAttribute("src","/extras/wobject/Calendar/images/delete.gif");
         button.setAttribute("border","0");
-        
+
         var deleteLink    = document.createElement("a");
         deleteLink.setAttribute("href","#");
         YAHOO.util.Event.addListener(deleteLink, "click", function (e, rowId) {
@@ -579,51 +579,51 @@ sub getEditForm {
             YAHOO.util.Event.preventDefault(e);
         }, rowId);
         deleteLink.appendChild(button);
-        
+
         cells[0].appendChild(deleteLink);
-        
-        
+
+
         /*** [1] - Feed link for teh clicking and form element for teh saving */
         var feedLink    = document.createElement("a");
         feedLink.setAttribute("href",params.url);
         feedLink.setAttribute("target","_new"); // TODO: Use JS to open window. target="" is deprecated
         feedLink.appendChild(document.createTextNode(params.url));
-        
+
         var formElement    = document.createElement("input");
         formElement.setAttribute("type","hidden");
         formElement.setAttribute("name","feeds-"+rowId);
         formElement.setAttribute("value",params.url);
-        
+
         cells[1].appendChild(feedLink);
         cells[1].appendChild(formElement);
-        
-        
+
+
         /*** [2] - Result (new) */
         if (params.lastResult == undefined)
             params.lastResult = "new";
         var lastResult    = document.createTextNode(params.lastResult);
-        
+
         cells[2].appendChild(lastResult);
-        
-        
+
+
         /*** [3] - Last updated */
         if (params.lastUpdated == undefined)
             params.lastUpdated = "never";
         var lastUpdated    = document.createTextNode(params.lastUpdated);
-        
+
         cells[3].appendChild(lastUpdated);
-        
-        
+
+
         /*** [4] - Update now! */
         /* TODO */
-        
-        
+
+
         /* Add the row to the table */
         var row        = document.createElement("tr");
         row.setAttribute("id",rowId);
         for (var i = 0; i < cells.length; i++)
             row.appendChild(cells[i]);
-        
+
         var tbody = table.getElementsByTagName('tbody')[0];
         if (tbody)
             tbody.appendChild(row);
@@ -631,27 +631,27 @@ sub getEditForm {
             table.appendChild(row);
         FeedsManager.updateFeed(table.getAttribute("id"),rowId);
     }
-    
-    
+
+
     FeedsManager.updateFeed = function (table,rowId) {
         /* TODO */
-        
+
     }
-    
-    
+
+
     FeedsManager.deleteFeed = function (table,rowId) {
         row        = document.getElementById(rowId);
-        
+
         row.parentNode.removeChild(row);
     }
-    
-    
+
+
     FeedsManager.setFeed    = function (table,rowId,params) {
-        
-        
-        
+
+
+
     }
-    
+
     </script>
 ENDJS
 
@@ -665,7 +665,7 @@ ENDJS
     <label for="addFeed">$addFeed</label>
     <input type="text" size="60" id="addFeed" name="addFeed" value="" />
     <input type="button" value="$add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
-    
+
     <table id="feeds" style="width: 100%;">
     <thead>
         <th style="width: 30px;">&nbsp;</th>
@@ -709,11 +709,11 @@ sub getEvent {
     # Warn and return undef if no assetId
     $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: No asset ID."), return
         unless $assetId;
-    
+
     # ? Perhaps use Stow to cache events ?
-    
+
     my $event = WebGUI::Asset->newById($self->session, $assetId);
-    
+
     unless ( $event ) {
         $self->session->errorHandler->warn("Event '$assetId' doesn't exist!");
         return undef;
@@ -774,9 +774,9 @@ sub getEventsIn {
         $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEventsIn() called with not enough arguments at ".join('::',(caller)[1,2]));
         return undef;
     }
-    
+
     # Create objects and adjust for timezone
-    
+
     my ($startDate)    = split / /, $start;
     my ($endDate)      = split / /, $end;
 
@@ -837,7 +837,7 @@ week, month and or day views.
 sub getEventVars {
     my $self    = shift;
     my $event   = shift;
-    
+
     my %eventVar    = %{$event->get};
     %eventVar       = (map { "event".ucfirst($_) => delete $eventVar{$_} } keys %eventVar);
     my %eventDates  = $event->getTemplateVars;
@@ -917,7 +917,7 @@ Gets the last event in this calendar. Returns the Event object.
 sub getLastEvent {
     my $self    = shift;
     my $lineage = $self->get("lineage");
-    
+
     my ($assetId) = $self->session->db->quickArray(<<ENDSQL);
         SELECT asset.assetId 
         FROM asset
@@ -927,7 +927,7 @@ sub getLastEvent {
         ORDER BY startDate DESC, startTime DESC, revisionDate DESC
         LIMIT 1
 ENDSQL
-    
+
     return unless $assetId;
     return $self->getEvent($assetId);
 }
@@ -944,7 +944,7 @@ sub getTemplateVars {
     my $self        = shift;
     my $var         = $self->get;
 
-    
+
     return $var;
 }
 
@@ -975,18 +975,18 @@ parameters.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    
+
     my $view = ucfirst lc $self->session->form->param("type")
             || ucfirst $self->get("defaultView") 
             || "Month";
-    
+
     if ($self->session->form->param("print")){
         $view = "Print".$view;
         $self->session->style->makePrintable(1);
     }
-    
+
     #$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
-    
+
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
@@ -996,7 +996,7 @@ sub prepareView {
         );
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
-    
+
     $self->{_viewTemplate} = $template;
 }
 
@@ -1017,13 +1017,13 @@ sub processPropertiesFromFormPost {
     my $session = $self->session;
     my $form    = $self->session->form;
     $self->SUPER::processPropertiesFromFormPost;
-    
+
     unless ($self->get("groupIdSubscribed")) {
         $self->createSubscriptionGroup();
     }
-        
+
     $self->session->errorHandler->info( "DEFAULT VIEW:" . $self->get('defaultView') );
-    
+
     ### Get feeds from the form
     # Workaround WebGUI::Session::Form->param bug that returns duplicate
     # names.
@@ -1099,15 +1099,15 @@ sub view {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $session->form;
-    
+
     ## INTERRUPT: If user is only a Visitor and we have a cached version 
         # and is not expired, use it.
-    
+
     # Get the form parameters
     my $params        = {};    
     $params->{type}   = $form->param("type") || $self->get( 'defaultView' );
     $params->{start}  = $form->param("start");
-   
+
     # Validate type passed, or recover from session scratchpad
     if ($params->{type} =~ /^(?:month|week|day|list)$/i) {
        $session->scratch->set('cal_view_type', $params->{'type'});
@@ -1137,7 +1137,7 @@ sub view {
 
         $session->scratch->set('cal_view_start', $params->{'start'});
     }
-    
+
     # Get the template from the appropriate view* method
     # TODO: This should be abstracted
     my $var = lc $params->{type} eq "month"     ? $self->viewMonth( $params )
@@ -1146,7 +1146,7 @@ sub view {
             : lc $params->{type} eq "list"      ? $self->viewList( $params )
             : return $self->errorHandler->error("Calendar invalid 'type=' url parameter")
             ;
-    
+
     ##### Process the template
     # Add any global variables
     # Admin
@@ -1154,13 +1154,13 @@ sub view {
         $var->{'admin'}         = 1;
         $var->{'adminControls'} = $self->getToolbar;
     }
-    
+
     # Event editor
     if ($self->canAddEvent) {
         $var->{'editor'}    = 1;
         $var->{"urlAdd"}    = $self->getUrl("func=add;class=WebGUI::Asset::Event;type=".$params->{type}.";start=$params->{start}");
     }
-    
+
     # URLs
     $var->{ url }           = $self->getUrl;
     $var->{"urlDay"}        = $self->getUrl("type=day;start=".$params->{start});
@@ -1169,13 +1169,13 @@ sub view {
     $var->{"urlSearch"}     = $self->getSearchUrl;
     $var->{"urlPrint"}      = $self->getUrl("type=".$params->{type}.";start=".$params->{start}.";print=1");
     $var->{"urlIcal"}	    = $self->getUrl("func=ical");
-    
+
     $var->{"extrasUrl"}     = $self->session->url->extras();
     $var->{ paramStart      } = $params->{ start };
     $var->{ paramType       } = $params->{ type };
 
     # TODO: If user is only a Visitor and we've gotten this far, update the cache
-    
+
     # Return the processed template to be displayed for the user
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
@@ -1292,7 +1292,7 @@ sub viewList {
     my $session     = $self->session;
     my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
     my $var         = $self->getTemplateVars;
-    
+
     ### Get the events
     my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} )->truncate( to => "day" );
     my $dtEnd       = $dtStart->clone->add( seconds => $self->get('listViewPageInterval') );
@@ -1321,7 +1321,7 @@ sub viewList {
         if ( $dt->day > $dtLast->day ) {
             $eventVar{ new_day } = 1;
         }
-        
+
         push @{ $var->{events} }, { %eventVar, %eventDate };
         $dtLast = $dt;
     }
@@ -1330,7 +1330,7 @@ sub viewList {
     # Date span
     $self->appendTemplateVarsDateTime( $var, $dtStart, "start" );
     $self->appendTemplateVarsDateTime( $var, $dtEnd, "end" );
-    
+
     # Previous and next pages
     if ( $self->getFirstEvent && $self->getFirstEvent->getDateTimeStart < $dtStart ) {
         my $dtPrevious
@@ -1374,7 +1374,7 @@ sub viewMonth {
     my $tz          = $session->datetime->getTimeZone;
     my $today       = WebGUI::DateTime->new($self->session, time)
                     ->set_time_zone($tz)->toMysqlDate;
-    
+
     #### Get all the events in this time period
     # Get the range of the epoch of this month
     my $dt          = WebGUI::DateTime->new($self->session, $params->{start});
@@ -1384,11 +1384,11 @@ sub viewMonth {
     my $dtEnd = $dt->clone->add(months => 1);
     my $end   = $dtEnd->toMysql;
     $dtEnd->add(seconds => -1);
-    
+
     my @events      
         = $self->getEventsIn($start,$end);
-    
-    
+
+
     #### Create the template parameters
     ## The grid
     my $first_dow     = $session->user->profileField("firstDayOfWeek") || 0;
@@ -1399,15 +1399,15 @@ sub viewMonth {
     my $days_in_month    = $dt->clone->add(months=>1)->subtract(seconds=>1)->day_of_month;
     # Adjustment for first day of week
     my $adjust    = ( $dt->day_of_week_0 - $first_dow + 1) % 7;
-    
+
     # First create the days that are in this month
     for my $day (0..$days_in_month-1) {
         my $dt_day      = $dt->clone->add(days=>$day);
-        
+
         # Calculate what position this day should be in
         my $week        = int(($adjust + $dt_day->day_of_month_0) / 7);
         my $position    = ($adjust + $dt_day->day_of_month_0) % 7;
-        
+
         # Add the day in the appropriate position
         $var->{weeks}->[$week]->{days}->[$position] = {
             "dayMonth"      => $dt_day->day_of_month,
@@ -1415,18 +1415,18 @@ sub viewMonth {
             "dayCurrent"    => ($today eq $dt_day->toMysqlDate ? 1 : 0 ),
         };
     }
-    
+
     # Add any remaning trailing empty spaces
     push @{$var->{weeks}->[-1]->{days}},undef 
         until @{$var->{weeks}->[-1]->{days}} >= 7;
-    
+
     ## The events
     EVENT: for my $event (@events) {
         next EVENT unless $event->canView();
         # Get the WebGUI::DateTime objects
         my $dt_event_start  = $event->getDateTimeStart;
         my $dt_event_end    = $event->getDateTimeEndNI;
-        
+
         # Prepare the template variables
         my %eventTemplateVariables = $self->getEventVars($event);
 
@@ -1443,16 +1443,16 @@ sub viewMonth {
         for my $mday ($dt_event_start->day_of_month_0..$dt_event_end->day_of_month_0) {
             my $week        = int(($adjust + $mday) / 7);
             my $position    = ($adjust + $mday) % 7;
-            
+
             push @{$var->{weeks}->[$week]->{days}->[$position]->{events}}, \%eventTemplateVariables;
         }
     }
-    
+
     # Make the navigation bars
     my $dt_year     = $dt->clone->truncate(to => "year");
     for my $m (0..11) {
         my $dt_month = $dt_year->clone->add(months=>$m);
-        
+
         push @{$var->{months}}, {
             "monthName"     => $dt_month->month_name,
             "monthAbbr"     => $dt_month->month_abbr,
@@ -1461,21 +1461,21 @@ sub viewMonth {
             "monthCurrent"  => ($dt_month->month eq $dt->month ? 1 : 0),
         };
     }
-    
+
     # Day names
     my @dayNames    = @{$dt->locale->day_names}[6,0..5]; # Put sunday first
     my @dayAbbrs    = @{$dt->locale->day_abbreviations}[6,0..5];
     # Take from FirstDOW to the end and put it on the beginning
     unshift @dayNames,splice(@dayNames,$first_dow);
     unshift @dayAbbrs,splice(@dayAbbrs,$first_dow);
-    
+
     for my $dayIndex (0..$#dayNames) {
         push @{$var->{dayNames}}, {
             "dayName"    => $dayNames[$dayIndex],
             "dayAbbr"    => $dayAbbrs[$dayIndex],
         };
     }
-    
+
     $var->{"pageNextYear"   } = $dt->year + 1;
     $var->{"pageNextUrl"    } = $self->getUrl("type=month;start=" . $dt->clone->add(years=>1)->toMysql);
     $var->{"pagePrevYear"   } = $dt->year - 1;
@@ -1483,7 +1483,7 @@ sub viewMonth {
     $var->{"monthName"      } = $dt->month_name;
     $var->{"monthAbbr"      } = $dt->month_abbr;
     $var->{"year"           } = $dt->year;
-    
+
     # Return the template
     return $var;
 }
@@ -1515,14 +1515,14 @@ sub viewWeek {
     my $tz      = $session->datetime->getTimeZone;
     my $today   = WebGUI::DateTime->new($self->session, time)->set_time_zone($tz)
                 ->toMysqlDate;
-    
-    
+
+
     #### Get all the events in this time period
     # Get the range of the epoch of this week
     my $dt      = WebGUI::DateTime->new($self->session, $params->{start});
     $dt->set_time_zone($tz);
     $dt->truncate( to => "day");
-    
+
     # Apply First Day of Week settings
     my $first_dow = $session->user->profileField("firstDayOfWeek") || 0;
                 # 0 - sunday
@@ -1530,11 +1530,11 @@ sub viewWeek {
                 # 2 - tuesday, etc...
     # subtract because we want to include the day that was passed
     $dt->subtract(days => $dt->day_of_week % 7 - $first_dow);
-    
+
     my $start   = $dt->toMysql;
     my $dtEnd   = $dt->clone->add(days => 7)->add( seconds => -1);
     my $end     = $dtEnd->toMysql; # Clone to prevent saving change
-    
+
     my $sort_by_sequence++ if $self->get('sortEventsBy') eq 'sequencenumber';
     my $can_edit_order++ if $self->canEdit && $sort_by_sequence;
 
@@ -1546,11 +1546,11 @@ sub viewWeek {
        my @events  = $self->getEventsIn( $start, $end );
 
        my (%event_asset_of, %seq_key_of, %week_day_of, @event_days);
-       
+
        # The events
        for my $event ( @events ) {
            next unless $event->canView();
-           
+
            my $event_asset_id = $event->get( 'assetId' );
 
            # Add Event object use by assetId
@@ -1560,16 +1560,16 @@ sub viewWeek {
            # the template variables
            my $dt_event_start = $event->getDateTimeStart;
            my $dt_event_end   = $event->getDateTimeEndNI;
-           
+
            #Handle events that start before this week or end after this week.
            if ($dt_event_start < $dt) {
                $dt_event_start = $dt;
            }
-           
+
            if ($dt_event_end > $dtEnd) {
                $dt_event_end = $dtEnd;
            }
-           
+
            my $start_dow = ($dt_event_start->day_of_week - $first_dow) % 7;
            my $end_dow   = ($dt_event_end->day_of_week   - $first_dow) % 7;
 
@@ -1578,13 +1578,13 @@ sub viewWeek {
                {},$event_asset_id)->[0];
 
            foreach my $weekDay ($start_dow .. $end_dow) {
-     
+
                push @{ $event_days[ $weekDay ] }, $event;
                my $event_day_pos = $#{ $event_days[ $weekDay ]};
 
                # Monitor duplicates in sequence list;
                push @{ $seq_key_of{ $sequence_number } }, $event_asset_id;
-               
+
                # Add find assetId by day/order pos
                $week_day_of{ $weekDay }{ $event_day_pos } = $event_asset_id;
 
@@ -1592,7 +1592,7 @@ sub viewWeek {
                $event_asset_of{ $event_asset_id }{ $weekDay } = $event_day_pos;
            }
        }
-       
+
        # Process the event sequence change request
        #
        #   Based upon binary values beginning at 16384 sequence
@@ -1653,7 +1653,7 @@ sub viewWeek {
                }
 
            }
-           
+
 
            $session->db->dbh->do
                ("UPDATE Event SET sequenceNumber = ? WHERE assetId = ? AND revisionDate = ?",{},
@@ -1667,7 +1667,7 @@ sub viewWeek {
            my $next_day_pos      = $event_asset_of{ $next_asset_id }{ $event_day };
            my $next_event_object = $event_asset_of{ $next_asset_id }{ object };
            my $next_seq_num      = $session->db->dbh->selectcol_arrayref("SELECT sequenceNumber FROM Event WHERE assetId = ? ORDER BY revisionDate desc LIMIT 1",{},$next_asset_id)->[0];
-           
+
 #          warn "After Asset: $next_asset_id, seqNum: $next_seq_num, day: $event_day.$next_day_pos\n";
 
            my $seq_idx;
@@ -1691,14 +1691,14 @@ sub viewWeek {
 #          warn "Moved Asset New Seq Num: ".($next_seq_num + $incr)." by $incr\n";
        }
     }
-  
-    
+
+
     #### Create the template parameters
     # Some friendly dates
     for my $i (0..6) {
         my $day     = {};
         my $dt_day  = $dt->clone->add(days=>$i);
-        
+
         $day->{"dayName"    } = $dt_day->day_name;
         $day->{"dayAbbr"    } = $dt_day->day_abbr;
         $day->{"dayOfMonth" } = $dt_day->day_of_month;
@@ -1710,14 +1710,14 @@ sub viewWeek {
         $day->{"mdy"        } = $dt_day->mdy;
         $day->{"dmy"        } = $dt_day->dmy;
         $day->{"epoch"      } = $dt_day->epoch;
-        
+
         if ($dt_day->toMysqlDate eq $today) {
             $day->{"dayCurrent"} = 1;
         }
-        
+
         push @{$var->{days}}, $day;
     }
-    
+
     # The events
     my @events  = $self->getEventsIn( $start, $end );
     for my $event ( @events ) {
@@ -1762,13 +1762,13 @@ sub viewWeek {
 
         }
     }
-    
+
     # Make the navigation bars
     $var->{"pageNextUrl"}        
         = $self->getUrl("type=week;start=" . $dt->clone->add(weeks=>1)->toMysql);
     $var->{"pagePrevUrl"}        
         = $self->getUrl("type=week;start=" . $dt->clone->subtract(weeks=>1)->toMysql);
-    
+
     $var->{"startMonth"         } = $dt->month;
     $var->{"startMonthName"     } = $dt->month_name;
     $var->{"startMonthAbbr"     } = $dt->month_abbr;
@@ -1776,7 +1776,7 @@ sub viewWeek {
     $var->{"startDayName"       } = $dt->day_name;
     $var->{"startDayAbbr"       } = $dt->day_abbr;
     $var->{"startYear"          } = $dt->year;
-    
+
     $var->{"endMonth"           } = $dtEnd->month;
     $var->{"endMonthName"       } = $dtEnd->month_name;
     $var->{"endMonthAbbr"       } = $dtEnd->month_abbr;
@@ -1784,8 +1784,8 @@ sub viewWeek {
     $var->{"endDayName"         } = $dtEnd->day_name;
     $var->{"endDayAbbr"         } = $dtEnd->day_abbr;
     $var->{"endYear"            } = $dtEnd->year;
-    
-    
+
+
     # Return the template
     return $var;
 }
@@ -1804,9 +1804,9 @@ sub unwrapIcal
 {
     my $self    = shift;
     my $text    = shift;
-    
-    
-    
+
+
+
 }
 
 #----------------------------------------------------------------------------
@@ -1846,10 +1846,10 @@ sub www_edit {
     my $self    = shift;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session, 'Asset_Calendar');
-    
+
     return $session->privilege->insufficient() unless $self->canEdit;
-    
-    
+
+
     return $self->getAdminConsole->render(
             $self->getEditForm->print,
             $i18n->get("assetName")
@@ -1869,7 +1869,7 @@ sub www_ical {
     my $session     = $self->session;
     my $user        = $self->session->user;
     my $form        = $self->session->form;
-    
+
     #!!! KLUDGE:
     # An "adminId" may be passed as a parameter in order to facilitate
     # calls between calendars on the same server getting administrator 
@@ -1885,13 +1885,13 @@ sub www_ical {
                 "SELECT value FROM userSessionScratch WHERE sessionId=? and name=?",
                 [$adminId,$self->get("assetId")]
             );
-        
+
         if ($spectreTest eq "SPECTRE") {
             $self->session->user({userId => 3});
         }
     }
     #/KLUDGE
-    
+
     my $dt_start;
     my $start       = $form->param("start");
     if ($start) {
@@ -1905,7 +1905,7 @@ sub www_ical {
         $dt_start = WebGUI::DateTime->new($self->session, time);
         $dt_start->set_time_zone( $session->datetime->getTimeZone );
     }
-    
+
     my $dt_end;
     my $end         = $form->param("end");
     if ($end) {
@@ -1918,22 +1918,22 @@ sub www_ical {
     else {
         $dt_end = $dt_start->clone->add( seconds => $self->get('icalInterval') );
     }
-    
-    
-    
+
+
+
     # Get all the events we're going to display
     my @events    = $self->getEventsIn($dt_start->toMysql,$dt_end->toMysql);
-    
-    
+
+
     my $ical    = qq{BEGIN:VCALENDAR\r\n}
                 . qq{PRODID:WebGUI }.$WebGUI::VERSION."-".$WebGUI::STATUS.qq{\r\n}
                 . qq{VERSION:2.0\r\n};
-    
+
     # VEVENT:
     EVENT: for my $event (@events) {
         next EVENT unless $event->canView();
         $ical   .= qq{BEGIN:VEVENT\r\n};
-        
+
         ### UID
         # Use feed's UID to prevent over-propagation
         if ($event->get("feedUid")) {
@@ -1944,17 +1944,17 @@ sub www_ical {
             my $domain  = $session->config->get("sitename")->[0];
             $ical       .= qq{UID:}.$event->get("assetId").'@'.$domain."\r\n";
         }
-        
+
         # LAST-MODIFIED (revisionDate)
         $ical   .= qq{LAST-MODIFIED:}
                 . WebGUI::DateTime->new($self->session, $event->get("revisionDate"))->toIcal
                 . "\r\n";
-        
+
         # CREATED (creationDate)
         $ical   .= qq{CREATED:}
                 . WebGUI::DateTime->new($self->session, $event->get("creationDate"))->toIcal
                 . "\r\n";
-        
+
         # SEQUENCE
         my $sequenceNumber = $event->get("iCalSequenceNumber");
         if (defined $sequenceNumber) {
@@ -1962,7 +1962,7 @@ sub www_ical {
                     . $event->get("iCalSequenceNumber")
                     . "\r\n";
         }
-        
+
         # DTSTART
         my $eventStart = $event->getIcalStart;
         $ical .= 'DTSTART';
@@ -1970,7 +1970,7 @@ sub www_ical {
             $ical .= ';VALUE=DATE';
         }
         $ical .= ":$eventStart\r\n";
-        
+
         # DTEND
         my $eventEnd = $event->getIcalEnd;
         $ical .= 'DTEND';
@@ -1978,7 +1978,7 @@ sub www_ical {
             $ical .= ';VALUE=DATE';
         }
         $ical .= ":$eventEnd\r\n";
-        
+
         # Summary (the title)
         # Wrapped at 75 columns
         $ical   .= $self->wrapIcal("SUMMARY:".$event->get("title"))."\r\n";
@@ -2006,8 +2006,8 @@ sub www_ical {
     # ENDVEVENT
 
     $ical       .= qq{END:VCALENDAR\r\n};
-    
-    
+
+
     # Set mime of text/icalendar
     #$self->session->http->setMimeType("text/plain");
     $self->session->http->setFilename("feed.ics","text/calendar");
@@ -2026,7 +2026,7 @@ Import an iCalendar file into the Events Calendar.
 
 sub www_importIcal {
     ### TODO: Everything
-    
+
     return $_[0]->session->privilege->noAccess;
 }
 
@@ -2049,10 +2049,10 @@ sub www_search {
     my $startDate   = $form->process("startdate");
     my $endDate     = $form->process("enddate");
     my $perpage     = $form->param("perpage");
-    
+
     my $var         = $self->getTemplateVars;
     $var->{url}     = $self->getUrl;
-    
+
     # If there is a search to perform
     if ($keywords || $startDate || $endDate) {
         my $search      = new WebGUI::Search($session);
@@ -2063,7 +2063,7 @@ sub www_search {
             join            => "join Event on assetIndex.assetId=Event.assetId and assetIndex.revisionDate=Event.revisionDate",
             columns         => ['Event.startDate','Event.startTime'],
         );
-        
+
         # If the start and/or end dates are not filled in, do not limit
         # to a certain time period
         $rules{where}    .= "Event.startDate >= '$startDate'"
@@ -2071,8 +2071,8 @@ sub www_search {
         $rules{where}    .= " && " if ($startDate && $endDate);
         $rules{where}    .= "Event.endDate <= '$endDate'"
                 if ($endDate);
-        
-        
+
+
         # Prepare the paginator
         my @results    = ();
         $search->search(\%rules);
@@ -2086,7 +2086,7 @@ sub www_search {
                 my $dt    = WebGUI::DateTime->new($self->session, $data->{startDate}." ".($data->{startTime}?$data->{startTime}:"00:00:00"));
                 $dt->set_time_zone( $self->session->datetime->getTimeZone )
                     if ($data->{startTime});
-            
+
                 push(@results, {
                     url         => $self->session->url->gateway($data->{url}),
                     title       => $data->{title},
@@ -2095,7 +2095,7 @@ sub www_search {
                 });
             }
         } 
-        
+
         my $urlParams   = 'func=search;'
                         . 'keywords=' . $self->session->url->escape($keywords) . ';'
                         . 'startdate=' . $startDate . ';'
@@ -2112,12 +2112,12 @@ sub www_search {
         $p->appendTemplateVars($var);
         $var->{results} = $p->getPageData;
     }
-    
+
     # Prepare the form
     my $default_dt      = WebGUI::DateTime->new($self->session, time);
     my $default_start   = $default_dt->toMysqlDate;
     my $default_end     = $default_dt->add(years => 1)->toMysqlDate;
-    
+
     $var->{"form.header"}    
         = WebGUI::Form::formHeader($session, {
             action      => $self->getUrl,
@@ -2126,9 +2126,9 @@ sub www_search {
             name        => "func",
             value       => "search",
         });
-    
+
     $var->{"form.footer"} = WebGUI::Form::formFooter($session);
-    
+
     $var->{"form.keywords"} 
         = WebGUI::Form::text($session, {
             name        => "keywords",
@@ -2154,7 +2154,7 @@ sub www_search {
             value           => $endDate,
             defaultValue    => $default_end,
         });
-    
+
     my $i18n = WebGUI::International->new($session, 'Asset_Calendar');
 
     $var->{"form.submit"}    
