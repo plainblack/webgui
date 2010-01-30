@@ -22,6 +22,11 @@ our $I18N = {
         lastUpdated => 1184820764,
 	},
 
+	'file template' => {
+		message => q|File Template|,
+        lastUpdated => 1264812976,
+	},
+
 	'fileSize' => {
 		message => q|The size (in bytes/kilobytes/megabytes, etc) of the file.|,
 		lastUpdated => 1148952092,

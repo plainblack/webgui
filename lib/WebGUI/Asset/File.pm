@@ -15,8 +15,40 @@ package WebGUI::Asset::File;
 =cut
 
 use strict;
-use base 'WebGUI::Asset';
 use Carp;
+
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+aspect assetName => ['assetName', 'Asset_File'];
+aspect tableName => 'FileAsset';
+property cacheTimeout => (
+                tab       => "display",
+                fieldType => "interval",
+                default   => 3600,
+                uiLevel   => 8,
+                label     => ["cache timeout", 'Asset_File'],
+                hoverHelp => ["cache timeout help", 'Asset_File'],
+         );
+property filename => (
+                noFormPost => 1,
+                fieldType  => 'hidden',
+                default    => '',
+         );
+property storageId => (
+                noFormPost => 1,
+                fieldType  => 'hidden',
+                default    => '',
+         );
+property templateId => (
+                fieldType => 'template',
+                default   => 'PBtmpl0000000000000024',
+                label     => ['file template', 'Asset_File'],
+                hoverHelp => ['file template description', 'Asset_File'],
+                namespace => "FileAsset",
+         );
+
 use WebGUI::Storage;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -55,8 +87,8 @@ sub addRevision {
     my $self        = shift;
     my $newSelf = $self->SUPER::addRevision(@_);
 
-    if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
-        my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
+    if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
+        my $newStorage = $self->getStorageClass->get($self->session, $self->storageId)->copy;
         $newSelf->update({storageId => $newStorage->getId});
     }
 
@@ -77,58 +109,8 @@ A hash reference of optional parameters. None at this time.
 
 sub applyConstraints {
     my $self = shift;
-	$self->getStorageLocation->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
+	$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
     $self->setSize;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_File");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		tableName=>'FileAsset',
-		className=>'WebGUI::Asset::File',
-		properties=>{
-			cacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("cache timeout"),
-				hoverHelp => $i18n->get("cache timeout help")
-				},
-			filename=>{
-				noFormPost=>1,
-				fieldType=>'hidden',
-				defaultValue=>'',
-			},
-			storageId=>{
-				noFormPost=>1,
-				fieldType=>'hidden',
-				defaultValue=>'',
-			},
-			templateId=>{
-				fieldType=>'template',
-				defaultValue=>'PBtmpl0000000000000024'
-			}
-		}
-	});
-	return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -160,7 +142,7 @@ See WebGUI::AssetPackage::exportAssetData() for details.
 sub exportAssetData {
 	my $self = shift;
 	my $data = $self->SUPER::exportAssetData;
-	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
+	push(@{$data->{storage}}, $self->storageId) if ($self->storageId ne "");
 	return $data;
 }
 
@@ -195,8 +177,8 @@ sub exportWriteFile {
         WebGUI::Error->throw(error => "could not make directory " . $parent->absolute->stringify);
     }
 
-    if ( ! File::Copy::copy($self->getStorageLocation->getPath($self->get('filename')), $dest->stringify) ) {
-        WebGUI::Error->throw(error => "can't copy " . $self->getStorageLocation->getPath($self->get('filename'))
+    if ( ! File::Copy::copy($self->getStorageLocation->getPath($self->filename), $dest->stringify) ) {
+        WebGUI::Error->throw(error => "can't copy " . $self->getStorageLocation->getPath($self->filename)
             . ' to ' . $dest->absolute->stringify . ": $!");
     }
 }
@@ -238,9 +220,9 @@ sub getEditFormUploadControl {
     my $i18n        = WebGUI::International->new($session, 'Asset_File');
     my $html        = '';
 
-    if ($self->get("filename") ne "") {
+    if ($self->filename ne "") {
         $html .= WebGUI::Form::readOnly( $session, {
-            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" style="border-style:none;vertical-align:middle;" /> '.$self->get("filename").'</a></p>'
+            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->filename.'" style="border-style:none;vertical-align:middle;" /> '.$self->filename.'</a></p>'
         });
     }
 
@@ -265,7 +247,7 @@ Returns the URL for the file stored in the storage location.
 sub getFileUrl {
 	my $self = shift;
 	#return $self->get("url");
-	return $self->getStorageLocation->getUrl($self->get("filename"));
+	return $self->getStorageLocation->getUrl($self->filename);
 }
 
 #-------------------------------------------------------------------
@@ -279,8 +261,8 @@ file, then it returns undef.
 
 sub getFileIconUrl {
     my $self = shift;
-    return undef unless $self->get("filename"); ## Why do I have to do this when creating new Files?
-    return $self->getStorageLocation->getFileIconUrl($self->get("filename"));
+    return undef unless $self->filename; ## Why do I have to do this when creating new Files?
+    return $self->getStorageLocation->getFileIconUrl($self->filename);
 }
 
 
@@ -368,7 +350,7 @@ Indexing the content of the attachment. See WebGUI::Asset::indexContent() for ad
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-	$indexer->addFile($self->getStorageLocation->getPath($self->get("filename")));
+	$indexer->addFile($self->getStorageLocation->getPath($self->filename));
 }
 
 
@@ -383,7 +365,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
@@ -545,7 +527,7 @@ sub setStorageLocation {
         $self->update({storageId=>$self->{_storageLocation}->getId});
     }
     else {
-        $self->{_storageLocation} = $self->getStorageClass->get($self->session,$self->get("storageId"));
+        $self->{_storageLocation} = $self->getStorageClass->get($self->session,$self->storageId);
     }
 }
 
@@ -560,18 +542,18 @@ We override the update method from WebGUI::Asset in order to handle file system 
 sub update {
 	my $self = shift;
 	my %before = (
-		owner => $self->get("ownerUserId"),
-		view => $self->get("groupIdView"),
-		edit => $self->get("groupIdEdit"),
-		storageId => $self->get('storageId'),
+		owner     => $self->ownerUserId,
+		view      => $self->groupIdView,
+		edit      => $self->groupIdEdit,
+		storageId => $self->storageId,
 	);
 	$self->SUPER::update(@_);
 	##update may have entered a new storageId.  Reset the cached one just in case.
-	if ($self->get("storageId") ne $before{storageId}) {
+	if ($self->storageId ne $before{storageId}) {
 		$self->setStorageLocation;
 	}
-	if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
-		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+	if ($self->ownerUserId ne $before{owner} || $self->groupIdEdit ne $before{edit} || $self->groupIdView ne $before{view}) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
 	}
 }
 
@@ -615,11 +597,11 @@ sub view {
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{fileSize} = formatBytes($self->get("assetSize"));
-       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+    my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		eval{$self->session->cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
 	}
-       	return $out;
+    return $out;
 }
 
 
@@ -639,7 +621,7 @@ sub www_edit {
 	my $i18n = WebGUI::International->new($self->session);
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
-		-value=>$self->getValue("templateId"),
+		-value=>$self->templateId,
 		-hoverHelp=>$i18n->get('file template description','Asset_File'),
 		-namespace=>"FileAsset"
 	);
@@ -660,14 +642,14 @@ sub www_view {
 	return $session->privilege->noAccess() unless $self->canView;
 
 	# Check to make sure it's not in the trash or some other weird place
-	if ($self->get("state") ne "published") {
+	if ($self->state ne "published") {
 		my $i18n = WebGUI::International->new($session,'Asset_File');
 		$session->http->setStatus("404");
 		return sprintf($i18n->get("file not found"), $self->getUrl());
 	}
 
     $session->http->setRedirect($self->getFileUrl) unless $session->config->get('enableStreamingUploads');
-    $session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
+    $session->http->setStreamedFile($self->getStorageLocation->getPath($self->filename));
     $session->http->sendHeader;
     return 'chunked';
 }

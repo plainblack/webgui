@@ -65,15 +65,15 @@ my $asset = $defaultAsset->addChild($properties, $properties->{id});
 ############################################
 
 ok($asset->getStorageLocation, 'File Asset getStorageLocation initialized');
-ok($asset->get('storageId'), 'getStorageLocation updates asset object with storage location');
-is($asset->get('storageId'), $asset->getStorageLocation->getId, 'Asset storageId and cached storageId agree');
+ok($asset->storageId, 'getStorageLocation updates asset object with storage location');
+is($asset->storageId, $asset->getStorageLocation->getId, 'Asset storageId and cached storageId agree');
 
 $asset->update({
 	storageId => $storage->getId,
 	filename => $filename,
 });
 
-is($storage->getId, $asset->get('storageId'), 'Asset updated with correct new storageId');
+is($storage->getId, $asset->storageId, 'Asset updated with correct new storageId');
 is($storage->getId, $asset->getStorageLocation->getId, 'Cached Asset storage location updated with correct new storageId');
 
 $versionTag->commit;
@@ -87,6 +87,7 @@ $versionTag->commit;
 my $fileStorage = WebGUI::Storage->create($session);
 my $guard2 = cleanupGuard($fileStorage);
 $mocker->set_always('get', $fileStorage->getId);
+$mocker->set_always('getValue', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
 
