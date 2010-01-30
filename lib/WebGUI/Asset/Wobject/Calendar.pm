@@ -12,7 +12,222 @@ use strict;
 # http://www.plainblack.com                     info@plainblack.com
 #----------------------------------------------------------------------------
 
-use Tie::IxHash;
+#use base qw/WebGUI::Asset::Wobject WebGUI::JSONCollateral/;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+
+aspect assetName   => ['assetName', 'Asset_Calendar'];
+aspect icon        => 'calendar.gif';
+aspect tableName   => 'Calendar';
+property defaultView => (
+            fieldType       => "SelectBox",
+            default         => "month",
+            options         => \%optionsDefaultView,
+            tab             => "display",
+            label           => ["defaultView label", 'Asset_Calendar'],
+            hoverHelp       => ["defaultView description", 'Asset_Calendar'],
+        );
+        
+property defaultDate => (
+            fieldType       => "SelectBox",
+            default         => 'current',
+            options         => \%optionsDefaultDate,
+            tab             => "display",
+            label           => ["defaultDate label", 'Asset_Calendar'],
+            hoverHelp       => ["defaultDate description", 'Asset_Calendar'],
+        );
+        
+        ##### GROUPS / ACCESS #####
+        # Edit events
+property groupIdEventEdit => (
+            fieldType       => "group",
+            default         => "3",
+            tab             => "security",
+            label           => ["groupIdEventEdit label", 'Asset_Calendar'],
+            hoverHelp       => ["groupIdEventEdit description", 'Asset_Calendar'],
+        );
+
+property groupIdSubscribed => (
+            fieldType       => 'hidden',
+        );
+        
+        
+        ##### TEMPLATES - DISPLAY #####
+        # Month
+property templateIdMonth => (
+            fieldType       => "template",  
+            default         => 'CalendarMonth000000001',
+            tab             => "display",
+            namespace       => "Calendar/Month", 
+            hoverHelp       => ['templateIdMonth description', 'Asset_Calendar'],
+            label           => ['templateIdMonth label', 'Asset_Calendar'],
+        );
+        
+        # Week
+property templateIdWeek => (
+            fieldType       => "template",  
+            default         => 'CalendarWeek0000000001',
+            tab             => "display",
+            namespace       => "Calendar/Week", 
+            hoverHelp       => ['templateIdWeek description', 'Asset_Calendar'],
+            label           => ['templateIdWeek label', 'Asset_Calendar'],
+        );
+        
+        # Day
+property templateIdDay => (
+            fieldType       => "template",  
+            default         => 'CalendarDay00000000001',
+            tab             => "display",
+            namespace       => "Calendar/Day", 
+            hoverHelp       => ['templateIdDay description', 'Asset_Calendar'],
+            label           => ['templateIdDay label', 'Asset_Calendar'],
+        );
+        
+        # List
+property templateIdList => (
+            fieldType       => "template",  
+            default         => 'kj3b-X3i6zRKnhLb4ZiCLw',
+            tab             => "display",
+            namespace       => "Calendar/List", 
+            hoverHelp       => ['editForm templateIdList description', 'Asset_Calendar'],
+            label           => ['editForm templateIdList label', 'Asset_Calendar'],
+        );
+
+        # Event Details
+property templateIdEvent => (
+            fieldType       => "template",  
+            default         => 'CalendarEvent000000001',
+            tab             => "display",
+            namespace       => "Calendar/Event", 
+            hoverHelp       => ['templateIdEvent description', 'Asset_Calendar'],
+            label           => ['templateIdEvent label', 'Asset_Calendar'],
+        );
+        
+        # Event Edit
+property templateIdEventEdit => (
+            fieldType       => "template",  
+            default         => 'CalendarEventEdit00001',
+            tab             => "display",
+            namespace       => "Calendar/EventEdit", 
+            hoverHelp       => ['templateIdEventEdit description', 'Asset_Calendar'],
+            label           => ['templateIdEventEdit label', 'Asset_Calendar'],
+        );
+        
+        # Search
+property templateIdSearch => (
+            fieldType       => "template",  
+            default         => 'CalendarSearch00000001',
+            tab             => "display",
+            namespace       => "Calendar/Search", 
+            hoverHelp       => ['templateIdSearch description', 'Asset_Calendar'],
+            label           => ['templateIdSearch label', 'Asset_Calendar'],
+        );
+        
+        
+        ##### TEMPLATES - PRINT #####
+        # Month
+property templateIdPrintMonth => (
+            fieldType       => "template",  
+            default         => 'CalendarPrintMonth0001',
+            tab             => "display",
+            namespace       => "Calendar/Print/Month", 
+            hoverHelp       => ['templateIdPrintMonth description', 'Asset_Calendar'],
+            label           => ['templateIdPrintMonth label', 'Asset_Calendar'],
+        );
+        
+        # Week
+property templateIdPrintWeek => (
+            fieldType       => "template",  
+            default         => 'CalendarPrintWeek00001',
+            tab             => "display",
+            namespace       => "Calendar/Print/Week", 
+            hoverHelp       => ['templateIdPrintWeek description', 'Asset_Calendar'],
+            label           => ['templateIdPrintWeek label', 'Asset_Calendar'],
+        );
+        
+        # Day
+property templateIdPrintDay => (
+            fieldType       => "template",  
+            default         => 'CalendarPrintDay000001',
+            tab             => "display",
+            namespace       => "Calendar/Print/Day", 
+            hoverHelp       => ['templateIdPrintDay description', 'Asset_Calendar'],
+            label           => ['templateIdPrintDay label', 'Asset_Calendar'],
+        );
+        
+        # List
+property templateIdPrintList => (
+            fieldType       => "template",  
+            default         => '',
+            tab             => "display",
+            namespace       => "Calendar/Print/List", 
+            hoverHelp       => ['editForm templateIdPrintList description', 'Asset_Calendar'],
+            label           => ['editForm templateIdPrintList label', 'Asset_Calendar'],
+        );
+
+        # Event Details
+property templateIdPrintEvent => (
+            fieldType       => "template",  
+            default         => 'CalendarPrintEvent0001',
+            tab             => "display",
+            namespace       => "Calendar/Print/Event", 
+            hoverHelp       => ['templateIdPrintEvent description', 'Asset_Calendar'],
+            label           => ['templateIdPrintEvent label', 'Asset_Calendar'],
+        );
+        
+        
+        ##### Miscellany #####
+property visitorCacheTimeout => (
+            fieldType       => "integer",
+            default         => "60",
+            tab             => "display",
+            hoverHelp       => ['visitorCacheTimeout description', 'Asset_Calendar'],
+            label           => ['visitorCacheTimeout label', 'Asset_Calendar'],
+        );
+property sortEventsBy => (
+            fieldType       => "SelectBox",
+            default         => "time",
+            options         => \%optionsEventSort,
+            tab             => "display",
+            label           => ["sortEventsBy label", 'Asset_Calendar'],
+            hoverHelp       => ["sortEventsBy description", 'Asset_Calendar'],
+        );
+
+property listViewPageInterval => (
+            fieldType       => "interval",
+            default         => $session->datetime->intervalToSeconds( 3, 'months' ),
+            tab             => "display",
+            label           => ['editForm listViewPageInterval label', 'Asset_Calendar'],
+            hoverHelp       => ['editForm listViewPageInterval description', 'Asset_Calendar'],
+            unitsAvailable  => [ qw( days weeks months years ) ],
+        );
+
+property icalFeeds    => (
+            fieldType       => "textarea",
+            default         => [],
+            serialize       => 1,
+            noFormPost      => 1,
+            autoGenerate    => 0,
+            tab             => "display",
+        );
+
+property icalInterval    => (
+            fieldType       => "interval",
+            default         => $session->datetime->intervalToSeconds( 3, 'months' ),
+            tab             => "display",
+            label           => ['editForm icalInterval label', 'Asset_Calendar'],
+            hoverHelp       => ['editForm icalInterval description', 'Asset_Calendar'],
+            unitsAvailable  => [ qw( days weeks months years ) ],
+        );
+
+property workflowIdCommit => (
+            fieldType       => "workflow",
+            default         => $session->setting->get('defaultVersionTagWorkflow'),
+            tab             => 'security',
+            label           => ['editForm workflowIdCommit label', 'Asset_Calendar'],
+            hoverHelp       => ['editForm workflowIdCommit description', 'Asset_Calendar'],
+            type            => 'WebGUI::VersionTag',
+        );
 
 use WebGUI::Utility;
 use WebGUI::International;
@@ -20,13 +235,11 @@ use WebGUI::Search;
 use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::DateTime;
-use Class::C3;
-
-use base qw/WebGUI::Asset::Wobject WebGUI::JSONCollateral/;
 
 use DateTime;
 use JSON;
 use Text::Wrap;
+use Tie::IxHash;
 
 =head1 NAME
 
@@ -73,221 +286,9 @@ sub definition {
     ### Build properties hash ###
     tie my %properties, 'Tie::IxHash', (
         ##### DEFAULTS #####
-        defaultView => {
-            fieldType       => "SelectBox",
-            defaultValue    => "month",
-            options         => \%optionsDefaultView,
-            tab             => "display",
-            label           => $i18n->get("defaultView label"),
-            hoverHelp       => $i18n->get("defaultView description"),
-        },
-        
-        defaultDate => {
-            fieldType       => "SelectBox",
-            defaultValue    => 'current',
-            options         => \%optionsDefaultDate,
-            tab             => "display",
-            label           => $i18n->get("defaultDate label"),
-            hoverHelp       => $i18n->get("defaultDate description"),
-        },
-        
-        ##### GROUPS / ACCESS #####
-        # Edit events
-        groupIdEventEdit => {
-            fieldType       => "group",
-            defaultValue    => "3",
-            tab             => "security",
-            label           => $i18n->get("groupIdEventEdit label"),
-            hoverHelp       => $i18n->get("groupIdEventEdit description"),
-        },
-
-        groupIdSubscribed => {
-            fieldType       => 'hidden',
-        },
-        
-        
-        ##### TEMPLATES - DISPLAY #####
-        # Month
-        templateIdMonth => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarMonth000000001',
-            tab             => "display",
-            namespace       => "Calendar/Month", 
-            hoverHelp       => $i18n->get('templateIdMonth description'),
-            label           => $i18n->get('templateIdMonth label'),
-        },
-        
-        # Week
-        templateIdWeek => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarWeek0000000001',
-            tab             => "display",
-            namespace       => "Calendar/Week", 
-            hoverHelp       => $i18n->get('templateIdWeek description'),
-            label           => $i18n->get('templateIdWeek label'),
-        },
-        
-        # Day
-        templateIdDay => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarDay00000000001',
-            tab             => "display",
-            namespace       => "Calendar/Day", 
-            hoverHelp       => $i18n->get('templateIdDay description'),
-            label           => $i18n->get('templateIdDay label'),
-        },
-        
-        # List
-        templateIdList => {
-            fieldType       => "template",  
-            defaultValue    => 'kj3b-X3i6zRKnhLb4ZiCLw',
-            tab             => "display",
-            namespace       => "Calendar/List", 
-            hoverHelp       => $i18n->get('editForm templateIdList description'),
-            label           => $i18n->get('editForm templateIdList label'),
-        },
-
-        # Event Details
-        templateIdEvent => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarEvent000000001',
-            tab             => "display",
-            namespace       => "Calendar/Event", 
-            hoverHelp       => $i18n->get('templateIdEvent description'),
-            label           => $i18n->get('templateIdEvent label'),
-        },
-        
-        # Event Edit
-        templateIdEventEdit => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarEventEdit00001',
-            tab             => "display",
-            namespace       => "Calendar/EventEdit", 
-            hoverHelp       => $i18n->get('templateIdEventEdit description'),
-            label           => $i18n->get('templateIdEventEdit label'),
-        },
-        
-        # Search
-        templateIdSearch => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarSearch00000001',
-            tab             => "display",
-            namespace       => "Calendar/Search", 
-            hoverHelp       => $i18n->get('templateIdSearch description'),
-            label           => $i18n->get('templateIdSearch label'),
-        },
-        
-        
-        ##### TEMPLATES - PRINT #####
-        # Month
-        templateIdPrintMonth => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarPrintMonth0001',
-            tab             => "display",
-            namespace       => "Calendar/Print/Month", 
-            hoverHelp       => $i18n->get('templateIdPrintMonth description'),
-            label           => $i18n->get('templateIdPrintMonth label'),
-        },
-        
-        # Week
-        templateIdPrintWeek => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarPrintWeek00001',
-            tab             => "display",
-            namespace       => "Calendar/Print/Week", 
-            hoverHelp       => $i18n->get('templateIdPrintWeek description'),
-            label           => $i18n->get('templateIdPrintWeek label'),
-        },
-        
-        # Day
-        templateIdPrintDay => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarPrintDay000001',
-            tab             => "display",
-            namespace       => "Calendar/Print/Day", 
-            hoverHelp       => $i18n->get('templateIdPrintDay description'),
-            label           => $i18n->get('templateIdPrintDay label'),
-        },
-        
-        # List
-        templateIdPrintList => {
-            fieldType       => "template",  
-            defaultValue    => '',
-            tab             => "display",
-            namespace       => "Calendar/Print/List", 
-            hoverHelp       => $i18n->get('editForm templateIdPrintList description'),
-            label           => $i18n->get('editForm templateIdPrintList label'),
-        },
-
-        # Event Details
-        templateIdPrintEvent => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarPrintEvent0001',
-            tab             => "display",
-            namespace       => "Calendar/Print/Event", 
-            hoverHelp       => $i18n->get('templateIdPrintEvent description'),
-            label           => $i18n->get('templateIdPrintEvent label'),
-        },
-        
-        
-        ##### Miscellany #####
-        visitorCacheTimeout => {
-            fieldType       => "integer",
-            defaultValue    => "60",
-            tab             => "display",
-            hoverHelp       => $i18n->get('visitorCacheTimeout description'),
-            label           => $i18n->get('visitorCacheTimeout label'),
-        },
-        sortEventsBy => {
-            fieldType       => "SelectBox",
-            defaultValue    => "time",
-            options         => \%optionsEventSort,
-            tab             => "display",
-            label           => $i18n->get("sortEventsBy label"),
-            hoverHelp       => $i18n->get("sortEventsBy description"),
-        },
-
-        listViewPageInterval => {
-            fieldType       => "interval",
-            defaultValue    => $session->datetime->intervalToSeconds( 3, 'months' ),
-            tab             => "display",
-            label           => $i18n->get('editForm listViewPageInterval label'),
-            hoverHelp       => $i18n->get('editForm listViewPageInterval description'),
-            unitsAvailable  => [ qw( days weeks months years ) ],
-        },
-
-        icalFeeds    => {
-            fieldType       => "textarea",
-            defaultValue    => [],
-            serialize       => 1,
-            noFormPost      => 1,
-            autoGenerate    => 0,
-            tab             => "display",
-        },
-
-        icalInterval    => {
-            fieldType       => "interval",
-            defaultValue    => $session->datetime->intervalToSeconds( 3, 'months' ),
-            tab             => "display",
-            label           => $i18n->get('editForm icalInterval label'),
-            hoverHelp       => $i18n->get('editForm icalInterval description'),
-            unitsAvailable  => [ qw( days weeks months years ) ],
-        },
-
-        workflowIdCommit => {
-            fieldType       => "workflow",
-            defaultValue    => $session->setting->get('defaultVersionTagWorkflow'),
-            tab             => 'security',
-            label           => $i18n->get('editForm workflowIdCommit label'),
-            hoverHelp       => $i18n->get('editForm workflowIdCommit description'),
-            type            => 'WebGUI::VersionTag',
-        },
     );
     
     push @{$definition}, {
-        assetName           => $i18n->get('assetName'),
-        icon                => 'calendar.gif',
-        tableName           => 'Calendar',
         className           => 'WebGUI::Asset::Wobject::Calendar',
         properties          => \%properties,
         autoGenerateForms   => 1,
