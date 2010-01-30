@@ -51,7 +51,7 @@ sub process {
     else {
         $asset = eval { WebGUI::Asset->newByUrl($session,$identifier); };
     }
-    if (WebGUI::Exception->caught()) {
+    if (Exception::Class->caught()) {
         $session->errorHandler->warn('AssetProxy macro called invalid asset: '.$identifier
             .'. The macro was called through this url: '.$session->asset->get('url'));
         if ($session->var->isAdminOn) {
