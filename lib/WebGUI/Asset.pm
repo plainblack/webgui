@@ -1814,13 +1814,10 @@ sub newByUrl {
     $url =~ tr/'"//d;
 	if ($url ne "") {
 		my ($id) = $session->db->quickArray("select assetId from assetData where url = ? limit 1", [ $url ]);
-		if ($id ne "" || $class ne "") {
-			return WebGUI::Asset->newById($session, $id, $revisionDate);
-		}
-        else {
-			$session->errorHandler->warn("The URL $url was requested, but does not exist in your asset tree.");
-			return undef;
-		}
+        if (!$id) {
+            WebGUI::Error::ObjectNotFound->throw(error => "The URL was requested, but does not exist in your asset tree.", id => $url);
+        }
+        return WebGUI::Asset->newById($session, $id, $revisionDate);
 	}
 	return WebGUI::Asset->getDefault($session);
 }

@@ -35,7 +35,7 @@ my $session = WebGUI::Test->session;
 
 my @getTitleTests = getTitleTests($session);
 
-plan tests => 105
+plan tests => 110
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             ;
 
@@ -137,6 +137,27 @@ note "newById";
         ),
         '... checking error message',
     );
+}
+
+note "newByUrl";
+{
+    my $deadAsset = eval { WebGUI::Asset->newByUrl($session, '/workFromHomeScam'); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::ObjectNotFound');
+    cmp_deeply(
+        $e,
+        methods(
+            error => "The URL was requested, but does not exist in your asset tree.",
+            id    => 'workfromhomescam',
+        ),
+        '... checking error message',
+    );
+    my $root = eval { WebGUI::Asset->newByUrl($session, '/root'); };
+    isa_ok($root, 'WebGUI::Asset');
+    $root = eval { WebGUI::Asset->newByUrl($session, '/ROOT'); };
+    isa_ok($root, 'WebGUI::Asset');
+    $root = eval { WebGUI::Asset->newByUrl($session, '/root/'); };
+    isa_ok($root, 'WebGUI::Asset');
 }
 
 # -- no session
