@@ -22,20 +22,41 @@ aspect tableName   => 'Calendar';
 property defaultView => (
             fieldType       => "SelectBox",
             default         => "month",
-            options         => \%optionsDefaultView,
+            options         => \&_defaultView_options,
             tab             => "display",
             label           => ["defaultView label", 'Asset_Calendar'],
             hoverHelp       => ["defaultView description", 'Asset_Calendar'],
         );
+sub _defaultView_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Calendar');
+    tie my %optionsDefaultView, 'Tie::IxHash', (
+        month   => $i18n->get("defaultView value month"),
+        week    => $i18n->get("defaultView value week"),
+        day     => $i18n->get("defaultView value day"),
+        list    => $i18n->get('defaultView value list'),
+    );
+    return %optionsDefaultView;
+}
 
 property defaultDate => (
             fieldType       => "SelectBox",
             default         => 'current',
-            options         => \%optionsDefaultDate,
+            options         => \&_defaultDate_options,
             tab             => "display",
             label           => ["defaultDate label", 'Asset_Calendar'],
             hoverHelp       => ["defaultDate description", 'Asset_Calendar'],
         );
+sub _defaultDate_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Calendar');
+    tie my %optionsDefaultDate, 'Tie::IxHash', (
+        current => $i18n->get("defaultDate value current"),
+        first   => $i18n->get("defaultDate value first"),
+        last    => $i18n->get("defaultDate value last"),
+    );
+    return %optionsDefaultDate;
+}
 
         ##### GROUPS / ACCESS #####
         # Edit events
@@ -187,20 +208,34 @@ property visitorCacheTimeout => (
 property sortEventsBy => (
             fieldType       => "SelectBox",
             default         => "time",
-            options         => \%optionsEventSort,
+            options         => \&_sortEventsBy_options,
             tab             => "display",
             label           => ["sortEventsBy label", 'Asset_Calendar'],
             hoverHelp       => ["sortEventsBy description", 'Asset_Calendar'],
         );
+sub _sortEventsBy_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Calendar');
+    tie my %optionsEventSort, 'Tie::IxHash', (
+        time            => $i18n->get("sortEventsBy value time"),
+        sequencenumber  => $i18n->get("sortEventsBy value sequencenumber"),
+    );
+    return %optionsEventSort;
+}
+
 
 property listViewPageInterval => (
             fieldType       => "interval",
-            default         => $session->datetime->intervalToSeconds( 3, 'months' ),
+            builder         => '_listViewPageInterval_builder',
             tab             => "display",
             label           => ['editForm listViewPageInterval label', 'Asset_Calendar'],
             hoverHelp       => ['editForm listViewPageInterval description', 'Asset_Calendar'],
             unitsAvailable  => [ qw( days weeks months years ) ],
         );
+sub _listViewPageInterval_builder {
+    my $self = shift;
+    return $self->session->datetime->intervalToSeconds( 3, 'months' );
+}
 
 property icalFeeds    => (
             fieldType       => "textarea",
@@ -213,21 +248,27 @@ property icalFeeds    => (
 
 property icalInterval    => (
             fieldType       => "interval",
-            default         => $session->datetime->intervalToSeconds( 3, 'months' ),
+            builder         => '_icalInterval_builder',
             tab             => "display",
             label           => ['editForm icalInterval label', 'Asset_Calendar'],
             hoverHelp       => ['editForm icalInterval description', 'Asset_Calendar'],
             unitsAvailable  => [ qw( days weeks months years ) ],
         );
+sub _icalInterval_builder {
+    return shift->session->datetime->intervalToSeconds( 3, 'months' );
+}
 
 property workflowIdCommit => (
             fieldType       => "workflow",
-            default         => $session->setting->get('defaultVersionTagWorkflow'),
+            builder         => '_workflowIdCommit_builder',
             tab             => 'security',
             label           => ['editForm workflowIdCommit label', 'Asset_Calendar'],
             hoverHelp       => ['editForm workflowIdCommit description', 'Asset_Calendar'],
             type            => 'WebGUI::VersionTag',
         );
+sub _workflowIdCommit_builder {
+    return shift->session->setting->get('defaultVersionTagWorkflow'),
+}
 
 use WebGUI::Utility;
 use WebGUI::International;
@@ -253,49 +294,6 @@ use Tie::IxHash;
 =head1 METHODS
 
 =cut
-
-#----------------------------------------------------------------------------
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift || [];
-
-    my $i18n        = WebGUI::International->new($session, 'Asset_Calendar');
-
-    ### Set up list options ###
-    tie my %optionsDefaultView, 'Tie::IxHash', (
-        month   => $i18n->get("defaultView value month"),
-        week    => $i18n->get("defaultView value week"),
-        day     => $i18n->get("defaultView value day"),
-        list    => $i18n->get('defaultView value list'),
-    );
-
-    tie my %optionsDefaultDate, 'Tie::IxHash', (
-        current => $i18n->get("defaultDate value current"),
-        first   => $i18n->get("defaultDate value first"),
-        last    => $i18n->get("defaultDate value last"),
-    );
-
-    tie my %optionsEventSort, 'Tie::IxHash', (
-        time            => $i18n->get("sortEventsBy value time"),
-        sequencenumber  => $i18n->get("sortEventsBy value sequencenumber"),
-    );
-
-
-    ### Build properties hash ###
-    tie my %properties, 'Tie::IxHash', (
-        ##### DEFAULTS #####
-    );
-
-    push @{$definition}, {
-        className           => 'WebGUI::Asset::Wobject::Calendar',
-        properties          => \%properties,
-        autoGenerateForms   => 1,
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
 
 #----------------------------------------------------------------------------
 
@@ -477,7 +475,7 @@ sub canAddEvent {
                 ;
 
     return 1 if (
-        $user->isInGroup( $self->get("groupIdEventEdit") ) 
+        $user->isInGroup( $self->groupIdEventEdit ) 
         || $self->SUPER::canEdit( $userId )
     );
 }
@@ -720,7 +718,7 @@ sub getEvent {
     }
 
     $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
-        unless $event->get("parentId") eq $self->getId;
+        unless $event->parentId eq $self->getId;
 
     return $event;
 }
@@ -767,7 +765,7 @@ sub getEventsIn {
     my $params  = shift;
 
     $params->{order} = '' if $params->{order} !~ /^(?:time|sequencenumber)/i;
-    my $order_by_type = $params->{order} ? lc($params->{order}) : $self->get('sortEventsBy');
+    my $order_by_type = $params->{order} ? lc($params->{order}) : $self->sortEventsBy;
 
     # Warn and return undef if no startDate or endDate
     unless ($start && $end) {
@@ -877,7 +875,7 @@ TODO: Format lastUpdated into the user's time zone
 
 sub getFeeds {
     my $self    = shift;
-    return $self->get('icalFeeds');
+    return $self->icalFeeds;
 }
 
 #----------------------------------------------------------------------------
@@ -890,7 +888,7 @@ Gets the first event in this calendar. Returns the Event object.
 
 sub getFirstEvent {
     my $self = shift;
-    my $lineage     = $self->get("lineage");
+    my $lineage     = $self->lineage;
 
     my ($assetId)   = $self->session->db->quickArray(<<ENDSQL);
         SELECT asset.assetId 
@@ -916,7 +914,7 @@ Gets the last event in this calendar. Returns the Event object.
 
 sub getLastEvent {
     my $self    = shift;
-    my $lineage = $self->get("lineage");
+    my $lineage = $self->lineage;
 
     my ($assetId) = $self->session->db->quickArray(<<ENDSQL);
         SELECT asset.assetId 
@@ -977,7 +975,7 @@ sub prepareView {
     $self->SUPER::prepareView();
 
     my $view = ucfirst lc $self->session->form->param("type")
-            || ucfirst $self->get("defaultView") 
+            || ucfirst $self->defaultView 
             || "Month";
 
     if ($self->session->form->param("print")){
@@ -1018,11 +1016,11 @@ sub processPropertiesFromFormPost {
     my $form    = $self->session->form;
     $self->SUPER::processPropertiesFromFormPost;
 
-    unless ($self->get("groupIdSubscribed")) {
+    unless ($self->groupIdSubscribed) {
         $self->createSubscriptionGroup();
     }
 
-    $self->session->errorHandler->info( "DEFAULT VIEW:" . $self->get('defaultView') );
+    $self->session->errorHandler->info( "DEFAULT VIEW:" . $self->defaultView );
 
     ### Get feeds from the form
     # Workaround WebGUI::Session::Form->param bug that returns duplicate
@@ -1105,7 +1103,7 @@ sub view {
 
     # Get the form parameters
     my $params        = {};    
-    $params->{type}   = $form->param("type") || $self->get( 'defaultView' );
+    $params->{type}   = $form->param("type") || $self->defaultView;
     $params->{start}  = $form->param("start");
 
     # Validate type passed, or recover from session scratchpad
@@ -1113,7 +1111,7 @@ sub view {
        $session->scratch->set('cal_view_type', $params->{'type'});
     }
     else {
-       $params->{type} = $session->scratch->get('cal_view_type') || $self->get( 'defaultView' ) || 'month';
+       $params->{type} = $session->scratch->get('cal_view_type') || $self->defaultView || 'month';
        $session->scratch->set('cal_view_type', $params->{'type'});
     }
 
@@ -1128,9 +1126,9 @@ sub view {
     # Set defaults if necessary
     if (!$params->{start}) {
         $params->{start}    
-            = $self->get("defaultDate") eq "first" && $self->getFirstEvent 
+            = $self->defaultDate eq "first" && $self->getFirstEvent 
                 ? $self->getFirstEvent->getDateTimeStart
-            : $self->get("defaultDate") eq "last" && $self->getLastEvent
+            : $self->defaultDate eq "last" && $self->getLastEvent
                 ? $self->getLastEvent->getDateTimeStart
             :   WebGUI::DateTime->new($session, time)->toUserTimeZone
             ;
@@ -1295,7 +1293,7 @@ sub viewList {
 
     ### Get the events
     my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} )->truncate( to => "day" );
-    my $dtEnd       = $dtStart->clone->add( seconds => $self->get('listViewPageInterval') );
+    my $dtEnd       = $dtStart->clone->add( seconds => $self->listViewPageInterval );
 
     my @events
         = $self->getEventsIn(
@@ -1334,7 +1332,7 @@ sub viewList {
     # Previous and next pages
     if ( $self->getFirstEvent && $self->getFirstEvent->getDateTimeStart < $dtStart ) {
         my $dtPrevious
-            = $dtStart->clone->add( seconds => 0 - $self->get('listViewPageInterval') );
+            = $dtStart->clone->add( seconds => 0 - $self->listViewPageInterval );
         $var->{ url_previousPage }
             = $self->getUrl( 'type=list;start=' . $dtPrevious->toDatabase );
     }
@@ -1535,7 +1533,7 @@ sub viewWeek {
     my $dtEnd   = $dt->clone->add(days => 7)->add( seconds => -1);
     my $end     = $dtEnd->toMysql; # Clone to prevent saving change
 
-    my $sort_by_sequence++ if $self->get('sortEventsBy') eq 'sequencenumber';
+    my $sort_by_sequence++ if $self->sortEventsBy eq 'sequencenumber';
     my $can_edit_order++ if $self->canEdit && $sort_by_sequence;
 
     my $reorder_request++ if $can_edit_order && $session->form->param( 'eventMove' ) =~ /^(?:UP|DOWN)$/;
@@ -1551,7 +1549,7 @@ sub viewWeek {
        for my $event ( @events ) {
            next unless $event->canView();
 
-           my $event_asset_id = $event->get( 'assetId' );
+           my $event_asset_id = $event->getId;
 
            # Add Event object use by assetId
            $event_asset_of{ $event_asset_id }{ object } = $event;
@@ -1657,7 +1655,7 @@ sub viewWeek {
 
            $session->db->dbh->do
                ("UPDATE Event SET sequenceNumber = ? WHERE assetId = ? AND revisionDate = ?",{},
-                $prev_seq_num-$incr, $event_asset_id, $event_object->get( 'revisionDate' )
+                $prev_seq_num-$incr, $event_asset_id, $event_object->revisionDate
                 );
 #          warn "Moved Asset New Seq Num: ".($prev_seq_num - $incr)." by $incr\n";
 
@@ -1686,7 +1684,7 @@ sub viewWeek {
 
            $session->db->dbh->do
                ("UPDATE Event SET sequenceNumber = ? WHERE assetId = ? AND revisionDate = ?",{},
-                $next_seq_num + $incr, $event_asset_id, $event_object->get( 'revisionDate' )
+                $next_seq_num + $incr, $event_asset_id, $event_object->revisionDate
                 );
 #          warn "Moved Asset New Seq Num: ".($next_seq_num + $incr)." by $incr\n";
        }
@@ -1742,7 +1740,7 @@ sub viewWeek {
         my %eventTemplateVariables = $self->getEventVars($event);
 
         foreach my $weekDay ($start_dow .. $end_dow) {
-            my $eventAssetId = $event->get( 'assetId' );
+            my $eventAssetId = $event->getId;
 
             my %hash = %eventTemplateVariables;
 
@@ -1883,7 +1881,7 @@ sub www_ical {
         my ($spectreTest) 
             = $self->session->db->quickArray(
                 "SELECT value FROM userSessionScratch WHERE sessionId=? and name=?",
-                [$adminId,$self->get("assetId")]
+                [$adminId,$self->getId]
             );
 
         if ($spectreTest eq "SPECTRE") {
@@ -1916,7 +1914,7 @@ sub www_ical {
             );
     }
     else {
-        $dt_end = $dt_start->clone->add( seconds => $self->get('icalInterval') );
+        $dt_end = $dt_start->clone->add( seconds => $self->icalInterval );
     }
 
 
@@ -1936,30 +1934,30 @@ sub www_ical {
 
         ### UID
         # Use feed's UID to prevent over-propagation
-        if ($event->get("feedUid")) {
-            $ical       .= qq{UID:}.$event->get("feedUid")."\r\n";
+        if ($event->feedUid) {
+            $ical       .= qq{UID:}.$event->feedUid."\r\n";
         }
         # Create a UID for feeds native to this calendar
         else {
             my $domain  = $session->config->get("sitename")->[0];
-            $ical       .= qq{UID:}.$event->get("assetId").'@'.$domain."\r\n";
+            $ical       .= qq{UID:}.$event->assetId.'@'.$domain."\r\n";
         }
 
         # LAST-MODIFIED (revisionDate)
         $ical   .= qq{LAST-MODIFIED:}
-                . WebGUI::DateTime->new($self->session, $event->get("revisionDate"))->toIcal
+                . WebGUI::DateTime->new($self->session, $event->revisionDate)->toIcal
                 . "\r\n";
 
         # CREATED (creationDate)
         $ical   .= qq{CREATED:}
-                . WebGUI::DateTime->new($self->session, $event->get("creationDate"))->toIcal
+                . WebGUI::DateTime->new($self->session, $event->creationDate)->toIcal
                 . "\r\n";
 
         # SEQUENCE
-        my $sequenceNumber = $event->get("iCalSequenceNumber");
+        my $sequenceNumber = $event->iCalSequenceNumber;
         if (defined $sequenceNumber) {
             $ical   .= qq{SEQUENCE:}
-                    . $event->get("iCalSequenceNumber")
+                    . $event->iCalSequenceNumber
                     . "\r\n";
         }
 
@@ -1981,25 +1979,25 @@ sub www_ical {
 
         # Summary (the title)
         # Wrapped at 75 columns
-        $ical   .= $self->wrapIcal("SUMMARY:".$event->get("title"))."\r\n";
+        $ical   .= $self->wrapIcal("SUMMARY:".$event->title)."\r\n";
 
         # Description (the text)
         # Wrapped at 75 columns
-        $ical   .= $self->wrapIcal("DESCRIPTION:".$event->get("description"))."\r\n";
+        $ical   .= $self->wrapIcal("DESCRIPTION:".$event->description)."\r\n";
 
         # Location (the text)
         # Wrapped at 75 columns
-        $ical   .= $self->wrapIcal("LOCATION:".$event->get("location"))."\r\n";
+        $ical   .= $self->wrapIcal("LOCATION:".$event->location)."\r\n";
 
         # X-WEBGUI lines
-        if ($event->get("groupIdView")) {
-            $ical   .= "X-WEBGUI-GROUPIDVIEW:".$event->get("groupIdView")."\r\n";
+        if ($event->groupIdView) {
+            $ical   .= "X-WEBGUI-GROUPIDVIEW:".$event->groupIdView."\r\n";
         }
         if ($event->get("groupIdEdit")) {
-            $ical   .= "X-WEBGUI-GROUPIDEDIT:".$event->get("groupIdEdit")."\r\n";
+            $ical   .= "X-WEBGUI-GROUPIDEDIT:".$event->groupIdEdit."\r\n";
         }
         $ical   .= "X-WEBGUI-URL:".$event->get("url")."\r\n";
-        $ical   .= "X-WEBGUI-MENUTITLE:".$event->get("menuTitle")."\r\n"; 
+        $ical   .= "X-WEBGUI-MENUTITLE:".$event->menuTitle."\r\n"; 
 
         $ical   .= qq{END:VEVENT\r\n};
     }
@@ -2059,7 +2057,7 @@ sub www_search {
         my %rules       = (
             keywords        => $keywords,
             classes         => ['WebGUI::Asset::Event'],
-            lineage         => [$self->get("lineage")],
+            lineage         => [$self->lineage],
             join            => "join Event on assetIndex.assetId=Event.assetId and assetIndex.revisionDate=Event.revisionDate",
             columns         => ['Event.startDate','Event.startTime'],
         );
@@ -2165,7 +2163,7 @@ sub www_search {
 
     # This is very bad! It should be $self->processStyle or whatnot.
     return $self->processStyle(
-        $self->processTemplate( $var, $self->get('templateIdSearch') )
+        $self->processTemplate( $var, $self->templateIdSearch )
     );
 }
 
