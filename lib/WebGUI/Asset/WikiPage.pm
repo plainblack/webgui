@@ -297,8 +297,9 @@ sub getTemplateVars {
         historyUrl          => $self->getUrl("func=getHistory"),
         editContent         => $self->getEditForm,
         allowsAttachments   => $wiki->get("allowAttachments"),
-        comments	    => $self->getFormattedComments(),
+        comments	        => $self->getFormattedComments(),
         canEdit             => $self->canEdit,
+        canAdminister       => $wiki->canAdminister,
 		isProtected         => $self->isProtected,
         content             => $wiki->autolinkHtml(
             $self->scrubContent,
@@ -580,6 +581,36 @@ sub www_getHistory {
 			});		
 	}
 	return $self->processTemplate($var, $self->getWiki->get('pageHistoryTemplateId'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_purgeRevision
+
+Override the main method to change which group is allowed to purge revisions for WikiPages.  Only
+members who can administer the parent wiki (canAdminister) can purge revisions.
+
+=cut
+
+sub www_purgeRevision {
+	my $self    = shift;
+	my $session = $self->session;
+	return $session->privilege->insufficient() unless $self->getWiki->canAdminister;
+	my $revisionDate = $session->form->process("revisionDate");
+	return undef unless $revisionDate;
+	my $asset = WebGUI::Asset->new($session, $self->getId, $self->get("className"), $revisionDate);
+	return undef if ($asset->get('revisionDate') != $revisionDate);
+	my $parent = $asset->getParent;
+	$asset->purgeRevision;
+	if ($session->form->process("proceed") eq "manageRevisionsInTag") {
+		my $working = (defined $self) ? $self : $parent;
+		$session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
+		return undef;
+	}
+	unless (defined $self) {
+		return $parent->www_view;
+	}
+	return $self->www_manageRevisions;
 }
 
 #-------------------------------------------------------------------

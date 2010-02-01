@@ -8,9 +8,9 @@
  - fixed #11044: Optionally include hidden pages in sitemap.xml
  - fixed #11379: Certain fields in some Assets cannot be overridden in the config file
  - fixed #11380: "Use this Address" button in Shop needs to be green!
- - fixed: Due to a typo France was not considered part of the EU by the EU
-   TaxDriver. ( Martin Kamerbeek / Oqapi )
+ - fixed: Due to a typo France was not considered part of the EU by the EU TaxDriver. ( Martin Kamerbeek / Oqapi )
  - fixed #11292: Made search less sticky
+ - fixed #11377: Normal users can delete revisions in wiki
 
 7.8.10
  - fixed #11332: Pagination in webgui.org forum urls
