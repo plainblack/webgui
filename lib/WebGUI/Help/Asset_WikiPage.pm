@@ -59,6 +59,7 @@ our $HELP = {
             {   name        => 'canEdit',
                 description => 'canEdit variable',
             },
+            {   name        => 'canAdminister', },
             {   name        => 'isProtected', },
             {   name        => 'historyLabel',
                 description => 'historyLabel variable',

@@ -209,7 +209,7 @@ sub autolinkHtml {
 =head2 canAdminister 
 
 Returns true if the current user is in the groupToAdminister group, or the user can edit
-this WikiMaster.
+this WikiMaster due to groupIdEdit or ownerUserId.
 
 =cut
 
@@ -222,33 +222,27 @@ sub canAdminister {
 
 =head2 canEdit ( )
 
-Overriding canEdit method to check permissions correctly when someone is adding a wikipage
+Overriding canEdit method to check permissions correctly when someone is adding a wikipage.
 
 =cut
 
 sub canEdit {
-        my $self = shift;
-        return (
-                (
-                        (
-                                $self->session->form->process("func") eq "add" ||
-                                (
-                                        $self->session->form->process("assetId") eq "new" &&
-                                        $self->session->form->process("func") eq "editSave" &&
-                                        $self->session->form->process("class") eq "WebGUI::Asset::WikiPage"
-                                )
-                        ) &&
-                        $self->canEditPages
-                ) || # account for new posts
-                $self->next::method()
-        );
+    my $self = shift;
+    my $form      = $self->session->form;
+    my $addNew    = $form->process("func"              ) eq "add";
+    my $editSave  = $form->process("assetId"           ) eq "new"
+                 && $form->process("func"              ) eq "editSave"
+                 && $form->process("class","className" ) eq "WebGUI::Asset::WikiPage";
+    my $canEdit = ( ($addNew || $editSave) && $self->canEditPages )
+               || $self->next::method();
+    return $canEdit;
 }
 
 #-------------------------------------------------------------------
 
 =head2 canEditPages 
 
-Returns true is the current user is in the group that can edit page, or if
+Returns true is the current user is in the group that can edit pages, or if
 they can administer the wiki (canAdminister).
 
 =cut
