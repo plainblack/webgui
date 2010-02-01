@@ -1460,7 +1460,13 @@ sub revertUsePacked {
     my $session = shift;
     print "\tReverting use packed... " unless $quiet;
     my $iter    = WebGUI::Asset->getIsa( $session, 0, { returnAll => 1 } );
-    while ( my $asset = $iter->() ) {
+    ASSET: while ( 1 ) {
+        my $asset = eval { $iter->() };
+        if (my $e = Exception::Class->caught()) {
+            warn "Problem with asset with assetId: ".$e->id."\n";
+            next ASSET;
+        }
+        last ASSET unless $asset;
         $asset->update({ usePackedHeadTags => 0 });
         if ( $asset->isa('WebGUI::Asset::Template') || $asset->isa('WebGUI::Asset::Snippet') ) {
             $asset->update({ usePacked => 0 });
