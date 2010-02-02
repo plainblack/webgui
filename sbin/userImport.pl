@@ -362,7 +362,7 @@ It can be overridden in the import file for specific users.
 =item B<--identifier string>
 
 Specify the default password to use for loaded users. It can (and should)
-be overriden in the import file for specific users. If left unspecified,
+be overridden in the import file for specific users. If left unspecified,
 it defaults to B<123qwe>.
 
 =item B<--status status>
