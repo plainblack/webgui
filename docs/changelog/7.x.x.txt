@@ -12,6 +12,7 @@
  - fixed #11292: Made search less sticky
  - fixed #11377: Normal users can delete revisions in wiki
  - fixed #11378: Cross publishing gallery files does not auto commit
+ - fixed #11387: editing a style template
 
 7.8.10
  - fixed #11332: Pagination in webgui.org forum urls
