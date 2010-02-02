@@ -6,6 +6,7 @@
  - fixed #11292: Made search less sticky
  - fixed #11377: Normal users can delete revisions in wiki
  - fixed #11378: Cross publishing gallery files does not auto commit
+ - fixed #11387: editing a style template
 
 7.7.31
  - fixed #11348: Typ-o in debug notice SQLReport
