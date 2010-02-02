@@ -562,6 +562,13 @@ sub makeShortcut {
         $shortcut->setOverride( $overrides );
     }
 
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return 'redirect';
+    };
+
     return $shortcut;
 }
 

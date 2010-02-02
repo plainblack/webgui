@@ -11,6 +11,7 @@
  - fixed: Due to a typo France was not considered part of the EU by the EU TaxDriver. ( Martin Kamerbeek / Oqapi )
  - fixed #11292: Made search less sticky
  - fixed #11377: Normal users can delete revisions in wiki
+ - fixed #11378: Cross publishing gallery files does not auto commit
 
 7.8.10
  - fixed #11332: Pagination in webgui.org forum urls
