@@ -221,7 +221,7 @@ sub deleteTab {
 =head2 getContentLastModified 
 
 Extends the base method to modify caching.  If the currentView is in list mode, or
-an entry is being viewed, bypass caching altogether.
+an entry is being viewed, or the DataForm has a captcha, bypass caching altogether.
 
 =cut
 
