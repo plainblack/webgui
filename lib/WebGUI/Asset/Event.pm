@@ -33,14 +33,17 @@ aspect assetName   => ['assetName', 'Asset_Event'];
 aspect icon        => 'calendar.gif';
 aspect tableName   => 'Event';
 property description => (
+            label           => ['description', 'Asset_Event'],
             fieldType       => "HTMLArea",
             defaultValue    => "",
         );
 property startDate => (
+            label           => ['start date', 'Asset_Event'],
             fieldType       => "Date",
             defaultValue    => $dt->toMysqlDate,
         );
 property endDate => (
+            label           => ['end date', 'Asset_Event'],
             fieldType       => "Date",
             defaultValue    => $dt->toMysqlDate,
         );
@@ -48,6 +51,7 @@ property startTime => (
             fieldType       => "TimeField",
             defaultValue    => undef,
             format          => 'mysql',
+            
         );
 property endTime => (
             fieldType       => "TimeField",
