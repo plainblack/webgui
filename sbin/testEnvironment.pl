@@ -88,7 +88,7 @@ checkModule("DateTime",                     0.4501       );
 checkModule("Time::HiRes",                  1.9719       );
 checkModule("DateTime::Format::Strptime",   1.0800       );
 checkModule("DateTime::Format::Mail",       0.3001       );
-checkModule("DateTime::Format::Http",       0.38         );
+checkModule("DateTime::Format::HTTP",       0.38         );
 checkModule("Image::Magick",                "6.0"        );
 checkModule("Log::Log4perl",                1.20         );
 checkModule("Net::LDAP",                    0.39         );
