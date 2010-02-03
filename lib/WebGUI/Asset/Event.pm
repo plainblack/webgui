@@ -27,7 +27,65 @@ use WebGUI::Form;
 use WebGUI::Storage;
 use Storable;
 
-use base 'WebGUI::Asset';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+aspect assetName   => ['assetName', 'Asset_Event'];
+aspect icon        => 'calendar.gif';
+aspect tableName   => 'Event';
+property description => (
+            fieldType       => "HTMLArea",
+            defaultValue    => "",
+        );
+property startDate => (
+            fieldType       => "Date",
+            defaultValue    => $dt->toMysqlDate,
+        );
+property endDate => (
+            fieldType       => "Date",
+            defaultValue    => $dt->toMysqlDate,
+        );
+property startTime => (
+            fieldType       => "TimeField",
+            defaultValue    => undef,
+            format          => 'mysql',
+        );
+property endTime => (
+            fieldType       => "TimeField",
+            defaultValue    => undef,
+            format          => 'mysql',
+        );
+
+property recurId => (
+            fieldType       => "Text",
+            defaultValue    => undef,
+        );
+
+property location => (
+            fieldType       => "Text",
+            defaultValue    => undef,
+        );
+property feedId => (
+            fieldType       => "Text",
+            defaultValue    => undef,
+        );
+property storageId => (
+            fieldType       => "Image",
+            defaultValue    => '',
+            maxAttachments  => 1,
+        );
+property feedUid => (
+            fieldType       => "Text",
+            defaultValue    => undef,
+        );
+property timeZone => (
+            fieldType       => 'TimeZone',
+        );
+property sequenceNumber => (
+            fieldType       => 'hidden',
+        );
+property iCalSequenceNumber => (
+            fieldType       => 'hidden',
+        );
 
 use WebGUI::DateTime;
 
@@ -93,60 +151,6 @@ sub definition {
     %properties = (
 
         ##### DEFAULTS #####
-        'description' => {
-            fieldType       => "HTMLArea",
-            defaultValue    => "",
-        },
-        'startDate' => {
-            fieldType       => "Date",
-            defaultValue    => $dt->toMysqlDate,
-        },
-        'endDate' => {
-            fieldType       => "Date",
-            defaultValue    => $dt->toMysqlDate,
-        },
-        'startTime' => {
-            fieldType       => "TimeField",
-            defaultValue    => undef,
-            format          => 'mysql',
-        },
-        'endTime' => {
-            fieldType       => "TimeField",
-            defaultValue    => undef,
-            format          => 'mysql',
-        },
-
-        'recurId' => {
-            fieldType       => "Text",
-            defaultValue    => undef,
-        },
-
-        'location' => {
-            fieldType       => "Text",
-            defaultValue    => undef,
-        },
-        'feedId' => {
-            fieldType       => "Text",
-            defaultValue    => undef,
-        },
-        'storageId' => {
-            fieldType       => "Image",
-            defaultValue    => '',
-            maxAttachments  => 1,
-        },
-        'feedUid' => {
-            fieldType       => "Text",
-            defaultValue    => undef,
-        },
-        'timeZone' => {
-            fieldType       => 'TimeZone',
-        },
-        sequenceNumber => {
-            fieldType       => 'hidden',
-        },
-        iCalSequenceNumber => {
-            fieldType       => 'hidden',
-        },
     );
 
 
@@ -160,9 +164,6 @@ sub definition {
 
 
     push(@{$definition}, {
-        assetName   => $i18n->get('assetName'),
-        icon        => 'calendar.gif',
-        tableName   => 'Event',
         className   => 'WebGUI::Asset::Event',
         properties  => \%properties
     });
