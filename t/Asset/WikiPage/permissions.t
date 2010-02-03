@@ -50,12 +50,12 @@ my $wiki = $node->addChild({
     groupToAdminister => $wikiAdmin->getId,
     groupToEditPages  => $wikiEditPage->getId,
     ownerUserId       => $wikiOwner,
-});
+}, undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 $versionTag->commit;
 my $wikipage = $wiki->addChild({
     className   => 'WebGUI::Asset::WikiPage',
     ownerUserId => $wikiPageOwner->userId,
-}, undef, undef, {skipAutoCommitWorkflows => 1});
+}, undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 is $wikipage->get('ownerUserId'), $wikiPageOwner->userId, 'wiki page owned by correct user';
 
 # Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
