@@ -35,65 +35,112 @@ aspect tableName   => 'Event';
 property description => (
             label           => ['description', 'Asset_Event'],
             fieldType       => "HTMLArea",
-            defaultValue    => "",
+            default         => "",
         );
 property startDate => (
             label           => ['start date', 'Asset_Event'],
             fieldType       => "Date",
-            defaultValue    => $dt->toMysqlDate,
+            builder         => '_defaultMysqlDate',
         );
 property endDate => (
             label           => ['end date', 'Asset_Event'],
             fieldType       => "Date",
-            defaultValue    => $dt->toMysqlDate,
+            builder         => '_defaultMysqlDate',
         );
+sub _defaultMysqlDate {
+    my $self = shift;
+    my $dt   = WebGUI::DateTime->new($self->session, time);
+    return $dt->toMysqlDate;
+}
 property startTime => (
+            label           => ['start', 'Asset_Event'],
             fieldType       => "TimeField",
-            defaultValue    => undef,
+            default         => undef,
             format          => 'mysql',
             
         );
 property endTime => (
+            label           => ['end', 'Asset_Event'],
             fieldType       => "TimeField",
-            defaultValue    => undef,
+            default         => undef,
             format          => 'mysql',
         );
 
 property recurId => (
+            label           => ['recurrence', 'Asset_Event'],
             fieldType       => "Text",
-            defaultValue    => undef,
+            default         => undef,
         );
 
 property location => (
+            label           => ['location', 'Asset_Event'],
             fieldType       => "Text",
-            defaultValue    => undef,
+            default         => undef,
         );
 property feedId => (
+            noFormPost      => 1,
             fieldType       => "Text",
-            defaultValue    => undef,
+            default         => undef,
         );
 property storageId => (
+            label           => ['attachments for event', 'Asset_Event'],
             fieldType       => "Image",
-            defaultValue    => '',
+            default         => '',
             maxAttachments  => 1,
         );
 property feedUid => (
+            noFormPost      => 1,
             fieldType       => "Text",
-            defaultValue    => undef,
+            default         => undef,
         );
 property timeZone => (
+            label           => ['time zone', 'DateTime'],
             fieldType       => 'TimeZone',
         );
 property sequenceNumber => (
+            noFormPost      => 1,
             fieldType       => 'hidden',
         );
 property iCalSequenceNumber => (
+            noFormPost      => 1,
             fieldType       => 'hidden',
         );
+property userDefined1 => (
+            label           => 'userDefined1',
+            fieldType       => 'text',
+            default         => '',
+        );
+property userDefined2 => (
+            label           => 'userDefined2',
+            fieldType       => 'text',
+            default         => '',
+        );
+property userDefined3 => (
+            label           => 'userDefined3',
+            fieldType       => 'text',
+            default         => '',
+        );
+property userDefined4 => (
+            label           => 'userDefined4',
+            fieldType       => 'text',
+            default         => '',
+        );
+property userDefined5 => (
+            label           => 'userDefined5',
+            fieldType       => 'text',
+            default         => '',
+        );
+
+around is_hidden => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        $_[0] = 1;
+    }
+    $self->$orig(@_);
+};
 
 use WebGUI::DateTime;
-
-
 
 =head1 NAME
 
@@ -133,50 +180,6 @@ sub addRevision {
     }
     return $newRev;
 }
-
-
-####################################################################
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-
-    my $i18n        = WebGUI::International->new($session, 'Asset_Event');
-    my $dt          = WebGUI::DateTime->new($session, time);
-
-    ### Set up list options ###
-
-
-
-    ### Build properties hash ###
-    my %properties;
-    tie %properties, 'Tie::IxHash';
-    %properties = (
-
-        ##### DEFAULTS #####
-    );
-
-
-    ### Add user defined fields
-    for my $num (1..5) {
-        $properties{"userDefined".$num} = {
-            fieldType       => "text",
-            defaultValue    => "",
-        };
-    }
-
-
-    push(@{$definition}, {
-        className   => 'WebGUI::Asset::Event',
-        properties  => \%properties
-    });
-
-    return $class->SUPER::definition($session, $definition);
-}
-
-
-
 
 
 #-------------------------------------------------------------------
@@ -1900,21 +1903,6 @@ sub setRelatedLinks {
 
     return undef;
 }
-
-####################################################################
-
-=head2 update
-
-Wrap update so that isHidden is always set to be a 1.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $properties = shift;
-    return $self->SUPER::update({%$properties, isHidden => 1});
-}
-
 
 #-------------------------------------------------------------------
 
