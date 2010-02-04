@@ -69,6 +69,7 @@ property groupIdEventEdit => (
         );
 
 property groupIdSubscribed => (
+            noFormPost      => 1,
             fieldType       => 'hidden',
         );
 
@@ -239,7 +240,7 @@ sub _listViewPageInterval_builder {
 
 property icalFeeds    => (
             fieldType       => "textarea",
-            default         => [],
+            default         => sub { return []; },
             serialize       => 1,
             noFormPost      => 1,
             autoGenerate    => 0,
