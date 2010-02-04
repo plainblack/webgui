@@ -131,7 +131,7 @@ property userDefined5 => (
             default         => '',
         );
 
-around is_hidden => sub {
+around isHidden => sub {
     my $orig = shift;
     my $self = shift;
     if (@_ > 0) {
