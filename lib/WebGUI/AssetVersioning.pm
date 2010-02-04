@@ -251,9 +251,9 @@ sub getRevisions {
 		$statusClause = " and status=".$self->session->db->quote($status);
 	}
 	my @revisions = ();
-	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=".$self->session->db->quote($self->getId).$statusClause. " order by revisionDate desc");
+	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc", [$self->getId]);
 	while (my ($version) = $rs->array) {
-		push(@revisions, WebGUI::Asset->new($self->session, $self->getId, $self->get("className"), $version));
+		push(@revisions, WebGUI::Asset->newById($self->session, $self->getId, $version));
 	}
 	return \@revisions;
 }
@@ -602,24 +602,28 @@ sub www_manageRevisions {
 #-------------------------------------------------------------------
 
 sub www_purgeRevision {
-	my $self = shift;
-	my $session = $self->session;
-	return $session->privilege->insufficient() unless $self->canEdit;
-	my $revisionDate = $session->form->process("revisionDate");
-	return undef unless $revisionDate;
-	my $asset = WebGUI::Asset->new($session,$self->getId,$self->get("className"),$revisionDate);
-	return undef if ($asset->get('revisionDate') != $revisionDate);
-	my $parent = $asset->getParent;
-	$asset->purgeRevision;
-	if ($session->form->process("proceed") eq "manageRevisionsInTag") {
-		my $working = (defined $self) ? $self : $parent;
-		$session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
-		return undef;
-	}
-	unless (defined $self) {
-		return $parent->www_view;
-	}
-	return $self->www_manageRevisions;
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canEdit;
+    my $revisionDate = $session->form->process("revisionDate");
+    return undef unless $revisionDate;
+    my $asset = eval { WebGUI::Asset->newById($session, $self->getId, $revisionDate); };
+    if (my $e = Exception::Class->caught()) {
+        $session->log->warn($@);
+        return undef;
+    }
+    return undef if ($asset->revisionDate != $revisionDate);
+    my $parent = $asset->getParent;
+    $asset->purgeRevision;
+    if ($session->form->process("proceed") eq "manageRevisionsInTag") {
+        my $working = (defined $self) ? $self : $parent;
+        $session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
+        return undef;
+    }
+    unless (defined $self) {
+        return $parent->www_view;
+    }
+    return $self->www_manageRevisions;
 }
 
 1;
