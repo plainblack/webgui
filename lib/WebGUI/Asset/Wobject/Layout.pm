@@ -117,10 +117,11 @@ sub getEditForm {
     my $i18n = WebGUI::International->new($self->session,"Asset_Layout");
 
     my ($templateId);
-    if (($self->get("assetId") eq "new") && ($self->getParent->get('className') eq 'WebGUI::Asset::Wobject::Layout')) {
-        $templateId = $self->getParent->getValue('templateId');
-    } else {
-        $templateId = $self->getValue('templateId');
+    if (($self->assetId eq "new") && ($self->getParent->isa('WebGUI::Asset::Wobject::Layout'))) {
+        $templateId = $self->getParent->templateId;
+    }
+    else {
+        $templateId = $self->templateId;
     }
     $tabform->getTab("display")->template(
             -value=>$templateId,
@@ -141,7 +142,7 @@ sub getEditForm {
     else {
         $tabform->getTab("display")->hidden(
             name        => 'mobileTemplateId',
-            value       => $self->getValue('mobileTemplateId'),
+            value       => $self->mobileTemplateId,
         );
     }
 
@@ -154,7 +155,7 @@ sub getEditForm {
 		-name      => 'assetOrder',
 		-label     => $i18n->get('asset order label'),
 		-hoverHelp => $i18n->get('asset order hoverHelp'),
-		-value     => $self->getValue('assetOrder'),
+		-value     => $self->assetOrder,
 		-options   => \%assetOrder
 	);
     if ($self->get("assetId") eq "new") {
@@ -166,7 +167,7 @@ sub getEditForm {
             -value=>"view"
             );
     } else {
-        my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
+        my @assetsToHide = split("\n",$self->assetsToHide);
         my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
         my %childIds;
         foreach my $child (@{$children}) {
@@ -201,13 +202,13 @@ sub prepareView {
     my $templateId;
 
     if ($session->style->useMobileStyle) {
-        $templateId = $self->get('mobileTemplateId');
+        $templateId = $self->mobileTemplateId;
     }
     else {
-        $templateId = $self->get('templateId');
+        $templateId = $self->templateId;
     }
 
-    my $template = WebGUI::Asset->new($session,$templateId,"WebGUI::Asset::Template");
+    my $template = WebGUI::Asset->newById($session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -218,7 +219,7 @@ sub prepareView {
     $template->prepare( $self->getMetaDataAsTemplateVariables );
     $self->{_viewTemplate} = $template;
 
-    my $templateContent = $template->get("template");
+    my $templateContent = $template->template;
     my $numPositions = 1;
     while ($templateContent =~ /position(\d+)_loop/g) {
         $numPositions = $1
@@ -231,7 +232,7 @@ sub prepareView {
     my $splitter = $self->{_viewSplitter} = $self->getSeparator;
 
     my %hidden = map { $_ => 1 }
-        split "\n", $self->get("assetsToHide");
+        split "\n", $self->assetsToHide;
 
     my %placeHolder;
     my @children;
@@ -247,7 +248,7 @@ sub prepareView {
         $placeHolder{$assetId} = $child;
         push @children, {
             id             => $assetId,
-            isUncommitted  => $child->get('status') eq 'pending',
+            isUncommitted  => $child->status eq 'pending',
             content        => $splitter . $assetId . '~~',
         };
         if ($vars{showAdmin}) {
@@ -255,7 +256,7 @@ sub prepareView {
         };
     }
 
-    my @positions = split /\./, $self->get("contentPositions");
+    my @positions = split /\./, $self->contentPositions;
     # cut positions off at the number we found in the template
     $#positions = $numPositions - 1
         if $numPositions < scalar @positions;
@@ -278,7 +279,7 @@ sub prepareView {
     }
     # deal with unplaced children
     # Add children to the top or bottom of the first content position based on assetOrder setting
-    if($self->getValue("assetOrder") eq "asc") {
+    if($self->assetOrder eq "asc") {
         push @{ $vars{"position1_loop"} }, @children;
     }
     else {
