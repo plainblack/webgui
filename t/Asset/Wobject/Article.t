@@ -118,12 +118,12 @@ my $output = $article->view;
 isnt ($output, "", 'view method returns something');
 
 # Lets see if caching works
-my $cachedOutput = WebGUI::Cache->new($session, 'view_'.$article->getId)->get;
+my $cachedOutput = $session->cache->get('view_'.$article->getId);
 is ($output, $cachedOutput, 'view method caches output');
 
 # Lets see if the purgeCache method works
 $article->purgeCache;
-$cachedOutput = WebGUI::Cache->new($session, 'view_'.$article->getId)->get;  # Check cache post purge
+$cachedOutput = $session->cache->get('view_'.$article->getId);  # Check cache post purge
 isnt ($output, $cachedOutput, 'purgeCache method deletes cache');
 
 

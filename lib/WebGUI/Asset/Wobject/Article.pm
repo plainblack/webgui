@@ -403,7 +403,7 @@ sub view {
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
-		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
+		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
 	}
        	return $out;
 }
