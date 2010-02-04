@@ -27,10 +27,22 @@ property template => (
              fieldType       => 'codearea',
              syntax          => "html",
              default         => undef,
-             filter          => 'packTemplate',
+             trigger         => \&_template_autopack,
              label           => ['assetName', 'Asset_Template'],
              hoverHelp       => ['template description', 'Asset_Template'],
          );
+sub _template_autopack {
+    my ($self, $new, $old) = @_;
+    return if $new eq $old;
+    my $packed  = $new;
+    HTML::Packer::minify( \$packed, {
+        remove_comments     => 1,
+        remove_newlines     => 1,
+        do_javascript       => "shrink",
+        do_stylesheet       => "minify",
+    } );
+    $self->templatePacked($packed);
+}
 property isEditable => (
              noFormPost      => 1,
              fieldType       => 'hidden',
@@ -128,7 +140,7 @@ sub addAttachments {
     foreach my $a (@$attachments) {
         my @params = (
             $self->getId, 
-            $self->get('revisionDate'),
+            $self->revisionDate,
             @{$a}{qw(url type sequence)}
         );
         $db->write($sql, \@params);
@@ -162,7 +174,7 @@ Extra Head Tags.
 
 sub drawExtraHeadTags {
 	my ($self, $params) = @_;
-    if ($self->get('namespace') eq 'style') {
+    if ($self->namespace eq 'style') {
         my $i18n = WebGUI::International->new($self->session);
         return $i18n->get(881);
     }
@@ -217,7 +229,7 @@ If defined, will limit the attachments to this type; e.g., passing
 
 sub getAttachments {
 	my ( $self, $type ) = @_;
-	my @params = ($self->getId, $self->get('revisionDate'));
+	my @params = ($self->getId, $self->revisionDate);
 	my $typeString;
 
 	if ($type) {
@@ -256,7 +268,7 @@ sub getEditForm {
 		name=>"returnUrl",
 		value=>$self->session->form->get("returnUrl")
 		});
-	if ($self->getValue("namespace") eq "") {
+	if ($self->namespace eq "") {
 		my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
 		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
@@ -269,16 +281,16 @@ sub getEditForm {
 		$tabform->getTab("meta")->readOnly(
 			-label=>$i18n->get('namespace'),
 			-hoverHelp=>$i18n->get('namespace description'),
-			-value=>$self->getValue("namespace")
+			-value=>$self->namespace
 			);	
 		$tabform->getTab("meta")->hidden(
 			-name=>"namespace",
-			-value=>$self->getValue("namespace")
+			-value=>$self->namespace
 			);
 	}
 	$tabform->getTab("display")->yesNo(
 		-name=>"showInForms",
-		-value=>$self->getValue("showInForms"),
+		-value=>$self->showInForms,
 		-label=>$i18n->get('show in forms'),
 		-hoverHelp=>$i18n->get('show in forms description'),
 		);
@@ -287,13 +299,13 @@ sub getEditForm {
 		-label=>$i18n->get('assetName'),
 		-hoverHelp=>$i18n->get('template description'),
 		-syntax => "html",
-		-value=>$self->getValue("template")
+		-value=>$self->template
 		);
     $tabform->getTab('properties')->yesNo(
         name        => "usePacked",
         label       => $i18n->get('usePacked label'),
         hoverHelp   => $i18n->get('usePacked description'),
-        value       => $self->getValue("usePacked"),
+        value       => $self->usePacked,
     );
 	if($self->session->config->get("templateParsers")){
 		my @temparray = @{$self->session->config->get("templateParsers")};
@@ -302,7 +314,7 @@ sub getEditForm {
 			$parsers{$a} = $self->getParser($self->session, $a)->getName();
 		}
 		my $value = [$self->getValue("parser")];
-		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->getValue("parser"));
+		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->parser);
 		$tabform->getTab("properties")->selectBox(
 			-name=>"parser",
 			-options=>\%parsers,
@@ -419,8 +431,10 @@ sub getList {
 	my $sth = $session->dbSlave->read($sql, [$namespace, $session->scratch->get("versionTag")]);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
-	while (my ($id, $version) = $sth->array) {
-		$templates{$id} = WebGUI::Asset::Template->new($session,$id,undef,$version)->getTitle;
+	TEMPLATE: while (my ($id, $version) = $sth->array) {
+		my $template = eval { WebGUI::Asset::Template->new($session,$id,$version); };
+        next TEMPLATE if Exception::Class->caught();
+		$templates{$id} = $template->getTitle;
 	}	
 	$sth->finish;	
 	return \%templates;
@@ -483,29 +497,8 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("namespace"));
+	$indexer->addKeywords($self->namespace);
 	$indexer->setIsPublic(0);
-}
-
-#-------------------------------------------------------------------
-
-=head2 packTemplate ( template )
-
-Pack the template into a minified version for faster downloads.
-
-=cut
-
-sub packTemplate {
-    my ( $self, $template ) = @_;
-    my $packed  = $template;
-    HTML::Packer::minify( \$packed, {
-        remove_comments     => 1,
-        remove_newlines     => 1,
-        do_javascript       => "shrink",
-        do_stylesheet       => "minify",
-    } );
-    $self->update({ templatePacked => $packed });
-    return $template;
 }
 
 #-------------------------------------------------------------------
@@ -536,7 +529,7 @@ sub prepare {
 
 	my $session      = $self->session;
 	my ($db, $style) = $session->quick(qw(db style));
-	my $parser       = $self->getParser($session, $self->get('parser'));
+	my $parser       = $self->getParser($session, $self->parser);
 	my $headBlock    = $parser->process($self->getExtraHeadTags, $vars);
 
 	$style->setRawHeadTags($headBlock);
@@ -580,16 +573,16 @@ sub process {
 	my $vars    = shift;
     my $session = $self->session;
 
-    if ($self->get('state') =~ /^trash/) {
+    if ($self->state =~ /^trash/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $session->errorHandler->warn('process called on template in trash: '.$self->getId
-            .'. The template was called through this url: '.$session->asset->get('url'));
+            .'. The template was called through this url: '.$session->asset->url);
         return $session->var->isAdminOn ? $i18n->get('template in trash') : '';
     }
-    elsif ($self->get('state') =~ /^clipboard/) {
+    elsif ($self->state =~ /^clipboard/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $session->errorHandler->warn('process called on template in clipboard: '.$self->getId
-            .'. The template was called through this url: '.$session->asset->get('url'));
+            .'. The template was called through this url: '.$session->asset->url);
         return $session->var->isAdminOn ? $i18n->get('template in clipboard') : '';
     }
 
@@ -600,10 +593,10 @@ sub process {
     }
 
 	$self->prepare unless ($self->{_prepared});
-    my $parser      = $self->getParser($session, $self->get("parser"));
-    my $template    = $self->get('usePacked')
-                    ? $self->get('templatePacked')
-                    : $self->get('template')
+    my $parser      = $self->getParser($session, $self->parser);
+    my $template    = $self->usePacked
+                    ? $self->templatePacked
+                    : $self->template
                     ;
     my $output;
     eval { $output = $parser->process($template, $vars); };
