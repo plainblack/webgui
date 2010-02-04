@@ -136,7 +136,7 @@ sub importAssetData {
     my $version     = $data->{properties}{revisionDate};
 
     # Load the class
-    WebGUI::Asset->loadModule( $session, $class );
+    WebGUI::Asset->loadModule( $class );
 
     my %properties = %{ $data->{properties} };
     if ($options->{inheritPermissions}) {
