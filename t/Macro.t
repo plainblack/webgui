@@ -44,7 +44,7 @@ foreach my $macro (qw/
 }
 $session->config->addToHash('macros', "Ex'tras", "Extras");
 
-plan tests => 48;
+plan tests => 51;
 
 my $macroText = "CompanyName: ^c;";
 my $companyName = $session->setting->get('companyName');
@@ -273,6 +273,8 @@ tie my %quotingEdges, 'Tie::IxHash';
     '^VisualMacro(,,"");'                           => '@MacroCall[``.``.``]:',
     '^ReverseParams(^VisualMacro("something","else"););'
         => '"else");^VisualMacro("something"',
+    '^ReverseParams(^VisualMacro(something,else););'
+        => 'else);^VisualMacro(something',
     '^ReverseParams("^VisualMacro(first word,second word);");'
         => '@MacroCall[`first word`.`second word`]:',
 );
@@ -321,7 +323,18 @@ is(
     "Macro can return undef",
 );
 
+my $macroText = '^VisualMacro(1,2,3,);';
+WebGUI::Macro::process($session, \$macroText);
+is (
+    $macroText,
+    '@MacroCall[`1`.`2`.`3`]:',
+    'dangling commas are okay'
+);
 
-
-END {
-}
+my $macroText = '^VisualMacro(1, 2,3);';
+WebGUI::Macro::process($session, \$macroText);
+is (
+    $macroText,
+    '@MacroCall[`1`.` 2`.`3`]:',
+    'internal spaces are okay'
+);
