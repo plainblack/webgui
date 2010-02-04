@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 43; # increment this value for each test you create
+use Test::More tests => 41; # increment this value for each test you create
 use Test::Deep;
 use JSON qw{ from_json };
 
@@ -74,12 +74,8 @@ is($templateCopy->get('isDefault'), 0, 'isDefault set to 0 on copy');
 my $template3 = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'headBlock test',
-    headBlock => "tag1 tag2 tag3",
     template  => "this is a template",
 });
-
-ok(!$template3->get('headBlock'),    'headBlock is empty');
-is($template3->get('extraHeadTags'), 'tag1 tag2 tag3', 'extraHeadTags contains headBlock info');
 
 my @atts = (
     {type => 'headScript', sequence => 1, url => 'bar'},
