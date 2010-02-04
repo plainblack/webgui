@@ -40,7 +40,14 @@ property storageId => (
                 noFormPost => 1,
                 fieldType  => 'hidden',
                 default    => '',
+                trigger    => \&_set_storageId,
          );
+sub _set_storageId {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->setStorageLocation;
+    }
+}
 property templateId => (
                 fieldType => 'template',
                 default   => 'PBtmpl0000000000000024',
@@ -48,6 +55,26 @@ property templateId => (
                 hoverHelp => ['file template description', 'Asset_File'],
                 namespace => "FileAsset",
          );
+sub _set_ownerUserId {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
+
+sub _set_groupIdView {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
+
+sub _set_groupIdEdit {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
 
 use WebGUI::Storage;
 use WebGUI::SQL;
@@ -529,32 +556,6 @@ sub setStorageLocation {
     else {
         $self->{_storageLocation} = $self->getStorageClass->get($self->session,$self->storageId);
     }
-}
-
-#-------------------------------------------------------------------
-
-=head2 update
-
-We override the update method from WebGUI::Asset in order to handle file system privileges.
-
-=cut
-
-sub update {
-	my $self = shift;
-	my %before = (
-		owner     => $self->ownerUserId,
-		view      => $self->groupIdView,
-		edit      => $self->groupIdEdit,
-		storageId => $self->storageId,
-	);
-	$self->SUPER::update(@_);
-	##update may have entered a new storageId.  Reset the cached one just in case.
-	if ($self->storageId ne $before{storageId}) {
-		$self->setStorageLocation;
-	}
-	if ($self->ownerUserId ne $before{owner} || $self->groupIdEdit ne $before{edit} || $self->groupIdView ne $before{view}) {
-		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
-	}
 }
 
 #----------------------------------------------------------------------------
