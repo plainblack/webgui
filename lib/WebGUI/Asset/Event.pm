@@ -166,7 +166,7 @@ Extent the method from the super class to handle iCalSequenceNumbers.
 sub addRevision {
     my $self = shift;
     my $newRev = $self->SUPER::addRevision(@_);
-    my $sequenceNumber = $newRev->get('iCalSequenceNumber');
+    my $sequenceNumber = $newRev->iCalSequenceNumber;
     if (defined $sequenceNumber) {
         $sequenceNumber++;
     }
@@ -174,8 +174,8 @@ sub addRevision {
         $sequenceNumber = 0;
     }
     $newRev->update({iCalSequenceNumber => $sequenceNumber});
-    if ($newRev->get("storageId") && $newRev->get("storageId") eq $self->get('storageId')) {
-        my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+    if ($newRev->storageId && $newRev->storageId eq $self->storageId) {
+        my $newStorage = WebGUI::Storage->get($self->session,$self->storageId)->copy;
         $newRev->update({storageId => $newStorage->getId});
     }
     return $newRev;
@@ -221,7 +221,7 @@ sub canEdit {
         $userId     = $self->session->user->userId;
     }
 
-    return 1 if ( $userId eq $self->get('ownerUserId') );
+    return 1 if ( $userId eq $self->ownerUserId );
     return $self->getParent->canEdit( $userId );
 }
 
@@ -242,7 +242,7 @@ sub generateRecurringEvents {
     my $session = $self->session;
 
     my $properties  = $self->get;
-    my $recurId     = $self->get("recurId");
+    my $recurId     = $self->recurId;
     my $recur       = {$self->getRecurrence};
 
     # This method only works on events that have recurrence patterns
@@ -322,7 +322,7 @@ sub getAutoCommitWorkflowId {
     my $self = shift;
     my $parent = $self->getParent;
     if ($parent->hasBeenCommitted) {
-        return $parent->get('workflowIdCommit')
+        return $parent->workflowIdCommit
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
     return undef;
@@ -346,8 +346,8 @@ adjusted.
 
 sub getDateTimeStart {
     my $self    = shift;
-    my $date    = $self->get("startDate");
-    my $time    = $self->get("startTime");
+    my $date    = $self->startDate;
+    my $time    = $self->startTime;
     my $tz      = $self->session->datetime->getTimeZone;
 
     #$self->session->errorHandler->warn($self->getId.":: Date: $date -- Time: $time");
@@ -385,8 +385,8 @@ adjusted.
 
 sub getDateTimeEnd {
     my $self    = shift;
-    my $date    = $self->get("endDate");
-    my $time    = $self->get("endTime");
+    my $date    = $self->endDate;
+    my $time    = $self->endTime;
     my $tz      = $self->session->datetime->getTimeZone;
 
     #$self->session->errorHandler->warn($self->getId.":: Date: $date -- Time: $time");
@@ -425,7 +425,7 @@ is used EVERYWHERE.
 sub getDateTimeEndNI {
     my $self = shift;
     my $dt   = $self->getDateTimeEnd;
-    if ($self->get('endTime') ) {
+    if ($self->endTime ) {
         $dt->subtract(seconds => 1);
     }
     return $dt;
@@ -448,20 +448,20 @@ sub getEventNext {
     my $self    = shift;
     my $db      = $self->session->db;
 
-    my $where   = 'Event.startDate > "'.$self->get("startDate").'"'
-                . '|| (Event.startDate = "'.$self->get("startDate").'" && ';
+    my $where   = 'Event.startDate > "'.$self->startDate.'"'
+                . '|| (Event.startDate = "'.$self->startDate.'" && ';
 
     # All day events must either look for null time or greater than 00:00:00
     if ($self->isAllDay) {
         $where  .= "((Event.startTime IS NULL "
-                . "&& assetData.title > ".$db->quote($self->get("title")).") "
+                . "&& assetData.title > ".$db->quote($self->title).") "
                 . "|| Event.startTime >= '00:00:00')";
     }
     # Non all-day events must look for greater than time
     else {
-        $where  .= "((Event.startTime = '".$self->get("startTime")."' "
-                . "&& assetData.title > ".$db->quote($self->get("title")).")"
-                . "|| Event.startTime > '".$self->get("startTime")."')";
+        $where  .= "((Event.startTime = '".$self->startTime."' "
+                . "&& assetData.title > ".$db->quote($self->title).")"
+                . "|| Event.startTime > '".$self->startTime."')";
     }
     $where    .= ")";
 
@@ -507,19 +507,19 @@ sub getEventPrev {
     my $self    = shift;
     my $db      = $self->session->db;
 
-    my $where   = 'Event.startDate < "'.$self->get("startDate").'"'
-                . '|| (Event.startDate = "'.$self->get("startDate").'" && ';
+    my $where   = 'Event.startDate < "'.$self->startDate.'"'
+                . '|| (Event.startDate = "'.$self->startDate.'" && ';
 
     # All day events must either look for null time or greater than 00:00:00
     if ($self->isAllDay) {
         $where  .= "(Event.startTime IS NULL "
-                . "&& assetData.title < ".$db->quote($self->get("title")).")";
+                . "&& assetData.title < ".$db->quote($self->title).")";
     }
     # Non all-day events must look for greater than time
     else {
-        $where  .= "((Event.startTime = '".$self->get("startTime")."' "
-                . "&& assetData.title < ".$db->quote($self->get("title")).")"
-                . "|| Event.startTime < '".$self->get("startTime")."')";
+        $where  .= "((Event.startTime = '".$self->startTime."' "
+                . "&& assetData.title < ".$db->quote($self->title).")"
+                . "|| Event.startTime < '".$self->startTime."')";
     }
     $where    .= ")";
 
@@ -564,13 +564,13 @@ sub getIcalStart {
     my $self    = shift;
 
     if ($self->isAllDay) {
-        my $date = $self->get("startDate");
+        my $date = $self->startDate;
         $date =~ s/\D//g;
         return $date;
     }
     else {
-        my $date = $self->get("startDate");
-        my $time = $self->get("startTime");
+        my $date = $self->startDate;
+        my $time = $self->startTime;
 
         $date =~ s/\D//g;
         $time =~ s/\D//g;
@@ -603,8 +603,8 @@ sub getIcalEnd {
         return $date;
     }
     else {
-        my $date = $self->get("endDate");
-        my $time = $self->get("endTime");
+        my $date = $self->endDate;
+        my $time = $self->endTime;
 
         $date =~ s/\D//g;
         $time =~ s/\D//g;
@@ -704,12 +704,12 @@ sub getRecurrence {
     my $self    = shift;
     #use Data::Dumper;
     #$self->session->errorHandler->warn("recurId: ".$self->get("recurId"));
-    return () unless $self->get("recurId");
+    return () unless $self->recurId;
 
     my %data  
         = $self->session->db->quickHash(
             "select * from Event_recur where recurId=?",
-            [$self->get("recurId")]
+            [$self->recurId]
         );
 
     my %recurrence = (
@@ -1260,11 +1260,11 @@ Get the storage location associated with this Event.
 sub getStorageLocation {
     my $self = shift;
     unless (exists $self->{_storageLocation}) {
-        if ($self->get("storageId") eq "") {
+        if ($self->storageId eq "") {
             $self->{_storageLocation} = WebGUI::Storage->create($self->session);
             $self->update({storageId=>$self->{_storageLocation}->getId});
         } else {
-            $self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
+            $self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->storageId);
         }
     }
     return $self->{_storageLocation};
@@ -1289,9 +1289,9 @@ sub getTemplateVars {
     # Some miscellaneous stuff
     $var{'canEdit'} = $self->canEdit;
     $var{"isPublic"} = 1
-        if $self->get("groupIdView") eq "7";
-    $var{"groupToView"} = $self->get("groupIdView");
-    $var{"timeZone"}    = $self->get('timeZone');        
+        if $self->groupIdView eq "7";
+    $var{"groupToView"} = $self->groupIdView;
+    $var{"timeZone"}    = $self->timeZone;        
 
     # Start date/time
     my $dtStart    = $self->getDateTimeStart;
@@ -1385,7 +1385,7 @@ sub getTemplateVars {
     my $gotImage;
     my $gotAttachment;
     $var{'attachment_loop'} = [];
-    unless ($self->get("storageId") eq "") {
+    unless ($self->storageId eq "") {
         my $storage = $self->getStorageLocation;
         foreach my $filename (@{$storage->getFiles}) {
             # Set top-level template vars for the first image and first non-image
@@ -1426,12 +1426,12 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 sub indexContent {
     my $self = shift;
     my $indexer = $self->SUPER::indexContent;
-    $indexer->addKeywords($self->get("userDefined1"));
-    $indexer->addKeywords($self->get("userDefined2"));
-    $indexer->addKeywords($self->get("userDefined3"));
-    $indexer->addKeywords($self->get("userDefined4"));
-    $indexer->addKeywords($self->get("userDefined5"));
-    $indexer->addKeywords($self->get("location"));
+    $indexer->addKeywords($self->userDefined1);
+    $indexer->addKeywords($self->userDefined2);
+    $indexer->addKeywords($self->userDefined3);
+    $indexer->addKeywords($self->userDefined4);
+    $indexer->addKeywords($self->userDefined5);
+    $indexer->addKeywords($self->location);
     my $storage = $self->getStorageLocation;
     foreach my $file (@{$storage->getFiles}) {
                $indexer->addFile($storage->getPath($file));
@@ -1451,7 +1451,7 @@ Returns true if this event is an all day event.
 
 sub isAllDay {
     my $self    = shift;
-    return 1 unless ($self->get("startTime") || $self->get("endTime"));
+    return 1 unless ($self->startTime || $self->endTime);
     return 0;
 }
 
@@ -1477,11 +1477,11 @@ sub prepareView {
 
     if ($parent) {
         if ($self->session->form->param("print")) {
-            $templateId = $parent->get("templateIdPrintEvent");
+            $templateId = $parent->templateIdPrintEvent;
             $self->session->style->makePrintable(1);
         }
         else {
-            $templateId = $parent->get("templateIdEvent");
+            $templateId = $parent->templateIdEvent;
         }
     }
     else {
@@ -1529,13 +1529,13 @@ sub processPropertiesFromFormPost {
     my @errors;
     # If the start date is after the end date
     my $i18n = WebGUI::International->new($session, 'Asset_Event');
-    if ($self->get("startDate") gt $self->get("endDate")) {
+    if ($self->startDate gt $self->endDate) {
         push @errors, $i18n->get("The event end date must be after the event start date.");
     }
 
     # If the dates are the same and the start time is after the end time
-    if ($self->get("startDate") eq $self->get("endDate")
-        && $self->get("startTime") gt $self->get("endTime")
+    if ($self->startDate eq $self->endDate
+        && $self->startTime gt $self->endTime
        ) {
         push @errors, $i18n->get("The event end time must be after the event start time.");
     }
@@ -1552,15 +1552,15 @@ sub processPropertiesFromFormPost {
         undef $activeVersionTag;
     }
     else {
-        WebGUI::VersionTag->new($session, $self->get('tagId'))->setWorking;
+        WebGUI::VersionTag->new($session, $self->tagId)->setWorking;
     }
 
     ### Form is verified
     # Events are always hidden from navigation
 
     if (!$self->get("groupIdEdit")) {
-        my $groupIdEdit =  $self->getParent->get("groupIdEventEdit")
-                        || $self->getParent->get("groupIdEdit")
+        my $groupIdEdit =  $self->getParent->groupIdEventEdit
+                        || $self->getParent->groupIdEdit
                         ;
 
         $self->update({
@@ -1578,17 +1578,17 @@ sub processPropertiesFromFormPost {
     }
     # Non-allday events need timezone conversion
     else {
-        my $tz    = $self->get('timeZone');
+        my $tz    = $self->timeZone;
 
         my $dtStart
             = WebGUI::DateTime->new($session, 
-                mysql       => $self->get("startDate") . " " . $self->get("startTime"),
+                mysql       => $self->startDate . " " . $self->startTime,
                 time_zone   => $tz,
             );
 
         my $dtEnd
             = WebGUI::DateTime->new($session, 
-                mysql       => $self->get("endDate") . " " . $self->get("endTime"),
+                mysql       => $self->endDate . " " . $self->endTime,
                 time_zone   => $tz,
             );
 
@@ -1602,8 +1602,8 @@ sub processPropertiesFromFormPost {
 
     my $top_val = $session->db->dbh->selectcol_arrayref("SELECT sequenceNumber FROM Event ORDER BY sequenceNumber desc LIMIT 1")->[0];
     $top_val += 16384;
-    my $assetId = $self->get('assetId');
-    my $revisionDate = $self->get('revisionDate');
+    my $assetId = $self->getId;
+    my $revisionDate = $self->revisionDate;
 
     $session->db->write("UPDATE Event SET sequenceNumber =? WHERE assetId = ? AND revisionDate =?",[($form->param('sequenceNumber') || $top_val), $assetId, $revisionDate]);
 
@@ -1683,7 +1683,7 @@ sub processPropertiesFromFormPost {
         # Pattern keys
         if (Storable::freeze(\%recurrence_new) ne Storable::freeze(\%recurrence_old)) {
             # Delete all old events and create new ones
-            my $old_id  = $self->get("recurId");
+            my $old_id  = $self->recurId;
 
             # Set the new recurrence pattern
             if (%recurrence_new) {
@@ -1726,15 +1726,15 @@ sub processPropertiesFromFormPost {
                 #returnObjects       => 1,
                 includeOnlyClasses  => ['WebGUI::Asset::Event'],
                 joinClass           => 'WebGUI::Asset::Event',
-                whereClause         => q{Event.recurId = "}.$self->get("recurId").q{"},
+                whereClause         => q{Event.recurId = "}.$self->recurId.q{"},
             });
 
             for my $eventId (@{$events}) {
                 my $event   = WebGUI::Asset->newById($session, $eventId);
 
                 # Add a revision
-                $properties{ startDate  } = $event->get("startDate");
-                $properties{ endDate    } = $event->get("endDate");
+                $properties{ startDate  } = $event->startDate;
+                $properties{ endDate    } = $event->endDate;
 
                 # addRevision returns the new revision
                 $event  = $event->addRevision(\%properties, undef, { skipAutoCommitWorkflows => 1 });
@@ -1985,7 +1985,7 @@ sub www_edit {
     my $self        = shift;
     my $session     = $self->session;
     my $form        = $self->session->form;
-    my $tz          = $form->param('timeZone') || $self->get('timeZone') || $session->datetime->getTimeZone;
+    my $tz          = $form->param('timeZone') || $self->timeZone || $session->datetime->getTimeZone;
     my $func        = lc $session->form->param("func");
     my $var         = {};
 
@@ -2017,7 +2017,7 @@ sub www_edit {
             })
             . WebGUI::Form::hidden($self->session, {
                 name    => "sequenceNumber",
-                value   => $self->get("sequenceNumber"),
+                value   => $self->sequenceNumber,
             })
             . WebGUI::Form::hidden( $self->session, {
                 name    => 'ownerUserId',
@@ -2033,7 +2033,7 @@ sub www_edit {
         })
         . WebGUI::Form::hidden($self->session, {
             name    => "recurId",
-            value   => $self->get("recurId"),
+            value   => $self->recurId,
         });
 
     $var->{"formFooter"} = WebGUI::Form::formFooter($session);
@@ -2044,14 +2044,14 @@ sub www_edit {
     $var->{"formTitle"}
         = WebGUI::Form::text($session, {
             name    => "title",
-            value   => $form->process("title") || $self->get("title"),
+            value   => $form->process("title") || $self->title,
         });
 
     # menu title AS short title
     $var->{"formMenuTitle"} 
         = WebGUI::Form::text($session, {
             name        => "menuTitle",
-            value       => $form->process("menuTitle") || $self->get("menuTitle"),
+            value       => $form->process("menuTitle") || $self->menuTitle,
             maxlength   => 15,
             size        => 22,
         });
@@ -2060,27 +2060,27 @@ sub www_edit {
     $var->{"formGroupIdView"} 
         = WebGUI::Form::Group($session, {
             name         => "groupIdView",
-            value        => $form->process("groupIdView") || $self->get("groupIdView"),
-            defaultValue => $self->getParent->get("groupIdView"),
+            value        => $form->process("groupIdView") || $self->groupIdView,
+            defaultValue => $self->getParent->groupIdView,
         });
 
     # location
     $var->{"formLocation"}
         = WebGUI::Form::text($session, {
             name    => "location",
-            value   => $form->process("location") || $self->get("location"),
+            value   => $form->process("location") || $self->location,
         });
 
     # description
     $var->{"formDescription"}
         = WebGUI::Form::HTMLArea($session, {
             name    => "description",
-            value   => $form->process("description") || $self->get("description"),
+            value   => $form->process("description") || $self->description,
         });
 
     # User defined
     for my $x (1..5) {
-        my $userDefinedValue = $self->getValue("userDefined".$x);
+        my $userDefinedValue = $self->get("userDefined".$x);
         $var->{'formUserDefined'.$x} = WebGUI::Form::text($session, {
             name    => "userDefined" . $x,
             value   => $userDefinedValue,
@@ -2108,7 +2108,7 @@ sub www_edit {
         = WebGUI::Form::Image($session, {
             name    => "storageId",
             maxAttachments => 5,
-            value   => $form->process("storageId") || $self->get("storageId"),
+            value   => $form->process("storageId") || $self->storageId,
             deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
         });
 
@@ -2224,8 +2224,8 @@ sub www_edit {
         $_->{delete_id} = "rel_del_id_".$_->{eventlinkId};
         $_->{group_id} = WebGUI::Form::Group($session, {
             name         => "rel_group_id_".$_->{eventlinkId},
-            value        => $form->process("rel_group_id_".$_->{eventlinkId}) || $_->{groupIdView} || $self->getParent->get("groupIdView"),
-            defaultValue => $self->getParent->get("groupIdView"),
+            value        => $form->process("rel_group_id_".$_->{eventlinkId}) || $_->{groupIdView} || $self->getParent->groupIdView,
+            defaultValue => $self->getParent->groupIdView,
         });
        $_->{seq_num_name} = "rel_seq_".$_->{eventlinkId};
        $_->{seq_num_id} = "rel_seq_id_".$_->{eventlinkId};
@@ -2235,8 +2235,8 @@ sub www_edit {
 
     $var->{"genericGroup"} = WebGUI::Form::Group($session, {
             name         => "rel_group_id_ZZZZZZZZZZ",
-            value        => $self->getParent->get("groupIdView"),
-            defaultValue => $self->getParent->get("groupIdView"),
+            value        => $self->getParent->groupIdView,
+            defaultValue => $self->getParent->groupIdView,
         });
     chomp $var->{"genericGroup"};
 
@@ -2382,7 +2382,7 @@ sub www_edit {
         = WebGUI::Form::date($session, {
             name            => "recurStart",
             value           => $recur{startDate},
-            defaultValue    => $self->get("startDate"),
+            defaultValue    => $self->startDate,
         });
 
     # End
@@ -2483,7 +2483,7 @@ ENDJS
     my $template;
     if ($parent) {
         $template 
-            = WebGUI::Asset::Template->new($session,$parent->get("templateIdEventEdit"));
+            = WebGUI::Asset::Template->new($session,$parent->templateIdEventEdit);
     }
     else {
         $template 
@@ -2529,7 +2529,7 @@ sub www_view {
     return $self->session->privilege->noAccess() unless $self->canView;
     my $check = $self->checkView;
     return $check if (defined $check);
-    $self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
+    $self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
     $self->session->http->sendHeader;    
     $self->prepareView;
     my $style = $self->getParent->processStyle($self->getSeparator);
