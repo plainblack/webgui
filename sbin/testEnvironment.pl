@@ -97,6 +97,7 @@ checkModule("HTML::Template",               2.9          );
 checkModule("HTML::Template::Expr",         0.07,      2 );
 checkModule("XML::FeedPP",                  0.40         );
 checkModule("JSON",                         2.12         );
+checkModule("JSON::Any",                    1.22         );
 checkModule("Config::JSON",                 "1.3.1"      );
 checkModule("Text::CSV_XS",                 "0.64"       );
 checkModule("Net::Subnets",                 0.21         );
