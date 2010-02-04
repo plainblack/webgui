@@ -124,7 +124,11 @@ property  ownerUserId => (
             uiLevel         => 6,
             fieldType       => 'user',
             default         => '3',
+            trigger         => \&_set_ownerUserId,
           );
+sub _set_ownerUserId {
+    return;
+}
 property  groupIdView  => (
             tab             => "security",
             label           => ['872','Asset'],
@@ -132,7 +136,11 @@ property  groupIdView  => (
             uiLevel         => 6,
             fieldType       => 'group',
             default         => '7',
+            trigger         => \&_set_groupIdView,
           );
+sub _set_groupIdView {
+    return;
+}
 property  groupIdEdit => (
             tab             => "security",
             label           => ['871','Asset'],
@@ -141,7 +149,11 @@ property  groupIdEdit => (
             uiLevel         => 6,
             fieldType       => 'group',
             default         => '4',
+            trigger         => \&_set_groupIdEdit,
           );
+sub _set_groupIdEdit {
+    return;
+}
 property  synopsis => (
             tab             => "meta",
             label           => ['412','Asset'],
