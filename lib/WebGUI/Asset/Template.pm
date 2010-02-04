@@ -759,30 +759,6 @@ sub removeAttachments {
 
 #-------------------------------------------------------------------
 
-=head2 update
-
-Override update from Asset.pm to handle backwards compatibility with the old
-packages that contain headBlocks. This will be removed in the future.  Don't plan
-on this being here.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $requestedProperties = shift;
-    my $properties = clone($requestedProperties);
-
-    if (exists $properties->{headBlock}) {
-        $properties->{extraHeadTags} .= $properties->{headBlock};
-        delete $properties->{headBlock};
-    }
-
-    $self->SUPER::update($properties);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_edit 
 
 Hand draw this form so that a warning can be displayed to the user when editing a
