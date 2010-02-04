@@ -72,6 +72,27 @@ sub _set_storageId {
 sub _storageid_deleteFileUrl {
     return shift->session->url->page("func=deleteFile;filename=");
 }
+sub _set_ownerUserId {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
+
+sub _set_groupIdView {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
+
+sub _set_groupIdEdit {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
+
 
 use WebGUI::Storage;
 use WebGUI::HTML;
@@ -256,27 +277,6 @@ sub processPropertiesFromFormPost {
     }
     $self->setSize($size);
 }
-
-#-------------------------------------------------------------------
-
-=head2 update ( )
-
-Extend the super class to handle the storage location.  Sets
-the correct privileges and deletes the internally cached
-Storage object.
-
-=cut
-
-sub update {
-    my $self = shift;
-    $self->SUPER::update(@_);
-    $self->getStorageLocation->setPrivileges(
-        $self->get("ownerUserId"),
-        $self->get("groupIdView"),
-        $self->get("groupIdEdit"),
-    );
-}
-
 
 #-------------------------------------------------------------------
 
