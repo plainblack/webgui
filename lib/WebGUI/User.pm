@@ -381,7 +381,8 @@ sub delete {
     $self->uncache;
 
     foreach my $groupId ( @{ $self->getGroups } ) {
-        WebGUI::Group->new($session, $groupId)->deleteUsers([$userId]);
+        my $group = WebGUI::Group->new($session, $groupId);
+        $group->deleteUsers([$userId]) if $group;
     }
 
     my $auth = $self->authInstance;
