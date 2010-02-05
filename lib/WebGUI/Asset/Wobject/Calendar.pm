@@ -232,6 +232,7 @@ property listViewPageInterval => (
             label           => ['editForm listViewPageInterval label', 'Asset_Calendar'],
             hoverHelp       => ['editForm listViewPageInterval description', 'Asset_Calendar'],
             unitsAvailable  => [ qw( days weeks months years ) ],
+            lazy            => 1,
         );
 sub _listViewPageInterval_builder {
     my $self = shift;
@@ -250,6 +251,7 @@ property icalFeeds    => (
 property icalInterval    => (
             fieldType       => "interval",
             builder         => '_icalInterval_builder',
+            lazy            => 1,
             tab             => "display",
             label           => ['editForm icalInterval label', 'Asset_Calendar'],
             hoverHelp       => ['editForm icalInterval description', 'Asset_Calendar'],
@@ -262,6 +264,7 @@ sub _icalInterval_builder {
 property workflowIdCommit => (
             fieldType       => "workflow",
             builder         => '_workflowIdCommit_builder',
+            lazy            => 1,
             tab             => 'security',
             label           => ['editForm workflowIdCommit label', 'Asset_Calendar'],
             hoverHelp       => ['editForm workflowIdCommit description', 'Asset_Calendar'],

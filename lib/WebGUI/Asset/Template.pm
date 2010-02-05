@@ -64,6 +64,7 @@ property parser => (
              fieldType       => 'selectBox',
              lazy            => 1,
              builder         => '_default_parser',
+             lazy            => 1,
          );
 sub _default_parser {
     my $self = shift;

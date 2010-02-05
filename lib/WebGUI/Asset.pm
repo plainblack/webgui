@@ -286,6 +286,7 @@ has       [qw/parentId     lineage
 has       className  => (
             is              => 'ro',
             builder         => '_build_className',
+            lazy            => 1,
             init_arg        => undef,
           );
 sub _build_className {

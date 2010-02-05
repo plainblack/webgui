@@ -30,6 +30,7 @@ property thumbnailSize => (
                 hoverHelp       => ['Thumbnail size description', 'Asset_Image'],
                 fieldType       => 'integer',
                 builder         => '_default_thumbnailSize',
+                lazy            => 1,
          );
 sub _default_thumbnailSize {
     my $self = shift;

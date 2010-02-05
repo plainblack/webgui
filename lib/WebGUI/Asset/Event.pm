@@ -41,11 +41,13 @@ property startDate => (
             label           => ['start date', 'Asset_Event'],
             fieldType       => "Date",
             builder         => '_defaultMysqlDate',
+            lazy            => 1,
         );
 property endDate => (
             label           => ['end date', 'Asset_Event'],
             fieldType       => "Date",
             builder         => '_defaultMysqlDate',
+            lazy            => 1,
         );
 sub _defaultMysqlDate {
     my $self = shift;
