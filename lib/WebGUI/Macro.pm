@@ -42,25 +42,52 @@ These functions are available from this package:
 =cut
 
 #-------------------------------------------------------------------
-my $parenthesis;
-$parenthesis = qr{
-    \(                      # Start with '(',
-    (?:                     # Followed by
-        (?>\\[()])              # Escaped parenthesis
-    |                       # or
-        (?>[^()])               # Non-parenthesis
-    |                       # or
-        (??{ $parenthesis })    # a balanced parenthesis block
-    )*                      # zero or more times
-    \)                      # Ending with ')'
-}x;
+my $macro_re;
+BEGIN {
+    if ( eval { require 5.010 } ) {
+        $macro_re = eval <<'END_REGEX';
+            qr{
+                (                               # capture #1 - entire macro call
+                    \^                              # start with carat
+                    ([-a-zA-Z0-9_@#/*]{1,64})       # capture #2 - macro name
+                    (                               # capture #3 - parenthesis
+                        \(                              # start with open parenthesis
+                        (?:                             # followed by
+                            (?> [^()] )                     # non-parenthesis
+                        |                               # or
+                            (?>\\[()])                      # Escaped parenthesis
+                        |                               # or
+                            (?3)                            # a balanced parenthesis block (recursive)
+                        )*                              # zero or more times
+                        \)                              # ending with closing parenthesis
+                    )?
+                    ;                               # End with a semicolon.
+                )
+            }msx;
+END_REGEX
+    }
+    else {
+        my $parenthesis;
+        $parenthesis = qr{
+            \(                      # Start with '(',
+            (?:                     # Followed by
+                (?>\\[()])              # Escaped parenthesis
+            |                       # or
+                (?>[^()])               # Non-parenthesis
+            |                       # or
+                (??{ $parenthesis })    # a balanced parenthesis block
+            )*                      # zero or more times
+            \)                      # Ending with ')'
+        }x;
 
-my $macro_re = qr{
-    (\^                     # Start with carat
-    ([-a-zA-Z0-9_@#/*]{1,64})   # And one or more non-macro characters -tagged-
-    ((??{ $parenthesis })?) # a balanced parenthesis block
-    ;)                      # End with a semicolon.
-}msx;
+        $macro_re = qr{
+            (\^                     # Start with carat
+            ([-a-zA-Z0-9_@#/*]{1,64})   # And one or more non-macro characters -tagged-
+            ((??{ $parenthesis })?) # a balanced parenthesis block
+            ;)                      # End with a semicolon.
+        }msx;
+    }
+}
 
 =head2 filter ( html )
 

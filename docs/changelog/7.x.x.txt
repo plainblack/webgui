@@ -1,4 +1,5 @@
 7.9.0
+ - added: Optimized macro parser for perl 5.10
 
 7.8.13
  - fixed #11418: confusing typ-o in gotcha
