@@ -8,6 +8,7 @@
  - fixed #11378: Cross publishing gallery files does not auto commit
  - fixed #11387: editing a style template
  - fixed #11390: Meta description duplicated in asset Folder
+ - fixed #11391: Duplicated Thingy maintains ids for storage fields
 
 7.7.31
  - fixed #11348: Typ-o in debug notice SQLReport
