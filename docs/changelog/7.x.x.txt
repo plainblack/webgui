@@ -4,6 +4,7 @@
  - fixed #11381: Captcha of DataForm cached
  - fixed #11392: account.message var sometimes returns invalid html
  - fixed #11395: i18n LDAP field name in user properties wrong
+ - fixed #11396: WebGUI Workflow Cache Error.
 
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin

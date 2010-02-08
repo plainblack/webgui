@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixWorkflowSizeLimits($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,20 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixWorkflowSizeLimits {
+    my $session = shift;
+    print "\tAdjust size limits on File and Database cache cleanups... " unless $quiet;
+    ACTIVITY: foreach my $workflowActivityId (qw{pbwfactivity0000000002 pbwfactivity0000000022}) {
+        my $activity = WebGUI::Workflow::Activity->new($session, $workflowActivityId);
+        next ACTIVITY unless $activity;
+        next ACTIVITY unless $activity->get('sizeLimit') == 1_000_000_000;
+        $activity->set('sizeLimit', 100_000_000);
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
