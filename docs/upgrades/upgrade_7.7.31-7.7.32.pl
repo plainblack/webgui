@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Workflow::Activity;
 
 
 my $toVersion = '7.7.32';
@@ -32,6 +33,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addSiteIndexToConfig($session);
+fixWorkflowSizeLimits($session);
 
 finish($session); # this line required
 
@@ -52,6 +54,20 @@ sub addSiteIndexToConfig {
     print "\tAdd Site Config indexing section to config file... " unless $quiet;
     $session->config->set('siteIndex', { showHiddenPages => 0 });
     # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixWorkflowSizeLimits {
+    my $session = shift;
+    print "\tAdjust size limits on File and Database cache cleanups... " unless $quiet;
+    ACTIVITY: foreach my $workflowActivityId (qw{pbwfactivity0000000002 pbwfactivity0000000022}) {
+        my $activity = WebGUI::Workflow::Activity->new($session, $workflowActivityId);
+        next ACTIVITY unless $activity;
+        next ACTIVITY unless $activity->get('sizeLimit') == 1_000_000_000;
+        $activity->set('sizeLimit', 100_000_000);
+    }
     print "DONE!\n" unless $quiet;
 }
 
