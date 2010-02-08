@@ -437,13 +437,37 @@ The id of row of data that should be copied.
 =cut
 
 sub copyThingData {
-    my $self = shift;
-    my $thingId = shift;
+    my $self        = shift;
+    my $thingId     = shift;
     my $thingDataId = shift;
-    my $db = $self->session->db;
-    return undef unless $self->canEditThingData($thingId, $thingDataId);;
+    my $session     = $self->session;
+    my $db          = $session->db;
+    return undef unless $self->canEditThingData($thingId, $thingDataId);
 
-    $self->copyCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
+    my $origCollateral = $self->getCollateral("Thingy_".$thingId, "thingDataId", $thingDataId);
+    use Data::Dumper;
+    $session->log->warn(Dumper $origCollateral);
+    $origCollateral->{thingDataId} = "new";
+    ##Get all fields
+    my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
+            ,[$self->getId,$thingId]);
+    my @storage_field_ids = ();
+    ##Check to see if any of them are File or Image
+    foreach my $field (@{ $fields }) {
+        if ($field->{fieldType} eq 'File' or $field->{fieldType} eq 'Image') {
+            push @storage_field_ids, $field->{fieldId};
+        }
+    }
+    ##Instance the storage object and duplicate it
+    foreach my $fieldId (@storage_field_ids) {
+        my $currentId = $origCollateral->{"field_". $fieldId};
+        my $storage   = WebGUI::Storage->get($session, $currentId);
+        my $new_store = $storage->copy;
+        ##Update the copy with the new storageId.
+        $origCollateral->{"field_". $fieldId} = $new_store->getId;
+    }
+    ##Update the copy
+    $self->setCollateral("Thingy_".$thingId, "thingDataId", $origCollateral, 0, 0);
 
     return undef;
 }
@@ -467,12 +491,13 @@ The id of row of data that should be deleted.
 
 sub deleteThingData {
 
-    my $self = shift;
-    my $thingId = shift;
+    my $self        = shift;
+    my $thingId     = shift;
     my $thingDataId = shift;
-    my $db = $self->session->db;
+    my $session     = $self->session;
+    my $db          = $session->db;
 
-    return undef unless $self->canEditThingData($thingId, $thingDataId);;
+    return undef unless $self->canEditThingData($thingId, $thingDataId);
 
     my ($onDeleteWorkflowId) = $db->quickArray("select onDeleteWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
@@ -480,7 +505,22 @@ sub deleteThingData {
         $self->triggerWorkflow($onDeleteWorkflowId, $thingId,$thingDataId);
     }
 
+    my $origCollateral = $self->getCollateral("Thingy_".$thingId, "thingDataId", $thingDataId);
     $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
+    my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
+            ,[$self->getId,$thingId]);
+    my @storage_field_ids = ();
+    ##Check to see if any of them are File or Image
+    foreach my $field (@{ $fields }) {
+        if ($field->{fieldType} eq 'File' or $field->{fieldType} eq 'Image') {
+            push @storage_field_ids, $field->{fieldId};
+        }
+    }
+    foreach my $fieldId (@storage_field_ids) {
+        my $currentId = $origCollateral->{"field_". $fieldId};
+        my $storage   = WebGUI::Storage->get($session, $currentId);
+        $storage->delete;
+    }
 
     return undef;
 }
