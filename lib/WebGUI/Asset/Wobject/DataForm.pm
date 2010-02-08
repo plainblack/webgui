@@ -227,11 +227,23 @@ an entry is being viewed, or the DataForm has a captcha, bypass caching altogeth
 
 sub getContentLastModified {
     my $self = shift;
-    my $hasCaptcha = isIn('Captcha', map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder });
-    if ($self->currentView eq 'list' || $self->session->form->process('entryId') || $hasCaptcha) {
+    if ($self->currentView eq 'list' || $self->session->form->process('entryId') || $self->hasCaptcha) {
         return time;
     }
     return $self->SUPER::getContentLastModified;
+}
+
+#-------------------------------------------------------------------
+
+=head2 hasCaptcha
+
+Returns true if the DataForm uses a captcha as one of the fields.
+
+=cut
+
+sub hasCaptcha {
+    my $self = shift;
+    return isIn('Captcha', map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder });
 }
 
 #-------------------------------------------------------------------
@@ -1264,6 +1276,9 @@ sub viewForm {
         $entry = $self->entryClass->new($self, ($entryId && $self->canEdit) ? $entryId : ());
     }
     $var = $passedVars || $self->getRecordTemplateVars($var, $entry);
+    if ($self->hasCaptcha) {
+        $self->session->http->setCacheControl('none');
+    }
     return $self->processTemplate($var, undef, $self->{_viewFormTemplate});
 }
 
