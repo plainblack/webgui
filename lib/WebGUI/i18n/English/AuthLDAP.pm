@@ -159,6 +159,12 @@ our $I18N = {
 		lastUpdated => 1031514049,
 	},
 
+	'LDAP User DN' => {
+		message => q|LDAP User DN|,
+		lastUpdated => 1265671176,
+        context => q|The actual DN for the user to use when logging in.|,
+	},
+
 	'connect_dn_help' => {
 		message => q|The distinguished name used to make an LDAP connection.  Used to be called Connect DN.|,
 		lastUpdated => 1249688660,
