@@ -494,7 +494,7 @@ sub editUserForm {
 	);
 	$f->text(
 		-name => "authLDAP_connectDN",
-		-label => $i18n->get(4),
+		-label => $i18n->get('LDAP User DN'),
 		-value => $connectDN,
 	);
 	$self->session->style->setRawHeadTags($jscript);

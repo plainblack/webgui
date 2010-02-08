@@ -11,6 +11,7 @@
  - fixed #11391: Duplicated Thingy maintains ids for storage fields
  - fixed #11381: Captcha of DataForm cached
  - fixed #11392: account.message var sometimes returns invalid html
+ - fixed #11395: i18n LDAP field name in user properties wrong
 
 7.7.31
  - fixed #11348: Typ-o in debug notice SQLReport
