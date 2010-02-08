@@ -308,8 +308,14 @@ sub sendHeader {
 		} 
 		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
 		else {
-			$request->headers_out->set('Last-Modified' => $date);
-  			$request->headers_out->set('Cache-Control' => "must-revalidate, max-age=" . $cacheControl);
+            if ( $cacheControl eq "none" ) {
+                $request->headers_out->set("Cache-Control" => "private, max-age=1");
+                $request->no_cache(1);
+            }
+            else {
+                $request->headers_out->set('Last-Modified' => $date);
+                $request->headers_out->set('Cache-Control' => "must-revalidate, max-age=" . $cacheControl);
+            }
 			# do an extra incantation if the HTTP protocol is really old
 			if ($request->protocol =~ /(\d\.\d)/ && $1 < 1.1) {
 				my $date = $datetime->epochToHttp(time() + $cacheControl);

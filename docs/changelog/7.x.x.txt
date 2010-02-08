@@ -1,6 +1,7 @@
 7.8.12
  - fixed #11390: Meta description duplicated in asset Folder
  - fixed #11391: Duplicated Thingy maintains ids for storage fields
+ - fixed #11381: Captcha of DataForm cached
 
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin
