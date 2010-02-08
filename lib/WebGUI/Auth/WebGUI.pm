@@ -1299,7 +1299,7 @@ sub updateAccount {
    }
    
    if($error){
-      $display = $error;
+      $display = '<ul>'.$error.'</ul>';
    }
    
    my $properties;
