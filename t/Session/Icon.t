@@ -111,7 +111,7 @@ is($extras, q!doSomething()!, "drag: set extras");
 
 $icon = $session->icon->delete('','','What did I ever do to you?');
 my ($onclick) = linkAndText($icon, 'a', 'onclick');
-is($onclick, "return confirm('What did I ever do to you?')", "delete: confirm text");
+is($onclick, "return confirm('What did I ever do to you?');", "delete: confirm text");
 
 ####################################################
 #
