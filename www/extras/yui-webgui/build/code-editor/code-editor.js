@@ -290,7 +290,7 @@
                 this._getSelection().getRangeAt(0).insertNode(this._getDoc().createTextNode(this.cc));
             } else if (this.browser.webkit || this.browser.ie || this.browser.opera) {
                 try {
-                    this.execCommand('inserthtml', '<span class="cursor_here"></span>');
+                    this.execCommand('inserthtml', this.cc);
                 }
                 catch (e) {}
             }
@@ -306,7 +306,7 @@
             html = html.replace(/<br><div>/ig, '<br>');
             html = html.replace(/<div>/ig, '<br>');
             html = html.replace(/<br>/ig,'\n');
-            html = html.replace(/<.*?>/g,'');
+            html = html.replace(/<[^>]*>/g,'');
             html = html.replace(/\r?\n/g,'<br>');
             //YAHOO.log('2: ' + html);
         } else {
@@ -315,18 +315,24 @@
             }
             YAHOO.log(html);
             // &nbsp; before <br> for IE7
-            html = html.replace(/(&nbsp;|<span class="cursor_here"><\/span>)?<br[^>]*>/gi,'$1\n');
+            html = html.replace(/(&nbsp;)?<br[^>]*>/gi,'$1\n');
+            html = html.replace(/<\/div>/ig, '');
+            html = html.replace(/<br><div>/ig, '<br>');
+            html = html.replace(/<div>/ig, '<br>');
+            html = html.replace(/<br>/ig,'\n');
             html = html.replace(/<[^>]*>/g,'');
             html = html.replace(/\r?\n/g,'<br>');
             // &nbsp; between <br> for IE6
-            html = html.replace(/<br[^>]*>(<span class="cursor_here"><\/span>)?<br[^>]*>/gi, '<br>$1&nbsp;<br>');
+            html = html.replace(/<br[^>]*><br[^>]*>/gi, '<br>$1&nbsp;<br>');
             YAHOO.log(html);
         }
         for (var i = 0; i < this.keywords.length; i++) {
             html = html.replace(this.keywords[i].code, this.keywords[i].tag);
         }
         YAHOO.log("AFTER HIGHLIGHT:" + html);
-        html = html.replace('<span class="cursor_here"></span>', '<span id="cur">|</span>');
+        if ( !this.browser.gecko ) {
+            html = html.replace(this.cc, '<span id="cur">|</span>');
+        }
 
         this._getDoc().body.innerHTML = html;
         if (!focus) {
