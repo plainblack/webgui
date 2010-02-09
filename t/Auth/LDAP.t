@@ -29,11 +29,11 @@ my $session         = WebGUI::Test->session;
 # Create LDAP Link
 my $ldapProps   = {
     ldapLinkName    => "Test LDAP Link",
-    ldapUrl         => "ldaps://smoke.plainblack.com/ou=Convicts,o=shawshank", # Always test ldaps
-    connectDn       => "cn=Samuel Norton,ou=Warden,o=shawshank",
+    ldapUrl         => "ldaps://smoke.plainblack.com/o=shawshank", # Always test ldaps
+    connectDn       => "cn=Warden,o=shawshank",
     identifier      => "gooey",
     ldapUserRDN     => "dn",
-    ldapIdentity    => "cn",
+    ldapIdentity    => "uid",
     ldapLinkId      => sprintf( '%022s', "testlink" ),
 };
 $session->db->setRow("ldapLink","ldapLinkId",$ldapProps, $ldapProps->{ldapLinkId});
@@ -41,10 +41,20 @@ my $ldapLink        = WebGUI::LDAPLink->new( $session, $ldapProps->{ldapLinkId} 
 my $ldap            = $ldapLink->bind;
 $session->setting->set('ldapConnection', $ldapProps->{ldapLinkId} );
 
+# An LDAP group
+my $ldapGroup = WebGUI::Group->new( $session, "new" );
+$ldapGroup->set( "ldapLinkId", $ldapProps->{ldapLinkId} );
+$ldapGroup->set( "ldapGroup", "cn=Convicts,o=shawshank" );
+$ldapGroup->set( "ldapGroupProperty", "member" );
+$ldapGroup->set( "ldapRecursiveProperty", "uid" );
+
 # Cleanup
 my @cleanup = (
     Scope::Guard->new(sub {
         $session->db->write("delete from ldapLink where ldapLinkId=?", [$ldapProps->{ldapLinkId}]);
+    }),
+    Scope::Guard->new( sub {
+        $ldapGroup->delete;
     }),
 );
 
@@ -52,7 +62,7 @@ my @cleanup = (
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 9;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test Login of existing user
@@ -65,7 +75,7 @@ $user->update({
 my $auth    = $user->authInstance;
 $auth->saveParams( $user->getId, $user->get('authMethod'), {
     ldapUrl         => $ldapProps->{ldapUrl},
-    connectDN       => "cn=Andy Dufresne,ou=Convicts,o=shawshank",
+    connectDN       => "uid=Andy Dufresne,o=shawshank",
     ldapConnection  => $ldapProps->{ldapLinkId},
 } );
 
@@ -112,6 +122,9 @@ is( $session->user->get('username'), 'Bogs Diamond', 'Bogs was created' )
 or diag( $auth->error );
 WebGUI::Test->addToCleanup( $session->user );
 
+# Test the the automatically registered user is in the right group
+ok( $session->user->isInGroup( $ldapGroup->getId ) )
+
 $session->setting->set('automaticLDAPRegistration', 0);
 $session->user({ userId => 1 }); # Restore Visitor
 
@@ -119,12 +132,12 @@ $session->user({ userId => 1 }); # Restore Visitor
 # Test DN reset from LDAP
 
 $session->setting->set('automaticLDAPRegistration', 1);
-my $result = $ldap->add( 'cn=Brooks Hatley,ou=Convicts,o=shawshank',
+my $result = $ldap->add( 'uid=Brooks Hatley,o=shawshank',
     attr    => [
+        uid             => 'Brooks Hatley',
         cn              => 'Brooks Hatley',
         givenName       => 'Brooks',
         sn              => 'Hatley',
-        ou              => 'Convicts',
         o               => 'shawshank',
         objectClass     => [ qw( top inetOrgPerson ) ],
         userPassword    => 'BrooksHatley',
@@ -141,9 +154,9 @@ is $session->user->get('username'), 'Brooks Hatley', 'Brooks was created';
 cmp_deeply(
     $auth->getParams,
     {
-        connectDN      => 'cn=Brooks Hatley,ou=Convicts,o=shawshank',
+        connectDN      => 'uid=Brooks Hatley,o=shawshank',
         ldapConnection => '00000000000000testlink',
-        ldapUrl        => 'ldaps://smoke.plainblack.com/ou=Convicts,o=shawshank',
+        ldapUrl        => 'ldaps://smoke.plainblack.com/o=shawshank',
     },
     'authentication information set after creating account'
 );
@@ -151,12 +164,13 @@ WebGUI::Test->addToCleanup( $session->user, );
 $out    = $auth->logout;
 is $session->user->get('username'), 'Visitor', 'Brooks was logged out';
 
-$ldap->moddn( 'cn=Brooks Hatley,ou=Convicts,o=shawshank',
-    newrdn => 'cn=Brooks Hatlen',
+$ldap->moddn( 'uid=Brooks Hatley,o=shawshank',
+    newrdn => 'uid=Brooks Hatlen',
 );
 
-$ldap->modify( 'cn=Brooks Hatlen,ou=Convicts,o=shawshank',
+$ldap->modify( 'uid=Brooks Hatlen,o=shawshank',
     replace    => {
+        cn              => 'Brooks Hatlen',
         sn              => 'Hatlen',
         userPassword    => 'BrooksHatlen',
     },
@@ -173,15 +187,15 @@ is $session->user->get('username'), 'Brooks Hatley', 'Brooks was logged in after
 cmp_deeply(
     $auth->getParams,
     {
-        connectDN      => 'cn=Brooks Hatlen,ou=Convicts,o=shawshank',
+        connectDN      => 'uid=Brooks Hatlen,o=shawshank',
         ldapConnection => '00000000000000testlink',
-        ldapUrl        => 'ldaps://smoke.plainblack.com/ou=Convicts,o=shawshank',
+        ldapUrl        => 'ldaps://smoke.plainblack.com/o=shawshank',
     },
     'authentication information updated after name change'
 );
 
 
-$ldap->delete( 'cn=Brooks Hatlen,ou=Convicts,o=shawshank' );
-$ldap->delete( 'cn=Brooks Hatley,ou=Convicts,o=shawshank' );
+$ldap->delete( 'uid=Brooks Hatlen,o=shawshank' );
+$ldap->delete( 'uid=Brooks Hatley,o=shawshank' );
 
 $session->setting->set('automaticLDAPRegistration', 0);
