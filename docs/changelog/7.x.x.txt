@@ -7,6 +7,7 @@
  - fixed #11396: WebGUI Workflow Cache Error.
  - fixed #11393: Map template variables missing
  - fixed #11336: Duplicate Version Tag Created.
+ - fixed #11398: Recent post information keeps disappearing from my forums
 
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin

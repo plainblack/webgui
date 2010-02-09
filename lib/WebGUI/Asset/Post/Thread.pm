@@ -51,7 +51,7 @@ sub archive {
 		$post->setStatusArchived;
 	}
     my $cs = $self->getParent;
-    $cs->incrementThreads($cs->get("lastPostId"), $cs->get("lastPostDate"));
+    $cs->incrementThreads($cs->get("lastPostDate"), $cs->get("lastPostId"));
 }
 
 #-------------------------------------------------------------------
