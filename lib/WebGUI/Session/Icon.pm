@@ -166,7 +166,7 @@ sub delete {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $confirmText = shift; 
 	if($confirmText) {
-		$confirmText = qq| onclick="return confirm('$confirmText')" |;
+		$confirmText = qq| onclick="return confirm('$confirmText');" |;
 	}
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p class="toolbarIcon" style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'" '.$confirmText.'>';

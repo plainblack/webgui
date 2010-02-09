@@ -14,6 +14,7 @@
  - fixed #11395: i18n LDAP field name in user properties wrong
  - fixed #11396: WebGUI Workflow Cache Error.
  - fixed #11393: Map template variables missing
+ - fixed #11336: Duplicate Version Tag Created.
 
 7.7.31
  - fixed #11348: Typ-o in debug notice SQLReport
