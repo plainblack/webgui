@@ -163,10 +163,16 @@
         }
         html = html.replace(/(&nbsp;){4}/g,"\t");   // TODO: make softtabs configurable
         html = html.replace(/&nbsp;/g," ");
-        html = html.replace(/ ?<br>/gi,'\n');
-        html = html.replace(/<[^>]+>/g,'');
         // Remove spaces at end of lines
-        html = html.replace(/ +(\r?)\n/g,"$1\n");
+        html = html.replace(/\s ?<br>/gi,'\n');
+        html = html.replace(/<[^>]+>/g,'');
+
+        // If, after all this, we are left with only a \n, user didn't add anything
+        //      (editor adds a <br> if it starts blank)
+        if ( html == "\n" ) {
+            html = "";
+        }
+
         return html;
     };
 
