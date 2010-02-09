@@ -6,6 +6,7 @@
  - fixed #11395: i18n LDAP field name in user properties wrong
  - fixed #11396: WebGUI Workflow Cache Error.
  - fixed #11393: Map template variables missing
+ - fixed #11336: Duplicate Version Tag Created.
 
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin
