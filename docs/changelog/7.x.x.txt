@@ -1,4 +1,6 @@
 7.8.12
+ - fixed #11349: Code editor returns newline for blank content
+ - fixed #11322: Code editor broken
  - fixed #11390: Meta description duplicated in asset Folder
  - fixed #11391: Duplicated Thingy maintains ids for storage fields
  - fixed #11381: Captcha of DataForm cached
