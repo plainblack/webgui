@@ -136,13 +136,13 @@ sub getFormProperties {
     my $self     = shift;
     my $property = $self->meta->find_attribute_by_name(@_);
     my $form     = $property->form;
-    PROPERTY: while (my ($property_name, $property) = each %{ $form }) {
-        next PROPERTY unless ref $property;
-        if (($property_name eq 'label' || $property_name eq 'hoverHelp') and ref $property eq 'ARRAY') {
-            $form->{$property_name} = WebGUI::International->new($self->session)->get(@{$property});
+    PROPERTY: while (my ($property_name, $property_value) = each %{ $form }) {
+        next PROPERTY unless ref $property_value;
+        if (($property_name eq 'label' || $property_name eq 'hoverHelp') and ref $property_value eq 'ARRAY') {
+            $form->{$property_name} = WebGUI::International->new($self->session)->get(@{$property_value});
         }
-        elsif (ref $property eq 'CODE') {
-            $form->{$property_name} = $self->$property($form, $property_name);
+        elsif (ref $property_value eq 'CODE') {
+            $form->{$property_name} = $self->$property_value($property, $property_name);
         }
     }
     return $form;

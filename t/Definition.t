@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 
-use Test::More tests => 12;
+use Test::More tests => 15;
 use Test::Deep;
 use Test::Exception;
 
@@ -104,8 +104,9 @@ my $called_getProperties;
 
     aspect 'aspect1' => 'aspect1 value';
     property  'property1' => (
-        label   => ['webgui', 'WebGUI'],
-        options => \&property1_options,
+        label     => ['webgui', 'WebGUI'],
+        options   => \&property1_options,
+        named_url => \&named_url,
     );
     has session => (
         is       => 'ro',
@@ -114,14 +115,23 @@ my $called_getProperties;
     sub property1_options {
         return { one => 1, two => 2, three => 3 };
     }
+    sub named_url {
+        my ($self, $property, $property_name) = @_;
+        ::note "Checking arguments passed to subroutine for defining a form property";
+        ::isa_ok($self, 'WGT::Class3');
+        ::isa_ok($property, 'WebGUI::Definition::Meta::Property');
+        ::is($property_name, 'named_url', 'form property name sent');
+        return $property->name;
+    }
 
     my $object = WGT::Class3->new({session => $session});
 
     ::cmp_deeply(
         $object->getFormProperties('property1'),
         {
-            label   => 'WebGUI',
-            options => { one => 1, two => 2, three => 3 },
+            label     => 'WebGUI',
+            options   => { one => 1, two => 2, three => 3 },
+            named_url => 'property1',
         },
         'getFormProperties handles i18n and subroutines'
     );
