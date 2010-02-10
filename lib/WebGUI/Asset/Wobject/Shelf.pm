@@ -190,10 +190,9 @@ sub importProducts {
             }
 
             if ($productRow{title} ne $product->getTitle) {
-                my $newTitle = $product->fixTitle($productRow{title});
                 $product->update({
-                    title     => $newTitle,
-                    menuTitle => $newTitle,
+                    title     => $productRow{title},
+                    menuTitle => $productRow{title},
                 });
             }
 
@@ -214,11 +213,10 @@ sub importProducts {
             ##Insert a new product;
             $session->log->warn("Making a new product: $productRow{sku}\n");
             my $newProduct = $node->addChild({className => 'WebGUI::Asset::Sku::Product'});
-            my $newTitle = $newProduct->fixTitle($productRow{title});
             $newProduct->update({
-                title     => $newTitle,
-                menuTitle => $newTitle,
-                url       => $newProduct->fixUrl($productRow{title}),
+                title     => $productRow{title},
+                menuTitle => $productRow{title},
+                url       => $productRow{title},
                 sku       => $productRow{mastersku},
             });
             $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productCollateral);
