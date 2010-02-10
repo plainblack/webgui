@@ -2,6 +2,8 @@
  - fixed #11394: Map points does not show all the data that was entered
 
 7.7.32
+ - fixed #11349: Code editor returns newline for blank content
+ - fixed #11322: Code editor broken
  - fixed #11044: Optionally include hidden pages in sitemap.xml
  - fixed #11379: Certain fields in some Assets cannot be overridden in the config file
  - fixed #11380: "Use this Address" button in Shop needs to be green!
