@@ -123,7 +123,7 @@ or diag( $auth->error );
 WebGUI::Test->addToCleanup( $session->user );
 
 # Test the the automatically registered user is in the right group
-ok( $session->user->isInGroup( $ldapGroup->getId ) )
+ok( $session->user->isInGroup( $ldapGroup->getId ) );
 
 $session->setting->set('automaticLDAPRegistration', 0);
 $session->user({ userId => 1 }); # Restore Visitor
