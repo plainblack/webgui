@@ -60,7 +60,8 @@ plan tests => 9;        # Increment this number for each test you create
     cmp_deeply $ldap->get(), superhashof($ldapProps), 'all db properties retrieved';
     my $connection = $ldap->bind();
     isa_ok $connection, 'Net::LDAP', 'returned by bind';
-    is $ldap->{'_error'}, undef, 'no errors from binding'
+    is $ldap->getErrorCode, undef, 'no errors from binding';
+
 }
 
 ###########################################################################

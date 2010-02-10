@@ -27,17 +27,11 @@ use Scope::Guard;
 my $session         = WebGUI::Test->session;
 
 # Create LDAP Link
-my $ldapProps   = {
-    ldapLinkName    => "Test LDAP Link",
-    ldapUrl         => "ldaps://smoke.plainblack.com/o=shawshank", # Always test ldaps
-    connectDn       => "cn=Warden,o=shawshank",
-    identifier      => "gooey",
-    ldapUserRDN     => "dn",
-    ldapIdentity    => "uid",
-    ldapLinkId      => sprintf( '%022s', "testlink" ),
-};
+my $ldapProps   = WebGUI::Test->getSmokeLDAPProps();
+
 $session->db->setRow("ldapLink","ldapLinkId",$ldapProps, $ldapProps->{ldapLinkId});
 my $ldapLink        = WebGUI::LDAPLink->new( $session, $ldapProps->{ldapLinkId} );
+addToCleanup($ldapLink);
 my $ldap            = $ldapLink->bind;
 $session->setting->set('ldapConnection', $ldapProps->{ldapLinkId} );
 
@@ -47,17 +41,7 @@ $ldapGroup->set( "ldapLinkId", $ldapProps->{ldapLinkId} );
 $ldapGroup->set( "ldapGroup", "cn=Convicts,o=shawshank" );
 $ldapGroup->set( "ldapGroupProperty", "member" );
 $ldapGroup->set( "ldapRecursiveProperty", "uid" );
-
-# Cleanup
-my @cleanup = (
-    Scope::Guard->new(sub {
-        $session->db->write("delete from ldapLink where ldapLinkId=?", [$ldapProps->{ldapLinkId}]);
-    }),
-    Scope::Guard->new( sub {
-        $ldapGroup->delete;
-    }),
-);
-
+addToCleanup($ldapGroup);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -123,7 +107,7 @@ or diag( $auth->error );
 WebGUI::Test->addToCleanup( $session->user );
 
 # Test the the automatically registered user is in the right group
-ok( $session->user->isInGroup( $ldapGroup->getId ) );
+ok( $session->user->isInGroup( $ldapGroup->getId ), 'Automatically registered user is in the correct group');
 
 $session->setting->set('automaticLDAPRegistration', 0);
 $session->user({ userId => 1 }); # Restore Visitor

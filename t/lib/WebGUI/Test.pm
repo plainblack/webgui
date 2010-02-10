@@ -505,11 +505,11 @@ Returns a hashref of properties for connecting to smoke's LDAP server.
 sub getSmokeLDAPProps {
     my $ldapProps   = {
         ldapLinkName    => "Test LDAP Link",
-        ldapUrl         => "ldaps://smoke.plainblack.com/ou=Convicts,o=shawshank", # Always test ldaps
-        connectDn       => "cn=Samuel Norton,ou=Warden,o=shawshank",
+        ldapUrl         => "ldaps://smoke.plainblack.com/o=shawshank", # Always test ldaps
+        connectDn       => "cn=Warden,o=shawshank",
         identifier      => "gooey",
         ldapUserRDN     => "dn",
-        ldapIdentity    => "cn",
+        ldapIdentity    => "uid",
         ldapLinkId      => sprintf( '%022s', "testlink" ),
     };
     return $ldapProps;
