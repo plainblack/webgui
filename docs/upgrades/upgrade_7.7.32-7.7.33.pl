@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+growMapPointDataColumns($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub growMapPointDataColumns {
+    my $session = shift;
+    print "\tIncrease the size of Map Point data columns... " unless $quiet;
+    foreach my $column (qw{address1 address2 city state zipCode country email}) {
+        $session->db->write(qq|ALTER TABLE MapPoint MODIFY $column  CHAR(35)|);
+    }
+    $session->db->write(qq|ALTER TABLE MapPoint MODIFY website  CHAR(255)|);
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
