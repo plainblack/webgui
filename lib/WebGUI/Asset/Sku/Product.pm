@@ -61,15 +61,19 @@ property image1 => (
             default        => undef,
             maxAttachments => 1,
             label          => ['7', 'Asset_Product'],
-            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image1;filename="),
+            deleteFileUrl  => \&_product_delete_file_url,
             persist        =>  1,
         );
+sub _product_delete_file_url {
+    my ($self, $property) = @_;
+    return $self->session->url->page(sprintf "func=deleteFileConfirm;file=%s;filename=", $property->name);
+}
 property image2 => (
             tab            => "properties",
             fieldType      => "image",
             maxAttachments => 1,
             label          => ['8', 'Asset_Product'],
-            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image2;filename="),
+            deleteFileUrl  => \&_product_delete_file_url,
             default        => undef,
             persist        => 1,
         );
@@ -78,7 +82,7 @@ property image3 => (
             fieldType      => "image",
             maxAttachments => 1,
             label          => ['9', 'Asset_Product'],
-            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=image3;filename="),
+            deleteFileUrl  => \&_product_delete_file_url,
             default        => undef,
             persist        => 1,
         );
@@ -87,7 +91,7 @@ property brochure => (
             fieldType      => "file",
             maxAttachments => 1,
             label          => ['13', 'Asset_Product'],
-            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=brochure;filename="),
+            deleteFileUrl  => \&_product_delete_file_url,
             default        => undef,
             persist        => 1,
         );
@@ -96,7 +100,7 @@ property manual => (
             fieldType      => "file",
             maxAttachments => 1,
             label          => ['14', 'Asset_Product'],
-            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=manual;filename="),
+            deleteFileUrl  => \&_product_delete_file_url,
             default        => undef,
             persist        => 1,
         );
@@ -112,7 +116,7 @@ property warranty => (
             fieldType      => "file",
             maxAttachments => 1,
             label          => ['15', 'Asset_Product'],
-            #deleteFileUrl  => $session->url->page("func=deleteFileConfirm;file=warranty;filename="),
+            deleteFileUrl  => \&_product_delete_file_url,
             default        => undef,
             persist        => 1,
         );
