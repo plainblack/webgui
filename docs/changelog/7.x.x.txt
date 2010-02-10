@@ -1,3 +1,5 @@
+7.7.33
+
 7.7.32
  - fixed #11044: Optionally include hidden pages in sitemap.xml
  - fixed #11379: Certain fields in some Assets cannot be overridden in the config file
