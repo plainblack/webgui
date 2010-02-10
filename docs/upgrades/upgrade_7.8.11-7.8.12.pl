@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 fixWorkflowSizeLimits($session);
+growMapPointDataColumns($session);
 
 finish($session); # this line required
 
@@ -57,6 +58,19 @@ sub fixWorkflowSizeLimits {
         next ACTIVITY unless $activity->get('sizeLimit') == 1_000_000_000;
         $activity->set('sizeLimit', 100_000_000);
     }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub growMapPointDataColumns {
+    my $session = shift;
+    print "\tIncrease the size of Map Point data columns... " unless $quiet;
+    foreach my $column (qw{address1 address2 city state zipCode country email}) {
+        $session->db->write(qq|ALTER TABLE MapPoint MODIFY $column  CHAR(35)|);
+    }
+    $session->db->write(qq|ALTER TABLE MapPoint MODIFY website  CHAR(255)|);
+    # and here's our code
     print "DONE!\n" unless $quiet;
 }
 
