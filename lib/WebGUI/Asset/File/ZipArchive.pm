@@ -15,7 +15,29 @@ package WebGUI::Asset::File::ZipArchive;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::File';
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::File';
+aspect assetName => ['assetName', 'Asset_ZipArchive'];
+aspect tableName => 'ZipArchiveAsset';
+aspect icon      => 'ziparchive.gif';
+property showPage => (
+            tab          => "properties",
+            label        => ['show page', 'Asset_ZipArchive'],
+            hoverHelp    => ['show page description', 'Asset_ZipArchive'],
+            fieldType    => 'text',
+            default      => 'index.html',
+         );
+property templateId => (
+            tab          => "display",
+            label        => ['template label', 'Asset_ZipArchive'],
+            hoverHelp    => ['template description', 'Asset_ZipArchive'],
+            namespace    => "ZipArchiveAsset",
+            fieldType    => 'template',
+            default      => '',
+         );
+
+
 use WebGUI::HTMLForm;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -96,65 +118,6 @@ sub unzip {
 
 #-------------------------------------------------------------------
 
-=head2 addRevision ( )
-
-This method exists for demonstration purposes only.  The superclass
-handles revisions to ZipArchive Assets.
-
-=cut
-
-sub addRevision {
-	my $self = shift;
-	my $newSelf = $self->SUPER::addRevision(@_);
-	return $newSelf;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_ZipArchive");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		tableName=>'ZipArchiveAsset',
-		autoGenerateForms=>1,
-		icon=>'ziparchive.gif',
-		className=>'WebGUI::Asset::File::ZipArchive',
-		properties=>{
-			showPage=>{
-				tab=>"properties",
-				label=>$i18n->get('show page'),
-				hoverHelp=>$i18n->get('show page description'),
-				fieldType=>'text',
-				defaultValue=>'index.html'
-			},
-			templateId=>{
-				tab=>"display",
-				label=>$i18n->get('template label'),
-				namespace=>"ZipArchiveAsset",
-				fieldType=>'template',
-				defaultValue=>''
-			},
-		}
-	});
-	return $class->SUPER::definition($session,$definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -164,7 +127,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
