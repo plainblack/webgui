@@ -1,3 +1,314 @@
+/*
+ * HTML Parser By John Resig (ejohn.org)
+ * Original code by Erik Arvidsson, Mozilla Public License
+ * http://erik.eae.net/simplehtmlparser/simplehtmlparser.js
+ *
+ * // Use like so:
+ * HTMLParser(htmlString, {
+ *     start: function(tag, attrs, unary) {},
+ *     end: function(tag) {},
+ *     chars: function(text) {},
+ *     comment: function(text) {}
+ * });
+ *
+ * // or to get an XML string:
+ * HTMLtoXML(htmlString);
+ *
+ * // or to get an XML DOM Document
+ * HTMLtoDOM(htmlString);
+ *
+ * // or to inject into an existing document/DOM node
+ * HTMLtoDOM(htmlString, document);
+ * HTMLtoDOM(htmlString, document.body);
+ *
+ */
+
+(function(){
+
+	// Regular Expressions for parsing tags and attributes
+	var startTag = /^<(\w+)((?:\s+\w+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
+		endTag = /^<\/(\w+)[^>]*>/,
+		attr = /(\w+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
+		
+	// Empty Elements - HTML 4.01
+	var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,isindex,link,meta,param,embed");
+
+	// Block Elements - HTML 4.01
+	var block = makeMap("address,applet,blockquote,button,center,dd,del,dir,div,dl,dt,fieldset,form,frameset,hr,iframe,ins,isindex,li,map,menu,noframes,noscript,object,ol,p,pre,script,table,tbody,td,tfoot,th,thead,tr,ul");
+
+	// Inline Elements - HTML 4.01
+	var inline = makeMap("a,abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,textarea,tt,u,var");
+
+	// Elements that you can, intentionally, leave open
+	// (and which close themselves)
+	var closeSelf = makeMap("colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr");
+
+	// Attributes that have their values filled in disabled="disabled"
+	var fillAttrs = makeMap("checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected");
+
+	// Special Elements (can contain anything)
+	var special = makeMap("script,style");
+
+	var HTMLParser = this.HTMLParser = function( html, handler ) {
+		var index, chars, match, stack = [], last = html;
+		stack.last = function(){
+			return this[ this.length - 1 ];
+		};
+
+		while ( html ) {
+			chars = true;
+
+			// Make sure we're not in a script or style element
+			if ( !stack.last() || !special[ stack.last() ] ) {
+
+				// Comment
+				if ( html.indexOf("<!--") == 0 ) {
+					index = html.indexOf("-->");
+	
+					if ( index >= 0 ) {
+						if ( handler.comment )
+							handler.comment( html.substring( 4, index ) );
+						html = html.substring( index + 3 );
+						chars = false;
+					}
+	
+				// end tag
+				} else if ( html.indexOf("</") == 0 ) {
+					match = html.match( endTag );
+	
+					if ( match ) {
+						html = html.substring( match[0].length );
+						match[0].replace( endTag, parseEndTag );
+						chars = false;
+					}
+	
+				// start tag
+				} else if ( html.indexOf("<") == 0 ) {
+					match = html.match( startTag );
+	
+					if ( match ) {
+						html = html.substring( match[0].length );
+						match[0].replace( startTag, parseStartTag );
+						chars = false;
+					}
+				}
+
+				if ( chars ) {
+					index = html.indexOf("<");
+					
+					var text = index < 0 ? html : html.substring( 0, index );
+					html = index < 0 ? "" : html.substring( index );
+					
+					if ( handler.chars )
+						handler.chars( text );
+				}
+
+			} else {
+				html = html.replace(new RegExp("(.*)<\/" + stack.last() + "[^>]*>"), function(all, text){
+					text = text.replace(/<!--(.*?)-->/g, "$1")
+						.replace(/<!\[CDATA\[(.*?)]]>/g, "$1");
+
+					if ( handler.chars )
+						handler.chars( text );
+
+					return "";
+				});
+
+				parseEndTag( "", stack.last() );
+			}
+
+			if ( html == last )
+				throw "Parse Error: " + html;
+			last = html;
+		}
+		
+		// Clean up any remaining tags
+		parseEndTag();
+
+		function parseStartTag( tag, tagName, rest, unary ) {
+			if ( block[ tagName ] ) {
+				while ( stack.last() && inline[ stack.last() ] ) {
+					parseEndTag( "", stack.last() );
+				}
+			}
+
+			if ( closeSelf[ tagName ] && stack.last() == tagName ) {
+				parseEndTag( "", tagName );
+			}
+
+			unary = empty[ tagName ] || !!unary;
+
+			if ( !unary )
+				stack.push( tagName );
+			
+			if ( handler.start ) {
+				var attrs = [];
+	
+				rest.replace(attr, function(match, name) {
+					var value = arguments[2] ? arguments[2] :
+						arguments[3] ? arguments[3] :
+						arguments[4] ? arguments[4] :
+						fillAttrs[name] ? name : "";
+					
+					attrs.push({
+						name: name,
+						value: value,
+						escaped: value.replace(/(^|[^\\])"/g, '$1\\\"') //"
+					});
+				});
+	
+				if ( handler.start )
+					handler.start( tagName, attrs, unary );
+			}
+		}
+
+		function parseEndTag( tag, tagName ) {
+			// If no tag name is provided, clean shop
+			if ( !tagName )
+				var pos = 0;
+				
+			// Find the closest opened tag of the same type
+			else
+				for ( var pos = stack.length - 1; pos >= 0; pos-- )
+					if ( stack[ pos ] == tagName )
+						break;
+			
+			if ( pos >= 0 ) {
+				// Close all the open elements, up the stack
+				for ( var i = stack.length - 1; i >= pos; i-- )
+					if ( handler.end )
+						handler.end( stack[ i ] );
+				
+				// Remove the open elements from the stack
+				stack.length = pos;
+			}
+		}
+	};
+	
+	this.HTMLtoXML = function( html ) {
+		var results = "";
+		
+		HTMLParser(html, {
+			start: function( tag, attrs, unary ) {
+				results += "<" + tag;
+		
+				for ( var i = 0; i < attrs.length; i++ )
+					results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
+		
+				results += (unary ? "/" : "") + ">";
+			},
+			end: function( tag ) {
+				results += "</" + tag + ">";
+			},
+			chars: function( text ) {
+				results += text;
+			},
+			comment: function( text ) {
+				results += "<!--" + text + "-->";
+			}
+		});
+		
+		return results;
+	};
+	
+	this.HTMLtoDOM = function( html, doc ) {
+		// There can be only one of these elements
+		var one = makeMap("html,head,body,title");
+		
+		// Enforce a structure for the document
+		var structure = {
+			link: "head",
+			base: "head"
+		};
+	
+		if ( !doc ) {
+			if ( typeof DOMDocument != "undefined" )
+				doc = new DOMDocument();
+			else if ( typeof document != "undefined" && document.implementation && document.implementation.createDocument )
+				doc = document.implementation.createDocument("", "", null);
+			else if ( typeof ActiveX != "undefined" )
+				doc = new ActiveXObject("Msxml.DOMDocument");
+			
+		} else
+			doc = doc.ownerDocument ||
+				doc.getOwnerDocument && doc.getOwnerDocument() ||
+				doc;
+		
+		var elems = [],
+			documentElement = doc.documentElement ||
+				doc.getDocumentElement && doc.getDocumentElement();
+				
+		// If we're dealing with an empty document then we
+		// need to pre-populate it with the HTML document structure
+		if ( !documentElement && doc.createElement ) (function(){
+			var html = doc.createElement("html");
+			var head = doc.createElement("head");
+			head.appendChild( doc.createElement("title") );
+			html.appendChild( head );
+			html.appendChild( doc.createElement("body") );
+			doc.appendChild( html );
+		})();
+		
+		// Find all the unique elements
+		if ( doc.getElementsByTagName )
+			for ( var i in one )
+				one[ i ] = doc.getElementsByTagName( i )[0];
+		
+		// If we're working with a document, inject contents into
+		// the body element
+		var curParentNode = one.body;
+		
+		HTMLParser( html, {
+			start: function( tagName, attrs, unary ) {
+				// If it's a pre-built element, then we can ignore
+				// its construction
+				if ( one[ tagName ] ) {
+					curParentNode = one[ tagName ];
+					return;
+				}
+			
+				var elem = doc.createElement( tagName );
+				
+				for ( var attr in attrs )
+					elem.setAttribute( attrs[ attr ].name, attrs[ attr ].value );
+				
+				if ( structure[ tagName ] && typeof one[ structure[ tagName ] ] != "boolean" )
+					one[ structure[ tagName ] ].appendChild( elem );
+				
+				else if ( curParentNode && curParentNode.appendChild )
+					curParentNode.appendChild( elem );
+					
+				if ( !unary ) {
+					elems.push( elem );
+					curParentNode = elem;
+				}
+			},
+			end: function( tag ) {
+				elems.length -= 1;
+				
+				// Init the new parentNode
+				curParentNode = elems[ elems.length - 1 ];
+			},
+			chars: function( text ) {
+				curParentNode.appendChild( doc.createTextNode( text ) );
+			},
+			comment: function( text ) {
+				// create comment node
+			}
+		});
+		
+		return doc;
+	};
+
+	function makeMap(str){
+		var obj = {}, items = str.split(",");
+		for ( var i = 0; i < items.length; i++ )
+			obj[ items[i] ] = true;
+		return obj;
+	}
+})();
+
+
 (function() {
     var Dom = YAHOO.util.Dom,
         Event = YAHOO.util.Event,
@@ -8,6 +319,7 @@
         // Disable Editor configs that don't apply
         cfg["animate"] = false;
         cfg["dompath"] = false;
+        cfg["focusAtStart"] = false;
 
         // Default toolbar is different
         cfg["toolbar"] = cfg["toolbar"] || {
@@ -66,8 +378,10 @@
             }
         }, this, true);
         
+
         //Borrowed this from CodePress: http://codepress.sourceforge.net
         this.cc = '\u2009'; // carret char
+        // TODO: Make this configurable based on a syntax definition
         this.keywords = [
             { code: /(&lt;DOCTYPE.*?--&gt.)/g, tag: '<ins>$1</ins>' }, // comments
             { code: /(&lt;[^!]*?&gt;)/g, tag: '<b>$1</b>'	}, // all tags
@@ -83,7 +397,7 @@
         //End Borrowed Content
 
     };
-    Lang.extend( YAHOO.widget.CodeEditor, YAHOO.widget.Editor, {
+    Lang.extend( YAHOO.widget.CodeEditor, YAHOO.widget.SimpleEditor, {
         /**
         * @property _defaultCSS
         * @description The default CSS used in the config for 'css'. This way you can add to the config like this: { css: YAHOO.widget.SimpleEditor.prototype._defaultCSS + 'ADD MYY CSS HERE' }
@@ -92,6 +406,11 @@
         _defaultCSS: 'html { height: 95%; } body { background-color: #fff; font:13px/1.22 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small; } a, a:visited, a:hover { color: blue !important; text-decoration: underline !important; cursor: text !important; } .warning-localfile { border-bottom: 1px dashed red !important; } .yui-busy { cursor: wait !important; } img.selected { border: 2px dotted #808080; } img { cursor: pointer !important; border: none; } body.ptags.webkit div { margin: 11px 0; }'
     });
     
+    /**
+    * @private
+    * @method _cleanIncomingHTML
+    * @description Clean up the HTML that the textarea starts with
+    */
     YAHOO.widget.CodeEditor.prototype._cleanIncomingHTML = function(str) {
         // Workaround for bug in Lang.substitute
         str = str.replace(/{/gi, 'RIGHT_BRACKET');
@@ -194,7 +513,11 @@
     };
     /* End override to fix problems with Lang.substitute */
 
-
+    /**
+    * @private
+    * @method _writeStatus
+    * @description Write the number of Characters and Lines to the status line
+    */
     YAHOO.widget.CodeEditor.prototype._writeStatus = function () {
         if ( this.status ) {
             var text = this.getEditorText();
@@ -235,25 +558,41 @@
         }
     };
     
+    /* 
+     * @method cleanHTML
+     * @description Reduce the HTML in the editor to plain text to be put back in the
+     *      textarea. Called by saveHTML()
+     */
     YAHOO.widget.CodeEditor.prototype.cleanHTML = function (html) {
         if (!html) { 
             html = this.getEditorHTML();
         }
+
+        // Handle special-case HTML
         html = html.replace(/(&nbsp;){4}/g,"\t");   // TODO: make softtabs configurable
         html = html.replace(/&nbsp;/g," ");
         // Remove spaces at end of lines
-        html = html.replace(/\s ?<br>/gi,'\n');
-        html = html.replace(/<[^>]+>/g,'');
+        html = html.replace(/ ?<br>/gi,'\n');
 
+        // Parse the text out of the remaining HTML
+        text = "";
+        HTMLParser( html, {
+            chars   : function (t) { text += t }
+        } );
+        
         // If, after all this, we are left with only a \n, user didn't add anything
         //      (editor adds a <br> if it starts blank)
-        if ( html == "\n" ) {
-            html = "";
+        if ( text == "\n" ) {
+            text = "";
         }
 
-        return html;
+        return text;
     };
 
+    /* 
+     * @method focusCaret
+     * @description I don't actually know what this does, it was like this when I got here
+     */
     YAHOO.widget.CodeEditor.prototype.focusCaret = function() {
         if (this.browser.gecko) {
             if (this._getWindow().find(this.cc)) {
@@ -269,11 +608,22 @@
         }
     };
 
+    /**
+    * @method getEditorText
+    * @description Get the text inside the editor, removing any HTML used for highlighting
+    */
     YAHOO.widget.CodeEditor.prototype.getEditorText
     = function () {
-        return this.cleanHTML( this.getEditorHTML() );
+        var html = this.getEditorHTML();
+        var text = this.cleanHTML( html );
+        return text;
     };
 
+    /**
+    * @method highlight
+    * @description Apply the syntax highlighting to the content of the editor
+    * @param {Boolean} focus If true, editor currently has focus
+    */
     YAHOO.widget.CodeEditor.prototype.highlight = function(focus) {
 
         // Opera support is not working yet
@@ -285,6 +635,7 @@
             return;
         }
 
+        // Keep track of where the cursor is right now
         if (!focus) {
             if (this.browser.gecko) {
                 this._getSelection().getRangeAt(0).insertNode(this._getDoc().createTextNode(this.cc));
@@ -295,41 +646,16 @@
                 catch (e) {}
             }
         }
-        var html = '';
-        html = this._getDoc().body.innerHTML;
-        //if (this.browser.opera) {
-        //    html = html.replace(/<(?!span|\/span|br).*?>/gi,'');
-        //} else
-        if (this.browser.webkit) {
-            //YAHOO.log('1: ' + html);
-            html = html.replace(/<\/div>/ig, '');
-            html = html.replace(/<br><div>/ig, '<br>');
-            html = html.replace(/<div>/ig, '<br>');
-            html = html.replace(/<br>/ig,'\n');
-            html = html.replace(/<[^>]*>/g,'');
-            html = html.replace(/\r?\n/g,'<br>');
-            //YAHOO.log('2: ' + html);
-        } else {
-            if (this.browser.ie) {
-                html = html.replace(/<SPAN><\/SPAN>/ig, '');
-            }
-            YAHOO.log(html);
-            // &nbsp; before <br> for IE7
-            html = html.replace(/(&nbsp;)?<br[^>]*>/gi,'$1\n');
-            html = html.replace(/<\/div>/ig, '');
-            html = html.replace(/<br><div>/ig, '<br>');
-            html = html.replace(/<div>/ig, '<br>');
-            html = html.replace(/<br>/ig,'\n');
-            html = html.replace(/<[^>]*>/g,'');
-            html = html.replace(/\r?\n/g,'<br>');
-            // &nbsp; between <br> for IE6
-            html = html.replace(/<br[^>]*><br[^>]*>/gi, '<br>$1&nbsp;<br>');
-            YAHOO.log(html);
-        }
+
+        // Remove existing highlighting
+        var html = this.getEditorText();
+
+        // Apply new highlighting
         for (var i = 0; i < this.keywords.length; i++) {
             html = html.replace(this.keywords[i].code, this.keywords[i].tag);
         }
-        YAHOO.log("AFTER HIGHLIGHT:" + html);
+
+        // Replace cursor
         if ( !this.browser.gecko ) {
             html = html.replace(this.cc, '<span id="cur">|</span>');
         }

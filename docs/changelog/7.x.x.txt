@@ -1,6 +1,7 @@
 7.7.33
  - fixed #11394: Map points does not show all the data that was entered
  - fixed #11400: Active Sessions Deletion
+ - fixed #11285: Pasting HTML into Code Editor in IE
 
 7.7.32
  - fixed #11349: Code editor returns newline for blank content
