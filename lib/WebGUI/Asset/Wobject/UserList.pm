@@ -21,7 +21,126 @@ use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Form::Image;
 use WebGUI::Form::File;
-use base 'WebGUI::Asset::Wobject';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+
+aspect assetName => ['assetName', 'Asset_UserList'];
+aspect icon      => 'userlist.gif';
+aspect tableName => 'UserList';
+property templateId => (
+            fieldType   => "template",  
+            default     => 'UserListTmpl0000000001',
+		    namespace   => 'UserList',
+    		tab         => "display",
+            hoverHelp   => ["template description",'Asset_UserList'],
+            label       => ["template label",'Asset_UserList'],
+	    );
+
+property showGroupId => (
+		   	fieldType   => "group",  
+            default     => "7",
+		    label       => ["Group to show label",'Asset_UserList'],
+            hoverHelp   => ['Group to show description','Asset_UserList'],
+    		tab         => "display",
+		);
+property hideGroupId => (
+	    	fieldType   => "group",  
+            default     => "3",
+		   	label       => ["Group to hide label",'Asset_UserList'],
+		    hoverHelp   => ['Group to hide description','Asset_UserList'],
+            tab         => "display",
+		);
+property usersPerPage => (
+    		fieldType   => "integer",  
+            default     => "25",
+	    	tab         => "display",
+		   	hoverHelp   => ['Users per page description','Asset_UserList'],
+            label       => ["Users per page label",'Asset_UserList'],
+		);
+property alphabet => (
+            fieldType   => "text",
+            default     => "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z",
+            tab         => "display",
+            label       => ["alphabet label",'Asset_UserList'],
+            hoverHelp   => ['alphabet description','Asset_UserList'],
+        );
+property alphabetSearchField => (
+            fieldType   => "selectBox",
+            default     => "lastName",
+            tab         => "display",
+            options     => \&_alphabetSearchField_options,
+            label       => ["alphabetSearchField label",'Asset_UserList'],
+            hoverHelp   => ['alphabetSearchField description','Asset_UserList'],
+        );
+sub _alphabetSearchField_options {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_UserList');
+    my $profileFields = $self->_get_profile_fields();
+    my %alphabetSearchFieldOptions;
+    tie %alphabetSearchFieldOptions, 'Tie::IxHash';
+    %alphabetSearchFieldOptions = ('disableAlphabetSearch'=>'Disable Alphabet Search',%{ $profileFields } );
+    return \%alphabetSearchFieldOptions;
+}
+sub _get_profile_fields {
+    my $self    = shift;
+    my $session = $self->session;
+    my %profileFields;
+    tie %profileFields, 'Tie::IxHash';
+    my $fields = $session->db->read("SELECT field.fieldName, field.label FROM userProfileField as field "
+        ."left join userProfileCategory as cat USING(profileCategoryId) ORDER BY cat.sequenceNumber, field.sequenceNumber");
+    while (my $field = $fields->hashRef){
+        my $label = WebGUI::Operation::Shared::secureEval($session,$field->{label});
+        $profileFields{$field->{fieldName}} = $label;
+    }
+    return \%profileFields;
+}
+property showOnlyVisibleAsNamed => (
+            fieldType   => "yesNo",
+            default     => "0",
+            tab         => "display",
+            label       => ["showOnlyVisibleAsNamed label",'Asset_UserList'],
+            hoverHelp   => ['showOnlyVisibleAsNamed description','Asset_UserList'],
+        );
+property sortOrder => (
+            fieldType   => "selectBox",
+            default     => 'asc',
+            tab         => 'display',
+            options     => \&_sortOrder_options,
+            label       => ['sort order','Asset_UserList'],
+            hoverHelp   => ['sort order description','Asset_UserList'],
+        );
+sub _sortOrder_options {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_UserList');
+    my %options = ( asc => $i18n->get('ascending'),
+                   desc => $i18n->get('descending') );
+    return \%options;
+
+}
+property sortBy => (
+            fieldType   => "selectBox",
+            default     => 'lastName',
+            tab         => 'display',
+            options     => \&_get_profile_fields,
+            label       => ['sort by','Asset_UserList'],
+            hoverHelp   => ['sort by description','Asset_UserList'],
+        );
+property overridePublicEmail => (
+            fieldType   => "yesNo",
+            default     => "0",
+            tab         => "display",
+            label       => ["overridePublicEmail label",'Asset_UserList'],
+            hoverHelp   => ['overridePublicEmail description','Asset_UserList'],
+        );
+property overridePublicProfile => (
+            fieldType   => "yesNo",
+            default     => "0",
+            tab         => "display",
+            label       => ["overridePublicProfile label",'Asset_UserList'],
+            hoverHelp   => ['overridePublicProfile description','Asset_UserList'],
+        );
 
 =head1 NAME
 
@@ -63,9 +182,9 @@ sub getAlphabetSearchLoop {
         my $hasResults;
         my $users = $self->session->db->read("select userId from userProfileData where `$fieldName` like '".$letter."%'"); 
         while (my $user = $users->hashRef){
-            my $showGroupId = $self->get("showGroupId");
+            my $showGroupId = $self->showGroupId;
             if ($showGroupId eq '0' || ($showGroupId && $self->isInGroup($showGroupId,$user->{userId}))){
-                unless ($self->get("hideGroupId") ne '0' && $self->isInGroup($self->get("hideGroupId"),$user->{userId})){
+                unless ($self->hideGroupId ne '0' && $self->isInGroup($self->hideGroupId,$user->{userId})){
                     $hasResults = 1;
                     last;
                 }
@@ -124,7 +243,7 @@ sub getFormElement {
     if ($data->{possibleValues}){
         my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
         unless (ref $values eq 'HASH') {
-            if ($self->get('possibleValues') =~ /\S/) {
+            if ($self->possibleValues =~ /\S/) {
                 $self->session->errorHandler->warn("Could not get a hash out of possible values for profile field "
                 .$self->getId);
             }
@@ -145,135 +264,6 @@ sub getFormElement {
 [$self->session, \%param ])};
     return $formElement->toHtml();
 
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( properties )
-
-Defines wobject properties for UserList instances.
-
-=head3 properties
-
-A hash reference containing the properties of this wobject.
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my %properties;
-    my $i18n = WebGUI::International->new($session, 'Asset_UserList');
-
-    my %profileFields;
-    tie %profileFields, 'Tie::IxHash';
-    my $fields = $session->db->read("SELECT field.fieldName, field.label FROM userProfileField as field "
-        ."left join userProfileCategory as cat USING(profileCategoryId) ORDER BY cat.sequenceNumber, field.sequenceNumber");
-    while (my $field = $fields->hashRef){
-        my $label = WebGUI::Operation::Shared::secureEval($session,$field->{label});
-        $profileFields{$field->{fieldName}} = $label;
-    }
-    my %alphabetSearchFieldOptions;
-    tie %alphabetSearchFieldOptions, 'Tie::IxHash';
-    %alphabetSearchFieldOptions = ('disableAlphabetSearch'=>'Disable Alphabet Search',%profileFields);
-
-    tie %properties, 'Tie::IxHash';
-    %properties = (
-       	templateId =>{
-            fieldType=>"template",  
-            defaultValue=>'UserListTmpl0000000001',
-		    namespace=>'UserList',
-    		tab=>"display",
-            hoverHelp=>$i18n->get("template description"),
-            label=>$i18n->get("template label"),
-	    },
-
-        showGroupId=>{
-		   	fieldType=>"group",  
-            defaultValue=>"7",
-		    label=>$i18n->get("Group to show label"),
-            hoverHelp=>$i18n->get('Group to show description'),
-    		tab=>"display",
-		},
-        hideGroupId=>{
-	    	fieldType=>"group",  
-            defaultValue=>"3",
-		   	label=>$i18n->get("Group to hide label"),
-		    hoverHelp=>$i18n->get('Group to hide description'),
-            tab=>"display",
-		},
-	    usersPerPage=>{
-    		fieldType=>"integer",  
-            defaultValue=>"25",
-	    	tab=>"display",
-		   	hoverHelp=>$i18n->get('Users per page description'),
-            label=>$i18n->get("Users per page label"),
-		},
-        alphabet=>{
-            fieldType=>"text",
-            defaultValue=>"a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z",
-            tab=>"display",
-            label=>$i18n->get("alphabet label"),
-            hoverHelp=>$i18n->get('alphabet description'),
-        },
-        alphabetSearchField=>{
-            fieldType=>"selectBox",
-            defaultValue=>"lastName",
-            tab=>"display",
-            options=>\%alphabetSearchFieldOptions,
-            label=>$i18n->get("alphabetSearchField label"),
-            hoverHelp=>$i18n->get('alphabetSearchField description'),
-        },
-        showOnlyVisibleAsNamed=>{
-            fieldType=>"yesNo",
-            defaultValue=>"0",
-            tab=>"display",
-            label=>$i18n->get("showOnlyVisibleAsNamed label"),
-            hoverHelp=>$i18n->get('showOnlyVisibleAsNamed description'),
-        },
-        sortOrder =>{
-            fieldType=>"selectBox",
-            defaultValue=>'asc',
-            tab=>'display',
-            options=>{ asc => $i18n->get('ascending'),
-                       desc => $i18n->get('descending') },
-            label=>$i18n->get('sort order'),
-            hoverHelp=>$i18n->get('sort order description'),
-        },
-        sortBy =>{
-            fieldType=>"selectBox",
-            defaultValue=>'lastName',
-            tab=>'display',
-            options=>\%profileFields,
-            label=>$i18n->get('sort by'),
-            hoverHelp=>$i18n->get('sort by description'),
-        },
-        overridePublicEmail=>{
-            fieldType=>"yesNo",
-            defaultValue=>"0",
-            tab=>"display",
-            label=>$i18n->get("overridePublicEmail label"),
-            hoverHelp=>$i18n->get('overridePublicEmail description'),
-        },
-        overridePublicProfile=>{
-            fieldType=>"yesNo",
-            defaultValue=>"0",
-            tab=>"display",
-            label=>$i18n->get("overridePublicProfile label"),
-            hoverHelp=>$i18n->get('overridePublicProfile description'),
-        },
-    );
-	
-	push(@{$definition}, {                
-		assetName=>$i18n->get('assetName'),                
-		icon=>'userlist.gif', 
-		autoGenerateForms=>1,                
-		tableName=>'UserList',
-		className=>'WebGUI::Asset::Wobject::UserList',
-		properties=>\%properties                
-	});
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -332,7 +322,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $templateId = $self->get("templateId");
+    my $templateId = $self->templateId;
     if ($self->session->form->process("overrideTemplateId") ne "") {
         $templateId = $self->session->form->process("overrideTemplateId");
     }
@@ -404,7 +394,7 @@ sub view {
                 "profileField_sortByURL"=>$sortByURL,
             });
         }
-        unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
+        unless($self->showOnlyVisibleAsNamed && $profileField->{visible} != 1){
             $var{'profileField_'.$fieldName.'_label'} = $label;
             $var{'profileField_'.$fieldName.'_sortByURL'} = $sortByURL;
         }
@@ -505,8 +495,8 @@ sub view {
     }
 	$sql .= " and ".$constraint if ($constraint);
 
-	my $sortBy = $form->process('sortBy') || $self->get('sortBy') || 'users.username';
-	my $sortOrder = $form->process('sortOrder') || $self->get('sortOrder') || 'asc';
+	my $sortBy = $form->process('sortBy') || $self->sortBy || 'users.username';
+	my $sortOrder = $form->process('sortOrder') || $self->sortOrder || 'asc';
 	
     my @sortByUserProperties = ('dateCreated', 'lastUpdated', 'karma', 'userId');
     if(isIn($sortBy,@sortByUserProperties)){
@@ -526,14 +516,14 @@ sub view {
         }
     }
 
-	my $p = WebGUI::Paginator->new($self->session,$currentUrl,$self->getValue("usersPerPage"), undef, $paginatePage);
+	my $p = WebGUI::Paginator->new($self->session,$currentUrl,$self->usersPerPage, undef, $paginatePage);
 
 	$sth = $self->session->db->read($sql);
 	my @visibleUsers;
 	while (my $user = $sth->hashRef){
-		my $showGroupId = $self->get("showGroupId");
+		my $showGroupId = $self->showGroupId;
 		if ($showGroupId eq '0' || ($showGroupId && $self->isInGroup($showGroupId,$user->{userId}))){
-			unless ($self->get("hideGroupId") ne '0' && $self->isInGroup($self->get("hideGroupId"),$user->{userId})){
+			unless ($self->hideGroupId ne '0' && $self->isInGroup($self->hideGroupId,$user->{userId})){
 				push(@visibleUsers,$user);
 			}
 		}
@@ -542,7 +532,7 @@ sub view {
 	my $users = $p->getPageData($paginatePage);
 	foreach my $user (@$users){
         my $userObject = WebGUI::User->new($self->session,$user->{userId});
-	    if ($self->get('overridePublicProfile') || $userObject->profileIsViewable()) {
+	    if ($self->overridePublicProfile || $userObject->profileIsViewable()) {
 		    my (@profileFieldValues);
 			my %userProperties;
 			foreach my $profileField (@profileFields){
@@ -571,7 +561,7 @@ sub view {
                     if($profileField->{visible}){
     					push (@profileFieldValues, \%profileFieldValues);
                     }
-                    unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
+                    unless($self->showOnlyVisibleAsNamed && $profileField->{visible} != 1){
                         $userProperties{'user_profile_'.$profileFieldName.'_value'} = $value;
                     }
 				}
@@ -600,7 +590,7 @@ sub view {
 
 	$var{profileField_loop}     = \@profileField_loop;
 	$var{user_loop}             = \@users;
-    $var{alphabetSearch_loop}   = $self->getAlphabetSearchLoop($self->get("alphabetSearchField"),$self->get("alphabet"));
+    $var{alphabetSearch_loop}   = $self->getAlphabetSearchLoop($self->alphabetSearchField,$self->alphabet);
 
 	$var{searchFormHeader}      = WebGUI::Form::formHeader($self->session,{action => $self->getUrl});
     $var{searchFormSubmit}      = WebGUI::Form::submit($self->session,{value => $i18n->get('submit search label')});
@@ -623,7 +613,7 @@ sub view {
     });
         
 
-	my $out = $self->processTemplate(\%var,$self->get("templateId"));
+	my $out = $self->processTemplate(\%var,$self->templateId);
 	return $out;
 }
 
