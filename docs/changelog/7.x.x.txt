@@ -11,6 +11,7 @@
  - fixed #11336: Duplicate Version Tag Created.
  - fixed #11398: Recent post information keeps disappearing from my forums
  - fixed #11394: Map points does not show all the data that was entered
+ - fixed #11400: Active Sessions Deletion
 
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin
