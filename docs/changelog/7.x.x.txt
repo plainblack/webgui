@@ -1,4 +1,5 @@
 7.8.12
+ - fixed #11285: Pasting HTML into Code Editor in IE
  - fixed #11349: Code editor returns newline for blank content
  - fixed #11322: Code editor broken
  - fixed #11390: Meta description duplicated in asset Folder
