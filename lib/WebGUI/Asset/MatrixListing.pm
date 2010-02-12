@@ -16,10 +16,107 @@ package WebGUI::Asset::MatrixListing;
 
 use strict;
 use Tie::IxHash;
-use Class::C3;
-use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
-use WebGUI::Utility;
+#use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+aspect assetName => ['assetName', 'Asset_MatrixListing'],
+aspect tableName => 'MatrixListing',
+property screenshots => (
+            tab             => "properties",
+            fieldType       => "image",
+            default         => undef,
+            maxAttachments  => 20,
+            label           => ["screenshots label", 'Asset_MatrixListing'],
+            hoverHelp       => ["screenshots description", 'Asset_MatrixListing'],
+         );
+property description => (
+            tab             => "properties",
+            fieldType       => "HTMLArea",
+            default         => undef,
+            label           => ["description label", 'Asset_MatrixListing'],
+            hoverHelp       => ["description description", 'Asset_MatrixListing'],
+         );
+property version => (
+            tab             => "properties",
+            fieldType       => "text",
+            default         => undef,
+            label           => ["version label", 'Asset_MatrixListing'],
+            hoverHelp       => ["version description", 'Asset_MatrixListing'],
+         );
+property score => (
+            fieldType       => 'integer',
+            default         => 0,
+            noFormPost      => 1,
+         );
+property views => (
+            fieldType       => 'integer',
+            default         => 0,
+            noFormPost      => 1,
+         );
+property compares => (
+            fieldType       => 'integer',
+            default         => 0,
+            noFormPost      => 1,
+         );
+property clicks => (
+            fieldType       => 'integer',
+            default         => 0,
+            noFormPost      => 1,
+         );
+property viewsLastIp => (
+            fieldType       => 'text',
+            default         => undef,
+            noFormPost      => 1,
+         );
+property comparesLastIp => (
+            fieldType       => 'text',
+            default         => undef,
+            noFormPost      => 1,
+         );
+property clicksLastIp => (
+            fieldType       => 'text',
+            default         => undef,
+            noFormPost      => 1,
+         );
+property maintainer => (
+            tab             => "properties",
+            fieldType       => "user",
+            builder         => '_maintainer_default',
+            lazy            => 1,
+            label           => ["maintainer label", 'Asset_MatrixListing'],
+            hoverHelp       => ["maintainer description", 'Asset_MatrixListing'],
+         );
+sub _maintainer_default {
+    return shift->session->user->userId;
+}
+property manufacturerName => (
+            tab             => "properties",
+            fieldType       => "text",
+            default         => undef,
+            label           => ["manufacturerName label", 'Asset_MatrixListing'],
+            hoverHelp       => ["manufacturerName description", 'Asset_MatrixListing']
+         );
+property manufacturerURL => (
+            tab             => "properties",
+            fieldType       => "url",
+            default         => undef,
+            label           => ["manufacturerURL label", 'Asset_MatrixListing'],
+            hoverHelp       => ["manufacturerURL description", 'Asset_MatrixListing']
+         );
+property productURL => (
+            tab             => "properties",
+            fieldType       => "url",
+            default         => undef,
+            label           => ["productURL label", 'Asset_MatrixListing'],
+            hoverHelp       => ["productURL description", 'Asset_MatrixListing']
+         );
+property lastUpdated => (
+            default         => sub { time() },
+            noFormPost      => 1,
+            fieldType       => 'hidden',
+         );
 
+use WebGUI::Utility;
 
 
 =head1 NAME
@@ -117,100 +214,8 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	my $i18n = WebGUI::International->new($session, "Asset_MatrixListing");
 	%properties = (
-        screenshots => {
-            tab             =>"properties",
-            fieldType       =>"image",
-            defaultValue    =>undef,
-            maxAttachments  =>20,
-            label           =>$i18n->get("screenshots label"),
-            hoverHelp       =>$i18n->get("screenshots description")
-            },
-        description => {
-            tab             =>"properties",
-            fieldType       =>"HTMLArea",
-            defaultValue    =>undef,
-            label           =>$i18n->get("description label"),
-            hoverHelp       =>$i18n->get("description description")
-            },
-        version => {
-            tab             =>"properties",
-            fieldType       =>"text",
-            defaultValue    =>undef,
-            label           =>$i18n->get("version label"),
-            hoverHelp       =>$i18n->get("version description")
-            },
-        score => {
-            defaultValue    =>0,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        views => {
-            defaultValue    =>0,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        compares => {
-            defaultValue    =>0,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        clicks => {
-            defaultValue    =>0,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        viewsLastIp => {
-            defaultValue    =>undef,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        comparesLastIp => {
-            defaultValue    =>undef,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        clicksLastIp => {
-            defaultValue    =>undef,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        maintainer => {
-            tab             =>"properties",
-            fieldType       =>"user",
-            defaultValue    =>$session->user->userId,
-            label           =>$i18n->get("maintainer label"),
-            hoverHelp       =>$i18n->get("maintainer description")
-            },
-        manufacturerName => {
-            tab             =>"properties",
-            fieldType       =>"text",
-            defaultValue    =>undef,
-            label           =>$i18n->get("manufacturerName label"),
-            hoverHelp       =>$i18n->get("manufacturerName description")
-            },
-        manufacturerURL => {
-            tab             =>"properties",
-            fieldType       =>"url",
-            defaultValue    =>undef,
-            label           =>$i18n->get("manufacturerURL label"),
-            hoverHelp       =>$i18n->get("manufacturerURL description")
-            },
-        productURL => {
-            tab             =>"properties",
-            fieldType       =>"url",
-            defaultValue    =>undef,
-            label           =>$i18n->get("productURL label"),
-            hoverHelp       =>$i18n->get("productURL description")
-            },
-        lastUpdated => {
-            defaultValue    =>time(),
-            fieldType       =>'hidden',
-            },
 	);
 	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		autoGenerateForms=>1,
-		tableName=>'MatrixListing',
 		className=>'WebGUI::Asset::MatrixListing',
 		properties=>\%properties
 	});
