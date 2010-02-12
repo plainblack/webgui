@@ -3587,7 +3587,13 @@ LongTruncOk=1</p>
 	'webgui' => {
 		message => q|WebGUI|,
 		lastUpdated => 1141963573,
-		context => q|Test key for International macro test.  DO NOT TRANSLATE|,
+		context => q|Test key for International macro test.  DO NOT TRANSLATE OR DELETE|,
+	},
+
+	'webgui help %s' => {
+		message => q|webgui help %s|,
+		lastUpdated => 1266003122,
+		context => q|Test key for Definition::Role::Object.  DO NOT TRANSLATE OR DELETE|,
 	},
 
 	'pages' => {

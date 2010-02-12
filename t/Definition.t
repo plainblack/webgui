@@ -105,6 +105,7 @@ my $called_getProperties;
     aspect 'aspect1' => 'aspect1 value';
     property  'property1' => (
         label     => ['webgui', 'WebGUI'],
+        hoverHelp => ['webgui help %s', 'WebGUI', 'extra'],
         options   => \&property1_options,
         named_url => \&named_url,
     );
@@ -130,6 +131,7 @@ my $called_getProperties;
         $object->getFormProperties('property1'),
         {
             label     => 'WebGUI',
+            hoverHelp => 'webgui help extra',
             options   => { one => 1, two => 2, three => 3 },
             named_url => 'property1',
         },

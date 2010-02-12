@@ -126,6 +126,20 @@ calling subroutines for values.
 Each subroutine is invoked as a method of the object, and is passed the entire set of
 form properties and the name of the property.
 
+i18n is allowed in the label, subtext and hoverHelp options, and is specified by passing
+an array reference.
+
+    label => [ 'key', 'namespace' ],
+
+If the array reference has more than two elements, getFormProperties will pass the retrieved
+i18n key to sprintf, with the extra elements as arguments.
+
+    label => [ 'key', 'namespace', 'extra' ],
+
+becomes
+
+    label => sprintf($i18n->get('label', 'namespace'), 'extra'),
+
 =head3 $name
 
 The name of the property to return.
@@ -139,7 +153,12 @@ sub getFormProperties {
     PROPERTY: while (my ($property_name, $property_value) = each %{ $form }) {
         next PROPERTY unless ref $property_value;
         if (($property_name eq 'label' || $property_name eq 'hoverHelp' || $property_name eq 'subtext') and ref $property_value eq 'ARRAY') {
-            $form->{$property_name} = WebGUI::International->new($self->session)->get(@{$property_value});
+            my ($label, $namespace, @arguments) = @{ $property_value };
+            my $text = WebGUI::International->new($self->session)->get($label, $namespace);
+            if (@arguments) {
+                $text = sprintf $text, @arguments;
+            }
+            $form->{$property_name} =  $text;
         }
         elsif (ref $property_value eq 'CODE') {
             $form->{$property_name} = $self->$property_value($property, $property_name);
