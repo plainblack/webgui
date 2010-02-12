@@ -6,9 +6,64 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use WebGUI::Asset::Wobject;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect tableName => 'InOutBoard';
+aspect assetName => ['assetName', 'Asset_MapPoint'];
+aspect icon      => 'iob.gif';
+property statusList => (
+                tab          => 'properties',
+                fieldType    => "textarea",
+                builder      => '_statusList_builder',
+                lazy         => 1,
+                label        => [1, 'Asset_InOutBoard'],
+                hoverHelp    => ['1 description', 'Asset_InOutBoard'],
+                subtext      => [2, 'Asset_InOutBoard'],
+         );
+sub _statusList_builder {
+    my $self = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_InOutBoard');
+    return $i18n->get(10)."\n".$i18n->get(11)."\n";
+}
+property reportViewerGroup => (
+                tab          => 'security',
+                default      => 3,
+                fieldType    => "group",
+                label        => [3, 'Asset_InOutBoard'],
+                hoverHelp    => ["3 description", 'Asset_InOutBoard'],
+         );
+property inOutGroup => (
+                tab          => 'security',
+                default      => 2,
+                fieldType    => "group",
+                label        => ['inOutGroup', 'Asset_InOutBoard'],
+                hoverHelp    => ['inOutGroup description', 'Asset_InOutBoard'],
+         );
+property inOutTemplateId => (
+                tab          => 'display',
+                fieldType    => "template",
+                namespace    => "InOutBoard",
+                label        => ["In Out Template", 'Asset_InOutBoard'],
+                hoverHelp    => ["In Out Template description", 'Asset_InOutBoard'],
+                default      => 'IOB0000000000000000001',
+         );
+property reportTemplateId => (
+                tab          => 'display',
+                fieldType    => "template",
+                default      => 'IOB0000000000000000002',
+                label        => [13, 'Asset_InOutBoard'],
+                hoverHelp    => ["13 description", 'Asset_InOutBoard'],
+                namespace    => "InOutBoard/Report"
+         );
+property paginateAfter => (
+                tab          => 'display',
+                fieldType    => "integer",
+                default      => 50,
+                label        => [12, 'Asset_InOutBoard'],
+                hoverHelp    => ['12 description', 'Asset_InOutBoard'],
+         );
 
 #See line 285 if you wish to change the users visible in the delegate select list
 
@@ -57,57 +112,8 @@ sub definition {
     my $definition = shift;
     my $i18n = WebGUI::International->new($session,"Asset_InOutBoard");
     push(@{$definition}, {
-        tableName => 'InOutBoard',
-        className => 'WebGUI::Asset::Wobject::InOutBoard',
-        assetName => $i18n->get('assetName'),
-        icon      => 'iob.gif',
         autoGenerateForms => 1,
         properties   => {
-            statusList => {
-                tab          => 'properties',
-                defaultValue => $i18n->get(10)."\n".$i18n->get(11)."\n",
-                fieldType    => "textarea",
-                label        => $i18n->get(1),
-                hoverHelp    => $i18n->get('1 description'),
-                subtext      => $i18n->get(2),
-            },
-            reportViewerGroup => {
-                tab          => 'security',
-                defaultValue => 3,
-                fieldType    => "group",
-                label        => $i18n->get(3),
-                hoverHelp    => $i18n->get("3 description"),
-            },
-            inOutGroup => {
-                tab          => 'security',
-                defaultValue => 2,
-                fieldType    => "group",
-                label        => $i18n->get('inOutGroup'),
-                hoverHelp    => $i18n->get('inOutGroup description'),
-            },
-            inOutTemplateId => {
-                tab          => 'display',
-                fieldType    => "template",
-                namespace    => "InOutBoard",
-                label        => $i18n->get("In Out Template"),
-                hoverHelp    => $i18n->get("In Out Template description"),
-                defaultValue => 'IOB0000000000000000001',
-            },
-            reportTemplateId => {
-                tab          => 'display',
-                fieldType    => "template",
-                defaultValue => 'IOB0000000000000000002',
-                label        => $i18n->get(13),
-                hoverHelp    => $i18n->get("13 description"),
-                namespace    => "InOutBoard/Report"
-            },
-            paginateAfter => {
-                tab          => 'display',
-                fieldType    => "integer",
-                defaultValue => 50,
-                label        => $i18n->get(12),
-                hoverHelp    => $i18n->get('12 description'),
-            },
         }
     });
     return $class->SUPER::definition($session, $definition);
@@ -124,11 +130,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->getValue("inOutTemplateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->inOutTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->getValue("inOutTemplateId"),
+            templateId => $self->inOutTemplateId,
             assetId    => $self->getId,
         );
     }
@@ -170,7 +176,7 @@ sub view {
 	my $url = $self->getUrl('func=view');
 	
 	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
-	if ($session->user->isInGroup($self->getValue("reportViewerGroup"))) {
+	if ($session->user->isInGroup($self->reportViewerGroup)) {
         $var{'viewReportURL'}   = $self->getUrl("func=viewReport");
         $var{'viewReportLabel'} = $i18n->get('view report label');
         $var{canViewReport}     = 1;
@@ -180,7 +186,7 @@ sub view {
     }
 	
 	my $statusUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
-	my $statusListString = $self->getValue("statusList");
+	my $statusListString = $self->statusList;
 	my @statusListArray = split("\n",$statusListString);
 	my $statusListHashRef;
 	tie %$statusListHashRef, 'Tie::IxHash';
@@ -240,7 +246,7 @@ sub view {
 	
 	my ($isInGroup) = $session->db->quickArray(
         "select count(*) from groupings where userId=? and groupId=?",
-        [ $session->user->userId, $self->get("inOutGroup") ]
+        [ $session->user->userId, $self->inOutGroup ]
     );
 	if ($isInGroup) {
 	    $var{displayForm} = 1;
@@ -254,7 +260,7 @@ sub view {
 	
 	my $lastDepartment = "_nothing_";
 	
-	my $p = WebGUI::Paginator->new($session, $url, $self->getValue("paginateAfter"));
+	my $p = WebGUI::Paginator->new($session, $url, $self->paginateAfter);
 	
 	my $sql = "select users.username, 
 users.userId, 
@@ -274,7 +280,7 @@ where users.userId<>'1' and InOutBoard.inOutGroup=?
 group by userId
 order by department, lastName, firstName";
 
-	$p->setDataByQuery($sql, undef, 0, [ $self->getId, $self->get('inOutGroup') ], );
+	$p->setDataByQuery($sql, undef, 0, [ $self->getId, $self->inOutGroup ], );
 	my $rowdata = $p->getPageData();
 	my @rows;
 	foreach my $data (@$rowdata) {
@@ -335,7 +341,7 @@ sub www_selectDelegates {
 			and users.userId <> ?
 			and InOutBoard.inOutGroup=?
 		group by userId
-		",[$self->getId, $self->session->user->userId, $self->getValue("inOutGroup")]);
+		",[$self->getId, $self->session->user->userId, $self->inOutGroup]);
 	while (my $data = $sth->hashRef) {
 		$userNames{ $data->{userId} } = _defineUsername($data);
 	}
@@ -439,7 +445,7 @@ the report.
 
 sub www_viewReport {
 	my $self = shift;
-	return "" unless ($self->session->user->isInGroup($self->getValue("reportViewerGroup")));
+	return "" unless ($self->session->user->isInGroup($self->reportViewerGroup));
 	my %var;
 	my $i18n = WebGUI::International->new($self->session,'Asset_InOutBoard');
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -method=>"GET");
@@ -522,7 +528,7 @@ left join groupings on groupings.userId=users.userId
 left join userProfileData on users.userId=userProfileData.userId
 left join InOutBoard_statusLog on users.userId=InOutBoard_statusLog.userId and InOutBoard_statusLog.assetId=".$self->session->db->quote($self->getId())."
 where users.userId<>'1' and 
- groupings.groupId=".$self->session->db->quote($self->getValue("inOutGroup"))." and 
+ groupings.groupId=".$self->session->db->quote($self->inOutGroup)." and 
  groupings.userId=users.userId and 
  InOutBoard_statusLog.dateStamp>=$startDate and 
  InOutBoard_statusLog.dateStamp<=$endDate
@@ -569,7 +575,7 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
         $var{showReport} = 0;
     }
 	
-	return $self->processStyle($self->processTemplate(\%var, $self->getValue("reportTemplateId")));
+	return $self->processStyle($self->processTemplate(\%var, $self->reportTemplateId));
 }
 
 1;
