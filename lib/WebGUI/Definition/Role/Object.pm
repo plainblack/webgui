@@ -138,7 +138,7 @@ sub getFormProperties {
     my $form     = $property->form;
     PROPERTY: while (my ($property_name, $property_value) = each %{ $form }) {
         next PROPERTY unless ref $property_value;
-        if (($property_name eq 'label' || $property_name eq 'hoverHelp') and ref $property_value eq 'ARRAY') {
+        if (($property_name eq 'label' || $property_name eq 'hoverHelp' || $property_name eq 'subtext') and ref $property_value eq 'ARRAY') {
             $form->{$property_name} = WebGUI::International->new($self->session)->get(@{$property_value});
         }
         elsif (ref $property_value eq 'CODE') {
