@@ -89,55 +89,6 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( class, definition )
-
-This method defines all properties of a Search and is used to autogenerate most methods.
-
-=head3 class
-
-$class is used to make sure that inheritance works on Assets and Wobjects.
-
-=head3 definition
-
-Definition hashref from subclasses.
-
-=head3 Search specific properties
-
-These properties are added just for this asset.
-
-=head4 templateId
-
-ID of a tempate from the Search namespace to display the search results.
-
-=head4 searchRoot
-
-An asset id of the point at which a search should start.
-
-=head4 classLimiter
-
-An array reference of asset classnames that are valid for the search.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_Search');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
- 		);
-
-	push(@{$definition}, {
-		className=>'WebGUI::Asset::Wobject::Search',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
