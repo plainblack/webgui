@@ -13,6 +13,7 @@
  - fixed #11398: Recent post information keeps disappearing from my forums
  - fixed #11394: Map points does not show all the data that was entered
  - fixed #11400: Active Sessions Deletion
+ - fixed #11399: m4a missin
 
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin

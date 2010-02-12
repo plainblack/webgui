@@ -48,6 +48,7 @@ var fileIcons;
         "log"       : extras + "fileIcons/log.gif",
         "lyx"       : extras + "fileIcons/lyx.gif",
         "m3u"       : extras + "fileIcons/m3u.gif",
+        "m4a"       : extras + "fileIcons/m4a.gif",
         "mdb"       : extras + "fileIcons/mdb.gif",
         "mif"       : extras + "fileIcons/mif.gif",
         "mov"       : extras + "fileIcons/mov.gif",
