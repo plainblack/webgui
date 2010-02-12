@@ -148,7 +148,7 @@ sub processPropertiesFromFormPost {
 	$self->SUPER::processPropertiesFromFormPost;
 	my $storage = $self->getStorageLocation();
 	
-	my $file = $self->get("filename");
+	my $file = $self->filename;
 	
 	#return undef unless $file;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_ZipArchive');
@@ -166,7 +166,7 @@ sub processPropertiesFromFormPost {
 		return undef;
 	}
 	
-	unless ($self->unzip($storage,$self->get("filename"))) {
+	unless ($self->unzip($storage,$self->filename)) {
 		$self->session->errorHandler->warn($i18n->get("unzip_error"));
 	}
 }
@@ -184,7 +184,7 @@ used to show the file to administrators.
 sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
 		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
@@ -196,19 +196,19 @@ sub view {
 	}
 	$self->session->scratch->delete("za_error");
 	my $storage = $self->getStorageLocation;
-	if($self->get("filename") ne "") {
-	   $var{fileUrl} = $storage->getUrl($self->get("showPage"));
-	   $var{fileIcon} = $storage->getFileIconUrl($self->get("showPage"));
+	if($self->filename ne "") {
+	   $var{fileUrl} = $storage->getUrl($self->showPage);
+	   $var{fileIcon} = $storage->getFileIconUrl($self->showPage);
 	}
-	unless($self->get("showPage")) {
+	unless($self->showPage) {
 	   $var{pageError} = "true";
 	}
 	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
 	$var{noInitialPage} = $i18n->get('noInitialPage');
 	$var{noFileSpecified} = $i18n->get('noFileSpecified');
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
 	}
        	return $out;
 }
@@ -246,7 +246,7 @@ sub www_view {
 	if ($self->session->var->isAdminOn) {
 		return $self->session->asset($self->getContainer)->www_view;
 	}
-	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
+	$self->session->http->setRedirect($self->getFileUrl($self->showPage));
 	return "1";
 }
 
