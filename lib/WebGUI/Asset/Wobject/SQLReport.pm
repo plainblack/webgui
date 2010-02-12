@@ -243,24 +243,6 @@ sub _downloadUserGroup_default {
 
 
 #-------------------------------------------------------------------
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,"Asset_SQLReport");
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-    );
-    push(@{$definition}, {
-        className=>'WebGUI::Asset::Wobject::SQLReport',
-		properties => \%properties,
-        autoGenerateForms => 0,
-    });
-    return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
 
 =head2 getContentLastModified ( )
 

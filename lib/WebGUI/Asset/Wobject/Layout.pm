@@ -79,32 +79,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,"Asset_Layout");
-    
-    push(@{$definition}, {
-        properties=>{
-        }
-    });
-    return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getEditForm ( )
 
 Extends the base method to  handle the optional mobileTemplateId and assetsToHide.

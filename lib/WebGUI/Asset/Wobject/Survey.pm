@@ -243,37 +243,6 @@ END_WARN
 
 #-------------------------------------------------------------------
 
-=head2 definition ( session, [definition] )
-
-Returns an array reference of definitions. Adds tableName, className, properties to array definition.
-
-=head3 definition
-
-An array of hashes to prepend to the list
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, 'Asset_Survey' );
-    my %properties;
-    tie %properties, 'Tie::IxHash'; ## no critic
-    %properties = (
-        # Properties Tab
-    );
-
-    push @{$definition}, {
-            className         => 'WebGUI::Asset::Wobject::Survey',
-            properties        => \%properties
-        };
-
-    return $class->SUPER::definition( $session, $definition );
-}
-
-#-------------------------------------------------------------------
-
 =head2 surveyJSON_update ( )
 
 Convenience method that delegates to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/update>

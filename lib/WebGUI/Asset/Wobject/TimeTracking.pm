@@ -69,29 +69,6 @@ use WebGUI::Asset::Wobject::ProjectManager;
 
 #-------------------------------------------------------------------
 
-=head2 definition 
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-	);
-	push(@{$definition}, {
-		className=>'WebGUI::Asset::Wobject::TimeTracking',
-		properties=>\%properties
-	 });
-     return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 prepareView 
 
 =cut

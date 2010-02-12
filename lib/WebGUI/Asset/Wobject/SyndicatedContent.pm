@@ -97,33 +97,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session,'Asset_SyndicatedContent');
-	%properties = (
-		);
-        push(@{$definition}, {
-                properties=>\%properties
-		});
-        return $class->next::method($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 generateFeed ()
 
 Combines all feeds into a single XML::FeedPP object.

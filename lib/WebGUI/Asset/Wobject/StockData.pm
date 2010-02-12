@@ -287,34 +287,6 @@ sub _trim {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( )
-
-defines wobject properties for Stock Data instances
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_StockData");
-
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-
-	);
-
-	push(@{$definition}, {
-		autoGenerateForms=>1,
-		properties=>\%properties
-	});
-
-        return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
