@@ -145,35 +145,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( session, definition )
-
-defines asset properties for New Asset instances.  You absolutely need 
-this method in your new Assets. 
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, "Asset_MapPoint" );
-    tie my %properties, 'Tie::IxHash', (
-    );
-    push @{$definition}, {
-        className         => 'WebGUI::Asset::MapPoint',
-        properties        => \%properties,
-        };
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
-
-#-------------------------------------------------------------------
-
 =head2 canEdit ( [userId] )
 
 Returns true if the user can edit this MapPoint. Only the owner or the
