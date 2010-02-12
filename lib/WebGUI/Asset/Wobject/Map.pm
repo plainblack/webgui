@@ -17,121 +17,104 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
 use HTML::Entities qw(encode_entities);
-use base 'WebGUI::Asset::Wobject';
-
-# To get an installer for your wobject, add the Installable AssetAspect
-# See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
-# details
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-Define asset properties
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, 'Asset_Map' );
-
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName         => ['assetName', 'Asset_Map'];
+aspect icon              => 'maps.png';
+aspect tableName         => 'Map';
+property groupIdAddPoint => (
+            tab         => "security",
+            fieldType   => "group",
+            label       => ["groupIdAddPoint label", 'Asset_Map'],
+            hoverHelp   => ["groupIdAddPoint description", 'Asset_Map'],
+            default     => '2', # Registered users
+         );
+property mapApiKey => (
+            tab         => "properties",
+            fieldType   => "text",
+            label       => ["mapApiKey label", 'Asset_Map'],
+            hoverHelp   => ["mapApiKey description", 'Asset_Map'],
+            builder     => '_mapApiKey_builder',
+            lazy        => 1,
+            subtext     => 
+         );
+sub _mapApiKey_builder {
+    my $self = shift;
+    return $self->getDefaultApiKey($self->session);
+}
+sub _mapApiKey_subtext {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Map');
     my $googleApiKeyUrl = 'http://code.google.com/apis/maps/signup.html';
     my $googleApiKeyLink
         = q{<a href="%s" onclick="window.open('%s'); return false;">%s</a>};
-    
-    tie my %properties, 'Tie::IxHash', (
-        groupIdAddPoint => {
-            tab         => "security",
-            fieldType   => "group",
-            label       => $i18n->get("groupIdAddPoint label"),
-            hoverHelp   => $i18n->get("groupIdAddPoint description"),
-            defaultValue=> '2', # Registered users
-        },
-        mapApiKey       => {
-            tab         => "properties",
-            fieldType   => "text",
-            label       => $i18n->get("mapApiKey label"),
-            hoverHelp   => $i18n->get("mapApiKey description"),
-            defaultValue=> $class->getDefaultApiKey($session),
-            subtext     => sprintf($googleApiKeyLink, ($googleApiKeyUrl)x2, $i18n->get('mapApiKey link') ),
-        },
-        mapHeight       => {
+    return sprintf($googleApiKeyLink, ($googleApiKeyUrl)x2, $i18n->get('mapApiKey link') );
+}
+property mapHeight => (
             tab         => "display",
             fieldType   => "text",
-            label       => $i18n->get("mapHeight label"),
-            hoverHelp   => $i18n->get("mapHeight description"),
-            defaultValue    => '400px',
-        },
-        mapWidth       => {
+            label       => ["mapHeight label", 'Asset_Map'],
+            hoverHelp   => ["mapHeight description", 'Asset_Map'],
+            default     => '400px',
+         );
+property mapWidth => (
             tab         => "display",
             fieldType   => "text",
-            label       => $i18n->get("mapWidth label"),
-            hoverHelp   => $i18n->get("mapWidth description"),
-            defaultValue    => '100%',
-        },
-        startLatitude   => {
+            label       => ["mapWidth label", 'Asset_Map'],
+            hoverHelp   => ["mapWidth description", 'Asset_Map'],
+            default     => '100%',
+         );
+property startLatitude => (
             tab         => "display",
             fieldType   => "float",
-            label       => $i18n->get("startLatitude label"),
-            hoverHelp   => $i18n->get("startLatitude description"),
-            defaultValue    => 43.074719,
-        },
-        startLongitude  => {
+            label       => ["startLatitude label", 'Asset_Map'],
+            hoverHelp   => ["startLatitude description", 'Asset_Map'],
+            default     => 43.074719,
+         );
+property startLongitude => (
             tab         => "display",
             fieldType   => "float",
-            label       => $i18n->get("startLongitude label"),
-            hoverHelp   => $i18n->get("startLongitude description"),
-            defaultValue    => -89.384251,
-        },
-        startZoom       => {
+            label       => ["startLongitude label", 'Asset_Map'],
+            hoverHelp   => ["startLongitude description", 'Asset_Map'],
+            default     => -89.384251,
+         );
+property startZoom => (
             tab         => "display",
             fieldType   => "intSlider",
             minimum     => 1,
             maximum     => 19,
-            label       => $i18n->get("startZoom label"),
-            hoverHelp   => $i18n->get("startZoom description"),
-        },
-        templateIdEditPoint => {
+            label       => ["startZoom label", 'Asset_Map'],
+            hoverHelp   => ["startZoom description", 'Asset_Map'],
+         );
+property templateIdEditPoint => (
             tab         => "display",
             fieldType   => "template",
             namespace   => "MapPoint/Edit",
-            label       => $i18n->get("templateIdEditPoint label"),
-            hoverHelp   => $i18n->get("templateIdEditPoint description"),
-        },
-        templateIdView  => {
+            label       => ["templateIdEditPoint label", 'Asset_Map'],
+            hoverHelp   => ["templateIdEditPoint description", 'Asset_Map'],
+         );
+property templateIdView => (
             tab         => "display",
             fieldType   => "template",
             namespace   => "Map/View",
-            label       => $i18n->get("templateIdView label"),
-            hoverHelp   => $i18n->get("templateIdView description"),
-        },
-        templateIdViewPoint => {
+            label       => ["templateIdView label", 'Asset_Map'],
+            hoverHelp   => ["templateIdView description", 'Asset_Map'],
+         );
+property templateIdViewPoint => (
             tab         => "display",
             fieldType   => "template",
             namespace   => "MapPoint/View",
-            label       => $i18n->get("templateIdViewPoint label"),
-            hoverHelp   => $i18n->get("templateIdViewPoint description"),
-        },
-        workflowIdPoint => {
+            label       => ["templateIdViewPoint label", 'Asset_Map'],
+            hoverHelp   => ["templateIdViewPoint description", 'Asset_Map'],
+         );
+property workflowIdPoint => (
             tab         => "security",
             fieldType   => "workflow",
-            label       => $i18n->get("workflowIdPoint label"),
-            hoverHelp   => $i18n->get("workflowIdPoint description"),
+            label       => ["workflowIdPoint label", 'Asset_Map'],
+            hoverHelp   => ["workflowIdPoint description", 'Asset_Map'],
             type        => 'WebGUI::VersionTag',
-        },
-    );
-    push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'maps.png',
-        autoGenerateForms => 1,
-        tableName         => 'Map',
-        className         => 'WebGUI::Asset::Wobject::Map',
-        properties        => \%properties
-        };
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
+         );
 
 #-------------------------------------------------------------------
 
@@ -150,7 +133,7 @@ sub canAddPoint {
                 : $self->session->user
                 ;
 
-    return $user->isInGroup( $self->get("groupIdAddPoint") );
+    return $user->isInGroup( $self->groupIdAddPoint );
 }
 
 #----------------------------------------------------------------------------
@@ -185,7 +168,7 @@ sub canEdit {
                         : $self->session->user
                         ;
         
-        return $user->isInGroup( $self->get("groupIdEdit") );
+        return $user->isInGroup( $self->groupIdEdit );
     }
 }
 
@@ -240,7 +223,7 @@ sub getEditPointTemplate {
     my $self    = shift;
     
     if ( !$self->{_editPointTemplate} ) {
-        my $templateId  = $self->get('templateIdEditPoint');
+        my $templateId  = $self->templateIdEditPoint;
         my $template
             = WebGUI::Asset::Template->new( $self->session, $templateId );
         $template->prepare;
@@ -263,7 +246,7 @@ sub getViewPointTemplate {
     my $self    = shift;
     
     if ( !$self->{_viewPointTemplate} ) {
-        my $templateId  = $self->get('templateIdViewPoint');
+        my $templateId  = $self->templateIdViewPoint;
         my $template
             = WebGUI::Asset::Template->new( $self->session, $templateId );
         $self->{_viewPointTemplate} = $template;
@@ -309,7 +292,7 @@ sub loadMapApiTags {
     my $style   = $self->session->style;
     my $url     = $self->session->url;
 
-    $style->setScript("http://www.google.com/jsapi?key=" . $self->get('mapApiKey'),{type=>"text/javascript"});
+    $style->setScript("http://www.google.com/jsapi?key=" . $self->mapApiKey,{type=>"text/javascript"});
     $style->setRawHeadTags(<<'ENDHTML');
 <script type="text/javascript">
     google.load("maps", "2", { "other_params" : "sensor=false" });
@@ -335,11 +318,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self    = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateIdView") );
+    my $template = WebGUI::Asset::Template->new( $self->session, $self->templateIdView );
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateIdView"),
+            templateId => $self->templateIdView,
             assetId    => $self->getId,
         );
     }
@@ -368,12 +351,12 @@ sub view {
     # Build the map container
     my $mapHtml = sprintf '<div id="map_%s" style="height: %s; width: %s"></div>', 
                     $self->getId,
-                    $self->get('mapHeight'),
-                    $self->get('mapWidth'),
+                    $self->mapHeight,
+                    $self->mapWidth,
                     ;
 
     # The script to load the map into the container
-    $mapHtml    .= sprintf <<'ENDHTML', $self->getId, $self->getUrl, $self->get('startLatitude'), $self->get('startLongitude'), $self->get('startZoom');
+    $mapHtml    .= sprintf <<'ENDHTML', $self->getId, $self->getUrl, $self->startLatitude, $self->startLongitude, $self->startZoom;
 <script type="text/javascript">
     google.setOnLoadCallback( function() {
         var mapId           = "%s";

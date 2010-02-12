@@ -16,12 +16,113 @@ package WebGUI::Asset::MapPoint;
 
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::Asset';
-use WebGUI::Utility;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+aspect assetName         => ['assetName', 'Asset_MapPoint'];
+aspect icon              => 'MapPoint.gif';
+aspect tableName         => 'MapPoint';
+property latitude => (
+            tab         => "properties",
+            fieldType   => "float",
+            label       => ["latitude label", 'Asset_MapPoint'],
+            hoverHelp   => ["latitude description", 'Asset_MapPoint'],
+         );
+property longitude => (
+            tab         => "properties",
+            fieldType   => "float",
+            label       => ["longitude label", 'Asset_MapPoint'],
+            hoverHelp   => ["longitude description", 'Asset_MapPoint'],
+         );
+property website => (
+            tab         => "properties",
+            fieldType   => "text",
+            label       => ["website label", 'Asset_MapPoint'],
+            hoverHelp   => ["website description", 'Asset_MapPoint'],
+         );
+property address1 => (
+            tab         => "properties",
+            fieldType   => "text",
+            label       => ["address1 label", 'Asset_MapPoint'],
+            hoverHelp   => ["address1 description", 'Asset_MapPoint'],
+         );
+property address2 => (
+            tab         => "properties",
+            fieldType   => "text",
+            label       => ["address2 label", 'Asset_MapPoint'],
+            hoverHelp   => ["address2 description", 'Asset_MapPoint'],
+         );
+property city => (
+            tab         => "properties",
+            fieldType   => "text",
+            label       => ["city label", 'Asset_MapPoint'],
+            hoverHelp   => ["city description", 'Asset_MapPoint'],
+         );
+property state => (
+            tab         => "properties",
+            fieldType   => "text",
+            label       => ["state label", 'Asset_MapPoint'],
+            hoverHelp   => ["state description", 'Asset_MapPoint'],
+         );
+property zipCode => (
+            tab         => "properties",
+            fieldType   => "text",
+            label       => ["zipCode label", 'Asset_MapPoint'],
+            hoverHelp   => ["zipCode description", 'Asset_MapPoint'],
+         );
+property country => (
+            tab         => "properties",
+            fieldType   => "country",
+            label       => ["country label", 'Asset_MapPoint'],
+            hoverHelp   => ["country description", 'Asset_MapPoint'],
+         );
+property phone => (
+            tab         => "properties",
+            fieldType   => "phone",
+            label       => ["phone label", 'Asset_MapPoint'],
+            hoverHelp   => ["phone description", 'Asset_MapPoint'],
+         );
+property fax => (
+            tab         => "properties",
+            fieldType   => "phone",
+            label       => ["fax label", 'Asset_MapPoint'],
+            hoverHelp   => ["fax description", 'Asset_MapPoint'],
+         );
+property email => (
+            tab         => "properties",
+            fieldType   => "email",
+            label       => ["email label", 'Asset_MapPoint'],
+            hoverHelp   => ["email description", 'Asset_MapPoint'],
+         );
+property storageIdPhoto => (
+            tab             => "properties",
+            fieldType       => "image",
+            forceImageOnly  => 1,
+            label           => ["storageIdPhoto label", 'Asset_MapPoint'],
+            hoverHelp       => ["storageIdPhoto description", 'Asset_MapPoint'],
+            noFormPost      => 1,
+         );
+property userDefined1 => (
+            fieldType       => "hidden",
+            noFormPost      => 1,
+         );
+property userDefined2 => (
+            fieldType       => "hidden",
+            noFormPost      => 1,
+         );
+property userDefined3 => (
+            fieldType       => "hidden",
+            noFormPost      => 1,
+         );
+property userDefined4 => (
+            fieldType       => "hidden",
+            noFormPost      => 1,
+         );
+property userDefined5 => (
+            fieldType       => "hidden",
+            noFormPost      => 1,
+         );
 
-# To get an installer for your wobject, add the Installable AssetAspect
-# See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
-# details
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -63,107 +164,8 @@ sub definition {
     my $definition = shift;
     my $i18n       = WebGUI::International->new( $session, "Asset_MapPoint" );
     tie my %properties, 'Tie::IxHash', (
-        latitude => {
-            tab         => "properties",
-            fieldType   => "float",
-            label       => $i18n->get("latitude label"),
-            hoverHelp   => $i18n->get("latitude description"),
-        },
-        longitude => {
-            tab         => "properties",
-            fieldType   => "float",
-            label       => $i18n->get("longitude label"),
-            hoverHelp   => $i18n->get("longitude description"),
-        },
-        website => {
-            tab         => "properties",
-            fieldType   => "text",
-            label       => $i18n->get("website label"),
-            hoverHelp   => $i18n->get("website description"),
-        },
-        address1 => {
-            tab         => "properties",
-            fieldType   => "text",
-            label       => $i18n->get("address1 label"),
-            hoverHelp   => $i18n->get("address1 description"),
-        },
-        address2 => {
-            tab         => "properties",
-            fieldType   => "text",
-            label       => $i18n->get("address2 label"),
-            hoverHelp   => $i18n->get("address2 description"),
-        },
-        city => {
-            tab         => "properties",
-            fieldType   => "text",
-            label       => $i18n->get("city label"),
-            hoverHelp   => $i18n->get("city description"),
-        },
-        state => {
-            tab         => "properties",
-            fieldType   => "text",
-            label       => $i18n->get("state label"),
-            hoverHelp   => $i18n->get("state description"),
-        },
-        zipCode => {
-            tab         => "properties",
-            fieldType   => "text",
-            label       => $i18n->get("zipCode label"),
-            hoverHelp   => $i18n->get("zipCode description"),
-        },
-        country => {
-            tab         => "properties",
-            fieldType   => "country",
-            label       => $i18n->get("country label"),
-            hoverHelp   => $i18n->get("country description"),
-        },
-        phone => {
-            tab         => "properties",
-            fieldType   => "phone",
-            label       => $i18n->get("phone label"),
-            hoverHelp   => $i18n->get("phone description"),
-        },
-        fax => {
-            tab         => "properties",
-            fieldType   => "phone",
-            label       => $i18n->get("fax label"),
-            hoverHelp   => $i18n->get("fax description"),
-        },
-        email => {
-            tab         => "properties",
-            fieldType   => "email",
-            label       => $i18n->get("email label"),
-            hoverHelp   => $i18n->get("email description"),
-        },
-        storageIdPhoto => {
-            tab             => "properties",
-            fieldType       => "image",
-            forceImageOnly  => 1,
-            label           => $i18n->get("storageIdPhoto label"),
-            hoverHelp       => $i18n->get("storageIdPhoto description"),
-            noFormPost      => 1,
-        },
-        userDefined1 => {
-            fieldType       => "hidden",
-        },
-        userDefined2 => {
-            fieldType       => "hidden",
-        },
-        userDefined3 => {
-            fieldType       => "hidden",
-        },
-        userDefined4 => {
-            fieldType       => "hidden",
-        },
-        userDefined5 => {
-            fieldType       => "hidden",
-        },
     );
     push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'MapPoint.gif',
-        autoGenerateForms => 1,
-        tableName         => 'MapPoint',
         className         => 'WebGUI::Asset::MapPoint',
         properties        => \%properties,
         };
@@ -182,7 +184,7 @@ group to edit the parent Map are allowed to edit MapPoint.
 sub canEdit {
     my $self    = shift;
     my $userId  = shift || $self->session->user->userId;
-    return 1 if $userId eq $self->get('ownerUserId');
+    return 1 if $userId eq $self->ownerUserId;
     return $self->SUPER::canEdit( $userId );
 }
 
@@ -196,7 +198,7 @@ Get the workflowId to commit this MapPoint
 
 sub getAutoCommitWorkflowId {
     my ( $self ) = @_;
-    return $self->getParent->get('workflowIdPoint');
+    return $self->getParent->workflowIdPoint;
 }
 
 #-------------------------------------------------------------------
@@ -229,7 +231,7 @@ sub getMapInfo {
     $var->{ assetId     } = $self->getId;
     my @keys    = qw( latitude longitude title );
     for my $key ( @keys ) {
-        $var->{ $key } = $self->get( $key );
+        $var->{ $key } = $self->$key;
     }
 
     # Get permissions
@@ -287,11 +289,11 @@ sub getTemplateVarsEditForm {
         } )
         . WebGUI::Form::hidden( $session, {
             name    => 'latitude',
-            value   => $self->get('latitude'),
+            value   => $self->latitude,
         } )
         . WebGUI::Form::hidden( $session, {
             name    => 'longitude',
-            value   => $self->get('longitude'),
+            value   => $self->longitude,
         } )
         ;
     $var->{ form_footer } = WebGUI::Form::formFooter( $session );
@@ -314,20 +316,20 @@ sub getTemplateVarsEditForm {
     $var->{ "form_title" }
         = WebGUI::Form::text( $session, {
             name        => "title",
-            value       => $self->get("title"),
+            value       => $self->title,
         } );
     $var->{ "form_synopsis" }
         = WebGUI::Form::textarea( $session, {
             name        => "synopsis",
-            value       => $self->get("synopsis"),
+            value       => $self->synopsis,
             resizable   => 0,
         } );	
 
     # Fix storageIdPhoto because scripts do not get executed in ajax requests
     $var->{ "form_storageIdPhoto" }
 	= '<input type="file" name="storageIdPhoto" />';
-    if ( $self->get('storageIdPhoto') ) {
-        my $storage = WebGUI::Storage->get( $self->session, $self->get('storageIdPhoto') );        
+    if ( $self->storageIdPhoto ) {
+        my $storage = WebGUI::Storage->get( $self->session, $self->storageIdPhoto );        
         $var->{ "currentPhoto" }
 	    = sprintf '<img src="%s" />', $storage->getUrl($storage->getFiles->[0]);
     }
@@ -371,8 +373,8 @@ sub processAjaxEditForm {
     # Photo magic
     if ( $form->get('storageIdPhoto') ) {
         my $storage;
-        if ( $self->get('storageIdPhoto') ) {
-            $storage = WebGUI::Storage->get( $session, $self->get('storageIdPhoto') );
+        if ( $self->storageIdPhoto ) {
+            $storage = WebGUI::Storage->get( $session, $self->storageIdPhoto );
             $storage->deleteFile( $storage->getFiles->[0] );
         }
         else {
