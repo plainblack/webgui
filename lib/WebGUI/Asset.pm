@@ -1704,7 +1704,7 @@ A hash reference of properties to assign to the object.
 
 =cut
 
-=head2 new ( session, assetId [, className, revisionDate ] )
+=head2 new ( session, assetId [,revisionDate ] )
 
 Instanciator. This does not create an asset in the database, but looks up the object's
 properties in the database and returns an object with the correct WebGUI::Asset subclass.
