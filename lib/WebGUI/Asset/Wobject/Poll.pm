@@ -23,8 +23,157 @@ use WebGUI::Image::Graph;
 use WebGUI::Storage;
 use JSON;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
-
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_Poll'];
+aspect tableName => 'Poll';
+aspect icon      => 'poll.gif';
+property templateId => (
+                tab          => 'display',
+                fieldType    => "template",
+                default      => 'PBtmpl0000000000000055',
+                label        => [73, 'Asset_Poll'],
+                hoverHelp    => ['73 description', 'Asset_Poll'],
+                namespace    => "Poll",
+         );
+property active => (
+                tab          => 'properties',
+                fieldType    => "yesNo",
+                default      => 1,
+                label        => [3, 'Asset_Poll'],
+                hoverHelp    => ['3 description', 'Asset_Poll'],
+            );
+property karmaPerVote => (
+                fieldType    => \&_karmaPerVote_fieldType,
+                default      => 0,
+                label        => [20, 'Asset_Poll'],
+                hoverHelp    => ['20 description', 'Asset_Poll'],
+         ); 
+sub _karmaPerVote_fieldType {
+    my $self = shift;
+    return $self->session->setting->get('useKarma') ? 'integer' : 'hidden';
+}
+property graphWidth => (
+                fieldType    => "integer",
+                default      => 150,
+                label        => [5, 'Asset_Poll'],
+                hoverHelp    => ['5 description', 'Asset_Poll'],
+         ); 
+property voteGroup => (
+                tab          => 'security',
+                fieldType    => "group",
+                default      => 7,
+                label        => [4, 'Asset_Poll'],
+                hoverHelp    => ['4 description', 'Asset_Poll'],
+         ); 
+property question => (
+                tab          => 'properties',
+                fieldType    => "text",
+                default      => undef,
+                label        => [6, 'Asset_Poll'],
+                hoverHelp    => ['6 description', 'Asset_Poll'],
+         ); 
+property randomizeAnswers => (
+                tab          => 'properties',
+                fieldType    => "yesNo",
+                default      => 1,
+                label        => [72, 'Asset_Poll'],
+                hoverHelp    => ['72 description', 'Asset_Poll'],
+         );
+property a1 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a2 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a3 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a4 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a5 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a6 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a7 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a8 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a9 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a10 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a11 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a12 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a13 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a14 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a15 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a16 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a17 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a18 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a19 => (
+                fieldType=>"hidden",
+                default     =>undef
+         ); 
+property a20 => (
+                fieldType=>"hidden",
+                default     =>undef
+         );
+property graphConfiguration => (
+                fieldType=>"hidden",
+                default     =>undef,
+         );
+property generateGraph => (
+                fieldType    => \&_generateGraph_fieldType,
+                default      => 0,
+                label        => ['generate graph', 'Asset_Poll'],
+                hoverHelp    => ['generate graph description', 'Asset_Poll'],
+         );
+sub _generateGraph_fieldType {
+    my $self = shift;
+    return WebGUI::Image::Graph->getPluginList($self->session) ? 'yesNo' : 'hidden';
+}
 #-------------------------------------------------------------------
 sub _hasVoted {
 	my $self = shift;
@@ -32,159 +181,6 @@ sub _hasVoted {
 		where assetId=".$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->userId)."
 		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->userId)." and ipAddress='".$self->session->env->getIp."'))");
 	return $hasVoted;
-}
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Poll");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		tableName=>'Poll',
-		icon=>'poll.gif',
-		className=>'WebGUI::Asset::Wobject::Poll',
-		autoGenerateForms=>1,
-		properties=>{
-			templateId =>{
-                tab          => 'display',
-				fieldType    => "template",
-				defaultValue => 'PBtmpl0000000000000055',
-                label        => $i18n->get(73),
-                hoverHelp    => $i18n->get('73 description'),
-                namespace    => "Poll",
-            },
-			active=>{
-                tab          => 'properties',
-				fieldType    => "yesNo",
-				defaultValue => 1,
-                label        => $i18n->get(3),
-                hoverHelp    => $i18n->get('3 description'),
-            },
-			karmaPerVote=>{
-				fieldType=>"integer",
-				defaultValue=>0,
-                autoGenerate=>0,
-				}, 
-			graphWidth=>{
-				fieldType=>"integer",
-				defaultValue=>150,
-                autoGenerate=>0,
-				}, 
-			voteGroup=>{
-                tab          => 'security',
-				fieldType    => "group",
-				defaultValue => 7,
-                label        => $i18n->get(4),
-                hoverHelp    => $i18n->get('4 description'),
-            }, 
-			question=>{
-                tab          => 'properties',
-				fieldType    => "text",
-				defaultValue => undef,
-                label        => $i18n->get(6),
-                hoverHelp    => $i18n->get('6 description'),
-            }, 
-			randomizeAnswers=>{
-                tab          => 'properties',
-				fieldType    => "yesNo",
-				defaultValue => 1,
-                label        => $i18n->get(72),
-                hoverHelp    => $i18n->get('72 description'),
-            },
-			a1=>{
-				fieldType=>"hidden",
-				defaultValue=>undef
-				}, 
-			a2=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a3=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a4=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a5=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a6=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a7=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a8=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a9=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a10=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a11=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a12=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a13=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a14=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a15=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a16=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a17=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a18=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a19=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a20=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                },
-			graphConfiguration=>{
-				fieldType=>"hidden",
-				defaultValue=>undef,
-				},
-            generateGraph => {
-                fieldType    => "yesNo",
-                defaultValue => 0,
-                autoGenerate => 0,
-            },
-        }
-    });
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

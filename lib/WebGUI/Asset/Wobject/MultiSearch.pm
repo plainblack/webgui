@@ -27,57 +27,28 @@ use WebGUI::SQL;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect tableName => 'MultiSearch';
+aspect assetName => ['assetName', 'Asset_MultiSearch'];
+aspect icon      => 'multiSearch.gif';
+property cacheTimeout => (
+            tab           => "display",
+            fieldType     => "interval",
+            default       => 3600,
+            uiLevel       => 8,
+            label         => ["cache timeout", 'Asset_MultiSearch'],
+            hoverHelp     => ["cache timeout help", 'Asset_MultiSearch'],
+         );
+property templateId => (
+            fieldType     => "template",
+            tab           => "display",
+            default       => 'MultiSearchTmpl0000001',
+            namespace     => "MultiSearch",
+            hoverHelp     => ['MultiSearch Template description', 'Asset_MultiSearch'],
+            label         => ['MultiSearch Template', 'Asset_MultiSearch'],
+         );
 
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-defines wobject properties for MultiSearch instances
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Asset_MultiSearch");
-	my $properties = {
-			cacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("cache timeout"),
-				hoverHelp => $i18n->get("cache timeout help")
-				},
-		templateId =>{
-			fieldType=>"template",
-			tab=>"display",
-			defaultValue=>'MultiSearchTmpl0000001',
-			namespace=>"MultiSearch",
-			hoverHelp=>$i18n->get('MultiSearch Template description'),
-			label=>$i18n->get('MultiSearch Template')
-		},
-#		predefinedSearches=>{
-#			fieldType=>"textarea",
-#			defaultValue=>"WebGUI",
-#			tab=>"properties",
-#			hoverHelp=>$i18n->get('article template description','Asset_Article'),
-#			label=>$i18n->get(72,"Asset_Article")
-#		},
-	};
-	push(@{$definition}, {
-		tableName=>'MultiSearch',
-		className=>'WebGUI::Asset::Wobject::MultiSearch',
-		assetName=>$i18n->get('assetName'),
-		icon=>'multiSearch.gif',
-		autoGenerateForms=>1,
-		properties=>$properties
-	});
-        return $class->SUPER::definition($session, $definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -90,11 +61,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -129,7 +100,7 @@ to be displayed within the page style
 sub view {
 	my $self = shift;	
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
 		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
@@ -142,8 +113,8 @@ sub view {
 	$var{'submit'} = WebGUI::Form::Submit->new($self->session, {name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
 
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
 	}
        	return $out;
 }
@@ -158,7 +129,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
+	$self->session->http->setCacheControl($self->cacheTimeout);
 	$self->SUPER::www_view(@_);
 }
 
