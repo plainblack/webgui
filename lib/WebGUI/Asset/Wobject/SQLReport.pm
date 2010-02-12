@@ -49,127 +49,146 @@ property paginateAfter => (
 property dbQuery1 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get(4) . ' 1',
+            label       => [4, 'Asset_SQLReport', 1],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
         );
 property prequeryStatements1 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get('Prequery statements') . ' 1',
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 1],
         );
 property preprocessMacros1 => (
             fieldType   => "yesNo",
             default     => 0,
-            label       => $i18n->get(15) . ' 1',
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 1],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property placeholderParams1 => (
             fieldType   => "textarea",
             default     => undef,
-            label       => $i18n->get('Placeholder Parameters') . ' 1',
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 1],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
         );
 property databaseLinkId1 => (
             fieldType   => "databaseLink",
             default     => 0,
-            label       => $i18n->get("1075", 'WebGUI').' 1',
+            label       => ['Database Link %s', 'Asset_SQLReport', 1],
         );
 property dbQuery2 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get(4) . ' 2',
+            label       => [4, 'Asset_SQLReport', 2],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
         );
 property prequeryStatements2 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get('Prequery statements') . ' 2',
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 2],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property preprocessMacros2 => (
             fieldType   => "yesNo",
             default     => 0,
-            label       => $i18n->get(15) . ' 2',
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 2],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property placeholderParams2 => (
             fieldType   => "textarea",
             default     => undef,
-            label       => $i18n->get('Placeholder Parameters') . ' 2',
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 2],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
         );
 property databaseLinkId2 => (
             fieldType   => "databaseLink",
             default     => 0,
-            label       => $i18n->get("1075", 'WebGUI').' 2',
+            label       => ['Database Link %s', 'Asset_SQLReport', 2],
         );
 property dbQuery3 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get(4) . ' 3',
+            label       => [4, 'Asset_SQLReport', 3],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
         );
 property prequeryStatements3 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get('Prequery statements') . ' 3',
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 3],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property preprocessMacros3 => (
             fieldType   => "yesNo",
             default     => 0,
-            label       => $i18n->get(15) . ' 3',
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 3],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property placeholderParams3 => (
             fieldType   => "textarea",
             default     => undef,
-            label       => $i18n->get('Placeholder Parameters') . ' 3',
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 3],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
         );
 property databaseLinkId3 => (
             fieldType   => "databaseLink",
             default     => 0,
-            label       => $i18n->get("1075", 'WebGUI').' 3',
+            label       => ['Database Link %s', 'Asset_SQLReport', 3],
         );
 property dbQuery4 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get(4) . ' 4',
+            label       => [4, 'Asset_SQLReport', 4],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
         );
 property prequeryStatements4 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get('Prequery statements') . ' 4',
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 4],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property preprocessMacros4 => (
             fieldType   => "yesNo",
             default     => 0,
-            label       => $i18n->get(15) . ' 4',
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 4],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property placeholderParams4 => (
             fieldType   => "textarea",
             default     => undef,
-            label       => $i18n->get('Placeholder Parameters') . ' 4',
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 4],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
         );
 property databaseLinkId4 => (
             fieldType   => "databaseLink",
             default     => 0,
-            label       => $i18n->get("1075", 'WebGUI').' 4',
+            label       => ['Database Link %s', 'Asset_SQLReport', 4],
         );
 property dbQuery5 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get(4) . ' 5',
+            label       => [4, 'Asset_SQLReport', 5],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
         );
 property prequeryStatements5 => (
             fieldType   => "codearea",
             default     => undef,
-            label       => $i18n->get('Prequery statements') . ' 5',
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 5],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property preprocessMacros5 => (
             fieldType   => "yesNo",
             default     => 0,
-            label       => $i18n->get(15) . '5',
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 5],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
         );
 property placeholderParams5 => (
             fieldType   => "textarea",
             default     => undef,
-            label       => $i18n->get('Placeholder Parameters') . ' 5',
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 5],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
         );
 property databaseLinkId5 => (
             fieldType   => "databaseLink",
             default     => 0,
-            label       => $i18n->get("1075", 'WebGUI').' 5',
+            label       => ['Database Link %s', 'Asset_SQLReport', 5],
         );
 property debugMode => (
             fieldType   => "yesNo",
@@ -183,7 +202,7 @@ property downloadType => (
             fieldType   => "text",
             default     => "none",
             label       => ["download type", 'Asset_SQLReport'],
-            hoverHelp   => $i18n->get("download type description"),
+            hoverHelp   => ["download type description", 'Asset_RichEdit'],
             vertical    => 1,
             options     => \&_downloadType_options,
             extras      => "onclick='changeDownloadType(this)'"
@@ -327,7 +346,7 @@ sub getEditForm {
 		-name=>"downloadMimeType",
 		-label=>$i18n->get("download mimetype"),
 		-hoverHelp=>$i18n->get("download mimetype description"),
-		-options=> \%downloadMimeType,
+		#-options=> \%downloadMimeType,
 		-value=>$self->getValue("downloadMimeType"),
 		-defaultValue=>"application/octet-stream",
 		);

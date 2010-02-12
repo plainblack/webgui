@@ -88,6 +88,11 @@ while the second question mark will contain the form variable "field1".</p>
 		lastUpdated => 1031514049
 	},
 
+	'Preprocess macros on query %s?' => {
+		message => q|Preprocess macros on query %s?|,
+		lastUpdated => 1266003604,
+	},
+
 	'14' => {
 		message => q|Paginate After|,
 		lastUpdated => 1031514049
@@ -106,6 +111,11 @@ while the second question mark will contain the form variable "field1".</p>
 	'4' => {
 		message => q|Query|,
 		lastUpdated => 1031514049
+	},
+
+	'Query %s' => {
+		message => q|Query %s|,
+		lastUpdated => 1266003369
 	},
 
 	'18' => {
@@ -268,6 +278,10 @@ will always be false for query5.|,
 		message => q|<b>Debug:</b> Error: The SQL specified is of an improper format.|,
 		lastUpdated => 1031514049
 	},
+	'Placeholder Parameters %s' => {
+		message => q|Placeholder Parameters %s|,
+		lastUpdated => 1266003738,
+	},
 	'Placeholder Parameters' => {
 		message => q|Placeholder Parameters|,
 		lastUpdated => 1031514049
@@ -287,6 +301,10 @@ will always be false for query5.|,
 	'Prequery statements' => {
 		message => q|Prequery statements|,
 		lastUpdated => 0,
+	},
+	'Prequery statements %s' => {
+		message => q|Prequery statements %s|,
+		lastUpdated => 1266003505,
 	},
 	'Prequery statements description' => {
 		message => q|<p>Prequery statements are sql statements executed before the real query. You can use prequery statements for instance to set variables that you want to use in the real query. For example:</p>
@@ -499,6 +517,11 @@ will always be false for query5.|,
 	'debugMode' => {
 		message => q|A conditional indicating whether or not the SQL Report can have debug information in the output.|,
 		lastUpdated => 1168886083,
+	},
+
+	'Database Link %s' => {
+		message => q|Database Link %s|,
+		lastUpdated => 1266003847,
 	},
 
 };
