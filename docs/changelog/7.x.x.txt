@@ -3,6 +3,7 @@
  - fixed #11400: Active Sessions Deletion
  - fixed #11285: Pasting HTML into Code Editor in IE
  - fixed #11399: m4a missin
+ - fixed #11406: AdSku table mssing karma column
 
 7.7.32
  - fixed #11349: Code editor returns newline for blank content
