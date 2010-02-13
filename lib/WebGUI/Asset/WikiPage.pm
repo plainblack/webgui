@@ -21,7 +21,7 @@ use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 
-apsect assetName => ['assetName', 'Asset_RichEdit'];
+apsect assetName => ['assetName', 'Asset_WikiPage'];
 apsect icon      => 'wikiPage.gif';
 apsect tableName => 'WikiPage';
 
