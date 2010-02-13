@@ -10,12 +10,183 @@ package WebGUI::Asset::Wobject::WikiMaster;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Class::C3;
-use base qw(
-    WebGUI::AssetAspect::Subscribable 
-    WebGUI::AssetAspect::RssFeed 
-    WebGUI::Asset::Wobject
-);
+#use Class::C3;
+#use base qw(
+#    WebGUI::AssetAspect::Subscribable 
+#    WebGUI::AssetAspect::RssFeed 
+#    WebGUI::Asset::Wobject
+#);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_RichEdit'],
+aspect icon      => 'wikiMaster.gif',
+aspect tableName => 'WikiMaster',
+
+property groupToEditPages => (
+            fieldType => 'group',
+            default   => ['2'],
+            tab       => 'security',
+            hoverHelp => ['groupToEditPages hoverHelp', 'Asset_WikiMaster'],
+            label     => ['groupToEditPages label', 'Asset_WikiMaster'],
+       );
+
+property groupToAdminister => (
+            fieldType => 'group',
+            default   => ['3'],
+            tab       => 'security',
+            hoverHelp => ['groupToAdminister hoverHelp', 'Asset_WikiMaster'],
+            label     => ['groupToAdminister label', 'Asset_WikiMaster'],
+       );
+
+property richEditor => (
+            fieldType => 'selectRichEditor',
+            default   => 'PBrichedit000000000001',
+            tab       => 'display',
+            hoverHelp => ['richEditor hoverHelp', 'Asset_WikiMaster'],
+            label     => ['richEditor label', 'Asset_WikiMaster'],
+       );
+
+property frontPageTemplateId => (
+            fieldType => 'template',
+            namespace => 'WikiMaster_front',
+            default   => 'WikiFrontTmpl000000001',
+            tab       => 'display',
+            hoverHelp => ['frontPageTemplateId hoverHelp', 'Asset_WikiMaster'],
+            label     => ['frontPageTemplateId label', 'Asset_WikiMaster'],
+       );
+
+property pageTemplateId => (
+            fieldType => 'template',
+            namespace => 'WikiPage',
+            default   => 'WikiPageTmpl0000000001',
+            tab       => 'display',
+            hoverHelp => ['pageTemplateId hoverHelp', 'Asset_WikiMaster'],
+            label     => ['pageTemplateId label', 'Asset_WikiMaster'],
+       );
+
+property pageHistoryTemplateId => (
+            fieldType => 'template',
+            namespace => 'WikiPage_pageHistory',
+            default   => 'WikiPHTmpl000000000001',
+            tab       => 'display',
+            hoverHelp => ['pageHistoryTemplateId hoverHelp', 'Asset_WikiMaster'],
+            label     => ['pageHistoryTemplateId label', 'Asset_WikiMaster'],
+       );
+
+property mostPopularTemplateId => (
+            fieldType => 'template',
+            namespace => 'WikiMaster_mostPopular',
+            default   => 'WikiMPTmpl000000000001',
+            tab       => 'display',
+            hoverHelp => ['mostPopularTemplateId hoverHelp', 'Asset_WikiMaster'],
+            label     => ['mostPopularTemplateId label', 'Asset_WikiMaster'],
+       );
+property recentChangesTemplateId => (
+            fieldType => 'template',
+            namespace => 'WikiMaster_recentChanges',
+            default   => 'WikiRCTmpl000000000001',
+            tab       => 'display',
+            hoverHelp => ['recentChangesTemplateId hoverHelp', 'Asset_WikiMaster'],
+            label     => ['recentChangesTemplateId label', 'Asset_WikiMaster'],
+       );
+property byKeywordTemplateId => (
+            fieldType => 'template',
+            namespace => 'WikiMaster_byKeyword',
+            default   => 'WikiKeyword00000000001',
+            tab       => 'display',
+            hoverHelp => ['byKeywordTemplateId hoverHelp', 'Asset_WikiMaster'],
+            label     => ['byKeywordTemplateId label', 'Asset_WikiMaster'],
+       );
+property searchTemplateId => (
+            fieldType => 'template',
+            namespace => 'WikiMaster_search',
+            default   => 'WikiSearchTmpl00000001',
+            tab       => 'display',
+            hoverHelp => ['searchTemplateId hoverHelp', 'Asset_WikiMaster'],
+            label     => ['searchTemplateId label', 'Asset_WikiMaster'],
+       );
+
+property pageEditTemplateId => ( fieldType => 'template',
+            namespace => 'WikiPage_edit',
+            default   => 'WikiPageEditTmpl000001',
+            tab       => 'display',
+            hoverHelp => ['pageEditTemplateId hoverHelp', 'Asset_WikiMaster'],
+            label     => ['pageEditTemplateId label', 'Asset_WikiMaster'],
+       );
+
+property recentChangesCount => (
+            fieldType => 'integer',
+            default   => 50,
+            tab       => 'display',
+            hoverHelp => ['recentChangesCount hoverHelp', 'Asset_WikiMaster'],
+            label     => ['recentChangesCount label', 'Asset_WikiMaster']
+       );
+property recentChangesCountFront => (
+            fieldType => 'integer',
+            default   => 10,
+            tab       => 'display',
+            hoverHelp => ['recentChangesCountFront hoverHelp', 'Asset_WikiMaster'],
+            label     => ['recentChangesCountFront label', 'Asset_WikiMaster'],
+       );
+property mostPopularCount => (
+            fieldType => 'integer',
+            default   => 50,
+            tab       => 'display',
+            hoverHelp => ['mostPopularCount hoverHelp', 'Asset_WikiMaster'],
+            label     => ['mostPopularCount label', 'Asset_WikiMaster'],
+       );
+
+property mostPopularCountFront => (
+            fieldType => 'integer',
+            default   => 10,
+            tab       => 'display',
+            hoverHelp => ['mostPopularCountFront hoverHelp', 'Asset_WikiMaster'],
+            label     => ['mostPopularCountFront label', 'Asset_WikiMaster'],
+       );
+property approvalWorkflow => (
+            fieldType => "workflow",
+            default   => "pbworkflow000000000003",
+            type      => 'WebGUI::VersionTag',
+            tab       => 'security',
+            label     => ['approval workflow', 'Asset_WikiMaster'],
+            hoverHelp => ['approval workflow description', 'Asset_WikiMaster'],
+         );    
+property thumbnailSize => (
+            fieldType => "integer",
+            default   => 0,
+            tab       => "display",
+            label     => ["thumbnail size", 'Asset_WikiMaster'],
+            hoverHelp => ["thumbnail size help", 'Asset_WikiMaster']
+         );
+property maxImageSize => (
+            fieldType => "integer",
+            default   => 0,
+            tab       => "display",
+            label     => ["max image size", 'Asset_WikiMaster'],
+            hoverHelp => ["max image size help", 'Asset_WikiMaster']
+         );
+property allowAttachments => (
+            fieldType  => "integer",
+            default    => 0,
+            tab        => "security",
+            label      => ["allow attachments", 'Asset_WikiMaster'],
+            hoverHelp  => ["allow attachments help", 'Asset_WikiMaster'],
+         );
+property useContentFilter => (
+            fieldType => "yesNo",
+            default   => 1,
+            tab       => 'display',
+            label     => ['content filter', 'Asset_WikiMaster'],
+            hoverHelp => ['content filter description', 'Asset_WikiMaster'],
+         );
+property filterCode => (
+            fieldType => "filterContent",
+            default   => 'javascript',
+            tab       => 'security',
+            label     => ['filter code', 'Asset_WikiMaster'],
+            hoverHelp => ['filter code description', 'Asset_WikiMaster'],
+         );
+
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
@@ -59,7 +230,7 @@ If passed in, this will override the mostPopularCount set in the object.
 sub appendMostPopular {
 	my $self = shift;
 	my $var = shift;
-	my $limit = shift || $self->get("mostPopularCount");
+	my $limit = shift || $self->mostPopularCount;
 	foreach my $asset (@{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"]})}) { 
 		if (defined $asset) {
 			push(@{$var->{mostPopular}}, {
@@ -90,7 +261,7 @@ If passed in, this will override the mostChangesCount set in the object.
 sub appendRecentChanges {
 	my $self = shift;
 	my $var = shift;
-	my $limit = shift || $self->get("recentChangesCount") || 50;
+	my $limit = shift || $self->recentChangesCount || 50;
 	my $revisions = $self->session->db->read("select asset.assetId, assetData.revisionDate, asset.className 
 		from asset left join assetData using (assetId) where asset.parentId=? and asset.className
 		like ? and status='approved' order by assetData.revisionDate desc limit ?", [$self->getId, 
@@ -101,15 +272,15 @@ sub appendRecentChanges {
 			$self->session->errorHandler->error("Asset $id $class $version could not be instanciated.");
 			next;
 		}
-		my $user = WebGUI::User->new($self->session, $asset->get("actionTakenBy"));
+		my $user = WebGUI::User->new($self->session, $asset->actionTakenBy);
 		my $specialAction = '';
 		my $isAvailable = 1;
 		# no need to i18n cuz the other actions aren't
-		if ($asset->get('state') =~ m/trash/) {
+		if ($asset->state =~ m/trash/) {
 			$isAvailable = 0;
 			$specialAction = 'Deleted';
 		}
-		elsif ($asset->get('state') =~ m/clipboard/) {
+		elsif ($asset->state =~ m/clipboard/) {
 			$isAvailable = 0;
 			$specialAction = 'Cut';
 		}
@@ -117,9 +288,9 @@ sub appendRecentChanges {
 			title=>$asset->getTitle,
 			url=>$asset->getUrl,
 			restoreUrl=>$asset->getUrl("func=restoreWikiPage"),
-			actionTaken=>$specialAction || $asset->get("actionTaken"),
+			actionTaken=>$specialAction || $asset->actionTaken,
 			username=>$user->username,
-			date=>$self->session->datetime->epochToHuman($asset->get("revisionDate")),
+			date=>$self->session->datetime->epochToHuman($asset->revisionDate),
 			isAvailable=>$isAvailable,
             assetId=>$id,
 			});
@@ -226,7 +397,7 @@ this WikiMaster.
 
 sub canAdminister {
 	my $self = shift;
-	return $self->session->user->isInGroup($self->get('groupToAdminister')) || $self->WebGUI::Asset::Wobject::canEdit;
+	return $self->session->user->isInGroup($self->groupToAdminister) || $self->WebGUI::Asset::Wobject::canEdit;
 }
 
 #-------------------------------------------------------------------
@@ -266,7 +437,7 @@ they can administer the wiki (canAdminister).
 
 sub canEditPages {
 	my $self = shift;
-	return $self->session->user->isInGroup($self->get("groupToEditPages")) || $self->canAdminister;
+	return $self->session->user->isInGroup($self->groupToEditPages) || $self->canAdminister;
 }
 
 #-------------------------------------------------------------------
@@ -280,154 +451,10 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	%properties =
 	    (
-	     groupToEditPages => { fieldType => 'group',
-				   defaultValue => ['2'],
-				   tab => 'security',
-				   hoverHelp => $i18n->get('groupToEditPages hoverHelp'),
-				   label => $i18n->get('groupToEditPages label') },
-
-	     groupToAdminister => { fieldType => 'group',
-				    defaultValue => ['3'],
-				    tab => 'security',
-				    hoverHelp => $i18n->get('groupToAdminister hoverHelp'),
-				    label => $i18n->get('groupToAdminister label') },
-
-	     richEditor => { fieldType => 'selectRichEditor',
-			     defaultValue => 'PBrichedit000000000001',
-			     tab => 'display',
-			     hoverHelp => $i18n->get('richEditor hoverHelp'),
-			     label => $i18n->get('richEditor label') },
-
-	     frontPageTemplateId => { fieldType => 'template',
-				   namespace => 'WikiMaster_front',
-				      defaultValue => 'WikiFrontTmpl000000001',
-				      tab => 'display',
-				      hoverHelp => $i18n->get('frontPageTemplateId hoverHelp'),
-				      label => $i18n->get('frontPageTemplateId label') },
-
-	     pageTemplateId => { fieldType => 'template',
-				 namespace => 'WikiPage',
-				 defaultValue => 'WikiPageTmpl0000000001',
-				 tab => 'display',
-				 hoverHelp => $i18n->get('pageTemplateId hoverHelp'),
-				 label => $i18n->get('pageTemplateId label') },
-
-	     pageHistoryTemplateId => { fieldType => 'template',
-					namespace => 'WikiPage_pageHistory',
-					defaultValue => 'WikiPHTmpl000000000001',
-					tab => 'display',
-					hoverHelp => $i18n->get('pageHistoryTemplateId hoverHelp'),
-					label => $i18n->get('pageHistoryTemplateId label') },
-
-	     mostPopularTemplateId => { fieldType => 'template',
-					  namespace => 'WikiMaster_mostPopular',
-					  defaultValue => 'WikiMPTmpl000000000001',
-					  tab => 'display',
-					  hoverHelp => $i18n->get('mostPopularTemplateId hoverHelp'),
-					  label => $i18n->get('mostPopularTemplateId label') },
-
-	     recentChangesTemplateId => { fieldType => 'template',
-					  namespace => 'WikiMaster_recentChanges',
-					  defaultValue => 'WikiRCTmpl000000000001',
-					  tab => 'display',
-					  hoverHelp => $i18n->get('recentChangesTemplateId hoverHelp'),
-					  label => $i18n->get('recentChangesTemplateId label') },
-
-	     byKeywordTemplateId => { fieldType => 'template',
-					  namespace => 'WikiMaster_byKeyword',
-					  defaultValue => 'WikiKeyword00000000001',
-					  tab => 'display',
-					  hoverHelp => $i18n->get('byKeywordTemplateId hoverHelp'),
-					  label => $i18n->get('byKeywordTemplateId label') },
-
-	     searchTemplateId => { fieldType => 'template',
-				   namespace => 'WikiMaster_search',
-				   defaultValue => 'WikiSearchTmpl00000001',
-				   tab => 'display',
-				   hoverHelp => $i18n->get('searchTemplateId hoverHelp'),
-				   label => $i18n->get('searchTemplateId label') },
-
-	     pageEditTemplateId => { fieldType => 'template',
-				   namespace => 'WikiPage_edit',
-				   defaultValue => 'WikiPageEditTmpl000001',
-				   tab => 'display',
-				   hoverHelp => $i18n->get('pageEditTemplateId hoverHelp'),
-				   label => $i18n->get('pageEditTemplateId label') },
-
-	     recentChangesCount => { fieldType => 'integer',
-				     defaultValue => 50,
-				     tab => 'display',
-				     hoverHelp => $i18n->get('recentChangesCount hoverHelp'),
-				     label => $i18n->get('recentChangesCount label') },
-
-	     recentChangesCountFront => { fieldType => 'integer',
-					  defaultValue => 10,
-					  tab => 'display',
-					  hoverHelp => $i18n->get('recentChangesCountFront hoverHelp'),
-					  label => $i18n->get('recentChangesCountFront label') },
-
-	     mostPopularCount => { fieldType => 'integer',
-				     defaultValue => 50,
-				     tab => 'display',
-				     hoverHelp => $i18n->get('mostPopularCount hoverHelp'),
-				     label => $i18n->get('mostPopularCount label') },
-
-	     mostPopularCountFront => { fieldType => 'integer',
-					  defaultValue => 10,
-					  tab => 'display',
-					  hoverHelp => $i18n->get('mostPopularCountFront hoverHelp'),
-					  label => $i18n->get('mostPopularCountFront label') },
-                approvalWorkflow =>{
-                        fieldType=>"workflow",
-                        defaultValue=>"pbworkflow000000000003",
-                        type=>'WebGUI::VersionTag',
-                        tab=>'security',
-                        label=>$i18n->get('approval workflow'),
-                        hoverHelp=>$i18n->get('approval workflow description'),
-                        },    
-		thumbnailSize => {
-			fieldType => "integer",
-			defaultValue => 0,
-			tab => "display",
-			label => $i18n->get("thumbnail size"),
-			hoverHelp => $i18n->get("thumbnail size help")
-			},
-		maxImageSize => {
-			fieldType => "integer",
-			defaultValue => 0,
-			tab => "display",
-			label => $i18n->get("max image size"),
-			hoverHelp => $i18n->get("max image size help")
-			},
-        allowAttachments => {
-            fieldType       => "integer",
-            defaultValue    => 0,
-            tab             => "security",
-            label           => $i18n->get("allow attachments"),
-            hoverHelp       => $i18n->get("allow attachments help"),
-            },
-		useContentFilter =>{
-                        fieldType=>"yesNo",
-                        defaultValue=>1,
-                        tab=>'display',
-                        label=>$i18n->get('content filter'),
-                        hoverHelp=>$i18n->get('content filter description'),
-                        },
-                filterCode =>{
-                        fieldType=>"filterContent",
-                        defaultValue=>'javascript',
-                        tab=>'security',
-                        label=>$i18n->get('filter code'),
-                        hoverHelp=>$i18n->get('filter code description'),
-                        },
 		);
 
 	push @$definition,
 	     {
-	      assetName => $i18n->get('assetName'),
-	      icon => 'wikiMaster.gif',
-	      autoGenerateForms => 1,
-	      tableName => 'WikiMaster',
 	      className => 'WebGUI::Asset::Wobject::WikiMaster',
 	      properties => \%properties,
 	     };
@@ -468,13 +495,13 @@ author, and a guid field.
 sub getRssFeedItems {
     my $self        = shift;
     my $vars = {};
-    $self->appendRecentChanges( $vars, $self->get('itemsPerFeed') );
+    $self->appendRecentChanges( $vars, $self->itemsPerFeed );
     my $var = [];
     foreach my $item ( @{ $vars->{recentChanges} } ) {
         my $asset       = WebGUI::Asset->newById( $self->session, $item->{assetId} );
         push @{ $var }, {
             'link'          => $asset->getUrl,
-            'guid'          => $item->{ 'assetId' } . $asset->get( 'revisionDate' ),
+            'guid'          => $item->{ 'assetId' } . $asset->revisionDate,
             'title'         => $asset->getTitle,
             'description'   => $item->{ 'actionTaken' },
             'date'          => $item->{ 'date' },
@@ -527,11 +554,11 @@ sub prepareView {
 	my $self = shift;
 	$self->next::method;
 	$self->{_frontPageTemplate} =
-	    WebGUI::Asset::Template->new($self->session, $self->get('frontPageTemplateId'));
+	    WebGUI::Asset::Template->new($self->session, $self->frontPageTemplateId);
     if (!$self->{_frontPageTemplate}) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get('frontPageTemplateId'),
+            templateId => $self->frontPageTemplateId,
             assetId    => $self->getId,
         );
     }
@@ -549,13 +576,13 @@ Extend the master method to propagate view and edit permissions down to the wiki
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	my $groupsChanged =
-	    (($self->session->form->process('groupIdView') ne $self->get('groupIdView'))
-	     or ($self->session->form->process('groupIdEdit') ne $self->get('groupIdEdit')));
+	    (($self->session->form->process('groupIdView') ne $self->groupIdView)
+	     or ($self->session->form->process('groupIdEdit') ne $self->groupIdEdit));
 	my $ret = $self->next::method(@_);
 	if ($groupsChanged) {
 		foreach my $child (@{$self->getLineage(['children'], {returnObjects => 1})}) {
-			$child->update({ groupIdView => $self->get('groupIdView'),
-					 groupIdEdit => $self->get('groupIdEdit') });
+			$child->update({ groupIdView => $self->groupIdView,
+					 groupIdEdit => $self->groupIdEdit });
 		}
 	}
 	return $ret;
@@ -603,8 +630,8 @@ sub view {
     }
 
 	$self->appendSearchBoxVars($var);
-	$self->appendRecentChanges($var, $self->get('recentChangesCountFront'));
-	$self->appendMostPopular($var, $self->get('mostPopularCountFront'));
+	$self->appendRecentChanges($var, $self->recentChangesCountFront);
+	$self->appendMostPopular($var, $self->mostPopularCountFront);
 	return $self->processTemplate($var, undef, $template);
 }
 
@@ -641,7 +668,7 @@ sub www_byKeyword {
         pagesLoop => \@pages,
         };
     $p->appendTemplateVars($var);
-	return $self->processStyle($self->processTemplate($var, $self->get('byKeywordTemplateId')));
+	return $self->processStyle($self->processTemplate($var, $self->byKeywordTemplateId));
 }
 
 
@@ -666,7 +693,7 @@ sub www_mostPopular {
 		wikiHomeUrl=>$self->getUrl,
 		};
 	$self->appendMostPopular($var);
-	return $self->processStyle($self->processTemplate($var, $self->get('mostPopularTemplateId')));
+	return $self->processStyle($self->processTemplate($var, $self->mostPopularTemplateId));
 }
 
 #-------------------------------------------------------------------
@@ -692,7 +719,7 @@ sub www_recentChanges {
 		wikiHomeUrl=>$self->getUrl,
 		};
 	$self->appendRecentChanges($var);
-	return $self->processStyle($self->processTemplate($var, $self->get('recentChangesTemplateId')));
+	return $self->processStyle($self->processTemplate($var, $self->recentChangesTemplateId));
 }
 
 #-------------------------------------------------------------------
@@ -731,7 +758,7 @@ sub www_search {
 	if (length $queryString) {
 		my $search = WebGUI::Search->new($self->session);
 		$search->search({ keywords => $queryString,
-				  lineage => [$self->get('lineage')],
+				  lineage => [$self->lineage],
 				  classes => ['WebGUI::Asset::WikiPage'] });
 		my $rs = $search->getPaginatorResultSet($self->getUrl("func=search"));
 		$rs->appendTemplateVars($var);
@@ -743,7 +770,7 @@ sub www_search {
 		$var->{'searchResults'} = \@results;
 		$var->{'performSearch'} = 1;
 	}
-	return $self->processStyle($self->processTemplate($var, $self->get('searchTemplateId')));
+	return $self->processStyle($self->processTemplate($var, $self->searchTemplateId));
 }
 
 1;
