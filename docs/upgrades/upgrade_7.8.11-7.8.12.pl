@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 fixWorkflowSizeLimits($session);
 growMapPointDataColumns($session);
+addKarmaToAdSku($session);
 
 finish($session); # this line required
 
@@ -70,6 +71,16 @@ sub growMapPointDataColumns {
         $session->db->write(qq|ALTER TABLE MapPoint MODIFY $column  CHAR(35)|);
     }
     $session->db->write(qq|ALTER TABLE MapPoint MODIFY website  CHAR(255)|);
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addKarmaToAdSku {
+    my $session = shift;
+    print "\tAdd the Karma column to the Ad Sku table... " unless $quiet;
+    $session->db->write(qq|ALTER TABLE AdSku ADD COLUMN karma INTEGER|);
     # and here's our code
     print "DONE!\n" unless $quiet;
 }
