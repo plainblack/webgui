@@ -441,28 +441,6 @@ sub canEditPages {
 }
 
 #-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_WikiMaster');
-
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties =
-	    (
-		);
-
-	push @$definition,
-	     {
-	      className => 'WebGUI::Asset::Wobject::WikiMaster',
-	      properties => \%properties,
-	     };
-
-        return $class->next::method($session, $definition);
-}
-
-#-------------------------------------------------------------------
 
 =head2 getFeaturedPageIds ( )
 
