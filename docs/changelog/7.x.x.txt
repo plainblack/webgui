@@ -6,6 +6,7 @@
  - fixed #11406: AdSku table mssing karma column
  - fixed #11410: Too much errors in log after fix #11346
  - fixed #11169: MapPoint asset does not have an icon
+ - fixed Typo in Subscription Sku prevented karma from being transferred to users.
 
 7.7.32
  - fixed #11349: Code editor returns newline for blank content
