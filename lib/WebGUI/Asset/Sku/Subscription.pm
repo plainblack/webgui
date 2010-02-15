@@ -75,7 +75,7 @@ sub apply {
     }
 
 	# Add karma to the user's account
-    if ($session->setting->get('userKarma')) {
+    if ($session->setting->get('useKarma')) {
         WebGUI::User->new($session,$userId)->karma($self->get('karma'), 'Subscription', 'Added for purchasing subscription '.$self->get('title'));
     }
 
