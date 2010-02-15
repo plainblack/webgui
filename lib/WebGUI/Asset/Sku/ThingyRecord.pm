@@ -105,32 +105,6 @@ These methods are available from this class:
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, "Asset_ThingyRecord" );
-    tie my %properties, 'Tie::IxHash', (
-    );
-    push @{$definition}, {
-        className         => __PACKAGE__,
-        properties        => \%properties,
-        };
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
-
 #----------------------------------------------------------------------------
 
 =head2 appendVarsEditRecord ( var, recordId )
