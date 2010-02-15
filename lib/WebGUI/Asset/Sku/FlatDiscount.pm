@@ -60,7 +60,7 @@ property thankYouMessage => (
          );
 sub _thankYouMessage_default {
     my $session = shift->session;
-	my $i18n = WebGUI::International->new($session, "Asset_Donation");
+	my $i18n = WebGUI::International->new($session, "Asset_FlatDiscount");
     return $i18n->get("default thank you message");
 }
 
