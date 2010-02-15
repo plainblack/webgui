@@ -11,13 +11,50 @@ package WebGUI::Asset::Wobject::GalleryAlbum;
 #-------------------------------------------------------------------
 
 use strict;
-use Class::C3;
-use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
+#use Class::C3;
+#use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
+use WebGUI::Definition::Asset;
+aspect assetName           => ['assetName', 'Asset_GalleryAlbum'];
+aspect icon                => 'photoAlbum.gif';
+aspect tableName           => 'GalleryAlbum';
+
+property allowComments => (
+            noFormPost      => 1,
+            fieldType       => "yesNo",
+            default         => 1,
+         );
+property othersCanAdd => (
+            label           => ['editForm othersCanAdd label','Asset_GalleryAlbum'],
+            fieldType       => "yesNo",
+            default         => 0,
+         );
+property assetIdThumbnail => (
+            label           => ['editForm assetIdThumbnail label','Asset_GalleryAlbum'],
+            fieldType       => "asset",
+            default         => undef,
+         );
+for my $i ( 1 .. 5 ) {
+    property 'userDefined'.$i => (
+        default     => undef,
+        label       => '',
+        fieldType   => 'text',
+    );
+}
+
+around isHidden => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        $_[0] = 1;
+    }
+    $self->$orig(@_);
+};
+
+
 use Carp qw( croak );
 use File::Find;
 use File::Spec;
 use File::Temp qw{ tempdir };
-use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::HTML;
@@ -33,54 +70,6 @@ use Archive::Any;
 =head1 DIAGNOSTICS
 
 =head1 METHODS
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-Define wobject properties for new GalleryAlbum wobjects.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-    my $i18n        = WebGUI::International->new($session, 'Asset_GalleryAlbum');
-
-    tie my %properties, 'Tie::IxHash', (
-        allowComments   => {
-            fieldType       => "yesNo",
-            defaultValue    => 1,
-        },
-        othersCanAdd    => {
-            fieldType       => "yesNo",
-            defaultValue    => 0,
-        },
-        assetIdThumbnail => {
-            fieldType       => "asset",
-            defaultValue    => undef,
-        },
-    );
-
-    # UserDefined Fields
-    for my $i (1 .. 5) {
-        $properties{"userDefined".$i} = {
-            defaultValue        => undef,
-        };
-    }
-
-    push @{$definition}, {
-        assetName           => $i18n->get('assetName'),
-        autoGenerateForms   => 0,
-        icon                => 'photoAlbum.gif',
-        tableName           => 'GalleryAlbum',
-        className           => __PACKAGE__,
-        properties          => \%properties,
-    };
-
-    return $class->next::method($session, $definition);
-}
 
 #----------------------------------------------------------------------------
 
@@ -141,7 +130,7 @@ sub addArchive {
 
     my $versionTag      = WebGUI::VersionTag->getWorking( $self->session );
     $versionTag->set({ 
-        "workflowId" => $self->getParent->get("workflowIdCommit"),
+        "workflowId" => $self->getParent->workflowIdCommit,
     });
     $versionTag->requestCommit;
 
@@ -171,7 +160,7 @@ sub addChild {
         && !$properties->{ className }->isa( "WebGUI::Asset::Shortcut" ) 
         ) {
         $self->session->errorHandler->security(
-            "add a ".$properties->{className}." to a ".$self->get("className")
+            "add a ".$properties->{className}." to a ".$self->className
         );
         return undef;
     }
@@ -238,8 +227,8 @@ sub canAddFile {
     my $userId      = shift || $self->session->user->userId;
     my $gallery     = $self->getParent;
 
-    return 1 if $userId eq $self->get("ownerUserId");
-    return 1 if $self->get("othersCanAdd") && $gallery->canAddFile( $userId );
+    return 1 if $userId eq $self->ownerUserId;
+    return 1 if $self->othersCanAdd && $gallery->canAddFile( $userId );
     return $gallery->canEdit( $userId );
 }
 
@@ -261,7 +250,7 @@ sub canComment {
     my $userId      = shift || $self->session->user->userId;
     my $gallery     = $self->getParent;
 
-    return 0 if !$self->get("allowComments");
+    return 0 if !$self->allowComments;
 
     return $gallery->canComment( $userId );
 }
@@ -294,7 +283,7 @@ sub canEdit {
         return $self->canAddFile;
     }
     else {
-        return 1 if $userId eq $self->get("ownerUserId");
+        return 1 if $userId eq $self->ownerUserId;
             
         return $gallery->canEdit($userId);
     }
@@ -364,7 +353,7 @@ sub getAutoCommitWorkflowId {
     my $self        = shift;
     my $gallery = $self->getParent;
     if ($gallery->hasBeenCommitted) {
-        return $gallery->get("workflowIdCommit")
+        return $gallery->workflowIdCommit
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
     return undef;
@@ -398,7 +387,7 @@ sub getCurrentRevisionDate {
 
     return undef unless $asset;
 
-    if ( $asset->get( 'status' ) eq "approved" || $asset->canEdit ) {
+    if ( $asset->status eq "approved" || $asset->canEdit ) {
         return $revisionDate;
     }
     else {
@@ -455,7 +444,7 @@ url to the current page that will be given to the paginator.
 sub getFilePaginator {
     my $self        = shift;
     my $url         = shift     || $self->getUrl;
-    my $perPage     = $self->getParent->get( 'defaultFilesPerPage' );
+    my $perPage     = $self->getParent->defaultFilesPerPage;
 
     my $p           = WebGUI::Paginator->new( $self->session, $url, $perPage );
     $p->setDataByArrayRef( $self->getFileIds );
@@ -515,7 +504,7 @@ sub getRssFeedItems {
 
     my $p
         = $self->getFilePaginator( { 
-            perpage     => $self->get('itemsPerFeed'),
+            perpage     => $self->itemsPerFeed,
         } );
     
     my $var = [];
@@ -547,7 +536,7 @@ sub getTemplateVars {
     my $session     = $self->session;
     my $gallery     = $self->getParent;
     my $var         = $self->get;
-    my $owner       = WebGUI::User->new( $session, $self->get("ownerUserId") );
+    my $owner       = WebGUI::User->new( $session, $self->ownerUserId );
 
     # Fix 'undef' vars since HTML::Template does inheritence on them
     for my $key ( qw( description ) ) {
@@ -557,7 +546,7 @@ sub getTemplateVars {
     }    
  
     # Set a flag for pending files
-    if ( $self->get( "status" ) eq "pending" ) {
+    if ( $self->status eq "pending" ) {
         $var->{ 'isPending' } = 1;
     }
 
@@ -592,12 +581,12 @@ sub getTemplateVars {
     
     if ( my $nextAlbum  = $self->getNextAlbum ) {
         $var->{ nextAlbum_url           } = $nextAlbum->getUrl;
-        $var->{ nextAlbum_title         } = $nextAlbum->get( "title" );
+        $var->{ nextAlbum_title         } = $nextAlbum->title;
         $var->{ nextAlbum_thumbnailUrl  } = $nextAlbum->getThumbnailUrl;
     }
     if ( my $prevAlbum  = $self->getPreviousAlbum ) {
         $var->{ previousAlbum_url           } = $prevAlbum->getUrl;
-        $var->{ previousAlbum_title         } = $prevAlbum->get( "title" );
+        $var->{ previousAlbum_title         } = $prevAlbum->title;
         $var->{ previousAlbum_thumbnailUrl  } = $prevAlbum->getThumbnailUrl;
     }
 
@@ -625,8 +614,8 @@ sub getThumbnailUrl {
     my $asset       = undef;
     
     # Try to get the asset
-    if ( $self->get("assetIdThumbnail") ) {
-        $asset      = WebGUI::Asset->newById( $self->session, $self->get("assetIdThumbnail") );
+    if ( $self->assetIdThumbnail ) {
+        $asset      = WebGUI::Asset->newById( $self->session, $self->assetIdThumbnail );
     }
     elsif ( $self->getFirstChild ) {
         $asset      = $self->getFirstChild;
@@ -663,7 +652,7 @@ Returns true if people other than the owner can add files to this album.
 
 sub othersCanAdd {
     my $self        = shift;
-    return $self->get("othersCanAdd");
+    return $self->othersCanAdd;
 }
 
 #----------------------------------------------------------------------------
@@ -678,7 +667,7 @@ sub prepareView {
     my $self = shift;
     $self->next::method();
 
-    my $templateId  = $self->getParent->get("templateIdViewAlbum");
+    my $templateId  = $self->getParent->templateIdViewAlbum;
 
     my $template 
         = WebGUI::Asset::Template->new($self->session, $templateId);
@@ -712,7 +701,7 @@ sub processFileSynopsis {
     my $oldVersionTag   = WebGUI::VersionTag->getWorking( $session, "nocreate" );
     my $newVersionTag
         = WebGUI::VersionTag->create( $session, {
-            workflowId      => $self->getParent->get("workflowIdCommit"),
+            workflowId      => $self->getParent->workflowIdCommit,
         } );
     $newVersionTag->setWorking;
     
@@ -721,7 +710,7 @@ sub processFileSynopsis {
         my $synopsis    = $form->get( $key );
     
         my $asset       = WebGUI::Asset->newById( $session, $assetId );
-        if ( $asset->get("synopsis") ne $synopsis ) {
+        if ( $asset->synopsis ne $synopsis ) {
             my $properties  = $asset->get;
             $properties->{ synopsis } = $synopsis;
 
@@ -799,20 +788,6 @@ sub sendChunkedContent {
 
 #----------------------------------------------------------------------------
 
-=head2 update ( )
-
-Override update to force isHidden=1 on all albums.
-
-=cut
-
-sub update {
-    my $self        = shift;
-    my $properties  = shift;
-    return $self->next::method({ %{ $properties }, isHidden=>1 });
-}
-
-#----------------------------------------------------------------------------
-
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -847,7 +822,7 @@ sub view_slideshow {
     my $self        = shift;
     my $session     = $self->session;	
     my $var         = delete $self->{_templateVars};
-    return $self->processTemplate($var, $self->getParent->get("templateIdViewSlideshow"), $self->{_preparedTemplate});
+    return $self->processTemplate($var, $self->getParent->templateIdViewSlideshow, $self->{_preparedTemplate});
 }
 
 #----------------------------------------------------------------------------
@@ -892,7 +867,7 @@ sub view_thumbnails {
         }
     }
 
-    return $self->processTemplate($var, $self->getParent->get("templateIdViewThumbnails"));
+    return $self->processTemplate($var, $self->getParent->templateIdViewThumbnails);
 }
 
 #----------------------------------------------------------------------------
@@ -953,7 +928,7 @@ sub www_addArchive {
         });
 
     return $self->processStyle(
-        $self->processTemplate($var, $self->getParent->get("templateIdAddArchive"))
+        $self->processTemplate($var, $self->getParent->templateIdAddArchive)
     );
 }
 
@@ -1082,8 +1057,8 @@ sub www_addFileService {
         title           => $file->getTitle,
         url             => $siteUrl.$file->getUrl,
         thumbnailUrl    => $siteUrl.$file->getThumbnailUrl,
-        dateCreated     => $date->epochToHuman($file->get('creationDate'), '%y-%m-%d %j:%n:%s'),
-        lastUpdated     => $date->epochToHuman($file->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+        dateCreated     => $date->epochToHuman($file->creationDate, '%y-%m-%d %j:%n:%s'),
+        lastUpdated     => $date->epochToHuman($file->revisionDate, '%y-%m-%d %j:%n:%s'),
     };
     if ($as eq "xml") {
         $session->http->setMimeType('text/xml');
@@ -1111,7 +1086,7 @@ sub www_delete {
     $var->{ url_yes     } = $self->getUrl("func=deleteConfirm");
 
     return $self->processStyle(
-        $self->processTemplate( $var, $self->getParent->get("templateIdDeleteAlbum") )
+        $self->processTemplate( $var, $self->getParent->templateIdDeleteAlbum )
     );
 }
 
@@ -1233,7 +1208,7 @@ sub www_edit {
             })
             . WebGUI::Form::hidden( $session, {
                 name        => "ownerUserId",
-                value       => $self->get("ownerUserId"),
+                value       => $self->ownerUserId,
             });
         
         # Put in the buttons that may ignore button handling code
@@ -1263,24 +1238,24 @@ sub www_edit {
     $var->{ form_title  }
         = WebGUI::Form::text( $session, {
             name        => "title",
-            value       => $form->get("title") || $self->get("title"),
+            value       => $form->get("title") || $self->title,
         });
 
     $var->{ form_description }
         = WebGUI::Form::HTMLArea( $session, {
             name        => "description",
-            value       => $form->get("description") || $self->get("description"),
-            richEditId  => $self->getParent->get("richEditIdAlbum"),
+            value       => $form->get("description") || $self->description,
+            richEditId  => $self->getParent->richEditIdAlbum,
         });
 
     $var->{ form_othersCanAdd }
         = WebGUI::Form::yesNo( $session, {
             name        => "othersCanAdd",
-            value       => $form->get( "othersCanAdd" ) || $self->get( "othersCanAdd" ),
+            value       => $form->get( "othersCanAdd" ) || $self->othersCanAdd,
         } );
 
     # Generate the file loop
-    my $assetIdThumbnail    = $form->get("assetIdThumbnail") || $self->get("assetIdThumbnail");
+    my $assetIdThumbnail    = $form->get("assetIdThumbnail") || $self->assetIdThumbnail;
     $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
     for my $file ( @{ $var->{file_loop} } ) {
         $file->{ form_assetIdThumbnail }
@@ -1313,14 +1288,14 @@ sub www_edit {
             = WebGUI::Form::HTMLArea( $session, {
                 name        => "fileSynopsis_$file->{assetId}",
                 value       => $form->get( "fileSynopsis_$file->{assetId}" ) || $file->{ synopsis },
-                richEditId  => $self->getParent->get( 'richEditIdFile' ),
+                richEditId  => $self->getParent->richEditIdFile,
                 height      => 150,
                 width       => 300,
             });
     }
 
     return $self->processStyle( 
-        $self->processTemplate( $var, $self->getParent->get("templateIdEditAlbum") )
+        $self->processTemplate( $var, $self->getParent->templateIdEditAlbum )
     );
 }
 
@@ -1368,7 +1343,7 @@ sub www_slideshow {
     $self->{_templateVars} = $self->getTemplateVars;
     $self->appendTemplateVarsFileLoop( $self->{_templateVars}, $self->getFileIds );
 
-    my $templateId = $self->getParent->get('templateIdViewSlideshow');
+    my $templateId = $self->getParent->templateIdViewSlideshow;
     my $template   = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_preparedTemplate} = $template;
@@ -1391,7 +1366,7 @@ sub www_thumbnails {
     $self->{_templateVars} = $self->getTemplateVars;
     $self->appendTemplateVarsFileLoop($self->{_templateVars}, $self->getFileIds);
 
-    my $templateId = $self->getParent->get('templateIdViewThumbnails');
+    my $templateId = $self->getParent->templateIdViewThumbnails;
     my $template   = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_preparedTemplate} = $template;
@@ -1441,7 +1416,7 @@ sub www_viewRss {
     }
 
     $self->session->http->setMimeType('text/xml');
-    return $self->processTemplate( $var, $self->getParent->get('templateIdViewAlbumRss') );
+    return $self->processTemplate( $var, $self->getParent->templateIdViewAlbumRss );
 }
 
 1;
