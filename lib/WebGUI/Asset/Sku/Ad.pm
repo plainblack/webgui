@@ -80,14 +80,15 @@ property impressionDiscounts => (
             default         => '',
          );
 property karma => (
-            fieldType       => \&_karma_fieldType,
+            fieldType       => 'integer',
+            noFormPost      => \&_karma_noFormPost,
             label           => ['property adsku karma', 'Asset_WikiMaster'],
             hoverHelp       => ['property adsku karma description', 'Asset_WikiMaster'],
             defaultvalue    => 0,
         );
-sub _karma_fieldType {
+sub _karma_noFormPost {
     my $session = shift->session;
-    return $session->setting->get('useKarma') ? 'integer' : 'hidden';
+    return ! $session->setting->get('useKarma');
 }
 
 

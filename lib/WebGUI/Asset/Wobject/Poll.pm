@@ -44,14 +44,15 @@ property active => (
                 hoverHelp    => ['3 description', 'Asset_Poll'],
             );
 property karmaPerVote => (
-                fieldType    => \&_karmaPerVote_fieldType,
+                fieldType    => 'integer',
+                noFormPost   => \&_karmaPerVote_noFormPost,
                 default      => 0,
                 label        => [20, 'Asset_Poll'],
                 hoverHelp    => ['20 description', 'Asset_Poll'],
          ); 
-sub _karmaPerVote_fieldType {
+sub _karmaPerVote_noFormPost {
     my $self = shift;
-    return $self->session->setting->get('useKarma') ? 'integer' : 'hidden';
+    return ! $self->session->setting->get('useKarma');
 }
 property graphWidth => (
                 fieldType    => "integer",
@@ -165,14 +166,15 @@ property graphConfiguration => (
                 default     =>undef,
          );
 property generateGraph => (
-                fieldType    => \&_generateGraph_fieldType,
+                noFormPost   => \&_generateGraph_noFormPost,
+                fieldType    => 'yesNo',
                 default      => 0,
                 label        => ['generate graph', 'Asset_Poll'],
                 hoverHelp    => ['generate graph description', 'Asset_Poll'],
          );
-sub _generateGraph_fieldType {
+sub _generateGraph_noFormPost {
     my $self = shift;
-    return WebGUI::Image::Graph->getPluginList($self->session) ? 'yesNo' : 'hidden';
+    return WebGUI::Image::Graph->getPluginList($self->session) ? 1 : 0;
 }
 #-------------------------------------------------------------------
 sub _hasVoted {
