@@ -55,7 +55,15 @@ property isFeatured => (
             noFormPost => 1,
          );
 
-use Tie::IxHash;
+around isHidden => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        $_[0] = 1;
+    }
+    $self->$orig(@_);
+};
+
 use WebGUI::International;
 use WebGUI::Utility;
 
@@ -459,21 +467,6 @@ sub scrubContent {
         }
 
         return $scrubbedContent;
-}
-
-#-------------------------------------------------------------------
-
-=head2 update
-
-Wrap update to force isHidden to be on, all the time.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $properties = shift;
-	$properties->{isHidden} = 1;
-    return $self->next::method($properties);
 }
 
 #-------------------------------------------------------------------
