@@ -18,7 +18,7 @@ aspect assetName           => ['assetName', 'Asset_GalleryAlbum'];
 aspect icon                => 'photoAlbum.gif';
 aspect tableName           => 'GalleryAlbum';
 
-property allowComments => (
+property allowComments => (  ##Note, there's no UI for this feature.  There's just the framework for it.
             noFormPost      => 1,
             fieldType       => "yesNo",
             default         => 1,
