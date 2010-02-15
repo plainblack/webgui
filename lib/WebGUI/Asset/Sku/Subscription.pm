@@ -170,29 +170,6 @@ sub apply {
 
 #-------------------------------------------------------------------
 
-=head2 definition
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_Subscription");
-	%properties = (
-    );
-
-	push(@{$definition}, {
-		className           => 'WebGUI::Asset::Sku::Subscription',
-		properties          => \%properties,
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 generateSubscriptionCode ( length )
 
 Generates a subscription code with the given length. Does not save to the db.
