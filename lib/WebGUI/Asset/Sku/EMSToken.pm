@@ -15,8 +15,19 @@ package WebGUI::Asset::Sku::EMSToken;
 =cut
 
 use strict;
-use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+aspect assetName           => ['ems token', 'Asset_EMSToken'],
+aspect icon                => 'EMSToken.gif',
+aspect tableName           => 'EMSToken',
+property price => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["price", 'Asset_EMSToken'],
+            hoverHelp       => ["price help", 'Asset_EMSToken'],
+         );
+
 use WebGUI::Utility;
 
 
@@ -37,43 +48,6 @@ use WebGUI::Asset::Sku::EMSToken;
 These methods are available from this class:
 
 =cut
-
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-Adds price field.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
-	my $date = WebGUI::DateTime->new($session, time());
-	%properties = (
-		price => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("price"),
-			hoverHelp       => $i18n->get("price help"),
-			},
-	    );
-	push(@{$definition}, {
-		assetName           => $i18n->get('ems token'),
-		icon                => 'EMSToken.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'EMSToken',
-		className           => 'WebGUI::Asset::Sku::EMSToken',
-		properties          => \%properties
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
 
 
 #-------------------------------------------------------------------
@@ -120,7 +94,7 @@ Returns the value of the price field.
 
 sub getPrice {
     my $self = shift;
-    return $self->get("price");
+    return $self->price;
 }
 
 #-------------------------------------------------------------------
@@ -208,7 +182,7 @@ sub view {
 	
 	# render the page;
 	my $output = '<h1>'.$self->getTitle.'</h1>'
-		.'<p>'.$self->get('description').'</p>';
+		.'<p>'.$self->description.'</p>';
 
 	# build the add to cart form
 	if ($form->get('badgeId') ne '') {
@@ -250,7 +224,7 @@ Override to return to appropriate page.
 sub www_delete {
 	my ($self) = @_;
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
-    return $self->session->privilege->vitalComponent() if $self->get('isSystem');
+    return $self->session->privilege->vitalComponent() if $self->isSystem;
     return $self->session->privilege->vitalComponent() if (isIn($self->getId,
 $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
     $self->trash;
