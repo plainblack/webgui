@@ -132,29 +132,6 @@ sub addToCart {
 
 #-------------------------------------------------------------------
 
-=head2 definition
-
-Adds price, seatsAvailable, eventNumber, startDate, endDate and relatedBadges fields.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
-	%properties = (
-	    );
-	push(@{$definition}, {
-		className           => 'WebGUI::Asset::Sku::EMSTicket',
-		properties          => \%properties
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 drawEventNumberField ()
 
 Draws the field for the eventNumber property.
