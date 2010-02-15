@@ -15,8 +15,71 @@ package WebGUI::Asset::Sku::EMSBadge;
 =cut
 
 use strict;
-use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+aspect assetName           => ['ems badge', 'Asset_EMSBadge'];
+aspect icon                => 'EMSBadge.gif';
+aspect tableName           => 'EMSBadge';
+property price => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["price", 'Asset_EMSBadge'],
+            hoverHelp       => ["price help", 'Asset_EMSBadge'],
+         );
+property earlyBirdPrice => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["early bird price", 'Asset_EMSBadge'],
+            hoverHelp       => ["early bird price help", 'Asset_EMSBadge'],
+         );
+property earlyBirdPriceEndDate => (
+            tab             => "shop",
+            fieldType       => "date",
+            default         => undef,
+            label           => ["early bird price end date", 'Asset_EMSBadge'],
+            hoverHelp       => ["early bird price end date help", 'Asset_EMSBadge'],
+         );
+property preRegistrationPrice => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["pre registration price", 'Asset_EMSBadge'],
+            hoverHelp       => ["pre registration price help", 'Asset_EMSBadge'],
+         );
+property preRegistrationPriceEndDate => (
+            tab             => "shop",
+            fieldType       => "date",
+            default         => undef,
+            label           => ["pre registration price end date", 'Asset_EMSBadge'],
+            hoverHelp       => ["pre registration price end date help", 'Asset_EMSBadge'],
+         );
+property seatsAvailable => (
+            tab             => "shop",
+            fieldType       => "integer",
+            default         => 100,
+            label           => ["seats available", 'Asset_EMSBadge'],
+            hoverHelp       => ["seats available help", 'Asset_EMSBadge'],
+         );
+property relatedBadgeGroups => (
+            tab             => "properties",
+            fieldType       => "checkList",
+            customDrawMethod=> 'drawRelatedBadgeGroupsField',
+            label           => ["related badge groups", 'Asset_EMSBadge'],
+            hoverHelp       => ["related badge groups badge help", 'Asset_EMSBadge'],
+         );
+property templateId => (
+            tab             => "display",
+            fieldType       => "template",
+            label           => ["view badge template", 'Asset_EMSBadge'],
+            hoverHelp       => ["view badge template help", 'Asset_EMSBadge'],
+            default         => 'PBEmsBadgeTemplate0000',
+            namespace       => 'EMSBadge',
+         );
+
+
+
 use JSON;
 use WebGUI::HTMLForm;
 use WebGUI::International;
@@ -59,91 +122,6 @@ sub addToCart {
 	$badgeInfo->{emsAssetId} = $self->getParent->getId;
 	my $badgeId = $self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
 	$self->SUPER::addToCart({badgeId=>$badgeId});
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-Adds price, seatsAvailable fields.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
-	%properties = (
-		price => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("price"),
-			hoverHelp       => $i18n->get("price help"),
-			},
-		earlyBirdPrice => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("early bird price"),
-			hoverHelp       => $i18n->get("early bird price help"),
-			},
-		earlyBirdPriceEndDate => {
-			tab             => "shop",
-			fieldType       => "date",
-			defaultValue    => undef,
-			label           => $i18n->get("early bird price end date"),
-			hoverHelp       => $i18n->get("early bird price end date help"),
-			},
-		preRegistrationPrice => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("pre registration price"),
-			hoverHelp       => $i18n->get("pre registration price help"),
-			},
-		preRegistrationPriceEndDate => {
-			tab             => "shop",
-			fieldType       => "date",
-			defaultValue    => undef,
-			label           => $i18n->get("pre registration price end date"),
-			hoverHelp       => $i18n->get("pre registration price end date help"),
-			},
-		seatsAvailable => {
-			tab             => "shop",
-			fieldType       => "integer",
-			defaultValue    => 100,
-			label           => $i18n->get("seats available"),
-			hoverHelp       => $i18n->get("seats available help"),
-			},
-		relatedBadgeGroups => {
-			tab             => "properties",
-			fieldType		=> "checkList",
-			customDrawMethod=> 'drawRelatedBadgeGroupsField',
-			label           => $i18n->get("related badge groups"),
-			hoverHelp       => $i18n->get("related badge groups badge help"),
-			},
-		templateId => {
-			tab             => "display",
-			fieldType		=> "template",
-			label           => $i18n->get("view badge template"),
-			hoverHelp       => $i18n->get("view badge template help"),
-            defaultValue    => 'PBEmsBadgeTemplate0000',
-            namespace       => 'EMSBadge',
-			},
-	    );
-	push(@{$definition}, {
-		assetName           => $i18n->get('ems badge'),
-		icon                => 'EMSBadge.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'EMSBadge',
-		className           => 'WebGUI::Asset::Sku::EMSBadge',
-		properties          => \%properties
-	    });
-	return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -222,13 +200,13 @@ Returns the price field value.
 
 sub getPrice {
     my $self = shift;
-	if ($self->get('earlyBirdPriceEndDate') < time) {
-		return $self->get('price');
+	if ($self->earlyBirdPriceEndDate < time) {
+		return $self->price;
 	}
-	elsif ($self->get('preRegistrationPriceEndDate') < time) {
-		return $self->get('earlyBirdPrice');
+	elsif ($self->preRegistrationPriceEndDate < time) {
+		return $self->earlyBirdPrice;
 	}
-	return $self->get('preRegistrationPrice');
+	return $self->preRegistrationPrice;
 }
 
 #-------------------------------------------------------------------
@@ -242,7 +220,7 @@ Returns seatsAvailable - the count from the EMSRegistrant table.
 sub getQuantityAvailable {
 	my $self = shift;
 	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrant where badgeAssetId=?",[$self->getId]);
-    return $self->get("seatsAvailable") - $seatsTaken;
+    return $self->seatsAvailable - $seatsTaken;
 }
 
 #-------------------------------------------------------------------
@@ -350,7 +328,7 @@ See WebGUI::Asset, prepareView for details.
 sub prepareView {
 	my $self = shift;
     $self->SUPER::prepareView();
-    my $templateId = $self->get('templateId');
+    my $templateId = $self->templateId;
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
     $self->{_viewTemplate} = $template;
 }
@@ -458,7 +436,7 @@ sub view {
         $vars{submitAddress} = WebGUI::Form::submit($session, {value => $i18n->get('add to cart'),});
     }
     $vars{title}       = $self->getTitle;
-    $vars{description} = $self->get('description');
+    $vars{description} = $self->description;
 	
     # render the page;
     return $self->processTemplate(\%vars, undef, $self->{_viewTemplate});
