@@ -1244,8 +1244,11 @@ The file to retrieve the thumbnail for.
 =cut
 
 sub getThumbnailUrl {
-	my $self = shift;
-	my $filename = shift;
+    my $self     = shift;
+    my $filename = shift;
+    if (! $self->isImage($filename)) {
+        return '';
+    }
 	if (! defined $filename) {
 		$self->session->errorHandler->error("Can't find a thumbnail url without a filename.");
 		return '';
