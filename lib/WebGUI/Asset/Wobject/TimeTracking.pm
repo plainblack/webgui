@@ -20,7 +20,7 @@ use WebGUI::Utility;
 use POSIX qw(ceil floor);
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_TimeTracking'],
+aspect assetName => ['assetName', 'Asset_TimeTracking'];
 aspect icon      => 'timetrack.gif';
 aspect tableName => 'TT_wobject';
 property userViewTemplateId => (

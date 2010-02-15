@@ -17,9 +17,9 @@ package WebGUI::Asset::Sku::EMSRibbon;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-aspect assetName           => ['ems ribbon', 'Asset_EMSRibbon'],
-aspect icon                => 'EMSRibbon.gif',
-aspect tableName           => 'EMSRibbon',
+aspect assetName           => ['ems ribbon', 'Asset_EMSRibbon'];
+aspect icon                => 'EMSRibbon.gif';
+aspect tableName           => 'EMSRibbon';
 property price => (
             tab             => "shop",
             fieldType       => "float",

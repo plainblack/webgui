@@ -21,9 +21,9 @@ use WebGUI::HTML;
 use POSIX qw(ceil floor);
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_ProjectManager'],
-aspect icon      => 'projManagement.gif',
-aspect tableName => 'PM_wobject',
+aspect assetName => ['assetName', 'Asset_ProjectManager'];
+aspect icon      => 'projManagement.gif';
+aspect tableName => 'PM_wobject';
 property projectDashboardTemplateId => (
             fieldType   => "template",  
             default     => 'ProjectManagerTMPL0001',

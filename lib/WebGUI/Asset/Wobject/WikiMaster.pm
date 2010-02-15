@@ -18,9 +18,9 @@ package WebGUI::Asset::Wobject::WikiMaster;
 #);
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_RichEdit'],
-aspect icon      => 'wikiMaster.gif',
-aspect tableName => 'WikiMaster',
+aspect assetName => ['assetName', 'Asset_RichEdit'];
+aspect icon      => 'wikiMaster.gif';
+aspect tableName => 'WikiMaster';
 
 property groupToEditPages => (
             fieldType => 'group',
