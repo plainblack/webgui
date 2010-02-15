@@ -16,6 +16,7 @@
  - fixed #11399: m4a missin
  - fixed #11406: AdSku table mssing karma column
  - fixed #11410: Too much errors in log after fix #11346
+ - fixed #11169: MapPoint asset does not have an icon
 
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin

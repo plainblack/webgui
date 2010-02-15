@@ -161,7 +161,7 @@ sub definition {
     );
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),
-        icon              => 'MapPoint.gif',
+        icon              => 'mappoint.png',
         autoGenerateForms => 1,
         tableName         => 'MapPoint',
         className         => 'WebGUI::Asset::MapPoint',
