@@ -21,7 +21,7 @@ aspect tableName         => 'DataTable';
 property data => (
             fieldType    => 'DataTable',
             default      => undef,
-            autoGenerate => 0,
+            label        => '',
          );
 property templateId => (
             tab          => "display",
