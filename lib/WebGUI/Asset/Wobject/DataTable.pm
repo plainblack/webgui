@@ -13,51 +13,28 @@ $VERSION = "1.0.0";
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
-use WebGUI::International;
-use WebGUI::Utility;
-use WebGUI::Form::DataTable;
-use base 'WebGUI::Asset::Wobject';
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, 'Asset_DataTable' );
-
-    tie my %properties, 'Tie::IxHash', (
-        data => {
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName         => ['assetName', 'Asset_EMSRibbon'];
+aspect icon              => 'DataTable.gif';
+aspect tableName         => 'DataTable';
+property data => (
             fieldType    => 'DataTable',
-            defaultValue => undef,
+            default      => undef,
             autoGenerate => 0,
-        },
-        templateId => {
+         );
+property templateId => (
             tab          => "display",
             fieldType    => "template",
             namespace    => "DataTable",
-            defaultValue => "3rjnBVJRO6ZSkxlFkYh_ug",
-            label        => $i18n->get("editForm templateId label"),
-            hoverHelp    => $i18n->get("editForm templateId description"),
-        },
-        );
+            default      => "3rjnBVJRO6ZSkxlFkYh_ug",
+            label        => ["editForm templateId label", 'Asset_DataTable'],
+            hoverHelp    => ["editForm templateId description", 'Asset_DataTable'],
+         );
 
-    push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'DataTable.gif',
-        autoGenerateForms => 1,
-        tableName         => 'DataTable',
-        className         => 'WebGUI::Asset::Wobject::DataTable',
-        properties        => \%properties,
-        };
-
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
+use WebGUI::International;
+use WebGUI::Utility;
+use WebGUI::Form::DataTable;
 
 #----------------------------------------------------------------------------
 
@@ -87,7 +64,7 @@ Get the data as a JSON object with the following structure:
 sub getDataJson {
     my $self = shift;
 
-    return $self->get("data");
+    return $self->data;
 }
 
 #----------------------------------------------------------------------------
@@ -157,7 +134,7 @@ sub getEditForm {
         WebGUI::Form::DataTable->new(
             $self->session, {
                 name         => "data",
-                value        => $self->get("data"),
+                value        => $self->data,
                 defaultValue => undef,
                 showEdit     => 1,
             }
@@ -221,7 +198,7 @@ sub prepareView {
     my $dt = WebGUI::Form::DataTable->new(
         $session, {
             name         => $self->getId,
-            value        => $self->get('data'),
+            value        => $self->data,
             defaultValue => undef,
         }
     );
@@ -229,11 +206,11 @@ sub prepareView {
     $self->{_datatable} = $dt;
 
     # Prepare the template
-    my $template = WebGUI::Asset::Template->new( $session, $self->get("templateId") );
+    my $template = WebGUI::Asset::Template->new( $session, $self->templateId );
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -293,7 +270,7 @@ sub www_ajaxUpdateData {
         $self->update( { data => $data } );
     }
 
-    $data ||= $self->get("data");
+    $data ||= $self->data;
 
     $self->session->http->setMimeType("application/json");
     return $data;
