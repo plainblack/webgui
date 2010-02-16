@@ -11,7 +11,447 @@ package WebGUI::Asset::Wobject::Collaboration;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_Collaboration'];
+aspect icon      => 'collaboration.gif';
+aspect tableName => 'Collaboration';
+property visitorCacheTimeout => (
+    tab       => "display",
+    fieldType => "interval",
+    default   => 3600,
+    uiLevel   => 8,
+    label     => [ "visitor cache timeout", 'Asset_Collaboration' ],
+    hoverHelp => [ "visitor cache timeout help", 'Asset_Collaboration' ]
+);
+property autoSubscribeToThread => (
+    fieldType => "yesNo",
+    default   => 1,
+    tab       => 'mail',
+    label     => [ "auto subscribe to thread", 'Asset_Collaboration' ],
+    hoverHelp => [ "auto subscribe to thread help", 'Asset_Collaboration' ],
+);
+property requireSubscriptionForEmailPosting => (
+    fieldType => "yesNo",
+    default   => 1,
+    tab       => 'mail',
+    label     => [ "require subscription for email posting", 'Asset_Collaboration' ],
+    hoverHelp => [ "require subscription for email posting help", 'Asset_Collaboration' ],
+);
+property approvalWorkflow => (
+    fieldType => "workflow",
+    default   => "pbworkflow000000000003",
+    type      => 'WebGUI::VersionTag',
+    tab       => 'security',
+    label     => [ 'approval workflow', 'Asset_Collaboration' ],
+    hoverHelp => [ 'approval workflow description', 'Asset_Collaboration' ],
+);
+property threadApprovalWorkflow => (
+    fieldType => "workflow",
+    default   => "pbworkflow000000000003",
+    type      => 'WebGUI::VersionTag',
+    tab       => 'security',
+    label     => [ 'thread approval workflow', 'Asset_Collaboration' ],
+    hoverHelp => [ 'thread approval workflow description', 'Asset_Collaboration' ],
+);
+property thumbnailSize => (
+    fieldType => "integer",
+    default   => 0,
+    tab       => "display",
+    label     => [ "thumbnail size", 'Asset_Collaboration' ],
+    hoverHelp => [ "thumbnail size help", 'Asset_Collaboration' ]
+);
+property maxImageSize => (
+    fieldType => "integer",
+    default   => 0,
+    tab       => "display",
+    label     => [ "max image size", 'Asset_Collaboration' ],
+    hoverHelp => [ "max image size help", 'Asset_Collaboration' ]
+);
+property mailServer => (
+    fieldType => "text",
+    default   => undef,
+    tab       => 'mail',
+    label     => [ "mail server", 'Asset_Collaboration' ],
+    hoverHelp => [ "mail server help", 'Asset_Collaboration' ],
+);
+property mailAccount => (
+    fieldType => "text",
+    default   => undef,
+    tab       => 'mail',
+    label     => [ "mail account", 'Asset_Collaboration' ],
+    hoverHelp => [ "mail account help", 'Asset_Collaboration' ],
+);
+property mailPassword => (
+    fieldType => "password",
+    default   => undef,
+    tab       => 'mail',
+    label     => [ "mail password", 'Asset_Collaboration' ],
+    hoverHelp => [ "mail password help", 'Asset_Collaboration' ],
+);
+property mailAddress => (
+    fieldType => "email",
+    default   => undef,
+    tab       => 'mail',
+    label     => [ "mail address", 'Asset_Collaboration' ],
+    hoverHelp => [ "mail address help", 'Asset_Collaboration' ],
+);
+property mailPrefix => (
+    fieldType => "text",
+    default   => undef,
+    tab       => 'mail',
+    label     => [ "mail prefix", 'Asset_Collaboration' ],
+    hoverHelp => [ "mail prefix help", 'Asset_Collaboration' ],
+);
+property getMailCronId => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1
+);
+property getMail => (
+    fieldType => "yesNo",
+    default   => 0,
+    tab       => 'mail',
+    label     => [ "get mail", 'Asset_Collaboration' ],
+    hoverHelp => [ "get mail help", 'Asset_Collaboration' ],
+);
+property getMailInterval => (
+    fieldType => "interval",
+    default   => 300,
+    tab       => 'mail',
+    label     => [ "get mail interval", 'Asset_Collaboration' ],
+    hoverHelp => [ "get mail interval help", 'Asset_Collaboration' ],
+);
+property displayLastReply => (
+    fieldType => "yesNo",
+    default   => 0,
+    tab       => 'display',
+    label     => [ 'display last reply', 'Asset_Collaboration' ],
+    hoverHelp => [ 'display last reply description', 'Asset_Collaboration' ],
+);
+property allowReplies => (
+    fieldType => "yesNo",
+    default   => 1,
+    tab       => 'security',
+    label     => [ 'allow replies', 'Asset_Collaboration' ],
+    hoverHelp => [ 'allow replies description', 'Asset_Collaboration' ],
+);
+property threadsPerPage => (
+    fieldType => "integer",
+    default   => 30,
+    tab       => 'display',
+    label     => [ 'threads/page', 'Asset_Collaboration' ],
+    hoverHelp => [ 'threads/page description', 'Asset_Collaboration' ],
+);
+property postsPerPage => (
+    fieldType => "integer",
+    default   => 10,
+    tab       => 'display',
+    label     => [ 'posts/page', 'Asset_Collaboration' ],
+    hoverHelp => [ 'posts/page description', 'Asset_Collaboration' ],
+);
+property archiveEnabled => (
+    fieldType => "yesNo",
+    default   => 1,
+    tab       => 'properties',
+    label     => [ 'editForm archiveEnabled label', 'Asset_Collaboration' ],
+    hoverHelp => [ 'editForm archiveEnabled description', 'Asset_Collaboration' ],
+);
+property archiveAfter => (
+    fieldType => "interval",
+    default   => 31536000,
+    tab       => 'properties',
+    label     => [ 'archive after', 'Asset_Collaboration' ],
+    hoverHelp => [ 'archive after description', 'Asset_Collaboration' ],
+);
+property lastPostDate => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => undef
+);
+property lastPostId => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => undef
+);
+property rating => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => undef
+);
+property replies => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => undef
+);
+property views => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => undef
+);
+property threads => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => undef
+);
+property useContentFilter => (
+    fieldType => "yesNo",
+    default   => 1,
+    tab       => 'display',
+    label     => [ 'content filter', 'Asset_Collaboration' ],
+    hoverHelp => [ 'content filter description', 'Asset_Collaboration' ],
+);
+property filterCode => (
+    fieldType => "filterContent",
+    default   => 'most',
+    tab       => 'security',
+    label     => [ 'filter code', 'Asset_Collaboration' ],
+    hoverHelp => [ 'filter code description', 'Asset_Collaboration' ],
+);
+property replyFilterCode => (
+    fieldType => "filterContent",
+    default   => 'most',
+    tab       => 'security',
+    label     => [ 'reply filter code', 'Asset_Collaboration' ],
+    hoverHelp => [ 'reply filter code description', 'Asset_Collaboration' ],
+);
+property richEditor => (
+    fieldType => "selectRichEditor",
+    default   => "PBrichedit000000000002",
+    tab       => 'display',
+    label     => [ 'rich editor', 'Asset_Collaboration' ],
+    hoverHelp => [ 'rich editor description', 'Asset_Collaboration' ],
+);
+property replyRichEditor => (
+    fieldType => "selectRichEditor",
+    default   => "PBrichedit000000000002",
+    tab       => 'display',
+    label     => [ 'reply rich editor', 'Asset_Collaboration' ],
+    hoverHelp => [ 'reply rich editor description', 'Asset_Collaboration' ],
+);
+property attachmentsPerPost => (
+    fieldType => "integer",
+    default   => 0,
+    tab       => 'properties',
+    label     => [ 'attachments/post', 'Asset_Collaboration' ],
+    hoverHelp => [ 'attachments/post description', 'Asset_Collaboration' ],
+);
+property editTimeout => (
+    fieldType => "interval",
+    default   => 3600,
+    tab       => 'security',
+    label     => [ 'edit timeout', 'Asset_Collaboration' ],
+    hoverHelp => [ 'edit timeout description', 'Asset_Collaboration' ],
+);
+property addEditStampToPosts => (
+    fieldType => "yesNo",
+    default   => 0,
+    tab       => 'security',
+    label     => [ 'edit stamp', 'Asset_Collaboration' ],
+    hoverHelp => [ 'edit stamp description', 'Asset_Collaboration' ],
+);
+property usePreview => (
+    fieldType => "yesNo",
+    default   => 1,
+    tab       => 'properties',
+    label     => [ 'use preview', 'Asset_Collaboration' ],
+    hoverHelp => [ 'use preview description', 'Asset_Collaboration' ],
+);
+property sortOrder => (
+    fieldType        => "selectBox",
+    default          => 'desc',
+    tab              => 'display',
+    options          => \&_sortOrder_options,
+    label     => [ 'sort order',             'Asset_Collaboration' ],
+    hoverHelp => [ 'sort order description', 'Asset_Collaboration' ],
+);
+sub _sortOrder_options {
+    my $session = shift->session;
+	my $i18n = WebGUI::International->new($session,"Asset_Collaboration");
+    return {
+        asc  => $i18n->get('ascending'),
+        desc => $i18n->get('descending'),
+    };
+}
+property sortBy => (
+    fieldType => "selectBox",
+    default   => 'assetData.revisionDate',
+    tab       => 'display',
+    options   => \&_sortBy_options,
+    label     => [ 'sort by', 'Asset_Collaboration' ],
+    hoverHelp => [ 'sort by description', 'Asset_Collaboration' ],
+);
+sub _sortBy_options {
+    my $self    = shift;
+    my $session = $self->session;
+	my $i18n = WebGUI::International->new($session,"Asset_Collaboration");
+	tie my %sortByOptions, 'Tie::IxHash';
+    %sortByOptions = (
+        lineage                  => $i18n->get('sequence'),
+        "assetData.revisionDate" => $i18n->get('date updated'),
+        creationDate             => $i18n->get('date submitted'),
+        title                    => $i18n->get('title'),
+        userDefined1             => $i18n->get('user defined 1'),
+        userDefined2             => $i18n->get('user defined 2'),
+        userDefined3             => $i18n->get('user defined 3'),
+        userDefined4             => $i18n->get('user defined 4'),
+        userDefined5             => $i18n->get('user defined 5'),
+    );
+    if ($self->_useKarma) {
+        $sortByOptions{karmaRank} = $i18n->get('karma rank');
+    }
+    return \%sortByOptions;
+}
+property notificationTemplateId => (
+    fieldType => "template",
+    namespace => "Collaboration/Notification",
+    default   => 'PBtmpl0000000000000027',
+    tab       => 'mail',
+    label     => [ 'notification template', 'Asset_Collaboration' ],
+    hoverHelp => [ 'notification template description', 'Asset_Collaboration' ],
+);
+property searchTemplateId => (
+    fieldType => "template",
+    namespace => "Collaboration/Search",
+    default   => 'PBtmpl0000000000000031',
+    tab       => 'display',
+    label     => [ 'search template', 'Asset_Collaboration' ],
+    hoverHelp => [ 'search template description', 'Asset_Collaboration' ],
+);
+property postFormTemplateId => (
+    fieldType => "template",
+    namespace => "Collaboration/PostForm",
+    default   => 'PBtmpl0000000000000029',
+    tab       => 'display',
+    label     => [ 'post template', 'Asset_Collaboration' ],
+    hoverHelp => [ 'post template description', 'Asset_Collaboration' ],
+);
+property threadTemplateId => (
+    fieldType => "template",
+    namespace => "Collaboration/Thread",
+    default   => 'PBtmpl0000000000000032',
+    tab       => 'display',
+    label     => [ 'thread template', 'Asset_Collaboration' ],
+    hoverHelp => [ 'thread template description', 'Asset_Collaboration' ],
+);
+property collaborationTemplateId => (
+    fieldType => "template",
+    namespace => 'Collaboration',
+    default   => 'PBtmpl0000000000000026',
+    tab       => 'display',
+    label     => [ 'system template', 'Asset_Collaboration' ],
+    hoverHelp => [ 'system template description', 'Asset_Collaboration' ],
+);
+property karmaPerPost => (
+    fieldType  => "integer",
+    default    => 0,
+    tab        => 'properties',
+    noFormPost => \&_disableForKarma,
+    label      => [ 'karma/post', 'Asset_Collaboration' ],
+    hoverHelp  => [ 'karma/post description', 'Asset_Collaboration' ],
+);
+sub _disableForKarma {
+    my $self = shift;
+    return ! $self->_useKarma;
+}
+property karmaSpentToRate => (
+    fieldType  => "integer",
+    default    => 0,
+    tab        => 'properties',
+    noFormPost => \&_disableForKarma,
+    label      => [ 'karma spent to rate', 'Asset_Collaboration' ],
+    hoverHelp  => [ 'karma spent to rate description', 'Asset_Collaboration' ],
+);
+property karmaRatingMultiplier => (
+    fieldType  => "integer",
+    default    => 1,
+    tab        => 'properties',
+    noFormPost => \&_disableForKarma,
+    label      => [ 'karma rating multiplier', 'Asset_Collaboration' ],
+    hoverHelp  => [ 'karma rating multiplier description', 'Asset_Collaboration' ],
+);
+property avatarsEnabled => (
+    fieldType => "yesNo",
+    default   => 0,
+    tab       => 'properties',
+    label     => [ 'enable avatars', 'Asset_Collaboration' ],
+    hoverHelp => [ 'enable avatars description', 'Asset_Collaboration' ],
+);
+property enablePostMetaData => (
+    fieldType => "yesNo",
+    default   => 0,
+    tab       => 'meta',
+    label     => [ 'enable metadata', 'Asset_Collaboration' ],
+    hoverHelp => [ 'enable metadata description', 'Asset_Collaboration' ],
+);
+property postGroupId => (
+    fieldType => "group",
+    default   => '2',
+    tab       => 'security',
+    label     => [ 'who posts', 'Asset_Collaboration' ],
+    hoverHelp => [ 'who posts description', 'Asset_Collaboration' ],
+);
+property canStartThreadGroupId => (
+    fieldType => "group",
+    default   => '2',
+    tab       => 'security',
+    label     => [ 'who threads', 'Asset_Collaboration' ],
+    hoverHelp => [ 'who threads description', 'Asset_Collaboration' ],
+);
+property defaultKarmaScale => (
+    fieldType  => "integer",
+    default    => 1,
+    tab        => 'properties',
+    noFormPost => \&_disableForKarma,
+    label      => [ "default karma scale", 'Asset_Collaboration' ],
+    hoverHelp  => [ 'default karma scale help', 'Asset_Collaboration' ],
+);
+property useCaptcha => (
+    fieldType => "yesNo",
+    default   => '0',
+    tab       => 'security',
+    label     => [ 'use captcha label', 'Asset_Collaboration' ],
+    hoverHelp => [ 'use captcha hover help', 'Asset_Collaboration' ],
+);
+property subscriptionGroupId => (
+    fieldType  => "subscriptionGroup",
+    tab        => 'security',
+    label      => [ "subscription group label", 'Asset_Collaboration' ],
+    hoverHelp  => [ "subscription group hoverHelp", 'Asset_Collaboration' ],
+    noFormPost => 1,
+    default    => undef,
+);
+property groupToEditPost => (
+    tab           => "security",
+    label         => [ 'group to edit label', 'Asset_Collaboration' ],
+    excludeGroups => [ 1, 7 ],
+    hoverHelp     => [ 'group to edit hoverhelp', 'Asset_Collaboration' ],
+    uiLevel       => 6,
+    fieldType     => 'group',
+    builder       => '_groupToEditPost_builder',    # groupToEditPost should default to groupIdEdit
+    lazy          => 1,
+);
+sub _groupToEditPost_builder {
+    my $session = shift->session;
+    my $groupIdEdit;
+    if($session->asset) {
+        $groupIdEdit = $session->asset->groupIdEdit;
+    }
+    else {
+        $groupIdEdit = '4';
+    }
+    return $groupIdEdit;
+}
+property postReceivedTemplateId => (
+    fieldType => 'template',
+    namespace => 'Collaboration/PostReceived',
+    tab       => 'display',
+    label     => [ 'post received template', 'Asset_Collaboration' ],
+    hoverHelp => [ 'post received template hoverHelp', 'Asset_Collaboration' ],
+    default   => 'default_post_received1',
+);
+
+
 use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::International;
@@ -19,9 +459,8 @@ use WebGUI::Paginator;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Workflow::Cron;
-use Class::C3;
-use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
-
+#use Class::C3;
+#use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
 sub _computePostCount {
@@ -47,6 +486,19 @@ sub _get_rfc822_date {
                        $mday, $month, $year, $hour, $min, $sec);
 }
   
+
+#-------------------------------------------------------------------
+
+=head2 _useKarma 
+
+Internal method for determining if the karma is enabled in settings.
+
+=cut
+
+sub _useKarma {
+    my $self = shift;
+    return $self->session->setting->get('useKarma');
+}
 #-------------------------------------------------------------------
 sub _visitorCacheKey {
 	my $self = shift;
@@ -74,7 +526,7 @@ sub addChild {
 	my $properties = shift;
 	my @other = @_;
 	if ($properties->{className} ne "WebGUI::Asset::Post::Thread") {
-		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
+		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->className);
 		return undef;
 	}
 	return $self->next::method($properties, @other);
@@ -108,39 +560,39 @@ sub appendPostListTemplateVars {
 	foreach my $row (@$page) {
 		my $post = WebGUI::Asset->new($self->session,$row->{assetId}, $row->{className}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
-		my $controls = $icon->delete('func=delete',$post->get("url"),"Delete") . $icon->edit('func=edit',$post->get("url"));
-		if ($self->get("sortBy") eq "lineage") {
-			if ($self->get("sortOrder") eq "desc") {
-				$controls .= $icon->moveUp('func=demote',$post->get("url")).$icon->moveDown('func=promote',$post->get("url"));
+		my $controls = $icon->delete('func=delete',$post->url,"Delete") . $icon->edit('func=edit',$post->url);
+		if ($self->sortBy eq "lineage") {
+			if ($self->sortOrder eq "desc") {
+				$controls .= $icon->moveUp('func=demote',$post->url).$icon->moveDown('func=promote',$post->url);
 			} 
             else {
-				$controls .= $icon->moveUp('func=promote',$post->get("url")).$icon->moveDown('func=demote',$post->get("url"));
+				$controls .= $icon->moveUp('func=promote',$post->url).$icon->moveDown('func=demote',$post->url);
 			}
 		}
 		my @rating_loop;
-		for (my $i=0;$i<=$post->get("rating");$i++) {
+		for (my $i=0;$i<=$post->rating;$i++) {
 			push(@rating_loop,{'rating_loop.count'=>$i});
 		}
 		my %lastReply;
 		my $hasRead = 0;
-		if ($post->get("className") =~ /Thread/) {
-			if ($self->get("displayLastReply")) {
+		if ($post->isa('WebGUI::Asset::Post::Thread')) {
+			if ($self->displayLastReply) {
 				my $lastPost = $post->getLastPost();
 				%lastReply = (
 					"lastReply.url"                 => $lastPost->getUrl.'#'.$lastPost->getId,
-                    "lastReply.title"               => $lastPost->get("title"),
-                    "lastReply.user.isVisitor"      => $lastPost->get("ownerUserId") eq "1",
-                    "lastReply.username"            => $lastPost->get("username"),
+                    "lastReply.title"               => $lastPost->title,
+                    "lastReply.user.isVisitor"      => $lastPost->ownerUserId eq "1",
+                    "lastReply.username"            => $lastPost->username,
                     "lastReply.userProfile.url"     => $lastPost->getPosterProfileUrl(),
-                    "lastReply.dateSubmitted.human" => $datetime->epochToHuman($lastPost->get("creationDate"),"%z"),
-                    "lastReply.timeSubmitted.human" => $datetime->epochToHuman($lastPost->get("creationDate"),"%Z"),
+                    "lastReply.dateSubmitted.human" => $datetime->epochToHuman($lastPost->creationDate,"%z"),
+                    "lastReply.timeSubmitted.human" => $datetime->epochToHuman($lastPost->creationDate,"%Z"),
 					);
 			}
 			$hasRead = $post->isMarkedRead;
 		}
 		my $url;
-		if ($post->get("status") eq "pending") {
-			$url = $post->getUrl("revision=".$post->get("revisionDate"))."#".$post->getId;
+		if ($post->status eq "pending") {
+			$url = $post->getUrl("revision=".$post->revisionDate)."#".$post->getId;
 		} else {
 			$url = $post->getUrl."#".$post->getId;
 		}
@@ -153,12 +605,12 @@ sub appendPostListTemplateVars {
             "status"                => $post->getStatus,
             "thumbnail"             => $post->getThumbnailUrl,
             "image.url"             => $post->getImageUrl,
-            "dateSubmitted.human"   => $datetime->epochToHuman($post->get("creationDate"),"%z"),
-            "dateUpdated.human"     => $datetime->epochToHuman($post->get("revisionDate"),"%z"),
-            "timeSubmitted.human"   => $datetime->epochToHuman($post->get("creationDate"),"%Z"),
-            "timeUpdated.human"     => $datetime->epochToHuman($post->get("revisionDate"),"%Z"),
+            "dateSubmitted.human"   => $datetime->epochToHuman($post->creationDate,"%z"),
+            "dateUpdated.human"     => $datetime->epochToHuman($post->revisionDate,"%z"),
+            "timeSubmitted.human"   => $datetime->epochToHuman($post->creationDate,"%Z"),
+            "timeUpdated.human"     => $datetime->epochToHuman($post->revisionDate,"%Z"),
             "userProfile.url"       => $post->getPosterProfileUrl,
-            "user.isVisitor"        => $post->get("ownerUserId") eq "1",
+            "user.isVisitor"        => $post->ownerUserId eq "1",
         	"edit.url"              => $post->getEditUrl,
 			'controls'              => $controls,
             "isSecond"              => (($i+1)%2==0),
@@ -172,7 +624,7 @@ sub appendPostListTemplateVars {
 		);
         $post->getTemplateMetadataVars(\%postVars);
 		if ($row->{className} =~ m/^WebGUI::Asset::Post::Thread/) {
-			$postVars{'rating'} = $post->get('threadRating');
+			$postVars{'rating'} = $post->threadRating;
 		}
                 push(@{$var->{post_loop}}, \%postVars );
 		$i++;
@@ -344,11 +796,11 @@ sub canPost {
                 ;
 
     # checks to make sure that the cs has been committed at least once
-    if  ( $self->get("status") ne "approved" && $self->getTagCount <= 1 ) {
+    if  ( $self->status ne "approved" && $self->getTagCount <= 1 ) {
         return 0;
     }
     # Users in the postGroupId can post
-    elsif ( $user->isInGroup( $self->get("postGroupId") ) ) {
+    elsif ( $user->isInGroup( $self->postGroupId ) ) {
         return 1;
     }
     # Users who can edit the collab can post
@@ -406,7 +858,7 @@ sub canStartThread {
                 : $self->session->user
                 ;
     return (
-        $user->isInGroup($self->get("canStartThreadGroupId")) 
+        $user->isInGroup($self->canStartThreadGroupId) 
         || $self->WebGUI::Asset::canEdit( $userId )
     );
 }
@@ -445,14 +897,14 @@ sub commit {
     my $self = shift;
     $self->next::method;
     my $cron = undef;
-    if ($self->get("getMailCronId")) {
-        $cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
+    if ($self->getMailCronId) {
+        $cron = WebGUI::Workflow::Cron->new($self->session, $self->getMailCronId);
     }
     my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
     unless (defined $cron) {
             $cron = WebGUI::Workflow::Cron->create($self->session, {
                     title=>$self->getTitle." ".$i18n->get("mail"),
-                    minuteOfHour=>"*/".($self->get("getMailInterval")/60),
+                    minuteOfHour=>"*/".($self->getMailInterval/60),
                     className=>(ref $self),
                     methodName=>"new",
                     parameters=>$self->getId,
@@ -460,10 +912,10 @@ sub commit {
                     });
             $self->update({getMailCronId=>$cron->getId});
     }
-    if ($self->get("getMail")) {
-            $cron->set({enabled=>1,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
+    if ($self->getMail) {
+            $cron->set({enabled=>1,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->getMailInterval/60)});
     } else {
-            $cron->set({enabled=>0,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
+            $cron->set({enabled=>0,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->getMailInterval/60)});
     }
 }
 
@@ -486,446 +938,6 @@ sub createSubscriptionGroup {
 	$self->update({
 		subscriptionGroupId=>$group->getId
 		});
-}
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Collaboration");
-	my $useKarma = $session->setting->get('useKarma');
-
-    # obtain the groupIdEdit default value. Try to get it from the parent asset
-    # if it exists. If not, default to the value specified in WebGUI::Asset's
-    # definition.
-    my $groupIdEdit;
-    if($session->asset) {
-        $groupIdEdit = $session->asset->get('groupIdEdit');
-    }
-    else {
-        $groupIdEdit = '4';
-    }
-
-
-	my %sortByOptions;
-	tie %sortByOptions, 'Tie::IxHash';
-	%sortByOptions = (lineage=>$i18n->get('sequence'),
-			  "assetData.revisionDate"=>$i18n->get('date updated'),
-			  creationDate=>$i18n->get('date submitted'),
-			  title=>$i18n->get('title'),
-			  userDefined1=>$i18n->get('user defined 1'),
-			  userDefined2=>$i18n->get('user defined 2'),
-			  userDefined3=>$i18n->get('user defined 3'),
-			  userDefined4=>$i18n->get('user defined 4'),
-			  userDefined5=>$i18n->get('user defined 5'),
-			  ($useKarma? (karmaRank=>$i18n->get('karma rank')) : ()),
-			 );
-
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		visitorCacheTimeout => {
-			tab => "display",
-			fieldType => "interval",
-			defaultValue => 3600,
-			uiLevel => 8,
-			label => $i18n->get("visitor cache timeout"),
-			hoverHelp => $i18n->get("visitor cache timeout help")
-			},
-		autoSubscribeToThread => {
-			fieldType=>"yesNo",
-			defaultValue=>1,
-			tab=>'mail',
-			label=>$i18n->get("auto subscribe to thread"),
-			hoverHelp=>$i18n->get("auto subscribe to thread help"),
-			},
-		requireSubscriptionForEmailPosting => {
-			fieldType=>"yesNo",
-			defaultValue=>1,
-			tab=>'mail',
-			label=>$i18n->get("require subscription for email posting"),
-			hoverHelp=>$i18n->get("require subscription for email posting help"),
-			},
-		approvalWorkflow =>{
-			fieldType=>"workflow",
-			defaultValue=>"pbworkflow000000000003",
-			type=>'WebGUI::VersionTag',
-			tab=>'security',
-			label=>$i18n->get('approval workflow'),
-			hoverHelp=>$i18n->get('approval workflow description'),
-			},
-		threadApprovalWorkflow =>{
-			fieldType=>"workflow",
-			defaultValue=>"pbworkflow000000000003",
-			type=>'WebGUI::VersionTag',
-			tab=>'security',
-			label=>$i18n->get('thread approval workflow'),
-			hoverHelp=>$i18n->get('thread approval workflow description'),
-			},
-		thumbnailSize => {
-			fieldType => "integer",
-			defaultValue => 0,
-			tab => "display",
-			label => $i18n->get("thumbnail size"),
-			hoverHelp => $i18n->get("thumbnail size help")
-			},
-		maxImageSize => {
-			fieldType => "integer",
-			defaultValue => 0,
-			tab => "display",
-			label => $i18n->get("max image size"),
-			hoverHelp => $i18n->get("max image size help")
-			},
-		mailServer=>{
-			fieldType=>"text",
-			defaultValue=>undef,
-			tab=>'mail',
-			label=>$i18n->get("mail server"),
-			hoverHelp=>$i18n->get("mail server help"),
-			},
-		mailAccount=>{
-			fieldType=>"text",
-			defaultValue=>undef,
-			tab=>'mail',
-			label=>$i18n->get("mail account"),
-			hoverHelp=>$i18n->get("mail account help"),
-			},
-		mailPassword=>{
-			fieldType=>"password",
-			defaultValue=>undef,
-			tab=>'mail',
-			label=>$i18n->get("mail password"),
-			hoverHelp=>$i18n->get("mail password help"),
-			},
-		mailAddress=>{
-			fieldType=>"email",
-			defaultValue=>undef,
-			tab=>'mail',
-			label=>$i18n->get("mail address"),
-			hoverHelp=>$i18n->get("mail address help"),
-			},
-		mailPrefix=>{
-			fieldType=>"text",
-			defaultValue=>undef,
-			tab=>'mail',
-			label=>$i18n->get("mail prefix"),
-			hoverHelp=>$i18n->get("mail prefix help"),
-			},
-		getMailCronId=>{
-			fieldType=>"hidden",
-			defaultValue=>undef,
-			noFormPost=>1
-			},
-		getMail=>{
-			fieldType=>"yesNo",
-			defaultValue=>0,
-			tab=>'mail',
-			label=>$i18n->get("get mail"),
-			hoverHelp=>$i18n->get("get mail help"),
-			},
-		getMailInterval=>{
-			fieldType=>"interval",
-			defaultValue=>300,
-			tab=>'mail',
-			label=>$i18n->get("get mail interval"),
-			hoverHelp=>$i18n->get("get mail interval help"),
-			},
-		displayLastReply =>{
-			fieldType=>"yesNo",
-			defaultValue=>0,
-			tab=>'display',
-			label=>$i18n->get('display last reply'),
-			hoverHelp=>$i18n->get('display last reply description'),
-			},
-		allowReplies =>{
-			fieldType=>"yesNo",
-			defaultValue=>1,
-			tab=>'security',
-			label=>$i18n->get('allow replies'),
-			hoverHelp=>$i18n->get('allow replies description'),
-			},
-		threadsPerPage =>{
-			fieldType=>"integer",
-			defaultValue=>30,
-			tab=>'display',
-			label=>$i18n->get('threads/page'),
-			hoverHelp=>$i18n->get('threads/page description'),
-			},
-		postsPerPage =>{
-			fieldType=>"integer",
-			defaultValue=>10,
-			tab=>'display',
-			label=>$i18n->get('posts/page'),
-			hoverHelp=>$i18n->get('posts/page description'),
-			},
-                archiveEnabled => {
-                    fieldType       => "yesNo",
-                    defaultValue    => 1,
-                    tab             => 'properties',
-                    label           => $i18n->get('editForm archiveEnabled label'),
-                    hoverHelp       => $i18n->get('editForm archiveEnabled description'),
-                },
-		archiveAfter =>{
-			fieldType=>"interval",
-			defaultValue=>31536000,
-			tab=>'properties',
-			label=>$i18n->get('archive after'),
-			hoverHelp=>$i18n->get('archive after description'),
-			},
-		lastPostDate =>{
-			noFormPost=>1,
-			fieldType=>"hidden",
-			defaultValue=>undef
-			},
-		lastPostId =>{
-			noFormPost=>1,
-			fieldType=>"hidden",
-			defaultValue=>undef
-			},
-		rating =>{
-			noFormPost=>1,
-			fieldType=>"hidden",
-			defaultValue=>undef
-			},
-		replies =>{
-			noFormPost=>1,
-			fieldType=>"hidden",
-			defaultValue=>undef
-			},
-		views =>{
-			noFormPost=>1,
-			fieldType=>"hidden",
-			defaultValue=>undef
-			},
-		threads =>{
-			noFormPost=>1,
-			fieldType=>"hidden",
-			defaultValue=>undef
-			},
-		useContentFilter =>{
-			fieldType=>"yesNo",
-			defaultValue=>1,
-			tab=>'display',
-			label=>$i18n->get('content filter'),
-			hoverHelp=>$i18n->get('content filter description'),
-			},
-		filterCode =>{
-			fieldType=>"filterContent",
-			defaultValue=>'most',
-			tab=>'security',
-			label=>$i18n->get('filter code'),
-			hoverHelp=>$i18n->get('filter code description'),
-			},
-		replyFilterCode =>{
-			fieldType=>"filterContent",
-			defaultValue=>'most',
-			tab=>'security',
-			label=>$i18n->get('reply filter code'),
-			hoverHelp=>$i18n->get('reply filter code description'),
-			},
-		richEditor =>{
-			fieldType=>"selectRichEditor",
-			defaultValue=>"PBrichedit000000000002",
-			tab=>'display',
-			label=>$i18n->get('rich editor'),
-			hoverHelp=>$i18n->get('rich editor description'),
-			},
-		replyRichEditor =>{
-			fieldType=>"selectRichEditor",
-			defaultValue=>"PBrichedit000000000002",
-			tab=>'display',
-			label=>$i18n->get('reply rich editor'),
-			hoverHelp=>$i18n->get('reply rich editor description'),
-			},
-		attachmentsPerPost =>{
-			fieldType=>"integer",
-			defaultValue=>0,
-			tab=>'properties',
-			label=>$i18n->get('attachments/post'),
-			hoverHelp=>$i18n->get('attachments/post description'),
-			},
-		editTimeout =>{
-			fieldType=>"interval",
-			defaultValue=>3600,
-			tab=>'security',
-			label=>$i18n->get('edit timeout'),
-			hoverHelp=>$i18n->get('edit timeout description'),
-			},
-		addEditStampToPosts =>{
-			fieldType=>"yesNo",
-			defaultValue=>0,
-			tab=>'security',
-			label=>$i18n->get('edit stamp'),
-			hoverHelp=>$i18n->get('edit stamp description'),
-			},
-		usePreview =>{
-			fieldType=>"yesNo",
-			defaultValue=>1,
-			tab=>'properties',
-			label=>$i18n->get('use preview'),
-			hoverHelp=>$i18n->get('use preview description'),
-			},
-		sortOrder =>{
-			fieldType=>"selectBox",
-			defaultValue=>'desc',
-			tab=>'display',
-			options=>{ asc => $i18n->get('ascending'),
-				   desc => $i18n->get('descending') },
-			label=>$i18n->get('sort order'),
-			hoverHelp=>$i18n->get('sort order description'),
-			},
-		sortBy =>{
-			fieldType=>"selectBox",
-			defaultValue=>'assetData.revisionDate',
-			tab=>'display',
-			options=>\%sortByOptions,
-			label=>$i18n->get('sort by'),
-			hoverHelp=>$i18n->get('sort by description'),
-			},
-		notificationTemplateId =>{
-			fieldType=>"template",
-			namespace=>"Collaboration/Notification",
-			defaultValue=>'PBtmpl0000000000000027',
-			tab=>'mail',
-			label=>$i18n->get('notification template'),
-			hoverHelp=>$i18n->get('notification template description'),
-			},
-		searchTemplateId =>{
-			fieldType=>"template",
-			namespace=>"Collaboration/Search",
-			defaultValue=>'PBtmpl0000000000000031',
-			tab=>'display',
-			label=>$i18n->get('search template'),
-			hoverHelp=>$i18n->get('search template description'),
-			},
-		postFormTemplateId =>{
-			fieldType=>"template",
-			namespace=>"Collaboration/PostForm",
-			defaultValue=>'PBtmpl0000000000000029',
-			tab=>'display',
-			label=>$i18n->get('post template'),
-			hoverHelp=>$i18n->get('post template description'),
-			},
-		threadTemplateId =>{
-			fieldType=>"template",
-			namespace=>"Collaboration/Thread",
-			defaultValue=>'PBtmpl0000000000000032',
-			tab=>'display',
-			label=>$i18n->get('thread template'),
-			hoverHelp=>$i18n->get('thread template description'),
-			},
-		collaborationTemplateId =>{
-			fieldType=>"template",
-			namespace=>'Collaboration',
-			defaultValue=>'PBtmpl0000000000000026',
-			tab=>'display',
-			label=>$i18n->get('system template'),
-			hoverHelp=>$i18n->get('system template description'),
-			},
-		karmaPerPost =>{
-			fieldType=>"integer",
-			defaultValue=>0,
-			tab=>'properties',
-			visible=>$useKarma,
-			label=>$i18n->get('karma/post'),
-			hoverHelp=>$i18n->get('karma/post description'),
-			},
-		karmaSpentToRate => {
-			fieldType => "integer",
-			defaultValue=> 0,
-			tab=>'properties',
-			visible => $useKarma,
-			label => $i18n->get('karma spent to rate'),
-			hoverHelp => $i18n->get('karma spent to rate description'),
-			},
-		karmaRatingMultiplier => {
-			fieldType => "integer",
-			defaultValue=> 1,
-			tab=>'properties',
-			visible => $useKarma,
-			label=>$i18n->get('karma rating multiplier'),
-			hoverHelp=>$i18n->get('karma rating multiplier description'),
-			},
-		avatarsEnabled =>{
-			fieldType=>"yesNo",
-			defaultValue=>0,
-			tab=>'properties',
-			label=>$i18n->get('enable avatars'),
-			hoverHelp=>$i18n->get('enable avatars description'),
-			},
-		enablePostMetaData =>{
-			fieldType=>"yesNo",
-			defaultValue=>0,
-			tab=>'meta',
-			label=>$i18n->get('enable metadata'),
-			hoverHelp=>$i18n->get('enable metadata description'),
-			},
-		postGroupId =>{
-			fieldType=>"group",
-			defaultValue=>'2',
-			tab=>'security',
-			label=>$i18n->get('who posts'),
-			hoverHelp=>$i18n->get('who posts description'),
-			},
-		canStartThreadGroupId =>{
-			fieldType=>"group",
-			defaultValue=>'2',
-			tab=>'security',
-			label=>$i18n->get('who threads'),
-			hoverHelp=>$i18n->get('who threads description'),
-			},
-		defaultKarmaScale => {
-			fieldType=>"integer",
-			defaultValue=>1,
-			tab=>'properties',
-			visible=>$useKarma,
-			label=>$i18n->get("default karma scale"),
-			hoverHelp=>$i18n->get('default karma scale help'),
-			},
-        useCaptcha => {
-            fieldType=>"yesNo",
-            defaultValue=>'0',
-            tab=>'security',
-            label=>$i18n->get('use captcha label'),
-            hoverHelp=>$i18n->get('use captcha hover help'),
-        },
-        subscriptionGroupId =>{
-            fieldType=>"subscriptionGroup",
-            tab=>'security',
-            label=>$i18n->get("subscription group label"),
-            hoverHelp=>$i18n->get("subscription group hoverHelp"),
-            noFormPost=>1,
-            defaultValue=>undef,
-        },
-        groupToEditPost=>{
-            tab=>"security",
-            label=>$i18n->get('group to edit label'),
-            excludeGroups=>[1,7],
-            hoverHelp=>$i18n->get('group to edit hoverhelp'),
-            uiLevel=>6,
-            fieldType=>'group',
-            defaultValue=>$groupIdEdit, # groupToEditPost should default to groupIdEdit
-        },
-        postReceivedTemplateId =>{
-            fieldType=>'template',
-            namespace=>'Collaboration/PostReceived',
-            tab=>'display',
-            label=>$i18n->get('post received template'),
-            hoverHelp=>$i18n->get('post received template hoverHelp'),
-            defaultValue=>'default_post_received1',
-        },
-        );
-
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		autoGenerateForms=>1,
-		icon=>'collaboration.gif',
-                tableName=>'Collaboration',
-                className=>'WebGUI::Asset::Wobject::Collaboration',
-                properties=>\%properties,
-		});
-        return $class->next::method($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -983,7 +995,7 @@ sub getRssFeedItems {
 
 	# XXX copied and reformatted this query from www_viewRSS, but why is it constructed like this?
 	# And it's duplicated inside view, too!  Eeeagh!  And it uses the versionTag scratch var...
-	my ($sortBy, $sortOrder) = ($self->getValue('sortBy'), $self->getValue('sortOrder'));
+	my ($sortBy, $sortOrder) = ($self->sortBy, $self->sortOrder);
 	
     my @postIds = $self->session->db->buildArray(<<"SQL", [$self->getId, $self->session->scratch->get('versionTag')]);
   SELECT asset.assetId
@@ -1001,7 +1013,7 @@ SQL
 	my $datetime = $self->session->datetime;
 
     my @posts;
-    my $rssLimit = $self->get('itemsPerFeed');
+    my $rssLimit = $self->itemsPerFeed;
     for my $postId (@postIds) {
 		my $post = WebGUI::Asset->new($self->session, $postId, 'WebGUI::Asset::Post::Thread');
 		my $postUrl = $siteUrl . $post->getUrl;
@@ -1011,7 +1023,7 @@ SQL
         # Create the attachment template loop
         my $storage = $post->getStorageLocation;
         my $attachmentLoop = [];
-        if ($post->get('storageId')) {
+        if ($post->storageId) {
             for my $file (@{$storage->getFiles}) {
                 push @{$attachmentLoop}, {
                     'attachment.url'        => $storage->getUrl($file),
@@ -1023,19 +1035,19 @@ SQL
         }
         
         push @posts, {
-            author          => $post->get('username'),
-		    title           => $post->get('title'),
+            author          => $post->username,
+		    title           => $post->title,
 		    'link'          => $postUrl,
             guid            => $postUrl,
-		    description     => $post->get('synopsis'),
-            epochDate       => $post->get('creationDate'),
-		    pubDate         => $datetime->epochToMail($post->get('creationDate')),
+		    description     => $post->synopsis,
+            epochDate       => $post->creationDate,
+		    pubDate         => $datetime->epochToMail($post->creationDate),
 		    attachmentLoop  => $attachmentLoop,
-			userDefined1 => $post->get("userDefined1"),
-			userDefined2 => $post->get("userDefined2"),
-			userDefined3 => $post->get("userDefined3"),
-			userDefined4 => $post->get("userDefined4"),
-			userDefined5 => $post->get("userDefined5"),
+			userDefined1 => $post->userDefined1,
+			userDefined2 => $post->userDefined2,
+			userDefined3 => $post->userDefined3,
+			userDefined4 => $post->userDefined4,
+			userDefined5 => $post->userDefined5,
 		 };
 
          last if $rssLimit <= scalar(@posts);
@@ -1086,7 +1098,7 @@ Retrieves the field to sort by
 sub getSortBy {
     my $self = shift;
     my $scratchSortBy = $self->getId."_sortBy";
-    my $sortBy = $self->session->scratch->get($scratchSortBy) || $self->getValue("sortBy");
+    my $sortBy = $self->session->scratch->get($scratchSortBy) || $self->sortBy;
     # XXX: This should be fixed in an upgrade and in the definition, NOT HERE
     if ( $sortBy eq "rating" ) {
         $sortBy = "threadRating";
@@ -1105,7 +1117,7 @@ Retrieves the direction to sort in
 sub getSortOrder {
     my $self = shift;
     my $scratchSortOrder = $self->getId."_sortDir";
-    my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->getValue("sortOrder");
+    my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->sortOrder;
     return $sortOrder;
 }
 
@@ -1136,8 +1148,8 @@ sub getThreadsPaginator {
 	
     my $scratchSortBy = $self->getId."_sortBy";
 	my $scratchSortOrder = $self->getId."_sortDir";
-	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->get("sortBy");
-    my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
+	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->sortBy;
+    my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->sortOrder;
 	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
 		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
         $self->session->scratch->set($scratchSortOrder, $sortOrder);
@@ -1186,7 +1198,7 @@ sub getThreadsPaginator {
 			Thread.isSticky desc, 
 		".$sortBy." 
 			".$sortOrder;
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->threadsPerPage);
 	$p->setDataByQuery($sql);
 
     return $p;
@@ -1301,7 +1313,7 @@ Increments the views counter on this forum.
 
 sub incrementViews {
         my ($self) = @_;
-        $self->update({views=>$self->get("views")+1});
+        $self->update({views=>$self->views+1});
 }
 
 #-------------------------------------------------------------------
@@ -1314,7 +1326,7 @@ Returns a boolean indicating whether the user is subscribed to the forum.
 
 sub isSubscribed {
         my $self = shift;
-	return $self->session->user->isInGroup($self->get("subscriptionGroupId"));	
+	return $self->session->user->isInGroup($self->subscriptionGroupId);	
 }
 
 #-------------------------------------------------------------------
@@ -1328,11 +1340,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->next::method;
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->collaborationTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("collaborationTemplateId"),
+            templateId => $self->collaborationTemplateId,
             assetId    => $self->getId,
         );
     }
@@ -1353,16 +1365,16 @@ and direction.
 
 sub processPropertiesFromFormPost {
 	my $self = shift;
-        my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->get("groupIdView") || $self->session->form->process("groupIdEdit") ne $self->get("groupIdEdit"));
+        my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->groupIdView || $self->session->form->process("groupIdEdit") ne $self->groupIdEdit);
 	$self->next::method;
-	if ($self->get("subscriptionGroupId") eq "") {
+	if ($self->subscriptionGroupId eq "") {
 		$self->createSubscriptionGroup;
 	}
         if ($updatePrivs) {
                 foreach my $descendant (@{$self->getLineage(["descendants"],{returnObjects=>1})}) {
                         $descendant->update({
-                                groupIdView=>$self->get("groupIdView"),
-                                groupIdEdit=>$self->get("groupIdEdit")
+                                groupIdView=>$self->groupIdView,
+                                groupIdEdit=>$self->groupIdEdit
                                 });
                 }
         }
@@ -1381,12 +1393,12 @@ Extend the base method to delete the subscription group and cron job for emails.
 
 sub purge {
 	my $self = shift;
-	my $group = WebGUI::Group->new($self->session, $self->get("subscriptionGroupId"));
+	my $group = WebGUI::Group->new($self->session, $self->subscriptionGroupId);
 	if ($group) {
         $group->delete;
     }
-	if ($self->get("getMailCronId")) {
-		my $cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
+	if ($self->getMailCronId) {
+		my $cron = WebGUI::Workflow::Cron->new($self->session, $self->getMailCronId);
 		$cron->delete if defined $cron;
 	}
 	$self->next::method;
@@ -1512,13 +1524,13 @@ Subscribes a user to this collaboration system.
 sub subscribe {
 	my $self = shift;
     my $group;
-    my $subscriptionGroup = $self->get('subscriptionGroupId');
+    my $subscriptionGroup = $self->subscriptionGroupId;
     if ($subscriptionGroup) {
 	    $group = WebGUI::Group->new($self->session,$subscriptionGroup);
     }
     if (!$group) {
         $self->createSubscriptionGroup;
-	    $group = WebGUI::Group->new($self->session,$self->get('subscriptionGroupId'));
+	    $group = WebGUI::Group->new($self->session,$self->subscriptionGroupId);
     }
     $group->addUsers([$self->session->user->userId]);
 }
@@ -1533,10 +1545,10 @@ Unsubscribes a user from this collaboration system
 
 sub unsubscribe {
 	my $self = shift;
-	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
+	my $group = WebGUI::Group->new($self->session,$self->subscriptionGroupId);
 	return
         unless $group;
-    $group->deleteUsers([$self->session->user->userId],[$self->get("subscriptionGroupId")]);
+    $group->deleteUsers([$self->session->user->userId],[$self->subscriptionGroupId]);
 }
 
 
@@ -1563,7 +1575,7 @@ sub view {
 	$self->prepareView unless ($self->{_viewTemplate});
     my $out = $self->processTemplate($self->getViewTemplateVars,undef,$self->{_viewTemplate});
 	if ($self->_visitorCacheOk) {
-		eval{$cache->set($self->_visitorCacheKey, $out, $self->get("visitorCacheTimeout"))};
+		eval{$cache->set($self->_visitorCacheKey, $out, $self->visitorCacheTimeout)};
 	}
     return $out;
 }
@@ -1602,13 +1614,13 @@ sub www_search {
         my $search = WebGUI::Search->new($self->session);
 		$search->search({
             keywords=>$query,
-            lineage=>[$self->get("lineage")],
+            lineage=>[$self->lineage],
             classes=>["WebGUI::Asset::Post", "WebGUI::Asset::Post::Thread"]
         });
-        my $p = $search->getPaginatorResultSet($self->getUrl("func=search;doit=1;query=".$query), $self->get("threadsPerPage"));
+        my $p = $search->getPaginatorResultSet($self->getUrl("func=search;doit=1;query=".$query), $self->threadsPerPage);
         $self->appendPostListTemplateVars($var, $p);
     }
-    return  $self->processStyle($self->processTemplate($var, $self->get("searchTemplateId")));
+    return  $self->processStyle($self->processTemplate($var, $self->searchTemplateId));
 }
 
 #-------------------------------------------------------------------
@@ -1654,7 +1666,7 @@ Extend the base method to handle the visitor cache timeout.
 sub www_view {
 	my $self = shift;
 	my $disableCache = ($self->session->form->process("sortBy") ne "");
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor && !$disableCache);
+	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor && !$disableCache);
 	return $self->next::method(@_);
 }
 
