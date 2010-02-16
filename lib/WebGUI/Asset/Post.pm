@@ -12,8 +12,99 @@ package WebGUI::Asset::Post;
 
 use strict;
 use Tie::CPHash;
-use Tie::IxHash;
-use WebGUI::Asset;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+aspect assetName => ['assetName', 'Asset_Post'];
+aspect icon      => 'post.gif';
+aspect tableName => 'Post';
+property storageId => (
+            fieldType         => "image",
+            default           => '',
+            enforceSizeLimits => 0,
+            label             => ['attachement', 'Asset_Collaboration'],
+         );
+property threadId => (
+            noFormPost  => 1,
+            fieldType   => "hidden",
+            default     => '',
+         );
+property originalEmail => (
+            noFormPost  => 1,
+            fieldType   => "hidden",
+            default     => undef,
+         );
+property username => (
+            noFormPost  => 1,
+            fieldType   => "hidden",
+            builder     => '_username_builder',
+            lazy        => 1,
+         );
+sub _username_builder {
+    my $session = shift->session;
+    return $session->form->process("visitorUsername")
+        || $session->user->profileField("alias")
+        || $session->user->username;
+}
+property rating => (
+            noFormPost  => 1,
+            fieldType   => "hidden",
+            default     => undef,
+         );
+property views => ( 
+            noFormPost  => 1,
+            fieldType   => "hidden",
+            default     => undef,
+         );
+property contentType => (
+            label       => ['contentType', 'Asset_Collaboration'],
+            fieldType   => "contentType",
+            default     => "mixed",
+         );
+for my $i ( 1 .. 5 ) {
+    property 'userDefined'.$i => (
+        default     => undef,
+        label       => '',
+        fieldType   => 'HTMLArea',
+    );
+}
+property content => (
+            label       => ['message', 'Asset_Collaboration'],
+            fieldType   => "HTMLArea",
+            default     => undef,
+         );
+
+around isHidden => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        $_[0] = 1;
+    }
+    $self->$orig(@_);
+};
+
+sub _set_ownerUserId {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
+
+sub _set_groupIdView {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
+
+sub _set_groupIdEdit {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    }
+}
+
+
+
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post::Thread;
 use WebGUI::Group;
@@ -31,7 +122,6 @@ use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::VersionTag;
-our @ISA = qw(WebGUI::Asset);
 
 #-------------------------------------------------------------------
 
@@ -62,7 +152,7 @@ sub _fixReplyCount {
     } )->[0];
 
     if ($lastPost) {
-        $asset->incrementReplies( $lastPost->get( 'revisionDate' ), $lastPost->getId );
+        $asset->incrementReplies( $lastPost->revisionDate, $lastPost->getId );
     }
     else {
         $asset->incrementReplies( undef, undef );
@@ -82,7 +172,7 @@ sub addChild {
 	my $properties = shift;
 	my @other = @_;
 	if ($properties->{className} ne "WebGUI::Asset::Post") {
-		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
+		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->className);
 		return undef;
 	}
 	return $self->SUPER::addChild($properties, @other);
@@ -99,17 +189,17 @@ Override the default method in order to deal with attachments.
 sub addRevision {
         my $self = shift;
         my $newSelf = $self->SUPER::addRevision(@_);
-        if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
-                my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+        if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
+                my $newStorage = WebGUI::Storage->get($self->session,$self->storageId)->copy;
                 $newSelf->update({storageId=>$newStorage->getId});
         }
-	my $threadId = $newSelf->get("threadId");
+	my $threadId = $newSelf->threadId;
 	my $now = time();
 	if ($threadId eq "") { # new post
 		if ($newSelf->getParent->isa("WebGUI::Asset::Wobject::Collaboration")) {
 			$newSelf->update({threadId=>$newSelf->getId});
 		} else {
-			$newSelf->update({threadId=>$newSelf->getParent->get("threadId")});
+			$newSelf->update({threadId=>$newSelf->getParent->threadId});
 		}
 		delete $newSelf->{_thread};
 	}
@@ -170,14 +260,14 @@ sub canEdit {
 
     # User who posted can edit their own post
     if ( $self->isPoster( $userId ) ) {
-        my $editTimeout = $self->getThread->getParent->get( 'editTimeout' );
-        if ( $editTimeout > time - $self->get( "revisionDate" ) ) {
+        my $editTimeout = $self->getThread->getParent->editTimeout;
+        if ( $editTimeout > time - $self->revisionDate ) {
             return 1;
         }
     }
 
     # Users in groupToEditPost of the Collab can edit any post
-    if ( $user->isInGroup( $self->getThread->getParent->get('groupToEditPost') ) ) {
+    if ( $user->isInGroup( $self->getThread->getParent->groupToEditPost ) ) {
         return 1;
     }
 
@@ -194,7 +284,7 @@ Returns a boolean indicating whether the user can view the current post.
 
 sub canView {
         my $self = shift;
-        if (($self->get("status") eq "approved" || $self->get("status") eq "archived") && $self->getThread->getParent->canView) {
+        if (($self->status eq "approved" || $self->status eq "archived") && $self->getThread->getParent->canView) {
                 return 1;
         } elsif ($self->canEdit) {
                 return 1;
@@ -214,7 +304,7 @@ Cuts a title string off at 30 characters.
 
 sub chopTitle {
     my $self = shift;
-    return substr($self->get("title"),0,30);
+    return substr($self->title,0,30);
 }
 
 #-------------------------------------------------------------------
@@ -233,11 +323,11 @@ sub commit {
     $self->notifySubscribers unless ($self->shouldSkipNotification);
            
 	if ($self->isNew) {
-		if ($self->session->setting->get("useKarma") && $self->getThread->getParent->get("karmaPerPost")) {
-			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-			$u->karma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
+		if ($self->session->setting->get("useKarma") && $self->getThread->getParent->karmaPerPost) {
+			my $u = WebGUI::User->new($self->session, $self->ownerUserId);
+			$u->karma($self->getThread->getParent->karmaPerPost, $self->getId, "Collaboration post");
 		}
-        	$self->getThread->incrementReplies($self->get("revisionDate"),$self->getId);# if ($self->isReply);
+        	$self->getThread->incrementReplies($self->revisionDate,$self->getId);# if ($self->isReply);
 	}
 }
 
@@ -280,69 +370,9 @@ sub definition {
 	my $i18n = WebGUI::International->new($session,"Asset_Post");
     
     my $properties = {
-        storageId => {
-            fieldType=>"image",
-            defaultValue=>'',
-            enforceSizeLimits => 0,
-        },
-        threadId => {
-            noFormPost=>1,
-            fieldType=>"hidden",
-            defaultValue=>'',
-        },
-        originalEmail => {
-            noFormPost=>1,
-            fieldType=>"hidden",
-            defaultValue=>undef
-        },
-        username => {
-            fieldType=>"hidden",
-            defaultValue=>$session->form->process("visitorUsername") || $session->user->profileField("alias") || $session->user->username
-        },
-        rating => {
-            noFormPost=>1,
-            fieldType=>"hidden",
-            defaultValue=>undef
-        },
-        views => { 
-            noFormPost=>1,
-            fieldType=>"hidden",
-            defaultValue=>undef
-        },
-        contentType => {
-            fieldType=>"contentType",
-            defaultValue=>"mixed"
-        },
-        userDefined1 => {
-            fieldType=>"HTMLArea",
-            defaultValue=>undef
-        },
-        userDefined2 => {
-            fieldType=>"HTMLArea",
-            defaultValue=>undef
-        },
-        userDefined3 => {
-            fieldType=>"HTMLArea",
-            defaultValue=>undef
-        },
-        userDefined4 => {
-            fieldType=>"HTMLArea",
-            defaultValue=>undef
-        },
-        userDefined5 => {
-            fieldType=>"HTMLArea",
-            defaultValue=>undef
-        },
-        content => {
-            fieldType=>"HTMLArea",
-            defaultValue=>undef
-        },
     };
     
     push(@{$definition}, {
-        assetName=>$i18n->get('assetName'),
-        icon=>'post.gif',
-        tableName=>'Post',
         className=>'WebGUI::Asset::Post',
         properties=>$properties,
     });
@@ -376,7 +406,7 @@ Extend the base class to handle storage locations.
 sub exportAssetData {
 	my $self = shift;
 	my $data = $self->SUPER::exportAssetData;
-	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
+	push(@{$data->{storage}}, $self->storageId) if ($self->storageId ne "");
 	return $data;
 }
 
@@ -418,16 +448,16 @@ The content type to use for formatting. Defaults to the content type specified i
 
 sub formatContent {
 	my $self = shift;
-	my $content = shift || $self->get("content");
-	my $contentType = shift || $self->get("contentType");	
+	my $content = shift || $self->content;
+	my $contentType = shift || $self->contentType;	
         my $msg = undef ;
 	if (!$self->isa("WebGUI::Asset::Post::Thread")) { # apply appropriate content filter
-		$msg = WebGUI::HTML::filter($content,$self->getThread->getParent->get("replyFilterCode"));
+		$msg = WebGUI::HTML::filter($content,$self->getThread->getParent->replyFilterCode);
 	} else {
-		$msg = WebGUI::HTML::filter($content,$self->getThread->getParent->get("filterCode"));
+		$msg = WebGUI::HTML::filter($content,$self->getThread->getParent->filterCode);
 	}
         $msg = WebGUI::HTML::format($msg, $contentType);
-        if ($self->getThread->getParent->get("useContentFilter")) {
+        if ($self->getThread->getParent->useContentFilter) {
                 $msg = WebGUI::HTML::processReplacements($self->session,$msg);
         }
         return $msg;
@@ -445,7 +475,7 @@ sub getAutoCommitWorkflowId {
     my $self = shift;
     my $cs = $self->getThread->getParent;
     if ($cs->hasBeenCommitted) {
-        return $cs->get('approvalWorkflow')
+        return $cs->approvalWorkflow
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
     return undef;
@@ -463,7 +493,7 @@ sub getAvatarUrl {
 	my $self = shift;
 	my $parent = $self->getThread->getParent;
 	return '' unless $parent and $parent->getValue("avatarsEnabled");
-	my $user = WebGUI::User->new($self->session, $self->get('ownerUserId'));
+	my $user = WebGUI::User->new($self->session, $self->ownerUserId);
 	#Get avatar field, storage Id.
 	my $storageId = $user->profileField("avatar");
 	return '' unless $storageId;
@@ -491,7 +521,7 @@ Formats the url to delete a post.
 
 sub getDeleteUrl {
 	my $self = shift;
-	return $self->getUrl("func=delete;revision=".$self->get("revisionDate"));
+	return $self->getUrl("func=delete;revision=".$self->revisionDate);
 }
 
 #-------------------------------------------------------------------
@@ -504,7 +534,7 @@ Formats the url to edit a post.
 
 sub getEditUrl {
 	my $self = shift;
-	return $self->getUrl("func=edit;revision=".$self->get("revisionDate"));
+	return $self->getUrl("func=edit;revision=".$self->revisionDate);
 }
 
 
@@ -519,7 +549,7 @@ are not stored files, it returns undef.
 
 sub getImageUrl {
 	my $self = shift;
-	return undef if ($self->get("storageId") eq "");
+	return undef if ($self->storageId eq "");
 	my $storage = $self->getStorageLocation;
 	my $url;
 	foreach my $filename (@{$storage->getFiles}) {
@@ -542,7 +572,7 @@ Formats the url to view a users profile.
 
 sub getPosterProfileUrl {
 	my $self = shift;
-	return WebGUI::User->new($self->session,$self->get("ownerUserId"))->getProfileUrl;
+	return WebGUI::User->new($self->session,$self->ownerUserId)->getProfileUrl;
 }
 
 #-------------------------------------------------------------------
@@ -591,7 +621,7 @@ Returns the status of this Post, 'approved', 'pending', or 'archived'.
 
 sub getStatus {
 	my $self = shift;
-	my $status = $self->get("status");
+	my $status = $self->status;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Post");
         if ($status eq "approved") {
                 return $i18n->get('approved');
@@ -614,11 +644,11 @@ creates one.
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
-		if ($self->get("storageId") eq "") {
+		if ($self->storageId eq "") {
 			$self->{_storageLocation} = WebGUI::Storage->create($self->session);
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
-			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
+			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->storageId);
 		}
 	}
 	return $self->{_storageLocation};
@@ -683,7 +713,7 @@ sub getTemplateMetadataVars {
 	my $self = shift;
     my $var  = shift;
     if ($self->session->setting->get("metaDataEnabled")
-     && $self->getThread->getParent->get('enablePostMetaData')) {
+     && $self->getThread->getParent->enablePostMetaData) {
         my $meta = $self->getMetaDataFields();
         my @meta_loop = ();
         foreach my $field (keys %{ $meta }) {
@@ -712,13 +742,13 @@ sub getTemplateVars {
 	my $self    = shift;
     my $session = $self->session;
 	my %var     = %{$self->get};
-    my $postUser   = WebGUI::User->new($session, $self->get("ownerUserId"));
-	$var{"userId"} = $self->get("ownerUserId");
+    my $postUser   = WebGUI::User->new($session, $self->ownerUserId);
+	$var{"userId"} = $self->ownerUserId;
 	$var{"user.isPoster"} = $self->isPoster;
 	$var{"avatar.url"}    = $self->getAvatarUrl;
 	$var{"userProfile.url"} = $postUser->getProfileUrl($self->getUrl());
-	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->get("creationDate"));
-	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->get("revisionDate"));
+	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->creationDate);
+	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->revisionDate);
 	$var{'title.short'} = $self->chopTitle;
 	$var{content} = $self->formatContent if ($self->getThread);
 	$var{'user.canEdit'} = $self->canEdit if ($self->getThread);
@@ -729,14 +759,14 @@ sub getTemplateVars {
 	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
 	$var{'url'} = $self->getUrl.'#id'.$self->getId;
         $var{'url.raw'} = $self->getUrl;
-	$var{'rating.value'} = $self->get("rating")+0;
+	$var{'rating.value'} = $self->rating+0;
 	$var{'rate.url.thumbsUp'} = $self->getRateUrl(1);
 	$var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
 	$var{'hasRated'} = $self->hasRated;
 	my $gotImage;
 	my $gotAttachment;
 	@{$var{'attachment_loop'}} = ();
-	unless ($self->get("storageId") eq "") {
+	unless ($self->storageId eq "") {
 		my $storage = $self->getStorageLocation;
 		foreach my $filename (@{$storage->getFiles}) {
 			if (!$gotImage && $storage->isImage($filename)) {
@@ -774,12 +804,12 @@ Returns the Thread that this Post belongs to.  The method caches the result of t
 sub getThread {
 	my $self = shift;
 	unless (defined $self->{_thread}) {
-		my $threadId = $self->get("threadId");
+		my $threadId = $self->threadId;
                 if ($threadId eq "") { # new post
                         if ($self->getParent->isa("WebGUI::Asset::Wobject::Collaboration")) {
                                 $threadId=$self->getId;
                         } else {
-                                $threadId=$self->getParent->get("threadId");
+                                $threadId=$self->getParent->threadId;
                         }
                 }
                 $self->{_thread} = WebGUI::Asset::Post::Thread->new($self->session, $threadId);
@@ -798,7 +828,7 @@ is stored in it.  Otherwise, it returns undef.
 
 sub getThumbnailUrl {
 	my $self = shift;
-	return undef if ($self->get("storageId") eq "");
+	return undef if ($self->storageId eq "");
 	my $storage = $self->getStorageLocation;
 	my $url;
 	foreach my $filename (@{$storage->getFiles}) {
@@ -842,13 +872,13 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("content"));
-	$indexer->addKeywords($self->get("userDefined1"));
-	$indexer->addKeywords($self->get("userDefined2"));
-	$indexer->addKeywords($self->get("userDefined3"));
-	$indexer->addKeywords($self->get("userDefined4"));
-	$indexer->addKeywords($self->get("userDefined5"));
-	$indexer->addKeywords($self->get("username"));
+	$indexer->addKeywords($self->content);
+	$indexer->addKeywords($self->userDefined1);
+	$indexer->addKeywords($self->userDefined2);
+	$indexer->addKeywords($self->userDefined3);
+	$indexer->addKeywords($self->userDefined4);
+	$indexer->addKeywords($self->userDefined5);
+	$indexer->addKeywords($self->username);
 	my $storage = $self->getStorageLocation;
 	foreach my $file (@{$storage->getFiles}) {
                $indexer->addFile($storage->getPath($file));
@@ -865,7 +895,7 @@ Increments the views counter for this post.
 
 sub incrementViews {
 	my ($self) = @_;
-        $self->update({views=>$self->get("views")+1});
+        $self->update({views=>$self->views+1});
 }
 
 #-------------------------------------------------------------------
@@ -904,7 +934,7 @@ Returns a boolean indicating whether this post is new (not an edit).
 
 sub isNew {
 	my $self = shift;
-	return $self->get("creationDate") == $self->get("revisionDate");
+	return $self->creationDate == $self->revisionDate;
 }
 
 #-------------------------------------------------------------------
@@ -918,7 +948,7 @@ Returns a boolean that is true if the current user created this post and is not 
 sub isPoster {
     my $self    = shift;
     my $userId  = shift     || $self->session->user->userId;
-    return ( $userId ne "1" && $userId eq $self->get("ownerUserId") );
+    return ( $userId ne "1" && $userId eq $self->ownerUserId );
 }
 
 
@@ -932,7 +962,7 @@ Returns a boolean indicating whether this post is a reply.
 
 sub isReply {
 	my $self = shift;
-	return $self->getId ne $self->get("threadId");
+	return $self->getId ne $self->threadId;
 }
 
 
@@ -955,11 +985,11 @@ sub notifySubscribers {
     my $siteurl = $self->session->url->getSiteURL();
     $var->{url} = $siteurl.$self->getUrl;
     $var->{'notify.subscription.message'} = $i18n->get(875,"Asset_Post");
-    my $user = WebGUI::User->new($self->session, $self->get("ownerUserId"));
+    my $user = WebGUI::User->new($self->session, $self->ownerUserId);
     my $setting = $self->session->setting;
     my $returnAddress = $setting->get("mailReturnPath");
     my $companyAddress = $setting->get("companyEmail");
-    my $listAddress = $cs->get("mailAddress");
+    my $listAddress = $cs->mailAddress;
     my $posterAddress = $user->getProfileFieldPrivacySetting('email') eq "all"
                       ? $user->profileField('email')
                       : '';
@@ -969,21 +999,21 @@ sub notifySubscribers {
     my $returnPath = $returnAddress || $sender;
     my $listId = $sender;
     $listId =~ s/\@/\./;
-    my $domain = $cs->get("mailAddress");
+    my $domain = $cs->mailAddress;
     $domain =~ s/.*\@(.*)/$1/;
     my $messageId = "cs-".$self->getId.'@'.$domain;
     my $replyId = "";
     if ($self->isReply) {
         $replyId = "cs-".$self->getParent->getId.'@'.$domain;
     }
-    my $subject = $cs->get("mailPrefix").$self->get("title");
+    my $subject = $cs->mailPrefix.$self->title;
     
     foreach my $subscriptionAsset ($cs, $thread) {
         $var->{unsubscribeUrl} = $siteurl.$subscriptionAsset->getUnsubscribeUrl;
         $var->{unsubscribeLinkText} = $i18n->get("unsubscribe","Asset_Collaboration");
-        my $message = $self->processTemplate($var, $cs->get("notificationTemplateId"));
+        my $message = $self->processTemplate($var, $cs->notificationTemplateId);
         WebGUI::Macro::process($self->session, \$message);
-        my $groupId = $subscriptionAsset->get('subscriptionGroupId');
+        my $groupId = $subscriptionAsset->subscriptionGroupId;
         my $mail = WebGUI::Mail::Send->create($self->session, {
 			from=>"<".$from.">",
 			returnPath => "<".$returnPath.">",
@@ -1037,7 +1067,7 @@ sub paste {
     } )->[0];
 
     # If the pasted asset is not a thread we'll have to update the threadId of it and all posts below it.
-    if ( $self->get('threadId') ne $self->getId ) {
+    if ( $self->threadId ne $self->getId ) {
         # Check if we're actually pasting under a thread.
         if ($thread) {
             # If so, get the threadId from the thread and fetch all posts that must be updated.
@@ -1088,7 +1118,7 @@ sub processPropertiesFromFormPost {
     $self->update({synopsis => ($form->process("synopsis") || "")});
 	if ($form->process("archive") && $self->getThread->getParent->canModerate) {
 		$self->getThread->archive;
-	} elsif ($self->getThread->get("status") eq "archived") {
+	} elsif ($self->getThread->status eq "archived") {
 		$self->getThread->unarchive;
 	}
     if ($form->process("subscribe")) {
@@ -1118,7 +1148,7 @@ adding edit stamp to posts and setting the size.
 sub postProcess {
 	my $self = shift;
 	my %data = ();
-	($data{synopsis}, $data{content}) = $self->getSynopsisAndContent($self->get("synopsis"), $self->get("content"));
+	($data{synopsis}, $data{content}) = $self->getSynopsisAndContent($self->synopsis, $self->content);
     my $spamStopWords = $self->session->config->get('spamStopWords');
     if (ref $spamStopWords eq 'ARRAY') {
         my $spamRegex = join('|',@{$spamStopWords});
@@ -1128,21 +1158,21 @@ sub postProcess {
             $self->trash;
         }
     }
-	my $user = WebGUI::User->new($self->session, $self->get("ownerUserId"));
+	my $user = WebGUI::User->new($self->session, $self->ownerUserId);
 	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
-	if ($self->getThread->getParent->get("addEditStampToPosts")) {
+	if ($self->getThread->getParent->addEditStampToPosts) {
 		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$user->profileField("alias").") --- \n</p>";
 	}
-	$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply && $self->isNew);
-	$data{groupIdView} = $self->getThread->getParent->get("groupIdView");
-	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
+	$data{url} = $self->fixUrl($self->getThread->url."/1") if ($self->isReply && $self->isNew);
+	$data{groupIdView} = $self->getThread->getParent->groupIdView;
+	$data{groupIdEdit} = $self->getThread->getParent->groupIdEdit;
 	$self->update(\%data);
 	my $size = 0;
 	my $storage = $self->getStorageLocation;
 	foreach my $file (@{$storage->getFiles}) {
 		if ($storage->isImage($file)) {
-            $storage->adjustMaxImageSize($file, $self->getThread->getParent->get('maxImageSize'));
-			$storage->generateThumbnail($file, $self->getThread->getParent->get("thumbnailSize"));
+            $storage->adjustMaxImageSize($file, $self->getThread->getParent->maxImageSize);
+			$storage->generateThumbnail($file, $self->getThread->getParent->thumbnailSize);
 		}
 		$size += $storage->getFileSize($file);
 	}
@@ -1229,10 +1259,10 @@ sub rate {
     my $thread = $self->getThread;
 	$thread->updateThreadRating();
 	if ($self->session->setting->get("useKarma")
-        && $self->session->user->karma > $thread->getParent->get('karmaSpentToRate')) {
-		$self->session->user->karma(-$self->getThread->getParent->get("karmaSpentToRate"), "Rated Post ".$self->getId, "Rated a CS Post.");
-		my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-		$u->karma($self->getThread->getParent->get("karmaRatingMultiplier"), "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
+        && $self->session->user->karma > $thread->getParent->karmaSpentToRate) {
+		$self->session->user->karma(-$self->getThread->getParent->karmaSpentToRate, "Rated Post ".$self->getId, "Rated a CS Post.");
+		my $u = WebGUI::User->new($self->session, $self->ownerUserId);
+		$u->karma($self->getThread->getParent->karmaRatingMultiplier, "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
 	}
 }
 
@@ -1299,10 +1329,10 @@ An asset object to make the parent of this asset.
 =cut
 
 sub setParent {
-        my $self = shift;
-        my $newParent = shift;
-        return 0 unless ($newParent->get("className") eq "WebGUI::Asset::Post" || $newParent->get("className") eq "WebGUI::Asset::Post::Thread");
-        return $self->SUPER::setParent($newParent);
+    my $self = shift;
+    my $newParent = shift;
+    return 0 unless ($newParent->isa('WebGUI::Asset::Post'));
+    return $self->SUPER::setParent($newParent);
 }
 
 
@@ -1332,7 +1362,7 @@ Sets the status of this post to approved, but does so without any of the normal 
 
 sub setStatusUnarchived {
         my ($self) = @_;
-        $self->update({status=>'approved'}) if ($self->get("status") eq "archived");
+        $self->update({status=>'approved'}) if ($self->status eq "archived");
 }
 
 #-------------------------------------------------------------------
@@ -1348,44 +1378,19 @@ sub trash {
     $self->SUPER::trash;
     $self->getThread->sumReplies if ($self->isReply);
     $self->getThread->updateThreadRating;
-    if ($self->getThread->get("lastPostId") eq $self->getId) {
-        my $threadLineage = $self->getThread->get("lineage");
+    if ($self->getThread->lastPostId eq $self->getId) {
+        my $threadLineage = $self->getThread->lineage;
         my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
             lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
             order by creationDate desc",[$threadLineage.'%', $self->getId]);
         $self->getThread->update({lastPostId=>$id, lastPostDate=>$date});
     }
-    if ($self->getThread->getParent->get("lastPostId") eq $self->getId) {
-        my $forumLineage = $self->getThread->getParent->get("lineage");
+    if ($self->getThread->getParent->lastPostId eq $self->getId) {
+        my $forumLineage = $self->getThread->getParent->lineage;
         my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
             lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
             order by creationDate desc",[$forumLineage.'%', $self->getId]);
         $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
-    }
-}
-
-#-------------------------------------------------------------------
-
-=head2 update ( )
-
-We overload the update method from WebGUI::Asset in order to handle file system privileges.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $properties = shift;
-    my %before = (
-        owner => $self->get("ownerUserId"),
-        view => $self->get("groupIdView"),
-        edit => $self->get("groupIdEdit")
-    );
-    $self->SUPER::update({%$properties, isHidden => 1});
-    if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
-    my $storage = $self->getStorageLocation;
-        if (-d $storage->getPath) {
-            $storage->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
-        }
     }
 }
 
@@ -1457,7 +1462,7 @@ sub www_edit {
 	my $i18n = WebGUI::International->new($session);
 
 
-    my $className = $form->process("class","className") || $self->get('className');
+    my $className = $form->process("class","className") || $self->className;
 	if ($func eq "add" || ($func eq "editSave" && $form->process("assetId") eq "new")) { # new post
         #Post to the parent if this is a new request
         my $action    = $self->getParent->getUrl;
@@ -1511,15 +1516,15 @@ sub www_edit {
             return $privilege->insufficient() unless ($self->getThread->canReply);
 			
             $var{'isReply'       } = 1;
-			$var{'reply.title'   } = $title || $parent->get("title");
-			$var{'reply.synopsis'} = $synopsis || $parent->get("synopsis");
+			$var{'reply.title'   } = $title || $parent->title;
+			$var{'reply.synopsis'} = $synopsis || $parent->synopsis;
 			$var{'reply.content' } = $content || $parent->formatContent;
 			for my $i (1..5) {	
 				$var{'reply.userDefined'.$i} = WebGUI::HTML::filter($parent->get('userDefined'.$i),"macros");
 			}
 			unless ($content || $title) {
-                $content = "[quote]".$parent->get("content")."[/quote]" if ($form->process("withQuote"));
-                $title = $parent->get("title");
+                $content = "[quote]".$parent->content."[/quote]" if ($form->process("withQuote"));
+                $title = $parent->title;
                 $title = "Re: ".$title unless ($title =~ /^Re:/i);
 			}
 			my $subscribe = $form->process("subscribe");
@@ -1585,7 +1590,7 @@ sub www_edit {
 		}
 	}
 	$var{'form.footer'     } = WebGUI::Form::formFooter($session);
-	$var{'usePreview'      } = $self->getThread->getParent->get("usePreview");
+	$var{'usePreview'      } = $self->getThread->getParent->usePreview;
 	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
 	$var{'user.isVisitor'  } = ($user->isVisitor);
 	$var{'visitorName.form'} = WebGUI::Form::text($session, {
@@ -1646,18 +1651,18 @@ sub www_edit {
         name=>"content",
         value=>$content,
         richEditId=>($self->isa("WebGUI::Asset::Post::Thread") ? 
-	  $self->getThread->getParent->get("richEditor") :
- 	  $self->getThread->getParent->get("replyRichEditor")),
+	  $self->getThread->getParent->richEditor :
+ 	  $self->getThread->getParent->replyRichEditor),
     });
     ##Edit variables just for Threads
     if ($className eq 'WebGUI::Asset::Post::Thread' && $self->getThread->getParent->canEdit) {
         $var{'sticky.form'} = WebGUI::Form::yesNo($session, {
             name=>'isSticky',
-            value=>$form->process('isSticky') || $self->get('isSticky'),
+            value=>$form->process('isSticky') || $self->isSticky,
         });
         $var{'lock.form'  } = WebGUI::Form::yesNo($session, {
             name=>'isLocked',
-            value=>$form->process('isLocked') || $self->get('isLocked'),
+            value=>$form->process('isLocked') || $self->isLocked,
         });
     }
 	$var{'form.submit'} = WebGUI::Form::submit($session, {
@@ -1665,17 +1670,17 @@ sub www_edit {
 	});
 	$var{'karmaScale.form'} = WebGUI::Form::integer($session, {
         name=>"karmaScale",
-        defaultValue=>$self->getThread->getParent->get("defaultKarmaScale"),
+        defaultValue=>$self->getThread->getParent->defaultKarmaScale,
         value=>$self->getValue("karmaScale"),
     });
-	$var{karmaIsEnabled} = $session->setting->get("useKarma");
+	$var{karmaIsEnabled} = $session->setting->useKarma;
 	$var{'form.preview'} = WebGUI::Form::submit($session, {
         value=>$i18n->get("preview","Asset_Collaboration")
     });
 	my $numberOfAttachments = $self->getThread->getParent->getValue("attachmentsPerPost");
 	$var{'attachment.form'} = WebGUI::Form::image($session, {
         name=>"storageId",
-        value=>$self->get("storageId"),
+        value=>$self->storageId,
         maxAttachments=>$numberOfAttachments,
         ##Removed deleteFileUrl, since it will go around the revision control system.
     }) if ($numberOfAttachments);
@@ -1685,7 +1690,7 @@ sub www_edit {
         value=>$self->getValue("contentType") || "mixed",
     });
     if ($session->setting->get("metaDataEnabled")
-     && $self->getThread->getParent->get('enablePostMetaData')) {
+     && $self->getThread->getParent->enablePostMetaData) {
         my $meta = $self->getMetaDataFields();
         my $formGen = $form;
         my @meta_loop = ();
@@ -1719,11 +1724,11 @@ sub www_edit {
 	#keywords field
     $var{'keywords.form'} = WebGUI::Form::text($session,{
 	    name        => 'keywords',
-        value       => $self->get('keywords'),
+        value       => $self->keywords,
     });
 
 	$self->getThread->getParent->appendTemplateLabels(\%var);
-	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
+	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->postFormTemplateId));
 }
 
 
@@ -1745,11 +1750,11 @@ sub www_editSave {
         }
     }
     my $currentTag;
-    if ($assetId ne "new" && $self->get("status") eq "pending") {
+    if ($assetId ne "new" && $self->status eq "pending") {
         # When editting posts pending approval, temporarily switch to their version tag so
         # we don't get denied because it is locked
         $currentTag = WebGUI::VersionTag->getWorking($self->session, 1);
-        my $tag = WebGUI::VersionTag->new($self->session, $self->get("tagId"));
+        my $tag = WebGUI::VersionTag->new($self->session, $self->tagId);
         if ($tag) {
             if ($tag->getId eq $currentTag->getId) {
                 undef $currentTag;  # don't restore tag afterward if we are already using it
@@ -1806,7 +1811,7 @@ sub www_showConfirmation {
     else {
         $collabSystem = $parent->getParent;
     }
-    my $templateId = $collabSystem->get('postReceivedTemplateId');
+    my $templateId = $collabSystem->postReceivedTemplateId;
     my $template = WebGUI::Asset->new($self->session, $templateId);
     my %var = (
         url     => $url,
