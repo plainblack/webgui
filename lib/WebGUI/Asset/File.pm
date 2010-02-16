@@ -78,8 +78,17 @@ A hash reference of optional parameters. None at this time.
 
 sub applyConstraints {
     my $self = shift;
-	$self->getStorageLocation->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
+    $self->setPrivileges;
     $self->setSize;
+}
+
+sub setPrivileges {
+    my $self = shift;
+    $self->getStorageLocation->setPrivileges(
+        $self->get('ownerUserId'),
+        $self->get('groupIdView'),
+        $self->get('groupIdEdit'),
+    );
 }
 
 

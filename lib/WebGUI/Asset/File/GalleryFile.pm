@@ -1106,5 +1106,10 @@ sub www_view {
     return "chunked";
 }
 
+sub setPrivileges {
+    my $self = shift;
+    $self->getStorageLocation->setPrivileges($self);
+}
+
 
 1; # Who knew the truth would be so obvious?

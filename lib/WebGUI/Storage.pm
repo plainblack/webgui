@@ -26,6 +26,7 @@ use Image::Magick;
 use Path::Class::Dir;
 use Storable ();
 use WebGUI::Utility qw(isIn);
+use JSON ();
 
 
 =head1 NAME
@@ -1665,10 +1666,42 @@ The groupId that is allowed to edit the files in this storage location.
 =cut
 
 sub setPrivileges {
-	my $self = shift;
-	my $owner = shift;
-	my $viewGroup = shift;
-	my $editGroup = shift;
+    my $self = shift;
+    my %privs = (
+        users => [],
+        groups => [],
+        assets => [],
+    );
+    if (@_ == 3 && !ref $_[0] && !ref $_[1] && !ref $_[0]) {
+        push @{ $privs{users} }, $_[0];
+        push @{ $privs{groups} }, @_[1,2];
+    }
+    else {
+        for my $object (@_) {
+            if ($object->isa('WebGUI::User')) {
+                push @{ $privs{users} }, $object->getId;
+            }
+            elsif ($object->isa('WebGUI::Group')) {
+                push @{ $privs{groups} }, $object->getId;
+            }
+            elsif ($object->isa('WebGUI::Asset')) {
+                push @{ $privs{assets} }, $object->getId;
+            }
+        }
+    }
+
+    my $public;
+    for my $user (@{ $privs{users} }) {
+        if ($user eq '1') {
+            $public = 1;
+        }
+    }
+    for my $group (@{ $privs{groups} }) {
+        if ($group eq '1' || $group eq '7') {
+            $public = 1;
+        }
+    }
+    my $accessFile = JSON->new->encode( \%privs );
 
     my $dirObj = $self->getPathClassDir();
     return undef if ! defined $dirObj;
@@ -1678,11 +1711,11 @@ sub setPrivileges {
             return unless $obj->is_dir;
             my $rel = $obj->relative($dirObj);
 
-            if ($owner eq '1' || $viewGroup eq '1' || $viewGroup eq '7' || $editGroup eq '1' || $editGroup eq '7') {
+            if ($public) {
                 $self->deleteFile($rel->file('.wgaccess')->stringify);
             }
             else {
-                $self->addFileFromScalar($rel->file('.wgaccess')->stringify,$owner."\n".$viewGroup."\n".$editGroup);
+                $self->addFileFromScalar($rel->file('.wgaccess')->stringify, $accessFile);
             }
         }
     );
