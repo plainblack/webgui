@@ -98,13 +98,13 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Navigation");
    	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
+      		-value=>$self->templateId,
       		-namespace=>"Navigation",
 		-label=>$i18n->get(1096),
 		-hoverHelp=>$i18n->get('1096 description'),
    		);
    	$tabform->getTab("display")->mimeType(
-      		-value=>$self->getValue('mimeType'),
+      		-value=>$self->mimeType,
       		-name=>"mimeType",
 		-label=>$i18n->get('mimeType'),
 		-hoverHelp=>$i18n->get('mimeType description'),
@@ -114,7 +114,7 @@ sub getEditForm {
 		value=>$self->session->form->process("returnUrl")
 		});
 	my ($descendantsChecked, $ancestorsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
-	my @assetsToInclude = split("\n",$self->getValue("assetsToInclude"));
+	my @assetsToInclude = split("\n",$self->assetsToInclude);
 	my $afterScript;
 	foreach my $item (@assetsToInclude) {
 		if ($item eq "self") {
@@ -137,7 +137,7 @@ sub getEditForm {
 			relativeToCurrentUrl=>$i18n->get('Relative To Current URL'),
 			relativeToRoot=>$i18n->get('Relative To Root')
 			},
-		-value=>[$self->getValue("startType")],
+		-value=>[$self->startType],
 		-label=>$i18n->get("Start Point Type"),
 		-hoverHelp=>$i18n->get("Start Point Type description"),
 		-id=>"navStartType",
@@ -162,7 +162,7 @@ sub getEditForm {
 		'</tbody><tbody id="navAncestorEnd"><tr><td class="formDescription">'.$i18n->get("Ancestor End Point").'</td><td>'
 		.WebGUI::Form::selectBox($self->session,{
 			name=>"ancestorEndPoint",
-			value=>[$self->getValue("ancestorEndPoint")],
+			value=>[$self->ancestorEndPoint],
 			options=>\%options
 			})
 		.'</td></tr></tbody><tbody>'
@@ -212,7 +212,7 @@ sub getEditForm {
 		'</tbody><tbody id="navDescendantEnd"><tr><td class="formDescription">'.$i18n->get('Descendant End Point').'</td><td>'
 		.WebGUI::Form::selectBox($self->session,{
 			name=>"descendantEndPoint",
-			value=>[$self->getValue("descendantEndPoint")],
+			value=>[$self->descendantEndPoint],
 			options=>\%options
 			})
 		.'</td></tr></tbody><tbody>'
@@ -221,27 +221,27 @@ sub getEditForm {
 		-name=>'showSystemPages',
 		-label=>$i18n->get(30),
 		-hoverHelp=>$i18n->get('30 description'),
-		-value=>$self->getValue("showSystemPages")
+		-value=>$self->showSystemPages
 		);
         $tabform->getTab("display")->yesNo(
                 -name=>'showHiddenPages',
                 -label=>$i18n->get(31),
                 -hoverHelp=>$i18n->get('31 description'),
-                -value=>$self->getValue("showHiddenPages")
+                -value=>$self->showHiddenPages
         	);
         $tabform->getTab("display")->yesNo(
                 -name=>'showUnprivilegedPages',
                 -label=>$i18n->get(32),
                 -hoverHelp=>$i18n->get('32 description'),
-                -value=>$self->getValue("showUnprivilegedPages")
+                -value=>$self->showUnprivilegedPages
         	);
 	$tabform->getTab("display")->yesNo(
 		-name=>'reversePageLoop',
 		-label=>$i18n->get('reverse page loop'),
 		-hoverHelp => $i18n->get('reverse page loop description'),
-		-value=>$self->getValue('reversePageLoop'),
+		-value=>$self->reversePageLoop,
 		);
-	my $start = $self->getValue("startPoint");
+	my $start = $self->startPoint;
 	$tabform->getTab("properties")->raw("<script type=\"text/javascript\">
 		//<![CDATA[
 		var displayNavDescendantEndPoint = true;
@@ -559,7 +559,7 @@ other types aside from text/html.
 
 sub www_view {
 	my $self = shift;
-	my $mimeType = $self->getValue('mimeType') || 'text/html';
+	my $mimeType = $self->mimeType || 'text/html';
 	if ($mimeType eq 'text/html') {
 		return $self->SUPER::www_view();
 	}

@@ -107,7 +107,7 @@ sub _drawQueryBuilder {
 	# Static form fields
 	my $shortcutCriteriaField = WebGUI::Form::textarea($session, {
 		name=>"shortcutCriteria",
-		value=>$self->getValue("shortcutCriteria"),
+		value=>$self->shortcutCriteria,
 		extras=>'style="width: 100%" '.$self->{_disabled}
 	});
 	my $conjunctionField = WebGUI::Form::selectBox($session, {
@@ -307,7 +307,7 @@ sub getEditForm {
 			);
 	}
 	$tabform->getTab("display")->template(
-		-value=>$self->getValue("templateId"),
+		-value=>$self->templateId,
 		-label=>$i18n->get('shortcut template title'),
 		-hoverHelp=>$i18n->get('shortcut template title description'),
 		-namespace=>"Shortcut"
@@ -599,7 +599,7 @@ sub getShortcutByCriteria {
 	my $scratchId;
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
-		if($self->session->scratch->get($scratchId) && !$self->getValue("disableContentLock")) {
+		if($self->session->scratch->get($scratchId) && !$self->disableContentLock) {
 			unless ($self->session->var->isAdminOn) {
 				return WebGUI::Asset->newById($self->session, $self->session->scratch->get($scratchId));
 			}
@@ -729,7 +729,7 @@ Returns an array of profile fields to show to the user as preferences.
 
 sub getPrefFieldsToShow {
 	my $self = shift;
-	return split("\n",$self->getValue("prefFieldsToShow"));
+	return split("\n",$self->prefFieldsToShow);
 }
 
 #-------------------------------------------------------------------
@@ -743,7 +743,7 @@ for overrides.
 
 sub getPrefFieldsToImport {
 	my $self = shift;
-	return split("\n",$self->getValue("prefFieldsToImport"));
+	return split("\n",$self->prefFieldsToImport);
 }
 
 #----------------------------------------------------------------------------
@@ -1136,7 +1136,7 @@ sub www_editOverride {
 	# Cannot fetch the original value from the overrides hash b/c it will be empty if
 	# the override has not been set before. Also getOverrides uses a cached version of
 	# the origValue, which can be out of date.
-	my $origValue = $self->getShortcutOriginal->getValue($fieldName); 
+	my $origValue = $self->getShortcutOriginal->$fieldName; 
 
 	my $output = '';
 	$output .= '</table>';

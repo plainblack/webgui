@@ -107,7 +107,7 @@ sub getEditForm {
     if ( $self->session->setting->get('useMobileStyle') ) {
         $tabform->getTab("display")->template(
             name        => 'mobileTemplateId',
-            value       => $self->getValue('mobileTemplateId'),
+            value       => $self->mobileTemplateId,
             label       => $i18n->get('mobileTemplateId label'),
             hoverHelp   => $i18n->get('mobileTemplateId description'),
             namespace   => 'Layout',

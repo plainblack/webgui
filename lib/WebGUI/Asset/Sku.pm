@@ -325,7 +325,7 @@ sub getTaxConfiguration {
     my $self        = shift;
     my $namespace   = shift;
 
-    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    my $configs = eval { from_json( $self->taxConfiguration ) };
     if ($@) {
         $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' appears to be corrupt. :' . $@ );
         return undef;
@@ -617,7 +617,7 @@ sub setTaxConfiguration {
     my $configuration   = shift;
 
     # Fetch current tax configurations
-    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    my $configs = eval { from_json( $self->taxConfiguration ) };
     if ($@) {
         $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' is corrupt.' );
         return undef;

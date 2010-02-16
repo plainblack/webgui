@@ -278,7 +278,7 @@ sub getTemplateVarsEditForm {
     for my $key ( keys %{$definition} ) {
         next if $definition->{$key}->{noFormPost};
         $definition->{$key}->{name}     = $key;
-        $definition->{$key}->{value}    = $self->getValue($key);
+        $definition->{$key}->{value}    = $self->$key;
         $var->{ "form_$key" } 
             = WebGUI::Form::dynamicField( $session, %{$definition->{$key}} );
     }

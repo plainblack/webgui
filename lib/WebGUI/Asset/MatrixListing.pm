@@ -294,7 +294,7 @@ sub getEditForm {
         -defaultValue   =>'Untitled',
         -label          =>$i18n->get("product name label"),
         -hoverHelp      =>$i18n->get('product name description'),
-        -value          =>$self->getValue('title'),
+        -value          =>$self->title,
         );
     $form->image(
         -name           =>'screenshots',
@@ -302,19 +302,19 @@ sub getEditForm {
         -maxAttachments =>20,
         -label          =>$i18n->get("screenshots label"),
         -hoverHelp      =>$i18n->get("screenshots description"),,
-        -value          =>$self->getValue('screenshots'),
+        -value          =>$self->screenshots,
         );
     $form->HTMLArea(
         -name           =>'description',
         -defaultValue   =>undef,
         -label          =>$i18n->get("description label"),
         -hoverHelp      =>$i18n->get("description description"),
-        -value          =>$self->getValue('description'),
+        -value          =>$self->description,
         );
     if ($self->getParent->canEdit) {
         $form->user(
             name        =>"ownerUserId",
-            value       =>$self->getValue('ownerUserId'),
+            value       =>$self->ownerUserId,
             label       =>$i18n->get('maintainer label'),
             hoverHelp   =>$i18n->get('maintainer description'),
             );
@@ -337,28 +337,28 @@ sub getEditForm {
         -defaultValue   =>undef,
         -label          =>$i18n->get("version label"),
         -hoverHelp      =>$i18n->get("version description"),
-        -value          =>$self->getValue('version'),
+        -value          =>$self->version,
         );
     $form->text(
         -name           =>'manufacturerName',
         -defaultValue   =>undef,
         -label          =>$i18n->get("manufacturerName label"),
         -hoverHelp      =>$i18n->get("manufacturerName description"),
-        -value          =>$self->getValue('manufacturerName'),
+        -value          =>$self->manufacturerName,
         );
     $form->url(
         -name           =>'manufacturerURL',
         -defaultValue   =>undef,
         -label          =>$i18n->get("manufacturerURL label"),
         -hoverHelp      =>$i18n->get("manufacturerURL description"),
-        -value          =>$self->getValue('manufacturerURL'),
+        -value          =>$self->manufacturerURL,
         );
     $form->url(
         -name           =>'productURL',
         -defaultValue   =>undef,
         -label          =>$i18n->get("productURL label"),
         -hoverHelp      =>$i18n->get("productURL description"),
-        -value          =>$self->getValue('productURL'),
+        -value          =>$self->productURL,
         );
 
     foreach my $category (keys %{$self->getParent->getCategories}) {

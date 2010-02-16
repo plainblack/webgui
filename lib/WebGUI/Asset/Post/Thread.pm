@@ -678,7 +678,7 @@ Extend the base method to do captcha processing.
 sub processPropertiesFromFormPost {
     my $self = shift;
 
-    if ($self->isNew && $self->getParent->getValue('useCaptcha')) {
+    if ($self->isNew && $self->getParent->useCaptcha) {
         my $captchaOk = $self->session->form->process("captcha","Captcha");
 
         return [ 'invalid captcha' ] unless $captchaOk;

@@ -465,7 +465,7 @@ Returns a URL to the owner's avatar.
 sub getAvatarUrl {
 	my $self = shift;
 	my $parent = $self->getThread->getParent;
-	return '' unless $parent and $parent->getValue("avatarsEnabled");
+	return '' unless $parent and $parent->avatarsEnabled;
 	my $user = WebGUI::User->new($self->session, $self->ownerUserId);
 	#Get avatar field, storage Id.
 	my $storageId = $user->profileField("avatar");
@@ -1459,7 +1459,7 @@ sub www_edit {
             value=>$form->process("class","className")
         });
         
-        if($self->getThread->getParent->getValue("useCaptcha")) {
+        if($self->getThread->getParent->useCaptcha) {
             $var{'useCaptcha'   } = "true";
             
             use WebGUI::Form::Captcha;
@@ -1534,16 +1534,16 @@ sub www_edit {
         });
 	    $var{'form.header'} .= WebGUI::Form::hidden($session, {
             name=>"ownerUserId",
-            value=>$self->getValue("ownerUserId")
+            value=>$self->ownerUserId
         });
         $var{'form.header'} .= WebGUI::Form::hidden($session, {
             name=>"username",
-            value=>$self->getValue("username")
+            value=>$self->username
         });
 		$var{isEdit} = 1;
-		$content     = $form->process('content') || $self->getValue("content");
-		$title       = $form->process('title') || $self->getValue("title");
-		$synopsis    = $form->process('synopsis') || $self->getValue("synopsis");
+		$content     = $form->process('content')  || $self->content;
+		$title       = $form->process('title')    || $self->title;
+		$synopsis    = $form->process('synopsis') || $self->synopsis;
 	}
     
     $var{'archive.form'} = WebGUI::Form::yesNo($session, {
@@ -1568,13 +1568,13 @@ sub www_edit {
 	$var{'user.isVisitor'  } = ($user->isVisitor);
 	$var{'visitorName.form'} = WebGUI::Form::text($session, {
 		name => "visitorName",
-		value => $form->process('visitorName') || $self->getValue("visitorName")
+		value => $form->process('visitorName') || $self->visitorName
     });
     
 	for my $x (1..5) {
 		my $userDefinedValue 
             = $form->process("userDefined".$x) 
-            || $self->getValue("userDefined".$x)
+            || $self->get("userDefined".$x)
             ;
 		$var{'userDefined'.$x}  = $userDefinedValue;
         $var{'userDefined'.$x.'.form'} 
@@ -1644,13 +1644,13 @@ sub www_edit {
 	$var{'karmaScale.form'} = WebGUI::Form::integer($session, {
         name=>"karmaScale",
         defaultValue=>$self->getThread->getParent->defaultKarmaScale,
-        value=>$self->getValue("karmaScale"),
+        value=>$self->karmaScale,
     });
 	$var{karmaIsEnabled} = $session->setting->useKarma;
 	$var{'form.preview'} = WebGUI::Form::submit($session, {
         value=>$i18n->get("preview","Asset_Collaboration")
     });
-	my $numberOfAttachments = $self->getThread->getParent->getValue("attachmentsPerPost");
+	my $numberOfAttachments = $self->getThread->getParent->attachmentsPerPost;
 	$var{'attachment.form'} = WebGUI::Form::image($session, {
         name=>"storageId",
         value=>$self->storageId,
@@ -1660,7 +1660,7 @@ sub www_edit {
     
     $var{'contentType.form'} = WebGUI::Form::contentType($session, {
         name=>'contentType',
-        value=>$self->getValue("contentType") || "mixed",
+        value=>$self->contentType || "mixed",
     });
     if ($session->setting->get("metaDataEnabled")
      && $self->getThread->getParent->enablePostMetaData) {
@@ -1716,7 +1716,7 @@ We're extending www_editSave() here to deal with editing a post that has been de
 sub www_editSave {
     my $self = shift;
     my $assetId = $self->session->form->param("assetId");
-    if($assetId eq "new" && $self->getThread->getParent->getValue("useCaptcha")) {
+    if($assetId eq "new" && $self->getThread->getParent->useCaptcha) {
         my $captcha = $self->session->form->process("captcha","Captcha");
         unless ($captcha) {
             return $self->www_edit;
