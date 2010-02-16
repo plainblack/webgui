@@ -131,8 +131,8 @@ our $HELP = {
                 ],
             },
             {
-                name        => 'synopsis_text',
-                description => 'helpvar synopsis_text',
+                name        => 'synopsis_textonly',
+                description => 'helpvar synopsis_textonly',
             },
             {
                 name        => 'url_album',

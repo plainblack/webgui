@@ -589,7 +589,7 @@ our $I18N = {
         context     => q{Label for the albums the photo will be removed from.},
     },
 
-    'helpvar synopsis_text' => {
+    'helpvar synopsis_textonly' => {
         message     => q{The "synopsis" field with all HTML removed},
         lastUpdated => 0,
         context     => q{Description of template variable},
