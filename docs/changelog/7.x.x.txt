@@ -7,6 +7,7 @@
  - fixed #11410: Too much errors in log after fix #11346
  - fixed #11169: MapPoint asset does not have an icon
  - fixed Typo in Subscription Sku prevented karma from being transferred to users.
+ - fixed #11411: Photo Asset: Error in template help
 
 7.7.32
  - fixed #11349: Code editor returns newline for blank content
