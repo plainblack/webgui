@@ -239,35 +239,16 @@ sub getEditForm {
     my ($i, $answers);
     for ($i=1; $i<=20; $i++) {
         if ($self->get('a'.$i) =~ /\C/) {
-            $answers .= $self->getValue("a".$i)."\n";
+            $answers .= $self->get("a".$i)."\n";
         }
     }
-	if ($self->session->setting->get("useKarma")) {
-		$tabform->getTab("properties")->integer(
-			-name=>"karmaPerVote",
-			-label=>$i18n->get(20),
-			-hoverHelp=>$i18n->get('20 description'),
-			-value=>$self->getValue("karmaPerVote")
-			);
-	} else {
-		$tabform->getTab("properties")->hidden(
-			-name=>"karmaPerVote",
-			-value=>$self->getValue("karmaPerVote")
-			);
-	}
-	$tabform->getTab("display")->integer(
-		-name=>"graphWidth",
-		-label=>$i18n->get(5),
-		-hoverHelp=>$i18n->get('5 description'),
-		-value=>$self->getValue("graphWidth")
-		);
-        $tabform->getTab("properties")->textarea(
+    $tabform->getTab("properties")->textarea(
 		-name=>"answers",
 		-label=>$i18n->get(7),
 		-hoverHelp=>$i18n->get('7 description'),
 		-subtext=>('<span class="formSubtext"><br />'.$i18n->get(8).'</span>'),
 		-value=>$answers
-		);
+    );
 	$tabform->getTab("properties")->yesNo(
 		-name=>"resetVotes",
 		-label=>$i18n->get(10),
@@ -283,7 +264,7 @@ sub getEditForm {
 			-name		=> 'generateGraph',
 			-label		=> $i18n->get('generate graph'),
 			-hoverHelp	=> $i18n->get('generate graph description'),
-			-value		=> $self->getValue('generateGraph'),
+			-value		=> $self->generateGraph,
 		);
 		$tabform->getTab('graph')->raw(WebGUI::Image::Graph->getGraphingTab($self->session, $config));
 	}
@@ -505,7 +486,7 @@ sub view {
 	@answers = List::Util::shuffle(@answers) if ($self->get("randomizeAnswers"));
 	$var{answer_loop} = \@answers;
 
-	if ($self->getValue('generateGraph')) {
+	if ($self->generateGraph) {
 		my $config = $self->getGraphConfig;
         if ($config) {
             my $graph = WebGUI::Image::Graph->loadByConfiguration($self->session, $config);
