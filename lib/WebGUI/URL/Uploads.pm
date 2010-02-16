@@ -47,38 +47,58 @@ The Apache request handler for this package.
 
 sub handler {
     my ($request, $server, $config) = @_;
-    $request->push_handlers(PerlAccessHandler => sub { 
-	    if (-e $request->filename) {
-		    my $path = $request->filename;
-		    $path =~ s/^(\/.*\/).*$/$1/;
-	    	if (-e $path.".wgaccess") {
-			    my $fileContents;
-			    open(my $FILE, "<" ,$path.".wgaccess");
-			    while (my $line = <$FILE>) {
-				    $fileContents .= $line;
-			    }
-			    close($FILE);
-			    my @privs = split("\n", $fileContents);
-			    unless ($privs[1] eq "7" || $privs[1] eq "1") {
-					my $session = $request->pnotes('wgSession');
-					unless (defined $session) {
-						$session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
-					}
-				    my $hasPrivs = ($session->var->get("userId") eq $privs[0] || $session->user->isInGroup($privs[1]) || $session->user->isInGroup($privs[2]));
-				    $session->close();
-				    if ($hasPrivs) {
-					    return Apache2::Const::OK;
-				    }    
-                    else {
-					    return Apache2::Const::AUTH_REQUIRED;
-				    }
-			    }
-		    }
-		    return Apache2::Const::OK;
-	    } 
+    $request->push_handlers(PerlAccessHandler => sub {
+        my $path = $request->filename;
+        return Apache2::Const::NOT_FOUND
+            unless -e $path;
+        $path =~ s{[^/]*$}{};
+        return Apache2::Const::OK
+            unless -e $path . '.wgaccess';
+
+        my $fileContents;
+        open my $FILE, '<' , $path . '.wgaccess';
+        my $fileContents = do { local $/; <$FILE> };
+        close($FILE);
+        my @users;
+        my @groups;
+        my @assets;
+        if ($fileContents =~ /\A(?:\d+|[A-Za-z0-9_-]{22})\n(?:\d+|[A-Za-z0-9_-]{22})\n(?:\d+|[A-Za-z0-9_-]{22})/) {
+            my @privs = split("\n", $fileContents);
+            push @users, $privs[0];
+            push @groups, @privs[1,2];
+        }
         else {
-		    return Apache2::Const::NOT_FOUND;
-	    }
+            my $privs = JSON->new->decode($fileContents);
+            @users = @{ $privs->{users} };
+            @groups = @{ $privs->{groups} };
+            @assets = @{ $privs->{assets} };
+        }
+
+        return Apache2::Const::OK
+            if grep { $_ eq '1' } @users;
+
+        return Apache2::Const::OK
+            if grep { $_ eq '1' || $_ eq '7' } @groups;
+
+        my $session = $request->pnotes('wgSession');
+        unless (defined $session) {
+            $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
+        }
+
+        my $userId = $session->var->get('userId');
+
+        return Apache2::Const::OK
+            if grep { $_ eq $userId } @users;
+
+        my $user = $session->user;
+
+        return Apache2::Const::OK
+            if grep { $user->isInGroup($_) } @groups;
+
+        return Apache2::Const::OK
+            if grep { WebGUI::Asset->new($session, $_)->canView } @assets;
+
+        return Apache2::Const::AUTH_REQUIRED;
     } );
     return Apache2::Const::OK;
 }
