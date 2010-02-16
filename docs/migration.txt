@@ -131,7 +131,6 @@ with the properties you have passed in.  Missing properties will have default se
 
 Exceptions
 ----------
-
 All Asset instanciators, new, newById, newByUrl, newPending, newByPropertyHashRef throw exceptions instead
 of returning undef to indicate an error.  You should wrap any call to an instanciator in an eval, and catch
 any exceptions that are thrown and deal with them.
@@ -154,3 +153,8 @@ fixTitle - The title() method does what this used to do as the title is set.
 fixUrlFromParent - This functionality is built into fixUrl, so that all fixes happen and can't cause breakages.
 
 fixId - Never assign the asset anything other than a GUID.
+
+Asset API
+----------
+->get will still work, but will be slightly slower since inside it calls the direct Moose accessor.  Similarly,
+getId is slightly slower than ->assetId.
