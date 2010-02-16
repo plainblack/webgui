@@ -1,4 +1,4 @@
-package WebGUI::AssetRole::SetStoragePermissions;
+package WebGUI::Role::Asset::SetStoragePermissions;
 
 =head1 LEGAL
 
@@ -16,7 +16,7 @@ package WebGUI::AssetRole::SetStoragePermissions;
 
 =head1 NAME
 
-Package WebGUI::AssetRole::SetStoragePermissions
+Package WebGUI::Role::Asset::SetStoragePermissions
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ the file permissions on storage locations for an Asset.
 
 =head1 SYNOPSIS
 
-with WebGUI::AssetRole::SetStoragePermissions;
+with WebGUI::Role::Asset::SetStoragePermissions;
 
 =cut
 

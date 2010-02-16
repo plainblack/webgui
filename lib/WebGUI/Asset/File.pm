@@ -56,7 +56,7 @@ property templateId => (
                 namespace => "FileAsset",
          );
 
-with 'WebGUI::AssetRole::SetStoragePermissions';
+with 'WebGUI::Role::Asset::SetStoragePermissions';
 
 use WebGUI::Storage;
 use WebGUI::SQL;

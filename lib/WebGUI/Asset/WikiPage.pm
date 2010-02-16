@@ -55,7 +55,7 @@ property isFeatured => (
             noFormPost => 1,
          );
 
-with 'WebGUI::AssetRole::AlwaysHidden';
+with 'WebGUI::Role::Asset::AlwaysHidden';
 
 use WebGUI::International;
 use WebGUI::Utility;

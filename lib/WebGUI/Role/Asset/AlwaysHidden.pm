@@ -1,4 +1,4 @@
-package WebGUI::AssetRole::AlwaysHidden;
+package WebGUI::Role::Asset::AlwaysHidden;
 
 =head1 LEGAL
 
@@ -16,7 +16,7 @@ package WebGUI::AssetRole::AlwaysHidden;
 
 =head1 NAME
 
-Package WebGUI::AssetRole::AlwaysHidden
+Package WebGUI::Role::Asset::AlwaysHidden
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,7 @@ Asset Role that guarantees that the isHidden property is always 1.
 
 =head1 SYNOPSIS
 
-with WebGUI::AssetRole::AlwaysHidden;
+with WebGUI::Role::Asset::AlwaysHidden;
 
 =cut
 

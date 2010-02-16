@@ -73,9 +73,9 @@ property content => (
             default     => undef,
          );
 
-with 'WebGUI::AssetRole::AlwaysHidden';
+with 'WebGUI::Role::Asset::AlwaysHidden';
 
-with 'WebGUI::AssetRole::SetStoragePermissions';
+with 'WebGUI::Role::Asset::SetStoragePermissions';
 
 
 use WebGUI::Asset::Template;

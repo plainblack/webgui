@@ -133,7 +133,7 @@ property userDefined5 => (
             default         => '',
         );
 
-with 'WebGUI::AssetRole::AlwaysHidden';
+with 'WebGUI::Role::Asset::AlwaysHidden';
 
 use WebGUI::DateTime;
 

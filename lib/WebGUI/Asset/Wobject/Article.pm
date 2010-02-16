@@ -73,7 +73,7 @@ sub _storageid_deleteFileUrl {
     return shift->session->url->page("func=deleteFile;filename=");
 }
 
-with 'WebGUI::AssetRole::SetStoragePermissions';
+with 'WebGUI::Role::Asset::SetStoragePermissions';
 
 use WebGUI::Storage;
 use WebGUI::HTML;

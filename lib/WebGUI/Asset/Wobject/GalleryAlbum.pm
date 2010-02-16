@@ -41,7 +41,7 @@ for my $i ( 1 .. 5 ) {
     );
 }
 
-with 'WebGUI::AssetRole::AlwaysHidden';
+with 'WebGUI::Role::Asset::AlwaysHidden';
 
 use Carp qw( croak );
 use File::Find;
