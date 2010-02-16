@@ -55,26 +55,8 @@ property templateId => (
                 hoverHelp => ['file template description', 'Asset_File'],
                 namespace => "FileAsset",
          );
-sub _set_ownerUserId {
-    my ($self, $new, $old) = @_;
-    if ($new ne $old) {
-		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
-    }
-}
 
-sub _set_groupIdView {
-    my ($self, $new, $old) = @_;
-    if ($new ne $old) {
-		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
-    }
-}
-
-sub _set_groupIdEdit {
-    my ($self, $new, $old) = @_;
-    if ($new ne $old) {
-		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
-    }
-}
+with 'WebGUI::AssetRole::SetStoragePermissions';
 
 use WebGUI::Storage;
 use WebGUI::SQL;
