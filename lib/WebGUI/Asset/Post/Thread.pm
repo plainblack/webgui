@@ -11,6 +11,63 @@ package WebGUI::Asset::Post::Thread;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Post';
+aspect assetName => ['assetName', 'Asset_Thread'];
+aspect icon      => 'thread.gif';
+aspect tableName => 'Thread';
+property subscriptionGroupId => (
+                noFormPost  => 1,
+                fieldType   => "hidden",
+                default     => '',
+         );
+property replies => (
+                noFormPost  => 1,
+                fieldType   => "hidden",
+                default     => 0,
+         );
+property isSticky => (
+                label       => ['sticky', 'Asset_Collaboration'],
+                fieldType   => "yesNo",
+                default     => 0
+         );
+property isLocked => (
+                label       => ['lock', 'Asset_Collaboration'],
+                fieldType   => "yesNo",
+                default     => 0,
+         );
+property lastPostId => (
+                noFormPost  => 1,
+                fieldType   => "hidden",
+                default     => '',
+         );
+property lastPostDate => (
+                noFormPost  => 1,
+                fieldType   => "dateTime",
+                default     => undef,
+         );
+property karma => (
+                noFormPost  => 1,
+                fieldType   => "integer",
+                default     => 0,
+         );
+property karmaRank => (
+                noFormPost  => 1,
+                fieldType   => "float",
+                default     => 0,
+         );
+property karmaScale => (
+                noFormPost  => 1,
+                fieldType   => "integer",
+                default     => 10,
+         );
+property threadRating => (
+                noFormPost  => 1,
+                fieldType   => "hidden",
+                default     => undef,
+         );
+
+
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post;
 use WebGUI::Group;
@@ -19,7 +76,6 @@ use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Utility;
 
-our @ISA = qw(WebGUI::Asset::Post);
 
 #-------------------------------------------------------------------
 
@@ -63,7 +119,7 @@ in the default asset, which better be a Collaboration System.
 sub canAdd {
     my $class   = shift;
     my $session = shift;
-    return $session->user->isInGroup($session->asset->get('canStartThreadGroupId'));
+    return $session->user->isInGroup($session->asset->canStartThreadGroupId);
 }
 
 #-------------------------------------------------------------------
@@ -83,7 +139,7 @@ sub canReply {
     my $self        = shift;
     my $userId      = shift || $self->session->user->userId;
     return !$self->isThreadLocked 
-        && $self->getParent->get("allowReplies") 
+        && $self->getParent->allowReplies 
         && $self->getParent->canPost( $userId )
         ;
 }
@@ -120,7 +176,7 @@ sub commit {
 	my $self = shift;
 	$self->SUPER::commit;
 	if ($self->isNew) {
-        	$self->getParent->incrementThreads($self->get("revisionDate"),$self->getId);
+        	$self->getParent->incrementThreads($self->revisionDate,$self->getId);
 	}
 }
 
@@ -158,7 +214,7 @@ already have one.
 
 sub createSubscriptionGroup {
 	my $self = shift;
-	return undef if ($self->get("subscriptionGroupId"));
+	return undef if ($self->subscriptionGroupId);
 	my $group = WebGUI::Group->new($self->session, "new");
 	$group->name($self->getId);
 	$group->description("The group to store subscriptions for the thread ".$self->getId);
@@ -168,71 +224,6 @@ sub createSubscriptionGroup {
 	$self->update({
 		subscriptionGroupId=>$group->getId
 		});
-}
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Thread");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'thread.gif',
-                tableName=>'Thread',
-                className=>'WebGUI::Asset::Post::Thread',
-                properties=>{
-			subscriptionGroupId => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>'',
-				},
-			replies => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>0,
-				},
-			isSticky => {
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			isLocked => {
-				fieldType=>"yesNo",
-				defaultValue=>0,
-				},
-			lastPostId => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>'',
-				},
-			lastPostDate => {
-				noFormPost=>1,
-				fieldType=>"dateTime",
-				defaultValue=>undef
-				},
-			karma => {
-				noFormPost=>1,
-				fieldType=>"integer",
-				defaultValue=>0
-				},
-			karmaRank => {
-				noFormPost=>1,
-				fieldType=>"float",
-				defaultValue=>0
-				},
-			karmaScale => {
-				noFormPost=>1,
-				fieldType=>"integer",
-				defaultValue=>10
-				},
-			threadRating => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			},
-		});
-	return $class->SUPER::definition($session,$definition);
 }
 
 #-------------------------------------------------------------------
@@ -301,7 +292,7 @@ sub getAdjacentThread {
         ORDER BY $sortBy $sortOrder, assetData.revisionDate $sortOrder
         LIMIT 1
 END_SQL
-        [$self->get('parentId'), $self->getId, $sortCompareValue, $tagId, $session->user->userId]
+        [$self->parentId, $self->getId, $sortCompareValue, $tagId, $session->user->userId]
     );
     if ($id) {
         return WebGUI::Asset->new($session, $id, $class, $version);
@@ -332,7 +323,7 @@ Override the base method to fetch the threadApprovalWorkflow from the parent CS.
 
 sub getAutoCommitWorkflowId {
 	my $self = shift;
-	return $self->getThread->getParent->get("threadApprovalWorkflow");
+	return $self->getThread->getParent->threadApprovalWorkflow;
 }
 
 #-------------------------------------------------------------------
@@ -345,7 +336,7 @@ Fetches the last post in this thread, otherwise, returns itself.
 
 sub getLastPost {
 	my $self = shift;
-	my $lastPostId = $self->get("lastPostId");
+	my $lastPostId = $self->lastPostId;
 	my $lastPost;
 	if ($lastPostId) {
 		$lastPost = WebGUI::Asset::Post->new($self->session, $lastPostId);
@@ -546,7 +537,7 @@ Returns a boolean indicating whether this thread is locked from new posts and ot
 
 sub isThreadLocked {
         my ($self) = @_;
-        return $self->get("isLocked");
+        return $self->isLocked;
 }
 
 
@@ -582,7 +573,7 @@ Increments the views counter for this thread.
 
 sub incrementViews {
         my ($self) = @_;
-        $self->update({views=>$self->get("views")+1});
+        $self->update({views=>$self->views+1});
         $self->getParent->incrementViews;
 }
 
@@ -603,20 +594,6 @@ sub isMarkedRead {
 
 #-------------------------------------------------------------------
 
-=head2 isSticky ( )
-
-Returns a boolean indicating whether this thread should be "stuck" a the top of the forum and not be sorted with the rest of the threads.
-
-=cut
-
-sub isSticky {
-        my ($self) = @_;
-        return $self->get("isSticky");
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 isSubscribed ( )
 
 Returns a boolean indicating whether the user is subscribed to this thread.
@@ -625,7 +602,7 @@ Returns a boolean indicating whether the user is subscribed to this thread.
 
 sub isSubscribed {
 	my $self = shift;
-	return $self->session->user->isInGroup($self->get("subscriptionGroupId"));
+	return $self->session->user->isInGroup($self->subscriptionGroupId);
 }
 
 #-------------------------------------------------------------------
@@ -666,7 +643,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->get("threadTemplateId"));
+	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->threadTemplateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
@@ -683,8 +660,8 @@ Extend the base method from Post to process the karmaScale.
 sub postProcess {
 	my $self = shift;
 	if ($self->getParent->canEdit) {
-		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->get("defaultKarmaScale");
-		my $karmaRank = $self->get("karma")/$karmaScale;
+		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->defaultKarmaScale;
+		my $karmaRank = $self->karma/$karmaScale;
 		$self->update({karmaScale=>$karmaScale, karmaRank=>$karmaRank});
 	}
 	$self->SUPER::postProcess;
@@ -722,7 +699,7 @@ the subscriptionGroup for this thread.
 sub purge {
     my $self = shift;
     $self->session->db->write("delete from Thread_read where threadId=?",[$self->getId]);
-    my $group = WebGUI::Group->new($self->session, $self->get("subscriptionGroupId"));
+    my $group = WebGUI::Group->new($self->session, $self->subscriptionGroupId);
     if ($group) {
         $group->delete;
     }
@@ -750,10 +727,10 @@ sub rate {
 
 	##Thread specific karma adjustment for CS
 	if ($self->session->setting->get("useKarma")) {
-		my $poster = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-		$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
+		my $poster = WebGUI::User->new($self->session, $self->ownerUserId);
+		$poster->karma($rating*$self->getParent->karmaRatingMultiplier,"collaboration rating","someone rated post ".$self->getId);
 		my $rater = WebGUI::User->new($self->session->user->userId);
-		$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId);
+		$rater->karma(-$self->getParent->karmaSpentToRate,"collaboration rating","spent karma to rate post ".$self->getId);
 	}
 
 }
@@ -845,7 +822,7 @@ Subscribes the user to this thread.
 sub subscribe {
 	my $self = shift;
 	$self->createSubscriptionGroup;
-	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
+	my $group = WebGUI::Group->new($self->session,$self->subscriptionGroupId);
   $group->addUsers([$self->session->user->userId]);
 }
 
@@ -875,8 +852,8 @@ sub trash {
     my $self = shift;
     $self->SUPER::trash;
     $self->getParent->sumReplies;
-    if ($self->getParent->get("lastPostId") eq $self->getId) {
-        my $parentLineage = $self->getThread->get("lineage");
+    if ($self->getParent->lastPostId eq $self->getId) {
+        my $parentLineage = $self->getThread->lineage;
         my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
             lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
             order by creationDate desc",[$parentLineage.'%', $self->getId]);
@@ -954,7 +931,7 @@ Negates the subscribe method.
 
 sub unsubscribe {
     my $self = shift;
-    my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
+    my $group = WebGUI::Group->new($self->session,$self->subscriptionGroupId);
     return
         if !$group;
     $group->deleteUsers([$self->session->user->userId]);
@@ -1040,7 +1017,7 @@ sub view {
     $var->{'user.isModerator'   }  = $self->getParent->canModerate;
     $var->{'user.canPost'       }  = $self->getParent->canPost;
     $var->{'user.canReply'      }  = $self->canReply;
-    $var->{'repliesAllowed'     }  = $self->getParent->get("allowReplies");
+    $var->{'repliesAllowed'     }  = $self->getParent->allowReplies;
 
     $var->{'layout.nested.url'  }  = $self->getLayoutUrl("nested");
     $var->{'layout.flat.url'    }  = $self->getLayoutUrl("flat");
@@ -1054,7 +1031,7 @@ sub view {
 	$var->{'thumbsUp.icon.url'  }  = $self->session->url->extras('thumbup.gif');
 	$var->{'thumbsDown.icon.url'}  = $self->session->url->extras('thumbdown.gif');
 
-    $var->{'isArchived'         }  = $self->get("status") eq "archived";
+    $var->{'isArchived'         }  = $self->status eq "archived";
     $var->{'archive.url'        }  = $self->getArchiveUrl;
     $var->{'unarchive.url'      }  = $self->getUnarchiveUrl;
     
@@ -1081,10 +1058,10 @@ sub view {
     $var->{'transfer.karma.form'} .= WebGUI::Form::submit($self->session);
     $var->{'transfer.karma.form'} .= WebGUI::Form::formFooter($self->session);
 
-    my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->get("postsPerPage"));
+    my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->postsPerPage);
 	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate, assetData.url as url from asset 
 		left join assetData on assetData.assetId=asset.assetId
-		where asset.lineage like ".$self->session->db->quote($self->get("lineage").'%')
+		where asset.lineage like ".$self->session->db->quote($self->lineage.'%')
 		."	and asset.state='published'
         and asset.className like 'WebGUI::Asset::Post%'
 		and assetData.revisionDate=(SELECT max(assetData.revisionDate) from assetData where assetData.assetId=asset.assetId
@@ -1129,12 +1106,12 @@ sub view {
 
 	$var->{"search.url"               } = $self->getParent->getSearchUrl;
     $var->{"collaboration.url"        } = $self->getThread->getParent->getUrl;
-    $var->{'collaboration.title'      } = $self->getParent->get("title");
-    $var->{'collaboration.description'} = $self->getParent->get("description");
+    $var->{'collaboration.title'      } = $self->getParent->title;
+    $var->{'collaboration.description'} = $self->getParent->description;
     my $out                             = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	
     if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
-		eval{$cache->set("view_".$self->getId, $out, $self->getThread->getParent->get("visitorCacheTimeout"))};
+		eval{$cache->set("view_".$self->getId, $out, $self->getThread->getParent->visitorCacheTimeout)};
 	}
     return $out;
 }
@@ -1253,8 +1230,8 @@ sub www_transferKarma {
 	# cant have them giving more karma then they have
 	if ($amount > 0 && $amount <= $self->session->user->karma) {
 		$self->session->user->karma(-$amount, "Thread ".$self->getId, "Transferring karma to a thread.");
-		my $newKarma = $self->get("karma")+$amount;
-		my $karmaScale = $self->get("karmaScale") || 1;
+		my $newKarma = $self->karma+$amount;
+		my $karmaScale = $self->karmaScale || 1;
 		$self->update({karma=>$newKarma,karmaRank=>$newKarma/$karmaScale});
 	}
 	return $self->www_view;
@@ -1330,7 +1307,7 @@ sub www_view {
 	return $self->session->privilege->noAccess() unless $self->canView;
 	my $check = $self->checkView;
 	return $check if (defined $check);
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
+	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
         $self->session->http->sendHeader;    
         $self->prepareView;
         my $style = $self->getParent->processStyle($self->getSeparator);
