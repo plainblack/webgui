@@ -133,14 +133,7 @@ property userDefined5 => (
             default         => '',
         );
 
-around isHidden => sub {
-    my $orig = shift;
-    my $self = shift;
-    if (@_ > 0) {
-        $_[0] = 1;
-    }
-    $self->$orig(@_);
-};
+with 'WebGUI::AssetRole::AlwaysHidden';
 
 use WebGUI::DateTime;
 
