@@ -15,9 +15,60 @@ package WebGUI::Asset::Story;
 =cut
 
 use strict;
-use Class::C3;
-use base 'WebGUI::Asset';
-use Tie::IxHash;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+aspect assetName         => ['assetName', 'Asset_Story'];
+aspect icon              => 'story.gif';
+aspect tableName         => 'Story';
+property headline => (
+            fieldType    => 'text',  
+            label        => ['headline', 'Asset_Story'],
+            hoverHelp    => ['headline help', 'Asset_Story'],
+            default      => '',
+         );
+property subtitle => (
+            fieldType    => 'text',  
+            label        => ['subtitle', 'Asset_Story'],
+            hoverHelp    => ['subtitle help', 'Asset_Story'],
+            default      => '',
+         );
+property byline => (
+            fieldType    => 'text',  
+            label        => ['byline', 'Asset_Story'],
+            hoverHelp    => ['byline help', 'Asset_Story'],
+            default      => '',
+         );
+property location => (
+            fieldType    => 'text',  
+            label        => ['location', 'Asset_Story'],
+            hoverHelp    => ['location help', 'Asset_Story'],
+            default      => '',
+         );
+property highlights => (
+            fieldType    => 'textarea',  
+            label        => ['highlights', 'Asset_Story'],
+            hoverHelp    => ['highlights help', 'Asset_Story'],
+            default      => '',
+         );
+property story => (
+            fieldType    => 'HTMLArea',  
+            label        => ['highlights', 'Asset_Story'],
+            hoverHelp    => ['highlights help', 'Asset_Story'],
+            richEditId   => \&_story_richEditId,
+            default      => '',
+         );
+sub _story_richEditId {
+    my $self = shift;
+    return $self->parent->getStoryRichEdit;
+}
+property photo => (
+            fieldType    => 'textarea',
+            default      => '[]',
+            noFormPost   => 1,
+         );
+
+with 'WebGUI::Role::Asset::AlwaysHidden';
+
 use WebGUI::Utility;
 use WebGUI::International;
 use JSON qw/from_json to_json/;
@@ -94,91 +145,13 @@ You can't add children to a Story.
 sub canEdit {
     my $self = shift;
     my $userId = shift || $self->session->user->userId;
-    if ($userId eq $self->get("ownerUserId")) {
+    if ($userId eq $self->ownerUserId) {
         return 1;
     }
     my $user = WebGUI::User->new($self->session, $userId);
     return $self->SUPER::canEdit($userId)
         || $self->getArchive->canPostStories($userId);
 }
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-defines asset properties for New Asset instances.  You absolutely need 
-this method in your new Assets. 
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my %properties;
-    tie %properties, 'Tie::IxHash';
-    my $i18n = WebGUI::International->new($session, 'Asset_Story');
-    %properties = (
-        headline => {
-            fieldType    => 'text',  
-            #label        => $i18n->get('headline'),
-            #hoverHelp    => $i18n->get('headline help'),
-            defaultValue => '',
-        },
-        subtitle => {
-            fieldType    => 'text',  
-            #label        => $i18n->get('subtitle'),
-            #hoverHelp    => $i18n->get('subtitle help'),
-            defaultValue => '',
-        },
-        byline => {
-            fieldType    => 'text',  
-            #label        => $i18n->get('byline'),
-            #hoverHelp    => $i18n->get('byline help'),
-            defaultValue => '',
-        },
-        location => {
-            fieldType    => 'text',  
-            #label        => $i18n->get('location'),
-            #hoverHelp    => $i18n->get('location help'),
-            defaultValue => '',
-        },
-        highlights => {
-            fieldType    => 'textarea',  
-            #label        => $i18n->get('highlights'),
-            #hoverHelp    => $i18n->get('highlights help'),
-            defaultValue => '',
-        },
-        story => {
-            fieldType    => 'HTMLArea',  
-            #label        => $i18n->get('highlights'),
-            #hoverHelp    => $i18n->get('highlights help'),
-            #richEditId  => $self->parent->getStoryRichEdit,
-            defaultValue => '',
-        },
-        photo => {
-            fieldType    => 'textarea',
-            defaultValue => '[]',
-            noFormPost   => 1,
-        },
-    );
-    push(@{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'story.gif',
-        tableName         => 'Story',
-        className         => 'WebGUI::Asset::Story',
-        properties        => \%properties,
-        autoGenerateForms => 0,
-    });
-    return $class->next::method($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -252,7 +225,7 @@ The date this was last updated.  If left blank, it uses the revisionDate.
 
 sub formatDuration {
     my ($self, $lastUpdated) = @_;
-    $lastUpdated = defined $lastUpdated ? $lastUpdated : $self->get('revisionDate');
+    $lastUpdated = defined $lastUpdated ? $lastUpdated : $self->revisionDate;
     my $session = $self->session;
     my $datetime = $session->datetime;
     my $duration = time() - $lastUpdated;
@@ -305,7 +278,7 @@ sub getAutoCommitWorkflowId {
 	my $self    = shift;
     my $archive = $self->getArchive;
     if ($archive->hasBeenCommitted) {
-        return $archive->get('approvalWorkflowId')
+        return $archive->approvalWorkflowId
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
     return undef;
@@ -383,23 +356,23 @@ sub getEditForm {
                         : $i18n->get('editing','Asset_WikiPage').' '.$title,
         headlineForm   => WebGUI::Form::text($session, {
                              name  => 'headline',
-                             value => $form->get('headline') || $self->get('headline'),
+                             value => $form->get('headline') || $self->headline,
                           } ),
         titleForm      => WebGUI::Form::text($session, {
                              name  => 'title',
-                             value => $form->get('title')    || $self->get('title'),
+                             value => $form->get('title')    || $self->title,
                           } ),
         subtitleForm   => WebGUI::Form::text($session, {
                              name  => 'subtitle',
-                             value => $form->get('subtitle') || $self->get('subtitle')
+                             value => $form->get('subtitle') || $self->subtitle
                           } ),
         bylineForm     => WebGUI::Form::text($session, {
                              name  => 'byline',
-                             value => $form->get('byline')   || $self->get('byline')
+                             value => $form->get('byline')   || $self->byline
                           } ),
         locationForm   => WebGUI::Form::text($session, {
                              name  => 'location',
-                             value => $form->get('location') || $self->get('location')
+                             value => $form->get('location') || $self->location
                           } ),
         keywordsForm   => WebGUI::Form::keywords($session, {
                             name  => 'keywords',
@@ -407,12 +380,12 @@ sub getEditForm {
                          } ),
         highlightsForm => WebGUI::Form::textarea($session, {
                             name  => 'highlights',
-                            value => $form->get('highlights') || $self->get('highlights')
+                            value => $form->get('highlights') || $self->highlights
                           } ),
         storyForm      => WebGUI::Form::HTMLArea($session, {
                             name  => 'story',
-                            value => $form->get('story')      || $self->get('story'),
-                            richEditId => $archive->get('richEditorId')
+                            value => $form->get('story')      || $self->story,
+                            richEditId => $archive->richEditorId
                           }),
         saveButton     => WebGUI::Form::submit($session, {
                             name  => 'saveStory',
@@ -501,7 +474,7 @@ sub getEditForm {
     else {
         $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'url',     value => $url});
     }
-    return $self->processTemplate($var, $archive->get('editStoryTemplateId'));
+    return $self->processTemplate($var, $archive->editStoryTemplateId);
 
 }
 
@@ -516,7 +489,7 @@ Returns the photo hash formatted as perl data.  See also L<setPhotoData>.
 sub getPhotoData {
 	my $self     = shift;
 	if (!exists $self->{_photoData}) {
-        my $json = $self->get('photo');
+        my $json = $self->photo;
         $json ||= '[]';
         $self->{_photoData} = from_json($json);
 	}
@@ -535,11 +508,11 @@ property of the Asset.
 sub getRssData {
 	my $self = shift;
     my $data = {
-        title       => $self->get('headline') || $self->getTitle,
-        description => $self->get('subtitle'),
+        title       => $self->headline || $self->getTitle,
+        description => $self->subtitle,
         'link'      => $self->getUrl,
-        author      => $self->get('byline'),
-        date        => $self->get('lastModified'),
+        author      => $self->byline,
+        date        => $self->lastModified,
     };
 	return $data;
 }
@@ -555,7 +528,7 @@ Extend the base class to index Story properties like headline, byline, etc.
 sub indexContent {
 	my $self    = shift;
     my $indexer = $self->next::method();
-    $indexer->addKeywords($self->get('headline'), $self->get('subtitle'), $self->get('location'), $self->get('highlights'), $self->get('byline'), $self->get('story'), );
+    $indexer->addKeywords($self->headline, $self->subtitle, $self->location, $self->highlights, $self->byline, $self->story, );
 }
 
 #-------------------------------------------------------------------
@@ -573,10 +546,10 @@ sub prepareView {
     my $templateId;
     my $topic = $self->topic;
     if ($topic) {
-        $templateId = $topic->get('storyTemplateId');
+        $templateId = $topic->storyTemplateId;
     }
     else {
-        $templateId = $self->getArchive->get('storyTemplateId');
+        $templateId = $self->getArchive->storyTemplateId;
     }
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare;
@@ -621,8 +594,8 @@ sub processPropertiesFromFormPost {
             my $filename = $upload->getFiles->[0];
             $storage->addFileFromFilesystem($upload->getPath($filename));
             my ($width, $height) = $storage->getSizeInPixels($filename);
-            if ($width > $self->getArchive->get('photoWidth')) {
-                $storage->resize($filename, $self->getArchive->get('photoWidth'));
+            if ($width > $self->getArchive->photoWidth) {
+                $storage->resize($filename, $self->getArchive->photoWidth);
             }
             $upload->delete;
         }
@@ -641,8 +614,8 @@ sub processPropertiesFromFormPost {
         my $newStorage = WebGUI::Storage->get($session, $newStorageId);
         my $photoName = $newStorage->getFiles->[0];
         my ($width, $height) = $newStorage->getSizeInPixels($photoName);
-        if ($width > $self->getArchive->get('photoWidth')) {
-            $newStorage->resize($photoName, $self->getArchive->get('photoWidth'));
+        if ($width > $self->getArchive->photoWidth) {
+            $newStorage->resize($photoName, $self->getArchive->photoWidth);
         }
         push @{ $photoData }, {
             caption   => $form->process('newImgCaption', 'text'),
@@ -805,21 +778,6 @@ sub topic {
 
 #-------------------------------------------------------------------
 
-=head2 update
-
-Extend the superclass to make sure that the asset always stays hidden from navigation.
-
-=cut
-
-sub update {
-    my $self   = shift;
-    my $properties = shift;
-    #$self->session->log->warn('story update');
-    return $self->next::method({%$properties, isHidden => 1});
-}
-
-#-------------------------------------------------------------------
-
 =head2 validParent
 
 Make sure that the current session asset is a StoryArchive for pasting and adding checks.
@@ -889,7 +847,7 @@ sub viewTemplateVariables {
         };
     }
     $var->{updatedTime}      = $self->formatDuration();
-    $var->{updatedTimeEpoch} = $self->get('revisionDate');
+    $var->{updatedTimeEpoch} = $self->revisionDate;
 
     $var->{crumb_loop}       = $self->getCrumbTrail();
     my $photoData = $self->getPhotoData;
@@ -914,7 +872,7 @@ sub viewTemplateVariables {
     $var->{hasPhotos}   = $photoCounter;
     $var->{singlePhoto} = $photoCounter == 1;
     $var->{canEdit}     = $self->canEdit;
-    $var->{photoWidth}  = $archive->get('photoWidth');
+    $var->{photoWidth}  = $archive->photoWidth;
     return $var;
 }
 

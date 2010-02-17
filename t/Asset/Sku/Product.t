@@ -37,7 +37,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 13;        # Increment this number for each test you create
+plan tests => 19;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -49,6 +49,12 @@ my $product = $node->addChild({
 });
 
 is($product->getThumbnailUrl(), '', 'Product with no image1 property returns the empty string');
+
+note "Checking automatically generated deleteFileUrl links";
+foreach my $file_property (qw/image1 image2 image3 brochure manual warranty/) {
+    my $form_properties = $product->getFormProperties($file_property);
+    like $form_properties->{deleteFileUrl}, qr/file=$file_property/, '...' . $file_property;
+}
 
 my $image = WebGUI::Storage->create($session);
 WebGUI::Test->storagesToDelete($image);
@@ -164,7 +170,7 @@ $tag2->commit;
 WebGUI::Test->tagsToRollback($tag2);
 
 ##Fetch a copy from the db, just like a page fetch
-$viewProduct = WebGUI::Asset->new($session, $viewProduct->getId, 'WebGUI::Asset::Sku::Product');
+$viewProduct = WebGUI::Asset->newById($session, $viewProduct->getId);
 
 $viewProduct->prepareView();
 my $json = $viewProduct->view();

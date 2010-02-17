@@ -15,8 +15,81 @@ package WebGUI::Asset::Sku::EMSTicket;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::Sku';
-use Tie::IxHash;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+aspect assetName           => ['ems ticket', 'Asset_EMSTicket'];
+aspect icon                => 'EMSTicket.gif';
+aspect tableName           => 'EMSTicket';
+property price => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["price", 'Asset_EMSTicket'],
+            hoverHelp       => ["price help", 'Asset_EMSTicket'],
+         );
+property seatsAvailable => (
+            tab             => "shop",
+            fieldType       => "integer",
+            default         => 25,
+            label           => ["seats available", 'Asset_EMSTicket'],
+            hoverHelp       => ["seats available help", 'Asset_EMSTicket'],
+         );
+property eventNumber => (
+            tab             => "properties",
+            fieldType        => "integer",
+            customDrawMethod=> 'drawEventNumberField',
+            label           => ["event number", 'Asset_EMSTicket'],
+            hoverHelp       => ["event number help", 'Asset_EMSTicket'],
+         );
+property startDate => (
+            noFormPost      => 1,
+            fieldType       => "hidden",
+            builder         => '_startDate_builder',
+            lazy            => 1,
+            label           => ["add/edit event start date", 'Asset_EMSTicket'],
+            hoverHelp       => ["add/edit event start date help", 'Asset_EMSTicket'],
+            autoGenerate    => 0,
+         );
+sub _startDate_builder {
+    my $session = shift->session;
+	my $date = WebGUI::DateTime->new($session, time());
+    return $date->toDatabase,
+}
+property duration => (
+            tab             => "properties",
+            fieldType       => "float",
+            default         => 1.0,
+            subtext         => ['hours', 'Asset_EMSTicket'],
+            label           => ["duration", 'Asset_EMSTicket'],
+            hoverHelp       => ["duration help", 'Asset_EMSTicket'],
+         );
+property location => (
+            fieldType        => "combo",
+            tab             => "properties",
+            customDrawMethod=> 'drawLocationField',
+            label           => ["location", 'Asset_EMSTicket'],
+            hoverHelp       => ["location help", 'Asset_EMSTicket'],
+         );
+property relatedBadgeGroups => (
+            tab             => "properties",
+            fieldType        => "checkList",
+            customDrawMethod=> 'drawRelatedBadgeGroupsField',
+            label           => ["related badge groups", 'Asset_EMSTicket'],
+            hoverHelp       => ["related badge groups ticket help", 'Asset_EMSTicket'],
+         );
+property relatedRibbons => (
+            tab             => "properties",
+            fieldType        => "checkList",
+            customDrawMethod=> 'drawRelatedRibbonsField',
+            label           => ["related ribbons", 'Asset_EMSTicket'],
+            hoverHelp       => ["related ribbons help", 'Asset_EMSTicket'],
+         );
+property eventMetaData => (
+            noFormPost      => 1,
+            fieldType       => "hidden",
+            default         => '{}',
+         );
+
 use JSON ();
 use WebGUI::Utility;
 
@@ -59,98 +132,6 @@ sub addToCart {
 
 #-------------------------------------------------------------------
 
-=head2 definition
-
-Adds price, seatsAvailable, eventNumber, startDate, endDate and relatedBadges fields.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
-	my $date = WebGUI::DateTime->new($session, time());
-	%properties = (
-		price => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("price"),
-			hoverHelp       => $i18n->get("price help"),
-			},
-		seatsAvailable => {
-			tab             => "shop",
-			fieldType       => "integer",
-			defaultValue    => 25,
-			label           => $i18n->get("seats available"),
-			hoverHelp       => $i18n->get("seats available help"),
-			},
-		eventNumber => {
-			tab             => "properties",
-			fieldType		=> "integer",
-			customDrawMethod=> 'drawEventNumberField',
-			label           => $i18n->get("event number"),
-			hoverHelp       => $i18n->get("event number help"),
-			},
-        startDate => {
-            noFormPost      => 1,
-            fieldType       => "hidden",
-            defaultValue    => $date->toDatabase,
-            label           => $i18n->get("add/edit event start date"),
-            hoverHelp       => $i18n->get("add/edit event start date help"),
-            autoGenerate    => 0,
-            },			    
-		duration => {
-			tab             => "properties",
-			fieldType       => "float",
-			defaultValue    => 1.0,
-			subtext			=> $i18n->get('hours'),
-			label           => $i18n->get("duration"),
-			hoverHelp       => $i18n->get("duration help"),
-			},
-		location => {
-			fieldType		=> "combo",
-			tab             => "properties",
-			customDrawMethod=> 'drawLocationField',
-			label           => $i18n->get("location"),
-			hoverHelp       => $i18n->get("location help"),
-			},
-		relatedBadgeGroups => {
-			tab             => "properties",
-			fieldType		=> "checkList",
-			customDrawMethod=> 'drawRelatedBadgeGroupsField',
-			label           => $i18n->get("related badge groups"),
-			hoverHelp       => $i18n->get("related badge groups ticket help"),
-			},
-		relatedRibbons => {
-			tab             => "properties",
-			fieldType		=> "checkList",
-			customDrawMethod=> 'drawRelatedRibbonsField',
-			label           => $i18n->get("related ribbons"),
-			hoverHelp       => $i18n->get("related ribbons help"),
-			},
-		eventMetaData => {
-			noFormPost		=> 1,
-			fieldType		=> "hidden",
-			defaultValue	=> '{}',
-			},
-	    );
-	push(@{$definition}, {
-		assetName           => $i18n->get('ems ticket'),
-		icon                => 'EMSTicket.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'EMSTicket',
-		className           => 'WebGUI::Asset::Sku::EMSTicket',
-		properties          => \%properties
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 drawEventNumberField ()
 
 Draws the field for the eventNumber property.
@@ -160,7 +141,7 @@ Draws the field for the eventNumber property.
 sub drawEventNumberField {
 	my ($self, $params) = @_;
 	my $default = $self->session->db->quickScalar("select max(eventNumber)+1 from EMSTicket left join asset using (assetId)
-		where parentId=?",[$self->get('parentId')]);
+		where parentId=?",[$self->parentId]);
 	return WebGUI::Form::integer($self->session, {
 		name			=> $params->{name},
 		value			=> $self->get($params->{name}),
@@ -179,10 +160,10 @@ Draws the field for the location property.
 sub drawLocationField {
 	my ($self, $params) = @_;
 	my $options = $self->session->db->buildHashRef("select distinct(location) from EMSTicket left join asset using (assetId)
-		where parentId=? order by location",[$self->get('parentId')]);
+		where parentId=? order by location",[$self->parentId]);
 	return WebGUI::Form::combo($self->session, {
 		name	=> 'location',
-		value	=> $self->get('location'),
+		value	=> $self->location,
 		options	=> $options,
 		});
 }
@@ -291,7 +272,7 @@ sub getEditForm {
             hoverHelp       => $i18n->get("add/edit event start date help"),
             timeZone        => $self->getParent->get("timezone"),
             defaultValue    => $date->toDatabase,
-            value           => $self->get("startDate"),
+            value           => $self->startDate,
     );
 	return $form;
 }
@@ -312,7 +293,7 @@ If specified, returns a single value for the key specified.
 sub getEventMetaData {
 	my $self = shift;
 	my $key = shift;
-	my $metadata = JSON->new->decode($self->get("eventMetaData") || '{}');
+	my $metadata = JSON->new->decode($self->eventMetaData || '{}');
 	if (defined $key) {
 		return $metadata->{$key};
 	}
@@ -341,20 +322,20 @@ Returns the value of the price field, after applying ribbon discounts.
 
 sub getPrice {
     my $self = shift;
-	my @ribbonIds = split("\n", $self->get('relatedRibbons'));
-	my $price = $self->get("price");
+	my @ribbonIds = split("\n", $self->relatedRibbons);
+	my $price = $self->price;
 	my $discount = 0;
 	my $badgeId = $self->getOptions->{badgeId};
 	my $ribbonId = $self->session->db->quickScalar("select ribbonAssetId from EMSRegistrantRibbon where badgeId=? limit 1",[$badgeId]);
 	if (defined $ribbonId && isIn($ribbonId, @ribbonIds)) {
 		my $ribbon = WebGUI::Asset->new($self->session,$ribbonId,'WebGUI::Asset::Sku::EMSRibbon');
-		$discount = $ribbon->get('percentageDiscount');
+		$discount = $ribbon->percentageDiscount;
 	}
 	else {
 		foreach my $item (@{$self->getCart->getItemsByAssetId(\@ribbonIds)}) {
 			if ($item->get('options')->{badgeId} eq $badgeId) {
 				my $ribbon = $item->getSku;
-				$discount = $ribbon->get('percentageDiscount');
+				$discount = $ribbon->percentageDiscount;
 				last;
 			}
 		}
@@ -374,7 +355,7 @@ Returns seatsAvailable minus the count from the EMSRegistrantTicket table.
 sub getQuantityAvailable {
 	my $self = shift;
 	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrantTicket where ticketAssetId=?",[$self->getId]);
-    return $self->get("seatsAvailable") - $seatsTaken;
+    return $self->seatsAvailable - $seatsTaken;
 }
 
 #-------------------------------------------------------------------
@@ -388,7 +369,7 @@ Adding location and eventNumber as a keyword. See WebGUI::Asset::indexContent() 
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-    $indexer->addKeywords($self->get('location').' '.$self->get('eventNumber'));
+    $indexer->addKeywords($self->location.' '.$self->eventNumber);
 	return $indexer;
 }
 
@@ -456,7 +437,7 @@ sub processPropertiesFromFormPost {
 	}
     my $date = WebGUI::DateTime->new($self->session, time())->toDatabase;
     my $startDate = $form->process('startDate', "dateTime", $date, 
-        { defaultValue => $date, timeZone => $self->getParent->get("timezone")});
+        { defaultValue => $date, timeZone => $self->getParent->timezone});
 	$self->update({eventMetaData => JSON->new->encode(\%metadata), startDate => $startDate});
 }
 
@@ -509,9 +490,9 @@ sub view {
 		
 	
 	# render the page;
-	my $output = '<h1>'.$self->getTitle.' ('.$self->get('eventNumber').')</h1>'
-		.'<p>'.$self->get('description').'</p>'
-		.'<p>'.$self->get('startDate').'</p>';
+	my $output = '<h1>'.$self->getTitle.' ('.$self->eventNumber.')</h1>'
+		.'<p>'.$self->description.'</p>'
+		.'<p>'.$self->startDate.'</p>';
 
 	# build the add to cart form
 	if ($form->get('badgeId') ne '') {
@@ -552,7 +533,7 @@ Override to return to appropriate page.
 sub www_delete {
 	my ($self) = @_;
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
-    return $self->session->privilege->vitalComponent() if $self->get('isSystem');
+    return $self->session->privilege->vitalComponent() if $self->isSystem;
     return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
     $self->trash;
 	return $self->getParent->www_buildBadge(undef,'tickets');

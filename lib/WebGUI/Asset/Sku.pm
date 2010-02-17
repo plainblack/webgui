@@ -16,11 +16,58 @@ package WebGUI::Asset::Sku;
 
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::Asset';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
 use WebGUI::International;
 use WebGUI::Inbox;
 use WebGUI::Shop::Cart;
 use JSON qw{ from_json to_json };
+
+aspect assetName => ['assetName', 'Asset_Sku'];
+aspect icon      => 'Sku.gif';
+aspect tableName => 'sku';
+
+property description => (
+            tab             => "properties",
+            fieldType       => "HTMLArea",
+            default         => undef,
+            label           => ["description", 'Asset_Sku'],
+            hoverHelp       => ["description help", 'Asset_Sku'],
+         );
+property sku => (
+            tab             => "shop",
+            fieldType       => "text",
+            default         => sub { shift->session->id->generate },
+            lazy            => 1,
+            label           => ["sku", 'Asset_Sku'],
+            hoverHelp       => ["sku help", 'Asset_Sku'],
+         );
+property displayTitle => (
+            tab             => "display",
+            fieldType       => "yesNo",
+            default         => 1,
+            label           => ["display title", 'Asset_Sku'],
+            hoverHelp       => ["display title help", 'Asset_Sku'],
+         );
+property vendorId => (
+            tab             => "shop",
+            fieldType       => "vendor",
+            default         => 'defaultvendor000000000',
+            label           => ["vendor", 'Asset_Sku'],
+            hoverHelp       => ["vendor help", 'Asset_Sku'],
+         );
+property taxConfiguration => (
+            noFormPost      => 1,
+            fieldType       => 'hidden',
+            defaultValue    => '{}',
+         );
+property shipsSeparately => (
+            tab             => 'shop',
+            fieldType       => 'yesNo',
+            default         => 0,
+            label           => ['shipsSeparately', 'Asset_Sku'],
+            hoverHelp       => ['shipsSeparately help', 'Asset_Sku'],
+         );
 
 =head1 NAME
 
@@ -87,76 +134,6 @@ sub applyOptions {
     my ($self, $options) = @_;
     $self->{_skuOptions} = $options;
 }
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-See super class.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-
-	my $i18n = WebGUI::International->new($session, "Asset_Sku");
-	%properties = (
-		description => {
-			tab				=> "properties",
-			fieldType		=> "HTMLArea",
-			defaultValue	=> undef,
-			label			=> $i18n->get("description"),
-			hoverHelp		=> $i18n->get("description help")
-			},
-		sku => {
-			tab				=> "shop",
-			fieldType		=> "text",
-			defaultValue	=> $session->id->generate,
-			label			=> $i18n->get("sku"),
-			hoverHelp		=> $i18n->get("sku help")
-			},
-		displayTitle => {
-			tab				=> "display",
-			fieldType		=> "yesNo",
-			defaultValue	=> 1,
-			label			=> $i18n->get("display title"),
-			hoverHelp		=> $i18n->get("display title help")
-			},
-		vendorId => {
-			tab				=> "shop",
-			fieldType		=> "vendor",
-			defaultValue	=> 'defaultvendor000000000',
-			label			=> $i18n->get("vendor"),
-			hoverHelp		=> $i18n->get("vendor help")
-			},
-        taxConfiguration => {
-            noFormPost      => 1,
-            fieldType       => 'hidden',
-            defaultValue    => '{}',
-        },
-        shipsSeparately => {
-            tab             => 'shop',
-            fieldType       => 'yesNo',
-            defaultValue    => 0,
-            label           => $i18n->get('shipsSeparately'),
-            hoverHelp       => $i18n->get('shipsSeparately help'),
-        },
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'Sku.gif',
-		autoGenerateForms=>1,
-		tableName=>'sku',
-		className=>'WebGUI::Asset::Sku',
-		properties=>\%properties
-	});
-	return $class->SUPER::definition($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -348,7 +325,7 @@ sub getTaxConfiguration {
     my $self        = shift;
     my $namespace   = shift;
 
-    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    my $configs = eval { from_json( $self->taxConfiguration ) };
     if ($@) {
         $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' appears to be corrupt. :' . $@ );
         return undef;
@@ -420,7 +397,7 @@ Adding sku as a keyword. See WebGUI::Asset::indexContent() for additonal details
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-    $indexer->addKeywords($self->get('sku'));
+    $indexer->addKeywords($self->sku);
 	return $indexer;
 }
 
@@ -482,7 +459,7 @@ The sku attached to the object you wish to instanciate.
 sub newBySku {
     my ($class, $session, $sku) = @_;
     my $assetId = $session->db->quickScalar("select assetId from sku where sku=?", [$sku]);
-    return WebGUI::Asset->newByDynamicClass($session, $assetId); 
+    return WebGUI::Asset->newById($session, $assetId); 
 }
 
 #-------------------------------------------------------------------
@@ -640,7 +617,7 @@ sub setTaxConfiguration {
     my $configuration   = shift;
 
     # Fetch current tax configurations
-    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    my $configs = eval { from_json( $self->taxConfiguration ) };
     if ($@) {
         $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' is corrupt.' );
         return undef;
@@ -657,7 +634,7 @@ sub setTaxConfiguration {
 
 #-------------------------------------------------------------------
 
-=head2 shipsSeparately
+=head2 isShippingSeparately
 
 Returns a boolean indicating whether this item must be shipped separately from other items.
 If the shipsSeparately property is true, but isShippingRequired is false, this will return
@@ -665,9 +642,9 @@ false.
 
 =cut
 
-sub shipsSeparately {
+sub isShippingSeparately {
     my ($self) = @_;
-    return $self->isShippingRequired && $self->get('shipsSeparately');
+    return $self->isShippingRequired && $self->shipsSeparately;
 }
 
 

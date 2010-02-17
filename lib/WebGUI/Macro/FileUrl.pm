@@ -14,6 +14,7 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Storage;
 use WebGUI::International;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -40,23 +41,23 @@ The URL to the Asset.
 =cut
 
 sub process {
-	my $session = shift;
-        my $url = shift;
-	my $asset = WebGUI::Asset->newByUrl($session,$url);
-	my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
-	if (not defined $asset) {
-		return $i18n->get('invalid url');
-	}
-	my $storageId = $asset->get('storageId');
-	if (not defined $storageId) {
-		return $i18n->get('no storage');
-	}
-	my $filename = $asset->get('filename');
-	if (not defined $filename) {
-		return $i18n->get('no filename');
-	}
-	my $storage = WebGUI::Storage->get($session,$storageId);
-	return $storage->getUrl($filename);
+    my $session = shift;
+    my $url = shift;
+    my $asset = eval { WebGUI::Asset->newByUrl($session,$url); };
+    my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
+    if (Exception::Class->caught()) {
+        return $i18n->get('invalid url');
+    }
+    my $storageId = $asset->storageId;
+    if (not defined $storageId) {
+        return $i18n->get('no storage');
+    }
+    my $filename = $asset->filename;
+    if (not defined $filename) {
+        return $i18n->get('no filename');
+    }
+    my $storage = WebGUI::Storage->get($session,$storageId);
+    return $storage->getUrl($filename);
 }
 
 

@@ -97,6 +97,7 @@ checkModule("HTML::Template",               2.9          );
 checkModule("HTML::Template::Expr",         0.07,      2 );
 checkModule("XML::FeedPP",                  0.40         );
 checkModule("JSON",                         2.12         );
+checkModule("JSON::Any",                    1.22         );
 checkModule("Config::JSON",                 "1.3.1"      );
 checkModule("Text::CSV_XS",                 "0.64"       );
 checkModule("Net::Subnets",                 0.21         );
@@ -134,6 +135,9 @@ checkModule("CSS::Minifier::XS",            "0.03"       );
 checkModule("JavaScript::Minifier::XS",     "0.05"       );
 checkModule("Readonly",                     "1.03"       );
 checkModule("Memcached::libmemcached",      "0.3102"     );
+checkModule("Moose",                        "0.93"       );
+checkModule("MooseX::Storage",              "0.23"       );
+checkModule("namespace::autoclean",         "0.09"       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

@@ -28,6 +28,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Shortcut Test"});
+addToCleanup;
 
 # Make a snippet to shortcut
 my $snippet 
@@ -40,12 +41,6 @@ my $shortcut
         className           => "WebGUI::Asset::Shortcut",
         shortcutToAssetId   => $snippet->getId,
     });
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-	$versionTag->rollback();
-}
 
 
 #----------------------------------------------------------------------------
@@ -74,7 +69,7 @@ is(
 #----------------------------------------------------------------------------
 # Test trashing snippet trashes shortcut also
 $snippet->trash;
-$shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
+$shortcut   = WebGUI::Asset->newById($session, $shortcut->getId);
 
 ok(
     defined $shortcut,

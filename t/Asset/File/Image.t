@@ -30,7 +30,7 @@ use WebGUI::Form::File;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 11;
+plan tests => 13;
 
 my $session = WebGUI::Test->session;
 
@@ -55,54 +55,50 @@ $session->user({userId=>3});
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Image Asset test"});
 my $properties = {
-	#     '1234567890123456789012'
-	id => 'ImageAssetTest00000001',
-	title => 'Image Asset Test',
+	#            '1234567890123456789012'
+	id        => 'ImageAssetTest00000001',
+	title     => 'Image Asset Test',
 	className => 'WebGUI::Asset::File::Image',
-	url => 'image-asset-test',
+	url       => 'image-asset-test',
 };
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 my $asset = $defaultAsset->addChild($properties, $properties->{id});
 
 ok($asset->getStorageLocation, 'Image Asset getStorageLocation initialized');
-ok($asset->get('storageId'), 'getStorageLocation updates Image asset object with storage location');
-is($asset->get('storageId'), $asset->getStorageLocation->getId, 'Image Asset storageId and cached storageId agree');
+ok($asset->storageId, 'getStorageLocation updates Image asset object with storage location');
+is($asset->storageId, $asset->getStorageLocation->getId, 'Image Asset storageId and cached storageId agree');
 
 $asset->update({
 	storageId => $storage->getId,
 	filename => 'blue.png',
 });
 
-my $filename = $asset->getStorageLocation->getPath . "/" . $asset->get("filename");
+my $filename = $asset->getStorageLocation->getPath($asset->filename);
+ok(-e $filename, 'file exists in the storage location for following tests');
 
 my @stat_before = stat($filename);
-$asset->getStorageLocation->rotate($asset->get("filename"), 90);
+ok($asset->getStorageLocation->rotate($asset->filename, 90), 'rotate worked');
 my @stat_after = stat($filename);
 is(isnt_array(\@stat_before, \@stat_after), 1, 'Image is different after rotation');
 
 @stat_before = stat($filename);
-$asset->getStorageLocation->resize($asset->get("filename"), 200, 300);
+$asset->getStorageLocation->resize($asset->filename, 200, 300);
 my @stat_after = stat($filename);
 is(isnt_array(\@stat_before, \@stat_after), 1, 'Image is different after resize');
 
 @stat_before = stat($filename);
-$asset->getStorageLocation->crop($asset->get("filename"), 100, 125, 10, 25);
+$asset->getStorageLocation->crop($asset->filename, 100, 125, 10, 25);
 my @stat_after = stat($filename);
 is(isnt_array(\@stat_before, \@stat_after), 1, 'Image is different after crop');
 
 my $sth = $session->db->read('describe ImageAsset annotations');
 isnt($sth->hashRef, undef, 'Annotations column is defined');
 
-is($storage->getId, $asset->get('storageId'), 'Asset updated with correct new storageId');
+is($storage->getId, $asset->storageId, 'Asset updated with correct new storageId');
 is($storage->getId, $asset->getStorageLocation->getId, 'Cached Asset storage location updated with correct new storageId');
 
 $versionTag->commit;
-
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
-}
+addToCleanup($versionTag);
 
 sub isnt_array {
     my ($a, $b) = @_;

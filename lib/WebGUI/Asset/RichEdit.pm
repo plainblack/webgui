@@ -15,13 +15,160 @@ package WebGUI::Asset::RichEdit;
 =cut
 
 use strict;
-use WebGUI::Asset;
 use WebGUI::Form;
 use WebGUI::Utility;
 use WebGUI::International;
 use JSON;
 
-our @ISA = qw(WebGUI::Asset);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+aspect assetName   => ['assetName', 'Asset_RichEdit'];
+aspect icon        => 'richEdit.gif';
+aspect uiLevel     => 5;
+aspect tableName   => 'RichEdit';
+property disableRichEditor => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['disable rich edit', 'Asset_RichEdit'],
+                hoverHelp       => ['disable rich edit description', 'Asset_RichEdit'],
+         );
+property askAboutRichEdit => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['using rich edit', 'Asset_RichEdit'],
+                hoverHelp       => ['using rich edit description', 'Asset_RichEdit'],
+         );
+property validElements => (
+                fieldType       => 'textarea',
+                default         => 'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]',
+                label           => ['elements', 'Asset_RichEdit'],
+                hoverHelp       => ['elements description', 'Asset_RichEdit'],
+                subtext         => ['elements subtext', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property preformatted => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['preformatted', 'Asset_RichEdit'],
+                hoverHelp       => ['preformatted description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property editorWidth => (
+                fieldType       => 'integer',
+                default         => 0,
+                label           => ['editor width', 'Asset_RichEdit'],
+                hoverHelp       => ['editor width description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property editorHeight => (
+                fieldType       => 'integer',
+                default         => 0,
+                label           => ['editor height', 'Asset_RichEdit'],
+                hoverHelp       => ['editor height description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property sourceEditorWidth => (
+                fieldType       => 'integer',
+                default         => 0,
+                label           => ['source editor height', 'Asset_RichEdit'],
+                hoverHelp       => ['source editor height description', 'Asset_RichEdit'],
+         );
+property sourceEditorHeight => (
+                fieldType       => 'integer',
+                default         => 0,
+                label           => ['source editor height', 'Asset_RichEdit'],
+                hoverHelp       => ['source editor height description', 'Asset_RichEdit'],
+         );
+property useBr => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['use br', 'Asset_RichEdit'],
+                hoverHelp       => ['use br description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property removeLineBreaks => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['remove line breaks', 'Asset_RichEdit'],
+                hoverHelp       => ['remove line breaks description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property nowrap => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['no wrap', 'Asset_RichEdit'],
+                hoverHelp       => ['no wrap description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property directionality => (
+                fieldType       => 'selectBox',
+                default         => 'ltr',
+                label           => ['directionality', 'Asset_RichEdit'],
+                hoverHelp       => ['directionality description', 'Asset_RichEdit'],
+                options         => \&_directionality_options,
+         );
+sub _directionality_options {
+    my $session = shift->session;
+	my $i18n    = WebGUI::International->new($session, 'Asset_RichEdit');
+    return {
+        ltr=>$i18n->get('left to right'),
+        rtl=>$i18n->get('right to left'),
+    };
+}
+property toolbarLocation => (
+                fieldType       => 'selectBox',
+                default         => 'bottom',
+                label           => ['toolbar location', 'Asset_RichEdit'],
+                hoverHelp       => ['toolbar location description', 'Asset_RichEdit'],
+                options         => \&_toolbarLocation_options,
+         );
+sub _toolbarLocation_options {
+    my $session = shift->session;
+	my $i18n    = WebGUI::International->new($session, 'Asset_RichEdit');
+    return {
+        top    => $i18n->get('top'),
+        bottom => $i18n->get('bottom'),
+    };
+}
+property cssFile => (
+                fieldType       => 'text',
+                default         => undef,
+                label           => ['css file', 'Asset_RichEdit'],
+                hoverHelp       => ['css file description', 'Asset_RichEdit'],
+         );
+property toolbarRow1 => (
+                fieldType       => 'checkList',
+                default         => undef,
+                label           => '',
+         );
+property toolbarRow2 => (
+                fieldType       => 'checkList',
+                default         => undef,
+                label           => '',
+         );
+property toolbarRow3 => (
+                fieldType       => 'checkList',
+                default         => undef,
+                label           => '',
+         );
+property enableContextMenu => (
+                fieldType       => "yesNo",
+                default         => 0,
+                label           => ['enable context menu', 'Asset_RichEdit'],
+                hoverHelp       => ['enable context menu description', 'Asset_RichEdit'],
+         );
+property inlinePopups => (
+                fieldType       => "yesNo",
+                default         => 0,
+                label           => ['inline popups', 'Asset_RichEdit'],
+                hoverHelp       => ['inline popups description', 'Asset_RichEdit'],
+         );
+property allowMedia => (
+                fieldType       => "yesNo",
+                default         => 0,
+                label           => ['editForm allowMedia label', 'Asset_RichEdit'],
+                hoverHelp       => ['editForm allowMedia description', 'Asset_RichEdit'],
+         );
 
 
 =head1 NAME
@@ -42,117 +189,6 @@ use WebGUI::Asset::RichEdit;
 These methods are available from this class:
 
 =cut
-
-
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,'Asset_RichEdit');
-    push(@{$definition}, {
-        assetName   => $i18n->get('assetName'),
-        icon        => 'richEdit.gif',
-        uiLevel     => 5,
-        tableName   => 'RichEdit',
-        className   => 'WebGUI::Asset::RichEdit',
-        properties => {
-            disableRichEditor => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            askAboutRichEdit => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            validElements => {
-                fieldType       => 'textarea',
-                defaultValue    => 'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]',
-            },
-            preformatted => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            editorWidth => {
-                fieldType       => 'integer',
-                defaultValue    => 0,
-            },
-            editorHeight => {
-                fieldType       => 'integer',
-                defaultValue    => 0,
-            },
-            sourceEditorWidth => {
-                fieldType       => 'integer',
-                defaultValue    => 0,
-            },
-            sourceEditorHeight => {
-                fieldType       => 'integer',
-                defaultValue    => 0,
-            },
-            useBr => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            removeLineBreaks => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            nowrap=>{
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            directionality => {
-                fieldType       => 'selectBox',
-                defaultValue    => 'ltr',
-            },
-            toolbarLocation => {
-                fieldType       => 'selectBox',
-                defaultValue    => 'bottom',
-            },
-            cssFile => {
-                fieldType       => 'text',
-                defaultValue    => undef,
-            },
-            toolbarRow1 => {
-                fieldType       => 'checkList',
-                defaultValue    => undef,
-            },
-            toolbarRow2 => {
-                fieldType       => 'checkList',
-                defaultValue    => undef,
-            },
-            toolbarRow3 => {
-                fieldType       => 'checkList',
-                defaultValue    => undef,
-            },
-            enableContextMenu => {
-                fieldType       => "yesNo",
-                defaultValue    => 0,
-            },
-            inlinePopups => {
-                fieldType       => "yesNo",
-                defaultValue    => 0,
-            },
-            allowMedia => {
-                fieldType       => "yesNo",
-                defaultValue    => 0,
-            },
-        },
-    });
-    return $class->SUPER::definition($session, $definition);
-}
 
 
 
@@ -244,9 +280,9 @@ sub getEditForm {
 		$i18n->get('row 1'),
 		$i18n->get('row 2'),
 		$i18n->get('row 3');
-	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));
-	my @toolbarRow2 = split("\n",$self->getValue("toolbarRow2"));
-	my @toolbarRow3 = split("\n",$self->getValue("toolbarRow3"));
+	my @toolbarRow1 = split("\n",$self->toolbarRow1);
+	my @toolbarRow2 = split("\n",$self->toolbarRow2);
+	my @toolbarRow3 = split("\n",$self->toolbarRow3);
 	my $evenOddToggle = 0;
 	foreach my $key (keys %buttons) {
 		$evenOddToggle = $evenOddToggle ? 0 : 1;
@@ -285,7 +321,7 @@ sub getEditForm {
 		-value=>$buttonGrid
 		);
         $tabform->getTab("properties")->yesNo(
-                -value=>$self->getValue("disableRichEditor"),
+                -value=>$self->disableRichEditor,
 		-label=>$i18n->get('disable rich edit'),
 		-hoverHelp=>$i18n->get('disable rich edit description'),
 		-name=>"disableRichEditor"
@@ -364,8 +400,6 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get('directionality description'),
 		-name=>"directionality",
 		-options=>{
-			ltr=>$i18n->get('left to right'),
-			rtl=>$i18n->get('right to left'),
 			}
                 );
         $tabform->getTab("display")->selectBox(
@@ -397,7 +431,7 @@ sub getEditForm {
         -name=>"inlinePopups"
     );
     $tabform->getTab("properties")->yesNo(
-        value       => $self->getValue("allowMedia"),
+        value       => $self->allowMedia,
         label       => $i18n->get('editForm allowMedia label'),
         hoverHelp   => $i18n->get('editForm allowMedia description'),
         name        => "allowMedia",
@@ -462,22 +496,22 @@ for a HTML tag.
 
 sub getRichEditor {
 	my $self = shift;
-	return '' if ($self->getValue('disableRichEditor'));
+	return '' if ($self->disableRichEditor);
 	my $nameId = shift;
     my @plugins;
     my %loadPlugins;
     push @plugins, "safari";
     push @plugins, "contextmenu"
-        if $self->getValue("enableContextMenu");
+        if $self->enableContextMenu;
     push @plugins, "inlinepopups"
-        if $self->getValue("inlinePopups");
+        if $self->inlinePopups;
     push @plugins, "media"
-        if $self->getValue( 'allowMedia' );
+        if $self->allowMedia;
 
-    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+    my @toolbarRows = map{[split "\n", $self->get("toolbarRow$_")]} (1..3);
     my @toolbarButtons = map{ @{$_} } @toolbarRows;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
-    my $ask = $self->getValue("askAboutRichEdit");
+    my $ask = $self->askAboutRichEdit;
 	my %config = (
 		mode     => $ask ? "none" : "exact",
 		elements => $nameId,
@@ -492,16 +526,16 @@ sub getRichEditor {
 		       (0..$#toolbarRows)),
 		#ask => $self->getValue("askAboutRichEdit") ? JSON::true() : JSON::false(),
 		ask => JSON::false(),
-		preformatted => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
-		force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
-		force_p_newlines => $self->getValue("useBr") ? JSON::false() : JSON::true(),
-        $self->getValue("useBr") ? ( forced_root_block => JSON::false() ) : (),
-		remove_linebreaks => $self->getValue("removeLineBreaks") ? JSON::true() : JSON::false(),
-		nowrap => $self->getValue("nowrap") ? JSON::true() : JSON::false(),
-		directionality => $self->getValue("directionality"),
-		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
+		preformatted => $self->preformatted ? JSON::true() : JSON::false(),
+		force_br_newlines => $self->useBr ? JSON::true() : JSON::false(),
+		force_p_newlines => $self->useBr ? JSON::false() : JSON::true(),
+        $self->useBr ? ( forced_root_block => JSON::false() ) : (),
+		remove_linebreaks => $self->removeLineBreaks ? JSON::true() : JSON::false(),
+		nowrap => $self->nowrap ? JSON::true() : JSON::false(),
+		directionality => $self->directionality,
+		theme_advanced_toolbar_location => $self->toolbarLocation,
 		theme_advanced_statusbar_location => "bottom",
-		valid_elements => $self->getValue("validElements"),
+		valid_elements => $self->validElements,
 		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
 		);
 #    if ($ask) {
@@ -558,8 +592,8 @@ sub getRichEditor {
             $loadPlugins{wgmacro} = $self->session->url->extras("tinymce-webgui/plugins/wgmacro/editor_plugin.js");
         }
 		if ($button eq "code") {
-			$config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth") if ($self->getValue("sourceEditorWidth") > 0);
-			$config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight") if ($self->getValue("sourceEditorHeight") > 0);
+			$config{theme_advanced_source_editor_width} = $self->sourceEditorWidth if ($self->sourceEditorWidth > 0);
+			$config{theme_advanced_source_editor_height} = $self->sourceEditorHeight if ($self->sourceEditorHeight > 0);
 		}
 	}
 	my $language  = $i18n->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
@@ -567,9 +601,9 @@ sub getRichEditor {
 		$language = $i18n->getLanguage("English","languageAbbreviation");
 	}
 	$config{language} = $language;
-	$config{content_css} = $self->getValue("cssFile") || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
-	$config{width} = $self->getValue("editorWidth") if ($self->getValue("editorWidth") > 0);
-	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
+	$config{content_css} = $self->cssFile || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
+	$config{width} = $self->editorWidth if ($self->editorWidth > 0);
+	$config{height} = $self->editorHeight if ($self->editorHeight > 0);
 	$config{plugins} = join(",",@plugins);
 
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{type=>"text/javascript"});

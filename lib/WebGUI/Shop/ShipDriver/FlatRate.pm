@@ -60,7 +60,7 @@ sub calculate {
             ## Two items shipped separately    = two bundles
             ## 1 shipped separately plus 1 not = two bundles
             ## two items shipped together      = one bundle
-            if ($sku->shipsSeparately) {
+            if ($sku->isShippingSeparately) {
                 $separatelyShipped += $quantity;
             }
             else {

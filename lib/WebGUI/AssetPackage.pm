@@ -92,7 +92,7 @@ sub getPackageList {
     my @packageIds = $db->buildArray("select distinct assetId from assetData where isPackage=1");
     my @assets;
     ID: foreach my $id (@packageIds) {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        my $asset = WebGUI::Asset->newById($session, $id);
         next ID unless defined $asset;
         next ID unless $asset->get('isPackage');
         next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
@@ -127,27 +127,27 @@ from the asset where it is deployed.
 
 sub importAssetData {
     my $self        = shift;
+    my $session     = $self->session;
     my $data        = shift;
     my $options     = shift || {};
-    my $error       = $self->session->errorHandler;
+    my $error       = $session->errorHandler;
     my $id          = $data->{properties}{assetId};
     my $class       = $data->{properties}{className};
     my $version     = $data->{properties}{revisionDate};
 
     # Load the class
-    WebGUI::Asset->loadModule( $self->session, $class );
+    WebGUI::Asset->loadModule( $class );
 
-    my $asset;
-    my $revisionExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
     my %properties = %{ $data->{properties} };
     if ($options->{inheritPermissions}) {
         delete $properties{ownerUserId};
         delete $properties{groupIdView};
         delete $properties{groupIdEdit};
     }
-    if ($revisionExists) { # update an existing revision
-        $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
 
+    my $asset = eval { $class->new($session, $id, $version); };
+
+    if (! Exception::Class->caught()) { # update an existing revision
         ##If the existing asset is not committed, do not allow the new package data to 
         ##change the version control status.
         if (  $asset->get('status') eq 'pending'
@@ -158,17 +158,17 @@ sub importAssetData {
         $asset->update(\%properties);
         ##Pending assets are assigned a new version tag
         if ($properties{status} eq 'pending') {
-            $self->session->db->write(
+            $session->db->write(
                 'update assetData set tagId=? where assetId=? and revisionDate=?',
-                [WebGUI::VersionTag->getWorking($self->session)->getId, $properties{assetId}, $properties{revisionDate},]
+                [WebGUI::VersionTag->getWorking($session)->getId, $properties{assetId}, $properties{revisionDate},]
             );
         }
     }
     else {
         eval {
-            $asset = WebGUI::Asset->newPending($self->session, $id, $class);
+            $asset = WebGUI::Asset->newPending($session, $id);
         };
-        if (defined $asset) {   # create a new revision of an existing asset
+        if (! Exception::Class->caught()) {   # create a new revision of an existing asset
             $error->info("Creating a new revision of asset $id");
             $asset = $asset->addRevision($data->{properties}, $version, {skipAutoCommitWorkflows => 1});
         }
@@ -277,15 +277,16 @@ current asset.
 =cut
 
 sub www_deployPackage {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 	# Must have edit rights to the asset deploying the package.  Also, must be a Content Manager.
 	# This protects against non content managers deploying packages using a post or similar trickery.
-	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
-	my $packageMasterAssetId = $self->session->form->param("assetId");
+	return $session->privilege->insufficient() unless ($self->canEdit && $session->user->isInGroup(4));
+	my $packageMasterAssetId = $session->form->param("assetId");
 	if (defined $packageMasterAssetId) {
-		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($self->session, $packageMasterAssetId);
-		unless ($packageMasterAsset->getValue('isPackage')) { #only deploy packages
-		 	$self->session->errorHandler->security('deploy an asset as a package which was not set as a package.');
+		my $packageMasterAsset = WebGUI::Asset->newById($session, $packageMasterAssetId);
+		unless ($packageMasterAsset->get('isPackage')) { #only deploy packages
+		 	$session->errorHandler->security('deploy an asset as a package which was not set as a package.');
 		 	return undef;
 		}
 		my $masterLineage = $packageMasterAsset->get("lineage");
@@ -295,16 +296,16 @@ sub www_deployPackage {
 			$deployedTreeMaster->update({isPackage=>0, styleTemplateId=>$self->get("styleTemplateId")});
 		}
 	}
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,
     }) eq 'redirect') {
         return undef;
     };
-	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getManagerUrl);
+	if ($session->form->param("proceed") eq "manageAssets") {
+		$session->http->setRedirect($self->getManagerUrl);
 	} else {
-		$self->session->http->setRedirect($self->getUrl());
+		$session->http->setRedirect($self->getUrl());
 	}
 	return undef;
 }

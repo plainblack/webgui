@@ -132,7 +132,7 @@ Returns an instanciated WebGUI::Asset::Sku object for this item.
 
 sub getSku {
     my ($self) = @_;
-    my $asset = WebGUI::Asset->newByDynamicClass($self->transaction->session, $self->get("assetId"));
+    my $asset = WebGUI::Asset->newById($self->transaction->session, $self->get("assetId"));
     if (defined $asset) {
         $asset->applyOptions($self->get("options"));
         return $asset;

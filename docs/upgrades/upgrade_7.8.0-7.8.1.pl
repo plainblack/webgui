@@ -79,7 +79,7 @@ sub addPackage {
     # Turn off the package flag, and set the default flag for templates added
     my $assetIds = $package->getLineage( ['self','descendants'] );
     for my $assetId ( @{ $assetIds } ) {
-        my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset   = WebGUI::Asset->newById( $session, $assetId );
         if ( !$asset ) {
             print "Couldn't instantiate asset with ID '$assetId'. Please check package '$file' for corruption.\n";
             next;

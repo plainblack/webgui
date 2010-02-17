@@ -14,45 +14,25 @@ use strict;
 use List::MoreUtils;
 use Tie::IxHash;
 use WebGUI::International;
-use base 'WebGUI::Asset::Wobject';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
 use WebGUI::Text;
 use WebGUI::Storage;
 use WebGUI::Exception::Shop;
 use WebGUI::Asset::Sku::Product;
 
-#-------------------------------------------------------------------
+aspect assetName  => ['assetName', 'Asset_Shelf'];
+aspect icon       => 'Shelf.gif';
+aspect tableName  => 'Shelf';
 
-=head2 definition ( )
-
-Add our custom properties of templateId to this asset.
-
-=cut
-
-sub definition {
-	my ($class, $session, $definition) = @_;
-	my $i18n = WebGUI::International->new($session, 'Asset_Shelf');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		templateId =>{
-			fieldType		=> "template",  
-			defaultValue	=> 'nFen0xjkZn8WkpM93C9ceQ',
-			tab				=> "display",
-			namespace		=> "Shelf", 
-			hoverHelp		=> $i18n->get('shelf template help'),
-			label			=> $i18n->get('shelf template'),
-		}
-	);
-	push(@{$definition}, {
-		assetName			=> $i18n->get('assetName'),
-		icon				=> 'Shelf.gif',
-		autoGenerateForms	=> 1,
-		tableName			=> 'Shelf',
-		className			=> 'WebGUI::Asset::Wobject::Shelf',
-		properties			=> \%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
+property templateId => (
+            fieldType        => "template",  
+            defaultValue     => 'nFen0xjkZn8WkpM93C9ceQ',
+            tab              => "display",
+            namespace        => "Shelf", 
+            hoverHelp        => ['shelf template help', 'Asset_Shelf'],
+            label            => ['shelf template', 'Asset_Shelf'],
+        );
 
 #-------------------------------------------------------------------
 
@@ -74,7 +54,7 @@ sub exportProducts {
     @columns = map { $_ eq 'shortdescription' ? 'shortdesc' : $_ } @columns;
     my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
     while (my $product = $getAProduct->()) {
-        my $mastersku = $product->get('sku');
+        my $mastersku = $product->sku;
         my $title     = $product->getTitle;
         my $collateri = $product->getAllCollateral('variantsJSON');
         foreach my $collateral (@{ $collateri }) {
@@ -210,10 +190,9 @@ sub importProducts {
             }
 
             if ($productRow{title} ne $product->getTitle) {
-                my $newTitle = $product->fixTitle($productRow{title});
                 $product->update({
-                    title     => $newTitle,
-                    menuTitle => $newTitle,
+                    title     => $productRow{title},
+                    menuTitle => $productRow{title},
                 });
             }
 
@@ -234,11 +213,10 @@ sub importProducts {
             ##Insert a new product;
             $session->log->warn("Making a new product: $productRow{sku}\n");
             my $newProduct = $node->addChild({className => 'WebGUI::Asset::Sku::Product'});
-            my $newTitle = $newProduct->fixTitle($productRow{title});
             $newProduct->update({
-                title     => $newTitle,
-                menuTitle => $newTitle,
-                url       => $newProduct->fixUrl($productRow{title}),
+                title     => $productRow{title},
+                menuTitle => $productRow{title},
+                url       => $productRow{title},
                 sku       => $productRow{mastersku},
             });
             $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productCollateral);
@@ -260,7 +238,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -300,7 +278,7 @@ sub view {
 	my @childSkus = @{$self->getLineage(['children'],{isa=>'WebGUI::Asset::Sku'})};
 	
 	# find products based upon keywords
-	my @keywords = $self->get('keywords');
+	my @keywords = $self->keywords;
 	my $keywordBasedAssetIds = WebGUI::Keyword->new($session)->getMatchingAssets({
 		matchAssetKeywords	=> $self,
 		isa					=> 'WebGUI::Asset::Sku',
@@ -310,7 +288,7 @@ sub view {
 	my @productIds = List::MoreUtils::uniq(@childSkus, @{$keywordBasedAssetIds});
     my @products = ();
     PRODUCT: foreach my $id (@productIds) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+		my $asset = WebGUI::Asset->newById($session, $id);
         if (!defined $asset) {
 			$session->errorHandler->error(q|Couldn't instanciate SKU with assetId |.$id.q| on shelf with assetId |.$self->getId);
             next PRODUCT;

@@ -18,73 +18,54 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
 use POSIX qw(ceil floor);
-use base 'WebGUI::Asset::Wobject';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_TimeTracking'];
+aspect icon      => 'timetrack.gif';
+aspect tableName => 'TT_wobject';
+property userViewTemplateId => (
+			fieldType   => "template",  
+			default     => 'TimeTrackingTMPL000001',
+			tab         => "display",
+			namespace   => "TimeTracking_user", 
+			hoverHelp   => ['userViewTemplate hoverhelp', 'Asset_TimeTracking'],
+		    label       => ['userViewTemplate label', 'Asset_TimeTracking'],
+		);
+property managerViewTemplateId => (
+			fieldType   => "template",  
+			default     => 'TimeTrackingTMPL000002',
+			tab         => "display",
+			namespace   => "TimeTracking_manager", 
+			hoverHelp   => ['managerViewTemplate hoverhelp', 'Asset_TimeTracking'],
+		    label       => ['managerViewTemplate label', 'Asset_TimeTracking'],
+		);
+property timeRowTemplateId => (
+			fieldType   => "template",  
+			default     => 'TimeTrackingTMPL000003',
+			tab         => "display",
+			namespace   => "TimeTracking_row", 
+			hoverHelp   => ['timeRowTemplateId hoverhelp', 'Asset_TimeTracking'],
+		    label       => ['timeRowTemplateId label', 'Asset_TimeTracking'],
+		);
+property groupToManage => (
+			fieldType   => "group",
+			default     => 3,
+			tab         => "security",
+			hoverHelp   => ['groupToManage hoverhelp', 'Asset_TimeTracking'],
+			label       => ['groupToManage label', 'Asset_TimeTracking'],
+		);
+property pmIntegration => (
+		    fieldTypei  => "yesNo",
+			default     => 0,
+			tab         => "properties",
+			hoverHelp   => ["Choose yes to pull projects and task information from the various project management assets on your site", 'Asset_TimeTracking'],
+			label       => ["Project Management Integration", 'Asset_TimeTracking'],
+		);
+
+
+
+
 use WebGUI::Asset::Wobject::ProjectManager;
-
-#-------------------------------------------------------------------
-
-=head2 definition 
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		userViewTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'TimeTrackingTMPL000001',
-			tab=>"display",
-			namespace=>"TimeTracking_user", 
-			hoverHelp=>$i18n->get('userViewTemplate hoverhelp'),
-		    label=>$i18n->get('userViewTemplate label')
-		},
-		managerViewTemplateId => {
-			fieldType=>"template",  
-			defaultValue=>'TimeTrackingTMPL000002',
-			tab=>"display",
-			namespace=>"TimeTracking_manager", 
-			hoverHelp=>$i18n->get('managerViewTemplate hoverhelp'),
-		    label=>$i18n->get('managerViewTemplate label')
-		},
-		timeRowTemplateId=>  {
-			fieldType=>"template",  
-			defaultValue=>'TimeTrackingTMPL000003',
-			tab=>"display",
-			namespace=>"TimeTracking_row", 
-			hoverHelp=>$i18n->get('timeRowTemplateId hoverhelp'),
-		    label=>$i18n->get('timeRowTemplateId label')
-		},
-		groupToManage => {
-			fieldType=>"group",
-			defaultValue=>3,
-			tab=>"security",
-			hoverHelp=>$i18n->get('groupToManage hoverhelp'),
-			label=>$i18n->get('groupToManage label')
-		},
-		pmIntegration => {
-		    fieldType=>"yesNo",
-			defaultValue=>0,
-			tab=>"properties",
-			hoverHelp=>$i18n->get("Choose yes to pull projects and task information from the various project management assets on your site"),
-			label=>$i18n->get("Project Management Integration")
-		},
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'timetrack.gif',
-		autoGenerateForms=>1,
-		tableName=>'TT_wobject',
-		className=>'WebGUI::Asset::Wobject::TimeTracking',
-		properties=>\%properties
-	 });
-     return $class->SUPER::definition($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -96,15 +77,11 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template;
-	#if($user->isInGroup($self->get("groupToManage")) {
-	#  $template = WebGUI::Asset::Template->new($self->session, $self->get("managerViewTemplateId"));
-	#} else {
-	   $template = WebGUI::Asset::Template->new($self->session, $self->get("userViewTemplateId"));
-	#}
+    $template = WebGUI::Asset::Template->new($self->session, $self->userViewTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("userViewTemplateId"),
+            templateId => $self->userViewTemplateId,
             assetId    => $self->getId,
         );
     }
@@ -209,7 +186,7 @@ sub view {
 	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	$var->{'extras'} = $config->get("extrasURL")."/wobject/TimeTracking"; 
 	
-	if($user->isInGroup($self->get("groupToManage"))) {
+	if($user->isInGroup($self->groupToManage)) {
 	   $var->{'project.manage.url'} = $self->getUrl("func=manageProjects");
 	   $var->{'project.manage.label'} = $i18n->get("project manage label");
 	}
@@ -303,7 +280,7 @@ sub www_editTimeEntrySave {
 	}
 	
 	# Update Project Management App if integrated
-	if ($self->getValue("pmIntegration")) {
+	if ($self->pmIntegration) {
 		foreach my $projectId (keys %deltaHours) {
 			foreach my $taskId (keys %{$deltaHours{$projectId}}) {
 				my $deltaHours = $deltaHours{$projectId}{$taskId};
@@ -329,7 +306,7 @@ sub www_deleteProject {
 	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	#Check Privileges
-    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
+    return $privilege->insufficient unless ($user->isInGroup($self->groupToManage));
     my $projectId = $form->get("projectId");
 	my ($count) = $db->quickArray("select count(*) from TT_timeEntry where projectId=".$db->quote($projectId));
     
@@ -356,7 +333,7 @@ sub www_editProject {
 	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	#Check Privileges
-    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
+    return $privilege->insufficient unless ($user->isInGroup($self->groupToManage));
     my $projectId = $_[0] || $form->get("projectId") || "new";
 	my $taskError = qq|<br><span style="color:red;font-weight:bold">$_[1]</span>| if($_[1]);
 	my $extras = $config->get("extrasURL")."/wobject/TimeTracking"; 
@@ -461,7 +438,7 @@ sub www_editProjectSave {
 	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	#Check Privileges
-    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
+    return $privilege->insufficient unless ($user->isInGroup($self->groupToManage));
 	
 	my $action = $form->get("action");
 		
@@ -526,7 +503,7 @@ sub www_manageProjects {
 	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	#Check Privileges
-    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
+    return $privilege->insufficient unless ($user->isInGroup($self->groupToManage));
 	
 	my $pnLabel = $i18n->get("manage project name label");
 	my $atLabel = $i18n->get("manage project available task label");
@@ -656,7 +633,7 @@ sub www_buildTimeTable {
 	
 	return $privilege->insufficient unless ($self->canView);
 	
-	my $pmIntegration = $self->getValue("pmIntegration");
+	my $pmIntegration = $self->pmIntegration;
 	
 	my $week = $form->get("week") || $dt->time;
 	
@@ -702,7 +679,7 @@ sub www_buildTimeTable {
 	   #Build project list and task lists from project management app
 	   my ($pmAssetId) = $db->quickArray("select a.assetId from PM_wobject a, asset b where a.assetId=b.assetId and b.state not like 'trash%'");   
 	   if($pmAssetId) {
-	      $pmAsset = WebGUI::Asset->newByDynamicClass($session,$pmAssetId);
+	      $pmAsset = WebGUI::Asset->newById($session,$pmAssetId);
 	      my %pmProjectList = %{$pmAsset->getProjectList($user->userId)};
 		  %projectList = WebGUI::Utility::sortHash((%projectList,%pmProjectList));
 	   }
@@ -743,7 +720,7 @@ sub www_buildTimeTable {
 	%projectList = (""=>$chooseLabel,%projectList);
 	
 	my $resourceIdFromForm = $form->get("resourceId");
-	my $resourceId = ($user->isInGroup($self->get("groupToManage")) && $resourceIdFromForm)?$resourceIdFromForm:$user->userId;
+	my $resourceId = ($user->isInGroup($self->groupToManage) && $resourceIdFromForm)?$resourceIdFromForm:$user->userId;
 	#Build Report Info
 	my $report = $db->quickHashRef("select * from TT_report where resourceId=? and assetId=? and startDate=? and endDate=?",[$resourceId,$self->getId,$weekStart,$weekEnd]);	
 	my $reportId = $report->{reportId};
@@ -806,7 +783,7 @@ sub www_buildTimeTable {
 	$var->{'time.entry.loop'} = \@timeEntries;
 	$viewVar->{'time.report.rows.total'} = (scalar(@timeEntries)+1);
 	
-    return $self->processTemplate($var,$self->getValue("timeRowTemplateId"));
+    return $self->processTemplate($var,$self->timeRowTemplateId);
 }
 
 #-------------------------------------------------------------------

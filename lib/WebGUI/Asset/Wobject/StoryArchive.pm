@@ -13,7 +13,90 @@ our $VERSION = "1.0.0";
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
+
+#use Class::C3;
+#use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_StoryArchive'];
+aspect icon      => 'storyarchive.gif';
+aspect tableName => 'StoryArchive';
+property storiesPerPage => (
+            tab          => 'display',  
+            fieldType    => 'integer',  
+            label        => ['stories per page', 'Asset_StoryArchive'],
+            hoverHelp    => ['stories per page help', 'Asset_StoryArchive'],
+            default      => 25,
+         );
+property groupToPost => (
+            tab          => 'security',  
+            fieldType    => 'group',  
+            label        => ['group to post', 'Asset_StoryArchive'],
+            hoverHelp    => ['group to post help', 'Asset_StoryArchive'],
+            default      => '12',
+         );
+property templateId => (
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => ['template', 'Asset_StoryArchive'],
+            hoverHelp    => ['template help', 'Asset_StoryArchive'],
+            namespace    => 'StoryArchive',
+            default      => 'yxD5ka7XHebPLD-LXBwJqw',
+         );
+property storyTemplateId => (
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => ['story template', 'Asset_StoryArchive'],
+            hoverHelp    => ['story template help', 'Asset_StoryArchive'],
+            namespace    => 'Story',
+            default      => '3QpYtHrq_jmAk1FNutQM5A',
+         );
+property photoWidth => (
+            tab          => 'display',
+            fieldType    => 'integer',
+            label        => ['photo width', 'Asset_StoryArchive'],
+            hoverHelp    => ['photo width help', 'Asset_StoryArchive'],
+            default      => '300',
+         );
+property editStoryTemplateId => (
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => ['edit story template', 'Asset_StoryArchive'],
+            hoverHelp    => ['edit story template help', 'Asset_StoryArchive'],
+            namespace    => 'Story/Edit',
+            default      => 'E3tzZjzhmYoNlAyP2VW33Q',
+         );
+property keywordListTemplateId => (
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => ['keyword list template', 'Asset_StoryArchive'],
+            hoverHelp    => ['keyword list template help', 'Asset_StoryArchive'],
+            namespace    => 'StoryArchive/KeywordList',
+            default      => '0EAJ9EYb9ap2XwfrcXfdLQ',
+         );
+property archiveAfter => (
+            tab          => 'display',  
+            fieldType    => 'interval',  
+            label        => ['archive after', 'Asset_StoryArchive'],
+            hoverHelp    => ['archive after help', 'Asset_StoryArchive'],
+            default      => 31536000,
+         );
+property richEditorId => (
+            tab          => 'display',  
+            fieldType    => 'selectRichEditor',  
+            label        => ['rich editor', 'Asset_StoryArchive'],
+            hoverHelp    => ['rich editor help', 'Asset_StoryArchive'],
+            default      => 'PBrichedit000000000002',
+         );
+property approvalWorkflowId => (
+            tab           => 'security',
+            fieldType     => 'workflow',
+            default       => 'pbworkflow000000000003',
+            type          => 'WebGUI::VersionTag',
+            label         => ['approval workflow', 'Asset_StoryArchive'],
+            hoverHelp     => ['approval workflow help', 'Asset_StoryArchive'],
+         );    
+
 use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Asset::Story;
@@ -21,8 +104,7 @@ use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Paginator;
 use WebGUI::Keyword;
 use WebGUI::Search;
-use Class::C3;
-use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
+
 use File::Path;
 
 use constant DATE_FORMAT => '%c_%D_%y';
@@ -68,7 +150,7 @@ sub canPostStories {
 	my ($self, $userId) = @_;
     $userId ||= $self->session->user->userId;
     my $user = WebGUI::User->new($self->session, $userId);
-	return $user->isInGroup($self->get("groupToPost")) || $self->canEdit($userId);
+	return $user->isInGroup($self->groupToPost) || $self->canEdit($userId);
 }
 
 #-------------------------------------------------------------------
@@ -87,89 +169,9 @@ sub definition {
     my $definition = shift;
     my $i18n = WebGUI::International->new($session, 'Asset_StoryArchive');
     my %properties;
-    tie %properties, 'Tie::IxHash';
     %properties = (
-        storiesPerPage => {
-            tab          => 'display',  
-            fieldType    => 'integer',  
-            label        => $i18n->get('stories per page'),
-            hoverHelp    => $i18n->get('stories per page help'),
-            defaultValue => 25,
-        },
-        groupToPost => {
-            tab          => 'security',  
-            fieldType    => 'group',  
-            label        => $i18n->get('group to post'),
-            hoverHelp    => $i18n->get('group to post help'),
-            defaultValue => '12',
-        },
-        templateId => {
-            tab          => 'display',
-            fieldType    => 'template',
-            label        => $i18n->get('template'),
-            hoverHelp    => $i18n->get('template help'),
-            namespace    => 'StoryArchive',
-            defaultValue => 'yxD5ka7XHebPLD-LXBwJqw',
-        },
-        storyTemplateId => {
-            tab          => 'display',
-            fieldType    => 'template',
-            label        => $i18n->get('story template'),
-            hoverHelp    => $i18n->get('story template help'),
-            namespace    => 'Story',
-            defaultValue => '3QpYtHrq_jmAk1FNutQM5A',
-        },
-        photoWidth => {
-            tab          => 'display',
-            fieldType    => 'integer',
-            label        => $i18n->get('photo width'),
-            hoverHelp    => $i18n->get('photo width help'),
-            defaultValue => '300',
-        },
-        editStoryTemplateId => {
-            tab          => 'display',
-            fieldType    => 'template',
-            label        => $i18n->get('edit story template'),
-            hoverHelp    => $i18n->get('edit story template help'),
-            namespace    => 'Story/Edit',
-            defaultValue => 'E3tzZjzhmYoNlAyP2VW33Q',
-        },
-        keywordListTemplateId => {
-            tab          => 'display',
-            fieldType    => 'template',
-            label        => $i18n->get('keyword list template'),
-            hoverHelp    => $i18n->get('keyword list template help'),
-            namespace    => 'StoryArchive/KeywordList',
-            defaultValue => '0EAJ9EYb9ap2XwfrcXfdLQ',
-        },
-        archiveAfter => {
-            tab          => 'display',  
-            fieldType    => 'interval',  
-            label        => $i18n->get('archive after'),
-            hoverHelp    => $i18n->get('archive after help'),
-            defaultValue => 31536000,
-        },
-        richEditorId => {
-            tab          => 'display',  
-            fieldType    => 'selectRichEditor',  
-            label        => $i18n->get('rich editor'),
-            hoverHelp    => $i18n->get('rich editor help'),
-            defaultValue => 'PBrichedit000000000002',
-        },
-        approvalWorkflowId =>{
-            tab           => 'security',
-            fieldType     => 'workflow',
-            defaultValue  => 'pbworkflow000000000003',
-            type          => 'WebGUI::VersionTag',
-            label         => $i18n->get('approval workflow'),
-            hoverHelp     => $i18n->get('approval workflow help'),
-        },    
     );
     push(@{$definition}, {
-        assetName=>$i18n->get('assetName'),
-        icon=>'storyarchive.gif',
-        autoGenerateForms=>1,
-        tableName=>'StoryArchive',
         className=>'WebGUI::Asset::Wobject::StoryArchive',
         properties=>\%properties,
     });
@@ -235,7 +237,7 @@ sub exportAssetCollateral {
         limit => 50, ##This is based on the tagcloud setting
     });
 
-    my $listTemplate = WebGUI::Asset->new($session, $self->get('keywordListTemplateId'), 'WebGUI::Asset::Template');
+    my $listTemplate = WebGUI::Asset->new($session, $self->keywordListTemplateId, 'WebGUI::Asset::Template');
     foreach my $keyword (@{ $keywords }) {
         ##Keywords may not be URL safe, so urlize them
         my $keyword_url = $self->getKeywordFilename($keyword);
@@ -264,7 +266,7 @@ sub exportAssetCollateral {
         });
         my $listOfStories = [];
         STORYID: foreach my $storyId (@{ $storyIds }) {
-            my $story = WebGUI::Asset->newByDynamicClass($session, $storyId);
+            my $story = WebGUI::Asset->newById($session, $storyId);
             next STORYID unless $story;
             push @{ $listOfStories }, {
                 title => $story->getTitle,
@@ -330,7 +332,7 @@ sub getFolder {
         menuTitle       => $folderName,
         url             => $folderUrl,
         isHidden        => 1,
-        styleTemplateId => $self->get('styleTemplateId'),
+        styleTemplateId => $self->styleTemplateId,
     });
     $newVersionTag->commit();
     ##Restore the old one, if it exists
@@ -404,7 +406,7 @@ sub getRssFeedItems {
         excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
         orderByClause  => 'creationDate desc, lineage',
         returnObjects  => 1,
-        limit          => $self->get('itemsPerFeed'),
+        limit          => $self->itemsPerFeed,
     });
     my $storyData = [];
     while (my $story = $stories->()) {
@@ -424,11 +426,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -510,7 +512,7 @@ sub viewTemplateVariables {
             keywords     => $wordList,
             isa          => 'WebGUI::Asset::Story',
             usePaginator => 1,
-            rowsPerPage  => $self->get('storiesPerPage'),
+            rowsPerPage  => $self->storiesPerPage,
         });
         $p->setBaseUrl($self->getUrl("func=view;keyword=".$keywords));
     }
@@ -519,7 +521,7 @@ sub viewTemplateVariables {
         my $search   = WebGUI::Search->new($session);
         $search->search({
             keywords => $query,
-            lineage  => [ $self->get('lineage'),    ],
+            lineage  => [ $self->lineage,    ],
             classes  => [ qw/WebGUI::Asset::Story/, ],
         });
         $p = $search->getPaginatorResultSet($self->getUrl, $self->get('storiesPerPage'));
@@ -531,7 +533,7 @@ sub viewTemplateVariables {
             excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
             orderByClause  => 'creationDate desc, lineage',
         });
-        my $storiesPerPage = $self->get('storiesPerPage');
+        my $storiesPerPage = $self->storiesPerPage;
         if ($exporting) {
             ##10 pages worth of data on 1 page in export mode
             $storiesPerPage *= 10;
@@ -557,7 +559,7 @@ sub viewTemplateVariables {
     STORY: foreach my $storyId (@{ $storyIds }) {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
         next STORY unless $story;
-        my $creationDate = $story->get('creationDate');
+        my $creationDate = $story->creationDate;
         my ($creationDay,undef) = $session->datetime->dayStartEnd($creationDate);
         my $storyDate = $session->datetime->epochToHuman($creationDay, DATE_FORMAT);
         if ($storyDate ne $lastStoryDate) {
@@ -573,10 +575,10 @@ sub viewTemplateVariables {
             creationDate  => $creationDate,
         };
         if ($story->canEdit && $userUiLevel >= $uiLevels->{delete} && !$exporting) {
-            $storyVars->{deleteIcon} = $icon->delete('func=delete', $story->get('url'), $i18n->get(43));
+            $storyVars->{deleteIcon} = $icon->delete('func=delete', $story->url, $i18n->get(43));
         }
         if ($story->canEdit && $userUiLevel >= $uiLevels->{edit}   && !$exporting) {
-            $storyVars->{editIcon}   = $icon->edit('func=edit', $story->get('url'));
+            $storyVars->{editIcon}   = $icon->edit('func=edit', $story->url);
         }
         push @{$datePointer->{story_loop}}, $storyVars;
     }

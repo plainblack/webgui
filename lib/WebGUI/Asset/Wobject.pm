@@ -23,8 +23,50 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::SQL;
 use WebGUI::Utility;
-
-our @ISA = qw(WebGUI::Asset);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+aspect tableName   => 'wobject';
+aspect assetName   => 'Wobject';
+property description => (
+            fieldType       => 'HTMLArea',
+            default         => undef,
+            tab             => "properties",
+            label           => [85,'Asset_Wobject'],
+            hoverHelp       => ['85 description','Asset_Wobject'],
+         );
+property displayTitle => (
+            fieldType       => 'yesNo',
+            default         => 1,
+            tab             => "display",
+            label           => [174,'Asset_Wobject'],
+            hoverHelp       => ['174 description','Asset_Wobject'],
+            uiLevel         => 5
+         );
+property styleTemplateId => (
+            fieldType       => 'template',
+            default         => 'PBtmpl0000000000000060',
+            tab             => "display",
+            label           => [1073,'Asset_Wobject'],
+            hoverHelp       => ['1073 description','Asset_Wobject'],
+            namespace       => 'style'
+         );
+property printableStyleTemplateId => (
+            fieldType       => 'template',
+            default         => 'PBtmpl0000000000000060',
+            tab             => "display",
+            label           => [1079,'Asset_Wobject'],
+            hoverHelp       => ['1079 description','Asset_Wobject'],
+            namespace       => 'style'
+         );
+property mobileStyleTemplateId => (
+            fieldType       =>  'template',
+            noFormPost      =>  sub { return !$_[0]->session->setting->get('useMobileStyle'); },
+            default         =>  'PBtmpl0000000000000060',
+            tab             =>  'display',
+            label           =>  ['mobileStyleTemplateId label','Asset_Wobject'],
+            hoverHelp       =>  ['mobileStyleTemplateId description','Asset_Wobject'],
+            namespace       =>  'style',
+         );
 
 =head1 NAME
 
@@ -46,78 +88,6 @@ See the subclasses in lib/WebGUI/Wobjects for details.
 These methods are available from this class:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, [definition] )
-
-Returns an array reference of definitions. Adds tableName, className, properties to array definition.
-
-=head3 definition
-
-An array of hashes to prepend to the list
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_Wobject');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-	description=>{
-		fieldType=>'HTMLArea',
-		defaultValue=>undef,
-		tab=>"properties",
-		label=>$i18n->get(85),
-		hoverHelp=>$i18n->get('85 description')
-	},
-	displayTitle=>{
-		fieldType=>'yesNo',
-		defaultValue=>1,
-		tab=>"display",
-		label=>$i18n->get(174),
-		hoverHelp=>$i18n->get('174 description'),
-		uiLevel=>5
-	},
-	styleTemplateId=>{
-		fieldType=>'template',
-		defaultValue=>'PBtmpl0000000000000060',
-		tab=>"display",
-		label=>$i18n->get(1073),
-		hoverHelp=>$i18n->get('1073 description'),
-	    filter=>'fixId',
-		namespace=>'style'
-	},
-	printableStyleTemplateId=>{
-		fieldType=>'template',
-		defaultValue=>'PBtmpl0000000000000060',
-		tab=>"display",
-		label=>$i18n->get(1079),
-		hoverHelp=>$i18n->get('1079 description'),
-	    filter=>'fixId',
-		namespace=>'style'
-	},
-    mobileStyleTemplateId => {
-        fieldType       => ( $session->setting->get('useMobileStyle') ? 'template' : 'hidden' ),
-        defaultValue    => 'PBtmpl0000000000000060',
-        tab             => 'display',
-        label           => $i18n->get('mobileStyleTemplateId label'),
-        hoverHelp       => $i18n->get('mobileStyleTemplateId description'),
-        filter          => 'fixId',
-        namespace       => 'style',
-    },
-	);
-	push(@{$definition}, {
-		tableName=>'wobject',
-		className=>'WebGUI::Asset::Wobject',
-		autoGenerateForms=>1,
-		properties => \%properties
-	});
-	return $class->SUPER::definition($session,$definition);
-}
 
 #-------------------------------------------------------------------
 

@@ -24,6 +24,12 @@ our $I18N = {
          lastUpdated => 1121703035,
      },
 
+     'template description' => {
+         message => q|Choose a template to style and display the contents of the Zip Archive|,
+         context => q|hover help for Zip Archive asset form|,
+         lastUpdated => 1265822565,
+     },
+
 	'show page' => {
 		message => q|Initial Page|,
 		context => q|label for Zip Archive asset form|,
@@ -103,12 +109,6 @@ our $I18N = {
 	},
 
 	'templateId' => {
-                message => q|The ID of the template used to display the contents of the Zip Archive.
-		|,
-		lastUpdated => 1166823840,
-	},
-
-	 'templateId' => {
                 message => q|The ID of the template used to display the contents of the Zip Archive.
 		|,
 		lastUpdated => 1166823840,

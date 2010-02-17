@@ -72,12 +72,13 @@ $versionTag->commit;
 
 sleep 2;
 
+note "duplicate";
 my $duplicatedSnippet = $snippet->duplicate;
 
-is($duplicatedSnippet->get('title'), 'snippet',        'duplicated snippet has correct title');
-isnt($duplicatedSnippet->getId,      $snippetAssetId,  'duplicated snippet does not have same assetId as original');
+is($duplicatedSnippet->title,   'snippet',        'duplicated snippet has correct title');
+isnt($duplicatedSnippet->getId, $snippetAssetId,  'duplicated snippet does not have same assetId as original');
 is( 
-    $duplicatedSnippet->get("revisionDate"),
+    $duplicatedSnippet->revisionDate,
     $snippetRevisionDate,
     'duplicated snippet has the same revision date',
 );
@@ -96,9 +97,10 @@ WebGUI::Test->tagsToRollback($newVersionTag);
 #
 ####################################################
 
-is( $topFolder->cut, 1, 'cut: returns 1 if successful' );
-is($topFolder->get('state'),              'clipboard', '... state set to trash on the trashed asset object');
-is($topFolder->cloneFromDb->get('state'), 'clipboard', '... state set to trash in db on object');
-is($folder1a->cloneFromDb->get('state'),  'clipboard-limbo', '... state set to clipboard-limbo on child #1');
-is($folder1b->cloneFromDb->get('state'),  'clipboard-limbo', '... state set to clipboard-limbo on child #2');
-is($folder1a2->cloneFromDb->get('state'), 'clipboard-limbo', '... state set to clipboard-limbo on grandchild #1-1');
+note "cut";
+is($topFolder->cut, 1, 'returns 1 if successful' );
+is($topFolder->state,              'clipboard', '... state set to trash on the trashed asset object');
+is($topFolder->cloneFromDb->state, 'clipboard', '... state set to trash in db on object');
+is($folder1a->cloneFromDb->state,  'clipboard-limbo', '... state set to clipboard-limbo on child #1');
+is($folder1b->cloneFromDb->state,  'clipboard-limbo', '... state set to clipboard-limbo on child #2');
+is($folder1a2->cloneFromDb->state, 'clipboard-limbo', '... state set to clipboard-limbo on grandchild #1-1');

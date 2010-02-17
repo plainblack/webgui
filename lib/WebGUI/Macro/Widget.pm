@@ -11,6 +11,9 @@ package WebGUI::Macro::Widget;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Exception;
+use WebGUI::Asset;
+use WebGUI::Storage;
 
 #-------------------------------------------------------------------
 
@@ -55,8 +58,8 @@ sub process {
     );
 
     # construct the absolute URL and get the asset ID
-    my $asset           = WebGUI::Asset->newByUrl($session, $url);
-    if ( !$asset ) {
+    my $asset           = eval { WebGUI::Asset->newByUrl($session, $url); };
+    if ( Exception::Class->caught() ) {
         return "Widget: Could not find asset with URL '$url'";
     }
     my $assetId         = $asset->getId;

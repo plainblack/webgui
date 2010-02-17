@@ -11,90 +11,58 @@ package WebGUI::Asset::Wobject::Collaboration::Newsletter;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject::Collaboration';
+aspect assetName => ['assetName', 'Asset_Newsletter'];
+aspect icon      => 'newsletter.gif';
+aspect tableName => 'Newsletter';
+property newsletterHeader => (
+    default   => undef,
+    fieldType => "HTMLArea",
+    tab       => "mail",
+    label     => [ "newsletter header", 'Asset_Newsletter' ],
+    hoverHelp => [ "newsletter header help", 'Asset_Newsletter' ],
+);
+property newsletterFooter => (
+    default   => undef,
+    fieldType => "HTMLArea",
+    tab       => "mail",
+    label     => [ "newsletter footer", 'Asset_Newsletter' ],
+    hoverHelp => [ "newsletter footer help", 'Asset_Newsletter' ],
+);
+property newsletterTemplateId => (
+    default   => 'newsletter000000000001',
+    fieldType => "template",
+    namespace => "newsletter",
+    tab       => "mail",
+    label     => [ "newsletter template", 'Asset_Newsletter' ],
+    hoverHelp => [ "newsletter template help", 'Asset_Newsletter' ],
+);
+property mySubscriptionsTemplateId => (
+    default   => 'newslettersubscrip0001',
+    fieldType => "template",
+    namespace => "newsletter/mysubscriptions",
+    tab       => "display",
+    label     => [ "my subscriptions template", 'Asset_Newsletter' ],
+    hoverHelp => [ "my subscriptions template help", 'Asset_Newsletter' ],
+);
+property newsletterCategories => (
+    default   => undef,
+    fieldType => "checkList",
+    tab       => "properties",
+    options   => \&_newsletterCategories_options,
+    label     => [ "newsletter categories", 'Asset_Newsletter' ],
+    hoverHelp => [ "newsletter categories help", 'Asset_Newsletter' ],
+    vertical  => 1,
+);
+sub _newsletterCategories_options {
+    my $session = shift->session;
+    return $session->db->buildHashRef("select fieldId, fieldName from metaData_properties where fieldType in ('selectBox', 'checkList', 'radioList') order by fieldName");
+}
+
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Utility;
-use base 'WebGUI::Asset::Wobject::Collaboration';
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-defines wobject properties for Newsletter instances.  You absolutely need 
-this method in your new Wobjects.  If you choose to "autoGenerateForms", the
-getEditForm method is unnecessary/redundant/useless.  
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_Newsletter');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-        newsletterHeader => {
-            defaultValue=>undef,
-            fieldType=>"HTMLArea",
-            tab=>"mail",
-            label=>$i18n->get("newsletter header"),
-            hoverHelp=>$i18n->get("newsletter header help"),
-        },
-        newsletterFooter => {
-            defaultValue=>undef,
-            fieldType=>"HTMLArea",
-            tab=>"mail",
-            label=>$i18n->get("newsletter footer"),
-            hoverHelp=>$i18n->get("newsletter footer help"),
-        },
-        newsletterTemplateId => {
-            defaultValue=>'newsletter000000000001',
-            fieldType=>"template",
-            namespace=>"newsletter",
-            tab=>"mail",
-            label=>$i18n->get("newsletter template"),
-            hoverHelp=>$i18n->get("newsletter template help"),
-        },
-        mySubscriptionsTemplateId => {
-            defaultValue=>'newslettersubscrip0001',
-            fieldType=>"template",
-            namespace=>"newsletter/mysubscriptions",
-            tab=>"display",
-            label=>$i18n->get("my subscriptions template"),
-            hoverHelp=>$i18n->get("my subscriptions template help"),
-        },
-	);
-    if ($session->setting->get("metaDataEnabled")) {
-	    $properties{newsletterCategories} = {
-            defaultValue=>undef,
-            fieldType=>"checkList",
-            tab=>"properties",
-            options=>$session->db->buildHashRef("select fieldId, fieldName from metaData_properties where 
-                fieldType in ('selectBox', 'checkList', 'radioList') order by fieldName"),
-            label=>$i18n->get("newsletter categories"),
-            hoverHelp=>$i18n->get("newsletter categories help"),
-            vertical=>1,
-            };
-    }
-    else {
-        $properties{newsletterCategories} = {
-            fieldType=>"readOnly",
-            value=>'<b style="color: #800000;">'.$i18n->get("content profiling needed").'</b>',
-            };
-    }
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'newsletter.gif',
-		autoGenerateForms=>1,
-		tableName=>'Newsletter',
-		className=>'WebGUI::Asset::Wobject::Collaboration::Newsletter',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -215,7 +183,7 @@ sub www_mySubscriptions {
     my @userPrefs = $self->getUserSubscriptions;
     foreach my $id (keys %{$meta}) {
         my @options = ();
-        if (isIn($id, split("\n", $self->get("newsletterCategories")))) {
+        if (isIn($id, split("\n", $self->newsletterCategories))) {
             foreach my $option (split("\n", $meta->{$id}{possibleValues})) {
                 $option =~ s/\s+$//;    # remove trailing spaces
                 next if $option eq "";  # skip blank values
@@ -242,7 +210,7 @@ sub www_mySubscriptions {
         $var{formFooter} = WebGUI::Form::formFooter($self->session);
         $var{formSubmit} = WebGUI::Form::submit($self->session);
     }
-    return $self->processStyle($self->processTemplate(\%var, $self->get("mySubscriptionsTemplateId")));
+    return $self->processStyle($self->processTemplate(\%var, $self->mySubscriptionsTemplateId));
 }
 
 #-------------------------------------------------------------------

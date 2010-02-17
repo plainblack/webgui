@@ -269,9 +269,9 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 	$var{'head_attachments'} = $var{'head.tags'};
 	$var{'head.tags'}       .= ($var{'body_attachments'} = '<!--morebody-->');
 
-	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
+	my $style = eval { WebGUI::Asset::Template->new($self->session,$templateId); };
 	my $output;
-	if (defined $style) {
+	if (! Exception::Class->caught()) {
 		my $meta = {};
         	if ($self->session->setting->get("metaDataEnabled")) {
                 	$meta = $style->getMetaDataFields();

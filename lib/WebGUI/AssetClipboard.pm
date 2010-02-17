@@ -66,7 +66,7 @@ sub cut {
 	$session->db->write("update asset set state='clipboard-limbo' where lineage like ? and state='published'",[$self->get("lineage").'%']);
 	$session->db->write("update asset set state='clipboard', stateChangedBy=?, stateChanged=? where assetId=?", [$session->user->userId, $session->datetime->time(), $self->getId]);
 	$session->db->commit;
-	$self->{_properties}{state} = "clipboard";
+	$self->state("clipboard");
     foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
         $asset->purgeCache;
         $asset->updateHistory('cut');
@@ -93,25 +93,26 @@ Assets that normally autocommit their workflows (like CS Posts, and Wiki Pages) 
 
 sub duplicate {
     my $self        = shift;
+    my $session     = $self->session;
     my $options     = shift;
     my $parent      = $self->getParent;
     my $newAsset    
         = $parent->addChild( $self->get, undef, $self->get("revisionDate"), { skipAutoCommitWorkflows => $options->{skipAutoCommitWorkflows} } );
 
-    $self->session->log->error(
+    $session->log->error(
         sprintf "Unable to add child %s (%s) to %s (%s)", $self->getTitle, $self->getId, $parent->getTitle, $parent->getId
     );
     # Duplicate metadata fields
-    my $sth = $self->session->db->read(
+    my $sth = $session->db->read(
         "select * from metaData_values where assetId = ?", 
         [$self->getId]
     );
     while (my $h = $sth->hashRef) {
-        $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
+        $session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
     }
 
     # Duplicate keywords
-    my $k = WebGUI::Keyword->new( $self->session );
+    my $k = WebGUI::Keyword->new( $session );
     my $keywords    = $k->getKeywordsForAsset( {
         asset       => $self,
         asArrayRef  => 1,
@@ -196,7 +197,7 @@ sub paste {
 	my $assetId      = shift;
     my $outputSub    = shift;
     my $session      = $self->session;
-	my $pastedAsset  = WebGUI::Asset->newByDynamicClass($session,$assetId);
+	my $pastedAsset  = WebGUI::Asset->newById($session,$assetId);
 	return 0 unless ($self->get("state") eq "published");
     return 0 unless ($pastedAsset->canPaste());  ##Allow pasted assets to have a say about pasting.
 
@@ -279,7 +280,7 @@ sub www_copyList {
     my $session = $self->session;
 	return $self->session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
 	foreach my $assetId ($session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+		my $asset = WebGUI::Asset->newById($session,$assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate({skipAutoCommitWorkflows => 1});
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
@@ -386,7 +387,7 @@ sub www_cutList {
     my $session = $self->session;
 	return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
 	foreach my $assetId ($session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+		my $asset = WebGUI::Asset->newById($session,$assetId);
 		if ($asset->canEdit && !$asset->get('isSystem')) {
 			$asset->cut;
 		}
@@ -419,7 +420,7 @@ sub www_duplicateList {
 	my $session = $self->session;
 	return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
 	foreach my $assetId ($session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+		my $asset = WebGUI::Asset->newById($session,$assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});

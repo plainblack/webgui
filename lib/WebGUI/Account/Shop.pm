@@ -267,11 +267,15 @@ sub www_viewSales {
         . q{ group by assetId order by quantity desc },
         [ $vendor->getId ]
     );
-    while (my $row = $sth->hashRef) {
+    ROW: while (my $row = $sth->hashRef) {
         my $data = $row;
 
         # Add asset properties to tmpl_vars.
-        my $asset = WebGUI::Asset->newByDynamicClass( $session, $row->{ assetId } );
+        my $asset = eval { WebGUI::Asset->newById( $session, $row->{ assetId } ); };
+        if (Exception::Class->caught()) {
+            $session->log->error('Unable to instanciate assetId '.$row->{ assetId }.": $@");
+            next ROW;
+        }
         $row = { %{ $row }, %{ $asset->get } } if $asset;
         
         push @products, $row;

@@ -174,7 +174,7 @@ sub www_delete {
     my $assetId = $session->form->param("assetId");
     my @assetIds = $session->form->param("attachments");
     if ($assetId ne "") {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        my $asset = WebGUI::Asset->newById($session, $assetId);
         if (defined $asset) {
             if ($asset->canEdit) {
                 my $version = WebGUI::VersionTag->new($session, $asset->get("tagId"));
@@ -246,7 +246,7 @@ sub www_show {
     my $attachments = '';
     my $attachmentsList = "attachments=".join(";attachments=", @assetIds) if (scalar(@assetIds));
     foreach my $assetId (@assetIds) {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        my $asset = WebGUI::Asset->newById($session, $assetId);
         if (defined $asset) {
             $attachments .= '<div class="attachment"><a href="'
                 .$url->page("op=formHelper;class=Attachments;sub=delete;maxAttachments=".$form->param("maxAttachments")

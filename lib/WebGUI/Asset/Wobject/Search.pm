@@ -11,7 +11,61 @@ package WebGUI::Asset::Wobject::Search;
 #-------------------------------------------------------------------
 
 use strict;
-use base "WebGUI::Asset::Wobject";
+use WebGUI::Definition::Asset;
+extends "WebGUI::Asset::Wobject";
+aspect assetName => ['assetName', 'Asset_Search'];
+aspect icon      => 'search.gif';
+aspect tableName => 'search';
+property templateId => (
+                fieldType       => "template",
+                default         => 'PBtmpl0000000000000200',    
+                tab             => "display",
+                namespace       => "Search",
+                hoverHelp       => ['search template description', 'Asset_Search'],
+                label           => ['search template', 'Asset_Search'],
+         );
+property searchRoot => (
+                fieldType       => "asset",
+                builder         => '_searchRoot_builder',
+                tab             => "properties",
+                hoverHelp       => ["search root description", 'Asset_Search'],
+                label           => ['search root', 'Asset_Search'],
+         );
+sub _searchRoot_builder {
+    my $session = shift->session;
+    return $session->setting->get("defaultPage");
+}
+property classLimiter => (
+                fieldType       => "checkList",
+                default         => undef,
+                vertical        => 1,
+                tab             => "properties",
+                hoverHelp       => ["class limiter description", 'Asset_Search'],
+                label           => ["class limiter", 'Asset_Search'],
+                options         => \&_classLimiter_options,
+                showSelectAll   => 1,
+         );
+sub _classLimiter_options {
+    my $session = shift->session;
+    return $session->db->buildHashRef("select distinct(className) from asset");
+}
+property useContainers => (
+                tab             => "properties",
+                hoverHelp       => ["useContainers help", 'Asset_Search'],
+                label           => ["useContainers", 'Asset_Search'],
+                fieldType       => "yesNo",
+                default         => 0,
+         );
+property paginateAfter => (
+                hoverHelp       => ["paginate after help", 'Asset_Search'],
+                label           => ["paginate after", 'Asset_Search'],
+                tab             => "display",
+                fieldType       => "integer",
+                default         => 25,
+         );
+
+
+
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
@@ -35,98 +89,6 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( class, definition )
-
-This method defines all properties of a Search and is used to autogenerate most methods.
-
-=head3 class
-
-$class is used to make sure that inheritance works on Assets and Wobjects.
-
-=head3 definition
-
-Definition hashref from subclasses.
-
-=head3 Search specific properties
-
-These properties are added just for this asset.
-
-=head4 templateId
-
-ID of a tempate from the Search namespace to display the search results.
-
-=head4 searchRoot
-
-An asset id of the point at which a search should start.
-
-=head4 classLimiter
-
-An array reference of asset classnames that are valid for the search.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_Search');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-			templateId => {
-				fieldType       => "template",
-				defaultValue    => 'PBtmpl0000000000000200',	
-				tab             => "display",
-				namespace       => "Search",
-                hoverHelp       => $i18n->get('search template description'),
-                label           => $i18n->get('search template')
-				},
-			searchRoot => {
-				fieldType       => "asset",
-				defaultValue    => $session->setting->get("defaultPage"),
-				tab             => "properties",
-				hoverHelp       => $i18n->get("search root description"),
-				label           => $i18n->get('search root')
-				},
-			classLimiter => {
-				fieldType       => "checkList",
-				defaultValue    => undef,
-				vertical        => 1,
-				tab             => "properties",
-				hoverHelp       => $i18n->get("class limiter description"),
-				label           => $i18n->get("class limiter"),
-				options         => $session->db->buildHashRef("select distinct(className) from asset"),
-                showSelectAll   => 1,
-				},
-            useContainers => {
-                tab             => "properties",
-                hoverHelp       => $i18n->get("useContainers help"),
-                label           => $i18n->get("useContainers"),
-                fieldType       => "yesNo",
-                defaultValue    => 0,
-                },
-			paginateAfter => {
-				hoverHelp       => $i18n->get("paginate after help"),
-				label           => $i18n->get("paginate after"),
-				tab             => "display",
-				fieldType       => "integer",
-				defaultValue    => 25,
-				},
- 		);
-
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'search.gif',
-		autoGenerateForms=>1,
-		tableName=>'search',
-		className=>'WebGUI::Asset::Wobject::Search',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -136,11 +98,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -187,10 +149,10 @@ sub view {
 		my %rules   = (
 			keywords =>$keywords, 
 			lineage  =>[
-                WebGUI::Asset->newByDynamicClass($session,$self->getValue("searchRoot"))->get("lineage")
+                WebGUI::Asset->newById($session,$self->searchRoot)->get("lineage")
             ],
 		);
-		my @classes     = split("\n",$self->get("classLimiter"));
+		my @classes     = split("\n",$self->classLimiter);
 		$rules{classes} = \@classes if (scalar(@classes));
 		$search->search(\%rules);
 		
@@ -205,7 +167,7 @@ sub view {
         #Set up the paginator
         my $p         = $search->getPaginatorResultSet (
             $self->getUrl('doit=1;keywords='.$session->url->escape($keywords)),
-			$self->get("paginateAfter"),
+			$self->paginateAfter,
         );
 
         my @results   = ();
@@ -219,8 +181,8 @@ sub view {
             my $asset = WebGUI::Asset->new($session, $data->{assetId}, $data->{className});
             if (defined $asset) {
                 my $properties = $asset->get;
-                if ($self->get("useContainers")) {
-                    $properties->{url} = $asset->getContainer->get("url");
+                if ($self->useContainers) {
+                    $properties->{url} = $asset->getContainer->url;
                 }
                 #Add highlighting
                 $properties->{'title'               } = $hl->highlight($properties->{title} || '');

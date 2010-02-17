@@ -53,7 +53,7 @@ sub getAsset {
     my $session = shift;
 	my $assetUrl = shift;
 	my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
-	if ($@) {
+	if (Exception::Class->caught()) {
 		$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
 	}
     return $asset;
@@ -179,7 +179,10 @@ sub page {
 	}
 	if ($output eq "") {
 		if ($session->var->isAdminOn) { # they're expecting it to be there, so let's help them add it
-			my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
+			my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl);
+            if (Exception::Class->caught()) {
+                $asset = WebGUI::Asset->getDefault($session);
+            }
 			$output = $asset->addMissing($assetUrl);
 		}
 	}

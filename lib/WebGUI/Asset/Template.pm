@@ -15,7 +15,79 @@ package WebGUI::Asset::Template;
 =cut
 
 use strict;
-use base 'WebGUI::Asset';
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+aspect assetName   => ['assetName', 'Asset_Template'];
+aspect icon        => 'template.gif';
+aspect tableName   => 'template';
+
+property template => (
+             fieldType       => 'codearea',
+             syntax          => "html",
+             default         => undef,
+             trigger         => \&_template_autopack,
+             label           => ['assetName', 'Asset_Template'],
+             hoverHelp       => ['template description', 'Asset_Template'],
+         );
+sub _template_autopack {
+    my ($self, $new, $old) = @_;
+    return if $new eq $old;
+    my $packed  = $new;
+    HTML::Packer::minify( \$packed, {
+        remove_comments     => 1,
+        remove_newlines     => 1,
+        do_javascript       => "shrink",
+        do_stylesheet       => "minify",
+    } );
+    $self->templatePacked($packed);
+}
+property isEditable => (
+             noFormPost      => 1,
+             fieldType       => 'hidden',
+             default         => 1,
+         );
+property isDefault => (
+             noFormPost      => 1,
+             fieldType       => 'hidden',
+             default         => 0,
+         );
+property showInForms => (
+             fieldType       => 'yesNo',
+             default         => 1,
+             label           => ['show in forms', 'Asset_Template'],
+             hoverHelp       => ['show in forms description', 'Asset_Template'],
+         );
+property parser => (
+             noFormPost      => 1,
+             fieldType       => 'selectBox',
+             lazy            => 1,
+             builder         => '_default_parser',
+             lazy            => 1,
+         );
+sub _default_parser {
+    my $self = shift;
+    return $self->session->config->get('defaultTemplateParser');
+}
+property namespace => (
+             fieldType       => 'combo',
+             default         => undef,
+			 label           => ['namespace', 'Asset_Template'],
+			 hoverHelp       => ['namespace description', 'Asset_Template'],
+         );
+property templatePacked => (
+             fieldType       => 'hidden',
+             default         => undef,
+             noFormPost      => 1,
+         );
+property usePacked => (
+             fieldType       => 'yesNo',
+             default         => 0,
+             label           => ['usePacked label', 'Asset_Template'],
+             hoverHelp       => ['usePacked description', 'Asset_Template'],
+         );
+
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
@@ -47,75 +119,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( session, definition )
-
-Defines the properties of this asset.
-
-=head3 session
-
-A reference to an existing session.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-	my $session     = shift;
-    my $definition  = shift;
-	my $i18n        = WebGUI::International->new($session,"Asset_Template");
-    push @{$definition}, {
-		assetName   => $i18n->get('assetName'),
-		icon        => 'template.gif',
-        tableName   => 'template',
-        className   => 'WebGUI::Asset::Template',
-        properties  => {
-            template => {
-                fieldType       => 'codearea',
-                syntax          => "html",
-                defaultValue    => undef,
-                filter          => 'packTemplate',
-            },
-            isEditable => {
-                noFormPost      => 1,
-                fieldType       => 'hidden',
-                defaultValue    => 1,
-            },
-            isDefault => {
-                fieldType       => 'hidden',
-                defaultValue    => 0,
-            },
-            showInForms => {
-                fieldType       => 'yesNo',
-                defaultValue    => 1,
-            },
-            parser => {
-                noFormPost      => 1,
-                fieldType       => 'selectBox',
-                defaultValue    => [$session->config->get("defaultTemplateParser")],
-            },	
-            namespace => {
-                fieldType       => 'combo',
-                defaultValue    => undef,
-            },
-            templatePacked => {
-                fieldType       => 'hidden',
-                defaultValue    => undef,
-                noFormPost      => 1,
-            },
-            usePacked => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-        },
-    };
-    return $class->SUPER::definition($session,$definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 addAttachments ( attachments )
 
 Adds attachments to this template.  Attachments is an arrayref of hashrefs,
@@ -138,7 +141,7 @@ sub addAttachments {
     foreach my $a (@$attachments) {
         my @params = (
             $self->getId, 
-            $self->get('revisionDate'),
+            $self->revisionDate,
             @{$a}{qw(url type sequence)}
         );
         $db->write($sql, \@params);
@@ -172,7 +175,7 @@ Extra Head Tags.
 
 sub drawExtraHeadTags {
 	my ($self, $params) = @_;
-    if ($self->get('namespace') eq 'style') {
+    if ($self->namespace eq 'style') {
         my $i18n = WebGUI::International->new($self->session);
         return $i18n->get(881);
     }
@@ -227,7 +230,7 @@ If defined, will limit the attachments to this type; e.g., passing
 
 sub getAttachments {
 	my ( $self, $type ) = @_;
-	my @params = ($self->getId, $self->get('revisionDate'));
+	my @params = ($self->getId, $self->revisionDate);
 	my $typeString;
 
 	if ($type) {
@@ -266,7 +269,7 @@ sub getEditForm {
 		name=>"returnUrl",
 		value=>$self->session->form->get("returnUrl")
 		});
-	if ($self->getValue("namespace") eq "") {
+	if ($self->namespace eq "") {
 		my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
 		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
@@ -279,16 +282,16 @@ sub getEditForm {
 		$tabform->getTab("meta")->readOnly(
 			-label=>$i18n->get('namespace'),
 			-hoverHelp=>$i18n->get('namespace description'),
-			-value=>$self->getValue("namespace")
+			-value=>$self->namespace
 			);	
 		$tabform->getTab("meta")->hidden(
 			-name=>"namespace",
-			-value=>$self->getValue("namespace")
+			-value=>$self->namespace
 			);
 	}
 	$tabform->getTab("display")->yesNo(
 		-name=>"showInForms",
-		-value=>$self->getValue("showInForms"),
+		-value=>$self->showInForms,
 		-label=>$i18n->get('show in forms'),
 		-hoverHelp=>$i18n->get('show in forms description'),
 		);
@@ -297,13 +300,13 @@ sub getEditForm {
 		-label=>$i18n->get('assetName'),
 		-hoverHelp=>$i18n->get('template description'),
 		-syntax => "html",
-		-value=>$self->getValue("template")
+		-value=>$self->template
 		);
     $tabform->getTab('properties')->yesNo(
         name        => "usePacked",
         label       => $i18n->get('usePacked label'),
         hoverHelp   => $i18n->get('usePacked description'),
-        value       => $self->getValue("usePacked"),
+        value       => $self->usePacked,
     );
 	if($self->session->config->get("templateParsers")){
 		my @temparray = @{$self->session->config->get("templateParsers")};
@@ -312,7 +315,7 @@ sub getEditForm {
 			$parsers{$a} = $self->getParser($self->session, $a)->getName();
 		}
 		my $value = [$self->getValue("parser")];
-		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->getValue("parser"));
+		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->parser);
 		$tabform->getTab("properties")->selectBox(
 			-name=>"parser",
 			-options=>\%parsers,
@@ -429,8 +432,10 @@ sub getList {
 	my $sth = $session->dbSlave->read($sql, [$namespace, $session->scratch->get("versionTag")]);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
-	while (my ($id, $version) = $sth->array) {
-		$templates{$id} = WebGUI::Asset::Template->new($session,$id,undef,$version)->getTitle;
+	TEMPLATE: while (my ($id, $version) = $sth->array) {
+		my $template = eval { WebGUI::Asset::Template->new($session,$id,$version); };
+        next TEMPLATE if Exception::Class->caught();
+		$templates{$id} = $template->getTitle;
 	}	
 	$sth->finish;	
 	return \%templates;
@@ -493,29 +498,8 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("namespace"));
+	$indexer->addKeywords($self->namespace);
 	$indexer->setIsPublic(0);
-}
-
-#-------------------------------------------------------------------
-
-=head2 packTemplate ( template )
-
-Pack the template into a minified version for faster downloads.
-
-=cut
-
-sub packTemplate {
-    my ( $self, $template ) = @_;
-    my $packed  = $template;
-    HTML::Packer::minify( \$packed, {
-        remove_comments     => 1,
-        remove_newlines     => 1,
-        do_javascript       => "shrink",
-        do_stylesheet       => "minify",
-    } );
-    $self->update({ templatePacked => $packed });
-    return $template;
 }
 
 #-------------------------------------------------------------------
@@ -546,7 +530,7 @@ sub prepare {
 
 	my $session      = $self->session;
 	my ($db, $style) = $session->quick(qw(db style));
-	my $parser       = $self->getParser($session, $self->get('parser'));
+	my $parser       = $self->getParser($session, $self->parser);
 	my $headBlock    = $parser->process($self->getExtraHeadTags, $vars);
 
 	$style->setRawHeadTags($headBlock);
@@ -590,16 +574,16 @@ sub process {
 	my $vars    = shift;
     my $session = $self->session;
 
-    if ($self->get('state') =~ /^trash/) {
+    if ($self->state =~ /^trash/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $session->errorHandler->warn('process called on template in trash: '.$self->getId
-            .'. The template was called through this url: '.$session->asset->get('url'));
+            .'. The template was called through this url: '.$session->asset->url);
         return $session->var->isAdminOn ? $i18n->get('template in trash') : '';
     }
-    elsif ($self->get('state') =~ /^clipboard/) {
+    elsif ($self->state =~ /^clipboard/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $session->errorHandler->warn('process called on template in clipboard: '.$self->getId
-            .'. The template was called through this url: '.$session->asset->get('url'));
+            .'. The template was called through this url: '.$session->asset->url);
         return $session->var->isAdminOn ? $i18n->get('template in clipboard') : '';
     }
 
@@ -610,10 +594,10 @@ sub process {
     }
 
 	$self->prepare unless ($self->{_prepared});
-    my $parser      = $self->getParser($session, $self->get("parser"));
-    my $template    = $self->get('usePacked')
-                    ? $self->get('templatePacked')
-                    : $self->get('template')
+    my $parser      = $self->getParser($session, $self->parser);
+    my $template    = $self->usePacked
+                    ? $self->templatePacked
+                    : $self->template
                     ;
     my $output;
     eval { $output = $parser->process($template, $vars); };
@@ -640,7 +624,7 @@ sub processPropertiesFromFormPost {
     # TODO: Perhaps add a way to check template syntax before it blows stuff up?
     my %data;
     my $needsUpdate = 0;
-	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
+	if ($self->parser ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
         $needsUpdate = 1;
 		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
 			%data = ( parser => $self->session->form->process("parser","className") );
@@ -766,30 +750,6 @@ sub removeAttachments {
     );
     $db->write($rmsql, \@params);
 }
-
-#-------------------------------------------------------------------
-
-=head2 update
-
-Override update from Asset.pm to handle backwards compatibility with the old
-packages that contain headBlocks. This will be removed in the future.  Don't plan
-on this being here.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $requestedProperties = shift;
-    my $properties = clone($requestedProperties);
-
-    if (exists $properties->{headBlock}) {
-        $properties->{extraHeadTags} .= $properties->{headBlock};
-        delete $properties->{headBlock};
-    }
-
-    $self->SUPER::update($properties);
-}
-
 
 #-------------------------------------------------------------------
 

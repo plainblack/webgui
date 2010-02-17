@@ -19,7 +19,66 @@ use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::HTML;
 use POSIX qw(ceil floor);
-use base 'WebGUI::Asset::Wobject';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_ProjectManager'];
+aspect icon      => 'projManagement.gif';
+aspect tableName => 'PM_wobject';
+property projectDashboardTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0001',
+            tab         => "display",
+            namespace   => "ProjectManager_dashboard", 
+            hoverHelp   => ['projectDashboardTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['projectDashboardTemplate label', 'Asset_ProjectManager'],
+        );
+property projectDisplayTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0002',
+            tab         => "display",
+            namespace   => "ProjectManager_project", 
+            hoverHelp   => ['projectDisplayTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['projectDisplayTemplate label', 'Asset_ProjectManager'],
+        );
+property ganttChartTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0003',
+            tab         => "display",
+            namespace   => "ProjectManager_gantt", 
+            hoverHelp   => ['ganttChartTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['ganttChartTemplate label', 'Asset_ProjectManager'],
+        );
+property editTaskTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0004',
+            tab         => "display",
+            namespace   => "ProjectManager_editTask", 
+            hoverHelp   => ['editTaskTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['editTaskTemplate label', 'Asset_ProjectManager'],
+        );
+property resourcePopupTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0005',
+            tab         => "display",
+            namespace   => "ProjectManager_resourcePopup", 
+            hoverHelp   => ['resourcePopupTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['resourcePopupTemplate label', 'Asset_ProjectManager'],
+        );
+property resourceListTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0006',
+            tab         => "display",
+            namespace   => "ProjectManager_resourceList", 
+            hoverHelp   => ['resourceListTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['resourceListTemplate label', 'Asset_ProjectManager'],
+        );
+property groupToAdd => (
+            fieldType   => "group",
+            default     => 3,
+            tab         => "security",
+            hoverHelp   => ['groupToAdd hoverhelp', 'Asset_ProjectManager'],
+            label       => ['groupToAdd label', 'Asset_ProjectManager'],
+        );
 
 #-------------------------------------------------------------------
 
@@ -219,7 +278,7 @@ sub _htmlOfResourceList {
 		push @{$var->{resourceLoop}}, $subvar;
 	}
 
-	return $self->processTemplate($var, $self->getValue('resourceListTemplateId'));
+	return $self->processTemplate($var, $self->resourceListTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -306,7 +365,7 @@ sub _resourceSearchPopup {
 		$var->{doingSearch} = 0;
 	}
 
-	return $self->processTemplate($var, $self->getValue('resourcePopupTemplateId'));
+	return $self->processTemplate($var, $self->resourcePopupTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -405,7 +464,7 @@ sub _userCanManageProject {
     my $user = shift;
     my $projectId = shift;
     my ($managerGroup) = $self->session->db->quickArray("select projectManager from PM_project where projectId = ?", [$projectId]);
-    return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($self->get('groupToAdd')));
+    return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($self->groupToAdd));
 }
 
 #-------------------------------------------------------------------
@@ -417,7 +476,7 @@ sub _userCanManageProject {
 sub _userCanManageProjectList {
 	my $self = shift;
 	my $user = shift;
-	return $self->canView($user->userId) && $user->isInGroup($self->get('groupToAdd'));
+	return $self->canView($user->userId) && $user->isInGroup($self->groupToAdd);
 }
 
 #-------------------------------------------------------------------
@@ -431,91 +490,8 @@ sub _userCanObserveProject {
 	my $user = shift;
 	my $projectId = shift;
 	my ($managerGroup, $observerGroup) = $self->session->db->quickArray("select projectManager, projectObserver from PM_project where projectId = ?", [$projectId]);
-	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($observerGroup) || $user->isInGroup($self->get('groupToAdd')));
+	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($observerGroup) || $user->isInGroup($self->groupToAdd));
 }
-
-#-------------------------------------------------------------------
-
-=head2 definition 
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_ProjectManager');
-	my $db = $session->db;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		projectDashboardTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0001',
-			tab=>"display",
-			namespace=>"ProjectManager_dashboard", 
-			hoverHelp=>$i18n->get('projectDashboardTemplate hoverhelp'),
-		    label=>$i18n->get('projectDashboardTemplate label')
-		},
-		projectDisplayTemplateId => {
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0002',
-			tab=>"display",
-			namespace=>"ProjectManager_project", 
-			hoverHelp=>$i18n->get('projectDisplayTemplate hoverhelp'),
-		    label=>$i18n->get('projectDisplayTemplate label')
-		},
-		ganttChartTemplateId => {
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0003',
-			tab=>"display",
-			namespace=>"ProjectManager_gantt", 
-			hoverHelp=>$i18n->get('ganttChartTemplate hoverhelp'),
-		    label=>$i18n->get('ganttChartTemplate label')
-		},
-		editTaskTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0004',
-			tab=>"display",
-			namespace=>"ProjectManager_editTask", 
-			hoverHelp=>$i18n->get('editTaskTemplate hoverhelp'),
-		    label=>$i18n->get('editTaskTemplate label')
-		},
-		resourcePopupTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0005',
-			tab=>"display",
-			namespace=>"ProjectManager_resourcePopup", 
-			hoverHelp=>$i18n->get('resourcePopupTemplate hoverhelp'),
-		    label=>$i18n->get('resourcePopupTemplate label')
-		},
-		resourceListTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0006',
-			tab=>"display",
-			namespace=>"ProjectManager_resourceList", 
-			hoverHelp=>$i18n->get('resourceListTemplate hoverhelp'),
-		    label=>$i18n->get('resourceListTemplate label')
-		},
-		groupToAdd => {
-			fieldType=>"group",
-			defaultValue=>3,
-			tab=>"security",
-			hoverHelp=>$i18n->get('groupToAdd hoverhelp'),
-			label=>$i18n->get('groupToAdd label')
-		}
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'projManagement.gif',
-		autoGenerateForms=>1,
-		tableName=>'PM_wobject',
-		className=>'WebGUI::Asset::Wobject::ProjectManager',
-		properties=>\%properties
-	 });
-     return $class->SUPER::definition($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 #API method called by Time Tracker to return the instance of the PM wobject which this project blongs
@@ -532,7 +508,7 @@ sub getProjectInstance {
    return undef unless $projectId;
    my ($assetId) = $db->quickArray("select assetId from PM_project where projectId=?",[$projectId]);
    if($assetId) {
-      return WebGUI::Asset->newByDynamicClass($session,$assetId);
+      return WebGUI::Asset->newById($session,$assetId);
    }
    return undef;
 }
@@ -615,11 +591,11 @@ sub i18n {
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("projectDashboardTemplateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->projectDashboardTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("projectDashboardTemplateId"),
+            templateId => $self->projectDashboardTemplateId,
             assetId    => $self->getId,
         );
     }
@@ -785,7 +761,7 @@ sub view {
 	
 	#Project Data
 	my @projects = ();
-	my $sth = $db->read("select * from PM_project where assetId=".$db->quote($self->get("assetId")));
+	my $sth = $db->read("select * from PM_project where assetId=".$db->quote($self->assetId));
 	while (my $project = $sth->hashRef) {
 	   my $hash = {};
 	   my $projectId = $project->{projectId};
@@ -1141,7 +1117,7 @@ sub www_drawGanttChart {
 	my $scrollWidth = (1- (560 / $projVar->{'project.table.width'})) * 100;
 	$var->{'project.scroll.percentWidth'} = $projVar->{'project.scroll.percentWidth'} =  sprintf("%2.2f",$scrollWidth); 	
 	
-	return $self->processTemplate($var,$self->getValue("ganttChartTemplateId"));
+	return $self->processTemplate($var,$self->ganttChartTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -1192,7 +1168,7 @@ sub www_editProject {
    );
    $f->group(
          -name=> "projectManager",
-		 -value=> $form->get("projectManager") || $project->{projectManager} || $self->get("groupToAdd"),
+		 -value=> $form->get("projectManager") || $project->{projectManager} || $self->groupToAdd,
 		 -hoverHelp=> $i18n->get('project manager hoverhelp'),
 		 -label => $i18n->get('project manager label')
    );
@@ -1530,7 +1506,7 @@ sub www_editTask {
    $var->{'task_resource_label'}    = $i18n->get('task resource label');
    $var->{'task_save_label'}        = $i18n->get('task save label');
 
-   return $self->processTemplate($var,$self->getValue("editTaskTemplateId"));
+   return $self->processTemplate($var,$self->editTaskTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -2018,7 +1994,7 @@ sub www_viewProject {
 	$var->{'task.back.label'} = $i18n->get("task back label");
 	$var->{'task.back.url'} = $self->getUrl;
 
-	return $self->processStyle($self->processTemplate($var,$self->getValue("projectDisplayTemplateId")));
+	return $self->processStyle($self->processTemplate($var,$self->projectDisplayTemplateId));
 }
 
 

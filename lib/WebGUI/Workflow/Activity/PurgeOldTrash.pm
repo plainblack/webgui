@@ -18,6 +18,7 @@ package WebGUI::Workflow::Activity::PurgeOldTrash;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -75,13 +76,26 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-	my $self = shift;
-       	my $sth = $self->session->db->read("select assetId,className from asset where state='trash' and stateChanged < ?", [time() - $self->get("purgeAfter")]);
-        while (my ($id, $class) = $sth->array) {
-        	my $asset = WebGUI::Asset->new($self->session, $id,$class);
-               $asset->purge if (defined $asset);
+    my $self    = shift;
+    my $session = $self->session;
+    my $sth     = $session->db->read("select assetId,className from asset where state='trash' and stateChanged < ?", [time() - $self->get("purgeAfter")]);
+    my $start   = time();
+    my $ttl     = $self->getTTL;
+    ASSET: while (my ($id, $class) = $sth->array) {
+        my $asset = eval { WebGUI::Asset->newById($session, $id); };
+        if (Exception::Class->caught()) {
+            $session->log->warn("Unable to instanciate assetId $id: $@");
+            next ASSET;
         }
-	return $self->COMPLETE;
+        $asset->purge;
+        if (time() - $start > $ttl) { 
+            $session->log->info("Ran out of time processing"); 
+            $sth->finish;
+            return $self->WAITING(1);
+        }
+    }
+    $sth->finish;
+    return $self->COMPLETE;
 }
 
 

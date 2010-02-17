@@ -18,6 +18,8 @@ package WebGUI::Workflow::Activity::ArchiveOldThreads;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Collaboration;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -47,15 +49,15 @@ See WebGUI::Workflow::Activity::definition() for details.
 =cut 
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_ArchiveOldThreads");
-	push(@{$definition}, {
-		name=>$i18n->get("activityName"),
-		properties=> {}
-		});
-	return $class->SUPER::definition($session,$definition);
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my $i18n = WebGUI::International->new($session, "Workflow_Activity_ArchiveOldThreads");
+    push(@{$definition}, {
+        name=>$i18n->get("activityName"),
+        properties=> {}
+        });
+    return $class->SUPER::definition($session,$definition);
 }
 
 
@@ -68,31 +70,39 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-	my $self = shift;
-        my $epoch = $self->session->datetime->time();
-        my $a = $self->session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::Collaboration'");
-        while (my ($assetId) = $a->array) {
-                my $cs = WebGUI::Asset->new($self->session, $assetId, "WebGUI::Asset::Wobject::Collaboration");
-		next unless defined $cs;
-                next unless $cs->get("archiveEnabled");
-                my $archiveDate = $epoch - $cs->get("archiveAfter");
-                my $sql = "select asset.assetId, assetData.revisionDate from Post left join asset on asset.assetId=Post.assetId 
-                        left join assetData on Post.assetId=assetData.assetId and Post.revisionDate=assetData.revisionDate
-                        where Post.revisionDate<? and assetData.status='approved' and asset.state='published'
-			and Post.threadId=Post.assetId and asset.lineage like ?";
-                my $b = $self->session->db->read($sql,[$archiveDate, $cs->get("lineage").'%']);
-                while (my ($id, $version) = $b->array) {
-			my $thread = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::Post::Thread", $version);
-			my $archiveIt = 1;
-			foreach my $post (@{$thread->getPosts}) {
-                        	$archiveIt = 0 if (defined $post && $post->get("revisionDate") > $archiveDate);
-			}
-			$thread->archive if ($archiveIt);
-                }
-                $b->finish;
+    my $self    = shift;
+    my $session = $self->session;
+    my $epoch   = $session->datetime->time();
+    my $getCs   = WebGUI::Asset::Wobject::Collaboration->getIsa($session);
+    CS: while (1) {
+        my $cs = eval { $getCs->(); };
+        if (Exception::Class->caught()) {
+            $session->log->error("Unable to instance Collaboration System: $@");
+            next CS;
         }
-        $a->finish;
-	return $self->COMPLETE;
+        last CS unless $cs;
+        next CS unless $cs->archiveEnabled;
+        my $archiveDate = $epoch - $cs->archiveAfter;
+        my $sql = "select asset.assetId, assetData.revisionDate from Post left join asset on asset.assetId=Post.assetId 
+                left join assetData on Post.assetId=assetData.assetId and Post.revisionDate=assetData.revisionDate
+                where Post.revisionDate<? and assetData.status='approved' and asset.state='published'
+                and Post.threadId=Post.assetId and asset.lineage like ?";
+        my $b = $session->db->read($sql,[$archiveDate, $cs->lineage.'%']);
+        THREAD: while (my ($id, $version) = $b->array) {
+            my $thread = eval { WebGUI::Asset->newById($session, $id, $version); };
+            if (WebGUI::Exception->caught()) {
+                $session->log->error("Unable to instanciate Thread: $@");
+                next THREAD;
+            }
+            my $archiveIt = 1;
+            foreach my $post (@{$thread->getPosts}) {
+                $archiveIt = 0 if (defined $post && $post->get("revisionDate") > $archiveDate);
+            }
+            $thread->archive if ($archiveIt);
+        }
+        $b->finish;
+    }
+    return $self->COMPLETE;
 }
 
 1;

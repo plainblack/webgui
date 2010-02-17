@@ -16,6 +16,7 @@ package WebGUI::Macro::RandomThread;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Template;
 use WebGUI::Utility;
 
@@ -67,28 +68,28 @@ sub process {
 	my $numberOfTries = 2; # try this many times in case we select a thread the user cannot view
 
 	# Sanity check of parameters:
-	my $startAsset = WebGUI::Asset->newByUrl($session, $startURL);
-	unless ($startAsset) {
-		$session->errorHandler->warn('Error: invalid startURL. Check parameters of macro on page '.$session->asset->get('url'));
+	my $startAsset = eval { WebGUI::Asset->newByUrl($session, $startURL); };
+	if (Exception::Class->caught()) {
+		$session->errorHandler->warn('Error: invalid startURL. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}
 
 	$relatives = lc($relatives);
 	unless ( isIn($relatives, ('siblings','children','ancestors','self','descendants','pedigree')) ) {
-		$session->errorHandler->warn('Error: invalid relatives specified. Must be one of siblings, children, ancestors, self, descendants, pedigree. Check parameters of macro on page '.$session->asset->get('url'));
+		$session->errorHandler->warn('Error: invalid relatives specified. Must be one of siblings, children, ancestors, self, descendants, pedigree. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}
 
-	my $template = $templateURL ? WebGUI::Asset::Template->newByUrl($session,$templateURL) : WebGUI::Asset::Template->new($session,'WVtmpl0000000000000001');
-	unless ($template) {
-		$session->errorHandler->warn('Error: invalid template URL. Check parameters of macro on page '.$session->asset->get('url'));
+	my $template = eval { $templateURL ? WebGUI::Asset::Template->newByUrl($session,$templateURL) : WebGUI::Asset::Template->new($session,'WVtmpl0000000000000001'); };
+	if (Exception::Class->caught()) {
+		$session->errorHandler->warn('Error: invalid template URL. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}
 
 	# Get all CS's that we'll use to pick a thread from:
 	my $lineage = $startAsset->getLineage([$relatives],{includeOnlyClasses => ['WebGUI::Asset::Wobject::Collaboration']});
 	unless ( scalar(@{$lineage}) ) {
-		$session->errorHandler->warn('Error: no Collaboration Systems found with current parameters. Check parameters of macro on page '.$session->asset->get('url'));
+		$session->errorHandler->warn('Error: no Collaboration Systems found with current parameters. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}
 	
@@ -97,14 +98,14 @@ sub process {
 	foreach my $csid (@{$lineage}) {
 	   my $cs = undef;
 	   # Get random thread in that CS:
-	   $cs = WebGUI::Asset->new($session,$csid,'WebGUI::Asset::Wobject::Collaboration');
+	   $cs = WebGUI::Asset::Wobject::Collaboration->new($session,$csid);
 	   my $threads = $cs->getLineage(['children'],{includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
 	   push(@llist,$csid) if (scalar(@{$threads}) > 0);
 	}
 	$lineage = \@llist;
 	
 	unless ( scalar(@{$lineage}) ) {
-		$session->errorHandler->warn('Error: no Collaboration Systems found have any threads to display.'.$session->asset->get('url'));
+		$session->errorHandler->warn('Error: no Collaboration Systems found have any threads to display.'.$session->asset->url);
 		return '';
 	}
 	
@@ -124,7 +125,7 @@ sub process {
 		}
 	}
 	# If we reach this point, we had no success in finding an asset the user can view:
-	$session->errorHandler->warn("Could not find a random thread that was viewable by the user ".$session->user->username." after $numberOfTries tries. Check parameters of macro on page ".$session->asset->get('url'));
+	$session->errorHandler->warn("Could not find a random thread that was viewable by the user ".$session->user->username." after $numberOfTries tries. Check parameters of macro on page ".$session->asset->url);
 	return '';
 }
 
@@ -151,13 +152,13 @@ sub _getRandomThread {
 	# Get random CS:
 	my $randomIndex = int(rand(scalar(@{$lineage})));
 	my $randomCSId = $lineage->[$randomIndex];
-	my $randomCS = WebGUI::Asset->new($session,$randomCSId,'WebGUI::Asset::Wobject::Collaboration');
+	my $randomCS = WebGUI::Asset::Wobject::Collaboration->new($session, $randomCSId);
 
 	# Get random thread in that CS:
-	$lineage = $randomCS->getLineage(['children'],{includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
+	$lineage = $randomCS->getLineage(['children'], {includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
 	$randomIndex = int(rand(scalar(@{$lineage})));
 	my $randomThreadId = $lineage->[$randomIndex];
-	return WebGUI::Asset->new($session,$randomThreadId,'WebGUI::Asset::Post::Thread');
+	return WebGUI::Asset::Post::Thread->new($session, $randomThreadId);
 }
 
 1;

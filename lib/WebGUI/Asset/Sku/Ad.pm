@@ -16,7 +16,82 @@ package WebGUI::Asset::Sku::Ad;
 
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+aspect assetName           => ['assetName', 'Asset_WikiMaster'];
+aspect icon                => 'adsku.gif';
+aspect tableName           => 'AdSku';
+
+property purchaseTemplate => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "AdSku/Purchase",
+            default         => 'AldPGu0u-jm_5xK13atCSQ',
+            label           => ["property purchase template", 'Asset_WikiMaster'],
+            hoverHelp       => ["property purchase template help", 'Asset_WikiMaster'],
+         );
+property manageTemplate => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "AdSku/Manage",
+            default         => 'ohjyzab5i-yW6GOWTeDUHg',
+            label           => ["property manage template", 'Asset_WikiMaster'],
+            hoverHelp       => ["property manage template help", 'Asset_WikiMaster'],
+         );
+property adSpace => (
+            tab             => "properties",
+            fieldType       => "AdSpace",
+            label           => ["property ad space", 'Asset_WikiMaster'],
+            hoverHelp       => ["property ad Space help", 'Asset_WikiMaster'],
+         );
+property priority => (
+            tab             => "properties",
+            default         => '1',
+            fieldType       => "integer",
+            label           => ["property priority", 'Asset_WikiMaster'],
+            hoverHelp       => ["property priority help", 'Asset_WikiMaster'],
+         );
+property pricePerClick => (
+            tab             => "shop",
+            default         => '0.00',
+            fieldType       => "float",
+            label           => ["property price per click", 'Asset_WikiMaster'],
+            hoverHelp       => ["property price per click help", 'Asset_WikiMaster'],
+         );
+property pricePerImpression => (
+            tab             => "shop",
+            default         => '0.00',
+            fieldType       => "float",
+            label           => ["property price per impression", 'Asset_WikiMaster'],
+            hoverHelp       => ["property price per impression help", 'Asset_WikiMaster'],
+         );
+property clickDiscounts => (
+            tab             => "shop",
+            fieldType       => 'textarea',
+            label           => ['property click discounts', 'Asset_WikiMaster'],
+            hoverHelp       => ['property click discounts help', 'Asset_WikiMaster'],
+            default         => '',
+         );
+property impressionDiscounts => (
+            tab             => "shop",
+            fieldType       => 'textarea',
+            label           => ['property impression discounts', 'Asset_WikiMaster'],
+            hoverHelp       => ['property impression discounts help', 'Asset_WikiMaster'],
+            default         => '',
+         );
+property karma => (
+            fieldType       => 'integer',
+            noFormPost      => \&_karma_noFormPost,
+            label           => ['property adsku karma', 'Asset_WikiMaster'],
+            hoverHelp       => ['property adsku karma description', 'Asset_WikiMaster'],
+            defaultvalue    => 0,
+        );
+sub _karma_noFormPost {
+    my $session = shift->session;
+    return ! $session->setting->get('useKarma');
+}
+
+
 use WebGUI::Asset::Template;
 use WebGUI::Form;
 use WebGUI::Storage;
@@ -46,102 +121,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition
-
-Adds purchaseTemplate, manageTemplate, adSpace, priority, pricePerClick, pricePerImpression, clickDiscounts, impresisonDiscounts
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my %properties;
-    tie %properties, 'Tie::IxHash';
-    my $i18n = WebGUI::International->new($session, "Asset_AdSku");
-    %properties = (
-        purchaseTemplate      => {
-            tab             => "display",
-            fieldType       => "template",
-                        namespace       => "AdSku/Purchase",
-            defaultValue    => 'AldPGu0u-jm_5xK13atCSQ',
-            label           => $i18n->get("property purchase template"),
-            hoverHelp       => $i18n->get("property purchase template help"),
-        },
-        manageTemplate      => {
-            tab             => "display",
-            fieldType       => "template",
-                        namespace       => "AdSku/Manage",
-            defaultValue    => 'ohjyzab5i-yW6GOWTeDUHg',
-            label           => $i18n->get("property manage template"),
-            hoverHelp       => $i18n->get("property manage template help"),
-        },
-        adSpace => {
-            tab             => "properties",
-            fieldType       => "AdSpace",
-            label           => $i18n->get("property ad space"),
-            hoverHelp       => $i18n->get("property ad Space help"),
-        },
-        priority => {
-            tab             => "properties",
-            defaultValue    => '1',
-        fieldType       => "integer",
-        label           => $i18n->get("property priority"),
-        hoverHelp       => $i18n->get("property priority help"),
-            },
-        pricePerClick => {
-            tab             => "shop",
-            defaultValue    => '0.00',
-        fieldType       => "float",
-        label           => $i18n->get("property price per click"),
-        hoverHelp       => $i18n->get("property price per click help"),
-            },
-        pricePerImpression => {
-            tab             => "shop",
-            defaultValue    => '0.00',
-        fieldType       => "float",
-        label           => $i18n->get("property price per impression"),
-        hoverHelp       => $i18n->get("property price per impression help"),
-            },
-        clickDiscounts   => {
-            tab             => "shop",
-            fieldType       => 'textarea',
-            label        => $i18n->get('property click discounts'),
-            hoverHelp        => $i18n->get('property click discounts help'),
-            defaultValue    => '',
-        },
-        impressionDiscounts => {
-            tab             => "shop",
-            fieldType       => 'textarea',
-            label        => $i18n->get('property impression discounts'),
-            hoverHelp        => $i18n->get('property impression discounts help'),
-            defaultValue    => '',
-        },
-    );
-
-    # Show the karma field only if karma is enabled
-    if ($session->setting->get("useKarma")) {
-        $properties{ karma    } = {
-            type            => 'integer',
-            label           => $i18n->get('property adsku karma'),
-            hoverHelp       => $i18n->get('property adsku karma description'),
-            defaultvalue    => 0,
-        };
-    }
-
-    push(@{$definition}, {
-        assetName           => $i18n->get('assetName'),
-        icon                => 'adsku.gif',
-        autoGenerateForms   => 1,
-        tableName           => 'AdSku',
-        className           => 'WebGUI::Asset::Sku::AdSku',
-        properties          => \%properties,
-        });
-    return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 getAddToCartForm
 
 Returns an empty string, since the add to cart form is complex.
@@ -162,7 +141,7 @@ Returns an AdSpace object for this Ad Sku.
 
 sub getAdSpace {
     my $self    = shift;
-    my $adSpace = WebGUI::AdSpace->new($self->session,$self->get('adSpace'));
+    my $adSpace = WebGUI::AdSpace->new($self->session,$self->adSpace);
     return $adSpace;
 }
 
@@ -177,7 +156,7 @@ returns the text to display the number of clicks purchasaed where discounts appl
 sub getClickDiscountText {
      my $self = shift;
      return getDiscountText($self->i18n->get('click discount'),
-                             $self->get('clickDiscounts'));
+                             $self->clickDiscounts);
 }
 
 #-------------------------------------------------------------------
@@ -190,7 +169,7 @@ combines the adSKu title with the customers ad title
 
 sub getConfiguredTitle {
      my $self = shift;
-     return $self->get('title') . ' (' . $self->getOptions->{'adtitle'} . ')';
+     return $self->title . ' (' . $self->getOptions->{'adtitle'} . ')';
 }
 
 #-------------------------------------------------------------------
@@ -236,7 +215,7 @@ returns the text to display the number of impressions purchased where discounts 
 sub getImpressionDiscountText {
     my $self = shift;
     return getDiscountText($self->i18n->get('impression discount'),
-                              $self->get('impressionDiscounts'));
+                              $self->impressionDiscounts);
 }
 
 #-------------------------------------------------------------------
@@ -252,10 +231,10 @@ sub getPrice {
     my $options = $self->getOptions;
     my $impressionCount = $options->{impressions} || $self->{formImpressions};
     my $clickCount = $options->{clicks};
-    my $impressionDiscount = getDiscountAmount($self->get('impressionDiscounts'),$impressionCount );
-    my $clickDiscount = getDiscountAmount($self->get('clickDiscounts'),$clickCount );
-    my $impressionPrice = $self->get('pricePerImpression') * ( 100 - $impressionDiscount ) / 100 ;
-    my $clickPrice = $self->get('pricePerClick') * ( 100 - $clickDiscount ) / 100 ;
+    my $impressionDiscount = getDiscountAmount($self->impressionDiscounts,$impressionCount );
+    my $clickDiscount = getDiscountAmount($self->clickDiscounts,$clickCount );
+    my $impressionPrice = $self->pricePerImpression * ( 100 - $impressionDiscount ) / 100 ;
+    my $clickPrice = $self->pricePerClick * ( 100 - $clickDiscount ) / 100 ;
     return sprintf "%.2f", $impressionPrice * $impressionCount + $clickPrice * $clickCount;
 }
 
@@ -335,7 +314,7 @@ sub onCompletePurchase {
         });
     }
     else {
-        $ad = WebGUI::AdSpace::Ad->create($self->session,$self->get('adSpace'),{
+        $ad = WebGUI::AdSpace::Ad->create($self->session,$self->adSpace,{
             title =>  $options->{'adtitle'},
             clicksBought => $options->{'clicks'},
             impressionsBought => $options->{'impressions'},
@@ -344,8 +323,8 @@ sub onCompletePurchase {
             ownerUserId =>  $self->session->user->userId,
             isActive => 1,
             type =>  'image',
-            priority => $self->get('priority'),
-            adSpace => $self->get('adSpace'),
+            priority => $self->priority,
+            adSpace => $self->adSpace,
         });
     }
 
@@ -437,7 +416,7 @@ Prepares the template.
 sub prepareManage {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $templateId = $self->get("manageTemplate");
+    my $templateId = $self->manageTemplate;
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
@@ -454,7 +433,7 @@ Prepares the template.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $templateId = $self->get("purchaseTemplate");
+    my $templateId = $self->purchaseTemplate;
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
@@ -485,8 +464,8 @@ sub view {
         hasAddedToCart      => $self->{_hasAddedToCart},
         continueShoppingUrl => $self->getUrl,
         manageLink          => $self->getUrl("func=manage"),
-        adSkuTitle          => $self->get('title'),
-        adSkuDescription    => $self->get('description'),
+        adSkuTitle          => $self->title,
+        adSkuDescription    => $self->description,
         formTitle           => WebGUI::Form::text($session, {
                                   -name         => "formTitle",
                                   -value        => $options->{adtitle},
@@ -518,8 +497,8 @@ sub view {
                                   -name=>"formAdId",
                                   -value=>$options->{adId} || '',
                                  }),
-        clickPrice          => $self->get('pricePerClick'),
-        impressionPrice     => $self->get('pricePerImpression'),
+        clickPrice          => $self->pricePerClick,
+        impressionPrice     => $self->pricePerImpression,
         minimumClicks       => $adSpace->get('minimumClicks'),
         minimumImpressions  => $adSpace->get('minimumImpressions'),
         clickDiscount       => $self->getClickDiscountText,
@@ -573,7 +552,7 @@ sub www_addToCart {
         push @errors, $i18n->get('form error no link');
     }
     my $adSpace = $self->getAdSpace;
-    my $adId    = $self->get('adId');
+    my $adId    = $self->adId;
     my $clicks  = $form->process('formClicks','integer');
     if($clicks < $adSpace->get('minimumClicks') ) {
         push @errors, sprintf($i18n->get('form error min clicks'), $adSpace->get('minimumClicks'));

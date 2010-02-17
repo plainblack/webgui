@@ -15,13 +15,26 @@ package WebGUI::Asset::File::GalleryFile::Photo;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::File::GalleryFile';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::File::GalleryFile';
+aspect assetName           => ['assetName', 'Asset_Photo'];
+aspect icon                => 'photo.gif';
+aspect tableName           => 'Photo';
+property exifData => (
+            fieldType           => 'text',
+            noFormPost          => 1,
+            default             => undef,
+         );
+property location => (
+            fieldType           => 'text',
+            label               => ['editForm location','Asset_Photo'],
+            default             => undef,
+         );
 
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
 use JSON qw/ to_json from_json /;
 use URI::Escape;
-use Tie::IxHash;
 
 use WebGUI::DateTime;
 use WebGUI::Friends;
@@ -58,41 +71,6 @@ These methods are available from this class:
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-Define the properties of the Photo asset.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-    my $i18n        = WebGUI::International->new($session, 'Asset_Photo');
-
-    tie my %properties, 'Tie::IxHash', (
-        exifData => {
-            defaultValue        => undef,
-        },
-        location    => {
-            defaultValue        => undef,
-        },
-    );
-
-    push @{$definition}, {
-        assetName           => $i18n->get('assetName'),
-        autoGenerateForms   => 0,
-        icon                => 'photo.gif',
-        tableName           => 'Photo',
-        className           => 'WebGUI::Asset::File::GalleryFile::Photo',
-        properties          => \%properties,
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
-
 #----------------------------------------------------------------------------
 
 =head2 applyConstraints ( options )
@@ -113,18 +91,18 @@ sub applyConstraints {
     my $gallery     = $self->getGallery;
     
     # Update the asset's size and make a thumbnail
-    my $maxImageSize    = $gallery->get("imageViewSize") 
+    my $maxImageSize    = $gallery->imageViewSize 
                         || $self->session->setting->get("maxImageSize");
-    my $parameters      = $self->get("parameters");
+    my $parameters      = $self->parameters;
     my $storage         = $self->getStorageLocation;
-    my $file            = $self->get("filename");
+    my $file            = $self->filename;
 
     # Make resolutions before fixing image, so that we can get higher quality 
     # resolutions
     $self->makeResolutions;
 
     # adjust density before size, so that the dimensions won't change
-    $storage->resize( $file, undef, undef, $gallery->get( 'imageDensity' ) );
+    $storage->resize( $file, undef, undef, $gallery->imageDensity );
     $storage->adjustMaxImageSize($file, $maxImageSize);
 
     $self->generateThumbnail;
@@ -144,8 +122,8 @@ Generates a thumbnail for this image.
 sub generateThumbnail {
     my $self        = shift;
     $self->getStorageLocation->generateThumbnail(
-        $self->get("filename"),
-        $self->getGallery->get("imageThumbnailSize"),
+        $self->filename,
+        $self->getGallery->imageThumbnailSize,
     );
     return;
 }
@@ -187,9 +165,9 @@ sub getEditFormUploadControl {
     my $i18n        = WebGUI::International->new($session, 'Asset_File');
     my $html        = '';
 
-    if ($self->get("filename") ne "") {
+    if ($self->filename ne "") {
         $html .= WebGUI::Form::readOnly( $session, {
-            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'" alt="'.$self->get("filename").'" style="border-style:none;vertical-align:middle;" /> '.$self->get("filename").'</a></p>'
+            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'" alt="'.$self->filename.'" style="border-style:none;vertical-align:middle;" /> '.$self->filename.'</a></p>'
         });
     }
 
@@ -215,14 +193,14 @@ Gets a hash reference of Exif data about this Photo.
 sub getExifData {
     my $self        = shift;
 
-    return unless $self->get('exifData');    
+    return unless $self->exifData;    
 
     # Our processing and eliminating of bad / unparsable keys
     # isn't perfect, so handle errors gracefully
-    my $exif    = eval { from_json( $self->get('exifData') ) };
+    my $exif    = eval { from_json( $self->exifData ) };
     if ( $@ ) {
         $self->session->errorHandler->warn( 
-            "Could not parse JSON data for EXIF in Photo '" . $self->get('title') 
+            "Could not parse JSON data for EXIF in Photo '" . $self->title 
             . "' (" . $self->getId . "): " . $@
         );
         return;
@@ -245,7 +223,7 @@ sub getResolutions {
     my $storage     = $self->getStorageLocation;
 
     # Return a list not including the web view image.
-    return [ sort { $a <=> $b } grep { $_ ne $self->get("filename") } @{ $storage->getFiles } ];
+    return [ sort { $a <=> $b } grep { $_ ne $self->filename } @{ $storage->getFiles } ];
 }
 
 #----------------------------------------------------------------------------
@@ -310,7 +288,7 @@ Get the URL to the thumbnail for this Photo.
 sub getThumbnailUrl {
     my $self = shift;
     return $self->getStorageLocation->getThumbnailUrl(
-        $self->get("filename")
+        $self->filename
     );
 }
 
@@ -336,7 +314,7 @@ sub makeResolutions {
     $resolutions    ||= $self->getGallery->getImageResolutions;
     
     my $storage     = $self->getStorageLocation;
-    $self->session->errorHandler->info(" Making resolutions for '" . $self->get("filename") . q{'});
+    $self->session->errorHandler->info(" Making resolutions for '" . $self->filename . q{'});
 
     for my $res ( @$resolutions ) {
         # carp if resolution is bad
@@ -345,8 +323,8 @@ sub makeResolutions {
             next;
         }
         my $newFilename     = $res . ".jpg";
-        $storage->copyFile( $self->get("filename"), $newFilename );
-        $storage->resize( $newFilename, $res, undef, $self->getGallery->get( 'imageDensity' ) );
+        $storage->copyFile( $self->filename, $newFilename );
+        $storage->resize( $newFilename, $res, undef, $self->getGallery->imageDensity );
     }
 }
 
@@ -371,7 +349,7 @@ sub processPropertiesFromFormPost {
     ### Passes all checks
     # If no title was given, make it the file name
     if ( !$form->get('title') ) {
-        my $title   = $self->get('filename');
+        my $title   = $self->filename;
         $title  =~ s/\.[^.]*$//;
         $title  =~ tr/-/ /; # De-mangle the spaces at the expense of the dashes
         $self->update( {
@@ -382,7 +360,7 @@ sub processPropertiesFromFormPost {
         # If this is a new Photo, change some other things too
         if ( $form->get('assetId') eq "new" ) {
             $self->update( {
-                url         => $self->session->url->urlize( join "/", $self->getParent->get('url'), $title ),
+                url         => $self->session->url->urlize( join "/", $self->getParent->url, $title ),
             } );
         }
     }
@@ -418,7 +396,7 @@ sub updateExifDataFromFile {
     
     my $exifTool    = Image::ExifTool->new;
     $exifTool->Options( PrintConv => 1 );
-    my $info        = $exifTool->ImageInfo( $storage->getPath( $self->get('filename') ) );
+    my $info        = $exifTool->ImageInfo( $storage->getPath( $self->filename ) );
     
     # Sanitize Exif data by removing keys with references as values
     for my $key ( keys %$info ) {
@@ -461,7 +439,7 @@ sub www_download {
         return $storage->getFileContentsAsScalar( $resolution . ".jpg" ); 
     }
     else {
-        return $storage->getFileContentsAsScalar( $self->get("filename") );
+        return $storage->getFileContentsAsScalar( $self->filename );
     }
 }
 
@@ -524,7 +502,7 @@ sub www_edit {
             })
             . WebGUI::Form::hidden( $session, {
                 name        => 'ownerUserId',
-                value       => $self->get('ownerUserId'),
+                value       => $self->ownerUserId,
             })
             ;
     }
@@ -545,7 +523,7 @@ sub www_edit {
     $var->{ form_title  }
         = WebGUI::Form::Text( $session, {
             name        => "title",
-            value       => ( $form->get("title") || $self->get("title") ),
+            value       => ( $form->get("title") || $self->title ),
         });
     
     $self->getGallery;
@@ -553,8 +531,8 @@ sub www_edit {
     $var->{ form_synopsis }
         = WebGUI::Form::HTMLArea( $session, {
             name        => "synopsis",
-            value       => ( $form->get("synopsis") || $self->get("synopsis") ),
-            richEditId  => $self->getGallery->get("richEditIdFile"),
+            value       => ( $form->get("synopsis") || $self->synopsis ),
+            richEditId  => $self->getGallery->richEditIdFile,
         });
 
     $var->{ form_photo } = $self->getEditFormUploadControl;
@@ -562,19 +540,19 @@ sub www_edit {
     $var->{ form_keywords }
         = WebGUI::Form::Text( $session, {
             name        => "keywords",
-            value       => ( $form->get("keywords") || $self->get("keywords") ),
+            value       => ( $form->get("keywords") || $self->keywords ),
         });
 
     $var->{ form_location }
         = WebGUI::Form::Text( $session, {
             name        => "location",
-            value       => ( $form->get("location") || $self->get("location") ),
+            value       => ( $form->get("location") || $self->location ),
         });
 
     $var->{ form_friendsOnly }
         = WebGUI::Form::yesNo( $session, {
             name            => "friendsOnly",
-            value           => ( $form->get("friendsOnly") || $self->get("friendsOnly") ),
+            value           => ( $form->get("friendsOnly") || $self->friendsOnly ),
             defaultValue    => undef,
         });
 

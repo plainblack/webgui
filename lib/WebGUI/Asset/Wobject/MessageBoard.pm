@@ -16,45 +16,27 @@ use WebGUI::Asset::Wobject;
 use WebGUI::International;
 use WebGUI::SQL;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
-
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_MessageBoard");
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-			templateId =>{
-				tab=>"display",
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000047',	
-				namespace=>"MessageBoard",
-                		label=>$i18n->get(73),
-                		hoverHelp=>$i18n->get('73 description')
-				},
-			visitorCacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("visitor cache timeout"),
-				hoverHelp => $i18n->get("visitor cache timeout help")
-				},
-		);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'messageBoard.gif',
-		tableName=>'MessageBoard',
-		className=>'WebGUI::Asset::Wobject::MessageBoard',
-		autoGenerateForms=>1,
-		properties=>\%properties
-		});
-	return $class->SUPER::definition($session, $definition);
-}
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_MessageBoard'];
+aspect icon      => 'messageBoard.gif';
+aspect tableName => 'MessageBoard';
+property templateId => (
+                tab         => "display",
+                fieldType   => "template",
+                default     => 'PBtmpl0000000000000047',    
+                namespace   => "MessageBoard",
+                label       => [73, 'Asset_MessageBoard'],
+                hoverHelp   => ['73 description', 'Asset_MessageBoard'],
+         );
+property visitorCacheTimeout => (
+                tab         => "display",
+                fieldType   => "interval",
+                default     => 3600,
+                uiLevel     => 8,
+                label       => ["visitor cache timeout", 'Asset_MessageBoard'],
+                hoverHelp   => ["visitor cache timeout help", 'Asset_MessageBoard'],
+         );
 
 
 #-------------------------------------------------------------------
@@ -68,11 +50,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -122,20 +104,20 @@ sub view {
 			$first = $child;
 		}
 		my %lastPostVars;
-		my $lastPost = WebGUI::Asset::Wobject::MessageBoard->newByDynamicClass($self->session, $child->get("lastPostId"));
+		my $lastPost = WebGUI::Asset::Wobject::MessageBoard->newById($self->session, $child->lastPostId);
 		if (defined $lastPost) {
 			%lastPostVars = (
 				'forum.lastPost.url' => $lastPost->getUrl,
-				'forum.lastPost.date' => $self->session->datetime->epochToHuman($lastPost->get("creationDate"),"%z"),
-				'forum.lastPost.time' => $self->session->datetime->epochToHuman($lastPost->get("creationDate"),"%Z"),
-				'forum.lastPost.epoch' => $lastPost->get("creationDate"),
-				'forum.lastPost.subject' => $lastPost->get("title"),
+				'forum.lastPost.date' => $self->session->datetime->epochToHuman($lastPost->creationDate,"%z"),
+				'forum.lastPost.time' => $self->session->datetime->epochToHuman($lastPost->creationDate,"%Z"),
+				'forum.lastPost.epoch' => $lastPost->creationDate,
+				'forum.lastPost.subject' => $lastPost->title,
 				'forum.lastPost.user.hasRead' => $lastPost->getThread->isMarkedRead,
-				'forum.lastPost.user.id' => $lastPost->get("ownerUserId"),
-				'forum.lastPost.user.name' => $lastPost->get("username"),
-				'forum.lastPost.user.alias' => $lastPost->get("username"),
+				'forum.lastPost.user.id' => $lastPost->ownerUserId,
+				'forum.lastPost.user.name' => $lastPost->username,
+				'forum.lastPost.user.alias' => $lastPost->username,
 				'forum.lastPost.user.profile' => $lastPost->getPosterProfileUrl,
-				'forum.lastPost.user.isVisitor' => ($lastPost->get("ownerUserId") eq '1')
+				'forum.lastPost.user.isVisitor' => ($lastPost->ownerUserId eq '1')
 				);
 		}
 
@@ -143,12 +125,12 @@ sub view {
 			%lastPostVars,
 			'forum.controls' => $child->getToolbar,
 			'forum.count' => $count,
-			'forum.title' => $child->get('title'),
-			'forum.description' => $child->get("description"),
-			'forum.replies' => $child->get("replies"),
-			'forum.rating' => $child->get("rating"),
-			'forum.views' => $child->get("views"),
-			'forum.threads' => $child->get("threads"),
+			'forum.title' => $child->title,
+			'forum.description' => $child->description,
+			'forum.replies' => $child->replies,
+			'forum.rating' => $child->rating,
+			'forum.views' => $child->views,
+			'forum.threads' => $child->threads,
 			'forum.url' => $child->getUrl,
 			'forum.user.canView' => $child->canView,
 			'forum.user.canPost' => $child->canPost
@@ -171,7 +153,7 @@ sub view {
 
 	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if ($self->session->user->isVisitor) {
-		eval{$cache->set("view_".$self->getId, $out, $self->get("visitorCacheTimeout"))};
+		eval{$cache->set("view_".$self->getId, $out, $self->visitorCacheTimeout)};
 	}
        	return $out;
 }
@@ -186,7 +168,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
+	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
 	$self->SUPER::www_view(@_);
 }
 

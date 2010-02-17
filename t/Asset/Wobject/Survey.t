@@ -40,7 +40,7 @@ my $tag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->assetsToPurge($survey);
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
-my $sJSON = $survey->surveyJSON;
+my $sJSON = $survey->getSurveyJSON;
 
 # Load bare-bones survey, containing a single section (S0)
 $sJSON->update([0], { variable => 'S0' });
@@ -209,7 +209,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
 
     # Modify Survey structure, new revision not created
     $survey->submitObjectEdit({ id =>  "0", text => "new text"});
-    is($survey->surveyJSON->section([0])->{text}, 'new text', 'Survey updated');
+    is($survey->getSurveyJSON->section([0])->{text}, 'new text', 'Survey updated');
     is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision unchanged');
 
     # Push revisionDate into the past because we can't have 2 revision dates with the same epoch (this is very hacky)
@@ -220,7 +220,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     $session->db->write('update assetData set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update wobject set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
 
-    $survey = WebGUI::Asset->new($session, $surveyId);
+    $survey = WebGUI::Asset->newById($session, $surveyId);
     isa_ok($survey, 'WebGUI::Asset::Wobject::Survey', 'Got back survey after monkeying with revisionDate');
     is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision date pushed back');
 
@@ -235,10 +235,10 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     # Make another change, causing new revision to be automatically created
     $survey->submitObjectEdit({ id =>  "0", text => "newer text"});
 
-    my $newerSurvey = WebGUI::Asset->new($session, $surveyId); # retrieve newer revision
+    my $newerSurvey = WebGUI::Asset->newById($session, $surveyId); # retrieve newer revision
     isa_ok($newerSurvey, 'WebGUI::Asset::Wobject::Survey', 'After change, re-retrieved Survey instance');
     is($newerSurvey->getId, $surveyId, '..which is the same survey');
-    is($newerSurvey->surveyJSON->section([0])->{text}, 'newer text', '..with updated text');
+    is($newerSurvey->getSurveyJSON->section([0])->{text}, 'newer text', '..with updated text');
     ok($newerSurvey->get('revisionDate') > $revisionDate, '..and newer revisionDate');
 
     # Create another response (this one will use the new revision)
@@ -261,7 +261,7 @@ SKIP: {
 
 skip "Unable to load GraphViz", 1 if $@;
 
-$survey->surveyJSON->remove([1]);
+$survey->getSurveyJSON->remove([1]);
 my ($storage, $filename) = $survey->graph( { format => 'plain', layout => 'dot' } );
 like($storage->getFileContentsAsScalar($filename), qr{
     ^graph .*       # starts with graph

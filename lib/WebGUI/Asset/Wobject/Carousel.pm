@@ -15,78 +15,33 @@ $VERSION = "1.0.0";
 use strict;
 use warnings;
 use JSON;
-use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
-use base 'WebGUI::Asset::Wobject';
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-defines wobject properties for New Wobject instances.  You absolutely need 
-this method in your new Wobjects.  If you choose to "autoGenerateForms", the
-getEditForm method is unnecessary/redundant/useless.  
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_Carousel');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		templateId =>{
-			fieldType       =>"template",  
-			defaultValue    =>'CarouselTmpl0000000001',
-			tab             =>"display",
-			noFormPost      =>0,  
-			namespace       =>"Carousel", 
-			hoverHelp       =>$i18n->get('carousel template description'),
-			label           =>$i18n->get('carousel template label'),
-		},
-		slideWidth =>{
-			fieldType       => "integer",  
-			defaultValue    => 0,
-			tab             => "display",
-			hoverHelp       => $i18n->get('carousel slideWidth description'),
-			label           => $i18n->get('carousel slideWidth label'),
-		},
-        items =>{
-            noFormPost      =>1,
-            fieldType       =>'text',
-            autoGenerate    =>0,
-        },
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'Carousel.png',
-		autoGenerateForms=>1,
-		tableName=>'Carousel',
-		className=>'WebGUI::Asset::Wobject::Carousel',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 duplicate ( )
-
-duplicates a New Wobject.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-wobject instances, you will need to duplicate them here.
-
-=cut
-
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
-	return $newAsset;
-}
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => [ 'assetName', 'Asset_Carousel' ];
+aspect icon      => 'Carousel.png';
+aspect tableName => 'Carousel';
+property templateId => (
+    fieldType  => "template",
+    default    => 'CarouselTmpl0000000001',
+    tab        => "display",
+    noFormPost => 0,
+    namespace  => "Carousel",
+    hoverHelp  => [ 'carousel template description', 'Asset_Carousel' ],
+    label      => [ 'carousel template label', 'Asset_Carousel' ],
+);
+property slideWidth => (
+    fieldType => "integer",
+    default   => 0,
+    tab       => "display",
+    hoverHelp => [ 'carousel slideWidth description', 'Asset_Carousel' ],
+    label     => [ 'carousel slideWidth label', 'Asset_Carousel' ],
+);
+property items => (
+    noFormPost   => 1,
+    fieldType    => 'text',
+);
 
 #-------------------------------------------------------------------
 
@@ -119,8 +74,8 @@ sub getEditForm {
 
     $tabform->getTab("properties")->raw($tableRowStart);
 
-    if($self->getValue('items')){
-        my @items = @{JSON->new->decode($self->getValue('items'))->{items}};
+    if($self->items){
+        my @items = @{JSON->new->decode($self->items)->{items}};
 
         foreach my $item (@items){
             my $itemNr = $item->{sequenceNumber};
@@ -184,11 +139,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -238,24 +193,6 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
-=head2 purge ( )
-
-removes collateral data associated with a Carousel when the system
-purges it's data.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-wobject instances, you will need to purge them here.
-
-=cut
-
-sub purge {
-	my $self = shift;
-	#purge your wobject-specific data here.  This does not include fields 
-	# you create for your Carousel asset/wobject table.
-	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -271,8 +208,8 @@ sub view {
 	#This automatically creates template variables for all of your wobject's properties.
 	my $var = $self->get;
 
-    if($self->getValue('items')){
-        $var->{item_loop} = JSON->new->decode($self->getValue('items'))->{items};
+    if($self->items){
+        $var->{item_loop} = JSON->new->decode($self->items)->{items};
     }
 	
 	#This is an example of debugging code to help you diagnose problems.

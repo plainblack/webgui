@@ -11,9 +11,62 @@ package WebGUI::Asset::Shortcut;
 #-------------------------------------------------------------------
 
 use strict;
-use Carp;
+use Carp qw/croak/;
 use Tie::IxHash;
-use WebGUI::Asset;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+aspect assetName => ['assetName', 'Asset_Shortcut'];
+aspect icon      => 'shortcut.gif';
+aspect tableName => 'Shortcut';
+
+property  shortcutToAssetId => (
+              noFormPost => 1,
+              fieldType  => "hidden",
+              default    => undef,
+              noFormPost => 1,
+          );
+property  shortcutByCriteria => (
+              fieldType  => "yesNo",
+              default    => 0,
+              noFormPost => 1,
+          );
+property  disableContentLock => (
+              fieldType  => "yesNo",
+              default    => 0,
+              noFormPost => 1,
+          );
+property  resolveMultiples => (
+              fieldType  => "selectBox",
+              default    => "mostRecent",
+              noFormPost => 1,
+          );
+property  shortcutCriteria => (
+              fieldType  => "textarea",
+              default    => "",
+              noFormPost => 1,
+          );
+property  templateId => (
+              fieldType  => "template",
+              default    => "PBtmpl0000000000000140",
+              noFormPost => 1,
+          );
+property  prefFieldsToShow => (
+              fieldType  => "checkList",
+              default    => undef,
+              noFormPost => 1,
+          );
+property  prefFieldsToImport => (
+              fieldType  => "checkList",
+              default    => undef,
+              noFormPost => 1,
+          );
+property  showReloadIcon => (
+              fieldType  => "yesNo",
+              default    => 1,
+              noFormPost => 1,
+          );
+
 use WebGUI::International;
 use WebGUI::Operation::Profile;
 use WebGUI::ProfileField;
@@ -21,8 +74,6 @@ use WebGUI::ProfileCategory;
 use WebGUI::Macro;
 use HTML::Entities qw(encode_entities);
 use Data::Dumper;
-
-our @ISA = qw(WebGUI::Asset);
 
 #-------------------------------------------------------------------
 sub _drawQueryBuilder {
@@ -56,7 +107,7 @@ sub _drawQueryBuilder {
 	# Static form fields
 	my $shortcutCriteriaField = WebGUI::Form::textarea($session, {
 		name=>"shortcutCriteria",
-		value=>$self->getValue("shortcutCriteria"),
+		value=>$self->shortcutCriteria,
 		extras=>'style="width: 100%" '.$self->{_disabled}
 	});
 	my $conjunctionField = WebGUI::Form::selectBox($session, {
@@ -174,48 +225,7 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Shortcut");
 	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'shortcut.gif',
-		tableName=>'Shortcut',
-		className=>'WebGUI::Asset::Shortcut',
 		properties=>{
-			shortcutToAssetId=>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-			},
-			shortcutByCriteria=>{
-				fieldType=>"yesNo",
-				defaultValue=>0,
-			},
-			disableContentLock=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-			},
-			resolveMultiples=>{
-				fieldType=>"selectBox",
-				defaultValue=>"mostRecent",
-			},
-			shortcutCriteria=>{
-				fieldType=>"textarea",
-				defaultValue=>"",
-			},
-			templateId=>{
-				fieldType=>"template",
-				defaultValue=>"PBtmpl0000000000000140"
-			},
-			prefFieldsToShow=>{
-				fieldType=>"checkList",
-				defaultValue=>undef
-			},
-			prefFieldsToImport=>{
-				fieldType=>"checkList",
-				defaultValue=>undef
-			},
-			showReloadIcon=>{
-				fieldType=>"yesNo",
-				defaultValue=>1
-			}
 		}
 	});
 	return $class->SUPER::definition($session,$definition);
@@ -297,7 +307,7 @@ sub getEditForm {
 			);
 	}
 	$tabform->getTab("display")->template(
-		-value=>$self->getValue("templateId"),
+		-value=>$self->templateId,
 		-label=>$i18n->get('shortcut template title'),
 		-hoverHelp=>$i18n->get('shortcut template title description'),
 		-namespace=>"Shortcut"
@@ -589,9 +599,9 @@ sub getShortcutByCriteria {
 	my $scratchId;
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
-		if($self->session->scratch->get($scratchId) && !$self->getValue("disableContentLock")) {
+		if($self->session->scratch->get($scratchId) && !$self->disableContentLock) {
 			unless ($self->session->var->isAdminOn) {
-				return WebGUI::Asset->newByDynamicClass($self->session, $self->session->scratch->get($scratchId));
+				return WebGUI::Asset->newById($self->session, $self->session->scratch->get($scratchId));
 			}
 		}
 	}
@@ -675,7 +685,7 @@ sub getShortcutByCriteria {
 	# Store the matching assetId in user scratch. 
 	$self->session->scratch->set($scratchId,$id) if ($scratchId);
 
-	return WebGUI::Asset->newByDynamicClass($self->session, $id);
+	return WebGUI::Asset->newById($self->session, $id);
 }
 
 #-------------------------------------------------------------------
@@ -688,7 +698,7 @@ Return the asset that this Shortcut points to.
 
 sub getShortcutDefault {
 	my $self = shift;
-	return WebGUI::Asset->newByDynamicClass($self->session, $self->get("shortcutToAssetId"));
+	return WebGUI::Asset->newById($self->session, $self->get("shortcutToAssetId"));
 }
 
 #-------------------------------------------------------------------
@@ -719,7 +729,7 @@ Returns an array of profile fields to show to the user as preferences.
 
 sub getPrefFieldsToShow {
 	my $self = shift;
-	return split("\n",$self->getValue("prefFieldsToShow"));
+	return split("\n",$self->prefFieldsToShow);
 }
 
 #-------------------------------------------------------------------
@@ -733,7 +743,7 @@ for overrides.
 
 sub getPrefFieldsToImport {
 	my $self = shift;
-	return split("\n",$self->getValue("prefFieldsToImport"));
+	return split("\n",$self->prefFieldsToImport);
 }
 
 #----------------------------------------------------------------------------
@@ -836,7 +846,7 @@ sub setOverride {
     my $self        = shift;
     my $override    = shift;
 
-    croak "Shortcut->setOverride - first argument must be hash reference" 
+    Carp::croak "Shortcut->setOverride - first argument must be hash reference" 
         unless $override && ref $override eq "HASH";
     
     for my $key ( %$override ) {
@@ -1126,7 +1136,7 @@ sub www_editOverride {
 	# Cannot fetch the original value from the overrides hash b/c it will be empty if
 	# the override has not been set before. Also getOverrides uses a cached version of
 	# the origValue, which can be out of date.
-	my $origValue = $self->getShortcutOriginal->getValue($fieldName); 
+	my $origValue = $self->getShortcutOriginal->$fieldName; 
 
 	my $output = '';
 	$output .= '</table>';
@@ -1163,7 +1173,7 @@ sub www_editOverride {
 	$params{label} = $params{label} || $i18n->get("Edit Field Directly");
 	$params{hoverHelp} = $params{hoverHelp} || $i18n->get("Use this field to edit the override using the native form handler for this field type");
 
-	if ($params{fieldType} eq 'template') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($self->session, $origValue)->get("namespace");}
+	if ($params{fieldType} eq 'template') {$params{namespace} = $params{namespace} || WebGUI::Asset->newById($self->session, $origValue)->get("namespace");}
 
 	$f->dynamicField(%params);
 	$f->textarea(
@@ -1271,11 +1281,11 @@ sub getShortcutsForAssetId {
     my $assetId     = shift;
     my $properties  = shift || {};
     
-    croak "First argument to getShortcutsForAssetId must be WebGUI::Session"
+    Carp::croak "First argument to getShortcutsForAssetId must be WebGUI::Session"
         unless $session && $session->isa("WebGUI::Session");
-    croak "Second argument to getShortcutsForAssetId must be assetId"
+    Carp::croak "Second argument to getShortcutsForAssetId must be assetId"
         unless $assetId;
-    croak "Third argument to getShortcutsForAssetId must be hash reference"
+    Carp::croak "Third argument to getShortcutsForAssetId must be hash reference"
         if $properties && !ref $properties eq "HASH";
 
     my $db      = $session->db;

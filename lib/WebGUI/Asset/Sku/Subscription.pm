@@ -16,7 +16,89 @@ package WebGUI::Asset::Sku::Subscription;
 
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+aspect assetName           => ['assetName', 'Asset_Subscription'];
+aspect icon                => 'subscription.gif';
+aspect tableName           => 'Subscription';
+property templateId => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "Subscription",
+            default         => 'eqb9sWjFEVq0yHunGV8IGw',
+            label           => ["template", 'Asset_Subscription'],
+            hoverHelp       => ["template help", 'Asset_Subscription'],
+         );
+property redeemSubscriptionCodeTemplateId => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "Operation/RedeemSubscription",
+            default         => 'PBtmpl0000000000000053',
+            label           => ["redeem subscription code template", 'Asset_Subscription'],
+            hoverHelp       => ["redeem subscription code template help", 'Asset_Subscription'],
+         );
+property thankYouMessage => (
+            tab             => "properties",
+            builder         => '_thankYouMessage_default',
+            lazy            => 1,
+            fieldType       => "HTMLArea",
+            label           => ["thank you message", 'Asset_Subscription'],
+            hoverHelp       => ["thank you message help", 'Asset_Subscription'],
+         );
+sub _thankYouMessage_default {
+    my $session = shift->session;
+	my $i18n = WebGUI::International->new($session, "Asset_Subscription");
+    return $i18n->get("default thank you message");
+}
+property price => (
+            fieldType       => 'float',
+            label           => ['subscription price', 'Asset_Subscription'],
+            hoverHelp       => ['subscription price description', 'Asset_Subscription'],
+            default         => '0.00',
+         );
+property subscriptionGroup => (
+            fieldType       => 'group',
+            label           => ['subscription group', 'Asset_Subscription'],
+            hoverHelp       => ['subscription group description', 'Asset_Subscription'],
+            defaultvalue    => [ 2 ]
+         );
+property recurringSubscription => (
+            fieldType       => 'yesNo',
+            label           => ['recurring subscription', 'Asset_Subscription'],
+            hoverHelp       => ['recurring subscription description', 'Asset_Subscription'],
+            default         => 1,
+         );
+property duration => ( 
+            fieldType       => 'selectBox',
+            label           => ['subscription duration', 'Asset_Subscription'],
+            hoverHelp       => ['subscription duration description', 'Asset_Subscription'],
+            default         => 'Monthly',
+            options         => \&_duration_options,
+         );
+sub _duration_options {
+    my $session = shift->session;
+    return WebGUI::Shop::Pay->new( $session )->getRecurringPeriodValues,
+}
+property executeOnSubscription => (
+            fieldType       => 'text',
+            label           => ['execute on subscription', 'Asset_Subscription'],
+            hoverHelp       => ['execute on subscription description', 'Asset_Subscription'],
+            default         => '',
+         );
+property karma => (
+    fieldType       => 'integer',
+    noFormPost      => \&_karma_noFormPost,
+    label           => ['subscription karma', 'Asset_Subscription'],
+    hoverHelp       => ['subscription karma description', 'Asset_Subscription'],
+    defaultvalue	=> 0,
+);
+sub _karma_noFormPost {
+    my $session = shift->session;
+    return ! $session->setting->get('useKarma');
+}
+
+
+
 use WebGUI::Asset::Template;
 use WebGUI::Form;
 use WebGUI::Shop::Pay;
@@ -60,7 +142,7 @@ sub apply {
 	my $self    = shift;
     my $session = $self->session;
 	my $userId  = shift || $session->user->userId;
-	my $groupId = $self->get('subscriptionGroup');
+	my $groupId = $self->subscriptionGroup;
 
 	# Make user part of the right group and adjust the expiration date
 	my $group   = WebGUI::Group->new($session, $groupId);
@@ -75,108 +157,16 @@ sub apply {
     }
 
 	# Add karma to the user's account
-    if ($session->setting->get('userKarma')) {
-        WebGUI::User->new($session,$userId)->karma($self->get('karma'), 'Subscription', 'Added for purchasing subscription '.$self->get('title'));
+    if ($session->setting->get('useKarma')) {
+        WebGUI::User->new($session,$userId)->karma($self->karma, 'Subscription', 'Added for purchasing subscription '.$self->title);
     }
 
 	# Process the executeOnPurchase field
-	my $command = $self->get('executeOnSubscription');
+	my $command = $self->executeOnSubscription;
 	WebGUI::Macro::process($session,\$command);
-	system($command) if ($self->get('executeOnSubscription') ne "");
+	system($command) if ($self->executeOnSubscription ne "");
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_Subscription");
-	%properties = (
-		templateId      => {
-			tab             => "display",
-			fieldType       => "template",
-            namespace       => "Subscription",
-			defaultValue    => 'eqb9sWjFEVq0yHunGV8IGw',
-			label           => $i18n->get("template"),
-			hoverHelp       => $i18n->get("template help"),
-		},
-        redeemSubscriptionCodeTemplateId => {
-            tab             => "display",
-            fieldType       => "template",
-            namespace       => "Operation/RedeemSubscription",
-            defaultValue    => 'PBtmpl0000000000000053',
-            label           => $i18n->get("redeem subscription code template"),
-            hoverHelp       => $i18n->get("redeem subscription code template help"),
-        },
-        thankYouMessage => {
-            tab             => "properties",
-			defaultValue    => $i18n->get("default thank you message"),
-			fieldType       => "HTMLArea",
-			label           => $i18n->get("thank you message"),
-			hoverHelp       => $i18n->get("thank you message help"),
-            },
-
-        price           => {
-            fieldType       => 'float',
-            label	        => $i18n->get('subscription price'),
-            hoverHelp	    => $i18n->get('subscription price description'),
-            defaultValue    => '0.00',
-        },
-        subscriptionGroup   => {
-            fieldType       => 'group',
-            label	        => $i18n->get('subscription group'),
-            hoverHelp	    => $i18n->get('subscription group description'),
-            defaultvalue	=> [ 2 ]
-        },
-        recurringSubscription => {
-            fieldType       => 'yesNo',
-            label           => $i18n->get('recurring subscription'),
-            hoverHelp       => $i18n->get('recurring subscription description'),
-            defaultValue    => 1,
-        },
-        duration        => { 
-            fieldType       => 'selectBox',
-            label	        => $i18n->get('subscription duration'),
-            hoverHelp       => $i18n->get('subscription duration description'),
-            defaultValue	=> 'Monthly',
-            options         => WebGUI::Shop::Pay->new( $session )->getRecurringPeriodValues,
-        },
-        executeOnSubscription   => {
-            fieldType       => 'text',
-            label           => $i18n->get('execute on subscription'),
-            hoverHelp       => $i18n->get('execute on subscription description'),
-            defaultValue    => '',
-        },
-    );
-
-    # Show the karma field only if karma is enabled
-    if ($session->setting->get("useKarma")) {
-        $properties{ karma    } = {
-            type            => 'integer',
-            label           => $i18n->get('subscription karma'),
-            hoverHelp       => $i18n->get('subscription karma description'),
-            defaultvalue	=> 0,
-        };
-    }
-
-	push(@{$definition}, {
-		assetName           => $i18n->get('assetName'),
-		icon                => 'subscription.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'Subscription',
-		className           => 'WebGUI::Asset::Sku::Subscription',
-		properties          => \%properties,
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -409,7 +399,7 @@ The identifier of the interval. Can be either 'Weekly', 'BiWeekly', 'FourWeekly'
 
 sub getExpirationOffset {
     my $self        = shift;
-	my $duration    = shift || $self->get('duration');
+	my $duration    = shift || $self->duration;
     
     #                                              y, m,  d  
     return $self->session->datetime->addToDate( 1, 0, 0,  7 ) - 1 if $duration eq 'Weekly';
@@ -433,7 +423,7 @@ Returns configured price, 0.00 if neither of those are available.
 
 sub getPrice {
     my $self = shift;
-    return $self->get('price') || 0.00;
+    return $self->price || 0.00;
 }
 
 #-------------------------------------------------------------------
@@ -447,7 +437,7 @@ Returns the duration of this subscription in a format used by the commerce syste
 sub getRecurInterval {
     my $self    = shift;
 
-    return $self->get('duration');
+    return $self->duration;
 }
 
 #-------------------------------------------------------------------
@@ -461,7 +451,7 @@ Tells the commerce system this Sku is recurring.
 sub isRecurring {
     my $self = shift;
 
-    return $self->getValue('recurringSubscription');
+    return $self->recurringSubscription;
 }
 
 #-------------------------------------------------------------------
@@ -489,7 +479,7 @@ Prepares the template.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $templateId = $self->get("templateId");
+	my $templateId = $self->templateId;
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
@@ -1018,7 +1008,7 @@ sub www_redeemSubscriptionCode {
 	$f->submit;
 	$var->{ codeForm } = $f->print;
 
-    return $self->processStyle($self->processTemplate($var, $self->get('redeemSubscriptionCodeTemplateId')));
+    return $self->processStyle($self->processTemplate($var, $self->redeemSubscriptionCodeTemplateId));
 }
 
 1;

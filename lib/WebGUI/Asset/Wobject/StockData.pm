@@ -16,7 +16,48 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use Finance::Quote;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect tableName => 'StockData';
+aspect icon      => 'stockData.gif';
+aspect assetName => ["assetName", 'Asset_StockData'];
+property templateId => (
+            fieldType   => "template",
+            default     => 'StockDataTMPL000000001',
+            tab         => 'display',
+            namespace   => 'StockData',
+            label       => ["template_label", 'Asset_StockData'],
+            hoverHelp   => ["template_label_description", 'Asset_StockData'],
+        );
+property displayTemplateId => (
+            fieldType   => "template",
+            default     => 'StockDataTMPL000000002',
+            tab         => 'display',
+            namespace   => "StockData/Display",
+            label       => ["display_template_label", 'Asset_StockData'],
+            hoverHelp   => ["display_template_label_description", 'Asset_StockData'],
+        );
+property defaultStocks => (
+            fieldType   => "textarea",
+            default     => "DELL\nMSFT\nORCL\nSUNW\nYHOO",
+            tab         => 'properties',
+            label       => ["default_stock_label", 'Asset_StockData'],
+            hoverHelp   => ["default_stock_label_description", 'Asset_StockData'],
+        );
+property source => (
+            fieldType   => "selectList",
+            default     => "usa",
+            tab         => 'properties',
+            options     => &_getStockSources,
+            label       => ["stock_source", 'Asset_StockData'],
+            hoverHelp   => ["stock_source_description", 'Asset_StockData'],
+        );
+property failover => (
+            fieldType   => "yesNo",
+            default     => undef,
+            label       => ["failover_label", 'Asset_StockData'],
+            hoverHelp   => ["failover_description", 'Asset_StockData'],
+        );
 
 #-------------------------------------------------------------------
 
@@ -189,7 +230,7 @@ sub _getStocks {
    # Create a new Finance::Quote object
    my $q = Finance::Quote->new;
    # Disable failover if specified
-   unless ($self->getValue("failover")) {
+   unless ($self->failover) {
 	   $q->failover(0);
    }
 
@@ -197,7 +238,7 @@ sub _getStocks {
    $q->timeout(15);
 
    # Fetch the stock information and return the results
-   return $q->fetch($self->getValue("source"),@{$stocks});
+   return $q->fetch($self->source,@{$stocks});
 }
 
 #-------------------------------------------------------------------
@@ -246,74 +287,6 @@ sub _trim {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( )
-
-defines wobject properties for Stock Data instances
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_StockData");
-
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		templateId =>{
-			fieldType=>"template",
-			defaultValue=>'StockDataTMPL000000001',
-			tab=>'display',
-			namespace=>'StockData',
-			label=>$i18n->get("template_label"),
-			hoverHelp=>$i18n->get("template_label_description"),
-		},
-		displayTemplateId=>{
-			fieldType=>"template",
-			defaultValue=>'StockDataTMPL000000002',
-			tab=>'display',
-			namespace=>"StockData/Display",
-			label=>$i18n->get("display_template_label"),
-			hoverHelp=>$i18n->get("display_template_label_description"),
-		},
-		defaultStocks=>{
-			fieldType=>"textarea",
-			defaultValue=>"DELL\nMSFT\nORCL\nSUNW\nYHOO",
-			tab=>'properties',
-			label=> $i18n->get("default_stock_label"),
-			hoverHelp=> $i18n->get("default_stock_label_description"),
-		},
-		source=>{
-			fieldType=>"selectList",
-			defaultValue=>"usa",
-			tab=>'properties',
-			label=> $i18n->get("stock_source"),
-			options=>$class->_getStockSources(),
-			hoverHelp=>$i18n->get("stock_source_description"),
-		},
-		failover=>{
-			fieldType=>"yesNo",
-			defaultValue=>undef,
-			label=> $i18n->get("failover_label"),
-			hoverHelp=> $i18n->get("failover_description")
-		}
-	);
-
-	push(@{$definition}, {
-		tableName=>'StockData',
-		className=>'WebGUI::Asset::Wobject::StockData',
-		icon=>'stockData.gif',
-		assetName=>$i18n->get("assetName"),
-		autoGenerateForms=>1,
-		properties=>\%properties
-	});
-
-        return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -323,11 +296,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -369,7 +342,7 @@ sub view {
 	$var->{'stock.display.url'} = $self->getUrl("func=displayStock;symbol=");
 	
 	#Build list of stocks as an array
-	my $defaults = $self->getValue("defaultStocks");
+	my $defaults = $self->defaultStocks;
 	#replace any windows newlines
 	$defaults =~ s/\r//;
 	my @array = split("\n",$defaults);
@@ -436,7 +409,7 @@ sub www_displayStock {
 	       ('(not available)') x 2;
    }
    
-   return $self->processTemplate($var, $self->get("displayTemplateId"));
+   return $self->processTemplate($var, $self->displayTemplateId);
 }
 
 

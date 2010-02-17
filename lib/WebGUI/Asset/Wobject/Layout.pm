@@ -16,10 +16,45 @@ package WebGUI::Asset::Wobject::Layout;
 
 use strict;
 use WebGUI::AdSpace;
-use WebGUI::Asset::Wobject;
-use WebGUI::Utility;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+aspect assetName => ["assetName", 'Asset_Layout'];
+aspect icon      => 'layout.gif';
+aspect tableName => 'Layout';
+
+property templateId => (
+             fieldType    => "template",
+             namespace    => "Layout",
+             default      => 'PBtmpl0000000000000054',
+             label        => ['layout template title', 'Asset_Layout'],
+             hoverHelp    => ['template description', 'Asset_Layout'],
+         );
+property mobileTemplateId => (
+             #fieldType    => ( $session->style->useMobileStyle ? 'template' : 'hidden' ),
+             fieldType    => 'template',
+             namespace    => 'Layout',
+             default      => 'PBtmpl0000000000000054',
+             noFormPost   => 1,
+         );
+property contentPositions => (
+             noFormPost   => 1,
+             default      => undef,
+             fieldType    => "hidden",
+             noFormPost   => 1,
+         );
+property assetsToHide => (
+             default      => undef,
+             fieldType    => "checkList",
+             noFormPost   => 1,
+         );
+property assetOrder => (
+             default      => 'asc',
+             fieldType    => 'selectBox',
+             noFormPost   => 1,
+         );
+
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -44,59 +79,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,"Asset_Layout");
-    
-    push(@{$definition}, {
-        assetName=>$i18n->get("assetName"),
-        icon=>'layout.gif',
-        tableName=>'Layout',
-        className=>'WebGUI::Asset::Wobject::Layout',
-        properties=>{
-            templateId =>{
-                fieldType    =>"template",
-                namespace    => "Layout",
-                defaultValue =>'PBtmpl0000000000000054',
-            },
-            mobileTemplateId => {
-                fieldType    => ( $session->style->useMobileStyle ? 'template' : 'hidden' ),
-                namespace    => 'Layout',
-                defaultValue => 'PBtmpl0000000000000054',
-            },
-            contentPositions => {
-                noFormPost   =>1,
-                defaultValue =>undef,
-                fieldType    =>"hidden"
-            },
-            assetsToHide => {
-                defaultValue =>undef,
-                fieldType    =>"checkList"
-            },
-            assetOrder => {
-                defaultValue =>'asc',
-                fieldType    =>'selectBox',
-            }
-        }
-    });
-    return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getEditForm ( )
 
 Extends the base method to  handle the optional mobileTemplateId and assetsToHide.
@@ -109,10 +91,11 @@ sub getEditForm {
     my $i18n = WebGUI::International->new($self->session,"Asset_Layout");
 
     my ($templateId);
-    if (($self->get("assetId") eq "new") && ($self->getParent->get('className') eq 'WebGUI::Asset::Wobject::Layout')) {
-        $templateId = $self->getParent->getValue('templateId');
-    } else {
-        $templateId = $self->getValue('templateId');
+    if (($self->assetId eq "new") && ($self->getParent->isa('WebGUI::Asset::Wobject::Layout'))) {
+        $templateId = $self->getParent->templateId;
+    }
+    else {
+        $templateId = $self->templateId;
     }
     $tabform->getTab("display")->template(
             -value=>$templateId,
@@ -124,7 +107,7 @@ sub getEditForm {
     if ( $self->session->setting->get('useMobileStyle') ) {
         $tabform->getTab("display")->template(
             name        => 'mobileTemplateId',
-            value       => $self->getValue('mobileTemplateId'),
+            value       => $self->mobileTemplateId,
             label       => $i18n->get('mobileTemplateId label'),
             hoverHelp   => $i18n->get('mobileTemplateId description'),
             namespace   => 'Layout',
@@ -133,7 +116,7 @@ sub getEditForm {
     else {
         $tabform->getTab("display")->hidden(
             name        => 'mobileTemplateId',
-            value       => $self->getValue('mobileTemplateId'),
+            value       => $self->mobileTemplateId,
         );
     }
 
@@ -146,7 +129,7 @@ sub getEditForm {
 		-name      => 'assetOrder',
 		-label     => $i18n->get('asset order label'),
 		-hoverHelp => $i18n->get('asset order hoverHelp'),
-		-value     => $self->getValue('assetOrder'),
+		-value     => $self->assetOrder,
 		-options   => \%assetOrder
 	);
     if ($self->get("assetId") eq "new") {
@@ -158,7 +141,7 @@ sub getEditForm {
             -value=>"view"
             );
     } else {
-        my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
+        my @assetsToHide = split("\n",$self->assetsToHide);
         my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
         my %childIds;
         foreach my $child (@{$children}) {
@@ -193,13 +176,13 @@ sub prepareView {
     my $templateId;
 
     if ($session->style->useMobileStyle) {
-        $templateId = $self->get('mobileTemplateId');
+        $templateId = $self->mobileTemplateId;
     }
     else {
-        $templateId = $self->get('templateId');
+        $templateId = $self->templateId;
     }
 
-    my $template = WebGUI::Asset->new($session,$templateId,"WebGUI::Asset::Template");
+    my $template = WebGUI::Asset->newById($session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -210,7 +193,7 @@ sub prepareView {
     $template->prepare( $self->getMetaDataAsTemplateVariables );
     $self->{_viewTemplate} = $template;
 
-    my $templateContent = $template->get("template");
+    my $templateContent = $template->template;
     my $numPositions = 1;
     while ($templateContent =~ /position(\d+)_loop/g) {
         $numPositions = $1
@@ -223,7 +206,7 @@ sub prepareView {
     my $splitter = $self->{_viewSplitter} = $self->getSeparator;
 
     my %hidden = map { $_ => 1 }
-        split "\n", $self->get("assetsToHide");
+        split "\n", $self->assetsToHide;
 
     my %placeHolder;
     my @children;
@@ -239,7 +222,7 @@ sub prepareView {
         $placeHolder{$assetId} = $child;
         push @children, {
             id             => $assetId,
-            isUncommitted  => $child->get('status') eq 'pending',
+            isUncommitted  => $child->status eq 'pending',
             content        => $splitter . $assetId . '~~',
         };
         if ($vars{showAdmin}) {
@@ -247,7 +230,7 @@ sub prepareView {
         };
     }
 
-    my @positions = split /\./, $self->get("contentPositions");
+    my @positions = split /\./, $self->contentPositions;
     # cut positions off at the number we found in the template
     $#positions = $numPositions - 1
         if $numPositions < scalar @positions;
@@ -270,7 +253,7 @@ sub prepareView {
     }
     # deal with unplaced children
     # Add children to the top or bottom of the first content position based on assetOrder setting
-    if($self->getValue("assetOrder") eq "asc") {
+    if($self->assetOrder eq "asc") {
         push @{ $vars{"position1_loop"} }, @children;
     }
     else {

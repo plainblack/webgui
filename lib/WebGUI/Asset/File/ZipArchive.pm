@@ -15,7 +15,29 @@ package WebGUI::Asset::File::ZipArchive;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::File';
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::File';
+aspect assetName => ['assetName', 'Asset_ZipArchive'];
+aspect tableName => 'ZipArchiveAsset';
+aspect icon      => 'ziparchive.gif';
+property showPage => (
+            tab          => "properties",
+            label        => ['show page', 'Asset_ZipArchive'],
+            hoverHelp    => ['show page description', 'Asset_ZipArchive'],
+            fieldType    => 'text',
+            default      => 'index.html',
+         );
+property templateId => (
+            tab          => "display",
+            label        => ['template label', 'Asset_ZipArchive'],
+            hoverHelp    => ['template description', 'Asset_ZipArchive'],
+            namespace    => "ZipArchiveAsset",
+            fieldType    => 'template',
+            default      => '',
+         );
+
+
 use WebGUI::HTMLForm;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -96,65 +118,6 @@ sub unzip {
 
 #-------------------------------------------------------------------
 
-=head2 addRevision ( )
-
-This method exists for demonstration purposes only.  The superclass
-handles revisions to ZipArchive Assets.
-
-=cut
-
-sub addRevision {
-	my $self = shift;
-	my $newSelf = $self->SUPER::addRevision(@_);
-	return $newSelf;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_ZipArchive");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		tableName=>'ZipArchiveAsset',
-		autoGenerateForms=>1,
-		icon=>'ziparchive.gif',
-		className=>'WebGUI::Asset::File::ZipArchive',
-		properties=>{
-			showPage=>{
-				tab=>"properties",
-				label=>$i18n->get('show page'),
-				hoverHelp=>$i18n->get('show page description'),
-				fieldType=>'text',
-				defaultValue=>'index.html'
-			},
-			templateId=>{
-				tab=>"display",
-				label=>$i18n->get('template label'),
-				namespace=>"ZipArchiveAsset",
-				fieldType=>'template',
-				defaultValue=>''
-			},
-		}
-	});
-	return $class->SUPER::definition($session,$definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -164,7 +127,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
@@ -185,7 +148,7 @@ sub processPropertiesFromFormPost {
 	$self->SUPER::processPropertiesFromFormPost;
 	my $storage = $self->getStorageLocation();
 	
-	my $file = $self->get("filename");
+	my $file = $self->filename;
 	
 	#return undef unless $file;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_ZipArchive');
@@ -203,7 +166,7 @@ sub processPropertiesFromFormPost {
 		return undef;
 	}
 	
-	unless ($self->unzip($storage,$self->get("filename"))) {
+	unless ($self->unzip($storage,$self->filename)) {
 		$self->session->errorHandler->warn($i18n->get("unzip_error"));
 	}
 }
@@ -221,7 +184,7 @@ used to show the file to administrators.
 sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
 		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
@@ -233,19 +196,19 @@ sub view {
 	}
 	$self->session->scratch->delete("za_error");
 	my $storage = $self->getStorageLocation;
-	if($self->get("filename") ne "") {
-	   $var{fileUrl} = $storage->getUrl($self->get("showPage"));
-	   $var{fileIcon} = $storage->getFileIconUrl($self->get("showPage"));
+	if($self->filename ne "") {
+	   $var{fileUrl} = $storage->getUrl($self->showPage);
+	   $var{fileIcon} = $storage->getFileIconUrl($self->showPage);
 	}
-	unless($self->get("showPage")) {
+	unless($self->showPage) {
 	   $var{pageError} = "true";
 	}
 	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
 	$var{noInitialPage} = $i18n->get('noInitialPage');
 	$var{noFileSpecified} = $i18n->get('noFileSpecified');
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
 	}
        	return $out;
 }
@@ -283,7 +246,7 @@ sub www_view {
 	if ($self->session->var->isAdminOn) {
 		return $self->session->asset($self->getContainer)->www_view;
 	}
-	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
+	$self->session->http->setRedirect($self->getFileUrl($self->showPage));
 	return "1";
 }
 

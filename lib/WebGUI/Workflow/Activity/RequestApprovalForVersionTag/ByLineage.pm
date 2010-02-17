@@ -83,7 +83,7 @@ sub execute {
     my $self        = shift;
     my $tag         = shift;
     my $instance    = shift;
-    my $ancestor    = WebGUI::Asset->newByDynamicClass( $self->session, $self->get( 'assetId' ) );
+    my $ancestor    = WebGUI::Asset->newById( $self->session, $self->get( 'assetId' ) );
     my $lineage     = $ancestor->get( 'lineage' );
     # Descendant has at least the ancestors lineage plus 6 more character
     my $isDescendant    = qr{^$lineage.{6}};

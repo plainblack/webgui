@@ -17,8 +17,218 @@ use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::Utility;
+use WebGUI::Definition::Asset;
+use feature ":5.10";
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_Matrix'];
+aspect icon      => 'matrix.gif';
+aspect tableName => 'Matrix';
+property templateId => (
+            fieldType       => "template",  
+            default         => 'matrixtmpl000000000001',
+            tab             => "display",
+            noFormPost      => 0,  
+            namespace       => "Matrix", 
+            hoverHelp       => ['template description', 'Asset_Matrix'],
+            label           => ['template label', 'Asset_Matrix'],
+         );
+property searchTemplateId => (
+            default         => "matrixtmpl000000000005",
+            fieldType       => "template",
+            tab             => "display",
+            namespace       => "Matrix/Search",
+            hoverHelp       => ['search template description', 'Asset_Matrix'],
+            label           => ['search template label', 'Asset_Matrix'],
+         );
+property detailTemplateId => (
+            default         => "matrixtmpl000000000003",
+            fieldType       => "template",
+            tab             => "display",
+            namespace       => "Matrix/Detail",
+            hoverHelp       => ['detail template description', 'Asset_Matrix'],
+            label           => ['detail template label', 'Asset_Matrix'],
+         );
+property compareTemplateId => (
+            default         => "matrixtmpl000000000002",
+            fieldType       => "template",
+            tab             => "display",
+            namespace       => "Matrix/Compare",
+            hoverHelp       => ['compare template description', 'Asset_Matrix'],
+            label           => ['compare template label', 'Asset_Matrix'],
+         );
+property editListingTemplateId => (
+            default         => "matrixtmpl000000000004",
+            fieldType       => "template",
+            tab             => "display",
+            namespace       => "Matrix/EditListing",
+            hoverHelp       => ['edit listing template description', 'Asset_Matrix'],
+            label           => ['edit listing template label', 'Asset_Matrix'],
+         );
+property screenshotsTemplateId => (
+            default         => "matrixtmpl000000000006",
+            fieldType       => "template",
+            tab             => "display",
+            namespace       => "Matrix/Screenshots",
+            hoverHelp       => ['screenshots template description', 'Asset_Matrix'],
+            label           => ['screenshots template label', 'Asset_Matrix'],
+         );
+property screenshotsConfigTemplateId => (
+            default         => "matrixtmpl000000000007",
+            fieldType       => "template",
+            tab             => "display",
+            namespace       => "Matrix/ScreenshotsConfig",
+            hoverHelp       => ['screenshots config template description', 'Asset_Matrix'],
+            label           => ['screenshots config template label', 'Asset_Matrix'],
+         );
+property defaultSort => (
+            fieldType       => "selectBox",
+            tab             => "display",
+            options         => \&_defaultSort_options,
+            default         => "title",
+            hoverHelp       => ['default sort description', 'Asset_Matrix'],
+            label           => ['default sort label', 'Asset_Matrix'],
+         );
+sub _defaultSort_options {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Matrix');
+    my $options = {
+        score           => $i18n->get('sort by score label'),
+        title           => $i18n->get('sort alpha numeric label'),
+        lineage         => $i18n->get('sort by asset rank label'),
+        lastUpdated     => $i18n->get('sort by last updated label'),
+    };
+    return $options;
+}
+property compareColorNo => (
+            fieldType       => "color",
+            tab             => "display",
+            default         => "#ffaaaa",
+            hoverHelp       => ['compare color no description', 'Asset_Matrix'],
+            label           => ['compare color no label', 'Asset_Matrix'],
+         );
+property compareColorLimited => (
+            fieldType       => "color",
+            tab             => "display",
+            default         => "#ffffaa",
+            hoverHelp       => ['compare color limited description', 'Asset_Matrix'],
+            label           => ['compare color limited label', 'Asset_Matrix'],
+         );
+property compareColorCostsExtra => (
+            fieldType       => "color",
+            tab             => "display",
+            default         => "#ffffaa",
+            hoverHelp       => ['compare color costs extra description', 'Asset_Matrix'],
+            label           => ['compare color costs extra label', 'Asset_Matrix'],
+         );
+property compareColorFreeAddOn => (
+            fieldType       => "color",
+            tab             => "display",
+            default         => "#ffffaa",
+            hoverHelp       => ['compare color free add on description', 'Asset_Matrix'],
+            label           => ['compare color free add on label', 'Asset_Matrix'],
+         );
+property compareColorYes => (
+            fieldType       => "color",
+            tab             => "display",
+            default         => "#aaffaa",
+            hoverHelp       => ['compare color yes description', 'Asset_Matrix'],
+            label           => ['compare color yes label', 'Asset_Matrix'],
+         );
+property maxScreenshotWidth => (
+            fieldType       => "integer",
+            tab             => "display",
+            default         => "800",
+            hoverHelp       => ['max screenshot width description', 'Asset_Matrix'],
+            label           => ['max screenshot width label', 'Asset_Matrix'],
+         );
+property maxScreenshotHeight => (
+            fieldType       => "integer",
+            tab             => "display",
+            default         => "600",
+            hoverHelp       => ['max screenshot height description', 'Asset_Matrix'],
+            label           => ['max screenshot height label', 'Asset_Matrix'],
+         );
+property categories => (
+            fieldType       => "textarea",
+            tab             => "properties",
+            builder         => '_categories_builder',
+            lazy            => 1,
+            hoverHelp       => ['categories description', 'Asset_Matrix'],
+            label           => ['categories label', 'Asset_Matrix'],
+            subtext         => ['categories subtext', 'Asset_Matrix'],
+         );
+sub _categories_builder {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Matrix');
+    return $i18n->get('categories default value');
+}
+property maxComparisons => (
+            fieldType       => "integer",
+            tab             => "properties",
+            default         => 25,
+            hoverHelp       => ['max comparisons description', 'Asset_Matrix'],       
+            label           => ['max comparisons label', 'Asset_Matrix'],
+         );
+property maxComparisonsPrivileged => (
+            fieldType       => "integer",
+            tab             => "properties",
+            default         => 10,
+            hoverHelp       => ['max comparisons privileged description', 'Asset_Matrix'],
+            label           => ['max comparisons privileged label', 'Asset_Matrix'],
+         );
+property maxComparisonsGroup => (
+            fieldType       => "group",
+            tab             => "properties",
+            hoverHelp       => ['maxgroup description', 'Asset_Matrix'],
+            label           => ['maxgroup label', 'Asset_Matrix'],
+         );
+property maxComparisonsGroupInt => (
+            fieldType       => "integer",
+            tab             => "properties",
+            default         => 25,
+            hoverHelp       => ['maxgroup per description', 'Asset_Matrix'],
+            label           => ['maxgroup per label', 'Asset_Matrix'],
+         );
+property groupToAdd => (
+            fieldType       => "group",
+            tab             => "security",
+            default         => 2,
+            hoverHelp       => ['group to add description', 'Asset_Matrix'],
+            label           => ['group to add label', 'Asset_Matrix'],
+         );
+property submissionApprovalWorkflowId => (
+            fieldType       => "workflow",
+            tab             => "security",
+            type            => 'WebGUI::VersionTag',
+            default         => "pbworkflow000000000003",
+            hoverHelp       => ['submission approval workflow description', 'Asset_Matrix'],
+            label           => ['submission approval workflow label', 'Asset_Matrix'],
+         );
+property ratingsDuration => (
+            fieldType       => "interval",
+            tab             => "properties",
+            default         => 7776000, # 3 months 3*30*24*60*60
+            hoverHelp       => ['ratings duration description', 'Asset_Matrix'],
+            label           => ['ratings duration label', 'Asset_Matrix'],
+         );
+property statisticsCacheTimeout => (
+            tab             => "display",
+            fieldType       => "interval",
+            default         => 3600,
+            uiLevel         => 8,
+            label           => ["statistics cache timeout label", 'Asset_Matrix'],
+            hoverHelp       => ["statistics cache timeout description", 'Asset_Matrix'],
+         );
+property listingsCacheTimeout => (
+            tab             => "display",
+            fieldType       => "interval",
+            default         => 3600,
+            uiLevel         => 8,
+            label           => ["listings cache timeout label", 'Asset_Matrix'],
+            hoverHelp       => ["listings cache timeout description", 'Asset_Matrix'],
+         );
+
 use WebGUI::Asset::MatrixListing;
-use base 'WebGUI::Asset::Wobject';
 
 #----------------------------------------------------------------------------
 
@@ -33,7 +243,7 @@ sub canAddMatrixListing {
     my $user    = $self->session->user;
 
     # Users in the groupToAdd group can add listings
-    if ( $user->isInGroup( $self->get("groupToAdd") ) ) {
+    if ( $user->isInGroup( $self->groupToAdd ) ) {
         return 1;
     }
     # Users who can edit matrix can add listings
@@ -64,233 +274,12 @@ sub canEdit {
         return $self->canAddMatrixListing();
     }
     else {
-        if ($userId eq $self->get("ownerUserId")) {
+        if ($userId eq $self->ownerUserId) {
             return 1;
         }
         my $user = WebGUI::User->new($self->session, $userId);
-        return $user->isInGroup($self->get("groupIdEdit"));
+        return $user->isInGroup($self->groupIdEdit);
     }
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-defines wobject properties for Matrix instances. 
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_Matrix');
-
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-	    templateId =>{
-		    fieldType       =>"template",  
-    		defaultValue    =>'matrixtmpl000000000001',
-	    	tab             =>"display",
-		    noFormPost      =>0,  
-    		namespace       =>"Matrix", 
-	    	hoverHelp       =>$i18n->get('template description'),
-		    label           =>$i18n->get('template label'),
-    	},
-        searchTemplateId=>{
-            defaultValue    =>"matrixtmpl000000000005",
-            fieldType       =>"template",
-            tab             =>"display",
-            namespace       =>"Matrix/Search",
-            hoverHelp       =>$i18n->get('search template description'),
-            label           =>$i18n->get('search template label'),
-        },
-        detailTemplateId=>{
-            defaultValue    =>"matrixtmpl000000000003",
-            fieldType       =>"template",
-            tab             =>"display",
-            namespace       =>"Matrix/Detail",
-            hoverHelp       =>$i18n->get('detail template description'),
-            label           =>$i18n->get('detail template label'),
-        },
-        compareTemplateId=>{
-            defaultValue    =>"matrixtmpl000000000002",
-            fieldType       =>"template",
-            tab             =>"display",
-            namespace       =>"Matrix/Compare",
-            hoverHelp       =>$i18n->get('compare template description'),
-            label           =>$i18n->get('compare template label'),
-        },
-        editListingTemplateId=>{
-            defaultValue    =>"matrixtmpl000000000004",
-            fieldType       =>"template",
-            tab             =>"display",
-            namespace       =>"Matrix/EditListing",
-            hoverHelp       =>$i18n->get('edit listing template description'),
-            label           =>$i18n->get('edit listing template label'),
-        },
-        screenshotsTemplateId=>{
-            defaultValue    =>"matrixtmpl000000000006",
-            fieldType       =>"template",
-            tab             =>"display",
-            namespace       =>"Matrix/Screenshots",
-            hoverHelp       =>$i18n->get('screenshots template description'),
-            label           =>$i18n->get('screenshots template label'),
-        },
-        screenshotsConfigTemplateId=>{
-            defaultValue    =>"matrixtmpl000000000007",
-            fieldType       =>"template",
-            tab             =>"display",
-            namespace       =>"Matrix/ScreenshotsConfig",
-            hoverHelp       =>$i18n->get('screenshots config template description'),
-            label           =>$i18n->get('screenshots config template label'),
-        },
-        defaultSort=>{
-            fieldType       =>"selectBox",
-            tab             =>"display",
-            options         =>{ 
-                                score           => $i18n->get('sort by score label'),
-                                title           => $i18n->get('sort alpha numeric label'),
-                                lineage         => $i18n->get('sort by asset rank label'),
-                                lastUpdated     => $i18n->get('sort by last updated label'),
-                              },
-            defaultValue    =>"title",
-            hoverHelp       =>$i18n->get('default sort description'),
-            label           =>$i18n->get('default sort label'),
-        },
-        compareColorNo=>{
-            fieldType       =>"color",
-            tab             =>"display",
-            defaultValue    =>"#ffaaaa",
-            hoverHelp       =>$i18n->get('compare color no description'),
-            label           =>$i18n->get('compare color no label'),
-        },
-        compareColorLimited=>{
-            fieldType       =>"color",
-            tab             =>"display",
-            defaultValue    =>"#ffffaa",
-            hoverHelp       =>$i18n->get('compare color limited description'),
-            label           =>$i18n->get('compare color limited label'),
-        },
-        compareColorCostsExtra=>{
-            fieldType       =>"color",
-            tab             =>"display",
-            defaultValue    =>"#ffffaa",
-            hoverHelp       =>$i18n->get('compare color costs extra description'),
-            label           =>$i18n->get('compare color costs extra label'),
-        },
-        compareColorFreeAddOn=>{
-            fieldType       =>"color",
-            tab             =>"display",
-            defaultValue    =>"#ffffaa",
-            hoverHelp       =>$i18n->get('compare color free add on description'),
-            label           =>$i18n->get('compare color free add on label'),
-        },
-        compareColorYes=>{
-            fieldType       =>"color",
-            tab             =>"display",
-            defaultValue    =>"#aaffaa",
-            hoverHelp       =>$i18n->get('compare color yes description'),
-            label           =>$i18n->get('compare color yes label'),
-        },
-        maxScreenshotWidth=>{
-            fieldType       =>"integer",
-            tab             =>"display",
-            defaultValue    =>"800",
-            hoverHelp       =>$i18n->get('max screenshot width description'),
-            label           =>$i18n->get('max screenshot width label'),
-        },
-        maxScreenshotHeight=>{
-            fieldType       =>"integer",
-            tab             =>"display",
-            defaultValue    =>"600",
-            hoverHelp       =>$i18n->get('max screenshot height description'),
-            label           =>$i18n->get('max screenshot height label'),
-        },
-        categories=>{
-            fieldType       =>"textarea",
-            tab             =>"properties",
-            defaultValue    =>$i18n->get('categories default value'),
-            hoverHelp       =>$i18n->get('categories description'),
-            label           =>$i18n->get('categories label'),
-            subtext         =>$i18n->get('categories subtext'),
-        },
-        maxComparisons=>{
-            fieldType       =>"integer",
-            tab             =>"properties",
-            defaultValue    =>25,
-            hoverHelp       =>$i18n->get('max comparisons description'),       
-            label           =>$i18n->get('max comparisons label'),
-        },
-        maxComparisonsPrivileged=>{
-            fieldType       =>"integer",
-            tab             =>"properties",
-            defaultValue    =>10,
-            hoverHelp       =>$i18n->get('max comparisons privileged description'),
-            label           =>$i18n->get('max comparisons privileged label'),
-        },
-        maxComparisonsGroup=>{
-            fieldType       =>"group",
-            tab             =>"properties",
-            hoverHelp       =>$i18n->get('maxgroup description'),
-            label           =>$i18n->get('maxgroup label'),
-        },
-        maxComparisonsGroupInt=>{
-            fieldType       =>"integer",
-            tab             =>"properties",
-            defaultValue    =>25,
-            hoverHelp       =>$i18n->get('maxgroup per description'),
-            label           =>$i18n->get('maxgroup per label'),
-        },
-        groupToAdd=>{
-            fieldType       =>"group",
-            tab             =>"security",
-            defaultValue    =>2,
-            hoverHelp       =>$i18n->get('group to add description'),
-            label           =>$i18n->get('group to add label'),
-        },
-        submissionApprovalWorkflowId=>{
-            fieldType       =>"workflow",
-            tab             =>"security",
-            type            =>'WebGUI::VersionTag',
-            defaultValue    =>"pbworkflow000000000003",
-            hoverHelp       =>$i18n->get('submission approval workflow description'),
-            label           =>$i18n->get('submission approval workflow label'),
-        },
-        ratingsDuration=>{
-            fieldType       =>"interval",
-            tab             =>"properties",
-            defaultValue    =>7776000, # 3 months 3*30*24*60*60
-            hoverHelp       =>$i18n->get('ratings duration description'),
-            label           =>$i18n->get('ratings duration label'),
-        },
-        statisticsCacheTimeout => {
-            tab             => "display",
-            fieldType       => "interval",
-            defaultValue    => 3600,
-            uiLevel         => 8,
-            label           => $i18n->get("statistics cache timeout label"),
-            hoverHelp       => $i18n->get("statistics cache timeout description")
-        },
-        listingsCacheTimeout => {
-            tab             => "display",
-            fieldType       => "interval",
-            defaultValue    => 3600,
-            uiLevel         => 8,
-            label           => $i18n->get("listings cache timeout label"),
-            hoverHelp       => $i18n->get("listings cache timeout description")
-        },
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'matrix.gif',
-		autoGenerateForms=>1,
-		tableName=>'Matrix',
-		className=>'WebGUI::Asset::Wobject::Matrix',
-		properties=>\%properties
-		});
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -395,7 +384,7 @@ sub getCategories {
     my %categories;
     tie %categories, 'Tie::IxHash';
 
-    my $categories  = $self->getValue("categories");
+    my $categories  = $self->categories;
     $categories     =~ s/\r//g;
     chomp($categories);
 
@@ -424,22 +413,23 @@ sub getCompareColor {
     my $self    = shift;
     my $value   = shift;
 
-    if($value == 0){
-        return $self->get('compareColorNo');
+    given($value) {
+        when(0) {
+            return $self->compareColorNo;
+        }
+        when(1){
+            return $self->compareColorLimited;
+        }
+        when(2){
+            return $self->compareColorCostsExtra;
+        }
+        when(3){
+            return $self->compareColorFreeAddOn;
+        }
+        when(4){
+            return $self->compareColorYes;
+        }
     }
-    elsif($value == 1){
-        return $self->get('compareColorLimited');
-    }
-    elsif($value == 2){
-        return $self->get('compareColorCostsExtra');
-    }
-    elsif($value == 3){
-        return $self->get('compareColorFreeAddOn');
-    }
-    elsif($value == 4){
-        return $self->get('compareColorYes');
-    }
-
 }
 
 #-------------------------------------------------------------------
@@ -465,13 +455,13 @@ sub getCompareForm {
 
     my $maxComparisons;
     if($self->session->user->isVisitor){
-        $maxComparisons = $self->get('maxComparisons');
+        $maxComparisons = $self->maxComparisons;
     }
-    elsif($self->session->user->isInGroup( $self->get("maxComparisonsGroup") )) { 
-        $maxComparisons = $self->get('maxComparisonsGroupInt');
+    elsif($self->session->user->isInGroup( $self->maxComparisonsGroup )) { 
+        $maxComparisons = $self->maxComparisonsGroupInt;
     }
     else{
-        $maxComparisons = $self->get('maxComparisonsPrivileged');
+        $maxComparisons = $self->maxComparisonsPrivileged;
     }
     $maxComparisons += 0;
     $form .=  "\n<script type='text/javascript'>\n".
@@ -497,14 +487,14 @@ sub getListings {
 
     my $self        = shift;
     my $session     = $self->session;
-    my $sort        = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
+    my $sort        = shift || $session->scratch->get('matrixSort') || $self->defaultSort;
     my $versionTag  = WebGUI::VersionTag->getWorking($session, 1);
     my ($listings, $listingsEncoded);
 
     my $noCache =
         $session->var->isAdminOn
-        || $self->get("listingsCacheTimeout") <= 10
-        || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+        || $self->listingsCacheTimeout <= 10
+        || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cache = $session->cache;
     unless ($noCache) {
         $listingsEncoded = eval{$cache->get("matrixListings_".$self->getId)};
@@ -547,7 +537,7 @@ assetData.revisionDate
         }
 
         $listingsEncoded = JSON->new->encode($listings);
-        eval{$cache->set("matrixListings_".$self->getId, $listingsEncoded, $self->get("listingsCacheTimeout"))};
+        eval{$cache->set("matrixListings_".$self->getId, $listingsEncoded, $self->listingsCacheTimeout)};
     }
     return $listings;
 }
@@ -578,11 +568,11 @@ sub prepareView {
     my $self = shift;
 
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -653,13 +643,13 @@ sub view {
 
     my $maxComparisons;
     if($session->user->isVisitor){
-        $maxComparisons = $self->get('maxComparisons');
+        $maxComparisons = $self->maxComparisons;
     }
-    elsif($session->user->isInGroup( $self->get("maxComparisonsGroup") )) {
-        $maxComparisons = $self->get('maxComparisonsGroupInt');
+    elsif($session->user->isInGroup( $self->maxComparisonsGroup )) {
+        $maxComparisons = $self->maxComparisonsGroupInt;
     }
     else{
-        $maxComparisons = $self->get('maxComparisonsPrivileged');
+        $maxComparisons = $self->maxComparisonsPrivileged;
     }
     $maxComparisons += 0;
     $var->{maxComparisons} = $maxComparisons;
@@ -675,8 +665,8 @@ sub view {
         foreach my $pendingListing (@pendingListings){
             push (@{ $var->{pending_loop} }, {
                             url     => $pendingListing->getUrl
-                                       ."?func=view;revision=".$pendingListing->get('revisionDate'),
-                            name    => $pendingListing->get('title'),
+                                       ."?func=view;revision=".$pendingListing->revisionDate,
+                            name    => $pendingListing->title,
                         });
         }
     } 
@@ -684,8 +674,8 @@ sub view {
     my $versionTag = WebGUI::VersionTag->getWorking($session, 1); 
     my $noCache =
         $session->var->isAdminOn
-        || $self->get("statisticsCacheTimeout") <= 10
-        || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+        || $self->statisticsCacheTimeout <= 10
+        || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cache = $session->cache;
     unless ($noCache) {
         $varStatisticsEncoded = eval{$cache->get("matrixStatistics_".$self->getId)};
@@ -709,8 +699,8 @@ sub view {
         }) };
         if($bestViews_listing){
             $varStatistics->{bestViews_url}           = $bestViews_listing->getUrl;
-            $varStatistics->{bestViews_count}         = $bestViews_listing->get('views');
-            $varStatistics->{bestViews_name}          = $bestViews_listing->get('title');
+            $varStatistics->{bestViews_count}         = $bestViews_listing->views;
+            $varStatistics->{bestViews_name}          = $bestViews_listing->title;
             $varStatistics->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>"
                                                       . $i18n->get('Sort by views')
                                                       . "</button></span><br />";
@@ -727,8 +717,8 @@ sub view {
         }) };   
         if($bestCompares_listing){
             $varStatistics->{bestCompares_url}        = $bestCompares_listing->getUrl;
-            $varStatistics->{bestCompares_count}      = $bestCompares_listing->get('compares');
-            $varStatistics->{bestCompares_name}       = $bestCompares_listing->get('title');
+            $varStatistics->{bestCompares_count}      = $bestCompares_listing->compares;
+            $varStatistics->{bestCompares_name}       = $bestCompares_listing->title;
             $varStatistics->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>"
                                                       . $i18n->get('Sort by compares')
                                                       . "</button></span><br />";
@@ -744,8 +734,8 @@ sub view {
         }) };   
         if($bestClicks_listing){
             $varStatistics->{bestClicks_url}          = $bestClicks_listing->getUrl;
-            $varStatistics->{bestClicks_count}        = $bestClicks_listing->get('clicks');
-            $varStatistics->{bestClicks_name}         = $bestClicks_listing->get('title');
+            $varStatistics->{bestClicks_count}        = $bestClicks_listing->clicks;
+            $varStatistics->{bestClicks_name}         = $bestClicks_listing->title;
             $varStatistics->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>"
                                                       . $i18n->get('Sort by clicks')
                                                       . "</button></span><br />";
@@ -763,8 +753,8 @@ sub view {
         foreach my $lastUpdatedListing (@lastUpdatedListings){
             push (@{ $varStatistics->{last_updated_loop} }, {
                         url         => $lastUpdatedListing->getUrl,
-                        name        => $lastUpdatedListing->get('title'),
-                        lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
+                        name        => $lastUpdatedListing->title,
+                        lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->lastUpdated,"%z")
                     });
         }
         $varStatistics->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>"
@@ -837,7 +827,7 @@ sub view {
         [$self->getId]);
 
         $varStatisticsEncoded = JSON->new->encode($varStatistics);
-        eval{$cache->set("matrixStatistics_".$self->getId, $varStatisticsEncoded, $self->get("statisticsCacheTimeout"))};
+        eval{$cache->set("matrixStatistics_".$self->getId, $varStatisticsEncoded, $self->statisticsCacheTimeout)};
     }
 
     foreach my $statistic (keys %{$varStatistics}) {
@@ -894,13 +884,13 @@ sub www_compare {
 
     my $maxComparisons;
     if($self->session->user->isVisitor){
-        $maxComparisons = $self->get('maxComparisons');
+        $maxComparisons = $self->maxComparisons;
     }
-    elsif($self->session->user->isInGroup( $self->get("maxComparisonsGroup") )) { 
-        $maxComparisons = $self->get('maxComparisonsGroupInt');
+    elsif($self->session->user->isInGroup( $self->maxComparisonsGroup )) { 
+        $maxComparisons = $self->maxComparisonsGroupInt;
     }
     else{
-        $maxComparisons = $self->get('maxComparisonsPrivileged');
+        $maxComparisons = $self->maxComparisonsPrivileged;
     }
     $maxComparisons += 0;
 
@@ -916,7 +906,7 @@ sub www_compare {
     $var->{responseFields}  = '"attributeId", "name", "description","fieldType", "checked", '
                               .join(", ",map{'"'.$_.'"'} @responseFields);
 
-    return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));
+    return $self->processStyle($self->processTemplate($var,$self->compareTemplateId));
 }
 
 #-------------------------------------------------------------------
@@ -1142,7 +1132,7 @@ sub www_getCompareFormData {
     my $self            = shift;
     my $session         = $self->session;
     my $form            = $session->form;
-    my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
+    my $sort            = shift || $session->scratch->get('matrixSort') || $self->defaultSort;
     my $sortDirection   = ' desc';
     if ($sort eq 'title'){
         $sortDirection = ' asc';
@@ -1278,10 +1268,10 @@ sub www_getCompareListData {
         $listingId_safe =~ s/-/_____/g;
         push(@columnDefs,{
             key         =>$listingId_safe,
-            label       =>$listing->get('title').' '.$listing->get('version'),
+            label       =>$listing->title.' '.$listing->version,
             formatter   =>"formatColors",
             url         =>$listing->getUrl,
-            lastUpdated =>$session->datetime->epochToHuman( $listing->get('lastUpdated'),"%z" ),
+            lastUpdated =>$session->datetime->epochToHuman( $listing->lastUpdated,"%z" ),
         });
         push(@responseFields, $listingId_safe, $listingId_safe."_compareColor");
     }
@@ -1447,7 +1437,7 @@ sub www_search {
         });
     }
 
-    return $self->processStyle($self->processTemplate($var,$self->get("searchTemplateId")));
+    return $self->processStyle($self->processTemplate($var,$self->searchTemplateId));
 }
 
 #-------------------------------------------------------------------

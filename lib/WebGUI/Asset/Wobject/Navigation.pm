@@ -12,82 +12,78 @@ package WebGUI::Asset::Wobject::Navigation;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::Asset::Wobject;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ["assetName", 'Asset_Navigation'];
+aspect icon      => 'navigation.gif';
+aspect tableName => 'Navigation';
 
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Navigation");
-	push(@{$definition}, {
-		assetName=>$i18n->get("assetName"),
-		icon=>'navigation.gif',
-		tableName=>'Navigation',
-		className=>'WebGUI::Asset::Wobject::Navigation',
-		properties=>{
-            templateId => {
-                label        => $i18n->get(1096),
+property    templateId => (
+                label        => ['1096', 'Asset_Navigation'],
+                hoverHelp    => ['1096 description', 'Asset_Navigation'],
                 fieldType    => "template",
-                defaultValue => 'PBtmpl0000000000000048'
-            },
-            mimeType => {
-                label        => $i18n->get('mimeType'),
+                default      => 'PBtmpl0000000000000048',
+            );
+property    mimeType => (
+                label        => ['mimeType', 'Asset_Navigation'],
+                hoverHelp    => ['mimeType description', 'Asset_Navigation'],
                 fieldType    => "mimeType",
-                defaultValue => 'text/html'
-            },
-            assetsToInclude => {
-                fieldType    =>'checkList',
-                defaultValue =>"descendants"
-            },
-			startType => {
-				fieldType=>'selectBox',
-				defaultValue=>"relativeToCurrentUrl"
-				},
-			startPoint=>{
-				fieldType=>'text',
-				defaultValue=>0
-				},
-			ancestorEndPoint=>{
-				fieldType=>'selectBox',
-				defaultValue=>55
-				},
-			descendantEndPoint=>{
-				fieldType=>'selectBox',
-				defaultValue=>55
-				},
-			showSystemPages => {
-                label        => $i18n->get(30),
-				fieldType    => 'yesNo',
-				defaultValue => 0,
-            },
-			showHiddenPages => {
-                label        => $i18n->get(31),
-				fieldType    => 'yesNo',
-				defaultValue => 0,
-            },
-			showUnprivilegedPages => {
-                label        => $i18n->get(32),
-				fieldType    => 'yesNo',
-				defaultValue => 0,
-            },
-			reversePageLoop => {
-                label        => $i18n->get('reverse page loop'),
-				fieldType    => 'yesNo',
-				defaultValue => 0,
-            },
-			}
-		});
-        return $class->SUPER::definition($session, $definition);
-}
+                default      => 'text/html',
+            );
+property    assetsToInclude => (
+                fieldType    => 'checkList',
+                default      => "descendants",
+                label        => ["Relatives To Include", 'Asset_Navigation'],
+                hoverHelp    => ["Relatives To Include description", 'Asset_Navigation'],
+            );
+property    startType => (
+                fieldType    => 'selectBox',
+                default      => "relativeToCurrentUrl",
+                label        => ["Start Point Type", 'Asset_Navigation'],
+                hoverHelp    => ["Start Point Type description", 'Asset_Navigation'],
+            );
+property    startPoint => (
+                fieldType   => 'text',
+                default     => 0,
+                label       => ["Start Point", 'Asset_Navigation'],
+                hoverHelp   => ["Start Point description", 'Asset_Navigation'],
+            );
+property    ancestorEndPoint => (
+                noFormPost  => 1,
+                fieldType   => 'selectBox',
+                default     => 55,
+            );
+property    descendantEndPoint => (
+                noFormPost  => 1,
+                fieldType   => 'selectBox',
+                default     => 55,
+            );
+property    showSystemPages => (
+                label        => [30, 'Asset_Navigation'],
+                fieldType    => 'yesNo',
+                default      => 0,
+            );
+property    showHiddenPages => (
+                label        => [31, 'Asset_Navigation'],
+                fieldType    => 'yesNo',
+                default      => 0,
+            );
+property    showUnprivilegedPages => (
+                label        => [32, 'Asset_Navigation'],
+                fieldType    => 'yesNo',
+                default      => 0,
+            );
+property    reversePageLoop => (
+                label        => ['reverse page loop', 'Asset_Navigation'],
+                fieldType    => 'yesNo',
+                default      => 0,
+            );
 
 #-------------------------------------------------------------------
 
@@ -102,13 +98,13 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Navigation");
    	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
+      		-value=>$self->templateId,
       		-namespace=>"Navigation",
 		-label=>$i18n->get(1096),
 		-hoverHelp=>$i18n->get('1096 description'),
    		);
    	$tabform->getTab("display")->mimeType(
-      		-value=>$self->getValue('mimeType'),
+      		-value=>$self->mimeType,
       		-name=>"mimeType",
 		-label=>$i18n->get('mimeType'),
 		-hoverHelp=>$i18n->get('mimeType description'),
@@ -118,7 +114,7 @@ sub getEditForm {
 		value=>$self->session->form->process("returnUrl")
 		});
 	my ($descendantsChecked, $ancestorsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
-	my @assetsToInclude = split("\n",$self->getValue("assetsToInclude"));
+	my @assetsToInclude = split("\n",$self->assetsToInclude);
 	my $afterScript;
 	foreach my $item (@assetsToInclude) {
 		if ($item eq "self") {
@@ -141,7 +137,7 @@ sub getEditForm {
 			relativeToCurrentUrl=>$i18n->get('Relative To Current URL'),
 			relativeToRoot=>$i18n->get('Relative To Root')
 			},
-		-value=>[$self->getValue("startType")],
+		-value=>[$self->startType],
 		-label=>$i18n->get("Start Point Type"),
 		-hoverHelp=>$i18n->get("Start Point Type description"),
 		-id=>"navStartType",
@@ -166,7 +162,7 @@ sub getEditForm {
 		'</tbody><tbody id="navAncestorEnd"><tr><td class="formDescription">'.$i18n->get("Ancestor End Point").'</td><td>'
 		.WebGUI::Form::selectBox($self->session,{
 			name=>"ancestorEndPoint",
-			value=>[$self->getValue("ancestorEndPoint")],
+			value=>[$self->ancestorEndPoint],
 			options=>\%options
 			})
 		.'</td></tr></tbody><tbody>'
@@ -216,7 +212,7 @@ sub getEditForm {
 		'</tbody><tbody id="navDescendantEnd"><tr><td class="formDescription">'.$i18n->get('Descendant End Point').'</td><td>'
 		.WebGUI::Form::selectBox($self->session,{
 			name=>"descendantEndPoint",
-			value=>[$self->getValue("descendantEndPoint")],
+			value=>[$self->descendantEndPoint],
 			options=>\%options
 			})
 		.'</td></tr></tbody><tbody>'
@@ -225,27 +221,27 @@ sub getEditForm {
 		-name=>'showSystemPages',
 		-label=>$i18n->get(30),
 		-hoverHelp=>$i18n->get('30 description'),
-		-value=>$self->getValue("showSystemPages")
+		-value=>$self->showSystemPages
 		);
         $tabform->getTab("display")->yesNo(
                 -name=>'showHiddenPages',
                 -label=>$i18n->get(31),
                 -hoverHelp=>$i18n->get('31 description'),
-                -value=>$self->getValue("showHiddenPages")
+                -value=>$self->showHiddenPages
         	);
         $tabform->getTab("display")->yesNo(
                 -name=>'showUnprivilegedPages',
                 -label=>$i18n->get(32),
                 -hoverHelp=>$i18n->get('32 description'),
-                -value=>$self->getValue("showUnprivilegedPages")
+                -value=>$self->showUnprivilegedPages
         	);
 	$tabform->getTab("display")->yesNo(
 		-name=>'reversePageLoop',
 		-label=>$i18n->get('reverse page loop'),
 		-hoverHelp => $i18n->get('reverse page loop description'),
-		-value=>$self->getValue('reversePageLoop'),
+		-value=>$self->reversePageLoop,
 		);
-	my $start = $self->getValue("startPoint");
+	my $start = $self->startPoint;
 	$tabform->getTab("properties")->raw("<script type=\"text/javascript\">
 		//<![CDATA[
 		var displayNavDescendantEndPoint = true;
@@ -563,7 +559,7 @@ other types aside from text/html.
 
 sub www_view {
 	my $self = shift;
-	my $mimeType = $self->getValue('mimeType') || 'text/html';
+	my $mimeType = $self->mimeType || 'text/html';
 	if ($mimeType eq 'text/html') {
 		return $self->SUPER::www_view();
 	}

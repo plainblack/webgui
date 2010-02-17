@@ -142,7 +142,7 @@ END_SQL
                     deleted => $self->get("deleteExpired"),
                     companyName => $self->session->setting->get("companyName"),
                 };
-            my $template = WebGUI::Asset->newByDynamicClass($self->session,$self->get('emailTemplateId')); 
+            my $template = WebGUI::Asset->newById($self->session,$self->get('emailTemplateId')); 
             my $message = $template->processTemplate($var, $self->get("emailTemplateId"));
             WebGUI::Macro::process($self->session,\$message);
             my $mail = WebGUI::Mail::Send->create($self->session,{

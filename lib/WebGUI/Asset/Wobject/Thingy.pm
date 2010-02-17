@@ -18,8 +18,31 @@ use WebGUI::Utility;
 use WebGUI::Text;
 use WebGUI::Form::File;
 use WebGUI::DateTime;
-use base 'WebGUI::Asset::Wobject';
-use Data::Dumper;
+use WebGUI::Definition::Asset;
+
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_Thingy'];
+aspect icon      => 'thingy.gif';
+aspect tableName => 'Thingy';
+property templateId => (
+            fieldType   => "template",  
+            default     => 'ThingyTmpl000000000001',
+            tab         => "display",
+            namespace   => "Thingy", 
+            hoverHelp   => ['thingy template description', 'Asset_Thingy'],
+            label       => ['thingy template label', 'Asset_Thingy'],
+        );
+property defaultThingId => (
+            default      => undef,
+            fieldType    => "selectBox",
+    		label        => ["default thing label", 'Asset_Thingy'],
+            options      => \&_defaultThingId_options,
+        );
+sub _defaultThingId_options {
+    my $self = shift;
+    my $things = $self->session->db->buildHashRef('select thingId, label from Thingy_things where assetId = ?',[$self->getId]);
+    return $things;
+}
 
 
 #-------------------------------------------------------------------
@@ -233,51 +256,6 @@ sub badOtherThing {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( )
-
-defines wobject properties for Thingy instances. If you choose to "autoGenerateForms", the
-getEditForm method is unnecessary/redundant/useless.  
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_Thingy');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	
-    %properties = (
-		templateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ThingyTmpl000000000001',
-			tab=>"display",
-			noFormPost=>0,  
-			namespace=>"Thingy", 
-			hoverHelp=>$i18n->get('thingy template description'),
-			label=>$i18n->get('thingy template label'),
-		},
-        defaultThingId => {
-            autoGenerate => 0,
-            default=>undef,
-            fieldType=>"selectBox",
-        },
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'thingy.gif',
-		autoGenerateForms=>1,
-		tableName=>'Thingy',
-		className=>'WebGUI::Asset::Wobject::Thingy',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 duplicate ( )
 
 Duplicates a Thingy, including the definitions of the Things in this Thingy and their fields.
@@ -289,7 +267,7 @@ sub duplicate {
     my $options = shift;
 	my $newAsset = $self->SUPER::duplicate($options);
     my $db = $self->session->db;
-    my $assetId = $self->get("assetId");
+    my $assetId = $self->getId;
     my $fields;
 
     my $otherThingFields = $db->buildHashRefOfHashRefs(
@@ -328,7 +306,7 @@ sub duplicate {
                     where fieldInOtherThingId = ? and assetId = ?',
                     [$otherThingFields->{$otherThingField}->{newFieldType},
                     $otherThingFields->{$otherThingField}->{newFieldId},
-                    $otherThingFields->{$otherThingField}->{fieldInOtherThingId}, $newAsset->get('assetId')]);
+                    $otherThingFields->{$otherThingField}->{fieldInOtherThingId}, $newAsset->getId]);
     }
     return $newAsset;
 }
@@ -560,7 +538,7 @@ sub editThingDataSave {
     );
     
     $fields = $session->db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber',
-        [$self->get("assetId"),$thingId]);
+        [$self->getId,$thingId]);
     while (my $field = $fields->hashRef) {
         my $fieldName = 'field_'.$field->{fieldId};
         my $fieldValue;
@@ -623,7 +601,7 @@ sub exportAssetData {
     my $self = shift;
     my $data = $self->SUPER::exportAssetData;
     my $db = $self->session->db;
-    my $assetId = $self->get("assetId");
+    my $assetId = $self->getId;
 
     $data->{things} = $db->buildArrayRefOfHashRefs('select * from Thingy_things where assetId = ?',[$assetId]);
     $data->{fields} = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId = ?',[$assetId]);
@@ -832,38 +810,6 @@ sub getEditFieldForm {
     #    $f->raw('<script type="text/javascript">initHoverHelp("'.$dialogPrefix.'");</script>');
     #}
     return $f;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-Returns the tabform object that will be used in generating the edit page for Thingy's.
-Adds the defaultThingId selectBox to the tabform object, because the options for this selectBox depends on already
-existing Things. The rest of the form is auto-generated.
-
-=cut
-
-sub getEditForm {
-
-    my $self = shift;
-    my $i18n = WebGUI::International->new($self->session, 'Asset_Thingy');
-
-    my $tabform = $self->SUPER::getEditForm();
-
-    my $things = $self->session->db->buildHashRef('select thingId, label from Thingy_things where assetId = ?',[$self->get("assetId")]);
-
-    if (scalar(keys(%{$things}))) {
-    	$tabform->getTab("display")->selectBox(
-	    	-name=>"defaultThingId",
-            -value=>$self->get("defaultThingId"),
-    		-label=>$i18n->get("default thing label"),
-            -options=>$things,
-    	);
-    }
-
-	
-	return $tabform;
 }
 
 #-------------------------------------------------------------------
@@ -1148,7 +1094,7 @@ sub getViewThingVars {
 
     if (%thingData) {
         my $fields = $db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber',
-            [$self->get('assetId'),$thingId]);
+            [$self->getId,$thingId]);
         while (my %field = $fields->hash) {
             next unless ($field{display} eq '1');
             my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
@@ -1282,7 +1228,7 @@ sub importAssetCollateralData {
     my $id = $data->{properties}{assetId};
     my $class = $data->{properties}{className};
     my $version = $data->{properties}{revisionDate};
-    my $assetExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
+    my $assetExists = WebGUI::Asset->new($self->session, $id, $class, $version);
     
     $error->info("Importing Things for Thingy ".$data->{properties}{title});
     my @importThings;
@@ -1328,7 +1274,7 @@ sub importAssetCollateralData {
     }
     # delete deleted fields
     my $fieldsInDatabase = $session->db->read('select fieldId, thingId from Thingy_fields where assetId = ?',
-        [$self->get("assetId")]);
+        [$self->getId]);
     while (my $fieldInDataBase = $fieldsInDatabase->hashRef) {
         if (!WebGUI::Utility::isIn($fieldInDataBase->{fieldId},@importFields)){
             # delete field
@@ -1351,11 +1297,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -1499,7 +1445,7 @@ sub view {
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
 
     #Get this Thingy's default thing
-    $defaultThingId = $self->get("defaultThingId");
+    $defaultThingId = $self->defaultThingId;
     $self->appendThingsVars($var, $defaultThingId);
 
     if ($defaultThingId ne ""){
@@ -1688,7 +1634,7 @@ sub www_editThing {
     return $self->www_view unless ($thingId);
 
     if($thingId eq "new"){
-        my $groupIdEdit = $self->get("groupIdEdit");
+        my $groupIdEdit = $self->groupIdEdit;
         %properties = (
             thingId=>$thingId,
             label=>$i18n->get('thing name label'),
@@ -1815,7 +1761,7 @@ sub www_editThing {
                         ."  <td class='formDescription'>".$i18n->get('sort by label')."</td>\n"
                         ."</tr>\n";
     
-    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->getId).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
     while (my $field = $fields->hashRef) {
         my $formElement;
         if ($field->{fieldType} eq "File"){
@@ -2126,7 +2072,7 @@ sub www_editThingSave {
     my ($thingId, $fields);
     $thingId = $self->session->form->process("thingId");
 
-    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->getId).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
 
         
     $self->setCollateral("Thingy_things","thingId",{
@@ -2190,7 +2136,7 @@ sub www_editField {
     $fieldId = $session->form->process("fieldId");
     $thingId = $session->form->process("thingId");
     %properties = $session->db->quickHash("select * from Thingy_fields where thingId=? and fieldId=? and assetId=?",
-        [$thingId,$fieldId,$self->get("assetId")]);
+        [$thingId,$fieldId,$self->getId]);
     if($session->form->process("copy")){
         $properties{oldFieldId} = $properties{fieldId};
         $properties{fieldId}    = 'new';
@@ -2262,7 +2208,7 @@ sub www_editFieldSave {
         $properties{dateUpdated} = time();
         $properties{updatedBy} = $self->session->user->userId;
         # Check if column has to be altered for existing fields.
-        $self->_updateFieldType($fieldType,$fieldId,$thingId,$self->get('assetId'),$dbDataType);
+        $self->_updateFieldType($fieldType,$fieldId,$thingId,$self->getId,$dbDataType);
         $newFieldId = $self->setCollateral("Thingy_fields","fieldId",\%properties,1,1,"thingId",$thingId);
     }
 
@@ -2647,7 +2593,7 @@ sub www_export {
     return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdExport});
    
     $fields = $session->db->read('select * from Thingy_fields where assetId =? and thingId = ? order by sequenceNumber',
-        [$self->get("assetId"),$thingId]);
+        [$self->getId,$thingId]);
     while (my $field = $fields->hashRef) {
         if ($field->{displayInSearch}){
             push(@fields, {
@@ -2795,7 +2741,7 @@ sub www_import {
     return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdImport});
 
     $fields = $session->db->read('select label, fieldId, fieldType, fieldInOtherThingId from Thingy_fields '
-        .' where assetId = '.$session->db->quote($self->get("assetId"))
+        .' where assetId = '.$session->db->quote($self->getId)
         .' and thingId = '.$session->db->quote($thingId)
         .' order by sequenceNumber');
     while (my $field = $fields->hashRef) {
@@ -2955,7 +2901,7 @@ sub www_importForm {
         ."</tr>";
 
     $fields = $db->read('select label, fieldId from Thingy_fields where assetId =? and thingId = ? order by sequenceNumber',
-        [$self->get("assetId"),$thingId]);
+        [$self->getId,$thingId]);
     while (my $field = $fields->hashRef) {
         $fieldOptions .= "<tr><td>".$field->{label}."</td><td>";
         $fieldOptions .= WebGUI::Form::checkbox($self->session, {
@@ -3034,7 +2980,7 @@ sub www_manage {
 
     $var->{"things_loop"} = \@things_loop;
 
-    return $self->processStyle($self->processTemplate($var, $self->get("templateId")));
+    return $self->processStyle($self->processTemplate($var, $self->templateId));
 }
 
 #-------------------------------------------------------------------
@@ -3053,7 +2999,7 @@ sub www_moveFieldConfirm {
 
     my $error = $self->session->errorHandler;
     my $direction = $session->form->process('direction');
-    my $assetId = $self->get('assetId');
+    my $assetId = $self->getId;
     my $fieldId = $session->form->process('fieldId');
     my $targetFieldId = $session->form->process('targetFieldId');
    
@@ -3240,7 +3186,7 @@ $self->session->form->process($_) eq "") {
     }
     
     $fields = $session->db->read('select * from Thingy_fields where assetId =
-'.$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by
+'.$session->db->quote($self->getId).' and thingId = '.$session->db->quote($thingId).' order by
 sequenceNumber');
     while (my $field = $fields->hashRef) {
         if ($field->{searchIn}){
@@ -3344,15 +3290,15 @@ sequenceNumber');
         if ($self->canEditThingData($thingId,$thingDataId,$thingProperties)){
             $templateVars{canEditThingData} = 1;
             $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
-            .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
+            .$thingId.';thingDataId='.$thingDataId,$self->url,$i18n->get('delete thing data warning'));
             $templateVars{searchResult_delete_url} = $session->url->append($url,
                 'func=deleteThingDataConfirm;thingId='.$thingId.';thingDataId='.$thingDataId);
             $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
-            .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            .$thingId.';thingDataId='.$thingDataId,$self->url);
             $templateVars{searchResult_edit_url} = $session->url->append($url, 
                 'func=editThingData;thingId='.$thingId.';thingDataId='.$thingDataId);
             $templateVars{searchResult_copy_icon} = $session->icon->copy('func=copyThingData;thingId='
-            .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            .$thingId.';thingDataId='.$thingDataId,$self->url);
             $templateVars{searchResult_copy_url} = $session->url->append($url, 
                 'func=copyThingData;thingId='.$thingId.';thingDataId='.$thingDataId,);
         }
@@ -3447,7 +3393,7 @@ sub www_selectFieldInThing {
 
     my $fields = $session->db->buildHashRef('select fieldId, label from Thingy_fields'
         .' where assetId = ? and thingId = ? and fieldId != ? order by sequenceNumber',
-        [$self->get("assetId"),$thingId,$fieldId]);
+        [$self->getId,$thingId,$fieldId]);
    
     my ($value) = $session->db->quickArray('select fieldInOtherThingId from Thingy_fields where fieldId = '
     .$session->db->quote($fieldId));

@@ -118,8 +118,8 @@ Formats as a link.
 
 sub getValueAsHtml {
     my $self = shift;
-#    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getDefaultValue);
-    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getOriginalValue);
+#    my $asset = WebGUI::Asset->newById($self->session,$self->getDefaultValue);
+    my $asset = WebGUI::Asset->newById($self->session,$self->getOriginalValue);
     if (defined $asset) {
         return '<a href="'.$asset->getUrl.'">'.$asset->getTitle.'</a>';
     }
@@ -149,7 +149,7 @@ Renders an asset selector.
 
 sub toHtml {
 	my $self = shift;
-    my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->getOriginalValue) || WebGUI::Asset->getRoot($self->session);
+    my $asset = WebGUI::Asset->newById($self->session, $self->getOriginalValue) || WebGUI::Asset->getRoot($self->session);
 	my $url = $asset->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$self->get('id'));
 	$url .= ";classLimiter=".$self->get("class") if ($self->get("class"));
         return WebGUI::Form::Hidden->new($self->session,

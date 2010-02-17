@@ -19,7 +19,7 @@ use WebGUI::Asset::Event;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 18;
+plan tests => 20;
 
 my $session = WebGUI::Test->session;
 
@@ -131,3 +131,22 @@ ok($session->id->valid($event6a->get('storageId')), 'addRevision gives the new r
 isnt($event6a->get('storageId'), $event6->get('storageId'), '... and it is different from the previous revision');
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag2);
+$versionTag2->commit;
+
+my $event7 = $cal->addChild(
+    {
+        className => 'WebGUI::Asset::Event',
+        assetId   => 'EventAssetTestStorage6',
+        url       => 'hidden_event',
+    }, undef, undef, { skipNotifications => 1, skipAutoCommitWorkflows => 1 },
+);
+
+my $tag = WebGUI::VersionTag->getWorking($session);
+$tag->commit;
+addToCleanup($tag);
+
+is $event7->isHidden, 1, 'isHidden set to 1 by default';
+
+$event7->isHidden(0);
+is $event7->isHidden, 1, 'isHidden cannot be set to 0';
+

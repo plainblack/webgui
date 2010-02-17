@@ -20,203 +20,246 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Text qw(:csv);
 
-our @ISA = qw(WebGUI::Asset::Wobject);
-
-
-
-#-------------------------------------------------------------------
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,"Asset_SQLReport");
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-        templateId =>{
-            fieldType=>"template",
-            defaultValue=>'PBtmpl0000000000000059',
-            label=>$i18n->get(72),
-        },
-        cacheTimeout=>{
-            fieldType=>"interval",
-            defaultValue=>0,
-            label=>$i18n->get('cache timeout'),
-        },
-        paginateAfter=>{
-            fieldType=>"integer",
-            defaultValue=>50,
-            label=>$i18n->get(14),
-        },
-        dbQuery1=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label=>$i18n->get(4) . ' 1',
-        },
-        prequeryStatements1=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label => $i18n->get('Prequery statements') . ' 1',
-        },
-        preprocessMacros1=>{
-            fieldType=>"yesNo",
-            defaultValue=>0,
-            label=>$i18n->get(15) . ' 1',
-        },
-        placeholderParams1=>{
-            fieldType=>"textarea",
-            defaultValue=>undef,
-            label=>$i18n->get('Placeholder Parameters') . ' 1',
-        },
-        databaseLinkId1=>{
-            fieldType=>"databaseLink",
-            defaultValue=>0,
-            label=>$i18n->get("1075", 'WebGUI').' 1',
-        },
-        dbQuery2=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label=>$i18n->get(4) . ' 2',
-        },
-        prequeryStatements2=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label => $i18n->get('Prequery statements') . ' 2',
-        },
-        preprocessMacros2=>{
-            fieldType=>"yesNo",
-            defaultValue=>0,
-            label=>$i18n->get(15) . ' 2',
-        },
-        placeholderParams2=>{
-            fieldType=>"textarea",
-            defaultValue=>undef,
-            label=>$i18n->get('Placeholder Parameters') . ' 2',
-        },
-        databaseLinkId2=>{
-            fieldType=>"databaseLink",
-            defaultValue=>0,
-            label=>$i18n->get("1075", 'WebGUI').' 2',
-        },
-        dbQuery3=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label=>$i18n->get(4) . ' 3',
-        },
-        prequeryStatements3=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label => $i18n->get('Prequery statements') . ' 3',
-        },
-        preprocessMacros3=>{
-            fieldType=>"yesNo",
-            defaultValue=>0,
-            label=>$i18n->get(15) . ' 3',
-        },
-        placeholderParams3=>{
-            fieldType=>"textarea",
-            defaultValue=>undef,
-            label=>$i18n->get('Placeholder Parameters') . ' 3',
-        },
-        databaseLinkId3=>{
-            fieldType=>"databaseLink",
-            defaultValue=>0,
-            label=>$i18n->get("1075", 'WebGUI').' 3',
-        },
-        dbQuery4=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label=>$i18n->get(4) . ' 4',
-        },
-        prequeryStatements4=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label => $i18n->get('Prequery statements') . ' 4',
-        },
-        preprocessMacros4=>{
-            fieldType=>"yesNo",
-            defaultValue=>0,
-            label=>$i18n->get(15) . ' 4',
-        },
-        placeholderParams4=>{
-            fieldType=>"textarea",
-            defaultValue=>undef,
-            label=>$i18n->get('Placeholder Parameters') . ' 4',
-        },
-        databaseLinkId4=>{
-            fieldType=>"databaseLink",
-            defaultValue=>0,
-            label=>$i18n->get("1075", 'WebGUI').' 4',
-        },
-        dbQuery5=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label=>$i18n->get(4) . ' 5',
-        },
-        prequeryStatements5=>{
-            fieldType=>"codearea",
-            defaultValue=>undef,
-            label => $i18n->get('Prequery statements') . ' 5',
-        },
-        preprocessMacros5=>{
-            fieldType=>"yesNo",
-            defaultValue=>0,
-            label=>$i18n->get(15) . '5',
-        },
-        placeholderParams5=>{
-            fieldType=>"textarea",
-            defaultValue=>undef,
-            label=>$i18n->get('Placeholder Parameters') . ' 5',
-        },
-        databaseLinkId5=>{
-            fieldType=>"databaseLink",
-            defaultValue=>0,
-            label=>$i18n->get("1075", 'WebGUI').' 5',
-        },
-        debugMode=>{
-            fieldType=>"yesNo",
-            defaultValue=>0,
-            label=>$i18n->get(16),
-        },
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_SQLReport'];
+aspect uiLevel   => 5;
+aspect icon      => 'sqlReport.gif';
+aspect tableName => 'SQLReport';
+property templateId => (
+            fieldType   => "template",
+            default     => 'PBtmpl0000000000000059',
+            label       => [72, 'Asset_SQLReport'],
+            hoverHelp   => ['72 description', 'Asset_SQLReport'],
+      		namespace   => "SQLReport"
+        );
+property cacheTimeout => (
+            fieldType   => "interval",
+            default     => 0,
+            label       => ['cache timeout', 'Asset_SQLReport'],
+            hoverHelp   => ['cache timeout description', 'Asset_SQLReport'],
+            uiLevel     => 8,
+        );
+property paginateAfter => (
+            fieldType   => "integer",
+            default     => 50,
+            label       => ['14', 'Asset_SQLReport'],
+            hoverHelp   => ['14 description', 'Asset_SQLReport'],
+        );
+property dbQuery1 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => [4, 'Asset_SQLReport', 1],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+        );
+property prequeryStatements1 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 1],
+        );
+property preprocessMacros1 => (
+            fieldType   => "yesNo",
+            default     => 0,
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 1],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property placeholderParams1 => (
+            fieldType   => "textarea",
+            default     => undef,
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 1],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+        );
+property databaseLinkId1 => (
+            fieldType   => "databaseLink",
+            default     => 0,
+            label       => ['Database Link %s', 'Asset_SQLReport', 1],
+        );
+property dbQuery2 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => [4, 'Asset_SQLReport', 2],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+        );
+property prequeryStatements2 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 2],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property preprocessMacros2 => (
+            fieldType   => "yesNo",
+            default     => 0,
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 2],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property placeholderParams2 => (
+            fieldType   => "textarea",
+            default     => undef,
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 2],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+        );
+property databaseLinkId2 => (
+            fieldType   => "databaseLink",
+            default     => 0,
+            label       => ['Database Link %s', 'Asset_SQLReport', 2],
+        );
+property dbQuery3 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => [4, 'Asset_SQLReport', 3],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+        );
+property prequeryStatements3 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 3],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property preprocessMacros3 => (
+            fieldType   => "yesNo",
+            default     => 0,
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 3],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property placeholderParams3 => (
+            fieldType   => "textarea",
+            default     => undef,
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 3],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+        );
+property databaseLinkId3 => (
+            fieldType   => "databaseLink",
+            default     => 0,
+            label       => ['Database Link %s', 'Asset_SQLReport', 3],
+        );
+property dbQuery4 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => [4, 'Asset_SQLReport', 4],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+        );
+property prequeryStatements4 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 4],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property preprocessMacros4 => (
+            fieldType   => "yesNo",
+            default     => 0,
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 4],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property placeholderParams4 => (
+            fieldType   => "textarea",
+            default     => undef,
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 4],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+        );
+property databaseLinkId4 => (
+            fieldType   => "databaseLink",
+            default     => 0,
+            label       => ['Database Link %s', 'Asset_SQLReport', 4],
+        );
+property dbQuery5 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => [4, 'Asset_SQLReport', 5],
+			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+        );
+property prequeryStatements5 => (
+            fieldType   => "codearea",
+            default     => undef,
+            label       => ['Prequery statements %s', 'Asset_SQLReport', 5],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property preprocessMacros5 => (
+            fieldType   => "yesNo",
+            default     => 0,
+            label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 5],
+			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+        );
+property placeholderParams5 => (
+            fieldType   => "textarea",
+            default     => undef,
+            label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 5],
+			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+        );
+property databaseLinkId5 => (
+            fieldType   => "databaseLink",
+            default     => 0,
+            label       => ['Database Link %s', 'Asset_SQLReport', 5],
+        );
+property debugMode => (
+            fieldType   => "yesNo",
+            default     => 0,
+            label       => [16, 'Asset_SQLReport'],
+            hoverHelp   => ['16 description', 'Asset_SQLReport'],
+        );
 
         # download
-        downloadType=>{
-            fieldType=>"text",
-            defaultValue=>"none",
-            label=>$i18n->get("download type"),
-        },
-        downloadFilename=>{
-            fieldType=>"text",
-            defaultValue=>"",
-            label=>$i18n->get("download filename"),
-        },
-        downloadTemplateId=>{
-            fieldType=>"template",
-            defaultValue=>'SQLReportDownload00001',
-            label=>$i18n->get("download template"),
-        },
-        downloadMimeType=>{
-            fieldType=>"text",
-            defaultValue=>"text/html",
-            label=>$i18n->get("download mimetype"),
-        },
-        downloadUserGroup=>{
-            fieldType    => "group",
-            defaultValue => "7",
-            label        => $i18n->get("download usergroup"),
-        },
-    );
-    push(@{$definition}, {
-        assetName=>$i18n->get('assetName'),
-        uiLevel => 5,
-        icon=>'sqlReport.gif',
-        tableName=>'SQLReport',
-        className=>'WebGUI::Asset::Wobject::SQLReport',
-		properties => \%properties,
-        autoGenerateForms => 0,
-    });
-    return $class->SUPER::definition($session, $definition);
+property downloadType => (
+            fieldType   => "text",
+            default     => "none",
+            label       => ["download type", 'Asset_SQLReport'],
+            hoverHelp   => ["download type description", 'Asset_RichEdit'],
+            vertical    => 1,
+            options     => \&_downloadType_options,
+            extras      => "onclick='changeDownloadType(this)'"
+        );
+sub _downoadType_options {
+    my $self = shift;
+    tie my %downloadTypes, 'Tie::IxHash', 
+        "none"     => "No Download",
+        "csv"      => "CSV",
+        "template" => "Template",
+    ;
+    return \%downloadTypes;
 }
+property downloadFilename => (
+            fieldType   => "text",
+            default     => "",
+            label       => ["download filename", 'Asset_SQLReport'],
+            hoverHelp   => ["download filename description", 'Asset_SQLReport'],
+        );
+property downloadTemplateId => (
+            fieldType   => "template",
+            default     => 'SQLReportDownload00001',
+            label       => ["download template", 'Asset_SQLReport'],
+            hoverHelp   => ["download template description", 'Asset_SQLReport'],
+            namespace   => "SQLReport/Download",
+        );
+property downloadMimeType => (
+            fieldType   => "text",
+            default     => "text/html",
+            label       => ["download mimetype", 'Asset_SQLReport'],
+            hoverHelp   => ["download mimetype description", 'Asset_SQLReport'],
+            options     => \&_downloadMimeType_options,
+        );
+sub _downloadMimeType_options {
+    my $self = shift;
+    my %downloadMimeType;
+    tie %downloadMimeType, 'Tie::IxHash', 
+        "application/octet-stream"  => "application/octet-stream",
+        "application/xml"           => "application/xml",
+        "application/csv"           => "application/csv",
+        "text/html"                 => "text/html",
+        "text/plain"                => "text/plain",
+    ;
+    return \%downloadMimeType;
+}
+property downloadUserGroup => (
+            fieldType   => "group",
+            builder     => '_downloadUserGroup_default',
+            lazy        => 1,
+            label       => ["download usergroup", 'Asset_SQLReport'],
+            hoverHelp   => ["download usergroup description", 'Asset_SQLReport'],
+        );
+sub _downloadUserGroup_default {
+    my $self = shift;
+    return $self->groupIdView;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -229,7 +272,7 @@ touched.  Default to using $self->get('cacheTimeout') seconds ago.
 
 sub getContentLastModified {
     my $self = shift;
-    return (time - $self->get("cacheTimeout"));
+    return (time - $self->cacheTimeout);
 }
 
 #-------------------------------------------------------------------
@@ -268,11 +311,6 @@ sub getEditForm {
 	### Download
 	# Download Type
 	my %downloadTypes;
-	tie %downloadTypes, 'Tie::IxHash', 
-		"none" 		=> "No Download",
-		"csv"		=> "CSV",
-		"template"	=> "Template",
-		;
 		
 	$tabform->getTab("properties")->radioList(
 		-name=>"downloadType",		# ID is downloadType_formId
@@ -303,20 +341,12 @@ sub getEditForm {
 		);
 	
 	# Download mimeType (if necessary)
-	my %downloadMimeType;
-	tie %downloadMimeType, 'Tie::IxHash', 
-		"application/octet-stream"	=> "application/octet-stream",
-		"application/xml"		=> "application/xml",
-		"application/csv"		=> "application/csv",
-		"text/html"			=> "text/html",
-		"text/plain"			=> "text/plain",
-		;
 
 	$tabform->getTab("properties")->selectBox(
 		-name=>"downloadMimeType",
 		-label=>$i18n->get("download mimetype"),
 		-hoverHelp=>$i18n->get("download mimetype description"),
-		-options=> \%downloadMimeType,
+		#-options=> \%downloadMimeType,
 		-value=>$self->getValue("downloadMimeType"),
 		-defaultValue=>"application/octet-stream",
 		);
@@ -442,7 +472,7 @@ sub download {
 	my $self	= shift;
 	
 	# Instead of going through some costly exercises...
-	return undef if ($self->getValue("downloadType") eq "none");
+	return undef if ($self->downloadType eq "none");
 	
         # Initiate an empty debug loop
         $self->{_debug_loop} = [] ;
@@ -451,7 +481,7 @@ sub download {
 	$self->_storeQueries();
 	
 	# If we're downloading CSV
-	if ($self->getValue("downloadType") eq "csv") {
+	if ($self->downloadType eq "csv") {
         my $data	= $self->_processQuery(0,0);
 		my $out		= "";
 		
@@ -471,9 +501,9 @@ sub download {
 		
 		return $out;
 	} 
-    elsif ($self->getValue("downloadType") eq "template") { 
+    elsif ($self->downloadType eq "template") { 
         my $data	= $self->_processQuery(1,0);
-		return $self->processTemplate($data,$self->get("downloadTemplateId"));
+		return $self->processTemplate($data,$self->downloadTemplateId);
 	} 
     else {
 		# I don't know what to do
@@ -494,11 +524,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -533,7 +563,7 @@ if the user is not in Admin Mode.
 sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
 		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
@@ -551,16 +581,16 @@ sub view {
 	#use Data::Dumper; return '<pre>'.Dumper($var).'</pre>';
 	
 	# Add the "Download data" link if the user is allowed to download
-	if ($self->getValue("downloadType") ne "none" 
-		&& $self->session->user->isInGroup($self->getValue("downloadUserGroup"))
+	if ($self->downloadType ne "none" 
+		&& $self->session->user->isInGroup($self->downloadUserGroup)
 	) {
 	    $var->{'canDownload'} = 1;
         $var->{'downloadLink'} = $self->_getDownloadLink($self);
     }
 	
        	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
 	}
        	return $out;
 }
@@ -681,7 +711,7 @@ sub _processQuery {
         if (defined $dbh) {
 		if ($dbLink->queryIsAllowed($query)) {
                 	# Check and execute prequery statements first
-			foreach (split(/\n/, $self->getValue("prequeryStatements".$nr))) {
+			foreach (split(/\n/, $self->get('prequeryStatements' .$nr))) {
 				my $prequeryStatement = $_;
 				WebGUI::Macro::process($self->session, \$prequeryStatement) if ($self->{_query}{$nr}{preprocessMacros});
 				
@@ -711,7 +741,7 @@ sub _processQuery {
                                                 .'='.$self->session->url->escape($self->session->form->process($_)));
                                 }
                         }
-			my $paginateAfter = ($page == 1) ? $self->get("paginateAfter") : 99999999;
+			my $paginateAfter = ($page == 1) ? $self->paginateAfter : 99999999;
 			my $paginatePage = ($nr > 1) ? 1 : $self->session->form->param('pn');
                         my $p = WebGUI::Paginator->new($self->session,$url,$paginateAfter, undef, $paginatePage);
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
@@ -790,20 +820,20 @@ sub www_download {
 	my $self	= shift;
 	
 	# Only allow if download type is not "none"
-	return undef if $self->getValue("downloadType") eq "none";
+	return undef if $self->downloadType eq "none";
 	
 	# Only allow users in appropriate group
 	return $self->session->privilege->noAccess() 
-		unless $self->session->user->isInGroup($self->getValue("downloadUserGroup"));
+		unless $self->session->user->isInGroup($self->downloadUserGroup);
 	
 	# Set filename and mimetype
-	if ($self->getValue("downloadType") eq "csv")
+	if ($self->downloadType eq "csv")
 	{
-		$self->session->http->setFilename($self->getValue("downloadFilename"),"application/octet-stream");
+		$self->session->http->setFilename($self->downloadFilename,"application/octet-stream");
 	}
 	else
 	{
-		$self->session->http->setFilename($self->getValue("downloadFilename"),$self->getValue("downloadMimeType"));
+		$self->session->http->setFilename($self->downloadFilename, $self->downloadMimeType);
 	}
 	
 	$self->session->http->sendHeader;
@@ -824,7 +854,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
+	$self->session->http->setCacheControl($self->cacheTimeout);
 	$self->SUPER::www_view(@_);
 }
 

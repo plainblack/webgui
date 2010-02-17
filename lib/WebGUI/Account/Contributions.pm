@@ -195,9 +195,13 @@ sub www_view {
     
     #Export page to template
     my @contribs = ();
-    foreach my $row ( @{$p->getPageData} ) {
+    ROW: foreach my $row ( @{$p->getPageData} ) {
         my $assetId    = $row->{assetId};
-        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset      = eval { WebGUI::Asset->newById( $session, $assetId ); };
+        if (Exception::Class->caught()) {
+            $session->log->error("Unable to instanciate assetId $assetId: $@");
+            next ROW;
+        }
         my $props      = $asset->get;
         $props->{url}  = $asset->getUrl;
         if (ref $asset eq "WebGUI::Asset::Post") {

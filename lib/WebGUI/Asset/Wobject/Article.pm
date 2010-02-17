@@ -14,7 +14,67 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Asset::Wobject;
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect assetName => ['assetName', 'Asset_Article'];
+aspect icon      => 'article.gif';
+aspect tableName => 'Article';
+property cacheTimeout => (
+                tab       => "display",
+                fieldType => "interval",
+                default   => 3600,
+                uiLevel   => 8,
+                label     => ["cache timeout", 'Asset_Article'],
+                hoverHelp => ["cache timeout help", 'Asset_Article'],
+         );
+property templateId => (
+                tab        => "display",
+                fieldType  => "template",
+                default    => 'PBtmpl0000000000000002',    
+                namespace  => "Article",
+                hoverHelp  => ['article template description', 'Asset_Article'],
+                label      => ['72', 'Asset_Article'],
+         );
+property linkTitle => (
+                tab       => "properties",
+                fieldType => 'text',
+                default   => undef,
+                label     => ['7', 'Asset_Article'],
+                hoverHelp => ['link title description', 'Asset_Article'],
+                uiLevel   => 3
+         );
+property linkURL => (
+                tab       => "properties",
+                fieldType => 'url',
+                default   => undef,
+                label     => ['8', 'Asset_Article'],
+                hoverHelp => ['link url description', 'Asset_Article'],
+                uiLevel   => 3
+         );
+property storageId => (
+                tab            => "properties",
+                fieldType      => "image",
+                deleteFileUrl  => \&_storageId_deleteFileUrl,
+                maxAttachments => 2,
+                persist        =>  1,
+                default        => undef,
+                label          => ["attachments", 'Asset_Article'],
+                hoverHelp      => ["attachments help", 'Asset_Article'],
+                trigger        => \&_set_storageId,
+         );
+sub _set_storageId {
+    my ($self, $new, $old) = @_;
+    if ($new ne $old) {
+        delete $self->{_storageLocation};
+    }
+}
+sub _storageid_deleteFileUrl {
+    return shift->session->url->page("func=deleteFile;filename=");
+}
+
+with 'WebGUI::Role::Asset::SetStoragePermissions';
+
 use WebGUI::Storage;
 use WebGUI::HTML;
 
@@ -72,76 +132,12 @@ Override the default method in order to deal with attachments.
 sub addRevision {
     my $self = shift;
     my $newSelf = $self->SUPER::addRevision(@_);
-    if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
-        my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+    if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
+        my $newStorage = WebGUI::Storage->get($self->session,$self->storageId)->copy;
         $newSelf->update({storageId => $newStorage->getId});
     }
     return $newSelf;
 }
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_Article');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-			cacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("cache timeout"),
-				hoverHelp => $i18n->get("cache timeout help")
-				},
-			templateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000002',	
-				tab=>"display",
-				namespace=>"Article",
-                		hoverHelp=>$i18n->get('article template description'),
-                		label=>$i18n->get(72)
-				},
-			linkTitle=>{
-				tab=>"properties",
-				fieldType=>'text',
-				defaultValue=>undef,
-				label=>$i18n->get(7),
-                		hoverHelp=>$i18n->get('link title description'),
-                		uiLevel=>3
-				},
-			linkURL=>{
-				tab=>"properties",
-				fieldType=>'url',
-				defaultValue=>undef,
-				label=>$i18n->get(8),
-                		hoverHelp=>$i18n->get('link url description'),
-                		uiLevel=>3
-				},
-			storageId=>{
-				tab=>"properties",
-				fieldType=>"image",
-				deleteFileUrl=>$session->url->page("func=deleteFile;filename="),
-				maxAttachments=>2,
-                persist => 1,
-				defaultValue=>undef,
-				label=>$i18n->get("attachments"),
-				hoverHelp=>$i18n->get("attachments help")
-				}
-		);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'article.gif',
-		autoGenerateForms=>1,
-		tableName=>'Article',
-		className=>'WebGUI::Asset::Wobject::Article',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -153,7 +149,7 @@ Extend the super class to duplicate the storage location.
 
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset   = $self->SUPER::duplicate(@_);
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
 	return $newAsset;
@@ -170,7 +166,7 @@ See WebGUI::AssetPackage::exportAssetData() for details.
 sub exportAssetData {
 	my $self = shift;
 	my $data = $self->SUPER::exportAssetData;
-	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
+	push(@{$data->{storage}}, $self->storageId) if ($self->storageId ne "");
 	return $data;
 }
 
@@ -187,11 +183,11 @@ then make one.  Build an internal cache of the storage object.
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
-		if ($self->get("storageId") eq "") {
+		if ($self->storageId eq "") {
 			$self->{_storageLocation} = WebGUI::Storage->create($self->session);
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
-			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
+			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->storageId);
 		}
 	}
 	return $self->{_storageLocation};
@@ -208,8 +204,8 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("linkTitle"));
-	$indexer->addKeywords($self->get("linkUrl"));
+	$indexer->addKeywords($self->linkTitle);
+	$indexer->addKeywords($self->linkUrl);
 	my $storage = $self->getStorageLocation;
 	foreach my $file (@{$storage->getFiles}) {
                $indexer->addFile($storage->getPath($file));
@@ -227,7 +223,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $templateId = $self->get("templateId");
+    my $templateId = $self->templateId;
     if ($self->session->form->process("overrideTemplateId") ne "") {
         $templateId = $self->session->form->process("overrideTemplateId");
     }
@@ -262,32 +258,6 @@ sub processPropertiesFromFormPost {
     }
     $self->setSize($size);
 }
-
-#-------------------------------------------------------------------
-
-=head2 update ( )
-
-Extend the super class to handle the storage location.  Sets
-the correct privileges and deletes the internally cached
-Storage object.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $previousStorageId = $self->get('storageId');
-    $self->SUPER::update(@_);
-    ##update may have entered a new storageId.  Reset the cached one just in case.
-    if ($self->get("storageId") ne $previousStorageId) {
-        delete $self->{_storageLocation};
-    }
-    $self->getStorageLocation->setPrivileges(
-        $self->get("ownerUserId"),
-        $self->get("groupIdView"),
-        $self->get("groupIdEdit"),
-    );
-}
-
 
 #-------------------------------------------------------------------
 
@@ -348,13 +318,13 @@ returns the output.
 sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		my $out = eval{$cache->get("view_".$self->getId)};
 		return $out if $out;
 	}
 	my %var;
-	if ($self->get("storageId")) {
+	if ($self->storageId) {
 		my $storage = $self->getStorageLocation;
 		my @loop = ();
 		foreach my $file (@{$storage->getFiles}) {
@@ -375,7 +345,7 @@ sub view {
 				});
 		}
 	}
-    $var{description} = $self->get("description");
+    $var{description} = $self->description;
 	$var{"new.template"} = $self->getUrl("func=view").";overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
@@ -412,9 +382,9 @@ sub view {
 	}
 	$p->appendTemplateVars(\%var);
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
-		eval{$cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
+		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
 	}
        	return $out;
 }
@@ -444,7 +414,7 @@ Deletes and attached file.
 sub www_deleteFile {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
-	if ($self->get("storageId") ne "") {
+	if ($self->storageId ne "") {
 		my $storage = $self->getStorageLocation;
 		$storage->deleteFile($self->session->form->param("filename"));
 	}
@@ -461,7 +431,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
+	$self->session->http->setCacheControl($self->cacheTimeout);
 	$self->SUPER::www_view(@_);
 }
 

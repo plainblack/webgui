@@ -19,7 +19,143 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 use JSON;
 
-use base 'WebGUI::Asset::Sku';
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+
+aspect assetName  => ['assetName', 'Asset_Product'];
+aspect icon       => 'product.gif';
+aspect tableName  => 'Product';
+
+property cacheTimeout => (
+            tab          => "display",
+            fieldType    => "interval",
+            default      => 3600,
+            uiLevel      => 8,
+            label        => ["cache timeout"],
+            hoverHelp    => ["cache timeout help"],
+        );
+property templateId => (
+            fieldType    => "template",
+            tab          => "display",
+            namespace    => "Product",
+            label        => ['62', 'Asset_Product'],
+            hoverHelp    => ['62 description', 'Asset_Product'],
+            default      => 'PBtmpl0000000000000056'
+        );
+property thankYouMessage => (
+            tab             => "properties",
+            default         => '_default_thankYouMessage',
+            fieldType       => "HTMLArea",
+            label           => ["thank you message", 'Asset_Product'],
+            hoverHelp       => ["thank you message help", 'Asset_Product'],
+            lazy            => 1,
+        );
+sub _default_thankYouMessage {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Product');
+    return $i18n->get("default thank you message");
+}
+property image1 => (
+            tab            => "properties",
+            fieldType      => "image",
+            default        => undef,
+            maxAttachments => 1,
+            label          => ['7', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            persist        =>  1,
+        );
+sub _product_delete_file_url {
+    my ($self, $property) = @_;
+    return $self->session->url->page(sprintf "func=deleteFileConfirm;file=%s;filename=", $property->name);
+}
+property image2 => (
+            tab            => "properties",
+            fieldType      => "image",
+            maxAttachments => 1,
+            label          => ['8', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property image3 => (
+            tab            => "properties",
+            fieldType      => "image",
+            maxAttachments => 1,
+            label          => ['9', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property brochure => (
+            tab            => "properties",
+            fieldType      => "file",
+            maxAttachments => 1,
+            label          => ['13', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property manual => (
+            tab            => "properties",
+            fieldType      => "file",
+            maxAttachments => 1,
+            label          => ['14', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property isShippingRequired => (
+            tab          => "shop",
+            fieldType    => "yesNo",
+            label        => ['isShippingRequired', 'Asset_Product'],
+            hoverHelp    => ['isShippingRequired help', 'Asset_Product'],
+            default      => 0,
+        );
+property warranty => (
+            tab            => "properties",
+            fieldType      => "file",
+            maxAttachments => 1,
+            label          => ['15', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property variantsJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 0,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property accessoryJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 0,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property relatedJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 0,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property specificationJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 0,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property featureJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 0,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property benefitJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 0,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
 
 #-------------------------------------------------------------------
 sub _duplicateFile {
@@ -53,148 +189,6 @@ sub addRevision {
         }
     }
     return $newSelf;
-}
-
-#-------------------------------------------------------------------
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,"Asset_Product");
-    my %properties;
-    tie %properties, 'Tie::IxHash';
-    %properties = (
-        cacheTimeout => {
-            tab => "display",
-            fieldType => "interval",
-            defaultValue => 3600,
-            uiLevel => 8,
-            label => $i18n->get("cache timeout"),
-            hoverHelp => $i18n->get("cache timeout help")
-        },
-        templateId =>{
-            fieldType=>"template",
-            tab => "display",
-                  namespace=>"Product",
-            label=>$i18n->get(62),
-            hoverHelp=>$i18n->get('62 description'),
-            defaultValue=>'PBtmpl0000000000000056'
-        },
-        thankYouMessage => {
-            tab             => "properties",
-            defaultValue    => $i18n->get("default thank you message"),
-            fieldType       => "HTMLArea",
-            label           => $i18n->get("thank you message"),
-            hoverHelp       => $i18n->get("thank you message help"),
-        },
-        image1=>{
-            tab => "properties",
-            fieldType=>"image",
-            defaultValue=>undef,
-            maxAttachments=>1,
-            label=>$i18n->get(7),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename="),
-            persist => 1,
-        },
-        image2=>{
-            tab => "properties",
-            fieldType=>"image",
-            maxAttachments=>1,
-            label=>$i18n->get(8),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image2;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        image3=>{
-            tab => "properties",
-            fieldType=>"image",
-            maxAttachments=>1,
-            label=>$i18n->get(9),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image3;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        brochure=>{
-            tab => "properties",
-            fieldType=>"file",
-            maxAttachments=>1,
-            label=>$i18n->get(13),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=brochure;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        manual=>{
-            tab => "properties",
-            fieldType=>"file",
-            maxAttachments=>1,
-            label=>$i18n->get(14),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        isShippingRequired => {
-            tab          => "shop",
-            fieldType    => "yesNo",
-            label        => $i18n->get('isShippingRequired'),
-            hoverHelp    => $i18n->get('isShippingRequired help'),
-            defaultValue => 0,
-        },
-        warranty=>{
-            tab => "properties",
-            fieldType=>"file",
-            maxAttachments=>1,
-            label=>$i18n->get(15),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        variantsJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType=>"textarea",
-        },
-        accessoryJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType=>"textarea",
-        },
-        relatedJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType=>"textarea",
-        },
-        specificationJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType=>"textarea",
-        },
-        featureJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType=>"textarea",
-        },
-        benefitJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType=>"textarea",
-        },
-    );
-    push(@{$definition}, {
-        assetName=>$i18n->get('assetName'),
-        autoGenerateForms=>1,
-        icon=>'product.gif',
-        tableName=>'Product',
-        className=>'WebGUI::Asset::Sku::Product',
-        properties=>\%properties
-        }
-    );
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -560,20 +554,6 @@ sub getWeight {
     my $self = shift;
     return $self->getOptions->{weight};
 }
-
-#-------------------------------------------------------------------
-
-=head2 isShippingRequired
-
-Overriding the method from Sku so that the user can configure it.
-
-=cut
-
-sub isShippingRequired {
-    my $self = shift;
-    return $self->get('isShippingRequired');
-}
-
 
 #-------------------------------------------------------------------
 
@@ -1794,7 +1774,7 @@ sub view {
         $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
                  . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get('url'));
-        my $accessory = WebGUI::Asset->newByDynamicClass($session, $collateral->{accessoryAssetId});
+        my $accessory = WebGUI::Asset->newById($session, $collateral->{accessoryAssetId});
         push(@accessoryloop,{
                            'accessory_URL'      => $accessory->getUrl,
                            'accessory_title'    => $accessory->getTitle,
@@ -1811,7 +1791,7 @@ sub view {
         $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id, $self->get('url'),$i18n->get(4))
                  . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id, $self->get('url'))
                  . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id, $self->get('url'));
-        my $related = WebGUI::Asset->newByDynamicClass($session, $collateral->{relatedAssetId});
+        my $related = WebGUI::Asset->newById($session, $collateral->{relatedAssetId});
         push(@relatedloop,{
                           'relatedproduct_URL'      => $related->getUrl,
                           'relatedproduct_title'    => $related->getTitle,
@@ -1877,8 +1857,8 @@ sub view {
     $var{continueShoppingUrl} = $self->getUrl;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && $self->{_hasAddedToCart} != 1){
-        $cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"));
+    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && $self->{_hasAddedToCart} != 1){
+        $cache->set("view_".$self->getId, $out, $self->cacheTimeout);
     }
     return $out;
 }
@@ -1893,7 +1873,7 @@ Extend the base method to handle caching.
 
 sub www_view {
     my $self = shift;
-    $self->session->http->setCacheControl($self->get("cacheTimeout"));
+    $self->session->http->setCacheControl($self->cacheTimeout);
     $self->SUPER::www_view(@_);
 }
 

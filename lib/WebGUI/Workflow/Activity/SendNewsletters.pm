@@ -88,7 +88,7 @@ sub execute {
         # get newsletter asset
         unless (defined $newsletter && $newsletter->getId eq $assetId) { # cache newsletter object
             $eh->info("Getting newsletter asset $assetId");
-            $newsletter = WebGUI::Asset->new($self->session, $assetId);
+            $newsletter = WebGUI::Asset->newById($self->session, $assetId);
         }
 
         # find matching threads
@@ -106,14 +106,14 @@ sub execute {
             while (my ($threadId) = $matchingThreads->array) {
                 next
                     if $foundThreads{$threadId};
-                my $thread = WebGUI::Asset->new($self->session, $threadId);
-                if (defined $thread) {
+                my $thread = eval { WebGUI::Asset->newById($self->session, $threadId); };
+                if (! Exception::Class->caught()) {
                     $eh->info("Found thread $threadId");
                     push(@threads, $thread);
                     $foundThreads{$threadId} = 1;
                 }
                 else {
-                    $eh->error("Couldn't instanciate thread $threadId");
+                    $eh->error("Couldn't instanciate thread $threadId: $@");
                 }    
             }
         }
@@ -141,7 +141,7 @@ sub execute {
             footer      => $newsletter->get("newsletterFooter"),
             thread_loop => \@threadLoop,
             );
-        my $template = WebGUI::Asset->new($self->session, $newsletter->get("newsletterTemplateId"));
+        my $template = WebGUI::Asset->newById($self->session, $newsletter->get("newsletterTemplateId"));
         my $content = $template->process(\%var);
         
         # send newsletter

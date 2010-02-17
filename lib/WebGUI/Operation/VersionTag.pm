@@ -373,7 +373,7 @@ sub www_commitVersionTag {
             $session->url->page("op=commitVersionTag;tagId=".$tag->getId),
         );
     $p->setDataByQuery(q{
-        SELECT assetData.revisionDate, users.username, asset.assetId, asset.className 
+        SELECT assetData.revisionDate, users.username, asset.assetId
         FROM assetData 
         LEFT JOIN asset ON assetData.assetId = asset.assetId
         LEFT JOIN users ON assetData.revisedBy = users.userId
@@ -384,8 +384,8 @@ sub www_commitVersionTag {
     );
 
     foreach my $row ( @{$p->getPageData} ) {
-        my ( $date, $by, $id, $class) = @{ $row }{ qw( revisionDate username assetId className ) };
-        my $asset = WebGUI::Asset->new($session, $id, $class, $date);
+        my ( $date, $by, $id, $class) = @{ $row }{ qw( revisionDate username assetId ) };
+        my $asset = WebGUI::Asset->newById($session, $id, $date);
         $output 
             .= '<tr><td>'
             .$session->icon->view("func=view;revision=".$date, $asset->get("url"))
@@ -661,7 +661,7 @@ sub www_manageRevisionsInTag {
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
             ( my $assetId, my $revisionDate ) = split ":", $assetInfo;
-            my $asset = WebGUI::Asset->new( $session, $assetId, undef, $revisionDate );
+            my $asset = WebGUI::Asset->newById( $session, $assetId, $revisionDate );
             $asset->purgeRevision;
         }
 
@@ -689,7 +689,7 @@ sub www_manageRevisionsInTag {
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
             ( my $assetId, my $revisionDate ) = split ":", $assetInfo;
-            my $asset = WebGUI::Asset->new( $session, $assetId, undef, $revisionDate );
+            my $asset = WebGUI::Asset->newById( $session, $assetId, $revisionDate );
             $asset->setVersionTag( $moveToTag->getId );
         }
 
@@ -809,12 +809,12 @@ sub www_manageRevisionsInTag {
         . '</tr> '
         ;
     my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId));
-    $p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
+    $p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId from assetData 
             left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
             where assetData.tagId=?",undef, undef, [$tag->getId]);
     foreach my $row (@{$p->getPageData}) {
-            my ($date,$by,$id, $class) = ($row->{revisionDate}, $row->{username}, $row->{assetId}, $row->{className});
-            my $asset = WebGUI::Asset->new($session,$id,$class,$date);
+            my ($date, $by, $id) = ($row->{revisionDate}, $row->{username}, $row->{assetId});
+            my $asset = WebGUI::Asset->newById($session, $id, $date);
             # A checkbox for delete and move actions
             my $checkbox    = WebGUI::Form::checkbox( $session, {
                 name        => 'assetInfo',

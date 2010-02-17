@@ -15,14 +15,88 @@ package WebGUI::Asset::Snippet;
 =cut
 
 use strict;
-use WebGUI::Asset;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use HTML::Packer;
 use JavaScript::Packer;
 use CSS::Packer;
 
-our @ISA = qw(WebGUI::Asset);
+aspect assetName  => ['assetName','Asset_Snippet'];
+aspect uiLevel    =>  5;
+aspect icon       => 'snippet.gif';
+aspect tableName  => 'snippet';
+
+property snippet => (
+    fieldType       => 'codearea',
+	tab             => "properties",
+	label           => ['assetName','Asset_Snippet'],
+	hoverHelp       => ['snippet description','Asset_Snippet'],
+    default         => undef,
+);
+around snippet => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 1) {
+        my $packed  = $_[0];
+        if ( $self->mimeType eq "text/html" ) {
+            HTML::Packer::minify( \$packed, {
+                remove_comments     => 1,
+                remove_newlines     => 1,
+                do_javascript       => "shrink",
+                do_stylesheet       => "minify",
+            } );
+        }
+        elsif ( $self->mimeType eq "text/css" ) {
+            CSS::Packer::minify( \$packed, {
+                compress            => 'minify',
+            });
+        }
+        elsif ( $self->mimeType eq 'text/javascript' ) {
+            JavaScript::Packer::minify( \$packed, {
+                compress            => "shrink",
+            });
+        }
+        $self->snippetPacked($packed);
+    }
+    $self->$orig(@_);
+};
+
+property snippetPacked => (
+    fieldType       => "hidden",
+    default         => undef,
+    noFormPost      => 1,
+);
+property usePacked => (
+    tab             => 'properties',
+    fieldType       => 'yesNo',
+    label           => ['usePacked label','Asset_Snippet'],
+    hoverHelp       => ['usePacked description','Asset_Snippet'],
+    default         => 0,
+);
+property cacheTimeout => (
+	tab             => "display",
+	fieldType       => "interval",
+	default         => 3600,
+	uiLevel         => 8,
+	label           => ["cache timeout",'Asset_Snippet'],
+	hoverHelp       => ["cache timeout help",'Asset_Snippet'],
+);
+property processAsTemplate => (
+   	fieldType       => 'yesNo',
+	label           => ['process as template','Asset_Snippet'],
+	hoverHelp       => ['process as template description','Asset_Snippet'],
+	tab             => "properties",
+    default         => 0,
+);
+property mimeType => (
+	tab             => "properties",
+	hoverHelp       => ['mimeType description','Asset_Snippet'],
+	label           => ['mimeType','Asset_Snippet'],
+   	fieldType       => 'mimeType',
+    default         => 'text/html',
+);
 
 
 =head1 NAME
@@ -31,12 +105,15 @@ Package WebGUI::Asset::Snippet
 
 =head1 DESCRIPTION
 
-Provides a mechanism to publish arbitrary code snippets to WebGUI for reuse in other pages. Can be used for things like HTML segments, javascript, and cascading style sheets. You can also specify the MIME type of the snippet, allowing you to serve XML, CSS and other text files directly from the WebGUI asset system and have browsers recognize them correctly.
+Provides a mechanism to publish arbitrary code snippets to WebGUI for reuse
+in other pages. Can be used for things like HTML segments, javascript, and
+cascading style sheets. You can also specify the MIME type of the snippet,
+allowing you to serve XML, CSS and other text files directly from the WebGUI
+asset system and have browsers recognize them correctly.
 
 =head1 SYNOPSIS
 
 use WebGUI::Asset::Snippet;
-
 
 =head1 METHODS
 
@@ -45,82 +122,6 @@ These methods are available from this class:
 =cut
 
 
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-        my $class = shift;
-        my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Snippet");
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
- 			snippet=>{
-                        	fieldType=>'codearea',
-				tab=>"properties",
-				label=>$i18n->get('assetName'),
-				hoverHelp=>$i18n->get('snippet description'),
-                                defaultValue=>undef,
-                filter   => "packSnippet",
-                                },
-            snippetPacked => {
-                fieldType => "hidden",
-                defaultValue => undef,
-                noFormPost   => 1,
-            },
-            usePacked => {
-                tab             => 'properties',
-                fieldType       => 'yesNo',
-                label           => $i18n->get('usePacked label'),
-                hoverHelp       => $i18n->get('usePacked description'),
-                defaultValue    => 0,
-            },
-			cacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("cache timeout"),
-				hoverHelp => $i18n->get("cache timeout help")
-				},
- 			processAsTemplate=>{
-                        	fieldType=>'yesNo',
-				label=>$i18n->get('process as template'),
-				hoverHelp=>$i18n->get('process as template description'),
-				tab=>"properties",
-                                defaultValue=>0
-                                },
-			mimeType=>{
-				tab=>"properties",
-				hoverHelp=>$i18n->get('mimeType description'),
-				label=>$i18n->get('mimeType'),
-                        	fieldType=>'mimeType',
-                                defaultValue=>'text/html'
-                                }
-
-                        );
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		uiLevel => 5,
-		icon=>'snippet.gif',
-		autoGenerateForms=>1,
-                tableName=>'snippet',
-                className=>'WebGUI::Asset::Snippet',
-                properties=>\%properties
-                });
-        return $class->SUPER::definition($session,$definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -199,45 +200,8 @@ Indexing the content of the snippet. See WebGUI::Asset::indexContent() for addit
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("snippet"));
+	$indexer->addKeywords($self->snippet);
 	$indexer->setIsPublic(0);
-}
-
-#-------------------------------------------------------------------
-
-=head2 packSnippet ( unpacked )
-
-Pack the snippet if possible. We can pack HTML, CSS, and JS snippets.
-
-=cut
-
-sub packSnippet {
-    my ( $self, $unpacked ) = @_;
-    return $unpacked if !$unpacked;
-    my $packed  = $unpacked;
-
-    if ( $self->get('mimeType') eq "text/html" ) {
-        HTML::Packer::minify( \$packed, {
-            remove_comments     => 1,
-            remove_newlines     => 1,
-            do_javascript       => "shrink",
-            do_stylesheet       => "minify",
-        } );
-    }
-    elsif ( $self->get('mimeType') eq "text/css" ) {
-        CSS::Packer::minify( \$packed, {
-            compress            => 'minify',
-        });
-    }
-    elsif ( $self->get('mimeType') eq 'text/javascript' ) {
-        JavaScript::Packer::minify( \$packed, {
-            compress            => "shrink",
-        });
-    }
-
-    $self->update({ snippetPacked => $packed });
-    
-    return $unpacked;
 }
 
 #-------------------------------------------------------------------
@@ -260,6 +224,18 @@ sub purgeCache {
 
 #-------------------------------------------------------------------
 
+=head2 snippet ( value )
+
+Returns the snippet's content.
+
+=head3 value
+
+If specified, sets the value, and also packs the content and inserts it into packedSnippet.
+
+=cut
+
+#-------------------------------------------------------------------
+
 =head2 view ( $calledAsWebMethod )
 
 Override the base class to implement caching, template and macro processing.
@@ -278,23 +254,23 @@ sub view {
     my $versionTag = WebGUI::VersionTag->getWorking($session, 1);
     my $noCache =
         $session->var->isAdminOn
-        || $self->get("cacheTimeout") <= 10
-        || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+        || $self->cacheTimeout <= 10
+        || ($versionTag && $versionTag->getId eq $self->tagId);
     unless ($noCache) {
 		my $out = eval{$session->cache->get("view_".$calledAsWebMethod."_".$self->getId)};
 		return $out if $out;
 	}
-	my $output = $self->get('usePacked')
-                ? $self->get("snippetPacked")
-                : $self->get('snippet')
-                ;
+	my $output = $self->usePacked
+               ? $self->snippetPacked
+               : $self->snippet
+               ;
 	$output = $self->getToolbar.$output if ($session->var->isAdminOn && !$calledAsWebMethod);
-	if ($self->getValue("processAsTemplate")) {
+	if ($self->processAsTemplate) {
 		$output = WebGUI::Asset::Template->processRaw($session, $output, $self->get);
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-		eval{$session->cache->set("view_".$calledAsWebMethod."_".$self->getId, $output, $self->get("cacheTimeout"))};
+		eval{$session->cache->set("view_".$calledAsWebMethod."_".$self->getId, $output, $self->cacheTimeout)};
 	}
     return $output;
 }
@@ -310,9 +286,9 @@ A web accessible version of the view method.
 sub www_view {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canView;
-    my $mimeType=$self->getValue('mimeType');
+    my $mimeType=$self->mimeType;
     $self->session->http->setMimeType($mimeType || 'text/html');
-    $self->session->http->setCacheControl($self->get("cacheTimeout"));
+    $self->session->http->setCacheControl($self->cacheTimeout);
     my $output = $self->view(1);
     if (!defined $output) {
         $output = 'empty';

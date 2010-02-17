@@ -278,7 +278,7 @@ sub www_ajaxGetManagerPage {
     my $p               = getManagerPaginator( $session );
 
     for my $assetId ( @{ $p->getPageData } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset->newById( $session, $assetId );
         
         # Populate the required fields to fill in
         my %fields      = (
@@ -550,14 +550,14 @@ sub www_search {
 
         if ( $action eq "delete" ) { ##aka trash
             for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+                my $asset       = WebGUI::Asset->newById( $session, $assetId );
                 next unless $asset;
                 $asset->trash;
             }
         }
         elsif ( $action eq "cut" ) {
             for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+                my $asset       = WebGUI::Asset->newById( $session, $assetId );
                 next unless $asset;
                 $asset->cut;
             }
@@ -565,7 +565,7 @@ sub www_search {
         elsif ( $action eq "copy" ) {
             for my $assetId ( @assetIds ) {
                 # Copy == Duplicate + Cut
-		my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId);
+		my $asset       = WebGUI::Asset->newById( $session, $assetId);
                 my $newAsset    = $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
                 $newAsset->update( { title => $newAsset->getTitle . ' (copy)' } );
                 $newAsset->cut;
@@ -655,7 +655,7 @@ sub www_search {
             my $count           = 0;
             for my $assetInfo ( @{ $p->getPageData } ) {
                 $count++;
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetInfo->{ assetId } );
+                my $asset       = WebGUI::Asset->newById( $session, $assetInfo->{ assetId } );
                 
                 # Populate the required fields to fill in
                 my %fields      = (

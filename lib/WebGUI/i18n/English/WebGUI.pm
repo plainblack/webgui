@@ -2,6 +2,12 @@ package WebGUI::i18n::English::WebGUI;
 use strict;
 
 our $I18N = {
+	'JSON Blob' => {
+		message => q|JSON Blob|,
+		context => q|The name of hte JSON Blob form control.|,
+		lastUpdated => 0,
+	},
+
 	'ok' => {
 		message => q|OK|,
 		context => q|used by database link and other things to give a message to the user that a test passed|,
@@ -3581,7 +3587,13 @@ LongTruncOk=1</p>
 	'webgui' => {
 		message => q|WebGUI|,
 		lastUpdated => 1141963573,
-		context => q|Test key for International macro test.  DO NOT TRANSLATE|,
+		context => q|Test key for International macro test.  DO NOT TRANSLATE OR DELETE|,
+	},
+
+	'webgui help %s' => {
+		message => q|webgui help %s|,
+		lastUpdated => 1266003122,
+		context => q|Test key for Definition::Role::Object.  DO NOT TRANSLATE OR DELETE|,
 	},
 
 	'pages' => {

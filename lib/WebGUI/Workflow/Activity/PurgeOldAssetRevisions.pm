@@ -18,6 +18,7 @@ package WebGUI::Workflow::Activity::PurgeOldAssetRevisions;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -99,16 +100,16 @@ sub execute {
         }
 
         # instanciate and purge
-        my $asset = WebGUI::Asset->new($session, $id,$class,$version);
-		if (defined $asset) {
+        my $asset = eval { WebGUI::Asset->newById($session, $id, $version); };
+        if (Exception::Class->caught()) {
+            $log->error("Could not instanciate asset $id $class $version perhaps it is corrupt.")
+        }
+        else {
             if ($asset->getRevisionCount("approved") > 1) {
                 $log->info("Purging revision $version for asset $id.");
                 $asset->purgeRevision;
             }
-		}
-        else {
-			$log->error("Could not instanciate asset $id $class $version perhaps it is corrupt.")
-		}
+        }
 
         # give up if we're taking too long
         if (time() - $start > $ttl) { 

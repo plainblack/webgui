@@ -16,7 +16,43 @@ package WebGUI::Asset::Sku::Donation;
 
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+aspect assetName           => ['assetName', 'Asset_Donation'];
+aspect icon                => 'Donation.gif';
+aspect tableName           => 'donation';
+property templateId => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "Donation",
+            default         => "vrKXEtluIhbmAS9xmPukDA",
+            label           => ["donate template", 'Asset_Donation'],
+            hoverHelp       => ["donate template help", 'Asset_Donation'],
+         );
+property thankYouMessage => (
+            tab             => "properties",
+            builder         => '_thankYouMessage_default',
+            lazy            => 1,
+            fieldType       => "HTMLArea",
+            label           => ["thank you message", 'Asset_Donation'],
+            hoverHelp       => ["thank you message help", 'Asset_Donation'],
+         );
+sub _thankYouMessage_default {
+    my $session = shift->session;
+	my $i18n = WebGUI::International->new($session, "Asset_Donation");
+    return $i18n->get("default thank you message");
+}
+property defaultPrice => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 100.00,
+            label           => ["default price", 'Asset_Donation'],
+            hoverHelp       => ["default price help", 'Asset_Donation'],
+         );
+
+
+
 use WebGUI::Asset::Template;
 use WebGUI::Form;
 
@@ -39,57 +75,6 @@ These methods are available from this class:
 
 =cut
 
-
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-Adds templateId, thankYouMessage, and defaultPrice fields.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_Donation");
-	%properties = (
-		templateId => {
-			tab             => "display",
-			fieldType       => "template",
-            namespace       => "Donation",
-			defaultValue    => "vrKXEtluIhbmAS9xmPukDA",
-			label           => $i18n->get("donate template"),
-			hoverHelp       => $i18n->get("donate template help"),
-			},
-        thankYouMessage => {
-            tab             => "properties",
-			defaultValue    => $i18n->get("default thank you message"),
-			fieldType       => "HTMLArea",
-			label           => $i18n->get("thank you message"),
-			hoverHelp       => $i18n->get("thank you message help"),
-            },
-		defaultPrice => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 100.00,
-			label           => $i18n->get("default price"),
-			hoverHelp       => $i18n->get("default price help"),
-			},
-	    );
-	push(@{$definition}, {
-		assetName           => $i18n->get('assetName'),
-		icon                => 'Donation.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'donation',
-		className           => 'WebGUI::Asset::Sku::Donation',
-		properties          => \%properties
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
 
 
 #-------------------------------------------------------------------
@@ -138,7 +123,7 @@ Returns configured price, or default price, or 100 if neither of those are avail
 
 sub getPrice {
     my $self = shift;
-    return $self->getOptions->{price} || $self->get("defaultPrice") || 100.00;
+    return $self->getOptions->{price} || $self->defaultPrice || 100.00;
 }
 
 #-------------------------------------------------------------------
@@ -152,7 +137,7 @@ Prepares the template.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $templateId = $self->get("templateId");
+	my $templateId = $self->templateId;
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;

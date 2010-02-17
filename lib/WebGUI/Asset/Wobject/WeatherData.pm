@@ -28,64 +28,48 @@ BEGIN {
 }
 
 use WebGUI::International;
-use base 'WebGUI::Asset::Wobject';
-use WebGUI::Utility;
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-defines wobject properties for WeatherData instances
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Asset_WeatherData");
-	my $properties = {
-		partnerId => {
-			fieldType 	=> "text",
-			tab 		=> "properties",
-			defaultValue	=> undef,
-			hoverHelp	=> $i18n->get("partnerId help"),
-			label		=> $i18n->get("partnerId"),
-			subtext		=> '<a href="http://www.weather.com/services/xmloap.html">'.$i18n->get("you need a weather.com key").'</a>',
-			},
-		licenseKey => {
-			fieldType	=> "text",
-			tab		=> "properties",
-			defaultValue	=> undef,
-			hoverHelp	=> $i18n->get("licenseKey help"),
-			label		=> $i18n->get("licenseKey"),
-			},
-		templateId =>{
-			fieldType=>"template",
-			tab=>"display",
-			defaultValue=>'WeatherDataTmpl0000001',
-			namespace=>"WeatherData",
-			hoverHelp=>$i18n->get("Current Weather Conditions Template to use"),
-			label=>$i18n->get("Template")
-		},
-		locations=>{
-			fieldType=>"textarea",
-			defaultValue=>"Madison, WI\nToronto, Canada\n53536",
-			tab=>"properties",
-			hoverHelp=>$i18n->get("Your list of default weather locations"),
-			label=>$i18n->get("Default Locations")
-		},
-	};
-	push(@{$definition}, {
-		tableName=>'WeatherData',
-		className=>'WebGUI::Asset::Wobject::WeatherData',
-		assetName=>$i18n->get("assetName"),
-		icon=>'weatherData.gif',
-		autoGenerateForms=>1,
-		properties=>$properties
-	});
-	return $class->SUPER::definition($session, $definition);
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+aspect tableName => 'WeatherData';
+aspect assetName => ["assetName", 'Asset_WeatherData'];
+aspect icon      => 'weatherData.gif';
+property partnerId => (
+            fieldType   => "text",
+            tab         => "properties",
+            default     => undef,
+            hoverHelp   => ["partnerId help", 'Asset_WeatherData'],
+            label       => ["partnerId", 'Asset_WeatherData'],
+            subtext     => \&_partnerId_subtext,
+          );
+sub _partnerId_subtext {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_WeatherData');
+    return '<a href="http://www.weather.com/services/xmloap.html">'.$i18n->get("you need a weather.com key").'</a>';
 }
+property licenseKey => (
+            fieldType   => "text",
+            tab         => "properties",
+            default     => undef,
+            hoverHelp   => ["licenseKey help", 'Asset_WeatherData'],
+            label       => ["licenseKey", 'Asset_WeatherData'],
+         );
+property templateId => (
+            fieldType   => "template",
+            tab         => "display",
+            default     => 'WeatherDataTmpl0000001',
+            namespace   => "WeatherData",
+            hoverHelp   => ["Current Weather Conditions Template to use", 'Asset_WeatherData'],
+            label       => ["Template", 'Asset_WeatherData'],
+         );
+property locations => (
+            fieldType   => "textarea",
+            default     => "Madison, WI\nToronto, Canada\n53536",
+            tab         => "properties",
+            hoverHelp   => ["Your list of default weather locations", 'Asset_WeatherData'],
+            label       => ["Default Locations", 'Asset_WeatherData'],
+         );
+
+use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 
@@ -98,11 +82,11 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -124,11 +108,11 @@ sub view {
 	my %var;
     my $url = $self->session->url;
     
-	if ($self->get("partnerId") ne "" && $self->get("licenseKey") ne "") {
-		foreach my $location (split("\n", $self->get("locations"))) {
+	if ($self->partnerId ne "" && $self->licenseKey ne "") {
+		foreach my $location (split("\n", $self->locations)) {
 		    my $weather = Weather::Com::Finder->new({
-				'partner_id' => $self->get("partnerId"), 
-       	        'license'    => $self->get("licenseKey"),
+				'partner_id' => $self->partnerId, 
+       	        'license'    => $self->licenseKey,
 				'cache'		 => '/tmp',
 				});	
 			next unless defined $weather;
