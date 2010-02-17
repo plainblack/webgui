@@ -962,23 +962,20 @@ Use this ID to create a new row. Same as setting the key value to "new" except t
 
 sub setRow {
 	my ($self, $table, $keyColumn, $data, $id) = @_;
-	if ($data->{$keyColumn} eq "new" || $id) {
-		$data->{$keyColumn} = $id || $self->session->id->generate();
-		$self->write("replace into $table (" . $self->dbh->quote_identifier($keyColumn) . ") values (?)",[$data->{$keyColumn}]);
+    $data->{$keyColumn} ||= $id;
+	if ($data->{$keyColumn} eq "new") {
+		$data->{$keyColumn} = $self->session->id->generate();
 	}
+    my $dbh = $self->dbh;
 	my @fields = ();
 	my @data = ();
+    my @placeholders = ();
 	foreach my $key (keys %{$data}) {
-		unless ($key eq $keyColumn) {
-			push(@fields, $self->dbh->quote_identifier($key).'=?');
-			push(@data,$data->{$key});
-		}
+		push(@fields, $dbh->quote_identifier($key));
+        push(@placeholders, '?');
+		push(@data,$data->{$key});
 	}
-	if ($fields[0] ne "") {
-		push(@data,$data->{$keyColumn});
-		$self->write("update $table set " . join(", ", @fields)
-            . " where " . $self->dbh->quote_identifier($keyColumn) . "=?", \@data);
-	}
+	$self->write("replace into $table (" . join(",",@fields) . ") values (".join(",",@placeholders).")",\@data);
 	return $data->{$keyColumn};
 }
 

@@ -55,6 +55,7 @@ sub migrateToNewCache {
     my $db = $session->db;
     $db->write("drop table cache");
     $db->write("delete from WorkflowActivity where className in ('WebGUI::Workflow::Activity::CleanDatabaseCache','WebGUI::Workflow::Activity::CleanFileCache')");
+    $db->write("delete from WorkflowActivityData where activityId in  ('pbwfactivity0000000002','pbwfactivity0000000022')");
     print "DONE!\n" unless $quiet;
 }
 

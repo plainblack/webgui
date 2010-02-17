@@ -264,7 +264,7 @@ sub _createForm {
     elsif ( $class->isa('WebGUI::Form::List') ) {
         delete $param{size};
     }
-    elsif ( $type eq 'HTMLArea' && $data->{htmlAreaRichEditor} ne '**Use_Default_Editor**') {
+    elsif ( $type eq 'HTMLArea' && $data->{htmlAreaRichEditor} ne '') {
         $param{richEditId} = $data->{htmlAreaRichEditor}  ;
     }
     return $class->new($session, \%param);
