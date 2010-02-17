@@ -24,10 +24,6 @@ Asset Role that guarantees that the isHidden property is always 1.
 
 =head1 SYNOPSIS
 
-Despite using OO style methods, there are no AssetHelper objects.  This is simply to provide inheritance.
-
-=head1 METHODS
-
 with WebGUI::Role::Asset::AlwaysHidden;
 
 =cut
