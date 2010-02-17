@@ -15,7 +15,7 @@ package WebGUI::Definition::Meta::Property::Asset;
 =cut
 
 use 5.010;
-use Moose;
+use Moose::Role;
 use namespace::autoclean;
 no warnings qw(uninitialized);
 
@@ -35,8 +35,6 @@ specific methods.  The tableName and fieldType class properties must be defined.
 The following methods are added.
 
 =cut
-
-extends 'WebGUI::Definition::Meta::Property';
 
 has 'tableName' => (
     is       => 'ro',

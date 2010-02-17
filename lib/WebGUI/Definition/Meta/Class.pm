@@ -15,12 +15,10 @@ package WebGUI::Definition::Meta::Class;
 =cut
 
 use 5.010;
-use Moose;
+use Moose::Role;
 use namespace::autoclean;
 use WebGUI::Definition::Meta::Property;
 no warnings qw(uninitialized);
-
-extends 'Moose::Meta::Class';
 
 our $VERSION = '0.0.1';
 
@@ -43,6 +41,33 @@ sub metaclasses.  Database persistance is handled similarly.
 These methods are available from this class:
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 add_property ()
+
+=cut
+
+sub add_property {
+    my ($self, $name, %options) = @_;
+    if (! (exists $options{noFormPost} || exists $options{label}) ) {
+        Moose->throw_error("Must pass either noFormPost or label when making a property");
+    }
+    my %form_options;
+    my $prop_meta = $self->property_meta;
+    for my $key ( keys %options ) {
+        if ( ! $prop_meta->meta->find_attribute_by_name($key) ) {
+            $form_options{$key} = delete $options{$key};
+        }
+    }
+    $self->add_attribute(
+        $name,
+        is          => 'rw',
+        metaclass   => $prop_meta,
+        form => \%form_options,
+        %options,
+    );
+}
 
 #-------------------------------------------------------------------
 
@@ -75,7 +100,7 @@ sub get_all_class_metas {
     my @metas = ();
     CLASS: foreach my $class_name (reverse $self->linearized_isa()) {
         my $meta = $self->initialize($class_name);
-        next CLASS unless $meta->isa('WebGUI::Definition::Meta::Class');
+        next CLASS unless $meta->does('WebGUI::Definition::Meta::Class');
         push @metas, $meta;
     }
     return @metas;
@@ -144,7 +169,7 @@ Returns an array of all properties, but only for this class.
 
 sub get_properties {
     my $self = shift;
-    return grep { $_->isa('WebGUI::Definition::Meta::Property') } $self->get_attributes;
+    return grep { $_->does('WebGUI::Definition::Meta::Property') } $self->get_attributes;
 }
 
 #-------------------------------------------------------------------
@@ -185,13 +210,13 @@ sub get_tables {
 
 #-------------------------------------------------------------------
 
-=head2 property_meta ( )
+=head2 property_traits ( )
 
 Returns the name of the class for properties.
 
 =cut
 
-sub property_meta {
+sub property_metaclass {
     return 'WebGUI::Definition::Meta::Property';
 }
 

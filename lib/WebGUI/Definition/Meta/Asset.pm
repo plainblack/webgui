@@ -15,12 +15,10 @@ package WebGUI::Definition::Meta::Asset;
 =cut
 
 use 5.010;
-use Moose;
+use Moose::Role;
 use namespace::autoclean;
 use WebGUI::Definition::Meta::Property::Asset;
 no warnings qw(uninitialized);
-
-extends 'WebGUI::Definition::Meta::Class';
 
 our $VERSION = '0.0.1';
 
@@ -51,13 +49,22 @@ for properties.
 
 =cut
 
-sub property_meta {
-    return 'WebGUI::Definition::Meta::Property::Asset';
-}
+around property_traits => sub {
+    my ($orig, $self) = shift;
+    my $traits = $self->$orig;
+    push @$traits, 'WebGUI::Definition::Meta::Property::Asset';
+    return $traits;
+};
 
 has [ qw{tableName icon assetName uiLevel} ] => (
     is       => 'rw',
 );
+
+around add_property => sub {
+    my ($orig, $self, $name, %options) = shift;
+    $options{tableName} //= $self->tableName;
+    return $self->$orig($name, %options);
+};
 
 #-------------------------------------------------------------------
 

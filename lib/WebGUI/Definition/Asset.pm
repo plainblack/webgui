@@ -15,11 +15,14 @@ package WebGUI::Definition::Asset;
 =cut
 
 use 5.010;
-use Moose;
+use feature ();
+
 use Moose::Exporter;
 use WebGUI::Definition ();
 use WebGUI::Definition::Meta::Asset;
+
 use namespace::autoclean;
+
 no warnings qw(uninitialized);
 
 our $VERSION = '0.0.1';
@@ -45,47 +48,45 @@ These methods are available from this class:
 =cut
 
 my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
-    install         => [ 'unimport' ],
-    also            => 'WebGUI::Definition',
-    with_meta       => [ 'property' ],
+    install          => [ 'unimport' ],
+    also             => 'WebGUI::Definition',
 );
+
+#-------------------------------------------------------------------
+
+=head2 import ( )
+
+A custom import method is provided so that uninitialized properties do not
+generate warnings.
+
+=cut
 
 sub import {
     my $class = shift;
     my $caller = caller;
     $class->$import({ into_level => 1 });
     warnings->unimport('uninitialized');
+    feature->import(':5.10');
     namespace::autoclean->import( -cleanee => $caller );
     return 1;
 }
 
 sub init_meta {
     my $class = shift;
-    my %options = @_;
-    $options{metaclass} //= 'WebGUI::Definition::Meta::Asset';
-    my $meta = WebGUI::Definition->init_meta(%options);
-    Moose::Util::apply_all_roles($meta, 'WebGUI::Definition::Role::Asset');
-    return $meta;
-}
+    my %args = @_;
 
-#-------------------------------------------------------------------
+    WebGUI::Definition->init_meta(%args);
 
-=head2 property ( $name, %options )
-
-Extends WebGUI::Definition::property to copy the tableName from the
-meta class into the options for each property.
-
-=head3 $name
-
-=head3 %options
-
-=cut
-
-
-sub property {
-    my ($meta, $name, %options) = @_;
-    $options{tableName} //= $meta->tableName;
-    return WebGUI::Definition::property($meta, $name, %options);
+    Moose::Util::MetaRole::apply_base_class_roles(
+        for   => $args{for_class},
+        roles => ['WebGUI::Definition::Role::Asset'],
+    );
+    Moose::Util::MetaRole::apply_metaroles(
+        for              => $args{for_class},
+        class_metaroles  => {
+            class           => ['WebGUI::Definition::Meta::Asset'],
+        },
+    );
 }
 
 1;

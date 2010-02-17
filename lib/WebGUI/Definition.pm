@@ -15,11 +15,13 @@ package WebGUI::Definition;
 =cut
 
 use 5.010;
-use Moose::Exporter;
 use feature ();
+
+use Moose ();
+use Moose::Exporter;
+use Moose::Util::MetaRole;
+
 use namespace::autoclean;
-use WebGUI::Definition::Meta::Class;
-use WebGUI::Definition::Meta::Property;
 no warnings qw(uninitialized);
 
 our $VERSION = '0.0.1';
@@ -68,21 +70,22 @@ sub import {
     return 1;
 }
 
-#-------------------------------------------------------------------
-
-=head2 init_meta ( )
-
-Sets the metaclass to WebGUI::Definition::Meta::Class.
-
-=cut
-
 sub init_meta {
     my $class = shift;
-    my %options = @_;
-    $options{metaclass} //= 'WebGUI::Definition::Meta::Class';
-    my $meta = Moose->init_meta(%options);
-    Moose::Util::apply_all_roles($meta, 'WebGUI::Definition::Role::Object');
-    return $meta;
+    my %args = @_;
+
+    Moose->init_meta(%args);
+
+    Moose::Util::MetaRole::apply_base_class_roles(
+        for   => $args{for_class},
+        roles => ['WebGUI::Definition::Role::Object'],
+    );
+    Moose::Util::MetaRole::apply_metaroles(
+        for              => $args{for_class},
+        class_metaroles  => {
+            class           => ['WebGUI::Definition::Meta::Class'],
+        },
+    );
 }
 
 #-------------------------------------------------------------------
@@ -142,23 +145,7 @@ Either or both of these must be passed in.
 
 sub property {
     my ($meta, $name, %options) = @_;
-    if (! (exists $options{noFormPost} || exists $options{label}) ) {
-        Moose->throw_error("Must pass either noFormPost or label when making a property");
-    }
-    my %form_options;
-    my $prop_meta = $meta->property_meta;
-    for my $key ( keys %options ) {
-        if ( ! $prop_meta->meta->find_attribute_by_name($key) ) {
-            $form_options{$key} = delete $options{$key};
-        }
-    }
-    $meta->add_attribute(
-        $name,
-        is => 'rw',
-        metaclass => $prop_meta,
-        form => \%form_options,
-        %options,
-    );
+    $meta->add_property($name, %options);
     return 1;
 }
 
