@@ -39,6 +39,7 @@ A package for manipulating and massaging HTML.
  $html = WebGUI::HTML::makeAbsolute($session, $html);
  $html = WebGUI::HTML::processReplacements($session, $html);
  $html = WebGUI::HTML::splitTag([$tag,]$html[,$count]);    # defaults to ( 'p', $html, 1 )
+ $html = WebGUI::HTML::arrayToRow(@columnData);
 
 =head1 METHODS
 
@@ -46,6 +47,27 @@ These methods are available from this package:
 
 =cut
 
+
+#-------------------------------------------------------------------
+
+=head2 arrayToRow ( @columnData )
+
+Wraps each element of @columnData in a table cell tag, concatenates them all together,
+and then wraps that in table row tags.
+
+=head3 @columnData
+
+An array of strings to wrap.
+
+=cut
+
+sub arrayToRow {
+    my @columnData = @_;
+    my $output = '<tr><td>';
+    $output .= join '</td><td>', @columnData;
+    $output .= '</td></tr>';
+    return $output;
+}
 
 #-------------------------------------------------------------------
 
