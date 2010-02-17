@@ -4,21 +4,21 @@ use strict;
 use Moose;
 use MooseX::Storage;
 
-has 'action' => ( is => 'rw' );
+has 'action'  => ( is => 'rw' );
 has 'enctype' => ( is => 'rw', default => 'multipart/form-data' );
-has 'method' => ( is => 'rw', default => 'POST' );
-has 'name' => ( is => 'rw' );
-has 'session' => ( 
-    is => 'ro', 
-    isa => 'WebGUI::Session', 
-    required => 1, 
+has 'method'  => ( is => 'rw', default => 'POST' );
+has 'name'    => ( is => 'rw' );
+has 'session' => (
+    is       => 'ro',
+    isa      => 'WebGUI::Session',
+    required => 1,
     weak_ref => 1,
-    traits => [ 'DoNotSerialize' ],
+    traits   => ['DoNotSerialize'],
 );
 
 with Storage( format => 'JSON' );
 with 'WebGUI::FormBuilder::Role::HasFields';
-with 'WebGUI::FormBuilder::Role::HasFieldsets'; 
+with 'WebGUI::FormBuilder::Role::HasFieldsets';
 with 'WebGUI::FormBuilder::Role::HasTabs';
 
 use WebGUI::FormBuilder::Tab;
@@ -56,10 +56,10 @@ other possible value is "application/x-www-form-urlencoded".
 
 =cut
 
-sub new {
+sub BUILDARGS {
     my ( $class, $session, %properties ) = @_;
-    $properties{ session    } = $session;
-    return $class->SUPER::new( %properties );
+    $properties{session} = $session;
+    return \%properties;
 }
 
 #----------------------------------------------------------------------------
@@ -79,6 +79,7 @@ Create a clone of this Form
 =cut
 
 sub clone {
+
     # TODO
 }
 
@@ -99,9 +100,9 @@ Get the footer for this form.
 =cut
 
 sub getFooter {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
-    my $html    = '</form>';
+    my $html = '</form>';
 
     return $html;
 }
@@ -115,13 +116,13 @@ Get the header for this form.
 =cut
 
 sub getHeader {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
-    my @attrs   = qw{ action method name enctype };
-    my $attrs   = join " ", map { qq{$_="} . $self->$_ . qq{"} } grep { $self->$_ } @attrs;
+    my @attrs = qw{ action method name enctype };
+    my $attrs = join " ", map { qq{$_="} . $self->$_ . qq{"} } grep { $self->$_ } @attrs;
 
-    my $html    = sprintf '<form %s>', $attrs;
-    
+    my $html = sprintf '<form %s>', $attrs;
+
     return $html;
 }
 
@@ -158,12 +159,13 @@ Return the HTML for the form
 =cut
 
 sub toHtml {
-    my ( $self ) = @_;
-    
+    my ($self) = @_;
+
     my $html = $self->getHeader;
+
     # Add individual objects
-    $html   .= join "", map { $_->toHtml } @{$self->objects};
-    $html   .= $self->getFooter;
+    $html .= join "", map { $_->toHtml } @{ $self->objects };
+    $html .= $self->getFooter;
 
     return $html;
 }
@@ -183,9 +185,11 @@ sub toTemplateVars {
     $var ||= {};
 
     # $prefix_header
-    $var->{ "${prefix}_header" } = $self->getHeader;
+    $var->{"${prefix}_header"} = $self->getHeader;
+
     # $prefix_footer
-    $var->{ "${prefix}_footer" } = $self->getFooter;
+    $var->{"${prefix}_footer"} = $self->getFooter;
+
     # $prefix_fieldloop
     #   name    -- for comparisons
     #   field
@@ -195,26 +199,26 @@ sub toTemplateVars {
     #   subtext
     #   hoverhelp   -- The text. For use with label_nohover
     # $prefix_field_$fieldName
-    if ( @{$self->fields} ) {
-        my $fieldLoop = [];
-        $var->{ "${prefix}_fieldloop" } = $fieldLoop;
-        for my $field ( @{$self->fields} ) {
+    if ( @{ $self->fields } ) {
+        my $fieldLoop = $var->{"${prefix}_fieldloop"} = [];
+        for my $field ( @{ $self->fields } ) {
             my $name  = $field->get('name');
             my $props = {
-                name            => $name,
-                field           => $field->toHtml,
-                label           => $field->getLabel,
-                label_nohover   => $field->get('label'),
-                pretext         => $field->get('pretext'),
-                subtext         => $field->get('subtext'),
-                hoverhelp       => $field->get('hoverhelp'),
+                name          => $name,
+                field         => $field->toHtml,
+                label         => $field->getLabel,
+                label_nohover => $field->get('label'),
+                pretext       => $field->get('pretext'),
+                subtext       => $field->get('subtext'),
+                hoverhelp     => $field->get('hoverhelp'),
             };
             for my $key ( keys %{$props} ) {
-                $var->{ "${prefix}_field_${name}_${key}" } = $props->{$key};
+                $var->{"${prefix}_field_${name}_${key}"} = $props->{$key};
             }
             push @{$fieldLoop}, $props;
-        }
-    }
+        } ## end for my $field ( @{ $self...})
+    } ## end if ( @{ $self->fields ...})
+
     # $prefix_fieldsetloop
     #   name
     #   legend
@@ -226,18 +230,18 @@ sub toTemplateVars {
     #   tabloop
     #       ...
     # $prefix_fieldset_$fieldsetName
-    if ( @{$self->fieldsets} ) {
-        my $fieldsetLoop = [];
-        $var->{ "${prefix}_fieldsetLoop" } = $fieldsetLoop;
-        for my $fieldset ( @{$self->fieldsets} ) {
-            my $name    = $fieldset->name;
-            my $props   = $fieldset->toTemplateVars;
+    if ( @{ $self->fieldsets } ) {
+        my $fieldsetLoop = $var->{"${prefix}_fieldsetLoop"} = [];
+        for my $fieldset ( @{ $self->fieldsets } ) {
+            my $name  = $fieldset->name;
+            my $props = $fieldset->toTemplateVars;
             for my $key ( keys %{$props} ) {
-                $var->{ "${prefix}_fieldset_${name}_${key}" } = $props->{key};
+                $var->{"${prefix}_fieldset_${name}_${key}"} = $props->{key};
             }
             push @{$fieldsetLoop}, $props;
         }
     }
+
     # $prefix_tabloop
     #   name
     #   label
@@ -248,21 +252,20 @@ sub toTemplateVars {
     #   tabloop
     #       ...
     # $prefix_tab_$tabName
-    if ( @{$self->tabs} ) {
-        my $tabLoop = [];
-        $var->{ "${prefix}_tabLoop" } = $tabLoop;
-        for my $tab ( @{$self->tabs} ) {
-            my $name    = $tab->name;
-            my $props   = $tab->toTemplateVars;
+    if ( @{ $self->tabs } ) {
+        my $tabLoop = $var->{"${prefix}_tabLoop"} = [];
+        for my $tab ( @{ $self->tabs } ) {
+            my $name  = $tab->name;
+            my $props = $tab->toTemplateVars;
             for my $key ( keys %{$props} ) {
-                $var->{ "${prefix}_tab_${name}_${key}" } = $props->{key};
+                $var->{"${prefix}_tab_${name}_${key}"} = $props->{key};
             }
             push @{$tabLoop}, $props;
         }
     }
 
     return $var;
-}
+} ## end sub toTemplateVars
 
 =head1 TEMPLATES
 

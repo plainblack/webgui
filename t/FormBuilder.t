@@ -47,6 +47,7 @@ $fb = WebGUI::FormBuilder->new( $session,
     enctype     => 'application/x-www-form-urlencoded',
     name        => 'search',
     method      => 'get',
+    id          => "myId",
 );
 isa_ok( $fb, 'WebGUI::FormBuilder' );
 is( $fb->method, 'get' );
