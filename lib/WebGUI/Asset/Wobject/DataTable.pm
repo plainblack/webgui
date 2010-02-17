@@ -15,9 +15,9 @@ $VERSION = "1.0.0";
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName         => ['assetName', 'Asset_EMSRibbon'];
-aspect icon              => 'DataTable.gif';
-aspect tableName         => 'DataTable';
+define assetName         => ['assetName', 'Asset_EMSRibbon'];
+define icon              => 'DataTable.gif';
+define tableName         => 'DataTable';
 property data => (
             fieldType    => 'DataTable',
             default      => undef,

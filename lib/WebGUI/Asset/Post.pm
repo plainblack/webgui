@@ -14,9 +14,9 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect assetName => ['assetName', 'Asset_Post'];
-aspect icon      => 'post.gif';
-aspect tableName => 'Post';
+define assetName => ['assetName', 'Asset_Post'];
+define icon      => 'post.gif';
+define tableName => 'Post';
 property storageId => (
             fieldType         => "image",
             default           => '',

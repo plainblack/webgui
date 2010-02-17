@@ -18,9 +18,9 @@ use WebGUI::SQL;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_MessageBoard'];
-aspect icon      => 'messageBoard.gif';
-aspect tableName => 'MessageBoard';
+define assetName => ['assetName', 'Asset_MessageBoard'];
+define icon      => 'messageBoard.gif';
+define tableName => 'MessageBoard';
 property templateId => (
                 tab         => "display",
                 fieldType   => "template",

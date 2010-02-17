@@ -18,9 +18,9 @@ use strict;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::File';
-aspect assetName => ['assetName', 'Asset_ZipArchive'];
-aspect tableName => 'ZipArchiveAsset';
-aspect icon      => 'ziparchive.gif';
+define assetName => ['assetName', 'Asset_ZipArchive'];
+define tableName => 'ZipArchiveAsset';
+define icon      => 'ziparchive.gif';
 property showPage => (
             tab          => "properties",
             label        => ['show page', 'Asset_ZipArchive'],

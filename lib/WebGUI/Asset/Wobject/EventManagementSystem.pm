@@ -17,9 +17,9 @@ package WebGUI::Asset::Wobject::EventManagementSystem;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_EventManagementSystem'];
-aspect icon      => 'ems.gif';
-aspect tableName => 'EventManagementSystem';
+define assetName => ['assetName', 'Asset_EventManagementSystem'];
+define icon      => 'ems.gif';
+define tableName => 'EventManagementSystem';
 property timezone => (
             fieldType        => 'TimeZone',
             default          => 'America/Chicago',

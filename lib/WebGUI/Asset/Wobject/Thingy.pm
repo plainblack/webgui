@@ -21,9 +21,9 @@ use WebGUI::DateTime;
 use WebGUI::Definition::Asset;
 
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_Thingy'];
-aspect icon      => 'thingy.gif';
-aspect tableName => 'Thingy';
+define assetName => ['assetName', 'Asset_Thingy'];
+define icon      => 'thingy.gif';
+define tableName => 'Thingy';
 property templateId => (
             fieldType   => "template",  
             default     => 'ThingyTmpl000000000001',

@@ -27,7 +27,7 @@ my $called_getProperties;
     package WGT::Class;
     use WebGUI::Definition;
 
-    aspect 'aspect1' => 'aspect1 value';
+    define 'define1' => 'define1 value';
     property 'property1' => (
         arbitrary_key => 'arbitrary_value',
         label         => 'property1',
@@ -37,10 +37,10 @@ my $called_getProperties;
         label         => 'property2',
     );
 
-    # aspects create methods
-    ::can_ok +__PACKAGE__, 'aspect1';
+    # define creates methods
+    ::can_ok +__PACKAGE__, 'define1';
 
-    # propeties create methods
+    # properties create methods
     ::can_ok +__PACKAGE__, 'property1';
 
     # role applied
@@ -60,7 +60,7 @@ my $called_getProperties;
     package WGT::Class2;
     use WebGUI::Definition;
 
-    aspect 'aspect1' => 'aspect1 value';
+    define 'define1' => 'define1 value';
     property  'property3' => ( label => 'label' );
     property  'property1' => ( label => 'label' );
     property  'property2' => ( label => 'label' );
@@ -102,7 +102,7 @@ my $called_getProperties;
     package WGT::Class3;
     use WebGUI::Definition;
 
-    aspect 'aspect1' => 'aspect1 value';
+    define 'define1' => 'define1 value';
     property  'property1' => (
         label     => ['webgui', 'WebGUI'],
         hoverHelp => ['webgui help %s', 'WebGUI', 'extra'],
@@ -145,7 +145,7 @@ my $called_getProperties;
     use WebGUI::Definition;
     extends 'WGT::Class3';
 
-    aspect 'aspect41' => 'aspect41 value';
+    define 'define41' => 'define41 value';
     property  'property41' => (
         label   => ['webgui', 'WebGUI'],
     );
@@ -159,7 +159,7 @@ my $called_getProperties;
     ::cmp_bag (
         [WGT::Class3->meta->get_all_attributes_list],
         [qw/ property1 session /],
-        'get_all_aspects_list returns all aspects in all metaclasses for the class'
+        'get_all_attributes_list returns all attributes in all metaclasses for the class'
     );
 
     ::cmp_bag (

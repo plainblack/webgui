@@ -19,9 +19,9 @@ use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => [ 'assetName', 'Asset_Carousel' ];
-aspect icon      => 'Carousel.png';
-aspect tableName => 'Carousel';
+define assetName => [ 'assetName', 'Asset_Carousel' ];
+define icon      => 'Carousel.png';
+define tableName => 'Carousel';
 property templateId => (
     fieldType  => "template",
     default    => 'CarouselTmpl0000000001',

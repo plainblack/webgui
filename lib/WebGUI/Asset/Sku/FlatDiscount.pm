@@ -18,9 +18,9 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-aspect assetName           => ['assetName', 'Asset_FlatDiscount'];
-aspect icon                => 'FlatDiscount.gif';
-aspect tableName           => 'FlatDiscount';
+define assetName           => ['assetName', 'Asset_FlatDiscount'];
+define icon                => 'FlatDiscount.gif';
+define tableName           => 'FlatDiscount';
 property templateId => (
             tab             => "display",
             fieldType       => "template",

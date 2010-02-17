@@ -21,9 +21,9 @@ use WebGUI::Storage;
 use WebGUI::Exception::Shop;
 use WebGUI::Asset::Sku::Product;
 
-aspect assetName  => ['assetName', 'Asset_Shelf'];
-aspect icon       => 'Shelf.gif';
-aspect tableName  => 'Shelf';
+define assetName  => ['assetName', 'Asset_Shelf'];
+define icon       => 'Shelf.gif';
+define tableName  => 'Shelf';
 
 property templateId => (
             fieldType        => "template",  

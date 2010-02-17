@@ -21,8 +21,8 @@ use Carp;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 
-aspect assetName => ['assetName', 'Asset_File'];
-aspect tableName => 'FileAsset';
+define assetName => ['assetName', 'Asset_File'];
+define tableName => 'FileAsset';
 property cacheTimeout => (
                 tab       => "display",
                 fieldType => "interval",

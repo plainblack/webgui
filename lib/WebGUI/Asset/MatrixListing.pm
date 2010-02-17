@@ -19,8 +19,8 @@ use Tie::IxHash;
 #use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect assetName => ['assetName', 'Asset_MatrixListing'];
-aspect tableName => 'MatrixListing';
+define assetName => ['assetName', 'Asset_MatrixListing'];
+define tableName => 'MatrixListing';
 property screenshots => (
             tab             => "properties",
             fieldType       => "image",

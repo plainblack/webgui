@@ -19,9 +19,9 @@ use WebGUI::Asset::Wobject;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => [ 'assetName', 'Asset_Dashboard' ];
-aspect icon      => 'dashboard.gif';
-aspect tableName => 'Dashboard';
+define assetName => [ 'assetName', 'Asset_Dashboard' ];
+define icon      => 'dashboard.gif';
+define tableName => 'Dashboard';
 property templateId => (
     fieldType => "template",
     default   => 'DashboardViewTmpl00001',

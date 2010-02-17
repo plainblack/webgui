@@ -9,9 +9,9 @@ use WebGUI::SQL;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect tableName => 'InOutBoard';
-aspect assetName => ['assetName', 'Asset_MapPoint'];
-aspect icon      => 'iob.gif';
+define tableName => 'InOutBoard';
+define assetName => ['assetName', 'Asset_MapPoint'];
+define icon      => 'iob.gif';
 property statusList => (
                 tab          => 'properties',
                 fieldType    => "textarea",

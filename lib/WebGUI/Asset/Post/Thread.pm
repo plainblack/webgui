@@ -13,9 +13,9 @@ package WebGUI::Asset::Post::Thread;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Post';
-aspect assetName => ['assetName', 'Asset_Thread'];
-aspect icon      => 'thread.gif';
-aspect tableName => 'Thread';
+define assetName => ['assetName', 'Asset_Thread'];
+define icon      => 'thread.gif';
+define tableName => 'Thread';
 property subscriptionGroupId => (
                 noFormPost  => 1,
                 fieldType   => "hidden",

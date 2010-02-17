@@ -17,9 +17,9 @@ use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 #use Class::C3;
 #use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
-aspect assetName => ['assetName', 'Asset_StoryTopic'];
-aspect icon      => 'storytopic.gif';
-aspect tableName => 'StoryTopic';
+define assetName => ['assetName', 'Asset_StoryTopic'];
+define icon      => 'storytopic.gif';
+define tableName => 'StoryTopic';
 property storiesPer => (
             tab          => 'display',  
             fieldType    => 'integer',  

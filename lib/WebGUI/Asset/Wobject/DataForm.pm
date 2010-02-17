@@ -28,10 +28,10 @@ use JSON ();
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
-aspect assetName           => ['assetName', 'Asset_DataForm'];
-aspect uiLevel             => 5;
-aspect tableName           => 'DataForm';
-aspect icon                => 'dataForm.gif';
+define assetName           => ['assetName', 'Asset_DataForm'];
+define uiLevel             => 5;
+define tableName           => 'DataForm';
+define icon                => 'dataForm.gif';
 property templateId => (
             fieldType       => 'template',
             default         => 'PBtmpl0000000000000141',

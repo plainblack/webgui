@@ -25,9 +25,9 @@ use JSON;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_Poll'];
-aspect tableName => 'Poll';
-aspect icon      => 'poll.gif';
+define assetName => ['assetName', 'Asset_Poll'];
+define tableName => 'Poll';
+define icon      => 'poll.gif';
 property templateId => (
                 tab          => 'display',
                 fieldType    => "template",

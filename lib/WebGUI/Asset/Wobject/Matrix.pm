@@ -20,9 +20,9 @@ use WebGUI::Utility;
 use WebGUI::Definition::Asset;
 use feature ":5.10";
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_Matrix'];
-aspect icon      => 'matrix.gif';
-aspect tableName => 'Matrix';
+define assetName => ['assetName', 'Asset_Matrix'];
+define icon      => 'matrix.gif';
+define tableName => 'Matrix';
 property templateId => (
             fieldType       => "template",  
             default         => 'matrixtmpl000000000001',

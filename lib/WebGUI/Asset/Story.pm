@@ -17,9 +17,9 @@ package WebGUI::Asset::Story;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect assetName         => ['assetName', 'Asset_Story'];
-aspect icon              => 'story.gif';
-aspect tableName         => 'Story';
+define assetName         => ['assetName', 'Asset_Story'];
+define icon              => 'story.gif';
+define tableName         => 'Story';
 property headline => (
             fieldType    => 'text',  
             label        => ['headline', 'Asset_Story'],

@@ -18,9 +18,9 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect assetName         => ['assetName', 'Asset_MapPoint'];
-aspect icon              => 'MapPoint.gif';
-aspect tableName         => 'MapPoint';
+define assetName         => ['assetName', 'Asset_MapPoint'];
+define icon              => 'MapPoint.gif';
+define tableName         => 'MapPoint';
 property latitude => (
             tab         => "properties",
             fieldType   => "float",

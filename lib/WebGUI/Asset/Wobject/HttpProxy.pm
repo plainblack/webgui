@@ -24,10 +24,10 @@ use Apache2::Upload;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_HttpProxy'];
-aspect uiLevel   => 5;
-aspect icon      => 'httpProxy.gif';
-aspect tableName => 'HttpProxy';
+define assetName => ['assetName', 'Asset_HttpProxy'];
+define uiLevel   => 5;
+define icon      => 'httpProxy.gif';
+define tableName => 'HttpProxy';
 property templateId => (
                 fieldType => "template",
                 default   => 'PBtmpl0000000000000033',

@@ -22,9 +22,9 @@ use WebGUI::Form::Image;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::File';
-aspect   assetName     => ['assetName', 'Asset_Image'];
-aspect   tableName     => 'ImageAsset';
-aspect   icon          => 'image.gif';
+define assetName     => ['assetName', 'Asset_Image'];
+define tableName     => 'ImageAsset';
+define icon          => 'image.gif';
 property thumbnailSize => (
                 label           => ['thumbnail size', 'Asset_Image'],
                 hoverHelp       => ['Thumbnail size description', 'Asset_Image'],

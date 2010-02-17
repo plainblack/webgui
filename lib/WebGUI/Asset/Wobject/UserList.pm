@@ -24,9 +24,9 @@ use WebGUI::Form::File;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
-aspect assetName => ['assetName', 'Asset_UserList'];
-aspect icon      => 'userlist.gif';
-aspect tableName => 'UserList';
+define assetName => ['assetName', 'Asset_UserList'];
+define icon      => 'userlist.gif';
+define tableName => 'UserList';
 property templateId => (
             fieldType   => "template",  
             default     => 'UserListTmpl0000000001',

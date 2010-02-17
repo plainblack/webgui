@@ -15,9 +15,9 @@ use strict;
 #use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName           => ['assetName', 'Asset_Gallery'];
-aspect icon                => 'photoGallery.gif';
-aspect tableName           => 'Gallery',
+define assetName           => ['assetName', 'Asset_Gallery'];
+define icon                => 'photoGallery.gif';
+define tableName           => 'Gallery',
 property groupIdAddComment => (
             tab             => "security",
             fieldType       => "group",

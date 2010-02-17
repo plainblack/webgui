@@ -25,8 +25,8 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect tableName   => 'wobject';
-aspect assetName   => 'Wobject';
+define tableName   => 'wobject';
+define assetName   => 'Wobject';
 property description => (
             fieldType       => 'HTMLArea',
             default         => undef,

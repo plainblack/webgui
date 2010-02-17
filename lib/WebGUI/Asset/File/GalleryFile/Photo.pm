@@ -17,9 +17,9 @@ package WebGUI::Asset::File::GalleryFile::Photo;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::File::GalleryFile';
-aspect assetName           => ['assetName', 'Asset_Photo'];
-aspect icon                => 'photo.gif';
-aspect tableName           => 'Photo';
+define assetName           => ['assetName', 'Asset_Photo'];
+define icon                => 'photo.gif';
+define tableName           => 'Photo';
 property exifData => (
             fieldType           => 'text',
             noFormPost          => 1,

@@ -16,9 +16,9 @@ use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
-aspect assetName   => ['assetName', 'Asset_Calendar'];
-aspect icon        => 'calendar.gif';
-aspect tableName   => 'Calendar';
+define assetName   => ['assetName', 'Asset_Calendar'];
+define icon        => 'calendar.gif';
+define tableName   => 'Calendar';
 property defaultView => (
             fieldType       => "SelectBox",
             default         => "month",

@@ -14,9 +14,9 @@ use strict;
 #use Class::C3;
 #use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use WebGUI::Definition::Asset;
-aspect assetName           => ['assetName', 'Asset_GalleryAlbum'];
-aspect icon                => 'photoAlbum.gif';
-aspect tableName           => 'GalleryAlbum';
+define assetName           => ['assetName', 'Asset_GalleryAlbum'];
+define icon                => 'photoAlbum.gif';
+define tableName           => 'GalleryAlbum';
 
 property allowComments => (  ##Note, there's no UI for this feature.  There's just the framework for it.
             noFormPost      => 1,

@@ -30,9 +30,9 @@ BEGIN {
 use WebGUI::International;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect tableName => 'WeatherData';
-aspect assetName => ["assetName", 'Asset_WeatherData'];
-aspect icon      => 'weatherData.gif';
+define tableName => 'WeatherData';
+define assetName => ["assetName", 'Asset_WeatherData'];
+define icon      => 'weatherData.gif';
 property partnerId => (
             fieldType   => "text",
             tab         => "properties",

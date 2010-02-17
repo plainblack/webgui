@@ -18,9 +18,9 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-aspect assetName           => ['assetName', 'Asset_Subscription'];
-aspect icon                => 'subscription.gif';
-aspect tableName           => 'Subscription';
+define assetName           => ['assetName', 'Asset_Subscription'];
+define icon                => 'subscription.gif';
+define tableName           => 'Subscription';
 property templateId => (
             tab             => "display",
             fieldType       => "template",

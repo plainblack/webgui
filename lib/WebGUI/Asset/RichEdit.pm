@@ -22,10 +22,10 @@ use JSON;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect assetName   => ['assetName', 'Asset_RichEdit'];
-aspect icon        => 'richEdit.gif';
-aspect uiLevel     => 5;
-aspect tableName   => 'RichEdit';
+define assetName   => ['assetName', 'Asset_RichEdit'];
+define icon        => 'richEdit.gif';
+define uiLevel     => 5;
+define tableName   => 'RichEdit';
 property disableRichEditor => (
                 fieldType       => 'yesNo',
                 default         => 0,

@@ -13,9 +13,9 @@ package WebGUI::Asset::Wobject::Collaboration;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_Collaboration'];
-aspect icon      => 'collaboration.gif';
-aspect tableName => 'Collaboration';
+define assetName => ['assetName', 'Asset_Collaboration'];
+define icon      => 'collaboration.gif';
+define tableName => 'Collaboration';
 property visitorCacheTimeout => (
     tab       => "display",
     fieldType => "interval",

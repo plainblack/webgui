@@ -19,9 +19,9 @@ use WebGUI::Utility;
 use HTML::Entities qw(encode_entities);
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName         => ['assetName', 'Asset_Map'];
-aspect icon              => 'maps.png';
-aspect tableName         => 'Map';
+define assetName         => ['assetName', 'Asset_Map'];
+define icon              => 'maps.png';
+define tableName         => 'Map';
 property groupIdAddPoint => (
             tab         => "security",
             fieldType   => "group",

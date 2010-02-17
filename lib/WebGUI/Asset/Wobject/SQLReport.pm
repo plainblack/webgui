@@ -22,10 +22,10 @@ use WebGUI::Text qw(:csv);
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_SQLReport'];
-aspect uiLevel   => 5;
-aspect icon      => 'sqlReport.gif';
-aspect tableName => 'SQLReport';
+define assetName => ['assetName', 'Asset_SQLReport'];
+define uiLevel   => 5;
+define icon      => 'sqlReport.gif';
+define tableName => 'SQLReport';
 property templateId => (
             fieldType   => "template",
             default     => 'PBtmpl0000000000000059',

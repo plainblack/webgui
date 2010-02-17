@@ -18,9 +18,9 @@ use Finance::Quote;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect tableName => 'StockData';
-aspect icon      => 'stockData.gif';
-aspect assetName => ["assetName", 'Asset_StockData'];
+define tableName => 'StockData';
+define icon      => 'stockData.gif';
+define assetName => ["assetName", 'Asset_StockData'];
 property templateId => (
             fieldType   => "template",
             default     => 'StockDataTMPL000000001',

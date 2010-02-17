@@ -29,9 +29,9 @@ use WebGUI::Utility;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect tableName => 'MultiSearch';
-aspect assetName => ['assetName', 'Asset_MultiSearch'];
-aspect icon      => 'multiSearch.gif';
+define tableName => 'MultiSearch';
+define assetName => ['assetName', 'Asset_MultiSearch'];
+define icon      => 'multiSearch.gif';
 property cacheTimeout => (
             tab           => "display",
             fieldType     => "interval",

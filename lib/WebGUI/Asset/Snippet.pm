@@ -23,10 +23,10 @@ use HTML::Packer;
 use JavaScript::Packer;
 use CSS::Packer;
 
-aspect assetName  => ['assetName','Asset_Snippet'];
-aspect uiLevel    =>  5;
-aspect icon       => 'snippet.gif';
-aspect tableName  => 'snippet';
+define assetName  => ['assetName','Asset_Snippet'];
+define uiLevel    =>  5;
+define icon       => 'snippet.gif';
+define tableName  => 'snippet';
 
 property snippet => (
     fieldType       => 'codearea',

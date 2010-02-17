@@ -17,9 +17,9 @@ package WebGUI::Asset::Sku::EMSTicket;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-aspect assetName           => ['ems ticket', 'Asset_EMSTicket'];
-aspect icon                => 'EMSTicket.gif';
-aspect tableName           => 'EMSTicket';
+define assetName           => ['ems ticket', 'Asset_EMSTicket'];
+define icon                => 'EMSTicket.gif';
+define tableName           => 'EMSTicket';
 property price => (
             tab             => "shop",
             fieldType       => "float",

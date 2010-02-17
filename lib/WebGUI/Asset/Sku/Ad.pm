@@ -18,9 +18,9 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-aspect assetName           => ['assetName', 'Asset_WikiMaster'];
-aspect icon                => 'adsku.gif';
-aspect tableName           => 'AdSku';
+define assetName           => ['assetName', 'Asset_WikiMaster'];
+define icon                => 'adsku.gif';
+define tableName           => 'AdSku';
 
 property purchaseTemplate => (
             tab             => "display",

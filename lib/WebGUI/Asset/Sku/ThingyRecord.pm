@@ -18,9 +18,9 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-aspect assetName         => ['assetName', 'Asset_ThingyRecord'];
-aspect icon              => 'thingyRecord.gif';
-aspect tableName         => 'ThingyRecord';
+define assetName         => ['assetName', 'Asset_ThingyRecord'];
+define icon              => 'thingyRecord.gif';
+define tableName         => 'ThingyRecord';
 property templateIdView => (
             tab       => "display",
             fieldType => "template",

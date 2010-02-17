@@ -20,10 +20,10 @@ use WebGUI::International;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
-aspect assetName => ['assetName','Asset_SyndicatedContent'];
-aspect uiLevel   => 6;
-aspect icon      => 'syndicatedContent.gif';
-aspect tableName => 'SyndicatedContent';
+define assetName => ['assetName','Asset_SyndicatedContent'];
+define uiLevel   => 6;
+define icon      => 'syndicatedContent.gif';
+define tableName => 'SyndicatedContent';
 property cacheTimeout => (
                 tab          => "display",
                 fieldType    => "interval",

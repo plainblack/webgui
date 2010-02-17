@@ -22,9 +22,9 @@ use JSON;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
 
-aspect assetName  => ['assetName', 'Asset_Product'];
-aspect icon       => 'product.gif';
-aspect tableName  => 'Product';
+define assetName  => ['assetName', 'Asset_Product'];
+define icon       => 'product.gif';
+define tableName  => 'Product';
 
 property cacheTimeout => (
             tab          => "display",

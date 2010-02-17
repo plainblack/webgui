@@ -17,8 +17,8 @@ package WebGUI::Asset::File::GalleryFile;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::File';
-aspect assetName           => ['assetName', 'Asset_GalleryFile'];
-aspect tableName           => 'GalleryFile';
+define assetName           => ['assetName', 'Asset_GalleryFile'];
+define tableName           => 'GalleryFile';
 property views => (
             noFormPost          => 1,
             default             => 0,

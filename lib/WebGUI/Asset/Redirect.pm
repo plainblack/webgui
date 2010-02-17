@@ -19,10 +19,10 @@ use WebGUI::Macro;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect assetName => ['assetName', 'Asset_Redirect'];
-aspect uiLevel   => 9;
-aspect icon      => 'redirect.gif';
-aspect tableName => 'redirect';
+define assetName => ['assetName', 'Asset_Redirect'];
+define uiLevel   => 9;
+define icon      => 'redirect.gif';
+define tableName => 'redirect';
 property redirectUrl => (
                 tab          => "properties",
                 label        => ['redirect url', 'Asset_Redirect'],

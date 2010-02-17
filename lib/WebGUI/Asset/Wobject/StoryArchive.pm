@@ -18,9 +18,9 @@ use strict;
 #use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_StoryArchive'];
-aspect icon      => 'storyarchive.gif';
-aspect tableName => 'StoryArchive';
+define assetName => ['assetName', 'Asset_StoryArchive'];
+define icon      => 'storyarchive.gif';
+define tableName => 'StoryArchive';
 property storiesPerPage => (
             tab          => 'display',  
             fieldType    => 'integer',  

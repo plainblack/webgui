@@ -18,9 +18,9 @@ use WebGUI::Form::File;
 use WebGUI::Utility;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName   => ['assetName', 'Asset_Survey'];
-aspect icon        => 'survey.gif';
-aspect tableName   => 'Survey';
+define assetName   => ['assetName', 'Asset_Survey'];
+define icon        => 'survey.gif';
+define tableName   => 'Survey';
 property exitURL => (
             fieldType    => 'text',
             default      => undef,

@@ -17,9 +17,9 @@ package WebGUI::Asset::Sku::EMSBadge;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-aspect assetName           => ['ems badge', 'Asset_EMSBadge'];
-aspect icon                => 'EMSBadge.gif';
-aspect tableName           => 'EMSBadge';
+define assetName           => ['ems badge', 'Asset_EMSBadge'];
+define icon                => 'EMSBadge.gif';
+define tableName           => 'EMSBadge';
 property price => (
             tab             => "shop",
             fieldType       => "float",

@@ -29,9 +29,9 @@ use Storable;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect assetName   => ['assetName', 'Asset_Event'];
-aspect icon        => 'calendar.gif';
-aspect tableName   => 'Event';
+define assetName   => ['assetName', 'Asset_Event'];
+define icon        => 'calendar.gif';
+define tableName   => 'Event';
 property description => (
             label           => ['description', 'Asset_Event'],
             fieldType       => "HTMLArea",

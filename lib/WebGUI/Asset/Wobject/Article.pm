@@ -17,9 +17,9 @@ use WebGUI::Paginator;
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-aspect assetName => ['assetName', 'Asset_Article'];
-aspect icon      => 'article.gif';
-aspect tableName => 'Article';
+define assetName => ['assetName', 'Asset_Article'];
+define icon      => 'article.gif';
+define tableName => 'Article';
 property cacheTimeout => (
                 tab       => "display",
                 fieldType => "interval",

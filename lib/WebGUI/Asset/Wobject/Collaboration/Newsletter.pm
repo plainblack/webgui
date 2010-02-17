@@ -13,9 +13,9 @@ package WebGUI::Asset::Wobject::Collaboration::Newsletter;
 use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject::Collaboration';
-aspect assetName => ['assetName', 'Asset_Newsletter'];
-aspect icon      => 'newsletter.gif';
-aspect tableName => 'Newsletter';
+define assetName => ['assetName', 'Asset_Newsletter'];
+define icon      => 'newsletter.gif';
+define tableName => 'Newsletter';
 property newsletterHeader => (
     default   => undef,
     fieldType => "HTMLArea",

@@ -13,9 +13,9 @@ package WebGUI::Asset::Wobject::Search;
 use strict;
 use WebGUI::Definition::Asset;
 extends "WebGUI::Asset::Wobject";
-aspect assetName => ['assetName', 'Asset_Search'];
-aspect icon      => 'search.gif';
-aspect tableName => 'search';
+define assetName => ['assetName', 'Asset_Search'];
+define icon      => 'search.gif';
+define tableName => 'search';
 property templateId => (
                 fieldType       => "template",
                 default         => 'PBtmpl0000000000000200',    

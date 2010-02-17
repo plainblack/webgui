@@ -19,9 +19,9 @@ use strict;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 
-aspect assetName   => ['assetName', 'Asset_Template'];
-aspect icon        => 'template.gif';
-aspect tableName   => 'template';
+define assetName   => ['assetName', 'Asset_Template'];
+define icon        => 'template.gif';
+define tableName   => 'template';
 
 property template => (
              fieldType       => 'codearea',
