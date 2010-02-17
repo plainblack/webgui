@@ -1246,13 +1246,13 @@ The file to retrieve the thumbnail for.
 sub getThumbnailUrl {
     my $self     = shift;
     my $filename = shift;
-    if (! $self->isImage($filename)) {
-        return '';
-    }
 	if (! defined $filename) {
 		$self->session->errorHandler->error("Can't find a thumbnail url without a filename.");
 		return '';
 	}
+    if (! $self->isImage($filename)) {
+        return '';
+    }
     my $thumbname = 'thumb-' . $filename;
     if (! -e $self->getPath($thumbname)) {
         $self->session->errorHandler->error("Can't find a thumbnail for a file named '$filename' that is not in my storage location.");
