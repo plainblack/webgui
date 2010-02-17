@@ -188,6 +188,9 @@ sub requestNotViewed {
 
 Returns true if a https request was made.
 
+HTTP_SSLPROXY is set by mod_proxy in the WRE so that WebGUI knows that the original request
+was made via SSL.
+
 =cut
 
 sub sslRequest {
