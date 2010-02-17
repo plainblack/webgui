@@ -1,3 +1,5 @@
+7.8.13
+
 7.8.12
  - fixed #11285: Pasting HTML into Code Editor in IE
  - fixed #11349: Code editor returns newline for blank content
