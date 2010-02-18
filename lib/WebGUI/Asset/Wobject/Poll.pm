@@ -82,89 +82,110 @@ property randomizeAnswers => (
                 hoverHelp    => ['72 description', 'Asset_Poll'],
          );
 property a1 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a2 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a3 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a4 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a5 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a6 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a7 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a8 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a9 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a10 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a11 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a12 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a13 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a14 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a15 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a16 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a17 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a18 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a19 => (
-                fieldType=>"hidden",
-                default     =>undef
-         ); 
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property a20 => (
-                fieldType=>"hidden",
-                default     =>undef
-         );
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property graphConfiguration => (
-                fieldType=>"hidden",
-                default     =>undef,
-         );
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
 property generateGraph => (
                 noFormPost   => \&_generateGraph_noFormPost,
                 fieldType    => 'yesNo',
