@@ -55,7 +55,7 @@ property groupToManage => (
 			label       => ['groupToManage label', 'Asset_TimeTracking'],
 		);
 property pmIntegration => (
-		    fieldTypei  => "yesNo",
+		    fieldType   => "yesNo",
 			default     => 0,
 			tab         => "properties",
 			hoverHelp   => ["Choose yes to pull projects and task information from the various project management assets on your site", 'Asset_TimeTracking'],
