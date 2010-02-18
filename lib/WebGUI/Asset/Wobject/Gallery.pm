@@ -17,7 +17,7 @@ use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName           => ['assetName', 'Asset_Gallery'];
 define icon                => 'photoGallery.gif';
-define tableName           => 'Gallery',
+define tableName           => 'Gallery';
 property groupIdAddComment => (
             tab             => "security",
             fieldType       => "group",
