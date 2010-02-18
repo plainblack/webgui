@@ -21,7 +21,7 @@ Definition
 ----------
 You must migrate your asset to use the new WebGUI::Definition::Asset class instead of the definition() method. This executes several orders of magnitude faster, but is different in a few ways.
 
-1) You define your definition using property and aspect calls, as well as standard Moose syntax.
+1) You define your definition using property and define calls, as well as standard Moose syntax.
 
 2) You no longer have a reference to $session, so you'll need to make sub routine refs to to method calls. However, you cannot use sub refs on any attributes or the following property elements: tableName.
 
@@ -34,7 +34,7 @@ an i18n identifier, place the label and namespace in an arrayref, like this:
     
     label => ['i18n key', 'namespace'],
 
-6) Definition's are now rigid. This means that every property needs to be defined in the definition, and it must at least have a "fieldType" element. If the field is to be displayed (ie: it doesn't have a noFormPost=>1 element) then it must also at minimum have label elements. In addition, you must specify assetName, tableName, and properties aspects at minimum. Anything less is invalid. 
+6) Definition's are now rigid. This means that every property needs to be defined in the definition, and it must at least have a "fieldType" element. If the field is to be displayed (ie: it doesn't have a noFormPost=>1 element) then it must also at minimum have label elements. In addition, you must specify assetName, tableName, and properties defines at minimum. Anything less is invalid. 
 
 7) The properties attribute must be an array reference of properties. No more Tie::IxHash.
 
@@ -54,10 +54,10 @@ Here's an example.
 
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
-aspect assetName  => 'Gadget';
-aspect tableName  => 'gadget'; 
-aspect uiLevel    => 5;
-aspect icon       => 'gadget.gif';
+define assetName  => 'Gadget';
+define tableName  => 'gadget'; 
+define uiLevel    => 5;
+define icon       => 'gadget.gif';
 property urlToJavascript => (
             fieldType    => 'url',
             label        => ['URL to Javascript Class','Asset_Gadget'],
