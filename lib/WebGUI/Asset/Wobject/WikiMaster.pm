@@ -24,7 +24,7 @@ define tableName => 'WikiMaster';
 
 property groupToEditPages => (
             fieldType => 'group',
-            default   => ['2'],
+            default   => '2',
             tab       => 'security',
             hoverHelp => ['groupToEditPages hoverHelp', 'Asset_WikiMaster'],
             label     => ['groupToEditPages label', 'Asset_WikiMaster'],
@@ -32,7 +32,7 @@ property groupToEditPages => (
 
 property groupToAdminister => (
             fieldType => 'group',
-            default   => ['3'],
+            default   => '3',
             tab       => 'security',
             hoverHelp => ['groupToAdminister hoverHelp', 'Asset_WikiMaster'],
             label     => ['groupToAdminister label', 'Asset_WikiMaster'],
