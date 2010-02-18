@@ -20,8 +20,8 @@ use WebGUI::LDAPLink;
 use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::Pluggable;
+use WebGUI::Asset;
 use WebGUI::International;
-
 
 =head1 NAME
 
@@ -1187,14 +1187,16 @@ sub resetGroupFields {
 
     ##Note, I did assets in SQL instead of using the API because you would have to
     ##instanciate every version of the asset that used the group.  This should be much quicker
-    ASSET: foreach my $asset (keys %{ $assets }) {
-        my $definition = WebGUI::Pluggable::instanciate($asset, 'definition', [$session]);
-        SUBDEF: foreach my $subdef (@{ $definition }) {
-            next SUBDEF if exists $tableCache->{$subdef->{tableName}}; 
-            PROP: while (my ($fieldName, $properties) = each %{ $subdef->{properties} }) {
-                next PROP unless $properties->{fieldType} eq 'group';
-                push @{ $tableCache->{$subdef->{tableName}} }, $fieldName;
-            }
+    ASSET: foreach my $assetClass (keys %{ $assets }) {
+        my $className  = eval { WebGUI::Asset->loadModule($assetClass); };
+        if (my $e = Exception::Class->caught) {
+            warn $e->cause;
+            next ASSET;
+        }
+        PROPERTY: foreach my $property_name ($className->meta->get_all_property_list) {
+            my $property = $className->meta->find_attribute_by_name($property_name);
+            next PROPERTY unless $property->fieldType eq 'group';
+            push @{ $tableCache->{$property->tableName} }, $property->name;
         }
     }
     ##VersionTags
