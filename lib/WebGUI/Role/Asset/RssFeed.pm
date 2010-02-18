@@ -1,4 +1,4 @@
-package WebGUI::AssetAspect::RssFeed;
+package WebGUI::Role::Asset::RssFeed;
 
 =head1 LEGAL
 
@@ -15,7 +15,87 @@ package WebGUI::AssetAspect::RssFeed;
 =cut
 
 use strict;
-use Class::C3;
+with WebGUI::Definition::Role::Asset;
+define tableName      => 'assetAspectRssFeed';
+property itemsPerFeed => (
+    noFormPost => 0,
+    fieldType  => "integer",
+    default    => 25,
+    tab        => "rss",
+    label      => [ 'itemsPerFeed', 'Role_RssFeed' ],
+    hoverHelp  => [ 'itemsPerFeed hoverHelp', 'Role_RssFeed' ]
+);
+property feedCopyright => (
+    noFormPost => 0,
+    fieldType  => "text",
+    default    => "",
+    tab        => "rss",
+    label      => [ 'feedCopyright', 'Role_RssFeed' ],
+    hoverHelp  => [ 'feedCopyright hoverHelp', 'Role_RssFeed' ]
+);
+property feedTitle => (
+    noFormPost => 0,
+    fieldType  => "text",
+    default    => "",
+    tab        => "rss",
+    label      => [ 'feedTitle', 'Role_RssFeed' ],
+    hoverHelp  => [ 'feedTitle hoverHelp', 'Role_RssFeed' ]
+);
+property feedDescription => (
+    noFormPost => 0,
+    fieldType  => "textarea",
+    default    => "",
+    tab        => "rss",
+    label      => [ 'feedDescription', 'Role_RssFeed' ],
+    hoverHelp  => [ 'feedDescription hoverHelp', 'Role_RssFeed' ]
+);
+property feedImage => (
+    noFormPost => 0,
+    fieldType  => "image",
+    tab        => "rss",
+    label      => [ 'feedImage', 'Role_RssFeed' ],
+    hoverHelp  => [ 'feedImage hoverHelp', 'Role_RssFeed' ]
+);
+property feedImageLink => (
+    noFormPost => 0,
+    fieldType  => "url",
+    default    => "",
+    tab        => "rss",
+    label      => [ 'feedImageLink', 'Role_RssFeed' ],
+    hoverHelp  => [ 'feedImageLink hoverHelp', 'Role_RssFeed' ]
+);
+property feedImageDescription => (
+    noFormPost => 0,
+    fieldType  => "text",
+    default    => "",
+    tab        => "rss",
+    label      => [ 'feedImageDescription', 'Role_RssFeed' ],
+    hoverHelp  => [ 'feedImageDescription hoverHelp', 'Role_RssFeed' ]
+);
+property feedHeaderLinks => (
+    fieldType => "checkList",
+    value     => "rss\natom",
+    default   => undef,
+    tab       => "rss",
+    options   => \&feedHeaderLinks_options,
+    label     => [ 'feedHeaderLinks', 'Role_RssFeed' ],
+    hoverHelp => [ 'feedHeaderLinks hoverHelp', 'Role_RssFeed' ]
+);
+sub _feedHeaderLinks_options {
+    my $session = shift->session;
+	my $i18n = WebGUI::International->new($session,'Role_RssFeed');
+    my %headerLinksOptions;
+    tie %headerLinksOptions, 'Tie::IxHash';
+    %headerLinksOptions = (
+        rss  => $i18n->get('rssLinkOption'),
+        atom => $i18n->get('atomLinkOption'),
+        rdf  => $i18n->get('rdfLinkOption'),
+    );
+    return \&headerLinksOptions;
+}
+
+
+
 use WebGUI::Exception;
 use WebGUI::Storage;
 use XML::FeedPP;
@@ -23,7 +103,7 @@ use Path::Class::File;
 
 =head1 NAME
 
-Package WebGUI::AssetAspect::RssFeed
+Package WebGUI::Role::Asset::RssFeed
 
 =head1 DESCRIPTION
 
@@ -31,10 +111,7 @@ This is an aspect which exposes an asset's items as an RSS or Atom feed.
 
 =head1 SYNOPSIS
 
- use Class::C3;
- use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset);
-
-And then wherever you would call $self->SUPER::someMethodName call $self->next::method instead.
+ with 'WebGUI::Role::Asset::RssFeed';
 
 =head1 METHODS
 
@@ -54,88 +131,12 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'AssetAspect_RssFeed');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
-		itemsPerFeed => {
-			noFormPost		=> 0,
-			fieldType       => "integer",
-			defaultValue    => 25,
-    		tab             => "rss",
-    		label           => $i18n->get('itemsPerFeed'),
-    		hoverHelp       => $i18n->get('itemsPerFeed hoverHelp')
-			},
-		feedCopyright => {
-			noFormPost		=> 0,
-			fieldType       => "text",
-			defaultValue    => "",
-    		tab             => "rss",
-    		label           => $i18n->get('feedCopyright'),
-    		hoverHelp       => $i18n->get('feedCopyright hoverHelp')
-			},
-		feedTitle => {
-			noFormPost		=> 0,
-			fieldType       => "text",
-			defaultValue    => "",
-    		tab             => "rss",
-    		label           => $i18n->get('feedTitle'),
-    		hoverHelp       => $i18n->get('feedTitle hoverHelp')
-			},
-		feedDescription => {
-			noFormPost		=> 0,
-			fieldType       => "textarea",
-			defaultValue    => "",
-    		tab             => "rss",
-    		label           => $i18n->get('feedDescription'),
-    		hoverHelp       => $i18n->get('feedDescription hoverHelp')
-			},
-		feedImage => {
-			noFormPost		=> 0,
-			fieldType       => "image",
-    		tab             => "rss",
-    		label           => $i18n->get('feedImage'),
-    		hoverHelp       => $i18n->get('feedImage hoverHelp')
-			},
-		feedImageLink => {
-			noFormPost		=> 0,
-			fieldType       => "url",
-			defaultValue    => "",
-    		tab             => "rss",
-    		label           => $i18n->get('feedImageLink'),
-    		hoverHelp       => $i18n->get('feedImageLink hoverHelp')
-			},
-		feedImageDescription => {
-			noFormPost		=> 0,
-			fieldType       => "text",
-			defaultValue    => "",
-    		tab             => "rss",
-    		label           => $i18n->get('feedImageDescription'),
-    		hoverHelp       => $i18n->get('feedImageDescription hoverHelp')
-			},
-        feedHeaderLinks => {
-            fieldType       => "checkList",
-            value           => "rss\natom",
-            defaultValue    => undef,
-            tab             => "rss",
-            options         => do {
-                my %headerLinksOptions;
-                tie %headerLinksOptions, 'Tie::IxHash';
-                %headerLinksOptions = (
-                    rss  => $i18n->get('rssLinkOption'),
-                    atom => $i18n->get('atomLinkOption'),
-                    rdf  => $i18n->get('rdfLinkOption'),
-                );
-                \%headerLinksOptions;
-            },
-            label           => $i18n->get('feedHeaderLinks'),
-            hoverHelp       => $i18n->get('feedHeaderLinks hoverHelp')
-        },
 	    );
 	push(@{$definition}, {
 		autoGenerateForms   => 1,
-		tableName           => 'assetAspectRssFeed',
-		className           => 'WebGUI::AssetAspect::RssFeed',
 		properties          => \%properties
 	    });
 	return $class->next::method($session, $definition);
@@ -349,9 +350,9 @@ The kind of feed that is requested.  Valid extensions are "rss", "atom" or "rdf"
 sub _getStaticFeedUrl {
     my $self = shift;
     my $extension = shift;
-    my $url = $self->get("url") . '.' . $extension;
+    my $url = $self->url . '.' . $extension;
     $url = $self->session->url->gateway($url);
-    if ($self->get("encryptPage")) {
+    if ($self->encryptPage) {
         $url = $self->session->url->getSiteURL . $url;
         $url =~ s/^http:/https:/;
     }
@@ -479,21 +480,21 @@ sub getFeed {
         }
         $new_item->guid( $new_item->guid, isPermaLink => 0 ) if $set_permalink_false;
     }
-    $feed->title( $self->get('feedTitle') || $self->get('title') );
-    $feed->description( $self->get('feedDescription') || $self->get('synopsis') );
+    $feed->title( $self->feedTitle || $self->title );
+    $feed->description( $self->feedDescription || $self->synopsis );
     $feed->pubDate( $self->getContentLastModified );
-    $feed->copyright( $self->get('feedCopyright') );
+    $feed->copyright( $self->feedCopyright );
     $feed->link( $self->getUrl );
     # $feed->language( $lang );
-    if ($self->get('feedImage')) {
-        my $storage = WebGUI::Storage->get($self->session, $self->get('feedImage'));
+    if ($self->feedImage) {
+        my $storage = WebGUI::Storage->get($self->session, $self->feedImage);
         my @files = @{ $storage->getFiles };
         if (scalar @files) {
             $feed->image(
                 $storage->getUrl( $files[0] ),
-                $self->get('feedImageDescription') || $self->getTitle,
-                $self->get('feedImageUrl') || $self->getUrl,
-                $self->get('feedImageDescription') || $self->getTitle,
+                $self->feedImageDescription || $self->getTitle,
+                $self->feedImageUrl || $self->getUrl,
+                $self->feedImageDescription || $self->getTitle,
                 ( $storage->getSizeInPixels( $files[0] ) ) # expands to width and height
             );
         }
@@ -527,8 +528,8 @@ on how the Asset has configured feedHeaderLinks.
 sub addHeaderLinks {
     my $self = shift;
     my $style = $self->session->style;
-    my $title = $self->get('feedTitle') || $self->get("title");
-    my %feeds = map { $_ => 1 } split /\n/, $self->get('feedHeaderLinks');
+    my $title = $self->feedTitle || $self->title;
+    my %feeds = map { $_ => 1 } split /\n/, $self->feedHeaderLinks;
     my $addType = keys %feeds > 1;
     if ($feeds{rss}) {
         $style->setLink($self->getRssFeedUrl, {

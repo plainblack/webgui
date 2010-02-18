@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::AssetAspect_RssFeed;
+package WebGUI::i18n::English::Role_RssFeed;
 use strict;
 
 our $I18N = {
