@@ -77,8 +77,8 @@ sub init_meta {
     Moose->init_meta(%args);
 
     Moose::Util::MetaRole::apply_base_class_roles(
-        for   => $args{for_class},
-        roles => ['WebGUI::Definition::Role::Object'],
+        for     => $args{for_class},
+        roles   => [ 'WebGUI::Definition::Role::Object' ],
     );
     Moose::Util::MetaRole::apply_metaroles(
         for              => $args{for_class},
@@ -86,6 +86,7 @@ sub init_meta {
             class           => ['WebGUI::Definition::Meta::Class'],
         },
     );
+    return $args{for_class}->meta;
 }
 
 #-------------------------------------------------------------------

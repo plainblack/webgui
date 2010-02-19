@@ -20,6 +20,8 @@ use feature ();
 use Moose::Exporter;
 use WebGUI::Definition ();
 use WebGUI::Definition::Meta::Asset;
+use Moose::Util;
+use Moose::Util::MetaRole;
 
 use namespace::autoclean;
 
@@ -79,7 +81,7 @@ sub init_meta {
 
     Moose::Util::MetaRole::apply_base_class_roles(
         for   => $args{for_class},
-        roles => ['WebGUI::Definition::Role::Asset'],
+        roles => [ 'WebGUI::Definition::Role::Asset' ],
     );
     Moose::Util::MetaRole::apply_metaroles(
         for              => $args{for_class},
@@ -87,6 +89,7 @@ sub init_meta {
             class           => ['WebGUI::Definition::Meta::Asset'],
         },
     );
+    return $args{for_class}->meta;
 }
 
 1;

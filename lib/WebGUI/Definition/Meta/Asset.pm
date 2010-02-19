@@ -17,6 +17,7 @@ package WebGUI::Definition::Meta::Asset;
 use 5.010;
 use Moose::Role;
 use namespace::autoclean;
+use WebGUI::Definition::Meta::Property;
 use WebGUI::Definition::Meta::Property::Asset;
 no warnings qw(uninitialized);
 
@@ -49,22 +50,44 @@ for properties.
 
 =cut
 
-around property_traits => sub {
-    my ($orig, $self) = shift;
-    my $traits = $self->$orig;
-    push @$traits, 'WebGUI::Definition::Meta::Property::Asset';
-    return $traits;
-};
+sub _build_property_metaclass {
+    my $self = shift;
+    Moose::Meta::Class->create_anon_class(
+        superclasses => [ $self->attribute_metaclass ],
+        roles        => [ 'WebGUI::Definition::Meta::Property', 'WebGUI::Definition::Meta::Property::Asset' ],
+        cache        => 1,
+    );
+}
 
 has [ qw{tableName icon assetName uiLevel} ] => (
     is       => 'rw',
 );
 
 around add_property => sub {
-    my ($orig, $self, $name, %options) = shift;
+    my ($orig, $self, $name, %options) = @_;
     $options{tableName} //= $self->tableName;
     return $self->$orig($name, %options);
 };
+
+#-------------------------------------------------------------------
+
+=head2 get_tables ( )
+
+Returns an array of the names of all tables in every class used by this class.
+
+=cut
+
+sub get_tables {
+    my $self       = shift;
+    my @properties = ();
+    my %seen       = ();
+    push @properties, 
+        grep { ! $seen{$_}++ }
+        map  { $_->tableName }
+        $self->get_all_class_metas
+    ;
+    return @properties;
+}
 
 #-------------------------------------------------------------------
 

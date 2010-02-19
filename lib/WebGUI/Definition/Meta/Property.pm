@@ -15,7 +15,7 @@ package WebGUI::Definition::Meta::Property;
 =cut
 
 use 5.010;
-use Moose;
+use Moose::Role;
 use namespace::autoclean;
 no warnings qw(uninitialized);
 
@@ -35,8 +35,6 @@ WebGUI::Definition::Meta::Property extends Moose::Meta::Attribute to include
 a read-only form method, that provides the form properties for the attribute.
 
 =cut
-
-extends 'Moose::Meta::Attribute';
 
 has 'form' => (
     is  => 'ro',

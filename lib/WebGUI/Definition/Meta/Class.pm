@@ -54,7 +54,7 @@ sub add_property {
         Moose->throw_error("Must pass either noFormPost or label when making a property");
     }
     my %form_options;
-    my $prop_meta = $self->property_meta;
+    my $prop_meta = $self->property_metaclass;
     for my $key ( keys %options ) {
         if ( ! $prop_meta->meta->find_attribute_by_name($key) ) {
             $form_options{$key} = delete $options{$key};
@@ -64,7 +64,7 @@ sub add_property {
         $name,
         is          => 'rw',
         metaclass   => $prop_meta,
-        form => \%form_options,
+        form        => \%form_options,
         %options,
     );
 }
@@ -117,11 +117,8 @@ created in the Definition.
 
 sub get_all_properties {
     my $self       = shift;
-    my @properties = ();
-    foreach my $meta ($self->get_all_class_metas) {
-        push @properties, $meta->get_properties;
-    }
-    return @properties;
+    return
+        map { $_->get_properties } $self->get_all_class_metas;
 }
 
 #-------------------------------------------------------------------
@@ -190,34 +187,27 @@ sub get_property_list {
 
 #-------------------------------------------------------------------
 
-=head2 get_tables ( )
-
-Returns an array of the names of all tables in every class used by this class.
-
-=cut
-
-sub get_tables {
-    my $self       = shift;
-    my @properties = ();
-    my %seen       = ();
-    push @properties, 
-        grep { ! $seen{$_}++ }
-        map  { $_->tableName }
-        $self->get_all_class_metas
-    ;
-    return @properties;
-}
-
-#-------------------------------------------------------------------
-
 =head2 property_traits ( )
 
 Returns the name of the class for properties.
 
 =cut
 
-sub property_metaclass {
-    return 'WebGUI::Definition::Meta::Property';
+has property_metaclass => (
+    is  => 'ro',
+    lazy => 1,
+    builder => '_build_property_metaclass',
+);
+
+sub _build_property_metaclass {
+    my $self = shift;
+    my $class = Moose::Meta::Class->create_anon_class(
+        superclasses => [ $self->attribute_metaclass ],
+        roles        => [ 'WebGUI::Definition::Meta::Property' ],
+        cache        => 1,
+    );
+    return $class;
 }
 
 1;
+
