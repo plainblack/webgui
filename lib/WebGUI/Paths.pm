@@ -69,6 +69,28 @@ sub siteConfigs {
     return @configs;
 }
 
+sub preloadPaths {
+    my @paths;
+    if (open my $fh, '<', PRELOAD_CUSTOM) {
+        while (my $path = <$fh>) {
+            $path =~ s/#.*//;
+            $path =~ s/^\s+//;
+            $path =~ s/\s+$//;
+            next
+                if !$path;
+            if (! -d $path) {
+                warn "WARNING: Not adding using lib directory '$path' from @{[PRELOAD_CUSTOM]}: Directory does not exist.\n";
+            }
+            else {
+                push @paths, $path;
+            }
+        }
+        close $fh;
+    }
+}
 
+sub includePreloads {
+    unshift @INC, preloadPaths();
+}
 
 1;
