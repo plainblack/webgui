@@ -15,7 +15,8 @@ package WebGUI::Role::Asset::RssFeed;
 =cut
 
 use strict;
-with WebGUI::Definition::Role::Asset;
+use Moose::Role;
+use WebGUI::Definition::Asset;
 define tableName      => 'assetAspectRssFeed';
 property itemsPerFeed => (
     noFormPost => 0,
@@ -94,7 +95,7 @@ sub _feedHeaderLinks_options {
     return \&headerLinksOptions;
 }
 
-
+requires 'getRssFeedItems';
 
 use WebGUI::Exception;
 use WebGUI::Storage;
@@ -118,29 +119,6 @@ This is an aspect which exposes an asset's items as an RSS or Atom feed.
 These methods are available from this class:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-Extends the definition to add the RSS fields.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-	    );
-	push(@{$definition}, {
-		autoGenerateForms   => 1,
-		properties          => \%properties
-	    });
-	return $class->next::method($session, $definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -307,10 +285,6 @@ This is optional.
 This is optional.  A unique descriptor for this item.
 
 =cut
-
-sub getRssFeedItems {
-    WebGUI::Error::OverrideMe->throw();
-}
 
 #-------------------------------------------------------------------
 
