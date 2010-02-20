@@ -15,6 +15,12 @@ package WebGUI::Paths;
 =cut
 
 our $VERSION = '0.0.1';
+use Carp qw(croak);
+use Cwd qw(realpath);
+use File::Spec::Functions qw(catdir splitpath catpath splitpath updir catfile);
+use Try::Tiny;
+
+use namespace::clean;
 
 =head1 NAME
 
@@ -30,67 +36,90 @@ These methods are available from this class:
 
 =cut
 
-use File::Spec ();
-use Cwd ();
 my $root;
 BEGIN {
-    $root = Cwd::realpath(File::Spec->catdir(
-        File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], ''),
-        (File::Spec->updir) x 2
+    $root = realpath(catdir(
+        catpath((splitpath(__FILE__))[0,1], ''), (updir) x 2
     ));
 }
 
 use constant {
-    CONFIG_BASE        => File::Spec->catdir($root, 'etc'),
-    LOG_CONFIG         => File::Spec->catfile($root, 'etc', 'log.conf'),
-    SPECTRE_CONFIG     => File::Spec->catfile($root, 'etc', 'spectre.conf'),
-    UPGRADES_PATH      => File::Spec->catfile($root, 'var', 'upgrades'),
-    PRELOAD_CUSTOM     => File::Spec->catfile($root, 'sbin', 'preload.custom'),
-    PRELOAD_EXCLUSIONS => File::Spec->catfile($root, 'sbin', 'preload.exclude'),
-    EXTRAS             => File::Spec->catdir($root, 'www', 'extras'),
-    DEFAULT_UPLOADS    => File::Spec->catdir($root, 'www', 'uploads'),
-    DEFAULT_SQL        => File::Spec->catdir($root, 'var', 'create.sql'),
+    CONFIG_BASE        => catdir($root, 'etc'),
+    LOG_CONFIG         => catfile($root, 'etc', 'log.conf'),
+    SPECTRE_CONFIG     => catfile($root, 'etc', 'spectre.conf'),
+    UPGRADES_PATH      => catfile($root, 'var', 'upgrades'),
+    PRELOAD_CUSTOM     => catfile($root, 'sbin', 'preload.custom'),
+    PRELOAD_EXCLUSIONS => catfile($root, 'sbin', 'preload.exclude'),
+    EXTRAS             => catdir($root, 'www', 'extras'),
+    DEFAULT_UPLOADS    => catdir($root, 'www', 'uploads'),
+    DEFAULT_SQL        => catdir($root, 'var', 'create.sql'),
 };
 
 sub siteConfigs {
     opendir my $dh, CONFIG_BASE;
     my @configs;
-    while (my $file = readdir $dh) {
-        my $fullPath = Cwd::realpath(File::Spec->catfile(CONFIG_BASE, $file));
-        if (-d $fullPath
+    while ( my $file = readdir $dh ) {
+        my $fullPath = realpath( catfile( CONFIG_BASE, $file ) );
+        if (   -d $fullPath
             || $file !~ /\.conf$/
-            || $fullPath eq Cwd::realpath(LOG_CONFIG)
-            || $fullPath eq Cwd::realpath(SPECTRE_CONFIG)
-        ) {
+            || $fullPath eq realpath(LOG_CONFIG)
+            || $fullPath eq realpath(SPECTRE_CONFIG) )
+        {
             next;
         }
         push @configs, $fullPath;
     }
     return @configs;
-}
+} ## end sub siteConfigs
 
 sub preloadPaths {
     my @paths;
-    if (open my $fh, '<', PRELOAD_CUSTOM) {
-        while (my $path = <$fh>) {
-            $path =~ s/#.*//;
-            $path =~ s/^\s+//;
-            $path =~ s/\s+$//;
-            next
-                if !$path;
-            if (! -d $path) {
-                warn "WARNING: Not adding using lib directory '$path' from @{[PRELOAD_CUSTOM]}: Directory does not exist.\n";
+    try {
+        @paths = grep {
+            -d ? 1 : do {
+                warn "WARNING: Not adding lib directory '$path' from @{[PRELOAD_CUSTOM]}: Directory does not exist.\n";
+                0;
             }
-            else {
-                push @paths, $path;
-            }
-        }
-        close $fh;
-    }
+        } _readTextLines(PRELOAD_CUSTOM);
+    };
+    return @paths;
 }
 
 sub includePreloads {
     unshift @INC, preloadPaths();
 }
+
+sub preloadExclude {
+    my @excludes = _readTextLines(PRELOAD_EXCLUDE);
+    return @excludes;
+}
+
+sub preloadAll {
+    require WebGUI::Pluggable;
+
+    WebGUI::Pluggable::findAndLoad( 'WebGUI', {
+        exclude     => \( preloadExclude() ),
+        onLoadFail  => sub { warn sprintf 'Error loading %s: %s', @_ },
+    });
+}
+
+no namespace::clean;
+
+sub _readTextLines {
+    my $file = shift;
+    my @lines;
+    open my $fh, '<', $file or croak "Cannot open $file: $!";
+    while (my $line = <$fh>) {
+        $line =~ s/#.*//;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next
+            if !$line;
+        push @lines, $line;
+    }
+    return @lines;
+}
+
+use namespace::clean;
 
 1;
