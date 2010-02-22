@@ -59,11 +59,11 @@ Optional. A synonym for C<label>.
 
 =cut
 
-sub new {
+sub BUILDARGS {
     my ( $class, $session, %properties ) = @_;
     $properties{ session } = $session;
     $properties{ label } ||= delete $properties{ legend };
-    return $class->SUPER::new( %properties );
+    return \%properties;
 }
 
 sub getFooter {

@@ -53,10 +53,10 @@ Optional. A label for the tab.
 
 =cut
 
-sub new {
+sub BUILDARGS {
     my ( $class, $session, %properties ) = @_;
     $properties{ session } = $session;
-    return $class->SUPER::new( %properties );
+    return \%properties;
 }
 
 #----------------------------------------------------------------------------

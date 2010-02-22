@@ -2,6 +2,7 @@ package WebGUI::FormBuilder::Role::HasFields;
 
 use strict;
 use Moose::Role;
+use Try::Tiny;
 
 requires 'session', 'pack', 'unpack';
 
@@ -47,14 +48,18 @@ sub addField {
     }
     else {
         # Is $type a class name?
-        eval { WebGUI::Pluggable::load( $type ) };
-        if ( $@ ) {
-            eval { WebGUI::Pluggable::load( "WebGUI::Form::" . ucfirst( $type ) ) };
-            if ( $@ ) {
-                $self->session->error("Could not load field type '$type'. Try loading it manually." );
-                confess "Could not load field type '$type'. Try loading it manually.";
-            }
-            $type = "WebGUI::Form::" . ucfirst( $type );
+        my $file    = $type;
+        $file =~ s{::}{/}g;
+        $file .= ".pm";
+
+        # Load the class
+        # Try to load the WebGUI Field first in case we conveniently overlap with a common name
+        # (like Readonly)
+        if ( $INC{'WebGUI/Form/'.$file} || try { require 'WebGUI/Form/' . $file } ) {
+            $type = 'WebGUI::Form::' . $type;
+        }
+        elsif ( !$INC{$file} && !try { require $file; } ) {
+            confess sprintf "Could not load form control class %s", $type;
         }
         $field = $type->new( $self->session, { @properties } );
     }

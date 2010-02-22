@@ -56,10 +56,10 @@ other possible value is "application/x-www-form-urlencoded".
 
 =cut
 
-sub new {
+sub BUILDARGS {
     my ( $class, $session, %properties ) = @_;
     $properties{ session    } = $session;
-    return $class->SUPER::new( %properties );
+    return \%properties;
 }
 
 #----------------------------------------------------------------------------
