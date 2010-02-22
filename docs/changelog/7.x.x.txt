@@ -11,6 +11,7 @@
  - fixed #11418: confusing typ-o in gotcha
  - fixed #11415: Wiki - Edit page appearing below the content
  - fixed #11414: SQLReport Pagination Setting
+ - fixed #11420: Snippet not save mimetype
 
 7.7.32
  - fixed #11349: Code editor returns newline for blank content
