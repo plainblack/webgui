@@ -1,4 +1,6 @@
 7.8.13
+ - fixed #11418: confusing typ-o in gotcha
+ - fixed #11415: Wiki - Edit page appearing below the content
   
 7.8.12
  - fixed #11285: Pasting HTML into Code Editor in IE
@@ -21,7 +23,6 @@
  - fixed #11169: MapPoint asset does not have an icon
  - fixed Typo in Subscription Sku prevented karma from being transferred to users.
  - fixed #11411: Photo Asset: Error in template help
- - fixed #11418: confusing typ-o in gotcha
 
 7.8.11
  - fixed #11362: Unable to checkout with ITransact plugin
