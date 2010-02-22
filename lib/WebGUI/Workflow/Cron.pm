@@ -309,6 +309,7 @@ sub set {
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	$self->session->db->setRow("WorkflowSchedule","taskId",$self->{_data});
 	$spectre->notify("cron/deleteJob", $self->session->config->getFilename."-".$self->getId);
+    return unless $self->get('enabled');
 	my %params = %{$self->{_data}};
 	$params{parameters} = $self->get("parameters");
 	$params{config} = $self->session->config->getFilename;
