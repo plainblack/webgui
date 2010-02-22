@@ -65,9 +65,9 @@ while the second question mark will contain the form variable "field1".</p>
         },
 
         '14 description' => {
-                message => q|<p>How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?
+                message => q|<p>How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?  Setting this to 0 will not disable pagination, but will use an internal default of 25, instead.
 </p>|,
-                lastUpdated => 1119841649,
+                lastUpdated => 1266860050,
         },
 
 	'17' => {
