@@ -76,7 +76,7 @@ sub preloadPaths {
     my @paths;
     try {
         @paths = grep {
-            -d ? 1 : do {
+            (-d) ? 1 : do {
                 warn "WARNING: Not adding lib directory '$path' from @{[PRELOAD_CUSTOM]}: Directory does not exist.\n";
                 0;
             }
