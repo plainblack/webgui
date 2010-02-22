@@ -7,9 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.8.13
+--------------------------------------------------------------------
+     * A new gotcha was not documented in the 7.8.11 release, the new required version
+       of Javascript::Packer, 0.04.  The correct version was put into the testEnvironment
+       script.
+
 7.8.11
 --------------------------------------------------------------------
      * WebGUI now requires DateTime::Format::HTTP, to handle parsing HTTP dates.
+
+     * WebGUI now requires JavaScript Packer v0.04, for compressing javascript.
 
      * The Google sitemap generator in WebGUI was including hidden pages in the list of
        pages.  This is now configurable, with the default being to NOT show hidden pages.
