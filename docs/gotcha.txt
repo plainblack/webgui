@@ -18,7 +18,7 @@ save you many hours of grief.
 --------------------------------------------------------------------
      * WebGUI now requires DateTime::Format::HTTP, to handle parsing HTTP dates.
 
-     * WebGUI now requires JavaScript Packer v0.40, for compressing javascript.
+     * WebGUI now requires JavaScript Packer v0.04, for compressing javascript.
 
 7.7.27
 --------------------------------------------------------------------
