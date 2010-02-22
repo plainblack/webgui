@@ -9,6 +9,7 @@
  - fixed Typo in Subscription Sku prevented karma from being transferred to users.
  - fixed #11411: Photo Asset: Error in template help
  - fixed #11418: confusing typ-o in gotcha
+ - fixed #11415: Wiki - Edit page appearing below the content
  - fixed #11414: SQLReport Pagination Setting
 
 7.7.32
