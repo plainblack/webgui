@@ -573,6 +573,10 @@
         // Remove existing highlighting
         var html = this.getEditorText();
 
+        // Fix line breaks
+        html = html.replace( /\n/g, "<br>");
+        html = html.replace( /\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;" );
+
         // Apply new highlighting
         for (var i = 0; i < this.keywords.length; i++) {
             html = html.replace(this.keywords[i].code, this.keywords[i].tag);
