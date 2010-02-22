@@ -19,8 +19,7 @@ use Carp qw(croak);
 use Cwd qw(realpath);
 use File::Spec::Functions qw(catdir splitpath catpath splitpath updir catfile);
 use Try::Tiny;
-
-use namespace::clean;
+use namespace::autoclean -also => qr/^_/;
 
 =head1 NAME
 
@@ -36,34 +35,39 @@ These methods are available from this class:
 
 =cut
 
-my $root;
 BEGIN {
-    $root = realpath(catdir(
+    use Sub::Name qw(subname);
+    my $root = realpath(catdir(
         catpath((splitpath(__FILE__))[0,1], ''), (updir) x 2
     ));
+    my %paths = (
+        configBase         => catdir($root, 'etc'),
+        logConfig          => catfile($root, 'etc', 'log.conf'),
+        spectreConfig      => catfile($root, 'etc', 'spectre.conf'),
+        upgradesPath       => catfile($root, 'var', 'upgrades'),
+        preloadCustom      => catfile($root, 'sbin', 'preload.custom'),
+        preloadExclusions  => catfile($root, 'sbin', 'preload.exclude'),
+        extras             => catdir($root, 'www', 'extras'),
+        defaultUploads     => catdir($root, 'www', 'uploads'),
+        defaultCreateSQL   => catdir($root, 'var', 'create.sql'),
+    );
+    for my $sub (keys %paths) {
+        my $path = $paths{$sub};
+        no strict 'refs';
+        *{$sub} = subname $sub => sub () { $path };
+    }
 }
 
-use constant {
-    CONFIG_BASE        => catdir($root, 'etc'),
-    LOG_CONFIG         => catfile($root, 'etc', 'log.conf'),
-    SPECTRE_CONFIG     => catfile($root, 'etc', 'spectre.conf'),
-    UPGRADES_PATH      => catfile($root, 'var', 'upgrades'),
-    PRELOAD_CUSTOM     => catfile($root, 'sbin', 'preload.custom'),
-    PRELOAD_EXCLUSIONS => catfile($root, 'sbin', 'preload.exclude'),
-    EXTRAS             => catdir($root, 'www', 'extras'),
-    DEFAULT_UPLOADS    => catdir($root, 'www', 'uploads'),
-    DEFAULT_SQL        => catdir($root, 'var', 'create.sql'),
-};
-
 sub siteConfigs {
-    opendir my $dh, CONFIG_BASE;
+    my $class = shift;
+    opendir my $dh, $class->configBase;
     my @configs;
     while ( my $file = readdir $dh ) {
-        my $fullPath = realpath( catfile( CONFIG_BASE, $file ) );
+        my $fullPath = realpath( catfile( $class->configBase, $file ) );
         if (   -d $fullPath
             || $file !~ /\.conf$/
-            || $fullPath eq realpath(LOG_CONFIG)
-            || $fullPath eq realpath(SPECTRE_CONFIG) )
+            || $fullPath eq realpath($class->logConfig)
+            || $fullPath eq realpath($class->spectreConfig) )
         {
             next;
         }
@@ -73,37 +77,39 @@ sub siteConfigs {
 } ## end sub siteConfigs
 
 sub preloadPaths {
+    my $class = shift;
     my @paths;
     try {
         @paths = grep {
             (-d) ? 1 : do {
-                warn "WARNING: Not adding lib directory '$path' from @{[PRELOAD_CUSTOM]}: Directory does not exist.\n";
+                warn "WARNING: Not adding lib directory '$path' from @{[$class->preloadCustom]}: Directory does not exist.\n";
                 0;
             }
-        } _readTextLines(PRELOAD_CUSTOM);
+        } _readTextLines($class->preloadCustom);
     };
     return @paths;
 }
 
 sub includePreloads {
-    unshift @INC, preloadPaths();
+    my $class = shift;
+    unshift @INC, $class->preloadPaths;
 }
 
 sub preloadExclude {
-    my @excludes = _readTextLines(PRELOAD_EXCLUDE);
+    my $class = shift;
+    my @excludes = _readTextLines($class->preloadExclude);
     return @excludes;
 }
 
 sub preloadAll {
+    my $class = shift;
     require WebGUI::Pluggable;
 
     WebGUI::Pluggable::findAndLoad( 'WebGUI', {
-        exclude     => \( preloadExclude() ),
+        exclude     => \( $class->preloadExclude ),
         onLoadFail  => sub { warn sprintf 'Error loading %s: %s', @_ },
     });
 }
-
-no namespace::clean;
 
 sub _readTextLines {
     my $file = shift;
@@ -119,7 +125,5 @@ sub _readTextLines {
     }
     return @lines;
 }
-
-use namespace::clean;
 
 1;

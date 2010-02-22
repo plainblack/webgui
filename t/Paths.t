@@ -5,11 +5,11 @@ use warnings;
 use Test::More tests => 2;                      # last test to print
 use WebGUI::Paths;
 
-can_ok 'WebGUI::Paths', qw(CONFIG_BASE LOG_CONFIG SPECTRE_CONFIG UPGRADES_PATH PRELOAD_CUSTOM PRELOAD_EXCLUSIONS EXTRAS DEFAULT_UPLOADS DEFAULT_SQL);
+can_ok 'WebGUI::Paths', qw(configBase logConfig spectreConfig upgradesPath preloadCustom preloadExclusions extras defaultUploads defaultCreateSQL);
 ok !(grep { WebGUI::Paths->can($_) }
-    qw(croak realpath catdir splitpath catpath splitpath updir catfile try catch _readTextLines)),
+    qw(croak realpath catdir splitpath catpath splitpath updir catfile try catch _readTextLines subname)),
     'Internal functions cleaned up';
 
 my @configs = WebGUI::Paths->siteConfigs;
-ok !(\@configs ~~ WebGUI::Paths->SPECTRE_CONFIG), 'Spectre config not listed in configs';
+ok !(\@configs ~~ WebGUI::Paths->spectreConfig), 'Spectre config not listed in configs';
 
