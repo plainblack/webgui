@@ -416,8 +416,8 @@
         str = str.replace(/{/gi, 'RIGHT_BRACKET');
         str = str.replace(/}/gi, 'LEFT_BRACKET');
 
-        // &nbsp; before <br> for IE8 so lines show up correctly
-        if ( this.browser.ie && this.browser.ie <= 8 ) {
+        // &nbsp; before <br> for IE6 so lines show up correctly
+        if ( this.browser.ie && this.browser.ie <= 6 ) {
             str = str.replace(/\r?\n/g, "&nbsp;<br>");
         }
 
@@ -651,7 +651,12 @@
         var html = this.getEditorText();
 
         // Fix line breaks
-        html = html.replace( /\n/g, "<br>");
+        if ( this.browser.ie <= 6 ) {
+            html = html.replace( /\n/g, "&nbsp;<br>" );
+        }
+        else {
+            html = html.replace( /\n/g, "<br>");
+        }
         html = html.replace( /\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;" );
 
         // Apply new highlighting
