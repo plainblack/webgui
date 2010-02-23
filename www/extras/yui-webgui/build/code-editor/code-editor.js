@@ -395,7 +395,102 @@
             { code: /\/\*(.*?)\*\//g, tag: '<i>/*$1*/</i>' } // comments / * */
         ];
         //End Borrowed Content
+        
 
+        if ( cfg["toggleButton"] ) {
+            var editor  = this;
+            // Add toggle button
+            var button  = document.createElement("input");
+            
+            button.type         = "button";
+            button.value        = "Toggle Editor";
+            button.editorState  = "on";
+
+            Event.addListener( button, "click", function () {
+                if ( editor.editorState == "off" ) {
+                    editor.editorState = "off";
+                    var fc = editor.get('element').previousSibling,
+                        el = editor.get('element');
+
+                    Dom.setStyle(fc, 'position', 'static');
+                    Dom.setStyle(fc, 'top', '0');
+                    Dom.setStyle(fc, 'left', '0');
+                    Dom.setStyle(el, 'visibility', 'hidden');
+                    Dom.setStyle(el, 'top', '-9999px');
+                    Dom.setStyle(el, 'left', '-9999px');
+                    Dom.setStyle(el, 'position', 'absolute');
+                    editor.get('element_cont').addClass('yui-editor-container');
+                    YAHOO.log('Reset designMode on the Editor', 'info', 'example');
+                    editor._setDesignMode('on');
+                    YAHOO.log('Inject the HTML from the textarea into the editor', 'info', 'example');
+                    
+                    // Escape HTML
+                    var div = document.createElement("div");
+                    var text =  editor.get('textarea').value;
+                    // IE truncates whitespace internally, so go line by line
+                    var lines   = text.split(/\n/);
+                    for ( var i = 0; i < lines.length; i++ ) {
+                        var line = lines[i];
+                        YAHOO.log( i + ": " + line, "info", "CodeEditor" );
+                        div.appendChild( document.createTextNode( line ) );
+                        div.appendChild( document.createElement( "br" ) );
+                    }
+                    var html = div.innerHTML;
+                    // We have <br>, not \n
+                    html = html.replace(/\n/g,"");
+
+                    YAHOO.log( html, "info", "CodeEditor" );
+                    editor.setEditorHTML(html);
+                    editor.highlight();
+                }
+                else {
+                    editor.editorState = "off";
+                    editor.saveHTML();
+                    var fc = editor.get('element').previousSibling,
+                        el = editor.get('element');
+
+                    Dom.setStyle(fc, 'position', 'absolute');
+                    Dom.setStyle(fc, 'top', '-9999px');
+                    Dom.setStyle(fc, 'left', '-9999px');
+                    editor.get('element_cont').removeClass('yui-editor-container');
+                    Dom.setStyle(el, 'visibility', 'visible');
+                    Dom.setStyle(el, 'top', '');
+                    Dom.setStyle(el, 'left', '');
+                    Dom.setStyle(el, 'position', 'static');
+
+                    // Unescape HTML
+                    var div = document.createElement("div");
+                    var text = editor.getEditorText();
+                    // IE truncates all whitespace internally, so add HTML for it
+                    if ( editor.browser.ie && editor.browser.ie <= 8 ) {
+                        text = text.replace(/\n/g, "&nbsp;<br>");
+                        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+                    }
+                    div.innerHTML = text;
+                    editor.get('element').value = "";
+                    for ( var i = 0; i < div.childNodes.length; i++ ) {
+                        if ( div.childNodes[i].nodeName == "#text" ) {
+                            editor.get('element').value = editor.get('element').value 
+                                                        + div.childNodes[i].nodeValue
+                                                        + "\n"
+                                                        ;
+                        }
+                    }
+                    YAHOO.log( editor.getEditorText(), "info", "CodeEditor" );
+                    YAHOO.log( div.childNodes[0].nodeValue, "info", "CodeEditor" );
+                    YAHOO.log( editor.get('element').value, "info", "CodeEditor" );
+                }
+            } );
+            
+            // Put it right after the text area
+            var ta = document.getElementById( id );
+            if ( ta.nextSibling ) {
+                ta.parentNode.insertBefore( button, ta.nextSibling );
+            }
+            else {
+                ta.parentNode.appendChild( button );
+            }
+        }
     };
     Lang.extend( YAHOO.widget.CodeEditor, YAHOO.widget.SimpleEditor, {
         /**
@@ -416,8 +511,8 @@
         str = str.replace(/{/gi, 'RIGHT_BRACKET');
         str = str.replace(/}/gi, 'LEFT_BRACKET');
 
-        // &nbsp; before <br> for IE6 so lines show up correctly
-        if ( this.browser.ie && this.browser.ie <= 6 ) {
+        // &nbsp; before <br> for IE8- so lines show up correctly
+        if ( this.browser.ie && this.browser.ie <= 8 ) {
             str = str.replace(/\r?\n/g, "&nbsp;<br>");
         }
 
@@ -431,7 +526,9 @@
      * ( it doesn't properly click the correct submit button )
      */
     YAHOO.widget.CodeEditor.prototype._handleFormSubmit = function () {
-        this.saveHTML();
+        if ( this.editorState == "on" ) {
+            this.saveHTML();
+        }
         return;
     };
     /* End override to fix problem */
@@ -651,13 +748,13 @@
         var html = this.getEditorText();
 
         // Fix line breaks
-        if ( this.browser.ie <= 6 ) {
+        html = html.replace( /\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;" );
+        if ( this.browser.ie ) {
             html = html.replace( /\n/g, "&nbsp;<br>" );
         }
         else {
             html = html.replace( /\n/g, "<br>");
         }
-        html = html.replace( /\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;" );
 
         // Apply new highlighting
         for (var i = 0; i < this.keywords.length; i++) {
