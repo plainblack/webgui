@@ -408,7 +408,7 @@
 
             Event.addListener( button, "click", function () {
                 if ( editor.editorState == "off" ) {
-                    editor.editorState = "off";
+                    editor.editorState = "on";
                     var fc = editor.get('element').previousSibling,
                         el = editor.get('element');
 
