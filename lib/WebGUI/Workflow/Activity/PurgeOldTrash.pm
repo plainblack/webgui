@@ -75,13 +75,21 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-	my $self = shift;
-       	my $sth = $self->session->db->read("select assetId,className from asset where state='trash' and stateChanged < ?", [time() - $self->get("purgeAfter")]);
-        while (my ($id, $class) = $sth->array) {
-        	my $asset = WebGUI::Asset->new($self->session, $id,$class);
-               $asset->purge if (defined $asset);
+    my $self = shift;
+    my $sth  = $self->session->db->read( "select assetId,className from asset where state='trash' and stateChanged < ? order by stateChanged ASC",
+        [ time() - $self->get("purgeAfter") ]
+    );
+    my $expireTime = time() + $self->getTTL();
+    while ( my ( $id, $class ) = $sth->array ) {
+        my $asset = WebGUI::Asset->new( $self->session, $id, $class );
+        $asset->purge if ( defined $asset );
+        if (time() > $expireTime) {
+            $sth->finish;
+            return $self->WAITING(1);
         }
-	return $self->COMPLETE;
+    }
+    $sth->finish;
+    return $self->COMPLETE;
 }
 
 
