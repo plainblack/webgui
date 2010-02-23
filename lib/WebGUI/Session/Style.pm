@@ -20,7 +20,7 @@ use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Asset::Template;
-use WebGUI;
+eval { require WebGUI; import WebGUI; };
 use HTML::Entities ();
 
 =head1 NAME
