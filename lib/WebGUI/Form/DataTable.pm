@@ -107,7 +107,7 @@ sub getDataTableHtml {
 
     ### Prepare the columns data
     my %parsers = (
-        date   => "YAHOO.util.DataSource.parseDate",
+        date   => "YAHOO.lang.JSON.stringToDate",
         number => "YAHOO.util.DataSource.parseNumber",
     );
 

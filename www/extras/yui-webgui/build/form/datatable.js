@@ -91,7 +91,6 @@ WebGUI.Form.DataTable
             delete data.columns[ i ].editorOptions;
         }
 
-        YAHOO.lang.JSON.dateToString = function(d) { return d.toString(); }; /* this overrides the default stringify date format */
         return YAHOO.lang.JSON.stringify( data );
     };
 
