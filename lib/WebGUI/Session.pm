@@ -273,7 +273,6 @@ Creates a new session using the same WebGUI root, config file, and user.
 sub duplicate {
     my $self = shift;
     my $newSession = WebGUI::Session->open(
-        $self->config->getWebguiRoot,
         $self->config->getFilename,
         undef,
         undef,
@@ -460,7 +459,7 @@ sub open {
 	my $configFile = shift;
 	my $request = shift;
 	my $server = shift;
-	my $config = WebGUI::Config->new($webguiRoot,$configFile);
+	my $config = WebGUI::Config->new($configFile);
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
 	$self->{_request} = $request if (defined $request);

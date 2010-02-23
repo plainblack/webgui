@@ -44,12 +44,13 @@ BEGIN {
         configBase         => catdir($root, 'etc'),
         logConfig          => catfile($root, 'etc', 'log.conf'),
         spectreConfig      => catfile($root, 'etc', 'spectre.conf'),
-        upgradesPath       => catfile($root, 'var', 'upgrades'),
+        upgrades           => catfile($root, 'docs', 'upgrades'),
         preloadCustom      => catfile($root, 'sbin', 'preload.custom'),
         preloadExclusions  => catfile($root, 'sbin', 'preload.exclude'),
         extras             => catdir($root, 'www', 'extras'),
         defaultUploads     => catdir($root, 'www', 'uploads'),
-        defaultCreateSQL   => catdir($root, 'var', 'create.sql'),
+        defaultCreateSQL   => catdir($root, 'docs', 'create.sql'),
+        var                => catdir($root, 'var'),
     );
     for my $sub (keys %paths) {
         my $path = $paths{$sub};

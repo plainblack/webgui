@@ -196,13 +196,7 @@ sub exportAssetCollateral {
     }
 
     # open another session to handle printing...
-    my $printSession = WebGUI::Session->open(
-        $self->session->config->getWebguiRoot,
-        $self->session->config->getFilename,
-        undef,
-        undef,
-        $self->session->getId,
-    );
+    my $printSession = WebGUI::Session->duplicate;
 
     my $keywordObj = WebGUI::Keyword->new($printSession);
     my $keywords = $keywordObj->findKeywords({

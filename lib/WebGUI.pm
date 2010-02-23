@@ -93,7 +93,7 @@ sub authen {
 		}
 	}
 
-	$config ||= WebGUI::Config->new($server->dir_config('WebguiRoot'),$request->dir_config('WebguiConfig'));
+	$config ||= WebGUI::Config->new($request->dir_config('WebguiConfig'));
 	my $cookies = APR::Request::Apache2->handle($request)->jar();
    
 	# determine session id
@@ -160,7 +160,7 @@ sub handler {
     $request = Apache2::Request->new($request);
 	my $configFile = shift || $request->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
 	my $server = Apache2::ServerUtil->server;	#instantiate the server api
-	my $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
+	my $config = WebGUI::Config->new($configFile); #instantiate the config object
     my $error = "";
     my $matchUri = $request->uri;
     my $gateway = $config->get("gateway");

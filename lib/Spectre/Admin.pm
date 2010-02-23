@@ -24,6 +24,7 @@ use POE::Component::IKC::Server;
 use POE::Component::IKC::Specifier;
 use Spectre::Cron;
 use Spectre::Workflow;
+use WebGUI::Paths;
 
 
 #-------------------------------------------------------------------
@@ -136,7 +137,7 @@ Fetches the site from each defined site, and loads it into the Workflow and Cron
 
 sub loadSiteData {
         my ( $kernel, $self) = @_[ KERNEL, OBJECT ];
-	my $configs = WebGUI::Config->readAllConfigs($self->{_config}->getWebguiRoot);
+	my $configs = WebGUI::Config->readAllConfigs;
     $self->debug("Reading site configs.");
 	foreach my $key (keys %{$configs}) {
 		next if $key =~ m/^demo/;
@@ -194,7 +195,7 @@ sub new {
 	my $class = shift;
 	my $config = shift;
 	my $debug = shift;
- 	Log::Log4perl->init( $config->getWebguiRoot."/etc/log.conf" );   
+ 	Log::Log4perl->init( WebGUI::Paths->logConfig );
 	$Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth+3;
 	my $logger = Log::Log4perl->get_logger($config->getFilename);
 	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
@@ -244,7 +245,7 @@ sub runTests {
 	my $class = shift;
 	my $config = shift;
 	print "Running connectivity tests.\n";
-	my $configs = WebGUI::Config->readAllConfigs($config->getWebguiRoot);
+	my $configs = WebGUI::Config->readAllConfigs;
 	foreach my $key (keys %{$configs}) {
 		next if $key =~ m/^demo/;
 		print "Testing $key\n";

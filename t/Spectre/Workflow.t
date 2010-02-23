@@ -18,6 +18,7 @@ use Test::More;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::Paths;
 use WebGUI::Session;
 use Spectre::Admin;
 use WebGUI::Config;
@@ -35,7 +36,7 @@ plan tests => 19;
 $|++;
 
 my $session             = WebGUI::Test->session;
-my $spectreConfigFile   = WebGUI::Test->root . '/etc/spectre.conf';
+my $spectreConfigFile   = WebGUI::Paths->spectreConfig;
 my $spectreConfig       = Config::JSON->new($spectreConfigFile);
 my $ip                  = $spectreConfig->get('ip');
 my $port                = $spectreConfig->get('port');

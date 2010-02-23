@@ -17,6 +17,7 @@ package WebGUI::Session::ErrorHandler;
 
 use strict;
 use Log::Log4perl;
+use WebGUI::Paths;
 #use Apache2::RequestUtil;
 use JSON;
 use HTML::Entities qw(encode_entities);
@@ -324,7 +325,7 @@ An active WebGUI::Session object.
 sub new {
 	my $class = shift;
 	my $session = shift;
-    Log::Log4perl->init_once( $session->config->getWebguiRoot."/etc/log.conf" );   
+    Log::Log4perl->init_once( WebGUI::Paths->logConfig );
 	my $logger = Log::Log4perl->get_logger($session->config->getFilename);
 	bless {_queryCount=>0, _logger=>$logger, _session=>$session}, $class;
 }

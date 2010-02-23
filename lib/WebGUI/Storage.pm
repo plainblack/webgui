@@ -26,6 +26,7 @@ use Image::Magick;
 use Path::Class::Dir;
 use Storable ();
 use WebGUI::Utility qw(isIn);
+use WebGUI::Paths;
 
 
 =head1 NAME
@@ -257,7 +258,7 @@ sub addFileFromCaptcha {
         $self->session->errorHandler->warn("Error adding noise: $error");
     }
     # AddNoise generates a different average color depending on library.  This is ugly, but the best I can see for now
-    $error = $image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
+    $error = $image->Annotate(font=>WebGUI::Paths->var.'/default.ttf', pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
 	if($error) {
         $self->session->errorHandler->warn("Error Annotating image: $error");
     }

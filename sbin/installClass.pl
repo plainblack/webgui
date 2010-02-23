@@ -17,6 +17,7 @@ use Getopt::Long;
 use Pod::Usage;
 use WebGUI::Pluggable;
 use WebGUI::Session;
+use WebGUI::Paths;
 
 $|++;
 
@@ -44,7 +45,7 @@ pod2usage("$0: Must specify a configFile")
     if !$configFile;
 
 die "Config file '$configFile' does not exist!\n"
-    if !-f '../etc/' . $configFile;
+    if !-f WebGUI::Paths->configBase . '/' . $configFile;
 
 # Open the session
 my $session = WebGUI::Session->open( "..", $configFile );

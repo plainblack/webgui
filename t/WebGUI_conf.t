@@ -33,7 +33,7 @@ plan tests => 3;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $defaultConfigFile = Path::Class::File->new(WebGUI::Test->root, qw/etc WebGUI.conf.original/);
+my $defaultConfigFile = Path::Class::File->new(WebGUI::Paths->configBase, 'WebGUI.conf.original');
 
 ok (-e $defaultConfigFile->stringify, 'WebGUI.conf.original exists');
 

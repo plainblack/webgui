@@ -22,6 +22,7 @@ use MIME::Parser;
 use Encode qw/decode encode/;
 
 use WebGUI::Test;
+use WebGUI::Paths;
 
 use WebGUI::Mail::Send;
 
@@ -134,7 +135,7 @@ SKIP: {
     my $numtests        = 2; # Number of tests in this block
 
     # Must be able to write the config, or we'll die
-    if ( !-w File::Spec->catfile( WebGUI::Test::root, 'etc', WebGUI::Test::file() ) ) {
+    if ( !-w File::Spec->catfile( WebGUI::Paths->configBase, WebGUI::Test->file ) ) {
         skip "Cannot test emailOverride: Can't write new configuration value", $numtests;
     }
 
