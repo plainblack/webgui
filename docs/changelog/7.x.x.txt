@@ -6,6 +6,7 @@
  - fixed #11422: Disabled scheduled task run by spectre
  - fixed #11431: Prototypes cache attribute lost
  - fixed #11428: Dataform Date Field Problem
+ - fixed #11409: 7.7.32 Breaks Code Editor
 
 7.8.12
  - fixed #11285: Pasting HTML into Code Editor in IE
