@@ -10,22 +10,14 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN { 
-	$webguiRoot = "..";
-	unshift (@INC, $webguiRoot."/lib"); 
-}
-
-
-$| = 1;
-
+use strict;
 use Getopt::Long;
 use Pod::Usage;
-use strict;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 use WebGUI::Utility;
 
+$| = 1;
 my $configFile;
 my $help;
 my $quiet;
@@ -40,7 +32,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() unless (defined($configFile) && $configFile ne '');
 
 print "Starting..." unless ($quiet);
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 print "OK\n" unless ($quiet);
 
 print "Looking for descendant replationships...\n" unless ($quiet);

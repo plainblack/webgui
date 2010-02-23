@@ -50,7 +50,7 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
 
  use WebGUI::Session;
 
- $session = WebGUI::Session->open($webguiRoot, $configFile);
+ $session = WebGUI::Session->open($configFile);
  $sessionId = $session->getId;
  ($form, $db, $user) = $session->quick("form", "db", "user");
  $session->close;
@@ -455,11 +455,16 @@ Uses simple session vars. See WebGUI::Session::Var::new() for more details.
 
 sub open {
 	my $class = shift;
-	my $webguiRoot = shift;
 	my $configFile = shift;
 	my $request = shift;
 	my $server = shift;
-	my $config = WebGUI::Config->new($configFile);
+    my $config;
+    if (try { $configFile->isa('WebGUI::Config' }) {
+        $config = $configFile;
+    }
+    else {
+        $config = WebGUI::Config->new($configFile);
+    }
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
 	$self->{_request} = $request if (defined $request);

@@ -10,16 +10,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN { 
-	$webguiRoot = "..";
-	unshift (@INC, $webguiRoot."/lib"); 
-}
-
+use strict;
 use Getopt::Long;
 use Pod::Usage;
-use strict;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Inbox;
@@ -51,7 +45,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() unless $configFile;
 
 print "Starting up...\n" unless ($quiet);
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 
 if ($userMessageFile) {
 	print "Opening message file.." unless ($quiet);

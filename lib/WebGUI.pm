@@ -98,7 +98,7 @@ sub authen {
    
 	# determine session id
 	my $sessionId = $cookies->{$config->getCookieName};
-	my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'),$config->getFilename, $request, $server, $sessionId);
+	my $session = WebGUI::Session->open($config, $request, $server, $sessionId);
 	my $log = $session->log;
 	$request->pnotes(wgSession => $session);
 

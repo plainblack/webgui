@@ -264,9 +264,7 @@ sub exportAsHtml {
 
     # now, create a new session as the user doing the exports. this is so that
     # the exported assets are taken from that user's perspective.
-    my $exportSession = WebGUI::Session->open(
-        $session->config->getFilename,
-    );
+    my $exportSession = WebGUI::Session->open($session->config);
     my $esGuard = Scope::Guard->new(sub {
         $exportSession->var->end;
         $exportSession->close;
@@ -497,9 +495,7 @@ sub exportGetDescendants {
         # open a temporary session as the user doing the exporting so we don't get
         # assets that they can't see
         if ( ref $user && $user->isa('WebGUI::User') ) {
-            $session = WebGUI::Session->open(
-                $session->config->getFilename,
-            );
+            $session = WebGUI::Session->open($session->config);
             $session->user( { userId => $user->userId } );
             $sGuard = Scope::Guard->new(sub {
                 $session->var->end;

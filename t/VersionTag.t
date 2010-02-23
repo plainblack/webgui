@@ -214,7 +214,7 @@ is($siteWideTag->getId(), $siteWideTagId, 'versionTagMode siteWide: reclaim site
 
 
 ## Through in a new session as different user
-my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+my $admin_session = WebGUI::Session->open($WebGUI::Test->file);
 $admin_session->user({'userId' => 3});
 WebGUI::Test->sessionsToDelete($admin_session);
 
@@ -279,8 +279,8 @@ $adminUserTag->rollback();
     is($tag->getAssetCount, 1, qq{$test_prefix [singlePerUser] tag with 1 asset});
 
     # create admin session
-    my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
-    WebGUI::Test->sessionsToDelete($admin_session);
+    my $admin_session = WebGUI::Session->open($WebGUI::Test->file);
+    addToCleanup($session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -331,8 +331,8 @@ $adminUserTag->rollback();
     is($tag->getAssetCount, 1, qq{$test_prefix [siteWide] tag with 1 asset});
 
     # create admin session
-    $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
-    WebGUI::Test->sessionsToDelete($admin_session);
+    $admin_session = WebGUI::Session->open(WebGUI::Test->file);
+    addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});

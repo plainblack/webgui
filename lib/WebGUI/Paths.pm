@@ -15,6 +15,9 @@ package WebGUI::Paths;
 =cut
 
 our $VERSION = '0.0.1';
+use 5.010;
+use strict;
+use warnings;
 use Carp qw(croak);
 use Cwd qw(realpath);
 use File::Spec::Functions qw(catdir splitpath catpath splitpath updir catfile);
@@ -59,6 +62,21 @@ BEGIN {
     }
 }
 
+sub import {
+    my $class = shift;
+    given (\@_) {
+        when ('-inc') {
+            $class->includePreloads;
+        }
+        when ('-preload') {
+            $class->preloadAll;
+        }
+        default {
+            warn "Invalid option $_";
+        }
+    }
+}
+
 sub siteConfigs {
     my $class = shift;
     opendir my $dh, $class->configBase;
@@ -83,7 +101,7 @@ sub preloadPaths {
     try {
         @paths = grep {
             (-d) ? 1 : do {
-                warn "WARNING: Not adding lib directory '$path' from @{[$class->preloadCustom]}: Directory does not exist.\n";
+                warn "WARNING: Not adding lib directory '$_' from @{[$class->preloadCustom]}: Directory does not exist.\n";
                 0;
             }
         } _readTextLines($class->preloadCustom);
@@ -104,6 +122,8 @@ sub preloadExclude {
 
 sub preloadAll {
     my $class = shift;
+    $class->includePreloads;
+
     require WebGUI::Pluggable;
 
     WebGUI::Pluggable::findAndLoad( 'WebGUI', {

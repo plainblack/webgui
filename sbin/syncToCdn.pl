@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -8,16 +10,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our $webguiRoot;
-
-BEGIN {
-    $webguiRoot = "..";
-    unshift( @INC, $webguiRoot . "/lib" );
-}
-
 use strict;
 use Fcntl ':flock';
 use Getopt::Long;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 use WebGUI::Storage;
 use Pod::Usage;
@@ -51,7 +47,7 @@ if ( !( $^O =~ /^Win/i ) && $> != 0 && !$override ) {
 }
 
 print "Starting..." unless ($quiet);
-my $session = WebGUI::Session->open( $webguiRoot, $configFile );
+my $session = WebGUI::Session->open( $configFile );
 $session->user( { userId => 3 } );
 print "OK\n" unless ($quiet);
 

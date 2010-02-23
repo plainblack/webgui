@@ -80,7 +80,7 @@ is($user->status, "Selfdestructed", 'status("Selfdestructed")');
 
 
 # Deactivation user deletes all sessions and scratches
-my $newSession  = WebGUI::Session->open( WebGUI::Test->root, WebGUI::Test->file );
+my $newSession  = WebGUI::Session->open( WebGUI::Test->file );
 $newSession->user({ user => $user });
 $newSession->scratch->set("hasStapler" => "no");
 

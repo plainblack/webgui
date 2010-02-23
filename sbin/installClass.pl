@@ -11,10 +11,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../lib";
 use strict;
 use Getopt::Long;
 use Pod::Usage;
+use WebGUI::Paths -inc;
 use WebGUI::Pluggable;
 use WebGUI::Session;
 use WebGUI::Paths;
@@ -48,7 +48,7 @@ die "Config file '$configFile' does not exist!\n"
     if !-f WebGUI::Paths->configBase . '/' . $configFile;
 
 # Open the session
-my $session = WebGUI::Session->open( "..", $configFile );
+my $session = WebGUI::Session->open( $configFile );
 $session->user( { userId => 3 } );
 
 # Install or uninstall the asset

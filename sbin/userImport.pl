@@ -10,17 +10,11 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN {
-	$webguiRoot = "..";
-	unshift (@INC, $webguiRoot."/lib");
-}
-
 use strict;
 use Digest::MD5;
 use Getopt::Long;
 use Pod::Usage;
+use WebGUI::Paths -inc;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Session;
@@ -78,7 +72,7 @@ if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 
 
 print "Starting up..." unless ($quiet);
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 $session->user({userId=>3});
 open(FILE,"<".$usersFile);
 print "OK\n" unless ($quiet);

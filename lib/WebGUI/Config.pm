@@ -36,9 +36,9 @@ This package parses the WebGUI config file.
 
  WebGUI::Config->loadAllConfigs($webguiRoot);
  
- my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
+ my $configs = WebGUI::Config->readAllConfigs;
 
- my $config = WebGUI::Config->new($webguiRoot, $configFileName);
+ my $config = WebGUI::Config->new($configFileName);
 
  my $value = $config->get($param);
  $config->set($param,$value);
@@ -123,8 +123,7 @@ The path to the WebGUI installation.
 
 sub loadAllConfigs {
 	my $class = shift;
-	my $webguiPath = shift;
-	my $configs = $class->readAllConfigs($webguiPath);
+	my $configs = $class->readAllConfigs;
 	foreach my $filename (keys %{$configs}) {
 		unless ($filename =~ /^demo\d/) {
 			print "\tLoading ".$filename."\n";	

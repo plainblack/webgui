@@ -54,7 +54,7 @@ for (my $count = 1; $count <= $maxCount; $count++){
 }
 
 ##Creating a new session with the previous session's Id should clone the scratch data
-my $newSession = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file, undef, undef, $session->getId);
+my $newSession = WebGUI::Session->open(WebGUI::Test->file, undef, undef, $session->getId);
 
 is($newSession->getId, $session->getId, "Successful session duplication");
 
@@ -81,7 +81,7 @@ is($scratch->set('','value'), undef, 'set returns undef unless it gets a name ev
 #
 ############################################
 
-my @sessionBank = map { WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file) } 0..3;
+my @sessionBank = map { WebGUI::Session->open(WebGUI::Test->file) } 0..3;
 
 ##Set variables to be deleted by name
 foreach my $i (0..3) {

@@ -66,7 +66,7 @@ sub handler {
         my $session = $request->pnotes('wgSession');
         WEBGUI_FATAL: {
             unless (defined $session) {
-                $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
+                $session = WebGUI::Session->open($config, $request, $server);
                 return Apache2::Const::OK if ! defined $session;
             }
             foreach my $handler (@{$config->get("contentHandlers")}) {

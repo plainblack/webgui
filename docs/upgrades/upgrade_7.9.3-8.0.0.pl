@@ -10,16 +10,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN {
-    $webguiRoot = "../..";
-    unshift (@INC, $webguiRoot."/lib");
-}
-
 use strict;
 use File::Path qw/rmtree/;
 use Getopt::Long;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
@@ -116,7 +110,7 @@ sub start {
         'configFile=s'=>\$configFile,
         'quiet'=>\$quiet
     );
-    my $session = WebGUI::Session->open($webguiRoot,$configFile);
+    my $session = WebGUI::Session->open($configFile);
     $session->user({userId=>3});
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->set({name=>"Upgrade to ".$toVersion});

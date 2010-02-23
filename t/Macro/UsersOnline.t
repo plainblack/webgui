@@ -178,7 +178,7 @@ sub setupUsers {
 
     # Create sessions such that users are added to the userSession table
     foreach (@users) {
-        my $newSession = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
+        my $newSession = WebGUI::Session->open(WebGUI::Test::file);
         $newSession->user({user => $_});
     }
     addToCleanup(@users);

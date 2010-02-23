@@ -27,7 +27,7 @@ is( ref $config->get("macros"), "HASH", "get() macros hash" );
 is( ref $config->get("assets"), "HASH", "get() assets hash" );
 is( ref $config->get("shippingDrivers"), "ARRAY", "get() shippingDrivers array" );
 is( $config->getFilename, basename($configFile), "getFilename()" );
-ok( defined WebGUI::Config->readAllConfigs($webguiRoot), "readAllConfigs" );
+ok( defined WebGUI::Config->readAllConfigs, "readAllConfigs" );
 $config->addToArray("shippingDrivers","TEST");
 my $found = 0;
 foreach my $driver ( @{$config->get("shippingDrivers")}) {

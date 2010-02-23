@@ -540,7 +540,7 @@ my @sessionBank = ();
 
 foreach my $idx (0..$#scratchTests) {
 	##Create a new session
-	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->file);
 
 	##Create a new user and make this session's default user that user
 	$itchies[$idx] = WebGUI::User->new($sessionBank[$idx], "new");
@@ -587,7 +587,7 @@ foreach my $idx (0..$#ipTests) {
 	$ENV{REMOTE_ADDR} = $ip;
 
 	##Create a new session
-	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->file);
 
 	##Create a new user and make this session's default user that user
 	$tcps[$idx] = WebGUI::User->new($sessionBank[$idx], "new");

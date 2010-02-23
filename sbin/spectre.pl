@@ -10,19 +10,14 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN {
-    $webguiRoot = "..";
-    unshift (@INC, $webguiRoot."/lib");
-}
-
-use Pod::Usage;
 use strict;
 use warnings;
+use Pod::Usage;
 use Getopt::Long;
+use File::Spec;
 use POE::Component::IKC::ClientLite;
 use Spectre::Admin;
+use WebGUI::Paths -inc;
 use WebGUI::Config;
 use JSON;
 
@@ -52,9 +47,7 @@ GetOptions(
 pod2usage( verbose => 2 ) if $help;
 pod2usage() unless ($ping||$shutdown||$daemon||$run||$test||$status);
 
-require File::Spec;
-# Convert to absolute since we'll be changing directory
-my $config = WebGUI::Config->new(File::Spec->rel2abs($webguiRoot),"spectre.conf",1);
+my $config = WebGUI::Config->new( WebGUI::Paths->spectreConfig, 1);
 unless (defined $config) {
 	print <<STOP;
 

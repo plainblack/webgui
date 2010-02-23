@@ -58,14 +58,14 @@ note $scratchCount;
 my @sessions;
 
 foreach (1..2) {
-    push @sessions, WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+    push @sessions, WebGUI::Session->open(WebGUI::Test->file);
 }
 
 ##Force automatic expiration of the sessions
 $session->setting->set('sessionTimeout', -500);
 
 foreach (1..2) {
-    push @sessions, WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+    push @sessions, WebGUI::Session->open(WebGUI::Test->file);
 }
 
 $session->setting->set('sessionTimeout', $origSessionTimeout );

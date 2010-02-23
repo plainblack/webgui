@@ -11,16 +11,10 @@
 #-------------------------------------------------------------------
 
 
-our ($webguiRoot);
-
-BEGIN {
-        $webguiRoot = "..";
-        unshift (@INC, $webguiRoot."/lib");
-}
-
+use strict;
 use Getopt::Long;
 use Pod::Usage;
-use strict;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 
 my $help;
@@ -39,7 +33,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() if $configFile eq "";
 
 
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 $session->setting->remove('specialState');
 $session->setting->add('specialState','upgrading') unless $stop;
 $session->var->end;

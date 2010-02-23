@@ -37,8 +37,8 @@ WebGUI::Test->tagsToRollback($tag);
 
 my $cart1 = WebGUI::Shop::Cart->create($session);
 
-my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
-WebGUI::Test->sessionsToDelete($session2);
+my $session2 = WebGUI::Session->open(WebGUI::Test->file);
+addToCleanup($session2);
 my $cart2 = WebGUI::Shop::Cart->create($session2);
 $cart2->update({creationDate => time()-10000});
 

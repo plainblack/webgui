@@ -133,8 +133,8 @@ is( $cart->readyForCheckout, 0, 'Cannot checkout an empty cart' );
 is($session->db->quickScalar("select count(*) from cartItem where cartId=?",[ $cart->getId ]), 0, "Items are removed from cart.");
 
 
-my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
-WebGUI::Test->sessionsToDelete($session2);
+my $session2 = WebGUI::Session->open(WebGUI::Test->file);
+addToCleanup($session2);
 $session2->user({userId => 3});
 my $cart2 = WebGUI::Shop::Cart->newBySession($session2);
 isnt(

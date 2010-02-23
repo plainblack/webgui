@@ -10,19 +10,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
- 
-our $webguiRoot;
-
-BEGIN {
-        $webguiRoot = "..";
-        unshift (@INC, $webguiRoot."/lib");
-}
-
-use DBI;
-use FileHandle;
+use strict;
 use Getopt::Long;
 use Pod::Usage;
-use strict qw(subs vars);
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 use WebGUI::Asset;
 
@@ -46,7 +37,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() if ($configFile eq '' || !($assetId||$url) );
 
 # Open WebGUI session
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 $session->user({userId=>$userId}) if (defined $userId);
 $session->scratch->set("personalStyleId", $styleId) if (defined $styleId);
 
@@ -54,23 +45,26 @@ my $asset = undef;
 
 if ($url) {
 	$asset = WebGUI::Asset->newByUrl($session,$url);
-} else {
+}
+else {
 	$asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
 }
 
 if (defined $asset) {
-	my $file = undef;
+	my $file;
 	if ($toFile) {
-		$file = FileHandle->new(">$toFile") or die "Can't open file $toFile for writing. $!";
+        open $file '>', $toFile or die "Can't open file $toFile for writing. $!";
 		$session->output->setHandle($file);
 	}
 	my $content = $asset->www_view;
 	unless ($content eq "chunked") {
-		$session->output->print($content);	
+		$session->output->print($content);
 		$session->output->setHandle(undef);
 	}
-	$file->close if (defined $file);
-} else {
+    close $file
+        if defined $file;
+}
+else {
 	print "Asset not defined!!\n";
 }
 

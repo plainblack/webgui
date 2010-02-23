@@ -10,14 +10,13 @@
 #  http://www.plainblack.com                     info@plainblack.com
 # -------------------------------------------------------------------
 
-$|=1;
-use lib '../lib';
 use strict;
 use Carp qw( carp croak );
 use File::Find;
 use Getopt::Long;
 use Pod::Usage;
 use Scalar::Util qw( blessed );
+use WebGUI::Paths -inc;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Wobject::GalleryAlbum;
 use WebGUI::Asset::Wobject::Gallery;
@@ -25,6 +24,7 @@ use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Asset::Post::Thread;
 use WebGUI::Storage;
 
+$|=1;
 
 # custom flags
 my ($fromAssetId, $fromPath, $fromAssetUrl, $toId, $toUrl) = undef;
@@ -378,7 +378,7 @@ sub start {
         pod2usage("$0: Must specify a --configFile");
     }
 
-    my $session = WebGUI::Session->open("..",$configFile);
+    my $session = WebGUI::Session->open($configFile);
     $session->user({userId=>3});
 
     my $versionTag = WebGUI::VersionTag->getWorking($session);
