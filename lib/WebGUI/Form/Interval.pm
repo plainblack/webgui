@@ -95,6 +95,29 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getUnitOptions (  )
+
+Returns a hash with i18n labels and values for units of time.
+
+=cut
+
+sub getUnitOptions {
+    my $self = shift;
+    tie my %units, 'Tie::IxHash';
+    my $i18n = WebGUI::International->new($self->session);
+    %units = (seconds => $i18n->get(704),
+              minutes => $i18n->get(705),
+              hours   => $i18n->get(706),
+              days    => $i18n->get(700),
+              weeks   => $i18n->get(701),
+              months  => $i18n->get(702),
+              years   => $i18n->get(703),
+    );
+    return %units;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getValue ( [ num_and_units ] )
 
 Returns either the interval that was posted (in seconds) or if nothing comes back it returns 0.
@@ -165,17 +188,7 @@ Renders an interval control.
 
 sub toHtml {
     my $self = shift;
-    my %units;
-    tie %units, 'Tie::IxHash';
-    my $i18n = WebGUI::International->new($self->session);
-    %units = (seconds => $i18n->get(704),
-              minutes => $i18n->get(705),
-              hours   => $i18n->get(706),
-              days    => $i18n->get(700),
-              weeks   => $i18n->get(701),
-              months  => $i18n->get(702),
-              years   => $i18n->get(703),
-    );
+    my %units = $self->getUnitOptions();
     my %reverseUnits = reverse %units;
     my ($interval, $units) = $self->session->datetime->secondsToExactInterval($self->getOriginalValue);
     # not sure why, but these things need to be defined like this or
@@ -208,16 +221,20 @@ Returns the field as hidden controls rather than displayable controls.
 =cut
 
 sub toHtmlAsHidden {
-	my $self = shift;
-        my ($interval, $units) = $self->session->datetime->secondsToExactInterval($self->getOriginalValue);
-        return WebGUI::Form::Hidden->new($self->session,
-                        name=>$self->get("name").'_interval',
-                        value=>$interval
-                        )->toHtmlAsHidden
-        	.WebGUI::Form::Hidden->new($self->session,
-                        name=>$self->get("name").'_units',
-                        value=>$units
-                        )->toHtmlAsHidden;
+    my $self    = shift;
+    my $session = $self->session;
+    my %units   = $self->getUnitOptions();
+    my %reverseUnits = reverse %units;
+    my ($interval, $units) = $session->datetime->secondsToExactInterval($self->getOriginalValue);
+    my $unitVal = $reverseUnits{$units};
+    return WebGUI::Form::Hidden->new($session,
+                    name  => $self->get("name").'_interval',
+                    value => $interval,
+           )->toHtmlAsHidden
+         . WebGUI::Form::Hidden->new($session,
+                    name  => $self->get("name").'_units',
+                    value => $unitVal,
+          )->toHtmlAsHidden;
 }
 
 1;
