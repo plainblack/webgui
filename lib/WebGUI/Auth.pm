@@ -877,6 +877,9 @@ sub logout {
        my $error = qx($command);
        $self->session->errorHandler->warn($error) if $error;
     }
+
+    # Do not allow caching of the logout page (to ensure the page gets requested)
+    $self->session->http->setCacheControl( "none" );
    
 	return undef;
 }
