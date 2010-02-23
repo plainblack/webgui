@@ -1012,7 +1012,7 @@ sub www_manageUsersInGroup {
 	my $session = shift;
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
-	my $output = WebGUI::Form::formHeader($session,{ method => 'GET', })
+	my $output = WebGUI::Form::formHeader($session)
 		.WebGUI::Form::hidden($session,{
 			name=>"gid",
 			value=>$session->form->process("gid")
