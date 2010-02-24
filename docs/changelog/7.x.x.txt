@@ -11,6 +11,7 @@
  - fixed #11428: Dataform Date Field Problem
  - fixed #11434: Inbox invitation adds text to email instead of html
  - fixed #11436: Inbox invitation use mail send instead of mail queue
+ - fixed #11385: Wrong user in onCompletePurchase
 
 7.8.12
  - fixed #11285: Pasting HTML into Code Editor in IE
