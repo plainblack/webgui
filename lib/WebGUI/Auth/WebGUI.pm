@@ -288,7 +288,7 @@ WebGUI::Asset::Template->new($self->session,$self->getSetting('accountActivation
         WebGUI::Macro::process($self->session,\$text);
         $mail->addText($text);
         $mail->addFooter;
-        $mail->send;
+        $mail->queue;
         $self->user->status("Deactivated");
         $session->var->end($session->var->get("sessionId"));
         $session->var->start(1,$session->getId);
@@ -1086,7 +1086,7 @@ sub emailRecoverPasswordFinish {
 
     my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>$i18n->get('WebGUI password recovery')});
     $mail->addText($i18n->get('recover password email text1', 'AuthWebGUI') . $url. ". \n\n".$i18n->get('recover password email text2', 'AuthWebGUI')." \n\n ".$url."?op=auth;method=emailResetPassword;token=$recoveryGuid"."\n\n ". $i18n->get('recover password email text3', 'AuthWebGUI'));
-    $mail->send;
+    $mail->queue;
     return "<h1>". $i18n->get('recover password banner', 'AuthWebGUI')." </h1> <br> <br> <h3>". $i18n->get('email recover password finish message', 'AuthWebGUI') . "</h3>";
 }
 
