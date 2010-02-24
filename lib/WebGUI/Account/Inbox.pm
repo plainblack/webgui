@@ -946,7 +946,8 @@ sub www_inviteUserSave {
         my $invitation = WebGUI::Mail::Send->create(
             $session, {
                 to      => $to,
-                from    => $email,
+                from    => $session->setting->get('companyEmail'),
+                replyTo => $email,
                 subject => $subject,
             }
         );
