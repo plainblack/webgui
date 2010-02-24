@@ -198,7 +198,7 @@ sub payoutVendor {
             . "\n\nVendor information:\n"
             . Dumper( $vendor->get )
         );
-        $mail->send;
+        $mail->queue;
 
         $payoutDetails->{ errorCode     } = $errorCode;
         $payoutDetails->{ errorMessage  } = $errorMessage;
