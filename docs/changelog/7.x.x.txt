@@ -10,6 +10,7 @@
  - fixed #11426: Logout page gets cached
  - fixed #11428: Dataform Date Field Problem
  - fixed #11434: Inbox invitation adds text to email instead of html
+ - fixed #11436: Inbox invitation use mail send instead of mail queue
 
 7.8.12
  - fixed #11285: Pasting HTML into Code Editor in IE
