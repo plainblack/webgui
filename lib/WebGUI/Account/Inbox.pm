@@ -956,7 +956,7 @@ sub www_inviteUserSave {
 
         my $emailBody = $self->processTemplate( $var, $self->getInviteUserMessageTemplateId );
 
-        $invitation->addText($emailBody);
+        $invitation->addHtml($emailBody);
 
         $invitation->send;
 
