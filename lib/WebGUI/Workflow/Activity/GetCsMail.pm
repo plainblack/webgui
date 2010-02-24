@@ -194,7 +194,7 @@ sub execute {
 						from=>$cs->get("mailAddress")
 						});
 					$send->addText($i18n->get("rejected because no user account"));
-					$send->send;
+					$send->queue;
 				}
 				next;
 			}
@@ -232,7 +232,7 @@ sub execute {
 				from=>$cs->get("mailAddress")
 				});
 			$send->addText($i18n->get("rejected because not allowed"));
-			$send->send;
+			$send->queue;
 		}
 		# just in case there are a lot of messages, we should release after a minutes worth of retrieving
 		last if (time() > $start + $ttl);
