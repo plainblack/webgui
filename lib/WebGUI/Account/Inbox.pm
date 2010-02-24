@@ -958,7 +958,7 @@ sub www_inviteUserSave {
 
         $invitation->addHtml($emailBody);
 
-        $invitation->send;
+        $invitation->queue;
 
     } ## end for my $inviteeEmail (@toList)
 
