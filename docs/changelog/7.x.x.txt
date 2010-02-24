@@ -16,6 +16,7 @@
  - fixed #11431: Prototypes cache attribute lost
  - fixed #11409: 7.7.32 Breaks Code Editor
  - fixed #11426: Logout page gets cached
+ - fixed #11428: Dataform Date Field Problem
 
 7.7.32
  - fixed #11349: Code editor returns newline for blank content

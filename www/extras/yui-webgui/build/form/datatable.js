@@ -49,7 +49,7 @@ WebGUI.Form.DataTable
             data        = {};
             var columns = this.dataTable.getColumnSet().getDefinitions();
             for ( var i = 0; i < columns.length; i++ ) {
-                data[ columns[ i ].key ] = "";
+                data[ columns[ i ].key ] = columns[i].formatter == "date" ? new Date : "";
             }
         }
         this.dataTable.addRow( data );
@@ -627,17 +627,10 @@ WebGUI.Form.DataTable
                 key         : newKey,
                 formatter   : format,
                 resizeable  : ( col ? col.resizeable : 1 ),
-                sortable    : ( col ? col.sortable : 1 )
+                sortable    : ( col ? col.sortable : 1 ),
+                editor      : ( format == "date" ? "date" : "textbox")
             };
             var newIndex    = col ? col.getKeyIndex() : undefined;
-
-            // Set the editor
-            if ( format == "date" ) {
-                newCol.editor   = "date";
-            }
-            else {
-                newCol.editor   = "textbox";
-            }
 
             this.dataTable.insertColumn( newCol, newIndex );
             if ( col ) {
@@ -650,6 +643,18 @@ WebGUI.Form.DataTable
                     delCol  = this.dataTable.getColumn( oldKey );
                 }
                 this.dataTable.removeColumn( delCol );
+            }
+            else {
+                //Set data in the new column to useful defaults.
+                var allRecords = this.dataTable.getRecordSet().getRecords();
+                var numRecords = allRecords.length;
+                for (j=0; j < numRecords; j++) {
+                    if (format == "date") {
+                        allRecords[j].setData(newKey, new Date);
+                    } else {
+                        allRecords[j].setData(newKey, '');
+                    }
+                }
             }
             i++;
         }
