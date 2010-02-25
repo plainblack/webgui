@@ -497,13 +497,13 @@ sub getDeleteUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getDirectLinkUrl ( )
+=head2 getThreadLinkUrl ( )
 
 Returns the URL for this Post, which links directly to its anchor and page.
 
 =cut
 
-sub getDirectLinkUrl {
+sub getThreadLinkUrl {
 	my $self = shift;
     my $url;
     my $page_size = $self->getThread->getParent->get('postsPerPage');

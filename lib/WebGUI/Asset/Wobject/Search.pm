@@ -220,7 +220,8 @@ sub view {
             if (defined $asset) {
                 my $properties = $asset->get;
                 if ($self->get("useContainers")) {
-                    $properties->{url} = $asset->getContainer->get("url");
+                    $properties->{url} = $asset->isa('WebGUI::Asset::Post::Thread') ? $asset->getCSLinkUrl()
+                                       :                                              $asset->getContainer->get("url");
                 }
                 #Add highlighting
                 $properties->{'title'               } = $hl->highlight($properties->{title} || '');

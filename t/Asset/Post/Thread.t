@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 5; # increment this value for each test you create
+use Test::More tests => 9; # increment this value for each test you create
 use Test::MockObject::Extends;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post::Thread;
@@ -30,7 +30,12 @@ addToCleanup($versionTag);
 
 # Need to create a Collaboration system in which the post lives.
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
-my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', editTimeout => '1'}, @addArgs);
+my $collab = $node->addChild({
+        className      => 'WebGUI::Asset::Wobject::Collaboration',
+        editTimeout    => '1',
+        threadsPerPage => 3,
+    },
+    @addArgs);
 
 
 # finally, add the post to the collaboration system
@@ -63,8 +68,19 @@ $thread->rate(1);
 $thread->trash;
 is($thread->get('threadRating'), 0, 'trash does not die, and updates the threadRating to 0');
 
-unlike $thread->getDirectLinkUrl, qr/\?pn=\d+/, 'threads do not need pagination url query fragments';
-unlike $uncommittedThread->getDirectLinkUrl, qr/\?pn=\d+/, 'uncommitted threads, too';
-like $uncommittedThread->getDirectLinkUrl, qr/\?revision=\d+/, 'uncommitted threads do have a revision query param';
+note 'getThreadLinkUrl';
+unlike $thread->getThreadLinkUrl, qr/\?pn=\d+/, 'threads do not need pagination url query fragments';
+unlike $uncommittedThread->getThreadLinkUrl, qr/\?pn=\d+/, 'uncommitted threads, too';
+like $uncommittedThread->getThreadLinkUrl, qr/\?revision=\d+/, 'uncommitted threads do have a revision query param';
+
+note 'getCSLinkUrl';
+my @newThreads;
+push @newThreads, $collab->addChild($props, @addArgs);
+push @newThreads, $collab->addChild($props, @addArgs);
+my $csUrl = $collab->get('url');
+like $newThreads[-1]->getCSLinkUrl, qr/^$csUrl/, 'getCsLinkUrl returns URL of the parent CS with no gateway';
+like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1/, 'and has the right page number';
+like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1;sortBy=lineage;sortOrder=desc/, 'and has the right sort parameters';
+like $thread->getCSLinkUrl, qr/\?pn=2/, 'checking 2nd thread on another page';
 
 # vim: syntax=perl filetype=perl
