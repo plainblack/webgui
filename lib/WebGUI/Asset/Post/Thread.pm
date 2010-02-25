@@ -340,15 +340,39 @@ sub getAutoCommitWorkflowId {
 
 #-------------------------------------------------------------------
 
-=head2 getDirectLinkUrl ( )
+=head2 getCSLinkUrl ( )
+
+This URL links to the page of the CS containing this thread, similar
+to the getThreadLink for the Post.  It does not contain the gateway
+for the site.
+
+=cut
+
+sub getCSLinkUrl {
+	my $self = shift;
+    my $url;
+    my $cs         = $self->getParent;
+    my $page_size  = $cs->get('threadsPerPage');
+    my $place      = $self->getRank+1;
+    my $last_place = $cs->getLastChild->getRank+1;
+    my $page       = int(($last_place - $place)/$page_size) + 1;
+    my $page_frag  = 'pn='.$page.';sortBy=lineage;sortOrder=desc';
+    $url = $self->session->url->append($cs->get('url'), $page_frag);
+    return $url;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getThreadLinkUrl ( )
 
 Extend the base method from Post to remove the pagination query fragment
 
 =cut
 
-sub getDirectLinkUrl {
+sub getThreadLinkUrl {
 	my $self = shift;
-    my $url = $self->SUPER::getDirectLinkUrl();
+    my $url = $self->SUPER::getThreadLinkUrl();
     $url =~ s/\?pn=\d+//;
     if ($url =~ m{;revision=\d+}) {
         $url =~ s/;revision/?revision/;

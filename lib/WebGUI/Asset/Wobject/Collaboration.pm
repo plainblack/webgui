@@ -130,7 +130,7 @@ sub appendPostListTemplateVars {
 			if ($self->get("displayLastReply")) {
 				my $lastPost = $post->getLastPost();
 				%lastReply = (
-					"lastReply.url"                 => $lastPost->getDirectLinkUrl,
+					"lastReply.url"                 => $lastPost->getThreadLinkUrl,
                     "lastReply.title"               => $lastPost->get("title"),
                     "lastReply.user.isVisitor"      => $lastPost->get("ownerUserId") eq "1",
                     "lastReply.username"            => $lastPost->get("username"),
@@ -145,7 +145,7 @@ sub appendPostListTemplateVars {
 		my %postVars = (
 			%{$post->get},
             "id"                    => $post->getId,
-            "url"                   => $post->getDirectLinkUrl,
+            "url"                   => $post->getThreadLinkUrl,
 			rating_loop             => \@rating_loop,
 			"content"               => $post->formatContent,
             "status"                => $post->getStatus,
@@ -1161,10 +1161,14 @@ Collaboration System
 sub getThreadsPaginator {
     my $self        = shift;
 	
-    my $scratchSortBy = $self->getId."_sortBy";
+    my $scratchSortBy    = $self->getId."_sortBy";
 	my $scratchSortOrder = $self->getId."_sortDir";
-	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->get("sortBy");
-    my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
+	my $sortBy    = $self->session->form->process("sortBy")   
+                 || $self->session->scratch->get($scratchSortBy)
+                 || $self->get("sortBy");
+    my $sortOrder = $self->session->form->process("sortOrder")
+                 || $self->session->scratch->get($scratchSortOrder)
+                 || $self->get("sortOrder");
 	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
 		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
         $self->session->scratch->set($scratchSortOrder, $sortOrder);
