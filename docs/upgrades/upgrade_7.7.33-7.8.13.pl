@@ -45,6 +45,7 @@ addPickLanguageMacro($session);
 installSetLanguage($session);
 dropSkipNotification($session);
 removeOldWebGUICSS($session);
+addEMSSubmissionTables($session);
 configEMSActivities($session);
 addUSPSInternationalShippingDriver( $session );
 deleteFieldFromEMSSubmission($session);
@@ -324,6 +325,91 @@ ENDSQL
 
     print "DONE!\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+# make database changes relevant to EMS Submission system
+sub addEMSSubmissionTables {
+    my $session = shift;
+    print "\tCreate EMS Submission Tables... " unless $quiet;
+    my $db = $session->db;
+
+    $db->write(<<ENDSQL);
+INSERT INTO incrementer (incrementerId,nextValue) VALUES ('submissionId',1);
+ENDSQL
+
+    $db->write(<<ENDSQL);
+CREATE TABLE EMSSubmissionForm (
+    assetId CHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    canSubmitGroupId CHAR(22) BINARY,
+    daysBeforeCleanup INT,
+    deleteCreatedItems INT(1),
+    formDescription TEXT,
+    submissionDeadline Date,
+    pastDeadlineMessage TEXT,
+    PRIMARY KEY ( assetId, revisionDate )
+)
+ENDSQL
+
+    $db->write(<<ENDSQL);
+CREATE TABLE EMSSubmission (
+    assetId CHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    submissionId INT NOT NULL,
+    submissionStatus CHAR(30),
+    ticketId CHAR(22) BINARY,
+    description mediumtext,
+    sku char(35),
+    vendorId char(22) BINARY,
+    displayTitle tinyint(1),
+    shipsSeparately tinyint(1),
+    price FLOAT,
+    seatsAvailable INT,
+    startDate DATETIME,
+    duration FLOAT,
+    eventNumber INT,
+    location CHAR(100),
+    relatedBadgeGroups MEDIUMTEXT,
+    relatedRibbons MEDIUMTEXT,
+    eventMetaData MEDIUMTEXT,
+    sendEmailOnChange INT(1),
+    PRIMARY KEY ( assetId, revisionDate )
+)
+ENDSQL
+
+    $db->write(<<ENDSQL);
+    ALTER TABLE EventManagementSystem
+            ADD COLUMN eventSubmissionTemplateId CHAR(22) BINARY;
+ENDSQL
+
+    $db->write(<<ENDSQL);
+    ALTER TABLE EventManagementSystem
+            ADD COLUMN eventSubmissionQueueTemplateId CHAR(22) BINARY;
+ENDSQL
+
+    $db->write(<<ENDSQL);
+    ALTER TABLE EventManagementSystem
+            ADD COLUMN eventSubmissionMainTemplateId CHAR(22) BINARY;
+ENDSQL
+
+    $db->write(<<ENDSQL);
+    ALTER TABLE EventManagementSystem
+            ADD COLUMN eventSubmissionGroups MEDIUMTEXT;
+ENDSQL
+
+    $db->write(<<ENDSQL);
+    ALTER TABLE EventManagementSystem
+            ADD COLUMN submittedLocationsList MEDIUMTEXT;
+ENDSQL
+
+    $db->write(<<ENDSQL);
+    ALTER TABLE EMSEventMetaField
+            ADD COLUMN helpText MEDIUMTEXT;
+ENDSQL
+
+    print "DONE!\n" unless $quiet;
+}
+
 
 
 
