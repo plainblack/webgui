@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Utility;
 
 
 my $toVersion = "7.8.13"; # make this match what version you're going to
