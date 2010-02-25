@@ -316,6 +316,9 @@
         ;
     
     YAHOO.widget.CodeEditor = function (id, cfg) {
+        // TODO: Make a cfg for off by default
+        this.editorState = "on";
+
         // Disable Editor configs that don't apply
         cfg["animate"] = false;
         cfg["dompath"] = false;
@@ -399,12 +402,12 @@
 
         if ( cfg["toggleButton"] ) {
             var editor  = this;
+
             // Add toggle button
             var button  = document.createElement("input");
             
             button.type         = "button";
             button.value        = "Toggle Editor";
-            button.editorState  = "on";
 
             Event.addListener( button, "click", function () {
                 if ( editor.editorState == "off" ) {
