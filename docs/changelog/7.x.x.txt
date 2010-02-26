@@ -22,6 +22,7 @@
  - fixed #11385: Wrong user in onCompletePurchase
  - fixed #11435: Invitation mail uses wrong mail 'from' header
  - fixed #11440: Search for thread with containers
+ - fixed #11439: Wrong page after login
 
 7.7.32
  - fixed #11349: Code editor returns newline for blank content
