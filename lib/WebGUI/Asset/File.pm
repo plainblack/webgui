@@ -18,6 +18,7 @@ use strict;
 use Carp;
 
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 

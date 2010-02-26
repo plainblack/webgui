@@ -15,6 +15,7 @@ package WebGUI::Asset::Sku::EMSTicket;
 =cut
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
 define assetName           => ['ems ticket', 'Asset_EMSTicket'];

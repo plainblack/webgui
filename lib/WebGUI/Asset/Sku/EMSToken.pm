@@ -15,6 +15,7 @@ package WebGUI::Asset::Sku::EMSToken;
 =cut
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
 define assetName           => ['ems token', 'Asset_EMSToken'];

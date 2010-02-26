@@ -16,6 +16,7 @@ package WebGUI::Asset::Template;
 
 use strict;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 

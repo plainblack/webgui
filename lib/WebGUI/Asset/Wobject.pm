@@ -23,6 +23,7 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::SQL;
 use WebGUI::Utility;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define tableName   => 'wobject';

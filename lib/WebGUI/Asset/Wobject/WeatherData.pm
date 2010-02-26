@@ -28,6 +28,7 @@ BEGIN {
 }
 
 use WebGUI::International;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define tableName => 'WeatherData';

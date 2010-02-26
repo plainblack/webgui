@@ -13,6 +13,7 @@ package WebGUI::Asset::Shortcut;
 use strict;
 use Carp qw/croak/;
 use Tie::IxHash;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 

@@ -16,6 +16,7 @@ use JSON;
 use WebGUI::International;
 use WebGUI::Form::File;
 use WebGUI::Utility;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName   => ['assetName', 'Asset_Survey'];

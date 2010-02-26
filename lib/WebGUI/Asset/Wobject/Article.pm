@@ -15,6 +15,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_Article'];

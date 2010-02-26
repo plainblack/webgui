@@ -47,7 +47,6 @@ These methods are available from this class:
 my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
     install         => [ 'unimport' ],
     with_meta       => [ 'property', 'define' ],
-    also            => 'Moose',
 );
 
 #-------------------------------------------------------------------

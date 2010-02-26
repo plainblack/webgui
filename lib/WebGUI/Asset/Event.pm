@@ -27,6 +27,7 @@ use WebGUI::Form;
 use WebGUI::Storage;
 use Storable;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName   => ['assetName', 'Asset_Event'];

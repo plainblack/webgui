@@ -22,6 +22,7 @@ use WebGUI::Asset::Wobject::HttpProxy::Parse;
 use WebGUI::Macro;
 use Apache2::Upload;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_HttpProxy'];

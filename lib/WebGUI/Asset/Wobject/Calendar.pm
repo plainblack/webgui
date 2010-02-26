@@ -13,6 +13,7 @@ use strict;
 #----------------------------------------------------------------------------
 
 #use base qw/WebGUI::Asset::Wobject WebGUI::JSONCollateral/;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 

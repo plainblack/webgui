@@ -17,6 +17,7 @@ use warnings;
 use JSON;
 use WebGUI::International;
 use WebGUI::Utility;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => [ 'assetName', 'Asset_Carousel' ];

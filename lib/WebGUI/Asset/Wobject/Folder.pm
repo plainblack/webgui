@@ -15,6 +15,7 @@ package WebGUI::Asset::Wobject::Folder;
 =cut
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 

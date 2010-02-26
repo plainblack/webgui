@@ -13,6 +13,7 @@ package WebGUI::Asset::Wobject::Gallery;
 use strict;
 #use Class::C3;
 #use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName           => ['assetName', 'Asset_Gallery'];

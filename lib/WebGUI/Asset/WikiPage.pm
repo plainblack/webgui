@@ -18,6 +18,7 @@ use strict;
 #    WebGUI::Asset
 #);
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 

@@ -15,6 +15,7 @@ package WebGUI::Asset::Snippet;
 =cut
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 use WebGUI::Asset::Template;

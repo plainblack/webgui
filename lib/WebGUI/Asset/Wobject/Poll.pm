@@ -23,6 +23,7 @@ use WebGUI::Image::Graph;
 use WebGUI::Storage;
 use JSON;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_Poll'];

@@ -21,6 +21,7 @@ use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Form::Image;
 use WebGUI::Form::File;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 

@@ -16,6 +16,7 @@ package WebGUI::Asset::MapPoint;
 
 use strict;
 use Tie::IxHash;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName         => ['assetName', 'Asset_MapPoint'];

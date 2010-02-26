@@ -27,6 +27,7 @@ use WebGUI::SQL;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define tableName => 'MultiSearch';

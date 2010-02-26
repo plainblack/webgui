@@ -17,6 +17,7 @@ use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::Utility;
+use Moose;
 use WebGUI::Definition::Asset;
 use feature ":5.10";
 extends 'WebGUI::Asset::Wobject';

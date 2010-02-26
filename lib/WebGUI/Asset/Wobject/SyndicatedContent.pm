@@ -17,6 +17,7 @@ use WebGUI::Exception;
 use WebGUI::HTML;
 use WebGUI::International;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 

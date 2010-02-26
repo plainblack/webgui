@@ -13,6 +13,7 @@ package WebGUI::Asset::Wobject::GalleryAlbum;
 use strict;
 #use Class::C3;
 #use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
+use Moose;
 use WebGUI::Definition::Asset;
 define assetName           => ['assetName', 'Asset_GalleryAlbum'];
 define icon                => 'photoAlbum.gif';

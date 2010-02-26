@@ -16,6 +16,7 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use Finance::Quote;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define tableName => 'StockData';

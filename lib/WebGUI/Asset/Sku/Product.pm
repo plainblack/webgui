@@ -19,6 +19,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 use JSON;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
 

@@ -15,6 +15,7 @@ package WebGUI::Asset::Story;
 =cut
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName         => ['assetName', 'Asset_Story'];

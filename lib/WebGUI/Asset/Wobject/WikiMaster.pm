@@ -16,6 +16,7 @@ package WebGUI::Asset::Wobject::WikiMaster;
 #    WebGUI::AssetAspect::RssFeed 
 #    WebGUI::Asset::Wobject
 #);
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_RichEdit'];

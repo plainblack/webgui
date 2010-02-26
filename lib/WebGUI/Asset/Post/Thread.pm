@@ -11,6 +11,7 @@ package WebGUI::Asset::Post::Thread;
 #-------------------------------------------------------------------
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Post';
 define assetName => ['assetName', 'Asset_Thread'];

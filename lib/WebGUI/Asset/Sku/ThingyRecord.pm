@@ -16,6 +16,7 @@ package WebGUI::Asset::Sku::ThingyRecord;
 
 use strict;
 use Tie::IxHash;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
 define assetName         => ['assetName', 'Asset_ThingyRecord'];

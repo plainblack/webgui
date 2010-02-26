@@ -16,6 +16,7 @@ use WebGUI::Asset::Wobject;
 use WebGUI::International;
 use WebGUI::SQL;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_MessageBoard'];

@@ -13,6 +13,7 @@ $VERSION = "1.0.0";
 #-------------------------------------------------------------------
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 #use Class::C3;

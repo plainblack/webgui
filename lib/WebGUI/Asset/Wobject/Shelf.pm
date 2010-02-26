@@ -14,6 +14,7 @@ use strict;
 use List::MoreUtils;
 use Tie::IxHash;
 use WebGUI::International;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 use WebGUI::Text;

@@ -7,6 +7,7 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define tableName => 'InOutBoard';

@@ -20,6 +20,7 @@ use WebGUI::Utility;
 use WebGUI::International;
 use JSON;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName   => ['assetName', 'Asset_RichEdit'];

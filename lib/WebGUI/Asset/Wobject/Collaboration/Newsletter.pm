@@ -11,6 +11,7 @@ package WebGUI::Asset::Wobject::Collaboration::Newsletter;
 #-------------------------------------------------------------------
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject::Collaboration';
 define assetName => ['assetName', 'Asset_Newsletter'];

@@ -15,6 +15,7 @@ package WebGUI::Asset::Sku::EMSBadge;
 =cut
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
 define assetName           => ['ems badge', 'Asset_EMSBadge'];

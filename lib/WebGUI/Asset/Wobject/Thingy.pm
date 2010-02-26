@@ -18,6 +18,7 @@ use WebGUI::Utility;
 use WebGUI::Text;
 use WebGUI::Form::File;
 use WebGUI::DateTime;
+use Moose;
 use WebGUI::Definition::Asset;
 
 extends 'WebGUI::Asset::Wobject';

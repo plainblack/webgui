@@ -20,6 +20,7 @@ use Clone qw(clone);
 use JSON;
 use HTML::Packer;
 
+use Moose;
 use WebGUI::Definition::Asset;
 define assetName  => 'asset';
 define tableName  => 'assetData';

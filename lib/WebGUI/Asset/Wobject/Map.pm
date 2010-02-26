@@ -17,6 +17,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
 use HTML::Entities qw(encode_entities);
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName         => ['assetName', 'Asset_Map'];

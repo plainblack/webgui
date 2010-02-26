@@ -25,6 +25,7 @@ use WebGUI::Inbox;
 use WebGUI::SQL;
 use JSON ();
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 

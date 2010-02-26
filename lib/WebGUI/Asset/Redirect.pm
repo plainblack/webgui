@@ -17,6 +17,7 @@ package WebGUI::Asset::Redirect;
 use strict;
 use WebGUI::Macro;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName => ['assetName', 'Asset_Redirect'];

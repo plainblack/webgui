@@ -20,6 +20,7 @@ use WebGUI::HTMLForm;
 use WebGUI::Utility;
 use WebGUI::Form::Image;
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::File';
 define assetName     => ['assetName', 'Asset_Image'];

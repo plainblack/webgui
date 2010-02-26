@@ -15,6 +15,7 @@ package WebGUI::Asset::File::GalleryFile;
 =cut
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::File';
 define assetName           => ['assetName', 'Asset_GalleryFile'];

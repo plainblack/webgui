@@ -20,6 +20,7 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Text qw(:csv);
 
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_SQLReport'];

@@ -12,6 +12,7 @@ package WebGUI::Asset::Post;
 
 use strict;
 use Tie::CPHash;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName => ['assetName', 'Asset_Post'];
