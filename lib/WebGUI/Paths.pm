@@ -48,8 +48,8 @@ BEGIN {
         logConfig          => catfile($root, 'etc', 'log.conf'),
         spectreConfig      => catfile($root, 'etc', 'spectre.conf'),
         upgrades           => catfile($root, 'docs', 'upgrades'),
-        preloadCustom      => catfile($root, 'sbin', 'preload.custom'),
-        preloadExclusions  => catfile($root, 'sbin', 'preload.exclude'),
+        preloadCustom      => catfile($root, 'etc', 'preload.custom'),
+        preloadExclusions  => catfile($root, 'etc', 'preload.exclude'),
         extras             => catdir($root, 'www', 'extras'),
         defaultUploads     => catdir($root, 'www', 'uploads'),
         defaultCreateSQL   => catdir($root, 'docs', 'create.sql'),
@@ -64,16 +64,20 @@ BEGIN {
 
 sub import {
     my $class = shift;
-    given (\@_) {
-        when ('-inc') {
+    my @invalid;
+    for my $param (@_) {
+        if ($param eq '-inc') {
             $class->includePreloads;
         }
-        when ('-preload') {
+        elsif ($param eq '-preload') {
             $class->preloadAll;
         }
-        default {
-            warn "Invalid option $_";
+        else {
+            push @invalid, $param;
         }
+    }
+    if (@invalid) {
+        die 'Invalid options ' . join(', ', @invalid);
     }
 }
 
