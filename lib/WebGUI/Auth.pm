@@ -805,11 +805,10 @@ Open version tag is reclaimed if user is in site wide or singlePerUser mode.
 
 sub login {
 	my $self = shift;
-	my ($cmd, $uid, $u);
 
 	#Create a new user
-	$uid = $self->userId;
-	$u = WebGUI::User->new($self->session,$uid);
+	my $uid = $self->userId;
+	my $u = WebGUI::User->new($self->session,$uid);
    	$self->session->user({user=>$u});
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
 	$self->_logLogin($uid,"success");
