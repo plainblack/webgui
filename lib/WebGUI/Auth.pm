@@ -828,29 +828,29 @@ sub login {
 	}
 	
 
-        # Set the proper redirect
-        if ( $self->session->setting->get( 'showMessageOnLogin' ) 
-            && $self->user->profileField( $LOGIN_MESSAGE_SEEN ) 
-                < $self->session->setting->get( 'showMessageOnLoginTimes' ) 
-        ) {
-            return $self->showMessageOnLogin;
-        }
-        elsif ( $self->session->setting->get("redirectAfterLoginUrl") ) {
+    # Set the proper redirect
+    if ( $self->session->setting->get( 'showMessageOnLogin' ) 
+        && $self->user->profileField( $LOGIN_MESSAGE_SEEN ) 
+            < $self->session->setting->get( 'showMessageOnLoginTimes' ) 
+    ) {
+        return $self->showMessageOnLogin;
+    }
+    elsif ( $self->session->setting->get("redirectAfterLoginUrl") ) {
         $self->session->http->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
-        }
-        elsif ( $self->session->form->get('returnUrl') ) {
+	  	$self->session->scratch->delete("redirectAfterLogin");
+    }
+    elsif ( $self->session->form->get('returnUrl') ) {
 		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
 	  	$self->session->scratch->delete("redirectAfterLogin");
-        }
-	elsif ( $self->session->scratch->get("redirectAfterLogin") ) {
-		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
-	  	$self->session->scratch->delete("redirectAfterLogin");
+    }
+	elsif ( my $url = $self->session->scratch->delete("redirectAfterLogin") ) {
+		$self->session->http->setRedirect($url);
 	}
 
-        # Get open version tag. This is needed if we want
-        # to reclaim a version right after login (singlePerUser and siteWide mode)
-        # and to have the correct version displayed.
-        WebGUI::VersionTag->getWorking($self->session(), q{noCreate});
+    # Get open version tag. This is needed if we want
+    # to reclaim a version right after login (singlePerUser and siteWide mode)
+    # and to have the correct version displayed.
+    WebGUI::VersionTag->getWorking($self->session(), q{noCreate});
 
 	return undef;
 }
