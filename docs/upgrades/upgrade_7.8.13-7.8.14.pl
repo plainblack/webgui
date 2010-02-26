@@ -44,6 +44,66 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+sub upgradeToYUI28 {
+    my $session = shift;
+    print "\tUpgrading to YUI 2.8... " unless $quiet;
+
+    $session->db->write(
+        "UPDATE template SET template = REPLACE(template, 'element-beta.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET template = REPLACE(template, 'element-beta-min.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET templatePacked = REPLACE(templatePacked, 'element-beta.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET templatePacked = REPLACE(templatePacked, 'element-beta-min.js', 'element-min.js')"
+    );
+
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTags = REPLACE(extraHeadTags, 'element-beta.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTags = REPLACE(extraHeadTags, 'element-beta-min.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'element-beta.js', 'element-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'element-beta-min.js', 'element-min.js')"
+    );
+
+    $session->db->write(
+        "UPDATE template SET template = REPLACE(template, 'carousel-beta.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET template = REPLACE(template, 'carousel-beta-min.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET templatePacked = REPLACE(templatePacked, 'carousel-beta.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE template SET templatePacked = REPLACE(templatePacked, 'carousel-beta-min.js', 'carousel-min.js')"
+    );
+
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTags = REPLACE(extraHeadTags, 'carousel-beta.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTags = REPLACE(extraHeadTags, 'carousel-beta-min.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'carousel-beta.js', 'carousel-min.js')"
+    );
+    $session->db->write(
+        "UPDATE assetData SET extraHeadTagsPacked = REPLACE(extraHeadTagsPacked, 'carousel-beta-min.js', 'carousel-min.js')"
+    );
+
+    print "Done.\n" unless $quiet;
+}
+
+
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
@@ -104,6 +164,7 @@ sub start {
 sub finish {
     my $session = shift;
     updateTemplates($session);
+    upgradeToYUI28( $session );
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
     $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".time().")");
@@ -115,6 +176,7 @@ sub updateTemplates {
     my $session = shift;
     return undef unless (-d "packages-".$toVersion);
     print "\tUpdating packages.\n" unless ($quiet);
+    addPackage( $session, 'packages-7.7.33-7.8.13/merged.wgpkg' );
     opendir(DIR,"packages-".$toVersion);
     my @files = readdir(DIR);
     closedir(DIR);

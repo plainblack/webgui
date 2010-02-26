@@ -1,5 +1,5 @@
 7.8.14
-
+ - fixed #11442: PickLanguage template missing after 7.7 to 7.8 upgrade
 
 7.8.13
  - fixed #11418: confusing typ-o in gotcha

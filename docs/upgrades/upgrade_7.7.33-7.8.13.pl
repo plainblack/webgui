@@ -493,18 +493,8 @@ sub finish {
 #-------------------------------------------------
 sub updateTemplates {
     my $session = shift;
-    return undef unless (-d "packages-".$toVersion);
     print "\tUpdating packages.\n" unless ($quiet);
-    opendir(DIR,"packages-".$toVersion);
-    my @files = readdir(DIR);
-    closedir(DIR);
-    my $newFolder = undef;
-    foreach my $file (@files) {
-        next unless ($file =~ /\.wgpkg$/);
-        # Fix the filename to include a path
-        $file       = "packages-" . $toVersion . "/" . $file;
-        addPackage( $session, $file );
-    }
+    addPackage( $session, 'packages-7.7.33-7.8.13/merged.wgpkg' );
 }
 
 #vim:ft=perl
