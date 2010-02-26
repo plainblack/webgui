@@ -15,7 +15,6 @@ package WebGUI::Definition;
 =cut
 
 use 5.010;
-use Moose;
 use Moose::Exporter;
 use feature ();
 use namespace::autoclean;

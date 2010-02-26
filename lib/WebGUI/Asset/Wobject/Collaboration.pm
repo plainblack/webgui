@@ -11,6 +11,7 @@ package WebGUI::Asset::Wobject::Collaboration;
 #-------------------------------------------------------------------
 
 use strict;
+use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_Collaboration'];
@@ -451,6 +452,7 @@ property postReceivedTemplateId => (
     default   => 'default_post_received1',
 );
 
+with 'WebGUI::Role::Asset::RssFeed';
 
 use WebGUI::Group;
 use WebGUI::HTML;
