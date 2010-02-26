@@ -53,6 +53,7 @@ sub addPackage {
     my $session     = shift;
     my $file        = shift;
 
+    print "\tUpgrading package $file\n" unless $quiet;
     # Make a storage location for the package
     my $storage     = WebGUI::Storage->createTemp( $session );
     $storage->addFileFromFilesystem( $file );
