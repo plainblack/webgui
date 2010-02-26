@@ -113,6 +113,7 @@ sub addPackage {
     my $session     = shift;
     my $file        = shift;
 
+    print "\tUpgrading package $file\n" unless $quiet;
     # Make a storage location for the package
     my $storage     = WebGUI::Storage->createTemp( $session );
     $storage->addFileFromFilesystem( $file );
@@ -174,9 +175,9 @@ sub finish {
 #-------------------------------------------------
 sub updateTemplates {
     my $session = shift;
-    return undef unless (-d "packages-".$toVersion);
     print "\tUpdating packages.\n" unless ($quiet);
     addPackage( $session, 'packages-7.7.33-7.8.13/merged.wgpkg' );
+    return undef unless (-d "packages-".$toVersion);
     opendir(DIR,"packages-".$toVersion);
     my @files = readdir(DIR);
     closedir(DIR);
