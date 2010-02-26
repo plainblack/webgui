@@ -26,25 +26,6 @@ use strict;
 use warnings;
 use base qw(Test::Builder::Module);
 
-BEGIN {
-    # http://thread.gmane.org/gmane.comp.apache.apreq/3378
-    # http://article.gmane.org/gmane.comp.apache.apreq/3388
-    if ( $^O eq 'darwin' && $Config::Config{osvers} lt '8.0.0' ) {
-        unshift @INC, sub {
-            return undef unless $_[1] =~ m/^Apache2|APR/;
-            return IO::File->new( $INC{'Class/Null.pm'}, &IO::File::O_RDONLY );
-            #my $buffer = '1';
-            #open my $fh, '<', \$buffer;
-            #return $fh;
-        };
-
-        no warnings 'redefine';
-        *Apache2::Const::OK        = sub () {   0 };
-        *Apache2::Const::DECLINED  = sub () {  -1 };
-        *Apache2::Const::NOT_FOUND = sub () { 404 };
-    }
-}
-
 use Test::MockObject;
 use Test::MockObject::Extends;
 use Clone               qw(clone);
@@ -117,15 +98,23 @@ sub import {
     });
 
     if ($ENV{WEBGUI_TEST_DEBUG}) {
+        ##Offset Sessions, and Scratch by 1 because 1 will exist at the start
         my @checkCount = (
-            Sessions  => 'userSession',
-            Scratch   => 'userSessionScratch',
-            Users     => 'users',
-            Groups    => 'groups',
-            mailQ     => 'mailQueue',
-            Tags      => 'assetVersionTag',
-            Assets    => 'assetData',
-            Workflows => 'Workflow',
+            Sessions            => 'userSession',
+            Scratch             => 'userSessionScratch',
+            Users               => 'users',
+            Groups              => 'groups',
+            mailQ               => 'mailQueue',
+            Tags                => 'assetVersionTag',
+            Assets              => 'assetData',
+            Workflows           => 'Workflow',
+            Carts               => 'cart',
+            Transactions        => 'transaction',
+            'Transaction Items' => 'transactionItem',
+            'Ship Drivers'      => 'shipper',
+            'Payment Drivers'   => 'paymentGateway',
+            'Database Links'    => 'databaseLink',
+            'LDAP Links'        => 'ldapLink',
         );
         my %initCounts;
         for ( my $i = 0; $i < @checkCount; $i += 2) {
@@ -136,7 +125,10 @@ sub import {
             for ( my $i = 0; $i < @checkCount; $i += 2) {
                 my ($label, $table) = @checkCount[$i, $i+1];
                 my $quant = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
-                $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, ($quant - $initCounts{$table}));
+                my $delta = $quant - $initCounts{$table};
+                if ($delta) {
+                    $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, $delta);
+                }
             }
         });
     }
@@ -154,11 +146,14 @@ sub cleanup {
     pop @guarded
         while @guarded;
 
-    if ( my $session = $CLASS->session ) {
-        $session->var->end;
-        $session->close;
+    if ( our $SESSION ) {
+        $SESSION->var->end;
+        $SESSION->close;
+        undef $SESSION;
     }
 }
+
+#----------------------------------------------------------------------------
 
 =head2 newSession ( $noCleanup )
 
@@ -169,8 +164,6 @@ Builds a WebGUI session object for testing.
 If true, the session won't be registered for automatic deletion.
 
 =cut
-
-#----------------------------------------------------------------------------
 
 sub newSession {
     my $noCleanup = shift;
@@ -183,6 +176,8 @@ sub newSession {
     return $session;
 }
 
+
+#----------------------------------------------------------------------------
 
 =head2 mockAssetId ( $assetId, $object )
 
@@ -401,7 +396,8 @@ sub getPage {
     my $oldRequest  = $session->request;
     my $request     = WebGUI::PseudoRequest->new;
     $request->setup_param($optionsRef->{formParams});
-    $session->{_request} = $request;
+    local $session->{_request} = $request;
+    local $session->output->{_handle};
 
     # Fill the buffer
     my $returnedContent;
@@ -414,7 +410,7 @@ sub getPage {
     else {
         # Try using it as a subroutine
         no strict 'refs';
-        $returnedContent = $actor->(@{$optionsRef->{args}});    
+        $returnedContent = $actor->(@{$optionsRef->{args}});
     }
 
     if ($returnedContent && $returnedContent ne "chunked") {
@@ -423,10 +419,9 @@ sub getPage {
 
     # Restore the former user and request
     $session->user({ user => $oldUser });
-    $session->{_request} = $oldRequest;
 
     # Return the page's output
-    my $return = $request->get_output;
+    return $request->get_output;
 }
 
 #----------------------------------------------------------------------------
@@ -500,6 +495,27 @@ be found easy.  This is the epoch date when WebGUI was released.
 
 sub webguiBirthday {
     return 997966800 ;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getSmokeLDAPProps ( )
+
+Returns a hashref of properties for connecting to smoke's LDAP server.
+
+=cut
+
+sub getSmokeLDAPProps {
+    my $ldapProps   = {
+        ldapLinkName    => "Test LDAP Link",
+        ldapUrl         => "ldaps://smoke.plainblack.com/o=shawshank", # Always test ldaps
+        connectDn       => "cn=Warden,o=shawshank",
+        identifier      => "gooey",
+        ldapUserRDN     => "dn",
+        ldapIdentity    => "uid",
+        ldapLinkId      => sprintf( '%022s', "testlink" ),
+    };
+    return $ldapProps;
 }
 
 #----------------------------------------------------------------------------
@@ -775,6 +791,12 @@ were passed in.  Currently able to destroy:
     WebGUI::User
     WebGUI::VersionTag
     WebGUI::Workflow
+    WebGUI::Shop::Cart
+    WebGUI::Shop::ShipDriver
+    WebGUI::Shop::PayDriver
+    WebGUI::Shop::Transaction
+    WebGUI::DatabaseLink
+    WebGUI::LDAPLink
 
 Example call:
 
@@ -806,6 +828,7 @@ Example call:
         'WebGUI::Group' => sub {
             WebGUI::Group->new($CLASS->session, shift->getId);
         },
+        'WebGUI::Session' => 'duplicate',
     );
 
     my %check = (
@@ -814,6 +837,11 @@ Example call:
             my $userId = $user->userId;
             die "Refusing to clean up vital user @{[ $user->username ]}!\n"
                 if any { $userId eq $_ } (1, 3);
+        },
+        'WebGUI::DatabaseLink' => sub {
+            my $db_link = shift;
+            die "Refusing to clean up database link @{[ $db_link->get('title') ]}!\n"
+                if $db_link->getId eq '0';
         },
         'WebGUI::Group' => sub {
             my $group = shift;
@@ -842,16 +870,30 @@ Example call:
     );
 
     my %cleanup = (
-        'WebGUI::User' => 'delete',
-        'WebGUI::Group' => 'delete',
-        'WebGUI::Storage' => 'delete',
-        'WebGUI::Asset' => 'purge',
-        'WebGUI::VersionTag' => 'rollback',
-        'WebGUI::Workflow' => 'delete',
-        'WebGUI::Session' => sub {
+        'WebGUI::User'              => 'delete',
+        'WebGUI::Group'             => 'delete',
+        'WebGUI::Storage'           => 'delete',
+        'WebGUI::Asset'             => 'purge',
+        'WebGUI::VersionTag'        => 'rollback',
+        'WebGUI::Workflow'          => 'delete',
+        'WebGUI::DatabaseLink'      => 'delete',
+        'WebGUI::Shop::Transaction' => 'delete',
+        'WebGUI::Shop::ShipDriver'  => 'delete',
+        'WebGUI::Shop::PayDriver'   => 'delete',
+        'WebGUI::Shop::Cart'        => sub {
+            my $cart        = shift;
+            my $addressBook = $cart->getAddressBook();
+            $addressBook->delete if $addressBook;  ##Should we call cleanupGuard instead???
+            $cart->delete;
+        },
+        'WebGUI::Session'          => sub {
             my $session = shift;
             $session->var->end;
             $session->close;
+        },
+        'WebGUI::LDAPLink'         => sub {
+            my $link = shift;
+            $link->session->db->write("delete from ldapLink where ldapLinkId=?", [$link->{ldapLinkId}]);
         },
     );
 

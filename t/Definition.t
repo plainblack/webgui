@@ -25,6 +25,7 @@ my $session = WebGUI::Test->session;
 my $called_getProperties;
 {
     package WGT::Class;
+    use Moose;
     use WebGUI::Definition;
 
     define 'define1' => 'define1 value';
@@ -58,6 +59,7 @@ my $called_getProperties;
 
 {
     package WGT::Class2;
+    use Moose;
     use WebGUI::Definition;
 
     define 'define1' => 'define1 value';
@@ -100,6 +102,7 @@ my $called_getProperties;
 
 {
     package WGT::Class3;
+    use Moose;
     use WebGUI::Definition;
 
     define 'define1' => 'define1 value';
@@ -116,11 +119,12 @@ my $called_getProperties;
     sub property1_options {
         return { one => 1, two => 2, three => 3 };
     }
+
     sub named_url {
         my ($self, $property, $property_name) = @_;
         ::note "Checking arguments passed to subroutine for defining a form property";
         ::isa_ok($self, 'WGT::Class3');
-        ::isa_ok($property, 'WebGUI::Definition::Meta::Property');
+        ::ok($property->can('form'), 'Correct property class given');
         ::is($property_name, 'named_url', 'form property name sent');
         return $property->name;
     }
@@ -142,6 +146,7 @@ my $called_getProperties;
 
 {
     package WGT::Class4;
+    use Moose;
     use WebGUI::Definition;
     extends 'WGT::Class3';
 

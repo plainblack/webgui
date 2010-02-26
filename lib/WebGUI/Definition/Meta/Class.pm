@@ -54,7 +54,8 @@ sub add_property {
         Moose->throw_error("Must pass either noFormPost or label when making a property");
     }
     my %form_options;
-    my $prop_meta = $self->property_metaclass;
+    my $prop_meta_roles = $self->property_metaroles;
+    my $prop_meta = $self->_property_metaclass;
     for my $key ( keys %options ) {
         if ( ! $prop_meta->meta->find_attribute_by_name($key) ) {
             $form_options{$key} = delete $options{$key};
@@ -63,7 +64,7 @@ sub add_property {
     $self->add_attribute(
         $name,
         is          => 'rw',
-        metaclass   => $prop_meta,
+        traits      => $prop_meta_roles,
         form        => \%form_options,
         %options,
     );
@@ -98,9 +99,9 @@ in the order they were created in the Definition.
 sub get_all_class_metas {
     my $self  = shift;
     my @metas = ();
-    CLASS: foreach my $class_name (reverse $self->linearized_isa()) {
-        my $meta = $self->initialize($class_name);
-        next CLASS unless $meta->does('WebGUI::Definition::Meta::Class');
+    CLASS: foreach my $class_name (reverse $self->linearized_isa) {
+        my $meta = $class_name->meta;
+        next CLASS unless $meta->can('get_all_properties');
         push @metas, $meta;
     }
     return @metas;
@@ -193,7 +194,12 @@ Returns the name of the class for properties.
 
 =cut
 
-has property_metaclass => (
+has property_metaroles => (
+    is  => 'ro',
+    default => sub { ['WebGUI::Definition::Meta::Property' ] },
+);
+
+has _property_metaclass => (
     is  => 'ro',
     lazy => 1,
     builder => '_build_property_metaclass',
@@ -203,7 +209,7 @@ sub _build_property_metaclass {
     my $self = shift;
     my $class = Moose::Meta::Class->create_anon_class(
         superclasses => [ $self->attribute_metaclass ],
-        roles        => [ 'WebGUI::Definition::Meta::Property' ],
+        roles        => $self->property_metaroles,
         cache        => 1,
     );
     return $class;

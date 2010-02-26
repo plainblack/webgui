@@ -17,6 +17,7 @@ package WebGUI::Definition::Role::Object;
 use 5.010;
 use Moose::Role;
 use namespace::autoclean;
+use WebGUI::International;
 no warnings qw(uninitialized);
 
 our $VERSION = '0.0.1';

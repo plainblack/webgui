@@ -50,14 +50,10 @@ for properties.
 
 =cut
 
-sub _build_property_metaclass {
-    my $self = shift;
-    Moose::Meta::Class->create_anon_class(
-        superclasses => [ $self->attribute_metaclass ],
-        roles        => [ 'WebGUI::Definition::Meta::Property', 'WebGUI::Definition::Meta::Property::Asset' ],
-        cache        => 1,
-    );
-}
+has '+property_metaroles' => (
+    is => 'ro',
+    default => sub { [ 'WebGUI::Definition::Meta::Property', 'WebGUI::Definition::Meta::Property::Asset'] },
+);
 
 has [ qw{tableName icon assetName uiLevel} ] => (
     is       => 'rw',

@@ -22,6 +22,7 @@ use WebGUI::Test;
 
 {
     package WGT::Class::Atset;
+    use Moose;
     use WebGUI::Definition::Asset;
 
     define tableName => 'asset';
@@ -42,6 +43,7 @@ use WebGUI::Test;
 
 {
     package WGT::Class::Asset;
+    use Moose;
     use WebGUI::Definition::Asset;
 
     define tableName => 'asset';
@@ -136,6 +138,7 @@ use WebGUI::Test;
 {
 
     package WGT::Class::AlsoAsset;
+    use Moose;
     use WebGUI::Definition::Asset;
 
     define tableName => 'asset';
@@ -153,6 +156,7 @@ use WebGUI::Test;
     );
 
     package WGT::Class::Asset::Snippet;
+    use Moose;
     use WebGUI::Definition::Asset;
     extends 'WGT::Class::AlsoAsset';
 
@@ -208,6 +212,7 @@ use WebGUI::Test;
 {
 
     package WGT::Class::Asset::NotherOne;
+    use Moose;
     use WebGUI::Definition::Asset;
     extends 'WGT::Class::AlsoAsset';
 
@@ -234,6 +239,7 @@ use WebGUI::Test;
 {
 
     package WGT::Class::Asset::Tertiary;
+    use Moose;
     use WebGUI::Definition::Asset;
     extends 'WGT::Class::AlsoAsset';
 
