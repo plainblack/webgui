@@ -2,6 +2,7 @@
  - added: Optimized macro parser for perl 5.10
  - fixed #11445: NotifyAboutUsers sends infinite e-mails
  - fixed #11446: Delete a wiki
+ - fixed #11401: Remove hacks in Asset::Wobject::Weather
 
 7.8.13
  - fixed #11418: confusing typ-o in gotcha
