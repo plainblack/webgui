@@ -3,6 +3,7 @@
  - fixed #11445: NotifyAboutUsers sends infinite e-mails
  - fixed #11446: Delete a wiki
  - fixed #11401: Remove hacks in Asset::Wobject::Weather
+ - fixed #11449: List of macros in my config file has HASH(0x45223ab3) entry
 
 7.8.13
  - fixed #11418: confusing typ-o in gotcha

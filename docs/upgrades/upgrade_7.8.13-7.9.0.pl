@@ -31,6 +31,8 @@ my $quiet;
 my $session = start();
 
 # upgrade functions go here
+removeBadMacroEntries($session);
+addFilePumpMacro($session);
 
 finish($session);
 
@@ -43,6 +45,30 @@ finish($session);
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub removeBadMacroEntries {
+    my $session = shift;
+    print "\tRemove bad macro entries that look like perl memory locations... " unless $quiet;
+    my $macros = $session->config->get('macros');
+    # and here's our code
+    foreach my $macroName (keys %{ $macros }) {
+        delete $macros->{$macroName} if $macroName =~ /HASH \( 0x \w+ \)/ox;
+    }
+    $session->config->set('macros', $macros);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addFilePumpMacro {
+    my $session = shift;
+    print "\tAdd the FilePump macro... " unless $quiet;
+    # and here's our code
+    $session->config->addToHash('macros', 'FilePump' => 'FilePump');
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
