@@ -429,9 +429,9 @@ sub purge {
 
     my $group   = $self->getSubscriptionGroup();
     $group->delete;
-    $self->next::method($options);
+    my $success = $self->next::method($options);
 
-    return;
+    return $success;
 }
 
 #----------------------------------------------------------------------------
