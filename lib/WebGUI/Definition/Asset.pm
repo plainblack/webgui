@@ -77,8 +77,6 @@ sub init_meta {
     my $class = shift;
     my %args = @_;
 
-    WebGUI::Definition->init_meta(%args);
-
     Moose::Util::MetaRole::apply_base_class_roles(
         for   => $args{for_class},
         roles => [ 'WebGUI::Definition::Role::Asset' ],

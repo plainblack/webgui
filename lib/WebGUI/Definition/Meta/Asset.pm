@@ -21,6 +21,8 @@ use WebGUI::Definition::Meta::Property;
 use WebGUI::Definition::Meta::Property::Asset;
 no warnings qw(uninitialized);
 
+with 'WebGUI::Definition::Meta::Class';
+
 our $VERSION = '0.0.1';
 
 =head1 NAME
@@ -50,7 +52,7 @@ for properties.
 
 =cut
 
-has '+property_metaroles' => (
+has 'property_metaroles' => (
     is => 'ro',
     default => sub { [ 'WebGUI::Definition::Meta::Property', 'WebGUI::Definition::Meta::Property::Asset'] },
 );

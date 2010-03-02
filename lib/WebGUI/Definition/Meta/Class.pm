@@ -57,7 +57,7 @@ sub add_property {
     my $prop_meta_roles = $self->property_metaroles;
     my $prop_meta = $self->_property_metaclass;
     for my $key ( keys %options ) {
-        if ( ! $prop_meta->meta->find_attribute_by_name($key) ) {
+        if ( ! $prop_meta->find_attribute_by_name($key) ) {
             $form_options{$key} = delete $options{$key};
         }
     }
