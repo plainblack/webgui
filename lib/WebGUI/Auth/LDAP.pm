@@ -605,6 +605,18 @@ sub getCreateAccountTemplateId {
 
 #-------------------------------------------------------------------
 
+=head2 getDefaultLoginTemplateId ( )
+
+Get the default template ID for the login form.
+
+=cut
+
+sub getDefaultLoginTemplateId {
+    return "PBtmpl0000000000000006";
+}
+
+#-------------------------------------------------------------------
+
 =head2 getLDAPConnection ( )
 
 Get the properties of the LDAP connection we're using for Auth.
@@ -643,8 +655,8 @@ Get the template ID for the login form.
 sub getLoginTemplateId {
     my $self = shift;
     my $ldapConnect = $self->getLDAPConnection;
-    return "PBtmpl0000000000000006" unless $ldapConnect;
-    return ($self->getLDAPConnection->{ldapLoginTemplate} || "PBtmpl0000000000000006");
+    return $self->getDefaultLoginTemplateId unless $ldapConnect;
+    return ($self->getLDAPConnection->{ldapLoginTemplate} || $self->getDefaultLoginTemplateId);
 }
 
 #-------------------------------------------------------------------
