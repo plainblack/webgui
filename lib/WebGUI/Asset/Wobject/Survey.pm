@@ -27,11 +27,6 @@ use Params::Validate qw(:all);
 use WebGUI::Macro;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
-my $TAP_PARSER_MISSING = <<END_WARN;
-The Survey Test Suite feature requires TAP::Parser and TAP::Parser::Aggregator CPAN modules. 
-These will be installed as a dependency if you upgrade to Test::Harness 3.x
-END_WARN
-
 #-------------------------------------------------------------------
 
 =head2 definition ( session, [definition] )
@@ -2947,11 +2942,7 @@ sub www_runTest {
     my $i18n = WebGUI::International->new($session, 'Asset_Survey');
     my $ac = $self->getAdminConsole;
     
-    eval { require TAP::Parser };
-    if ($@) {
-        $self->session->log->warn($TAP_PARSER_MISSING);
-        return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
-    }
+    require TAP::Parser;
     
     my $testId = $session->form->get("testId");
     
@@ -2983,11 +2974,7 @@ all interesting TAP::Parser and TAP::Parser::Result properties) and the template
 sub parseTap {
     my ($self, $tap) = @_;
     
-    eval { require TAP::Parser };
-    if ($@) {
-        $self->session->log->warn($TAP_PARSER_MISSING);
-        return;
-    }
+    require TAP::Parser;
     my $parser = TAP::Parser->new( { tap => $tap } );
     
     # Expose TAP::Parser and TAP::Parser::Result info as template variables
@@ -3082,16 +3069,8 @@ sub www_runTests {
 
     
     my @parsers;
-    eval { require TAP::Parser };
-    if ($@) {
-        $self->session->log->warn($TAP_PARSER_MISSING);
-        return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
-    }
-    eval { require TAP::Parser::Aggregator };
-    if ($@) {
-        $self->session->log->warn($TAP_PARSER_MISSING);
-        return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
-    }
+    require TAP::Parser;
+    require TAP::Parser::Aggregator;
     my $aggregate = TAP::Parser::Aggregator->new;
     $aggregate->start;
     

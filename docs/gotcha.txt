@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.9.0
+--------------------------------------------------------------------
+     * WebGUI new requires Test::Harness 3.17 or higher to enable the testing functions
+       the Survey.
+
 7.8.13
 --------------------------------------------------------------------
      * A new gotcha was not documented in the 7.8.11 release, the new required version
