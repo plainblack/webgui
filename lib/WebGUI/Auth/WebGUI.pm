@@ -680,6 +680,11 @@ sub getCreateAccountTemplateId {
 }
 
 #-------------------------------------------------------------------
+sub getDefaultLoginTemplateId {
+	return "PBtmpl0000000000000013";
+}
+
+#-------------------------------------------------------------------
 sub getExpiredPasswordTemplateId {
 	my $self = shift;
 	return $self->session->setting->get("webguiExpiredPasswordTemplate") || "PBtmpl0000000000000012";
@@ -688,7 +693,7 @@ sub getExpiredPasswordTemplateId {
 #-------------------------------------------------------------------
 sub getLoginTemplateId {
 	my $self = shift;
-	return $self->session->setting->get("webguiLoginTemplate") || "PBtmpl0000000000000013";
+	return $self->session->setting->get("webguiLoginTemplate") || $self->getDefaultLoginTemplateId;
 }
 
 #-------------------------------------------------------------------

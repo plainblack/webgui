@@ -571,7 +571,8 @@ sub displayLogin {
     $vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
     $vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
     $vars->{'createAccount.label'} = $i18n->get(67);
-    return WebGUI::Asset::Template->new($self->session,$self->getLoginTemplateId)->process($vars);
+    my $template = $self->getLoginTemplate;
+    return $template->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -661,6 +662,18 @@ sub getCreateAccountTemplateId {
 
 #-------------------------------------------------------------------
 
+=head2 getDefaultLoginTemplateId ( )
+
+This method should be overridden by the subclass and should return the default template ID for the login screen.
+
+=cut
+
+sub getDefaultLoginTemplateId {
+	return "PBtmpl0000000000000013";
+}
+
+#-------------------------------------------------------------------
+
 =head2 getExtrasStyle ( )
 
 This method returns the proper field to display for required fields.
@@ -678,6 +691,27 @@ sub getExtrasStyle {
     return $errorStyle if($self->error && $value eq "");
     return $requiredStyle unless($value);
     return $requiredStyleOff;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLoginTemplate ( )
+
+Returns a WebGUI::Asset::Template object for the login template.  If the configured
+template cannot be used, then it returns a default template object.
+
+=cut
+
+sub getLoginTemplate {
+    my $self    = shift;
+    my $session = $self->session;
+    my $templateId = $self->getLoginTemplateId;
+    my $template   = WebGUI::Asset::Template->newByDynamicClass($session, $templateId);
+    if (!$template) {
+        $templateId = $self->getDefaultLoginTemplateId;
+        $template   = WebGUI::Asset::Template->newByDynamicClass($session, $templateId);
+    }
+	return $template;
 }
 
 #-------------------------------------------------------------------
