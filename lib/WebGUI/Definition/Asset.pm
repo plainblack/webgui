@@ -76,18 +76,28 @@ sub import {
 sub init_meta {
     my $class = shift;
     my %args = @_;
-
-    Moose::Util::MetaRole::apply_base_class_roles(
-        for   => $args{for_class},
-        roles => [ 'WebGUI::Definition::Role::Asset' ],
-    );
-    Moose::Util::MetaRole::apply_metaroles(
-        for              => $args{for_class},
-        class_metaroles  => {
-            class           => ['WebGUI::Definition::Meta::Asset'],
-        },
-    );
-    return $args{for_class}->meta;
+    my $for_class = $args{for_class};
+    if ($for_class->meta->isa('Moose::Meta::Class')) {
+        Moose::Util::MetaRole::apply_base_class_roles(
+            for   => $for_class,
+            roles => [ 'WebGUI::Definition::Role::Asset' ],
+        );
+        Moose::Util::MetaRole::apply_metaroles(
+            for             => $for_class,
+            class_metaroles => {
+                class           => ['WebGUI::Definition::Meta::Asset'],
+            },
+        );
+    }
+    else {
+        Moose::Util::MetaRole::apply_metaroles(
+            for             => $for_class,
+            role_metaroles  => {
+                role            => ['WebGUI::Definition::Meta::Asset'],
+            },
+        );
+    }
+    return $for_class->meta;
 }
 
 1;
