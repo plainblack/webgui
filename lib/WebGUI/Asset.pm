@@ -294,6 +294,27 @@ sub _build_className {
     my $self = shift;
     return ref $self;
 }
+has       keywords       => (
+            is              => 'rw',
+            init_arg        => undef,
+            builder         => '_build_assetKeywords',
+            lazy            => 1,
+);
+sub _build_assetKeywords {
+    my $session = shift->session;
+    return WebGUI::Keyword->new($session);
+}
+
+around keywords => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_) {
+        return $self->$orig->setKeywordsForAsset({asset => $self, keywords => $_[0], });
+    }
+    else {
+        return $self->$orig->getKeywordsForAsset({asset => $self});
+    }
+};
 
 around BUILDARGS => sub {
     my $orig       = shift;

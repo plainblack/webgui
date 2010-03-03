@@ -21,7 +21,7 @@ use Test::Deep;
 use Test::Exception;
 use WebGUI::Exception;
 
-plan tests => 59;
+plan tests => 62;
 
 my $session = WebGUI::Test->session;
 
@@ -287,4 +287,17 @@ my $session = WebGUI::Test->session;
     is $properties->{className}, 'WebGUI::Asset', 'get() works on className';
     is $properties->{assetId},  $asset->assetId,   '... works on assetId';
     is $properties->{parentId}, 'I have a parent',  '... works on parentId';
+}
+
+{
+    note "keywords";
+    my $default = WebGUI::Asset->getDefault($session);
+    my $asset = $default->addChild({
+        className => 'WebGUI::Asset::Snippet',
+    });
+    addToCleanup($asset);
+    can_ok($asset, 'keywords');
+    $asset->keywords('chess set');
+    is ($asset->keywords, 'chess set', 'set and get of keywords via direct accessor');
+    is ($asset->get('keywords'), 'chess set', 'via get method');
 }
