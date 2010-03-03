@@ -375,8 +375,8 @@ SKIP: {
     $shelf->purge;
     undef $shelf;
 
-    $record = WebGUI::Asset::Sku->newBySku($session, 'classical-records-1');
-    is($record, undef, 'deleting a shelf deletes all products beneath it');
+    $record = eval { WebGUI::Asset::Sku->newBySku($session, 'classical-records-1'); };
+    ok(Exception::Class->caught(), 'deleting a shelf deletes all products beneath it');
 
     #######################################################################
     #
