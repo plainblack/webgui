@@ -1,4 +1,5 @@
 7.8.15
+- fixed #11453: fileUpload.pl does not handle files with spaces, overwriting
 
 7.8.14
  - fixed #11442: PickLanguage template missing after 7.7 to 7.8 upgrade
