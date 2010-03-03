@@ -2346,11 +2346,19 @@ sub write {
     $self->lastModified(time());
 	
     my $db = $self->session->db;
-    CLASS: foreach my $meta (reverse $self->meta->get_all_class_metas()) {
-        my $table       = $db->quoteIdentifier($meta->tableName);
-        my @properties  = $meta->get_property_list;
-        my @values      = map { $self->$_ } @properties;      
-        my @columnNames = map { $db->quoteIdentifier($_).'=?' } @properties;
+    my %data_by_table = ();
+    
+    PROPERTY: foreach my $property_name ($self->meta->get_all_property_list) {
+        my $property  = $self->meta->find_attribute_by_name($property_name);
+        my $tableName = $property->tableName;
+        my $value     = $self->$property_name;
+        push @{ $data_by_table{$tableName}->{NAMES}  }, $property_name;
+        push @{ $data_by_table{$tableName}->{VALUES} }, $value;
+    }
+    CLASS: foreach my $tableName (keys %data_by_table) {
+        my $table       = $db->quoteIdentifier($tableName);
+        my @values      = @{ $data_by_table{$tableName}->{VALUES} };
+        my @columnNames = map { $db->quoteIdentifier($_).'=?' } @{ $data_by_table{$tableName}->{NAMES}};
         push @values, $self->getId, $self->revisionDate;
         $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
     }
