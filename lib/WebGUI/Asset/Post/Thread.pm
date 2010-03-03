@@ -296,7 +296,7 @@ END_SQL
         [$self->parentId, $self->getId, $sortCompareValue, $tagId, $session->user->userId]
     );
     if ($id) {
-        return WebGUI::Asset->new($session, $id, $class, $version);
+        return WebGUI::Asset->newById($session, $id, $version);
     }
     return undef;
 }
@@ -340,7 +340,7 @@ sub getLastPost {
 	my $lastPostId = $self->lastPostId;
 	my $lastPost;
 	if ($lastPostId) {
-		$lastPost = WebGUI::Asset::Post->new($self->session, $lastPostId);
+		$lastPost = WebGUI::Asset::Post->newById($self->session, $lastPostId);
 	}
 	return $lastPost if (defined $lastPost);
 	return $self;	
@@ -644,7 +644,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->threadTemplateId);
+	my $template = WebGUI::Asset::Template->newByid($self->session, $self->getParent->threadTemplateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
@@ -1085,7 +1085,7 @@ sub view {
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
 		next unless ($dataSet->{className} eq "WebGUI::Asset::Post" || $dataSet->{className} eq "WebGUI::Asset::Post::Thread"); #handle non posts!
-		my $reply = WebGUI::Asset::Post->new($self->session, $dataSet->{assetId}, $dataSet->{className}, $dataSet->{revisionDate});
+		my $reply = WebGUI::Asset::Post->newById($self->session, $dataSet->{assetId}, $dataSet->{revisionDate});
 		$reply->{'_thread'      }  = $self; # caching thread for better performance
 		my %replyVars             = %{$reply->getTemplateVars};
 		$replyVars{isCurrent    } = ($reply->getId eq $currentPost->getId);

@@ -560,7 +560,7 @@ sub appendPostListTemplateVars {
 	my $i = 0;
     my ($icon, $datetime) = $self->session->quick(qw(icon datetime));
 	foreach my $row (@$page) {
-		my $post = WebGUI::Asset->new($self->session,$row->{assetId}, $row->{className}, $row->{revisionDate});
+		my $post = WebGUI::Asset->newById($self->session,$row->{assetId}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
 		my $controls = $icon->delete('func=delete',$post->url,"Delete") . $icon->edit('func=edit',$post->url);
 		if ($self->sortBy eq "lineage") {
@@ -1017,7 +1017,7 @@ SQL
     my @posts;
     my $rssLimit = $self->itemsPerFeed;
     for my $postId (@postIds) {
-		my $post = WebGUI::Asset->new($self->session, $postId, 'WebGUI::Asset::Post::Thread');
+		my $post = WebGUI::Asset->newById($self->session, $postId);
 		my $postUrl = $siteUrl . $post->getUrl;
 		# Buggo: this is an abuse of 'author'.  'author' is supposed to be an email address.
 		# But this is how it was in the original Collaboration RSS, so.
@@ -1342,7 +1342,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->next::method;
-    my $template = WebGUI::Asset::Template->new($self->session, $self->collaborationTemplateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->collaborationTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
