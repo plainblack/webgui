@@ -77,14 +77,14 @@ Returns an array of the names of all tables in every class used by this class.
 
 sub get_tables {
     my $self       = shift;
-    my @properties = ();
+    my @tables = ();
     my %seen       = ();
-    push @properties, 
+    push @tables, 
         grep { ! $seen{$_}++ }
         map  { $_->tableName }
         $self->get_all_class_metas
     ;
-    return @properties;
+    return @tables;
 }
 
 #-------------------------------------------------------------------
