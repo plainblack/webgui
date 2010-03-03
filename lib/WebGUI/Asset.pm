@@ -2163,7 +2163,9 @@ sub processTemplate {
         $self->session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
-    $template = eval { WebGUI::Asset->newById($self->session, $templateId) unless (defined $template); };
+    if (!defined $template) {
+        $template = eval { WebGUI::Asset->newById($self->session, $templateId) };
+    }
     if (! Exception::Class->caught() ) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
         $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
