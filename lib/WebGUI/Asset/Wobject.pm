@@ -14,17 +14,10 @@ package WebGUI::Asset::Wobject;
 
 =cut
 
-#use CGI::Util qw(rearrange);
-use DBI;
-use strict qw(subs vars);
-use Tie::IxHash;
-use WebGUI::Asset;
-use WebGUI::International;
-use WebGUI::Macro;
-use WebGUI::SQL;
-use WebGUI::Utility;
 use Moose;
 use WebGUI::Definition::Asset;
+use WebGUI::Asset;
+use WebGUI::International;
 extends 'WebGUI::Asset';
 define tableName   => 'wobject';
 define assetName   => 'Wobject';
