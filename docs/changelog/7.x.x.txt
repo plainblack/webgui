@@ -7,6 +7,7 @@
  - fixed #11443: no language switch in rich edit
  - fixed #11450: How to lock yourself out of your WebGUI site...
  - fixed #11402: Survey TAP module requirements
+ - fixed #11453: fileUpload.pl does not handle files with spaces, overwriting
 
 7.8.13
  - fixed #11418: confusing typ-o in gotcha
