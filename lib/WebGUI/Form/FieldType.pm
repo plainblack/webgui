@@ -19,7 +19,6 @@ use base 'WebGUI::Form::SelectBox';
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 use Module::Find qw(findallmod);
 
 =head1 NAME

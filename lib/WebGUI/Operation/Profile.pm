@@ -15,7 +15,6 @@ use WebGUI::Content::Account;
 use WebGUI::International;
 use WebGUI::ProfileField;
 use WebGUI::User;
-use WebGUI::Utility;
 
 =head1 NAME
 

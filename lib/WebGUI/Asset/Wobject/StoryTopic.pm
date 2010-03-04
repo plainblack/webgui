@@ -53,7 +53,6 @@ with 'WebGUI::Role::Asset::RssFeed';
 
 
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::Asset::Story;
 
 use constant DATE_FORMAT => '%c_%D_%y';

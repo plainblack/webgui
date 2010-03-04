@@ -18,7 +18,6 @@ use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 
 =head1 NAME
 

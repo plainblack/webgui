@@ -70,8 +70,6 @@ property locations => (
             label       => ["Default Locations", 'Asset_WeatherData'],
          );
 
-use WebGUI::Utility;
-
 #-------------------------------------------------------------------
 
 =head2 prepareView ( )

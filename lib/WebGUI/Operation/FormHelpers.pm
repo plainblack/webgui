@@ -17,7 +17,6 @@ use WebGUI::Form::Group;
 use WebGUI::HTMLForm;
 use WebGUI::Pluggable;
 use WebGUI::Storage;
-use WebGUI::Utility;
 
 =head1 NAME
 

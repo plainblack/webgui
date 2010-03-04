@@ -19,7 +19,6 @@ use strict qw(vars refs);
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 
 =head1 NAME
 

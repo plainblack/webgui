@@ -75,7 +75,6 @@ use WebGUI::Group;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use WebGUI::Utility;
 
 
 #-------------------------------------------------------------------

@@ -7,7 +7,6 @@ use WebGUI::Exception;
 use Carp qw(croak);
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 
 =head1 NAME
 

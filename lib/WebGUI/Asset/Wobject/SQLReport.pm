@@ -16,7 +16,6 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Text qw(:csv);
 use Tie::IxHash;

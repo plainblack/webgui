@@ -17,7 +17,6 @@ package WebGUI::Form::Email;
 use strict;
 use base 'WebGUI::Form::Text';
 use WebGUI::International;
-use WebGUI::Utility;
 
 =head1 NAME
 

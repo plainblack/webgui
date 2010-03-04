@@ -39,7 +39,6 @@ use URI::Escape;
 
 use WebGUI::DateTime;
 use WebGUI::Friends;
-use WebGUI::Utility;
 use WebGUI::Storage;
 
 

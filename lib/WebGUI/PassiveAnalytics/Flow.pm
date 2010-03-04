@@ -6,7 +6,6 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::PassiveAnalytics::Rule;
-use WebGUI::Utility;
 use WebGUI::HTMLForm;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Instance;

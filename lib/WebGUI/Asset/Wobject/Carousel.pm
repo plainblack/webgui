@@ -16,7 +16,6 @@ use strict;
 use warnings;
 use JSON;
 use WebGUI::International;
-use WebGUI::Utility;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';

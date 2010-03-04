@@ -93,7 +93,6 @@ use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Storage;
 use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::VersionTag;
 
 #-------------------------------------------------------------------

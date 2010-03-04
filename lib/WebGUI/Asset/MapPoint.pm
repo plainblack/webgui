@@ -122,8 +122,6 @@ property userDefined5 => (
             noFormPost      => 1,
          );
 
-use WebGUI::Utility;
-
 =head1 NAME
 
 Package WebGUI::Asset::MapPoint

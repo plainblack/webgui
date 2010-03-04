@@ -34,7 +34,6 @@ property templateId => (
          );
 
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::Form::DataTable;
 
 #----------------------------------------------------------------------------

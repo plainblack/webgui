@@ -21,7 +21,6 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Storage;
 use WebGUI::VersionTag;
-use WebGUI::Utility;
 use WebGUI::Operation::Statistics;
 
 =head1 NAME

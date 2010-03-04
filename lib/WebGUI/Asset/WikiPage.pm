@@ -56,7 +56,6 @@ with 'WebGUI::Role::Asset::Subscribable';
 with 'WebGUI::Role::Asset::Comments';
 
 use WebGUI::International;
-use WebGUI::Utility;
 
 use WebGUI::VersionTag;
 

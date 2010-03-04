@@ -21,7 +21,6 @@ use WebGUI::Asset::File::Image;
 use WebGUI::SQL;
 use WebGUI::Storage;
 use WebGUI::TabForm;
-use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset);
 

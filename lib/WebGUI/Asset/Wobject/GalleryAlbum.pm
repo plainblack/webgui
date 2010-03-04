@@ -48,7 +48,6 @@ use File::Find;
 use File::Spec;
 use File::Temp qw{ tempdir };
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::HTML;
 
 use Archive::Any;

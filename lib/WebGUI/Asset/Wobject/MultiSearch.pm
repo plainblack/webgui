@@ -23,7 +23,6 @@ use JSON;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::Asset::Wobject;
-use WebGUI::Utility;
 
 use Moose;
 use WebGUI::Definition::Asset;

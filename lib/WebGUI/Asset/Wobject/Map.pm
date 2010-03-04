@@ -14,7 +14,6 @@ $VERSION = "1.0.0";
 
 use strict;
 use WebGUI::International;
-use WebGUI::Utility;
 use HTML::Entities qw(encode_entities);
 use Moose;
 use WebGUI::Definition::Asset;

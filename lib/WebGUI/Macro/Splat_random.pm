@@ -11,7 +11,6 @@ package WebGUI::Macro::Splat_random;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Utility;
 
 =head1 NAME
 

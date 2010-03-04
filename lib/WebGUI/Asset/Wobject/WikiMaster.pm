@@ -185,7 +185,6 @@ with 'WebGUI::Role::Asset::Subscribable';
 with 'WebGUI::Role::Asset::RssFeed';
 
 use WebGUI::International;
-use WebGUI::Utility;
 use HTML::Parser;
 use URI::Escape;
 

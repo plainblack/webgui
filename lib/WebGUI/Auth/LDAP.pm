@@ -15,7 +15,6 @@ use WebGUI::Auth;
 use WebGUI::HTMLForm;
 use WebGUI::Form;
 use WebGUI::LDAPLink;
-use WebGUI::Utility;
 use WebGUI::Workflow;
 use WebGUI::Operation::Shared;
 use WebGUI::Asset::Template;

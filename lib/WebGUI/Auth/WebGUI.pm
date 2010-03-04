@@ -20,7 +20,6 @@ use WebGUI::Macro;
 use WebGUI::Mail::Send;
 use WebGUI::Storage;
 use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::Form::Captcha;
 use Encode ();
 use Tie::IxHash;

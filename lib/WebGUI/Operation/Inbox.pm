@@ -15,7 +15,6 @@ use WebGUI::Content::Account;
 use WebGUI::Inbox::Message;
 use WebGUI::International;
 use WebGUI::User;
-use WebGUI::Utility;
 
 =head1 NAME
 

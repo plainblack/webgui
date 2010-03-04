@@ -13,7 +13,6 @@ package WebGUI::Macro::r_printable;
 use strict;
 use WebGUI::International;
 use WebGUI::Asset::Template;
-use WebGUI::Utility;
 
 =head1 NAME
 

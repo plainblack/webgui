@@ -327,7 +327,6 @@ with 'WebGUI::Role::Asset::RssFeed';
 use JSON;
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility;
 use XML::Simple;
 use WebGUI::HTML;
 

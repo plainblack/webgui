@@ -15,7 +15,6 @@ use WebGUI::AdminConsole;
 use WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Utility;
 use WebGUI::VersionTag;
 
 =head1 NAME

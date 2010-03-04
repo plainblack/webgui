@@ -5,7 +5,6 @@ use strict;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 use Tie::IxHash;
 use base qw/WebGUI::Account/;
 

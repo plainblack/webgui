@@ -98,7 +98,6 @@ property approvalWorkflowId => (
 with 'WebGUI::Role::Asset::RssFeed';
 
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::Asset::Story;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Paginator;

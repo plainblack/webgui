@@ -5,7 +5,6 @@ use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 use WebGUI::FilePump::Bundle;
 
 =head1 NAME

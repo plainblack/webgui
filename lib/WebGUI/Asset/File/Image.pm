@@ -17,7 +17,6 @@ package WebGUI::Asset::File::Image;
 use strict;
 use WebGUI::Storage;
 use WebGUI::HTMLForm;
-use WebGUI::Utility;
 use WebGUI::Form::Image;
 
 use Moose;

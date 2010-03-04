@@ -56,8 +56,6 @@ property assetOrder => (
              noFormPost   => 1,
          );
 
-use WebGUI::Utility;
-
 =head1 NAME
 
 Package WebGUI::Asset::Wobject::Layout

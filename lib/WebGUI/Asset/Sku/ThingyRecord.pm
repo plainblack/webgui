@@ -81,7 +81,6 @@ property duration => (
             hoverHelp    => ['duration description', 'Asset_ThingyRecord'],
          );
 
-use WebGUI::Utility;
 use HTML::Entities qw( encode_entities );
 
 # Collateral data class... very long name. Zoffix eat your heart out.
