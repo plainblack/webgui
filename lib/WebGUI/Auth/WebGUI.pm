@@ -165,7 +165,7 @@ sub createAccount {
     unless($setting->get('webguiUseEmailAsUsername')){   
         my $username = $form->process("authWebGUI.username");
         $vars->{'create.form.username'} 
-            = WebGUI::Form::text($self->session, {
+            = WebGUI::Form::username($self->session, {
                 name   => "authWebGUI.username",
                 value  => $username,
                 extras => $self->getExtrasStyle($username)
@@ -324,6 +324,32 @@ sub deactivateAccountConfirm {
     # Otherwise show the login form with a friendly message
     my $i18n    = WebGUI::International->new($self->session);
     return $self->displayLogin(sprintf( $i18n->get("deactivateAccount success"), $username ));
+}
+
+#-------------------------------------------------------------------
+
+=head2 checkField ( )
+
+Performs AJAX checks on form field input. For example, can check whether a user
+name is free for registration.
+
+Returns the JSON {"error":"errorString"} where errorString is an error message
+or an empty string if the check was successful.
+
+=cut
+
+sub checkField {
+  my $self = shift;
+  my $session = $self->session;
+  $session->http->setMimeType( 'application/json' );
+
+  my $input = $session->form->param('input');
+  my $fieldName = $session->form->param('fieldName');
+  my $fieldType = $session->form->param('fieldType');
+
+  my $checkClass = 'WebGUI::Form::'. ucfirst $fieldType;
+  my (%checkResults) = "$checkClass"->check($session, $input);
+  return JSON::encode_json(\%checkResults);
 }
 
 #-------------------------------------------------------------------
@@ -774,7 +800,7 @@ sub new {
     my $session = shift;
     my $authMethod = $_[0];
     my $userId = $_[1];
-    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount', 'emailResetPassword', 'emailResetPasswordFinish');
+    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount', 'emailResetPassword', 'emailResetPasswordFinish','checkField');
     my $self = WebGUI::Auth->new($session,$authMethod,$userId,\@callable);
     bless $self, $class;
 }
