@@ -21,14 +21,17 @@ extends 'WebGUI::Asset::File';
 define assetName           => ['assetName', 'Asset_GalleryFile'];
 define tableName           => 'GalleryFile';
 property views => (
+            fieldType           => 'integer',
             noFormPost          => 1,
             default             => 0,
          );
 property friendsOnly => (
+            fieldType           => 'yesNo',
             label               => ['editForm friendsOnly','Asset_Photo'],
             default             => 0,
          );
 property rating => (
+            fieldType           => 'integer',
             noFormPost          => 1,
             default             => 0,
          );

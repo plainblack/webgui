@@ -10,11 +10,9 @@ package WebGUI::Asset::Wobject::GalleryAlbum;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use strict;
-#use Class::C3;
-#use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use Moose;
 use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
 define assetName           => ['assetName', 'Asset_GalleryAlbum'];
 define icon                => 'photoAlbum.gif';
 define tableName           => 'GalleryAlbum';
@@ -43,6 +41,7 @@ for my $i ( 1 .. 5 ) {
 }
 
 with 'WebGUI::Role::Asset::AlwaysHidden';
+with 'WebGUI::Role::Asset::RssFeed';
 
 use Carp qw( croak );
 use File::Find;

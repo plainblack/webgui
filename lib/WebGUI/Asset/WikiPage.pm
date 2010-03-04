@@ -22,9 +22,9 @@ use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 
-apsect assetName => ['assetName', 'Asset_WikiPage'];
-apsect icon      => 'wikiPage.gif';
-apsect tableName => 'WikiPage';
+define assetName => ['assetName', 'Asset_WikiPage'];
+define icon      => 'wikiPage.gif';
+define tableName => 'WikiPage';
 
 property content => (
             fieldType    => "HTMLArea",
