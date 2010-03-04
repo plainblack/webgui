@@ -16,8 +16,6 @@ use strict;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-#use Class::C3;
-#use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
 define assetName => ['assetName', 'Asset_StoryTopic'];
 define icon      => 'storytopic.gif';
 define tableName => 'StoryTopic';
@@ -51,6 +49,7 @@ property storyTemplateId => (
             namespace    => 'Story',
             default      => 'TbDcVLbbznPi0I0rxQf2CQ',
          );
+with 'WebGUI::AssetAspect::RssFeed';
 
 
 use WebGUI::International;

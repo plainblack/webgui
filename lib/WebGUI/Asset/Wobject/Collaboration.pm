@@ -461,8 +461,6 @@ use WebGUI::Paginator;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Workflow::Cron;
-#use Class::C3;
-#use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
 sub _computePostCount {

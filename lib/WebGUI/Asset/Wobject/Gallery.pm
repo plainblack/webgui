@@ -11,8 +11,6 @@ package WebGUI::Asset::Wobject::Gallery;
 #-------------------------------------------------------------------
 
 use strict;
-#use Class::C3;
-#use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
@@ -322,7 +320,7 @@ property defaultFilesPerPage => (
             label           => [ 'defaultFilesPerPage label' , 'Asset_Gallery'],
             hoverHelp       => [ 'defaultFilesPerPage description' , 'Asset_Gallery'],
          );
-
+with 'WebGUI::AssetAspect::RssFeed';
 
 
 use JSON;

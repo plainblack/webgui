@@ -71,11 +71,9 @@ property hasTerms => (
                 maxlength    => 255,
          );
 
-#use Class::C3;
-#use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
+with 'WebGUI::AssetAspect::RssFeed';
 use WebGUI::Macro;
 use XML::FeedPP;
-
 
 =head1 NAME
 

@@ -11,12 +11,6 @@ package WebGUI::Asset::WikiPage;
 # -------------------------------------------------------------------
 
 use strict;
-#use Class::C3;
-#use base qw(
-#    WebGUI::AssetAspect::Subscribable
-#    WebGUI::AssetAspect::Comments 
-#    WebGUI::Asset
-#);
 
 use Moose;
 use WebGUI::Definition::Asset;
@@ -58,6 +52,8 @@ property isFeatured => (
          );
 
 with 'WebGUI::Role::Asset::AlwaysHidden';
+with 'WebGUI::AssetAspect::Subscribable';
+with 'WebGUI::AssetAspect::Comments';
 
 use WebGUI::International;
 use WebGUI::Utility;

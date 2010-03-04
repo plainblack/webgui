@@ -14,8 +14,6 @@ our $VERSION = "1.0.0";
 
 use strict;
 
-#use Class::C3;
-#use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
@@ -97,6 +95,7 @@ property approvalWorkflowId => (
             label         => ['approval workflow', 'Asset_StoryArchive'],
             hoverHelp     => ['approval workflow help', 'Asset_StoryArchive'],
          );    
+with 'WebGUI::AssetAspect::RssFeed';
 
 use WebGUI::International;
 use WebGUI::Utility;

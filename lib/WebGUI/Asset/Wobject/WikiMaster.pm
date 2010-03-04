@@ -10,12 +10,6 @@ package WebGUI::Asset::Wobject::WikiMaster;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-#use Class::C3;
-#use base qw(
-#    WebGUI::AssetAspect::Subscribable 
-#    WebGUI::AssetAspect::RssFeed 
-#    WebGUI::Asset::Wobject
-#);
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
@@ -187,9 +181,9 @@ property filterCode => (
             label     => ['filter code', 'Asset_WikiMaster'],
             hoverHelp => ['filter code description', 'Asset_WikiMaster'],
          );
+with 'WebGUI::AssetAspect::Subscribable';
+with 'WebGUI::AssetAspect::RssFeed';
 
-use strict;
-use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
 use HTML::Parser;
