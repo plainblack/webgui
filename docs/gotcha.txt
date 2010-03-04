@@ -72,7 +72,8 @@ save you many hours of grief.
 7.8.3
 --------------------------------------------------------------------
     * WebGUI now requires Locales::Country 0.05 or higher to use
-      the UPS shipping driver.
+      the UPS shipping driver.  NOTE:  This gotcha has been superseded
+      by the gotcha in 7.8.5.  Please install Locales 0.10 or higher.
 
 7.8.2
 --------------------------------------------------------------------
