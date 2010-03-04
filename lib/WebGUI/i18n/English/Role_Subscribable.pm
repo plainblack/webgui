@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::AssetAspect_Subscribable;
+package WebGUI::i18n::English::Role_Subscribable;
 
 use strict; 
 

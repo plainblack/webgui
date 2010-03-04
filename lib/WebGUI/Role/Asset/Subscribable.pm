@@ -36,7 +36,7 @@ property subscriptionTemplateId => (
          );
 sub _subscriptionTemplateId_namespace {
     my $self = shift;
-    return $self->getSubscriptionTemplateNamespace($session);
+    return $self->getSubscriptionTemplateNamespace($self->session);
 }
 property skipNotification => (
             autoGenerate    => 0,
