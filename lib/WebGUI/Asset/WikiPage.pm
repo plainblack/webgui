@@ -27,6 +27,7 @@ define icon      => 'wikiPage.gif';
 define tableName => 'WikiPage';
 
 property content => (
+            label        => ['contentLabel', 'Asset_WikiPage'],
             fieldType    => "HTMLArea",
             default      => undef
          );
