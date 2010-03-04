@@ -116,8 +116,8 @@ sub www_changeUrlSave {
         $asset->update({url => $newUrl});
         my $rs = $session->db->read("select revisionDate from assetData where assetId=? and revisionDate<>?",[$asset->getId, $asset->get("revisionDate")]);
         while (my ($version) = $rs->array) {
-            my $old = WebGUI::Asset->new($session, $asset->getId, $asset->get("className"), $version);
-            $old->purgeRevision if defined $old;
+            my $old = eval { WebGUI::Asset->newById($session, $asset->getId, $version); };
+            $old->purgeRevision if ! Exception::Class->caught();
         }
     }
 

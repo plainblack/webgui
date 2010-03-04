@@ -275,7 +275,7 @@ sub new {
         }
         if (! $assetId{$id}) {
             $assetId{$id} = $properties->{assetId};
-            $asset{$id} = WebGUI::Asset::Wobject::DataForm->new($session, $properties->{assetId});
+            $asset{$id} = WebGUI::Asset::Wobject::DataForm->newById($session, $properties->{assetId});
         }
         $self->setFromHash($properties);
     }
