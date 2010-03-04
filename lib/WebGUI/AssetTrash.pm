@@ -79,7 +79,7 @@ sub getAssetsInTrash {
                         assetData.title desc
                         ");
     while (my ($id, $date) = $sth->array) {
-		my $asset = WebGUI::Asset->new($self->session, $id, $date);
+		my $asset = WebGUI::Asset->newById($self->session, $id, $date);
         if (!Exception::Class->caught()) {
             push(@assets, $asset);
         }
