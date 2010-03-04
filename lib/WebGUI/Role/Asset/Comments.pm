@@ -1,4 +1,4 @@
-package WebGUI::AssetAspect::Comments;
+package WebGUI::Role::Asset::Comments;
 
 =head1 LEGAL
 
@@ -14,10 +14,21 @@ package WebGUI::AssetAspect::Comments;
 
 =cut
 
-use strict;
-use Class::C3;
+use Moose::Role;
+use WebGUI::Definition::Asset;
+define tableName           => 'assetAspectComments';
+property comments => (
+            noFormPost      => 1,
+            fieldType       => "hidden",
+            default         => '[]',
+         );
+property averageCommentRating => (
+            noFormPost      => 1,
+            fieldType       => "hidden",
+            default         => 0,
+         );
+
 use JSON;
-use Tie::IxHash;
 use WebGUI::Exception;
 use WebGUI::Form;
 use WebGUI::HTML;
@@ -25,7 +36,7 @@ use WebGUI::Utility;
 
 =head1 NAME
 
-Package WebGUI::AssetAspect::Comments
+Package WebGUI::Role::Asset::Comments
 
 =head1 DESCRIPTION
 
@@ -33,11 +44,8 @@ This is an aspect which makes adding comments to existing assets trivial.
 
 =head1 SYNOPSIS
 
- use Class::C3;
- use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
+ with 'WebGUI::Role::Asset::Comments';
  
-And then where-ever you would call $self->SUPER::someMethodName call $self->next::method instead.
-
 =head1 METHODS
 
 These methods are available from this class:
@@ -127,33 +135,6 @@ sub canComment {
 Extends the definition to add the comments and averageCommentRating fields.
 
 =cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		comments => {
-			noFormPost		=> 1,
-			fieldType       => "hidden",
-			defaultValue    => [],
-			},
-		averageCommentRating => {
-			noFormPost		=> 1,
-			fieldType       => "hidden",
-			defaultValue    => 0,
-			},
-	    );
-	push(@{$definition}, {
-		autoGenerateForms   => 1,
-		tableName           => 'assetAspectComments',
-		className           => 'WebGUI::Asset::Sku::BazaarItem',
-		properties          => \%properties
-	    });
-	return $class->next::method($session, $definition);
-}
 
 #-------------------------------------------------------------------
 

@@ -1,19 +1,17 @@
-package WebGUI::AssetAspect::Installable;
+package WebGUI::Role::Asset::Installable;
 
 use strict;
-use Class::C3;
 
 use WebGUI::Asset;
 use WebGUI::Form::DynamicField;
 
 =head1 NAME
 
-WebGUI::AssetAspect::Installable -- Make your asset installable
+WebGUI::Role::Asset::Installable -- Make your asset installable
 
 =head1 SYNOPSIS
 
-  package WebGUI::Asset::MyAsset;
-  use base ( 'WebGUI::AssetAspect::Installable', 'WebGUI::Asset' );
+  with 'WebGUI::Role::Asset::Installable';
 
   # Override the install method to install collateral tables
   sub install {
