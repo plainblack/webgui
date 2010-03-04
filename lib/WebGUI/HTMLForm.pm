@@ -14,8 +14,8 @@ package WebGUI::HTMLForm;
 
 =cut
 
+use strict;
 use CGI::Util qw(rearrange);
-use strict qw(vars refs);
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Pluggable;

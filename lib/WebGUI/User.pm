@@ -16,14 +16,10 @@ package WebGUI::User;
 
 use strict;
 use WebGUI::Group;
-use WebGUI::DatabaseLink;
-use WebGUI::Exception;
 use WebGUI::Utility;
-use WebGUI::Operation::Shared;
 use WebGUI::Workflow::Instance;
 use WebGUI::Shop::AddressBook;
-use JSON;
-use WebGUI::Exception;
+use JSON ();
 use WebGUI::ProfileField;
 use Tie::CPHash;
 

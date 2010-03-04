@@ -14,19 +14,11 @@ package WebGUI::Auth;
 
 =cut
 
-use CGI::Util qw(rearrange);
-use DBI;
 use strict qw(subs vars);
-use WebGUI::HTML;
-use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::Macro;
-use WebGUI::TabForm;
 use WebGUI::Asset::Template;
 use WebGUI::Utility;
 use WebGUI::User;
-use WebGUI::Operation::Shared;
-use WebGUI::Operation::Profile;
 use WebGUI::Workflow::Instance;
 use WebGUI::Inbox;
 use WebGUI::Friends;

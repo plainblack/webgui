@@ -14,7 +14,6 @@ package WebGUI::Asset;
 
 =cut
 
-use Carp;
 use Scalar::Util qw( blessed );
 use Clone qw(clone);
 use JSON;

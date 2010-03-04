@@ -2,6 +2,7 @@ package WebGUI::FormBuilder::Role::HasTabs;
 
 use strict;
 use Moose::Role;
+use Carp qw(confess);
 
 with 'WebGUI::FormBuilder::Role::HasObjects';
 requires 'session', 'pack', 'unpack';

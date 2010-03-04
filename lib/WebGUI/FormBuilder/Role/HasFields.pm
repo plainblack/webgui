@@ -3,6 +3,7 @@ package WebGUI::FormBuilder::Role::HasFields;
 use strict;
 use Moose::Role;
 use Try::Tiny;
+use Carp qw(confess);
 
 requires 'session', 'pack', 'unpack';
 
