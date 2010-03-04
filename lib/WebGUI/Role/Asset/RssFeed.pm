@@ -14,7 +14,6 @@ package WebGUI::Role::Asset::RssFeed;
 
 =cut
 
-use strict;
 use Moose::Role;
 use WebGUI::Definition::Asset;
 define tableName      => 'assetAspectRssFeed';
