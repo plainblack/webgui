@@ -253,7 +253,7 @@ sub exportAssetCollateral {
 
 =head2 getRssFeedItems ()
 
-This method needs to be overridden by any class that is using it.  To ensure
+This method needs to be implemented by any class that is using it.  To ensure
 this, it will throw an exception.
 
 It returns an array reference of hash references.  The list below shows
