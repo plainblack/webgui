@@ -1383,8 +1383,8 @@ sub www_sendMessageSave {
             if (!$notificationAddresses) {
                 $messageOptions->{no_email} = 1;
             } else {
-                my $template = WebGUI::Asset::Template->new($session, $self->getInboxNotificationTemplateId);
-                if ($template) {
+                my $template = eval { WebGUI::Asset::Template->newById($session, $self->getInboxNotificationTemplateId); };
+                if (! Exception::Class->caught() ) {
                     ##Create template variables
                     my $var = {
                         fromUsername => $fromUser->username,
