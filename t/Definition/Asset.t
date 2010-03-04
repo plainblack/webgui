@@ -73,6 +73,8 @@ use WebGUI::Test;
 
     ::can_ok +__PACKAGE__, 'update';
     ::can_ok +__PACKAGE__, 'tableName';
+    ::can_ok +__PACKAGE__, 'get';
+    ::can_ok +__PACKAGE__, 'set';
 
     my $object = __PACKAGE__->new;
     $object->set({property1 => 'property value'});
