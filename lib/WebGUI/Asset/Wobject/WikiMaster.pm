@@ -263,14 +263,14 @@ sub appendRecentChanges {
 	my $self = shift;
 	my $var = shift;
 	my $limit = shift || $self->recentChangesCount || 50;
-	my $revisions = $self->session->db->read("select asset.assetId, assetData.revisionDate, asset.className 
+	my $revisions = $self->session->db->read("select asset.assetId, assetData.revisionDate
 		from asset left join assetData using (assetId) where asset.parentId=? and asset.className
 		like ? and status='approved' order by assetData.revisionDate desc limit ?", [$self->getId, 
 		"WebGUI::Asset::WikiPage%", $limit]);
-	while (my ($id, $version, $class) = $revisions->array) {
-		my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
+	while (my ($id, $version) = $revisions->array) {
+		my $asset = WebGUI::Asset->newById($self->session, $id, $version);
 		unless (defined $asset) {
-			$self->session->errorHandler->error("Asset $id $class $version could not be instanciated.");
+			$self->session->errorHandler->error("Asset $id $version could not be instanciated.");
 			next;
 		}
 		my $user = WebGUI::User->new($self->session, $asset->actionTakenBy);
@@ -533,7 +533,7 @@ sub prepareView {
 	my $self = shift;
 	$self->next::method;
 	$self->{_frontPageTemplate} =
-	    WebGUI::Asset::Template->new($self->session, $self->frontPageTemplateId);
+	    WebGUI::Asset::Template->newById($self->session, $self->frontPageTemplateId);
     if (!$self->{_frontPageTemplate}) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},

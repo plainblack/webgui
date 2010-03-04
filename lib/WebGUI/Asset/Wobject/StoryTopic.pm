@@ -98,7 +98,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -164,7 +164,7 @@ sub viewTemplateVariables {
 
     ##Only build objects for the assets that we need
     STORY: foreach my $storyId (@{ $storyIds }) {
-        my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
+        my $story = WebGUI::Asset->newById($session, $storyId->{assetId}, $storyId->{revisionDate});
         next STORY unless $story;
         my $storyVars = {
             url           => ( $exporting
@@ -186,7 +186,7 @@ sub viewTemplateVariables {
         my $topStoryData = $storyIds->[0];
         shift @{ $var->{story_loop} };
         ##Note, this could have saved from the loop above, but this looks more clean and encapsulated to me.
-        my $topStory   = WebGUI::Asset->new($session, $topStoryData->{assetId}, $topStoryData->{className}, $topStoryData->{revisionDate});
+        my $topStory   = WebGUI::Asset->newById($session, $topStoryData->{assetId}, $topStoryData->{revisionDate});
         $var->{topStoryTitle}          = $topStory->getTitle;
         $var->{topStorySubtitle}       = $topStory->subtitle;
         $var->{topStoryUrl}            = $session->url->append($self->getUrl, 'func=viewStory;assetId='.$topStoryData->{assetId}),
@@ -246,7 +246,7 @@ sub www_viewStory {
     my $storyId = $session->form->get('assetId');
     my $story;
     if ($storyId) {
-        $story = WebGUI::Asset->new($session, $storyId);
+        $story = WebGUI::Asset->newById($session, $storyId);
     }
     if (! $story) {
         my $notFound = WebGUI::Asset->getNotFound($session);

@@ -99,7 +99,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -179,7 +179,7 @@ sub view {
                 || $user->isInGroup($data->{groupIdEdit})
             );
 
-            my $asset = WebGUI::Asset->new($session, $data->{assetId}, $data->{className});
+            my $asset = WebGUI::Asset->newById($session, $data->{assetId});
             if (defined $asset) {
                 my $properties = $asset->get;
                 if ($self->useContainers) {

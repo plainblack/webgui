@@ -1484,7 +1484,7 @@ sub prepareView {
         $templateId = "CalendarEvent000000001";
     }
 
-    my $template = WebGUI::Asset::Template->new($self->session,$templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session,$templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
 
     $self->{_viewTemplate}    = $template;
@@ -2479,11 +2479,11 @@ ENDJS
     my $template;
     if ($parent) {
         $template 
-            = WebGUI::Asset::Template->new($session,$parent->templateIdEventEdit);
+            = WebGUI::Asset::Template->newById($session,$parent->templateIdEventEdit);
     }
     else {
         $template 
-            = WebGUI::Asset::Template->new($session,"CalendarEventEdit00001");
+            = WebGUI::Asset::Template->newById($session,"CalendarEventEdit00001");
     }
 
 

@@ -78,7 +78,7 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template;
-    $template = WebGUI::Asset::Template->new($self->session, $self->userViewTemplateId);
+    $template = WebGUI::Asset::Template->newById($self->session, $self->userViewTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},

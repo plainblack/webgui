@@ -411,7 +411,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -501,7 +501,7 @@ sub www_addRibbonToBadge {
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
     my $form = $session->form;
-	my $ribbon = WebGUI::Asset->new($session, $form->get('assetId'), 'WebGUI::Asset::Sku::EMSRibbon');
+	my $ribbon = WebGUI::Asset->newById($session, $form->get('assetId'));
 	if (defined $ribbon) {
 		$ribbon->addToCart({badgeId=>$form->get('badgeId')});
 	}
@@ -523,7 +523,7 @@ sub www_addTicketsToBadge {
     my $form = $session->form;
 	my @ids = $form->param('assetId');
 	foreach my $id (@ids) {
-		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
+		my $ticket = WebGUI::Asset->newById($session, $id);
 		if (defined $ticket) {
 			$ticket->addToCart({badgeId=>$form->get('badgeId')});
 		}		
@@ -544,7 +544,7 @@ sub www_addTokenToBadge {
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
     my $form = $session->form;
-	my $token = WebGUI::Asset->new($session, $form->get('assetId'), 'WebGUI::Asset::Sku::EMSToken');
+	my $token = WebGUI::Asset->newById($session, $form->get('assetId'));
 	if (defined $token) {
 		my $item = $token->addToCart({badgeId=>$form->get('badgeId')});
 		$item->setQuantity($form->get('quantity'));
@@ -857,7 +857,7 @@ sub www_exportEvents {
 
 	# process events
 	foreach my $id (@{$self->getTickets({returnIds=>1})}) {
-		my $event = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
+		my $event = WebGUI::Asset::Sku::EMSTicket->newById($session, $id);
 		my @export = ();
 		if (defined $event) {
 			my $metadata = $event->getEventMetaData;
@@ -942,7 +942,7 @@ sub www_getRegistrantAsJson {
 	# get badge info
 	my $badgeInfo = $self->getRegistrant($badgeId);
 	return "{}" unless (exists $badgeInfo->{badgeAssetId});
-	my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $badgeInfo->{badgeAssetId});
+	my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $badgeInfo->{badgeAssetId});
 	$badgeInfo->{title} = $badge->getTitle;
 	$badgeInfo->{sku} = $badge->sku;
 	$badgeInfo->{assetId} = $badge->getId;
@@ -951,7 +951,7 @@ sub www_getRegistrantAsJson {
 	# get existing tickets
 	my $existingTickets = $db->read("select ticketAssetId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
 	while (my ($id) = $existingTickets->array) {
-		my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
+		my $ticket = WebGUI::Asset::Sku::EMSTicket->newById($session, $id);
         my $startTime = WebGUI::DateTime->new($ticket->startDate)->set_time_zone($self->timezone);
 		push(@tickets, {
 			title			=> $ticket->getTitle,
@@ -968,7 +968,7 @@ sub www_getRegistrantAsJson {
 	# get existing ribbons
 	my $existingRibbons = $db->read("select ribbonAssetId from EMSRegistrantRibbon where badgeId=?",[$badgeId]);
 	while (my ($id) = $existingRibbons->array) {
-		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->new($session, $id);
+		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->newById($session, $id);
 		push(@ribbons, {
 			title			=> $ribbon->getTitle,
 			hasPurchased 	=> 1,
@@ -980,7 +980,7 @@ sub www_getRegistrantAsJson {
 	# get existing tokens
 	my $existingTokens = $db->read("select tokenAssetId,quantity from EMSRegistrantToken where badgeId=?",[$badgeId]);
 	while (my ($id, $quantity) = $existingTokens->array) {
-		my $token = WebGUI::Asset::Sku::EMSToken->new($session, $id);
+		my $token = WebGUI::Asset::Sku::EMSToken->newById($session, $id);
 		push(@tokens, {
 			title			=> $token->getTitle,
 			hasPurchased 	=> 1,
@@ -1094,7 +1094,7 @@ sub www_getRegistrantsAsJson {
     $results{'recordsReturned'} = $badges->rows()+0;
     $results{'totalRecords'}    = $db->quickScalar('select found_rows()') + 0; ##Convert to numeric
 	while (my $badgeInfo = $badges->hashRef) {
-		my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $badgeInfo->{badgeAssetId});
+		my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $badgeInfo->{badgeAssetId});
 		unless (defined $badge) {
 			$session->log->error('badge '.$badgeInfo->{badgeAssetId}.' does not exist.');
 			next;
@@ -1307,7 +1307,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 	my @badgeGroups = ();
 	if (defined $badgeId) {
 		my $assetId = $db->quickScalar("select badgeAssetId from EMSRegistrant where badgeId=?",[$badgeId]);
-		my $badge = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Sku::EMSBadge');
+		my $badge = WebGUI::Asset->newById($session, $assetId);
 		@badgeGroups = split("\n",$badge->relatedBadgeGroups) if (defined $badge);
 	}
 	
@@ -1326,7 +1326,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 			next;
 		}
 
-		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
+		my $ticket = WebGUI::Asset->newById($session, $id);
 		
 		# skip borked tickets
 		unless (defined $ticket) {
@@ -1577,7 +1577,7 @@ $|=1;
         		$out->print("Processing ".join(",", @row)."\n",1);
 				my $event = undef;
 				if (defined $assetIdIndex) {
-					$event = WebGUI::Asset::Sku::EMSTicket->new($session, $row[$assetIdIndex]);
+					$event = WebGUI::Asset::Sku::EMSTicket->newById($session, $row[$assetIdIndex]);
 				}
 				if (defined $event) {
 					$out->print('Updating '.$event->getId."\n",1);
@@ -1856,7 +1856,7 @@ sub www_manageRegistrant {
 	}
 
 	# badge management
-	my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $registrant->{badgeAssetId});
+	my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $registrant->{badgeAssetId});
 	$output .= q|<p><b style="font-size: 150%; line-height: 150%;">|.$badge->getTitle.q|</b><br />
 		<a href="|.$self->getUrl('func=printBadge;badgeId='.$badgeId).q|" target="_blank">|.$i18n->get('print').q|</a>
 		&bull; <a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$registrant->{transactionItemId}).q|">|.$i18n->get('refund').q|</a>
@@ -1874,7 +1874,7 @@ sub www_manageRegistrant {
 	# ticket management
 	my $existingTickets = $db->read("select ticketAssetId, transactionItemId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
 	while (my ($id, $itemId) = $existingTickets->array) {
-		my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
+		my $ticket = WebGUI::Asset::Sku::EMSTicket->newById($session, $id);
 		$output .= q|<p><b>|.$ticket->getTitle.q|</b><br />
 			<a href="|.$self->getUrl('func=printTicket;badgeId='.$badgeId.';ticketAssetId='.$id).q|" target="_blank">|.$i18n->get('print').q|</a>
 			&bull; <a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$itemId).q|">|.$i18n->get('refund').q|</a>
@@ -1884,7 +1884,7 @@ sub www_manageRegistrant {
 	# ribbon management
 	my $existingRibbons = $db->read("select ribbonAssetId, transactionItemId from EMSRegistrantRibbon where badgeId=?",[$badgeId]);
 	while (my ($id, $itemId) = $existingRibbons->array) {
-		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->new($session, $id);
+		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->newById($session, $id);
 		$output .= q|<p><b>|.$ribbon->getTitle.q|</b><br />
 			<a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$itemId).q|">|.$i18n->get('refund').q|</a>
 			</p><br />|;
@@ -1893,7 +1893,7 @@ sub www_manageRegistrant {
 	# token management
 	my $existingTokens = $db->read("select tokenAssetId,quantity,transactionItemIds from EMSRegistrantToken where badgeId=?",[$badgeId]);
 	while (my ($id, $quantity, $itemIds) = $existingTokens->array) {
-		my $token = WebGUI::Asset::Sku::EMSToken->new($session, $id);
+		my $token = WebGUI::Asset::Sku::EMSToken->newById($session, $id);
 		my @itemIds = split(',', $itemIds);
 		$output .= q|<p><b>|.$token->getTitle.q|</b> (|.$quantity.q|)<br />
 			<a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.join(';transactionItemId=', @itemIds)).q|">|.$i18n->get('refund').q|</a>
@@ -1962,7 +1962,7 @@ sub www_printBadge {
 	return $session->privilege->insufficient unless ($self->isRegistrationStaff);
 	my $form = $session->form;
 	my $registrant = $self->getRegistrant($form->get('badgeId'));
-	my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $registrant->{badgeAssetId});
+	my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $registrant->{badgeAssetId});
 	$registrant->{badgeTitle} = $badge->getTitle;
 	return $self->processTemplate($registrant,$self->printBadgeTemplateId);
 }
@@ -1981,7 +1981,7 @@ sub www_printTicket {
 	return $session->privilege->insufficient unless ($self->isRegistrationStaff);
 	my $form = $session->form;
 	my $registrant = $self->getRegistrant($form->get('badgeId'));
-	my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $form->get('ticketAssetId'));
+	my $ticket = WebGUI::Asset::Sku::EMSTicket->newById($session, $form->get('ticketAssetId'));
 	$registrant->{ticketTitle} = $ticket->getTitle;
         my $startTime = WebGUI::DateTime->new($ticket->startDate)->set_time_zone($self->timezone);
 	$registrant->{ticketStart} = $startTime->strftime('%F %R');

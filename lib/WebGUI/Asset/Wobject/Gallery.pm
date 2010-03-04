@@ -999,7 +999,7 @@ Prepare the template for listing multiple albums.
 sub prepareViewListAlbums {
     my $self        = shift;
     my $template 
-        = WebGUI::Asset::Template->new($self->session, $self->templateIdListAlbums);
+        = WebGUI::Asset::Template->newById($self->session, $self->templateIdListAlbums);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -1204,7 +1204,7 @@ sub www_listAlbumsRss {
     my $var         = $self->getTemplateVars;
 
     for my $assetId ( @{ $self->getAlbumIds } ) {
-        my $asset       = WebGUI::Asset->new( $session, $assetId, 'WebGUI::Asset::Wobject::GalleryAlbum');
+        my $asset       = WebGUI::Asset->newById( $session, $assetId);
         my $assetVar    = $asset->getTemplateVars;
 
         # Fix URLs
@@ -1332,7 +1332,7 @@ sub www_listAlbumsService {
         if ($count > $pageNumber * 100 - 1) { # skip high page numbers
             last;
         }        
-        my $asset       = WebGUI::Asset->new( $session, $assetId, 'WebGUI::Asset::Wobject::GalleryAlbum' );
+        my $asset       = WebGUI::Asset->newById( $session, $assetId);
         if (defined $asset) {
             if ($asset->canView) {
                 push @assets, {

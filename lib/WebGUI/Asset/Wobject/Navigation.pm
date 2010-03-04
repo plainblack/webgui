@@ -357,7 +357,7 @@ Extend the superclass to add metadata and to preprocess the template.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},

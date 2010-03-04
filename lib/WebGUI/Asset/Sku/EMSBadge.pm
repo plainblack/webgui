@@ -330,7 +330,7 @@ sub prepareView {
 	my $self = shift;
     $self->SUPER::prepareView();
     my $templateId = $self->templateId;
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     $self->{_viewTemplate} = $template;
 }
 

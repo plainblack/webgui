@@ -226,7 +226,7 @@ sub getEditPointTemplate {
     if ( !$self->{_editPointTemplate} ) {
         my $templateId  = $self->templateIdEditPoint;
         my $template
-            = WebGUI::Asset::Template->new( $self->session, $templateId );
+            = WebGUI::Asset::Template->newById( $self->session, $templateId );
         $template->prepare;
         $self->{_editPointTemplate} = $template;
     }
@@ -249,7 +249,7 @@ sub getViewPointTemplate {
     if ( !$self->{_viewPointTemplate} ) {
         my $templateId  = $self->templateIdViewPoint;
         my $template
-            = WebGUI::Asset::Template->new( $self->session, $templateId );
+            = WebGUI::Asset::Template->newById( $self->session, $templateId );
         $self->{_viewPointTemplate} = $template;
     }
     
@@ -319,7 +319,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self    = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->templateIdView );
+    my $template = WebGUI::Asset::Template->newById( $self->session, $self->templateIdView );
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},

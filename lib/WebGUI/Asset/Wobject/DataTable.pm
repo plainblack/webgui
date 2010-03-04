@@ -207,7 +207,7 @@ sub prepareView {
     $self->{_datatable} = $dt;
 
     # Prepare the template
-    my $template = WebGUI::Asset::Template->new( $session, $self->templateId );
+    my $template = WebGUI::Asset::Template->newById( $session, $self->templateId );
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},

@@ -434,7 +434,7 @@ sub getList {
 	my %templates;
 	tie %templates, 'Tie::IxHash';
 	TEMPLATE: while (my ($id, $version) = $sth->array) {
-		my $template = eval { WebGUI::Asset::Template->new($session,$id,$version); };
+		my $template = eval { WebGUI::Asset::Template->newById($session,$id,$version); };
         next TEMPLATE if Exception::Class->caught();
 		$templates{$id} = $template->getTitle;
 	}	

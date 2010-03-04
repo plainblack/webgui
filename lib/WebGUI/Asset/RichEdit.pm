@@ -460,7 +460,7 @@ my $sql = "select asset.assetId, assetData.revisionDate from RichEdit left join 
 	my %richEditors;
 	tie %richEditors, 'Tie::IxHash';
 	while (my ($id, $version) = $sth->array) {
-		$richEditors{$id} = WebGUI::Asset::RichEdit->new($session, $id, undef, $version)->getTitle;
+		$richEditors{$id} = WebGUI::Asset::RichEdit->newById($session, $id, $version)->getTitle;
 	}
 	$sth->finish;
 	return \%richEditors;

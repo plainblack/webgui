@@ -418,7 +418,7 @@ sub prepareManage {
     my $self = shift;
     $self->SUPER::prepareView();
     my $templateId = $self->manageTemplate;
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
 }
@@ -435,7 +435,7 @@ sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
     my $templateId = $self->purchaseTemplate;
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
 }

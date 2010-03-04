@@ -375,7 +375,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }

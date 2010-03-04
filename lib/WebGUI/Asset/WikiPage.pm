@@ -356,7 +356,7 @@ sub preparePageTemplate {
 	my $self = shift;
 	return $self->{_pageTemplate} if $self->{_pageTemplate};
 	$self->{_pageTemplate} =
-	    WebGUI::Asset::Template->new($self->session, $self->getWiki->pageTemplateId);
+	    WebGUI::Asset::Template->newById($self->session, $self->getWiki->pageTemplateId);
 	$self->{_pageTemplate}->prepare;
 	return $self->{_pageTemplate};
 }

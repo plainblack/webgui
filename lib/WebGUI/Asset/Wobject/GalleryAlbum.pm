@@ -376,7 +376,7 @@ sub getCurrentRevisionDate {
 
     return undef unless $revisionDate;
 
-    my $asset   = WebGUI::Asset->new( $session, $assetId, $class, $revisionDate );
+    my $asset   = WebGUI::Asset->newById( $session, $assetId, $revisionDate );
 
     return undef unless $asset;
 
@@ -663,7 +663,7 @@ sub prepareView {
     my $templateId  = $self->getParent->templateIdViewAlbum;
 
     my $template 
-        = WebGUI::Asset::Template->new($self->session, $templateId);
+        = WebGUI::Asset::Template->newById($self->session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -1337,7 +1337,7 @@ sub www_slideshow {
     $self->appendTemplateVarsFileLoop( $self->{_templateVars}, $self->getFileIds );
 
     my $templateId = $self->getParent->templateIdViewSlideshow;
-    my $template   = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template   = WebGUI::Asset::Template->newById($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_preparedTemplate} = $template;
 
@@ -1360,7 +1360,7 @@ sub www_thumbnails {
     $self->appendTemplateVarsFileLoop($self->{_templateVars}, $self->getFileIds);
 
     my $templateId = $self->getParent->templateIdViewThumbnails;
-    my $template   = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template   = WebGUI::Asset::Template->newById($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_preparedTemplate} = $template;
 

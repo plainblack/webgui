@@ -1174,7 +1174,7 @@ Like prepareView, but for the list view of the template.
 sub prepareViewList {
     my $self = shift;
     my $templateId = $self->listTemplateId;
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -1213,7 +1213,7 @@ sub prepareViewForm {
     $self->session->style->setLink($self->session->url->extras('tabs/tabs.css'), {"type"=>"text/css"});
     $self->session->style->setScript($self->session->url->extras('tabs/tabs.js'), {"type"=>"text/javascript"});
     my $templateId = $self->templateId;
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},

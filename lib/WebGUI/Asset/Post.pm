@@ -786,7 +786,7 @@ sub getThread {
                                 $threadId=$self->getParent->threadId;
                         }
                 }
-                $self->{_thread} = WebGUI::Asset::Post::Thread->new($self->session, $threadId);
+                $self->{_thread} = WebGUI::Asset::Post::Thread->newById($self->session, $threadId);
 	}
 	return $self->{_thread};	
 }
@@ -1786,7 +1786,7 @@ sub www_showConfirmation {
         $collabSystem = $parent->getParent;
     }
     my $templateId = $collabSystem->postReceivedTemplateId;
-    my $template = WebGUI::Asset->new($self->session, $templateId);
+    my $template = WebGUI::Asset->newById($self->session, $templateId);
     my %var = (
         url     => $url,
     );

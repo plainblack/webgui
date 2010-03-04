@@ -238,7 +238,7 @@ sub exportAssetCollateral {
         limit => 50, ##This is based on the tagcloud setting
     });
 
-    my $listTemplate = WebGUI::Asset->new($session, $self->keywordListTemplateId, 'WebGUI::Asset::Template');
+    my $listTemplate = WebGUI::Asset->newById($session, $self->keywordListTemplateId);
     foreach my $keyword (@{ $keywords }) {
         ##Keywords may not be URL safe, so urlize them
         my $keyword_url = $self->getKeywordFilename($keyword);
@@ -427,7 +427,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -558,7 +558,7 @@ sub viewTemplateVariables {
 
     ##Only build objects for the assets that we need
     STORY: foreach my $storyId (@{ $storyIds }) {
-        my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
+        my $story = WebGUI::Asset->newById($session, $storyId->{assetId}, $storyId->{revisionDate});
         next STORY unless $story;
         my $creationDate = $story->creationDate;
         my ($creationDay,undef) = $session->datetime->dayStartEnd($creationDate);

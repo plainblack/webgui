@@ -127,7 +127,7 @@ sub run {
     }
     
     my $assetId = $self->get('assetId');
-    my $survey = WebGUI::Asset::Wobject::Survey->new($session, $assetId);
+    my $survey = WebGUI::Asset::Wobject::Survey->newById($session, $assetId);
     if (!$survey || !$survey->isa('WebGUI::Asset::Wobject::Survey') ) {
         return { tap => "Bail Out! Unable to instantiate Survey using assetId: $assetId" };
     }

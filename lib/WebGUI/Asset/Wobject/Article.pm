@@ -228,7 +228,7 @@ sub prepareView {
     if ($self->session->form->process("overrideTemplateId") ne "") {
         $templateId = $self->session->form->process("overrideTemplateId");
     }
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},

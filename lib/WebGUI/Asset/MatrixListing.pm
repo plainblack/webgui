@@ -474,7 +474,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->next::method();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->get('detailTemplateId'));
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->getParent->get('detailTemplateId'));
     $template->prepare;
 	$self->{_viewTemplate} = $template;
     return undef;

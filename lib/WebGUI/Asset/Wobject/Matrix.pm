@@ -569,7 +569,7 @@ sub prepareView {
     my $self = shift;
 
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -1263,7 +1263,7 @@ sub www_getCompareListData {
     
     foreach my $listingId (@listingIds){
         $listingId =~ s/_____/-/g;
-        my $listing = WebGUI::Asset::MatrixListing->new($session,$listingId);
+        my $listing = WebGUI::Asset::MatrixListing->newById($session,$listingId);
         $listing->incrementCounter("compares");
         my $listingId_safe = $listingId;
         $listingId_safe =~ s/-/_____/g;

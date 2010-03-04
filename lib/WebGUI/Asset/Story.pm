@@ -552,7 +552,7 @@ sub prepareView {
     else {
         $templateId = $self->getArchive->storyTemplateId;
     }
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     $template->prepare;
     $self->{_viewTemplate} = $template;
 }

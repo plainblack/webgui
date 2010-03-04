@@ -809,7 +809,7 @@ on the Asset that is shortcutted.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 	my $shortcut = $self->getShortcut;

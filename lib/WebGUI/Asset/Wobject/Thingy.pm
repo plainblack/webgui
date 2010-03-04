@@ -1229,7 +1229,7 @@ sub importAssetCollateralData {
     my $id = $data->{properties}{assetId};
     my $class = $data->{properties}{className};
     my $version = $data->{properties}{revisionDate};
-    my $assetExists = WebGUI::Asset->new($self->session, $id, $class, $version);
+    my $assetExists = WebGUI::Asset->newById($self->session, $id, $version);
     
     $error->info("Importing Things for Thingy ".$data->{properties}{title});
     my @importThings;
@@ -1298,7 +1298,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},

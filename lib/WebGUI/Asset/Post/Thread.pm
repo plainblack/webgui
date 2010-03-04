@@ -644,7 +644,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->newByid($self->session, $self->getParent->threadTemplateId);
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->getParent->threadTemplateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }

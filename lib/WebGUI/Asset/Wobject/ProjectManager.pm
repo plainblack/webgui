@@ -592,7 +592,7 @@ sub i18n {
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->projectDashboardTemplateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->projectDashboardTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
