@@ -769,7 +769,7 @@ sub www_view {
         );
 
         # render the cart
-        my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
+        my $template = WebGUI::Asset::Template->newById($session, $session->setting->get("shopCartTemplateId"));
         return $session->style->userStyle($template->process(\%var));
     }
     
@@ -883,7 +883,7 @@ sub www_view {
     $var{ error                 } = $error{id $self}; 
 
     # render the cart
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
+    my $template = WebGUI::Asset::Template->newById($session, $session->setting->get("shopCartTemplateId"));
     return $session->style->userStyle($template->process(\%var));
 }
 

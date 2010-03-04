@@ -697,7 +697,7 @@ sub sendNotifications {
     my $var     = $transaction->getTransactionVars;
 
     # render
-    my $template = WebGUI::Asset::Template->new( $session, $self->get("receiptEmailTemplateId") );
+    my $template = WebGUI::Asset::Template->newById( $session, $self->get("receiptEmailTemplateId") );
     my $inbox = WebGUI::Inbox->new($session);
     my $receipt = $template->process( $var );
     WebGUI::Macro::process($session, \$receipt);

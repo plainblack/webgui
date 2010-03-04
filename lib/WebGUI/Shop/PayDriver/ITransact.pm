@@ -811,9 +811,9 @@ sub www_getCredentials {
         value => $i18n->get('checkout button', 'Shop'),
     });
 
-    my $template = WebGUI::Asset::Template->new($session, $self->get("credentialsTemplateId"));
+    my $template = eval { WebGUI::Asset::Template->newById($session, $self->get("credentialsTemplateId")); };
     my $output;
-    if (defined $template) {
+    if (! Exception::Class->caught()) {
         $template->prepare;
         $output = $template->process($var);
     }

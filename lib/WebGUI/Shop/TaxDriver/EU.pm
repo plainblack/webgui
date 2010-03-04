@@ -665,7 +665,7 @@ sub getUserScreen {
 
     $var->{ addVatNumber_form } = $f->print;
 
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get('userTemplateId') );
+    my $template = WebGUI::Asset::Template->newById( $self->session, $self->get('userTemplateId') );
 
     return $template->process( $var );
 }

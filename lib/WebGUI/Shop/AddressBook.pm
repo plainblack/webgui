@@ -464,7 +464,10 @@ sub www_editAddress {
             defaultValue    =>$form->get('email') || $properties->{ email }
         } );
 
-    my $template = WebGUI::Asset::Template->new( $session, $session->setting->get('shopAddressTemplateId') );
+    my $template = eval { WebGUI::Asset::Template->newById( $session, $session->setting->get('shopAddressTemplateId') ); };
+    if (Exception::Class->caught()) {
+        return '';
+    }
     $template->prepare;
 
     return $session->style->userStyle( $template->process( $var ) );
@@ -602,7 +605,10 @@ sub www_view {
                     .WebGUI::Form::submit($session, {value=>$i18n->get("add a new address")})
                     .WebGUI::Form::formFooter($session),
         );
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopAddressBookTemplateId"));
+    my $template = eval { WebGUI::Asset::Template->newById($session, $session->setting->get("shopAddressBookTemplateId")); };
+    if (Exception::Class->caught()) {
+        return '';
+    }
     $template->prepare;
     return $session->style->userStyle($template->process(\%var));
 }

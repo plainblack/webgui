@@ -132,8 +132,8 @@ Returns an instanciated WebGUI::Asset::Sku object for this item.
 
 sub getSku {
     my ($self) = @_;
-    my $asset = WebGUI::Asset->newById($self->transaction->session, $self->get("assetId"));
-    if (defined $asset) {
+    my $asset = eval { WebGUI::Asset->newById($self->transaction->session, $self->get("assetId")); };
+    if (Exception::Class->caught()) {
         $asset->applyOptions($self->get("options"));
         return $asset;
     }
