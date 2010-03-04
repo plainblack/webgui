@@ -1350,8 +1350,8 @@ sub www_sendMessageSave {
         my $smsAddress = $user->getInboxSmsNotificationAddress;
         if ( $smsAddress && !$isSender ) {
             my $smsNotificationTemplate
-                = WebGUI::Asset::Template->new($session, $self->getInboxSmsNotificationTemplateId);
-            if ($smsNotificationTemplate) {
+                = WebGUI::Asset::Template->newById($session, $self->getInboxSmsNotificationTemplateId);
+            if (! Exception::Class->caught() ) {
                 ##Create template variables
                 my $var = {
                     fromUsername => $fromUser->username,
