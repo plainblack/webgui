@@ -327,7 +327,7 @@ sub www_viewHelp {
                 } if ($uiOverride || ($userUiLevel >= ($row->{uiLevel} || 1)));
         }
 	$vars{variable_loop1} = _getTemplateVars($session, 1,  $help->{variables}, $i18n);
-    my $body = WebGUI::Asset::Template->new($session,"PBtmplHelp000000000001")->process(\%vars);
+    my $body = WebGUI::Asset::Template->newById($session, "PBtmplHelp000000000001")->process(\%vars);
 	my $uiOverrideText = $uiOverride ? $i18n->get('show my fields','WebGUI') : $i18n->get('show all fields','WebGUI');
 
 	$ac->addSubmenuItem(_link($session, $session->form->process("hid"), $namespace).";uiOverride=".!$uiOverride, $uiOverrideText) if $userUiLevel < 9;
