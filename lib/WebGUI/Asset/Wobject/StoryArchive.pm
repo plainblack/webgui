@@ -95,7 +95,7 @@ property approvalWorkflowId => (
             label         => ['approval workflow', 'Asset_StoryArchive'],
             hoverHelp     => ['approval workflow help', 'Asset_StoryArchive'],
          );    
-with 'WebGUI::AssetAspect::RssFeed';
+with 'WebGUI::Role::Asset::RssFeed';
 
 use WebGUI::International;
 use WebGUI::Utility;

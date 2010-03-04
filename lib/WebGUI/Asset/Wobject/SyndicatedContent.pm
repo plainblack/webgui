@@ -71,7 +71,7 @@ property hasTerms => (
                 maxlength    => 255,
          );
 
-with 'WebGUI::AssetAspect::RssFeed';
+with 'WebGUI::Role::Asset::RssFeed';
 use WebGUI::Macro;
 use XML::FeedPP;
 

@@ -320,7 +320,7 @@ property defaultFilesPerPage => (
             label           => [ 'defaultFilesPerPage label' , 'Asset_Gallery'],
             hoverHelp       => [ 'defaultFilesPerPage description' , 'Asset_Gallery'],
          );
-with 'WebGUI::AssetAspect::RssFeed';
+with 'WebGUI::Role::Asset::RssFeed';
 
 
 use JSON;

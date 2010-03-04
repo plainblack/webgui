@@ -16,7 +16,6 @@ package WebGUI::Asset::MatrixListing;
 
 use strict;
 use Tie::IxHash;
-#use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
@@ -117,6 +116,7 @@ property lastUpdated => (
             fieldType       => 'hidden',
          );
 
+with 'WebGUI::Role::Asset::Comments';
 use WebGUI::Utility;
 
 
@@ -192,37 +192,6 @@ sub canEdit {
         return $self->getParent->canEdit();
     }
 }
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-defines asset properties for MatrixListing instances.  
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_MatrixListing");
-	%properties = (
-	);
-	push(@{$definition}, {
-		className=>'WebGUI::Asset::MatrixListing',
-		properties=>\%properties
-	});
-	return $class->next::method($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 

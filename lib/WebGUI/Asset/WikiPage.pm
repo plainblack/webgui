@@ -52,8 +52,8 @@ property isFeatured => (
          );
 
 with 'WebGUI::Role::Asset::AlwaysHidden';
-with 'WebGUI::AssetAspect::Subscribable';
-with 'WebGUI::AssetAspect::Comments';
+with 'WebGUI::Role::Asset::Subscribable';
+with 'WebGUI::Role::Asset::Comments';
 
 use WebGUI::International;
 use WebGUI::Utility;

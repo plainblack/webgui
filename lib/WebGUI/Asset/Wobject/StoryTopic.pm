@@ -49,7 +49,7 @@ property storyTemplateId => (
             namespace    => 'Story',
             default      => 'TbDcVLbbznPi0I0rxQf2CQ',
          );
-with 'WebGUI::AssetAspect::RssFeed';
+with 'WebGUI::Role::Asset::RssFeed';
 
 
 use WebGUI::International;

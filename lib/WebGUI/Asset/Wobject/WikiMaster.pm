@@ -181,8 +181,8 @@ property filterCode => (
             label     => ['filter code', 'Asset_WikiMaster'],
             hoverHelp => ['filter code description', 'Asset_WikiMaster'],
          );
-with 'WebGUI::AssetAspect::Subscribable';
-with 'WebGUI::AssetAspect::RssFeed';
+with 'WebGUI::Role::Asset::Subscribable';
+with 'WebGUI::Role::Asset::RssFeed';
 
 use WebGUI::International;
 use WebGUI::Utility;
