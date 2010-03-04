@@ -127,7 +127,7 @@ sub process {
         $var{'account.create.url'} = $session->url->page('op=auth;method=createAccount');
 	$var{'account.create.label'} = $i18n->get(407, 'WebGUI');
 	$var{'form.footer'} = WebGUI::Form::formFooter($session,);
-        return WebGUI::Asset::Template->new($session,$templateId)->process(\%var); 
+        return WebGUI::Asset::Template->newById($session,$templateId)->process(\%var); 
 }
 
 1;

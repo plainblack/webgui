@@ -80,7 +80,7 @@ sub process {
 		return '';
 	}
 
-	my $template = eval { $templateURL ? WebGUI::Asset::Template->newByUrl($session,$templateURL) : WebGUI::Asset::Template->new($session,'WVtmpl0000000000000001'); };
+	my $template = eval { $templateURL ? WebGUI::Asset::Template->newByUrl($session,$templateURL) : WebGUI::Asset::Template->newById($session,'WVtmpl0000000000000001'); };
 	if (Exception::Class->caught()) {
 		$session->errorHandler->warn('Error: invalid template URL. Check parameters of macro on page '.$session->asset->url);
 		return '';
@@ -98,7 +98,7 @@ sub process {
 	foreach my $csid (@{$lineage}) {
 	   my $cs = undef;
 	   # Get random thread in that CS:
-	   $cs = WebGUI::Asset::Wobject::Collaboration->new($session,$csid);
+	   $cs = WebGUI::Asset::Wobject::Collaboration->newById($session,$csid);
 	   my $threads = $cs->getLineage(['children'],{includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
 	   push(@llist,$csid) if (scalar(@{$threads}) > 0);
 	}
@@ -152,13 +152,13 @@ sub _getRandomThread {
 	# Get random CS:
 	my $randomIndex = int(rand(scalar(@{$lineage})));
 	my $randomCSId = $lineage->[$randomIndex];
-	my $randomCS = WebGUI::Asset::Wobject::Collaboration->new($session, $randomCSId);
+	my $randomCS = WebGUI::Asset::Wobject::Collaboration->newById($session, $randomCSId);
 
 	# Get random thread in that CS:
 	$lineage = $randomCS->getLineage(['children'], {includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
 	$randomIndex = int(rand(scalar(@{$lineage})));
 	my $randomThreadId = $lineage->[$randomIndex];
-	return WebGUI::Asset::Post::Thread->new($session, $randomThreadId);
+	return WebGUI::Asset::Post::Thread->newById($session, $randomThreadId);
 }
 
 1;

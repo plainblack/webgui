@@ -118,7 +118,7 @@ sub process {
 	$var{'lastActivity_label'} = $i18n->get("Last Activity");
 	
 	# Process Template
-	return WebGUI::Asset::Template->new($session,$templateId)->process(\%var);
+	return WebGUI::Asset::Template->newById($session,$templateId)->process(\%var);
 }
 
 #-------------------------------------------------------------------

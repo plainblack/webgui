@@ -57,7 +57,7 @@ sub process {
 		if ($templateUrl) {
          		return WebGUI::Asset::Template->newByUrl($session,$templateUrl)->process(\%var);
 		} else {
-         		return WebGUI::Asset::Template->new($session,"PBtmpl0000000000000042")->process(\%var);
+         		return WebGUI::Asset::Template->newById($session,"PBtmpl0000000000000042")->process(\%var);
 		}
 	}
 	return $home->getUrl;

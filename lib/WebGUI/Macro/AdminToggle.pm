@@ -60,7 +60,7 @@ sub process {
         $var{'toggle.text'} = $turnOn || $i18n->get(516);
     }
     my $template = $templateName    ? WebGUI::Asset::Template->newByUrl($session, $templateName)
-                                    : WebGUI::Asset::Template->new($session, "PBtmpl0000000000000036");
+                                    : WebGUI::Asset::Template->newById($session, "PBtmpl0000000000000036");
     return $template->process(\%var);
 }
 

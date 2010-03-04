@@ -48,28 +48,30 @@ The URL of a template from the Macro/EditableToggle namespace to use for formatt
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
-         if ($session->asset && $session->asset->canEdit && $session->user->isInGroup(12)) {
-        	my %var;
-              my @param = @_;
-	      my $i18n = WebGUI::International->new($session,'Macro_EditableToggle');
-              my $turnOn = $param[0] || $i18n->get(516);
-              my $turnOff = $param[1] || $i18n->get(517);
-                 if ($session->var->isAdminOn) {
-                      $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
-                      $var{'toggle.text'} = $turnOff;
-                 } else {
-                      $var{'toggle.url'} = $session->url->page('op=switchOnAdmin');
-                      $var{'toggle.text'} = $turnOn;
-                 }
-		if ($param[2]) {
-         		return  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);
-		} else {
-         		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000038")->process(\%var);
-                }
-       }
-       return "";
-}
+    my $session = shift;
+    if ( $session->asset && $session->asset->canEdit && $session->user->isInGroup(12) ) {
+        my %var;
+        my @param   = @_;
+        my $i18n    = WebGUI::International->new( $session, 'Macro_EditableToggle' );
+        my $turnOn  = $param[0] || $i18n->get(516);
+        my $turnOff = $param[1] || $i18n->get(517);
+        if ( $session->var->isAdminOn ) {
+            $var{'toggle.url'}  = $session->url->page('op=switchOffAdmin');
+            $var{'toggle.text'} = $turnOff;
+        }
+        else {
+            $var{'toggle.url'}  = $session->url->page('op=switchOnAdmin');
+            $var{'toggle.text'} = $turnOn;
+        }
+        if ( $param[2] ) {
+            return WebGUI::Asset::Template->newByUrl( $session, $param[2] )->process( \%var );
+        }
+        else {
+            return WebGUI::Asset::Template->newById( $session, "PBtmpl0000000000000038" )->process( \%var );
+        }
+    } ## end if ( $session->asset &&...)
+    return "";
+} ## end sub process
 
 1;
 

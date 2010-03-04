@@ -47,9 +47,9 @@ sub process {
 	$var{'account.url'} = $session->url->page('op=auth;method=init');
 	$var{'account.text'} = $param[0] || $i18n->get(46);
 	if ($param[1]) {
-		return  WebGUI::Asset::Template->newByUrl($session,$param[1])->process(\%var);
+		return  WebGUI::Asset::Template->newByUrl($session, $param[1])->process(\%var);
 	} else {
-		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000037")->process(\%var);
+		return  WebGUI::Asset::Template->newById($session, "PBtmpl0000000000000037")->process(\%var);
 	}
 }
 

@@ -59,7 +59,7 @@ sub process {
 		totalPrice		=> sprintf("%.2f",$totalPrice),
 		totalItems		=> $totalItems,
 		);
-	my $template = WebGUI::Asset::Template->new($session, $templateId || 'EBlxJpZQ9o-8VBOaGQbChA');
+	my $template = WebGUI::Asset::Template->newById($session, $templateId || 'EBlxJpZQ9o-8VBOaGQbChA');
 	return $template->process(\%var);
 }
 
