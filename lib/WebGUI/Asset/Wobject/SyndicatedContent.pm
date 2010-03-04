@@ -160,48 +160,27 @@ sub generateFeed {
 
 #-------------------------------------------------------------------
 
-=head2 getFeed ()
+=head2 getRssFeedItems ()
 
-Override the one in the parent...
+Go through the items, and produce a new RSS feed for them so that the SC is an aggregator
+and producer.
 
 =cut
 
-sub getFeed {
-    my $self = shift;
-    my $feed = shift;
+sub getRssFeedItems {
+    my $self  = shift;
+    my @items = ();
     foreach my $item ($self->generateFeed( $self->itemsPerFeed )->get_item) {
-        my $set_permalink_false = 0;
-        my $new_item = $feed->add_item( $item );
-        if (!$new_item->guid) {
-            if ($new_item->link) {
-                $new_item->guid( $new_item->link );
-            } else {
-                $new_item->guid( $self->session->id->generate );
-                $set_permalink_false = 1;
-            }
-        }
-        $new_item->guid( $new_item->guid, isPermaLink => 0 ) if $set_permalink_false;
+        my %feed_item = (
+            title           => $item->title,
+            description     => $item->description,
+            pubDate         => $item->pubDate,
+            category        => $item->category,
+            author          => $item->author,
+            guid            => $item->guid,
+        );
     }
-    $feed->title( $self->feedTitle || $self->title );
-    $feed->description( $self->feedDescription || $self->synopsis );
-    $feed->pubDate( $self->getContentLastModified );
-    $feed->copyright( $self->getfeedCopyright );
-    $feed->link( $self->getUrl );
-    # $feed->language( $lang );
-    if ($self->feedImage) {
-        my $storage = WebGUI::Storage->get($self->session, $self->feedImage);
-        my @files = @{ $storage->getFiles };
-        if (scalar @files) {
-            $feed->image(
-                $storage->getUrl( $files[0] ),
-                $self->feedImageDescription || $self->getTitle,
-                $self->feedImageUrl         || $self->getUrl,
-                $self->feedImageDescription || $self->getTitle,
-                ( $storage->getSizeInPixels( $files[0] ) ) # expands to width and height
-            );
-        }
-    }
-    return $feed;
+    return \@items;
 }
 
 #-------------------------------------------------------------------
