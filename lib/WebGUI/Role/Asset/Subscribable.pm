@@ -1,12 +1,52 @@
-package WebGUI::AssetAspect::Subscribable;
+package WebGUI::Role::Asset::Subscribable;
 
-use strict;
-use Class::C3;
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+
 use WebGUI::International;
+use Moose::Role;
+use WebGUI::Definition::Asset;
+define tableName               => "assetAspect_Subscribable",
+property subscriptionGroupId => (
+            tab             => "security",
+            fieldType       => "subscriptionGroup",
+            label           => ["Subscription Group", 'Role_Subscribable'],
+            hoverHelp       => ["Subscription Group help", 'Role_Subscribable'],
+            default         => undef,
+            noFormPost      => 1,
+         );
+property subscriptionTemplateId => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => \&_subscriptionTemplateId_namespace,
+            label           => ["Email Template", 'Role_Subscribable'],
+            hoverHelp       => ["Email Template help", 'Role_Subscribable'],
+         );
+sub _subscriptionTemplateId_namespace {
+    my $self = shift;
+    return $self->getSubscriptionTemplateNamespace($session);
+}
+property skipNotification => (
+            autoGenerate    => 0,
+            noFormPost      => 1,
+            fieldType       => 'yesNo',
+         );
 
 =head1 NAME
 
-WebGUI::AssetAspect::Subscribable - Let users subscribe to your asset
+WebGUI::Role::Asset::Subscribable - Let users subscribe to your asset
 
 =head1 SYNOPSIS
 
@@ -15,50 +55,6 @@ WebGUI::AssetAspect::Subscribable - Let users subscribe to your asset
 
 
 =head1 METHODS
-
-#----------------------------------------------------------------------------
-
-=head2 definition ( session [, definition ] )
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-    my $i18n        = WebGUI::International->new($session, 'AssetAspect_Subscribable');
-
-    tie my %properties, 'Tie::IxHash', (
-        subscriptionGroupId => {
-            tab             => "security",
-            fieldType       => "subscriptionGroup",
-            label           => $i18n->get("Subscription Group"),
-            hoverHelp       => $i18n->get("Subscription Group help"),
-            defaultValue    => undef,
-            noFormPost      => 1,
-        },
-        subscriptionTemplateId => {
-            tab             => "display",
-            fieldType       => "template",
-            namespace       => $class->getSubscriptionTemplateNamespace,
-            label           => $i18n->get("Email Template"),
-            hoverHelp       => $i18n->get("Email Template help"),
-        },
-        skipNotification => {
-            autoGenerate    => 0,
-            noFormPost      => 1,
-            fieldType       => 'yesNo',
-        },
-    );
-
-    push @{ $definition }, {
-        autoGenerateForms       => 1,
-        tableName               => "assetAspect_Subscribable",
-        properties              => \%properties,
-    };
-
-    return $class->maybe::next::method( $session, $definition ); 
-}
 
 #----------------------------------------------------------------------------
 
