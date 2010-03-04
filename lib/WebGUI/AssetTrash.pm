@@ -62,31 +62,31 @@ sub getAssetsInTrash {
 		$limit = "and asset.stateChangedBy=".$self->session->db->quote($userId);
 	}
 	my $sth = $self->session->db->read("
-                select 
-                        asset.assetId, 
-                        assetData.revisionDate,
-                        asset.className
-                from 
-                        asset                 
-                left join 
-                        assetData on asset.assetId=assetData.assetId 
-                where 
-                        asset.state='trash'
-                        and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
-                        $limit
+        select 
+                asset.assetId, 
+                assetData.revisionDate,
+        from 
+                asset                 
+        left join 
+                assetData on asset.assetId=assetData.assetId 
+        where 
+                asset.state='trash'
+                and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
+                $limit
 		group by
 			assetData.assetId
                 order by 
                         assetData.title desc
                         ");
-        while (my ($id, $date, $class) = $sth->array) {
-		my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
-                if ($asset){
-                        push(@assets, $asset);
-                }else{
-                        $self->session->errorHandler->error("AssetTrash::getAssetsInTrash - failed to instanciate asset with assetId $id, className $class, and revisionDate $date");
-                }
+    while (my ($id, $date) = $sth->array) {
+		my $asset = WebGUI::Asset->new($self->session, $id, $date);
+        if (!Exception::Class->caught()) {
+            push(@assets, $asset);
         }
+        else {
+            $self->session->errorHandler->error("AssetTrash::getAssetsInTrash - failed to instanciate asset with assetId $id and revisionDate $date");
+        }
+    }
 	$sth->finish;
 	return \@assets;
 }
