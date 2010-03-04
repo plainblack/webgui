@@ -259,12 +259,13 @@ A string that defaults to _function's title.
 
 sub render {
 	my $self = shift;
-	$self->session->http->setCacheControl("none");
+    my $session = $self->session;
+	$session->http->setCacheControl("none");
 	my %var;
 	$var{"application_loop"} = $self->getAdminFunction;
 	$var{"application.workarea"} = shift;
 	$var{"application.title"} = shift || $self->{_function}{title};
-	my $i18n = WebGUI::International->new($self->session, "AdminConsole");
+	my $i18n = WebGUI::International->new($session, "AdminConsole");
 	$var{"backtosite.label"} = $i18n->get("493", "WebGUI");
 	$var{"toggle.on.label"} = $i18n->get("toggle on");
 	$var{"toggle.off.label"} = $i18n->get("toggle off");
@@ -280,21 +281,21 @@ sub render {
 	$var{"console.canUse"} = $acParams->{canUse};
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
-	my $working = WebGUI::VersionTag->getWorking($self->session, 1);
+	my $working = WebGUI::VersionTag->getWorking($session, 1);
         my $workingId = "";
         my @tags = ();
         if ($working) {
 			$workingId = $working->getId;
 			push(@tags, {
-					url=>$self->session->url->page("op=commitVersionTag;tagId=".$workingId),
+					url=>$session->url->page("op=commitVersionTag;tagId=".$workingId),
 					title=>$i18n->get("commit my changes","Macro_AdminBar"),
-					icon=>$self->session->url->extras('adminConsole/small/versionTags.gif')
+					icon=>$session->url->extras('adminConsole/small/versionTags.gif')
 					});
         }
-	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($self->session)}) {
-		next unless $self->session->user->isInGroup($tag->get("groupToUse"));
+	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($session)}) {
+		next unless $session->user->isInGroup($tag->get("groupToUse"));
 		push(@tags, {
-				url=>$self->session->url->page("op=setWorkingVersionTag;tagId=".$tag->getId),
+				url=>$session->url->page("op=setWorkingVersionTag;tagId=".$tag->getId),
 				title=>($tag->getId eq $workingId) ?  '* '.$tag->get("name") : $tag->get("name"),
 				});
 	}
@@ -302,21 +303,21 @@ sub render {
 		$var{versionTags} = \@tags;
 	}
 
-    $var{"backtosite.url"} = $self->session->url->getBackToSiteURL();
+    $var{"backtosite.url"} = $session->url->getBackToSiteURL();
     my $formId = $self->getSubmenuFormId;
-    $var{"formHeader"} = WebGUI::Form::formHeader($self->session, { action => $self->{_formUrl}, extras => qq|id='$formId'|, });
-    $var{"formFooter"} = WebGUI::Form::formFooter($self->session);
+    $var{"formHeader"} = WebGUI::Form::formHeader($session, { action => $self->{_formUrl}, extras => qq|id='$formId'|, });
+    $var{"formFooter"} = WebGUI::Form::formFooter($session);
     my $template
-        = WebGUI::Asset::Template->new(
-            $self->session,
-            $self->session->setting->get("AdminConsoleTemplate")
+        = WebGUI::Asset::Template->newById(
+            $session,
+            $session->setting->get("AdminConsoleTemplate")
         );
     if ( $self->{_options}->{showAdminBar} ) {
         $var{adminBar}
-            = WebGUI::Macro::AdminBar::process($self->session);
+            = WebGUI::Macro::AdminBar::process($session);
     }
     my $output  = $template->process(\%var);
-    return $self->session->style->process($output,"PBtmpl0000000000000137");
+    return $session->style->process($output,"PBtmpl0000000000000137");
 }
 
 #-------------------------------------------------------------------
