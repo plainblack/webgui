@@ -11,7 +11,6 @@ package WebGUI::Operation::ProfileSettings;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;

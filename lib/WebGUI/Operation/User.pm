@@ -11,7 +11,6 @@ package WebGUI::Operation::User;
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
-use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::Group;

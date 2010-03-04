@@ -25,6 +25,7 @@ use WebGUI::Shop::AddressBook;
 use JSON;
 use WebGUI::Exception;
 use WebGUI::ProfileField;
+use Tie::CPHash;
 
 =head1 NAME
 

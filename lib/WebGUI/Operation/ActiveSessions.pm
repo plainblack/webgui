@@ -15,6 +15,7 @@ use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
+use Tie::CPHash;
 
 =head1 NAME
 

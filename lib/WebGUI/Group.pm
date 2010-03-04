@@ -15,7 +15,6 @@ package WebGUI::Group;
 =cut
 
 use strict;
-use Tie::CPHash;
 use WebGUI::LDAPLink;
 use WebGUI::Macro;
 use WebGUI::Utility;

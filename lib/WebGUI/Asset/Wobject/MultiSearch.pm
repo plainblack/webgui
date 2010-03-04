@@ -19,7 +19,6 @@ package WebGUI::Asset::Wobject::MultiSearch;
 
 use strict;
 
-use Tie::CPHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::SQL;

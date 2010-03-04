@@ -11,7 +11,6 @@ package WebGUI::Operation::Group;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::Group;
 use WebGUI::Form;

@@ -16,7 +16,6 @@ package WebGUI::LDAPLink;
 
 
 use strict;
-use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::International;
 use Net::LDAP;
