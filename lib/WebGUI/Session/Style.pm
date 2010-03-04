@@ -269,7 +269,7 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 	$var{'head_attachments'} = $var{'head.tags'};
 	$var{'head.tags'}       .= ($var{'body_attachments'} = '<!--morebody-->');
 
-	my $style = eval { WebGUI::Asset::Template->new($self->session,$templateId); };
+	my $style = eval { WebGUI::Asset::Template->newById($self->session, $templateId); };
 	my $output;
 	if (! Exception::Class->caught()) {
 		my $meta = {};
