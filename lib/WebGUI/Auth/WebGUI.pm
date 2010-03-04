@@ -284,7 +284,7 @@ sub createAccountSave {
         $var->{newUser_username} = $username;
         $var->{activationUrl} = $session->url->page("op=auth;method=validateEmail;key=".$key, 'full');
         my $text =
-WebGUI::Asset::Template->new($self->session,$self->getSetting('accountActivationTemplate'))->process($var);
+WebGUI::Asset::Template->newById($self->session,$self->getSetting('accountActivationTemplate'))->process($var);
         WebGUI::Macro::process($self->session,\$text);
         $mail->addText($text);
         $mail->addFooter;
@@ -853,7 +853,7 @@ sub emailRecoverPassword {
     $vars->{'recoverFormUsername'}      = WebGUI::Form::text($session, {name => 'username'});
     $vars->{'recoverFormUsernameLabel'} = $i18n->get(50);
 
-	return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
+	return WebGUI::Asset::Template->newById($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
 }
  
 #-------------------------------------------------------------------
@@ -898,7 +898,7 @@ sub profileRecoverPassword {
 		$vars->{'recoverFormUsernameLabel'} = $i18n->get(50);
 	}
 
-	return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
+	return WebGUI::Asset::Template->newById($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
 }
   
 #-------------------------------------------------------------------
@@ -1024,7 +1024,7 @@ sub profileRecoverPasswordFinish {
 		
 		# Mrgh.  z.z
 		$vars->{'doingRecovery'} = 1;
-		return WebGUI::Asset::Template->new($self->session, $self->getPasswordRecoveryTemplateId)->process($vars);
+		return WebGUI::Asset::Template->newById($self->session, $self->getPasswordRecoveryTemplateId)->process($vars);
 	}
 
 	if ($self->_isValidPassword($password, $passwordConfirm)) {
@@ -1217,7 +1217,7 @@ sub resetExpiredPassword {
     $vars->{'expired.form.submit'} = WebGUI::Form::submit($self->session,{});
     $vars->{'expired.form.footer'} = WebGUI::Form::formFooter($self->session,);
 	
-	return WebGUI::Asset::Template->new($self->session,$self->getExpiredPasswordTemplateId)->process($vars);
+	return WebGUI::Asset::Template->newById($self->session,$self->getExpiredPasswordTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------

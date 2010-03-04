@@ -266,7 +266,7 @@ sub createAccount {
     $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
     $vars->{'login.label'} = $i18n->get(58);
 
-    return WebGUI::Asset::Template->new($self->session,$self->getCreateAccountTemplateId)->process($vars);
+    return WebGUI::Asset::Template->newById($self->session,$self->getCreateAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -319,7 +319,7 @@ sub createAccountSave {
         $var->{welcomeMessage}      = $self->getSetting("welcomeMessage");
         $var->{newUser_username}    = $username;
         $var->{newUser_password}    = $password;
-        my $message = WebGUI::Asset::Template->new($self->session,$self->getSetting('welcomeMessageTemplate'))->process($var);
+        my $message = WebGUI::Asset::Template->newById($self->session,$self->getSetting('welcomeMessageTemplate'))->process($var);
         WebGUI::Macro::process($self->session,\$message);
         WebGUI::Inbox->new($self->session)->addMessage({
             message => $message,
@@ -406,7 +406,7 @@ sub deactivateAccount {
 	$var{'yes.label'} = $i18n->get(44);
    	$var{'no.url'} = $self->session->url->page();
 	$var{'no.label'} = $i18n->get(45);
-	return WebGUI::Asset::Template->new($self->session,"PBtmpl0000000000000057")->process(\%var);
+	return WebGUI::Asset::Template->newById($self->session,"PBtmpl0000000000000057")->process(\%var);
 }
 
 #-------------------------------------------------------------------
@@ -509,7 +509,7 @@ sub displayAccount {
     ########### ACCOUNT SHUNT
     #The following is a shunt which allows the displayAccount page to be displayed in the
     #Account system.  This shunt will be replaced in WebGUI 8 when the API can be broken
-    my $output = WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+    my $output = WebGUI::Asset::Template->newById($self->session,$self->getAccountTemplateId)->process($vars);
     #If the account system is calling this method, just return the template
     my $op = $self->session->form->get("op");
     if($op eq "account") {
@@ -571,7 +571,7 @@ sub displayLogin {
     $vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
     $vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
     $vars->{'createAccount.label'} = $i18n->get(67);
-    return WebGUI::Asset::Template->new($self->session,$self->getLoginTemplateId)->process($vars);
+    return WebGUI::Asset::Template->newById($self->session,$self->getLoginTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------

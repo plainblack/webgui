@@ -404,7 +404,7 @@ sub displayAccount {
     ########### ACCOUNT SHUNT
     #The following is a shunt which allows the displayAccount page to be displayed in the
     #Account system.  This shunt will be replaced in WebGUI 8 when the API can be broken
-    my $output = WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+    my $output = WebGUI::Asset::Template->newById($self->session,$self->getAccountTemplateId)->process($vars);
     #If the account system is calling this method, just return the template
     my $op = $self->session->form->get("op");
     if($op eq "account") {
