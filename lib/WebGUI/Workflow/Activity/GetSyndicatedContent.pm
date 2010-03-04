@@ -78,8 +78,7 @@ sub execute {
     }
 	my $log = $self->session->log;
     # start time to check for timeouts
-    my $time = time();
-    my $ttl  = $self->getTTL;
+    my $finish_time = time() | $self->getTTL;
     
     # get asset list
     my $scratch = $instance->getScratch("syndicatedassets");
@@ -95,8 +94,8 @@ sub execute {
     while (my $id = shift(@{$assets})) {
         # Get RSS data, which will be stored in the cache
         $log->info("GetSyndicatedContent: Caching for $id");
-		my $asset = WebGUI::Asset::Wobject::SyndicatedContent->new($self->session, $id);
-		if (defined $asset) {
+		my $asset = eval { WebGUI::Asset::Wobject::SyndicatedContent->newById($self->session, $id); };
+		if (! Exception::Class->caught()) {
 			my $feed = $asset->generateFeed;
 			unless ($feed->isa('XML::FeedPP')) {
 				$log->error("GetSyndicatedContent: Syndicated Content Asset $id returned an invalid feed");
@@ -106,11 +105,11 @@ sub execute {
 			$log->error("GetSyndicatedContent: Couldn't instanciate $id")
 		}
         # Check for timeout
-        last if (time() - $time > $ttl);
+        last if (time() > $finish_time);
     }
 
     # if there are urls left, we need to process again
-    if (scalar(@$assets) > 0) {
+    if (scalar(@{ $assets }) > 0) {
         $instance->setScratch("syndicatedassets", JSON->new->encode($assets));
         return $self->WAITING(1);
     }
