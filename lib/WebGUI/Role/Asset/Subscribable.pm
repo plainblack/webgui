@@ -230,7 +230,7 @@ Get a WebGUI::Asset::Template object for the subscription template.
 sub getSubscriptionTemplate {
     my $self        = shift;
     my $templateId  = $self->subscriptionTemplateId;
-    my $template    = WebGUI::Asset::Template->new( $self->session, $templateId ); # This should throw if we don't
+    my $template    = WebGUI::Asset::Template->newById( $self->session, $templateId ); # This should throw if we don't
     return $template;
 }
 
