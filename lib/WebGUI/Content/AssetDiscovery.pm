@@ -112,18 +112,18 @@ sub handler {
             my $limit = ($pageNumber * 100 - 100).','.($pageNumber * 100 - 1);
             my $siteUrl = $session->url->getSiteURL;
             my $date = $session->datetime;
-            my $matchingAssets = $session->db->read("select assetId from asset where lineage like ? and className=? limit ".$limit, [$start->get('lineage').'%', $class]);
+            my $matchingAssets = $session->db->read("select assetId from asset where lineage like ? and className=? limit ".$limit, [$start->lineage.'%', $class]);
             while (my ($id) = $matchingAssets->array) {
-                my $asset = WebGUI::Asset->new($session, $id, $class);
-                if (defined $asset) {
-                    if ($asset->canView && $asset->get('state') eq 'published' && isIn($asset->get('status'), 'approved', 'archived')) {
+                my $asset = eval { WebGUI::Asset->newById($session, $id); };
+                if (! Exception::Class->caught() ) {
+                    if ($asset->canView && $asset->state eq 'published' && isIn($asset->status, 'approved', 'archived')) {
                         push @assets, {
                             title       => $asset->getTitle,
-                            menuTitle   => $asset->get('menuTitle'),
-                            synopsis    => $asset->get('synopsis'),
+                            menuTitle   => $asset->menuTitle,
+                            synopsis    => $asset->synopsis,
                             url         => $siteUrl.$asset->getUrl,
-                            dateCreated => $date->epochToHuman($asset->get('creationDate'), '%y-%m-%d %j:%n:%s'),
-                            lastUpdated => $date->epochToHuman($asset->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+                            dateCreated => $date->epochToHuman($asset->creationDate, '%y-%m-%d %j:%n:%s'),
+                            lastUpdated => $date->epochToHuman($asset->revisionDate, '%y-%m-%d %j:%n:%s'),
                         };
                     }
                 }
