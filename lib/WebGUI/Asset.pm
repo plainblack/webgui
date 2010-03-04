@@ -2066,7 +2066,7 @@ asset open in a new window.
 sub prepareWidgetView {
     my $self            = shift;
     my $templateId      = shift;
-    my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $template        = WebGUI::Asset::Template->newById($self->session, $templateId);
     my $extras          = $self->session->config->get('extrasURL');
 
     $template->prepare;
@@ -2469,7 +2469,7 @@ sub www_add {
     return undef unless (defined $class);
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
 	if ($self->session->form->process('prototype')) {
-		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
+		my $prototype = WebGUI::Asset->newById($self->session, $self->session->form->process("prototype"));
 		foreach my $property ($prototype->getProperties) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
             my $definition = $prototype->getProperty($property);
 			next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
@@ -2551,8 +2551,8 @@ sub www_changeUrlConfirm {
 		$self->update({url=>$self->session->form->process("url","text")});
 	 	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? and revisionDate<>?",[$self->getId, $self->get("revisionDate")]);
                 while (my ($version) = $rs->array) {
-                	my $old = WebGUI::Asset->new($self->session, $self->getId, $self->get("className"), $version);
-                        $old->purgeRevision if defined $old;
+                	my $old = eval { WebGUI::Asset->newById($self->session, $self->getId, $version); };
+                    $old->purgeRevision if ! Exception::Class->caught();
                 }
 	}
 
