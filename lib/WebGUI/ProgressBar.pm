@@ -122,7 +122,7 @@ sub start {
         title   => $title,
         icon    => $icon
         );
-    my $template = WebGUI::Asset::Template->new($self->session, 'YP9WaMPJHvCJl-YwrLVcPw');
+    my $template = WebGUI::Asset::Template->newById($self->session, 'YP9WaMPJHvCJl-YwrLVcPw');
     my $output = $self->session->style->process($template->process(\%var).'~~~', "PBtmpl0000000000000137");
     my ($head, $foot) = split '~~~', $output;
     local $| = 1; # Tell modperl not to buffer the output
