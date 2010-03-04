@@ -140,7 +140,7 @@ Create a group to hold subscribers to this asset, if there is not one already.
 sub createSubscriptionGroup {
     my $self    = shift;
 
-    if ( my $groupId = $self->get('subscriptionGroupId') ) {
+    if ( my $groupId = $self->subscriptionGroupId ) {
         return WebGUI::Group->new( $self->session, $groupId );
     }
     else {
@@ -214,7 +214,7 @@ Gets the WebGUI::Group for the subscribers group.
 
 sub getSubscriptionGroup {
     my $self        = shift;
-    my $groupId     = $self->get( "subscriptionGroupId" );
+    my $groupId     = $self->subscriptionGroupId;
     my $group       = $groupId ? WebGUI::Group->new( $self->session, $groupId ) : $self->createSubscriptionGroup;
     return $group;
 }
@@ -229,7 +229,7 @@ Get a WebGUI::Asset::Template object for the subscription template.
 
 sub getSubscriptionTemplate {
     my $self        = shift;
-    my $templateId  = $self->get( "subscriptionTemplateId" );
+    my $templateId  = $self->subscriptionTemplateId;
     my $template    = WebGUI::Asset::Template->new( $self->session, $templateId ); # This should throw if we don't
     return $template;
 }
@@ -345,7 +345,7 @@ sub notifySubscribers {
     WebGUI::Macro::process( $self->session, \$opt->{content} );
     
     if ( !$opt->{ from } ) {
-        my $owner   = WebGUI::User->new( $self->session, $self->get( "ownerUserId" ) );
+        my $owner   = WebGUI::User->new( $self->session, $self->ownerUserId );
         $opt->{ from } = $owner->profileField( "email" ) || $opt->{ listAddress } || $companyEmail;
     }
     
@@ -466,7 +466,7 @@ Returns true if the asset should skip notifications.
 
 sub shouldSkipNotification {
     my $self    = shift;
-    return $self->get( "skipNotification" ) ? 1 : 0;
+    return $self->skipNotification ? 1 : 0;
 }
 
 #----------------------------------------------------------------------------
