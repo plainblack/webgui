@@ -150,7 +150,7 @@ sub toHtml {
     my $templateList = WebGUI::Asset::Template->getList($self->session, $self->get("namespace"), $onlyCommitted);
     #Remove entries from template list that the user does not have permission to view.
     for my $assetId ( keys %{$templateList} ) {
-        my $asset = WebGUI::Asset::Template->new($self->session, $assetId);
+        my $asset = WebGUI::Asset::Template->newById($self->session, $assetId);
         if (!$asset->canView($self->session->user->userId)) {
                 delete $templateList->{$assetId};
         }
@@ -168,10 +168,10 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 =cut
 
 sub toHtmlWithWrapper {
-    my $self = shift;
-    my $session = $self->session;
-    my $template = WebGUI::Asset::Template->new($session,$self->getOriginalValue());
-        if (defined $template && $template->canEdit) {
+    my $self     = shift;
+    my $session  = $self->session;
+    my $template = eval { WebGUI::Asset::Template->newById($session, $self->getOriginalValue()); };
+        if (!Exception::Class->caught() && $template->canEdit) {
             my $returnUrl;
             if (defined $session->asset && ref $session->asset ne "WebGUI::Asset::Template") {
                 $returnUrl = ";proceed=goBackToPage;returnUrl=".$session->url->escape($self->session->asset->getUrl);

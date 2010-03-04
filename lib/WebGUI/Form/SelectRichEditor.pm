@@ -139,15 +139,16 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 =cut
 
 sub toHtmlWithWrapper {
-    my $self = shift;
-    my $editor = WebGUI::Asset::RichEdit->new($self->session,$self->getOriginalValue);
-    if (defined $editor && $editor->canEdit) {
+    my $self    = shift;
+    my $session = $self->session;
+    my $editor  = eval { WebGUI::Asset::RichEdit->newById($session, $self->getOriginalValue); };
+    if (! Exception::Class->caught() && $editor->canEdit) {
         my $returnUrl = '';
-        if (defined $self->session->asset && !$self->session->asset->isa("WebGUI::Asset::RichEdit")) {
-            $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
+        if (defined $session->asset && !$session->asset->isa("WebGUI::Asset::RichEdit")) {
+            $returnUrl = ";proceed=goBackToPage;returnUrl=".$session->url->escape($self->session->asset->getUrl);
         }
-        my $buttons = $self->session->icon->edit("func=edit".$returnUrl,$editor->get("url"));
-        $buttons .= $self->session->icon->manage("op=assetManager",$editor->getParent->get("url"));
+        my $buttons = $session->icon->edit("func=edit".$returnUrl,$editor->get("url"));
+        $buttons   .= $session->icon->manage("op=assetManager",$editor->getParent->get("url"));
         $self->set("subtext", $buttons . $self->get("subtext"));
     }
     return $self->SUPER::toHtmlWithWrapper;

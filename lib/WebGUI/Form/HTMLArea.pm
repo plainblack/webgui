@@ -169,8 +169,8 @@ Renders an HTML area field.
 sub toHtml {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	my $richEdit = WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"));
-	if (defined $richEdit) {
+	my $richEdit = eval { WebGUI::Asset::RichEdit->newById($self->session, $self->get("richEditId")); };
+	if (! Exception::Class->caught() ) {
        $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
 	   $self->set("extras", $self->get('extras') . ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ');
 	   $self->set("resizable", 0);
