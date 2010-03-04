@@ -16,7 +16,6 @@ package WebGUI::PassiveProfiling;
 
 
 use strict;
-use Tie::IxHash;
 
 =head1 NAME
 

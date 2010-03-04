@@ -16,6 +16,7 @@ package WebGUI::Form::CommentRating;
 
 use strict;
 use base 'WebGUI::Form::RadioList';
+use Tie::IxHash;
 
 =head1 NAME
 

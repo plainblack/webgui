@@ -11,7 +11,6 @@ package WebGUI::Asset::Wobject::Survey;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::Form::File;

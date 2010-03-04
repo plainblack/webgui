@@ -6,6 +6,7 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
+use Tie::IxHash;
 
 use Moose;
 use WebGUI::Definition::Asset;

@@ -6,6 +6,7 @@ use WebGUI::Text;
 use WebGUI::Storage;
 use WebGUI::Exception::Shop;
 use List::Util qw{ sum };
+use Tie::IxHash;
 
 use base qw{ WebGUI::Shop::TaxDriver };
 

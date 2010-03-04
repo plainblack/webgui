@@ -16,6 +16,7 @@ package WebGUI::Asset::Wobject::Layout;
 
 use strict;
 use WebGUI::AdSpace;
+use Tie::IxHash;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';

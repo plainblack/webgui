@@ -23,6 +23,7 @@ use WebGUI::HTML;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Pluggable;
+use Tie::IxHash;
 
 
 =head1 NAME

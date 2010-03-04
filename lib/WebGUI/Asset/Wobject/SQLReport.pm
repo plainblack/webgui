@@ -19,6 +19,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Text qw(:csv);
+use Tie::IxHash;
 
 use Moose;
 use WebGUI::Definition::Asset;

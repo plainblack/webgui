@@ -20,7 +20,6 @@ package WebGUI::Asset::Wobject::MultiSearch;
 use strict;
 
 use Tie::CPHash;
-use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::SQL;

@@ -16,6 +16,7 @@ package WebGUI::Session::Icon;
 
 use strict;
 use WebGUI::International;
+use Tie::IxHash;
 
 
 =head1 NAME

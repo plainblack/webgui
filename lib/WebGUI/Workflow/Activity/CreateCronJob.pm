@@ -18,6 +18,7 @@ package WebGUI::Workflow::Activity::CreateCronJob;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Workflow::Cron;
+use Tie::IxHash;
 
 
 =head1 NAME

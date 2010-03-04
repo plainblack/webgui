@@ -12,7 +12,6 @@ package WebGUI::Asset::Wobject::SyndicatedContent;
 
 use strict;
 use HTML::Entities;
-use Tie::IxHash;
 use WebGUI::Exception;
 use WebGUI::HTML;
 use WebGUI::International;

@@ -21,6 +21,7 @@ use WebGUI::International;
 use WebGUI::VersionTag;
 use WebGUI::HTMLForm;
 use WebGUI::Paginator;
+use Tie::IxHash;
 
 =head1 NAME
 

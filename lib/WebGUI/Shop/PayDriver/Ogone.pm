@@ -21,6 +21,7 @@ use WebGUI::Exception;
 use Digest::SHA qw{ sha1_hex };
 use WebGUI::International;
 use Data::Dumper;
+use Tie::IxHash;
 
 use base qw{ WebGUI::Shop::PayDriver };
 

@@ -11,7 +11,6 @@ package WebGUI::Asset::Wobject::MessageBoard;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
 use WebGUI::Asset::Wobject;
 use WebGUI::International;
 use WebGUI::SQL;

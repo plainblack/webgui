@@ -17,6 +17,7 @@ package WebGUI::Shop::PayDriver::ITransact;
 use strict;
 use XML::Simple;
 use Data::Dumper;
+use Tie::IxHash;
 
 use base qw/WebGUI::Shop::PayDriver/;
 

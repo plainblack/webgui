@@ -14,6 +14,7 @@ use strict;
 
 #use base qw/WebGUI::Asset::Wobject WebGUI::JSONCollateral/;
 use Moose;
+use Tie::IxHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
@@ -285,7 +286,6 @@ use WebGUI::DateTime;
 use DateTime;
 use JSON;
 use Text::Wrap;
-use Tie::IxHash;
 
 =head1 NAME
 

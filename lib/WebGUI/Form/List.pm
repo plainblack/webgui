@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::Form::Hidden;
 use WebGUI::International;
+use Tie::IxHash;
 
 =head1 NAME
 

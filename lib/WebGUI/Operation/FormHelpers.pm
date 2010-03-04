@@ -11,7 +11,6 @@ package WebGUI::Operation::FormHelpers;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Form::Group;

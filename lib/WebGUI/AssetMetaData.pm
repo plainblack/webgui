@@ -15,6 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
+use Tie::IxHash;
 
 =head1 NAME
 

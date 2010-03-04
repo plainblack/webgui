@@ -23,6 +23,7 @@ use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Form::Captcha;
 use Encode ();
+use Tie::IxHash;
 
 our @ISA = qw(WebGUI::Auth);
 

@@ -11,7 +11,6 @@ package WebGUI::Operation::Help;
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
-use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::Asset::Template;

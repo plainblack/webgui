@@ -17,7 +17,6 @@ package WebGUI::Auth;
 use CGI::Util qw(rearrange);
 use DBI;
 use strict qw(subs vars);
-use Tie::IxHash;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;

@@ -22,6 +22,7 @@ use WebGUI::Operation::User;
 use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Utility;
+use Tie::IxHash;
 
 #----------------------------------------------------------------------------
 sub _submenu {

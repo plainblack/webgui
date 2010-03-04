@@ -11,7 +11,6 @@ package WebGUI::Asset::Wobject::Article;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
 

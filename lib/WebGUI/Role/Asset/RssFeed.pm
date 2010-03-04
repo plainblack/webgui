@@ -16,6 +16,8 @@ package WebGUI::Role::Asset::RssFeed;
 
 use Moose::Role;
 use WebGUI::Definition::Asset;
+use Tie::IxHash;
+
 define tableName      => 'assetAspectRssFeed';
 property itemsPerFeed => (
     noFormPost => 0,

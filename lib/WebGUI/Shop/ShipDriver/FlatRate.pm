@@ -3,6 +3,7 @@ package WebGUI::Shop::ShipDriver::FlatRate;
 use strict;
 use base qw/WebGUI::Shop::ShipDriver/;
 use WebGUI::Exception;
+use Tie::IxHash;
 
 =head1 NAME
 

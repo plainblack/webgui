@@ -18,6 +18,7 @@ use strict;
 
 use WebGUI::Shop::PayDriver;
 use WebGUI::Exception;
+use Tie::IxHash;
 
 use base qw/WebGUI::Shop::PayDriver/;
 

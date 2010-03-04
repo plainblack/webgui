@@ -15,7 +15,6 @@ package WebGUI::Asset::Sku;
 =cut
 
 use strict;
-use Tie::IxHash;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';

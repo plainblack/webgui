@@ -19,6 +19,7 @@ use WebGUI::Form;
 use WebGUI::Utility;
 use WebGUI::International;
 use JSON;
+use Tie::IxHash;
 
 use Moose;
 use WebGUI::Definition::Asset;

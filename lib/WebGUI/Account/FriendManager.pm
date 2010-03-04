@@ -7,6 +7,7 @@ use WebGUI::Friends;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Utility;
+use Tie::IxHash;
 use base qw/WebGUI::Account/;
 
 use List::MoreUtils qw/uniq/;

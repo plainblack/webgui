@@ -15,6 +15,7 @@ use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use Finance::Quote;
+use Tie::IxHash;
 
 use Moose;
 use WebGUI::Definition::Asset;

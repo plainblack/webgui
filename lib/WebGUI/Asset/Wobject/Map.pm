@@ -13,7 +13,6 @@ $VERSION = "1.0.0";
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
 use HTML::Entities qw(encode_entities);

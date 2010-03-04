@@ -17,7 +17,6 @@ package WebGUI::Form;
 use strict;
 use Carp qw( croak );
 use Scalar::Util qw( blessed );
-use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Utility;

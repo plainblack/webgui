@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::Slider';
 use WebGUI::Form::SelectBox;
 use WebGUI::International;
+use Tie::IxHash;
 
 =head1 NAME
 

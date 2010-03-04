@@ -18,7 +18,6 @@ our $VERSION = "0.0.0";
 
 =cut
 
-use Tie::IxHash;
 use Carp qw(croak);
 
 use WebGUI::International;

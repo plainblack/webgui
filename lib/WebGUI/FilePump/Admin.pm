@@ -1,7 +1,6 @@
 package WebGUI::FilePump::Admin;
 
 use strict;
-use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;

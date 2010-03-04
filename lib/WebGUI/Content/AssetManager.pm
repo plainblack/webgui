@@ -8,6 +8,7 @@ use WebGUI::Form;
 use WebGUI::Paginator;
 use WebGUI::Utility;
 use WebGUI::Macro::AdminBar;
+use Tie::IxHash;
 
 #----------------------------------------------------------------------------
 

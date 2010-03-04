@@ -67,7 +67,6 @@ property paginateAfter => (
 
 
 
-use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Search;
