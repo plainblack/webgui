@@ -32,6 +32,10 @@ sub assetUiLevel {
      return 1;
 }
 
+sub list_of_tables {
+     return [qw/assetData/];
+}
+
 sub _00_init : Test(startup) {
     my $test = shift;
     my $session = WebGUI::Test->session;
@@ -39,7 +43,7 @@ sub _00_init : Test(startup) {
     eval { require $test->class; };
 }
 
-sub constructor : Test(4) {
+sub _constructor : Test(4) {
     my $test    = shift;
     my $session = $test->session;
     my $asset = $test->class->new({session => $session});
@@ -194,10 +198,21 @@ sub keywords : Test(3) {
         className => $test->class,
     });
     addToCleanup($asset);
-    can_ok($asset, 'keywords');
+    can_ok $asset, 'keywords';
     $asset->keywords('chess set');
-    is ($asset->keywords, 'chess set', 'set and get of keywords via direct accessor');
-    #is ($asset->get('keywords'), 'chess set', 'via get method');
+    is $asset->keywords, 'chess set', 'set and get of keywords via direct accessor';
+    is $asset->get('keywords'), 'chess set', 'via get method';
+}
+
+sub keywords : Test(1) {
+    my $test    = shift;
+    note "get_tables";
+    my @tables = $test->class->meta->get_tables;
+    cmp_deeply(
+        \@tables,
+        $test->list_of_tables,
+        'Set of tables for properties is correct'
+    );
 }
 
 1;
