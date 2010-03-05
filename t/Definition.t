@@ -22,7 +22,6 @@ use Test::Exception;
 
 my $session = WebGUI::Test->session;
 
-my $called_getProperties;
 {
     package WGT::Class;
     use Moose;
@@ -48,6 +47,9 @@ my $called_getProperties;
     ::can_ok +__PACKAGE__, 'update';
     ::can_ok +__PACKAGE__, 'get';
     ::can_ok +__PACKAGE__, 'set';
+
+    ::ok +__PACKAGE__->meta->does_role('WebGUI::Definition');
+    ::ok +__PACKAGE__->meta->does_role('WebGUI::Definition::Role::Object');
 
     ::cmp_deeply(
         [ +__PACKAGE__->getProperties ],
