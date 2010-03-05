@@ -76,13 +76,12 @@ Returns an array of the names of all tables in every class used by this class.
 =cut
 
 sub get_tables {
-    my $self       = shift;
-    my @tables = ();
-    my %seen       = ();
-    push @tables, 
+    my $self   = shift;
+    my %seen   = ();
+    my @tables = 
         grep { ! $seen{$_}++ }
         map  { $_->tableName }
-        $self->get_all_class_metas
+        $self->get_all_properties
     ;
     return @tables;
 }
