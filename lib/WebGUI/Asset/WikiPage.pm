@@ -329,19 +329,6 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
-=head2 isProtected 
-
-Returns a boolean indicating whether or not this WikiPage is protected.
-
-=cut
-
-sub isProtected {
-	my $self = shift;
-	return $self->isProtected;
-}
-
-#-------------------------------------------------------------------
-
 =head2 preparePageTemplate 
 
 This is essentially prepareView, but is smart and will only do the template
