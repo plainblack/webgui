@@ -78,15 +78,15 @@ sub init_meta {
     my %args = @_;
     my $for_class = $args{for_class};
     if ($for_class->meta->isa('Moose::Meta::Class')) {
-        Moose::Util::apply_all_roles(
-            $for_class,
-            'WebGUI::Definition::Role::Asset',
-        );
         Moose::Util::MetaRole::apply_metaroles(
             for             => $for_class,
             class_metaroles => {
                 class           => ['WebGUI::Definition::Meta::Asset'],
             },
+        );
+        Moose::Util::apply_all_roles(
+            $for_class,
+            'WebGUI::Definition::Role::Asset',
         );
     }
     else {
