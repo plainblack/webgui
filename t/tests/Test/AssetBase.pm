@@ -12,9 +12,9 @@ package Test::AssetBase;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
+use base qw/Test::Class/;
 use WebGUI::Test;
 
-use base qw/Test::Class/;
 use Test::More;
 use Test::Deep;
 use Test::Exception;
@@ -215,59 +215,9 @@ sub keywords : Test(1) {
     );
 }
 
-1;
-
-__END__
-
-{
-    note "Property inspection";
-    my $asset = WebGUI::Asset->new({
-        session   => $session,
-    });
-
-    cmp_deeply(
-        [$asset->meta->get_all_properties],
-        array_each(
-            methods(
-                tableName => 'assetData',
-            )
-        ),
-        'all properties have the right tableName'
-    );
-
-}
-
-{
-    note "getClassById";
-    my $class;
-    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
-    is $class, 'WebGUI::Asset', 'getClassById: retrieve a class';
-    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
-    is $class, 'WebGUI::Asset', '... cache check';
-    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000002');
-    is $class, 'WebGUI::Asset::Wobject::Folder', '... retrieve another class';
-}
-
-{
-    note "newByPropertyHashRef";
-    my $asset;
-    $asset = WebGUI::Asset->newByPropertyHashRef($session, {className => 'WebGUI::Asset::Snippet', title => 'The Shawshank Snippet'});
-    isa_ok $asset, 'WebGUI::Asset::Snippet';
-    is $asset->title, 'The Shawshank Snippet', 'title is assigned from the property hash';
-
-    my $a2 = WebGUI::Asset::Snippet->newByPropertyHashRef($session, {});
-    isa_ok $asset, 'WebGUI::Asset::Snippet';
-}
-
-{
-    note "new, fetching from db";
-    my $asset;
-    $asset = WebGUI::Asset->new($session, 'PBasset000000000000001');
-    isa_ok $asset, 'WebGUI::Asset';
-    is $asset->title, 'Root', 'got the right asset';
-}
-
-{
+sub getParent : Test(2) {
+    my $test    = shift;
+    my $session = $test->session;
     note "getParent";
     my $testId1      = 'wg8TestAsset0000000001';
     my $testId2      = 'wg8TestAsset0000000002';
@@ -289,7 +239,9 @@ __END__
     $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
 }
 
-{
+sub addRevision : Test(6) {
+    my $test    = shift;
+    my $session = $test->session;
     note "addRevision";
     my $testId1      = 'wg8TestAsset0000000001';
     my $testId2      = 'wg8TestAsset0000000002';
@@ -321,24 +273,44 @@ __END__
     $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
 }
 
+sub addRevision : Test(2) {
+    my $test    = shift;
+    my $session = $test->session;
+    note "newByPropertyHashRef";
+    my $asset;
+    $asset = WebGUI::Asset->newByPropertyHashRef($session, {className => $test->class, title => 'The Shawshank Snippet'});
+    isa_ok $asset, $test->class;
+    is $asset->title, 'The Shawshank Snippet', 'title is assigned from the property hash';
+}
+
+
+1;
+
+__END__
+
 {
-    note "get_tables, with inheritance";
-    use WebGUI::Asset::Snippet;
-    my @tables = WebGUI::Asset::Snippet->meta->get_tables;
-    cmp_deeply(
-        \@tables,
-        [qw/assetData snippet/],
-        'get_tables works on inherited classes'
-    );
+    note "getClassById";
+    my $class;
+    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
+    is $class, 'WebGUI::Asset', 'getClassById: retrieve a class';
+    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
+    is $class, 'WebGUI::Asset', '... cache check';
+    $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000002');
+    is $class, 'WebGUI::Asset::Wobject::Folder', '... retrieve another class';
+}
+
+{
+    note "new, fetching from db";
+    my $asset;
+    $asset = WebGUI::Asset->new($session, 'PBasset000000000000001');
+    isa_ok $asset, 'WebGUI::Asset';
+    is $asset->title, 'Root', 'got the right asset';
 }
 
 {
     note "getDefault";
     my $asset = WebGUI::Asset->getDefault($session);
     isa_ok $asset, 'WebGUI::Asset::Wobject::Layout';
-}
-
-{
 }
 
 {
