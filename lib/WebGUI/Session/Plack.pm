@@ -39,9 +39,9 @@ sub AUTOLOAD {
 }
 
 # Emulate/delegate/fake Apache2::* subs
-sub uri         { shift->{request}->request_uri(@_) }
+sub uri         { shift->{request}->path_info }
 sub param       { shift->{request}->param(@_) }
-sub params      { shift->{request}->params(@_) }
+sub params      { shift->{request}->prameters->mixed(@_) }
 sub headers_in  { shift->{request}->headers(@_) }
 sub headers_out { shift->{headers_out} }
 sub protocol    { shift->{request}->protocol(@_) }
@@ -58,23 +58,6 @@ sub handler     {'perl-script'}                         # or not..?
 sub content_type {
     my ( $self, $ct ) = @_;
     $self->{headers_out}->set( 'Content-Type' => $ct );
-}
-
-# These two cookie subs are called from our wG Plack-specific code
-sub get_request_cookies {
-
-    # Get the hash of { name => CGI::Simple::Cookie }
-    my $cookies = shift->{request}->cookies;
-
-    # Convert into { name => value } as expected by wG
-    my %c = map { $_->name => $_->value } values %{$cookies};
-
-    return \%c;
-}
-
-sub set_response_cookie {
-    my ( $self, $name, $val ) = @_;
-    $self->{response}->cookies->{$name} = $val;
 }
 
 # TODO: I suppose this should do some sort of IO::Handle thing

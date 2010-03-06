@@ -93,7 +93,7 @@ sub getCookies {
 	my $self = shift;
 	if ($self->session->request) {
 	    if ($self->session->request->isa('WebGUI::Session::Plack')) {
-	        return $self->session->request->get_request_cookies;
+	        return $self->session->request->{request}->cookies;
 	    }
 	    
 		# Have to require this instead of using it otherwise it causes problems for command-line scripts on some platforms (namely Windows)
@@ -389,17 +389,15 @@ sub setCookie {
 	$ttl = (defined $ttl ? $ttl : '+10y');
 
 	if ($self->session->request) {
-	    if ( $self->session->request->isa('WebGUI::Session::Plack') ) {
-            $self->session->request->set_response_cookie(
-                $name => {
-                    value   => $value,
-                    path    => '/',
-                    expires => $ttl ne 'session' ? $ttl : undef,
-                    domain  => $domain,
-                }
-            );
-            return;
-        }
+		if ( $self->session->request->isa('WebGUI::Session::Plack') ) {
+		    $self->session->request->{response}->cookies->{$name} = {
+			value   => $value,
+			path    => '/',
+			expires => $ttl ne 'session' ? $ttl : undef,
+			domain  => $domain,
+		    };
+		}
+		return;
 	    
 		require Apache2::Cookie;
 		my $cookie = Apache2::Cookie->new($self->session->request,
