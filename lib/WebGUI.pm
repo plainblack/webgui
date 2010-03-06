@@ -165,7 +165,7 @@ sub handler {
     my ($server, $config);
     if ($request->isa('WebGUI::Session::Plack')) {
         $server  = $request->server;
-        $config = WebGUI->config;
+        $config = WebGUI->config; # use our cached version
     } else {
         $request = Apache2::Request->new($request);
         $server  = Apache2::ServerUtil->server;	#instantiate the server api
