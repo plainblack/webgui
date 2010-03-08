@@ -38,7 +38,8 @@ WebGUI.FieldCheck.prototype.initialize = function() {
   if (required && !input) {
     var imgEltId=fieldId+"_Img";
     var imgElt=document.getElementById(imgEltId);
-    imgElt.setAttribute('src','/extras/form/cross.png');
+    var extras = getWebguiProperty("extrasURL");
+    imgElt.setAttribute('src',extras+'/form/cross.png');
     alert(this.i18n('field required'));
     return false;
   }
@@ -51,6 +52,7 @@ WebGUI.FieldCheck.AjaxEvent = function() {
 }
 
 WebGUI.FieldCheck.AjaxEvent.prototype = {
+  extras: getWebguiProperty("extrasURL"),
   startThrobber: function(fieldId) {
     this.field = document.getElementById(fieldId);
     var imgEltId=fieldId+"_Img";
@@ -63,7 +65,7 @@ WebGUI.FieldCheck.AjaxEvent.prototype = {
     }else{
       var imgElt=document.getElementById(imgEltId);
     }
-    imgElt.setAttribute('src','/extras/form/throbber.gif');
+    imgElt.setAttribute('src',this.extras+'/form/throbber.gif');
   },
   connect: function(fieldId,sUri) {
     if (!sUri && !this.sUri) {
@@ -77,9 +79,9 @@ WebGUI.FieldCheck.AjaxEvent.prototype = {
           var imgElt=document.getElementById(imgEltId);
           document.getElementById(imgEltId);
           if(oJSON.error == ""){
-            imgElt.setAttribute('src','/extras/form/tick.png');
+            imgElt.setAttribute('src',this.extras+'/form/tick.png');
           }else{
-            imgElt.setAttribute('src','/extras/form/cross.png');
+            imgElt.setAttribute('src',this.extras+'/form/cross.png');
             alert(oJSON.error);
           }
         },
