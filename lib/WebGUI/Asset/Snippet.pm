@@ -243,7 +243,6 @@ sub packSnippet {
     if ( $self->get('mimeType') eq "text/html" ) {
         HTML::Packer::minify( \$packed, {
             remove_comments     => 1,
-            remove_newlines     => 1,
             do_javascript       => "shrink",
             do_stylesheet       => "minify",
         } );
