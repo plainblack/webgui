@@ -30,7 +30,6 @@ WebGUI.FieldCheck.prototype.initialize = function() {
   var fieldType=this.fieldType;
   var required=this.required;
   var field=document.getElementById(fieldId);
-  var fieldName=field.name;
   var input=field.value;
 
   var myAjaxEvent = new WebGUI.FieldCheck.AjaxEvent();
@@ -44,7 +43,7 @@ WebGUI.FieldCheck.prototype.initialize = function() {
     return false;
   }
 
-  myAjaxEvent.connect(fieldId,'/?op=auth;method=checkField;fieldName='+fieldName+';fieldType='+fieldType+';input='+input);
+  myAjaxEvent.connect(fieldId,'/?op=formHelper;sub=check;class='+fieldType+';input='+input);
 }
 
 WebGUI.FieldCheck.AjaxEvent = function() {

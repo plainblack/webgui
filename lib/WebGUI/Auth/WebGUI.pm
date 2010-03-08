@@ -338,20 +338,6 @@ or an empty string if the check was successful.
 
 =cut
 
-sub checkField {
-  my $self = shift;
-  my $session = $self->session;
-  $session->http->setMimeType( 'application/json' );
-
-  my $input = $session->form->param('input');
-  my $fieldName = $session->form->param('fieldName');
-  my $fieldType = $session->form->param('fieldType');
-
-  my $checkClass = 'WebGUI::Form::'. ucfirst $fieldType;
-  my (%checkResults) = "$checkClass"->check($session, $input);
-  return JSON::encode_json(\%checkResults);
-}
-
 #-------------------------------------------------------------------
 sub displayAccount {
    my $self = shift;
@@ -800,7 +786,7 @@ sub new {
     my $session = shift;
     my $authMethod = $_[0];
     my $userId = $_[1];
-    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount', 'emailResetPassword', 'emailResetPasswordFinish','checkField');
+    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount', 'emailResetPassword', 'emailResetPasswordFinish');
     my $self = WebGUI::Auth->new($session,$authMethod,$userId,\@callable);
     bless $self, $class;
 }

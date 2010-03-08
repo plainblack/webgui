@@ -92,15 +92,15 @@ sub toHtml {
   $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),       {type=>'text/javascript'});
   $self->session->style->setScript($self->session->url->extras('yui-webgui/build/i18n/i18n.js'), {type=>'text/javascript'});
   my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
-  $self->set("extras", $self->get('extras') . ' onblur="new WebGUI.FieldCheck(\''. $self->get("id").'\',\'username\',1);"');
+  $self->set("extras", $self->get('extras') . ' onblur="new WebGUI.FieldCheck(\''. $self->get("id").'\',\'Username\',1);"');
   return '<input id="'.$self->get('id').'" type="text" name="'.$self->get("name").'" value="'.$value.'" size="'.$self->get("size").'" maxlength="'.$self->get("maxlength").'" '.$self->get("extras").' />';
 }
 
 #-------------------------------------------------------------------
 
-=head2 check ( $session, $input )
+=head2 www_check ($session)
 
-check() is called as a class method.
+www_check() is called by an Ajax call from the user registration page.
 
 It checks whether a user name is free for registration. Returns a hash
 (error => $error)
@@ -108,16 +108,19 @@ if the username is not free.
 
 =cut
 
-sub check {
-  my ($class, $session, $input) = @_;
+sub www_check {
+  my $session = shift;
+  my $input = $session->form->param('input');
+
+  $session->http->setMimeType( 'application/json' );
   my $i18n = WebGUI::International->new($session, 'Form_Username');
 
   my $error = '';
   my ($existingUserId) = $session->db->quickArray("select userId from users where username=".$session->db->quote($input));
   $error = $i18n->get('username in use') if $existingUserId;
 
-  my %checkInfo = (error => $error);
-  return %checkInfo;
+  my %checkResults = (error => $error);
+  return JSON::encode_json(\%checkResults);
 }
 
 1;
