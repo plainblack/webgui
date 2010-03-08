@@ -19,6 +19,7 @@ use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 use HTML::TokeParser;
+use JSON qw/from_json/;
 
 my $session = WebGUI::Test->session;
 
@@ -157,13 +158,13 @@ sub setupTest {
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
 	$versionTag->set({name=>"GroupAdd test"});
 	my $properties = {
-		title => 'GroupAdd test template',
+		title     => 'GroupAdd test template',
 		className => 'WebGUI::Asset::Template',
-		url => 'groupadd-test',
+		url       => 'groupadd-test',
 		namespace => 'Macro/GroupAdd',
-		template => "HREF=<tmpl_var group.url>\nLABEL=<tmpl_var group.text>",
-		#     '1234567890123456789012'
-		id => 'GroupAdd001100Template',
+		template  => qq|{"HREF":"<tmpl_var group.url>",\n"LABEL":"<tmpl_var group.text>"}|,
+		#            '1234567890123456789012'
+		id        => 'GroupAdd001100Template',
         usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
@@ -187,8 +188,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
-	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
+    my $json_data = from_json($text);
+    my ($url, $label) = @{ $json_data }{qw/HREF LABEL/};
 
 	return ($url, $label);
 }
