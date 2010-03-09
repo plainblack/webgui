@@ -1,3 +1,4 @@
+package Test::Asset::File::GalleryFile;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -8,19 +9,22 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib 'tests';
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
-use Test::AssetBase;
-use Test::Asset::File;
-use Test::Asset::Snippet;
-use Test::Asset::RichEdit;
-use Test::Asset::Shortcut;
-use Test::Asset::Sku;
-use Test::Asset::Wobject;
-use Test::Asset::Template;
-use Test::Asset::Redirect;
-use Test::Asset::File::Image;
-use Test::Asset::File::ZipArchive;
-use Test::Asset::File::GalleryFile;
+use base qw/Test::AssetBase/;
+use WebGUI::Test;
 
-Test::Class->runtests;
+use Test::More;
+use Test::Deep;
+use Test::Exception;
+
+sub class {
+     return qw/WebGUI::Asset::File::GalleryFile/;
+}
+
+sub list_of_tables {
+     return [qw/assetData FileAsset GalleryFile/];
+}
+
+1;
