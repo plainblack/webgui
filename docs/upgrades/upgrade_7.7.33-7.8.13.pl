@@ -453,21 +453,6 @@ sub addPackage {
         die "Error during package import on $file: $@\nStopping upgrade\n.";
     }
 
-    # Turn off the package flag, and set the default flag for templates added
-    my $assetIds = $package->getLineage( ['self','descendants'] );
-    for my $assetId ( @{ $assetIds } ) {
-        my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-        if ( !$asset ) {
-            print "Couldn't instantiate asset with ID '$assetId'. Please check package '$file' for corruption.\n";
-            next;
-        }
-        my $properties = { isPackage => 0 };
-        if ($asset->isa('WebGUI::Asset::Template')) {
-            $properties->{isDefault} = 1;
-        }
-        $asset->update( $properties );
-    }
-
     return;
 }
 
