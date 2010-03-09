@@ -13,7 +13,6 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use base qw/Test::AssetBase/;
-use WebGUI::Test;
 
 use Test::More;
 use Test::Deep;

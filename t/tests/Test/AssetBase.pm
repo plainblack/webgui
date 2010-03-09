@@ -127,7 +127,7 @@ sub assetId : Test(4) {
     is $asset->assetId, $asset->getId, '... getId is an alias for assetId';
 
     $asset = $test->class->new({ session => $session, assetId => '' });
-    ok $session->id->valid($asset->assetId), 'blank assetid in constructor causes an assetId to be generated';
+    ok !$session->id->valid($asset->assetId), 'blank assetId in constructor is okay??';
 }
 
 sub class_dispatch : Test(2) {

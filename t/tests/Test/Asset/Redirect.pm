@@ -13,7 +13,6 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use base qw/Test::AssetBase/;
-use WebGUI::Test;
 
 use Test::More;
 use Test::Deep;
@@ -23,7 +22,7 @@ sub class {
      return qw/WebGUI::Asset::Redirect/;
 }
 
-sub uiLevel {
+sub assetUiLevel {
      return 9;
 }
 

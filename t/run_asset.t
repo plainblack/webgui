@@ -12,15 +12,19 @@ use lib 'tests';
 
 use Test::AssetBase;
 use Test::Asset::File;
-use Test::Asset::Snippet;
-use Test::Asset::RichEdit;
-use Test::Asset::Shortcut;
-use Test::Asset::Sku;
-use Test::Asset::Wobject;
-use Test::Asset::Template;
-use Test::Asset::Redirect;
 use Test::Asset::File::Image;
 use Test::Asset::File::ZipArchive;
 use Test::Asset::File::GalleryFile;
+use Test::Asset::Redirect;
+use Test::Asset::RichEdit;
+use Test::Asset::Shortcut;
+use Test::Asset::Sku;
+use Test::Asset::Snippet;
+use Test::Asset::Template;
+use Test::Asset::Wobject;
+use Test::Asset::Wobject::Article;
+use Test::Asset::Wobject::Calendar;
+use Test::Asset::Wobject::Carousel;
+use Test::Asset::Wobject::Folder;
 
 Test::Class->runtests;
