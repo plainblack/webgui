@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 use Test::Deep;
 use Test::Exception;
 
@@ -48,7 +48,6 @@ my $session = WebGUI::Test->session;
     ::can_ok +__PACKAGE__, 'get';
     ::can_ok +__PACKAGE__, 'set';
 
-    ::ok +__PACKAGE__->meta->does_role('WebGUI::Definition');
     ::ok +__PACKAGE__->meta->does_role('WebGUI::Definition::Role::Object');
 
     ::cmp_deeply(

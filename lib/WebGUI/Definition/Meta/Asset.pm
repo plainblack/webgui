@@ -57,7 +57,7 @@ has 'property_metaroles' => (
     default => sub { [ 'WebGUI::Definition::Meta::Property', 'WebGUI::Definition::Meta::Property::Asset'] },
 );
 
-has [ qw{tableName icon assetName uiLevel} ] => (
+has [ qw{tableName icon assetName} ] => (
     is       => 'rw',
 );
 
@@ -110,15 +110,6 @@ the icon, 16x16, is found in www/extras/assets/small.
 
 An array reference containing two items.  The first is the i18n key for the asset's name.
 The second is the i18n namespace to find the asset's name.
-
-=cut
-
-#-------------------------------------------------------------------
-
-=head2 uiLevel ( )
-
-An integer, representing how difficult the Asset will be to use.  The default uiLevel is
-1.  uiLevels for an asset can be overridden in the config file for each site.
 
 =cut
 

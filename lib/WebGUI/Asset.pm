@@ -25,7 +25,6 @@ use WebGUI::Definition::Asset;
 define assetName  => 'asset';
 define tableName  => 'assetData';
 define icon       => 'assets.gif';
-define uiLevel    => 1;
 property  title => (
             tab             => "properties",
             label           => ['99','Asset'],
@@ -272,6 +271,11 @@ has       assetId => (
           );
 has       revisionDate => (
             is              => 'rw',
+          );
+has       uiLevel => (
+            is              => 'ro',
+            default         => 1,
+            init_arg        => undef,
           );
 property  revisedBy => (
             is              => 'rw',
