@@ -181,13 +181,17 @@ sub view {
         value=>$keywords
     });
 	$var{'no_results'   } = $i18n->get("no results");
+    my $searchRoot = $self->getValue('searchRoot');
+    if (my $searchOverride = $form->get('searchroot', 'asset')) {
+        $searchRoot = $searchOverride;
+    }
 	
     if ($form->get("doit")) {
 		my $search = WebGUI::Search->new($session);
 		my %rules   = (
 			keywords =>$keywords, 
 			lineage  =>[
-                WebGUI::Asset->newByDynamicClass($session,$self->getValue("searchRoot"))->get("lineage")
+                WebGUI::Asset->newByDynamicClass($session, $searchRoot)->get("lineage"),
             ],
 		);
 		my @classes     = split("\n",$self->get("classLimiter"));
