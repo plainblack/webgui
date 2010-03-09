@@ -337,24 +337,6 @@ sub cut {
 }
 
 #-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-    my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Post");
-    
-    my $properties = {
-    };
-    
-    push(@{$definition}, {
-        className=>'WebGUI::Asset::Post',
-        properties=>$properties,
-    });
-    return $class->SUPER::definition($session,$definition);
-}
-
-
-#-------------------------------------------------------------------
 
 =head2 DESTROY 
 

@@ -66,38 +66,6 @@ These methods are available from this class
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-Define the properties of all GalleryFile assets.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-    my $i18n        = WebGUI::International->new($session,'Asset_Photo');
-
-    tie my %properties, 'Tie::IxHash', (
-    );
-
-    # UserDefined Fields
-    for my $i (1 .. 5) {
-        $properties{"userDefined".$i} = {
-            defaultValue        => undef,
-        };
-    }
-
-    push @{$definition}, {
-        className           => 'WebGUI::Asset::File::GalleryFile',
-        properties          => \%properties,
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
-
 #----------------------------------------------------------------------------
 
 =head2 appendTemplateVarsCommentForm ( var [, comment ] ) 

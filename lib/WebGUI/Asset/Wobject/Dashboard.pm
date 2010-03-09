@@ -112,26 +112,6 @@ sub canPersonalize {
 }
 
 #-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Dashboard");
-
-	my %properties;
-	%properties = (
-	);
-
-	push(@{$definition}, {
-		className => 'WebGUI::Asset::Wobject::Dashboard',
-		properties => \%properties,
-		autoGenerateForms => 1,
-	});
-
-	return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
 
 =head2 discernUserId 
 

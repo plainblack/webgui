@@ -220,19 +220,6 @@ sub canManage {
 }
 
 #-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Shortcut");
-	push(@{$definition}, {
-		properties=>{
-		}
-	});
-	return $class->SUPER::definition($session,$definition);
-}
-
-#-------------------------------------------------------------------
 
 =head2 discernUserId 
 

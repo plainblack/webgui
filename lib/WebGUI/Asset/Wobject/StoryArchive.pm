@@ -155,32 +155,6 @@ sub canPostStories {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( )
-
-defines wobject properties for New Wobject instances.  You absolutely need 
-this method in your new Wobjects.  If you choose to "autoGenerateForms", the
-getEditForm method is unnecessary/redundant/useless.  
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session, 'Asset_StoryArchive');
-    my %properties;
-    %properties = (
-    );
-    push(@{$definition}, {
-        className=>'WebGUI::Asset::Wobject::StoryArchive',
-        properties=>\%properties,
-    });
-    return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 exportAssetCollateral (basePath, params, session)
 
 Extended the master method in order to produce keyword files.
