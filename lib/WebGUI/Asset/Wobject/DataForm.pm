@@ -214,7 +214,7 @@ property tabConfiguration => (
             fieldType       => 'hidden',
             noFormPost      => 1,
         );
-has +uiLevel => (
+has '+uiLevel' => (
     default => 5,
 );
 

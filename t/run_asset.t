@@ -13,5 +13,11 @@ use lib 'tests';
 use Test::AssetBase;
 use Test::Asset::File;
 use Test::Asset::Snippet;
+use Test::Asset::RichEdit;
+use Test::Asset::Shortcut;
+use Test::Asset::Sku;
+use Test::Asset::Wobject;
+use Test::Asset::Template;
+use Test::Asset::Redirect;
 
 Test::Class->runtests;

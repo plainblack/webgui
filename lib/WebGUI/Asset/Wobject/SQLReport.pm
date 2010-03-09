@@ -259,7 +259,7 @@ sub _downloadUserGroup_default {
     my $self = shift;
     return $self->groupIdView;
 }
-has +uiLevel => (
+has '+uiLevel' => (
     default => 5,
 );
 

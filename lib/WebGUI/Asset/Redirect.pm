@@ -46,7 +46,7 @@ sub _redirectType_options {
         301 => $i18n->get('301 Moved Permanently'),       
     };
 }
-has +uiLevel => (
+has '+uiLevel' => (
     default => 9,
 );
 

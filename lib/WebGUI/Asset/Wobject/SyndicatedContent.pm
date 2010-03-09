@@ -69,7 +69,7 @@ property hasTerms => (
                 hoverHelp    => ['hasTermsLabel description', 'Asset_SyndicatedContent'],
                 maxlength    => 255,
          );
-has +uiLevel => (
+has '+uiLevel' => (
     default => 6,
 );
 

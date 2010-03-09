@@ -146,7 +146,7 @@ property cookieJarStorageId => (
                 fieldType  => "hidden",
                 default    => undef
          );
-has +uiLevel => (
+has '+uiLevel' => (
     default => 5,
 );
 

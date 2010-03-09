@@ -97,7 +97,7 @@ property mimeType => (
    	fieldType       => 'mimeType',
     default         => 'text/html',
 );
-has +uiLevel => (
+has '+uiLevel' => (
     default         => 5,
 );
 

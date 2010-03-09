@@ -169,7 +169,7 @@ property allowMedia => (
                 label           => ['editForm allowMedia label', 'Asset_RichEdit'],
                 hoverHelp       => ['editForm allowMedia description', 'Asset_RichEdit'],
          );
-has +uiLevel => (
+has '+uiLevel' => (
     default => 5,
 );
 
