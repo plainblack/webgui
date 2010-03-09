@@ -428,7 +428,7 @@ sub purge {
     my $options = shift;
 
     my $group   = $self->getSubscriptionGroup();
-    $group->delete;
+    $group->delete if $group;
     my $success = $self->next::method($options);
 
     return $success;
