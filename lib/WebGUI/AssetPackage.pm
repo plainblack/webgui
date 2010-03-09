@@ -150,6 +150,12 @@ sub importAssetData {
         delete $properties{groupIdView};
         delete $properties{groupIdEdit};
     }
+    if ($options->{clearPackageFlag}) {
+        $properties{isPackage} = 0;
+    }
+    if ($options->{setDefaultTemplate}) {
+        $properties{isDefault} = 1;
+    }
     if ($revisionExists) { # update an existing revision
         $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
 

@@ -437,7 +437,14 @@ sub addPackage {
     $storage->addFileFromFilesystem( $file );
 
     # Import the package into the import node
-    my $package = eval { WebGUI::Asset->getImportNode($session)->importPackage( $storage, { overwriteLatest => 1 } ); };
+    my $package = eval {
+        my $node = WebGUI::Asset->getImportNode($session);
+        my $node->importPackage( $storage, {
+            overwriteLatest    => 1,
+            clearPackageFlag   => 1,
+            setDefaultTemplate => 1,
+        } );
+    };
 
     if ($package eq 'corrupt') {
         die "Corrupt package found in $file.  Stopping upgrade.\n";
