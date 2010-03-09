@@ -30,7 +30,6 @@ use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
 define assetName           => ['assetName', 'Asset_DataForm'];
-define uiLevel             => 5;
 define tableName           => 'DataForm';
 define icon                => 'dataForm.gif';
 property templateId => (
@@ -215,6 +214,11 @@ property tabConfiguration => (
             fieldType       => 'hidden',
             noFormPost      => 1,
         );
+has +uiLevel => (
+    default => 5,
+);
+
+
 
 use WebGUI::Pluggable;
 use WebGUI::DateTime;

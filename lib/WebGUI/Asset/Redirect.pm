@@ -21,7 +21,6 @@ use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName => ['assetName', 'Asset_Redirect'];
-define uiLevel   => 9;
 define icon      => 'redirect.gif';
 define tableName => 'redirect';
 property redirectUrl => (
@@ -47,6 +46,11 @@ sub _redirectType_options {
         301 => $i18n->get('301 Moved Permanently'),       
     };
 }
+has +uiLevel => (
+    default => 9,
+);
+
+
 
 =head1 NAME
 

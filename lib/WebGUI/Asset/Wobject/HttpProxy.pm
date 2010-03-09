@@ -26,7 +26,6 @@ use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_HttpProxy'];
-define uiLevel   => 5;
 define icon      => 'httpProxy.gif';
 define tableName => 'HttpProxy';
 property templateId => (
@@ -147,6 +146,10 @@ property cookieJarStorageId => (
                 fieldType  => "hidden",
                 default    => undef
          );
+has +uiLevel => (
+    default => 5,
+);
+
 
 #-------------------------------------------------------------------
 

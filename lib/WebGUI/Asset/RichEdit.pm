@@ -25,7 +25,6 @@ use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName   => ['assetName', 'Asset_RichEdit'];
 define icon        => 'richEdit.gif';
-define uiLevel     => 5;
 define tableName   => 'RichEdit';
 property disableRichEditor => (
                 fieldType       => 'yesNo',
@@ -170,6 +169,9 @@ property allowMedia => (
                 label           => ['editForm allowMedia label', 'Asset_RichEdit'],
                 hoverHelp       => ['editForm allowMedia description', 'Asset_RichEdit'],
          );
+has +uiLevel => (
+    default => 5,
+);
 
 
 =head1 NAME

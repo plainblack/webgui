@@ -22,7 +22,6 @@ use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
 define assetName => ['assetName','Asset_SyndicatedContent'];
-define uiLevel   => 6;
 define icon      => 'syndicatedContent.gif';
 define tableName => 'SyndicatedContent';
 property cacheTimeout => (
@@ -70,6 +69,11 @@ property hasTerms => (
                 hoverHelp    => ['hasTermsLabel description', 'Asset_SyndicatedContent'],
                 maxlength    => 255,
          );
+has +uiLevel => (
+    default => 6,
+);
+
+
 
 with 'WebGUI::Role::Asset::RssFeed';
 use WebGUI::Macro;

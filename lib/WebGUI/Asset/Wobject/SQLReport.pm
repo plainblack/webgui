@@ -24,7 +24,6 @@ use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_SQLReport'];
-define uiLevel   => 5;
 define icon      => 'sqlReport.gif';
 define tableName => 'SQLReport';
 property templateId => (
@@ -260,6 +259,11 @@ sub _downloadUserGroup_default {
     my $self = shift;
     return $self->groupIdView;
 }
+has +uiLevel => (
+    default => 5,
+);
+
+
 
 
 #-------------------------------------------------------------------

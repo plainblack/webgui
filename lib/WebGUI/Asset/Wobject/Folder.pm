@@ -20,7 +20,6 @@ use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
 define assetName   => ["assetName", 'Asset_Folder'];
-define uiLevel     => 5;
 define icon        => 'folder.gif';
 define tableName   => 'Folder';
 
@@ -67,6 +66,9 @@ property templateId => (
              label           => ['folder template title',       'Asset_Folder'],
              hoverHelp       => ['folder template description', 'Asset_Folder'],
          );
+has +uiLevel => (
+    default => 5,
+);
 
 use WebGUI::Utility;
 

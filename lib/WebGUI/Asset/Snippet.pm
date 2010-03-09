@@ -25,7 +25,6 @@ use JavaScript::Packer;
 use CSS::Packer;
 
 define assetName  => ['assetName','Asset_Snippet'];
-define uiLevel    =>  5;
 define icon       => 'snippet.gif';
 define tableName  => 'snippet';
 
@@ -97,6 +96,9 @@ property mimeType => (
 	label           => ['mimeType','Asset_Snippet'],
    	fieldType       => 'mimeType',
     default         => 'text/html',
+);
+has +uiLevel => (
+    default         => 5,
 );
 
 
