@@ -439,7 +439,7 @@ sub addPackage {
     # Import the package into the import node
     my $package = eval {
         my $node = WebGUI::Asset->getImportNode($session);
-        my $node->importPackage( $storage, {
+        $node->importPackage( $storage, {
             overwriteLatest    => 1,
             clearPackageFlag   => 1,
             setDefaultTemplate => 1,
