@@ -66,7 +66,7 @@ property templateId => (
              label           => ['folder template title',       'Asset_Folder'],
              hoverHelp       => ['folder template description', 'Asset_Folder'],
          );
-has +uiLevel => (
+has '+uiLevel' => (
     default => 5,
 );
 
