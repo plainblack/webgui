@@ -30,6 +30,8 @@ use Test::Asset::Wobject::DataForm;
 use Test::Asset::Wobject::DataTable;
 use Test::Asset::Wobject::EventManagementSystem;
 use Test::Asset::Wobject::Folder;
+use Test::Asset::Wobject::Gallery;
 use Test::Asset::Wobject::GalleryAlbum;
+use Test::Asset::Wobject::HttpProxy;
 
 Test::Class->runtests;
