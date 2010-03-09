@@ -40,7 +40,8 @@ sub _00_init : Test(startup) {
     my $test = shift;
     my $session = WebGUI::Test->session;
     $test->{_session} = $session;
-    eval { require $test->class; };
+    note "Loading ". $test->class;
+    eval { WebGUI::Asset->loadModule($test->class); };
 }
 
 sub _constructor : Test(4) {
@@ -149,7 +150,8 @@ sub uiLevel : Test(1) {
     my $test    = shift;
     my $session = $test->session;
     note "uiLevel";
-    is $test->class->meta->uiLevel, $test->assetUiLevel, 'asset uiLevel check';
+    my $asset   = $test->class->new({session => $session});
+    is $asset->uiLevel, $test->assetUiLevel, 'asset uiLevel check';
 }
 
 sub write_update : Test(8) {
@@ -273,7 +275,7 @@ sub addRevision : Test(6) {
     $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
 }
 
-sub addRevision : Test(2) {
+sub newByPropertyHashRef : Test(2) {
     my $test    = shift;
     my $session = $test->session;
     note "newByPropertyHashRef";
