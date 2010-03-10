@@ -506,7 +506,8 @@ Returns the URL for this Post, which links directly to its anchor and page.
 sub getThreadLinkUrl {
 	my $self = shift;
     my $url;
-    my $page_size = $self->getThread->getParent->get('postsPerPage');
+    my $paginator = WebGUI::Paginator->new($self->session, '', $self->getThread->getParent->get('postsPerPage'));
+    my $page_size = $paginator->{_rpp}; ##To make sure defaults are handled correctly.
     my $place     = $self->getRank+1;
     my $page      = int($place/$page_size) + 1;
     my $page_frag = 'pn='.$page;
