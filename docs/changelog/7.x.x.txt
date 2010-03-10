@@ -1,3 +1,5 @@
+7.9.1
+
 7.9.0
  - added #11383: AJAX username checks at registration (Luke Robinson / Orchard Solutions)
  - added: Optimized macro parser for perl 5.10
