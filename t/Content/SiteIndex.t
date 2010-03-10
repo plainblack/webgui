@@ -34,8 +34,6 @@ my $xmlData = XMLin($output,
     KeepRoot   => 1,
     ForceArray => ['url'],
 );
-use Data::Dumper;
-diag Dumper $xmlData;
 my @actual_urls = map { $_->{loc} } @{ $xmlData->{urlset}->{url} };
 my @expected_urls = map { $session->url->getSiteURL . '/' . $_ } qw{ home getting_started your_next_step the_latest_news tell_a_friend documentation site_map };
 cmp_deeply(
