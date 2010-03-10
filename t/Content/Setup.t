@@ -17,7 +17,7 @@ use WebGUI::Content::Setup;
 
 # load your modules here
 
-use Test::More tests => 8; # increment this value for each test you create
+use Test::More tests => 10; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -69,7 +69,7 @@ $languageField->set($properties);
 $session->setting->remove("specialState");
 
 my $u1 = WebGUI::User->new($session, '1');
-note $u1->get('language');
+is $u1->get('language'), 'English', 'returned Visitor to English';
 
 my $u3 = WebGUI::User->new($session, '3');
-note $u3->get('language');
+is $u3->get('language'), 'English', 'returned Admin to English';
