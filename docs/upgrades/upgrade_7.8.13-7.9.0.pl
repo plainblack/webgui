@@ -68,6 +68,7 @@ sub addFilePumpMacro {
     print "\tAdd the FilePump macro... " unless $quiet;
     # and here's our code
     $session->config->addToHash('macros', 'FilePump' => 'FilePump');
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
