@@ -13,8 +13,9 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 9; # increment this value for each test you create
+use Test::More tests => 11; # increment this value for each test you create
 use Test::MockObject::Extends;
+use Test::Exception;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post::Thread;
 
@@ -72,6 +73,9 @@ note 'getThreadLinkUrl';
 unlike $thread->getThreadLinkUrl, qr/\?pn=\d+/, 'threads do not need pagination url query fragments';
 unlike $uncommittedThread->getThreadLinkUrl, qr/\?pn=\d+/, 'uncommitted threads, too';
 like $uncommittedThread->getThreadLinkUrl, qr/\?revision=\d+/, 'uncommitted threads do have a revision query param';
+$collab->update({threadsPerPage => 0, postsPerPage => 0,});
+lives_ok { $uncommittedThread->getThreadLinkUrl } '... works when pagination set to 0';
+$collab->update({threadsPerPage => 3, postsPerPage => 10,});
 
 note 'getCSLinkUrl';
 my @newThreads;
@@ -82,5 +86,7 @@ like $newThreads[-1]->getCSLinkUrl, qr/^$csUrl/, 'getCsLinkUrl returns URL of th
 like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1/, 'and has the right page number';
 like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1;sortBy=lineage;sortOrder=desc/, 'and has the right sort parameters';
 like $thread->getCSLinkUrl, qr/\?pn=2/, 'checking 2nd thread on another page';
+$collab->update({threadsPerPage => 0, postsPerPage => 0,});
+lives_ok { $uncommittedThread->getCSLinkUrl } '... works when pagination set to 0';
 
 # vim: syntax=perl filetype=perl

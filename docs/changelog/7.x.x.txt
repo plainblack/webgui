@@ -3,6 +3,7 @@
  - fixed #11458: Use packed template removes wanted whitespace
  - fixed #11459: "default template" warning after upgrade to 7.8.14
  - fixed #11456: Delete a wiki (Reopen #11446 - subscription groups)
+ - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
 
 7.8.14
  - fixed #11442: PickLanguage template missing after 7.7 to 7.8 upgrade

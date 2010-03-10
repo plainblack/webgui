@@ -352,7 +352,8 @@ sub getCSLinkUrl {
 	my $self = shift;
     my $url;
     my $cs         = $self->getParent;
-    my $page_size  = $cs->get('threadsPerPage');
+    my $paginator  = WebGUI::Paginator->new($self->session, '', $self->getParent->get('threadsPerPage'));
+    my $page_size  = $paginator->{_rpp}; ##To make sure defaults are handled correctly.
     my $place      = $self->getRank+1;
     my $last_place = $cs->getLastChild->getRank+1;
     my $page       = int(($last_place - $place)/$page_size) + 1;
