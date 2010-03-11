@@ -41,13 +41,14 @@ use JSON                qw( from_json to_json );
 use Scope::Guard;
 use WebGUI::Paths -inc;
 
-our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir( $file_root, (File::Spec->updir) x 3, 'supporting_collateral');
-
-BEGIN {
-    our $WEBGUI_ROOT = Cwd::realpath( File::Spec->catdir( $file_root, (File::Spec->updir) x 3 ));
-    our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
-    our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_ROOT, 'lib' );
-}
+our $WEBGUI_TEST_ROOT = File::Spec->catdir(
+    File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], ''),
+    (File::Spec->updir) x 2, 'supporting_collateral'
+);
+our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir(
+    $WEBGUI_TEST_ROOT,
+    'supporting_collateral'
+);
 
 use WebGUI::Asset;
 use WebGUI::Session;
@@ -72,7 +73,7 @@ sub import {
     die "WEBGUI_CONFIG path '$CONFIG_FILE' is not readable by effective uid '$>'.\n"
         unless -r _;
 
-    $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, File::Spec->catdir($CLASS->root, 'etc'));
+    $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, WebGUI::Paths->configBase);
     my $session = our $SESSION = $CLASS->newSession(1);
 
     my $originalSetting = clone $session->setting->get;
@@ -433,6 +434,8 @@ sub getTestCollateralPath {
 Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
 
 =cut
+
+our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_TEST_ROOT, File::Spec->updir );
 
 sub lib {
     return our $WEBGUI_LIB;
