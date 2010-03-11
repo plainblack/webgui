@@ -53,7 +53,7 @@ else {
 if (defined $asset) {
 	my $file;
 	if ($toFile) {
-        open $file '>', $toFile or die "Can't open file $toFile for writing. $!";
+        open $file, '>', $toFile or die "Can't open file $toFile for writing. $!";
 		$session->output->setHandle($file);
 	}
 	my $content = $asset->www_view;

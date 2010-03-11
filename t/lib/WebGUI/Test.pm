@@ -43,7 +43,7 @@ use WebGUI::Paths -inc;
 
 our $WEBGUI_TEST_ROOT = File::Spec->catdir(
     File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], ''),
-    (File::Spec->updir) x 2, 'supporting_collateral'
+    (File::Spec->updir) x 2
 );
 our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir(
     $WEBGUI_TEST_ROOT,
