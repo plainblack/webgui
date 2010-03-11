@@ -16,7 +16,8 @@ use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 
-use Test::More tests => 16;
+use Test::More;
+#use Test::More tests => 17;
 use Test::Deep;
 use Test::Exception;
 
@@ -174,3 +175,28 @@ my $session = WebGUI::Test->session;
         '... checking inherited class'
     );
 }
+
+{
+    package WGT::Class5;
+    use Moose;
+    use WebGUI::Definition;
+
+    property  'traitorous' => (
+        noFormPost => 1,
+        traits  => ['Array'],
+        isa     => 'ArrayRef',
+        is      => 'ro',
+        handles => {
+            pop_traitor => 'pop',
+            push_traitor => 'push',
+        },
+        default => sub { [] },
+    );
+
+    my $object5 = WGT::Class5->new({session => $session});
+    $object5->push_traitor('Boggs');
+    ::cmp_deeply($object5->traitorous, ['Boggs'], 'push_traitor handler worked');
+
+}
+
+done_testing();
