@@ -65,7 +65,8 @@ is($dumper->Dump, q|$VAR1 = {
 #----------------------------------------------------------------------------
 # Test find and findAndLoad
 { # Block to localize @INC
-    local @INC  = ( File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'Pluggable', 'lib' );
+    my $lib = File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'Pluggable', 'lib' );
+    local @INC  = ( $lib );
 
     # Use the i18n files to test
     my @testFiles   = ();

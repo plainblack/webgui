@@ -158,7 +158,7 @@ sub new {
     my $filename = shift;
     my $noCache = shift;
     if (!File::Spec->file_name_is_absolute($filename)) {
-        Cwd::realpath($filename = File::Spec->catfile(WebGUI::Paths->configBase, $filename));
+        $filename = Cwd::realpath(File::Spec->catfile(WebGUI::Paths->configBase, $filename));
     }
     if (exists $config{$filename}) {
         return $config{$filename};
