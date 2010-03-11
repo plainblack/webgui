@@ -49,7 +49,7 @@ BEGIN {
         spectreConfig      => catfile($root, 'etc', 'spectre.conf'),
         preloadCustom      => catfile($root, 'etc', 'preload.custom'),
         preloadExclusions  => catfile($root, 'etc', 'preload.exclude'),
-        upgrades           => catdir($root, 'docs', 'upgrades'),
+        upgrades           => catdir($root, 'var', 'upgrades'),
         extras             => catdir($root, 'www', 'extras'),
         defaultUploads     => catdir($root, 'www', 'uploads'),
         defaultCreateSQL   => catdir($root, 'docs', 'create.sql'),
