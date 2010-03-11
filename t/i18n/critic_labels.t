@@ -33,6 +33,6 @@ if ($@) {
 # Init
 my $session         = WebGUI::Test->session;
 
-my $label_profile = Path::Class::File->new( WebGUI::Test->root , 't', 'i18n', 'perlcriticrc');
+my $label_profile = Path::Class::File->new( $FindBin::Bin )->parent->file('i18n', 'perlcriticrc');
 Test::Perl::Critic->import(-profile => $label_profile->stringify);
 all_critic_ok(WebGUI::Test->lib);

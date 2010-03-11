@@ -39,7 +39,7 @@ These methods are available from this class:
 =cut
 
 BEGIN {
-    use Sub::Name qw(subname);
+    use Class::MOP;
     my $root = realpath(catdir(
         catpath((splitpath(__FILE__))[0,1], ''), (updir) x 2
     ));
@@ -47,18 +47,18 @@ BEGIN {
         configBase         => catdir($root, 'etc'),
         logConfig          => catfile($root, 'etc', 'log.conf'),
         spectreConfig      => catfile($root, 'etc', 'spectre.conf'),
-        upgrades           => catfile($root, 'docs', 'upgrades'),
         preloadCustom      => catfile($root, 'etc', 'preload.custom'),
         preloadExclusions  => catfile($root, 'etc', 'preload.exclude'),
+        upgrades           => catdir($root, 'docs', 'upgrades'),
         extras             => catdir($root, 'www', 'extras'),
         defaultUploads     => catdir($root, 'www', 'uploads'),
         defaultCreateSQL   => catdir($root, 'docs', 'create.sql'),
         var                => catdir($root, 'var'),
     );
+    my $meta = Class::MOP::Class->initialize(__PACKAGE__);
     for my $sub (keys %paths) {
         my $path = $paths{$sub};
-        no strict 'refs';
-        *{$sub} = subname $sub => sub () { $path };
+        $meta->add_method( $sub, sub () { $path } );
     }
 }
 
@@ -77,7 +77,7 @@ sub import {
         }
     }
     if (@invalid) {
-        die 'Invalid options ' . join(', ', @invalid);
+        croak 'Invalid options ' . join(', ', @invalid);
     }
 }
 
@@ -105,7 +105,8 @@ sub preloadPaths {
     try {
         @paths = grep {
             (-d) ? 1 : do {
-                warn "WARNING: Not adding lib directory '$_' from @{[$class->preloadCustom]}: Directory does not exist.\n";
+                warn "WARNING: Not adding lib directory '$_' from "
+                    . $class->preloadCustom . ": Directory does not exist.\n";
                 0;
             }
         } _readTextLines($class->preloadCustom);
@@ -132,7 +133,7 @@ sub preloadAll {
 
     WebGUI::Pluggable::findAndLoad( 'WebGUI', {
         exclude     => \( $class->preloadExclude ),
-        onLoadFail  => sub { warn sprintf 'Error loading %s: %s', @_ },
+        onLoadFail  => sub { warn sprintf "Error loading %s: %s\n", @_ },
     });
 }
 

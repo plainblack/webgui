@@ -19,7 +19,6 @@ use File::Basename qw(basename);
 
 my $config     = WebGUI::Test->config;
 my $configFile = WebGUI::Test->file;
-my $webguiRoot = WebGUI::Test->root;
 
 ok( defined $config, "load config" );
 ok( $config->get("dsn") ne "", "get()" );

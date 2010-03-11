@@ -19,8 +19,9 @@ use WebGUI::Session;
 
 use Test::More tests => 90; # increment this value for each test you create
 
-installBadLocale();
- 
+local @INC = @INC;
+unshift @INC, File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'Session-DateTime', 'lib' );
+
 my $session = WebGUI::Test->session;
 
 my $dt = $session->datetime;
@@ -298,13 +299,3 @@ $session->user({user => $dude});
 is($dt->epochToHuman($wgbday), '8/16/2001  9:00 pm', 'epochToHuman: constructs a default locale if the language does not provide one.');
 $session->user({userId => 1});
 
-sub installBadLocale {
-	copy(
-		WebGUI::Test->getTestCollateralPath('BadLocale.pm'),
-		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/)
-	);
-}
-
-END {
-	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/);
-}

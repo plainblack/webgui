@@ -164,7 +164,7 @@ sub new {
         return $config{$filename};
     }
     else {
-        my $self = $class->SUPER::new($fullPath);
+        my $self = $class->SUPER::new($filename);
         $config{$filename} = $self unless $noCache;
         return $self;
     }
@@ -186,7 +186,7 @@ sub readAllConfigs {
     my @configs = WebGUI::Paths->siteConfigs;
     my %configs = map {
         $_ => $class->new($_);
-    } @configs
+    } @configs;
     return \%configs;
 }
 

@@ -59,7 +59,7 @@ plan tests => $numTests;
 
 foreach my $testSet (@testSets) {
 	my $file = $testSet->{input}
-		 ? join '/', WebGUI::Test->root, 'www/extras', $testSet->{input}
+		 ? join '/', WebGUI::Paths->extras, $testSet->{input}
 		 : $testSet->{input};
 	my $output = WebGUI::Macro::FetchMimeType::process($session, $file);
 	is($output, $testSet->{output}, $testSet->{comment} );

@@ -28,7 +28,6 @@ use Test::More; # increment this value for each test you create
 my $numTests = 0;
 
 my $session = WebGUI::Test->session;
-my $lib = WebGUI::Test->lib;
 
 ## Remove all macros but International, and set them to call WebGUI::Macro::Callback
 my $originalMacros = $session->config->get('macros');

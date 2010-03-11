@@ -39,30 +39,14 @@ use List::MoreUtils     qw( any );
 use Carp                qw( carp croak );
 use JSON                qw( from_json to_json );
 use Scope::Guard;
+use WebGUI::Paths -inc;
+
+our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir( $file_root, (File::Spec->updir) x 3, 'supporting_collateral');
 
 BEGIN {
-    my $file_root = File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], '');
-
     our $WEBGUI_ROOT = Cwd::realpath( File::Spec->catdir( $file_root, (File::Spec->updir) x 3 ));
     our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
     our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_ROOT, 'lib' );
-
-    push @INC, $WEBGUI_LIB;
-
-    ##Handle custom loaded library paths
-    my $customPreload = File::Spec->catfile( $WEBGUI_ROOT, 'sbin', 'preload.custom');
-    if (-e $customPreload) {
-        open my $PRELOAD, '<', $customPreload or
-            croak "Unload to open $customPreload: $!\n";
-        LINE: while (my $line = <$PRELOAD>) {
-            $line =~ s/#.*//;
-            $line =~ s/^\s+//;
-            $line =~ s/\s+$//;
-            next LINE if !$line;
-            unshift @INC, $line;
-        }
-        close $PRELOAD;
-    }
 }
 
 use WebGUI::Asset;
@@ -169,7 +153,7 @@ If true, the session won't be registered for automatic deletion.
 sub newSession {
     my $noCleanup = shift;
     my $pseudoRequest = WebGUI::PseudoRequest->new;
-    my $session = WebGUI::Session->open( $CLASS->root, $CLASS->file );
+    my $session = WebGUI::Session->open( $CLASS->file );
     $session->{_request} = $pseudoRequest;
     if ( ! $noCleanup ) {
         $CLASS->sessionsToDelete($session);
@@ -452,18 +436,6 @@ Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
 
 sub lib {
     return our $WEBGUI_LIB;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 root ( )
-
-Returns the full path to the WebGUI root directory, usually /data/WebGUI.
-
-=cut
-
-sub root {
-    return our $WEBGUI_ROOT;
 }
 
 #----------------------------------------------------------------------------

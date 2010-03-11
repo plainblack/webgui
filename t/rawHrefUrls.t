@@ -27,6 +27,10 @@ my $numTests = 0;
 
 my $session = WebGUI::Test->session;
 
+##Find the name of the International macro in the user's config file.
+
+#note "International macro name = $international";
+
 ##Regexp setup for parsing out the Macro calls.
 my $macro     = qr{
                     \^

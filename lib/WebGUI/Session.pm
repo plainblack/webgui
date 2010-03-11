@@ -459,7 +459,7 @@ sub open {
 	my $request = shift;
 	my $server = shift;
     my $config;
-    if (try { $configFile->isa('WebGUI::Config' }) {
+    if (eval { $configFile->isa('WebGUI::Config') } ) {
         $config = $configFile;
     }
     else {
