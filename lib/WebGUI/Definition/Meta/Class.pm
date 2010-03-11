@@ -53,21 +53,18 @@ sub add_property {
     if (! (exists $options{noFormPost} || exists $options{label}) ) {
         Moose->throw_error("Must pass either noFormPost or label when making a property");
     }
-    my %form_options;
-    my $prop_meta_roles = $self->property_metaroles;
-    my $prop_meta = $self->_property_metaclass;
+    $options{traits} ||= [];
+    push @{ $options{traits} }, @{ $self->property_metaroles };
+    my $prop_meta = Moose::Meta::Attribute->interpolate_class(\%options);
+    my %form_options = ();
     for my $key ( keys %options ) {
-        if ( ! $prop_meta->find_attribute_by_name($key) ) {
+        if ( ! $prop_meta->meta->find_attribute_by_name($key) ) {
             $form_options{$key} = delete $options{$key};
         }
     }
-    $self->add_attribute(
-        $name,
-        is          => 'rw',
-        traits      => $prop_meta_roles,
-        form        => \%form_options,
-        %options,
-    );
+    $options{is}    = 'rw';
+    $options{form}  = \%form_options;
+    $self->add_attribute( $name, %options );
 }
 
 #-------------------------------------------------------------------
@@ -198,22 +195,6 @@ has property_metaroles => (
     is  => 'ro',
     default => sub { ['WebGUI::Definition::Meta::Property' ] },
 );
-
-has _property_metaclass => (
-    is  => 'ro',
-    lazy => 1,
-    builder => '_build_property_metaclass',
-);
-
-sub _build_property_metaclass {
-    my $self = shift;
-    my $class = Moose::Meta::Class->create_anon_class(
-        superclasses => [ $self->attribute_metaclass ],
-        roles        => $self->property_metaroles,
-        cache        => 1,
-    );
-    return $class;
-}
 
 1;
 
