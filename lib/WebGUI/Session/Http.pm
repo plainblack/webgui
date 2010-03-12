@@ -91,20 +91,7 @@ Retrieves the cookies from the HTTP header and returns a hash reference containi
 
 sub getCookies {
 	my $self = shift;
-	if ($self->session->request) {
-	    if ($self->session->request->isa('WebGUI::Session::Plack')) {
-	        return $self->session->request->{request}->cookies;
-	    }
-	    
-		# Have to require this instead of using it otherwise it causes problems for command-line scripts on some platforms (namely Windows)
-		require APR::Request::Apache2;
-		my $jarHashRef = APR::Request::Apache2->handle($self->session->request)->jar();
-		return $jarHashRef if $jarHashRef;
-		return {};
-	}
-	else {
-		return {};
-	}
+	return $self->session->request ? $self->session->request->cookies : {};
 }
 
 
@@ -219,7 +206,7 @@ sub ifModifiedSince {
     my $self = shift;
     my $epoch = shift;
     require APR::Date;
-    my $modified = $self->session->request->headers_in->{'If-Modified-Since'};
+    my $modified = $self->session->request->header('If-Modified-Since');
     return 1 if ($modified eq "");
     $modified = APR::Date::parse_http($modified);
     return ($epoch > $modified);
@@ -282,32 +269,32 @@ sub sendHeader {
 	$self->setNoHeader(1);
 	my %params;
 	if ($self->isRedirect()) {
-		$request->headers_out->set(Location => $self->getRedirectLocation);
-		$request->status($self->getStatus);
+		$request->new_response->header(Location => $self->getRedirectLocation);
+		$request->new_response->status($self->getStatus);
 	} else {
 		$request->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
 		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
 		# under these circumstances, don't allow caching
 		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
-			$request->headers_out->set("Cache-Control" => "private, max-age=1");
+			$request->new_response->header("Cache-Control" => "private, max-age=1");
 			$request->no_cache(1);
 		} 
 		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
-		else {
-			$request->headers_out->set('Last-Modified' => $date);
-  			$request->headers_out->set('Cache-Control' => "must-revalidate, max-age=" . $cacheControl);
+		else { 
+			$request->new_response->header( 'Last-Modified' => $date);
+  			$request->new_response->header( 'Cache-Control' => "must-revalidate, max-age=" . $cacheControl );
 			# do an extra incantation if the HTTP protocol is really old
 			if ($request->protocol =~ /(\d\.\d)/ && $1 < 1.1) {
 				my $date = $datetime->epochToHttp(time() + $cacheControl);
-  				$request->headers_out->set('Expires' => $date);
+  				$request->new_response->header( 'Expires' => $date );
 			}
   		}
 		if ($self->getFilename) {
-                        $request->headers_out->set('Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
+            $request->new_response->headers( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
 		}
-		$request->status($self->getStatus());
-		$request->status_line($self->getStatus().' '.$self->getStatusDescription());
+		$request->new_response->status($self->getStatus());
+#		$request->new_response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	}
 	return undef;
 }
@@ -316,10 +303,10 @@ sub _sendMinimalHeader {
 	my $self = shift;
 	my $request = $self->session->request;
 	$request->content_type('text/html; charset=UTF-8');
-	$request->headers_out->set('Cache-Control' => 'private');
+	$request->new_response->header('Cache-Control' => 'private');
 	$request->no_cache(1);
-	$request->status($self->getStatus());
-	$request->status_line($self->getStatus().' '.$self->getStatusDescription());
+	$request->response->status($self->getStatus());
+#	$request->response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	return undef;
 }
 
@@ -389,26 +376,12 @@ sub setCookie {
 	$ttl = (defined $ttl ? $ttl : '+10y');
 
 	if ($self->session->request) {
-		if ( $self->session->request->isa('WebGUI::Session::Plack') ) {
-		    $self->session->request->{response}->cookies->{$name} = {
+		$self->session->request->new_response->cookies->{$name} = {
 			value   => $value,
 			path    => '/',
 			expires => $ttl ne 'session' ? $ttl : undef,
 			domain  => $domain,
-		    };
-		}
-		return;
-	    
-		require Apache2::Cookie;
-		my $cookie = Apache2::Cookie->new($self->session->request,
-			-name=>$name,
-			-value=>$value,
-			-path=>'/'
-		);
-
-		$cookie->expires($ttl) if $ttl ne 'session';
-		$cookie->domain($domain) if ($domain);
-		$cookie->bake($self->session->request);
+        };
 	}
 }
 

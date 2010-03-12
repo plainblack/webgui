@@ -71,7 +71,6 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->privilege
  $session->request
  $session->scratch
- $session->server
  $session->setting
  $session->stow
  $session->style
@@ -424,7 +423,7 @@ sub log {
 
 #-------------------------------------------------------------------
 
-=head2 open ( webguiRoot, configFile [, requestObject, serverObject, sessionId, noFuss ] )
+=head2 open ( webguiRoot, configFile [, requestObject, sessionId, noFuss ] )
 
 Constructor. Opens a closed ( or new ) WebGUI session.
 
@@ -438,11 +437,7 @@ The filename of the config file that WebGUI should operate from.
 
 =head3 requestObject
 
-The Apache request object (aka $r). If this session is being instanciated from the web, this is required.
-
-=head3 serverObject
-
-The Apache server object (Apache2::ServerUtil). If this session is being instanciated from the web, this is required.
+The Plack::Request object. If this session is being instanciated from the web, this is required.
 
 =head3 sessionId
 
@@ -459,23 +454,10 @@ sub open {
 	my $webguiRoot = shift;
 	my $configFile = shift;
 	my $request = shift;
-	my $server = shift;
-	my $config = WebGUI->config || WebGUI::Config->new($webguiRoot,$configFile);
-	my $self = {_config=>$config, _server=>$server};
+	my $config = WebGUI::Config->new($webguiRoot,$configFile);
+	my $self = {_config=>$config };
 	bless $self , $class;
-    
-    # $self->{_request} = $request if (defined $request);
-    if ($request) {
-        if ($request->isa('WebGUI::Session::Plack')) {
-            # Use our WebGUI::Session::Plack object that is supposed to do everything Apache2::* can
-            $self->{_request} = $request;
-        } else {
-            # Use WebGUI::Session::Request to wrap Apache2::* calls
-            require WebGUI::Session::Request;
-            $self->{_request} = WebGUI::Session::Request->new( r => $request, session => $self );
-        }
-    }
-	
+	$self->{_request} = $request if (defined $request);
 	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
@@ -559,7 +541,7 @@ sub quick {
 
 =head2 request ( )
 
-Returns the Apache request (aka $r) object, or undef if it doesn't exist.
+Returns the Plack::Request object, or undef if it doesn't exist.
 
 =cut
 
@@ -588,13 +570,13 @@ sub scratch {
 
 =head2 server ( )
 
-Returns the Apache server object (Apache2::ServerUtil), or undef if it doesn't exist.
+DEPRECATED (used to return the Apache2::ServerUtil object)
 
 =cut
 
 sub server {
 	my $self = shift;
-	return $self->{_server};
+	$self->log->fatal('WebGUI::Session::server is deprecated');
 }
 
 #-------------------------------------------------------------------

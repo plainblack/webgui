@@ -62,7 +62,7 @@ sub handler {
 			    unless ($privs[1] eq "7" || $privs[1] eq "1") {
 					my $session = $request->pnotes('wgSession');
 					unless (defined $session) {
-						$session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
+#						$session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request);
 					}
 				    my $hasPrivs = ($session->var->get("userId") eq $privs[0] || $session->user->isInGroup($privs[1]) || $session->user->isInGroup($privs[2]));
 				    $session->close();

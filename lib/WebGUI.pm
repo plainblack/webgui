@@ -20,18 +20,17 @@ our $STATUS = 'beta';
 =cut
 
 use strict;
-use Apache2::Access (); 
-use Apache2::Const -compile => qw(OK DECLINED HTTP_UNAUTHORIZED SERVER_ERROR);
-use Apache2::Request;
-use Apache2::RequestIO;
-use Apache2::RequestUtil ();
-use Apache2::ServerUtil ();
-use APR::Request::Apache2;
 use MIME::Base64 ();
 use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Session;
 use WebGUI::User;
+use Any::Moose;
+use Plack::Request;
+
+has root    => ( is => 'ro', required => 1 ); # WEBGUI_ROOT
+has config  => ( is => 'ro', required => 1 ); # WEBGUI_CONFIG
+has session => ( is => 'rw', isa => 'WebGUI::Session' );
 
 =head1 NAME
 
@@ -39,7 +38,7 @@ Package WebGUI
 
 =head1 DESCRIPTION
 
-An Apache mod_perl handler for WebGUI.
+PSGI handler for WebGUI.
 
 =head1 SYNOPSIS
 
@@ -59,7 +58,7 @@ HTTP Basic auth for WebGUI.
 
 =head3 requestObject
 
-The Apache2::RequestRec object passed in by Apache's mod_perl.
+The Plack::Request object instantiated from the PSGI env hash
 
 =head3 user
 
@@ -75,46 +74,43 @@ A reference to a WebGUI::Config object. One will be created if it isn't specifie
 
 =cut
 
-
 sub authen {
-    my ($request, $username, $password, $config) = @_;
-    my $server;
-    if ($request->isa('WebGUI::Session::Plack')) {
-        $server  = $request->server;
-    } else {
-        $request = Apache2::Request->new($request);
-        $server  = Apache2::ServerUtil->server;	#instantiate the server api
-    }
-	my $status = Apache2::Const::OK;
+    my ($self, $request, $username, $password, $config) = @_;
+    
+    my $response = $request->new_response( 200 );
+    
+#	# set username and password if it's an auth handler
+#	if ($username eq "") {
+#		if ($request->auth_type eq "Basic") {
+##			($status, $password) = $request->get_basic_auth_pw; # TODO - don't think this is supported by Plack::Request
+#			$username = $request->user;
+#		}
+#		else {
+#		    $response->status( 401 ); # HTTP_UNAUTHORIZED;
+#		    return;
+#		}
+#	}
 
-	# set username and password if it's an auth handler
-	if ($username eq "") {
-		if ($request->auth_type eq "Basic") {
-			($status, $password) = $request->get_basic_auth_pw;
-			$username = $request->user;
-		}
-		else {
-			return Apache2::Const::HTTP_UNAUTHORIZED;
-		}
-	}
-
-	$config ||= WebGUI::Config->new($server->dir_config('WebguiRoot'),$request->dir_config('WebguiConfig'));
-	my $cookies = APR::Request::Apache2->handle($request)->jar();
+	$config ||= WebGUI::Config->new( $self->root, $self->config );
    
 	# determine session id
-	my $sessionId = $cookies->{$config->getCookieName};
-	my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'),$config->getFilename, $request, $server, $sessionId);
-	my $log = $session->log;
-	$request->pnotes(wgSession => $session);
+	my $sessionId = $request->cookies->{$config->getCookieName};
+
+    # Instantiate the session object
+    my $session = $self->session( WebGUI::Session->open($self->root, $self->config, $request, $sessionId) );
+    my $log = $session->log;
+#	$request->pnotes(wgSession => $session); # TODO - no more pnotes
 
 	if (defined $sessionId && $session->user->isRegistered) { # got a session id passed in or from a cookie
 		$log->info("BASIC AUTH: using cookie");
-		return Apache2::Const::OK;
+		$response->status( 200 ); # OK;
+		return;
 	}
-	elsif ($status != Apache2::Const::OK) { # prompt the user for their username and password
-		$log->info("BASIC AUTH: prompt for user/pass");
-		return $status; 
-	}
+	# TODO - put this back in once we figure out get_basic_auth_pw
+#	elsif ($status != 200) { # prompt the user for their username and password
+#		$log->info("BASIC AUTH: prompt for user/pass");
+#		return $status; 
+#	}
 	elsif (defined $username && $username ne "") { # no session cookie, let's try to do basic auth
 		$log->info("BASIC AUTH: using user/pass");
 		my $user = WebGUI::User->newByUsername($session, $username);
@@ -124,7 +120,8 @@ sub authen {
 				my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod ] ) };
 				if ($@) { # got an error
 					$log->error($@);
-					return Apache2::Const::SERVER_ERROR;
+					$response->status( 500 ); # SERVER_ERROR
+					return;
 				}
 				elsif ($auth->authenticate($username, $password)) { # lets try to authenticate
 					$log->info("BASIC AUTH: authenticated successfully");
@@ -136,116 +133,90 @@ sub authen {
 					}
 					$session->{_var} = WebGUI::Session::Var->new($session, $sessionId);
 					$session->user({user=>$user});
-					return Apache2::Const::OK;
+					$response->status( 200 ); # OK
+					return;
 				}
 			}
 		}
 		$log->security($username." failed to login using HTTP Basic Authentication");
 		$request->note_basic_auth_failure;
-		return Apache2::Const::HTTP_UNAUTHORIZED;
+		$response->status( 401 ); # HTTP_UNAUTHORIZED;
+        return;
 	}
 	$log->info("BASIC AUTH: skipping");
-	return Apache2::Const::HTTP_UNAUTHORIZED;
+	$response->status( 401 ); # HTTP_UNAUTHORIZED;
+    return;
 }
 
 #-------------------------------------------------------------------
 
-=head2 handler ( requestObject )
+=head2 run ( env )
 
 Primary http init/response handler for WebGUI.  This method decides whether to hand off the request to contentHandler() or uploadsHandler()
 
-=head3 requestObject
+=head3 env
 
-The Apache2::RequestRec object passed in by Apache's mod_perl.
+The PSGI environment hash
 
 =cut
 
-sub handler {
-    my $request = shift; # either apache request object or PSGI env hash
-    my ($server, $config);
-    if ($request->isa('WebGUI::Session::Plack')) {
-        $server  = $request->server;
-        $config = WebGUI->config; # use our cached version
-    } else {
-        $request = Apache2::Request->new($request);
-        $server  = Apache2::ServerUtil->server;	#instantiate the server api
-        my $configFile = shift || $request->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
-        $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
-    }
-	
-    my $error = "";
+sub run {
+    my ($self, $env) = @_;
+    
+    my $request = Plack::Request->new( $env );
+    my $response = $request->new_response( 200 );
+    my $config  = WebGUI::Config->new( $self->root, $self->config );
+    
     my $matchUri = $request->uri;
     my $gateway = $config->get("gateway");
     $matchUri =~ s{^$gateway}{/};
-	my $gotMatch = 0;
 
     # handle basic auth
-    my $auth = $request->headers_in->{'Authorization'};
-    if ($auth =~ m/^Basic/) { # machine oriented
-	    # Get username and password from Apache and hand over to authen
+    my $auth = $request->header('Authorization');
+    if ($auth && $auth =~ m/^Basic/) { # machine oriented
+	    # Get username and password and hand over to authen
         $auth =~ s/Basic //;
-        authen($request, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
+        $self->authen($request, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
     }
     else { # realm oriented
-	    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
+        # TODO - what to do here? Should we check response status after call to authen?
+#	    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
+        $self->authen($request, undef, undef, $config);
     }
-
 	
 	# url handlers
+	# TODO - rip out urlHandler API - convert all to middleware
+	# all remaining url handlers (probably just Asset which might get converted to something else) should
+	# set $repsonse->body (e.g. so they can set it to IO) -- they no longer return $output
+	my $error = "";
+	my $gotMatch = 0;
+	
+	# TODO - would now be a time to fix the WEBGUI_FATAL label black magic?
     WEBGUI_FATAL: foreach my $handler (@{$config->get("urlHandlers")}) {
         my ($regex) = keys %{$handler};
         if ($matchUri =~ m{$regex}i) {
-            my $output = eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $server, $config]) };
+            eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $self->session]) };
             if ($@) {
 				$error = $@;
                 last;
             }
             else {
+                # Record that at least one url handler ran successfully
 				$gotMatch = 1;
-				if ($output ne Apache2::Const::DECLINED) {
-					return $output;
+				
+				# But only return response if body was set
+				if (defined $response->body ) { # or maybe get a smarter way for url handlers to flag success - b/c this may break delayed IO
+				    return $response->finalize;
 				}
             }
         }
 	}
-	return Apache2::Const::DECLINED if ($gotMatch);
 	
-	# can't handle the url due to error or misconfiguration
-    $request->push_handlers(PerlResponseHandler => sub { 
-        print "This server is unable to handle the url '".$request->uri."' that you requested. ".$error;
-        return Apache2::Const::OK;
-    } );
-	$request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
-	return Apache2::Const::DECLINED; 
+	if ( !$gotMatch ) {
+        # can't handle the url due to error or misconfiguration
+        $response->body( "This server is unable to handle the url '".$request->uri."' that you requested. ".$error );
+    }
+	return $response->finalize;
 }
-
-
-
-sub handle_psgi {
-    my $env = shift;
-    require WebGUI::Session::Plack;
-    my $plack = WebGUI::Session::Plack->new( env => $env );
-    
-    # returns something like Apache2::Const::OK, which we ignore
-    my $ret = handler($plack);
-    
-    # let Plack::Response do its thing
-    return $plack->finalize;
-}
-
-# Experimental speed boost
-my ($root, $config_file, $config);
-sub init {
-    my $class = shift;
-    my %opts = @_;
-    $root = $opts{root};
-    $config_file = $opts{config};
-    $config = WebGUI::Config->new($root, $config_file);
-    warn 'INIT';
-}
-sub config { $config }
-sub root { $root }
-sub config_file { $config_file }
 
 1;
-

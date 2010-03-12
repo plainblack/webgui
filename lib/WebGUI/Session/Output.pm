@@ -95,7 +95,17 @@ sub print {
         print $handle $content;
     }
     elsif ($self->session->request) {
-        $self->session->request->print($content);
+        # TODO - take away this hack
+        if (ref $self->session->request->body eq 'ARRAY') {
+            push @{$self->session->request->body}, $content;
+        } else {
+            if ($self->session->request->logger) {
+                $self->session->request->logger->({ level => 'warn', message => "dropping content: $content" });
+            } else {
+                warn "dropping content: $content";
+            }
+        }
+#        $self->session->request->print($content);
     }
     else {
         print $content;

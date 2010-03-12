@@ -69,15 +69,11 @@ sub _handle_static {
         close($FILE);
         my @privs = split("\n", $fileContents);
         unless ($privs[1] eq "7" || $privs[1] eq "1") {
+            my $request = Plack::Request->new( $env );
             
-            # Construct request,server,config in the usual way
-            require WebGUI::Session::Plack;
-            my $request = WebGUI::Session::Plack->new( env => $env );
-            my $server = $request->server;
-            
-            my $session = $request->pnotes('wgSession');
+#            my $session = $request->pnotes('wgSession');
             unless (defined $session) {
-                $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $request->dir_config('WebguiConfig'), $request, $server);
+#                $session = WebGUI::Session->open($env->{dir_config('WebguiRoot'), $request->dir_config('WebguiConfig'), $request );
             }
             my $hasPrivs = ($session->var->get("userId") eq $privs[0] || $session->user->isInGroup($privs[1]) || $session->user->isInGroup($privs[2]));
             $session->close();
