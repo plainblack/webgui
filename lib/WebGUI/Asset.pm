@@ -21,7 +21,7 @@ use HTML::Packer;
 
 use Moose;
 use WebGUI::Definition::Asset;
-define assetName  => 'asset';
+define assetName  => ['asset', 'Asset'];
 define tableName  => 'assetData';
 define icon       => 'assets.gif';
 property  title => (
