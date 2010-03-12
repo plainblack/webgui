@@ -39,5 +39,8 @@ use Test::Asset::Wobject::Map;
 use Test::Asset::Wobject::Matrix;
 use Test::Asset::Wobject::MessageBoard;
 use Test::Asset::Wobject::MultiSearch;
+use Test::Asset::Wobject::Navigation;
+use Test::Asset::Wobject::Poll;
+use Test::Asset::Wobject::ProjectManager;
 
 Test::Class->runtests;
