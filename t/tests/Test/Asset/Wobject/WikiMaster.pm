@@ -1,3 +1,4 @@
+package Test::Asset::Wobject::WikiMaster;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -8,5 +9,21 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Test::Class::Load qw/tests/;
-Test::Class->runtests;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use base qw/Test::AssetBase/;
+
+use Test::More;
+use Test::Deep;
+use Test::Exception;
+
+sub class {
+     return qw/WebGUI::Asset::Wobject::WikiMaster/;
+}
+
+sub list_of_tables {
+     return [qw/assetData wobject WikiMaster assetAspectRssFeed assetAspectComments assetAspect_Subscribable/];
+}
+
+1;

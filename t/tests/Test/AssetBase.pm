@@ -206,11 +206,11 @@ sub keywords : Test(3) {
     is $asset->get('keywords'), 'chess set', 'via get method';
 }
 
-sub keywords : Test(1) {
+sub get_tables : Test(1) {
     my $test    = shift;
     note "get_tables";
     my @tables = $test->class->meta->get_tables;
-    cmp_deeply(
+    cmp_bag(
         \@tables,
         $test->list_of_tables,
         'Set of tables for properties is correct'
