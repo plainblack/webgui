@@ -635,19 +635,6 @@ sub getThumbnailUrl {
 
 #----------------------------------------------------------------------------
 
-=head2 othersCanAdd ( )
-
-Returns true if people other than the owner can add files to this album.
-
-=cut
-
-sub othersCanAdd {
-    my $self        = shift;
-    return $self->othersCanAdd;
-}
-
-#----------------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
