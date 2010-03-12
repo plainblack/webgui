@@ -12,7 +12,7 @@ package Test::WebGUI::Asset::Wobject::DataTable;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use base qw/Test::WebGUI::AssetBase/;
+use base qw/Test::WebGUI::Asset/;
 
 use Test::WebGUI::More;
 use Test::WebGUI::Deep;

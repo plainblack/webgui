@@ -1,4 +1,4 @@
-package Test::WebGUI::AssetBase;
+package Test::WebGUI::Asset;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -12,21 +12,13 @@ package Test::WebGUI::AssetBase;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use base qw/Test::Class/;
+use base qw/My::Test::Class/;
 use WebGUI::Test;
 
 use Test::More;
 use Test::Deep;
 use Test::Exception;
 use WebGUI::Exception;
-
-sub session {
-     return shift->{_session};
-}
-
-sub class {
-     return qw/WebGUI::Asset/;
-}
 
 sub assetUiLevel {
      return 1;
