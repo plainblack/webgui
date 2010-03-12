@@ -33,5 +33,11 @@ use Test::Asset::Wobject::Folder;
 use Test::Asset::Wobject::Gallery;
 use Test::Asset::Wobject::GalleryAlbum;
 use Test::Asset::Wobject::HttpProxy;
+use Test::Asset::Wobject::InOutBoard;
+use Test::Asset::Wobject::Layout;
+use Test::Asset::Wobject::Map;
+use Test::Asset::Wobject::Matrix;
+use Test::Asset::Wobject::MessageBoard;
+use Test::Asset::Wobject::MultiSearch;
 
 Test::Class->runtests;
