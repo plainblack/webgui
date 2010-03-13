@@ -258,7 +258,7 @@ sub sendHeader {
 	return undef if ($self->{_http}{noHeader});
 	return $self->_sendMinimalHeader unless defined $self->session->db(1);
 
-	my ($request, $datetime, $config, $var) = $self->session->quick(qw(request datetime config var));
+	my ($request, $response, $datetime, $config, $var) = $self->session->quick(qw(request response datetime config var));
 	return undef unless $request;
 	my $userId = $var->get("userId");
 	
@@ -269,44 +269,44 @@ sub sendHeader {
 	$self->setNoHeader(1);
 	my %params;
 	if ($self->isRedirect()) {
-		$request->new_response->header(Location => $self->getRedirectLocation);
-		$request->new_response->status($self->getStatus);
+		$response->header(Location => $self->getRedirectLocation);
+		$response->status($self->getStatus);
 	} else {
 		$request->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
 		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
 		# under these circumstances, don't allow caching
 		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
-			$request->new_response->header("Cache-Control" => "private, max-age=1");
+			$response->header("Cache-Control" => "private, max-age=1");
 			$request->no_cache(1);
 		} 
 		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
 		else { 
-			$request->new_response->header( 'Last-Modified' => $date);
-  			$request->new_response->header( 'Cache-Control' => "must-revalidate, max-age=" . $cacheControl );
+			$response->header( 'Last-Modified' => $date);
+  			$response->header( 'Cache-Control' => "must-revalidate, max-age=" . $cacheControl );
 			# do an extra incantation if the HTTP protocol is really old
 			if ($request->protocol =~ /(\d\.\d)/ && $1 < 1.1) {
 				my $date = $datetime->epochToHttp(time() + $cacheControl);
-  				$request->new_response->header( 'Expires' => $date );
+  				$response->header( 'Expires' => $date );
 			}
   		}
 		if ($self->getFilename) {
-            $request->new_response->headers( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
+            $response->headers( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
 		}
-		$request->new_response->status($self->getStatus());
-#		$request->new_response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
+		$response->status($self->getStatus());
+#		$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	}
 	return undef;
 }
 
 sub _sendMinimalHeader {
 	my $self = shift;
-	my $request = $self->session->request;
-	$request->content_type('text/html; charset=UTF-8');
-	$request->new_response->header('Cache-Control' => 'private');
-	$request->no_cache(1);
-	$request->response->status($self->getStatus());
-#	$request->response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
+	my $response = $self->session->response;
+	$response->content_type('text/html; charset=UTF-8');
+	$response->header('Cache-Control' => 'private');
+	$response->no_cache(1);
+	$response->status($self->getStatus());
+#	$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	return undef;
 }
 
@@ -375,14 +375,12 @@ sub setCookie {
 	my $domain = shift;
 	$ttl = (defined $ttl ? $ttl : '+10y');
 
-	if ($self->session->request) {
-		$self->session->request->new_response->cookies->{$name} = {
-			value   => $value,
-			path    => '/',
-			expires => $ttl ne 'session' ? $ttl : undef,
-			domain  => $domain,
-        };
-	}
+	$self->session->response->cookies->{$name} = {
+        value   => $value,
+        path    => '/',
+        expires => $ttl ne 'session' ? $ttl : undef,
+        domain  => $domain,
+    };
 }
 
 

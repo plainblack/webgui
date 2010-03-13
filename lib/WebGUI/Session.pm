@@ -70,6 +70,7 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->os
  $session->privilege
  $session->request
+ $session->response
  $session->scratch
  $session->setting
  $session->stow
@@ -457,7 +458,8 @@ sub open {
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_config=>$config };
 	bless $self , $class;
-	$self->{_request} = $request if (defined $request);
+	$self->{_request} = $request if defined $request;
+	$self->{_response} = $request->new_response( 200 ) if defined $request;
 	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
@@ -541,13 +543,26 @@ sub quick {
 
 =head2 request ( )
 
-Returns the Plack::Request object, or undef if it doesn't exist.
+Returns the L<Plack::Request> object, or undef if it doesn't exist.
 
 =cut
 
 sub request {
 	my $self = shift;
 	return $self->{_request};
+}
+
+#-------------------------------------------------------------------
+
+=head2 response ( )
+
+Returns the L<Plack::Response> object, or undef if it doesn't exist.
+
+=cut
+
+sub response {
+	my $self = shift;
+	return $self->{_response};
 }
 
 #-------------------------------------------------------------------

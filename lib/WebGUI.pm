@@ -25,11 +25,11 @@ use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Session;
 use WebGUI::User;
-use Any::Moose;
+use Moose;
 use Plack::Request;
 
-has root    => ( is => 'ro', required => 1 ); # WEBGUI_ROOT
-has config  => ( is => 'ro', required => 1 ); # WEBGUI_CONFIG
+has root    => ( is => 'ro', required => 1 ); # WEBGUI_ROOT, e.g. /data/WebGUI
+has config  => ( is => 'ro', required => 1 ); # Site config, e.g. dev.localhost.localdomain.conf
 has session => ( is => 'rw', isa => 'WebGUI::Session' );
 
 =head1 NAME
@@ -77,8 +77,6 @@ A reference to a WebGUI::Config object. One will be created if it isn't specifie
 sub authen {
     my ($self, $request, $username, $password, $config) = @_;
     
-    my $response = $request->new_response( 200 );
-    
 #	# set username and password if it's an auth handler
 #	if ($username eq "") {
 #		if ($request->auth_type eq "Basic") {
@@ -103,7 +101,7 @@ sub authen {
 
 	if (defined $sessionId && $session->user->isRegistered) { # got a session id passed in or from a cookie
 		$log->info("BASIC AUTH: using cookie");
-		$response->status( 200 ); # OK;
+		$session->response->status( 200 ); # OK
 		return;
 	}
 	# TODO - put this back in once we figure out get_basic_auth_pw
@@ -120,7 +118,7 @@ sub authen {
 				my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod ] ) };
 				if ($@) { # got an error
 					$log->error($@);
-					$response->status( 500 ); # SERVER_ERROR
+					$session->response->status( 500 ); # SERVER_ERROR
 					return;
 				}
 				elsif ($auth->authenticate($username, $password)) { # lets try to authenticate
@@ -133,19 +131,33 @@ sub authen {
 					}
 					$session->{_var} = WebGUI::Session::Var->new($session, $sessionId);
 					$session->user({user=>$user});
-					$response->status( 200 ); # OK
+					$session->response->status( 200 ); # OK
 					return;
 				}
 			}
 		}
 		$log->security($username." failed to login using HTTP Basic Authentication");
 		$request->note_basic_auth_failure;
-		$response->status( 401 ); # HTTP_UNAUTHORIZED;
+		$session->response->status( 401 ); # HTTP_UNAUTHORIZED
         return;
 	}
 	$log->info("BASIC AUTH: skipping");
-	$response->status( 401 ); # HTTP_UNAUTHORIZED;
+	$session->response->status( 401 ); # HTTP_UNAUTHORIZED
     return;
+}
+
+sub to_app {
+    my ( $self, $env ) = @_;
+
+    # immediately starts the response and stream the content
+    return sub {
+        my $respond = shift;
+        my $writer = $respond->( [ 200, [ 'Content-Type', 'application/json' ] ] );
+        
+        # IO bound delayed response
+        $writer->write( "hi there\n" );
+        $writer->close;
+    };
 }
 
 #-------------------------------------------------------------------
@@ -164,7 +176,6 @@ sub run {
     my ($self, $env) = @_;
     
     my $request = Plack::Request->new( $env );
-    my $response = $request->new_response( 200 );
     my $config  = WebGUI::Config->new( $self->root, $self->config );
     
     my $matchUri = $request->uri;
@@ -190,6 +201,7 @@ sub run {
 	# set $repsonse->body (e.g. so they can set it to IO) -- they no longer return $output
 	my $error = "";
 	my $gotMatch = 0;
+	my $response = $self->session->response;
 	
 	# TODO - would now be a time to fix the WEBGUI_FATAL label black magic?
     WEBGUI_FATAL: foreach my $handler (@{$config->get("urlHandlers")}) {

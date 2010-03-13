@@ -95,16 +95,18 @@ sub print {
         print $handle $content;
     }
     elsif ($self->session->request) {
-        # TODO - take away this hack
-        if (ref $self->session->request->body eq 'ARRAY') {
-            push @{$self->session->request->body}, $content;
-        } else {
-            if ($self->session->request->logger) {
-                $self->session->request->logger->({ level => 'warn', message => "dropping content: $content" });
-            } else {
-                warn "dropping content: $content";
-            }
-        }
+        # TODO - put in IO bound delayed response
+        warn "content: $content";
+#        $self->session->request->body([]) unless $self->session->request->body();
+#        if (ref $self->session->request->body eq 'ARRAY') {
+#            push @{$self->session->request->body}, $content;
+#        } else {
+#            if ($self->session->request->logger) {
+#                $self->session->request->logger->({ level => 'warn', message => "dropping content: $content" });
+#            } else {
+#                warn "dropping content";#: $content";
+#            }
+#        }
 #        $self->session->request->print($content);
     }
     else {
