@@ -9,8 +9,6 @@ package Test::WebGUI::Asset::Wobject::Survey;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
 
 use base qw/Test::WebGUI::Asset/;
 

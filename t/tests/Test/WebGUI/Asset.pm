@@ -8,17 +8,12 @@ package Test::WebGUI::Asset;
 #-------------------------------------------------------------------
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
-
-use FindBin;
-use lib "$FindBin::Bin/lib";
-
 use base qw/My::Test::Class/;
-use WebGUI::Test;
 
 use Test::More;
 use Test::Deep;
 use Test::Exception;
-use WebGUI::Exception;
+use WebGUI::Test;
 
 sub assetUiLevel {
      return 1;
