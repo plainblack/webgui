@@ -14,13 +14,10 @@ use lib "$FindBin::Bin/lib";
 
 use base qw/Test::WebGUI::Asset/;
 
-use Test::WebGUI::More;
-use Test::WebGUI::Deep;
-use Test::WebGUI::Exception;
+use Test::More;
+use Test::Deep;
+use Test::Exception;
 
-sub class {
-     return qw/WebGUI::Asset::Wobject::DataTable/;
-}
 
 sub list_of_tables {
      return [qw/assetData wobject DataTable/];

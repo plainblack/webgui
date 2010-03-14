@@ -28,18 +28,10 @@ sub list_of_tables {
      return [qw/assetData/];
 }
 
-sub _00_init : Test(startup) {
-    my $test = shift;
-    my $session = WebGUI::Test->session;
-    $test->{_session} = $session;
-    note "Loading ". $test->class;
-    eval { WebGUI::Asset->loadModule($test->class); };
-}
-
 sub _constructor : Test(4) {
     my $test    = shift;
     my $session = $test->session;
-    my $asset = $test->class->new({session => $session});
+    my $asset   = $test->class->new({session => $session});
 
     isa_ok $asset, $test->class;
     isa_ok $asset->session, 'WebGUI::Session';
@@ -318,5 +310,4 @@ __END__
     is $properties->{assetId},  $asset->assetId,   '... works on assetId';
     is $properties->{parentId}, 'I have a parent',  '... works on parentId';
 }
-
 

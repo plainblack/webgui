@@ -8,5 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use lib 'tests';
+
 use Test::Class::Load qw{tests/Test};
 Test::Class->runtests;
