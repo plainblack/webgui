@@ -6,6 +6,7 @@ our $HELP = {
     'view calendar template' => {
         title => 'view calendar title',
         body  => 'view calendar body',
+        private => '1',
         isa   => [
             {   namespace => "Asset_Template",
                 tag       => "template variables"
@@ -64,6 +65,61 @@ our $HELP = {
                 tag             => 'event common variables',
             },
         ],
+    },
+
+    'view month template' => {
+        title => 'view calendar month title',
+        body  => 'view calendar month body',
+        isa   => [
+            {   namespace => "Asset_Calendar",
+                tag       => "view calendar template"
+            },
+        ],
+        fields    => [],
+        variables => [
+            {   'name'      => 'weeks',
+                'variables' => [
+                {   'name'      => 'days',
+                    'variables' => [
+                        { 'name' => 'dayUrl' },
+                        { 'name' => 'dayMonth',
+                          'description' => 'dayOfMonth' },
+                        { 'name' => 'dayCurrent' },
+                        {   'name'        => 'events',
+                            'description' => 'events weekVar',
+                        },
+                    ],
+                },
+                ],
+            },
+            {   'name'        => 'pageNextUrl',
+                'description' => 'pageNextUrl monthVar'
+            },
+            {   'name'        => 'pagePrevUrl',
+                'description' => 'pagePrevUrl monthVar'
+            },
+            { 'name' => 'pageNextYear', },
+            { 'name' => 'pagePrevYear', },
+            { 'name' => 'monthName', },
+            { 'name' => 'monthAbbr', },
+            { 'name' => 'year' },
+            {   'name'      => 'dayNames',
+                'variables' => [
+                    { 'name' => 'dayName' },
+                    { 'name' => 'dayAbbr' },
+                ],
+            },
+            {   'name'      => 'months',
+                'variables' => [
+                    { 'name' => 'monthName' },
+                    { 'name' => 'monthAbbr' },
+                    { 'name' => 'monthEpoch' },
+                    { 'name' => 'monthUrl' },
+                    { 'name' => 'monthCurrent' },
+                ],
+            },
+        ],
+        related => []
     },
 
     'view week template' => {
