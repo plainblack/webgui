@@ -76,112 +76,6 @@ sub BUILD {
 	$self->config( $config );
 }
 
-#-------------------------------------------------------------------
-
-=head2 authen ( requestObject, [ user, pass ])
-
-HTTP Basic auth for WebGUI.
-
-=head3 requestObject
-
-The Plack::Request object instantiated from the PSGI env hash
-
-=head3 user
-
-The username to authenticate with. Will pull from the request object if not specified.
-
-=head3 pass
-
-The password to authenticate with. Will pull from the request object if not specified.
-
-=cut
-
-sub authen {
-    my ($self, $request, $username, $password) = @_;
-    
-#	# set username and password if it's an auth handler
-#	if ($username eq "") {
-#		if ($request->auth_type eq "Basic") {
-##			($status, $password) = $request->get_basic_auth_pw; # TODO - don't think this is supported by Plack::Request
-#			$username = $request->user;
-#		}
-#		else {
-#		    $response->status( 401 ); # HTTP_UNAUTHORIZED;
-#		    return;
-#		}
-#	}
-
-	my $config = $self->config;
-   
-	# determine session id
-	my $sessionId = $request->cookies->{$config->getCookieName};
-
-    # Instantiate the session object
-    my $session = $self->session( WebGUI::Session->open($self->root, $config, $request, $sessionId) );
-    my $log = $session->log;
-#	$request->pnotes(wgSession => $session); # TODO - no more pnotes
-
-	if (defined $sessionId && $session->user->isRegistered) { # got a session id passed in or from a cookie
-		$log->info("BASIC AUTH: using cookie");
-		$session->response->status( 200 ); # OK
-		return;
-	}
-	# TODO - put this back in once we figure out get_basic_auth_pw
-#	elsif ($status != 200) { # prompt the user for their username and password
-#		$log->info("BASIC AUTH: prompt for user/pass");
-#		return $status; 
-#	}
-	elsif (defined $username && $username ne "") { # no session cookie, let's try to do basic auth
-		$log->info("BASIC AUTH: using user/pass");
-		my $user = WebGUI::User->newByUsername($session, $username);
-		if (defined $user) {
-			my $authMethod = $user->authMethod;
-			if ($authMethod) { # we have an auth method, let's try to instantiate
-				my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod ] ) };
-				if ($@) { # got an error
-					$log->error($@);
-					$session->response->status( 500 ); # SERVER_ERROR
-					return;
-				}
-				elsif ($auth->authenticate($username, $password)) { # lets try to authenticate
-					$log->info("BASIC AUTH: authenticated successfully");
-					$sessionId = $session->db->quickScalar("select sessionId from userSession where userId=?",[$user->userId]);
-					unless (defined $sessionId) { # no existing session found
-						$log->info("BASIC AUTH: creating new session");
-						$sessionId = $session->id->generate;
-						$auth->_logLogin($user->userId, "success (HTTP Basic)");
-					}
-					$session->{_var} = WebGUI::Session::Var->new($session, $sessionId);
-					$session->user({user=>$user});
-					$session->response->status( 200 ); # OK
-					return;
-				}
-			}
-		}
-		$log->security($username." failed to login using HTTP Basic Authentication");
-		$request->note_basic_auth_failure;
-		$session->response->status( 401 ); # HTTP_UNAUTHORIZED
-        return;
-	}
-	$log->info("BASIC AUTH: skipping");
-	$session->response->status( 401 ); # HTTP_UNAUTHORIZED
-    return;
-}
-
-sub to_app {
-    my ( $self, $env ) = @_;
-
-    # immediately starts the response and stream the content
-    return sub {
-        my $respond = shift;
-        my $writer = $respond->( [ 200, [ 'Content-Type', 'application/json' ] ] );
-        
-        # IO bound delayed response
-        $writer->write( "hi there\n" );
-        $writer->close;
-    };
-}
-
 sub psgi_app {
     my $self = shift;
     return $self->{psgi_app} ||= $self->compile_psgi_app;
@@ -189,13 +83,11 @@ sub psgi_app {
 
 sub compile_psgi_app {
     my $self = shift;
-
+    
     my $app = sub {
         my $env = shift;
-        
-        my $request = Plack::Request->new( $env );
-        my $response = $self->handle($request);
-        
+        my $request = Plack::Request->new($env); # This could also be WebGUI::Request
+        my $response = $self->dispatch($request);
         return $response;
     };
     
@@ -215,79 +107,64 @@ sub compile_psgi_app {
     my $uploadsPath = $config->get('uploadsPath');
     $app = Plack::Middleware::Static->wrap($app, 
         path => sub { s{^$uploadsURL/}{} }, 
-        root => "$uploadsPath/",
+        root => "$uploadsPath/", 
     );
 
     return $app;
 }
 
-#-------------------------------------------------------------------
-
-=head2 handle ( request )
-
-Primary http init/response handler for WebGUI.  This method decides whether to hand off the request to contentHandler() or uploadsHandler()
-
-=head3 request
-
-The Plack::Request object
-
-=cut
-
-sub handle {
-    my ($self, $request) = @_;
+sub dispatch {
+    my ( $self, $request ) = @_;
     
-    my $config  = $self->config;
-    my $gateway = $config->get("gateway");
-    my $matchUri = $request->uri;
-    $matchUri =~ s{^$gateway}{/};
+    my $config = $self->config;
+    
+    # determine session id
+	my $sessionId = $request->cookies->{$config->getCookieName};
 
-    # handle basic auth
-    my $auth = $request->header('Authorization');
-    if ($auth && $auth =~ m/^Basic/) { # machine oriented
-	    # Get username and password and hand over to authen
-        $auth =~ s/Basic //;
-        $self->authen($request, split(":", MIME::Base64::decode_base64($auth), 2)); 
-    }
-    else { # realm oriented
-        # TODO - what to do here? Should we check response status after call to authen?
-#	    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
-        $self->authen($request);
-    }
-	
-	# url handlers
-	# TODO - rip out urlHandler API - convert all to middleware
-	# all remaining url handlers (probably just Asset which might get converted to something else) should
-	# set $repsonse->body (e.g. so they can set it to IO) -- they no longer return $output
-	my $error = "";
-	my $gotMatch = 0;
-	my $response = $self->session->response;
-	
-	# TODO - would now be a time to fix the WEBGUI_FATAL label black magic?
-    WEBGUI_FATAL: foreach my $handler (@{$config->get("urlHandlers")}) {
-        my ($regex) = keys %{$handler};
-        if ($matchUri =~ m{$regex}i) {
-            eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $self->session]) };
-            if ($@) {
-				$error = $@;
+    # Instantiate the session object
+    my $session = $self->session( WebGUI::Session->open($self->root, $config, $request, $sessionId) );
+    
+    for my $handler (@{$config->get("contentHandlers")}) {
+        my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
+        if ( my $e = WebGUI::Error->caught ) {
+            $session->errorHandler->error($e->package.":".$e->line." - ".$e->error);
+            $session->errorHandler->debug($e->package.":".$e->line." - ".$e->trace);
+        }
+        elsif ( $@ ) {
+            $session->errorHandler->error( $@ );
+        }
+        else {
+            # We decide what to do next depending on what the contentHandler returned
+            
+            # "chunked" or "empty" means it took care of its own output needs
+            if (defined $output && ( $output eq "chunked" || $output eq "empty" )) {
+                if ($session->errorHandler->canShowDebug()) {
+                    $session->output->print($session->errorHandler->showDebug(),1);
+                }
                 last;
             }
-            else {
-                # Record that at least one url handler ran successfully
-				$gotMatch = 1;
-				
-				# But only return response if body was set
-				if (defined $response->body ) { # or maybe get a smarter way for url handlers to flag success - b/c this may break delayed IO
-				    return $response->finalize;
-				}
+            # non-empty output should be used as the response body
+            elsif (defined $output && $output ne "") {
+                # Auto-set the headers
+                $session->http->sendHeader; # TODO: should be renamed setHeader
+                
+                # Use contentHandler's return value as the output
+                $session->output->print($output);
+                if ($session->errorHandler->canShowDebug()) {
+                    $session->output->print($session->errorHandler->showDebug(),1);
+                }
+                last;
+            }
+            # Keep processing for success codes
+            elsif ($session->http->getStatus < 200 || $session->http->getStatus > 299) {
+                $session->http->sendHeader;
+                last;
             }
         }
-	}
-	
-	if ( !$gotMatch ) {
-        # can't handle the url due to error or misconfiguration
-        $response->body( "This server is unable to handle the url '".$request->uri."' that you requested. ".$error );
     }
-	return $response->finalize;
+    $session->close;
+
+    return $session->response->finalize;
 }
 
 1;

@@ -96,8 +96,7 @@ sub print {
     }
     elsif ($self->session->request) {
         # TODO - put in IO bound delayed response
-        warn "content: $content";
-#        $self->session->request->body([]) unless $self->session->request->body();
+        $self->session->response->body( $self->session->response->body() . $content );
 #        if (ref $self->session->request->body eq 'ARRAY') {
 #            push @{$self->session->request->body}, $content;
 #        } else {

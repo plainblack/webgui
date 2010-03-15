@@ -20,8 +20,6 @@ use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::PassiveAnalytics::Logging;
 
-use Apache2::Const -compile => qw(OK);
-
 =head1 NAME
 
 Package WebGUI::Content::MyHandler
@@ -131,7 +129,7 @@ sub handler {
         my $oldContentType = $request->content_type($ct);
         if ($request->sendfile($filename) ) {
             $session->close;
-            return Apache2::Const::OK;
+            return; # TODO - what should we return to indicate streaming?
         } 
         else {
             $request->content_type($oldContentType);
