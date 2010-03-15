@@ -278,7 +278,7 @@ sub sendHeader {
 		# under these circumstances, don't allow caching
 		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
 			$response->header("Cache-Control" => "private, max-age=1");
-			$request->no_cache(1);
+#			$request->no_cache(1); # TODO - re-enable this?
 		} 
 		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
 		else { 
@@ -304,7 +304,7 @@ sub _sendMinimalHeader {
 	my $response = $self->session->response;
 	$response->content_type('text/html; charset=UTF-8');
 	$response->header('Cache-Control' => 'private');
-	$response->no_cache(1);
+#	$response->no_cache(1); # TODO - re-enable this?
 	$response->status($self->getStatus());
 #	$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	return undef;

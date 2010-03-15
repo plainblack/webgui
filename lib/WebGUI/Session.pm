@@ -434,7 +434,7 @@ The path to the WebGUI files.
 
 =head3 configFile
 
-The filename of the config file that WebGUI should operate from.
+The filename of the config file that WebGUI should operate from, or a WebGUI::Config object
 
 =head3 requestObject
 
@@ -453,10 +453,10 @@ Uses simple session vars. See WebGUI::Session::Var::new() for more details.
 sub open {
 	my $class = shift;
 	my $webguiRoot = shift;
-	my $configFile = shift;
+	my $c = shift;
 	my $request = shift;
-	my $config = WebGUI::Config->new($webguiRoot,$configFile);
-	my $self = {_config=>$config };
+	my $config = ref $c ? $c : WebGUI::Config->new($webguiRoot,$c);
+	my $self = {_config=>$config }; # TODO - if we store reference here, should we weaken WebGUI->config?
 	bless $self , $class;
 	$self->{_request} = $request if defined $request;
 	$self->{_response} = $request->new_response( 200 ) if defined $request;

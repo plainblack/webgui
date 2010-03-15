@@ -77,6 +77,10 @@ sub handler {
             $session->errorHandler->error( $@ );
         }
         else {
+            if (defined $output) {
+                $session->response->body($output);
+                return;
+            }
             if ($output eq "chunked") {
                 if ($session->errorHandler->canShowDebug()) {
                     $session->output->print($session->errorHandler->showDebug(),1);

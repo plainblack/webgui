@@ -28,9 +28,12 @@ use WebGUI::User;
 use Moose;
 use Plack::Request;
 
-has root    => ( is => 'ro', required => 1 ); # WEBGUI_ROOT, e.g. /data/WebGUI
-has config  => ( is => 'ro', required => 1 ); # Site config, e.g. dev.localhost.localdomain.conf
+has root => ( is => 'ro', isa => 'Str', required => 1 );    # e.g. /data/WebGUI
+has site => ( is => 'ro', isa => 'Str', required => 1 );    # e.g. dev.localhost.localdomain.conf
 has session => ( is => 'rw', isa => 'WebGUI::Session' );
+has config  => ( is => 'rw', isa => 'WebGUI::Config' );
+
+use overload q(&{}) => sub { shift->psgi_app }, fallback => 1;
 
 =head1 NAME
 
@@ -50,9 +53,32 @@ These subroutines are available from this package:
 
 =cut
 
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $class = shift;
+    
+    # Make constructor work as:
+    #   WebGUI->new( $root, $site )
+    # In addition to the more verbose:
+    #   WebGUI->new( root => $root, site => $site )
+    if (@_ eq 2) {
+        return $class->$orig(root => $_[0], site => $_[1] );
+    } else {
+        return $class->$orig(@_);
+    }
+};
+
+sub BUILD {
+	my $self = shift;
+	
+	# Instantiate the WebGUI::Config object
+	my $config = WebGUI::Config->new( $self->root, $self->site );
+	$self->config( $config );
+}
+
 #-------------------------------------------------------------------
 
-=head2 authen ( requestObject, [ user, pass, config ])
+=head2 authen ( requestObject, [ user, pass ])
 
 HTTP Basic auth for WebGUI.
 
@@ -68,14 +94,10 @@ The username to authenticate with. Will pull from the request object if not spec
 
 The password to authenticate with. Will pull from the request object if not specified.
 
-=head3 config
-
-A reference to a WebGUI::Config object. One will be created if it isn't specified.
-
 =cut
 
 sub authen {
-    my ($self, $request, $username, $password, $config) = @_;
+    my ($self, $request, $username, $password) = @_;
     
 #	# set username and password if it's an auth handler
 #	if ($username eq "") {
@@ -89,13 +111,13 @@ sub authen {
 #		}
 #	}
 
-	$config ||= WebGUI::Config->new( $self->root, $self->config );
+	my $config = $self->config;
    
 	# determine session id
 	my $sessionId = $request->cookies->{$config->getCookieName};
 
     # Instantiate the session object
-    my $session = $self->session( WebGUI::Session->open($self->root, $self->config, $request, $sessionId) );
+    my $session = $self->session( WebGUI::Session->open($self->root, $config, $request, $sessionId) );
     my $log = $session->log;
 #	$request->pnotes(wgSession => $session); # TODO - no more pnotes
 
@@ -160,26 +182,63 @@ sub to_app {
     };
 }
 
+sub psgi_app {
+    my $self = shift;
+    return $self->{psgi_app} ||= $self->compile_psgi_app;
+}
+
+sub compile_psgi_app {
+    my $self = shift;
+
+    my $app = sub {
+        my $env = shift;
+        
+        my $request = Plack::Request->new( $env );
+        my $response = $self->handle($request);
+        
+        return $response;
+    };
+    
+    my $config = $self->config;
+
+    # Extras
+    use Plack::Middleware::Static;
+    my $extrasURL = $config->get('extrasURL');
+    my $extrasPath = $config->get('extrasPath');
+    $app = Plack::Middleware::Static->wrap($app, 
+        path => sub { s{^$extrasURL/}{} },
+        root => "$extrasPath/",
+    );
+    
+    # Uploads
+    my $uploadsURL = $config->get('uploadsURL');
+    my $uploadsPath = $config->get('uploadsPath');
+    $app = Plack::Middleware::Static->wrap($app, 
+        path => sub { s{^$uploadsURL/}{} }, 
+        root => "$uploadsPath/",
+    );
+
+    return $app;
+}
+
 #-------------------------------------------------------------------
 
-=head2 run ( env )
+=head2 handle ( request )
 
 Primary http init/response handler for WebGUI.  This method decides whether to hand off the request to contentHandler() or uploadsHandler()
 
-=head3 env
+=head3 request
 
-The PSGI environment hash
+The Plack::Request object
 
 =cut
 
-sub run {
-    my ($self, $env) = @_;
+sub handle {
+    my ($self, $request) = @_;
     
-    my $request = Plack::Request->new( $env );
-    my $config  = WebGUI::Config->new( $self->root, $self->config );
-    
-    my $matchUri = $request->uri;
+    my $config  = $self->config;
     my $gateway = $config->get("gateway");
+    my $matchUri = $request->uri;
     $matchUri =~ s{^$gateway}{/};
 
     # handle basic auth
@@ -187,12 +246,12 @@ sub run {
     if ($auth && $auth =~ m/^Basic/) { # machine oriented
 	    # Get username and password and hand over to authen
         $auth =~ s/Basic //;
-        $self->authen($request, split(":", MIME::Base64::decode_base64($auth), 2), $config); 
+        $self->authen($request, split(":", MIME::Base64::decode_base64($auth), 2)); 
     }
     else { # realm oriented
         # TODO - what to do here? Should we check response status after call to authen?
 #	    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
-        $self->authen($request, undef, undef, $config);
+        $self->authen($request);
     }
 	
 	# url handlers
