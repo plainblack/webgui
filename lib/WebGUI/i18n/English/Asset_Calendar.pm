@@ -354,8 +354,8 @@ our $I18N = {
 	},
 
 	'view calendar title' => {
-		message 	=> q|View Calendar Template Variables|,
-		lastUpdated 	=> 1171043337,
+		message 	=> q|Calendar View Template Variables|,
+		lastUpdated 	=> 1268671312,
 	},
 
 	'view calendar body' => {
@@ -430,8 +430,8 @@ our $I18N = {
 	},
 
 	'view calendar day title' => {
-		message 	=> q|View Calendar Day Template Variables|,
-		lastUpdated 	=> 1171043337,
+		message 	=> q|Calendar View Day Template Variables|,
+		lastUpdated 	=> 1268671336,
 	},
 
 	'view calendar day body' => {
@@ -541,8 +541,8 @@ our $I18N = {
 	},
 
 	'view calendar week title' => {
-		message 	=> q|View Calendar Week Template Variables|,
-		lastUpdated 	=> 1171172007,
+		message 	=> q|Calendar View Week Template Variables|,
+		lastUpdated 	=> 1268671327,
 	},
 
 	'view calendar week body' => {
@@ -952,6 +952,81 @@ our $I18N = {
         context => q{},
         lastUpdated => 1230931579,
     },
+
+	'pageNextUrl monthVar' => {
+		message 	=> q|A URL to the next year in the calendar.|,
+		lastUpdated 	=> 1268669460,
+	},
+
+	'pagePrevUrl monthVar' => {
+		message 	=> q|A URL to the previous year in the calendar.|,
+		lastUpdated 	=> 1268669463,
+	},
+
+	'pageNextYear' => {
+		message 	=> q|The year that follows the current one in the Calendar.|,
+		lastUpdated 	=> 1268669460,
+	},
+
+	'pagePrevYear' => {
+		message 	=> q|The year that preceeds the current one in the Calendar.|,
+		lastUpdated 	=> 1268669463,
+	},
+
+	'dayNames' => {
+		message 	=> q|A loop containing names and abbreviations for the days of the week.|,
+		lastUpdated 	=> 1268669463,
+	},
+
+	'months' => {
+		message 	=> q|A loop containing names and URLs for navigating among the months in a year.|,
+		lastUpdated 	=> 1268669463,
+	},
+
+	'monthEpoch' => {
+		message 	=> q|The epoch date for this month.|,
+		lastUpdated 	=> 1268669463,
+	},
+
+	'monthUrl' => {
+		message 	=> q|The URL to change the calendar to display this month.|,
+		lastUpdated 	=> 1268669463,
+	},
+
+	'monthCurrent' => {
+		message 	=> q|A boolean which is true if the calendar is displaying this month.|,
+		lastUpdated 	=> 1268669463,
+	},
+
+	'view calendar month title' => {
+		message 	=> q|Calendar View Month Template Variables|,
+		lastUpdated 	=> 1268671291,
+	},
+
+	'view calendar month body' => {
+		message 	=> q|<p>This template shows all events in a month in the calendar.</p>|,
+		lastUpdated 	=> 1171172004,
+	},
+
+	'weeks' => {
+		message 	=> q|A loop containing loops of events, by day.|,
+		lastUpdated 	=> 1171172004,
+	},
+
+	'weeks' => {
+		message 	=> q|A loop containing loops of events, by day.|,
+		lastUpdated 	=> 1171172004,
+	},
+
+	'dayUrl' => {
+		message 	=> q|A URL to view all events on this day.|,
+		lastUpdated 	=> 1171172004,
+	},
+
+	'dayCurrent' => {
+		message 	=> q|A boolean which is true if this day is today.|,
+		lastUpdated 	=> 1171172004,
+	},
 
 };
 
