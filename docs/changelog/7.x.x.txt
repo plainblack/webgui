@@ -5,6 +5,7 @@
  - fixed #11456: Delete a wiki (Reopen #11446 - subscription groups)
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
  - fixed #11472: View Calendar Month help missing
+ - fixed #11471: Errors in Calendar Event Edit template
 
 7.8.14
  - fixed #11442: PickLanguage template missing after 7.7 to 7.8 upgrade
