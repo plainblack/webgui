@@ -1,7 +1,7 @@
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
  - fixed #11472: View Calendar Month help missing
- - fixed #11471: Errors in Calendar Event Edit template
+ - fixed #11471: Errors in Calendar Event Edit template (Dale Trexel / U of MN Law School)
 
 7.9.0
  - added #11383: AJAX username checks at registration (Luke Robinson / Orchard Solutions)
