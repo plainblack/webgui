@@ -116,7 +116,7 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
 	},
 
     'mobileStyleTemplateId label' => {
-        message => 'Mobile Style Template'
+        message => 'Mobile Style Template',
 		lastUpdated => 1268412950,
     },
 
