@@ -168,7 +168,7 @@ Survey.Data = (function(){
                 YAHOO.util.Dom.setStyle('addAnswer', 'display', 'inline');
 				if (!aButton) {
                     aButton = new YAHOO.widget.Button({
-                        label: Survey.i18n.get('Asset_Survey',"Add Answer"),
+                        label: Survey.i18n.get('Asset_Survey',"add answer"),
                         id: "addAnswer",
                         container: "addAnswer"
                     });
