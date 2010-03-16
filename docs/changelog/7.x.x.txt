@@ -3,6 +3,7 @@
  - fixed #11472: View Calendar Month help missing
  - fixed #11471: Errors in Calendar Event Edit template (Dale Trexel / U of MN Law School)
  - fixed #11475: Inherit permissions on imported package fails if asset already exists.
+ - fixed #11476: Missing override in Page Layout shortcut
 
 7.9.0
  - added #11383: AJAX username checks at registration (Luke Robinson / Orchard Solutions)
