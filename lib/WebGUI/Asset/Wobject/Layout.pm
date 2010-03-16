@@ -67,13 +67,17 @@ sub definition {
         tableName=>'Layout',
         className=>'WebGUI::Asset::Wobject::Layout',
         properties=>{
-            templateId =>{
+            templateId => {
+                label        => $i18n->get('layout template title'),
+                hoverHelp    => $i18n->get('template description'),
                 fieldType    =>"template",
                 namespace    => "Layout",
                 defaultValue =>'PBtmpl0000000000000054',
             },
             mobileTemplateId => {
                 fieldType    => ( $session->style->useMobileStyle ? 'template' : 'hidden' ),
+                label        => $i18n->get('mobileTemplateId label'),
+                hoverHelp    => $i18n->get('mobileTemplateId description'),
                 namespace    => 'Layout',
                 defaultValue => 'PBtmpl0000000000000054',
             },
@@ -87,8 +91,10 @@ sub definition {
                 fieldType    =>"checkList"
             },
             assetOrder => {
-                defaultValue =>'asc',
-                fieldType    =>'selectBox',
+                defaultValue => 'asc',
+                fieldType    => 'selectBox',
+                label        => $i18n->get('asset order label'),
+                hoverHelp    => $i18n->get('asset order hoverHelp'),
             }
         }
     });
