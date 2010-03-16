@@ -5,6 +5,7 @@
  - fixed #11475: Inherit permissions on imported package fails if asset already exists.
  - fixed #11476: Missing override in Page Layout shortcut
  - fixed: Unable to add threads with permission to edit CS but not in post group
+ - fixed #11478: Overzealous removal of double slashes in FilePump macro
 
 7.9.0
  - added #11383: AJAX username checks at registration (Luke Robinson / Orchard Solutions)
