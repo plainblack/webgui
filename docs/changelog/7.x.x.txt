@@ -8,6 +8,7 @@
  - fixed #11471: Errors in Calendar Event Edit template (Dale Trexel / U of MN Law School)
  - fixed #11475: Inherit permissions on imported package fails if asset already exists.
  - fixed #11476: Missing override in Page Layout shortcut
+ - fixed: Unable to add threads with permission to edit CS but not in post group
 
 7.8.14
  - fixed #11442: PickLanguage template missing after 7.7 to 7.8 upgrade

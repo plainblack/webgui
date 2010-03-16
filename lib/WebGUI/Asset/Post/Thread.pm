@@ -66,7 +66,7 @@ in the default asset, which better be a Collaboration System.
 sub canAdd {
     my $class   = shift;
     my $session = shift;
-    return $session->user->isInGroup($session->asset->get('canStartThreadGroupId'));
+    return $session->asset->isa('WebGUI::Asset::Wobject::Collaboration') && $session->asset->canStartThread;
 }
 
 #-------------------------------------------------------------------
