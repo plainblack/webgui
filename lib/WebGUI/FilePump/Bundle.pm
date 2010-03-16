@@ -106,8 +106,6 @@ sub build {
         }
         $concatenatedJS .= $results->{content};
         $jsFile->{lastModified} = $results->{lastModified};
-        $self->session->log->warn($jsFile->{uri});
-        $self->session->log->warn($jsFile->{lastModified});
     }
     return (0, $error) if ($error);
 
@@ -164,7 +162,6 @@ sub build {
 
     ##Minimize files, and write them out.
 
-    $self->session->log->warn($concatenatedJS);
     my $minimizedJS  =  JavaScript::Minifier::XS::minify($concatenatedJS);
     undef $concatenatedJS;
 
