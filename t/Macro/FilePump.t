@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Macro::FilePump;
 
 #----------------------------------------------------------------------------
 # Init
@@ -28,20 +29,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  11;
-plan tests => 1 + $tests;
+plan tests => 11;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $macro = 'WebGUI::Macro::FilePump';
-my $loaded = use_ok($macro);
-
 my $bundle = WebGUI::FilePump::Bundle->create($session, { bundleName => 'test bundle'});
-
-SKIP: {
-
-skip "Unable to load $macro", $tests unless $loaded;
 
 my $root = WebGUI::Asset->getRoot($session);
 
@@ -119,10 +112,6 @@ is(
     '',
     '... check illegal file type access returns empty string'
 );
-
-
-}
-
 
 #----------------------------------------------------------------------------
 # Cleanup
