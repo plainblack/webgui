@@ -64,7 +64,7 @@ use Apache2::FilterRec;
 use Apache2::RequestIO;
 use Apache2::RequestRec;
 use ModPerl::Util;
-use Net::Subnets;
+use Net::CIDR::Lite;
 
 my @subTimes = ();
 my $depth = 0;
@@ -128,13 +128,11 @@ sub output {
 	return Apache2::Const::DECLINED unless($f->r->content_type =~ 'text/html');
     my $server = Apache2::ServerUtil->server;
     my $sn = $server->dir_config('ProfileSubnet');
-    my $subnet = [ $sn ];
     if ($sn) {
         my $conn = $f->c;
         my $ipAddress = $conn->remote_ip;
-        my $net = Net::Subnets->new();
-        $net->subnets($subnet);
-        if (!$net->check(\$ipAddress)) {
+        my $net = Net::CIDR::Lite->new($sn);
+        if (!$net->find($ipAddress)) {
             return Apache2::Const::DECLINED;
         }
     }
