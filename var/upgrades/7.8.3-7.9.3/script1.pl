@@ -1,0 +1,3 @@
+report "stuff\n";
+
+done;
