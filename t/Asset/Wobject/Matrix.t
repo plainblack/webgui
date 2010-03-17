@@ -104,7 +104,7 @@ is($newAttribute->{attributeId},undef,"The new attribute was successfully delete
 
 # add a listing
 
-my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'});
+my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1});
 
 my $secondVersionTag = WebGUI::VersionTag->new($session,$matrixListing->get("tagId"));
 $secondVersionTag->commit;
