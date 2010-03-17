@@ -28,8 +28,8 @@ use WebGUI::User;
 use Moose;
 use Plack::Request;
 
-has root => ( is => 'ro', isa => 'Str', required => 1 );    # e.g. /data/WebGUI
-has site => ( is => 'ro', isa => 'Str', required => 1 );    # e.g. dev.localhost.localdomain.conf
+has root => ( is => 'ro', isa => 'Str', default => '/data/WebGUI' );
+has site => ( is => 'ro', isa => 'Str', default => 'dev.localhost.localdomain.conf' );
 has session => ( is => 'rw', isa => 'WebGUI::Session' );
 has config  => ( is => 'rw', isa => 'WebGUI::Config' );
 
@@ -58,11 +58,11 @@ around BUILDARGS => sub {
     my $class = shift;
     
     # Make constructor work as:
-    #   WebGUI->new( $root, $site )
+    #   WebGUI->new( $site )
     # In addition to the more verbose:
     #   WebGUI->new( root => $root, site => $site )
-    if (@_ eq 2) {
-        return $class->$orig(root => $_[0], site => $_[1] );
+    if (@_ eq 1) {
+        return $class->$orig(site => $_[0] );
     } else {
         return $class->$orig(@_);
     }
@@ -166,5 +166,8 @@ sub dispatch {
 
     return $session->response->finalize;
 }
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
