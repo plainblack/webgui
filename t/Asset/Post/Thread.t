@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 11; # increment this value for each test you create
+use Test::More tests => 12; # increment this value for each test you create
 use Test::MockObject::Extends;
 use Test::Exception;
 use WebGUI::Asset::Wobject::Collaboration;
@@ -79,13 +79,25 @@ $collab->update({threadsPerPage => 3, postsPerPage => 10,});
 
 note 'getCSLinkUrl';
 my @newThreads;
-push @newThreads, $collab->addChild($props, @addArgs);
-push @newThreads, $collab->addChild($props, @addArgs);
+my $threadCount = 15;
+while ($threadCount--) {
+    push @newThreads, $collab->addChild($props, @addArgs);
+}
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+$versionTag2->commit;
+
 my $csUrl = $collab->get('url');
 like $newThreads[-1]->getCSLinkUrl, qr/^$csUrl/, 'getCsLinkUrl returns URL of the parent CS with no gateway';
 like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1/, 'and has the right page number';
 like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1;sortBy=lineage;sortOrder=desc/, 'and has the right sort parameters';
-like $thread->getCSLinkUrl, qr/\?pn=2/, 'checking 2nd thread on another page';
+$thread->restore();
+like $thread->getCSLinkUrl, qr/\?pn=6/, 'checking 2nd thread on another page';
+
+$newThreads[0]->archive;
+$newThreads[1]->archive;
+$newThreads[2]->archive;
+like $thread->getCSLinkUrl, qr/\?pn=5/, 'checking thread on another page, with archived threads';
+
 $collab->update({threadsPerPage => 0, postsPerPage => 0,});
 lives_ok { $uncommittedThread->getCSLinkUrl } '... works when pagination set to 0';
 

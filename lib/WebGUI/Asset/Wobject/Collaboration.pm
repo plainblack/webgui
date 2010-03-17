@@ -1159,66 +1159,68 @@ Collaboration System
 =cut
 
 sub getThreadsPaginator {
-    my $self        = shift;
-	
+    my $self  = shift;
+
     my $scratchSortBy    = $self->getId."_sortBy";
-	my $scratchSortOrder = $self->getId."_sortDir";
-	my $sortBy    = $self->session->form->process("sortBy")   
+    my $scratchSortOrder = $self->getId."_sortDir";
+    my $sortBy    = $self->session->form->process("sortBy")   
                  || $self->session->scratch->get($scratchSortBy)
                  || $self->get("sortBy");
     my $sortOrder = $self->session->form->process("sortOrder")
                  || $self->session->scratch->get($scratchSortOrder)
                  || $self->get("sortOrder");
-	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
-		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
+    if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
+        $self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
         $self->session->scratch->set($scratchSortOrder, $sortOrder);
-	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
-                if ($sortOrder eq "asc") {
-                        $sortOrder = "desc";
-                } else {
-                        $sortOrder = "asc";
-                }
-                $self->session->scratch->set($scratchSortOrder, $sortOrder);
-	}
-	$sortBy ||= "assetData.revisionDate";
-	$sortOrder ||= "desc";
+    }
+    elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
+        if ($sortOrder eq "asc") {
+            $sortOrder = "desc";
+        }
+        else {
+            $sortOrder = "asc";
+        }
+        $self->session->scratch->set($scratchSortOrder, $sortOrder);
+    }
+    $sortBy ||= "assetData.revisionDate";
+    $sortOrder ||= "desc";
     # Sort by the thread rating instead of the post rating.  other places don't care about threads.
     if ($sortBy eq 'rating') {
         $sortBy = 'threadRating';
     } 
     $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
 
-	my $sql = "
-		select 
-			asset.assetId,
-			asset.className,
-			assetData.revisionDate as revisionDate 
-		from Thread 
-			left join asset on Thread.assetId=asset.assetId 
-			left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate 
-			left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate 
-		where 
-			asset.parentId=".$self->session->db->quote($self->getId)." 
-			and asset.state='published' 
-			and asset.className='WebGUI::Asset::Post::Thread' 
-			and assetData.revisionDate=(
-				select
-					max(revisionDate) 
-				from 
-					assetData 
-				where 
-					assetData.assetId=asset.assetId 
-					and (status='approved' or status='archived')
-			) 
-			and status='approved'
-		group by 
-			assetData.assetId 
-		order by 
-			Thread.isSticky desc, 
-		".$sortBy." 
-			".$sortOrder;
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
-	$p->setDataByQuery($sql);
+    my $sql = "
+        select 
+            asset.assetId,
+            asset.className,
+            assetData.revisionDate as revisionDate 
+        from Thread 
+            left join asset on Thread.assetId=asset.assetId 
+            left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate 
+            left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate 
+        where 
+            asset.parentId=".$self->session->db->quote($self->getId)." 
+            and asset.state='published' 
+            and asset.className='WebGUI::Asset::Post::Thread' 
+            and assetData.revisionDate=(
+                select
+                    max(revisionDate) 
+                from 
+                    assetData 
+                where 
+                    assetData.assetId=asset.assetId 
+                    and (status='approved' or status='archived')
+            ) 
+            and status='approved'
+        group by 
+            assetData.assetId 
+        order by 
+            Thread.isSticky desc, 
+        ".$sortBy."
+        ".$sortOrder;
+    my $p     = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
+    $p->setDataByQuery($sql);
 
     return $p;
 }
