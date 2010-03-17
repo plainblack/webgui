@@ -27,6 +27,7 @@ my $session = start(); # this line required
 
 moveMaintenance($session);
 migrateToNewCache($session);
+moveFileLocations($session);
 
 finish($session); # this line required
 
@@ -57,8 +58,19 @@ sub migrateToNewCache {
 sub moveMaintenance {
     my $session = shift;
     print "\tMoving maintenance file " unless $quiet;
-    unlink "../maintenance.html";
+    unlink '../../docs/maintenance.html';
     print "DONE!\n" unless $quiet;
+}
+
+sub moveFileLocations {
+    my $session = shift;
+    print "\tMoving preload files " unless $quiet;
+    unlink '../../sbin/preload.custom.example';
+    rename '../../sbin/preload.custom', File::Spec->catfile(WebGUI::Paths->etc, 'preload.custom');
+    unlink '../../sbin/preload.exclude.example';
+    rename '../../sbin/preload.exclude', File::Spec->catfile(WebGUI::Paths->etc, 'preload.exclude');
+    unlink '../../lib/default.ttf';
+    print "Done.\n" unless $quiet;
 }
 
 
