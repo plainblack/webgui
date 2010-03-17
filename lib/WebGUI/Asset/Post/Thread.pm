@@ -349,19 +349,45 @@ for the site.
 =cut
 
 sub getCSLinkUrl {
-	my $self = shift;
+    my $self    = shift;
+    if ($self->get('status') eq 'archived') {
+        return $self->get('url');
+    }
+    my $session = $self->session;
     my $url;
     my $cs         = $self->getParent;
-    my $paginator  = WebGUI::Paginator->new($self->session, '', $self->getParent->get('threadsPerPage'));
-    my $page_size  = $paginator->{_rpp}; ##To make sure defaults are handled correctly.
-    my $place      = $self->getRank+1;
-    my $last_place = $cs->getLastChild->getRank+1;
-    my $page       = int(($last_place - $place)/$page_size) + 1;
+    my $page_size  = $cs->get('threadsPerPage');
+    my $sql        =<<EOSQL;
+select lineage from asset
+left join Thread    using (assetId)
+left join assetData using (assetId)
+ where parentId=?
+   and className='WebGUI::Asset::Post::Thread'
+   and state='published'
+   and status='approved'
+   group by assetData.assetId
+   order by Thread.isSticky DESC,
+            lineage         DESC
+EOSQL
+
+    my $sth     = $session->db->read($sql, [$cs->getId]);
+    my $place   = 1;  ##1 based indexing
+    my $found   = 0;
+    my $lineage = $self->get('lineage');
+    THREAD: while (my $arrayRef = $sth->arrayRef) {
+        if ($arrayRef->[0] eq $lineage) {
+            $found = 1;
+            last THREAD;
+        }
+        ++$place;
+    }
+    $sth->finish;
+    return $self->get('url') if !$found;
+    my $page  = int($place/$page_size) + 1;
     my $page_frag  = 'pn='.$page.';sortBy=lineage;sortOrder=desc';
-    $url = $self->session->url->append($cs->get('url'), $page_frag);
+    $url = $session->url->append($cs->get('url'), $page_frag);
     return $url;
 }
-
 
 #-------------------------------------------------------------------
 
