@@ -206,20 +206,13 @@ my $session = WebGUI::Test->session;
     use Moose::Util::TypeConstraints;
     use WebGUI::Definition;
     use JSON;
-
-    subtype 'WGT::Type::JSONArray'
-        => as   'ArrayRef'
-    ;
-    coerce 'WGT::Type::JSONArray'
-        => from Str
-        => via  { my $struct = eval { JSON::from_json($_); }; $struct ||= []; return $struct },
-    ;
+    use WebGUI::Types;
 
     property  'leaded' => (
         noFormPost => 1,
         default    => sub { [] },
         traits     => ['Array', 'WebGUI::Definition::Meta::Property::Serialize'],
-        isa        => 'WGT::Type::JSONArray',
+        isa        => 'WebGUI::Type::JSONArray',
         coerce     => 1,
     );
 
