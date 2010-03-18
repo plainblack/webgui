@@ -1348,6 +1348,22 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
+=head2 validParent
+
+Make sure that the current session asset is a Thread or Post for pasting and adding checks.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    my $class   = shift;
+    my $session = shift;
+    return $session->asset->isa('WebGUI::Asset::Post');
+}
+
+#-------------------------------------------------------------------
+
 =head2 view 
 
 Increment the number of views for this Post, and then display the Thread containing
