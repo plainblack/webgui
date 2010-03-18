@@ -133,25 +133,6 @@ sub _fixReplyCount {
 
 #-------------------------------------------------------------------
 
-=head2 addChild ( )
-
-Overriding to limit the types of children allowed.
-
-=cut
-
-sub addChild {
-	my $self = shift;
-	my $properties = shift;
-	my @other = @_;
-	if ($properties->{className} ne "WebGUI::Asset::Post") {
-		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->className);
-		return undef;
-	}
-	return $self->SUPER::addChild($properties, @other);
-}
-
-#-------------------------------------------------------------------
-
 =head2 addRevision ( )
 
 Override the default method in order to deal with attachments.
