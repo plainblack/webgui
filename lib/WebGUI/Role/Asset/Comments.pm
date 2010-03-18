@@ -20,7 +20,10 @@ define tableName           => 'assetAspectComments';
 property comments => (
             noFormPost      => 1,
             fieldType       => "hidden",
-            default         => '[]',
+            default         => sub { [] },
+            traits          => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
+            isa             => 'WebGUI::Type::JSONArray',
+            coerce          => 1,
          );
 property averageCommentRating => (
             noFormPost      => 1,
@@ -187,23 +190,7 @@ sub deleteComment {
 	}
 }
 
-##-------------------------------------------------------------------
-#
-#=head2 get ()
-#
-#See SUPER::get(). Extends the get() method to automatically decode the comments field into a Perl hash structure.
-#
-#=cut
-#
-#sub get {
-#	my $self = shift;
-#	my $param = shift;
-#	if ($param eq 'comments') {
-#		return JSON->new->decode($self->next::method('comments')||'[]');
-#	}
-#	return $self->next::method($param, @_);
-#}
-#
+
 #-------------------------------------------------------------------
 
 =head2 getAverageCommentRatingIcon ()
@@ -279,30 +266,6 @@ sub getKarmaAmountPerComment {
 }
 
 
-##-------------------------------------------------------------------
-#
-#=head2 update ()
-#
-#See SUPER::update(). Extends the update() method to encode the comments field into something storable in the database.
-#
-#=cut
-#
-#sub update {
-#	my $self = shift;
-#	my $properties = shift;
-#	if (exists $properties->{comments}) {
-#        my $comments = $properties->{comments};
-#        if (ref $comments ne 'ARRAY') {
-#			$comments = eval{JSON->new->decode($comments)};
-#            if (WebGUI::Error->caught || ref $comments ne 'ARRAY') {
-#                $comments = [];
-#			}
-#        }
-#        $properties->{comments} = JSON->new->encode($comments);
-#    }
-#	$self->next::method($properties, @_);
-#}
-#
 #-------------------------------------------------------------------
 
 =head2 www_addComment ()

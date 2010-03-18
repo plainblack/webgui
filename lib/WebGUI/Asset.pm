@@ -20,6 +20,16 @@ use JSON;
 use HTML::Packer;
 
 use Moose;
+use Moose::Util::TypeConstraints;
+
+subtype 'WebGUI::Type::JSONArray'
+    => as 'ArrayRef'
+;
+coerce 'WebGUI::Type::JSONArray'
+    => from Str
+    => via  { my $struct = eval { JSON::from_json($_); }; $struct ||= []; return $struct },
+;
+
 use WebGUI::Definition::Asset;
 define assetName  => ['asset', 'Asset'];
 define tableName  => 'assetData';
@@ -2355,6 +2365,9 @@ sub write {
         my $property  = $self->meta->find_attribute_by_name($property_name);
         my $tableName = $property->tableName;
         my $value     = $self->$property_name;
+        if ($property->does('WebGUI::Definition::Meta::Property::Serialize')) {
+            $value    = eval { JSON::from_json($value); } || '';
+        }
         push @{ $data_by_table{$tableName}->{NAMES}  }, $property_name;
         push @{ $data_by_table{$tableName}->{VALUES} }, $value;
     }
