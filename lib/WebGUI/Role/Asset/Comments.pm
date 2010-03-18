@@ -16,6 +16,7 @@ package WebGUI::Role::Asset::Comments;
 
 use Moose::Role;
 use WebGUI::Definition::Asset;
+use WebGUI::Types;
 define tableName           => 'assetAspectComments';
 property comments => (
             noFormPost      => 1,
@@ -31,7 +32,6 @@ property averageCommentRating => (
             default         => 0,
          );
 
-use JSON;
 use WebGUI::Exception;
 use WebGUI::Form;
 use WebGUI::HTML;
@@ -130,14 +130,6 @@ sub canComment {
 	return $self->session->user->isInGroup($self->getGroupToComment) || $self->canEdit;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-Extends the definition to add the comments and averageCommentRating fields.
-
-=cut
 
 #-------------------------------------------------------------------
 
