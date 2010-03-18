@@ -20,15 +20,7 @@ use JSON;
 use HTML::Packer;
 
 use Moose;
-use Moose::Util::TypeConstraints;
-
-subtype 'WebGUI::Type::JSONArray'
-    => as 'ArrayRef'
-;
-coerce 'WebGUI::Type::JSONArray'
-    => from Str
-    => via  { my $struct = eval { JSON::from_json($_); }; $struct ||= []; return $struct },
-;
+use WebGUI::Types;
 
 use WebGUI::Definition::Asset;
 define assetName  => ['asset', 'Asset'];
