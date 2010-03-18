@@ -1,4 +1,4 @@
-package WebGUI::Definition::Meta::Property;
+package WebGUI::Definition::Meta::Property::Serialize;
 
 =head1 LEGAL
 
@@ -23,28 +23,17 @@ our $VERSION = '0.0.1';
 
 =head1 NAME
 
-Package WebGUI::Definition::Meta::Property
+Package WebGUI::Definition::Meta::Property::Serialize
 
 =head1 DESCRIPTION
 
-Moose-based meta class for all properties in WebGUI::Definition.
+Extends WebGUI::Definition::Meta::Property to provide serialization for attribute
+values.  Currently just a marker, but eventually should provide per-attribute
+serialization via handles.
 
-=head1 SYNOPSIS
+=head1 METHODS
 
-WebGUI::Definition::Meta::Property extends Moose::Meta::Attribute to include
-a read-only form method, that provides the form properties for the attribute.
-
-=cut
-
-has 'form' => (
-    is  => 'ro',
-);
-
-#-------------------------------------------------------------------
-
-=head2 form ( )
-
-Returns a hashref of propertes that are specific to WebGUI::Forms.
+The following methods are added.
 
 =cut
 

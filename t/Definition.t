@@ -49,7 +49,7 @@ my $session = WebGUI::Test->session;
     ::can_ok +__PACKAGE__, 'get';
     ::can_ok +__PACKAGE__, 'set';
 
-    ::ok +__PACKAGE__->meta->does_role('WebGUI::Definition::Role::Object');
+    ::ok +__PACKAGE__->meta->does_role('WebGUI::Definition::Role::Object'), 'meta class check on the package';
 
     ::cmp_deeply(
         [ +__PACKAGE__->getProperties ],
@@ -126,7 +126,8 @@ my $session = WebGUI::Test->session;
         my ($self, $property, $property_name) = @_;
         ::note "Checking arguments passed to subroutine for defining a form property";
         ::isa_ok($self, 'WGT::Class3');
-        ::ok($property->can('form'), 'Correct property class given');
+        ::ok($property->can('form'),      'propery has a form method');
+        #::ok($property->can('serialize'), 'and a serialize method');
         ::is($property_name, 'named_url', 'form property name sent');
         return $property->name;
     }
@@ -198,5 +199,61 @@ my $session = WebGUI::Test->session;
     ::cmp_deeply($object5->traitorous, ['Boggs'], 'push_traitor handler worked');
 
 }
+
+{
+    package WGT::Class6;
+    use Moose;
+    use Moose::Util::TypeConstraints;
+    use WebGUI::Definition;
+    use JSON;
+
+    subtype 'WGT::Type::JSONArray'
+        => as   'ArrayRef'
+    ;
+    coerce 'WGT::Type::JSONArray'
+        => from Str
+        => via  { my $struct = eval { JSON::from_json($_); }; $struct ||= []; return $struct },
+    ;
+
+    property  'leaded' => (
+        noFormPost => 1,
+        default    => sub { [] },
+        traits     => ['Array', 'WebGUI::Definition::Meta::Property::Serialize'],
+        isa        => 'WGT::Type::JSONArray',
+        coerce     => 1,
+    );
+
+    property  'regular' => (
+        noFormPost => 1,
+        default    => sub { [] },
+        traits     => ['Array'],
+        isa        => 'ArrayRef',
+    );
+
+    my $object6 = WGT::Class6->new({session => $session});
+    my $leaded  = $object6->meta->find_attribute_by_name('leaded');
+    my $regular = $object6->meta->find_attribute_by_name('regular');
+    use Moose::Util;
+    ::ok Moose::Util::does_role($leaded, 'WebGUI::Definition::Meta::Property::Serialize'), 'does_role detects role';
+    ::ok !Moose::Util::does_role($regular, 'WebGUI::Definition::Meta::Property::Serialize'), 'does_role detects lack of role';
+    ::ok $leaded->does('WebGUI::Definition::Meta::Property::Serialize'), 'property does role';
+    ::ok !$regular->does('WebGUI::Definition::Meta::Property::Serialize'), 'property lacks role';
+
+    my $object6a = WGT::Class6->new({session => $session, leaded => '[{"a": "alpha"}]', });
+    ::cmp_deeply(
+        $object6a->leaded,
+        [ { a => "alpha", }, ],
+        'coercion from JSON worked on custom subtype'
+    );
+
+    my $object6b = WGT::Class6->new({session => $session, leaded => [{"b" => "beta"}], });
+    ::cmp_deeply(
+        $object6b->leaded,
+        [ { b => "beta", }, ],
+        'regular constructor without coercion'
+    );
+
+}
+
 
 done_testing();
