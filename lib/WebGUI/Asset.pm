@@ -2358,7 +2358,7 @@ sub write {
         my $tableName = $property->tableName;
         my $value     = $self->$property_name;
         if ($property->does('WebGUI::Definition::Meta::Property::Serialize')) {
-            $value    = eval { JSON::from_json($value); } || '';
+            $value    = eval { JSON::to_json($value); } || '';
         }
         push @{ $data_by_table{$tableName}->{NAMES}  }, $property_name;
         push @{ $data_by_table{$tableName}->{VALUES} }, $value;
