@@ -2,10 +2,10 @@ use 5.010;
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More;
 use WebGUI::Paths;
 
-can_ok 'WebGUI::Paths', qw(
+my @pathMethods = qw(
     configBase
     logConfig
     spectreConfig
@@ -17,6 +17,8 @@ can_ok 'WebGUI::Paths', qw(
     defaultCreateSQL
     var
 );
+can_ok 'WebGUI::Paths', @pathMethods;
+
 ok !(grep { WebGUI::Paths->can($_) } qw(
     croak
     realpath
@@ -34,4 +36,11 @@ ok !(grep { WebGUI::Paths->can($_) } qw(
 
 my @configs = WebGUI::Paths->siteConfigs;
 ok !(\@configs ~~ WebGUI::Paths->spectreConfig), 'Spectre config not listed in configs';
+
+for my $method (@pathMethods) {
+    my $return = WebGUI::Paths->$method;
+    ok $return, "$method returns a path";
+}
+
+done_testing;
 

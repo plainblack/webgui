@@ -103,13 +103,15 @@ sub preloadPaths {
     my $class = shift;
     my @paths;
     try {
-        @paths = grep {
-            (-d) ? 1 : do {
-                warn "WARNING: Not adding lib directory '$_' from "
-                    . $class->preloadCustom . ": Directory does not exist.\n";
-                0;
+        for my $path ( _readTextLines($class->preloadCustom) ) {
+            if (-d $path) {
+                push @paths, $path;
             }
-        } _readTextLines($class->preloadCustom);
+            else {
+                warn "WARNING: Not adding lib directory '$path' from "
+                    . $class->preloadCustom . ": Directory does not exist.\n";
+            }
+        }
     };
     return @paths;
 }
