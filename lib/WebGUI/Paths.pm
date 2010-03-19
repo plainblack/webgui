@@ -58,7 +58,7 @@ BEGIN {
     my $meta = Class::MOP::Class->initialize(__PACKAGE__);
     for my $sub (keys %paths) {
         my $path = $paths{$sub};
-        $meta->add_method( $sub, sub () { $path } );
+        $meta->add_method( $sub, sub { $path } );
     }
 }
 
