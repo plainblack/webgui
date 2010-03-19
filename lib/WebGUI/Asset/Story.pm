@@ -779,7 +779,7 @@ sub topic {
 
 #-------------------------------------------------------------------
 
-=head2 validParent
+=head2 valid_parent_classes
 
 Make sure that the current session asset is a StoryArchive for pasting and adding checks.
 
@@ -787,13 +787,8 @@ This is a class method.
 
 =cut
 
-sub validParent {
-    my $class   = shift;
-    my $session = shift;
-    return $session->asset
-        && (   $session->asset->isa('WebGUI::Asset::Wobject::StoryArchive')
-           || ($session->asset->isa('WebGUI::Asset::Wobject::Folder') && $session->asset->getParent->isa('WebGUI::Asset::Wobject::StoryArchive') )
-           );
+sub valid_parent_classes {
+    return [qw/WebGUI::Asset::Wobject::StoryArchive WebGUI::Asset::Wobject::Folder/];
 }
 
 #-------------------------------------------------------------------

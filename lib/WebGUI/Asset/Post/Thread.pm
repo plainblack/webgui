@@ -975,7 +975,7 @@ sub updateThreadRating {
 
 #-------------------------------------------------------------------
 
-=head2 validParent
+=head2 valid_parent_classes
 
 Make sure that the current session asset is a CS for pasting and adding checks.
 
@@ -983,10 +983,8 @@ This is a class method.
 
 =cut
 
-sub validParent {
-    my $class   = shift;
-    my $session = shift;
-    return $session->asset->isa('WebGUI::Asset::Wobject::Collaboration');
+sub valid_parent_classes {
+    return [qw/WebGUI::Asset::Wobject::Collaboration/];
 }
 
 #-------------------------------------------------------------------

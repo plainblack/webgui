@@ -516,26 +516,6 @@ sub _visitorCacheOk {
 
 #-------------------------------------------------------------------
 
-=head2 addChild 
-
-Extend the base method to allow only Threads as children.
-
-=cut
-
-sub addChild {
-	my $self = shift;
-	my $properties = shift;
-	my @other = @_;
-	if ($properties->{className} ne "WebGUI::Asset::Post::Thread") {
-		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->className);
-		return undef;
-	}
-	return $self->next::method($properties, @other);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 appendPostListTemplateVars ($var, $p)
 
 Takes a WebGUI::Paginator object that should be full of Posts, and appends template

@@ -2430,18 +2430,14 @@ sub urlExists {
 
 #-------------------------------------------------------------------
 
-=head2 validParent ( )
+=head2 valid_parent_classes ( )
 
-Make sure that the current session asset is a valid parent for the child and return true or false.
-For example, a WikiPage would check for a WikiMaster.  It should be overridden by those children
-that need to perform that kind of check.
-
-This is a class method.
+The default view method for any asset that doesn't define one. Under all normal circumstances this should be overridden or your asset won't have any output.
 
 =cut
 
-sub validParent {
-    return 1;
+sub valid_parent_classes {
+    return [qw/WebGUI::Asset/];
 }
 
 #-------------------------------------------------------------------

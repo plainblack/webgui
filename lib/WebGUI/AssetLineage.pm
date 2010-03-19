@@ -71,12 +71,17 @@ sub addChild {
 	my $id          = shift || $session->id->generate();
 	my $now         = shift || $session->datetime->time();
 	my $options     = shift;
+    # Check for valid parentage using validParent on child's class
+    if (! $properties->{className}->validParent($session, $self)) {
+        return undef;
+    }
 
 	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
 	if (length($self->lineage) >= 252) {
 		$session->errorHandler->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
 		return $self->getParent->addChild($properties, $id, $now, $options);
 	}
+
 	my $lineage = $self->lineage.$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	$session->db->beginTransaction;
@@ -972,6 +977,32 @@ sub swapRank {
 	return 1;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 validParent ([$asset])
+
+Find out whether a potential parent can have this asset as a child.
+
+This is a class method.
+
+=head3 $asset
+
+The potential parent.  If not passed, uses $session->asset;
+
+=cut
+
+sub validParent {
+    my $class          = shift;
+    my $session        = shift;
+    my $asset          = shift || $session->asset;
+    my $parent_classes = $class->valid_parent_classes;
+    my $valid_parent   = 0;
+    foreach my $parentClass (@{ $class->valid_parent_classes}) {
+        return 1 if $class->isa($parentClass);
+    }
+    return 0;
+}
 
 #-------------------------------------------------------------------
 

@@ -1348,7 +1348,7 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 validParent
+=head2 valid_parent_classes
 
 Make sure that the current session asset is a Thread or Post for pasting and adding checks.
 
@@ -1356,7 +1356,7 @@ This is a class method.
 
 =cut
 
-sub validParent {
+sub valid_parent_classes {
     my $class   = shift;
     my $session = shift;
     return $session->asset->isa('WebGUI::Asset::Post');

@@ -708,6 +708,18 @@ sub setComment {
     );
 }
 
+#-------------------------------------------------------------------
+
+=head2 valid_parent_classes
+
+Restrict valid parents to GalleryAlbums and Shortcuts.
+
+=cut
+
+sub valid_parent_classes {
+    return [qw/WebGUI::Asset::Wobject::GalleryAlbum WebGUI::Asset::Shortcut/];
+}
+
 #----------------------------------------------------------------------------
 
 =head2 view ( )
