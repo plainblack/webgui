@@ -1,3 +1,0 @@
-report "stuff\n";
-
-done;

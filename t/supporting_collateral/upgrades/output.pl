@@ -1,0 +1,4 @@
+report 'Simple Output';
+
+done;
+
