@@ -14,7 +14,7 @@ sub run {
     my ($configFile, $version, $file, $quiet) = @_;
 
     my $session = WebGUI::Session->open($configFile);
-    $session->user({user => 3});
+    $session->user({userId => 3});
 
     # Make a storage location for the package
     my $storage = WebGUI::Storage->createTemp( $session );

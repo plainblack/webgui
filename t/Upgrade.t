@@ -19,6 +19,7 @@ BEGIN {
 
 use WebGUI::Paths;
 use WebGUI::Upgrade;
+use WebGUI::Session::Id;
 use Try::Tiny;
 use Capture::Tiny qw(capture);
 use mro;
@@ -72,7 +73,7 @@ ok $stdout !~ 'Done', 'quiet flag silences done command';
 
 capture {
     try {
-        $upgrade->runUpgradeFile($configFile, '8.3.0', collateral('upgrades', 'die.pl'), 1);
+        $upgrade->runUpgradeFile($configFile, '8.3.0', collateral('upgrades', 'die.pl'));
         fail 'Error on failing upgrade';
     }
     catch {
@@ -82,13 +83,37 @@ capture {
 
 capture {
     try {
-        $upgrade->runUpgradeFile($configFile, '8.3.0', collateral('upgrades', 'strict-failure.pl'), 1);
+        $upgrade->runUpgradeFile($configFile, '8.3.0', collateral('upgrades', 'strict-failure.pl'));
         fail 'strict enabled in upgrades';
     }
     catch {
         pass 'strict enabled in upgrades';
     };
 };
+
+my $session = WebGUI::Test->session;
+
+my $dbh = $upgrade->dbhForConfig(WebGUI::Test->config);
+my ($totalAssets) = $dbh->selectrow_array('SELECT COUNT(*) FROM asset');
+($stdout, $stderr) = capture {
+    $upgrade->runUpgradeFile($configFile, '8.3.0', collateral('upgrades', 'dbh.pl'));
+};
+
+is $stdout, $totalAssets, 'dbh function working correctly';
+
+($stdout, $stderr) = capture {
+    $upgrade->runUpgradeFile($configFile, '8.3.0', collateral('upgrades', 'config.pl'));
+};
+
+is $stdout, $configFile, 'config function working correctly';
+
+($stdout, $stderr) = capture {
+    $upgrade->runUpgradeFile($configFile, '8.3.0', collateral('upgrades', 'session.pl'));
+};
+
+ok(WebGUI::Session::Id::valid({}, $stdout), 'valid session id generated');
+my ($hasSession) = $dbh->selectrow_array('SELECT COUNT(*) FROM userSession WHERE sessionId = ?', {}, $stdout);
+ok !$hasSession, 'session properly closed';
 
 done_testing;
 

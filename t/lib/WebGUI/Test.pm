@@ -26,6 +26,7 @@ use strict;
 use warnings;
 use base qw(Test::Builder::Module);
 
+use Log::Log4perl;
 use Test::MockObject;
 use Test::MockObject::Extends;
 use Log::Log4perl;  # load early to ensure proper order of END blocks

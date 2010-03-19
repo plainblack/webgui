@@ -1,0 +1,2 @@
+print config->getFilename;
+

@@ -1,0 +1,2 @@
+print session->getId;
+

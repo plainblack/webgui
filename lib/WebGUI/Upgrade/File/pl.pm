@@ -69,7 +69,7 @@ sub session () {
 
     require WebGUI::Session;
     $session = WebGUI::Session->open(config);
-    $session->user({user => 3});
+    $session->user({userId => 3});
     return $session;
 }
 
