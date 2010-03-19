@@ -14,11 +14,12 @@ package WebGUI::Config;
 
 =cut
 
-use strict;
+use Moose;
+extends 'Config::JSON';
+
 use WebGUI::Paths;
 use Cwd ();
 use File::Spec;
-use base 'Config::JSON';
 
 my %config = ();
 
@@ -153,7 +154,8 @@ A boolean value that when set to true tells the config system not to store the c
 
 =cut
 
-sub new {
+around new => sub {
+    my $orig = shift;
     my $class = shift;
     my $filename = shift;
     my $noCache = shift;
@@ -164,11 +166,11 @@ sub new {
         return $config{$filename};
     }
     else {
-        my $self = $class->SUPER::new($filename);
+        my $self = $class->$orig($filename);
         $config{$filename} = $self unless $noCache;
         return $self;
     }
-}
+};
 
 
 #-------------------------------------------------------------------
