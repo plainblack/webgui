@@ -18,7 +18,7 @@ use Test::Exception;
 
 
 sub list_of_tables {
-     return [qw/assetData wobject WikiMaster assetAspectRssFeed assetAspectComments assetAspect_Subscribable/];
+     return [qw/assetData wobject WikiMaster assetAspectRssFeed assetAspect_Subscribable/];
 }
 
 1;
