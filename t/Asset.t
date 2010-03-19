@@ -160,11 +160,6 @@ my $session = WebGUI::Test->session;
 }
 
 {
-    note "uiLevel";
-    is +WebGUI::Asset->meta->uiLevel, 1, 'uiLevel: default for assets is 1';
-}
-
-{
     note "write, update";
 
     my $testId       = 'wg8TestAsset0000000001';
@@ -300,4 +295,10 @@ my $session = WebGUI::Test->session;
     $asset->keywords('chess set');
     is ($asset->keywords, 'chess set', 'set and get of keywords via direct accessor');
     is ($asset->get('keywords'), 'chess set', 'via get method');
+}
+
+{
+    note "valid_parent_classes";
+    my $classes = WebGUI::Asset->valid_parent_classes;
+    cmp_deeply($classes, [qw/WebGUI::Asset/], 'Any asset okay');
 }

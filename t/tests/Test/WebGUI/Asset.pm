@@ -189,6 +189,8 @@ sub get_tables : Test(1) {
     my $test    = shift;
     note "get_tables";
     my @tables = $test->class->meta->get_tables;
+    use Data::Dumper;
+    diag Dumper \@tables;
     cmp_bag(
         \@tables,
         $test->list_of_tables,
@@ -262,6 +264,18 @@ sub newByPropertyHashRef : Test(2) {
     $asset = WebGUI::Asset->newByPropertyHashRef($session, {className => $test->class, title => 'The Shawshank Snippet'});
     isa_ok $asset, $test->class;
     is $asset->title, 'The Shawshank Snippet', 'title is assigned from the property hash';
+}
+
+sub scan_properties : Test(1) {
+    note "scan properties for table definitions";
+    my $test    = shift;
+    my @properties = $test->class->meta->get_all_properties;
+    my @undefined_tables = ();
+    foreach my $prop (@properties) {
+        push @undefined_tables, $prop->name if (!$prop->tableName);
+    }
+    ok !@undefined_tables, "all properties have tables defined"
+        or diag "except these: ".join ", ", @undefined_tables;
 }
 
 
