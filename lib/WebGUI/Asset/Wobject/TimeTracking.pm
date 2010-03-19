@@ -185,7 +185,7 @@ sub view {
 	
 	my ($session,$privilege,$form,$db,$dt,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","datetime","user","errorHandler","config");    
 	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
-	$var->{'extras'} = $config->get("extrasURL")."/wobject/TimeTracking"; 
+	$var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/TimeTracking"; 
 	
 	if($user->isInGroup($self->groupToManage)) {
 	   $var->{'project.manage.url'} = $self->getUrl("func=manageProjects");
@@ -337,7 +337,7 @@ sub www_editProject {
     return $privilege->insufficient unless ($user->isInGroup($self->groupToManage));
     my $projectId = $_[0] || $form->get("projectId") || "new";
 	my $taskError = qq|<br><span style="color:red;font-weight:bold">$_[1]</span>| if($_[1]);
-	my $extras = $config->get("extrasURL")."/wobject/TimeTracking"; 
+	my $extras = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/TimeTracking"; 
 	
 	my $project = $db->quickHashRef("select * from TT_projectList where projectId=".$db->quote($projectId));
 	#Build Form
@@ -509,7 +509,7 @@ sub www_manageProjects {
 	my $pnLabel = $i18n->get("manage project name label");
 	my $atLabel = $i18n->get("manage project available task label");
 	my $resLabel = $i18n->get("manage project resource label");
-	my $extras = $config->get("extrasURL")."/wobject/TimeTracking"; 
+	my $extras = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/TimeTracking"; 
 	my $errorMessage = "";
 	$errorMessage = qq|<span style="color:red;font-weight:bold">$_[0]</span>| if($_[0]);
 	

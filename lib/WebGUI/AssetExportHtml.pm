@@ -636,9 +636,9 @@ sub exportSymlinkExtrasUploads {
 
     my $config      = $session->config;
     my $extrasPath  = $config->get('extrasPath');
-    my $extrasUrl   = $config->get('extrasURL');
+    my $extrasUrl   = $session->url->make_urlmap_work($config->get('extrasURL'));
     my $uploadsPath = $config->get('uploadsPath');
-    my $uploadsUrl  = $config->get('uploadsURL');
+    my $uploadsUrl  = $session->url->make_urlmap_work($config->get('uploadsURL'));
 
     # we have no assurance whether the exportPath is valid or not, so check it.
     my $exportPath = WebGUI::Asset->exportCheckPath($session);

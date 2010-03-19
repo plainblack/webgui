@@ -144,7 +144,7 @@ consecutive slashes in the path part of the URL will be replaced with a single s
 sub extras {
     my $self   = shift;
     my $path   = shift;
-    my $url    = $self->session->config->get("extrasURL");
+    my $url    = $self->session->url->make_urlmap_work($self->session->config->get("extrasURL"));
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} and $cdnCfg->{'extrasCdn'} ) {
         unless ( $path and grep $path =~ m/$_/, @{ $cdnCfg->{'extrasExclude'} } ) {
@@ -190,7 +190,7 @@ sub gateway {
 	my $pageUrl = shift;
 	my $pairs = shift;
 	my $skipPreventProxyCache = shift;
-        my $url = $self->session->config->get("gateway").'/'.$pageUrl;
+        my $url = $self->make_urlmap_work($self->session->config->get("gateway")).'/'.$pageUrl;
 	$url =~ s/\/+/\//g;
         if ($self->session->setting->get("preventProxyCache") == 1 and !$skipPreventProxyCache) {
                 $url = $self->append($url,"noCache=".randint(0,1000).':'.$self->session->datetime->time());
@@ -198,7 +198,19 @@ sub gateway {
 	if ($pairs) {
 		$url = $self->append($url,$pairs);
 	}
-        return $url;
+
+   return $url;
+}
+
+# Temporary hack
+sub make_urlmap_work {
+    my $self = shift;
+    my $url = shift;
+	my $uri = $self->session->request->base;
+    $uri->path($uri->path . $url);
+    my $path = $uri->path;
+    $path =~ s{^//}{/};
+    return $path;
 }
 
 #-------------------------------------------------------------------

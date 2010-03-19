@@ -742,8 +742,8 @@ sub fixUrl {
 	# fix urls used by uploads and extras
 	# and those beginning with http
 	my @badUrls = (
-        $self->session->config->get("extrasURL"),
-        $self->session->config->get("uploadsURL"),
+        $self->session->url->make_urlmap_work($self->session->config->get("extrasURL")),
+        $self->session->url->make_urlmap_work($self->session->config->get("uploadsURL")),
     );
     foreach my $badUrl (@badUrls) {
         $badUrl =~ s{ / $ }{}x; # Remove trailing slashes from the end of the URL
@@ -1970,7 +1970,7 @@ sub outputWidgetMarkup {
     my $assetId         = $self->getId;
     my $hexId           = $session->id->toHex($assetId);
     my $conf            = $session->config;
-    my $extras          = $conf->get('extrasURL');
+    my $extras          = $session->url->make_urlmap_work($conf->get('extrasURL'));
 
     # the widgetized version of content that has the widget macro in it is
     # executing in an iframe. this iframe doesn't have a style object.
@@ -2072,7 +2072,7 @@ sub prepareWidgetView {
     my $self            = shift;
     my $templateId      = shift;
     my $template        = WebGUI::Asset::Template->newById($self->session, $templateId);
-    my $extras          = $self->session->config->get('extrasURL');
+    my $extras          = $self->session->url->make_urlmap_work($self->session->config->get('extrasURL'));
 
     $template->prepare;
 

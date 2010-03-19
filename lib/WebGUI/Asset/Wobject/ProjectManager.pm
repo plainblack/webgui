@@ -741,7 +741,7 @@ sub view {
 	my $config = $session->config;
 	my $eh = $session->errorHandler;
 	
-	$var->{'extras'} = $config->get("extrasURL")."/wobject/ProjectManager"; 
+	$var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/ProjectManager"; 
 	$var->{'project.create'} = $self->getUrl("func=editProject;projectId=new");
 	$var->{'project.create.label'} = $i18n->get("project new label");
 	
@@ -904,7 +904,7 @@ sub www_drawGanttChart {
 	
 	my ($dunits,$hoursPerDay) = $db->quickArray("select durationUnits,hoursPerDay from PM_project where projectId=".$db->quote($projectId));
 
-	$var->{'extras'} = $config->get("extrasURL")."/wobject/ProjectManager";
+	$var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/ProjectManager";
 	
 	#Initialize display settings 
 	my $projectDisplay = "weeks";
@@ -1494,8 +1494,8 @@ sub www_editTask {
 				});
    $var->{'form.footer'} = WebGUI::Form::formFooter($session);
 
-   $var->{'extras'} = $config->get("extrasURL");
-   $var->{'assetExtras'} = $config->get("extrasURL").'/wobject/ProjectManager';
+   $var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"));
+   $var->{'assetExtras'} = $session->url->make_urlmap_work($config->get("extrasURL")).'/wobject/ProjectManager';
    
    $var->{'task_name_label'}        = $i18n->get('task name label');
    $var->{'task_start_label'}       = $i18n->get('task start label');
@@ -1726,8 +1726,8 @@ sub www_viewProject {
 	return $privilege->insufficient unless $self->_userCanObserveProject($user, $projectId);
 	
     #Set extras template variables
-    my $extras            = $config->get("extrasURL");
-	my $assetExtras       = $config->get("extrasURL")."/wobject/ProjectManager";	
+    my $extras            = $session->url->make_urlmap_work($config->get("extrasURL"));
+	my $assetExtras       = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/ProjectManager";	
     $var->{'extras'     } = $assetExtras;
 	$var->{'extras.base'} = $extras;
     
