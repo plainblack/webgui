@@ -113,7 +113,6 @@ sub find {
         my @excludePatterns = map { s/(?<!\.)\*/.*/g; $_; } grep { /\*/ } @{ $options->{exclude} };
         if (@excludePatterns) {
             my $pattern         = join q{|}, @excludePatterns;
-            warn $pattern;
             my $exclusions      = qr/$pattern/;
             @modules = grep { ! m/$exclusions/ } @modules;
         }
