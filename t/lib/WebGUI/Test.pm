@@ -28,8 +28,8 @@ use base qw(Test::Builder::Module);
 
 use Test::MockObject;
 use Test::MockObject::Extends;
+use Log::Log4perl;  # load early to ensure proper order of END blocks
 use Clone               qw(clone);
-use Config              ();
 use IO::Handle          ();
 use File::Spec          ();
 use IO::Select          ();
@@ -50,12 +50,10 @@ our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir(
     'supporting_collateral'
 );
 
-use WebGUI::Asset;
-use WebGUI::Session;
 use WebGUI::PseudoRequest;
 
 our @EXPORT = qw(cleanupGuard addToCleanup);
-our @EXPORT_OK = qw(session config);
+our @EXPORT_OK = qw(session config collateral);
 
 my $CLASS = __PACKAGE__;
 
@@ -74,6 +72,11 @@ sub import {
         unless -r _;
 
     $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, WebGUI::Paths->configBase);
+
+    goto &{ $_[0]->can('SUPER::import') };
+}
+
+sub _initSession {
     my $session = our $SESSION = $CLASS->newSession(1);
 
     my $originalSetting = clone $session->setting->get;
@@ -118,8 +121,6 @@ sub import {
             }
         });
     }
-
-    goto &{ $_[0]->can('SUPER::import') };
 }
 
 END {
@@ -154,7 +155,8 @@ If true, the session won't be registered for automatic deletion.
 sub newSession {
     my $noCleanup = shift;
     my $pseudoRequest = WebGUI::PseudoRequest->new;
-    my $session = WebGUI::Session->open( $CLASS->file );
+    require WebGUI::Session;
+    my $session = WebGUI::Session->open( $CLASS->config );
     $session->{_request} = $pseudoRequest;
     if ( ! $noCleanup ) {
         $CLASS->sessionsToDelete($session);
@@ -321,9 +323,13 @@ Returns the config object from the session.
 
 =cut
 
+my $config;
 sub config {
-    return undef unless defined $CLASS->session;
-    return $CLASS->session->config;
+    return $config
+        if $config;
+    require WebGUI::Config;
+    $config = WebGUI::Config->new(our $CONFIG_FILE);
+    return $config;
 }
 
 #----------------------------------------------------------------------------
@@ -367,7 +373,6 @@ sub getPage {
                                 #              precedence
 
     my $session = $CLASS->session;
-
     # Set the appropriate user
     my $oldUser     = $session->user;
     if ($optionsRef->{user}) {
@@ -423,8 +428,12 @@ Optionally adds a filename to the end.
 
 sub getTestCollateralPath {
     my $class           = shift;
-    my $filename        = shift;
-    return File::Spec->catfile(our $WEBGUI_TEST_COLLATERAL, $filename);
+    my @path            = @_;
+    return File::Spec->catfile(our $WEBGUI_TEST_COLLATERAL, @path);
+}
+
+sub collateral {
+    return $CLASS->getTestCollateralPath(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -457,7 +466,11 @@ disabled.
 =cut
 
 sub session {
-    return our $SESSION;
+    our $SESSION;
+    if (! $SESSION) {
+        _initSession();
+    }
+    return $SESSION;
 }
 
 #----------------------------------------------------------------------------
