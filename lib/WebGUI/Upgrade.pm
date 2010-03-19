@@ -4,67 +4,92 @@ use strict;
 use warnings;
 use WebGUI::Paths;
 use WebGUI;
-
-sub upgradeSite {
-    my $class = shift;
-    my ($configFile) = @_;
-    my $fromVersion = '7.8.1';
-    my $steps = $class->calcUpgradePath($fromVersion);
-    for my $step ( @$steps ) {
-        $class->runUpgradeStep($configFile, $step);
-    }
-}
+use Try::Tiny;
+use WebGUI::Pluggable;
+use DBI;
+use WebGUI::Config;
 
 sub upgradeSites {
     my $class = shift;
+    my $quiet = shift;
     my @configs = WebGUI::Paths->siteConfigs;
     for my $configFile (@configs) {
-        $class->upgradeSite($configFile);
+        my $bareFilename = $configFile;
+        $bareFilename =~ s{.*/}{};
+        print "Upgrading $bareFilename:\n";
+        try {
+            $class->upgradeSite($configFile, $quiet);
+        }
+        catch {
+            print "Error upgrading $bareFilename: $@\n";
+        }
+    }
+}
+
+sub upgradeSite {
+    my $class = shift;
+    my ($configFile, $quiet) = @_;
+    my $fromVersion = $class->getCurrentVersion($configFile);
+    my @steps = $class->calcUpgradePath($fromVersion, $WebGUI::Version);
+    for my $step ( @steps ) {
+        $class->runUpgradeStep($configFile, $step, $quiet);
     }
 }
 
 sub calcUpgradePath {
     my $class = shift;
-    my $fromVersion = $class->decimalize_version(shift);
-    my $toVersion = $class->decimalize_version('7.9.3'); #$WebGUI::VERSION);
+    my ($fromVersionStr, $toVersionStr) = @_;
+    my $fromVersion = $class->numericVersion($fromVersionStr);
+    my $toVersion = $class->numericVersion($toVersionStr);
 
-    my %from;
+    my %upgrades;
     opendir my $dh, WebGUI::Paths->upgrades;
     while ( my $dir = readdir $dh ) {
         next
             if $dir =~ /^\./;
         next
             unless -d File::Spec->catdir(WebGUI::Paths->upgrades, $dir);
-        if ($dir =~ /^(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)$/) {
-            $from{ $class->decimalize_version($1) }{ $class->decimalize_version($2) } = "$1-$2";
+        if ($dir =~ /^((\d+\.\d+\.\d+)-(\d+\.\d+\.\d+))$/) {
+            $upgrades{ $class->numericVersion($2) }{ $class->numericVersion($3) } = $1;
         }
     }
     closedir $dh;
 
-    my $findSteps;
-    $findSteps = sub {
-        my ($found, $steps) = @_;
-        if ($found eq $toVersion) {
-            return $steps;
+    my @steps;
+    while ( 1 ) {
+        my $atVersion = @steps ? $steps[-1][0] : $fromVersion;
+        last
+            if $atVersion eq $toVersion;
+
+        # find the available steps for the version we are at
+        my $stepsAvail = $upgrades{ $atVersion };
+        if ( $stepsAvail && %{ $stepsAvail } ) {
+            # take the lowest destination version, and remove it so it isn't considered again
+            my ($nextStep) = sort { $a <=> $b } keys %{ $stepsAvail };
+            my $dir = delete $stepsAvail->{$nextStep};
+            # add a step for that 
+            push @steps, [$nextStep, $dir];
         }
-        my $stepsAvail = $from{$found};
-        for my $nextStep ( sort { $a <=> $b } keys %{ $stepsAvail } ) {
-            my $doneSteps = $findSteps->($nextStep, [@$steps, $stepsAvail->{$nextStep}]);
-            return $doneSteps
-                if $doneSteps;
+        # if we don't have any steps available, the last step we tried won't work so remove it
+        elsif ( @steps ) {
+            pop @steps;
         }
-        return;
-    };
-    my $steps = $findSteps->($fromVersion, []);
-    return $steps;
+        # if there is no way forward and we can't backtrack, bail out
+        else {
+            die "Can't find upgrade path from $fromVersionStr to $toVersionStr.\n";
+        }
+    }
+    return map { $_->[1] } @steps;
 }
 
 sub runUpgradeStep {
     my $class = shift;
-    my ($configFile, $step) = @_;
-    print "Running upgrade $step\n";
+    my ($configFile, $step, $quiet) = @_;
+
+    my ($version) = $step =~ /-(\d+\.\d+\.\d+)$/;
+    print "Running upgrades for $step.\n";
     my $upgradesDir = File::Spec->catdir(WebGUI::Paths->upgrades, $step);
-    opendir my($dh), $upgradesDir;
+    opendir my($dh), $upgradesDir or die "Can't get upgrades for $step: $!\n";
     while ( my $upgradeFile = readdir $dh ) {
         next
             if $upgradeFile =~ /^\./;
@@ -74,18 +99,67 @@ sub runUpgradeStep {
         my ($extension) = $filename =~ /\.([^.]+)$/;
         next
             unless $extension;
-        my $sub = __PACKAGE__->can('upgrade_file_' . $extension);
-        if ($sub) {
-            $class->$sub($configFile, $filename);
+
+        my $package = 'WebGUI::Upgrade::File::' . $extension;
+        if ( try { WebGUI::Pluggable::load($package) } && $package->can('run') ) {
+            $package->run($configFile, $version, $filename, $quiet);
         }
         else {
             warn "Don't know how to use $extension upgrade file\n";
         }
     }
     closedir $dh;
+    $class->markVersionUpgrade($configFile, $version);
 }
 
-sub decimalize_version {
+sub markVersionUpgrade {
+    my $class = shift;
+    my $configFile = shift;
+    my $version = shift;
+
+    my $dbh = $class->dbhForConfig($configFile);
+
+    $dbh->do(
+        'INSERT INTO webguiVersion (webguiVersion, versionType, dateApplied) VALUES (?,?,?)', {},
+        $version, 'upgrade', time,
+    );
+}
+
+sub getCurrentVersion {
+    my $class = shift;
+    my $configFile = shift;
+    my $config = WebGUI::Config->new($configFile, 1);
+    my $dbh = $class->dbhForConfig($config);
+
+    my $sth = $dbh->prepare('SELECT webguiVersion FROM webguiVersion');
+    $sth->execute;
+    my ($version) = map { $_->[0] }
+        sort { $a->[1] <=> $b->[1] }
+        map { [ $_->[0], $class->numericVersion($_->[0]) ] }
+        @{ $sth->fetchall_arrayref( [0] ) };
+    $sth->finish;
+    return $version;
+}
+
+sub dbhForConfig {
+    my $class = shift;
+    my $config = shift;
+
+    my $dsn = $config->get('dsn');
+    my $user = $config->get('dbuser');
+    my $pass = $config->get('dbpass');
+
+    my (undef, $driver) = DBI->parse_dsn($dsn);
+    my $dbh = DBI->connect($dsn, $user, $pass, {
+        RaiseError => 1,
+        AutoCommit => 1,
+        PrintError => 0,
+        $driver eq 'mysql' ? (mysql_enable_utf8 => 1) : (),
+    });
+    return $dbh;
+}
+
+sub numericVersion {
     my $class = shift;
     my $version = shift;
     my @parts = split /\./, $version;
@@ -94,63 +168,6 @@ sub decimalize_version {
         $decVersion += $parts[$i] / (1000**$i);
     }
     return $decVersion;
-}
-
-sub upgrade_file_pl {
-    my $class = shift;
-    my ($configFile, $file) = @_;
-    open my $fh, '<', $file;
-    my $contents = do { local $/; <$fh> };
-    close $fh;
-    my $code = sprintf <<'END_CODE', $file, $contents;
-package WebGUI::Upgrade::Script;
-use strict;
-use warnings;
-# line 1 "%s"
-%s
-END_CODE
-    my $pid = fork;
-    if (!$pid) {
-        $WebGUI::Upgrade::Script::configFile = $configFile;
-        $WebGUI::Upgrade::Script::quiet = 0;
-        eval $code;
-        die $@ if $@;
-        exit;
-    }
-    waitpid $pid, 0;
-}
-
-sub upgrade_file_sql {
-    my $class = shift;
-    my ($configFile, $file) = @_;
-    warn "running sql script: $file\n";
-}
-
-package WebGUI::Upgrade::Script;
-
-our $configFile;
-our $config;
-our $session;
-our $quiet;
-
-sub report {
-    print @_ unless $quiet;
-}
-
-sub done {
-    print "Done.\n" unless $quiet;
-}
-
-sub session () {
-    require WebGUI::Session;
-    $session ||= WebGUI::Session->open(config());
-    return $session;
-}
-
-sub config () {
-    require WebGUI::Config;
-    $config ||= WebGUI::Config->new($configFile, 1);
-    return $config;
 }
 
 1;
