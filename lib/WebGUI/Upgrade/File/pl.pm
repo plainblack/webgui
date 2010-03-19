@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use WebGUI::Upgrade;
+use POSIX ();
 
 sub _runCode {
     eval sprintf <<'END_CODE', $_[0], $_[1];
@@ -30,28 +31,22 @@ sub run {
     my $class = shift;
     ($configFile, $version, $file, $quiet) = @_;
     ($session, $config, $dbh, $versionTag) = undef;
-    my $pid = fork;
-    if (! $pid) {
-        open my $fh, '<', $file;
-        my $contents = do { local $/; <$fh> };
-        close $fh;
-        _runCode($file, $contents);
-        if ($session) {
-            require WebGUI::VersionTag;
-            if (WebGUI::VersionTag->getWorking($session, 'nocreate')) {
-                version_tag()->commit;
-            }
-            $session->var->end;
-            $session->close;
+    open my $fh, '<', $file;
+    my $contents = do { local $/; <$fh> };
+    close $fh;
+    _runCode($file, $contents);
+    my $error = $@;
+    if ($session) {
+        require WebGUI::VersionTag;
+        if (WebGUI::VersionTag->getWorking($session, 'nocreate')) {
+            version_tag()->commit;
         }
-        die $@
-            if $@;
-        exit;
+        $session->var->end;
+        $session->close;
     }
-    waitpid $pid, 0;
-    if ($?) {
-        die "Error processing $file\n";
-    }
+    die $error
+        if $error;
+    return 1;
 }
 
 sub report {
