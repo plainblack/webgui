@@ -48,7 +48,7 @@ my $wiki = $node->addChild({
     groupIdEdit       => $assetEdit->getId,
     groupToAdminister => $wikiAdmin->getId,
     groupToEditPages  => $wikiEditPage->getId,
-    ownerUserId       => $wikiOwner,
+    ownerUserId       => $wikiOwner->getId,
 }, undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 $versionTag->commit;
 my $wikipage = $wiki->addChild({
@@ -76,7 +76,7 @@ ok (  $wiki->canAdminister, 'wiki admin');
 $session->user({user => $wikiPageEditor});
 ok (! $wiki->canAdminister, 'wiki page editor');
 $session->user({user => $wikiOwner});
-ok (! $wiki->canAdminister, 'wiki owner');
+ok (  $wiki->canAdminister, 'wiki owner');
 $session->user({user => $wikiPageOwner});
 ok (! $wiki->canAdminister, 'wiki page owner');
 $session->user({userId => 1});
@@ -92,7 +92,7 @@ ok (  $wiki->canEditPages, 'wiki admin');
 $session->user({user => $wikiPageEditor});
 ok (  $wiki->canEditPages, 'wiki page editor');
 $session->user({user => $wikiOwner});
-ok (! $wiki->canEditPages, 'wiki owner');
+ok (  $wiki->canEditPages, 'wiki owner');
 $session->user({user => $wikiPageOwner});
 ok (! $wiki->canEditPages, 'wiki page owner');  ##A wiki page owner should not be able to edit _all_ pages, just their own
 $session->user({userId => 1});
@@ -108,7 +108,7 @@ ok (! $wiki->canEdit, 'wiki admin');
 $session->user({user => $wikiPageEditor});
 ok (! $wiki->canEdit, 'wiki page editor');
 $session->user({user => $wikiOwner});
-ok (! $wiki->canEdit, 'wiki owner');
+ok (  $wiki->canEdit, 'wiki owner');
 $session->user({user => $wikiPageOwner});
 ok (! $wiki->canEdit, 'wiki page owner');  ##A wiki page owner should not be able to edit _all_ pages, just their own
 $session->user({userId => 1});
@@ -124,7 +124,7 @@ ok (  $wikipage->canEdit, 'wiki admin');
 $session->user({user => $wikiPageEditor});
 ok (  $wikipage->canEdit, 'wiki page editor');
 $session->user({user => $wikiOwner});
-ok (! $wikipage->canEdit, 'wiki owner');
+ok (  $wikipage->canEdit, 'wiki owner');
 $session->user({user => $wikiPageOwner});
 ok (! $wikipage->canEdit, 'wiki page owner');
 $session->user({userId => 1});
