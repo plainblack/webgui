@@ -1464,8 +1464,8 @@ sub viewMonth {
     }
 
     # Day names
-    my @dayNames    = @{$dt->locale->day_names}[6,0..5]; # Put sunday first
-    my @dayAbbrs    = @{$dt->locale->day_abbreviations}[6,0..5];
+    my @dayNames    = @{$dt->locale->day_format_wide}[6,0..5]; # Put sunday first
+    my @dayAbbrs    = @{$dt->locale->day_format_abbreviated}[6,0..5];
     # Take from FirstDOW to the end and put it on the beginning
     unshift @dayNames,splice(@dayNames,$first_dow);
     unshift @dayAbbrs,splice(@dayAbbrs,$first_dow);
