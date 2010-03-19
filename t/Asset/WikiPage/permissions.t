@@ -15,7 +15,6 @@ use lib "$FindBin::Bin/../../lib";
 ##The goal of this test is to test permissions handling for the WikiMaster and WikiPage.
 
 use WebGUI::Test;
-use WebGUI::Test::Maker::Permission;
 use WebGUI::Session;
 use Test::More tests => 31; # increment this value for each test you create
 use WebGUI::Asset::Wobject::WikiMaster;
