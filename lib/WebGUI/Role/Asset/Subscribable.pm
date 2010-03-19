@@ -18,7 +18,7 @@ package WebGUI::Role::Asset::Subscribable;
 use WebGUI::International;
 use Moose::Role;
 use WebGUI::Definition::Asset;
-define tableName               => "assetAspect_Subscribable",
+define tableName               => "assetAspect_Subscribable";
 property subscriptionGroupId => (
             tab             => "security",
             fieldType       => "subscriptionGroup",
