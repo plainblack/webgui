@@ -21,16 +21,17 @@ sub upgradeSites {
             $class->upgradeSite($configFile, $quiet);
         }
         catch {
-            print "Error upgrading $bareFilename: $@\n";
+            print "Error upgrading $bareFilename: $_\n";
         }
     }
+    return 1;
 }
 
 sub upgradeSite {
     my $class = shift;
     my ($configFile, $quiet) = @_;
     my $fromVersion = $class->getCurrentVersion($configFile);
-    my @steps = $class->calcUpgradePath($fromVersion, $WebGUI::Version);
+    my @steps = $class->calcUpgradePath($fromVersion, $WebGUI::VERSION);
     for my $step ( @steps ) {
         $class->runUpgradeStep($configFile, $step, $quiet);
     }
@@ -96,20 +97,26 @@ sub runUpgradeStep {
         my $filename = File::Spec->catfile($upgradesDir, $upgradeFile);
         next
             unless -f $filename;
-        my ($extension) = $filename =~ /\.([^.]+)$/;
-        next
-            unless $extension;
-
-        my $package = 'WebGUI::Upgrade::File::' . $extension;
-        if ( try { WebGUI::Pluggable::load($package) } && $package->can('run') ) {
-            $package->run($configFile, $version, $filename, $quiet);
-        }
-        else {
-            warn "Don't know how to use $extension upgrade file\n";
-        }
+        $class->runUpgradeFile($configFile, $version, $filename, $quiet);
     }
     closedir $dh;
     $class->markVersionUpgrade($configFile, $version);
+}
+
+sub runUpgradeFile {
+    my $class = shift;
+    my ($configFile, $version, $filename, $quiet) = @_;
+
+    my ($extension) = $filename =~ /\.([^.]+)$/;
+    return
+        unless $extension;
+
+    my $package = 'WebGUI::Upgrade::File::' . $extension;
+    if ( try { WebGUI::Pluggable::load($package) } && $package->can('run') ) {
+        return $package->run($configFile, $version, $filename, $quiet);
+    }
+    warn "Don't know how to use $extension upgrade file\n";
+    return;
 }
 
 sub markVersionUpgrade {
@@ -117,7 +124,8 @@ sub markVersionUpgrade {
     my $configFile = shift;
     my $version = shift;
 
-    my $dbh = $class->dbhForConfig($configFile);
+    my $config = WebGUI::Config->new($configFile, 1);
+    my $dbh = $class->dbhForConfig($config);
 
     $dbh->do(
         'INSERT INTO webguiVersion (webguiVersion, versionType, dateApplied) VALUES (?,?,?)', {},
