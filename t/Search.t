@@ -57,8 +57,12 @@ ok(! $search->_isStopword('private.+'),      '_isStopword: regex metacharacters 
 # Chinese ideograph handling
 #
 ################################################
-{
+SKIP: {
     use utf8;
+
+    my $min_word_length = $session->db->quickScalar('SELECT @@ft_min_word_len');
+    skip 'MySQL minimum word length too long to support ideograms', 2
+        if $min_word_length > 2;
 
     # Create an article to index
     my $article         = WebGUI::Asset->getImportNode( $session )->addChild( {

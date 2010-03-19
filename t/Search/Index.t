@@ -244,23 +244,30 @@ cmp_deeply (
 
 #----------------------------------------------------------------------------
 # Test that Chinese ideographical characters are inserted and searchable.
-use utf8;
-$article->update({
-    description     => "甲骨文",
-});
-$indexer = WebGUI::Search::Index->create( $article );
+SKIP: {
+    use utf8;
 
-$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] );
-cmp_deeply ( 
-    $row,
-    superhashof({
-        keywords        => all( # keywords contains title, menuTitle, every part of the URL and every keyword
-            re("''甲''"),
-            re("''骨''"),
-            re("''文''"),
-        ),
-    }),
-    "Index has Chinese ideographs, separated by spaces and delimited with quotes to pad the length" 
-);
+    my $min_word_length = $session->db->quickScalar('SELECT @@ft_min_word_len');
+    skip 'MySQL minimum word length too long to support ideograms', 1
+        if $min_word_length > 2;
+
+    $article->update({
+        description     => "甲骨文",
+    });
+    $indexer = WebGUI::Search::Index->create( $article );
+
+    $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] );
+    cmp_deeply ( 
+        $row,
+        superhashof({
+            keywords        => all( # keywords contains title, menuTitle, every part of the URL and every keyword
+                re("''甲''"),
+                re("''骨''"),
+                re("''文''"),
+            ),
+        }),
+        "Index has Chinese ideographs, separated by spaces and delimited with quotes to pad the length" 
+    );
+}
 
 #vim:ft=perl
