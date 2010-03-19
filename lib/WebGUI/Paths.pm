@@ -32,9 +32,62 @@ Package WebGUI::Paths
 
 Locations for WebGUI files
 
+=head1 IMPORT OPTIONS
+
+=head2 -inc
+
+    use WebGUI::Paths -inc;
+
+Loads all of the entries from the preload.custom file into @INC
+
+=head2 -preload
+
+Loads all of the entries from the preload.custom file into @INC,
+and loads all modules in the WebGUI namespace.
+
 =head1 METHODS
 
 These methods are available from this class:
+
+=head2 configBase
+
+Returns the base directory for WebGUI site config files.
+
+=head2 logConfig
+
+Returns the file path of the log configuration file.
+
+=head2 spectreConfig
+
+Returns the file path of the Spectre configuration file.
+
+=head2 preloadCustom
+
+Returns the file path of the preload.custom file to use.
+
+=head2 preloadExclusions
+
+Returns the file path of the preload.exclude file to use.
+
+=head2 upgrades
+
+Returns the base directory that contains the upgrade scripts.
+
+=head2 extras
+
+Returns the base directory of the WebGUI extra web files.
+
+=head2 defaultUploads
+
+Returns the base directory of the default site uploads content.
+
+=head2 defaultCreateSQL
+
+Returns the file path of the default site create.sql script.
+
+=head2 var
+
+Returns the base directory for WebGUI auxiliary files.
 
 =cut
 
@@ -81,6 +134,13 @@ sub import {
     }
 }
 
+
+=head2 siteConfigs
+
+Returns the absolute paths of all of the config files inside L</configBase> as an array.
+
+=cut
+
 sub siteConfigs {
     my $class = shift;
     opendir my $dh, $class->configBase;
@@ -99,6 +159,12 @@ sub siteConfigs {
     return @configs;
 } ## end sub siteConfigs
 
+=head2 preloadPaths
+
+Returns the list of paths in the preload.custom file as an array.
+
+=cut
+
 sub preloadPaths {
     my $class = shift;
     my @paths;
@@ -116,16 +182,34 @@ sub preloadPaths {
     return @paths;
 }
 
+=head2 includePreloads
+
+Adds the paths from preload.custom to @INC.
+
+=cut
+
 sub includePreloads {
     my $class = shift;
     unshift @INC, $class->preloadPaths;
 }
+
+=head2 preloadExclude
+
+Returns the list of modules to exclude from preloading as an array.
+
+=cut
 
 sub preloadExclude {
     my $class = shift;
     my @excludes = _readTextLines($class->preloadExclude);
     return @excludes;
 }
+
+=head2 preloadAll
+
+Preloads all of the modules in the WebGUI namespace into memory.
+
+=cut
 
 sub preloadAll {
     my $class = shift;
