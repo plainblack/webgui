@@ -8,6 +8,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::VersionTag;
 use File::Spec;
+use Try::Tiny;
 
 sub run {
     my $class = shift;
@@ -16,15 +17,13 @@ sub run {
     my $session = WebGUI::Session->open($configFile);
     $session->user({userId => 3});
 
+    my $versionTag = WebGUI::VersionTag->getWorking($session);
     (undef, undef, my $shortname) = File::Spec->splitpath($file);
     $shortname =~ s/\.[^.]*$//;
-
-    my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->set({name => "Upgrade to $version - $shortname"});
 
     my $package = $class->import_package($session, $file);
 
-warn $versionTag->getId;
     $versionTag->commit;
     $session->var->end;
     $session->close;
@@ -41,8 +40,13 @@ sub import_package {
     $storage->addFileFromFilesystem( $file );
 
     # Import the package into the import node
-    my $package = eval {
-        WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+    my $package = try {
+        my $node = WebGUI::Asset->getImportNode($session);
+        $node->importPackage( $storage, {
+            overwriteLatest    => 1,
+            clearPackageFlag   => 1,
+            setDefaultTemplate => 1,
+        } );
     };
 
     $storage->delete;

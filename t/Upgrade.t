@@ -59,12 +59,10 @@ is_deeply
 }
 $upgrade->set_true('runUpgradeFile');
 
-my $stdout;
-my $stderr;
-
-my $res;
-capture { $res = $upgrade->upgradeSites };
-ok $res, 'upgradeSites runs';
+capture {
+    my $res = $upgrade->upgradeSites;
+    ok $res, 'upgradeSites runs';
+};
 
 $upgrade->called_pos_ok(1, 'getCurrentVersion');
 $upgrade->called_pos_ok(2, 'runUpgradeFile');
@@ -80,13 +78,17 @@ $upgrade->mock(testUpgrade => sub {
     $self->runUpgradeFile($configFile, '8.3.0', collateral('Upgrade', $file), @_);
 });
 
-$stdout = capture { $upgrade->testUpgrade('output.pl') };
-ok $stdout =~ 'Simple Output', 'report command functions correctly';
-ok $stdout =~ 'Done', 'done command functions correctly';
+{
+    my $stdout = capture { $upgrade->testUpgrade('output.pl') };
+    ok $stdout =~ 'Simple Output', 'report command functions correctly';
+    ok $stdout =~ 'Done', 'done command functions correctly';
+}
 
-$stdout = capture { $upgrade->testUpgrade('output.pl', 1) };
-ok $stdout !~ 'Simple Output', 'quiet flag silences report command';
-ok $stdout !~ 'Done', 'quiet flag silences done command';
+{
+    my $stdout = capture { $upgrade->testUpgrade('output.pl', 1) };
+    ok $stdout !~ 'Simple Output', 'quiet flag silences report command';
+    ok $stdout !~ 'Done', 'quiet flag silences done command';
+}
 
 ok !try { $upgrade->testUpgrade('die.pl'); 1 }, 'Error on failing upgrade';
 ok !try { $upgrade->testUpgrade('strict-failure.pl'); 1 }, 'strict enabled in upgrades';
@@ -146,10 +148,20 @@ END_PM
     my $package = $upgrade->testUpgrade('test-template.wgpkg');
     isa_ok $package, 'WebGUI::Asset::Template';
     my $vtId = $package->get('tagId');
-    warn $vtId;
     my $vt = WebGUI::VersionTag->new($session, $vtId);
     addToCleanup($vt);
-    is $vt->get('name'), 'Upgrade to 8.3.0 - test-snippet', 'package import names version tag correctly';
+    is $vt->get('name'), 'Upgrade to 8.3.0 - test-template', 'package import names version tag correctly';
+}
+
+{
+    my $stdout = capture {
+        $upgrade->testUpgrade('select.sql');
+    };
+    my @lines = split /[\r\n]+/, $stdout;
+    my $dateApplied = $lines[1];
+
+    my $dbdateApplied = $dbh->selectrow_array('SELECT dateApplied FROM webguiVersion ORDER BY dateApplied DESC LIMIT 1');
+    is $dateApplied, $dbdateApplied, 'SQL script run against database properly';
 }
 
 done_testing;

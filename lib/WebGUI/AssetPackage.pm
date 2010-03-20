@@ -161,11 +161,19 @@ sub importAssetData {
     WebGUI::Asset->loadModule( $class );
 
     my %properties = %{ $data->{properties} };
+    delete $properties{tagId};
     if ($options->{inheritPermissions}) {
         delete $properties{ownerUserId};
         delete $properties{groupIdView};
         delete $properties{groupIdEdit};
     }
+    if ($options->{clearPackageFlag}) {
+        $properties{isPackage} = 0;
+    }
+    if ($options->{setDefaultTemplate}) {
+        $properties{isDefault} = 1;
+    }
+
     if ($options->{clearPackageFlag}) {
         $properties{isPackage} = 0;
     }
