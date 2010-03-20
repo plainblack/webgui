@@ -704,6 +704,8 @@ Example call:
         my @cleanups;
         while (@_) {
             my $class = shift;
+            next
+                if !defined $class;
             my $construct;
             if ( ref $class ) {
                 my $object = $class;

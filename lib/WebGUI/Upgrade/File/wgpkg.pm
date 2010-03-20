@@ -16,15 +16,29 @@ sub run {
     my $session = WebGUI::Session->open($configFile);
     $session->user({userId => 3});
 
-    # Make a storage location for the package
-    my $storage = WebGUI::Storage->createTemp( $session );
-    $storage->addFileFromFilesystem( $file );
-
     (undef, undef, my $shortname) = File::Spec->splitpath($file);
     $shortname =~ s/\.[^.]*$//;
 
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->set({name => "Upgrade to $version - $shortname"});
+
+    my $package = $class->import_package($session, $file);
+
+warn $versionTag->getId;
+    $versionTag->commit;
+    $session->var->end;
+    $session->close;
+
+    return $package;
+}
+
+sub import_package {
+    my $class = shift;
+    my ($session, $file) = @_;
+    # Make a storage location for the package
+
+    my $storage = WebGUI::Storage->createTemp( $session );
+    $storage->addFileFromFilesystem( $file );
 
     # Import the package into the import node
     my $package = eval {
@@ -43,7 +57,7 @@ sub run {
     # Turn off the package flag, and set the default flag for templates added
     my $assetIds = $package->getLineage( ['self','descendants'] );
     for my $assetId ( @{ $assetIds } ) {
-        my $asset = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset = WebGUI::Asset->newById( $session, $assetId );
         if ( !$asset ) {
             print "Couldn't instantiate asset with ID '$assetId'. Please check package '$file' for corruption.\n";
             next;
@@ -54,12 +68,7 @@ sub run {
         }
         $asset->update( $properties );
     }
-
-    $versionTag->commit;
-    $session->var->end;
-    $session->close;
-
-    return 1;
+    return $package;
 }
 
 1;
