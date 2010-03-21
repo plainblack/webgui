@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 12; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 use Test::MockObject::Extends;
 use Test::Exception;
 use WebGUI::Asset::Wobject::Collaboration;
@@ -88,8 +88,11 @@ $versionTag2->commit;
 
 my $csUrl = $collab->get('url');
 like $newThreads[-1]->getCSLinkUrl, qr/^$csUrl/, 'getCsLinkUrl returns URL of the parent CS with no gateway';
-like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1/, 'and has the right page number';
+like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1/, '... and has the right page number';
 like $newThreads[-1]->getCSLinkUrl, qr/\?pn=1;sortBy=lineage;sortOrder=desc/, 'and has the right sort parameters';
+like $newThreads[-2]->getCSLinkUrl, qr/\?pn=1/, '... second to last has right page number';
+like $newThreads[-3]->getCSLinkUrl, qr/\?pn=1/, '... and third to last';
+like $newThreads[-4]->getCSLinkUrl, qr/\?pn=2/, '... and fourth to last';
 $thread->restore();
 like $thread->getCSLinkUrl, qr/\?pn=6/, 'checking 2nd thread on another page';
 

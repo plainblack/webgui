@@ -19,6 +19,7 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Utility;
+use POSIX qw/ceil/;
 
 our @ISA = qw(WebGUI::Asset::Post);
 
@@ -383,7 +384,7 @@ EOSQL
     }
     $sth->finish;
     return $self->get('url') if !$found;
-    my $page  = int($place/$page_size) + 1;
+    my $page  = ceil($place/$page_size);
     my $page_frag  = 'pn='.$page.';sortBy=lineage;sortOrder=desc';
     $url = $session->url->append($cs->get('url'), $page_frag);
     return $url;
