@@ -1,4 +1,5 @@
 7.8.16
+ - fixed thread pagination on search results, off by 1 error and modal direction
 
 7.8.15
  - fixed #11453: fileUpload.pl does not handle files with spaces, overwriting

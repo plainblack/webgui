@@ -1173,7 +1173,7 @@ sub getThreadsPaginator {
         $self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
         $self->session->scratch->set($scratchSortOrder, $sortOrder);
     }
-    elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
+    elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave" && ! $self->session->form->process('sortOrder')) {
         if ($sortOrder eq "asc") {
             $sortOrder = "desc";
         }
