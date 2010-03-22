@@ -1127,6 +1127,9 @@ sub processPropertiesFromFormPost {
     else {
         $self->getThread->unsubscribe;
     }
+    if ($self->canEdit && $form->process('skip_notification')) {
+        $self->setSkipNotification;
+    }
     if ($self->getThread->getParent->canEdit) {
         $form->process('isLocked') ?  $self->getThread->lock  : $self->getThread->unlock;
         $form->process('isSticky') ?  $self->getThread->stick : $self->getThread->unstick;
@@ -1714,6 +1717,10 @@ sub www_edit {
     $var{'contentType.form'} = WebGUI::Form::contentType($session, {
         name=>'contentType',
         value=>$self->getValue("contentType") || "mixed",
+    });
+    $var{'skipNotification.form'} = WebGUI::Form::yesNo($session, {
+        name=>'skip_notification',
+        value=>$form->get("skip_notification",'yesNo') || 0,
     });
     if ($session->setting->get("metaDataEnabled")
      && $self->getThread->getParent->get('enablePostMetaData')) {
