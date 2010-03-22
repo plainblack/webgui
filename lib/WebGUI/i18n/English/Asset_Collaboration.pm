@@ -1596,8 +1596,8 @@ the Collaboration Asset, the user will be notified.|,
         lastUpdated => 1206733328,
     },
     'group to edit hoverhelp' => {
-        message => q|Group to Edit Posts|,
-        lastUpdated => 1206733328,
+        message => q|A group that is allowed to edit posts after they have been submitted.|,
+        lastUpdated => 1269283819,
     },
     
     'use captcha label' => {
