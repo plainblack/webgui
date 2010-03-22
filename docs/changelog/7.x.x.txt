@@ -1,6 +1,7 @@
 7.8.16
  - fixed thread pagination on search results, off by 1 error and modal direction
  - fixed #11482: Template hard-coded in deactivateAccount
+ - fixed #11485: RedirectAfterLoginUrl Setting should not override returnUrl and redirectAfterLogin scratch
 
 7.8.15
  - fixed #11453: fileUpload.pl does not handle files with spaces, overwriting
