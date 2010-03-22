@@ -32,6 +32,16 @@ our $I18N = {
 		lastUpdated => 1078852836,
 	},
 
+	'deactivate account template' => {
+		message => q|Deactivate Account Template|,
+		lastUpdated => 1269277147,
+	},
+
+	'deactivate account template help' => {
+		message => q|Select a template to display the screen where the user deactivates their account.|,
+		lastUpdated => 1269277148,
+	},
+
 	'expired password template' => {
 		message => q|Expired Password Template|,
 		lastUpdated => 1078852836
@@ -65,6 +75,12 @@ our $I18N = {
     'account activation template title' => {
         message => q|WebGUI Authentication Account Activation Mail Template|,
         lastUpdated => 1230600500,
+        context => q|The title of the help page for the webgui auth account activition mail template.|,
+    },
+
+    'account deactivate account template title' => {
+        message => q|WebGUI Authentication Deactivate Account Template|,
+        lastUpdated => 1269279365,
         context => q|The title of the help page for the webgui auth account activition mail template.|,
     },
 

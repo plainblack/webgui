@@ -406,7 +406,7 @@ sub deactivateAccount {
 	$var{'yes.label'} = $i18n->get(44);
    	$var{'no.url'} = $self->session->url->page();
 	$var{'no.label'} = $i18n->get(45);
-	return WebGUI::Asset::Template->new($self->session,"PBtmpl0000000000000057")->process(\%var);
+	return WebGUI::Asset::Template->new($self->session,$self->get('getDeactivateAccountTemplateId'))->process(\%var);
 }
 
 #-------------------------------------------------------------------
@@ -658,6 +658,18 @@ This method should be overridden by the subclass and should return the template 
 
 sub getCreateAccountTemplateId {
 	return "PBtmpl0000000000000011";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDeactivateAccountTemplateId ( )
+
+This method should be overridden by the subclass and should return the template ID for the deactivate account screen.
+
+=cut
+
+sub getDeactivateAccountTemplateId {
+	return "PBtmpl0000000000000057";
 }
 
 #-------------------------------------------------------------------

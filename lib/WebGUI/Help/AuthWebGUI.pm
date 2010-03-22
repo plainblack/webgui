@@ -185,6 +185,21 @@ our $HELP = {
         fields  => [],
         related => []
     },
+
+    'webgui deactivate account template' => {
+        title => 'deactivate account template title',
+        body  => '',
+        isa   => [
+            {   namespace => "Auth",
+                tag       => "deactivate account template"
+            },
+        ],
+        variables => [
+        ],
+        fields  => [],
+        related => []
+    },
+
 };
 
 1;
