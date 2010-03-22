@@ -56,6 +56,7 @@ our $HELP = {
             { 'name' => 'title.form.textarea' },
             { 'name' => 'synopsis.form' },
             { 'name' => 'content.form' },
+            { 'name' => 'skipNotification.form' },
             { 'name' => 'form.submit' },
             { 'name' => 'karmaScale.form' },
             { 'name' => 'karmaIsEnabled' },
