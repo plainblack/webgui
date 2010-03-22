@@ -8,6 +8,7 @@
  - fixed #11478: Overzealous removal of double slashes in FilePump macro
  - fixed thread pagination on search results, off by 1 error and modal direction
  - fixed #11482: Template hard-coded in deactivateAccount
+ - fixed #11485: RedirectAfterLoginUrl Setting should not override returnUrl and redirectAfterLogin scratch
 
 7.9.0
  - added #11383: AJAX username checks at registration (Luke Robinson / Orchard Solutions)

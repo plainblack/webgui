@@ -881,10 +881,6 @@ sub login {
     ) {
         return $self->showMessageOnLogin;
     }
-    elsif ( $self->session->setting->get("redirectAfterLoginUrl") ) {
-        $self->session->http->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
-	  	$self->session->scratch->delete("redirectAfterLogin");
-    }
     elsif ( $self->session->form->get('returnUrl') ) {
 		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
 	  	$self->session->scratch->delete("redirectAfterLogin");
@@ -892,6 +888,10 @@ sub login {
 	elsif ( my $url = $self->session->scratch->delete("redirectAfterLogin") ) {
 		$self->session->http->setRedirect($url);
 	}
+    elsif ( $self->session->setting->get("redirectAfterLoginUrl") ) {
+        $self->session->http->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
+        $self->session->scratch->delete("redirectAfterLogin");
+    }
 
     # Get open version tag. This is needed if we want
     # to reclaim a version right after login (singlePerUser and siteWide mode)
