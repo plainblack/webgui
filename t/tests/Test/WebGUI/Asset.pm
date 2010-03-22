@@ -189,8 +189,6 @@ sub get_tables : Test(1) {
     my $test    = shift;
     note "get_tables";
     my @tables = $test->class->meta->get_tables;
-    use Data::Dumper;
-    diag Dumper \@tables;
     cmp_bag(
         \@tables,
         $test->list_of_tables,
