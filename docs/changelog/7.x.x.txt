@@ -3,6 +3,7 @@
  - fixed #11482: Template hard-coded in deactivateAccount
  - fixed #11485: RedirectAfterLoginUrl Setting should not override returnUrl and redirectAfterLogin scratch
  - fixed #11466: Can't delete attached file in CS
+ - fixed #11481: Problem assignment group Admin to an User
 
 7.8.15
  - fixed #11453: fileUpload.pl does not handle files with spaces, overwriting

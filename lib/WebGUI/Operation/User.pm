@@ -720,9 +720,9 @@ sub www_editUser {
 	my @include; 
 	foreach my $group (@exclude) {
 		unless (
-			$group eq "1" || $group eq "2" || $group eq "7" # can't remove user from magic groups 
-			|| ($session->user->userId eq $u->userId  && $group eq 3) # cannot remove self from admin
-			|| ($u->isAdmin && $group eq "3") # admin user cannot be remove from admin
+			$group eq "1" || $group eq "2" || $group eq "7"     # can't remove user from magic groups 
+			|| ($session->user->userId eq $uid  && $group eq 3) # cannot remove self from admin
+			|| ($uid eq '3' && $group eq "3")                   # user Admin cannot be removed from admin group
 			) {
 			push(@include,$group);
 		}
