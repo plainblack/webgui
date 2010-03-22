@@ -7,6 +7,7 @@
  - fixed: Unable to add threads with permission to edit CS but not in post group
  - fixed #11478: Overzealous removal of double slashes in FilePump macro
  - fixed thread pagination on search results, off by 1 error and modal direction
+ - fixed #11482: Template hard-coded in deactivateAccount
 
 7.9.0
  - added #11383: AJAX username checks at registration (Luke Robinson / Orchard Solutions)

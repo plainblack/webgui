@@ -581,6 +581,13 @@ sub editUserSettingsForm {
 		-label     => $i18n->get("create account template"),
 		-hoverHelp => $i18n->get("create account template help"),
     );
+    $f->template(
+        -name      => "webguiDeactivateAccountTemplate",
+        -value     => $self->session->setting->get("webguiDeactivateAccountTemplate"),
+        -namespace => "Auth/WebGUI/Deactivate",
+        -label     => $i18n->get("deactivate account template"),
+        -hoverHelp => $i18n->get("deactivate account template help"),
+    );
 	$f->template(
 		-name      => "webguiExpiredPasswordTemplate",
 		-value     => $self->session->setting->get("webguiExpiredPasswordTemplate"),
@@ -661,15 +668,16 @@ sub editUserSettingsFormSave {
     }
 
 	$s->set("webguiPasswordRecoveryRequireUsername", $f->process("webguiPasswordRecoveryRequireUsername","yesNo"));
-	$s->set("webguiValidateEmail", $f->process("webguiValidateEmail","yesNo"));
-	$s->set("webguiUseCaptcha", $f->process("webguiUseCaptcha","yesNo"));
-	$s->set("webguiAccountTemplate", $f->process("webguiAccountTemplate","template"));
-	$s->set("webguiCreateAccountTemplate", $f->process("webguiCreateAccountTemplate","template"));
-	$s->set("webguiExpiredPasswordTemplate", $f->process("webguiExpiredPasswordTemplate","template"));
-	$s->set("webguiLoginTemplate", $f->process("webguiLoginTemplate","template"));
-	$s->set("webguiPasswordRecoveryTemplate", $f->process("webguiPasswordRecoveryTemplate","template"));
-    $s->set("webguiWelcomeMessageTemplate", $f->process("webguiWelcomeMessageTemplate","template"));
-    $s->set("webguiAccountActivationTemplate", $f->process("webguiAccountActivationTemplate","template")); 
+	$s->set("webguiValidateEmail",                   $f->process("webguiValidateEmail","yesNo"));
+	$s->set("webguiUseCaptcha",                      $f->process("webguiUseCaptcha","yesNo"));
+	$s->set("webguiAccountTemplate",                 $f->process("webguiAccountTemplate","template"));
+	$s->set("webguiCreateAccountTemplate",           $f->process("webguiCreateAccountTemplate","template"));
+	$s->set("webguiDeactivateAccountTemplate",       $f->process("webguiDeactivateAccountTemplate","template"));
+	$s->set("webguiExpiredPasswordTemplate",         $f->process("webguiExpiredPasswordTemplate","template"));
+	$s->set("webguiLoginTemplate",                   $f->process("webguiLoginTemplate","template"));
+	$s->set("webguiPasswordRecoveryTemplate",        $f->process("webguiPasswordRecoveryTemplate","template"));
+    $s->set("webguiWelcomeMessageTemplate",          $f->process("webguiWelcomeMessageTemplate","template"));
+    $s->set("webguiAccountActivationTemplate",       $f->process("webguiAccountActivationTemplate","template")); 
 
     if (@errors) {
         return \@errors;
@@ -689,6 +697,12 @@ sub getAccountTemplateId {
 sub getCreateAccountTemplateId {
 	my $self = shift;
 	return $self->session->setting->get("webguiCreateAccountTemplate") || "PBtmpl0000000000000011";
+}
+
+#-------------------------------------------------------------------
+sub getDeactivateAccountTemplateId {
+	my $self = shift;
+	return $self->session->setting->get("webguiDeactivateAccountTemplate") || $self->SUPER::getDeactivateAccountTemplateId;
 }
 
 #-------------------------------------------------------------------

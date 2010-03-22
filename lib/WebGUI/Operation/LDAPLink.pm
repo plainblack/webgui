@@ -296,6 +296,13 @@ sub www_editLDAPLink {
 		-hoverHelp =>$i18n->get("create account template description"),
 		);
 	$f->template(
+		-name      =>"ldapDeactivateAccountTemplate",
+		-value     =>$form->template("ldapDeactivateAccountTemplate") || $db{ldapDeactivateAccountTemplate},
+		-namespace =>"Auth/LDAP/Deactivate",
+		-label     =>$i18n->get("deactivate account template"),
+		-hoverHelp =>$i18n->get("deactivate account template description"),
+		);
+	$f->template(
 		-name      =>"ldapLoginTemplate",
 		-value     =>$form->template("ldapLoginTemplate") || $db{ldapLoginTemplate},
 		-namespace =>"Auth/LDAP/Login",
@@ -340,6 +347,7 @@ sub www_editLDAPLinkSave {
 	$properties->{ldapWelcomeMessage} = $session->form->textarea("ldapWelcomeMessage");
 	$properties->{ldapAccountTemplate} = $session->form->template("ldapAccountTemplate");
 	$properties->{ldapCreateAccountTemplate} = $session->form->template("ldapCreateAccountTemplate");
+	$properties->{ldapDeactivateAccountTemplate} = $session->form->template("ldapDeactivateAccountTemplate");
 	$properties->{ldapLoginTemplate} = $session->form->template("ldapLoginTemplate");
 	$session->db->setRow("ldapLink","ldapLinkId",$properties);
 	if($session->form->process("returnUrl")) {

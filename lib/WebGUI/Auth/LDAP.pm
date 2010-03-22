@@ -600,7 +600,22 @@ sub getCreateAccountTemplateId {
     my $self = shift;
     my $ldapConnect = $self->getLDAPConnection;
     return "PBtmpl0000000000000005" unless $ldapConnect;
-	return ($self->getLDAPConnection->{ldapCreateAccountTemplate} || "PBtmpl0000000000000005");
+	return ($ldapConnect->{ldapCreateAccountTemplate} || "PBtmpl0000000000000005");
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDeactivateAccountTemplateId ( )
+
+Get the default template ID for the deactivate account form.
+
+=cut
+
+sub getDeactivateAccountTemplateId {
+    my $self = shift;
+    my $ldapConnect = $self->getLDAPConnection;
+    return $self->SUPER::getDeactivateAccountTemplateId unless $ldapConnect;
+    return ($ldapConnect->{ldapDeactivateAccountTemplate} || $self->SUPER::getDeactivateAccountTemplateId);
 }
 
 #-------------------------------------------------------------------
