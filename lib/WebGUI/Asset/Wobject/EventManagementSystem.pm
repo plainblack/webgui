@@ -93,7 +93,7 @@ property badgeInstructions => (
          );
 sub _badgeInstructions_builder {
     my $session = shift->session;
-    my $i18n = WebGUI::International->new($session, 'Asset_EventMangementSystem');
+    my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
     return $i18n->get('default badge instructions');
 }
 property ticketInstructions => (
@@ -106,7 +106,7 @@ property ticketInstructions => (
          );
 sub _ticketInstructions_builder {
     my $session = shift->session;
-    my $i18n = WebGUI::International->new($session, 'Asset_EventMangementSystem');
+    my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
     return $i18n->get('default ticket instructions');
 }
 property ribbonInstructions => (
@@ -119,7 +119,7 @@ property ribbonInstructions => (
          );
 sub _ribbonInstructions_builder {
     my $session = shift->session;
-    my $i18n = WebGUI::International->new($session, 'Asset_EventMangementSystem');
+    my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
     return $i18n->get('default ribbon instructions');
 }
 property tokenInstructions => (
@@ -132,7 +132,7 @@ property tokenInstructions => (
          );
 sub _tokenInstructions_builder {
     my $session = shift->session;
-    my $i18n = WebGUI::International->new($session, 'Asset_EventMangementSystem');
+    my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
     return $i18n->get('default token instructions');
 }
 property registrationStaffGroupId => (
