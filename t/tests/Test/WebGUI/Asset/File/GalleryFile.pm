@@ -10,7 +10,7 @@ package Test::WebGUI::Asset::File::GalleryFile;
 #-------------------------------------------------------------------
 
 
-use base qw/Test::WebGUI::Asset/;
+use base qw/Test::WebGUI::Asset::File/;
 
 use Test::More;
 use Test::Deep;
