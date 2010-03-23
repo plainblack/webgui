@@ -74,24 +74,6 @@ sub addChild {
 
 #-------------------------------------------------------------------
 
-=head2 addRevision ( )
-
-Override the default method in order to deal with attachments.
-
-=cut
-
-sub addRevision {
-        my $self = shift;
-        my $newSelf = $self->next::method(@_);
-	my $now = time();
-	$newSelf->update({
-		isHidden => 1,
-		});
-        return $newSelf;
-}
-
-#-------------------------------------------------------------------
-
 =head2 canAdd ($session)
 
 This functions as a class or an object method.  It sets the subclassGroupId to 7
