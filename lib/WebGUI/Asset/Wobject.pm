@@ -20,7 +20,7 @@ use WebGUI::Asset;
 use WebGUI::International;
 extends 'WebGUI::Asset';
 define tableName   => 'wobject';
-define assetName   => ['Wobject', 'Wobject'];
+define assetName   => ['Wobject', 'Asset_Wobject'];
 property description => (
             fieldType       => 'HTMLArea',
             default         => undef,
