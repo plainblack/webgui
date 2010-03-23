@@ -1352,14 +1352,15 @@ sub prepareView {
 
 Make sure that the current session asset is a Thread or Post for pasting and adding checks.
 
-This is a class method.
+Technically, we really only need WebGUI::Asset::Post, but it drives some testing code crazy
+so we explicitly list Thread, too.
 
 =cut
 
 sub valid_parent_classes {
     my $class   = shift;
     my $session = shift;
-    return $session->asset->isa('WebGUI::Asset::Post');
+    return [qw/WebGUI::Asset::Post::Thread WebGUI::Asset::Post/];
 }
 
 #-------------------------------------------------------------------
