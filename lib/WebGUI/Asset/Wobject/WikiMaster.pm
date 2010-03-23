@@ -13,7 +13,7 @@ package WebGUI::Asset::Wobject::WikiMaster;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-define assetName => ['assetName', 'Asset_RichEdit'];
+define assetName => ['assetName', 'Asset_WikiMaster'];
 define icon      => 'wikiMaster.gif';
 define tableName => 'WikiMaster';
 
