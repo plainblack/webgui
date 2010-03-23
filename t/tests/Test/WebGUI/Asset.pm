@@ -14,13 +14,33 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 use WebGUI::Test;
+use WebGUI::Utility;
 
 sub assetUiLevel {
-     return 1;
+    return 1;
 }
 
 sub list_of_tables {
-     return [qw/assetData/];
+    return [qw/assetData/];
+}
+
+sub getMyParent {
+    my $test    = shift;
+    my $session = $test->session;
+    my $parentClasses = $test->class->valid_parent_classes;
+    my $default       = WebGUI::Asset->getDefault($session);
+    if (WebGUI::Utility::isIn('WebGUI::Asset', @{ $parentClasses}) ) {
+        return $default;
+    }
+    else {
+        my $class = $parentClasses->[0];
+        note "Adding a parent of $class";
+        my $parent = $default->addChild({
+            className => $class,
+        }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
+        addToCleanup($parent);
+        return $parent;
+    }
 }
 
 sub _constructor : Test(4) {
@@ -173,11 +193,14 @@ sub write_update : Test(8) {
 sub keywords : Test(3) {
     my $test    = shift;
     my $session = $test->session;
-    note "keywords";
-    my $default = WebGUI::Asset->getDefault($session);
-    my $asset = $default->addChild({
+    note "keywords for ".$test->class;
+    use Data::Dumper;
+    warn Dumper $test->class->valid_parent_classes;
+    my $parent = $test->getMyParent;
+    note "got parent and it is a ".ref $parent;
+    my $asset  = $parent->addChild({
         className => $test->class,
-    });
+    }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
     addToCleanup($asset);
     can_ok $asset, 'keywords';
     $asset->keywords('chess set');

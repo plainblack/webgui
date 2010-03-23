@@ -64,31 +64,32 @@ Subclass the method to create a new group for subscribers for the new asset.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self        = shift;
     my $properties  = shift;
-    my $newSelf     = $self->next::method( $properties );
+    my $newSelf     = super();
     $newSelf->update({ subscriptionGroupId => '' });
     $newSelf->createSubscriptionGroup;
     return $newSelf;
-}
+};
 
 #----------------------------------------------------------------------------
 
 =head2 addRevision ( properties [, revisionDate, options ] )
 
-Override addRevision to set skipNotification to 0 for each new revision.
+Extend addRevision to set skipNotification to 0 for each new revision.
 
 =cut
 
-sub addRevision {
+around addRevision => sub {
+    my $orig        = shift;
     my $self        = shift;
     my $properties  = shift;
     
     $properties->{ skipNotification     } = 0;
 
-    return $self->maybe::next::method( $properties, @_ );
-}
+    return $self->$orig( $properties, @_ );
+};
 
 #----------------------------------------------------------------------------
 
@@ -120,14 +121,14 @@ want to be able to subscribe to children)
 
 =cut
 
-sub commit { 
+override commit => sub {
     my ( $self, @args ) = @_;
-    $self->maybe::next::method( @args );
+    super();
     if ( !$self->shouldSkipNotification ) {
         $self->notifySubscribers;
     }
     return;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -424,16 +425,16 @@ Subclass the method to remove the subscription group.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self    = shift;
     my $options = shift;
 
     my $group   = $self->getSubscriptionGroup();
     $group->delete;
-    $self->next::method($options);
+    super();
 
     return;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -444,7 +445,7 @@ revision.
 
 =cut
 
-sub setSkipNotification {
+override setSkipNotification => sub {
     my $self    = shift;
     my $value   = shift;
     $value      = defined $value ? $value : 1;
@@ -454,7 +455,7 @@ sub setSkipNotification {
     } );
 
     return;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -464,10 +465,10 @@ Returns true if the asset should skip notifications.
 
 =cut
 
-sub shouldSkipNotification {
+override shouldSkipNotification => sub {
     my $self    = shift;
     return $self->skipNotification ? 1 : 0;
-}
+};
 
 #----------------------------------------------------------------------------
 

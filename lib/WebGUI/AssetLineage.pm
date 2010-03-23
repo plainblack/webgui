@@ -72,6 +72,7 @@ sub addChild {
 	my $now         = shift || $session->datetime->time();
 	my $options     = shift;
     # Check for valid parentage using validParent on child's class
+    WebGUI::Asset->loadModule($properties->{className});
     if (! $properties->{className}->validParent($session, $self)) {
         return undef;
     }
@@ -997,9 +998,8 @@ sub validParent {
     my $session        = shift;
     my $asset          = shift || $session->asset;
     my $parent_classes = $class->valid_parent_classes;
-    my $valid_parent   = 0;
     foreach my $parentClass (@{ $class->valid_parent_classes}) {
-        return 1 if $class->isa($parentClass);
+        return 1 if $asset->isa($parentClass);
     }
     return 0;
 }
