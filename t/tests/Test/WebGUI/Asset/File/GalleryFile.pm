@@ -21,4 +21,8 @@ sub list_of_tables {
      return [qw/assetData FileAsset GalleryFile/];
 }
 
+sub parent_list {
+    return [qw/WebGUI::Asset::Wobject::Gallery WebGUI::Asset::Wobject::GalleryAlbum /];
+}
+
 1;
