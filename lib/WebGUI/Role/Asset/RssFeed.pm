@@ -485,11 +485,11 @@ Extend the master class to insert head links via addHeaderLinks.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
     $self->addHeaderLinks;
-    return $self->next::method(@_);
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -582,11 +582,14 @@ Adds an RSS tab to the Edit Tabs.
 
 =cut
 
-sub getEditTabs {
+around getEditTabs => sub {
+    my $orig = shift;
     my $self = shift;
+    my $tabs = $self->$orig(@_);
     my $i18n = WebGUI::International->new($self->session,'AssetAspect_RssFeed');
-    return ($self->next::method, ['rss', $i18n->get('RSS tab'), 1]);
-}
+    push @{ $tabs }, ['rss', $i18n->get('RSS tab'), 1];
+    return $tabs;
+};
 
 1;
 
