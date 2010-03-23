@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::TimeTracking;
+package Test::WebGUI::Asset::Wobject::Wobject::TimeTracking;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -10,7 +10,7 @@ package Test::WebGUI::Asset::Wobject::TimeTracking;
 #-------------------------------------------------------------------
 
 
-use base qw/Test::WebGUI::Asset/;
+use base qw/Test::WebGUI::Asset::Wobject/;
 
 use Test::More;
 use Test::Deep;
