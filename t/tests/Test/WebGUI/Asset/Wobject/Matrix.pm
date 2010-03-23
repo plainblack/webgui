@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::Matrix;
+package Test::WebGUI::Asset::Wobject::Matrix;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

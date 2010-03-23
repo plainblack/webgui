@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::InOutBoard;
+package Test::WebGUI::Asset::Wobject::InOutBoard;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::StockData;
+package Test::WebGUI::Asset::Wobject::StockData;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::EventManagementSystem;
+package Test::WebGUI::Asset::Wobject::EventManagementSystem;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

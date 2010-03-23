@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::Carousel;
+package Test::WebGUI::Asset::Wobject::Carousel;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

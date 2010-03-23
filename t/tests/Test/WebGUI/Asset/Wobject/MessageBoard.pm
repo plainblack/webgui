@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::MessageBoard;
+package Test::WebGUI::Asset::Wobject::MessageBoard;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

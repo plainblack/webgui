@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::StoryTopic;
+package Test::WebGUI::Asset::Wobject::StoryTopic;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

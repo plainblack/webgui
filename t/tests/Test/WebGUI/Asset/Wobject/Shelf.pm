@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::Shelf;
+package Test::WebGUI::Asset::Wobject::Shelf;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

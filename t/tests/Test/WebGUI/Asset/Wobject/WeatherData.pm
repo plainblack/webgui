@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::WeatherData;
+package Test::WebGUI::Asset::Wobject::WeatherData;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

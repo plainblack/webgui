@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::Calendar;
+package Test::WebGUI::Asset::Wobject::Calendar;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

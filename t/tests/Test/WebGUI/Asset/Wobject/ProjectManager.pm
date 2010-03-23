@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::ProjectManager;
+package Test::WebGUI::Asset::Wobject::ProjectManager;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::SyndicatedContent;
+package Test::WebGUI::Asset::Wobject::SyndicatedContent;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

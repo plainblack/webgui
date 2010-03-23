@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::GalleryAlbum;
+package Test::WebGUI::Asset::Wobject::GalleryAlbum;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

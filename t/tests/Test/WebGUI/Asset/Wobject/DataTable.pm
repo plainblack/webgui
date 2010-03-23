@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::DataTable;
+package Test::WebGUI::Asset::Wobject::DataTable;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

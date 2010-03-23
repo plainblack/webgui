@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::MultiSearch;
+package Test::WebGUI::Asset::Wobject::MultiSearch;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

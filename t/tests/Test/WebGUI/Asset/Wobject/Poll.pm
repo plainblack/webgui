@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::Poll;
+package Test::WebGUI::Asset::Wobject::Poll;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

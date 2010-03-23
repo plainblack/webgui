@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::TimeTracking;
+package Test::WebGUI::Asset::Wobject::TimeTracking;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

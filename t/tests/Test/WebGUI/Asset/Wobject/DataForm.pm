@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::DataForm;
+package Test::WebGUI::Asset::Wobject::DataForm;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------

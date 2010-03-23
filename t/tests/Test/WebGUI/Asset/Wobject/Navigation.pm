@@ -1,4 +1,4 @@
-package Test::WebGUI::Asset::Wobject::Wobject::Navigation;
+package Test::WebGUI::Asset::Wobject::Navigation;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
