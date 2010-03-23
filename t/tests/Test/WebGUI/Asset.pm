@@ -24,23 +24,25 @@ sub list_of_tables {
     return [qw/assetData/];
 }
 
-sub getMyParent {
-    my $test    = shift;
-    my $session = $test->session;
-    my $parentClasses = $test->class->valid_parent_classes;
-    my $default       = WebGUI::Asset->getDefault($session);
-    if (WebGUI::Utility::isIn('WebGUI::Asset', @{ $parentClasses}) ) {
-        return $default;
+sub parent_list {
+    return [];
+}
+
+sub getMyParents {
+    my $test           = shift;
+    my $session        = $test->session;
+    my $parent_classes = $test->parent_list;
+    my @parents        = ();
+    my $default        = WebGUI::Asset->getDefault($session);
+    push @parents, $default;
+    my $parent = $default;
+    foreach $parent_class (@{ $parent_classes }) {
+        my $new_parent = $parent->addChild({className => $parent_class}, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
+        push @parents, $new_parent;
+        $parent = $new_parent;
+        addToCleanup($new_parent);
     }
-    else {
-        my $class = $parentClasses->[0];
-        note "Adding a parent of $class";
-        my $parent = $default->addChild({
-            className => $class,
-        }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
-        addToCleanup($parent);
-        return $parent;
-    }
+    return @parents;
 }
 
 sub _constructor : Test(4) {
@@ -194,11 +196,8 @@ sub keywords : Test(3) {
     my $test    = shift;
     my $session = $test->session;
     note "keywords for ".$test->class;
-    use Data::Dumper;
-    warn Dumper $test->class->valid_parent_classes;
-    my $parent = $test->getMyParent;
-    note "got parent and it is a ".ref $parent;
-    my $asset  = $parent->addChild({
+    my @parents = $test->getMyParents;
+    my $asset  = $parents[-1]->addChild({
         className => $test->class,
     }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
     addToCleanup($asset);
