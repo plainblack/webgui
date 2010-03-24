@@ -1,3 +1,5 @@
+7.9.2
+
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
  - fixed #11472: View Calendar Month help missing
