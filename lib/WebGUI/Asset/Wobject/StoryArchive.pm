@@ -287,8 +287,8 @@ sub getFolder {
     my $session    = $self->session;
     my $folderName = $session->datetime->epochToHuman($date, DATE_FORMAT);
     my $folderUrl  = join '/', $self->getUrl, $folderName;
-    my $folder     = WebGUI::Asset->newByUrl($session, $folderUrl);
-    return $folder if $folder;
+    my $folder     = eval { WebGUI::Asset->newByUrl($session, $folderUrl); };
+    return $folder if !Exception::Class->caught();
     ##The requested folder doesn't exist.  Make it and autocommit it.
 
     ##For a fully automatic commit, save the current tag, create a new one
@@ -299,7 +299,7 @@ sub getFolder {
     $newVersionTag->setWorking;
 
     ##Call SUPER because my addChild calls getFolder
-    $folder = $self->SUPER::addChild({
+    $folder = $self->addChild({
         className       => 'WebGUI::Asset::Wobject::Folder',
         title           => $folderName,
         menuTitle       => $folderName,
