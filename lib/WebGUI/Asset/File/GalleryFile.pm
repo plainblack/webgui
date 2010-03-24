@@ -438,6 +438,76 @@ sub getParent {
 
 #----------------------------------------------------------------------------
 
+=head2 getFirstFile ( ) 
+
+Get the first file in the GalleryAlbum. Returns an instance of a GalleryFile
+or undef if there is no first file.
+
+=cut
+
+sub getFirstFile {
+    my $self       = shift;
+    my $allFileIds = $self->getParent->getFileIds;
+
+    return undef unless @{ $allFileIds };
+    return WebGUI::Asset->newByDynamicClass( $self->session, shift @{ $allFileIds });
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getLastFile ( ) 
+
+Get the last file in the GalleryAlbum. Returns an instance of a GalleryFile
+or undef if there is no last file.
+
+=cut
+
+sub getLastFile {
+    my $self       = shift;
+    my $allFileIds = $self->getParent->getFileIds;
+
+    return undef unless @{ $allFileIds };
+    return WebGUI::Asset->newByDynamicClass( $self->session, pop @{ $allFileIds });
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getNextFile ( ) 
+
+Get the next file in the GalleryAlbum. Returns an instance of a GalleryFile,
+or undef if there is no next file.
+
+=cut
+
+sub getNextFile {
+    my $self = shift;
+    return $self->{_nextFile} if $self->{_nextFile};
+    my $nextId = $self->getParent->getNextFileId( $self->getId );
+    return undef unless $nextId;
+    $self->{_nextFile} = WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    return $self->{_nextFile};
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPreviousFile ( ) 
+
+Get the previous file in the GalleryAlbum. Returns an instance of a GalleryFile,
+or undef if there is no previous file.
+
+=cut
+
+sub getPreviousFile {
+    my $self = shift;
+    return $self->{_previousFile} if $self->{_previousFile};
+    my $previousId  = $self->getParent->getPreviousFileId( $self->getId );
+    return undef unless $previousId;
+    $self->{_previousFile} = WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    return $self->{_previousFile};
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getThumbnailUrl ( )
 
 Gets the URL to the thumbnail for this GalleryFile. This should probably be
@@ -512,9 +582,29 @@ sub getTemplateVars {
         = $self->getGallery->getUrl('func=listFilesForUser;userId=' . $self->get("ownerUserId"));
     $var->{ url_promote         } = $self->getUrl('func=promote');
 
+    if ( my $firstFile = $self->getFirstFile ) {
+        $var->{ firstFile_url             } = $firstFile->getUrl;
+        $var->{ firstFile_title           } = $firstFile->get( "title" );
+        $var->{ firstFile_thumbnailUrl    } = $firstFile->getThumbnailUrl;
+    }
+    if ( my $nextFile  = $self->getNextFile ) {
+        $var->{ nextFile_url              } = $nextFile->getUrl;
+        $var->{ nextFile_title            } = $nextFile->get( "title" );
+        $var->{ nextFile_thumbnailUrl     } = $nextFile->getThumbnailUrl;
+    }
+    if ( my $prevFile  = $self->getPreviousFile ) {
+        $var->{ previousFile_url          } = $prevFile->getUrl;
+        $var->{ previousFile_title        } = $prevFile->get( "title" );
+        $var->{ previousFile_thumbnailUrl } = $prevFile->getThumbnailUrl;
+    }
+    if ( my $lastFile = $self->getLastFile ) {
+        $var->{ lastFile_url              } = $lastFile->getUrl;
+        $var->{ lastFile_title            } = $lastFile->get( "title" );
+        $var->{ lastFile_thumbnailUrl     } = $lastFile->getThumbnailUrl;
+    }
+
     return $var;
 }
-
 
 #----------------------------------------------------------------------------
 

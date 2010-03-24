@@ -460,6 +460,58 @@ sub getFileIds {
 
 #----------------------------------------------------------------------------
 
+=head2 getNextFileId ( fileId )
+
+Gets the next fileId from the list of fileIds. C<fileId> is the base 
+fileId we want to find the next file for.
+
+Returns C<undef> if there is no next fileId.
+
+=cut
+
+sub getNextFileId {
+    my $self       = shift;
+    my $fileId     = shift;
+    my $allFileIds = $self->getFileIds;
+
+    while ( my $checkId = shift @{ $allFileIds } ) {
+        # If this is the last albumId
+        return undef unless @{ $allFileIds };
+
+        if ( $fileId eq $checkId ) {
+            return shift @{ $allFileIds };
+        }
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPreviousFileId ( fileId )
+
+Gets the previous fileId from the list of fileIds. C<fileId> is the base 
+fileId we want to find the previous file for.
+
+Returns C<undef> if there is no previous fileId.
+
+=cut
+
+sub getPreviousFileId {
+    my $self       = shift;
+    my $fileId     = shift;
+    my $allFileIds = $self->getFileIds; 
+
+    while ( my $checkId = pop @{ $allFileIds } ) {
+        # If this is the last albumId
+        return undef unless @{ $allFileIds };
+
+        if ( $fileId eq $checkId ) {
+            return pop @{ $allFileIds };
+        }
+    }
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getFilePaginator ( paginatorUrl )
 
 Gets a WebGUI::Paginator for the files in this album. C<paginatorUrl> is the 
