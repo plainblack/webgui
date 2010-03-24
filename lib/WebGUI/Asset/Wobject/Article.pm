@@ -201,16 +201,16 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 
 =cut
 
-sub indexContent {
+override indexContent => sub {
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = super();
 	$indexer->addKeywords($self->linkTitle);
-	$indexer->addKeywords($self->linkUrl);
+	$indexer->addKeywords($self->linkURL);
 	my $storage = $self->getStorageLocation;
 	foreach my $file (@{$storage->getFiles}) {
                $indexer->addFile($storage->getPath($file));
 	}
-}
+};
 
 #-------------------------------------------------------------------
 
