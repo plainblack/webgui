@@ -117,23 +117,16 @@ Request autocommit.
 
 =cut
 
-sub addRevision {
+around addRevision => sub {
+    my $orig    = shift;
     my $self    = shift;
-    my $session = $self->session;
-    my $newSelf = $self->next::method(@_);
-
-    my $newProperties = {
-        isHidden => 1,
-    };
-
-    $newSelf->update($newProperties);
+    my $newSelf = $self->$orig(@_);
 
     my $newPhotoData = $newSelf->duplicatePhotoData;
     $newSelf->setPhotoData($newPhotoData);
-    #$newSelf->requestAutoCommit;
 
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 
