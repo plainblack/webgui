@@ -195,12 +195,14 @@ sub write_update : Test(8) {
 sub keywords : Test(3) {
     my $test    = shift;
     my $session = $test->session;
-    note "keywords for ".$test->class;
+    my $tag = WebGUI::VersionTag->getWorking($session);
     my @parents = $test->getMyParents;
-    my $asset  = $parents[-1]->addChild({
+    my $asset   = $parents[-1]->addChild({
         className => $test->class,
     }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
     addToCleanup($asset);
+    $tag->commit;
+    addToCleanup($tag);
     can_ok $asset, 'keywords';
     $asset->keywords('chess set');
     is $asset->keywords, 'chess set', 'set and get of keywords via direct accessor';
