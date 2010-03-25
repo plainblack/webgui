@@ -129,15 +129,15 @@ Override the default method in order to deal with attachments.
 
 =cut
 
-sub addRevision {
+override addRevision => sub {
     my $self = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+    my $newSelf = super();
     if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
         my $newStorage = WebGUI::Storage->get($self->session,$self->storageId)->copy;
         $newSelf->update({storageId => $newStorage->getId});
     }
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -147,13 +147,13 @@ Extend the super class to duplicate the storage location.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self = shift;
-	my $newAsset   = $self->SUPER::duplicate(@_);
+	my $newAsset   = super();
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
 	return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -248,16 +248,16 @@ any files stored in the storage location.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self = shift;
-    $self->SUPER::processPropertiesFromFormPost(@_);
+    super();
     my $size = 0;
     my $storage = $self->getStorageLocation;
     foreach my $file (@{$storage->getFiles}) {
         $size += $storage->getFileSize($file);
     }
     $self->setSize($size);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -267,7 +267,7 @@ Extend the super class to delete all storage locations.
 
 =cut
 
-sub purge {
+override purge => sub {
         my $self = shift;
         my $sth = $self->session->db->read("select storageId from Article where assetId=?",[$self->getId]);
         while (my ($storageId) = $sth->array) {
@@ -275,8 +275,8 @@ sub purge {
                 $storage->delete if defined $storage;
         }
         $sth->finish;
-        return $self->SUPER::purge;
-}
+        return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -286,11 +286,11 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
 	eval{$self->session->cache->delete("view_".$self->getId)};
-	$self->SUPER::purgeCache;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -300,11 +300,11 @@ Extend the super class to delete the storage location for this revision.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
         my $self = shift;
         $self->getStorageLocation->delete;
-        return $self->SUPER::purgeRevision;
-}
+        return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -429,11 +429,11 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
 	$self->session->http->setCacheControl($self->cacheTimeout);
-	$self->SUPER::www_view(@_);
-}
+	super();
+};
 
 
 1;
