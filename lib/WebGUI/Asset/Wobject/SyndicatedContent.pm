@@ -106,7 +106,14 @@ sub definition {
 				label=>$i18n->get('hasTermsLabel'),
                 		hoverHelp=>$i18n->get('hasTermsLabel description'),
                 		maxlength=>255
-				}
+				},
+            sortItems => {
+                tab             => 'properties',
+                fieldType       => 'yesNo',
+                defaultValue    => 1,
+                label           => $i18n->get('sortItemsLabel'),
+                hoverHelp       => $i18n->get('sortItemsLabel description'),
+            },
 		);
         push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -185,7 +192,9 @@ sub generateFeed {
     }
 
 	# sort them by date and remove any duplicate from the OR based term matching above
-	$feed->sort_item();
+    if ($self->get('sortItems')) {
+        $feed->sort_item();
+    }
 
 	# limit the feed to the maximum number of headlines (or the feed generator limit).
 	$feed->limit_item($limit);

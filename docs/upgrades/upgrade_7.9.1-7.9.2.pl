@@ -30,7 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+addSortItemsSCColumn($session);
 
 finish($session); # this line required
 
@@ -44,6 +44,22 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+sub addSortItemsSCColumn {
+    my $session = shift;
+    print "\tAdding sort items switch to Syndicated Content... " unless $quiet;
+
+    my $sth = $session->db->read('DESCRIBE `SyndicatedContent`');
+    while (my ($col) = $sth->array) {
+        if ($col eq 'sortItems') {
+            print "Skipped.\n" unless $quiet;
+            return;
+        }
+    }
+    $session->db->write('ALTER TABLE SyndicatedContent ADD COLUMN sortItems BOOL DEFAULT 1');
+
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
