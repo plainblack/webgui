@@ -1,4 +1,5 @@
 7.9.2
+ - added #11412: Additional navigation in Gallery Photo View 
 
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
