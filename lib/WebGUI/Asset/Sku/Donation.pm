@@ -31,7 +31,7 @@ This asset makes donations possible.
 
 =head1 SYNOPSIS
 
-use WebGUI::Asset::Sku::Dnoation;
+use WebGUI::Asset::Sku::Donation;
 
 =head1 METHODS
 
