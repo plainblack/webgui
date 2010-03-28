@@ -545,6 +545,7 @@ sub definition {
         groupIdAdminStatistics
         groupIdAdminTrash
         groupIdAdminUser
+        groupIdAdminUserEdit
         groupIdAdminUserAdd
         groupIdAdminVersionTag
         groupIdAdminWorkflow

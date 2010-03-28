@@ -167,7 +167,15 @@ sub getAdminFunction {
 			$canUse = $user->isInGroup($functions->{$function}{group});
 		}
 		elsif (defined $functions->{$function}{groupSetting}) {
-			$canUse = $user->isInGroup($setting->get($functions->{$function}{groupSetting}));
+            my $groupSetting = $functions->{$function}{groupSetting};
+            if (ref $groupSetting && ref $groupSetting eq 'ARRAY') {
+                for my $group (@{ $groupSetting }) {
+                    $canUse ||= $user->isInGroup($setting->get($group));
+                }
+            }
+            else {
+                $canUse = $user->isInGroup($setting->get($functions->{$function}{groupSetting}));
+            }
 		}
 		if ($functions->{$function}{uiLevel} > $user->profileField("uiLevel")) {
 			$canUse = 0;

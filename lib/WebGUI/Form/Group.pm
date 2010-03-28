@@ -94,6 +94,9 @@ sub definition {
 		excludeGroups=>{
 			defaultValue=>[]
 			},
+        includeOnlyGroups => {
+            defaultValue => undef,
+        },
         });
         return $class->SUPER::definition($session, $definition);
 }
@@ -165,8 +168,17 @@ sub toHtml {
 	my $self = shift;
 	my $where = '';
 	if (($self->get('excludeGroups')->[0]||'') ne "") {
-		$where = "and groupId not in (".$self->session->db->quoteAndJoin($self->get("excludeGroups")).")";
+		$where .= "and groupId not in (".$self->session->db->quoteAndJoin($self->get("excludeGroups")).")";
 	}
+    if ($self->get('includeOnlyGroups')) {
+        if (@{ $self->get('includeOnlyGroups') }) {
+            $where .= "and groupId in (".$self->session->db->quoteAndJoin($self->get("includeOnlyGroups")).")";
+        }
+        else {
+            $self->set('options', {});
+            return $self->SUPER::toHtml();
+        }
+    }
 	$self->set('options', $self->session->db->buildHashRef("select groupId,groupName from groups where showInForms=1 $where order by groupName"));
 	return $self->SUPER::toHtml();
 }

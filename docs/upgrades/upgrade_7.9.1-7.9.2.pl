@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 addSortItemsSCColumn($session);
+addUserEditGroupSetting($session);
 
 finish($session); # this line required
 
@@ -60,6 +61,24 @@ sub addSortItemsSCColumn {
 
     print "Done.\n" unless $quiet;
 }
+
+sub addUserEditGroupSetting {
+    my $session = shift;
+    print "\tAdding user edit group setting... " unless $quiet;
+    if (! defined $session->setting->get('groupIdAdminUserEdit')) {
+        $session->setting->add('groupIdAdminUserEdit', '3');
+    }
+    my @editGroupConfig = $session->config->get('adminConsole/users/groupSetting');
+    if (ref $editGroupConfig[0]) {
+        @editGroupConfig = @{ $editGroupConfig[0] };
+    }
+    @editGroupConfig = grep { $_ ne 'groupIdAdminUserEdit' } @editGroupConfig;
+    push @editGroupConfig, 'groupIdAdminUserEdit';
+    $session->config->set('adminConsole/users/groupSetting');
+
+    print "Done.\n" unless $quiet;
+}
+
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

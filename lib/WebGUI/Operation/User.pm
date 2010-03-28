@@ -71,13 +71,13 @@ sub _submenu {
 	my $title;
 	$title = $i18n->get($properties->{title}) if ($properties->{title});
 
-	if (canEdit($session)) {
+	if (canEditUser($session, undef, $userId)) {
 		$ac->addSubmenuItem($session->url->page("op=editUser;uid=new"), $i18n->get(169));
 	}
 
     $ac->setFormUrl($session->url->page('op=editUser;uid='.$userId));
     my $formId = $ac->getSubmenuFormId;
-	if (canEdit($session)) {
+	if (canEditUser($session, undef, $userId)) {
 		unless ($session->form->process("op") eq "listUsers" 
 			|| $session->form->process("op") eq "deleteUser"
 			|| $userId eq "new") {
@@ -110,7 +110,7 @@ sub canAdd {
     my $session     = shift;
     my $user        = shift || $session->user;
     return $user->isInGroup( $session->setting->get("groupIdAdminUserAdd") )
-        || canEdit($session, $user)
+        || canEditUser($session, $user)
         ;
 }
 
@@ -130,6 +130,32 @@ sub canEdit {
 }
 
 #----------------------------------------------------------------------------
+
+=head2 canEditUser ( session [, user] , userIdToEdit )
+
+Returns true if the user is allowed to edit the user with the given Id.  user 
+defaults to the current user.
+
+=cut
+
+sub canEditUser {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    my $userIdToEdit = shift;
+    return 1
+        if canEdit($session, $user);
+    return 0
+        unless $user->isInGroup( $session->setting->get("groupIdAdminUserEdit") );
+    return 1
+        unless $userIdToEdit;
+    my $userToEdit = WebGUI::User->new($session, $userIdToEdit);
+    return 1
+        if $userToEdit && !canEdit($session, $userToEdit);
+    return 0;
+}
+
+#----------------------------------------------------------------------------
+
 
 =head2 canUseService ( session )
 
@@ -439,8 +465,9 @@ sub www_ajaxDeleteUser {
 
     $session->http->setMimeType( $mimeType ); 
 
+    my $userId  = $session->form->get('userId');
     # Verify access
-    if ( !canEdit($session) || !canUseService($session) ) {
+    if ( !canEditUser($session, undef, $userId) || !canUseService($session) ) {
         # We need an automatic way to send a request for an http basic auth
         $session->http->setStatus(401,'Unauthorized');
         return createServiceResponse( $outputFormat, {
@@ -450,7 +477,6 @@ sub www_ajaxDeleteUser {
     }
 
     # Verify data
-    my $userId  = $session->form->get('userId');
     if ( !$userId ) {
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::InvalidParam",
@@ -506,16 +532,6 @@ sub www_ajaxUpdateUser {
 
     $session->http->setMimeType( $mimeType ); 
 
-    # Verify access
-    if ( !canEdit($session) || !canUseService($session) ) {
-        # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
-        return createServiceResponse( $outputFormat, {
-            error       => "WebGUI::Error::Unauthorized",
-            message     => "",
-        } );
-    }
-
     ### Verify data
     # User data is <PROPERTY_NAME> in form
     my %userParam = (
@@ -544,6 +560,16 @@ sub www_ajaxUpdateUser {
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::InvalidParam",
             param       => "userId",
+            message     => "",
+        } );
+    }
+
+    # Verify access
+    if ( !canEditUser($session, undef, $userParam{userId}) || !canUseService($session) ) {
+        # We need an automatic way to send a request for an http basic auth
+        $session->http->setStatus(401,'Unauthorized');
+        return createServiceResponse( $outputFormat, {
+            error       => "WebGUI::Error::Unauthorized",
             message     => "",
         } );
     }
@@ -580,7 +606,7 @@ Allows an administrator to assume another user.
 
 sub www_becomeUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
+	return $session->privilege->adminOnly() unless canEditUser($session, undef, $session->form->process('uid')) && $session->form->validToken;
 	return undef unless WebGUI::User->validUserId($session, $session->form->process("uid"));
 	$session->var->end($session->var->get("sessionId"));
 	$session->user({userId=>$session->form->process("uid")});
@@ -599,7 +625,7 @@ after this.
 
 sub www_deleteUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
+	return $session->privilege->adminOnly() unless canEditUser($session, undef, $session->process->('uid')) && $session->form->validToken;
     if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
         return WebGUI::AdminConsole->new($session,"users")->render($session->privilege->vitalComponent());
     }
@@ -620,9 +646,11 @@ Provides a form for editing a user, or adding a new user.
 
 sub www_editUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canAdd($session);
 	my $error = shift;
 	my $uid = shift || $session->form->process("uid");
+	return $session->privilege->adminOnly() unless canAdd($session);
+	return $session->privilege->adminOnly unless
+        $uid eq 'new' || canEditUser($session, undef, $uid);
 	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
@@ -700,45 +728,53 @@ sub www_editUser {
 		}
 		$tabform->getTab("profile")->fieldSetEnd($category->getLabel);
 	}
-	my @groupsToAdd = $session->form->group("groupsToAdd");
-	my @exclude = $session->db->buildArray("select groupId from groupings where userId=?",[$u->userId]);
-	@exclude = (@exclude,"1","2","7");
-    my $secondaryAdmin = $session->user->isInGroup('11');
-    my @extraExclude = ();
-    if ($secondaryAdmin && !$session->user->isAdmin) {
-        @extraExclude = $session->db->buildArray('select groupId from groups where groupId not in (select groupId from groupings where userId=?)',[$session->user->userId]);
+
+    my @groupsToAdd = $session->form->group("groupsToAdd");
+    my @currentGroups = $session->db->buildArray("select groupId from groupings where userId=?",[$u->userId]);
+    my @excludeGroups = ('1', '2', '7');
+
+    if (canEdit($session)) {
+        # no extra excludes
     }
-    push @extraExclude, @exclude;
-	$tabform->getTab("groups")->group(
-		-name=>"groupsToAdd",
-		-label=>$i18n->get("groups to add"),
-		-excludeGroups=>\@extraExclude,
-		-size=>15,
-		-multiple=>1,
-		-value=>\@groupsToAdd
-		);
-	my @include; 
-	foreach my $group (@exclude) {
-		unless (
-			$group eq "1" || $group eq "2" || $group eq "7"     # can't remove user from magic groups 
-			|| ($session->user->userId eq $uid  && $group eq 3) # cannot remove self from admin
-			|| ($uid eq '3' && $group eq "3")                   # user Admin cannot be removed from admin group
-			) {
-			push(@include,$group);
-		}
-	}
-	push (@include, "0");
-	my @groupsToDelete = $session->form->group("groupsToDelete");
-	$tabform->getTab("groups")->selectList(
-		-name=>"groupsToDelete",
-		-options=>$session->db->buildHashRef("select groupId, groupName from groups 
-			where groupId in (".$session->db->quoteAndJoin(\@include).") and showInForms=1 order by groupName"),
-		-label=>$i18n->get("groups to delete"),
-		-multiple=>1,
-		-size=>15,
-		-value=>\@groupsToDelete
-		);
-	my $submenu = _submenu(
+    elsif (canEditUser($session, undef, $uid)) {
+        my $fullControlGroupId = $session->setting->get('groupIdAdminUser');
+        my $fullControlGroup = WebGUI::Group->new($session, $fullControlGroupId);
+        push @excludeGroups, $fullControlGroupId, @{ $fullControlGroup->getGroupsIn(1) };
+    }
+    else {
+        # add only
+        push @excludeGroups, $session->db->buildArray('select groupId from groups where groupId not in (select groupId from groupings where userId=?)',[$session->user->userId]);
+    }
+
+    $tabform->getTab("groups")->group(
+        -name           => "groupsToAdd",
+        -label          => $i18n->get("groups to add"),
+        -excludeGroups  => [ @currentGroups, @excludeGroups ],
+        -size           => 15,
+        -multiple       => 1,
+        -value          => \@groupsToAdd,
+    );
+
+    my @include;
+    foreach my $group (@currentGroups) {
+        next
+            if $session->user->userId eq $uid && $group eq 3;   # cannot remove self from admin
+        next
+            if $uid eq '3' && $group eq "3";                    # user Admin cannot be removed from admin group
+        push @include, $group;
+    }
+    my @groupsToDelete = $session->form->group("groupsToDelete");
+    $tabform->getTab("groups")->group(
+        -name               => "groupsToDelete",
+        -label              => $i18n->get("groups to delete"),
+        -excludeGroups      => \@excludeGroups,
+        -size               => 15,
+        -multiple           => 1,
+        -includeOnlyGroups  => \@include,
+        -value              => \@groupsToDelete,
+    );
+
+    my $submenu = _submenu(
                         $session,
                         { workarea => $error.$tabform->print,
                           title    => 168,
@@ -759,7 +795,7 @@ to add/edit users and the submitted form passes the validToken check.
 sub www_editUserSave {
 	my $session = shift;
 	my $postedUserId = $session->form->process("uid"); #userId posted from www_editUser form
-	my $isAdmin = canEdit($session);
+	my $isAdmin = canEditUser($session, undef, $postedUserId);
 	my $isSecondary;
 	my $i18n = WebGUI::International->new($session);
 	my ($existingUserId) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
@@ -863,7 +899,7 @@ unless the current user can manage users.
 
 sub www_editUserKarma {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session);
+	return $session->privilege->adminOnly() unless canEditUser($session, undef, $session->form->process("uid"));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
 	my $i18n = WebGUI::International->new($session);
         $f = WebGUI::HTMLForm->new($session);
@@ -908,7 +944,7 @@ the validToken check.
 
 sub www_editUserKarmaSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
+	return $session->privilege->adminOnly() unless canEditUser($session, undef, $session->form->process("uid")) && $session->form->validToken;
         my ($u);
         $u = WebGUI::User->new($session,$session->form->process("uid"));
         $u->karma($session->form->process("amount"),$session->user->username." (".$session->user->userId.")",$session->form->process("description"));
@@ -960,7 +996,7 @@ sub www_listUsers {
 	my $session = shift;
 
     # If the user is only allowed to add users, send them right there.
-	unless (canEdit($session)) {
+	unless (canEditUser($session)) {
 		if (canAdd($session)) {
 			return www_editUser($session, undef, "new");
 		}

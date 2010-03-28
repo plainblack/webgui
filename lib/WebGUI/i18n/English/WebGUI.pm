@@ -4075,14 +4075,22 @@ LongTruncOk=1</p>
     },
 
     'settings groupIdAdminUser label' => {
-        message     => q{Users},
-        lastUpdated => 0,
+        message     => q{Users (full control)},
+        lastUpdated => 1269787056,
     },
     'settings groupIdAdminUser hoverHelp' => {
-        message     => q{Group to manage users. Can add and edit users.},
+        message     => q{Group to manage users. Can add and edit users from all groups.},
         lastUpdated => 0,
     },
 
+    'settings groupIdAdminUserEdit label' => {
+        message     => q{Users (edit)},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminUserEdit hoverHelp' => {
+        message     => q{Group to manage users. Can add and edit users in the same group.},
+        lastUpdated => 0,
+    },
 
     'settings groupIdAdminUserAdd label' => {
         message     => q{Users (add only)},
