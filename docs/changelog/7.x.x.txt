@@ -2,6 +2,7 @@
  - added #11412: Additional navigation in Gallery Photo View 
  - added: Sort Items switch to Syndicated Content asset
  - fixed #11493: i18n AssetCalendar::pageNextUrl monthVar
+ - fixed #11496: No linkable RSS feeds from gallery
 
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)

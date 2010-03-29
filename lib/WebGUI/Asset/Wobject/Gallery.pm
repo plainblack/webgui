@@ -761,11 +761,12 @@ sub getRssFeedItems {
             perpage     => $self->get('itemsPerFeed'),
         } );
     
-    my $var = [];
+    my $var     = [];
+    my $siteUrl = $self->session->url->getSiteURL();
     for my $assetId ( @{ $p->getPageData } ) {
         my $asset       = WebGUI::Asset::Wobject::GalleryAlbum->newPending( $self->session, $assetId );
         push @{ $var }, {
-            'link'          => $asset->getUrl,
+            'link'          => $siteUrl . $asset->getUrl,
             'guid'          => $asset->{_properties}->{ 'assetId' },
             'title'         => $asset->getTitle,
             'description'   => $asset->{_properties}->{ 'description' },
