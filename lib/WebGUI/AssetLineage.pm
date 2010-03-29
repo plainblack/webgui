@@ -65,37 +65,58 @@ If this is set to 1 assets that normally autocommit their workflows (like CS Pos
 =cut
 
 sub addChild {
-	my $self        = shift;
+    my $self        = shift;
     my $session     = $self->session;
-	my $properties  = shift;
-	my $id          = shift || $session->id->generate();
-	my $now         = shift || $session->datetime->time();
-	my $options     = shift;
-    # Check for valid parentage using validParent on child's class
-    WebGUI::Asset->loadModule($properties->{className});
-    if (! $properties->{className}->validParent($session, $self)) {
-        return undef;
+    my $properties  = shift;
+    my $id          = shift || $session->id->generate();
+    my $now         = shift || $session->datetime->time();
+    my $options     = shift;
+    my $child       = WebGUI::Asset->newByPropertyHashRef($session, {
+        parentId => $self->assetId,
+        assetId  => $id,
+        className => $properties->{className},
+    });
+    $child = $child->addRevision($properties, $now, $options);
+
+    $self->{_hasChildren} = 1;
+    return $child;
+}
+
+sub createInDatabase {
+    my $self = shift;
+    my $now = shift || time;
+    my $session = $self->session;
+    if ( $self->hasBeenWritten ) {
+        return $self;
     }
 
-	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
-	if (length($self->lineage) >= 252) {
-		$session->errorHandler->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
-		return $self->getParent->addChild($properties, $id, $now, $options);
-	}
+    my $parent = $self->getParent;
+    if (! $parent->hasBeenWritten) {
+        $session->db->write(
+            'INSERT INTO virtualChildren (assetId, realParentId) VALUES (?, ?)',
+            [$self->assetId, $parent->assetId],
+        );
+        $parent = WebGUI::Asset->getTempspace($session);
+        $self->parentId($parent->assetId);
+    }
+    my $lineage = $parent->lineage . $parent->getNextChildRank;
+    if (length $lineage > 255) {
+        $session->errorHandler->warn('Tried to add child to asset "'.$self->parentId.'" which is already on the deepest level. Adding it as a sibling instead.');
+        $self->parentId($parent->parentId);
+        return $self->createInDatabase;
+    }
 
-	my $lineage = $self->lineage.$self->getNextChildRank;
-	$self->{_hasChildren} = 1;
-	$session->db->beginTransaction;
-	$session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (?,?,?,?,?,?,'published')",
-		[$id, $self->getId, $lineage, $now, $session->user->userId, $properties->{className}]);
-	$session->db->commit;
-	$properties->{assetId}  = $id;
-	$properties->{parentId} = $self->getId;
-	my $temp = WebGUI::Asset->newByPropertyHashRef($session, $properties) || croak "Couldn't create a new $properties->{className} asset!";
-	my $newAsset = $temp->addRevision($properties, $now, $options); 
-	$self->updateHistory("added child ".$id);
-	$session->http->setStatus(201,"Asset Creation Successful");
-	return $newAsset;
+    $session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (?,?,?,?,?,?,'published')",
+        [$self->assetId, $self->parentId, $lineage, $now, $session->user->userId, ref $self]);
+
+    $parent->updateHistory("added child " . $self->assetId);
+    $self->hasBeenWritten(1);
+    my $sth = $session->db->read('SELECT assetId FROM virtualChildren WHERE realParentId = ?', [$self->assetId]);
+    while ( my ($assetId) = $sth->array ) {
+        my $asset = WebGUI::Asset->newById($session, $assetId);
+        $asset->setParent($self);
+    }
+    return $self;
 }
 
 #-------------------------------------------------------------------

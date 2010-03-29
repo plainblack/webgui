@@ -107,6 +107,9 @@ sub addRevision {
 
     #Create a dummy revision to be updated with real data later
     $session->db->beginTransaction;
+    if (!$self->hasBeenWritten) {
+        $self = $self->createInDatabase($now);
+    }
 
 	# prime the tables
     foreach my $table ($self->meta->get_tables) {

@@ -33,6 +33,7 @@ my $session = start(); # this line required
 
 moveMaintenance($session);
 migrateToNewCache($session);
+addVirtualChildTable($session);
 
 finish($session); # this line required
 
@@ -58,6 +59,15 @@ sub migrateToNewCache {
     $db->write("delete from WorkflowActivityData where activityId in  ('pbwfactivity0000000002','pbwfactivity0000000022')");
     print "DONE!\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+sub addVirtualChildTable {
+    my $session = shift;
+    print "\tCreating table to track children of virtual assets " unless $quiet;
+    $session->db->write('CREATE TABLE virtualChildren (assetId char(22) primary key, realParentId char(22))');
+    print "Done.\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 sub moveMaintenance {

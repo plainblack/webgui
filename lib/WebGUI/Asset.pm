@@ -286,7 +286,8 @@ property  revisedBy => (
 has       [qw/parentId     lineage
               creationDate createdBy
               state stateChanged stateChangedBy
-              isLockedBy isSystem lastExportedAs/] => (
+              isLockedBy isSystem lastExportedAs
+              hasBeenWritten/] => (
             is              => 'rw',
           );
 has       className  => (
@@ -367,6 +368,7 @@ around BUILDARGS => sub {
 
     if (defined $properties) {
         $properties->{session} = $session;
+        $properties->{hasBeenWritten} = 1;
         return $className->$orig($properties);
     }	
     $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
@@ -915,8 +917,18 @@ sub getEditForm {
 
     # Set the appropriate URL
     # If we're adding a new asset, don't set anything
-    if ( $session->form->get( "func" ) ne "add" ) {
+    if ( $session->form->get( "func" ) eq "add" ) {
+        $tabform->hidden({
+            name=>"func",
+            value=>"addSave"
+        });
+    }
+    else {
         $tabform->formHeader( { action => $self->getUrl, method => "POST" } );
+        $tabform->hidden({
+            name=>"func",
+            value=>"editSave"
+        });
     }
 
 	if ($session->config->get("enableSaveAndCommit")) {
@@ -933,10 +945,6 @@ sub getEditForm {
         } ) 
     );
 
-	$tabform->hidden({
-		name=>"func",
-		value=>"editSave"
-		});
 	my $assetId;
 	my $class;
 	if ($self->getId eq "new") {
@@ -2348,6 +2356,8 @@ Stores the current properties of the asset in the database.
 
 sub write {
 	my $self = shift;
+    return
+        if ! $self->hasBeenWritten;
     $self->lastModified(time());
 	
     my $db = $self->session->db;
@@ -2468,37 +2478,51 @@ new Asset will inherit security and style properties from the current asset, the
 
 sub www_add {
 	my $self = shift;
-	my %prototypeProperties;
-    my $class = $self->loadModule($self->session->form->process("class","className"));
+    my $newAsset = $self->childForEdit;
+	return $newAsset->www_edit;
+}
+
+sub childForEdit {
+    my $self = shift;
+    my $session = $self->session;
+    my $class = $self->loadModule($session->form->process("class", "className"));
     return undef unless (defined $class);
-	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
-	if ($self->session->form->process('prototype')) {
-		my $prototype = WebGUI::Asset->newById($self->session, $self->session->form->process("prototype"));
-		foreach my $property ($prototype->getProperties) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
+    return $session->privilege->insufficient()
+        unless $class->canAdd($session);
+    my %prototypeProperties;
+    if ($session->form->process('prototype')) {
+        my $prototype = WebGUI::Asset->newById($session, $session->form->process("prototype"));
+        foreach my $property ($prototype->getProperties) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
+            next if (isIn($property, qw(title menuTitle url isPrototype isPackage)));
             my $definition = $prototype->getProperty($property);
-			next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
-			next if ($definition->{noFormPost});
-			$prototypeProperties{$property} = $prototype->get($property);
-		}
-	}
-	my %properties = (
-		%prototypeProperties,
-		parentId => $self->getId,
-		groupIdView => $self->get("groupIdView"),
-		groupIdEdit => $self->get("groupIdEdit"),
-		ownerUserId => $self->get("ownerUserId"),
-		encryptPage => $self->get("encryptPage"),
-		styleTemplateId => $self->get("styleTemplateId"),
-		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
-		isHidden => $self->get("isHidden"),
-		className=>$class,
-		assetId=>"new",
-		url=>$self->session->form->param("url")
-		);
-	$properties{isHidden} = 1 unless $self->session->config->get("assets/".$class."/isContainer");
-	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
+            next if ($definition->{noFormPost});
+            $prototypeProperties{$property} = $prototype->$property;
+        }
+    }
+    my %properties = (
+        %prototypeProperties,
+        parentId        => $self->assetId,
+        groupIdView     => $self->groupIdView,
+        groupIdEdit     => $self->groupIdEdit,
+        ownerUserId     => $self->ownerUserId,
+        encryptPage     => $self->encryptPage,
+        styleTemplateId => $self->styleTemplateId,
+        printableStyleTemplateId => $self->printableStyleTemplateId,
+        isHidden        => $self->isHidden,
+        className       => $class,
+        assetId         => $session->id->generate,
+        url             => $session->form->param("url"),
+    );
+	$properties{isHidden} = 1 unless $session->config->get("assets/".$class."/isContainer");
+	my $newAsset = WebGUI::Asset->newByPropertyHashRef($session,\%properties);
 	$newAsset->{_parent} = $self;
-	return $newAsset->www_edit();
+    return $newAsset;
+}
+
+sub www_addSave {
+	my $self = shift;
+    my $newAsset = $self->childForEdit;
+	return $newAsset->www_editSave;
 }
 
 #-------------------------------------------------------------------
@@ -2599,41 +2623,23 @@ sub www_editSave {
     my $session = $self->session;
 
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
-    my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
-    return $session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
+    return $session->privilege->locked() if (!$self->canEditIfLocked);
     return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
     if ($self->session->config("maximumAssets")) {
         my ($count) = $self->session->db->quickArray("select count(*) from asset");
         my $i18n = WebGUI::International->new($self->session, "Asset");
         return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
     }
-    my $object;
-    if ($isNewAsset) {
-        $object = $self->addChild({className=>$session->form->process("class","className")});	
-        return $self->www_view unless defined $object;
-        $object->{_parent} = $self;
-        $object->url(undef);
-    } 
-    else {
-        if ($self->canEditIfLocked) {
-            $object = $self->addRevision;
-        } 
-        else {
-            return $session->asset($self->getContainer)->www_view;
-        }
-    }
+
+    my $object = $self->addRevision;
 
     # Process properties from form post
     my $errors = $object->processPropertiesFromFormPost;
+
     if (ref $errors eq 'ARRAY') {
         $session->stow->set('editFormErrors', $errors);
-        if ($session->form->process('assetId') eq 'new') {
-            $object->purge;
-            return $self->www_add();
-        } else {
-            $object->purgeRevision;
-            return $self->www_edit();
-        }
+        $object->purgeRevision;
+        return $self->www_edit;
     }
 
     $object->updateHistory("edited");

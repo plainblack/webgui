@@ -1,0 +1,32 @@
+www_add
+    creates virtual asset with asset id
+    uses www_edit to generate form
+    posts back to www_addSave
+www_addSave
+    recreates virtual asset
+    uses www_editSave to do edit work
+www_editSave
+    calls addRevision to create revision in db
+    does rest of work as per normal
+addRevision
+    calls createInDatabase to create asset record
+    creates assetData etc data per normal
+addChild
+    creates virtual asset
+    calls addRevision to save
+createInDatabase
+    if virtual parent, create in tempspace
+        record parent relationship (new table?)
+    creates asset record
+    moves virtual assets to be children
+
+purgeRevision
+    autopurge asset if last revision
+
+attachements form control
+    needs to know if being used on virtual asset or not
+
+
+TODO:
+    update www_editSave where it has been used
+
