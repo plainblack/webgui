@@ -5,6 +5,7 @@
  - fixed #11466: Can't delete attached file in CS
  - fixed #11481: Problem assignment group Admin to an User
  - fixed #11486: Bad matrix sorting
+ - fixed #11493: i18n AssetCalendar::pageNextUrl monthVar
 
 7.8.15
  - fixed #11453: fileUpload.pl does not handle files with spaces, overwriting
