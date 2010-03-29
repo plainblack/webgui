@@ -7,6 +7,7 @@
  - fixed #11486: Bad matrix sorting
  - fixed #11493: i18n AssetCalendar::pageNextUrl monthVar
  - fixed #11496: No linkable RSS feeds from gallery
+ - fixed #11497: default profile settings
 
 7.8.15
  - fixed #11453: fileUpload.pl does not handle files with spaces, overwriting
