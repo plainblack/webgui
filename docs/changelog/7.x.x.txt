@@ -4,6 +4,7 @@
  - fixed #11493: i18n AssetCalendar::pageNextUrl monthVar
  - fixed #11496: No linkable RSS feeds from gallery
  - fixed #11497: default profile settings
+ - fixed #11492: photo details
 
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
