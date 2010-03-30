@@ -232,6 +232,7 @@ sub fatal {
 	if (! defined $self->session->db(1)) {
 		# We can't even _determine_ whether we can show the debug text.  Punt.
 		$self->session->output->print("<h1>Fatal Internal Error</h1>");
+		$self->session->output->print("<p>".$message."</p>");
 	} 
 	elsif ($self->canShowDebug()) {
 		$self->session->output->print("<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n",1);
