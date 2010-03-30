@@ -118,6 +118,7 @@ sub addArchive {
     my $properties  = shift;
     my $outputSub   = shift || sub {};
     my $gallery     = $self->getParent;
+    my $session     = $self->session;
     
     my $archive     = Archive::Any->new( $filename );
 
@@ -143,7 +144,7 @@ sub addArchive {
         my $class       = $gallery->getAssetClassForFile( $filePath );
         next unless $class; # class is undef for those files the Gallery can't handle
 
-        $self->session->errorHandler->info( "Adding $filename to album!" );
+        $session->errorHandler->info( "Adding $filename to album!" );
         $outputSub->('Adding %s to album', $filename);
         # Remove the file extension
         $filename   =~ s{\.[^.]+}{};
@@ -151,13 +152,14 @@ sub addArchive {
         $properties->{ className        } = $class;
         $properties->{ menuTitle        } = $filename;
         $properties->{ title            } = $filename;
-        $properties->{ url              } = $self->session->url->urlize( $self->getUrl . "/" . $filename );
+        $properties->{ ownerUserId      } = $session->user->userId;
+        $properties->{ url              } = $session->url->urlize( $self->getUrl . "/" . $filename );
 
         my $asset   = $self->addChild( $properties, undef, undef, { skipAutoCommitWorkflows => 1 } );
         $asset->setFile( $filePath );
     }
 
-    my $versionTag      = WebGUI::VersionTag->getWorking( $self->session );
+    my $versionTag      = WebGUI::VersionTag->getWorking( $session );
     $versionTag->set({ 
         "workflowId" => $self->getParent->get("workflowIdCommit"),
     });
