@@ -1,4 +1,5 @@
 7.9.2
+ - fixed #11507: Spectre Reports Wrong Workflow Count
  - added #11412: Additional navigation in Gallery Photo View 
  - added: Sort Items switch to Syndicated Content asset
  - fixed #11493: i18n AssetCalendar::pageNextUrl monthVar
