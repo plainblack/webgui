@@ -901,13 +901,13 @@ sub view {
             keyword             => $keyword,
             url_searchKeyword   
                 => $self->getGallery->getUrl(
-                    "func=search;submit=1;keywords=" . uri_escape($keyword) 
+                    "func=search;submit=1;keywords=" . uri_escape_utf8($keyword) 
                 ),
             url_searchKeywordUser
                 => $self->getGallery->getUrl(
                     "func=search;submit=1;"
                     . "userId=" . $self->get("ownerUserId") . ';'
-                    . 'keywords=' . uri_escape( $keyword ) 
+                    . 'keywords=' . uri_escape_utf8( $keyword ) 
                 ),
         };
     }

@@ -7,6 +7,7 @@
  - fixed #11492: photo details
  - fixed #11503: Gallery: Wrong owner after uploading of ZIP archives
  - fixed #11494: Error message on mysql down
+ - fixed: Viewing a Gallery File with non-ASCII keywords crashes
 
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
