@@ -304,7 +304,7 @@ sub getJsonStatus {
         foreach my $instance ($self->getInstances) {
             my $site = $instance->{sitename};
             unless (exists $output{$site}) { # must have an entry for each queue in each site
-                $output{$site} = \%queues;
+                $output{$site} = clone \%queues;
             }
             my $queue = ucfirst($instance->{status});
             push @{$output{$site}{$queue}}, $instance;
