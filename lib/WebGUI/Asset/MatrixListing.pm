@@ -899,7 +899,6 @@ Web facing method which is the default edit page
 
 sub www_edit {
     my $self = shift;
-    my $i18n = WebGUI::International->new($self->session, "Asset_MatrixListing");
 
     if($self->session->form->process('func') eq 'add'){
         return $self->session->privilege->noAccess() unless $self->getParent->canAddMatrixListing();
