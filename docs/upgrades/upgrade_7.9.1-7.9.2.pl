@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addSortItemsSCColumn($session);
 removeTranslationCruft($session);
+addExtensionWorkflow($session);
 
 finish($session); # this line required
 
@@ -46,6 +47,17 @@ sub removeTranslationCruft {
     unlink File::Spec->catfile($webguiRoot, qw/lib WebGUi i18n Spanish .pm/);
     unlink File::Spec->catfile($webguiRoot, qw/lib WebGUi i18n Dutch .DS_Store/);
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addExtensionWorkflow {
+    print "\tAdding calendar event extension to weekly maintenence..."
+        unless $quiet;
+    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000002');
+    my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ExtendCalendarRecurrences');
+    $activity->set(title => 'Extend Calendar Recurrences');
+    $activity->set(description => 'Create events for live recurrences up to two years from the current date');
+    print "Done\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

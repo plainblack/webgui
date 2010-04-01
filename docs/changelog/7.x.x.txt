@@ -1,4 +1,7 @@
 7.9.2
+ - added: Workflow to extend recurring Calendar events 2 years from the
+   current date (now part of weekly maintenence)
+ - new dependency: DateTime::Event::ICal
  - fixed #11507: Spectre Reports Wrong Workflow Count
  - added #11412: Additional navigation in Gallery Photo View 
  - added: Sort Items switch to Syndicated Content asset
