@@ -396,7 +396,8 @@ sub www_manageTrash {
     my $header;
     my $limit = 1;
     my $canAdmin = $self->session->user->isInGroup($self->session->setting->get('groupIdAdminTrash'));
-    if ($self->session->form->process("systemTrash") && $canAdmin) {
+    my $systemTrash = $self->session->form->process("systemTrash");
+    if ($systemTrash && $canAdmin) {
 		$header = $i18n->get(965);
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), $i18n->get(10,"WebGUI"));
         $limit = undef;
@@ -436,6 +437,7 @@ sub www_manageTrash {
             assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
             assetManager.AddButton("'.$i18n->get("purge").'","purgeList","manageTrash");
             assetManager.AddFormHidden({ name:"webguiCsrfToken", value:"'.$self->session->scratch->get('webguiCsrfToken').'"});
+            assetManager.AddFormHidden({ name:"systemTrash", value:"'.$systemTrash.'"});
             assetManager.Write();        
             var assetListSelectAllToggle = false;
             function toggleAssetListSelectAll(form) {
@@ -485,6 +487,9 @@ sub www_purgeList {
         }
     }
     my $method = ($session->form->process("proceed")) ? $session->form->process('proceed') : 'manageTrash';
+    if ($session->form->process('systemTrash') ) {
+        $method .= ';systemTrash=1';
+    }
     $pb->finish($self->getUrl('func='.$method));
 }
 
