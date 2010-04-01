@@ -322,6 +322,41 @@ sub getAssets {
 
 #-------------------------------------------------------------------
 
+=head2 getCommitUrl ( )
+
+Get the URL to commit this version tag. Will check settings to see
+if commit comments are on or off
+
+=cut
+
+sub getCommitUrl {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $url ) = $session->quick(qw( url ));
+
+    if ($session->setting->get("skipCommitComments")) {
+        return $url->page("op=commitVersionTagConfirm;tagId=".$self->getId);
+    }
+    else {
+        return $url->page("op=commitVersionTag;tagId=".$self->getId);
+    }
+}
+
+#-------------------------------------------------------------------
+
+=head2 getEditUrl ( )
+
+Get the URL to edit this version tag
+
+=cut
+
+sub getEditUrl {
+    my ( $self ) = @_;
+    return $self->session->url->page( "op=editVersionTag;tagId=".$self->getId );
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the ID of this version tag.
@@ -331,6 +366,19 @@ Returns the ID of this version tag.
 sub getId {
 	my $self = shift;
 	return $self->{_id};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getJoinUrl ( )
+
+Get the URL to join this version tag
+
+=cut
+
+sub getJoinUrl {
+    my ( $self ) = @_;
+    return $self->session->url->page( "op=setWorkingVersionTag;tagId=".$self->getId );
 }
 
 #-------------------------------------------------------------------
