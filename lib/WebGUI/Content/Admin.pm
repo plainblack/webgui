@@ -63,5 +63,3 @@ sub handler {
 
 1;
 #vim:ft=perl
-
-__DATA__
