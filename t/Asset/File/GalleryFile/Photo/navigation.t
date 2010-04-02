@@ -26,6 +26,8 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 $versionTag->set({name=>"Photo Test"});
 
+addToCleanup($versionTag);
+
 # Create gallery and a single album
 my $gallery
     = $node->addChild({
@@ -77,21 +79,21 @@ use_ok("WebGUI::Asset::File::GalleryFile::Photo");
 #----------------------------------------------------------------------------
 # Test getFirstFile method
 
-diag('getFirstFile');
+note('getFirstFile');
 is( $photo[2]->getFirstFile->getId, $photo[0]->getId, 'First file is photo no. 1' );
 is( $photo[0]->getFirstFile->getId, $photo[0]->getId, 'First file is still photo no. 1' );
 
 #----------------------------------------------------------------------------
 # Test getFirstFile method
 
-diag('getLastFile');
+note('getLastFile');
 is( $photo[2]->getLastFile->getId, $photo[4]->getId, 'Last file is photo no. 5' );
 is( $photo[4]->getLastFile->getId, $photo[4]->getId, 'Last file is still photo no. 5' );
 
 #----------------------------------------------------------------------------
 # Test getPreviousFile method
 
-diag('getPreviousFile');
+note('getPreviousFile');
 is( $photo[2]->getPreviousFile->getId, $photo[1]->getId, 'Photo previous of photo no. 3 is photo no. 2' );
 is( $photo[1]->getPreviousFile->getId, $photo[0]->getId, 'Photo previous of photo no. 2 is photo no. 1' );
 is( $photo[0]->getPreviousFile, undef, 'Photo previous of photo no. 1 is undef' );
@@ -99,13 +101,8 @@ is( $photo[0]->getPreviousFile, undef, 'Photo previous of photo no. 1 is undef' 
 #----------------------------------------------------------------------------
 # Test getNextFile method
 
-diag('getNextFile');
+note('getNextFile');
 is( $photo[2]->getNextFile->getId, $photo[3]->getId, 'Photo next of photo no. 3 is photo no. 4' );
 is( $photo[3]->getNextFile->getId, $photo[4]->getId, 'Photo next of photo no. 4 is photo no. 5' );
 is( $photo[4]->getNextFile, undef, 'Photo next of photo no. 5 is undef' );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback;
-}
