@@ -14,6 +14,7 @@
  - fixed #11510: Scratch variables for sort direction and key can break the CS
  - fixed #11511: Approval Notifications: URL in mails only plain text
  - fixed #11513: white text, broken account mgmt
+ - fixed #11514: Added JS-type cancel button to edit view of WebGUI::Asset::Post
 
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)

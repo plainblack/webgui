@@ -192,7 +192,11 @@ will be a plain text area.|,
 		message => q|A button to submit the post.|,
 		lastUpdated => 1149829706,
 	},
-
+	
+	'form.cancel' => {
+		message => q|A button to cancel the post.|,
+		lastUpdated => 1270240208,
+	},
 	'karmaScale.form' => {
 		message => q|A form element that allows moderators to set the scale of an individual thread. This is only available for threads.|,
 		lastUpdated => 1149829706,

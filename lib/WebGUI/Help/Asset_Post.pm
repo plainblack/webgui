@@ -58,6 +58,7 @@ our $HELP = {
             { 'name' => 'content.form' },
             { 'name' => 'skipNotification.form' },
             { 'name' => 'form.submit' },
+            { 'name' => 'form.cancel' },
             { 'name' => 'karmaScale.form' },
             { 'name' => 'karmaIsEnabled' },
             {   'name'      => 'meta_loop',

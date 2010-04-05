@@ -1480,16 +1480,15 @@ Renders a template form for adding and editing posts.
 =cut
 
 sub www_edit {
-	my $self      = shift;
+    my $self      = shift;
     my $session   = $self->session;
     my $form      = $session->form;
     my $privilege = $session->privilege;
     my $user      = $session->user;
     my $func      = $form->process("func");
     
-	my (%var, $content, $title, $synopsis);
-	my $i18n = WebGUI::International->new($session);
-
+    my (%var, $content, $title, $synopsis);
+    my $i18n = WebGUI::International->new($session);
 
     my $className = $form->process("class","className") || $self->get('className');
 	if ($func eq "add" || ($func eq "editSave" && $form->process("assetId") eq "new")) { # new post
@@ -1695,7 +1694,12 @@ sub www_edit {
         });
     }
 	$var{'form.submit'} = WebGUI::Form::submit($session, {
-        extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave';return true;\""
+	    extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave';return true;\""
+	});
+	$var{'form.cancel'} = WebGUI::Form::button( $session, {
+	    name        => "cancel",
+	    value       => $i18n->get("cancel"),
+	    extras      => 'onclick="history.go(-1)"',
 	});
 	$var{'karmaScale.form'} = WebGUI::Form::integer($session, {
         name=>"karmaScale",
@@ -1704,7 +1708,7 @@ sub www_edit {
     });
 	$var{karmaIsEnabled} = $session->setting->get("useKarma");
 	$var{'form.preview'} = WebGUI::Form::submit($session, {
-        value=>$i18n->get("preview","Asset_Collaboration")
+	    value=>$i18n->get("preview","Asset_Collaboration")
     });
 	my $numberOfAttachments = $self->getThread->getParent->getValue("attachmentsPerPost");
 	$var{'attachment.form'} = WebGUI::Form::image($session, {
