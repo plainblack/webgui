@@ -3,6 +3,7 @@
  - fixed #11509: System trash not sticky
  - fixed #11506: Cruft on i18n dirs in the released .tar.gz
  - fixed #11510: Scratch variables for sort direction and key can break the CS
+ - fixed #11511: Approval Notifications: URL in mails only plain text
 
 7.8.16
  - fixed thread pagination on search results, off by 1 error and modal direction

@@ -174,7 +174,6 @@ sub execute {
     my $versionTag  = shift;
     my $instance    = shift;
     my $i18n        = WebGUI::International->new( $self->session, "VersionTag" );
-    my $inbox       = WebGUI::Inbox->new( $self->session );
 
     # First time through, send the message(s)
     if ( $instance->getScratch("status") eq "" ) {
@@ -267,7 +266,7 @@ sub sendMessage {
     my $messageText 
         = join "\n\n",
             $self->get("message"),
-            $approvalUrl,
+            sprintf('<a href="%s">%s</a>', $approvalUrl, $approvalUrl,),
             $versionTag->get("comments"),
         ;
 
