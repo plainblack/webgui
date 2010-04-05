@@ -10,6 +10,7 @@
  - fixed #11494: Error message on mysql down
  - fixed: Viewing a Gallery File with non-ASCII keywords crashes
  - fixed #11509: System trash not sticky
+ - fixed #11506: Cruft on i18n dirs in the released .tar.gz
 
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)

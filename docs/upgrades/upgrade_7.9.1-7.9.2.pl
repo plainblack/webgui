@@ -30,19 +30,23 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+# upgrade functions go here
 addSortItemsSCColumn($session);
+removeTranslationCruft($session);
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
 # Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub removeTranslationCruft {
+    my $session = shift;
+    print "\tRemoving files left over from unpacking translations... " unless $quiet;
+    # and here's our code
+    unlink File::Spec->catfile($webguiRoot, qw/lib WebGUi i18n Spanish .pm/);
+    unlink File::Spec->catfile($webguiRoot, qw/lib WebGUi i18n Dutch .DS_Store/);
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addSortItemsSCColumn {
