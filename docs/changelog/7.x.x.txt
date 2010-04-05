@@ -1,6 +1,7 @@
 7.8.17
  - fixed #11507: Spectre Reports Wrong Workflow Count
  - fixed #11509: System trash not sticky
+ - fixed #11506: Cruft on i18n dirs in the released .tar.gz
 
 7.8.16
  - fixed thread pagination on search results, off by 1 error and modal direction
