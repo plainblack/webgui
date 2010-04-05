@@ -1159,16 +1159,28 @@ Collaboration System
 =cut
 
 sub getThreadsPaginator {
-    my $self  = shift;
+    my $self    = shift;
+    my $session = $self->session;        
 
     my $scratchSortBy    = $self->getId."_sortBy";
     my $scratchSortOrder = $self->getId."_sortDir";
     my $sortBy    = $self->session->form->process("sortBy")   
                  || $self->session->scratch->get($scratchSortBy)
                  || $self->get("sortBy");
+    $sortBy =~ s/^\w+\.//;
+    # Sort by the thread rating instead of the post rating.  other places don't care about threads.
+    $sortBy = $sortBy eq 'rating' ? 'threadRating' : $sortBy;
+    if (! WebGUI::Utility::isIn($sortBy, qw/userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 title lineage revisionDate creationDate karmaRank threadRating/)) {
+        $sortBy = 'revisionDate';
+    }
+    if ($sortBy eq 'assetId' || $sortBy eq 'revisionDate') {
+        $sortBy = 'assetData.' . $sortBy;
+    }
     my $sortOrder = $self->session->form->process("sortOrder")
                  || $self->session->scratch->get($scratchSortOrder)
                  || $self->get("sortOrder");
+    #$sortOrder    = lc $sortOrder;
+    #$sortOrder    = 'desc' if ($sortOrder ne 'asc' && $sortOrder ne 'desc');
     if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
         $self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
         $self->session->scratch->set($scratchSortOrder, $sortOrder);
@@ -1182,13 +1194,8 @@ sub getThreadsPaginator {
         }
         $self->session->scratch->set($scratchSortOrder, $sortOrder);
     }
-    $sortBy ||= "assetData.revisionDate";
-    $sortOrder ||= "desc";
-    # Sort by the thread rating instead of the post rating.  other places don't care about threads.
-    if ($sortBy eq 'rating') {
-        $sortBy = 'threadRating';
-    } 
     $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
+    $sortOrder ||= 'desc';
 
     my $sql = "
         select 
