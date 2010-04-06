@@ -1,0 +1,50 @@
+
+#wrapper {
+    margin-left: 160px; /* move out of the adminbar's way */
+}
+
+#versionTag {
+    float: left;
+    width: 57%;
+    padding: 2px 1%;
+    border: 1px solid #339;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    line-height: 16px;
+}
+
+#user {
+    float: right;
+    width: 38%;
+    padding: 2px 1%;
+    border: 1px solid #339;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    line-height: 16px;
+}
+
+#locationBar {
+    height: 2em;
+}
+
+#tabs {
+    clear: both;
+}
+
+#wrapper .yui-content {
+    margin: 0; padding: 0;
+}
+
+#viewTab * { 
+    margin: 0; padding: 0;
+}
+
+img.icon {
+    vertical-align: baseline;
+}
+
+a:link {
+    text-decoration: none;
+}

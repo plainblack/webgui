@@ -84,3 +84,5 @@ TinyMCE..............................MoxieCode
 Yahoo User Interface (YUI)...........Yahoo!
                                      http://www.yahoo.com
 
+FamFamFam Silk Icon set..............FamFamFam
+                                     http://famfamfam.com/lab/icons/silk/

@@ -167,14 +167,28 @@ sub www_view {
 
     # Add vars for current version tag
     if ( my $tag = WebGUI::VersionTag->getWorking( $session, "nocreate" ) ) {
-        $var->{tagName}    = $tag->get("name");
-        $var->{publishUrl} = "";                  #TODO
-        $var->{leaveUrl}   = "";                  #TODO
+        $var->{tagName}         = $tag->get("name");
+        $var->{tagEditUrl}      = $tag->getEditUrl;
+        $var->{tagPublishUrl}   = "";                  #TODO
+        $var->{tagLeaveUrl}     = "";                  #TODO
     }
 
+    $var->{viewUrl} = $url->page;
+
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/utilities/utilities.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('accordion/accordion.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('admin/admin.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/element/element-min.js'), {type=>"text/javascript"});
+    $style->setScript($url->extras('yui/build/tabview/tabview-min.js'), {type=>"text/javascript"});
+    $style->setScript($url->extras('yui/build/container/container_core-min.js'), {type=>"text/javascript"});
+    $style->setScript($url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
+    $style->setScript($url->extras('yui/build/button/button-min.js'), {type=>"text/javascript"});
+    $style->setLink( $url->extras('yui/build/button/assets/skins/sam/button.css'), {type=>"text/css",rel=>"stylesheet"});
+    $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {type=>"text/css",rel=>"stylesheet"});
+    $style->setLink( $url->extras('yui/build/tabview/assets/skins/sam/tabview.css'), {type=>"text/css",rel=>"stylesheet"});
     $style->setLink($url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
+    $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
 
     # Use the template in our __DATA__ block
     my $tdata   = do { local $/ = undef; <WebGUI::Admin::DATA> };
@@ -189,8 +203,6 @@ sub www_view {
 1;
 
 __DATA__
-<div id="wrapper" class="yui-skin-sam">
-
 <dl class="accordion-menu">
     <dt class="a-m-t">^International("admin console","AdminConsole");</dt>
     <dd class="a-m-d"><div class="bd">
@@ -203,11 +215,41 @@ __DATA__
     </div></dd>
 </dl>
 
-<p>This is where cool stuff goes</p>
+<div id="wrapper" class="yui-skin-sam">
 
-<!-- Put this in style where belongs -->
-<script type="text/javascript">
-    YAHOO.util.Event.onDOMReady(function () { document.body.style.marginLeft = "160px"; });
-</script>
+    <div id="versionTag" <TMPL_UNLESS tagName>style="display: none"</TMPL_UNLESS> >
+        <div style="float: right">Publish | Leave</div>
+        <a href="<tmpl_var tagEditUrl>" id="tagEditLink" target="view">
+            <img src="^Extras(icon/tag_blue.png);" class="icon"/>
+            <tmpl_var tagName>
+        </a>
+    </div>
+    <div id="user">
+        <div style="float: right">Back to Site | Log Out</div>
+        <a href="<tmpl_var userEditUrl>" target="view">
+            <img src="^Extras(icon/user.png);" class="icon" />
+            <tmpl_var userName>
+        </a>
+    </div>
+
+    <div id="tabs" class="yui-navset">
+        <ul class="yui-nav">
+            <li class="selected"><a href="#tab1"><em>View</em></a></li>
+            <li><a href="#tab2"><em>Tree</em></a></li>
+        </ul>
+        <div id="locationBar"></div>
+        <div class="yui-content">
+            <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view" style="width: 100%; height: 80%"></iframe></div>
+            <div id="treeTab"><p>Tab Two Content</p></div>
+        </div>
+    </div>
+
 
 </div>
+
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady( function() { 
+    var myTabs = new YAHOO.widget.TabView("tabs");
+    var bar = new WebGUI.Admin.LocationBar("locationBar");
+} );
+</script>
