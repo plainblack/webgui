@@ -25,8 +25,8 @@ use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Session;
 use WebGUI::User;
+use WebGUI::Request;
 use Moose;
-use Plack::Request;
 
 has root => ( is => 'ro', isa => 'Str', default => '/data/WebGUI' );
 has site => ( is => 'ro', isa => 'Str', default => 'dev.localhost.localdomain.conf' );
@@ -69,11 +69,11 @@ around BUILDARGS => sub {
 };
 
 sub BUILD {
-	my $self = shift;
-	
-	# Instantiate the WebGUI::Config object
-	my $config = WebGUI::Config->new( $self->root, $self->site );
-	$self->config( $config );
+    my $self = shift;
+
+    # Instantiate the WebGUI::Config object
+    my $config = WebGUI::Config->new( $self->root, $self->site );
+    $self->config($config);
 }
 
 sub psgi_app {
@@ -86,7 +86,7 @@ sub compile_psgi_app {
     
     my $app = sub {
         my $env = shift;
-        my $request = Plack::Request->new($env); # This could also be WebGUI::Request
+        my $request = WebGUI::Request->new($env);
         my $response = $self->dispatch($request);
         return $response;
     };
@@ -119,7 +119,7 @@ sub dispatch {
     my $config = $self->config;
     
     # determine session id
-	my $sessionId = $request->cookies->{$config->getCookieName};
+    my $sessionId = $request->cookies->{$config->getCookieName};
 
     # Instantiate the session object
     my $session = $self->session( WebGUI::Session->open($self->root, $config, $request, $sessionId) );

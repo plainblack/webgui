@@ -1,5 +1,7 @@
 package WebGUI::Session::Plack;
 
+# This file is deprecated - keeping it here for reference until everything has been ported
+
 use strict;
 use warnings;
 use Carp;
