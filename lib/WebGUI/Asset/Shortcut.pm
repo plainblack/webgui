@@ -65,7 +65,7 @@ sub _drawQueryBuilder {
 			"AND" => $i18n->get("AND"),
 			"OR" => $i18n->get("OR")},
 			value=>["OR"],
-			extras=>'class="qbselect"',
+			extras=>'class="qbselect" '. $self->{_disabled},
 		}
 	);
 
@@ -88,7 +88,7 @@ sub _drawQueryBuilder {
 			name=>$opFieldName,
 			uiLevel=>5,
 			options=>$operator{$fieldType},
-			extras=>'class="qbselect"'
+			extras=>'class="qbselect" '. $self->{_disabled},
 		});
 		# The value select field
 		my $valFieldName = "val_field".$i;
@@ -97,13 +97,14 @@ sub _drawQueryBuilder {
 			fieldType=>$fieldType,
 			name=>$valFieldName,
 			uiLevel=>5,
-			extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
+			extras=>qq/title="$fields->{$field}{description}" class="qbselect" /. $self->{_disabled},
 			options=>$options,
 		);
 		# An empty row
 		$output .= qq|<tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr>|;
 
 		# Table row with field info
+        my $disabled = $self->{_disabled};
 		$output .= qq|
 		<tr>
 		<td class="qbtdleft"><p class="qbfieldLabel">$fieldLabel</p></td>
@@ -115,7 +116,7 @@ sub _drawQueryBuilder {
 		</td>
 		<td class="qbtd"></td>
 		<td class="qbtdright">
-		<input class="qbButton" type=button value=$addLabel onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
+		<input class="qbButton" type=button value=$addLabel onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)" $disabled></td>
 		</tr>
 		|;
 		$i++;
@@ -311,19 +312,12 @@ sub getEditForm {
 	);
 	if($self->session->setting->get("metaDataEnabled")) {
 		$tabform->getTab("properties")->yesNo(
-			-name=>"shortcutByCriteria",
-			-value=>$self->getValue("shortcutByCriteria"),
-			-label=>$i18n->get("Shortcut by alternate criteria"),
-			-hoverHelp=>$i18n->get("Shortcut by alternate criteria description"),
-			-extras=>q|onchange="
-				if (this.form.shortcutByCriteria[0].checked) { 
- 					this.form.resolveMultiples.disabled=false;
-					this.form.shortcutCriteria.disabled=false;
-				} else {
- 					this.form.resolveMultiples.disabled=true;
-					this.form.shortcutCriteria.disabled=true;
-				}"|
-                );
+			-name     => "shortcutByCriteria",
+			-value    => $self->getValue("shortcutByCriteria"),
+			-label    => $i18n->get("Shortcut by alternate criteria"),
+			-hoverHelp=> $i18n->get("Shortcut by alternate criteria description"),
+			-extras   => q|onchange="wgCriteriaDisable(this.form, this.form.shortcutByCriteria[0].checked)"|,
+        );
 		$tabform->getTab("properties")->yesNo(
 			-name=>"disableContentLock",
 			-value=>$self->getValue("disableContentLock"),
