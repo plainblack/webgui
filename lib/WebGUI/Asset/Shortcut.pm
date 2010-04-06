@@ -77,6 +77,7 @@ sub _drawQueryBuilder {
 
 	# Here starts the field loop
 	my $i = 1;
+    my $addLabel = $i18n->get('add', 'Asset_Wobject');
 	foreach my $field (keys %$fields) {
 		my $fieldLabel = $fields->{$field}{fieldName};
 		my $fieldType = $fields->{$field}{fieldType} || "text";
@@ -116,10 +117,14 @@ sub _drawQueryBuilder {
 		<td class="qbtd"></td>
 		<td class="qbtdright">
 <<<<<<< HEAD:lib/WebGUI/Asset/Shortcut.pm
+<<<<<<< HEAD:lib/WebGUI/Asset/Shortcut.pm
 		<input class="qbButton" type=button value=Add onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
 =======
 		<input class="qbButton" type=button value=$addLabel onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)" $disabled></td>
 >>>>>>> f32f209... Fix shortcut hoverhelp, javascript, and criteria builder usability.  Fixes bug #11516:lib/WebGUI/Asset/Shortcut.pm
+=======
+		<input class="qbButton" type=button value=$addLabel onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
+>>>>>>> 08b662b... Internationalize the Add button in the Criteria builder for the Shortcut.:lib/WebGUI/Asset/Shortcut.pm
 		</tr>
 		|;
 		$i++;
