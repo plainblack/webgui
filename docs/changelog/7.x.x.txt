@@ -7,6 +7,7 @@
  - fixed #11513: white text, broken account mgmt
  - fixed #11514: Added JS-type cancel button to edit view of WebGUI::Asset::Post (Bernd Kalbfuß-Zimmermann)
  - fixed #11469: Survey Ruler
+ - fixed Shortcut i18n for the Criteria Builder.
 
 7.8.16
  - fixed thread pagination on search results, off by 1 error and modal direction
