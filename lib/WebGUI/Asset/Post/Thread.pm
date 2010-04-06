@@ -85,12 +85,12 @@ Extend the base method to handle creating a subscription group for this Thread.
 
 =cut
 
-sub addRevision {
-    my $self = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+override addRevision => sub {
+    my $self    = shift;
+    my $newSelf = super();
     $newSelf->createSubscriptionGroup;
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 

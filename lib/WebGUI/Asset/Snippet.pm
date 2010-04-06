@@ -128,20 +128,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addRevision ( properties, ... )
-
-Force the packed snippet to be regenerated.
-
-=cut
-
-sub addRevision {
-    my ( $self, $properties, @args ) = @_;
-    delete $properties->{ snippetPacked };
-    return $self->SUPER::addRevision( $properties, @args );
-}
-
-#-------------------------------------------------------------------
-
 =head2 exportGetUrlAsPath ( index )
 
 Translates a URL into an appropriate path and filename for exporting.

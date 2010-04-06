@@ -178,9 +178,9 @@ Override the default method in order to deal with attachments.
 
 =cut
 
-sub addRevision {
+override addRevision => sub {
     my $self = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+    my $newSelf = super();
     if ($newSelf->getRevisionCount > 1) {
         foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
             if ($self->get($field)) {
@@ -190,7 +190,7 @@ sub addRevision {
         }
     }
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 

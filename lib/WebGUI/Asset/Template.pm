@@ -157,13 +157,13 @@ Override the master addRevision to copy attachments
 
 =cut
 
-sub addRevision {
+override addRevision => sub {
     my ( $self, $properties, @args ) = @_;
-    my $asset = $self->SUPER::addRevision($properties, @args);
+    my $asset = super();
     delete $properties->{templatePacked};
     $asset->addAttachments($self->getAttachments);
     return $asset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -193,12 +193,12 @@ copy.
 
 =cut
 
-sub duplicate {
-	my $self = shift;
-	my $newTemplate = $self->SUPER::duplicate;
+override duplicate => sub {
+    my $self = shift;
+    my $newTemplate = super();
     $newTemplate->update({isDefault => 0});
     return $newTemplate;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -710,11 +710,11 @@ Override the master purgeRevision to purge attachments
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
     $self->removeAttachments;
-    return $self->SUPER::purgeRevision(@_);
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

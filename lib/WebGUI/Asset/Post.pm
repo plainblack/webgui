@@ -77,9 +77,6 @@ with 'WebGUI::Role::Asset::AlwaysHidden';
 
 with 'WebGUI::Role::Asset::SetStoragePermissions';
 
-
-use WebGUI::Asset::Template;
-use WebGUI::Asset::Post::Thread;
 use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -139,27 +136,28 @@ Override the default method in order to deal with attachments.
 
 =cut
 
-sub addRevision {
-        my $self = shift;
-        my $newSelf = $self->SUPER::addRevision(@_);
-        if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
-                my $newStorage = WebGUI::Storage->get($self->session,$self->storageId)->copy;
-                $newSelf->update({storageId=>$newStorage->getId});
+override addRevision => sub {
+    my $self    = shift;
+    my $newSelf = super();
+    if ( $newSelf->storageId && $newSelf->storageId eq $self->storageId ) {
+        my $newStorage = WebGUI::Storage->get( $self->session, $self->storageId )->copy;
+        $newSelf->update( { storageId => $newStorage->getId } );
+    }
+    my $threadId = $newSelf->threadId;
+    my $now      = time();
+    if ( $threadId eq "" ) {    # new post
+        if ( $newSelf->getParent->isa("WebGUI::Asset::Wobject::Collaboration") ) {
+            $newSelf->update( { threadId => $newSelf->getId } );
         }
-	my $threadId = $newSelf->threadId;
-	my $now = time();
-	if ($threadId eq "") { # new post
-		if ($newSelf->getParent->isa("WebGUI::Asset::Wobject::Collaboration")) {
-			$newSelf->update({threadId=>$newSelf->getId});
-		} else {
-			$newSelf->update({threadId=>$newSelf->getParent->threadId});
-		}
-		delete $newSelf->{_thread};
-	}
-	$newSelf->getThread->unmarkRead;
+        else {
+            $newSelf->update( { threadId => $newSelf->getParent->threadId } );
+        }
+        delete $newSelf->{_thread};
+    }
+    $newSelf->getThread->unmarkRead;
 
-        return $newSelf;
-}
+    return $newSelf;
+};
 
 #-------------------------------------------------------------------
 
@@ -269,20 +267,20 @@ increment replies for the parent thread.
 
 =cut
 
-sub commit {
-	my $self = shift;
-	$self->SUPER::commit;
-    
-    $self->notifySubscribers unless ($self->shouldSkipNotification);
-           
-	if ($self->isNew) {
-		if ($self->session->setting->get("useKarma") && $self->getThread->getParent->karmaPerPost) {
-			my $u = WebGUI::User->new($self->session, $self->ownerUserId);
-			$u->karma($self->getThread->getParent->karmaPerPost, $self->getId, "Collaboration post");
-		}
-        	$self->getThread->incrementReplies($self->revisionDate,$self->getId);# if ($self->isReply);
-	}
-}
+override commit => sub {
+    my $self = shift;
+    super();
+
+    $self->notifySubscribers unless ( $self->shouldSkipNotification );
+
+    if ( $self->isNew ) {
+        if ( $self->session->setting->get("useKarma") && $self->getThread->getParent->karmaPerPost ) {
+            my $u = WebGUI::User->new( $self->session, $self->ownerUserId );
+            $u->karma( $self->getThread->getParent->karmaPerPost, $self->getId, "Collaboration post" );
+        }
+        $self->getThread->incrementReplies( $self->revisionDate, $self->getId );    # if ($self->isReply);
+    }
+};
 
 #-------------------------------------------------------------------
 

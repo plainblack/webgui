@@ -93,9 +93,9 @@ Override the default method in order to deal with attachments.
 
 =cut
 
-sub addRevision {
-    my $self        = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+override addRevision => sub {
+    my $self    = shift;
+    my $newSelf = super();
 
     if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
         my $newStorage = $self->getStorageClass->get($self->session, $self->storageId)->copy;
@@ -103,7 +103,7 @@ sub addRevision {
     }
 
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 

@@ -158,9 +158,9 @@ Extent the method from the super class to handle iCalSequenceNumbers.
 
 =cut
 
-sub addRevision {
+override addRevision => sub {
     my $self = shift;
-    my $newRev = $self->SUPER::addRevision(@_);
+    my $newRev = super();
     my $sequenceNumber = $newRev->iCalSequenceNumber;
     if (defined $sequenceNumber) {
         $sequenceNumber++;
@@ -174,7 +174,7 @@ sub addRevision {
         $newRev->update({storageId => $newStorage->getId});
     }
     return $newRev;
-}
+};
 
 
 #-------------------------------------------------------------------

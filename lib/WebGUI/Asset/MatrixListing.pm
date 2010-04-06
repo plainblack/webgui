@@ -139,23 +139,6 @@ These methods are available from this class:
 
 =cut
 
-
-
-#-------------------------------------------------------------------
-
-=head2 addRevision
-
-   This method exists for demonstration purposes only.  The superclass
-   handles revisions to MatrixListing Assets.
-
-=cut
-
-sub addRevision {
-	my $self = shift;
-	my $newSelf = $self->next::method(@_);
-	return $newSelf;
-}
-
 #----------------------------------------------------------------------------
 
 =head2 canAdd ( )
@@ -191,22 +174,6 @@ sub canEdit {
 
         return $self->getParent->canEdit();
     }
-}
-
-#-------------------------------------------------------------------
-
-=head2 duplicate
-
-   This method exists for demonstration purposes only.  The superclass
-   handles duplicating MatrixListing Assets.  This method will be called 
-   whenever a copy action is executed
-
-=cut
-
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->next::method(@_);
-	return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -533,19 +500,6 @@ sub purge {
     $db->write("delete from MatrixListing_rating        where listingId=?"      ,[$self->getId]);
     $db->write("delete from MatrixListing_ratingSummary where listingId=?"      ,[$self->getId]);
 
-	return $self->next::method;
-}
-
-#-------------------------------------------------------------------
-
-=head2 purgeRevision ( )
-
-This method is called when data is purged by the system.
-
-=cut
-
-sub purgeRevision {
-	my $self = shift;
 	return $self->next::method;
 }
 
