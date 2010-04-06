@@ -88,7 +88,7 @@ while (my $status = $instance->run ne 'complete') {
 my $sql = q{
     select e.startDate, e.endDate
     from   asset a
-    inner join event e on e.assetId = a.assetId
+    inner join Event e on e.assetId = a.assetId
     and    a.parentId = ?
     order by e.startDate
 };
