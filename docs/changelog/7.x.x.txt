@@ -18,6 +18,7 @@
  - fixed #11513: white text, broken account mgmt
  - fixed #11514: Added JS-type cancel button to edit view of WebGUI::Asset::Post (Bernd Kalbfuß-Zimmermann)
  - fixed #11469: Survey Ruler
+ - fixed #11516: Shortcut Asset: Properties panel messed up in edit view
 
 7.9.1
  - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
