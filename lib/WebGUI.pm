@@ -86,9 +86,13 @@ sub compile_psgi_app {
     
     my $app = sub {
         my $env = shift;
-        my $request = WebGUI::Request->new($env);
-        my $response = $self->dispatch($request);
-        return $response;
+        
+        return sub {
+            my $callback = shift;
+            my $request = WebGUI::Request->new($env);
+            my $response = $self->dispatch($request);
+            $callback->($response);
+        }
     };
     
     my $config = $self->config;
