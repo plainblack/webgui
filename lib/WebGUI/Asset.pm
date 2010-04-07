@@ -1637,19 +1637,6 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
-=head2 isValidRssItem ( )
-
-Returns true iff this asset should be included in RSS feeds from the
-RSS From Parent asset.  If false, this asset will be ignored when
-generating feeds, even if it appears in the item list.  Defaults to
-true.
-
-=cut
-
-sub isValidRssItem { 1 }
-
-#-------------------------------------------------------------------
-
 =head2 loadModule ( $className ) 
 
 Loads an asset module if it's not already in memory. This is a class method. Returns
