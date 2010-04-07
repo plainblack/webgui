@@ -1,3 +1,5 @@
+7.9.3
+
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
    current date (now part of weekly maintenence)
