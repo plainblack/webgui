@@ -90,18 +90,20 @@ sub print {
     my $content    = shift;
     my $skipMacros = shift || !($self->session->http->getMimeType =~ /^text/);
     WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
-    
-    # Initialise response body if it's empty
-    $self->session->response->body([]) if !$self->session->response->body;
-    
-    my $body = $self->session->response->body;
-    if (ref $body ne 'ARRAY') {
-        Carp::carp("Response body is not an ARRAY, it's a " . ref $body);
-        return;
+    my $handle = $self->{_handle};
+    if (defined $handle) {
+        print $handle $content;
     }
-    push @{ $body }, $content;
-    
-    # TODO - put in IO bound delayed response
+    elsif ($self->session->response) {
+        if ($self->session->response->streaming) {
+            $self->session->response->stream_write($content);
+        } else {
+            
+        }
+    }
+    else {
+        print $content;
+    }
 }
 
 #-------------------------------------------------------------------

@@ -1,7 +1,8 @@
 package WebGUI::Response;
+use strict;
 use parent qw(Plack::Response);
 
-use Plack::Util::Accessor qw(streaming);
+use Plack::Util::Accessor qw(streaming writer streamer);
 
 =head2 DESCRIPTION
 
@@ -13,7 +14,16 @@ sub stream {
     my $self = shift;
     my $streamer = shift;
     $self->streaming(1);
-    $self->body($streamer);
+    $self->streamer($streamer);
+}
+
+sub stream_write {
+    my $self = shift;
+    if (!$self->streaming) {
+        Carp::carp("stream_write can only be called inside streaming response");
+        return;
+    }
+    $self->writer->write(@_);
 }
 
 1;

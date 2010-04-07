@@ -91,26 +91,44 @@ sub compile_psgi_app {
         return sub {
             my $callback = shift;
             my $request = WebGUI::Request->new($env);
-            my $response = $self->dispatch($request);
+            my $res = $self->dispatch($request);
             
-            if (ref $response eq 'ARRAY' && ref $response->[2] eq 'CODE') {
-                # Response wants to stream itself, so tell PSGI server to give us
-                # a streaming writer object
-                my $writer = $callback->( [ $response->[0], $response->[1] ] );
+            if ( ref $res eq 'WebGUI::Session' ) {
+                my $session = $res;
+                my $response = $session->response;
                 
-                # ..and let the response stream itself
                 try {
-                    $response->[2]->($writer);
-                } catch {
-                    # Response has already been started, so log error and close writer
-                    warn "error caught after streaming response started";
+                    # Response wants to stream itself, so ask PSGI server for a 
+                    # streaming writer object by returning the PSGI response, minus the body
+                    
+                    # Anything in the response body gets cleared (should be empty anyway)
+                    $response->body([]);
+                    my $psgi_response = $response->finalize;
+                    
+                    my $writer = $callback->( [ $psgi_response->[0], $psgi_response->[1] ] );
+                    
+                    # Store the writer object in the WebGUI::Response object
+                    $response->writer($writer);
+                    
+                    # ..and let the response stream itself
+                    $response->streamer->($session);
+                    
                     $writer->close;
+                    $session->close;
+                } catch {
+                    if ($response->writer) {
+                        # Response has already been started, so log error and close writer
+                        warn "error caught after streaming response started";
+                        $response->writer->close;
+                    } else {
+                        $callback->( [ 500, [ 'Content-type: text/html' ], [ 'An error occurred' ] ] );
+                    }
                 }
             } else {
                 # Not streaming, so immediately tell the callback to return 
                 # the response. In the future we could use an Event framework here 
                 # to make this a non-blocking delayed response.
-                $callback->($response);
+                $callback->($res);
             }
         }
     };
@@ -152,18 +170,33 @@ sub dispatch {
 #    $session->close;
 #    $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking\n");
 #    return $session->response->finalize;
+
+    # TODO: From here, contentHandlers need to decide if they want to stream the response body:
+    #  $session->response->stream( sub { ... } )            # this replaces 'chunked'
+    # or return a psgi response body.
+    #
+    # We use the $session->response->streaming flag to detect if a contentHandler has requested
+    # to use streaming response.
+    #
+    # Otherwise, whatever they return (arrayref or IO::Handle) is used as the psgi response
+    #
+    # Regular assets should use streaming response body, unless they want to send a file
     
-    # Streaming content
+    # Here's an example of what a contentHandler would call to do a streaming response:
     $session->response->stream(sub {
-        my $writer = shift;
-        $writer->write("WebGUI PSGI with contentHandlers short-circuited for benchmarking (streaming)\n");
-#        sleep 1;
-        $writer->write("...see?\n");
-        $writer->close;
+        my $session = shift;
+        $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking (streaming)\n");
+        sleep 1;
+        $session->output->print("...see?\n");
     });
-    if ($session->response->streaming) {
-        $session->close;
-        return $session->response->finalize;
+    
+    # Afterwards, we check $session->response->streaming, and if it is set, return the 
+    # WebGUI::Session (since our caller doesn't have a reference to it) TODO - or does it via $request->session->response???
+    
+    # TODO: give WebGUI::Req/Res a weak session reference
+    
+    if ( $session->response->streaming ) {
+        return $session;
     }
     
     for my $handler (@{$config->get("contentHandlers")}) {
