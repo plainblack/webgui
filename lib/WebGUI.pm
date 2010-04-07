@@ -27,6 +27,7 @@ use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Request;
 use Moose;
+use Try::Tiny;
 
 has root => ( is => 'ro', isa => 'Str', default => '/data/WebGUI' );
 has site => ( is => 'ro', isa => 'Str', default => 'dev.localhost.localdomain.conf' );
@@ -91,7 +92,26 @@ sub compile_psgi_app {
             my $callback = shift;
             my $request = WebGUI::Request->new($env);
             my $response = $self->dispatch($request);
-            $callback->($response);
+            
+            if (ref $response eq 'ARRAY' && ref $response->[2] eq 'CODE') {
+                # Response wants to stream itself, so tell PSGI server to give us
+                # a streaming writer object
+                my $writer = $callback->( [ $response->[0], $response->[1] ] );
+                
+                # ..and let the response stream itself
+                try {
+                    $response->[2]->($writer);
+                } catch {
+                    # Response has already been started, so log error and close writer
+                    warn "error caught after streaming response started";
+                    $writer->close;
+                }
+            } else {
+                # Not streaming, so immediately tell the callback to return 
+                # the response. In the future we could use an Event framework here 
+                # to make this a non-blocking delayed response.
+                $callback->($response);
+            }
         }
     };
     
@@ -129,9 +149,22 @@ sub dispatch {
     my $session = $self->session( WebGUI::Session->open($self->root, $config, $request, $sessionId) );
     
     # Short-circuit contentHandlers - for benchmarking PSGI scaffolding vs. modperl
-    $session->close;
-    $session->output->print('WebGUI PSGI with contentHandlers short-circuited for benchmarking');
-    return $session->response->finalize;
+#    $session->close;
+#    $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking\n");
+#    return $session->response->finalize;
+    
+    # Streaming content
+    $session->response->stream(sub {
+        my $writer = shift;
+        $writer->write("WebGUI PSGI with contentHandlers short-circuited for benchmarking (streaming)\n");
+#        sleep 1;
+        $writer->write("...see?\n");
+        $writer->close;
+    });
+    if ($session->response->streaming) {
+        $session->close;
+        return $session->response->finalize;
+    }
     
     for my $handler (@{$config->get("contentHandlers")}) {
         my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
