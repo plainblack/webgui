@@ -90,27 +90,18 @@ sub print {
     my $content    = shift;
     my $skipMacros = shift || !($self->session->http->getMimeType =~ /^text/);
     WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
-    my $handle = $self->{_handle};
-    if (defined $handle) {
-        print $handle $content;
+    
+    # Initialise response body if it's empty
+    $self->session->response->body([]) if !$self->session->response->body;
+    
+    my $body = $self->session->response->body;
+    if (ref $body ne 'ARRAY') {
+        Carp::carp("Response body is not an ARRAY, it's a " . ref $body);
+        return;
     }
-    elsif ($self->session->request) {
-        # TODO - put in IO bound delayed response
-        $self->session->response->body( $self->session->response->body() . $content );
-#        if (ref $self->session->request->body eq 'ARRAY') {
-#            push @{$self->session->request->body}, $content;
-#        } else {
-#            if ($self->session->request->logger) {
-#                $self->session->request->logger->({ level => 'warn', message => "dropping content: $content" });
-#            } else {
-#                warn "dropping content";#: $content";
-#            }
-#        }
-#        $self->session->request->print($content);
-    }
-    else {
-        print $content;
-    }
+    push @{ $body }, $content;
+    
+    # TODO - put in IO bound delayed response
 }
 
 #-------------------------------------------------------------------
