@@ -184,8 +184,9 @@ sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
 		if ($self->storageId eq "") {
-			$self->{_storageLocation} = WebGUI::Storage->create($self->session);
-			$self->update({ storageId => $self->{_storageLocation}->getId });
+            my $storage = WebGUI::Storage->create($self->session);
+			$self->update({ storageId => $storage->getId });
+			$self->{_storageLocation} = $storage;
 		}
         else {
 			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->storageId);
