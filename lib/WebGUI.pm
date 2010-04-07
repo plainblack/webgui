@@ -124,6 +124,11 @@ sub dispatch {
     # Instantiate the session object
     my $session = $self->session( WebGUI::Session->open($self->root, $config, $request, $sessionId) );
     
+    # Short-circuit contentHandlers - for benchmarking PSGI scaffolding vs. modperl
+    $session->close;
+    $session->output->print('WebGUI PSGI with contentHandlers short-circuited for benchmarking');
+    return $session->response->finalize;
+    
     for my $handler (@{$config->get("contentHandlers")}) {
         my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
         if ( my $e = WebGUI::Error->caught ) {
