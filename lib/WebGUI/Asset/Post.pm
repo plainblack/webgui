@@ -291,7 +291,7 @@ the parent thread.
 
 =cut
 
-sub cut {
+override cut => sub {
     my $self = shift;
 
     # Fetch the Thread and CS before cutting the asset.
@@ -299,7 +299,7 @@ sub cut {
     my $cs      = $thread->getParent;
 
     # Cut the asset
-    my $result = $self->SUPER::cut;
+    my $result = super();
 
     # If a post is being cut update the thread reply count first
     if ($thread->getId ne $self->getId) {
@@ -311,7 +311,7 @@ sub cut {
     $self->_fixReplyCount( $cs );
 
     return $result;
-}
+};
 
 #-------------------------------------------------------------------
 
