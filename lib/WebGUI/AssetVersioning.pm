@@ -15,7 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Paginator;
+require WebGUI::Paginator;
 use WebGUI::VersionTag;
 use WebGUI::Search::Index;
 

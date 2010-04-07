@@ -15,7 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Asset::Shortcut;
+require WebGUI::Asset::Shortcut;
 use WebGUI::Utility qw(isIn formatBytes);
 
 =head1 NAME
