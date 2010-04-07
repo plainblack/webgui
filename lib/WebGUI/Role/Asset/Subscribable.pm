@@ -33,6 +33,7 @@ property subscriptionTemplateId => (
             namespace       => \&_subscriptionTemplateId_namespace,
             label           => ["Email Template", 'Role_Subscribable'],
             hoverHelp       => ["Email Template help", 'Role_Subscribable'],
+            default         => 'limMkk80fMB3fqNZVf162w',
          );
 sub _subscriptionTemplateId_namespace {
     my $self = shift;
@@ -43,6 +44,8 @@ property skipNotification => (
             noFormPost      => 1,
             fieldType       => 'yesNo',
          );
+
+use WebGUI::Mail::Send;
 
 =head1 NAME
 
