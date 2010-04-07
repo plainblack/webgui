@@ -40,7 +40,7 @@ sub getMyParents {
         my $new_parent = $parent->addChild({className => $parent_class}, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
         push @parents, $new_parent;
         $parent = $new_parent;
-        addToCleanup($new_parent);
+        WebGUI::Test->addToCleanup($new_parent);
     }
     return @parents;
 }
@@ -200,9 +200,9 @@ sub keywords : Test(3) {
     my $asset   = $parents[-1]->addChild({
         className => $test->class,
     }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
-    addToCleanup($asset);
+    WebGUI::Test->addToCleanup($asset);
     $tag->commit;
-    addToCleanup($tag);
+    WebGUI::Test->addToCleanup($tag);
     can_ok $asset, 'keywords';
     $asset->keywords('chess set');
     is $asset->keywords, 'chess set', 'set and get of keywords via direct accessor';
@@ -272,7 +272,7 @@ sub addRevision : Test(6) {
     is $revAsset->tagId, $tag->getId, 'tagId is current working tagId';
     my $count = $session->db->quickScalar('SELECT COUNT(*) from assetData where assetId=?',[$testId2]);
     is $count, 2, 'two records in the database';
-    addToCleanup($tag);
+    WebGUI::Test->addToCleanup($tag);
 
     $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");
     $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
