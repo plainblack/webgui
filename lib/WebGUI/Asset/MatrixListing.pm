@@ -493,7 +493,7 @@ purges it's data.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self    = shift;
     my $db      = $self->session->db;
 
@@ -501,8 +501,8 @@ sub purge {
     $db->write("delete from MatrixListing_rating        where listingId=?"      ,[$self->getId]);
     $db->write("delete from MatrixListing_ratingSummary where listingId=?"      ,[$self->getId]);
 
-	return $self->next::method;
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 

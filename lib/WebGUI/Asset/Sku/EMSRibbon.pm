@@ -166,11 +166,11 @@ Deletes all entries in EMSRegistrationRibbon table for this sku. No refunds are 
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantRibbon where ribbonAssetId=?",[$self->getId]);
-	$self->SUPER::purge;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

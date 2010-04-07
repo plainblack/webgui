@@ -1130,16 +1130,16 @@ Extend the base method to handle cleaning up storage locations.
 
 =cut
 
-sub purge {
-        my $self = shift;
-        my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
-        while (my ($storageId) = $sth->array) {
-		my $storage = WebGUI::Storage->get($self->session, $storageId);
-                $storage->delete if defined $storage;
-        }
-        $sth->finish;
-        return $self->SUPER::purge;
-}
+override purge => sub {
+    my $self = shift;
+    my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
+    while (my ($storageId) = $sth->array) {
+    my $storage = WebGUI::Storage->get($self->session, $storageId);
+        $storage->delete if defined $storage;
+    }
+    $sth->finish;
+    return $self->super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1149,11 +1149,11 @@ Extend the base class to handle caching.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
 	eval{$self->session->cache->delete("view_".$self->getThread->getId)} if ($self->getThread);
-	$self->SUPER::purgeCache;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1163,11 +1163,11 @@ Extend the base method to handle deleting the storage location.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
     $self->getStorageLocation->delete;
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 
 

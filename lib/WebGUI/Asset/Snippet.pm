@@ -202,15 +202,15 @@ Extending purgeCache to handle caching of the rendered snippet
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
         $cache->delete("view__".$self->getId);
 	    $cache->delete("view_1_".$self->getId);	
     };
-	$self->SUPER::purgeCache();
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

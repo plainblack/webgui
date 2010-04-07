@@ -420,15 +420,15 @@ Extends the master method to delete all storage locations associated with this a
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	my $sth = $self->session->db->read("select storageId from FileAsset where assetId=".$self->session->db->quote($self->getId));
 	while (my ($storageId) = $sth->array) {
 		$self->getStorageClass->get($self->session,$storageId)->delete;
 	}
 	$sth->finish;
-	return $self->SUPER::purge;
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -438,11 +438,11 @@ Extends the master method to clear the view cache.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
 	eval{$self->session->cache->delete("view_".$self->getId)};
-	$self->SUPER::purgeCache;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -452,11 +452,11 @@ Extends the master method to delete the storage location for this asset.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
 	my $self = shift;
 	$self->getStorageLocation->delete;
-	return $self->SUPER::purgeRevision;
-}
+	return super();
+};
 
 #----------------------------------------------------------------------------
 

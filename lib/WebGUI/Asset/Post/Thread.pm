@@ -696,15 +696,15 @@ the subscriptionGroup for this thread.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write("delete from Thread_read where threadId=?",[$self->getId]);
     my $group = WebGUI::Group->new($self->session, $self->subscriptionGroupId);
     if ($group) {
         $group->delete;
     }
-    $self->SUPER::purge;
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 

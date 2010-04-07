@@ -342,15 +342,15 @@ Deletes all badges and things attached to the badges. No refunds are given.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	my $db = $self->session->db;
 	$db->write("delete from EMSRegistrantTicket where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrantToken where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrantRibbon where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrant where badgeId=?",[$self->getId]);
-	$self->SUPER::purge;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

@@ -139,13 +139,13 @@ Extend the base method to cleanup the status and statusLog tables.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self    = shift;
     my $session = $self->session;
     $session->db->write('delete from InOutBoard_status    where assetId=?', [$self->getId]);
     $session->db->write('delete from InOutBoard_statusLog where assetId=?', [$self->getId]);
-    $self->SUPER::purge(@_);
-}
+    super();
+};
 
 
 #-------------------------------------------------------------------

@@ -858,14 +858,14 @@ overrides.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write(<<'END_SQL', [$self->getId]);
 DELETE FROM Shortcut_overrides
 WHERE assetId = ?
 END_SQL
-    return $self->SUPER::purge(@_);
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

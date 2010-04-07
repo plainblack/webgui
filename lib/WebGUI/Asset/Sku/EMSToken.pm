@@ -159,11 +159,11 @@ Destroys all tokens of this type. No refunds are given.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantToken where tokenAssetId=?",[$self->getId]);
-	$self->SUPER::purge;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

@@ -433,7 +433,7 @@ and event meta data.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     my $db = $self->session->db;
 
@@ -456,8 +456,8 @@ sub purge {
 	$db->write("delete from EMSBadgeGroup where emsAssetId=?",[$self->getId]);
 	$db->write("delete from EMSEventMetaField where assetId=?",[$self->getId]);
 
-    $self->SUPER::purge(@_);
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 

@@ -662,15 +662,15 @@ Purge the asset. Remove all comments on the GalleryFile.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self        = shift;
     
     for my $commentId ( @{ $self->getCommentIds } ) {
         $self->deleteComment( $commentId );
     }
 
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #----------------------------------------------------------------------------
 

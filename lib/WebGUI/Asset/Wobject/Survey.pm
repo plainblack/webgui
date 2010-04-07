@@ -1337,26 +1337,13 @@ Completely remove from WebGUI.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write( 'delete from Survey_response where assetId = ?',   [ $self->getId() ] );
     $self->session->db->write( 'delete from Survey_tempReport where assetId = ?', [ $self->getId() ] );
     $self->session->db->write( 'delete from Survey where assetId = ?',            [ $self->getId() ] );
-    return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-
-=head2 purgeCache ( )
-
-See WebGUI::Asset::purgeCache() for details.
-
-=cut
-
-sub purgeCache {
-    my $self = shift;
-    return $self->SUPER::purgeCache;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

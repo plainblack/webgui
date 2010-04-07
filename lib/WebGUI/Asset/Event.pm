@@ -1752,7 +1752,7 @@ Extent the method from the super class to delete all storage locations.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     my $sth = $self->session->db->read("select storageId from Event where assetId=?",[$self->getId]);
     while (my ($storageId) = $sth->array) {
@@ -1760,8 +1760,8 @@ sub purge {
         $storage->delete if defined $storage;
     }
     $sth->finish;
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1771,11 +1771,11 @@ Extent the method from the super class to delete the storage location for this r
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
     $self->getStorageLocation->delete;
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 ####################################################################
 

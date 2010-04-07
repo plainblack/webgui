@@ -508,7 +508,7 @@ Remove all collateral associated with the ThingyRecord sku
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
 
     my $options = { constraints => [ { 'assetId = ?' => $self->getId } ] };
@@ -520,8 +520,8 @@ sub purge {
 
     # XXX: Should we also remove the records from the Thingy?
 
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

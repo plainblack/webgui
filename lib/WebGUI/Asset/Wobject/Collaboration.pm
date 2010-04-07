@@ -1372,7 +1372,7 @@ Extend the base method to delete the subscription group and cron job for emails.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	my $group = WebGUI::Group->new($self->session, $self->subscriptionGroupId);
 	if ($group) {
@@ -1382,8 +1382,8 @@ sub purge {
 		my $cron = WebGUI::Workflow::Cron->new($self->session, $self->getMailCronId);
 		$cron->delete if defined $cron;
 	}
-	$self->next::method;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1393,15 +1393,15 @@ Extend the base method to delete view and visitor caches.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
         $cache->delete("view_".$self->getId);
 	    $cache->delete($self->_visitorCacheKey);
     };
-	$self->next::method;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

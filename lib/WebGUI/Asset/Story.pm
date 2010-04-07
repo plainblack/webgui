@@ -634,7 +634,7 @@ Cleaning up all storage objects in all revisions.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     ##Delete all storage locations from all revisions of the Asset
     my $sth = $self->session->db->read("select photo from Story where assetId=?",[$self->getId]);
@@ -647,8 +647,8 @@ sub purge {
         }
 	}
     $sth->finish;
-    return $self->next::method;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -658,15 +658,15 @@ Remove the storage locations for this revision of the Asset.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
 	my $self    = shift;
     my $session = $self->session;
     foreach my $photo ( @{ $self->getPhotoData} ) {
         my $storage = WebGUI::Storage->get($session, $self-$photo->{storageId});
         $storage->delete if $storage;
     }
-	return $self->next::method;
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 

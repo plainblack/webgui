@@ -388,11 +388,11 @@ Extend the base method to handle Poll answers.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId));
-	$self->SUPER::purge();
-}	
+	super();
+};	
 
 #----------------------------------------------------------------------------
 

@@ -1014,12 +1014,12 @@ entry collateral.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->deleteAttachedFiles;
     $self->entryClass->purgeAssetEntries($self);
-    return $self->SUPER::purge(@_);
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

@@ -593,12 +593,12 @@ purges it's data.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	
     $self->session->db->write("delete from Matrix_attribute where assetId=?",[$self->getId]);
-	return $self->SUPER::purge;
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 

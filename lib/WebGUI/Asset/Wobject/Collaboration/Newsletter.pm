@@ -111,11 +111,11 @@ Extend the base method to handle deleting information from the Newsletter_subscr
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write("delete from Newsletter_subscriptions where assetId=?", [$self->getId]);
-    $self->SUPER::purge(@_);
-}
+    super();
+};
 
 
 #-------------------------------------------------------------------

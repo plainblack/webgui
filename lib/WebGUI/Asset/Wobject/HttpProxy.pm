@@ -251,11 +251,11 @@ Extend the base method to delete the cookie jar
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->getCookieJar->delete;	
-	$self->SUPER::purge;
-}
+	super();
+};
 
 
 #-------------------------------------------------------------------
@@ -266,15 +266,15 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
         $cache->delete([$self->proxiedUrl,"URL"]);
 	    $cache->delete([$self->proxiedUrl,"HEADER"]);
     };
-	$self->SUPER::purgeCache;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

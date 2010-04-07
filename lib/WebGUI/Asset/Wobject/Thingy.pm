@@ -1321,7 +1321,7 @@ purges it's data.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
     my $session = $self->session;
 	my $db = $self->session->db;
@@ -1332,8 +1332,8 @@ sub purge {
     $db->write("delete from Thingy_things where assetId = ?",[$self->getId]);
     $db->write("delete from Thingy_fields where assetId = ?",[$self->getId]);
 
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

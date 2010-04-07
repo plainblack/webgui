@@ -261,14 +261,14 @@ for this dashboard.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     my $userPrefField = WebGUI::ProfileField->new($self->session,$self->getContentPositionsId);
     if (defined $userPrefField) {
         $userPrefField->delete;
     }
-    $self->SUPER::purge(@_);
-}
+    super();
+};
 
 
 #-------------------------------------------------------------------

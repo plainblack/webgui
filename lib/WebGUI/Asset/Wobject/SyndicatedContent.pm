@@ -282,11 +282,11 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
     eval{$self->session->cache->delete("view_".$self->getId)};
-	$self->next::method;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

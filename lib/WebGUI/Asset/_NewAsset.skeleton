@@ -193,10 +193,10 @@ asset instances, you will need to purge them here.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -206,10 +206,10 @@ This method is called when data is purged by the system.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

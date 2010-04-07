@@ -746,7 +746,7 @@ Extend the base class to handle all file collateral.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     my $sth = $self->session->db->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=?", [$self->getId]);
     while (my @array = $sth->array) {
@@ -756,8 +756,8 @@ sub purge {
         }
     }
     $sth->finish;
-    $self->SUPER::purge();
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -767,11 +767,11 @@ Extends the base class to handle cleaning up the cache for this asset.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
     my $self = shift;
     $self->session->cache->delete("view_".$self->getId);
-    $self->SUPER::purgeCache;
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -781,7 +781,7 @@ Extend the base method to handle deleting file collateral.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
     WebGUI::Storage->get($self->session, $self->get("image1"))->delete   if ($self->get("image1"));
     WebGUI::Storage->get($self->session, $self->get("image2"))->delete   if ($self->get("image2"));
@@ -789,8 +789,8 @@ sub purgeRevision {
     WebGUI::Storage->get($self->session, $self->get("brochure"))->delete if ($self->get("brochure"));
     WebGUI::Storage->get($self->session, $self->get("manual"))->delete   if ($self->get("manual"));
     WebGUI::Storage->get($self->session, $self->get("warranty"))->delete if ($self->get("warranty"));
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 #-----------------------------------------------------------------
 
