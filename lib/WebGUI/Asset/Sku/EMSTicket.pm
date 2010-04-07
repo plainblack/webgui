@@ -367,12 +367,13 @@ Adding location and eventNumber as a keyword. See WebGUI::Asset::indexContent() 
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
     $indexer->addKeywords($self->location.' '.$self->eventNumber);
 	return $indexer;
-}
+};
 
 
 

@@ -319,11 +319,12 @@ Indexing question and answers. See WebGUI::Asset::indexContent() for additonal d
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->addKeywords($self->get("question")." ".$self->get("answers"));
-}
+};
 
 
 #-------------------------------------------------------------------

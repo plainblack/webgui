@@ -301,12 +301,13 @@ Extends the master class to handle indexing the wiki content.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->next::method;
+	my $indexer = $self->$orig(@_);
 	$indexer->addKeywords($self->content);
 	return $indexer;
-}
+};
 
 #-------------------------------------------------------------------
 

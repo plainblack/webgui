@@ -186,12 +186,13 @@ Indexing the content of the snippet. See WebGUI::Asset::indexContent() for addit
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->addKeywords($self->snippet);
 	$indexer->setIsPublic(0);
-}
+};
 
 #-------------------------------------------------------------------
 

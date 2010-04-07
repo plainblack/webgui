@@ -357,11 +357,12 @@ Indexing the content of the attachment. See WebGUI::Asset::indexContent() for ad
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->addFile($self->getStorageLocation->getPath($self->filename));
-}
+};
 
 
 #-------------------------------------------------------------------

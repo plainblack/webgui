@@ -519,11 +519,12 @@ Extend the base class to index Story properties like headline, byline, etc.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig    = shift;
 	my $self    = shift;
-    my $indexer = $self->next::method();
+    my $indexer = $self->$orig(@_);
     $indexer->addKeywords($self->headline, $self->subtitle, $self->location, $self->highlights, $self->byline, $self->story, );
-}
+};
 
 #-------------------------------------------------------------------
 

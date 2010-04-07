@@ -1418,9 +1418,10 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+    my $orig = shift;
     my $self = shift;
-    my $indexer = $self->SUPER::indexContent;
+    my $indexer = $self->$orig(@_);
     $indexer->addKeywords($self->userDefined1);
     $indexer->addKeywords($self->userDefined2);
     $indexer->addKeywords($self->userDefined3);
@@ -1429,9 +1430,9 @@ sub indexContent {
     $indexer->addKeywords($self->location);
     my $storage = $self->getStorageLocation;
     foreach my $file (@{$storage->getFiles}) {
-               $indexer->addFile($storage->getPath($file));
+        $indexer->addFile($storage->getPath($file));
     }
-}
+};
 
 
 

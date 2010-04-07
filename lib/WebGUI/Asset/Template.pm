@@ -496,12 +496,13 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->addKeywords($self->namespace);
 	$indexer->setIsPublic(0);
-}
+};
 
 #-------------------------------------------------------------------
 

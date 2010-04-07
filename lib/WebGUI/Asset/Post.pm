@@ -802,21 +802,22 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 
 =cut
 
-sub indexContent {
-	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->content);
-	$indexer->addKeywords($self->userDefined1);
-	$indexer->addKeywords($self->userDefined2);
-	$indexer->addKeywords($self->userDefined3);
-	$indexer->addKeywords($self->userDefined4);
-	$indexer->addKeywords($self->userDefined5);
-	$indexer->addKeywords($self->username);
-	my $storage = $self->getStorageLocation;
-	foreach my $file (@{$storage->getFiles}) {
-               $indexer->addFile($storage->getPath($file));
-	}
-}
+around indexContent => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $indexer = $self->$orig(@_);
+    $indexer->addKeywords($self->content);
+    $indexer->addKeywords($self->userDefined1);
+    $indexer->addKeywords($self->userDefined2);
+    $indexer->addKeywords($self->userDefined3);
+    $indexer->addKeywords($self->userDefined4);
+    $indexer->addKeywords($self->userDefined5);
+    $indexer->addKeywords($self->username);
+    my $storage = $self->getStorageLocation;
+    foreach my $file (@{$storage->getFiles}) {
+        $indexer->addFile($storage->getPath($file));
+    }
+};
 
 #-------------------------------------------------------------------
 
