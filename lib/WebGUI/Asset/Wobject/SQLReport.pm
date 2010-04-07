@@ -750,7 +750,7 @@ sub _processQuery {
                                                 $row{$prefix.'row.field.'.$tmpl_name.'.value'} = $data->{$name};
                                         }
 					# Process nested query
-                                        if($nest && $self->{_query}{$nr + 1}{dbQuery}) {
+                                        if ($nest && $self->{_query}{$nr + 1}{dbQuery} =~ m/\S/) {
                                                 my $nest = $self->_processQuery($nest,$page,$nr+1);
 						%row = (%row , %$nest);
 						$row{$prefix.'hasNest'} = $nest->{'query'.($nr+1).'.rows.count'};
