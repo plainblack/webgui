@@ -1,11 +1,11 @@
 7.9.3
- - added #11007: Added drag'n'drop sorting in Gallery Album Edit View
+ - added #11007: Added drag'n'drop sorting in Gallery Album Edit View (Bernd Kalbfuß-Zimmermann)
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
    current date (now part of weekly maintenence)
  - fixed #11507: Spectre Reports Wrong Workflow Count
- - added #11412: Additional navigation in Gallery Photo View 
+ - added #11412: Additional navigation in Gallery Photo View (Bernd Kalbfuß-Zimmermann)
  - added: Sort Items switch to Syndicated Content asset
  - fixed #11493: i18n AssetCalendar::pageNextUrl monthVar
  - fixed #11496: No linkable RSS feeds from gallery

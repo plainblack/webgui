@@ -79,6 +79,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Paul Wrightson / Invicta Services
                                      Zhou Xiaopeng / WebGUI Worldwide
                                      Gerald Young
+                                     Bernd Kalbfuß-Zimmermann
                                      Tabitha Zipperer / Plain Black
                                      Rory Zweistra / Oqapi
 
