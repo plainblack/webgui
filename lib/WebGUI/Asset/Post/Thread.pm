@@ -172,13 +172,13 @@ Extends the base method to increment the number of threads in the parent CS.
 
 =cut
 
-sub commit {
-	my $self = shift;
-	$self->SUPER::commit;
-	if ($self->isNew) {
-        	$self->getParent->incrementThreads($self->revisionDate,$self->getId);
-	}
-}
+override commit => sub {
+    my $self = shift;
+    super();
+    if ($self->isNew) {
+        $self->getParent->incrementThreads($self->revisionDate,$self->getId);
+    }
+};
 
 #-------------------------------------------------------------------
 # Override duplicateBranch here so that new posts get their threadId set correctly.

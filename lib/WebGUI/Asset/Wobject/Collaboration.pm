@@ -874,9 +874,9 @@ in that case.
 
 =cut
 
-sub commit {
+override commit  => sub {
     my $self = shift;
-    $self->next::method;
+    super();
     my $cron = undef;
     if ($self->getMailCronId) {
         $cron = WebGUI::Workflow::Cron->new($self->session, $self->getMailCronId);
@@ -898,7 +898,7 @@ sub commit {
     } else {
             $cron->set({enabled=>0,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->getMailInterval/60)});
     }
-}
+};
 
 #-------------------------------------------------------------------
 
