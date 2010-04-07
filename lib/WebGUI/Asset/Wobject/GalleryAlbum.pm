@@ -17,6 +17,7 @@ use Carp qw( croak );
 use File::Find;
 use File::Spec;
 use File::Temp qw{ tempdir };
+use JSON;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
@@ -34,6 +35,7 @@ use Archive::Any;
 =head1 DIAGNOSTICS
 
 =head1 METHODS
+=cut
 
 #-------------------------------------------------------------------
 
@@ -1200,6 +1202,172 @@ sub www_deleteConfirm {
     return $self->processStyle(
         sprintf $i18n->get('delete message'), $self->getParent->getUrl,
     );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_ajax ( )
+
+Generic AJAX service for gallery. 
+
+Arguments are accepted in JSON format in the form variable C<args>. The single
+obligatory argument is C<action> determining the service to be called. A list
+of available services is given in the following. Additional arguments may be
+required depending on the service.
+
+Results are returned in JSON format. The information returned depends on the 
+service called. Generally, success is indicated by a value of 0 in C<err>.
+
+=head3 moveFile
+
+Service for changing the rank of files. Accepts the asset Id of the photo to be moved
+in C<target>. The asset Id of the photo to be replaced is specified in C<before>
+or C<after> depending on the desired order. Returns -1 in C<err> and an error
+message in C<errMessage> if moving of the photo failed.
+
+=cut
+
+sub www_ajax {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $form        = $self->session->form;
+    my $result;
+
+    # Get arguments encoded in json format
+    my $args = decode_json($form->get("args"));
+    
+    # Log some debug information
+    $session->log->debug("Ajax service called with args=" . $form->get("args"));
+    
+    # Process requests depending on action argument
+    SWITCH: {
+
+        # Return if no action was specified
+        if ( $args->{action} eq '' ) {
+            $session->log->error("Call of ajax service without action argument.");            
+            $result->{ errMessage } = "Action argument is missing.";
+            last;
+        }
+                
+        # ----- Move file action -----
+        $args->{action} eq 'moveFile' && do { $result = $self->_moveFileAjaxRequest( $args ); last; };
+                    
+        # ----- Unkown action -----
+        $session->log->error("Call of ajax service with unknown action '" . $args->{action} . "'.");
+        $result->{ errMessage } = "Action '" . $args->{action} ."' is unknown.";
+    }
+    
+    # Set error flag if error message exists
+    $result->{ err } = -1 if $result->{ errMessage };
+    
+    # Return results encoded in json format
+    return encode_json( $result );
+}
+
+
+#----------------------------------------------------------------------------
+
+=head2 _moveFileAjaxRequest ( args )
+
+AJAX service for changing the rank of single files. Returns a hash ref with
+error information. Arguments passed to the ajax service are provided via the 
+hash ref C<args>. Note that this is a private function owned by www_ajax. It 
+should not be used directly.
+
+=cut
+
+sub _moveFileAjaxRequest {
+    my $self        = shift;
+    my $args        = shift;
+    
+    my $session     = $self->session; 
+    my %result;
+            
+    # Return if current user is not allowed to edit this album
+    unless ( $self->canEdit ) {
+        $session->log->error("Call of moveFile action without having edit permission.");
+        $result{ errMessage } = "You do not have permission to move files.";
+        return \%result;
+    }            
+    # Return if no target was specified
+    if ( $args->{target} eq '') {
+        $session->log->error("Call of moveFile action without target argument.");
+        $result{ errMessage } = "Target argument is missing.";
+        return \%result;
+    }
+    # Return if before or after argument is missing
+    unless( $args->{before} or $args->{after} ) {
+        $session->log->error("Call of moveFile action without before/after argument.");
+        $result{ errMessage } = "Before/after argument is missing.";
+        return \%result;
+    }            
+    # Return if before and after arguments were specified
+    unless( $args->{before} xor $args->{after} ) {
+        $session->log->error("Call of moveFile action with before *and* after argument.");
+        $result{ errMessage } = "Both, before and after arguments were specified.";
+        return \%result;
+    }
+
+    # Get Id of target photo and instantiate asset
+    my $targetId = $args->{target};
+    my $target = WebGUI::Asset->newByDynamicClass( $session, $targetId );
+
+    # Return if target photo could not be instantiated
+    unless ( $target ) {
+        $session->log->error("Couldn't move file '$targetId' because we couldn't instantiate it.");
+        $result{ errMessage } = "ID of target file seems to be invalid.";
+        return \%result;
+    }
+    # Return if target is not a child of the current album
+    unless ( $target->getParent->getId eq $self->getId ) {
+        $session->log->error("Couldn't move file '$targetId' because it is not a child of this album.");
+        $result{ errMessage } = "ID of target file seems to be invalid.";
+        return \%result;
+    }               
+
+    my ($destId, $dest);
+
+    # Instantiate file with ID in before/after argument
+    $destId = $args->{before} ? $args->{before} : $args->{after};            
+    $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+
+    # Return if destination file could not be instantiated
+    unless ( $dest ) {
+        $session->log->error("Couldn't move file '$targetId' before/after file '$destId' because we couldn't instantiate the latter.");
+        $result{ errMessage } = "ID in before/after argument seems to be invalid.";
+        return \%result;
+    }               
+    # Return if destination file is not a child of the current album
+    unless ( $dest->getParent->getId eq $self->getId ) {
+        $session->log->error("Couldn't move file '$targetId' before/after file '$destId' because the latter is not a child of the same album.");
+        $result{ errMessage } = "ID in before/after argument seems to be invalid.";
+        return \%result;
+    }               
+
+    # Check for use of after argument when lowering the rank
+    if ( $args->{after} && $target->getRank() > $dest->getRank() ) {
+        # Get ID of next sibling
+        $destId = $self->getNextFileId( $destId );
+        # Instantiate next sibling
+        $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+    }
+    # Check for use of before argument when increasing the rank
+    if ( $args->{before} && $target->getRank() < $dest->getRank() ) {
+        # Get ID of previous sibling
+        $destId = $self->getPreviousFileId( $destId );
+        # Instantiate previous sibling
+        $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+    }
+    
+    # Update rank of target photo
+    $target->setRank( $dest->getRank );
+    
+    # Log some debug information
+    $session->log->debug("Successfully moved file '$targetId' before/after file '$destId'.");
+    
+    # Return reporting success
+    $result{ err } = 0;        
+    return \%result;
 }
 
 #----------------------------------------------------------------------------

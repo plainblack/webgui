@@ -1,4 +1,5 @@
 7.9.3
+ - added #11007: Added drag'n'drop sorting in Gallery Album Edit View
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
