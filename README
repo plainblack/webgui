@@ -2,7 +2,7 @@ This is the PSGI branch of WebGUI8
 
 Currently, the best performance is achieved via:
 
- plackup eg/basic.psgi -E none -s Starman --workers 10
+ plackup -E none -s Starman --workers 10
  
 You can benchmark your server via:
 

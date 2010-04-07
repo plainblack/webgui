@@ -224,7 +224,7 @@ sub handle {
             
             # "chunked" or "empty" means it took care of its own output needs
             if (defined $output && ( $output eq "chunked" || $output eq "empty" )) {
-#                warn "chunked and empty no longer stream, use session->response->stream() instead";
+                warn "chunked and empty no longer stream, use session->response->stream() instead";
                 if ($session->errorHandler->canShowDebug()) {
                     $session->output->print($session->errorHandler->showDebug(),1);
                 }

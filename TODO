@@ -1,10 +1,10 @@
 TODO
 * Deprecate WebGUI::Session::HTTP - replace with WebGUI::Request/Response
 * Turn logger into $self->request->env->{'psgi.errors'}->print(join '', @stuff);
-* Remove WebGUI::Session::Output
 
 DONE
 * $session->request is now a Plack::Request object
 * serverObject gone from WebGUI::Session::open()
 * WebGUI::authen API changed
 * urlHandler API changed - no longer gets server, config
+* Streaming response body
