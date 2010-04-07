@@ -43,6 +43,7 @@ sub definition {
             namespace       => $class->getSubscriptionTemplateNamespace,
             label           => $i18n->get("Email Template"),
             hoverHelp       => $i18n->get("Email Template help"),
+            defaultValue    => 'limMkk80fMB3fqNZVf162w',
         },
     );
 
