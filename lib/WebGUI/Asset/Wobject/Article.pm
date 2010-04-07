@@ -57,7 +57,7 @@ property storageId => (
                 fieldType      => "image",
                 deleteFileUrl  => \&_storageId_deleteFileUrl,
                 maxAttachments => 2,
-                persist        =>  1,
+                persist        => 1,
                 default        => undef,
                 label          => ["attachments", 'Asset_Article'],
                 hoverHelp      => ["attachments help", 'Asset_Article'],
@@ -185,8 +185,9 @@ sub getStorageLocation {
 	unless (exists $self->{_storageLocation}) {
 		if ($self->storageId eq "") {
 			$self->{_storageLocation} = WebGUI::Storage->create($self->session);
-			$self->update({storageId=>$self->{_storageLocation}->getId});
-		} else {
+			$self->update({ storageId => $self->{_storageLocation}->getId });
+		}
+        else {
 			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->storageId);
 		}
 	}
@@ -202,14 +203,14 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 =cut
 
 override indexContent => sub {
-	my $self = shift;
-	my $indexer = super();
-	$indexer->addKeywords($self->linkTitle);
-	$indexer->addKeywords($self->linkURL);
-	my $storage = $self->getStorageLocation;
-	foreach my $file (@{$storage->getFiles}) {
-               $indexer->addFile($storage->getPath($file));
-	}
+    my $self = shift;
+    my $indexer = super();
+    $indexer->addKeywords($self->linkTitle);
+    $indexer->addKeywords($self->linkURL);
+    my $storage = $self->getStorageLocation;
+    foreach my $file (@{$storage->getFiles}) {
+        $indexer->addFile($storage->getPath($file));
+    }
 };
 
 #-------------------------------------------------------------------
@@ -268,14 +269,14 @@ Extend the super class to delete all storage locations.
 =cut
 
 override purge => sub {
-        my $self = shift;
-        my $sth = $self->session->db->read("select storageId from Article where assetId=?",[$self->getId]);
-        while (my ($storageId) = $sth->array) {
-		my $storage = WebGUI::Storage->get($self->session,$storageId);
-                $storage->delete if defined $storage;
-        }
-        $sth->finish;
-        return super();
+    my $self = shift;
+    my $sth = $self->session->db->read("select storageId from Article where assetId=?",[$self->getId]);
+    while (my ($storageId) = $sth->array) {
+    my $storage = WebGUI::Storage->get($self->session,$storageId);
+        $storage->delete if defined $storage;
+    }
+    $sth->finish;
+    return super();
 };
 
 #-------------------------------------------------------------------
