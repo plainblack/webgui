@@ -162,8 +162,8 @@ sub dispatch {
             }
         }
     }
+    
     $session->close;
-
     return $session->response->finalize;
 }
 

@@ -460,7 +460,7 @@ sub open {
 	bless $self , $class;
 	$self->{_request} = $request if defined $request;
 	$self->{_response} = $request->new_response( 200 ) if defined $request;
-	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
+	my $sessionId = shift || $request->cookies->{$config->getCookieName} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);

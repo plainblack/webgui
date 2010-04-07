@@ -18,6 +18,12 @@ package WebGUI::Session::Http;
 use strict;
 use WebGUI::Utility;
 
+sub _deprecated {
+    my $alt = shift;
+    my $method = (caller(1))[3];
+    Carp::carp("$method is deprecated. Use 'WebGUI::$alt' instead.");
+}
+
 =head1 NAME
 
 Package WebGUI::Session::Http
@@ -91,7 +97,8 @@ Retrieves the cookies from the HTTP header and returns a hash reference containi
 
 sub getCookies {
 	my $self = shift;
-	return $self->session->request ? $self->session->request->cookies : {};
+	_deprecated('Request::cookies');
+	return $self->session->request->cookies;
 }
 
 
@@ -264,7 +271,7 @@ sub sendHeader {
 	
 	# send webgui session cookie
 	my $cookieName = $config->getCookieName;
-	$self->setCookie($cookieName,$var->getId, $config->getCookieTTL, $config->get("cookieDomain")) unless $var->getId eq $self->getCookies->{$cookieName};
+	$self->setCookie($cookieName,$var->getId, $config->getCookieTTL, $config->get("cookieDomain")) unless $var->getId eq $request->cookies->{$cookieName};
 
 	$self->setNoHeader(1);
 	my %params;
