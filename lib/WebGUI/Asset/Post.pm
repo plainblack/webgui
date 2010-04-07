@@ -989,10 +989,10 @@ Extends the master method to handle incrementing replies.
 
 =cut
 
-sub paste {
+override paste => sub {
     my $self = shift;
 
-    $self->SUPER::paste(@_);
+    super();
 
     # First, figure out what Thread we're under
     my $thread = $self->getLineage( [ qw{ self ancestors } ], {
@@ -1024,7 +1024,7 @@ sub paste {
 
     # Recount the replies under the thread.
     $thread->sumReplies;
-}
+};
 
 #-------------------------------------------------------------------
 
