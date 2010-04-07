@@ -95,10 +95,14 @@ sub print {
         print $handle $content;
     }
     elsif ($self->session->response) {
-        if ($self->session->response->streaming) {
-            $self->session->response->stream_write($content);
+        my $response = $self->session->response;
+        if ($response->streaming) {
+            $response->stream_write($content);
         } else {
-            
+            # Not streaming, so buffer the response instead
+            # warn "buffering output";
+            $response->body([]) unless $response->body && ref $response->body eq 'ARRAY';
+            push @{$response->body}, $content;
         }
     }
     else {

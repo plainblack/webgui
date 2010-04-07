@@ -6,7 +6,9 @@ The WebGUI server response object. See L<Plack::Response>
 
 =cut
 
+use strict;
 use parent qw(Plack::Request);
+use Plack::Util::Accessor qw(session);
 use WebGUI::Response;
 
 =head1 METHODS
@@ -23,7 +25,9 @@ See L<WebGUI::Session/response>
 
 sub new_response {
     my $self = shift;
-    WebGUI::Response->new(@_);
+    my $response = WebGUI::Response->new(@_);
+    $response->session($self->session);
+    return $response;
 }
 
 1;

@@ -2,7 +2,7 @@ package WebGUI::Response;
 use strict;
 use parent qw(Plack::Response);
 
-use Plack::Util::Accessor qw(streaming writer streamer);
+use Plack::Util::Accessor qw(session streaming writer streamer);
 
 =head2 DESCRIPTION
 
@@ -12,9 +12,8 @@ The WebGUI server response object. See of L<Plack::Response>
 
 sub stream {
     my $self = shift;
-    my $streamer = shift;
+    $self->streamer(shift);
     $self->streaming(1);
-    $self->streamer($streamer);
 }
 
 sub stream_write {

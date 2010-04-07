@@ -458,8 +458,11 @@ sub open {
 	my $config = ref $c ? $c : WebGUI::Config->new($webguiRoot,$c);
 	my $self = {_config=>$config }; # TODO - if we store reference here, should we weaken WebGUI->config?
 	bless $self , $class;
-	$self->{_request} = $request if defined $request;
-	$self->{_response} = $request->new_response( 200 ) if defined $request;
+	if (defined $request) {
+	    $request->session($self); # hello circular reference
+        $self->{_request} = $request;
+        $self->{_response} = $request->new_response( 200 );
+    }
 	my $sessionId = shift || $request->cookies->{$config->getCookieName} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
