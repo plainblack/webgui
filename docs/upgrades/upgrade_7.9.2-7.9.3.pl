@@ -30,7 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+reindexSiteForDefaultSynopsis( $session );
 
 finish($session); # this line required
 
@@ -44,6 +44,28 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Reindex the site to clear out default synopsis
+sub reindexSiteForDefaultSynopsis {
+    my $session = shift;
+    print "\tRe-indexing site to clear out default synopses... " unless $quiet;
+
+    my $rs = $session->db->read("select assetId, className from asset where state='published'");
+    my @searchableAssetIds;
+    while (my ($id, $class) = $rs->array) {
+        my $asset = WebGUI::Asset->new($session,$id,$class);
+        if (defined $asset && $asset->get("state") eq "published" && ($asset->get("status") eq "approved" || $asset->get("status") eq "archived")) {
+            $asset->indexContent;
+            push (@searchableAssetIds, $id);
+        }
+    }
+
+    # delete indexes of assets that are no longer searchable
+    my $list = $session->db->quoteAndJoin(\@searchableAssetIds) if scalar(@searchableAssetIds);
+    $session->db->write("delete from assetIndex where assetId not in (".$list.")") if $list;
+
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
