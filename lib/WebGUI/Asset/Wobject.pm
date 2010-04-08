@@ -341,15 +341,15 @@ Returns output parsed under the current style.  See also Asset::processStyle.
 
 =cut
 
-sub processStyle {
+override processStyle => sub {
 	my ($self, $output, $options) = @_;
-    $output   = $self->SUPER::processStyle($output, $options);
+    $output   = super();
     my $style = $self->session->style;
     if ($style->useMobileStyle) {
         return $style->process($output,$self->get("mobileStyleTemplateId"));
     }
     return $style->process($output,$self->get("styleTemplateId"));
-}
+};
 
 
 #-------------------------------------------------------------------
