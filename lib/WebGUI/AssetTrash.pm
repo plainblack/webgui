@@ -15,7 +15,6 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-require WebGUI::Asset::Shortcut;
 use WebGUI::Utility qw(isIn formatBytes);
 
 =head1 NAME
@@ -164,6 +163,7 @@ sub purge {
     # Delete shortcuts to this asset
     # Also publish any shortcuts to this asset that are in the trash
     $outputSub->($i18n->get('Purging shortcuts'));
+    require WebGUI::Asset::Shortcut;
     my $shortcuts 
         = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { 
             returnObjects   => 1,
@@ -277,6 +277,7 @@ sub trash {
     }
 
     # Trash any shortcuts to this asset
+    require WebGUI::Asset::Shortcut;
     my $shortcuts 
         = WebGUI::Asset::Shortcut->getShortcutsForAssetId($session, $self->getId, { returnObjects => 1});
     $outputSub->($i18n->get('Purging shortcuts'));

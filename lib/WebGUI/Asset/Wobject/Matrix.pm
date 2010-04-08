@@ -266,12 +266,14 @@ part of the C<groupToAdd> group.
 =cut
 
 sub canEdit {
-    my $self        = shift;
+    my $orig   = shift;
+    my $self   = shift;
     my $userId = shift || $self->session->user->userId;
 
-    my $form        = $self->session->form;
-    if ( $form->get('func') eq "editSave" && $form->get('assetId') eq "new" && $form->get( 'class' )->isa(
-'WebGUI::Asset::MatrixListing' ) ) {
+    my $form   = $self->session->form;
+    if ( $form->get('func')    eq "editSave"
+      && $form->get('assetId') eq "new"
+      && $form->get( 'class' )->isa( 'WebGUI::Asset::MatrixListing' ) ) {
         return $self->canAddMatrixListing();
     }
     else {

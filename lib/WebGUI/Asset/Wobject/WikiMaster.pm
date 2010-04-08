@@ -402,23 +402,24 @@ Overriding canEdit method to check permissions correctly when someone is adding 
 
 =cut
 
-sub canEdit {
-        my $self = shift;
-        return (
-                (
-                        (
-                                $self->session->form->process("func") eq "add" ||
-                                (
-                                        $self->session->form->process("assetId") eq "new" &&
-                                        $self->session->form->process("func") eq "editSave" &&
-                                        $self->session->form->process("class") eq "WebGUI::Asset::WikiPage"
-                                )
-                        ) &&
-                        $self->canEditPages
-                ) || # account for new posts
-                $self->next::method()
-        );
-}
+around canEdit => sub {
+    my $orig = shift;
+    my $self = shift;
+    return (
+            (
+                    (
+                            $self->session->form->process("func") eq "add" ||
+                            (
+                                    $self->session->form->process("assetId") eq "new" &&
+                                    $self->session->form->process("func") eq "editSave" &&
+                                    $self->session->form->process("class") eq "WebGUI::Asset::WikiPage"
+                            )
+                    ) &&
+                    $self->canEditPages
+            ) || # account for new posts
+            $self->$orig(@_)
+    );
+};
 
 #-------------------------------------------------------------------
 

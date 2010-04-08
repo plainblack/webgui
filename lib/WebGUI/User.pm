@@ -18,7 +18,6 @@ use strict;
 use WebGUI::Group;
 use WebGUI::Utility;
 use WebGUI::Workflow::Instance;
-use WebGUI::Shop::AddressBook;
 use JSON ();
 use WebGUI::ProfileField;
 use Tie::CPHash;
@@ -410,6 +409,7 @@ sub delete {
     # Shop cleanups
     my $sth = $session->db->prepare('select addressBookId from addressBook where userId=?');
     $sth->execute([$userId]);
+    require WebGUI::Shop::AddressBook;
     BOOK: while (my $bookId = $sth->hashRef) {
         my $book;
         eval { $book =  WebGUI::Shop::AddressBook->new($session, $bookId->{addressBookId}); };

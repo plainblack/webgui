@@ -136,16 +136,17 @@ You can't add children to a Story.
 
 =cut
 
-sub canEdit {
+around canEdit => sub {
+    my $orig    = shift;
     my $self = shift;
     my $userId = shift || $self->session->user->userId;
     if ($userId eq $self->ownerUserId) {
         return 1;
     }
     my $user = WebGUI::User->new($self->session, $userId);
-    return $self->SUPER::canEdit($userId)
+    return $self->$orig($userId)
         || $self->getArchive->canPostStories($userId);
-}
+};
 
 #-------------------------------------------------------------------
 

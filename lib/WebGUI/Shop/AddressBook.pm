@@ -4,7 +4,7 @@ use strict;
 
 use Class::InsideOut qw{ :std };
 use JSON;
-use WebGUI::Asset::Template;
+require WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
 use WebGUI::International;

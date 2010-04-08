@@ -412,7 +412,8 @@ around the canEdit check when www_editSave is being used to add an asset).
 
 =cut
 
-sub canEdit {
+around canEdit => sub {
+    my $orig    = shift;
     my $self    = shift;
     my $userId  = shift     || $self->session->user->userId;
     my $form    = $self->session->form;
@@ -430,13 +431,13 @@ sub canEdit {
     );
 
     # Who can edit the Calendar can do everything
-    if ( $self->SUPER::canEdit( $userId ) ) {
+    if ( $self->$orig( $userId ) ) {
         return 1;
     }
 
     # Fails all checks
     return 0;
-}
+};
 
 #----------------------------------------------------------------------------
 

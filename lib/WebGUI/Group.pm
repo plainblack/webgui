@@ -19,7 +19,7 @@ use WebGUI::LDAPLink;
 use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::Pluggable;
-use WebGUI::Asset;
+require WebGUI::Asset;
 use WebGUI::International;
 
 =head1 NAME

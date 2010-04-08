@@ -65,6 +65,7 @@ BEGIN {
     }
 }
 
+use WebGUI::Asset;
 use WebGUI::Session;
 use WebGUI::PseudoRequest;
 

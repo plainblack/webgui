@@ -200,11 +200,12 @@ can manage the parent you can edit this Shortcut.
 
 =cut
 
-sub canEdit {
-	my $self = shift;
-return 1 if ($self->SUPER::canEdit || ($self->isDashlet && $self->getParent->canManage));
-	return 0;
-}
+around canEdit => sub {
+    my $orig = shift;
+    my $self = shift;
+    return 1 if ($self->$orig(@_) || ($self->isDashlet && $self->getParent->canManage));
+    return 0;
+};
 
 #-------------------------------------------------------------------
 

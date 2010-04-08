@@ -150,12 +150,13 @@ group to edit the parent Map are allowed to edit MapPoint.
 
 =cut
 
-sub canEdit {
+around canEdit => sub {
+    my $orig    = shift;
     my $self    = shift;
     my $userId  = shift || $self->session->user->userId;
     return 1 if $userId eq $self->ownerUserId;
-    return $self->SUPER::canEdit( $userId );
-}
+    return $self->$orig( $userId );
+};
 
 #-------------------------------------------------------------------
 

@@ -715,24 +715,25 @@ the current session user.
 
 =cut
 
-sub canEdit {
-        my $self    = shift;
-        my $userId  = shift     || $self->session->user->userId;
-        return (
-		(
-			(
-				$self->session->form->process("func") eq "add" || 
-				(
-					$self->session->form->process("assetId") eq "new" && 
-					$self->session->form->process("func") eq "editSave" && 
-					$self->session->form->process("class") eq "WebGUI::Asset::Post::Thread"
-				)
-			) && 
-			$self->canStartThread( $userId )
-		) || # account for new threads
-		$self->next::method( $userId )
-	);
-}
+around canEdit => sub {
+    my $orig    = shift;
+    my $self    = shift;
+    my $userId  = shift     || $self->session->user->userId;
+    return (
+        (
+            (
+                $self->session->form->process("func") eq "add" || 
+                (
+                    $self->session->form->process("assetId") eq "new" && 
+                    $self->session->form->process("func") eq "editSave" && 
+                    $self->session->form->process("class") eq "WebGUI::Asset::Post::Thread"
+                )
+            ) && 
+            $self->canStartThread( $userId )
+        ) || # account for new threads
+        $self->$orig( $userId )
+    );
+};
 
 #-------------------------------------------------------------------
 
