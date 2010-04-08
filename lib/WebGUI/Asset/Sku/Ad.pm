@@ -407,37 +407,21 @@ sub  parseDiscountText {
 
 #-------------------------------------------------------------------
 
-=head2 prepareManage
-
-Prepares the template.
-
-=cut
-
-sub prepareManage {
-    my $self = shift;
-    $self->SUPER::prepareView();
-    my $templateId = $self->manageTemplate;
-    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
-    $template->prepare($self->getMetaDataAsTemplateVariables);
-    $self->{_viewTemplate} = $template;
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView
 
-Prepares the template.
+Prepares the template for both www_view and www_manage
 
 =cut
 
-sub prepareView {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $templateId = $self->purchaseTemplate;
+    $self->$orig();
+    my $templateId = shift || $self->purchaseTemplate;
     my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -602,7 +586,7 @@ sub www_manage {
     return $check if (defined $check);
     $self->session->http->setLastModified($self->getContentLastModified);
     $self->session->http->sendHeader;
-    $self->prepareManage;
+    $self->prepareView($self->manageTemplate);
     my $style = $self->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head, 1);
