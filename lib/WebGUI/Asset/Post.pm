@@ -1138,7 +1138,7 @@ override purge => sub {
         $storage->delete if defined $storage;
     }
     $sth->finish;
-    return $self->super();
+    return super();
 };
 
 #-------------------------------------------------------------------
