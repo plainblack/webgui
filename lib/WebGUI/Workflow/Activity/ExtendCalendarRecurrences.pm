@@ -15,7 +15,6 @@ package WebGUI::Workflow::Activity::ExtendCalendarRecurrences;
 =cut
 
 use strict;
-use warnings;
 
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::International;

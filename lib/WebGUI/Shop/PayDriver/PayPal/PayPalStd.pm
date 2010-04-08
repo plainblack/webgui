@@ -15,7 +15,6 @@ package WebGUI::Shop::PayDriver::PayPal::PayPalStd;
 =cut
 
 use strict;
-use warnings;
 
 use base qw/WebGUI::Shop::PayDriver::PayPal/;
 
