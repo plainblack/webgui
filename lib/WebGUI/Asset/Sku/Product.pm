@@ -233,9 +233,9 @@ Override the duplicate method so uploaded files and images also get copied.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self = shift;
-    my $newAsset = $self->SUPER::duplicate(@_);
+    my $newAsset = super;
 
     foreach my $file ('image1', 'image2', 'image3', 'manual', 'brochure', 'warranty') {
         $self->_duplicateFile($newAsset, $file);
@@ -243,7 +243,7 @@ sub duplicate {
 
     return $newAsset;
 
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -646,10 +646,10 @@ The WebGUI::Shop::CartItem that will be refunded.
 
 =cut
 
-sub onRefund {
+override onRefund => sub {
     my $self   = shift;
     my $item   = shift;
-    $self->SUPER::onRefund($item);
+    super();
     my $amount = $item->get('quantity');
     ##Update myself, as options
     $self->getOptions->{quantity} += $amount;
@@ -658,7 +658,7 @@ sub onRefund {
     my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
     $collateral->{quantity} += $amount;
     $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -1872,11 +1872,11 @@ Extend the base method to handle caching.
 
 =cut
 
-sub www_view {
+override www_view => sub {
     my $self = shift;
     $self->session->http->setCacheControl($self->cacheTimeout);
-    $self->SUPER::www_view(@_);
-}
+    super();
+};
 
 1;
 

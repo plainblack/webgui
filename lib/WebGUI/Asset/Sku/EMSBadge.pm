@@ -113,17 +113,17 @@ Adds this badge as configured for an individual to the cart.
 
 =cut
 
-sub addToCart {
-	my ($self, $badgeInfo) = @_;
+around addToCart => sub {
+    my ($orig, $self, $badgeInfo) = @_;
     if($self->getQuantityAvailable() < 1){ 
         return WebGUI::International->new($self->session, "Asset_EventManagementSystem")->get('no more available');
     }
-	$badgeInfo->{badgeId} = "new";
-	$badgeInfo->{badgeAssetId} = $self->getId;
-	$badgeInfo->{emsAssetId} = $self->getParent->getId;
-	my $badgeId = $self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
-	$self->SUPER::addToCart({badgeId=>$badgeId});
-}
+    $badgeInfo->{badgeId} = "new";
+    $badgeInfo->{badgeAssetId} = $self->getId;
+    $badgeInfo->{emsAssetId} = $self->getParent->getId;
+    my $badgeId = $self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
+    $self->$orig({badgeId=>$badgeId});
+};
 
 #-------------------------------------------------------------------
 
