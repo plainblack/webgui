@@ -320,20 +320,6 @@ sub deleteAttribute {
 
 #-------------------------------------------------------------------
 
-=head2 duplicate ( )
-
-duplicates a Matrix. 
-
-=cut
-
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
-	return $newAsset;
-}
-
-#-------------------------------------------------------------------
-
 =head2 editAttributeSave ( attributeProperties  )
 
 Saves an attribute. 
@@ -543,20 +529,6 @@ assetData.revisionDate
         eval{$cache->set("matrixListings_".$self->getId, $listingsEncoded, $self->listingsCacheTimeout)};
     }
     return $listings;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-returns the tabform object that will be used in generating the edit page for Matrix.
-
-=cut
-
-sub getEditForm {
-	my $self    = shift;
-	my $tabform = $self->SUPER::getEditForm();
-	return $tabform;
 }
 
 #-------------------------------------------------------------------

@@ -166,11 +166,11 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
 	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
-	$self->SUPER::www_view(@_);
-}
+	super();
+};
 
 1;
 

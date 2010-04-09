@@ -215,16 +215,16 @@ Extend the base method to handle copying Poll answer data.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset = super();
 	my $sth = $self->session->db->read("select * from Poll_answer where assetId=?", [$self->getId]);
 	while (my $data = $sth->hashRef) {
 		$newAsset->setVote($data->{answer}, $data->{userId}, $data->{ipAddress});
 	}
 	$sth->finish;
 	return $newAsset;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -254,9 +254,9 @@ Extend the base class to handle the answers and graphing plugins.
 ##TODO: Pull out all form elements which can come from the definition sub
 ##and only have hand code in here.
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm; 
+	my $tabform = super(); 
 	my $i18n = WebGUI::International->new($self->session,"Asset_Poll");
     my ($i, $answers);
     for ($i=1; $i<=20; $i++) {
@@ -292,7 +292,7 @@ sub getEditForm {
 	}
 
 	return $tabform;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -359,9 +359,9 @@ Extend the base method to handle the answers and the Graphing plugin.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
 	my $property = {};
     my $answers = $self->session->form->process("answers");
     $answers =~ s{\r}{}xmsg;
@@ -377,7 +377,7 @@ sub processPropertiesFromFormPost {
 
 	$self->update($property);
 	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId)) if ($self->session->form->process("resetVotes"));
-}
+};
 
 
 #-------------------------------------------------------------------

@@ -450,7 +450,7 @@ the calendar, or the group that can edit events in the calendar).
 
 =cut
 
-sub canAddEvent {
+override canAddEvent => sub {
     my $self    = shift;
     my $userId  = shift;
 
@@ -461,9 +461,9 @@ sub canAddEvent {
 
     return 1 if (
         $user->isInGroup( $self->groupIdEventEdit ) 
-        || $self->SUPER::canEdit( $userId )
+        || super();
     );
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -521,10 +521,10 @@ in other areas.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
-    my $form    = $self->SUPER::getEditForm;
+    my $form    = super();
     my $i18n    = WebGUI::International->new($session,"Asset_Calendar");
 
     my $tab     = $form->addTab("feeds",$i18n->get("feeds"), 6);
@@ -674,7 +674,7 @@ ENDHTML
 
     $tab->raw("</td></tr>");
     return $form;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -995,11 +995,11 @@ Adds / removes feeds from the feed trough.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $self->session->form;
-    $self->SUPER::processPropertiesFromFormPost;
+    super();
 
     unless ($self->groupIdSubscribed) {
         $self->createSubscriptionGroup();
@@ -1037,7 +1037,7 @@ sub processPropertiesFromFormPost {
     }
 
     return;
-}
+};
 
 
 #----------------------------------------------------------------------------

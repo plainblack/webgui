@@ -263,10 +263,10 @@ Duplicates a Thingy, including the definitions of the Things in this Thingy and 
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self = shift;
     my $options = shift;
-	my $newAsset = $self->SUPER::duplicate($options);
+	my $newAsset = super();
     my $db = $self->session->db;
     my $assetId = $self->getId;
     my $fields;
@@ -310,7 +310,7 @@ sub duplicate {
                     $otherThingFields->{$otherThingField}->{fieldInOtherThingId}, $newAsset->getId]);
     }
     return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -598,9 +598,9 @@ See WebGUI::AssetPackage::exportAssetData() for details.
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
     my $self = shift;
-    my $data = $self->SUPER::exportAssetData;
+    my $data = super();
     my $db = $self->session->db;
     my $assetId = $self->getId;
 
@@ -608,7 +608,7 @@ sub exportAssetData {
     $data->{fields} = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId = ?',[$assetId]);
 
     return $data;
-}
+};
 
 #-------------------------------------------------------------------
 

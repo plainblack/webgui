@@ -417,13 +417,13 @@ an entry is being viewed, bypass caching altogether.
 
 =cut
 
-sub getContentLastModified {
+override getContentLastModified => sub {
     my $self = shift;
     if ($self->currentView eq 'list' || $self->session->form->process('entryId')) {
         return time;
     }
-    return $self->SUPER::getContentLastModified;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -993,9 +993,9 @@ Extends the base class to handle form and list mode.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView(@_);
+    super();
     my $view = $self->currentView;
     if ( $view eq 'form' ) {
         $self->prepareViewForm(@_);
@@ -1003,7 +1003,7 @@ sub prepareView {
     else {
         $self->prepareViewList(@_);
     }
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -1153,10 +1153,10 @@ or are part of the groupToViewEntries.
 
 =cut
 
-sub canView {
+override canView => sub {
     my $self = shift;
     return 0
-        if !$self->SUPER::canView;
+        if !super();
     if ($self->currentView eq 'list') {
         return 1
             if $self->canEdit;
@@ -1165,7 +1165,7 @@ sub canView {
         return 0;
     }
     return 1;
-}
+};
 
 #-------------------------------------------------------------------
 

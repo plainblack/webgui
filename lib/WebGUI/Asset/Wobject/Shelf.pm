@@ -331,15 +331,15 @@ Override the superclass to add import and exprt items to the AdminConsole submen
 
 =cut
 
-sub www_edit {
+override www_edit => sub {
     my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Shelf');
 	if ($self->getId ne "new") {
 		$self->getAdminConsole->addSubmenuItem($self->getUrl('func=exportProducts'),$i18n->get("export"));
 		$self->getAdminConsole->addSubmenuItem($self->getUrl('func=importProducts'),$i18n->get("import"));
 	}
-	return $self->SUPER::www_edit();
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 

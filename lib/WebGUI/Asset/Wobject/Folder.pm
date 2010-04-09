@@ -119,9 +119,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Folder");
 	if ($self->assetId eq "new") {
                	$tabform->getTab("properties")->whatNext(
@@ -133,7 +133,7 @@ sub getEditForm {
 			);
 	}
 	return $tabform;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -289,11 +289,11 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
 	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
-	$self->SUPER::www_view(@_);
-}
+	super();
+};
 
 
 1;

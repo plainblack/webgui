@@ -126,9 +126,9 @@ Add the data table to the edit form.
 =cut
 
 # TODO Get the DataSource's edit form
-sub getEditForm {
+override getEditForm => sub {
     my $self    = shift;
-    my $tabform = $self->SUPER::getEditForm(@_);
+    my $tabform = super();
 
     $tabform->getTab("data")->raw(
         WebGUI::Form::DataTable->new(
@@ -142,7 +142,7 @@ sub getEditForm {
     );
 
     return $tabform;
-} ## end sub getEditForm
+}; ## end sub getEditForm
 
 #----------------------------------------------------------------------------
 
@@ -152,12 +152,12 @@ Add a tab for the data table.
 
 =cut
 
-sub getEditTabs {
+override getEditTabs => sub {
     my $self = shift;
     my $i18n = WebGUI::International->new( $self->session, "Asset_DataTable" );
 
-    return ( $self->SUPER::getEditTabs, [ "data" => $i18n->get("tab label data") ], );
-}
+    return ( super(), [ "data" => $i18n->get("tab label data") ], );
+};
 
 #----------------------------------------------------------------------------
 

@@ -94,12 +94,12 @@ Extends the base method to add custom template variables for the Newsletter.
 
 =cut
 
-sub getViewTemplateVars {
+override getViewTemplateVars => sub {
     my $self = shift;
-    my $var = $self->SUPER::getViewTemplateVars;
+    my $var = super();
     $var->{mySubscriptionsUrl} = $self->getUrl("func=mySubscriptions");
     return $var;
-}
+};
 
 
 

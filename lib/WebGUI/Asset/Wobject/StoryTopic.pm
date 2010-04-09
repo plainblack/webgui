@@ -223,11 +223,11 @@ variables are set correctly in viewTemplateVars.
 =cut
 
 
-sub www_view {
+override www_view => sub {
     my $self = shift;
     $self->{_standAlone} = 1;
-    return $self->SUPER::www_view;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

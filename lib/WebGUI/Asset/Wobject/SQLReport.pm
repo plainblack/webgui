@@ -288,9 +288,9 @@ Manually make the edit form due to javascript for adding more queries.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session,"Asset_SQLReport");
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
@@ -461,7 +461,7 @@ sub getEditForm {
 	);
 	
 	return $tabform;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -857,11 +857,11 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
 	$self->session->http->setCacheControl($self->cacheTimeout);
-	$self->SUPER::www_view(@_);
-}
+	super();
+};
 
 1;
 

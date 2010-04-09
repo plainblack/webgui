@@ -240,9 +240,9 @@ Extends the base method to handle assetsToHide.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
 	if ($self->session->form->process("assetId") eq "new" && $self->session->form->process("class") eq 'WebGUI::Asset::Wobject::Dashboard') {
 		$self->initialize;
 		if (ref $self->getParent eq 'WebGUI::Asset::Wobject::Layout') {
@@ -250,7 +250,7 @@ sub processPropertiesFromFormPost {
 		}
 		$self->update({styleTemplateId=>'PBtmplBlankStyle000001'});
 	}
-}
+};
 
 #-------------------------------------------------------------------
 

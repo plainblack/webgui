@@ -52,9 +52,9 @@ This method is optional if you set autoGenerateForms=1 in the definition.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self    = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
     my $i18n    = WebGUI::International->new($self->session, "Asset_Carousel");
 
     $self->session->style->setScript($self->session->url->extras('yui/build/editor/editor-min.js'), {type =>
@@ -126,7 +126,7 @@ onClick='javascript:deleteItem(this.id)'></input>\n"
     $tabform->getTab("properties")->raw($tableRowEnd);
     
     return $tabform;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -159,11 +159,11 @@ Used to process properties from the form posted.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
     my $form    = $self->session->form;
     my (@items,$items);
-    $self->SUPER::processPropertiesFromFormPost(@_);
+    super();
 
     foreach my $param ($form->param) {
         if ($param =~ m/^item_/){
@@ -189,7 +189,7 @@ sub processPropertiesFromFormPost {
     $items = JSON->new->encode({items => \@items});
     $self->update({items => $items});
     return undef;
-}
+};
 
 #-------------------------------------------------------------------
 

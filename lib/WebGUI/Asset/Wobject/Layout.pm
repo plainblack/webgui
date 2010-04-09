@@ -85,9 +85,9 @@ Extends the base method to  handle the optional mobileTemplateId and assetsToHid
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self = shift;
-    my $tabform = $self->SUPER::getEditForm();
+    my $tabform = super();
     my $i18n = WebGUI::International->new($self->session,"Asset_Layout");
 
     my ($templateId);
@@ -158,7 +158,7 @@ sub getEditForm {
             );
     }
     return $tabform;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -365,7 +365,7 @@ of the page, by lineage.
 sub getContentLastModified {
     # Buggo: this is a little too conservative.  Children that are hidden maybe shouldn't count.  Hm.
     my $self = shift;
-    my $mtime = $self->SUPER::getContentLastModified;
+    my $mtime = super();
     foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1, excludeClasses=>['WebGUI::Asset::Wobject::Layout']})}) {
         my $child_mtime = $child->getContentLastModified;
         $mtime = $child_mtime if ($child_mtime > $mtime);
@@ -381,7 +381,7 @@ Extend the base method to handle caching and ad rotation.
 
 =cut
 
-sub www_view {
+override www_view => sub {
     my $self = shift;
     my $session = $self->session;
     # slashdot / burst protection hack
@@ -417,8 +417,8 @@ sub www_view {
         return "chunked";
     }
     $self->{_viewPrintOverride} = 1; # we do this to make it output each asset as it goes, rather than waiting until the end
-    return $self->SUPER::www_view;
-}
+    return super();
+};
 
 1;
 
