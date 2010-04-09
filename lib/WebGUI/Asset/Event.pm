@@ -1515,9 +1515,9 @@ Requests that the events be committed
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
-    $self->SUPER::processPropertiesFromFormPost;    # Updates the event
+    super();
     my $session = $self->session;
     my $form    = $session->form;
 
@@ -1742,7 +1742,7 @@ sub processPropertiesFromFormPost {
 
     delete $self->{_storageLocation};
     return undef;
-}
+};
 
 #-------------------------------------------------------------------
 

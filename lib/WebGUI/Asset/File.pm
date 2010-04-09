@@ -132,13 +132,13 @@ Extend the master method to duplicate the storage location.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset = super();
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
 	return $newAsset;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -149,12 +149,12 @@ See WebGUI::AssetPackage::exportAssetData() for details.
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
 	my $self = shift;
-	my $data = $self->SUPER::exportAssetData;
+	my $data = super();
 	push(@{$data->{storage}}, $self->storageId) if ($self->storageId ne "");
 	return $data;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -201,9 +201,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self        = shift;
-    my $tabform     = $self->SUPER::getEditForm();
+    my $tabform     = super();
     my $i18n        = WebGUI::International->new($self->session, 'Asset_File');
 
     $tabform->getTab("properties")->raw( 
@@ -213,7 +213,7 @@ sub getEditForm {
     );
 
     return $tabform;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -390,11 +390,11 @@ Extend the master method to handle file uploads and applying constraints.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
     my $session = $self->session;
 
-    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors  = super() || [];
     return $errors if @$errors;
 
     if (my $storageId = $session->form->get('newFile','File')) {
@@ -409,7 +409,7 @@ sub processPropertiesFromFormPost {
     }
 
     return undef;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -500,7 +500,8 @@ the asset size.
 
 =cut
 
-sub setSize {
+around setSize => sub {
+    my $orig        = shift;
     my $self        = shift;
     my $fileSize    = shift || 0;
     my $storage     = $self->getStorageLocation;
@@ -509,8 +510,8 @@ sub setSize {
             $fileSize += $storage->getFileSize($file);
         }
     }
-    return $self->SUPER::setSize($fileSize);
-}
+    return $self->$orig($fileSize);
+};
 
 #-------------------------------------------------------------------
 

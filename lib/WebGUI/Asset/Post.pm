@@ -321,11 +321,11 @@ Extend the base method to delete the locally cached thread object.
 
 =cut
 
-sub DESTROY {
+override DESTROY => sub {
 	my $self = shift;
 	$self->{_thread}->DESTROY if (exists $self->{_thread} && ref $self->{_thread} =~ /Thread/);
-	$self->SUPER::DESTROY;
-}
+	super();
+};
 
 
 #-------------------------------------------------------------------
@@ -336,12 +336,12 @@ Extend the base class to handle storage locations.
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
 	my $self = shift;
-	my $data = $self->SUPER::exportAssetData;
+	my $data = super();
 	push(@{$data->{storage}}, $self->storageId) if ($self->storageId ne "");
 	return $data;
-}
+};
 
 #-------------------------------------------------------------------
 
