@@ -386,6 +386,7 @@ use WebGUI::Exception;
 use strict;
 use Tie::IxHash;
 require WebGUI::AdminConsole;
+require WebGUI::Asset::Shortcut;
 use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
