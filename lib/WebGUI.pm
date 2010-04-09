@@ -25,7 +25,7 @@ use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Session;
 use WebGUI::User;
-use WebGUI::Request;
+use WebGUI::Session::Request;
 use Moose;
 use Try::Tiny;
 
@@ -81,53 +81,51 @@ sub psgi_app {
     return $self->{psgi_app} ||= $self->compile_psgi_app;
 }
 
-sub new_session {
-    my $self = shift;
-    my $request = shift;
-    
-    # determine session id
-    my $sessionId = $request->cookies->{$self->config->getCookieName};
-
-    # Instantiate the session object
-    return WebGUI::Session->open($self->root, $self->config, $request, $sessionId);
-}
-
 sub compile_psgi_app {
     my $self = shift;
     
     my $catch = [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error\n" ] ];
     
+    # WebGUI is a PSGI app is a Perl code reference. Let's create one.
+    # Each web request results in a call to this sub
     my $app = sub {
         my $env = shift;
         
-        my $log = sub { 
-            $env->{'psgi.errors'}->print(join '', @_, "\n"); 
-        };
-        
+        # Use the PSGI callback style response, which allows for nice things like 
+        # delayed response/streaming body (server push). For now we just use this for 
+        # unbuffered response writing
         return sub {
-            my $callback = shift;
-            my $request = WebGUI::Request->new($env);
-            my $session = $self->new_session($request);
+            my $responder = shift;
             
-            try {
-                $self->handle($request);
-            } catch {
-                $log->( "Error handling request: $_" );
-                $callback->( $catch );
-                return;
-            };
+            # Open the WebGUI Session
+            # my $session = WebGUI::Session->open($self->root, $self->config, $env, $env->{'psgix.session'}->id);
+            my $session = WebGUI::Session->open($self->root, $self->config, $env);
             
+            # Handle the request
+            $self->handle($session);
+            
+            # Uncomment to catch errors (currently I prefer letting StackTrace do its thing)
+            # try {
+                # $self->handle($session);
+            # } catch {
+                # $session->request->log( "Error handling request: $_" );
+                # $responder->( $catch );
+                # return;
+            # };
+            
+            # Construct the PSGI response
             my $response = $session->response;
             my $psgi_response = $response->finalize;
             
+            # See if the content handler is doing unbuffered response writing
             if ( $response->streaming ) {
                 
                 try {
-                    # Ask PSGI server for a streaming writer object by returning a 2-part
-                    # arrayref instead of a 3-part array
-                    my $writer = $callback->( [ $psgi_response->[0], $psgi_response->[1] ] );
+                    # Ask PSGI server for a streaming writer object by returning only the first
+                    # two elements of the array reference
+                    my $writer = $responder->( [ $psgi_response->[0], $psgi_response->[1] ] );
                     
-                    # Store the writer object in the WebGUI::Response object
+                    # Store the writer object in the WebGUI::Session::Response object
                     $response->writer($writer);
                     
                     # Now call the callback that does the streaming
@@ -139,13 +137,15 @@ sub compile_psgi_app {
                 } catch {
                     if ($response->writer) {
                         # Response has already been started, so log error and close writer
-                        $log->("Error detected after streaming response started");
+                        $session->request->TRACE("Error detected after streaming response started");
                         $response->writer->close;
                     } else {
-                        $callback->( $catch );
+                        $responder->( $catch );
                     }
+                    
                 } finally {
                     $session->close;
+                    
                 };
             } else {
                 
@@ -153,7 +153,7 @@ sub compile_psgi_app {
                 # the response. In the future we could use an Event framework here 
                 # to make this a non-blocking delayed response.
                 $session->close;
-                $callback->($psgi_response);
+                $responder->($psgi_response);
             }
         }
     };
@@ -176,18 +176,20 @@ sub compile_psgi_app {
         path => sub { s{^$uploadsURL/}{} }, 
         root => "$uploadsPath/", 
     );
+    
+    # Session - TODO: make this user configurable
+    # use Plack::Middleware::Session;
+    # $app = Plack::Middleware::Session->wrap($app);
 
     return $app;
 }  
 
 sub handle {
-    my ( $self, $request ) = @_;
-    
-    my $session = $request->session;
+    my ( $self, $session ) = @_;
     
     # uncomment the following to short-circuit contentHandlers (for benchmarking PSGI scaffolding vs. modperl)
-#    $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking\n");
-#    return;
+    # $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking\n");
+    # return;
 
     # contentHandlers that return text will have that content returned as the response
     # Alternatively, contentHandlers can stream the response body by calling:
@@ -203,7 +205,7 @@ sub handle {
 #        sleep 1;
 #        $session->output->print("...see?\n");
 #    });
-#   return;    
+#   return;
     
     # TODO: refactor the following loop, find all instances of "chunked" and "empty" in codebase, etc..
     for my $handler (@{$self->config->get("contentHandlers")}) {
@@ -224,7 +226,7 @@ sub handle {
             
             # "chunked" or "empty" means it took care of its own output needs
             if (defined $output && ( $output eq "chunked" || $output eq "empty" )) {
-                warn "chunked and empty no longer stream, use session->response->stream() instead";
+                #warn "chunked and empty no longer stream, use session->response->stream() instead";
                 if ($session->errorHandler->canShowDebug()) {
                     $session->output->print($session->errorHandler->showDebug(),1);
                 }

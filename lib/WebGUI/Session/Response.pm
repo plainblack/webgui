@@ -1,12 +1,20 @@
-package WebGUI::Response;
+package WebGUI::Session::Response;
 use strict;
 use parent qw(Plack::Response);
 
 use Plack::Util::Accessor qw(session streaming writer streamer);
 
-=head2 DESCRIPTION
+=head1 SYNOPSIS
 
-The WebGUI server response object. See of L<Plack::Response>
+    my $session = WebGUI::Session->open(...);
+    my $response = $session->response;
+
+=head1 DESCRIPTION
+
+WebGUI's PSGI response utility class. Sub-classes L<Plack::Response>.
+
+An instance of this object is created automatically when the L<WebGUI::Session>
+is created.
 
 =cut
 

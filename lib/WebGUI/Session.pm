@@ -29,6 +29,7 @@ use WebGUI::Session::Id;
 use WebGUI::Session::Os;
 use WebGUI::Session::Output;
 use WebGUI::Session::Privilege;
+use WebGUI::Session::Request;
 use WebGUI::Session::Scratch;
 use WebGUI::Session::Setting;
 use WebGUI::Session::Stow;
@@ -424,7 +425,7 @@ sub log {
 
 #-------------------------------------------------------------------
 
-=head2 open ( webguiRoot, configFile [, requestObject, sessionId, noFuss ] )
+=head2 open ( webguiRoot, configFile [, env, sessionId, noFuss ] )
 
 Constructor. Opens a closed ( or new ) WebGUI session.
 
@@ -436,13 +437,14 @@ The path to the WebGUI files.
 
 The filename of the config file that WebGUI should operate from, or a WebGUI::Config object
 
-=head3 requestObject
+=head3 env
 
-The Plack::Request object. If this session is being instanciated from the web, this is required.
+The L<PSGI> env hash. If this session is being instanciated from the web, this is required.
 
 =head3 sessionId
 
 Optionally retrieve a specific session id. Normally this is set by a cookie in the user's browser.
+If you have a L<PSGI> env hash, you might find the sessionId at: $env->{'psgix.session'}->id
 
 =head3 noFuss
 
@@ -451,21 +453,29 @@ Uses simple session vars. See WebGUI::Session::Var::new() for more details.
 =cut
 
 sub open {
-	my $class = shift;
-	my $webguiRoot = shift;
-	my $c = shift;
-	my $request = shift;
+	my ($class, $webguiRoot, $c, $env, $sessionId, $noFuss) = @_;
 	my $config = ref $c ? $c : WebGUI::Config->new($webguiRoot,$c);
 	my $self = {_config=>$config }; # TODO - if we store reference here, should we weaken WebGUI->config?
-	bless $self , $class;
-	if (defined $request) {
-	    $request->session($self); # hello circular reference
-        $self->{_request} = $request;
+	bless $self, $class;
+	
+	if ($env) {
+	    my $request = WebGUI::Session::Request->new($env);
+	    $self->{_request} = $request;
         $self->{_response} = $request->new_response( 200 );
+        
+        # TODO: it might be nice to set a default Content-type here, but we can't until Assets can override it again
+        # $self->{_response} = $request->new_response( 200 );#, [ 'Content-type' => 'text/html; charset=UTF-8' ] );
+        
+        # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
+        # wasn't given explicitly
+        $sessionId ||= $request->cookies->{$config->getCookieName};
     }
-	my $sessionId = shift || $request->cookies->{$config->getCookieName} || $self->id->generate;
-	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
-	my $noFuss = shift;
+    
+    # If the sessionId is still unset or is invalid, generate a new one
+    if (!$sessionId || !$self->id->valid($sessionId)) {
+        $sessionId = $self->id->generate;
+    }
+	
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);
 	return $self;
 }
