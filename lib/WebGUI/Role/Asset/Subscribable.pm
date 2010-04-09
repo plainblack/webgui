@@ -15,7 +15,6 @@ package WebGUI::Role::Asset::Subscribable;
 =cut
 
 
-use WebGUI::International;
 use Moose::Role;
 use WebGUI::Definition::Asset;
 define tableName               => "assetAspect_Subscribable";
