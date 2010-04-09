@@ -279,13 +279,13 @@ sub sendHeader {
 		$response->header(Location => $self->getRedirectLocation);
 		$response->status($self->getStatus);
 	} else {
-		$request->content_type($self->getMimeType);
+		$response->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
 		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
 		# under these circumstances, don't allow caching
 		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
 			$response->header("Cache-Control" => "private, max-age=1");
-#			$request->no_cache(1); # TODO - re-enable this?
+#			$response->no_cache(1); # TODO - re-enable this?
 		} 
 		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
 		else { 

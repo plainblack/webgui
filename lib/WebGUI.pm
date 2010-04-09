@@ -101,15 +101,6 @@ sub compile_psgi_app {
             # Handle the request
             $self->handle($session);
             
-            # Uncomment to catch errors (currently I prefer letting StackTrace do its thing)
-            # try {
-                # $self->handle($session);
-            # } catch {
-                # $session->request->log( "Error handling request: $_" );
-                # $responder->( $catch );
-                # return;
-            # };
-            
             # Construct the PSGI response
             my $response = $session->response;
             my $psgi_response = $response->finalize;

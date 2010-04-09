@@ -463,9 +463,6 @@ sub open {
 	    $self->{_request} = $request;
         $self->{_response} = $request->new_response( 200 );
         
-        # TODO: it might be nice to set a default Content-Type here, but we can't until Assets can override it again
-        # $self->{_response} = $request->new_response( 200 );#, [ 'Content-Type' => 'text/html; charset=UTF-8' ] );
-        
         # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
         # wasn't given explicitly
         $sessionId ||= $request->cookies->{$config->getCookieName};

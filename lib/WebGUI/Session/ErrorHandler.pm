@@ -223,11 +223,10 @@ sub fatal {
 
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->session->http->setStatus("500","Server Error");
-	#Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
-	$self->session->request->content_type('text/html') if ($self->session->request);
+	$self->session->response->content_type('text/html') if ($self->session->response);
 	$self->getLogger->fatal($message);
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
-	$self->session->http->sendHeader if ($self->session->request);
+	$self->session->http->sendHeader if ($self->session->response);
 
 	if (! defined $self->session->db(1)) {
 		# We can't even _determine_ whether we can show the debug text.  Punt.

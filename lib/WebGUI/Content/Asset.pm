@@ -113,7 +113,6 @@ sub handler {
         if ($var->get("userId") eq "1" && defined $asset && !$http->ifModifiedSince($asset->getContentLastModified)) { 
             $http->setStatus("304","Content Not Modified");
             $http->sendHeader;
-            $session->close;
             return "chunked";
         } 
 
@@ -128,7 +127,6 @@ sub handler {
         my $ct = guess_media_type($filename);
         my $oldContentType = $request->content_type($ct);
         if ($request->sendfile($filename) ) {
-            $session->close;
             return; # TODO - what should we return to indicate streaming?
         } 
         else {

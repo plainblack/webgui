@@ -8,6 +8,7 @@ DONE
 * WebGUI::authen API changed
 * urlHandler API changed - no longer gets server, config
 * Streaming response body
+* Delete lib/WebGUI/URL and replace with new Middleware(s)
 
 NB
 * Periodically do a big stress-test and check for leaks, mysql overload etc..
