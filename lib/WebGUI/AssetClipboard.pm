@@ -47,7 +47,7 @@ paste a wiki page anywhere else but a wiki master.
 
 sub canPaste {
     my $self = shift;
-    return $self->validParent($self->session);  ##Lazy call to a class method
+    return $self->validParent($self->session, $self);  ##Lazy call to a class method
 }
 
 #-------------------------------------------------------------------
