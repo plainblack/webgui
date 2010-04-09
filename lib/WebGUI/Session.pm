@@ -145,7 +145,7 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler/) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
 		delete $self->{$key};
 	}
 }
@@ -463,8 +463,8 @@ sub open {
 	    $self->{_request} = $request;
         $self->{_response} = $request->new_response( 200 );
         
-        # TODO: it might be nice to set a default Content-type here, but we can't until Assets can override it again
-        # $self->{_response} = $request->new_response( 200 );#, [ 'Content-type' => 'text/html; charset=UTF-8' ] );
+        # TODO: it might be nice to set a default Content-Type here, but we can't until Assets can override it again
+        # $self->{_response} = $request->new_response( 200 );#, [ 'Content-Type' => 'text/html; charset=UTF-8' ] );
         
         # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
         # wasn't given explicitly

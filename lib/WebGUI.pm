@@ -29,12 +29,6 @@ use WebGUI::Session::Request;
 use Moose;
 use Try::Tiny;
 
-has root => ( is => 'ro', isa => 'Str', default => '/data/WebGUI' );
-has site => ( is => 'ro', isa => 'Str', default => 'dev.localhost.localdomain.conf' );
-has config  => ( is => 'rw', isa => 'WebGUI::Config' );
-
-use overload q(&{}) => sub { shift->psgi_app }, fallback => 1;
-
 =head1 NAME
 
 Package WebGUI
@@ -52,6 +46,10 @@ PSGI handler for WebGUI.
 These subroutines are available from this package:
 
 =cut
+
+has root    => ( is => 'ro', isa => 'Str', default => '/data/WebGUI' );
+has site    => ( is => 'ro', isa => 'Str', default => 'dev.localhost.localdomain.conf' );
+has config  => ( is => 'rw', isa => 'WebGUI::Config' );
 
 around BUILDARGS => sub {
     my $orig = shift;
@@ -74,7 +72,9 @@ sub BUILD {
     # Instantiate the WebGUI::Config object
     my $config = WebGUI::Config->new( $self->root, $self->site );
     $self->config($config);
-} 
+}
+
+use overload q(&{}) => sub { shift->psgi_app }, fallback => 1;
 
 sub psgi_app {
     my $self = shift;
@@ -84,7 +84,7 @@ sub psgi_app {
 sub compile_psgi_app {
     my $self = shift;
     
-    my $catch = [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error\n" ] ];
+    my $catch = [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error" ] ];
     
     # WebGUI is a PSGI app is a Perl code reference. Let's create one.
     # Each web request results in a call to this sub
@@ -96,10 +96,7 @@ sub compile_psgi_app {
         # unbuffered response writing
         return sub {
             my $responder = shift;
-            
-            # Open the WebGUI Session
-            # my $session = WebGUI::Session->open($self->root, $self->config, $env, $env->{'psgix.session'}->id);
-            my $session = WebGUI::Session->open($self->root, $self->config, $env);
+            my $session = $env->{'webgui.session'} or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
             
             # Handle the request
             $self->handle($session);
@@ -143,21 +140,22 @@ sub compile_psgi_app {
                         $responder->( $catch );
                     }
                     
-                } finally {
-                    $session->close;
-                    
-                };
+                }
             } else {
                 
                 # Not streaming, so immediately tell the callback to return 
                 # the response. In the future we could use an Event framework here 
                 # to make this a non-blocking delayed response.
-                $session->close;
                 $responder->($psgi_response);
             }
         }
     };
     
+    # Wrap $app with some extra middleware that acts as a fallback for when
+    # you're not using something fast to serve static content
+    #
+    # This could also be in the .psgi file, but it seems sensible to have it
+    # baked in as a fallback (unless we find it drains performance)
     my $config = $self->config;
 
     # Extras
@@ -176,12 +174,6 @@ sub compile_psgi_app {
         path => sub { s{^$uploadsURL/}{} }, 
         root => "$uploadsPath/", 
     );
-    
-    # Session - TODO: make this user configurable
-    # use Plack::Middleware::Session;
-    # $app = Plack::Middleware::Session->wrap($app);
-
-    return $app;
 }  
 
 sub handle {
@@ -199,16 +191,18 @@ sub handle {
     # This is generally a good thing to do, unless you want to send a file.
 
     # uncomment the following to short-circuit contentHandlers with a streaming response:
-#    $session->response->stream(sub {
-#        my $session = shift;
-#        $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking (streaming)\n");
-#        sleep 1;
-#        $session->output->print("...see?\n");
-#    });
-#   return;
+    # $session->response->stream(
+        # sub {
+            # my $session = shift;
+            # $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking (streaming)\n");
+            # #sleep 1;
+            # $session->output->print("...see?\n");
+        # }
+    # );
+    # return;
     
     # TODO: refactor the following loop, find all instances of "chunked" and "empty" in codebase, etc..
-    for my $handler (@{$self->config->get("contentHandlers")}) {
+    for my $handler (@{$session->config->get("contentHandlers")}) {
         my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
         if ( my $e = WebGUI::Error->caught ) {
             $session->errorHandler->error($e->package.":".$e->line." - ".$e->error);

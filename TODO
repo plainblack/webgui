@@ -8,3 +8,7 @@ DONE
 * WebGUI::authen API changed
 * urlHandler API changed - no longer gets server, config
 * Streaming response body
+
+NB
+* Periodically do a big stress-test and check for leaks, mysql overload etc..
+  ab -t 100 -c 10 -k http://dev.localhost.localdomain:5000 | grep 'Req'
