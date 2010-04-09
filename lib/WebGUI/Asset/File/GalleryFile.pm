@@ -362,7 +362,7 @@ override getCurrentRevisionDate => sub {
 
     return undef unless $asset;
 
-    if ( $asset->approved || $asset->canEdit ) {
+    if ( $asset->status eq 'approved' || $asset->canEdit ) {
         return $revisionDate;
     }
     else {
