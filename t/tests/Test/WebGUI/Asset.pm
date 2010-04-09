@@ -324,6 +324,15 @@ sub purge : Test(3) {
     ok ! $exists_in_table, 'assetId removed from all asset tables';
 }
 
+sub cut : Test(2) {
+    note "cut";
+    my $test    = shift;
+    my $session = $test->session;
+    my ($tag, $asset, @parents) = $test->getAnchoredAsset();
+    ok $asset->cut, 'cut returns true if it was cut';
+    is $asset->state, 'clipboard', 'asset state updated';
+}
+
 
 1;
 
