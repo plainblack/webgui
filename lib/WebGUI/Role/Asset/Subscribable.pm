@@ -433,7 +433,7 @@ override purge => sub {
     my $options = shift;
 
     my $group   = $self->getSubscriptionGroup();
-    $group->delete;
+    $group->delete if $group;
     super();
 
     return;
