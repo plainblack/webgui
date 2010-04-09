@@ -142,10 +142,10 @@ this method to deflate the zip file into the proper folder
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
 	#File should be saved here by the superclass
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
 	my $storage = $self->getStorageLocation();
 	
 	my $file = $self->filename;
@@ -169,7 +169,7 @@ sub processPropertiesFromFormPost {
 	unless ($self->unzip($storage,$self->filename)) {
 		$self->session->errorHandler->warn($i18n->get("unzip_error"));
 	}
-}
+};
 
 
 #-------------------------------------------------------------------

@@ -89,10 +89,10 @@ An integer (in pixels) representing the longest edge a thumbnail may have.
 
 =cut
 
-sub applyConstraints {
+override applyConstraints => sub {
     my $self = shift;
     my $options = shift;
-    $self->SUPER::applyConstraints($options);
+    super();
     my $maxImageSize  = $options->{maxImageSize}  || $self->maxImageSize  || $self->session->setting->get("maxImageSize");
     my $thumbnailSize = $options->{thumbnailSize} || $self->thumbnailSize || $self->session->setting->get("thumbnailSize");
 	my $parameters = $self->parameters;
@@ -104,7 +104,7 @@ sub applyConstraints {
     $storage->adjustMaxImageSize($file, $maxImageSize);
     $self->generateThumbnail($thumbnailSize);
     $self->setSize;
-}
+};
 
 
 
@@ -138,9 +138,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
         $tabform->getTab("properties")->integer(
                	-name=>"thumbnailSize",
@@ -167,7 +167,7 @@ sub getEditForm {
 			);
 	}
 	return $tabform;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -190,11 +190,11 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 =cut
 
-sub getToolbar {
+override getToolbar => sub {
 	my $self = shift;
 	return undef if ($self->getToolbarState);
-	return $self->SUPER::getToolbar();
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -246,11 +246,11 @@ Extend the superclass setFile to automatically generate thumbnails.
 
 =cut
 
-sub setFile {
+override setFile => sub {
     my $self    = shift;
-    $self->SUPER::setFile(@_);
+    super();
     $self->generateThumbnail;
-}
+};
 
 #-------------------------------------------------------------------
 

@@ -343,7 +343,7 @@ are authorized to see them.
 
 =cut
 
-sub getCurrentRevisionDate {
+override getCurrentRevisionDate => sub {
     my $class       = shift;
     my $session     = shift;
     my $assetId     = shift;
@@ -366,9 +366,9 @@ sub getCurrentRevisionDate {
         return $revisionDate;
     }
     else {
-        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+        return super();
     }
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -395,9 +395,9 @@ Get the parent GalleryAlbum. If the only revision of the GalleryAlbum is
 
 =cut
 
-sub getParent {
+override getParent => sub {
     my $self        = shift;
-    if ( my $album = $self->SUPER::getParent ) {
+    if ( my $album = super() ) {
         return $album;
     }
     # Only get the pending version if we're allowed to see this photo in its pending status
@@ -411,7 +411,7 @@ sub getParent {
             } )->[ 0 ];
         return $album;
     }
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -615,11 +615,11 @@ sub processCommentEditForm {
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
     my $i18n    = WebGUI::International->new( $self->session,'Asset_Photo' );
     my $form    = $self->session->form;
-    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors  = super() || [];
 
     # Make sure we have the disk space for this
     if ( !$self->getGallery->hasSpaceAvailable( $self->assetSize ) ) {
@@ -639,7 +639,7 @@ sub processPropertiesFromFormPost {
     }
 
     return;
-}
+};
 
 #----------------------------------------------------------------------------
 
