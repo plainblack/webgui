@@ -16,10 +16,9 @@ package WebGUI::Session::ErrorHandler;
 
 
 use strict;
-use Log::Log4perl;
-#use Apache2::RequestUtil;
 use JSON;
 use HTML::Entities qw(encode_entities);
+use Log::Log4perl;
 
 =head1 NAME 
 
@@ -162,8 +161,8 @@ The message you wish to add to the log.
 sub debug {
 	my $self = shift;
 	my $message = shift;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
-	$self->getLogger->debug($message);
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
+	$self->getLogger->({ level => 'debug', message => $message });
     $self->{_debug_debug} .= $message."\n";
 }
 
@@ -198,9 +197,9 @@ The message you wish to add to the log.
 sub error {
 	my $self = shift;
 	my $message = shift;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
-	$self->getLogger->error($message);
-	$self->getLogger->debug("Stack trace for ERROR ".$message."\n".$self->getStackTrace());
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
+	$self->getLogger->({ level => 'error', message => $message});
+	$self->getLogger->({ level => 'debug', message => "Stack trace for ERROR ".$message."\n".$self->getStackTrace() });
         $self->{_debug_error} .= $message."\n";
 }
 
@@ -221,11 +220,11 @@ sub fatal {
 	my $self = shift;
 	my $message = shift;
 
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
 	$self->session->http->setStatus("500","Server Error");
 	$self->session->response->content_type('text/html') if ($self->session->response);
-	$self->getLogger->fatal($message);
-	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
+	$self->getLogger->({ level => 'fatal', message => $message });
+	$self->getLogger->({ level => 'debug', message => "Stack trace for FATAL ".$message."\n".$self->getStackTrace() });
 	$self->session->http->sendHeader if ($self->session->response);
 
 	if (! defined $self->session->db(1)) {
@@ -262,7 +261,7 @@ Returns a reference to the logger.
 
 sub getLogger {
 	my $self = shift;
-	return $self->{_logger};
+	return $self->session->request->logger;
 }
 
 
@@ -302,8 +301,8 @@ The message you wish to add to the log.
 sub info {
 	my $self = shift;
 	my $message = shift;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
-	$self->getLogger->info($message);
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
+	$self->getLogger->({ level => 'info', message => $message });
         $self->{_debug_info} .= $message."\n";
 }
 
@@ -322,9 +321,7 @@ An active WebGUI::Session object.
 sub new {
 	my $class = shift;
 	my $session = shift;
-    Log::Log4perl->init_once( $session->config->getWebguiRoot."/etc/log.conf" );   
-	my $logger = Log::Log4perl->get_logger($session->config->getFilename);
-	bless {_queryCount=>0, _logger=>$logger, _session=>$session}, $class;
+	bless {_queryCount=>0, _session=>$session}, $class;
 }
 
 #----------------------------------------------------------------------------
@@ -357,7 +354,7 @@ A sql statement string.
 
 sub query {
 	my $self = shift;
-    return unless $self->canShowDebug || $self->getLogger->is_debug;
+    return unless $self->canShowDebug; # TODO - re-enable || $self->getLogger->is_debug;
 	my $query = shift;
 	my $placeholders = shift;
 	$self->{_queryCount}++;
@@ -378,8 +375,8 @@ sub query {
     $query =~ s/^/  /gms;
     $self->{_debug_debug} .= sprintf "query %d - %s(%s) :\n%s%s\n",
         $self->{_queryCount}, (caller($depth + 1))[3,2], $query, $plac;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + $depth + 1;
-    $self->getLogger->debug("query $self->{_queryCount}:\n$query$plac");
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + $depth + 2;
+    $self->getLogger->({ level => 'debug', message => "query $self->{_queryCount}:\n$query$plac" });
 }
 
 
@@ -470,8 +467,8 @@ The message you wish to add to the log.
 sub warn {
 	my $self = shift;
 	my $message = shift;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
-	$self->getLogger->warn($message);
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
+	$self->getLogger->({ level => 'warn', message => $message });
         $self->{_debug_warn} .= $message."\n";
 }
 

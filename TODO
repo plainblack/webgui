@@ -1,6 +1,5 @@
 TODO
 * Deprecate WebGUI::Session::HTTP - replace with WebGUI::Request/Response
-* Turn logger into $self->request->env->{'psgi.errors'}->print(join '', @stuff);
 
 DONE
 * $session->request is now a Plack::Request object
@@ -9,6 +8,7 @@ DONE
 * urlHandler API changed - no longer gets server, config
 * Streaming response body
 * Delete lib/WebGUI/URL and replace with new Middleware(s)
+* Mostly decoupled WebGUI from Log4perl
 
 NB
 * Periodically do a big stress-test and check for leaks, mysql overload etc..

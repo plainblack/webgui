@@ -7,6 +7,7 @@ my $wg = WebGUI->new( root => '/data/WebGUI', site => 'dev.localhost.localdomain
 
 builder {
     enable 'Debug', panels => [ qw(Environment Response Timer Memory Session DBITrace PerlConfig Response) ];
+    enable 'Log4perl', category => 'mysite', conf => $wg->config->getWebguiRoot . '/etc/log.conf';
     
     # Open/close the WebGUI::Session at the outer-most onion layer
     enable '+WebGUI::Middleware::Session', config => $wg->config;
