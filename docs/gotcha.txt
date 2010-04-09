@@ -13,11 +13,9 @@ save you many hours of grief.
    code, chances are you'll need to update it to make it work with
    WebGUI 8.
 
- * WebGUI now requires memcached.
-
- * WebGUI now requires the following Perl Modules:
-	- Memcached::libmemcached (0.3102)
-
+ * WebGUI now requires the following modules
+    - Moose
+    - CHI
 
 7.8.0
 --------------------------------------------------------------------
