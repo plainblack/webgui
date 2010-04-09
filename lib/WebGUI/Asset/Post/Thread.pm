@@ -191,9 +191,9 @@ to update the Thread with the lastPost information.
 
 =cut
 
-sub duplicateBranch {
+override duplicateBranch => sub {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicateBranch(@_);
+	my $newAsset = super();
 
 	foreach my $post (@{$newAsset->getPosts}) {
 		$post->rethreadUnder($newAsset);
@@ -201,7 +201,7 @@ sub duplicateBranch {
 	$newAsset->normalizeLastPost;
 
 	return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -235,13 +235,13 @@ and next threads, and to delete the parent CS.
 
 =cut
 
-sub DESTROY {
+override DESTROY => sub {
 	my $self = shift;
 	return undef unless defined $self;
 	$self->{_next}->DESTROY if (defined $self->{_next});
 	$self->{_previous}->DESTROY if (defined $self->{_previous});
-	$self->SUPER::DESTROY;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -657,15 +657,15 @@ Extend the base method from Post to process the karmaScale.
 
 =cut
 
-sub postProcess {
+override postProcess => sub {
 	my $self = shift;
 	if ($self->getParent->canEdit) {
 		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->defaultKarmaScale;
 		my $karmaRank = $self->karma/$karmaScale;
 		$self->update({karmaScale=>$karmaScale, karmaRank=>$karmaRank});
 	}
-	$self->SUPER::postProcess;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -675,7 +675,7 @@ Extend the base method to do captcha processing.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self = shift;
 
     if ($self->isNew && $self->getParent->useCaptcha) {
@@ -684,8 +684,8 @@ sub processPropertiesFromFormPost {
         return [ 'invalid captcha' ] unless $captchaOk;
     }
 
-    return $self->SUPER::processPropertiesFromFormPost;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -718,12 +718,12 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 
 =cut
 
-sub rate {
+override rate => sub {
 	my $self = shift;
 	my $rating = shift;
 	return undef unless ($rating == -1 || $rating == 1);
 	return undef if $self->hasRated;
-	$self->SUPER::rate($rating);
+	super();
 
 	##Thread specific karma adjustment for CS
 	if ($self->session->setting->get("useKarma")) {
@@ -733,7 +733,7 @@ sub rate {
 		$rater->karma(-$self->getParent->karmaSpentToRate,"collaboration rating","spent karma to rate post ".$self->getId);
 	}
 
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -848,9 +848,9 @@ Moves thread to the trash and updates reply counter on thread.
 
 =cut
 
-sub trash {
+override trash => sub {
     my $self = shift;
-    $self->SUPER::trash;
+    super();
     $self->getParent->sumReplies;
     if ($self->getParent->lastPostId eq $self->getId) {
         my $parentLineage = $self->getThread->lineage;
@@ -864,7 +864,7 @@ sub trash {
             $self->getParent->setLastPost('','');
         }
     }
-}
+};
 
 
 #-------------------------------------------------------------------
