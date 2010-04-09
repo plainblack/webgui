@@ -15,6 +15,7 @@ use Test::Deep;
 use Test::Exception;
 use WebGUI::Test;
 use WebGUI::Utility;
+use Data::Dumper;
 
 sub assetUiLevel {
     return 1;
@@ -26,6 +27,20 @@ sub list_of_tables {
 
 sub parent_list {
     return [];
+}
+
+sub getAnchoredAsset {
+    my $test    = shift;
+    my $session = $test->session;
+    my $tag     = WebGUI::VersionTag->getWorking($session);
+    my @parents = $test->getMyParents;
+    my $asset   = $parents[-1]->addChild({
+        className => $test->class,
+    }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
+    WebGUI::Test->addToCleanup($asset);
+    $tag->commit;
+    WebGUI::Test->addToCleanup($tag);
+    return ($tag, $asset, @parents);
 }
 
 sub getMyParents {
@@ -58,6 +73,7 @@ sub _constructor : Test(4) {
     $asset = eval { WebGUI::Asset->new($session, ''); };
     my $e = Exception::Class->caught;
     isa_ok $e, 'WebGUI::Error';
+
 }
 
 sub title : Test(6) {
@@ -195,14 +211,7 @@ sub write_update : Test(8) {
 sub keywords : Test(3) {
     my $test    = shift;
     my $session = $test->session;
-    my $tag = WebGUI::VersionTag->getWorking($session);
-    my @parents = $test->getMyParents;
-    my $asset   = $parents[-1]->addChild({
-        className => $test->class,
-    }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
-    WebGUI::Test->addToCleanup($asset);
-    $tag->commit;
-    WebGUI::Test->addToCleanup($tag);
+    my ($tag, $asset, @parents) = $test->getAnchoredAsset();
     can_ok $asset, 'keywords';
     $asset->keywords('chess set');
     is $asset->keywords, 'chess set', 'set and get of keywords via direct accessor';
@@ -298,6 +307,21 @@ sub scan_properties : Test(1) {
     }
     ok !@undefined_tables, "all properties have tables defined"
         or diag "except these: ".join ", ", @undefined_tables;
+}
+
+sub purge : Test(3) {
+    note "purge";
+    my $test    = shift;
+    my $session = $test->session;
+    my ($tag, $asset, @parents) = $test->getAnchoredAsset();
+    my @tables = $asset->meta->get_tables;
+    ok $asset->purge, 'purge returns true if it was purged';
+    throws_ok { WebGUI::Asset->newById($session, $asset->assetId); } 'WebGUI::Error::InvalidParam', 'Unable to fetch asset by assetId now';
+    my $exists_in_table = 0;
+    foreach my $table (@tables) {
+        $exists_in_table ||= $session->db->quickScalar("select count(*) from `$table` where assetId=?",[$asset->assetId]);
+    }
+    ok ! $exists_in_table, 'assetId removed from all asset tables';
 }
 
 
