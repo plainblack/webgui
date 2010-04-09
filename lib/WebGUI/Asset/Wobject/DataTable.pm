@@ -16,7 +16,7 @@ use strict;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-define assetName         => ['assetName', 'Asset_EMSRibbon'];
+define assetName         => ['assetName', 'Asset_DataTable'];
 define icon              => 'DataTable.gif';
 define tableName         => 'DataTable';
 property data => (
