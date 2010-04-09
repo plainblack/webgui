@@ -450,7 +450,7 @@ the calendar, or the group that can edit events in the calendar).
 
 =cut
 
-override canAddEvent => sub {
+sub canAddEvent {
     my $self    = shift;
     my $userId  = shift;
 
@@ -461,9 +461,9 @@ override canAddEvent => sub {
 
     return 1 if (
         $user->isInGroup( $self->groupIdEventEdit ) 
-        || super();
+        || $self->SUPER::canEdit($userId)
     );
-};
+}
 
 #----------------------------------------------------------------------------
 
