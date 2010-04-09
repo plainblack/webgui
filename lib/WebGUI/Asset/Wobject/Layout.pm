@@ -362,7 +362,7 @@ of the page, by lineage.
 
 =cut
 
-sub getContentLastModified {
+override getContentLastModified => sub {
     # Buggo: this is a little too conservative.  Children that are hidden maybe shouldn't count.  Hm.
     my $self = shift;
     my $mtime = super();
@@ -371,7 +371,7 @@ sub getContentLastModified {
         $mtime = $child_mtime if ($child_mtime > $mtime);
     }
     return $mtime;
-}
+};
 
 #-------------------------------------------------------------------
 
