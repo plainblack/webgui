@@ -1,6 +1,7 @@
 
 #wrapper {
     margin-left: 160px; /* move out of the adminbar's way */
+    min-width:   850px; /* min width for 1024x browsers */
 }
 
 #versionTag {
@@ -26,7 +27,66 @@
 }
 
 #locationBar {
+    position: relative;
     height: 2em;
+    padding: 5px 0;
+    background: url( /extras/admin/locationbar-back.png );
+}
+
+#locationBar .yui-button { 
+    margin: auto 2px;
+}
+
+#locationBar .yui-button button, 
+#locationBar .yui-button a,
+#locationBar .yui-button a:visited 
+{
+    padding:    2px 5px;
+    line-height: 1.5;
+    min-height: 1.5em;
+}
+
+#locationBar #left {
+    position:   absolute;
+    width:      8%;
+    top:        5px;
+    left:       0;
+}
+
+#locationBar #right {
+    position:   absolute;
+    width:      8%;
+    top:        5px;
+    right:      0;
+}
+
+#locationBar #location {
+    position:   relative;
+    margin:     auto 7%;
+    width:      83%;
+    height:     80%;
+    border: 1px solid #333;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+#locationBar #locationUrl { 
+    width: 99%;
+    height: 90%;
+    border: none;
+    font: 14px Verdana, sans-serif;
+}
+
+#locationBar #locationTitle {
+    display: block;
+    position: absolute;
+    top:   3px;
+    right: 0px;
+    height: 90%;
+    margin-right: 5px;
+    font: 14px Verdana, sans-serif;
+    text-align: right;
 }
 
 #tabs {
