@@ -190,11 +190,11 @@ Extends the base class to add Tax information for the Sku, in a new tab.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
 
-    my $tabform = $self->SUPER::getEditForm;
+    my $tabform = super();
 
     my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
     my $definition  = $taxDriver->skuFormDefinition;
@@ -210,7 +210,7 @@ sub getEditForm {
     }
 
     return $tabform;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -220,11 +220,11 @@ Not to be modified, just defines a new tab.
 
 =cut
 
-sub getEditTabs {
+override getEditTabs => sub {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Sku");
-	return ($self->SUPER::getEditTabs(), ['shop', $i18n->get('shop'), 9]);
-}
+	return (super(), ['shop', $i18n->get('shop'), 9]);
+};
 
 #-------------------------------------------------------------------
 
@@ -571,10 +571,10 @@ Extends the base class to process the tax data.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self = shift;
 
-    my $output = $self->SUPER::processPropertiesFromFormPost( @_ );
+    my $output = super();
 
     my $taxDriver = WebGUI::Shop::Tax->new( $self->session )->getDriver;
     $self->session->log->fatal( 'Could not instanciate tax driver.' ) unless $taxDriver;
@@ -582,7 +582,7 @@ sub processPropertiesFromFormPost {
     $self->setTaxConfiguration( $taxDriver->className, $taxDriver->processSkuFormPost );
 
     return $output;
-}
+};
 
 #-------------------------------------------------------------------
 

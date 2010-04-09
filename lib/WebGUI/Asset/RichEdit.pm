@@ -204,9 +204,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session,'Asset_RichEdit');
 	my %buttons;
 	tie %buttons, "Tie::IxHash";
@@ -441,7 +441,7 @@ sub getEditForm {
         name        => "allowMedia",
     );
 	return $tabform;
-}
+};
 
 
 
@@ -477,11 +477,11 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 =cut
 
-sub getToolbar {
+override getToolbar => sub {
 	my $self = shift;
 	return undef if ($self->getToolbarState);
-	return $self->SUPER::getToolbar();
-}
+	return super();
+};
 
 
 

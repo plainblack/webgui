@@ -174,14 +174,14 @@ Extra Head Tags.
 
 =cut
 
-sub drawExtraHeadTags {
-	my ($self, $params) = @_;
+override drawExtraHeadTags => sub {
+	my ($self) = @_;
     if ($self->namespace eq 'style') {
         my $i18n = WebGUI::International->new($self->session);
         return $i18n->get(881);
     }
-    return $self->SUPER::drawExtraHeadTags($params);
-}
+    return super();
+};
 
 
 #-------------------------------------------------------------------
@@ -208,12 +208,12 @@ Override to add attachments to package data
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
     my ( $self ) = @_;
-    my $data    = $self->SUPER::exportAssetData;
+    my $data    = super();
     $data->{template_attachments} = $self->getAttachments;
     return $data;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -262,9 +262,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
 	$tabform->hidden({
 		name=>"returnUrl",
@@ -392,7 +392,7 @@ sub getEditForm {
 	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
 
 	return $tabform;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -481,12 +481,12 @@ Override to import attachments
 
 =cut
 
-sub importAssetCollateralData {
+override importAssetCollateralData => sub {
     my ( $self, $data, @args ) = @_;
     $self->removeAttachments;
     $self->addAttachments( $data->{template_attachments} );
-    return $self->SUPER::importAssetCollateralData( $data, @args );
-}
+    return super();
+};
     
 #-------------------------------------------------------------------
 
@@ -620,9 +620,9 @@ Extends the master class to handle template parsers, namespaces and template att
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
     # TODO: Perhaps add a way to check template syntax before it blows stuff up?
     my %data;
     my $needsUpdate = 0;
@@ -668,7 +668,7 @@ sub processPropertiesFromFormPost {
     $self->addAttachments(\@add);
 
     return;
-}
+};
 
 #-------------------------------------------------------------------
 

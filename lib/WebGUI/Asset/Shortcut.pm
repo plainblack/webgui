@@ -242,9 +242,9 @@ Extend the base method to duplicate shortcut overrides.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self = shift;
-    my $newAsset = $self->SUPER::duplicate(@_);
+    my $newAsset = super();
     $self->session->db->write(<<'END_SQL', [$newAsset->getId, $self->getId]);
 INSERT INTO Shortcut_overrides (assetId, fieldName, newValue)
 SELECT ?, fieldName, newValue
@@ -252,7 +252,7 @@ FROM Shortcut_overrides
 WHERE assetId = ?
 END_SQL
     return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -278,9 +278,9 @@ Extend the base class to handle hand drawing the query build and other pieces.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $originalTemplate;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my $shortcut = $self->getShortcut;
@@ -355,7 +355,7 @@ sub getEditForm {
 		);
 	}
 	return $tabform;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -814,13 +814,13 @@ the scratch variables, and to uncache the overrides.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
 	my $scratchId = "Shortcut_" . $self->getId;
 	$self->session->scratch->delete($scratchId);
 	$self->uncacheOverrides;
-}
+};
 
 #----------------------------------------------------------------------------
 

@@ -355,13 +355,14 @@ The url of the post
 
 =cut
 
-sub fixUrl {
-	my $self = shift;
-	my $url = shift;
-	$url =~ s/\./_/g;
+around fixUrl => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $url = shift;
+    $url =~ s/\./_/g;
 
-	$self->SUPER::fixUrl($url);
-}
+    $self->$orig($url);
+};
 
 #-------------------------------------------------------------------
 
@@ -1035,9 +1036,9 @@ non-sticky, locking and unlocking posts.  Calls postProcess when it is done.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;	
+	super();
     my $session = $self->session;
     my $form    = $session->form;
 	my $i18n = WebGUI::International->new($session);
@@ -1067,7 +1068,7 @@ sub processPropertiesFromFormPost {
     }
 	delete $self->{_storageLocation};
 	$self->postProcess;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -1112,15 +1113,6 @@ sub postProcess {
 	}
 	$self->setSize($size);
 }
-
-#-------------------------------------------------------------------
-
-#sub publish {
-#	my $self = shift;
-#	$self->SUPER::publish(@_);
-#
-#	$self->getThread->sumReplies;
-#}
 
 #-------------------------------------------------------------------
 
@@ -1223,12 +1215,12 @@ the thread rating.
 
 =cut
 
-sub restore {
+override restore => sub {
     my $self = shift;
-    $self->SUPER::restore(@_);
+    super();
     $self->getThread->sumReplies;
     $self->getThread->updateThreadRating;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -1262,12 +1254,12 @@ An asset object to make the parent of this asset.
 
 =cut
 
-sub setParent {
+override setParent => sub {
     my $self = shift;
     my $newParent = shift;
     return 0 unless ($newParent->isa('WebGUI::Asset::Post'));
-    return $self->SUPER::setParent($newParent);
-}
+    return super();
+};
 
 
 #-------------------------------------------------------------------
@@ -1307,9 +1299,9 @@ Moves post to the trash, updates reply counter on thread and recalculates the th
 
 =cut
 
-sub trash {
+override trash => sub {
     my $self = shift;
-    $self->SUPER::trash;
+    super();
     $self->getThread->sumReplies if ($self->isReply);
     $self->getThread->updateThreadRating;
     if ($self->getThread->lastPostId eq $self->getId) {
@@ -1326,7 +1318,7 @@ sub trash {
             order by creationDate desc",[$forumLineage.'%', $self->getId]);
         $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
     }
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -1691,7 +1683,7 @@ We're extending www_editSave() here to deal with editing a post that has been de
 
 =cut
 
-sub www_editSave {
+override www_editSave => sub {
     my $self = shift;
     my $assetId = $self->session->form->param("assetId");
     if($assetId eq "new" && $self->getThread->getParent->useCaptcha) {
@@ -1715,12 +1707,12 @@ sub www_editSave {
             }
         }
     }
-    my $output = $self->SUPER::www_editSave();
+    my $output = super();
     if ($currentTag) { # Go back to our original tag
         $currentTag->setWorking;
     }
     return $output;
-}
+};
 
 #-------------------------------------------------------------------
 

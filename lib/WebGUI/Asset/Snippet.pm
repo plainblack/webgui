@@ -172,11 +172,11 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 =cut
 
-sub getToolbar {
+override getToolbar => sub {
 	my $self = shift;
 	return undef if ($self->getToolbarState);
-	return '<p>'.$self->SUPER::getToolbar().'</p>';
-}
+	return '<p>'.super().'</p>';
+};
 
 #-------------------------------------------------------------------
 
