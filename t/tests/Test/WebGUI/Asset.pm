@@ -324,13 +324,19 @@ sub purge : Test(3) {
     ok ! $exists_in_table, 'assetId removed from all asset tables';
 }
 
-sub cut : Test(2) {
+sub cut_paste : Test(4) {
     note "cut";
     my $test    = shift;
     my $session = $test->session;
     my ($tag, $asset, @parents) = $test->getAnchoredAsset();
     ok $asset->cut, 'cut returns true if it was cut';
     is $asset->state, 'clipboard', 'asset state updated';
+    my $session_asset = $session->asset();
+    $session->asset($parents[-1]);
+    ok $parents[-1]->paste($asset->assetId), 'paste returns true when it pastes';
+    $asset_prime = $asset->cloneFromDb;
+    is $asset_prime->state, 'published', 'asset state updated';
+    $session->asset($session_asset);
 }
 
 
