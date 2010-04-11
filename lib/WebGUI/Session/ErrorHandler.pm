@@ -19,6 +19,7 @@ use strict;
 use JSON;
 use HTML::Entities qw(encode_entities);
 use Log::Log4perl;
+use WebGUI::Exception;
 
 =head1 NAME 
 
@@ -221,33 +222,43 @@ sub fatal {
 	my $message = shift;
 
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
-	$self->session->http->setStatus("500","Server Error");
-	$self->session->response->content_type('text/html') if ($self->session->response);
 	$self->getLogger->({ level => 'fatal', message => $message });
 	$self->getLogger->({ level => 'debug', message => "Stack trace for FATAL ".$message."\n".$self->getStackTrace() });
-	$self->session->http->sendHeader if ($self->session->response);
 
+    my $error;
 	if (! defined $self->session->db(1)) {
 		# We can't even _determine_ whether we can show the debug text.  Punt.
-		$self->session->output->print("<h1>Fatal Internal Error</h1>");
+		$error = q{<h1>Fatal Internal Error</h1>};
 	} 
 	elsif ($self->canShowDebug()) {
-		$self->session->output->print("<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n",1);
-		$self->session->output->print("<p>".$message."</p>\n",1);
-		$self->session->output->print("<pre>" . encode_entities($self->getStackTrace) . "</pre>", 1);
-		$self->session->output->print($self->showDebug(),1);
+	    my $stack = encode_entities($self->getStackTrace);
+	    my $debug = $self->showDebug();
+		$error = <<END_HTML;
+<h1>WebGUI Fatal Error</h1>
+<p>Something unexpected happened that caused this system to fault.</p>
+<p>$message</p>
+<pre>$stack</pre>
+$debug
+END_HTML
 	} 
 	else {
 		# NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
-		$self->session->output->print("<h1>Problem With Request</h1>
-		We have encountered a problem with your request. Please use your back button and try again.
-		If this problem persists, please contact us with what you were trying to do and the time and date of the problem.<br />",1);
-		$self->session->output->print('<br />'.$self->session->setting->get("companyName"),1);
-		$self->session->output->print('<br />'.$self->session->setting->get("companyEmail"),1);
-		$self->session->output->print('<br />'.$self->session->setting->get("companyURL"),1);
+		my $company = $self->session->setting->get("companyName");
+		my $email = $self->session->setting->get("companyEmail");
+		my $url = $self->session->setting->get("companyURL");
+		
+		$error = <<END_HTML;
+<h1>Problem With Request</h1>
+We have encountered a problem with your request. Please use your back button and try again.
+If this problem persists, please contact us with what you were trying to do and the time and date of the problem.<br />
+<br />$company
+<br />$email
+<br />$url
+END_HTML
 	}
-	$self->session->close();
-    last WEBGUI_FATAL;
+	
+	# Fatal errors cause an exception to be thrown
+	WebGUI::Error->throw( error => $error );
 }
 
 

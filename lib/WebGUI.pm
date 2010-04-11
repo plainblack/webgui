@@ -220,7 +220,7 @@ sub handle {
             # non-empty output should be used as the response body
             elsif (defined $output && $output ne "") {
                 # Auto-set the headers
-                $session->http->sendHeader; # TODO: should be renamed setHeader
+                $session->http->sendHeader;
                 
                 # Use contentHandler's return value as the output
                 $session->output->print($output);

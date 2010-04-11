@@ -3,8 +3,13 @@ use strict;
 use parent qw(Plack::Middleware);
 use WebGUI::Config;
 use WebGUI::Session;
+use Try::Tiny;
+use Plack::Middleware::StackTrace;
+use Plack::Middleware::Debug;
+use Plack::Middleware::HTTPExceptions;
+use Plack::Middleware::ErrorDocument;
 
-use Plack::Util::Accessor qw( config );
+use Plack::Util::Accessor qw( config error_docs );
 
 =head1 NAME
 
@@ -26,13 +31,39 @@ and not worry about closing it.
 sub call {
     my ( $self, $env ) = @_;
 
+    my $app   = $self->app;
     my $config = $self->config or die 'Mandatory config parameter missing';
 
-    # Open the Session
-    $env->{'webgui.session'} = WebGUI::Session->open( $config->getWebguiRoot, $config, $env );
+    my $session = try {
+        $env->{'webgui.session'} = WebGUI::Session->open( $config->getWebguiRoot, $config, $env );
+    };
+    
+    if (!$session) {
+        # We don't have access to a db connection to find out if the user is allowed to see
+        # a verbose error message or not, so resort to a generic Internal Server Error
+        # (using the error_docs mapping)
+        return Plack::Middleware::ErrorDocument->wrap( 
+            sub { [ 500, [], [] ] }, 
+            %{ $self->error_docs } )->($env);
+    }
+
+    my $debug = $session->log->canShowDebug;
+    if ($debug) {
+        $app = Plack::Middleware::StackTrace->wrap($app);
+        $app = Plack::Middleware::Debug->wrap( $app,
+            panels => [qw(Environment Response Timer Memory Session DBITrace PerlConfig Response)] );
+    }
+
+    # Turn exceptions into HTTP errors
+    $app = Plack::Middleware::HTTPExceptions->wrap($app);
+
+    # HTTP error document mapping
+    if ( !$debug && $self->error_docs ) {
+        $app = Plack::Middleware::ErrorDocument->wrap( $app, %{ $self->error_docs } );
+    }
 
     # Run the app
-    my $res = $self->app->($env);
+    my $res = $app->($env);
 
     # Use callback style response
     return $self->response_cb(
