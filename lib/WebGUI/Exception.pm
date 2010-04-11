@@ -264,6 +264,12 @@ use Exception::Class (
         description     => "Couldn't establish a connection.",
         fields          => [qw{ resource }],
         },
+     
+     
+     'WebGUI::Error::Fatal' => {
+        isa             => 'WebGUI::Error',
+        description     => "Fatal error that should be shown to all site visitors.",
+        },
 
 );
 

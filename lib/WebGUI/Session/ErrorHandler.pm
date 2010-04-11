@@ -257,8 +257,10 @@ If this problem persists, please contact us with what you were trying to do and 
 END_HTML
 	}
 	
-	# Fatal errors cause an exception to be thrown
-	WebGUI::Error->throw( error => $error );
+	# Fatal errors cause an exception to be thrown - use WebGUI::Error::Fatal so
+	# that WebGUI knows to show this error message to all site users (instead of showing
+	# non-debug users the generic error screen)
+	WebGUI::Error::Fatal->throw( error => $error );
 }
 
 

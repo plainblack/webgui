@@ -6,7 +6,7 @@ use WebGUI::Session;
 use Try::Tiny;
 use Plack::Middleware::StackTrace;
 use Plack::Middleware::Debug;
-use Plack::Middleware::HTTPExceptions;
+use WebGUI::Middleware::HTTPExceptions;
 use Plack::Middleware::ErrorDocument;
 
 use Plack::Util::Accessor qw( config error_docs );
@@ -31,20 +31,19 @@ and not worry about closing it.
 sub call {
     my ( $self, $env ) = @_;
 
-    my $app   = $self->app;
+    my $app = $self->app;
     my $config = $self->config or die 'Mandatory config parameter missing';
 
     my $session = try {
         $env->{'webgui.session'} = WebGUI::Session->open( $config->getWebguiRoot, $config, $env );
     };
-    
-    if (!$session) {
+
+    if ( !$session ) {
+
         # We don't have access to a db connection to find out if the user is allowed to see
         # a verbose error message or not, so resort to a generic Internal Server Error
         # (using the error_docs mapping)
-        return Plack::Middleware::ErrorDocument->wrap( 
-            sub { [ 500, [], [] ] }, 
-            %{ $self->error_docs } )->($env);
+        return Plack::Middleware::ErrorDocument->wrap( sub { [ 500, [], [] ] }, %{ $self->error_docs } )->($env);
     }
 
     my $debug = $session->log->canShowDebug;
@@ -55,7 +54,7 @@ sub call {
     }
 
     # Turn exceptions into HTTP errors
-    $app = Plack::Middleware::HTTPExceptions->wrap($app);
+    $app = WebGUI::Middleware::HTTPExceptions->wrap($app);
 
     # HTTP error document mapping
     if ( !$debug && $self->error_docs ) {

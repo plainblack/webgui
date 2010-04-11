@@ -13,8 +13,8 @@ builder {
     
     # Open/close the WebGUI::Session at the outer-most onion layer
     enable '+WebGUI::Middleware::Session', 
-        config => $wg->config;#,
-        #error_docs => { 500 => "$root/www/maintenance.html" };
+        config => $wg->config,
+        error_docs => { 500 => "$root/www/maintenance.html" };
     
     # Return the app
     $wg;
