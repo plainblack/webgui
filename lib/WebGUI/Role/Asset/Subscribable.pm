@@ -433,9 +433,8 @@ override purge => sub {
 
     my $group   = $self->getSubscriptionGroup();
     $group->delete if $group;
-    super();
 
-    return;
+    return super();
 };
 
 #----------------------------------------------------------------------------
