@@ -37,8 +37,10 @@ sub getAnchoredAsset {
     my $asset   = $parents[-1]->addChild({
         className => $test->class,
     }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
-    WebGUI::Test->addToCleanup($asset);
     $tag->commit;
+    foreach my $a ($asset, @parents) {
+        $a = $a->cloneFromDb;
+    }
     WebGUI::Test->addToCleanup($tag);
     return ($tag, $asset, @parents);
 }
