@@ -819,6 +819,10 @@ Example call:
             my ($class, $ident) = @_;
             return WebGUI::Storage->get($CLASS->session, $ident);
         },
+        'SQL' => sub {
+            my (undef, $sql) = @_;
+            return $CLASS->session->db->dbh->prepare($sql);
+        },
     );
 
     my %clone = (
@@ -898,6 +902,7 @@ Example call:
         'CODE' => sub {
             (shift)->();
         },
+        'SQL' => 'execute',
     );
 
     sub cleanupGuard {
