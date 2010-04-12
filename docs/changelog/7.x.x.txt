@@ -2,6 +2,7 @@
  - added #11477: No synopsis in asset now means no synopsis in search index
  - added #11007: Added drag'n'drop sorting in Gallery Album Edit View (Bernd Kalbfuß-Zimmermann)
  - added Better comment rating icons.
+ - fixed #11520: Wiki Locked
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
