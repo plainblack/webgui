@@ -27,9 +27,7 @@ sub WRITE {
         for ( my $i = 0; caller($i); $i++) {
             (my $package, undef, $line) = caller($i);
             next
-                if $package eq 'WebGUI::SQL';
-            next
-                if $package eq 'WebGUI::SQL::ResultSet';
+                if $package =~ /\A(?:WebGUI::SQL|DBI|DBD)(?:\z|::)/;
             ($sub) = (caller($i + 1))[3];
             last;
         }
