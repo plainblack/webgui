@@ -16,6 +16,9 @@ builder {
         config => $wg->config,
         error_docs => { 500 => "$root/www/maintenance.html" };
     
+    # This one uses the Session object, so it comes after WebGUI::Middleware::Session
+    enable '+WebGUI::Middleware::WGAccess', config => $wg->config;
+    
     # Return the app
     $wg;
 };
