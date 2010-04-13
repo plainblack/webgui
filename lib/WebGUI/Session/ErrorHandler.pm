@@ -274,7 +274,24 @@ Returns a reference to the logger.
 
 sub getLogger {
 	my $self = shift;
-	return $self->session->request->logger;
+	if ($self->session->request) {
+        return $self->session->request->logger;
+    } else {
+        
+        # Thanks to Plack, wG has been decoupled from Log4Perl
+        # However when called outside a web context, we currently still fall back to Log4perl
+        # (pending a better idea)
+        if (!$self->{_logger}) {
+            Log::Log4perl->init_once( $self->session->config->getWebguiRoot."/etc/log.conf" );   
+            my $logger = Log::Log4perl->get_logger($self->session->config->getFilename);
+            $self->{_logger} = sub {
+                my $args = shift;
+                my $level = $args->{level};
+                $logger->$level($args->{message});
+            };
+        }
+        return $self->{_logger};
+    }
 }
 
 

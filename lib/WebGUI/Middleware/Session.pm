@@ -8,6 +8,7 @@ use Plack::Middleware::StackTrace;
 use Plack::Middleware::Debug;
 use WebGUI::Middleware::HTTPExceptions;
 use Plack::Middleware::ErrorDocument;
+use Plack::Middleware::SimpleLogger;
 
 use Plack::Util::Accessor qw( config error_docs );
 
@@ -33,6 +34,11 @@ sub call {
 
     my $app = $self->app;
     my $config = $self->config or die 'Mandatory config parameter missing';
+    
+    # Logger fallback
+    if (!$env->{'psgix.logger'}) {
+        $app = Plack::Middleware::SimpleLogger->wrap( $app );
+    }
 
     my $session = try {
         $env->{'webgui.session'} = WebGUI::Session->open( $config->getWebguiRoot, $config, $env );
