@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 91; # increment this value for each test you create
+use Test::More tests => 94; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -494,16 +494,19 @@ my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'
 is ($snippet4->getId, $snippets[4]->getId, 'newByLineage returns correct Asset');
 
 $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
-is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: cached lookup');
+is ($snippet4->getId, $snippets[4]->getId, '... cached lookup');
 
 my $cachedLineage = $session->stow->get('assetLineage');
 delete $cachedLineage->{$snippet4->get('lineage')}->{id};
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
-is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing id cache forces lookup');
+is ($snippet4->getId, $snippets[4]->getId, '... failing id cache forces lookup');
 
 delete $cachedLineage->{$snippet4->get('lineage')}->{class};
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
-is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing class cache forces lookup');
+is ($snippet4->getId, $snippets[4]->getId, '... failing class cache forces lookup');
+
+is(WebGUI::Asset->newByLineage($session, 'notALineage'), undef, '... returns undef');
+ok(!exists $session->stow->get('assetLineage')->{assetLineage}, '... no entry for the bad lineage in stow');
 
 ####################################################
 #
@@ -533,6 +536,26 @@ $vTag2->commit;
 
 is($deepAsset[41]->getParent->getId, $deepAsset[40]->getId, 'addChild will not create an asset with a lineage deeper than 42 levels');
 like($WebGUI::Test::logger_warns, qr/Adding it as a sibling instead/, 'addChild logged a warning about deep assets');
+
+{
+    my $tag = WebGUI::VersionTag->getWorking($session);
+    addToCleanup($tag);
+    my $uncommittedParent = $root->addChild({
+        className   => "WebGUI::Asset::Wobject::Layout",
+        groupIdView => 7,
+        ownerUserId => 3,
+        title       => "Uncommitted Parent",
+    });
+    $tag->leaveTag;
+    my $parent = WebGUI::Asset->newPending($session, $uncommittedParent->getId);
+    my $floater = $parent->addChild({
+        className   => "WebGUI::Asset::Snippet",
+        groupIdView => 7,
+        ownerUserId => 3, #For coverage on addChild properties
+        title       => "Child of uncommitted parent",
+    });
+    is $parent->get('tagId'), $floater->get('tagId'), 'addChild: with uncommitted parent, adds child and puts it into the same tag as the parent';
+}
 
 TODO: {
     local $TODO = "Tests to make later";

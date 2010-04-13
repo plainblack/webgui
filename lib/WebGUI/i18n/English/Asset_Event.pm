@@ -35,6 +35,11 @@ our $I18N = {
 		lastUpdated	=> 1171067211,
 	},
 
+	'formSynopsis'	=> {
+		message		=> q|HTML form for entering or editing the Event Synopsis.|,
+		lastUpdated	=> 1171067211,
+	},
+
 	'formLocation'	=> {
 		message		=> q|HTML form for entering or editing the Event Location.|,
 		lastUpdated	=> 1171067211,
@@ -693,6 +698,127 @@ be useful, others may not.|,
     'The event end time must be after the event start time.' => {
         message     => q{The event end time must be after the event start time.},
         lastUpdated => 1204668000,
+    },
+
+    'No specific time' => {
+        message     => q{No specific time (all day event)},
+        lastUpdated => 1257188155,
+    },
+
+    'Specific start/end time' => {
+        message     => q{Specific start/end time},
+        lastUpdated => 1257188155,
+    },
+
+    'day' => {
+        message     => q{day},
+        lastUpdated => 1257188155,
+    },
+
+    'Daily' => {
+        message     => q{Daily},
+        lastUpdated => 1257188155,
+        context     => q{An event that occurs every day},
+    },
+
+    'Weekday(s)' => {
+        message     => q{Weekday(s)},
+        lastUpdated => 1257188155,
+        context     => q{May occur on one or more weekdays (Monday through Friday)},
+    },
+
+    'Weekly' => {
+        message     => q{Weekly},
+        lastUpdated => 1257188155,
+    },
+
+    'Monthly' => {
+        message     => q{Monthly},
+        lastUpdated => 1257188155,
+    },
+
+    'Yearly' => {
+        message     => q{Yearly},
+        lastUpdated => 1257188155,
+    },
+
+    'first' => {
+        message     => q{first},
+        lastUpdated => 1257188155,
+    },
+
+    'second' => {
+        message     => q{second},
+        lastUpdated => 1257188155,
+    },
+
+    'third' => {
+        message     => q{third},
+        lastUpdated => 1257188155,
+    },
+
+    'fourth' => {
+        message     => q{fourth},
+        lastUpdated => 1257188155,
+    },
+
+    'last' => {
+        message     => q{last},
+        lastUpdated => 1257188155,
+    },
+
+    'of' => {
+        message => 'of',
+        lastUpdated => 0,
+    },
+
+    'No end' => {
+        message => 'No end',
+        lastUpdated => 0,
+    },
+
+    'By date' => {
+        message => 'By date',
+        lastUpdated => 0,
+    },
+
+    'After' => {
+        message => 'After',
+        lastUpdated => 0,
+    },
+
+    'occurences' => {
+        message => 'occurences',
+        lastUpdated => 0,
+    },
+
+    'Every' => {
+        message => 'Every',
+        lastUpdated => 0,
+    },
+
+    'Every N weeks on' => {
+        message => 'Every %s week(s) on',
+        lastUpdated => 0,
+        context => '%s is filled with an HTML Form control',
+    },
+
+    'Every N months on' => {
+        message => 'Every %s month(s) on',
+        lastUpdated => 0,
+        context => '%s is filled with an HTML Form control',
+    },
+
+    'Every N years on' => {
+        message => 'Every %s year(s) on',
+        lastUpdated => 0,
+        context => '%s is filled with an HTML Form control',
+    },
+
+    'week on' => {
+        message => 'week on',
+        lastUpdated => 0,
+        context => 'follows a select list with ordinals, first, second, etc.  To form the phrase, First week on, Second week on',
     },
 
 };

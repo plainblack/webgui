@@ -21,6 +21,7 @@ our $HELP = {
                 'required' => 1,
             },
             { 'name' => 'formMenuTitle', },
+            { 'name' => 'formSynopsis', },
             { 'name' => 'formLocation', },
             { 'name' => 'formDescription', },
             { 'name' => 'formGroupToView', },

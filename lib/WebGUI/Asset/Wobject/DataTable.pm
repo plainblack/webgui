@@ -102,7 +102,7 @@ sub getDataTemplateVars {
     my $self = shift;
 
     my $json = $self->getDataJson;
-    my $dt   = JSON->new->decode($json);
+    my $dt   = eval { JSON->new->decode($json) };
 
     # Make row data more friendly to templates
     my %cols = map { $_->{key} => $_ } @{ $dt->{columns} };
@@ -131,7 +131,8 @@ override getEditForm => sub {
     my $tabform = super();
 
     $tabform->getTab("data")->raw(
-        WebGUI::Form::DataTable->new(
+        q{<tr><td>}
+      . WebGUI::Form::DataTable->new(
             $self->session, {
                 name         => "data",
                 value        => $self->data,
@@ -139,6 +140,7 @@ override getEditForm => sub {
                 showEdit     => 1,
             }
             )->toHtml
+      . q{</td></tr>}
     );
 
     return $tabform;

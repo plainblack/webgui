@@ -33,8 +33,8 @@ our $I18N = {
     },
 
     'usps instructions' => {
-        lastUpdated => 1241028258,
-        message => q|<p>In order to use the USPS Shipping Driver, you must first register with the United States Postal Service as a <a href="https://secure.shippingapis.com/registration/">USPS Web Tools User</a>.  Fill out the form, submit it, and within a few days the USPS will send you a username and password to use this service.  Enter your username and password in the form fields below.</p><p>This driver supports three kinds of shipping with one preset size for each kind.  Package sizes, and shipping services outside of those choices, are currently not supported.</p><p>For the purpose of calculating weight, the weight property of a Product is considered to be in pounds.|,
+        lastUpdated => 1257399744,
+        message => q|<p>In order to use the USPS Shipping Driver, you must first register with the United States Postal Service as a <a href="https://secure.shippingapis.com/registration/">USPS Web Tools User</a>.  Fill out the form, submit it, and within a few days the USPS will send you a username and password to use this service.  After receiving your username, call 1-800-344-7779 to have the USPS authorize your username.  Enter your username and password in the form fields below.</p><p>This driver supports three kinds of shipping with one preset size for each kind.  Package sizes, and shipping services outside of those choices, are currently not supported.</p><p>For the purpose of calculating weight, the weight property of a Product is considered to be in pounds.|,
     },
 
     'ship type' => {
@@ -92,6 +92,30 @@ our $I18N = {
         message => q|Parcel Post, Regular size|,
         lastUpdated => 1242166045,
         context => q|Label for a type of shipping from the USPS.|,
+    },
+
+    'add insurance' => {
+        message => q|Ship with insurance?|,
+        lastUpdated => 1253988886,
+        context => q|Label for the edit screen.|,
+    },
+
+    'add insurance help' => {
+        message => q|If set to yes, the shipping plugin will ask the USPS for the cost of insuring this shipment.  The cost will be added to the total cost of shipping.  If insurance is not available, then the option to use this driver will not be presented to the user.|,
+        lastUpdated => 1253988884,
+        context => q|Label for a type of shipping from the USPS.|,
+    },
+
+    'insurance rates' => {
+        message => q|Insurance Rate Table|,
+        lastUpdated => 1253988886,
+        context => q|Label for the edit screen.|,
+    },
+
+    'insurance rates help' => {
+        message => q|Enter in one field per line with the format, value:cost.<br />value is the value of the contents.<br />cost is the cost of insurance at that value.<br />value and cost should look like numbers with a decimal point, like 0.50 or 1.00.<br />For values of contents inbetween points, use the next highest value.  If the value of the contents exceeds the highest listed value, it will use the cost of insurance at the highest listed value.|,
+        lastUpdated => 1257369016,
+        context => q|Help for the insurance rate field.|,
     },
 
 };

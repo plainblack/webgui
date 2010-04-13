@@ -76,12 +76,14 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
     my $self = shift;
-    my $sth = $self->session->db->read("select assetId from EventsCalendar_event where eventEndDate < ?", [time()-$self->get("trashAfter")]);
-    while (my ($id) = $sth->array) {
+    my $sth  = $self->session->db->read( "select assetId from Event where endDate < ?", [ time() - $self->get("trashAfter") ]);
+    my $finishTime = time() + $self->getTTL;
+    EVENT: while ( my ($id) = $sth->array ) {
         my $asset = eval { WebGUI::Asset::Event->newById($self->session, $id); };
-        if (! Exception::Class->caught() && $asset->get("eventEndDate") < time()-$self->get("trashAfter")) {
+        if (! Exception::Class->caught() && $asset->eventEndDate < time() - $self->trashAfter) {
             $asset->trash;
-        }	
+        }
+        last EVENT if time() > $finishTime;
     }
     $sth->finish;
     return $self->COMPLETE;

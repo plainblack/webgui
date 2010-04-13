@@ -820,6 +820,10 @@ Example call:
             my ($class, $ident) = @_;
             return WebGUI::Storage->get($CLASS->session, $ident);
         },
+        'SQL' => sub {
+            my (undef, $sql) = @_;
+            return $CLASS->session->db->dbh->prepare($sql);
+        },
     );
 
     my %clone = (
@@ -896,6 +900,10 @@ Example call:
             my $link = shift;
             $link->session->db->write("delete from ldapLink where ldapLinkId=?", [$link->{ldapLinkId}]);
         },
+        'CODE' => sub {
+            (shift)->();
+        },
+        'SQL' => 'execute',
     );
 
     sub cleanupGuard {
@@ -907,9 +915,9 @@ Example call:
             my $construct;
             if ( ref $class ) {
                 my $object = $class;
+                $class = ref $class;
                 my $cloneSub = $CLASS->_findByIsa($class, \%clone);
                 $construct = $cloneSub ? sub { $object->$cloneSub } : sub { $object };
-                $class = ref $class;
             }
             else {
                 my $id = shift;
@@ -959,7 +967,7 @@ sub _findByIsa {
     my $toFind = shift;
     my $hash = shift;
     for my $key ( sort { length $b <=> length $a} keys %$hash ) {
-        if ($toFind->isa($key)) {
+        if ($toFind eq $key || $toFind->isa($key)) {
             return $hash->{$key};
         }
     }

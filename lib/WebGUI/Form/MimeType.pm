@@ -104,6 +104,8 @@ sub toHtml {
 	foreach ('text/html','text/css','text/javascript','text/plain','text/xml','application/xml') {
 	    $mimeTypes->{$_}=$_;
 	} 
+    my $value            = $self->getOriginalValue();
+    $mimeTypes->{$value} = $value;
 	$self->set("options", $mimeTypes);
 	return $self->SUPER::toHtml();
 }

@@ -278,20 +278,6 @@ override getEditForm => sub {
 		".($ancestorsChecked ? "" : "toggleAncestorEndPoint();")."
 		//]]>
 		</script>");
-	my $previewButton;# = qq{
-                          # <INPUT TYPE="button" VALUE="Preview" NAME="preview"
-                          #  OnClick="
-                          #      window.open('', 'navPreview', 'toolbar=no,status=no,location=no,scrollbars=yes,resizable=yes');
-                          #      this.form.func.value='preview';
-                          #      this.form.target = 'navPreview';
-                          #      this.form.submit()">};
-	my $saveButton = ' <input type="button" class="forwardButton" value="'.$i18n->get(62,'WebGUI').'" onclick="
-		this.value=\''.$i18n->get(452,'WebGUI').'\';
-		this.form.func.value=\'editSave\';
-		this.form.target=\'_self\';
-		this.form.submit();
-		" />';
-	$tabform->{_submit} = $previewButton." ".$saveButton;
 	return $tabform;
 };
 

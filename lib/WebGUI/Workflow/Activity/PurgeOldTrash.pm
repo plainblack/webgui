@@ -78,9 +78,10 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
     my $self    = shift;
     my $session = $self->session;
-    my $sth     = $session->db->read("select assetId,className from asset where state='trash' and stateChanged < ?", [time() - $self->get("purgeAfter")]);
-    my $start   = time();
-    my $ttl     = $self->getTTL;
+    my $sth     = $session->db->read("select assetId,className from asset where state='trash' and stateChanged < ?",
+        [ time() - $self->get("purgeAfter") ]
+    );
+    my $expireTime = time() + $self->getTTL;
     ASSET: while (my ($id, $class) = $sth->array) {
         my $asset = eval { WebGUI::Asset->newById($session, $id); };
         if (Exception::Class->caught()) {
@@ -88,8 +89,8 @@ sub execute {
             next ASSET;
         }
         $asset->purge;
-        if (time() - $start > $ttl) { 
-            $session->log->info("Ran out of time processing"); 
+        if (time() > $expireTime) {
+            $session->log->info("Ran out of time processing");
             $sth->finish;
             return $self->WAITING(1);
         }

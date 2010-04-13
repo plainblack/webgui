@@ -98,8 +98,9 @@ to be displayed within the page style
 sub view {
 	my $self = shift;	
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
-		my $out = eval{$cache->get("view_".$self->getId)};
+    my $cacheKey = $self->getWwwCacheKey( 'view' );
+    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+        my $out = eval { $cache->get( $cacheKey ) };
 		return $out if $out;
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');
@@ -111,10 +112,10 @@ sub view {
 	$var{'submit'} = WebGUI::Form::Submit->new($self->session, {name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
 
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
-	}
-       	return $out;
+    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+        eval { $cache->set( $cacheKey, $out, $self->cacheTimeout) };
+    }
+    return $out;
 }
 
 #-------------------------------------------------------------------

@@ -33,7 +33,7 @@ WebGUI::Test->usersToDelete($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 47;        # Increment this number for each test you create
+plan tests => 48;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -114,6 +114,14 @@ my $newProfileField2 = WebGUI::ProfileField->create($session, 'testField2', {
 is($newProfileField2->get('fieldType'), 'ReadOnly', 'create: default fieldType is ReadOnly');
 is($newProfileField2->get('label'), q|WebGUI::International::get('webgui','WebGUI')|, 'getting raw label');
 is($newProfileField2->getLabel, 'WebGUI', 'getLabel will process safeEval calls for i18n');
+$newProfileField->delete;
+$newProfileField2->delete;
+
+$newProfileField = WebGUI::ProfileField->create($session, 'space field', {
+    fieldType => 'Float',
+    label     => 'Space Field',
+});
+is $newProfileField, undef, 'create returns undef if the field name contains white space';
 
 ###########################################################
 #
@@ -174,13 +182,4 @@ is ($newProfileField3->get('required'), 0, '... required = 0');
 $newProfileField3->set({ required => 1});
 is ($newProfileField3->get('required'), 1, 'set required = 1');
 is ($newProfileField3->get('editable'), 1, '... editable = 1');
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $newProfileField->delete;
-    $newProfileField2->delete;
-    $newProfileField3->delete;
-}
-
-
+$newProfileField3->delete;

@@ -34,9 +34,4 @@ plan tests => 1;        # Increment this number for each test you create
 # put your tests here
 
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
 #vim:ft=perl

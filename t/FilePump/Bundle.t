@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use Data::Dumper;
 use URI;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -33,17 +34,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  62;         # Increment this number for each test you create
-plan tests => 1 + $tests; # 1 for the use_ok
+plan tests => 64;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::FilePump::Bundle');
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::FilePump::Bundle', $tests unless $loaded;
+use WebGUI::FilePump::Bundle;
 
 my $bundle = WebGUI::FilePump::Bundle->create($session);
 isa_ok($bundle, 'WebGUI::FilePump::Bundle');
@@ -438,11 +434,20 @@ ok($bundle->get('otherFiles')->[1]->{lastModified}, '... updated OTHER directory
 $bundle->delete;
 ok(!-e $buildDir->stringify, 'delete deletes the current build directory');
 
-}
+###################################################################
+#
+# File checks
+#
+###################################################################
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $session->db->write('delete from filePumpBundle');
+##Test a number of files that live in WebGUI to make sure the minifiers do
+##the right job.  All paths are relative to the extras directory.
+
+my @jsFiles = qw/hoverhelp.js inputcheck.js/;
+
+foreach my $jsFile (@jsFiles) {
+    my $bundle = WebGUI::FilePump::Bundle->create($session);
+    $bundle->addFile('JS', 'file:extras/'.$jsFile);
+    lives_ok { $bundle->build } "built file $jsFile";
+    $bundle->delete;
 }
-#vim:ft=perl

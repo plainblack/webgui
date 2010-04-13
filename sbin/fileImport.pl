@@ -266,14 +266,15 @@ sub buildFileList {
 					exit 2;
 				}
 
+                my $filename = $session->url->urlize($file);
 				push(@filelist, {
 					ext=>$ext, 
-					filename=>$file, 
+					filename=>$filename, 
 					fullPathFile => $fullpathfile,
 				});
 
-				$filelisthash{$file} = $fullpathfile;
-				print "Found file $file.\n" unless ($quiet);
+				$filelisthash{$filename} = $fullpathfile;
+				print "Found file $file as $filename.\n" unless ($quiet);
 			}
 			# TB : the recursive call
 			push(@filelist, buildFileList($now,"$fullpathfile")) if ((-d "$fullpathfile") && $recursive);

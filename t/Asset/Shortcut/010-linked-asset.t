@@ -26,26 +26,14 @@ use WebGUI::Asset::Snippet;
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Shortcut Test"});
-addToCleanup;
 
-# Make a snippet to shortcut
-my $snippet 
-    = $node->addChild({
-        className       => "WebGUI::Asset::Snippet",
-    });
-
-my $shortcut
-    = $node->addChild({
-        className           => "WebGUI::Asset::Shortcut",
-        shortcutToAssetId   => $snippet->getId,
-    });
-
+my $snippet;
+my $shortcut;
+init();
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 9;
+plan tests => 11;
 
 #----------------------------------------------------------------------------
 # Test shortcut's link to original asset
@@ -69,7 +57,7 @@ is(
 #----------------------------------------------------------------------------
 # Test trashing snippet trashes shortcut also
 $snippet->trash;
-$shortcut   = WebGUI::Asset->newById($session, $shortcut->getId);
+$shortcut   = $shortcut->cloneFromDb();
 
 ok(
     defined $shortcut,
@@ -89,7 +77,7 @@ ok(
 #----------------------------------------------------------------------------
 # Test restoring snippet restores shortcut also
 $snippet->publish;
-$shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
+$shortcut   = $shortcut->cloneFromDb();
 
 ok( 
     defined $shortcut,
@@ -102,12 +90,74 @@ ok(
 );
 
 #----------------------------------------------------------------------------
+# Test purging snippet but keeping shortcut doesn't cause
+# getContentLastModified to generate an error; makes sure that
+# http://www.webgui.org/use/bugs/tracker/11052 stays fixed.
+$session->db->beginTransaction();
+$session->db->write("delete from assetData where assetId = ?",
+                    [$snippet->getId]);
+$session->db->write("delete from asset where assetId = ?",
+                    [$snippet->getId]);
+$session->db->write("delete from snippet where assetId = ?",
+                    [$snippet->getId]);
+$session->db->commit();
+
+my $contentLastModified;
+eval {
+    $contentLastModified = $shortcut->getContentLastModified();
+};
+
+is(
+    $contentLastModified, 0,
+    "Purged Linked Asset: getContentLastModified returns 0 when linked asset missing",
+);
+
+# re-init so further tests will work
+init();
+
+#----------------------------------------------------------------------------
+# Test purging snippet purges shortcut also, even when they're both in the trash
+
+# This will trash both the snippet and the shortcut (or else an earlier test failed)
+$snippet->trash();
+
+$snippet->purge();
+$shortcut   = $shortcut->cloneFromDb();
+
+ok(
+    !defined $shortcut,
+    "Purge Linked Asset: Shortcut is purged even though it's in the trash"
+);
+
+# re-init so further tests will work
+init();
+
+#----------------------------------------------------------------------------
 # Test purging snippet purges shortcut also
 $snippet->purge;
-$shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
+$shortcut   = $shortcut->cloneFromDb();
 
 ok( 
     !defined $shortcut,
     "Purge Linked Asset: Shortcut is not defined",
 );
 
+#----------------------------------------------------------------------------
+# init a new snippet and shortcut; handy to have in a sub because we destroy
+# them in some tests and need to reset them for the next round
+sub init {
+    my $versionTag      = WebGUI::VersionTag->getWorking($session);
+    $versionTag->set({name=>"Shortcut Test"});
+    WebGUI::Test->tagsToRollback($versionTag);
+    # Make a snippet to shortcut
+    $snippet 
+        = $node->addChild({
+            className       => "WebGUI::Asset::Snippet",
+        });
+
+    $shortcut
+        = $node->addChild({
+            className           => "WebGUI::Asset::Shortcut",
+            shortcutToAssetId   => $snippet->getId,
+        });
+}

@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::LoginToggle;
 use HTML::TokeParser;
 use Data::Dumper;
 
@@ -23,7 +24,7 @@ my $session = WebGUI::Test->session;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 $session->asset($homeAsset);
-my ($versionTag, $template) = setupTest($session, $homeAsset);
+my $template = setupTest($session, $homeAsset);
 
 my $i18n = WebGUI::International->new($session,'Macro_LoginToggle');
 
@@ -131,15 +132,7 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{parser} eq 'CODE');
 }
 
-$numTests += 1; #for the use_ok
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::LoginToggle';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
@@ -163,8 +156,6 @@ foreach my $testSet (@testSets) {
 	}
 }
 
-}
-
 sub simpleHTMLParser {
 	my ($text) = @_;
 	my $p = HTML::TokeParser->new(\$text);
@@ -179,8 +170,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
-	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
+	my ($url)   = $text =~ /HREF=(.+?)(\n?LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(\n?HREF|\Z)/;
 
 	return ($url, $label);
 }
@@ -205,11 +196,6 @@ sub setupTest {
 	};
 	my $template = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
-	return ($versionTag, $template);
-}
-
-END { ##Clean-up after yourself, always
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
+    addToCleanup($versionTag);
+	return ($template);
 }

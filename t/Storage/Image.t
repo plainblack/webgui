@@ -203,10 +203,10 @@ is($imageCopy->deleteFile('../../'), undef, 'deleteFile in Storage::Image also r
 ####################################################
 
 is($thumbStore->getThumbnailUrl(), '', 'getThumbnailUrl returns undef if no file is sent');
-is($WebGUI::Test::logger_error, q/Can't make a thumbnail url without a filename./, 'getThumbnailUrl logs an error message for not sending a filename');
+is($WebGUI::Test::logger_error, q/Can't find a thumbnail url without a filename./, 'getThumbnailUrl logs an error message for not sending a filename');
 
 is($thumbStore->getThumbnailUrl('round.png'), '', 'getThumbnailUrl returns undef if the requested file is not in the storage location');
-is($WebGUI::Test::logger_error, q/Can't make a thumbnail for a file named 'round.png' that is not in my storage location./, 'getThumbnailUrl logs an error message for not sending a filename');
+is($WebGUI::Test::logger_error, q/Can't find a thumbnail for a file named 'round.png' that is not in my storage location./, 'getThumbnailUrl logs an error message for not sending a filename');
 
 is($thumbStore->getThumbnailUrl('square.png'), $thumbStore->getUrl('thumb-square.png'), 'getThumbnailUrl returns the correct url');
 

@@ -296,6 +296,13 @@ sub www_editLDAPLink {
 		-hoverHelp =>$i18n->get("create account template description"),
 		);
 	$f->template(
+		-name      =>"ldapDeactivateAccountTemplate",
+		-value     =>$form->template("ldapDeactivateAccountTemplate") || $db{ldapDeactivateAccountTemplate},
+		-namespace =>"Auth/LDAP/Deactivate",
+		-label     =>$i18n->get("deactivate account template"),
+		-hoverHelp =>$i18n->get("deactivate account template description"),
+		);
+	$f->template(
 		-name      =>"ldapLoginTemplate",
 		-value     =>$form->template("ldapLoginTemplate") || $db{ldapLoginTemplate},
 		-namespace =>"Auth/LDAP/Login",
@@ -340,6 +347,7 @@ sub www_editLDAPLinkSave {
 	$properties->{ldapWelcomeMessage} = $session->form->textarea("ldapWelcomeMessage");
 	$properties->{ldapAccountTemplate} = $session->form->template("ldapAccountTemplate");
 	$properties->{ldapCreateAccountTemplate} = $session->form->template("ldapCreateAccountTemplate");
+	$properties->{ldapDeactivateAccountTemplate} = $session->form->template("ldapDeactivateAccountTemplate");
 	$properties->{ldapLoginTemplate} = $session->form->template("ldapLoginTemplate");
 	$session->db->setRow("ldapLink","ldapLinkId",$properties);
 	if($session->form->process("returnUrl")) {
@@ -361,16 +369,16 @@ links.  Each LDAP link is tested and the status of that test is returned.
 sub www_listLDAPLinks {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless canView($session);
-	my ($output, $p, $sth, $data, @row, $i);
 	my $i18n = WebGUI::International->new($session,"AuthLDAP");
 	my $returnUrl = "";
 	if ($session->form->process("returnUrl")) {
 		$returnUrl = ";returnUrl=".$session->url->escape($session->form->process("returnUrl"));
 	}
-	$sth = $session->db->read("select * from ldapLink order by ldapLinkName");
-	$row[$i] = '<tr><td valign="top" class="tableData">&nbsp;</td><td valign="top" class="tableData">'.$i18n->get("LDAPLink_1076").'</td><td>'.$i18n->get("LDAPLink_1077").'</td></tr>';
+	my $sth = $session->db->read("select * from ldapLink order by ldapLinkName");
+    my $i    = 0;
+    my @row  = ();
 	$i++;
-	while ($data = $sth->hashRef) {
+	while (my $data = $sth->hashRef) {
 		$row[$i] = '<tr><td valign="top" class="tableData">'
 			.$session->icon->delete('op=deleteLDAPLink;llid='.$data->{ldapLinkId},$session->url->page(),$i18n->get("LDAPLink_988"))
 			.$session->icon->edit('op=editLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
@@ -380,20 +388,27 @@ sub www_listLDAPLinks {
 	  
 		my $ldapLink = WebGUI::LDAPLink->new($session,$data->{ldapLinkId});
 		my $status = $i18n->get("LDAPLink_1078");
-		if ($ldapLink->bind) {
-			$status = $i18n->get("LDAPLink_1079");
-		} else {
-			$session->errorHandler->warn($ldapLink->getErrorMessage());
-		}
-		$ldapLink->unbind;
+        if ($ldapLink->bind && $ldapLink->getErrorCode == 0) {
+            $status = $i18n->get("LDAPLink_1079");
+            $ldapLink->unbind;
+        }
+        else {
+            $session->errorHandler->warn($ldapLink->getErrorMessage());
+            $status .= ": ".$ldapLink->getErrorMessage();
+        }
 		$row[$i] .= '<td valign="top" class="tableData">'.$status.'</td>';
 		$row[$i] .= '</tr>';
 		$i++;
 	}
 	$sth->finish;
-	$p = WebGUI::Paginator->new($session,$session->url->page('op=listLDAPLinks'));
+	my $p = WebGUI::Paginator->new($session,$session->url->page('op=listLDAPLinks'));
 	$p->setDataByArrayRef(\@row);
-	$output .= '<table border="1" cellpadding="3" cellspacing="0" align="center">';
+	my $output = qq{<table border="1" cellpadding="3" cellspacing="0" align="center">\n};
+    $output .= q{<tr><td valign="top" class="tableData">&nbsp;</td><td valign="top" class="tableData">}
+             . $i18n->get("LDAPLink_1076")
+             . q{</td><td>}
+             . $i18n->get("LDAPLink_1077")
+             . qq{</td></tr>\n};
 	$output .= $p->getPage;
 	$output .= '</table>';
 	$output .= $p->getBarTraditional;

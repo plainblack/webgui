@@ -143,13 +143,17 @@ sub view {
         value=>$keywords
     });
 	$var{'no_results'   } = $i18n->get("no results");
+    my $searchRoot = $self->searchRoot;
+    if (my $searchOverride = $form->get('searchroot', 'asset')) {
+        $searchRoot = $searchOverride;
+    }
 	
     if ($form->get("doit")) {
 		my $search = WebGUI::Search->new($session);
 		my %rules   = (
 			keywords =>$keywords, 
 			lineage  =>[
-                WebGUI::Asset->newById($session,$self->searchRoot)->get("lineage")
+                WebGUI::Asset->newById($session,$searchRoot)->get("lineage")
             ],
 		);
 		my @classes     = split("\n",$self->classLimiter);
@@ -157,7 +161,7 @@ sub view {
 		$search->search(\%rules);
 		
         #Instantiate the highlighter
-        my @words     = split(/\s+/,$keywords);
+        my @words     = grep { $_ ne '' } map { tr/+?*//d; $_; } split(/\s+/,$keywords);
         my @wildcards = map { "%" } @words;
         my $hl = HTML::Highlight->new(
             words     => \@words,
@@ -182,7 +186,8 @@ sub view {
             if (defined $asset) {
                 my $properties = $asset->get;
                 if ($self->useContainers) {
-                    $properties->{url} = $asset->getContainer->url;
+                    $properties->{url} = $asset->isa('WebGUI::Asset::Post::Thread') ? $asset->getCSLinkUrl()
+                                       :                                              $asset->getContainer->url;
                 }
                 #Add highlighting
                 $properties->{'title'               } = $hl->highlight($properties->{title} || '');

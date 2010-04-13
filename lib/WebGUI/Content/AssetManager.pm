@@ -20,17 +20,20 @@ Gets a select box to choose a class name.
 
 sub getClassSelectBox {
     my $session     = shift;
+    my $i18n        = WebGUI::International->new($session, 'Asset');
     
     tie my %classes, "Tie::IxHash", (
-        ""  => "Any Class", 
+        ""  => $i18n->get("Any Class"), 
         $session->db->buildHash("select distinct(className) from asset"),
     );
     delete $classes{"WebGUI::Asset"}; # don't want to search for the root asset
 
+    my $className = $session->form->process("class","className") || $session->scratch->get('assetManagerSearchClassName');
+    $session->scratch->set('assetManagerSearchClassName', $className);
     return WebGUI::Form::selectBox( $session, {
-        name            => "class", 
-        value           => $session->form->process("class","className"), 
-        defaultValue    => "", 
+        name            => "class",
+        value           => $className,
+        defaultValue    => "",
         options         => \%classes,
     });
 }
@@ -143,8 +146,10 @@ sub getSearchPaginator {
         $queryString    .= ';class=' . $class;
     }
 
-    my $p           = $s->getPaginatorResultSet( $session->url->page( $queryString ) );
+    my $pageNumber  = $session->form->get('pn') || $session->scratch->get('assetManagerSearchPageNumber');
+    my $p           = $s->getPaginatorResultSet( $session->url->page( $queryString ), undef, $pageNumber );
 
+    $session->scratch->set('assetManagerSearchPageNumber', $pageNumber);
     return $p;
 }
 
@@ -170,56 +175,56 @@ sub getMoreMenu {
     # These links are shown based on UI level
     if ( $userUiLevel >= $toolbarUiLevel->{ "changeUrl" } ) {
         push @more_fields, {
-            url     => '<url>?func=changeUrl;proceed=manageAssets', 
+            url     => 'func=changeUrl;proceed=manageAssets', 
             label   => $i18n->get( 'change url' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "editBranch" } ) {
         push @more_fields, {
-            url     => '<url>?func=editBranch', 
+            url     => 'func=editBranch', 
             label   => $i18n->get( 'edit branch' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "shortcut" } ) {
         push @more_fields, {
-            url     => '<url>?func=createShortcut;proceed=manageAssets', 
+            url     => 'func=createShortcut;proceed=manageAssets', 
             label   => $i18n->get( 'create shortcut' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "revisions" } ) {
         push @more_fields, {
-            url     => '<url>?func=manageRevisions',
+            url     => 'func=manageRevisions',
             label   => $i18n->get( 'revisions' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "view" } ) {
         push @more_fields, {
-            url     => '<url>',
+            url     => '',
             label   => $i18n->get( 'view' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "edit" } ) {
         push @more_fields, {
-            url     => '<url>?func=edit;proceed=manageAssets',
+            url     => 'func=edit;proceed=manageAssets',
             label   => $i18n->get( 'edit' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "lock" } ) {
         push @more_fields, {
-            url     => '<url>?func=lock;proceed=manageAssets',
+            url     => 'func=lock;proceed=manageAssets',
             label   => $i18n->get( 'lock' ),
         };
     }
 
     if ( $session->config->get("exportPath") && $userUiLevel >= $toolbarUiLevel->{"export"} ) {
         push @more_fields, {
-            url     => '<url>?func=export',
+            url     => 'func=export',
             label   => $i18n->get( 'Export Page' ),
         };
     }
@@ -407,11 +412,11 @@ ENDHTML
 <div id="dataTableContainer">
 </div>
 <p class="actions"> %s 
-<input type="submit" name="action_update" value="%s" onclick="this.form.func.value='setRanks'; this.form.submit();" />
-<input type="submit" name="action_delete" value="%s" onclick="if( confirm('%s')){ this.form.func.value='deleteList'; this.form.submit(); }{ return false; }" />
-<input type="submit" name="action_cut" value="%s" onclick="this.form.func.value='cutList'; this.form.submit();"/>
-<input type="submit" name="action_copy" value="%s"  onclick="this.form.func.value='copyList'; this.form.submit();"/>
-<input type="submit" name="action_duplicate" value="%s"  onclick="this.form.func.value='duplicateList'; this.form.submit();"/>
+<input type="submit" name="action_update" value="%s" onclick="this.form.func.value='setRanks'; this.form.submit(); return false;" />
+<input type="submit" name="action_delete" value="%s" onclick="if( confirm('%s')){ this.form.func.value='deleteList'; this.form.submit(); return false;}{ return false; }" />
+<input type="submit" name="action_cut" value="%s" onclick="this.form.func.value='cutList'; this.form.submit(); return false;"/>
+<input type="submit" name="action_copy" value="%s"  onclick="this.form.func.value='copyList'; this.form.submit(); return false;"/>
+<input type="submit" name="action_duplicate" value="%s"  onclick="this.form.func.value='duplicateList'; this.form.submit(); return false;"/>
 </p>
 </form>
 <div id="pagination">
@@ -534,64 +539,36 @@ sub www_search {
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
+    my $keywords =  $session->form->get('keywords') || $session->scratch->get('assetManagerSearchKeywords');
 
     ### Show the form
     $output     .= q{<form method="post" enctype="multipart/form-data" action="} . $currentAsset->getUrl . q{"><p>}
                 . q{<input type="hidden" name="op" value="assetManager" />}
                 . q{<input type="hidden" name="method" value="search" />}
-                . q{<input type="text" size="45" name="keywords" value="} . $session->form->get('keywords') . q{" />}
+                . q{<input type="text" size="45" name="keywords" value="} . $keywords . q{" />}
                 . getClassSelectBox( $session )
                 . q{<input type="submit" name="action" value="}.$i18n->get( "search" ).q{" />}
                 . q{</p></form>}
                 ;
 
-    ### Actions
-    if ( my $action = lc $session->form->get( 'action' ) ) {
-        my @assetIds = $session->form->get( 'assetId' );
-
-        if ( $action eq "delete" ) { ##aka trash
-            for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newById( $session, $assetId );
-                next unless $asset;
-                $asset->trash;
-            }
-        }
-        elsif ( $action eq "cut" ) {
-            for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newById( $session, $assetId );
-                next unless $asset;
-                $asset->cut;
-            }
-        }
-        elsif ( $action eq "copy" ) {
-            for my $assetId ( @assetIds ) {
-                # Copy == Duplicate + Cut
-		my $asset       = WebGUI::Asset->newById( $session, $assetId);
-                my $newAsset    = $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
-                $newAsset->update( { title => $newAsset->getTitle . ' (copy)' } );
-                $newAsset->cut;
-            }
-        }
-    }
-
     ### Run the search
-    if ( $session->form->get( 'keywords' ) || $session->form->get( 'class' ) ) {
-        my $keywords        = $session->form->get( 'keywords' );
-        my @classes         = $session->form->get( 'class' );
+    if ( $keywords || $session->form->get( 'class' ) ) {
+        my @classes          = $session->form->get( 'class' );
+        my $keywordsScrubbed = $keywords;
 
         # Detect a helper word key
         my @assetIds        = ($keywords =~ /assetid:\s*([^\s]+)/gi);
 
         # purge helper word keys
         if (@assetIds) {
-            $keywords =~ s/\bassetid:\s*[^\s]+//gi;
+            $keywordsScrubbed =~ s/\bassetid:\s*[^\s]+//gi;
         }
-        $keywords =~ s/^\s+//g;
-        $keywords =~ s/\s+$//g;
+        $keywordsScrubbed =~ s/^\s+//g;
+        $keywordsScrubbed =~ s/\s+$//g;
 
         my $p       = getSearchPaginator( $session, {
             assetIds            => \@assetIds,
-            keywords            => $keywords,
+            keywords            => $keywordsScrubbed,
             classes             => \@classes,
             orderByColumn       => $session->form->get( 'orderByColumn' ),
             orderByDirection    => $session->form->get( 'orderByDirection' ),
@@ -602,9 +579,10 @@ sub www_search {
         }
         else {
             ### Display the search results 
-            $output         .= q{<form method="post" enctype="multipart/form-data">}
-                            . q{<input type="hidden" name="op" value="assetManager" />}
-                            . q{<input type="hidden" name="method" value="search" />}
+            $output         .= q{<form method="post" enctype="multipart/form-data" action="}.$currentAsset->getUrl.q{">}
+                            . q{<input type="hidden" name="func"    value="searchAssets" />}
+                            . q{<input type="hidden" name="proceed" value="searchAssets" />}
+                            . WebGUI::Form::CsrfToken->new($session)->toHtml
                             . q{<input type="hidden" name="pn" value="} . $session->form->get('pn') . q{" />}
                             . q{<input type="hidden" name="keywords" value="} . $keywords . q{" />}
                             ;
@@ -708,9 +686,9 @@ sub www_search {
             $output     .= q{</tbody>}
                         . q{</table>}
                         . q{<p class="actions">} . $i18n->get( 'with selected' )
-                        . q{<input type="submit" name="action" value="}.$i18n->get( 'delete' ) . q{" />}
-                        . q{<input type="submit" name="action" value="}.$i18n->get( "cut" )    . q{" />}
-                        . q{<input type="submit" name="action" value="}.$i18n->get( "Copy" )    .q{" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( 'delete' ) . q[" onclick="if(confirm('].$i18n->get('43').q[')){this.form.func.value='deleteList'; this.form.submit();}{ return false; }" />]
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "cut" )    . q{" onclick="this.form.func.value='cutList'; this.form.submit();" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "Copy" )    .q{" onclick="this.form.func.value='copyList'; this.form.submit();" />}
                         . q{</p>}
                         . q{</form>}
                         ;
@@ -731,6 +709,7 @@ sub www_search {
 
     $output         .= '</div>';
 
+    $session->scratch->set('assetManagerSearchKeywords',  $keywords);
     return $ac->render( $output );
 }
 

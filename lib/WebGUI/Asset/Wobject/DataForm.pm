@@ -223,9 +223,11 @@ has '+uiLevel' => (
 use WebGUI::Pluggable;
 use WebGUI::DateTime;
 use WebGUI::User;
+use WebGUI::Utility;
 use WebGUI::Group;
 use WebGUI::AssetCollateral::DataForm::Entry;
 use WebGUI::Form::SelectRichEditor;
+use WebGUI::Paginator;
 
 
 =head1 NAME
@@ -413,17 +415,30 @@ sub deleteTab {
 =head2 getContentLastModified 
 
 Extends the base method to modify caching.  If the currentView is in list mode, or
-an entry is being viewed, bypass caching altogether.
+an entry is being viewed, or the DataForm has a captcha, bypass caching altogether.
 
 =cut
 
 override getContentLastModified => sub {
     my $self = shift;
-    if ($self->currentView eq 'list' || $self->session->form->process('entryId')) {
+    if ($self->currentView eq 'list' || $self->session->form->process('entryId') || $self->hasCaptcha) {
         return time;
     }
     return super();
 };
+
+#-------------------------------------------------------------------
+
+=head2 hasCaptcha
+
+Returns true if the DataForm uses a captcha as one of the fields.
+
+=cut
+
+sub hasCaptcha {
+    my $self = shift;
+    return isIn('Captcha', map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder });
+}
 
 #-------------------------------------------------------------------
 
@@ -693,9 +708,10 @@ A hash reference.  New template variables will be appended to it.
 =cut
 
 sub getListTemplateVars {
-	my $self = shift;
-	my $var = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+	my $self    = shift;
+    my $session = $self->session;
+	my $var     = shift;
+	my $i18n    = WebGUI::International->new($session,"Asset_DataForm");
 	$var->{"back.url"} = $self->getFormUrl;
 	$var->{"back.label"} = $i18n->get('go to form');
     my $fieldConfig = $self->getFieldConfig;
@@ -709,7 +725,9 @@ sub getListTemplateVars {
     } @{ $self->getFieldOrder };
     $var->{field_loop} = \@fieldLoop;
     my @recordLoop;
-    my $entryIter = $self->entryClass->iterateAll($self);
+    my $p = WebGUI::Paginator->new($session);
+    $p->setDataByCallback(sub { return $self->entryClass->iterateAll($self, { offset => $_[0], limit => $_[1], }); });
+    my $entryIter = $p->getPageIterator();
     while ( my $entry = $entryIter->() ) {
         my $entryData = $entry->fields;
         my @dataLoop;
@@ -730,9 +748,9 @@ sub getListTemplateVars {
             %dataVars,
             "record.ipAddress"              => $entry->ipAddress,
             "record.edit.url"               => $self->getFormUrl("func=view;entryId=".$entry->getId),
-            "record.edit.icon"              => $self->session->icon->edit("func=view;entryId=".$entry->getId, $self->url),
+            "record.edit.icon"              => $session->icon->edit("func=view;entryId=".$entry->getId, $self->url),
             "record.delete.url"             => $self->getUrl("func=deleteEntry;entryId=".$entry->getId),
-            "record.delete.icon"            => $self->session->icon->delete("func=deleteEntry;entryId=".$entry->getId, $self->url, $i18n->get('Delete entry confirmation')),
+            "record.delete.icon"            => $session->icon->delete("func=deleteEntry;entryId=".$entry->getId, $self->url, $i18n->get('Delete entry confirmation')),
             "record.username"               => $entry->username,
             "record.userId"                 => $entry->userId,
             "record.submissionDate.epoch"   => $entry->submissionDate->epoch,
@@ -742,6 +760,7 @@ sub getListTemplateVars {
         };
     }
     $var->{record_loop} = \@recordLoop;
+    $p->appendTemplateVars($var);
     return $var;
 }
 
@@ -1258,6 +1277,9 @@ sub viewForm {
         $entry = $self->entryClass->new($self, ($entryId && $self->canEdit) ? $entryId : ());
     }
     $var = $passedVars || $self->getRecordTemplateVars($var, $entry);
+    if ($self->hasCaptcha) {
+        $self->session->http->setCacheControl('none');
+    }
     return $self->processTemplate($var, undef, $self->{_viewFormTemplate});
 }
 
@@ -1338,6 +1360,8 @@ sub www_deleteFieldConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     $newSelf->deleteField($self->session->form->process("fieldName"));
     $newSelf->{_mode} = 'form';
@@ -1363,6 +1387,8 @@ sub www_deleteTabConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     $newSelf->deleteTab($self->session->form->process("tabId"));
     $newSelf->{_mode} = 'form';
@@ -1385,6 +1411,8 @@ sub www_editField {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     my $fieldName = shift || $self->session->form->process("fieldName");
     my $field;
@@ -1534,6 +1562,8 @@ sub www_editFieldSave {
     my $session = $self->session;
     return $session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $form = $session->form;
     my $fieldName = $form->process('fieldName');
     my $newName = $session->url->urlize($form->process('newName') || $form->process('label'));
@@ -1587,7 +1617,7 @@ sub www_editFieldSave {
         $newSelf->createField($newName, \%field);
     }
 
-    WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session);
     my $freshSelf = $newSelf->cloneFromDb();
     if ($form->process("proceed") eq "editField") {
         return $freshSelf->www_editField('new');
@@ -1677,6 +1707,8 @@ sub www_editTab {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     my $tabId = shift || $self->session->form->process("tabId") || "new";
     my $tab;
@@ -1732,6 +1764,8 @@ sub www_editTabSave {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $name = $self->session->form->process("name") || $self->session->form->process("label");
     $name = $self->session->url->urlize($name);
     my $tabId = $self->session->form->process('tabId');
@@ -1825,6 +1859,8 @@ sub www_moveFieldDown {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldDown($fieldName);
@@ -1883,6 +1919,8 @@ sub www_moveFieldUp {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldUp($fieldName);
@@ -1942,6 +1980,8 @@ sub www_moveTabRight {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabRight($tabId);
@@ -1996,6 +2036,8 @@ sub www_moveTabLeft {
     my $self = shift;
     return $self->session->privilege->insufficient
         unless $self->canEdit;
+    return $self->session->privilege->locked
+        unless $self->canEditIfLocked;
     my $newSelf = $self->addRevision;
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabLeft($tabId);

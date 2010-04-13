@@ -59,6 +59,7 @@ foreach my $file_property (qw/image1 image2 image3 brochure manual warranty/) {
 my $image = WebGUI::Storage->create($session);
 WebGUI::Test->storagesToDelete($image);
 $image->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
+$image->generateThumbnail('lamp.jpg');
 
 my $imagedProduct = $node->addChild({
     className          => "WebGUI::Asset::Sku::Product",
@@ -73,6 +74,7 @@ is($imagedProduct->getThumbnailUrl(), $image->getThumbnailUrl('lamp.jpg'), 'getT
 my $otherImage = WebGUI::Storage->create($session);
 WebGUI::Test->storagesToDelete($otherImage);
 $otherImage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
+$otherImage->generateThumbnail('gooey.jpg');
 
 ok($imagedProduct->getThumbnailUrl($otherImage), 'getThumbnailUrl with an explicit storageId returns something');
 is($imagedProduct->getThumbnailUrl($otherImage), $otherImage->getThumbnailUrl('gooey.jpg'), 'getThumbnailUrl with an explicit storageId returns the right path to the URL');

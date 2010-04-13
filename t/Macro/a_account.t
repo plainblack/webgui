@@ -16,13 +16,14 @@ use WebGUI::Test;
 use WebGUI::Session;
 use HTML::TokeParser;
 use Data::Dumper;
+use WebGUI::Macro::a_account;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
 # <a class="myAccountLink" href="<tmpl_var account.url>"><tmpl_var account.text></a>
-my ($versionTag, $template) = addTemplate();
+my $template = addTemplate();
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
@@ -65,16 +66,7 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
-$numTests += 1; #For the use_ok
-
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::a_account';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::a_account::process( $session,
@@ -88,8 +80,6 @@ foreach my $testSet (@testSets) {
 	else {
 		is($output, $testSet->{output}, $testSet->{comment});
 	}
-}
-
 }
 
 sub addTemplate {
@@ -108,7 +98,8 @@ sub addTemplate {
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
-	return ($versionTag, $template);
+    addToCleanup($versionTag);
+	return $template;
 }
 
 sub simpleHTMLParser {
@@ -125,14 +116,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
-	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
+	my ($url)   = $text =~ /HREF=(.+?)(\n?LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(\n?HREF|\Z)/;
 
 	return ($url, $label);
-}
-
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
 }

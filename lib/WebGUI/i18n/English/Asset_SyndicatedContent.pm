@@ -244,6 +244,14 @@ our $I18N = {
 		lastUpdated => 1168227896,
 	},
 
+    'sortItemsLabel' => {
+        message => q{Sort feed items by date?},
+    },
+
+    'sortItemsLabel description' => {
+        message => q{If enabled, items will be sorted by date.  If disabled, items will be left in the order they appear in the original feed.},
+    },
+
 	'syndicated content asset template variables title' => {
 		message => q|Syndicated Content Asset Template Variables|,
 		lastUpdated => 1164841146

@@ -137,7 +137,7 @@ sub create {
 	my $properties = shift;
 	my $tagId = $session->db->setRow("assetVersionTag","tagId",{
 		tagId=>"new",
-		creationDate=>$session->datetime->time(),
+		creationDate=>time(),
 		createdBy=>$session->user->userId
 		});
 	my $tag = $class->new($session, $tagId);
@@ -178,7 +178,7 @@ sub commit {
 	if ($finished) {
 		$self->{_data}{isCommitted} = 1;
 		$self->{_data}{committedBy} = $self->session->user->userId unless ($self->{_data}{committedBy});
-		$self->{_data}{commitDate} = $self->session->datetime->time();
+		$self->{_data}{commitDate} = time();
 		$self->session->db->setRow("assetVersionTag", "tagId", $self->{_data});
 		$self->clearWorking;
 		return 1;
@@ -563,6 +563,20 @@ sub getWorking {
 
 #-------------------------------------------------------------------
 
+=head2 leaveTag ( )
+
+Make the user leave their current tag.
+
+=cut
+
+sub leaveTag {
+	my $self = shift;
+	$self->session->scratch->delete('versionTag');
+	$self->session->stow->delete("versionTag");
+}
+
+#-------------------------------------------------------------------
+
 =head2 lock ( )
 
 Sets this version tag up so no more revisions may be applied to it.
@@ -722,7 +736,7 @@ sub set {
     my $self = shift;
     my $properties = shift;
 
-    my $now        = $self->session->datetime->time();
+    my $now        = time();
     my $startTime  = WebGUI::DateTime->new($self->session,$now)->toDatabase;
     my $endTime    = WebGUI::DateTime->new($self->session,'2036-01-01 00:00:00')->toDatabase;
 

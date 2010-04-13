@@ -197,7 +197,6 @@ sub new {
 	my $session = shift;
 	my $startingTabs = shift;
 	my $css = shift || $session->url->extras('tabs/tabs.css');
-	my $cancelUrl = shift || $session->url->page();
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
 	foreach my $key (keys %{$startingTabs}) {
@@ -206,9 +205,13 @@ sub new {
 		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}
 	my $i18n = WebGUI::International->new($session);
+    my $cancelJS  = 'history.go(-1);';
+    if (my $cancelURL = $session->env->get('HTTP_REFERER')) {
+        $cancelJS = sprintf q{window.location.href='%s';}, $cancelURL;
+    }
 	my $cancel = WebGUI::Form::button($session,{
 			value=>$i18n->get('cancel'),
-			extras=>q|onclick="history.go(-1);" class="backwardButton"|
+			extras=>sprintf(q|onclick="%s" class="backwardButton"|, $cancelJS),
 			});
 	bless {	_session=>$session, _cancel=>$cancel, _submit=>WebGUI::Form::submit($session), 
         _form=>WebGUI::Form::formHeader($session), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;

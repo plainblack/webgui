@@ -79,6 +79,3 @@ sub setupTest {
 	}
 	return @testSets;
 }
-
-END { ##Clean-up after yourself, always
-}

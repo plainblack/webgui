@@ -2,7 +2,9 @@ use strict;
 
 my $webguiRoot = '/data/WebGUI';
 
-unshift @INC, $webguiRoot . "/lib";
+@INC = grep { $_ ne q{.} } @INC;
+
+unshift @INC, "$webguiRoot/lib";
 
 # add custom lib directories to library search path
 unshift @INC, grep {

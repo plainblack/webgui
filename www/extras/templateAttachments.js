@@ -1,6 +1,13 @@
 // Really only used by the Template editor, but it doesn't belong in perl
 // code.  It's too long.
 
+if ( typeof WebGUI == "undefined" ) {
+    WebGUI  = {};
+}
+if ( typeof WebGUI.TemplateAttachments == "undefined" ) {
+    WebGUI.TemplateAttachments = {};
+}
+
 var addClick = (function() {
     var uniqueId     = 1;
     var count        = 0;
@@ -57,12 +64,15 @@ var addClick = (function() {
     function nameFields(u) {
         var id     = uniqueId++;
         var obj    = urls[u];
-        if (!obj.index.name) 
+        if (!obj.index.name) {
             obj.index.name = 'attachmentIndex' + id;
-        if (!obj.type.name) 
+        }
+        if (!obj.type.name) {
             obj.type.name  = 'attachmentType'  + id;
-        if (!obj.url.name) 
+        }
+        if (!obj.url.name) {
             obj.url.name   = 'attachmentUrl'   + id;
+        }
     }
 
     // Make a function which will remove an attachment (remove the table row
@@ -77,7 +87,7 @@ var addClick = (function() {
             if (--count == 0) {
                 displayTable.style.display = 'none';
             }
-        }
+        };
     }
 
     // Add a new attachment (proper table row, etc).  Attachments that already
@@ -85,7 +95,7 @@ var addClick = (function() {
     // to the backend.
     function add(d) {
         if (urls[d.url]) {
-            alert('Already attached!');
+            alert(WebGUI.TemplateAttachments.i18n.get('Asset_Template','Already attached!'));
             return;
         }
 
@@ -120,7 +130,7 @@ var addClick = (function() {
             var oldValue = url.oldValue;
             if (urls[newValue]) {
                 url.value = oldValue;
-                alert('Already attached!');
+                alert(WebGUI.TemplateAttachments.i18n.get('Asset_Template','Already attached!'));
             }
             else {
                 url.oldValue = newValue;
@@ -134,7 +144,7 @@ var addClick = (function() {
 
         var btn     = document.createElement('input');
         btn.type    = 'button';
-        btn.value   = 'Remove';
+        btn.value   = WebGUI.TemplateAttachments.i18n.get('Asset_Template','attachment header remove');
         btn.onclick = remover(d.url);
 
         var tr   = document.createElement('tr');
@@ -149,7 +159,7 @@ var addClick = (function() {
             tr    : tr,
             index : index,
             type  : type,
-            url   : url,
+            url   : url
         };
 
         nameFields(d.url);
@@ -157,7 +167,21 @@ var addClick = (function() {
         addAnchor.appendChild(tr);
     }
 
-    init();
+    if ( typeof WebGUI.TemplateAttachments.i18n == "undefined" ) {
+        WebGUI.TemplateAttachments.i18n = new WebGUI.i18n( { 
+            namespaces  : {
+                'Asset_Template' : [
+                    "attachment header remove",
+                    "Already attached!",
+                    "No url!"
+                ]
+            },
+            onpreload   : {
+                fn       : init
+            }
+        } );
+    }
+
     return function() {
         var d = {
             index: nodes.index.value,
@@ -165,9 +189,9 @@ var addClick = (function() {
             url:   nodes.url.value
         };
 
-        d.url = d.url.replace(/^\s+|\s+$/g, '')
+        d.url = d.url.replace(/^\s+|\s+$/g, '');
         if (d.url == '') {
-            alert('No url!');
+            alert(WebGUI.TemplateAttachments.i18n.get('Asset_Template','No url!'));
             return;
         }
         add(d);

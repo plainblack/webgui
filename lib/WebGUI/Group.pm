@@ -91,7 +91,7 @@ sub _defaults {
 	my $self = shift;
 	return {
 		groupId=>"new",
-		dateCreated=>$self->session->datetime->time(),
+		dateCreated=>time(),
 		expireOffset=>314496000,
 		karmaThreshold=>1000000000,
 		groupName=>"New Group",
@@ -100,7 +100,7 @@ sub _defaults {
 		expireNotify=>0,
 		databaseLinkId=>0,
 		groupCacheTimeout=>3600,
-		lastUpdated=>$self->session->datetime->time(),
+		lastUpdated=>time(),
 		autoAdd=>0,
 		autoDelete=>0,
 		isEditable=>1,
@@ -151,7 +151,7 @@ is updated.
 
 =head3 users 
 
-An array reference containing a list of users.
+An array reference containing a list of userIds.
 
 =head3 expireOffset
 
@@ -167,10 +167,10 @@ sub addUsers {
 	foreach my $uid (@{$users}) {
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [$self->getId, $uid]);
 		unless ($isIn) {
-			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, ($self->session->datetime->time()+$expireOffset)]);
+			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, (time()+$expireOffset)]);
 			$self->session->stow->delete("gotGroupsForUser");
 		} else {
-			$self->userGroupExpireDate($uid,($self->session->datetime->time()+$expireOffset));
+			$self->userGroupExpireDate($uid,(time()+$expireOffset));
 		}
 	}
 }
@@ -733,14 +733,14 @@ sub getIpUsers {
 	my $IpFilter;
 	return [] unless $IpFilter = $self->ipFilter();
 
-	my $time = $self->session->datetime->time();
+	my $time = time();
 
 	$IpFilter =~ s/\s//g;
 	my @filters = split /;/, $IpFilter;
 
 	my $query = "select userId,lastIP from userSession where expires > ?";
 
-	my $sth = $self->session->db->read($query, [ $self->session->datetime->time() ]);
+	my $sth = $self->session->db->read($query, [ time() ]);
 	my %localCache = ();
 	my @ipUsers = ();
 	while (my ($userId, $lastIP) = $sth->array() ) {
@@ -838,7 +838,7 @@ sub getScratchUsers {
 	my $scratchFilter;
 	return [] unless $scratchFilter = $self->scratchFilter();
 
-	my $time = $self->session->datetime->time();
+	my $time = time();
 
 	$scratchFilter =~ s/\s//g;
 	my @filters = split /;/, $scratchFilter;
@@ -879,7 +879,7 @@ sub getUserList {
 	my $withoutExpired = shift;
 	my $expireTime = 0;
 	if ($withoutExpired) {
-		$expireTime = $self->session->datetime->time();
+		$expireTime = time();
 	}
 	return $self->session->db->buildHashRef("select users.userId, users.username from users join groupings using(userId) where expireDate > ? and groupId = ? order by username asc", [$expireTime, $self->getId]);
 }
@@ -904,7 +904,7 @@ sub getUsers {
 	my $withoutExpired = shift;
 	my $expireTime = 0;
 	if ($withoutExpired) {
-		$expireTime = $self->session->datetime->time();
+		$expireTime = time();
 	}
 	my @users = $self->session->db->buildArray("select userId from groupings where expireDate > ? and groupId = ?", [$expireTime, $self->getId]);
 	return \@users;
@@ -939,7 +939,7 @@ sub getUsersNotIn {
 	
     my $expireTime = 0;
 	if ($withoutExpired) {
-		$expireTime = $self->session->datetime->time();
+		$expireTime = time();
 	}
 
     my $sql = q{
@@ -1499,7 +1499,7 @@ sub set {
 	my $value = shift;
 	$self->get("groupId") unless ($self->{_group}); # precache group stuff
 	$self->{_group}{$name} = $value;
-	$self->session->db->setRow("groups","groupId",{groupId=>$self->getId, $name=>$value, lastUpdated=>$self->session->datetime->time()});
+	$self->session->db->setRow("groups","groupId",{groupId=>$self->getId, $name=>$value, lastUpdated=>time()});
 	$self->clearCaches;
 }
 

@@ -67,7 +67,7 @@ sub canView {
     my $uid     = $self->uid;
 
     return 1 if (($session->user->userId eq $uid || $uid eq "") && $session->user->profileField('ableToBeFriend'));
-    
+
     my $user    = WebGUI::User->new($session,$uid);
     return 0 if($user->isVisitor); #This should never happen but let's make sure
     return 0 unless ($user->profileField('ableToBeFriend'));  #User doesn't have friends enabled
@@ -310,7 +310,7 @@ sub www_removeFriend {
         my $i18n = WebGUI::International->new($session,"Account_Friends");
         $errorMsg = $i18n->get("not a friend error");
     }
-    
+
     if($errorMsg ne "") {
         my $backUrl = $self->getUrl("module=friends");
         return $self->showError($var,$errorMsg,$backUrl,$self->getErrorTemplateId);
@@ -352,7 +352,7 @@ sub www_removeFriendConfirm {
     elsif(!$friend->isFriend($friendId)){
         $errorMsg = $i18n->get("not a friend error");
     }
-    
+
     if($errorMsg ne "") {
         my $backUrl = $self->getUrl("module=friends");
         return $self->showError($var,$errorMsg,$backUrl,$self->getErrorTemplateId);
@@ -401,7 +401,7 @@ sub www_sendFriendsRequest {
     #Overwrite these
     $var->{'user_full_name'    } = $user->getWholeName;
     $var->{'user_member_since' } = $user->dateCreated;
-    
+
     my $defaultComment = sprintf(
         $i18n->get('default friend comments'),
         $user->getFirstName,
@@ -419,12 +419,12 @@ sub www_sendFriendsRequest {
         value => $defaultComment,
         width => "600",
     });
-    
+
     $var->{'form_header'      }  = WebGUI::Form::formHeader($session,{
         action => $self->getUrl("module=friends;do=sendFriendsRequestSave;uid=$uid"),
         extras => q{name="messageForm"}
     });
-    
+
     $var->{'submit_button'    }  = WebGUI::Form::submit($session,{});
     $var->{'form_footer'      }  = WebGUI::Form::formFooter($session, {});
 
@@ -487,7 +487,7 @@ sub www_view {
     my $user     = $self->getUser;
 
     $self->appendCommonVars($var);
-    
+
     my $displayView           = $uid ne "";
     $var->{'display_message'} = $msg;
 
@@ -507,10 +507,13 @@ sub www_view {
     #Deal with rows per page
     my $rpp          = $session->form->get("rpp") || 25;
     my $rpp_url      = ";rpp=$rpp";
-    
-    #Cache the base url
-    my $friendsUrl     =  $self->getUrl("op=account;module=friends;do=view");
 
+    # Handle viewing someone else's friends
+    my $uid_url = $session->user->userId eq $uid ? q{} : ";uid=$uid";
+
+    #Cache the base url
+    my $friendsUrl     =  $self->getUrl("op=account;module=friends;do=view$uid_url");
+     
     #Note for anyone who attempts to sort this list by the user's whole name:
     #You can do this, but the only way to do it efficiently is to join
     #the users, userProfileData, and groupings table.  This will break if the groups API
@@ -525,7 +528,7 @@ sub www_view {
         $rpp
     );
     $p->setDataByArrayRef(\@friendIds);
-    
+
     #Export page to template
     my @friends            = ();
     foreach my $friendId ( @{$p->getPageData} ) {
@@ -533,7 +536,7 @@ sub www_view {
         next if($friend->isVisitor);
         #If you have friends turned off you shouldn't show up when other people view your friends friends
         next if($displayView && !$friend->profileField('ableToBeFriend'));
-        
+
         my $hash     = {};
         # TODO Move this into a sub that can be more easily overridden
         $hash->{'friend_full_name'         } = $friend->getWholeName;
@@ -564,7 +567,7 @@ sub www_view {
         push(@friends,$hash);
    	}
     my $friendCount  = $p->getRowCount;
-         
+
    	$var->{'friends_loop'  } = \@friends;
     $var->{'has_friends'   } = $friendCount > 0;
     $var->{'friends_total' } = $friendCount;

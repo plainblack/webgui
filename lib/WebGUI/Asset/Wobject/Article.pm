@@ -322,7 +322,7 @@ sub view {
     my $cache = $self->session->cache;
 	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
-		my $out = eval{$cache->get("view_".$self->getId)};
+		my $out = eval{$cache->get($self->getViewCacheKey)};
 		return $out if $out;
 	}
 	my %var;
@@ -386,7 +386,7 @@ sub view {
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
-		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
+		eval{$cache->set($self->getViewCacheKey, $out, $self->cacheTimeout)};
 	}
        	return $out;
 }

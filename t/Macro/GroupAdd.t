@@ -14,15 +14,17 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::GroupAdd;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 use HTML::TokeParser;
+use JSON qw/from_json/;
 
 my $session = WebGUI::Test->session;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
-my ($versionTag, $template, $groups, $users) = setupTest($session, $homeAsset);
+my ($template, $groups, $users) = setupTest($session, $homeAsset);
 
 my @testSets = (
 	{
@@ -118,16 +120,7 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + ($testSet->{empty} == 0);
 }
 
-$numTests += 1; #For the use_ok
-
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::GroupAdd';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->user({ userId => $testSet->{userId} });
@@ -144,8 +137,6 @@ foreach my $testSet (@testSets) {
 	}
 }
 
-}
-
 sub setupTest {
 	my ($session, $defaultNode) = @_;
 	my @groups;
@@ -156,30 +147,31 @@ sub setupTest {
 	$groups[1] = WebGUI::Group->new($session, "new");
 	$groups[1]->name('Regular Old Group');
 	$groups[1]->autoAdd(0);
-    WebGUI::Test->groupsToDelete(@groups);
+    addToCleanup(@groups);
 
 	##Three users.  One in each group and one with no group membership
 	my @users = map { WebGUI::User->new($session, "new") } 0..2;
 	$users[0]->addToGroups([$groups[0]->getId]);
 	$users[1]->addToGroups([$groups[1]->getId]);
-    WebGUI::Test->usersToDelete(@users);
+    addToCleanup(@users);
 
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
 	$versionTag->set({name=>"GroupAdd test"});
 	my $properties = {
-		title => 'GroupAdd test template',
+		title     => 'GroupAdd test template',
 		className => 'WebGUI::Asset::Template',
-		url => 'groupadd-test',
+		url       => 'groupadd-test',
 		namespace => 'Macro/GroupAdd',
-		template => "HREF=<tmpl_var group.url>\nLABEL=<tmpl_var group.text>",
-		#     '1234567890123456789012'
-		id => 'GroupAdd001100Template',
+		template  => qq|{"HREF":"<tmpl_var group.url>",\n"LABEL":"<tmpl_var group.text>"}|,
+		#            '1234567890123456789012'
+		id        => 'GroupAdd001100Template',
         usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
+    addToCleanup($versionTag);
 
-	return $versionTag, $asset, \@groups, \@users;
+	return $asset, \@groups, \@users;
 }
 
 sub simpleHTMLParser {
@@ -196,14 +188,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
-	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
+    my $json_data = from_json($text);
+    my ($url, $label) = @{ $json_data }{qw/HREF LABEL/};
 
 	return ($url, $label);
-}
-
-END { ##Clean-up after yourself, always
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
 }

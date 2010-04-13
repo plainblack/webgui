@@ -262,8 +262,9 @@ sub getTemplateVars {
         historyUrl          => $self->getUrl("func=getHistory"),
         editContent         => $self->getEditForm,
         allowsAttachments   => $wiki->allowAttachments,
-        comments	    => $self->getFormattedComments(),
+        comments            => $self->getFormattedComments,
         canEdit             => $self->canEdit,
+        canAdminister       => $wiki->canAdminister,
 		isProtected         => $self->isProtected,
         content             => $wiki->autolinkHtml(
             $self->scrubContent,
@@ -351,21 +352,22 @@ Extends the master method to handle properties and attachments.
 =cut
 
 sub processPropertiesFromFormPost {
-	my $self = shift;
-	$self->next::method(@_);
-	my $actionTaken = ($self->session->form->process("assetId") eq "new") ? "Created" : "Edited";
+    my $self    = shift;
+    my $session = $self->session;
+    $self->next::method(@_);
+    my $actionTaken = ($session->form->process("assetId") eq "new") ? "Created" : "Edited";
     my $wiki = $self->getWiki;
-	my $properties = {
-		groupIdView 	=> $wiki->groupIdView,
-		groupIdEdit 	=> $wiki->groupToAdminister,
-		actionTakenBy 	=> $self->session->user->userId,
-		actionTaken 	=> $actionTaken,
-	};
+    my $properties = {
+        groupIdView     => $wiki->groupIdView,
+        groupIdEdit     => $wiki->groupToAdminister,
+        actionTakenBy   => $session->user->userId,
+        actionTaken     => $actionTaken,
+    };
 
-	if ($wiki->canAdminister) {
-		$properties->{isProtected} = $self->session->form->get("isProtected");
-		$properties->{isFeatured} = $self->session->form->get("isFeatured");
-	}
+    if ($wiki->canAdminister) {
+        $properties->{isProtected} = $session->form->get("isProtected");
+        $properties->{isFeatured}  = $session->form->get("isFeatured");
+    }
 
 	$self->update($properties);
 
@@ -374,10 +376,10 @@ sub processPropertiesFromFormPost {
         maxImageSize    => $wiki->maxImageSize,
         thumbnailSize   => $wiki->thumbnailSize,
     };
-    my @attachments = $self->session->form->param("attachments");
+    my @attachments = $session->form->param("attachments");
     my @tags = ();
     foreach my $assetId (@attachments) {
-        my $asset = WebGUI::Asset->newById($self->session, $assetId);
+        my $asset = WebGUI::Asset->newById($session, $assetId);
         if (defined $asset) {
             unless ($asset->parentId eq $self->getId) {
                 $asset->setParent($self);
@@ -515,6 +517,36 @@ sub www_getHistory {
 			});		
 	}
 	return $self->processTemplate($var, $self->getWiki->pageHistoryTemplateId);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_purgeRevision
+
+Override the main method to change which group is allowed to purge revisions for WikiPages.  Only
+members who can administer the parent wiki (canAdminister) can purge revisions.
+
+=cut
+
+sub www_purgeRevision {
+	my $self    = shift;
+	my $session = $self->session;
+	return $session->privilege->insufficient() unless $self->getWiki->canAdminister;
+	my $revisionDate = $session->form->process("revisionDate");
+	return undef unless $revisionDate;
+	my $asset = WebGUI::Asset->new($session, $self->getId, $self->get("className"), $revisionDate);
+	return undef if ($asset->get('revisionDate') != $revisionDate);
+	my $parent = $asset->getParent;
+	$asset->purgeRevision;
+	if ($session->form->process("proceed") eq "manageRevisionsInTag") {
+		my $working = (defined $self) ? $self : $parent;
+		$session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
+		return undef;
+	}
+	unless (defined $self) {
+		return $parent->www_view;
+	}
+	return $self->www_manageRevisions;
 }
 
 #-------------------------------------------------------------------

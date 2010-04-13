@@ -265,7 +265,8 @@ The status of this item. The default is 'NotShipped'. Other statuses include: Ca
 sub update {
     my ($self, $newProperties) = @_;
     my $id          = id $self;
-    my $session     = $self->transaction->session;
+    my $transaction = $self->transaction;
+    my $session     = $transaction->session;
     my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
 
     if (exists $newProperties->{item}) {
@@ -296,7 +297,7 @@ sub update {
         $newProperties->{ taxConfiguration      } = 
             to_json( $taxDriver->getTransactionTaxData( $sku, $address ) || '{}' );
 
-        unless ($sku->isShippingRequired) {
+        if (!$sku->isShippingRequired && $transaction->get('isSuccessful')) {
             $newProperties->{orderStatus} = 'Shipped';
         }
     }
@@ -310,7 +311,7 @@ sub update {
     if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
         $properties{$id}{options} = JSON->new->encode($newProperties->{options});
     }
-    $properties{$id}{lastUpdated} = WebGUI::DateTime->new($self->transaction->session,time())->toDatabase;
+    $properties{$id}{lastUpdated} = WebGUI::DateTime->new($session,time())->toDatabase;
     $self->transaction->session->db->setRow("transactionItem","itemId",$properties{$id});
 }
 

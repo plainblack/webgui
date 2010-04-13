@@ -236,7 +236,7 @@ sub onCompletePurchase {
 	my ($self, $item) = @_;
 	my $badgeInfo = $self->getOptions;
 	$badgeInfo->{purchaseComplete} = 1;
-	$badgeInfo->{userId} = $self->session->user->userId; # they have to be logged in at this point
+	$badgeInfo->{userId} = $item->transaction->get('userId'); # they have to be logged in at this point
 	$badgeInfo->{transactionItemId} = $item->getId;
 	$self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
 	return undef;

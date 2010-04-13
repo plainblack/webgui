@@ -10,6 +10,7 @@ use File::Basename;
 use CSS::Minifier::XS;
 use JavaScript::Minifier::XS;
 use LWP;
+use DateTime::Format::HTTP;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
@@ -618,9 +619,10 @@ sub fetchHttp {
     if (! $response->is_success) {
         return {};
     }
+    my $lastModified = 
     my $guts = {
         content      => $response->content,
-        lastModified => $response->header('last-modified'),
+        lastModified => DateTime::Format::HTTP->parse_datetime($response->header('last-modified'))->epoch,
     };
     return $guts;
 }

@@ -375,7 +375,8 @@ sub delete {
     $self->uncache;
 
     foreach my $groupId ( @{ $self->getGroups } ) {
-        WebGUI::Group->new($session, $groupId)->deleteUsers([$userId]);
+        my $group = WebGUI::Group->new($session, $groupId);
+        $group->deleteUsers([$userId]) if $group;
     }
 
     my $auth = $self->authInstance;
@@ -539,9 +540,9 @@ sub friends {
         $myFriends->isEditable(0);
         $self->uncache;
         $self->{_user}{"friendsGroup"} = $myFriends->getId;
-        $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
+        $self->{_user}{"lastUpdated"} = time();
         $self->session->db->write("update users set friendsGroup=?, lastUpdated=? where userId=?",
-            [$myFriends->getId, $self->session->datetime->time(), $self->userId]);
+            [$myFriends->getId, time(), $self->userId]);
         $self->{_friendsGroup} = $myFriends;
     }
 
@@ -637,7 +638,7 @@ sub getGroups {
     my $withoutExpired = shift;
     my $clause = "";
     if ($withoutExpired) {
-        $clause = "and expireDate>".$self->session->datetime->time();
+        $clause = "and expireDate>".time();
     }
     my $gotGroupsForUser = $self->session->stow->get("gotGroupsForUser");
     if (exists $gotGroupsForUser->{$self->userId}) {
@@ -1011,7 +1012,7 @@ sub karma {
 		$self->uncache;
 		$self->{_user}{karma} += $amount;
 		$self->session->db->write("update users set karma=karma+? where userId=?", [$amount, $self->userId]);
-        	$self->session->db->write("insert into karmaLog values (?,?,?,?,?)",[$self->userId, $amount, $source, $description, $self->session->datetime->time()]);
+        	$self->session->db->write("insert into karmaLog values (?,?,?,?,?)",[$self->userId, $amount, $source, $description, time()]);
 	}
         return $self->{_user}{karma};
 }

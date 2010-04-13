@@ -60,10 +60,10 @@ if ($] >= 5.008) {
 ##Doing this as a global is not nice, but it works
 my $missingModule = 0;
 
-checkModule("LWP",                          5.824        );
+checkModule("LWP",                          5.833        );
 checkModule("HTTP::Request",                1.40         );
 checkModule("HTTP::Headers",                1.61         );
-checkModule("Test::More",                   0.61,      2 );
+checkModule("Test::More",                   0.82,      2 );
 checkModule("Test::MockObject",             1.02,      2 );
 checkModule("Test::Deep",                   0.095,     2 );
 checkModule("Test::Exception",              0.27,      2 );
@@ -88,6 +88,7 @@ checkModule("DateTime",                     0.4501       );
 checkModule("Time::HiRes",                  1.9719       );
 checkModule("DateTime::Format::Strptime",   1.0800       );
 checkModule("DateTime::Format::Mail",       0.3001       );
+checkModule("DateTime::Format::HTTP",       0.38         );
 checkModule("Image::Magick",                "6.0"        );
 checkModule("Log::Log4perl",                1.20         );
 checkModule("Net::LDAP",                    0.39         );
@@ -95,12 +96,13 @@ checkModule("HTML::Highlight",              0.20         );
 checkModule("HTML::TagFilter",              1.03         );
 checkModule("HTML::Template",               2.9          );
 checkModule("HTML::Template::Expr",         0.07,      2 );
+checkModule("Template",                     2.20,      2 );
 checkModule("XML::FeedPP",                  0.40         );
 checkModule("JSON",                         2.12         );
 checkModule("JSON::Any",                    1.22         );
 checkModule("Config::JSON",                 "1.3.1"      );
 checkModule("Text::CSV_XS",                 "0.64"       );
-checkModule("Net::Subnets",                 0.21         );
+checkModule("Net::CIDR::Lite",              0.20         );
 checkModule("Finance::Quote",               1.15         );
 checkModule("POE",                          1.005        );
 checkModule("POE::Component::IKC::Server",  0.2001       );
@@ -125,7 +127,7 @@ checkModule("Class::C3",                    "0.21"       );
 checkModule("Params::Validate",             "0.91"       );
 checkModule("Clone",                        "0.31"       );
 checkModule('HTML::Packer',                 "0.4"        );
-checkModule('JavaScript::Packer',           '0.02'       );
+checkModule('JavaScript::Packer',           '0.04'       );
 checkModule('CSS::Packer',                  '0.2'        );
 checkModule('Business::Tax::VAT::Validation', '0.20'     );
 checkModule('Crypt::SSLeay',                '0.57'       );
@@ -138,6 +140,10 @@ checkModule("Memcached::libmemcached",      "0.3102"     );
 checkModule("Moose",                        "0.93"       );
 checkModule("MooseX::Storage",              "0.23"       );
 checkModule("namespace::autoclean",         "0.09"       );
+checkModule("Business::PayPal::API",        "0.62"       );
+checkModule("Locales",                      "0.10"       );
+checkModule("Test::Harness",                "3.17"       );
+checkModule("DateTime::Event::ICal",        "0.10"       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

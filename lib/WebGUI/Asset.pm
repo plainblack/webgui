@@ -608,7 +608,7 @@ sub checkView {
 		return "chunked";
 	} 
     elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
-        my $queryFrag = "func=manageTrash";
+        my $queryFrag = "func=manageClipboard";
         if ($self->session->form->process('revision')) {
             $queryFrag .= ";revision=".$self->session->form->process('revision');
         }
@@ -862,6 +862,26 @@ sub getClassById {
 
 #-------------------------------------------------------------------
 
+=head2 getWwwCacheKey ( )
+
+Returns a cache object specific to this asset, and whether or not the request is in SSL mode.
+
+=cut
+
+sub getWwwCacheKey {
+    my $self     = shift;
+    my $session  = $self->session;
+    my $method   = shift;
+    my $cacheKey = join '_', @_, $self->getId;
+    if ($session->env->sslRequest) {
+        $cacheKey .= '_ssl';
+    }
+    return $cacheKey;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getContainer ( )
 
 Returns a reference to the container asset. If this asset is a container it returns a reference to itself. If this asset is not attached to a container it returns its parent.
@@ -1082,10 +1102,27 @@ sub getEditForm {
 	    $tabform->getTab($tab)->dynamicField(%params);
 	}
 
-	# send back the rendered form
+	# send back the object
 	return $tabform;
 }
 
+sub setupFormField {
+  my ($self, $tabform, $fieldName, $extraFields, $overrides) = @_;
+  my %params = %{$extraFields->{$fieldName}};
+  my $tab = delete $params{tab};
+
+  if (exists $overrides->{fields}{$fieldName}) {
+    my %overrideParams = %{$overrides->{fields}{$fieldName}};
+    my $overrideTab = delete $overrideParams{tab};
+    $tab = $overrideTab if defined $overrideTab;
+    foreach my $key (keys %overrideParams) {
+      $params{"-$key"} = $overrideParams{$key};
+    }
+  }
+
+  $tab ||= 'properties';
+  return $tabform->getTab($tab)->dynamicField(%params);
+}
 
 #-------------------------------------------------------------------
 
@@ -1208,16 +1245,31 @@ sub getImportNode {
 
 =head2 getIsa ( $session, [ $offset ] )
 
-A class method to return an iterator for getting all Assets by class (and all sub-classes)
-as Asset objects, one at a time.  When the end of the assets is reached, then the iterator
-will close the database handle that it uses and return undef.
+A class method to return an iterator for getting all committed Assets by
+class (and all sub-classes) as Asset objects, one at a time.  When the end
+of the assets is reached, then the iterator will close the database handle
+that it uses and return undef.
+
+Assets are processed in order by revisionDate.  If the iterator cannot
+instanciate an asset, it will not return undef.  Instead, it will throw
+an exception.  This allows the error condition to be distinguished from the
+end of the set of assets.
 
 It should be used like this:
 
-my $productIterator = WebGUI::Asset::Product->getIsa($session);
-while (my $product = $productIterator->()) {
-  ##Do something useful with $product
-}
+    my $productIterator = WebGUI::Asset::Product->getIsa($session);
+    ASSET: while (1) {
+        my $product = eval { $productIterator->() };
+        if (my $e = Exception::Class->caught()) {
+            $session->log->error($@);
+            next ASSET;
+        }
+        last ASSET unless $product;
+        ##Do something useful with $product
+    }
+
+In upgrade scripts, the eval and exception handling are best left off, because it is a good time
+to make the user aware that they have broken assets in their database.
 
 =head3 $session
 
@@ -1228,23 +1280,47 @@ A reference to a WebGUI::Session object.
 An offset, from the beginning of the results returned from the query, to really begin
 returning results.  This allows very large sets of results to be handled in chunks.
 
+=head3 $options
+
+A hashref of options to change how getIsa works.
+
+=head4 returnAll
+
+If set to true, then all assets will be returned, regardless of status and state.
+
 =cut
 
 sub getIsa {
-    my ($class, $session, $offset) = @_;
+    my $class    = shift;
+    my $session  = shift;
+    my $offset   = shift;
+    my $options  = shift;
     my $tableName = $class->tableName;
-    my $sql = "select distinct(assetId) from $tableName";
-    if (defined $offset) {
-        $sql .= ' LIMIT '. $offset . ',1234567890';
+    #Strategy, generate the correct set of assetIds
+    my $sql = "select assetId from assetData as ad ";
+    if ($tableName ne 'assetData') {
+        $sql .= "join `$tableName` using (assetId, revisionDate) ";
     }
-    my $sth = $session->db->read($sql);
+    $sql .= 'WHERE ';
+    if (! $options->{returnAll}) {
+        $sql .= q{(status='approved' OR status='archived') AND };
+    }
+    $sql .= q{revisionDate = (SELECT MAX(revisionDate) FROM assetData AS a WHERE a.assetId = ad.assetId) order by revisionDate };
+    if (defined $offset) {
+        $sql .= 'LIMIT '. $offset . ',1234567890 ';
+    }
+    my $sth    = $session->db->read($sql);
     return sub {
-        my ($assetId) = $sth->array;
+        my ($assetId, $revisionDate) = $sth->array;
         if (!$assetId) {
             $sth->finish;
             return undef;
         }
-        return WebGUI::Asset->newPending($session, $assetId);
+        my $asset = eval { WebGUI::Asset->newPending($session, $assetId); };
+        if (!$asset) {
+            WebGUI::Error::ObjectNotFound->throw(id => $assetId);
+        }
+        return $asset;
     };
 }
 
@@ -1376,6 +1452,21 @@ sub getRoot {
 	my $session = shift;
 	return WebGUI::Asset->newById($session, "PBasset000000000000001");
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 getSearchUrl ( )
+
+Returns the URL for the search screen of the asset manager.
+
+=cut
+
+sub getSearchUrl {
+	my $self = shift;
+	return $self->getUrl( 'op=assetManager;method=search' );
+}
+
 
 
 #-------------------------------------------------------------------
@@ -2150,18 +2241,20 @@ sub processTemplate {
     my $var = shift;
     my $templateId = shift;
     my $template = shift;
+    my $session  = $self->session;
 
     # Sanity checks
     if (ref $var ne "HASH") {
-        $self->session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
+        $session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
     if (!defined $template) {
-        $template = eval { WebGUI::Asset->newById($self->session, $templateId) };
+        $template = eval { WebGUI::Asset->newById($session, $templateId) };
     }
     if (! Exception::Class->caught() ) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-        $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
+        $var->{'controls'}   = $self->getToolbar if $session->var->isAdminOn;
+        $var->{'assetIdHex'} = $session->id->toHex($self->getId);
         my %vars = (
             %{$self->get},
             'title'     => $self->getTitle,
@@ -2171,7 +2264,7 @@ sub processTemplate {
         return $template->process(\%vars);
     }
     else {
-        $self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
+        $session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
         my $i18n = WebGUI::International->new($self->session, 'Asset');
         return $i18n->get('Error: Cannot instantiate template').' '.$templateId;
     }
@@ -2235,7 +2328,7 @@ sub publish {
 	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%')." $where");
         my $idList = $self->session->db->quoteAndJoin($assetIds);
         
-	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
+	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".time()." where assetId in (".$idList.")");
         foreach my $id (@{$assetIds}) {
                 my $asset = WebGUI::Asset->newById($self->session, $id);
                 if (defined $asset) {
@@ -2684,14 +2777,28 @@ sub www_editSave {
 
 =head2 www_manageAssets ( )
 
-Redirect to the asset manager content handler (for backwards 
-compatibility)
+Redirect to the asset manager content handler (for backwards compatibility)
 
 =cut
 
 sub www_manageAssets {
     my $self = shift;
     $self->session->http->setRedirect( $self->getManagerUrl );
+    return "redirect";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_searchAssets ( )
+
+Redirect to the asset manager content handler (for backwards 
+compatibility)
+
+=cut
+
+sub www_searchAssets {
+    my $self = shift;
+    $self->session->http->setRedirect( $self->getSearchUrl );
     return "redirect";
 }
 

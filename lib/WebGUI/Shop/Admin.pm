@@ -181,6 +181,13 @@ sub www_editSettings {
         hoverHelp   => $i18n->get("edit address template help"),
         );
     $form->template(
+        name        => "selectGatewayTemplateId",
+        value       => $setting->get("selectGatewayTemplateId"),
+        label       => $i18n->get("select gateway template"),
+        namespace   => "Shop/selectGateway",
+        hoverHelp   => $i18n->get("select gateway template help"),
+        );
+    $form->template(
         name        => "shopMyPurchasesTemplateId",
         value       => $setting->get("shopMyPurchasesTemplateId"),
         namespace   => "Shop/MyPurchases",
@@ -194,6 +201,21 @@ sub www_editSettings {
         label       => $i18n->get("my purchases detail template"),
         hoverHelp   => $i18n->get("my purchases detail template help"),
         );
+    $form->template(
+        name          => 'shopReceiptEmailTemplateId',
+        namespace     => "Shop/EmailReceipt",
+        label         => $i18n->get("receipt email template"),
+        hoverHelp     => $i18n->get("receipt email template help"),
+        defaultValue  => 'bPz1yk6Y9uwMDMBcmMsSCg',
+        value         => $setting->get("shopReceiptEmailTemplateId"),
+    );
+    $form->group(
+        name          => 'shopSaleNotificationGroupId',
+        label         => $i18n->get("sale notification group"),
+        hoverHelp     => $i18n->get("sale notification group help"),
+        defaultValue  => '3',
+        value         => $setting->get("shopSaleNotificationGroupId"),
+    );
     $form->submit;
     return $ac->render($form->print, $i18n->get("shop settings"));
 }
@@ -213,12 +235,12 @@ sub www_editSettingsSave {
 
     # Save shop templates
     foreach my $template (qw(shopMyPurchasesDetailTemplateId shopMyPurchasesTemplateId
-        shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId)) {
+        shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId selectGatewayTemplateId shopReceiptEmailTemplateId)) {
         $setting->set($template, $form->get($template, "template"));
     }
 
     # Save group settings
-    foreach my $group (qw(groupIdCashier groupIdAdminCommerce)) {
+    foreach my $group (qw(groupIdCashier groupIdAdminCommerce shopSaleNotificationGroupId)) {
         $setting->set($group, $form->get($group, "group"));
     }
 

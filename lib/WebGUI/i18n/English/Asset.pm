@@ -21,8 +21,8 @@ our $I18N = {
 	},
 
 	'keywords help' => {
-		message => q|Add some keywords here for this asset. They'll automatically be added to the search index, and as the keywords metatag.|,
-		lastUpdated => 0,
+		message => q|Keywords are automatically added to the keywords metatag for this asset, and are also put into the WebGUI search index.  Multiple keywords should be separated by commas.|,
+		lastUpdated => 1262117316,
 		context => q|help for the keywords property|
 	},
 
@@ -343,10 +343,22 @@ our $I18N = {
 		context => q|To skip, to move over, to not process|
 	},
 
+	'Processing form data' => {
+		message => q|Processing form data|,
+		lastUpdated => 1245343280,
+		context => q|To edit or change|
+	},
+
 	'editing %s' => {
 		message => q|editing %s|,
 		lastUpdated => 1245343280,
 		context => q|To edit or change|
+	},
+
+	'Attempting to commit changes' => {
+		message => q|Attempting to commit changes|,
+		lastUpdated => 1245343280,
+		context => q||,
 	},
 
 	'this asset only' => {
@@ -561,7 +573,7 @@ throughout the site.  Check yes if you want this Asset to be available as a pack
 	'asset' => {
 		message => q|Asset|,
         	lastUpdated => 1100463645,
-		context => 'The default name of all assets.'
+		context => 'The default name of all assets.  Asset, as in resource, part, object, item, or piece'
 	},
 
 	'extra head tags' => {
@@ -1088,6 +1100,16 @@ Couldn't open %-s because %-s <br />
 	    lastUpdated => 1100463645,
 	},
 
+	'assetId' => {
+		message => q|The unique identifier for this Asset, in base64 encoding.|,
+		lastUpdated => 1256327617,
+	},
+
+	'assetIdHex' => {
+		message => q|The unique identifier for this Asset, in hexadecimal format.|,
+		lastUpdated => 1256327617,
+	},
+
 	'title' => {
 		message => q|The title of the Asset|,
 		lastUpdated => 1160773957,
@@ -1428,6 +1450,12 @@ Couldn't open %-s because %-s <br />
         message     => q{Locked the asset %s.},
         lastUpdated => 0,
         context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'Any Class' => {
+        message     => q{Any Class},
+        lastUpdated => 0,
+        context     => q{Class, as in name of class, or type of asset},
     },
 
 };

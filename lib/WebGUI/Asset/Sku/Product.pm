@@ -123,37 +123,37 @@ property warranty => (
         );
 property variantsJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property accessoryJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property relatedJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property specificationJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property featureJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property benefitJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
@@ -1655,8 +1655,9 @@ sub view {
     my $error = shift;
     my $session = $self->session;
     my $cache = $session->cache;
+    my $cacheKey = $self->getWwwCacheKey( 'view' );
     if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10){
-        my $out = $cache->get("view_".$self->getId);
+        my $out = $cache->get( $cacheKey );
         return $out if $out;
     }
     my (%data, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
@@ -1859,7 +1860,7 @@ sub view {
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && $self->{_hasAddedToCart} != 1){
-        $cache->set("view_".$self->getId, $out, $self->cacheTimeout);
+        $cache->set( $cacheKey, $out, $self->cacheTimeout );
     }
     return $out;
 }

@@ -186,12 +186,12 @@ sub new {
             $self->session->{_sessionId} = $self->{_var}{sessionId};
             return $self;
         }
-		if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) { ##Session expired, start a new one with the same Id
+		if ($self->{_var}{expires} && $self->{_var}{expires} < time()) { ##Session expired, start a new one with the same Id
 			$self->end;
 			$self->start(1,$sessionId);
 		}
         elsif ($self->{_var}{sessionId} ne "") { ##Fetched an existing session.  Update variables with recent data.
-            my $time = $session->datetime->time();
+            my $time = time();
             my $timeout = $session->setting->get("sessionTimeout");
 			$self->{_var}{lastPageView} = $time;
 			$self->{_var}{lastIP} = $session->env->getIp;
@@ -255,7 +255,7 @@ sub start {
     my $id = $session->id;
 	$sessionId = $id->generate if ($sessionId eq "");
     my $timeout = $session->setting->get('sessionTimeout');
-	my $time = $session->datetime->time();
+	my $time = time();
 	$self->{_var} = {
 		expires      => $time + $timeout,
 		lastPageView => $time,

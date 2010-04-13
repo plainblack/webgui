@@ -28,9 +28,9 @@ Macro for displaying the output of an Asset in another location.
 
 =head3 url | assetId
 
-My specify either the asset url or the asset id. If no Asset with that URL or id can be found, an internationalized error message will be returned instead.
+Specify either the asset url or the asset id. If no Asset with that URL or id can be found, an internationalized error message will be returned instead.
 
-No editing controls (toolbar) will be displayed in the Asset output, even if Admin is turned on.
+Editing controls (toolbar) may or may not be displayed in the Asset output, even if Admin is turned on.
 
 The Not Found Page may not be Asset Proxied.
 

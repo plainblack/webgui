@@ -294,49 +294,51 @@ inserts the ad into the adspace...
 =cut
 
 sub onCompletePurchase {
-    my $self = shift;
-    my $item = shift;
+    my $self    = shift;
+    my $session = $self->session;
+    my $item    = shift;
     my $options = $self->getOptions;
     my $ad;
 
 # LATER: if we use Temp Storage for the image we need to move it to perm storage
 
+    my $userId = $item->transaction->get('userId');
     if( $options->{adId} ne '' ) {
-        $ad = WebGUI::AdSpace::Ad->new($self->session,$options->{adId});
-        my $clicks = $options->{clicks} + $ad->get('clicksBought');
+        $ad = WebGUI::AdSpace::Ad->new($session, $options->{adId});
+        my $clicks      = $options->{clicks}      + $ad->get('clicksBought');
         my $impressions = $options->{impressions} + $ad->get('impressionsBought');
         $ad->set({
-            title =>  $options->{'adtitle'},
-            clicksBought => $clicks,
-            impressionsBought => $impressions,
-            url =>   $options->{'link'},
-            storageId =>  $options->{'image'},
+            title               => $options->{'adtitle'},
+            clicksBought        => $clicks,
+            impressionsBought   => $impressions,
+            url                 => $options->{'link'},
+            storageId           => $options->{'image'},
         });
     }
     else {
-        $ad = WebGUI::AdSpace::Ad->create($self->session,$self->adSpace,{
-            title =>  $options->{'adtitle'},
-            clicksBought => $options->{'clicks'},
-            impressionsBought => $options->{'impressions'},
-            url =>   $options->{'link'},
-            storageId =>  $options->{'image'},
-            ownerUserId =>  $self->session->user->userId,
-            isActive => 1,
-            type =>  'image',
-            priority => $self->priority,
-            adSpace => $self->adSpace,
+        $ad = WebGUI::AdSpace::Ad->create($session, $self->adSpace, {
+            title               => $options->{'adtitle'},
+            clicksBought        => $options->{'clicks'},
+            impressionsBought   => $options->{'impressions'},
+            url                 => $options->{'link'},
+            storageId           => $options->{'image'},
+            ownerUserId         => $userId,
+            isActive            => 1,
+            type                => 'image',
+            priority            => $self->priority,
+            adSpace             => $self->adSpace,
         });
     }
 
-    WebGUI::AssetCollateral::Sku::Ad::Ad->create($self->session,{
-        userId => $item->transaction->get('userId'),
-        transactionItemId => $item->getId,
-        adId => $ad->getId,
-        clicksPurchased => $options->{'clicks'},
-        impressionsPurchased => $options->{'impressions'},
-        dateOfPurchase => $item->transaction->get('dateOfPurchase'),
-        storedImage =>  $options->{'image'},
-        isDeleted => 0,
+    WebGUI::AssetCollateral::Sku::Ad::Ad->create($session, {
+        userId                 => $userId,
+        transactionItemId      => $item->getId,
+        adId                   => $ad->getId,
+        clicksPurchased        => $options->{'clicks'},
+        impressionsPurchased   => $options->{'impressions'},
+        dateOfPurchase         => $item->transaction->get('dateOfPurchase'),
+        storedImage            => $options->{'image'},
+        isDeleted              => 0,
     });
 }
 

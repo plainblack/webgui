@@ -66,7 +66,7 @@ These functions are available from this package:
 Return an array of all the modules in the given namespace. Will search all 
 @INC directories. C<options> is a hashref of options with the following keys
 
- exclude        => An arrayref of modules to exclude
+ exclude        => An arrayref of modules to exclude. A module name can include an asterisk to glob.
  onelevel       => If true, only find sub modules (children), no deeper
                 find( "CGI", { onelevel => 1 } ) would match "CGI::Session" but 
                 not "CGI::Session::File"
@@ -110,6 +110,12 @@ sub find {
         @modulesHash{ @modules } = ( 1 ) x @modules;
         delete @modulesHash{ @{ $options->{exclude} } };
         @modules    = keys %modulesHash;
+        my @excludePatterns = map { s/(?<!\.)\*/.*/g; $_; } grep { /\*/ } @{ $options->{exclude} };
+        if (@excludePatterns) {
+            my $pattern         = join q{|}, @excludePatterns;
+            my $exclusions      = qr/$pattern/;
+            @modules = grep { ! m/$exclusions/ } @modules;
+        }
     }
 
     ### Return valu

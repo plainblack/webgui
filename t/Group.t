@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (152 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (151 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -659,10 +659,6 @@ ok( !$cacheDude->isInGroup($gA->getId), "Cache dude is not a member of group A")
 ok( !$cacheDude->isInGroup($gB->getId), "Cache dude is not a member of group B");
 
 ##Admin group inclusion check.
-
-my $vgroup = WebGUI::Group->new($session, 1);
-my $vgroups = $vgroup->getGroupsIn();
-ok( isIn(3, @{ $vgroups }), 'Admin Group is in Group Visitor');
 
 SKIP: {
 	skip("need to test expiration date in groupings interacting with recursive or not", 1);

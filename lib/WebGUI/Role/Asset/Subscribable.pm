@@ -38,11 +38,6 @@ sub _subscriptionTemplateId_namespace {
     my $self = shift;
     return $self->getSubscriptionTemplateNamespace($self->session);
 }
-property skipNotification => (
-            autoGenerate    => 0,
-            noFormPost      => 1,
-            fieldType       => 'yesNo',
-         );
 
 use WebGUI::Mail::Send;
 
@@ -435,27 +430,6 @@ override purge => sub {
     $group->delete if $group;
 
     return super();
-};
-
-#----------------------------------------------------------------------------
-
-=head2 setSkipNotification ( )
-
-Set a flag so that this asset does not send out notifications for this 
-revision.
-
-=cut
-
-override setSkipNotification => sub {
-    my $self    = shift;
-    my $value   = shift;
-    $value      = defined $value ? $value : 1;
-
-    $self->update( {
-        skipNotification        => $value,
-    } );
-
-    return;
 };
 
 #----------------------------------------------------------------------------

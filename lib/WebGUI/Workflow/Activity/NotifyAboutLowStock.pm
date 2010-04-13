@@ -91,20 +91,33 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my ($self, undef, $instance) = @_;
-	my $message         = $instance->getScratch('LowStockMessage') || '';
+    my $session         = $self->session;
+    my $messageHeader   =<<EOHEAD;
+<table>
+<tr><th>Quantity</th><th>Product</th></tr>
+EOHEAD
+	my $message         = $instance->getScratch('LowStockMessage') || $messageHeader;
 	my $counter         = $instance->getScratch('LowStockLast')    || 0;
 	my $belowThreshold  = $instance->getScratch('LowStockBelow')   || 0;
-    my $productIterator = WebGUI::Asset::Sku::Product->getIsa($self->session, $counter);
+    my $productIterator = WebGUI::Asset::Sku::Product->getIsa($session, $counter);
     my $warningLimit = $self->get('warningLimit');
     my $finishTime = time() + $self->getTTL;
     my $expired = 0;
-    PRODUCT: foreach my $product ($productIterator->()) {
+    PRODUCT: while (1) {
+        my $product = eval { $productIterator->() };
+        if (my $e = Exception::Class->caught()) {
+            $session->log->error($@);
+            next PRODUCT;
+        }
+        last PRODUCT unless $product;
         VARIANT: foreach my $collateral ( @{ $product->getAllCollateral('variantsJSON') }) {
             if ($collateral->{quantity} <= $warningLimit) {
                 ##Build message
                 $belowThreshold = 1;
-                $message .= $product->getUrl(sprintf 'func=editVariant;vid=%s', $collateral->{variantId})
-                         .  "\n";
+                $message .= sprintf qq{<tr><td>%d</td><td><a href="%s">%s</a></td></tr>\n},
+                    $collateral->{quantity},
+                    $session->url->getSiteURL.$session->url->gateway($product->getUrl(sprintf 'func=editVariant;vid=%s', $collateral->{variantId})),
+                    $collateral->{varSku};
             }
         }
         $counter++;
@@ -126,7 +139,8 @@ sub execute {
     $instance->deleteScratch('LowStockLast');
     $instance->deleteScratch('LowStockBelow');
     if ($belowThreshold) {
-        my $inbox = WebGUI::Inbox->new($self->session);
+        $message .= '</table>';
+        my $inbox = WebGUI::Inbox->new($session);
         $inbox->addMessage({
             status  => 'unread',
             subject => $self->get('subject'),

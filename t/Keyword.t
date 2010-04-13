@@ -17,7 +17,7 @@ use WebGUI::Keyword;
 use WebGUI::Asset;
 # load your modules here
 
-use Test::More tests => 14; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -92,6 +92,12 @@ cmp_deeply(
     $keyword->getMatchingAssets({ keyword => 'webgui', states => [ qw/published trash/, ]}),
     [$snippet->getId, $home->getId, ],
     '... retrieving assets in more than one state'
+);
+
+cmp_deeply(
+    $keyword->getTopKeywords(),
+    { 'webgui' => '2' },
+    'check getTopKeywords returns correctly'
 );
 
 $keyword->deleteKeywordsForAsset($home);

@@ -32,6 +32,7 @@ WebGUI::Test->usersToDelete($user{'2'});
 
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Album Test"});
+addToCleanup($versionTag);
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -104,10 +105,3 @@ $maker->prepare({
     fail        => [ 1, ],
 });
 $maker->run;
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
-

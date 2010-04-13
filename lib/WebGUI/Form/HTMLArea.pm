@@ -172,7 +172,7 @@ sub toHtml {
 	my $richEdit = eval { WebGUI::Asset::RichEdit->newById($self->session, $self->get("richEditId")); };
 	if (! Exception::Class->caught() ) {
        $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
-	   $self->set("extras", $self->get('extras') . ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ');
+	   $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
 	   $self->set("resizable", 0);
 	   return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
     } else {
@@ -386,8 +386,8 @@ sub www_addFolderSave {
 		title                    => $filename,
 		menuTitle                => $filename,
 		url                      => $base->getUrl.'/'.$filename,
-		groupIdEdit              => $session->form->process('groupIdEdit') || $base->get('groupIdEdit'),
-		groupIdView              => $session->form->process('groupIdView') || $base->get('groupIdView'),
+		groupIdEdit              => $base->get('groupIdEdit'),
+		groupIdView              => $base->get('groupIdView'),
 		ownerUserId              => $session->user->userId,
 		startDate                => $base->get('startDate'),
 		endDate                  => $base->get('endDate'),
@@ -410,6 +410,7 @@ sub www_addFolderSave {
 		className                => 'WebGUI::Asset::Wobject::Folder',
 		#filename                 => $filename,
 		});
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
 	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
 	return undef;
 }
@@ -495,6 +496,7 @@ sub www_addImageSave {
         $child->update({url => $child->fixUrl});
         $child->applyConstraints;
     }
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
     $session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
     return undef;
 }

@@ -460,6 +460,34 @@ sub getDeleteUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getThreadLinkUrl ( )
+
+Returns the URL for this Post, which links directly to its anchor and page.
+
+=cut
+
+sub getThreadLinkUrl {
+	my $self = shift;
+    my $url;
+    my $paginator = WebGUI::Paginator->new($self->session, '', $self->getThread->getParent->get('postsPerPage'));
+    my $page_size = $paginator->{_rpp}; ##To make sure defaults are handled correctly.
+    my $place     = $self->getRank+1;
+    my $page      = int($place/$page_size) + 1;
+    my $page_frag = 'pn='.$page;
+    if ($self->get("status") eq "pending") {
+        $url = $self->getUrl($page_frag.";revision=".$self->get("revisionDate"));
+    }
+    else {
+        $url = $self->getUrl($page_frag);
+    }
+    $url .= "#id".$self->getId;
+
+    return $url;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getEditUrl ( )
 
 Formats the url to edit a post.
@@ -673,30 +701,31 @@ Returns a hash reference of template variables for this Post.
 =cut
 
 sub getTemplateVars {
-	my $self    = shift;
+    my $self    = shift;
     my $session = $self->session;
-	my %var     = %{$self->get};
+    my %var     = %{$self->get};
     my $postUser   = WebGUI::User->new($session, $self->ownerUserId);
-	$var{"userId"} = $self->ownerUserId;
-	$var{"user.isPoster"} = $self->isPoster;
-	$var{"avatar.url"}    = $self->getAvatarUrl;
-	$var{"userProfile.url"} = $postUser->getProfileUrl($self->getUrl());
-	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->creationDate);
-	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->revisionDate);
-	$var{'title.short'} = $self->chopTitle;
-	$var{content} = $self->formatContent if ($self->getThread);
-	$var{'user.canEdit'} = $self->canEdit if ($self->getThread);
-	$var{"delete.url"} = $self->getDeleteUrl;
-	$var{"edit.url"} = $self->getEditUrl;
-	$var{"status"} = $self->getStatus;
-	$var{"reply.url"} = $self->getReplyUrl;
-	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
-	$var{'url'} = $self->getUrl.'#id'.$self->getId;
-        $var{'url.raw'} = $self->getUrl;
-	$var{'rating.value'} = $self->rating+0;
-	$var{'rate.url.thumbsUp'} = $self->getRateUrl(1);
-	$var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
-	$var{'hasRated'} = $self->hasRated;
+    $var{"userId"}              = $self->ownerUserId;
+    $var{"user.isPoster"}       = $self->isPoster;
+    $var{"avatar.url"}          = $self->getAvatarUrl;
+    $var{"userProfile.url"}     = $postUser->getProfileUrl($self->getUrl());
+    $var{"hideProfileUrl" }     = $self->ownerUserId eq '1' || $session->user->isVisitor;
+    $var{"dateSubmitted.human"} = $self->session->datetime->epochToHuman($self->creationDate);
+    $var{"dateUpdated.human"}   = $self->session->datetime->epochToHuman($self->revisionDate);
+    $var{'title.short'}         = $self->chopTitle;
+    $var{content}               = $self->formatContent if ($self->getThread);
+    $var{'user.canEdit'}        = $self->canEdit if ($self->getThread);
+    $var{"delete.url"}          = $self->getDeleteUrl;
+    $var{"edit.url"}            = $self->getEditUrl;
+    $var{"status"}              = $self->getStatus;
+    $var{"reply.url"}           = $self->getReplyUrl;
+    $var{'reply.withquote.url'} = $self->getReplyUrl(1);
+    $var{'url'}                 = $self->getUrl.'#id'.$self->getId;
+    $var{'url.raw'}             = $self->getUrl;
+    $var{'rating.value'}        = $self->rating+0;
+    $var{'rate.url.thumbsUp'}   = $self->getRateUrl(1);
+    $var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
+    $var{'hasRated'}            = $self->hasRated;
 	my $gotImage;
 	my $gotAttachment;
 	@{$var{'attachment_loop'}} = ();
@@ -854,7 +883,7 @@ sub insertUserPostRating {
 		[$self->getId,
 		 $self->session->user->userId,
 		 $self->session->env->getIp,
-		 $self->session->datetime->time(),
+		 time(),
 		 $rating,]
 	);
 }
@@ -1062,6 +1091,9 @@ override processPropertiesFromFormPost => sub {
     else {
         $self->getThread->unsubscribe;
     }
+    if ($self->canEdit && $form->process('skip_notification')) {
+        $self->setSkipNotification;
+    }
     if ($self->getThread->getParent->canEdit) {
         $form->process('isLocked') ?  $self->getThread->lock  : $self->getThread->unlock;
         $form->process('isSticky') ?  $self->getThread->stick : $self->getThread->unstick;
@@ -1176,19 +1208,20 @@ An integer indicating either thumbss up (+1) or thumbs down (-1)
 =cut
 
 sub rate {
-	my $self = shift;
+	my $self   = shift;
 	my $rating = shift;
 	return undef unless ($rating == -1 || $rating == 1);
 	return undef if $self->hasRated;
+    my $session = $self->session;
 	$self->insertUserPostRating($rating);
 	$self->recalculatePostRating();
     my $thread = $self->getThread;
 	$thread->updateThreadRating();
-	if ($self->session->setting->get("useKarma")
-        && $self->session->user->karma > $thread->getParent->karmaSpentToRate) {
-		$self->session->user->karma(-$self->getThread->getParent->karmaSpentToRate, "Rated Post ".$self->getId, "Rated a CS Post.");
-		my $u = WebGUI::User->new($self->session, $self->ownerUserId);
-		$u->karma($self->getThread->getParent->karmaRatingMultiplier, "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
+	if ($session->setting->get("useKarma")
+        && $session->user->karma > $thread->getParent->karmaSpentToRate) {
+		$session->user->karma(-$thread->getParent->karmaSpentToRate, "Rated Post ".$self->getId, "Rated a CS Post.");
+		my $u = WebGUI::User->new($session, $self->ownerUserId);
+		$u->karma($thread->getParent->karmaRatingMultiplier, "Post ".$self->getId." Rated by ".$session->user->userId, "Had post rated.");
 	}
 }
 
@@ -1394,16 +1427,15 @@ Renders a template form for adding and editing posts.
 =cut
 
 sub www_edit {
-	my $self      = shift;
+    my $self      = shift;
     my $session   = $self->session;
     my $form      = $session->form;
     my $privilege = $session->privilege;
     my $user      = $session->user;
     my $func      = $form->process("func");
     
-	my (%var, $content, $title, $synopsis);
-	my $i18n = WebGUI::International->new($session);
-
+    my (%var, $content, $title, $synopsis);
+    my $i18n = WebGUI::International->new($session);
 
     my $className = $form->process("class","className") || $self->className;
 	if ($func eq "add" || ($func eq "editSave" && $form->process("assetId") eq "new")) { # new post
@@ -1609,7 +1641,12 @@ sub www_edit {
         });
     }
 	$var{'form.submit'} = WebGUI::Form::submit($session, {
-        extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave';return true;\""
+	    extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave';return true;\""
+	});
+	$var{'form.cancel'} = WebGUI::Form::button( $session, {
+	    name        => "cancel",
+	    value       => $i18n->get("cancel"),
+	    extras      => 'onclick="history.go(-1)"',
 	});
 	$var{'karmaScale.form'} = WebGUI::Form::integer($session, {
         name=>"karmaScale",
@@ -1618,7 +1655,7 @@ sub www_edit {
     });
 	$var{karmaIsEnabled} = $session->setting->useKarma;
 	$var{'form.preview'} = WebGUI::Form::submit($session, {
-        value=>$i18n->get("preview","Asset_Collaboration")
+	    value=>$i18n->get("preview","Asset_Collaboration")
     });
 	my $numberOfAttachments = $self->getThread->getParent->attachmentsPerPost;
 	$var{'attachment.form'} = WebGUI::Form::image($session, {
@@ -1631,6 +1668,10 @@ sub www_edit {
     $var{'contentType.form'} = WebGUI::Form::contentType($session, {
         name=>'contentType',
         value=>$self->contentType || "mixed",
+    });
+    $var{'skipNotification.form'} = WebGUI::Form::yesNo($session, {
+        name=>'skip_notification',
+        value=>$form->get("skip_notification",'yesNo') || 0,
     });
     if ($session->setting->get("metaDataEnabled")
      && $self->getThread->getParent->enablePostMetaData) {

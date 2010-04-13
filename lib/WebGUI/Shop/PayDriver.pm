@@ -237,19 +237,6 @@ sub definition {
             hoverHelp       => $i18n->get('who can use help'),
             defaultValue    => 7,
         },
-        receiptEmailTemplateId => {
-            fieldType       => 'template',
-            namespace       => "Shop/EmailReceipt",
-            label           => $i18n->get("receipt email template"),
-            hoverHelp       => $i18n->get("receipt email template help"),
-            defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
-        },
-        saleNotificationGroupId => {
-            fieldType       => 'group',
-            label           => $i18n->get("sale notification group"),
-            hoverHelp       => $i18n->get("sale notification group help"),
-            defaultValue    => '3',
-        },
     );
 
     my %properties = (
@@ -662,7 +649,7 @@ sub processTransaction {
     if ($success) {
         $transaction->completePurchase($transactionCode, $statusCode, $statusMessage);
         $cart->onCompletePurchase;
-        $self->sendNotifications($transaction);
+        $transaction->sendNotifications();
     }
     else {
         $transaction->denyPurchase($transactionCode, $statusCode, $statusMessage);
@@ -679,49 +666,6 @@ sub processTransaction {
 Accessor for the session object.  Returns the session object.
 
 =cut
-
-
-#-------------------------------------------------------------------
-
-=head2 sendNotifications ( transaction )
-
-Sends out a receipt and a sale notification to the buyer and the store owner respectively.
-
-=cut
-
-sub sendNotifications {
-    my ($self, $transaction) = @_;
-    my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver');
-    my $url     = $session->url;
-    my $var     = $transaction->getTransactionVars;
-
-    # render
-    my $template = WebGUI::Asset::Template->newById( $session, $self->get("receiptEmailTemplateId") );
-    my $inbox = WebGUI::Inbox->new($session);
-    my $receipt = $template->process( $var );
-    WebGUI::Macro::process($session, \$receipt);
-
-    # purchase receipt
-    $inbox->addMessage( {
-        message     => $receipt,
-        subject     => $i18n->get('receipt subject') . ' ' . $transaction->get('orderNumber'),
-        userId      => $transaction->get('userId'),
-        status      => 'completed',
-    } );
-    
-    # shop owner notification
-    # Shop owner uses method=view rather than method=viewMy
-    $var->{viewDetailUrl} = $url->page( 'shop=transaction;method=view;transactionId='.$transaction->getId, 1 );
-    my $notification = $template->process( $var );
-    WebGUI::Macro::process($session, \$notification);
-    $inbox->addMessage( {
-        message     => $notification,
-        subject     => $i18n->get('a sale has been made') . ' ' . $transaction->get('orderNumber'),
-        groupId     => $self->get('saleNotificationGroupId'),
-        status      => 'unread',
-    } );
-}
 
 #-------------------------------------------------------------------
 

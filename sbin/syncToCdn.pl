@@ -20,6 +20,7 @@ use Fcntl ':flock';
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
+use Pod::Usage;
 
 my $configFile;
 my $help;
@@ -32,71 +33,17 @@ GetOptions(
     'override'     => \$override,
     'migrate'      => \$migrate,
     'quiet'        => \$quiet,
+    'h|help'       => \$help,
 );
 
-if ( $configFile eq "" ) {
-    printHelp();
-    exit 4;
-}
-
-if ($help) {
-    printHelp();
-    exit 2;
-}
+pod2usage( { verbose => 2, exitval => 2, } ) if $help;
+pod2usage( { exitval => 4, } ) unless $configFile;
 
 # don't want two copies of this to run simultaneously
 unless ( flock( DATA, LOCK_EX | LOCK_NB ) ) {
     print "$0 is already running. Exiting.\n";
     exit 3;
 }
-
-sub printHelp {
-    print <<STOP;
-
-Usage: perl $0 --configfile=<webguiConfig>
-
-	--configFile		WebGUI config file.
-
-Options:
-
-	--override		This utility is designed to be run as
-				a privileged user on Linux style systems.
-				If you wish to run this utility without
-				being the super user, then use this flag,
-				but note that it may not work as
-				intended.
-
-	--migrate		Migrate entirety of uploads directory to CDN.
-				Ignore the CDN queue and sync everything.
-
-	--help			Display this help message and exit.
-
-	--quiet			Disable output unless there's an error.
-
-EXIT STATUS
-
-  The following exit values are returned:
-
-  0
-	Successful execution.
-
-  1
-	Only super user may run the script.
-
-  2
-	Help requested.
-
-  3
-	Only one instance of this script can run at a time.
-
-  4
-	Error during invocation of the command.
-
-  5
-	Content Delivery Network (CDN) is not enabled.
-
-STOP
-} ## end sub printHelp
 
 if ( !( $^O =~ /^Win/i ) && $> != 0 && !$override ) {
     print "You must be the super user to use this utility.\n";
@@ -213,3 +160,91 @@ sub syncUploads {
 __DATA__
 This exists so flock() code above works.
 DO NOT REMOVE THIS DATA SECTION.
+
+__END__
+
+=head1 NAME
+
+syncToCdn - WebGUI interface to a Content Delivery Network.
+
+=head1 SYNOPSIS
+
+ syncToCdn.pl --configFile config.conf
+             [--override]
+             [--migrate]
+             [--quiet]
+
+ syncToCdn.pl --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script displays the amount of disk space used by
+an asset and it's descendants. It has been modeled after the *nix 'du'
+utility.
+
+=over
+
+=item B<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item B<--override>
+
+This utility is designed to be run as a privileged user on Linux style
+systems.  If you wish to run this utility without being the super user,
+then use this flag, but note that it may not work as intended.
+
+=item B<--migrate>
+
+Migrate entirety of uploads directory to CDN.  Ignore the CDN queue and
+sync everything.
+
+=item B<--quiet>
+
+Disable output unless there is an error.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 EXIT CODES
+
+The following exit values are returned:
+
+=over 4
+
+=item 0
+
+Successful execution.
+
+=item 1
+
+Only super user may run the script.
+
+=item 2
+
+Help requested.
+
+=item 3
+
+Only one instance of this script can run at a time.
+
+=item 4
+
+Error during invocation of the command.
+
+=item 5
+
+Content Delivery Network (CDN) is not enabled.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2009 Plain Black Corporation.
+
+=cut

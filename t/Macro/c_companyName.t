@@ -14,33 +14,18 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::c_companyName;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 2+1;
-
-plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::c_companyName';
-my $loaded = use_ok($macro);
-
-my $originalCompanyName = $session->setting->get('companyName');
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+plan tests => 2;
 
 my $output = WebGUI::Macro::c_companyName::process($session);
-is($output, $originalCompanyName, "Testing companyName");
+is($output, $session->setting->get('companyName'), "Testing companyName");
 
 $session->setting->set('companyName', q|Gooey's Consulting, LLC|);
 $output = WebGUI::Macro::c_companyName::process($session);
 is($output, q|Gooey&#39;s Consulting&#44; LLC|, "Testing companyName with embedded quote and comma");
-
-}
-
-END {
-}

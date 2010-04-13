@@ -170,9 +170,9 @@ sub new {
 	my $webguiPath = Cwd::realpath(shift);
 	my $filename = shift;
 	my $noCache = shift;
-    my $fullPath = $webguiPath.'/etc/'.$filename;
-	if (exists $config{$filename}) {
-		return $config{$filename};
+    my $fullPath = Cwd::realpath($webguiPath.'/etc/'.$filename);
+	if (exists $config{$fullPath}) {
+		return $config{$fullPath};
 	} else {
         my $self = Config::JSON->new($fullPath);
         register($self, $class);

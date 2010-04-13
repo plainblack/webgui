@@ -316,6 +316,11 @@ override getEditForm => sub {
 	### Download
 	# Download Type
 	my %downloadTypes;
+	tie %downloadTypes, 'Tie::IxHash', 
+		"none" 		=> $i18n->get("No Download"),
+		"csv"		=> $i18n->get("CSV"),
+		"template"	=> $i18n->get("Template"),
+		;
 		
 	$tabform->getTab("properties")->radioList(
 		-name=>"downloadType",		# ID is downloadType_formId
@@ -508,7 +513,9 @@ sub download {
 	} 
     elsif ($self->downloadType eq "template") { 
         my $data	= $self->_processQuery(1,0);
-		return $self->processTemplate($data,$self->downloadTemplateId);
+        my $output  = $self->processTemplate($data,$self->downloadTemplateId);
+        WebGUI::Macro::process($self->session, \$output);
+		return $output;
 	} 
     else {
 		# I don't know what to do
@@ -568,8 +575,9 @@ if the user is not in Admin Mode.
 sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
-		my $out = eval{$cache->get("view_".$self->getId)};
+    my $cacheKey = $self->getWwwCacheKey( 'view' );
+    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+        my $out = eval{ $cache->get( $cacheKey ) };
 		return $out if $out;
 	}
         # Initiate an empty debug loop
@@ -594,10 +602,10 @@ sub view {
     }
 	
        	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
-	}
-       	return $out;
+    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+        eval { $cache->set( $cacheKey, $out, $self->cacheTimeout ) };
+    }
+    return $out;
 }
 
 #-------------------------------------------------------------------
@@ -681,14 +689,15 @@ sub _processQuery {
 	$page		= 1 unless defined $page;	
 	my $nr 		= shift || 1;
         my ($query, %var, $prefix);
+	my $i18n = WebGUI::International->new($self->session,"Asset_SQLReport");
 
 	if($nr > 1) {
 		$prefix = 'query'.$nr.'.';
 	}
 
-    if (! $self->{_query}{$nr}{dbQuery}) {
+    if (! $self->{_query}{$nr}{dbQuery} || $self->{_query}{$nr}{dbQuery} =~ m{\A \s* \Z}msx) {
         $self->session->errorHandler->warn("No query specified for query $nr on '" . $self->getId . "'");
-        push @{$self->{_debug_loop}}, { 'debug.output' => "No query specfied for query $nr" };
+        push @{$self->{_debug_loop}}, { 'debug.output' => sprintf($i18n->get('No query specified for query'), $nr) };
         return \%var;
     }
 
@@ -703,7 +712,6 @@ sub _processQuery {
                 $query = $self->{_query}{$nr}{dbQuery};
         }
 
-	my $i18n = WebGUI::International->new($self->session,"Asset_SQLReport");
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get(17).$query});
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get('debug placeholder parameters').join(",",@$placeholderParams)});
         my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->{_query}{$nr}{databaseLinkId});
@@ -782,7 +790,7 @@ sub _processQuery {
                                                 $row{$prefix.'row.field.'.$tmpl_name.'.value'} = $data->{$name};
                                         }
 					# Process nested query
-                                        if($nest && $self->{_query}{$nr + 1}{dbQuery}) {
+                                        if ($nest && $self->{_query}{$nr + 1}{dbQuery} =~ m/\S/) {
                                                 my $nest = $self->_processQuery($nest,$page,$nr+1);
 						%row = (%row , %$nest);
 						$row{$prefix.'hasNest'} = $nest->{'query'.($nr+1).'.rows.count'};
@@ -832,12 +840,10 @@ sub www_download {
 		unless $self->session->user->isInGroup($self->downloadUserGroup);
 	
 	# Set filename and mimetype
-	if ($self->downloadType eq "csv")
-	{
+	if ($self->downloadType eq "csv") {
 		$self->session->http->setFilename($self->downloadFilename,"application/octet-stream");
 	}
-	else
-	{
+	else {
 		$self->session->http->setFilename($self->downloadFilename, $self->downloadMimeType);
 	}
 	

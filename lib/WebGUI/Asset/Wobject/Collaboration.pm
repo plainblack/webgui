@@ -532,14 +532,16 @@ A reference to a WebGUI::Paginator object.
 =cut
 
 sub appendPostListTemplateVars {
-	my $self = shift;
-	my $var = shift;
-	my $p = shift;
-	my $page = $p->getPageData;
-	my $i = 0;
-    my ($icon, $datetime) = $self->session->quick(qw(icon datetime));
+	my $self    = shift;
+    my $session = $self->session;
+	my $var     = shift;
+	my $p       = shift;
+	my $page    = $p->getPageData;
+	my $i       = 0;
+    my ($icon, $datetime) = $session->quick(qw(icon datetime));
+    my $isVisitor         = $session->user->isVisitor;
 	foreach my $row (@$page) {
-		my $post = WebGUI::Asset->newById($self->session,$row->{assetId}, $row->{revisionDate});
+		my $post = WebGUI::Asset->newById($session,$row->{assetId}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
 		my $controls = $icon->delete('func=delete',$post->url,"Delete") . $icon->edit('func=edit',$post->url);
 		if ($self->sortBy eq "lineage") {
@@ -560,10 +562,11 @@ sub appendPostListTemplateVars {
 			if ($self->displayLastReply) {
 				my $lastPost = $post->getLastPost();
 				%lastReply = (
-					"lastReply.url"                 => $lastPost->getUrl.'#'.$lastPost->getId,
+					"lastReply.url"                 => $lastPost->getThreadLinkUrl,
                     "lastReply.title"               => $lastPost->title,
                     "lastReply.user.isVisitor"      => $lastPost->ownerUserId eq "1",
                     "lastReply.username"            => $lastPost->username,
+                    "lastReply.hideProfileUrl"      => $lastPost->ownerUserId eq "1" || $isVisitor,
                     "lastReply.userProfile.url"     => $lastPost->getPosterProfileUrl(),
                     "lastReply.dateSubmitted.human" => $datetime->epochToHuman($lastPost->creationDate,"%z"),
                     "lastReply.timeSubmitted.human" => $datetime->epochToHuman($lastPost->creationDate,"%Z"),
@@ -571,16 +574,10 @@ sub appendPostListTemplateVars {
 			}
 			$hasRead = $post->isMarkedRead;
 		}
-		my $url;
-		if ($post->status eq "pending") {
-			$url = $post->getUrl("revision=".$post->revisionDate)."#".$post->getId;
-		} else {
-			$url = $post->getUrl."#".$post->getId;
-		}
 		my %postVars = (
 			%{$post->get},
             "id"                    => $post->getId,
-            "url"                   => $url,
+            "url"                   => $post->getThreadLinkUrl,
 			rating_loop             => \@rating_loop,
 			"content"               => $post->formatContent,
             "status"                => $post->getStatus,
@@ -590,14 +587,15 @@ sub appendPostListTemplateVars {
             "dateUpdated.human"     => $datetime->epochToHuman($post->revisionDate,"%z"),
             "timeSubmitted.human"   => $datetime->epochToHuman($post->creationDate,"%Z"),
             "timeUpdated.human"     => $datetime->epochToHuman($post->revisionDate,"%Z"),
+            "hideProfileUrl"        => $post->ownerUserId eq '1' || $isVisitor,
             "userProfile.url"       => $post->getPosterProfileUrl,
             "user.isVisitor"        => $post->ownerUserId eq "1",
         	"edit.url"              => $post->getEditUrl,
 			'controls'              => $controls,
-            "isSecond"              => (($i+1)%2==0),
-            "isThird"               => (($i+1)%3==0),
-            "isFourth"              => (($i+1)%4==0),
-            "isFifth"               => (($i+1)%5==0),
+            "isSecond"              => (($i+1) == 2),
+            "isThird"               => (($i+1) == 3),
+            "isFourth"              => (($i+1) == 4),
+            "isFifth"               => (($i+1) == 5),
 			"user.hasRead"          => $hasRead,
             "user.isPoster"         => $post->isPoster,
             "avatar.url"            => $post->getAvatarUrl,
@@ -607,7 +605,7 @@ sub appendPostListTemplateVars {
 		if ($row->{className} =~ m/^WebGUI::Asset::Post::Thread/) {
 			$postVars{'rating'} = $post->threadRating;
 		}
-                push(@{$var->{post_loop}}, \%postVars );
+        push(@{$var->{post_loop}}, \%postVars );
 		$i++;
 	}
 	$p->appendTemplateVars($var);
@@ -926,7 +924,8 @@ sub createSubscriptionGroup {
 
 =head2 duplicate 
 
-Extend the base method to handle making a subscription group for the new CS.
+Extend the base method to handle making a subscription group for the new CS, and
+to build a new Cron job.  It also recalculates the number of threads and replies.
 
 =cut
 
@@ -934,7 +933,33 @@ sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->next::method(@_);
 	$newAsset->createSubscriptionGroup;
-	return $newAsset;
+    my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
+    my $newCron = WebGUI::Workflow::Cron->create($self->session, {
+            title=>$self->getTitle." ".$i18n->get("mail"),
+            minuteOfHour=>"*/".($self->get("getMailInterval")/60),
+            className=>(ref $self),
+            methodName=>"new",
+            parameters=>$self->getId,
+            workflowId=>"csworkflow000000000001"
+    });
+    $newAsset->update({getMailCronId=>$newCron->getId});
+    $newAsset->incrementReplies('','');
+    return $newAsset;
+}
+
+#-------------------------------------------------------------------
+
+=head2 duplicateBranch.
+
+Extend the base method to recalculate the number of threads and replies.
+
+=cut
+
+sub duplicateBranch {
+    my $self = shift;
+    my $newAsset = $self->next::method(@_);
+    $newAsset->incrementReplies('','');
+    return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -1126,62 +1151,75 @@ Collaboration System
 =cut
 
 sub getThreadsPaginator {
-    my $self        = shift;
-	
-    my $scratchSortBy = $self->getId."_sortBy";
-	my $scratchSortOrder = $self->getId."_sortDir";
-	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->sortBy;
-    my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->sortOrder;
-	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
-		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
-        $self->session->scratch->set($scratchSortOrder, $sortOrder);
-	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
-                if ($sortOrder eq "asc") {
-                        $sortOrder = "desc";
-                } else {
-                        $sortOrder = "asc";
-                }
-                $self->session->scratch->set($scratchSortOrder, $sortOrder);
-	}
-	$sortBy ||= "assetData.revisionDate";
-	$sortOrder ||= "desc";
-    # Sort by the thread rating instead of the post rating.  other places don't care about threads.
-    if ($sortBy eq 'rating') {
-        $sortBy = 'threadRating';
-    } 
-    $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
+    my $self    = shift;
+    my $session = $self->session;
 
-	my $sql = "
-		select 
-			asset.assetId,
-			asset.className,
-			assetData.revisionDate as revisionDate 
-		from Thread 
-			left join asset on Thread.assetId=asset.assetId 
-			left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate 
-			left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate 
-		where 
-			asset.parentId=".$self->session->db->quote($self->getId)." 
-			and asset.state='published' 
-			and asset.className='WebGUI::Asset::Post::Thread' 
-			and assetData.revisionDate=(
-				select
-					max(revisionDate) 
-				from 
-					assetData 
-				where 
-					assetData.assetId=asset.assetId 
-					and (status='approved' or status='archived')
-			) 
-			and status='approved'
-		group by 
-			assetData.assetId 
-		order by 
-			Thread.isSticky desc, 
-		".$sortBy." 
-			".$sortOrder;
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->threadsPerPage);
-	$p->setDataByQuery($sql);
+    my $scratchSortBy    = $self->getId."_sortBy";
+    my $scratchSortOrder = $self->getId."_sortDir";
+    my $sortBy    = $self->session->form->process("sortBy")   
+                 || $self->session->scratch->get($scratchSortBy)
+                 || $self->sortBy;
+    $sortBy =~ s/^\w+\.//;
+    # Sort by the thread rating instead of the post rating.  other places don't care about threads.
+    $sortBy = $sortBy eq 'rating' ? 'threadRating' : $sortBy;
+    if (! WebGUI::Utility::isIn($sortBy, qw/userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 title lineage revisionDate creationDate karmaRank threadRating/)) {
+        $sortBy = 'revisionDate';
+    }
+    if ($sortBy eq 'assetId' || $sortBy eq 'revisionDate') {
+        $sortBy = 'assetData.' . $sortBy;
+    }
+    my $sortOrder = $self->session->form->process("sortOrder")
+                 || $self->session->scratch->get($scratchSortOrder)
+                 || $self->get("sortOrder");
+    #$sortOrder    = lc $sortOrder;
+    #$sortOrder    = 'desc' if ($sortOrder ne 'asc' && $sortOrder ne 'desc');
+    if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
+        $self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
+        $self->session->scratch->set($scratchSortOrder, $sortOrder);
+    }
+    elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave" && ! $self->session->form->process('sortOrder')) {
+        if ($sortOrder eq "asc") {
+            $sortOrder = "desc";
+        }
+        else {
+            $sortOrder = "asc";
+        }
+        $self->session->scratch->set($scratchSortOrder, $sortOrder);
+    }
+    $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
+    $sortOrder ||= 'desc';
+
+    my $sql = "
+        select
+            asset.assetId,
+            asset.className,
+            assetData.revisionDate as revisionDate
+        from Thread
+            left join asset on Thread.assetId=asset.assetId
+            left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate
+            left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate
+        where
+            asset.parentId=".$self->session->db->quote($self->getId)."
+            and asset.state='published'
+            and asset.className='WebGUI::Asset::Post::Thread'
+            and assetData.revisionDate=(
+                select
+                    max(revisionDate)
+                from
+                    assetData
+                where
+                    assetData.assetId=asset.assetId
+                    and (status='approved' or status='archived')
+            )
+            and status='approved'
+        group by
+            assetData.assetId
+        order by
+            Thread.isSticky desc,
+        ".$sortBy."
+        ".$sortOrder;
+    my $p     = WebGUI::Paginator->new($session,$self->getUrl,$self->threadsPerPage);
+    $p->setDataByQuery($sql);
 
     return $p;
 }
@@ -1214,10 +1252,10 @@ sub getViewTemplateVars {
 	my %var;
 	$var{'user.canPost'} = $self->canPost;
 	$var{'user.canStartThread'} = $self->canStartThread;
-        $var{"add.url"} = $self->getNewThreadUrl;
-        $var{"rss.url"} = $self->getRssFeedUrl;
-        $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($self->session->user->isVisitor);
+    $var{"add.url"} = $self->getNewThreadUrl;
+    $var{"rss.url"} = $self->getRssFeedUrl;
+    $var{'user.isModerator'} = $self->canModerate;
+    $var{'user.isVisitor'} = ($self->session->user->isVisitor);
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
@@ -1564,6 +1602,23 @@ sub view {
 
 #-------------------------------------------------------------------
 
+=head2 www_edit 
+
+Override the master class to add an "Unarchive All" link.
+
+=cut
+
+sub www_edit {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
+    $self->getAdminConsole->addConfirmedSubmenuItem($self->getUrl('func=unarchiveAll'),$i18n->get("unarchive all"),$i18n->get("unarchive confirm"));
+    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("assetName"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_search ( )
 
 The web method to display and use the forum search interface.
@@ -1578,7 +1633,8 @@ sub www_search {
 	
     my $query   = $self->session->form->process("query","text");
     $var->{'form.header'} = WebGUI::Form::formHeader($self->session,{
-        action=>$self->getUrl("func=search;doit=1")
+        action=> $self->getUrl("func=search;doit=1"),
+        method=> 'GET',
     });
     $var->{'query.form'}  = WebGUI::Form::text($self->session,{
         name  => 'query',
@@ -1617,6 +1673,35 @@ sub www_subscribe {
 	my $self = shift;
 	$self->subscribe if $self->canSubscribe;
         return $self->www_view;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_unarchiveAll ( )
+
+Unarchive all the threads in this collaboration system
+
+=cut
+
+sub www_unarchiveAll {
+    my ( $self ) = @_;
+    my $session     = $self->session;
+    return $session->privilege->insufficient() unless $self->canEdit;
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $i18n     = WebGUI::International->new($session, 'Asset_Collaboration');
+    $pb->start($i18n->get('unarchive all'), $self->getUrl('func=edit'));
+    my $threadIds = $self->getLineage(['children'],{
+        includeOnlyClasses      => [ 'WebGUI::Asset::Post::Thread' ],
+        statusToInclude         => [ 'archived' ],
+    } );
+    ASSET: foreach my $threadId (@$threadIds) {
+        my $thread = WebGUI::Asset->newPending($session, $threadId);
+        if (!$thread || !$thread->canEdit) {
+            next ASSET;
+        }
+        $thread->unarchive;
+    }
+    return $pb->finish( $self->getUrl('func=edit') );
 }
 
 #-------------------------------------------------------------------

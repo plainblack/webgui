@@ -4,11 +4,11 @@ if (typeof Survey === "undefined") {
 }
 
 (function(){
-	
+
 	var INVALID_QUESTION_CLASS = 'survey-invalid'; // CSS class for questions that fail input validation
 	var INVALID_SUBMIT_CLASS = 'survey-submit-invalid'; // CSS class for submit div when questions don't validate
 	var INVALID_QUESTION_MARKER = 'survey-invalid-marker'; // For default '*' invalid field marker
-	
+
     // All specially-handled question types are listed here
     // (anything else is assumed to be a multi-choice bundle)
     var TEXT_TYPES = {
@@ -43,15 +43,15 @@ if (typeof Survey === "undefined") {
     var HIDDEN_TYPES = {
         'Hidden': 1
     };
-    
+
     var hasFile;
     var verb = 0;
     var lastSection = 'first';
-    
+
     var toValidate;
     var sliderWidth = 500;
     var sliders;
-    
+
     function formsubmit(event){
         var submit = 1;//boolean for if all was good or not
         var lowestInvalidY = 0;
@@ -95,18 +95,18 @@ if (typeof Survey === "undefined") {
                         if (YAHOO.lang.hasOwnProperty(toValidate[i].answers, z2)) {
                             var month = document.getElementById(z2+'-month').value;
                             var year = document.getElementById(z2+'-year').value;
-                            if (month == ''){ 
-                                answered = 0; 
+                            if (month == ''){
+                                answered = 0;
                             }
                             var yInt = parseInt(year, 10);
-                            if(!yInt) { 
-                                answered = 0; 
+                            if(!yInt) {
+                                answered = 0;
                             }
-                            if(yInt < 1000 || yInt > 3000) { 
-                                answered = 0; 
+                            if(yInt < 1000 || yInt > 3000) {
+                                answered = 0;
                             }
-                            if (answered == 1){ 
-                                document.getElementById(z2).value = month + "-" + year; 
+                            if (answered == 1){
+                                document.getElementById(z2).value = month + "-" + year;
                             }
                         }
                     }
@@ -127,13 +127,13 @@ if (typeof Survey === "undefined") {
 				var q_parent_node = YAHOO.util.Dom.getAncestorByClassName(node, 'question');
                 if (!answered) {
                     submit = 0;
-					
+
 					// Apply INVALID_QUESTION_CLASS to the parent question div for people who want to skin Survey
                     YAHOO.util.Dom.addClass(q_parent_node, INVALID_QUESTION_CLASS);
-					
+
 					// Insert default '*' marker (can be hidden via CSS for those who want something different)
 					node.innerHTML = "<span class='" + INVALID_QUESTION_MARKER + "'>*</span>";
-                    
+
                     // Keep track of the lowest y-coord invalid question (to scroll to)
                     var qY = YAHOO.util.Dom.getY(q_parent_node);
                     lowestInvalidY = lowestInvalidY && lowestInvalidY < qY ? lowestInvalidY : qY;
@@ -146,7 +146,7 @@ if (typeof Survey === "undefined") {
         }
         var submitButton = document.getElementById('submitbutton');
         var submitDiv = submitButton && YAHOO.util.Dom.getAncestorByTagName(submitButton, 'div');
-        
+
         if (submit) {
             if (submitDiv) {
                 YAHOO.util.Dom.removeClass(submitDiv, INVALID_SUBMIT_CLASS);
@@ -158,24 +158,24 @@ if (typeof Survey === "undefined") {
             if (submitDiv) {
                 YAHOO.util.Dom.addClass(submitDiv, INVALID_SUBMIT_CLASS);
             }
-            
+
             // Scroll page to the y-coord of the lowest invalid question
             if (lowestInvalidY) {
                 scrollPage(lowestInvalidY, 1.5, YAHOO.util.Easing.easeOut);
             }
         }
     }
-    
+
     function goBack(event){
         YAHOO.log("Going back");
         Survey.Comm.callServer('', 'goBack');
     }
-    
+
     function scrollPage(to, dur, ease) {
         var setAttr = function(a, v, u) {
             window.scroll(0, v);
         };
-    
+
         var anim = new YAHOO.util.Anim(null,
             { 'scroll' : {
                 from : YAHOO.util.Dom.getDocumentScrollTop(),
@@ -186,16 +186,16 @@ if (typeof Survey === "undefined") {
         anim.setAttribute = setAttr;
         anim.animate();
     }
-    
+
     function numberHandler(event, objs){
-        
+
         var value = parseFloat(this.value, 10);
-        
+
         // Get the constraints
         var min = parseFloat(objs.min, 10);
         var max = parseFloat(objs.max, 10);
         var step = parseFloat(objs.step, 10);
-        
+
         if (YAHOO.lang.isNumber(value)) {
             // Enforce step
             if (YAHOO.lang.isNumber(step) && value % step != 0){
@@ -204,7 +204,7 @@ if (typeof Survey === "undefined") {
             // Enforce max/min constraints
             if (YAHOO.lang.isNumber(min) && value < min){
                 this.value = min;
-            }        
+            }
             if (YAHOO.lang.isNumber(max) && value > max){
                 this.value = max;
             }
@@ -218,7 +218,7 @@ if (typeof Survey === "undefined") {
         this.value = this.value * 1;
 		this.value = YAHOO.lang.isValue(this.value) ? this.value : 0;
     }
-    
+
     function sliderManager(q){
         //total number of pixels in the slider.
         var total = sliderWidth;
@@ -233,7 +233,7 @@ if (typeof Survey === "undefined") {
 
         //The number of values in between the max and min values
         var distance = max - min;
-       
+
         //Number of pixels each bug step takes
         var bugSteps = Math.round(total * step / distance);
 
@@ -241,9 +241,9 @@ if (typeof Survey === "undefined") {
         total = distance * bugSteps / step;
 
         var scale = Math.round(total / distance);
-        
-        //max is just the max value, used for determining allocation sliders. 
-        var allocMax = 0;         
+
+        //max is just the max value, used for determining allocation sliders.
+        var allocMax = max;
         var type = 'slider';
 
         //find the maximum difference between an answers max and min
@@ -251,8 +251,9 @@ if (typeof Survey === "undefined") {
             if (YAHOO.lang.hasOwnProperty(q.answers, _s)) {
                 var a1 = q.answers[_s];
                 YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
-                if (a1.max - a1.min > max) {
-                    allocMax = a1.max - a1.min;
+                localMax = a1.max - a1.min
+                if (localMax > max) {
+                    allocMax = localMax;
                 }
             }
         }
@@ -302,13 +303,13 @@ if (typeof Survey === "undefined") {
                 };
                 s.subscribe("change", check);
                 var manualEntry = function(e){
-                    // set the value when the 'return' key is detected 
+                    // set the value when the 'return' key is detected
                     if (Event.getCharCode(e) === 13 || e.type === 'blur') {
                         var v = parseFloat(this.value, 10);
                         v = (lang.isNumber(v)) ? v : 0;
                         //                  v *= scale;
                         v = (((v - min) / distance)) * total;
-                        // convert the real value into a pixel offset 
+                        // convert the real value into a pixel offset
                         for (var sl in sliders[q.id]) {
                             if (sliders[q.id][sl].input === this.id) {
                                 sliders[q.id][sl].setValue(Math.round(v));
@@ -318,7 +319,7 @@ if (typeof Survey === "undefined") {
                 };
                 Event.on(document.getElementById(s.input), "blur", manualEntry);
                 Event.on(document.getElementById(s.input), "keypress", manualEntry);
-                var getRealValue = function(){ 
+                var getRealValue = function(){
                     return parseInt((this.getValue() / bugSteps * step) +min, 10);
                 };
                 s.getRealValue = getRealValue;
@@ -327,23 +328,23 @@ if (typeof Survey === "undefined") {
         }
 
     }
-    
+
     function handleDualSliders(q){
         var a1 = q.answers[0];
         var a2 = q.answers[1];
         var scale = sliderWidth / a1.max;
-        
+
         var id = q.id;
         var a1id = a1.id;
         var a2id = a2.id;
-        
+
         var a1h = document.getElementById(a1id);
         var a2h = document.getElementById(a2id);
         var a1s = document.getElementById(a1id + 'show');
         var a2s = document.getElementById(a2id + 'show');
         var s = YAHOO.widget.Slider.getHorizDualSlider(id + 'slider-bg', a1id + "slider-min-thumb", a2id + "slider-max-thumb", sliderWidth, 1 * scale, [1, sliderWidth]);
         sliders[id] = s;
-        
+
         s.minRange = 4;
         var updateUI = function(){
             var min = Math.round(s.minVal / scale), max = Math.round(s.maxVal / scale);
@@ -352,18 +353,18 @@ if (typeof Survey === "undefined") {
             a2h.value = max;
             a2s.innerHTML = max;
         };
-        
-        // Subscribe to the dual thumb slider's change and ready events to 
-        // report the state. 
-        //           s.subscribe('ready', updateUI); 
-        //s.subscribe('change', updateUI);  
+
+        // Subscribe to the dual thumb slider's change and ready events to
+        // report the state.
+        //           s.subscribe('ready', updateUI);
+        //s.subscribe('change', updateUI);
         s.subscribe('slideEnd', updateUI);
     }
-    
+
     function showCalendar(event, objs){
         objs[0].show();
     }
-    
+
     function selectCalendar(event, args, obj){
         var id = obj[1];
         var selected = args[0];
@@ -373,22 +374,22 @@ if (typeof Survey === "undefined") {
         input.value = year + "/" + month + "/" + day; // until we can i18n this, use ISO
         obj[0].hide();
     }
-    
+
     function toggleButtonOn( button ) {
         document.getElementById(button.hid).value = 1;
         button.className = 'mcbutton-selected';
     }
-    
+
     function toggleButtonOff( button ) {
         document.getElementById(button.hid).value = '';
         button.className = 'mcbutton';
     }
-    
+
     function buttonChanged(event, o){
         var b = o.button;
         var maxAnswers = parseInt(o.maxAnswers, 10);
         var buttons = o.buttons;
-        
+
         // When maxAnswers is 2 or greater, user is required to manually toggle options on/off
         // (e.g. simulate checkboxes), and enforce maxAnswers limit
         // When maxAnswers is 0, user is also required to manually toggle options on/off,
@@ -396,13 +397,13 @@ if (typeof Survey === "undefined") {
         // When maxAnswers is 1, simulate radio group instead
         // (e.g. no need to untoggle selected answer to change to a different answer)
         if (!maxAnswers || maxAnswers > 1) {
-            
+
             // Simulate checkbox..
-            
+
             // See if answer is currently toggled on or off
             if (b.className === 'mcbutton') {
                 // Answer currently off (unselected). User wants to toggle it on.
-                
+
                 // See if we need to enforce maxAnswers limit
                 if (maxAnswers) {
                     // Count how many buttons are currently selected
@@ -412,12 +413,12 @@ if (typeof Survey === "undefined") {
                             bscount++;
                         }
                     }
-                    
+
                     // Proceed if we haven't filled all the allowed selections
                     if (maxAnswers - bscount > 0) {
                         toggleButtonOn(b);
                     }
-                } 
+                }
                 else {
                     // No maxAnswers limit, toggle answer on without counting
                     toggleButtonOn(b);
@@ -429,16 +430,16 @@ if (typeof Survey === "undefined") {
             }
         }
         else {
-            
+
             // maxAnswers == 1, so simulate Radio group instead
-            
+
             if (b.className === 'mcbutton-selected') {
                 toggleButtonOff(b);
             }
             else {
                 toggleButtonOn(b);
             }
-            
+
             // Toggle off all other answers
             for (var i in buttons) {
                 if (YAHOO.lang.hasOwnProperty(buttons, i) && buttons[i] !== b) {
@@ -447,7 +448,7 @@ if (typeof Survey === "undefined") {
             }
         }
     }
-    var chartsUrl = getWebguiProperty('extrasURL') + "/yui/build/charts/assets/charts.swf"; 
+    var chartsUrl = getWebguiProperty('extrasURL') + "/yui/build/charts/assets/charts.swf";
     YAHOO.widget.Chart.SWFURL = chartsUrl;
     // Public API
     Survey.Summary = {
@@ -494,14 +495,14 @@ if (typeof Survey === "undefined") {
             });
 
             //define section datatable columns
-            var myColumnDefs = [ 
-                {key:"Question ID", sortable:true, resizeable:true}, 
-                {key:"Question Text", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true}, 
-                {key:"Answer ID", sortable:true, resizeable:true}, 
-                {key:"Correct", sortable:true, resizeable:true}, 
+            var myColumnDefs = [
+                {key:"Question ID", sortable:true, resizeable:true},
+                {key:"Question Text", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true},
+                {key:"Answer ID", sortable:true, resizeable:true},
+                {key:"Correct", sortable:true, resizeable:true},
                 {key:"Answer Text", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true},
-                {key:"Score", sortable:true, resizeable:true}, 
-                {key:"Value", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true} 
+                {key:"Score", sortable:true, resizeable:true},
+                {key:"Value", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true}
             ];
             var sectionSummary = [];
             //Load up datatables and create section data for bar chart
@@ -511,19 +512,19 @@ if (typeof Survey === "undefined") {
                 var myDataSource = new YAHOO.util.DataSource(summary.sections[i].responses);
                 //These needs to be put in a destroy call list for when the html dom is recreated, if summaries are going to be uses with page reloads, else memory leak.
                 myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-                myDataSource.responseSchema = { 
-                   fields: ["Question ID","Question Text","Answer ID","Correct","Answer Text","Score","Value"] 
+                myDataSource.responseSchema = {
+                   fields: ["Question ID","Question Text","Answer ID","Correct","Answer Text","Score","Value"]
                 };
                 var tempText = "section" + (i+1) + "datatable";
                 var _dt = new YAHOO.widget.DataTable(tempText, myColumnDefs, myDataSource, { caption: "Section " + (i+1) } );
             }
 
             //Now create section summary bar charts
-            var sectionSummaryDS = new YAHOO.util.DataSource( sectionSummary ); 
-            sectionSummaryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
-            sectionSummaryDS.responseSchema = 
-            { 
-                fields: [ "Total Responses", "Correct", "Incorrect", "section" ] 
+            var sectionSummaryDS = new YAHOO.util.DataSource( sectionSummary );
+            sectionSummaryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+            sectionSummaryDS.responseSchema =
+            {
+                fields: [ "Total Responses", "Correct", "Incorrect", "section" ]
             };
             var sectionSummarySeriesDef =
                 [
@@ -570,14 +571,14 @@ if (typeof Survey === "undefined") {
             var qs = params.questions;
             var s = params.section;
             sliders = [];
-            
-            //What to show and where 
+
+            //What to show and where
             document.getElementById('survey').innerHTML = params.html;
-            //var te = document.createElement('span'); 
+            //var te = document.createElement('span');
             //te.innerHTML = "<input type=button id=testB name='Reload Page' value='Reload Page'>";
             //document.getElementById('survey').appendChild(te);
-            //YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer('','loadQuestions');});   
-            
+            //YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer('','loadQuestions');});
+
             if (qs[0]) {
                 if (lastSection !== s.id || s.everyPageTitle === '1') {
                     document.getElementById('headertitle').style.display = 'block';
@@ -589,9 +590,9 @@ if (typeof Survey === "undefined") {
                     var span = document.createElement("div");
                     span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
                     span.style.display = 'block';
-                    
+
                     document.getElementById('survey-header').appendChild(span);
-                    
+
                     YAHOO.util.Event.addListener("showQuestionsButton", "click", function(){
                         document.getElementById('showQuestionsButton').style.display = 'none';
                         if (s.everyPageTitle !== '1') {
@@ -626,7 +627,7 @@ if (typeof Survey === "undefined") {
                     // gracefully handle q with no answers
                     continue;
                 }
-                
+
                 var verts = '';
                 for (var x in q.answers) {
                     if (YAHOO.lang.hasOwnProperty(q.answers, x)) {
@@ -639,7 +640,7 @@ if (typeof Survey === "undefined") {
                         }
                     }
                 }
-                
+
                 //Check if this question should be validated.
                 //Sliders can't really be not answered, so requiring them makes little sense.
                 if (q.required == true && q.questionType != 'Slider') {
@@ -647,7 +648,7 @@ if (typeof Survey === "undefined") {
                     toValidate[q.id].type = q.questionType;
                     toValidate[q.id].answers = [];
                 }
-               
+
                 if (DATE_SHORT[q.questionType]) {
                     for (var k = 0; k < q.answers.length; k++) {
                         var ans = q.answers[k];
@@ -657,8 +658,8 @@ if (typeof Survey === "undefined") {
                         }
                     }
                     continue;
-                } 
-                
+                }
+
                 if (COUNTRY[q.questionType]) {
                     for (var k2 = 0; k2 < q.answers.length; k2++) {
                         var ans2 = q.answers[k2];
@@ -668,8 +669,8 @@ if (typeof Survey === "undefined") {
                         }
                     }
                     continue;
-                } 
-                
+                }
+
                 if (DATE_TYPES[q.questionType]) {
                     for (var k3 = 0; k3 < q.answers.length; k3++) {
                         var ans3 = q.answers[k3];
@@ -694,7 +695,7 @@ if (typeof Survey === "undefined") {
                     }
                     continue;
                 }
-                
+
                 if (SLIDER_TYPES[q.questionType]) {
                     //First run through and put up the span placeholders and find the max value for an answer, to know how big the allocation points will be.
                     var max = 0;
@@ -706,12 +707,12 @@ if (typeof Survey === "undefined") {
                     }
                     continue;
                 }
-                
+
                 if (UPLOAD_TYPES[q.questionType]) {
                     hasFile = true;
                     continue;
                 }
-                
+
                 if (TEXT_TYPES[q.questionType]) {
                     if (toValidate[q.id]) {
                         toValidate[q.id].answers[q.answers[x].id] = 1;
@@ -751,8 +752,8 @@ if (typeof Survey === "undefined") {
             YAHOO.util.Event.addListener("submitbutton", "click", formsubmit);
         }
     };
-    
-    
+
+
 })();
 
 YAHOO.util.Event.onDOMReady(function(){

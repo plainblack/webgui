@@ -600,7 +600,7 @@ sub getRichEditor {
 			$config{theme_advanced_source_editor_height} = $self->sourceEditorHeight if ($self->sourceEditorHeight > 0);
 		}
 	}
-	my $language  = $i18n->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
+	my $language  = $i18n->getLanguage('' ,"languageAbbreviation");
 	unless ($language) {
 		$language = $i18n->getLanguage("English","languageAbbreviation");
 	}

@@ -19,7 +19,7 @@ use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
 define assetName         => ['assetName', 'Asset_MapPoint'];
-define icon              => 'MapPoint.gif';
+define icon              => 'mappoint.png';
 define tableName         => 'MapPoint';
 property latitude => (
             tab         => "properties",

@@ -527,7 +527,7 @@ sub setRatings {
         if ($ratings->{$category}) {
             $db->write("insert into MatrixListing_rating 
                 (userId, category, rating, timeStamp, listingId, ipAddress, assetId) values (?,?,?,?,?,?,?)",
-                [$session->user->userId,$category,$ratings->{$category},$session->datetime->time(),$self->getId,
+                [$session->user->userId,$category,$ratings->{$category},time(),$self->getId,
                 $session->env->get("HTTP_X_FORWARDED_FOR"),$matrixId]);
         }
         my $sql     = "from MatrixListing_rating where listingId=? and category=?";

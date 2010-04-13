@@ -75,7 +75,6 @@ property groupIdSubscribed => (
             fieldType       => 'hidden',
         );
 
-
         ##### TEMPLATES - DISPLAY #####
         # Month
 property templateIdMonth => (
@@ -770,18 +769,18 @@ sub getEventsIn {
                     && Event.endTime   IS NULL 
                     && 
                         !(
-                            Event.startDate >= '$endDate' 
-                         || Event.endDate   <  '$startDate'
+                            Event.startDate > '$endDate' 
+                         || Event.endDate   < '$startDate'
                         )
                 ) 
-                || ( 
-                       CONCAT(Event.startDate,' ',Event.startTime) >= '$start' 
-                    && CONCAT(Event.startDate,' ',Event.startTime) <  '$end'
+                || !( 
+                       CONCAT(Event.startDate,' ',Event.startTime) >= '$end' 
+                    || CONCAT(Event.endDate,  ' ',Event.endTime  ) <= '$start'
                 )
         };
 
     my @order_priority 
-       = ( 'Event.startDate', 
+       = (  'Event.startDate', 
             'Event.startTime', 
             'Event.endDate', 
             'Event.endTime', 
@@ -1275,9 +1274,11 @@ sub viewList {
     my $session     = $self->session;
     my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
     my $var         = $self->getTemplateVars;
+    my $tz          = $session->datetime->getTimeZone();
 
     ### Get the events
-    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} )->truncate( to => "day" );
+    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} );
+    $dtStart->set_time_zone($tz);
     my $dtEnd       = $dtStart->clone->add( seconds => $self->listViewPageInterval );
 
     my @events
@@ -1446,8 +1447,8 @@ sub viewMonth {
     }
 
     # Day names
-    my @dayNames    = @{$dt->locale->day_names}[6,0..5]; # Put sunday first
-    my @dayAbbrs    = @{$dt->locale->day_abbreviations}[6,0..5];
+    my @dayNames    = @{$dt->locale->day_format_wide}[6,0..5]; # Put sunday first
+    my @dayAbbrs    = @{$dt->locale->day_format_abbreviated}[6,0..5];
     # Take from FirstDOW to the end and put it on the beginning
     unshift @dayNames,splice(@dayNames,$first_dow);
     unshift @dayAbbrs,splice(@dayAbbrs,$first_dow);
@@ -1885,7 +1886,7 @@ sub www_ical {
             );
     }
     else {
-        $dt_start = WebGUI::DateTime->new($self->session, time);
+        $dt_start = WebGUI::DateTime->new($session, time);
         $dt_start->set_time_zone( $session->datetime->getTimeZone );
     }
 
@@ -1893,7 +1894,7 @@ sub www_ical {
     my $end         = $form->param("end");
     if ($end) {
         $dt_end 
-            = WebGUI::DateTime->new($self->session, 
+            = WebGUI::DateTime->new($session, 
                 mysql       => $end, 
                 time_zone   => $session->datetime->getTimeZone,
             );
@@ -1901,8 +1902,6 @@ sub www_ical {
     else {
         $dt_end = $dt_start->clone->add( seconds => $self->icalInterval );
     }
-
-
 
     # Get all the events we're going to display
     my @events    = $self->getEventsIn($dt_start->toMysql,$dt_end->toMysql);
@@ -2104,6 +2103,7 @@ sub www_search {
     $var->{"form.header"}    
         = WebGUI::Form::formHeader($session, {
             action      => $self->getUrl,
+            method      => 'GET',
         })
         . WebGUI::Form::hidden($self->session, {
             name        => "func",

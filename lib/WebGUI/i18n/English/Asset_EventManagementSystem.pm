@@ -560,6 +560,25 @@ our $I18N = {
         context        => q|help for a property label|,
     },
 
+    
+    'print remaining ticket template' => {
+        message     => q|Print Remaining Tickets Template|,
+        lastUpdated    => 0,
+        context        => q|a property label|,
+    },
+
+    'print remaining ticket template help' => {
+        message     => q|Which template would you like to use for printing remaining tickets?|,
+        lastUpdated    => 0,
+        context        => q|help for a property label|,
+    },
+
+    'print remaining tickets' => {
+        message     => q|Print Remaining Tickets|,
+        lastUpdated    => 0,
+        context        => q|a link label on the builder page|,
+    },
+
     'badge builder template' => {
         message     => q|Badge Builder Template|,
         lastUpdated    => 0,
@@ -1877,6 +1896,386 @@ normal templates.|,
         lastUpdated => 1147050475,
         context => q|help text for the columns per page field|,
     },
+
+    'edit submission form' => {
+        message => q|Edit Submission Form|,
+        lastUpdated => 1147050475,
+        context => q|Label for the link to edit a submission form.|,
+    },
+
+    'new submission form' => {
+        message => q|Manage Event Submissions|,
+        lastUpdated => 1147050475,
+        context => q|Label for the link to create a new submission form.|,
+    },
+
+    'view submission queue' => {
+        message => q|Submission Queue|,
+        lastUpdated => 1147050475,
+        context => q|Label for link to view submission queue.|,
+    },
+
+    'add submission' => {
+        message => q|New|,
+        lastUpdated => 1147050475,
+        context => q|This is appended to the title of a submission form when user is submitting a new event.|,
+    },
+
+    'new submission' => {
+        message => q|Submit an Event|,
+        lastUpdated => 1147050475,
+        context => q|Label for link to create a new submission for an event.|,
+    },
+
+    'view my submissions' => {
+        message => q|My Submissions|,
+        lastUpdated => 1147050475,
+        context => q|Label for link to view submissions owned by current user.|,
+    },
+
+        'event submission template' => {
+                message => q|Event Submission Template|,
+                lastUpdated => 1131394072,
+                context => q|Label for the template that is used to submit events.|
+        },
+
+        'event submission template help' => {
+                message => q|This template is used for event submission, most of its contents is composed by the submission form asset based on the description given by the admin who created it.|,
+                lastUpdated => 1131394072,
+                context => q|Help text for the event submission form template.|
+        },
+
+        'event submission queue template' => {
+                message => q|Event Submission Queue Template|,
+                lastUpdated => 1131394072,
+                context => q|Label for the Event Submission Queue template.|
+        },
+
+        'event submission queue template help' => {
+                message => q|This is the template used to display the Event Submission Queue, used for both submitters and admin.|,
+                lastUpdated => 1131394072,
+                context => q|Help text for the Event SUbmission Queue Template.|
+        },
+
+        'event submission main template' => {
+                message => q|Event Submission Main Template|,
+                lastUpdated => 1131394072,
+                context => q|Label for the event submission main template.|
+        },
+
+        'event submission main template help' => {
+                message => q|This template is used to describe main page of the submission module. It has a dynamic tabset on it which is used to hold one or more pieces of the submission interface.|,
+                lastUpdated => 1131394072,
+                context => q|Help text for the event submission main template.|
+        },
+
+    'select form to edit' => {
+        message => q|Select a Form to Edit|,
+        lastUpdated => 1147050475,
+        context => q|Label for list of submission forms; user must choose one to edit.|,
+    },
+
+    'select form to submit' => {
+        message => q|Select a Form to Submit|,
+        lastUpdated => 1147050475,
+        context => q|Label for list of submission forms; user must choose one to proceed to a submission form.|,
+    },
+
+    'pending' => {
+        message => q|Pending|,
+        lastUpdated => 1147050475,
+        context => q|Label for pending status on submission.|,
+    },
+
+    'feedback' => {
+        message => q|Feedback|,
+        lastUpdated => 1147050475,
+        context => q|Label for feedback requested on a submission.|,
+    },
+
+    'denied' => {
+        message => q|Denied|,
+        lastUpdated => 1147050475,
+        context => q|Label for denied status on a submission.|,
+    },
+
+    'approved' => {
+        message => q|Approved|,
+        lastUpdated => 1147050475,
+        context => q|Label for approved status on a submission.|,
+    },
+
+    'created' => {
+        message => q|Created|,
+        lastUpdated => 1147050475,
+        context => q|Label for status indicating ticket is created for submission.|,
+    },
+
+    'failed' => {
+        message => q|Failed|,
+        lastUpdated => 1147050475,
+        context => q|Label indicating ticket creation failed for submission.|,
+    },
+
+    'meta field help text' => {
+        message => q|Help Text|,
+        lastUpdated => 1147050475,
+        context => q|The label for the meta field help text field.|,
+    },
+ 
+    'meta field help text description' => {
+        message => q|This help text will be provided in the event submission interface.|,
+        lastUpdated => 1147050475,
+        context => q|Describes the help text that is attached to meta fields.|,
+    },
+
+    'default submitted location list' => {
+        message => q||,
+        lastUpdated => 1147050475,
+        context => q|This is the default value for the list of locations for event submission.|,
+    },
+
+    'submitted location list label' => {
+        message => q|Locations Available for Event Submissions|,
+        lastUpdated => 1147050475,
+        context => q|Label for the submitted location list|,
+    },
+
+    'submitted location list help' => {
+        message => q|Enter a list of location names here, one name on a line.  This list will be available on the event submission form in the location select box. If this field is filled in then only these locations will be available.|,
+        lastUpdated => 1147050475,
+        context => q|This is help text for the submitted location list field.|,
+    },
+
+    'submission queue' => {
+        message => q|Submission Queue|,
+        lastUpdated => 1147050475,
+        context => q|Label for the submission list tab for registration staff.|,
+    },
+
+    'my submissions' => {
+        message => q|My Submissions|,
+        lastUpdated => 1147050475,
+        context => q|Label for the submission list tab for event submitters.|,
+    },
+
+    'print remaining ticket template help' => {
+        message => q|EMS Print Remaining Ticket Template|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'tickets_loop' => {
+        message => q|A loop containing all of the remaining tickets and their associated data|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'seatsRemaining' => {
+        message => q|Total number of seats remaining for the ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'seatsAvailable' => {
+        message => q|Total number of seats available for the ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+    
+    'relatedRibbons' => {
+        message => q|Ribbons related to the ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'relatedBadgeGroups' => {
+        message => q|Badge groups related to the ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'title' => {
+        message => q|The title of the ticket to be printed.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'menuTitle' => {
+        message => q|The title of the ticket to be displayed in the menu.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'synopsis' => {
+        message => q|Synopsis of the description for the ticket.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'assetId' => {
+        message => q|Asset Id of the ticket.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'assetSize' => {
+        message => q|Size of this ticket asset|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'creationDate' => {
+        message => q|Epoch value date for when the asset was created|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'encryptPage' => {
+        message => q|Whether or not to encrypt the page that the ticket is dipslayed on|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'extraHeadTags' => {
+        message => q|Extra tags that should be displayed in the header that this ticket is displayed on|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'extraHeadTagsPacked' => {
+        message => q|Extra tags that should be displayed in the header that this ticket is displayed on minimized so no whitespace exists|,
+        lastUpdated => 1257349398,
+        context => q|help text label|,
+    },
+
+    'groupIdEdit' => {
+        message => q|The id of the group that can edit this ticket.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'groupIdView' => {
+        message => q|The id of the group that can view this ticket.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'inheritUrlFromParent' => {
+        message => q|Whether or not to inherit the url from the parent|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'isExportable' => {
+        message => q|Whether or not this ticket is exportable|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'isHidden' => {
+        message => q|Whether or not this ticket should be hidden from the menu.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'isPrototype' => {
+        message => q|Whether or not this ticket asset is a prototype|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'isPackage' => {
+        message => q|Whether or not this ticket asset is a package|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'lastModified' => {
+        message => q|Epoch date for when this ticket was last modified|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'newWindow' => {
+        message => q|Whether this ticket should be displayed in a new window|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'ownerUserId' => {
+        message => q|User Id of the owner of this ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'revisedBy' => {
+        message => q|Id of the user who last modified this ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'revisionDate' => {
+        message => q|Epoch date for when this ticket was last revised|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'skipNotification' => {
+        message => q|Whether or not notifications for this ticket should be skipped.|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'tagId' => {
+        message => q|Tag Id for this asset|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'usePackedHeadTags' => {
+        message => q|Whether or not packed head tags should be used for this ticket|,
+        lastUpdated => 1147050475,
+        context => q|help text label|,
+    },
+
+    'printRemainingTicketsUrl' => {
+        message => q|URL to the print remaining tickets page|,
+        lastUpdated => 1147050475,
+        context => q|Field Label|,
+    },
+
+    'new form' => {
+        message => q|New Form|,
+        lastUpdated => 1147050475,
+        context => q|The label for the link to create a new submission form.|,
+    },
+
+
+    'eventMetaData' => {
+        message => q|Meta data for the event returned as a JSON data structure|,
+        lastUpdated => 1147050475,
+        context => q|Field Label|,
+    },
+
+    'ticketMeta_[LABEL]' => {
+        message => q|Value for the meta data field [LABEL].  Non word and whitespace characters in [LABEL] should be replaced with an underscore.  <br/><br/>Ex: Meta Data Label: "First Name" should be referenced: &lt;tmpl_var ticketMeta_First_Name&gt; and so on|,
+        lastUpdated => 1147050475,
+        context => q|Field Label|,
+    },
+    
+    'new form' => {
+        message => q|New Form|,
+        lastUpdated => 1147050475,
+        context => q|The label for the link to create a new submission form.|,
+    },
+
+#    'TODO' => {
+#        message => q|TODO|,
+#        lastUpdated => 1147050475,
+#        context => q|TODO|,
+#    },
+
 
 };
 

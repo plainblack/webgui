@@ -15,6 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Storage;
+use WebGUI::Macro::Include;
 
 use Test::More; # increment this value for each test you create
 
@@ -85,17 +86,9 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
-$numTests += 1; #For the use_ok
 $numTests += 1; #For the unreadable file test
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::Include';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::Include::process($session, $testSet->{file});
@@ -108,9 +101,4 @@ SKIP: {
 	my $file = $storage->getPath('unreadableFile');
 	my $output = WebGUI::Macro::Include::process($session, $file);
 	is($output, $i18n->get('not found'),  q|Unreadable file returns NOT FOUND|. ":" .$file);
-}
-
-}
-
-END {
 }

@@ -307,6 +307,66 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'helpvar firstFile_url' => {
+        message     => 'The URL of the first file in the album.',
+        lastUpdated => 0,
+    },
+
+    'helpvar firstFile_title' => {
+        message     => 'The title of the first file in the album.',
+        lastUpdated => 0,
+    },
+
+    'helpvar firstFile_thumbnailUrl' => {
+        message     => 'The URL of the thumbnail of the first file in the album.',
+        lastUpdated => 0,
+    },
+
+    'helpvar nextFile_url' => {
+        message     => 'The URL of the next file in the album. Undefined if no next file.',
+        lastUpdated => 0,
+    },
+
+    'helpvar nextFile_title' => {
+        message     => 'The title of the next file in the album. Undefined if no next file.',
+        lastUpdated => 0,
+    },
+
+    'helpvar nextFile_thumbnailUrl' => {
+        message     => 'The URL of the thumbnail of the next file in the album. Undefined if no next file.',
+        lastUpdated => 0,
+    },
+
+    'helpvar previousFile_url' => {
+        message     => 'The URL of the previous file in the album. Undefined if no previous file.',
+        lastUpdated => 0,
+    },
+
+    'helpvar previousFile_title' => {
+        message     => 'The title of the previous file in the album. Undefined if no previous file.',
+        lastUpdated => 0,
+    },
+
+    'helpvar previousFile_thumbnailUrl' => {
+        message     => 'The URL of the thumbnail of the previous file in the album. Undefined if no previous file.',
+        lastUpdated => 0,
+    },
+
+    'helpvar lastFile_url' => {
+        message     => 'The URL of the last file in the album.',
+        lastUpdated => 0,
+    },
+
+    'helpvar lastFile_title' => {
+        message     => 'The title of the last file in the album.',
+        lastUpdated => 0,
+    },
+
+    'helpvar lastFile_thumbnailUrl' => {
+        message     => 'The URL of the thumbnail of the last file in the album.',
+        lastUpdated => 0,
+    },
+
     'template view title' => {
         message     => 'Photo Details',
         lastUpdated => 0,
@@ -589,7 +649,7 @@ our $I18N = {
         context     => q{Label for the albums the photo will be removed from.},
     },
 
-    'helpvar synopsis_text' => {
+    'helpvar synopsis_textonly' => {
         message     => q{The "synopsis" field with all HTML removed},
         lastUpdated => 0,
         context     => q{Description of template variable},

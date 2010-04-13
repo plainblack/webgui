@@ -122,6 +122,7 @@ sub toHtml {
     my $options = $self->getOptions;
 	$options->{''} = '['.$i18n->get(582).']';
     $options->{_new_} = $i18n->get(581).'-&gt;';
+    $self->set('options', $options);
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Text->new($self->session,
 			size=>$self->session->setting->get("textBoxSize")-5,

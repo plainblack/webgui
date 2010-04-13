@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::LastModified;
 
 use Test::More; # increment this value for each test you create
 
@@ -46,17 +47,12 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
-$numTests += 1 + 2; #For the use_ok, default asset, and revisionDate=0
+$numTests += 2; #For the use_ok, default asset, and revisionDate=0
 
 plan tests => $numTests;
 
-my $macro = 'WebGUI::Macro::LastModified';
-my $loaded = use_ok($macro);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+addToCleanup($versionTag);
 
 my $output = WebGUI::Macro::LastModified::process($session);
 is($output, '', "Macro returns '' if no asset is defined");
@@ -97,11 +93,3 @@ is($output, $i18n->get('never'), 'asset with 0 revisionDate returns never modifi
 
 ##Restore the original revisionDate, otherwise it dies during clean-up
 $session->db->write('update assetData set revisionDate=? where assetId=?', [$revDate, $assetA->getId]);
-
-}
-
-END { ##Clean-up after yourself, always
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
-}

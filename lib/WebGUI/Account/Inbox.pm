@@ -337,7 +337,7 @@ sub getInboxNotificationTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getInboxSMSNotificationTemplateId ( )
+=head2 getInboxSmsNotificationTemplateId ( )
 
 This method returns the template ID for inbox SMS notifications.
 
@@ -947,7 +947,8 @@ sub www_inviteUserSave {
         my $invitation = WebGUI::Mail::Send->create(
             $session, {
                 to      => $to,
-                from    => $email,
+                from    => $session->setting->get('companyEmail'),
+                replyTo => $email,
                 subject => $subject,
             }
         );
@@ -957,9 +958,9 @@ sub www_inviteUserSave {
 
         my $emailBody = $self->processTemplate( $var, $self->getInviteUserMessageTemplateId );
 
-        $invitation->addText($emailBody);
+        $invitation->addHtml($emailBody);
 
-        $invitation->send;
+        $invitation->queue;
 
     } ## end for my $inviteeEmail (@toList)
 

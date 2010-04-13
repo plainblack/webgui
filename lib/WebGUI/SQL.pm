@@ -484,7 +484,7 @@ The value to search for in the key column.
 
 sub deleteRow {
 	my ($self, $table, $key, $keyValue) = @_;
-	my $sth = $self->write("delete from $table where ".$key."=?", [$keyValue]);
+	my $sth = $self->write("delete from ".$self->dbh->quote_identifier($table)." where ".$key."=?", [$keyValue]);
 }
 
 
@@ -606,7 +606,7 @@ The value to search for in the key column.
 
 sub getRow {
         my ($self, $table, $key, $keyValue) = @_;
-        my $row = $self->quickHashRef("select * from $table where ".$key."=?",[$keyValue]);
+        my $row = $self->quickHashRef("select * from ".$self->dbh->quote_identifier($table)." where ".$key."=?",[$keyValue]);
         return $row;
 }
 

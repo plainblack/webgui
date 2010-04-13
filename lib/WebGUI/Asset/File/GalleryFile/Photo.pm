@@ -456,10 +456,12 @@ This page is only available to those who can edit this Photo.
 sub www_edit {
     my $self    = shift;
     my $session = $self->session;
-    my $form    = $self->session->form;
+    my $form    = $session->form;
 
-    return $self->session->privilege->insufficient  unless $self->canEdit;
-    return $self->session->privilege->locked        unless $self->canEditIfLocked;
+    return $session->privilege->insufficient  unless $self->canEdit;
+    return $session->privilege->locked        unless $self->canEditIfLocked;
+
+    my $i18n = WebGUI::International->new($session, 'WebGUI');
 
     # Prepare the template variables
     # Cannot get all template vars since they require a storage location, doesn't work for
@@ -517,7 +519,7 @@ sub www_edit {
     $var->{ form_submit }
         = WebGUI::Form::submit( $session, {
             name        => "submit",
-            value       => "Save",
+            value       => $i18n->get('save'),
         });
 
     $var->{ form_title  }

@@ -9,8 +9,8 @@ our $I18N = {
      },
     'allow attachments help' => {
         lastUpdated => 0,
-        message     => q|?|,
-        context     => "The number of attachments that are allowed to be placed on each wiki page."
+        message     => q|The number of attachments that are allowed to be placed on each wiki page.|,
+        context     => "Hover help for edit form.",
      },
  'assetName' => { lastUpdated => 1160157064, message => 'Wiki' },
  'asset description' => { lastUpdated => 1160157064, message => q|A wiki is a collaborative content publishing mechanism. Traditionally wiki's use the wiki markup language, but that's generally not much easier to deal with than HTML, so WebGUI's wiki instead just uses a rich editor to help users publish rich great looking content.| },

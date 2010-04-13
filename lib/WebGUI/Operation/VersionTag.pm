@@ -374,10 +374,9 @@ sub www_commitVersionTag {
             $session->url->page("op=commitVersionTag;tagId=".$tag->getId),
         );
     $p->setDataByQuery(q{
-        SELECT assetData.revisionDate, users.username, asset.assetId
+        SELECT assetData.revisionDate, assetData.revisedBy, asset.assetId
         FROM assetData 
         LEFT JOIN asset ON assetData.assetId = asset.assetId
-        LEFT JOIN users ON assetData.revisedBy = users.userId
         WHERE assetData.tagId=? },
         undef, 
         undef, 
@@ -385,8 +384,9 @@ sub www_commitVersionTag {
     );
 
     foreach my $row ( @{$p->getPageData} ) {
-        my ( $date, $by, $id, $class) = @{ $row }{ qw( revisionDate username assetId ) };
+        my ( $date, $byUserId, $id, $class) = @{ $row }{ qw( revisionDate revisedBy assetId ) };
         my $asset = WebGUI::Asset->newById($session, $id, $date);
+        my $byUser = WebGUI::User->new( $session, $byUserId );
         $output 
             .= '<tr><td>'
             .$session->icon->view("func=view;revision=".$date, $asset->get("url"))
@@ -394,7 +394,7 @@ sub www_commitVersionTag {
             <td>'.$asset->getTitle.'</td>
             <td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
             <td>'.$session->datetime->epochToHuman($date).'</td>
-            <td>'.$by.'</td></tr>';
+            <td>'.$byUser->get('username').'</td></tr>';
     }
     $output .= '</table>'.$p->getBarSimple;
     
@@ -465,7 +465,7 @@ A reference to the current session.
 
 sub www_leaveVersionTag {
     my $session = shift;
-    WebGUI::VersionTag->getWorking($session)->clearWorking;
+    WebGUI::VersionTag->getWorking($session)->leaveTag;
     return www_manageVersions($session);
 }
 
@@ -810,11 +810,12 @@ sub www_manageRevisionsInTag {
         . '</tr> '
         ;
     my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId));
-    $p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId from assetData 
-            left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
+    $p->setDataByQuery("select assetData.revisionDate, assetData.revisedBy, asset.assetId from assetData 
+            left join asset on assetData.assetId=asset.assetId
             where assetData.tagId=?",undef, undef, [$tag->getId]);
     foreach my $row (@{$p->getPageData}) {
-            my ($date, $by, $id) = ($row->{revisionDate}, $row->{username}, $row->{assetId});
+            my ($date,$byUserId,$id) = ($row->{revisionDate}, $row->{revisedBy}, $row->{assetId});
+            my $byUser  = WebGUI::User->new( $session, $byUserId );
             my $asset = WebGUI::Asset->newById($session, $id, $date);
             # A checkbox for delete and move actions
             my $checkbox    = WebGUI::Form::checkbox( $session, {
@@ -828,7 +829,7 @@ sub www_manageRevisionsInTag {
                     <td>'.$asset->getTitle.'</td>
                     <td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
                     <td>'.$session->datetime->epochToHuman($date).'</td>
-                    <td>'.$by.'</td></tr>';
+                    <td>'.$byUser->username.'</td></tr>';
     }
     $output .= '</table>'.$p->getBarSimple.WebGUI::Form::formFooter( $session );
     $tag = $session->db->getRow("assetVersionTag","tagId",$tag->getId);

@@ -23,9 +23,7 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-my $num_tests = 53;
-
-plan tests => $num_tests;
+plan tests => 57;
  
 my $session = WebGUI::Test->session;
 
@@ -403,6 +401,22 @@ $session->user({userId => 1});
 
 ####################################################
 #
+# ifModifiedSince
+#
+####################################################
+##Clear request object to run a new set of requests
+$request = WebGUI::PseudoRequest->new();
+$session->{_request} = $request;
+$request->headers_in->{'If-Modified-Since'} = '';
+ok $session->http->ifModifiedSince(0), 'ifModifiedSince: empty header always returns true';
+
+$request->headers_in->{'If-Modified-Since'} = $session->datetime->epochToHttp(WebGUI::Test->webguiBirthday);
+ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday + 5), '... epoch check, true';
+ok !$session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5), '... epoch check, false';
+ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5, 3600), '... epoch check, made true by maxCacheTimeout';
+
+####################################################
+#
 # Utility functions
 #
 ####################################################
@@ -427,8 +441,4 @@ sub deltaHttpTimes {
 	my $dt1 = $httpParser->parse_datetime($http1);
 	my $dt2 = $httpParser->parse_datetime($http2);
 	my $delta_time = $dt1-$dt2;
-}
-
-
-END {
 }

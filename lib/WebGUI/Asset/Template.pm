@@ -38,7 +38,6 @@ sub _template_autopack {
     my $packed  = $new;
     HTML::Packer::minify( \$packed, {
         remove_comments     => 1,
-        remove_newlines     => 1,
         do_javascript       => "shrink",
         do_stylesheet       => "minify",
     } );
@@ -132,20 +131,16 @@ sub addAttachments {
 
     my $db = $self->session->db;
 
-    my $sql = q{
-        INSERT INTO template_attachments
-            (templateId, revisionDate, url, type, sequence)
-        VALUES
-            (?,          ?,            ?,   ?,    ?)
-    };
-
     foreach my $a (@$attachments) {
-        my @params = (
-            $self->getId, 
-            $self->revisionDate,
-            @{$a}{qw(url type sequence)}
+        my %params = (
+            templateId   => $self->getId,
+            revisionDate => $self->revisionDate,
+            url          => $a->{url},
+            type         => $a->{type},
+            sequence     => $a->{sequence},
+            attachId     => 'new',
         );
-        $db->write($sql, \@params);
+        $db->setRow('template_attachments', 'attachId', \%params);
     }
 }
 
@@ -197,6 +192,7 @@ override duplicate => sub {
     my $self = shift;
     my $newTemplate = super();
     $newTemplate->update({isDefault => 0});
+    $newTemplate->addAttachments($self->getAttachments);
     return $newTemplate;
 };
 
@@ -380,9 +376,12 @@ override getEditForm => sub {
 	);
 
 	my ($style, $url) = $self->session->quick(qw(style url));
-	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'), {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/json/json-min.js'),   {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/dom/dom-min.js'),     {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),           {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/json/json-min.js'),             {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/dom/dom-min.js'),               {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/event/event-min.js'),           {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
+	$style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),          {type => 'text/javascript'});
 
 	pop(@headers);
 	my $scriptUrl = $url->extras('templateAttachments.js');
@@ -705,9 +704,23 @@ sub processRaw {
 
 #-------------------------------------------------------------------
 
+=head2 purge ( )
+
+Extend the master to purge attachments in all revisions.
+
+=cut
+
+sub purge {
+    my $self = shift;
+    $self->session->db->write('delete from template_attachments where templateId=?', [$self->getId]);
+    return $self->SUPER::purge(@_);
+}
+
+#-------------------------------------------------------------------
+
 =head2 purgeRevision ( )
 
-Override the master purgeRevision to purge attachments
+Extend the master purgeRevision to purge attachments
 
 =cut
 

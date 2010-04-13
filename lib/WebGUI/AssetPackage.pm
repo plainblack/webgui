@@ -123,6 +123,19 @@ A hash reference of options to change how the import works
 Forces the all assets in the package to inherit ownerUserId, groupIdView and groupIdEdit
 from the asset where it is deployed.
 
+=head4 overwriteLatest
+
+Forces the package to ignore the revisionDate inside it.  This makes the imported package the
+latest revision of an asset.
+
+=head4 clearPackageFlag
+
+Clears the isPackage flag on the incoming asset.
+
+=head4 setDefaultTemplate
+
+Set the isDefault flag on the incoming asset.  Really only works on templates.
+
 =cut
 
 sub importAssetData {
@@ -133,7 +146,7 @@ sub importAssetData {
     my $error       = $session->errorHandler;
     my $id          = $data->{properties}{assetId};
     my $class       = $data->{properties}{className};
-    my $version     = $data->{properties}{revisionDate};
+    my $version     = $options->{overwriteLatest} ? time : $data->{properties}{revisionDate};
 
     # Load the class
     WebGUI::Asset->loadModule( $class );
@@ -143,6 +156,12 @@ sub importAssetData {
         delete $properties{ownerUserId};
         delete $properties{groupIdView};
         delete $properties{groupIdEdit};
+    }
+    if ($options->{clearPackageFlag}) {
+        $properties{isPackage} = 0;
+    }
+    if ($options->{setDefaultTemplate}) {
+        $properties{isDefault} = 1;
     }
 
     my $asset = eval { $class->new($session, $id, $version); };
@@ -170,16 +189,10 @@ sub importAssetData {
         };
         if (! Exception::Class->caught()) {   # create a new revision of an existing asset
             $error->info("Creating a new revision of asset $id");
-            $asset = $asset->addRevision($data->{properties}, $version, {skipAutoCommitWorkflows => 1});
+            $asset = $asset->addRevision(\%properties, $version, {skipAutoCommitWorkflows => 1});
         }
         else {  # add an entirely new asset
             $error->info("Adding $id that didn't previously exist.");
-            my %properties = %{ $data->{properties} };
-            if ($options->{inheritPermissions}) {
-                $properties{ownerUserId} = $self->get('ownerUserId');
-                $properties{groupIdView} = $self->get('groupIdView');
-                $properties{groupIdEdit} = $self->get('groupIdEdit');
-            }
             $asset = $self->addChild(\%properties, $id, $version, {skipAutoCommitWorkflows => 1});
         }
     }

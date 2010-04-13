@@ -161,7 +161,7 @@ sub purge {
 	}
 
     # Delete shortcuts to this asset
-    # Also publish any shortcuts to this asset that are in the trash
+    # Also purge any shortcuts to this asset that are in the trash
     $outputSub->($i18n->get('Purging shortcuts'));
     require WebGUI::Asset::Shortcut;
     my $shortcuts 
@@ -271,7 +271,7 @@ sub trash {
         $index->delete;
         $outputSub->($i18n->get('Deleting exported files'));
         $asset->_invokeWorkflowOnExportedFiles($session->setting->get('trashWorkflow'), 1);
-        $outputSub->($i18n->get('Purging the cache'));
+        $outputSub->($i18n->get('Clearing cache'));
         $asset->purgeCache;
         $asset->updateHistory("trashed");
     }
@@ -290,7 +290,7 @@ sub trash {
     $db->beginTransaction;
     $outputSub->($i18n->get('Clearing asset tables'));
     $db->write("update asset set state='trash-limbo' where lineage like ?",[$self->get("lineage").'%']);
-    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$session->user->userId, $session->datetime->time(), $self->getId]);
+    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$session->user->userId, time(), $self->getId]);
     $db->commit;
 
     # Update ourselves since we didn't use update()
@@ -393,15 +393,19 @@ sub www_manageTrash {
 	my $ac = WebGUI::AdminConsole->new($self->session,"trash");
 	my $i18n = WebGUI::International->new($self->session,"Asset");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
-	my ($header, $limit);
-        $ac->setHelp("trash manage");
-	if ($self->session->form->process("systemTrash") && $self->session->user->isAdmin) {
+    $ac->setHelp("trash manage");
+    my $header;
+    my $limit = 1;
+    my $canAdmin = $self->session->user->isInGroup($self->session->setting->get('groupIdAdminTrash'));
+    my $systemTrash = $self->session->form->process("systemTrash");
+    if ($systemTrash && $canAdmin) {
 		$header = $i18n->get(965);
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), $i18n->get(10,"WebGUI"));
-	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), $i18n->get(964));
-		$limit = 1;
+        $limit = undef;
 	}
+    elsif ( $canAdmin ) {
+        $ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), $i18n->get(964));
+    }
   	$self->session->style->setLink($self->session->url->extras('assetManager/assetManager.css'), {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'), {type=>"text/javascript"});
 	my $output = "
@@ -434,6 +438,7 @@ sub www_manageTrash {
             assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
             assetManager.AddButton("'.$i18n->get("purge").'","purgeList","manageTrash");
             assetManager.AddFormHidden({ name:"webguiCsrfToken", value:"'.$self->session->scratch->get('webguiCsrfToken').'"});
+            assetManager.AddFormHidden({ name:"systemTrash", value:"'.$systemTrash.'"});
             assetManager.Write();        
             var assetListSelectAllToggle = false;
             function toggleAssetListSelectAll(form) {
@@ -483,6 +488,9 @@ sub www_purgeList {
         }
     }
     my $method = ($session->form->process("proceed")) ? $session->form->process('proceed') : 'manageTrash';
+    if ($session->form->process('systemTrash') ) {
+        $method .= ';systemTrash=1';
+    }
     $pb->finish($self->getUrl('func='.$method));
 }
 

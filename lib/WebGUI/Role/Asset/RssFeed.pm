@@ -459,7 +459,7 @@ sub getFeed {
     $feed->description( $self->feedDescription || $self->synopsis );
     $feed->pubDate( $self->getContentLastModified );
     $feed->copyright( $self->feedCopyright );
-    $feed->link( $self->getUrl );
+    $feed->link( $self->session->url->getSiteURL . $self->getUrl );
     # $feed->language( $lang );
     if ($self->feedImage) {
         my $storage = WebGUI::Storage->get($self->session, $self->feedImage);

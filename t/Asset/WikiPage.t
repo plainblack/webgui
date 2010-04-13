@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 18; # increment this value for each test you create
+use Test::More tests => 17; # increment this value for each test you create
 use WebGUI::Asset::Wobject::WikiMaster;
 use WebGUI::Asset::WikiPage;
 
@@ -25,15 +25,20 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 
 my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster'});
 $versionTag->commit;
-my $wikipage = $wiki->addChild({className=>'WebGUI::Asset::WikiPage'});
+my $wikipage = $wiki->addChild(
+    {className=>'WebGUI::Asset::WikiPage'},
+    undef, undef,
+    {skipAutoCommitWorkflows => 1, skipNotification => 1}
+);
 
 # Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
 my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
-WebGUI::Test->tagsToRollback($secondVersionTag );
+$secondVersionTag->commit;
+addToCleanup($secondVersionTag );
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');
@@ -84,12 +89,4 @@ $wikipage->deleteComment($comments->[0]{id});
 $comments = $wikipage->get('comments');
 is($comments->[0]{comment}, $secondComment, "you can delete a comment");
 is($wikipage->get('averageCommentRating'), 1, 'average rating is adjusted after deleting a comment');
-
-
-##################
-
-TODO: {
-    local $TODO = "Tests to make later";
-    ok(0, 'Lots and lots to do');
-}
 

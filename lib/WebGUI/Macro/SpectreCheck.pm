@@ -35,8 +35,8 @@ sub process {
     my $i18n = WebGUI::International->new($session, "Macro_SpectreCheck");
     if (defined $status) {
         return $i18n->get('success') if($status eq 'success');
-        return $i18n->get('subnet') if($status eq 'subnet');
-        return $i18n->get('spectre') if($status eq 'spectre');
+        return $i18n->get('subnet')  if($status eq 'subnet');
+        return $i18n->get('spectre');
     }
     else {
         return $i18n->get('spectre');

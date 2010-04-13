@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::FormParam;
 
 use Test::More; # increment this value for each test you create
 use Test::MockObject;
@@ -53,22 +54,12 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
-$numTests += 1; ##use_ok
 $numTests += 1; ##testBlock has no name collisions
 $numTests += 3; ##TODO block
 
 plan tests => $numTests;
 
-my $macro = 'WebGUI::Macro::FormParam';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
-
 auto_check($session, \@testSets);
-
-}
 
 TODO: {
 	local $TODO = "Tests to write later";

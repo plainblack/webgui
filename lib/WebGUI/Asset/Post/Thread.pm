@@ -75,6 +75,7 @@ use WebGUI::Group;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
+use POSIX qw/ceil/;
 
 
 #-------------------------------------------------------------------
@@ -96,7 +97,7 @@ override addRevision => sub {
 
 =head2 archive 
 
-Archives all posts under this thread.
+Archives all posts under this thread.  Update the thread count in the parent CS.
 
 =cut
 
@@ -105,6 +106,8 @@ sub archive {
 	foreach my $post (@{$self->getPosts}) {
 		$post->setStatusArchived;
 	}
+    my $cs = $self->getParent;
+    $cs->incrementThreads($cs->get("lastPostDate"), $cs->get("lastPostId"));
 }
 
 #-------------------------------------------------------------------
@@ -119,7 +122,7 @@ in the default asset, which better be a Collaboration System.
 sub canAdd {
     my $class   = shift;
     my $session = shift;
-    return $session->user->isInGroup($session->asset->canStartThreadGroupId);
+    return $session->asset->isa('WebGUI::Asset::Wobject::Collaboration') && $session->asset->canStartThread;
 }
 
 #-------------------------------------------------------------------
@@ -325,6 +328,77 @@ sub getAutoCommitWorkflowId {
 	my $self = shift;
 	return $self->getThread->getParent->threadApprovalWorkflow;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getCSLinkUrl ( )
+
+This URL links to the page of the CS containing this thread, similar
+to the getThreadLink for the Post.  It does not contain the gateway
+for the site.
+
+=cut
+
+sub getCSLinkUrl {
+    my $self    = shift;
+    if ($self->get('status') eq 'archived') {
+        return $self->get('url');
+    }
+    my $session = $self->session;
+    my $url;
+    my $cs         = $self->getParent;
+    my $page_size  = $cs->get('threadsPerPage');
+    my $sql        =<<EOSQL;
+select lineage from asset
+left join Thread    using (assetId)
+left join assetData using (assetId)
+ where parentId=?
+   and className='WebGUI::Asset::Post::Thread'
+   and state='published'
+   and status='approved'
+   group by assetData.assetId
+   order by Thread.isSticky DESC,
+            lineage         DESC
+EOSQL
+
+    my $sth     = $session->db->read($sql, [$cs->getId]);
+    my $place   = 1;  ##1 based indexing
+    my $found   = 0;
+    my $lineage = $self->get('lineage');
+    THREAD: while (my $arrayRef = $sth->arrayRef) {
+        if ($arrayRef->[0] eq $lineage) {
+            $found = 1;
+            last THREAD;
+        }
+        ++$place;
+    }
+    $sth->finish;
+    return $self->get('url') if !$found;
+    my $page  = ceil($place/$page_size);
+    my $page_frag  = 'pn='.$page.';sortBy=lineage;sortOrder=desc';
+    $url = $session->url->append($cs->get('url'), $page_frag);
+    return $url;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getThreadLinkUrl ( )
+
+Extend the base method from Post to remove the pagination query fragment
+
+=cut
+
+sub getThreadLinkUrl {
+	my $self = shift;
+    my $url = $self->SUPER::getThreadLinkUrl();
+    $url =~ s/\?pn=\d+//;
+    if ($url =~ m{;revision=\d+}) {
+        $url =~ s/;revision/?revision/;
+    }
+
+    return $url;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -950,15 +1024,17 @@ sub updateThreadRating {
     my $self        = shift;
     my $session     = $self->session;
 
-    my $calcRating  = 0; 
     my $postIds     = $self->getLineage(["descendants","self"], {
         includeOnlyClasses  => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
         includeArchived     => 1,
     });
 
-    $calcRating += $session->db->quickScalar(
-        "SELECT SUM(rating) FROM Post_rating WHERE assetId IN (".$session->db->quoteAndJoin($postIds).")"
-    );     
+    my $calcRating = 0;
+    if (scalar @{ $postIds }) {
+        $calcRating += $session->db->quickScalar(
+            "SELECT SUM(rating) FROM Post_rating WHERE assetId IN (".$session->db->quoteAndJoin($postIds).")"
+        );     
+    }
 
     $self->update({
         threadRating    => $calcRating
@@ -967,7 +1043,8 @@ sub updateThreadRating {
     my $parent = $self->getParent;
     if (defined $parent) {
         $parent->recalculateRating;
-    } else {
+    }
+    else {
         $self->session->errorHandler->error("Couldn't get parent for thread ".$self->getId);
     }    
 }

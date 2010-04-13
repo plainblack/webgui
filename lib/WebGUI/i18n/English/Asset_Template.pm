@@ -33,9 +33,9 @@ our $I18N = {
 	},
 
 	'template error' => {
-		message => q|There is a syntax error in this template, %s, %s. Please correct.|,
+		message => q|There is a syntax error in this template, %s, %s, %s. Please correct.|,
 		context => q|Error when executing template|,
-		lastUpdated => 1244476530,
+		lastUpdated => 1254512327,
 	},
 
         'namespace description' => {
@@ -379,6 +379,17 @@ Any scratch variables will be available in the template with this syntax:<br/>
         message     => q|Template in clipboard|,
         lastUpdated => 0,
     },
+
+    'Already attached!' => {
+        message     => q|Already attached!|,
+        lastUpdated => 0,
+    },
+
+    'No url!' => {
+        message     => q|No url!|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;

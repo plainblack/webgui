@@ -8,13 +8,6 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# XXX I (chrisn) started this file to test the features I added to the
-# Collaboration / Post system for 7.5, but didn't have the time available to me
-# to do a full test suite for the Post Wobject. This means that this test suite
-# is *largely incomplete* and should be finished. What is here *is* the
-# following:
-#
-#
 # 1. The basic framework for a test suite for the Post Asset.
 # Includes setup, cleanup, boilerplate, etc. Basically the really boring,
 # repetitive parts of the test that you don't want to write yourself.
@@ -26,7 +19,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 9; # increment this value for each test you create
+use Test::More tests => 16; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Post::Thread;
@@ -114,7 +107,11 @@ ok($post->canEdit(), "User in groupToEditPost group can edit post after the time
 $session->user({userId => $groupIdEditUser->userId});
 ok($post->canEdit(), "User in groupIdEditUserGroup group can edit post after the timeout");
 
+######################################################################
+#
 # getSynopsisAndContent
+#
+######################################################################
 
 my ($synopsis, $content) = $post->getSynopsisAndContent('', q|Brandheiße Neuigkeiten rund um's Klettern für euch aus der Region |);
 is($synopsis, q|Brandheiße Neuigkeiten rund um's Klettern für euch aus der Region |, 'getSynopsisAndContent: UTF8 characters okay');
@@ -132,9 +129,40 @@ is($synopsis, q|less than &lt; greater than &gt;|, '... HTML escaped characters 
 ($synopsis, $content) = $post->getSynopsisAndContent('', q|<p>less than &lt; greater than &gt;</p>|);
 is($synopsis, q|less than < greater than >|, '... HTML entities decoded by HTML::splitTag');
 
-TODO: {
-    local $TODO = "Tests to make later";
-	ok(0, 'Whole lot more work to do here');
-}
+######################################################################
+#
+# getTemplateVars
+#
+######################################################################
+
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+my $post1 = $collab->addChild({
+    className   => 'WebGUI::Asset::Post::Thread',
+    content     => 'hello, world!',
+    ownerUserId => 3,
+}, @addArgs);
+my $post2 = $collab->addChild({
+    className   => 'WebGUI::Asset::Post::Thread',
+    content     => 'hello, world!',
+    ownerUserId => 1,
+}, @addArgs);
+$versionTag2->commit();
+WebGUI::Test->tagsToRollback($versionTag);
+my $variables;
+$session->user({userId => 1});
+$variables = $post1->getTemplateVars();
+is(  $variables->{'ownerUserId'}, 3, 'first post owned by admin');
+ok(  $variables->{'hideProfileUrl'}, 'hide profile url, since current user is visitor');
+$variables = $post2->getTemplateVars();
+is(  $variables->{'ownerUserId'}, 1, 'first post owned by admin');
+ok(  $variables->{'hideProfileUrl'}, 'hide profile url, since current user is visitor');
+
+$session->user({userId => 3});
+$variables = $post1->getTemplateVars();
+is(  $variables->{'ownerUserId'}, 3, 'first post owned by admin');
+ok( !$variables->{'hideProfileUrl'}, 'show profile url');
+$variables = $post2->getTemplateVars();
+is(  $variables->{'ownerUserId'}, 1, 'first post owned by admin');
+ok(  $variables->{'hideProfileUrl'}, 'hide profile url, since poster is visitor');
 
 # vim: syntax=perl filetype=perl

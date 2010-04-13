@@ -504,7 +504,7 @@ sub getRssData {
 	my $self = shift;
     my $data = {
         title       => $self->headline || $self->getTitle,
-        description => $self->subtitle,
+        description => $self->story,
         'link'      => $self->getUrl,
         author      => $self->byline,
         date        => $self->lastModified,

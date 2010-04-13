@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::L_loginBox;
 use HTML::TokeParser;
 
 use Test::More; # increment this value for each test you create
@@ -22,7 +23,7 @@ my $session = WebGUI::Test->session;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 $session->asset($homeAsset);
-my ($versionTag, $template) = setupTest($session, $homeAsset);
+my $template = setupTest($session, $homeAsset);
 $session->user({userId=>1});
 
 ##Replace the original ENV hash with one that will return a
@@ -37,17 +38,7 @@ $session->{_env}->{_env} = \%newEnvHash;
 
 my $i18n = WebGUI::International->new($session,'Macro_L_loginBox');
 
-my $numTests = 1; #Module loading test
-$numTests += 30; #Static tests
-
-plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::L_loginBox';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+plan tests => 30;
 
 my $output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
 my %vars = simpleTextParser($output);
@@ -170,8 +161,6 @@ $output = WebGUI::Macro::L_loginBox::process($session,'','','');
 my $passwordLabel = $i18n->get(51, 'WebGUI');
 like($output, qr/$passwordLabel/, 'default template works');
 
-}
-
 sub simpleTextParser {
 	my ($text) = @_;
 
@@ -236,11 +225,6 @@ sub setupTest {
 	#$properties->{template} .= "\n";
 	my $template = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
-	return ($versionTag, $template);
-}
-
-END { ##Clean-up after yourself, always
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
+    addToCleanup($versionTag);
+	return $template;
 }

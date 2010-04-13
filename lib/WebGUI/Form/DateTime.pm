@@ -20,6 +20,8 @@ use WebGUI::Form::Hidden;
 use WebGUI::International;
 use WebGUI::DateTime;
 
+my $isaEpoch = qr/^-?\d+$/;
+
 =head1 NAME
 
 Package WebGUI::Form::DateTime
@@ -82,7 +84,7 @@ sub definition {
 	my $definition = shift || [];
 	push(@{$definition}, {
 		defaultValue=>{
-                        defaultValue=>$session->datetime->time()
+                        defaultValue=>time()
                         },
 		maxlength=>{
 			defaultValue=> 19
@@ -139,9 +141,9 @@ sub getValue {
     # This should probably be rewritten as a cascading ternary
     my $value = $self->SUPER::getValue(@_);
 	
-    if (!$self->getDefaultValue || $self->getDefaultValue =~ m/^\d+$/) {
+    if (!$self->getDefaultValue || $self->getDefaultValue =~ $isaEpoch) {
 		# Epoch format
-        if($value =~ /^\d+$/){
+        if($value =~ $isaEpoch){
             return $value;
         }
 		return $self->session->datetime->setToEpoch($value);
@@ -150,7 +152,7 @@ sub getValue {
 		# MySQL format
 		# YY(YY)?-MM-DD HH:MM:SS
 
-        if($value =~ /^\d+$/){
+        if($value =~ $isaEpoch){
             return $self->session->datetime->epochToSet($value,$self->session->user->profileField( 'timeZone' ));
         }
 		
@@ -178,8 +180,10 @@ Return the date in a human readable format.
 sub getValueAsHtml {
 	my ($self) = @_;
     # This should probably be rewritten as a cascading ternary
-    my $formatValue = $self->getDefaultValue || $self->getOriginalValue;
-	if (!$formatValue || $formatValue =~ m/^\d+$/) {
+    if ( !$self->get("defaultValue") 
+      ||  $self->get("defaultValue") =~ $isaEpoch
+      || !$self->get("value")     
+      ||  $self->get("value")        =~ $isaEpoch) {
 		return $self->session->datetime->epochToHuman($self->getOriginalValue,"%z %Z");
 	} 
     else {
@@ -216,22 +220,10 @@ Renders a date picker control.
 sub toHtml {
     my $self    = shift;
     my $session = $self->session;
-    my $value;
-    # This should probably be rewritten as a cascading ternary
-    if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
-        # Epoch format
-        $value	= $session->datetime->epochToSet($self->getOriginalValue,1);
-    } else {
-        # MySQL format
-        $value	= $self->getOriginalValue;
-        # Fix time zone
-        $value 	= WebGUI::DateTime->new($session, mysql => $value)
-                ->set_time_zone($self->get("timeZone"))
-                ->strftime("%Y-%m-%d %H:%M:%S");
-    }
+    my $value   = eval { WebGUI::DateTime->new($session, $self->getOriginalValue); };
+    $value      = WebGUI::DateTime->new($session,0) if $value eq '';
+    $value      = $value->set_time_zone($self->get("timeZone"))->strftime("%Y-%m-%d %H:%M:%S");
+
     my $style   = $session->style;
     my $url     = $session->url;
     $style->setLink($url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
@@ -245,12 +237,12 @@ sub toHtml {
     $style->setScript($url->extras('yui-webgui/build/datepicker/datepicker.js'),{ type => 'text/javascript' });
 
     return WebGUI::Form::Text->new($self->session,
-            name=>$self->get("name"),
-            value=>$value,
-            size=>$self->get("size"),
-            extras=>$self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this, true);"',
-            id=>$self->get('id'),
-            maxlength=>$self->get("maxlength")
+            name      => $self->get("name"),
+            value     => $value,
+            size      => $self->get("size"),
+            extras    => $self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this, true);"',
+            id        => $self->get('id'),
+            maxlength => $self->get("maxlength")
             )->toHtml;
 }
 
@@ -263,28 +255,15 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 =cut
 
 sub toHtmlAsHidden {
-        my $self = shift;
-	my $value;
+    my $self = shift;
+    my $value = WebGUI::DateTime->new($self->session, $self->getOriginalValue)
+              ->set_time_zone($self->get("timeZone"))
+              ->strftime("%Y-%m-%d %H:%M:%S");
 	
-    # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
-		$value = $self->session->datetime->epochToSet($self->getOriginalValue,1);
-	} else {
-		# MySQL format
-		$value = $self->getOriginalValue;
-		# Fix Time zone
-		$value 	= WebGUI::DateTime->new($self->session, mysql => $value)
-                ->set_time_zone($self->get("timeZone"))
-                ->strftime("%Y-%m-%d %H:%M:%S");
-	}
-	
-	return WebGUI::Form::Hidden->new(
-		name	=> $self->get("name"),
-		value	=> $value,
-		)->toHtmlAsHidden;
+    return WebGUI::Form::Hidden->new($self->session,
+        name	=> $self->get("name"),
+        value	=> $value,
+        )->toHtmlAsHidden;
 }
 
 1;

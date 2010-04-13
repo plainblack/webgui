@@ -20,6 +20,7 @@ use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset;
 use WebGUI::DateTime;
 use DateTime::Duration;
+use WebGUI::Mail::Send;
 
 =head1 NAME
 
@@ -106,19 +107,7 @@ sub execute {
 	my $self = shift;
     my $session = $self->session;
 
-    my $sql = <<END_SQL;
-select r.Survey_responseId, r.username, r.userId, upd.email, upd.firstName, upd.lastName, r.startDate, s.timeLimit, s.doAfterTimeLimit, ad.title, ad.url  
-from Survey s, Survey_response r, assetData ad, userProfileData upd
-where r.isComplete = 0 
-    and s.timeLimit > 0 
-    and ( unix_timestamp() - r.startDate ) > ( s.timeLimit * 60 ) 
-    and r.assetId = s.assetId 
-    and ad.assetId = s.assetId 
-    and ad.revisionDate = s.revisionDate 
-    and upd.userId = r.userId
-END_SQL
-
-    my $refs = $self->session->db->buildArrayRefOfHashRefs($sql);
+    my $refs = $self->session->db->buildArrayRefOfHashRefs( $self->getSql );
     for my $ref (@{$refs}) {
         if($self->get("deleteExpired")){
             $session->log->debug("deleting response: $ref->{Survey_responseId} ");
@@ -141,6 +130,8 @@ END_SQL
                     responseId => $ref->{Survey_responseId},
                     deleted => $self->get("deleteExpired"),
                     companyName => $self->session->setting->get("companyName"),
+                    username => $ref->{username},
+                    userId => $ref->{userId},
                 };
             my $template = WebGUI::Asset->newById($self->session,$self->get('emailTemplateId')); 
             my $message = $template->processTemplate($var, $self->get("emailTemplateId"));
@@ -156,6 +147,37 @@ END_SQL
         }
     }
 	return $self->COMPLETE;
+}
+
+=head2 getSql
+
+Returns the SQL used to look up incomplete survey responses.
+
+Factored out into a separate subroutine for the sake of testability.
+
+=cut
+
+sub getSql {
+
+    # Use a left outer join on userProfileData so that we still get back responses for users that have been deleted
+    return <<END_SQL;
+select  
+    r.Survey_responseId, r.username, r.userId, r.startDate, 
+    upd.email, upd.firstName, upd.lastName, 
+    s.timeLimit, s.doAfterTimeLimit, 
+    ad.title, ad.url  
+from 
+    Survey_response r left outer join userProfileData upd on r.userId = upd.userId, Survey s, assetData ad
+where 
+    r.isComplete = 0 
+    and s.timeLimit > 0 
+    and ( unix_timestamp() - r.startDate ) > ( s.timeLimit * 60 ) 
+    and r.assetId = s.assetId 
+    and ad.assetId = s.assetId 
+    and ad.revisionDate = s.revisionDate 
+    and s.revisionDate = r.revisionDate
+END_SQL
+
 }
 
 1;

@@ -33,7 +33,7 @@ my $i18n = WebGUI::International->new($session, "Shop");
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 29;        # Increment this number for each test you create
+plan tests => 30;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -105,13 +105,15 @@ my $ship    = WebGUI::Shop::Ship->new( $session );
 my $shipper = $ship->addShipper( 'WebGUI::Shop::ShipDriver::FlatRate', {flatFee => 1 } );
 $cart->update( {
     shippingAddressId   => $address->getId,
-    shipperId           => $shipper->getId,
 } );
-is($cart->readyForCheckout, 1, 'Cart is ready for checkout');
+ok(! $cart->readyForCheckout, 'readyForCheckout:  returns false due to no shipperId');
+
+$cart->update( { shipperId           => $shipper->getId, } );
+ok($cart->readyForCheckout, '... returns true when it has shipperId, and shipping address');
 
 # Check shipping address constraint
 $cart->update( {shippingAddressId   => 'Does Not Exist'} );
-is( $cart->readyForCheckout, 0, 'Cannot checkout cart without shipping address' );
+ok( ! $cart->readyForCheckout, '... Cannot checkout cart without shipping address' );
 
 # Check minimum transaction amount
 $session->setting->set( 'shopCartCheckoutMinimum', 1000 );
@@ -132,6 +134,7 @@ is($session->db->quickScalar("select count(*) from cartItem where cartId=?",[ $c
 
 
 my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+WebGUI::Test->sessionsToDelete($session2);
 $session2->user({userId => 3});
 my $cart2 = WebGUI::Shop::Cart->newBySession($session2);
 isnt(
@@ -161,5 +164,4 @@ END {
     if ($shipper) {
         $shipper->delete;
     }
-    $session2->close;
 }

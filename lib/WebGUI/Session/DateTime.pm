@@ -298,8 +298,11 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 =cut
 
 sub epochToHuman {
-	my $self = shift;
-	my $epoch = shift || time();
+	my $self  = shift;
+	my $epoch = shift;
+    if (!defined $epoch || $epoch eq '') {
+        $epoch = time();
+    }
 	my $i18n = WebGUI::International->new($self->session);
 	my $language = $i18n->getLanguage($self->session->user->profileField('language'));
 	my $locale = $language->{languageAbbreviation} || 'en';
@@ -950,7 +953,7 @@ sub setToEpoch {
 	}
 	unless ($dt) {
 		$self->session->errorHandler->warn("Could not format date $set for epoch.  Returning current time");
-		return $self->time();
+		return time();
 	}
 	return $dt->epoch;
 }
@@ -959,7 +962,8 @@ sub setToEpoch {
 
 =head2 time ( )
 
-Returns an epoch date for now.
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
+the perl built in function time().
 
 =cut
 

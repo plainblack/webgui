@@ -72,7 +72,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
     my $self    = shift;
     my $session = $self->session;
-    my $epoch   = $session->datetime->time();
+    my $epoch   = time();
     my $getCs   = WebGUI::Asset::Wobject::Collaboration->getIsa($session);
     CS: while (1) {
         my $cs = eval { $getCs->(); };
