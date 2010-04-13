@@ -22,16 +22,15 @@ sub WRITE {
     if ($buf =~ /\ABinding parameters: /) {
         my $sql = $buf;
         $sql =~ s/\ABinding parameters: //;
-        my $sub;
-        my $line;
-        for ( my $i = 0; caller($i); $i++) {
-            (my $package, undef, $line) = caller($i);
-            next
-                if $package =~ /\A(?:WebGUI::SQL|DBI|DBD)(?:\z|::)/;
-            ($sub) = (caller($i + 1))[3];
-            last;
+        my $depth;
+        for ( $depth = 1; caller($depth); $depth++) {
+            my $package = caller($depth);
+            last
+                if $package !~ /\A(?:WebGUI::SQL|DBI|DBD)(?:\z|::)/;
         }
-        $$self->log->debug("Query - $sub($line) : $sql");
+        local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + $depth + 1;
+
+        $$self->log->debug("Query - $sql");
     }
     return length($buf);
 }
