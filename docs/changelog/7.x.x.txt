@@ -3,6 +3,7 @@
  - added #11007: Added drag'n'drop sorting in Gallery Album Edit View (Bernd Kalbfuß-Zimmermann)
  - added Better comment rating icons.
  - fixed #11520: Wiki Locked
+ - fixed Missing Template variables for the Wiki Page view template.
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the

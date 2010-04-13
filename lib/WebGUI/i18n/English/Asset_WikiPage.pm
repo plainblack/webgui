@@ -291,6 +291,24 @@ our $I18N =
         context     => q{Help for template variable},
     },
 
+    'keywordsLoop' => {
+        message     => q{A loop containing all keywords for this page is tagged with.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword title' => {
+        message     => q{The name of this keyword.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword url' => {
+        message     => q{The URL to view all pages tagged with this keyword.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
     'help owner' => {
         message     => q{The username of the owner of the page},
         lastUpdated => 0,

@@ -78,6 +78,16 @@ our $HELP = {
             },
             { 'name' => 'editContent', },
             { 'name' => 'content', },
+            { 'name' => 'keywordsLoop',
+              'variables' => [
+                { 'name' => 'keyword',
+                  'description' => 'keyword title',
+                },
+                { 'name' => 'url',
+                  'description' => 'keyword url',
+                },
+              ],
+            },
             {
                 name        => 'isSubscribed',
                 description => 'help isSubscribed',
