@@ -304,7 +304,7 @@ our $I18N =
     },
 
     'keyword url' => {
-        message     => q{The URL to view all pages tagged with this keyword.},
+        message     => q{The URL to view all pages tagged with this keyword.  The URL will have the gateway URL prepended to it.},
         lastUpdated => 0,
         context     => q{Help for template variable},
     },
@@ -352,7 +352,7 @@ our $I18N =
     },
 
     'keyword page url' => {
-        message     => q{The URL to a page that has this keyword.},
+        message     => q{The URL to a page that has this keyword.  The URL will have the gateway URL prepended to it.},
         lastUpdated => 0,
         context     => 'template variable help',
     },

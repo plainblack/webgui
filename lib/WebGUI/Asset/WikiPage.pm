@@ -331,7 +331,7 @@ sub getTemplateVars {
                 url   => $asset->getUrl,
             };
         }
-        $paginator->appendTemplateVariables($var);
+        $paginator->appendTemplateVars($var);
         @keyword_pages = map { $_->[1] }
                          sort
                          map { [ lc $_->{title}, $_ ] }
