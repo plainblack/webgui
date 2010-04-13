@@ -272,27 +272,7 @@ Returns a reference to the logger.
 
 =cut
 
-sub getLogger {
-	my $self = shift;
-	if ($self->session->request) {
-        return $self->session->request->logger;
-    } else {
-        
-        # Thanks to Plack, wG has been decoupled from Log4Perl
-        # However when called outside a web context, we currently still fall back to Log4perl
-        # (pending a better idea)
-        if (!$self->{_logger}) {
-            Log::Log4perl->init_once( $self->session->config->getWebguiRoot."/etc/log.conf" );   
-            my $logger = Log::Log4perl->get_logger($self->session->config->getFilename);
-            $self->{_logger} = sub {
-                my $args = shift;
-                my $level = $args->{level};
-                $logger->$level($args->{message});
-            };
-        }
-        return $self->{_logger};
-    }
-}
+sub getLogger { $_[0]->{_logger} }
 
 
 #-------------------------------------------------------------------
@@ -349,9 +329,25 @@ An active WebGUI::Session object.
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
-	bless {_queryCount=>0, _session=>$session}, $class;
+    my $class   = shift;
+    my $session = shift;
+
+    my $logger = $session->request && $session->request->logger;
+    if ( !$logger ) {
+
+        # Thanks to Plack, wG has been decoupled from Log4Perl
+        # However when called outside a web context, we currently still fall back to Log4perl
+        # (pending a better idea)
+        Log::Log4perl->init_once( $session->config->getWebguiRoot . "/etc/log.conf" );
+        my $log4perl = Log::Log4perl->get_logger( $session->config->getFilename );
+        $logger = sub {
+            my $args  = shift;
+            my $level = $args->{level};
+            $log4perl->$level( $args->{message} );
+        };
+    }
+
+    bless { _queryCount => 0, _session => $session, _logger => $logger }, $class;
 }
 
 #----------------------------------------------------------------------------

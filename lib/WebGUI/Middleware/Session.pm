@@ -42,6 +42,9 @@ sub call {
 
     my $session = try {
         $env->{'webgui.session'} = WebGUI::Session->open( $config->getWebguiRoot, $config, $env );
+    } catch {
+        # We don't have a logger object, so for now just warn() the error
+        warn "Unable to instantiate WebGUI::Session - $_";
     };
 
     if ( !$session ) {
@@ -49,7 +52,11 @@ sub call {
         # We don't have access to a db connection to find out if the user is allowed to see
         # a verbose error message or not, so resort to a generic Internal Server Error
         # (using the error_docs mapping)
-        return Plack::Middleware::ErrorDocument->wrap( sub { [ 500, [], [] ] }, %{ $self->error_docs } )->($env);
+        if ($self->error_docs) {
+            return Plack::Middleware::ErrorDocument->wrap( sub { [ 500, [], [] ] }, %{ $self->error_docs } )->($env);
+        } else {
+            return [ 500, [ 'Content-Type' => 'text/plain' ], [ 'Internal Server Error' ] ];
+        }
     }
 
     my $debug = $session->log->canShowDebug;
