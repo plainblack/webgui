@@ -48,6 +48,9 @@ our $HELP = {
             {   tag       => 'wiki page asset template variables',
                 namespace => 'Asset_WikiPage'
             },
+            {   tag       => 'pagination template variables',
+                namespace => 'WebGUI'
+            },
         ],
         variables => [
             {   name        => 'viewLabel',
@@ -103,6 +106,17 @@ our $HELP = {
             {
                 name        => 'owner',
                 description => 'help owner',
+            },
+            { 'name' => 'isKeywordPage', },
+            { 'name' => 'keyword_page_loop',
+              'variables' => [
+                { 'name' => 'title',
+                  'description' => 'keyword page title',
+                },
+                { 'name' => 'url',
+                  'description' => 'keyword page url',
+                },
+              ],
             },
         ],
         related => [],

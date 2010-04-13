@@ -327,12 +327,36 @@ our $I18N =
         context     => 'Body text for help page',
     },
 
-
     'isFeatured label' => {
         message     => q{Feature this on the front page},
         lastUpdated => 0,
         context     => 'Label for asset property',
     },
+
+    'isKeywordPage' => {
+        message     => q{A boolean that is true if this page is a keyword page.},
+        lastUpdated => 0,
+        context     => 'template variable help',
+    },
+
+    'keyword_page_loop' => {
+        message     => q{If this page is a keyword page, then this loop will contain a list of all pages tagged with this page's keyword.  The pagination variables will apply to the list of pages in this loop.  If this page is not a keyword page, the loop will be blank, and the pagination variables will not be present.},
+        lastUpdated => 0,
+        context     => 'template variable help',
+    },
+
+    'keyword page title' => {
+        message     => q{The title of a page that has this keyword.},
+        lastUpdated => 0,
+        context     => 'template variable help',
+    },
+
+    'keyword page url' => {
+        message     => q{The URL to a page that has this keyword.},
+        lastUpdated => 0,
+        context     => 'template variable help',
+    },
+
 };
 
 1;

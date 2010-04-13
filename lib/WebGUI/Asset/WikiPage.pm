@@ -265,13 +265,17 @@ Get the common template vars for this asset
 
 sub getTemplateVars {
     my ( $self ) = @_;
-    my $i18n        = WebGUI::International->new($self->session, "Asset_WikiPage");
-    my $wiki        = $self->getWiki;
-    my $owner       = WebGUI::User->new( $self->session, $self->get('ownerUserId') );
-    my $keywords    = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({
+    my $session  = $self->session;
+    my $i18n     = WebGUI::International->new($session, "Asset_WikiPage");
+    my $wiki     = $self->getWiki;
+    my $owner    = WebGUI::User->new( $session, $self->get('ownerUserId') );
+    my $keyObj   = WebGUI::Keyword->new($session);
+
+    my $keywords    = $keyObj->getKeywordsForAsset({
         asset       => $self,
         asArrayRef  => 1,
     });
+
     my @keywordsLoop = ();
     foreach my $word (@{$keywords}) {
         push @keywordsLoop, {
@@ -305,11 +309,35 @@ sub getTemplateVars {
             $self->scrubContent,
             {skipTitles => [$self->get('title')]},
         ),	
+        isKeywordPage       => $self->isKeywordPage,
         isSubscribed        => $self->isSubscribed,
         subscribeUrl        => $self->getSubscribeUrl,
         unsubscribeUrl      => $self->getUnsubscribeUrl,
         owner               => $owner->get('alias'),
     };
+    my @keyword_pages = ();
+    if ($var->{isKeywordPage}) {
+        my $paginator = $keyObj->getMatchingAssets({
+            startAsset   => $self->getWiki,
+            keyword      => $self->get('title'),
+            usePaginator => 1,
+        });
+        PAGE: foreach my $assetId (@{ $paginator->getPageData }) {
+            next PAGE if $assetId->{assetId} eq $self->getId;
+            my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId->{assetId});
+            next PAGE unless $asset;
+            push @keyword_pages, {
+                title => $asset->getTitle,
+                url   => $asset->getUrl,
+            };
+        }
+        $paginator->appendTemplateVariables($var);
+        @keyword_pages = map { $_->[1] }
+                         sort
+                         map { [ lc $_->{title}, $_ ] }
+                         @keyword_pages;
+    }
+    $var->{keyword_page_loop} = \@keyword_pages;
     return $var;
 }
 
@@ -355,6 +383,24 @@ Returns a boolean indicating whether or not this WikiPage is protected.
 sub isProtected {
 	my $self = shift;
 	return $self->get("isProtected");
+}
+
+#-------------------------------------------------------------------
+
+=head2 isKeywordPage
+
+Returns a boolean indicating whether or not the name of this WikiPage matches any keyword in the Wiki that
+contains it.
+
+=cut
+
+sub isKeywordPage {
+    my $self  = shift;
+    my $keywords = WebGUI::Keyword->new($self->session)->getMatchingAssets({
+        asset   => $self->getWiki,
+        keyword => $self->get('title'),
+    });
+    return scalar @{ $keywords };
 }
 
 #-------------------------------------------------------------------
