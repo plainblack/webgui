@@ -10,6 +10,7 @@
  - fixed Shortcut i18n for the Criteria Builder.
  - fixed #11516: Shortcut Asset: Properties panel messed up in edit view
  - fixed #11520: Wiki Locked
+ - fixed Missing Template variables for the Wiki Page view template.
 
 7.8.16
  - fixed thread pagination on search results, off by 1 error and modal direction
