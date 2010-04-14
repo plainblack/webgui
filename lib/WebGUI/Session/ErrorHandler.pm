@@ -72,7 +72,7 @@ Whatever message you wish to insert into the log.
 sub audit {
     my $self = shift;
     my $message = shift;
-    @_ = ($self->session->user->username." (".$self->session->user->userId.") ".$message);
+    @_ = ($self, $self->session->user->username." (".$self->session->user->userId.") ".$message);
     goto $self->can('info');
 }
 
@@ -246,7 +246,7 @@ The message you wish to add to the log.
 sub security {
     my $self = shift;
     my $message = shift;
-    @_ = ($self->session->user->username." (".$self->session->user->userId.") connecting from "
+    @_ = ($self, $self->session->user->username." (".$self->session->user->userId.") connecting from "
         .$self->session->env->getIp." attempted to ".$message);
     goto $self->can('warn');
 }
