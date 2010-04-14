@@ -63,7 +63,7 @@ sub call {
     if ($debug) {
         $app = Plack::Middleware::StackTrace->wrap($app);
         $app = Plack::Middleware::Debug->wrap( $app,
-            panels => [qw(Environment Response Timer Memory Session DBITrace PerlConfig Response)] );
+            panels => [qw(Environment Response Timer Memory Session DBITrace PerlConfig Response WgLogger)] );
     }
 
     # Turn exceptions into HTTP errors
