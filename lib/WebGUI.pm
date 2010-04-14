@@ -84,11 +84,9 @@ sub psgi_app {
 sub compile_psgi_app {
     my $self = shift;
     
-    my $catch = [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error" ] ];
-    
     # WebGUI is a PSGI app is a Perl code reference. Let's create one.
     # Each web request results in a call to this sub
-    my $app = sub {
+    return sub {
         my $env = shift;
         
         # Use the PSGI callback style response, which allows for nice things like 
@@ -99,7 +97,7 @@ sub compile_psgi_app {
             my $session = $env->{'webgui.session'} or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
             
             # Handle the request
-            $self->handle($session);
+            handle($session);
             
             # Construct the PSGI response
             my $response = $session->response;
@@ -128,12 +126,11 @@ sub compile_psgi_app {
                         $session->request->TRACE("Error detected after streaming response started");
                         $response->writer->close;
                     } else {
-                        $responder->( $catch );
+                        $responder->( [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error" ] ] );
                     }
                     
                 }
             } else {
-                
                 # Not streaming, so immediately tell the callback to return 
                 # the response. In the future we could use an Event framework here 
                 # to make this a non-blocking delayed response.
@@ -141,34 +138,10 @@ sub compile_psgi_app {
             }
         }
     };
-    
-    # Wrap $app with some extra middleware that acts as a fallback for when
-    # you're not using something fast to serve static content
-    #
-    # This could also be in the .psgi file, but it seems sensible to have it
-    # baked in as a fallback (unless we find it drains performance)
-    my $config = $self->config;
-
-    # Extras
-    use Plack::Middleware::Static;
-    my $extrasURL = $config->get('extrasURL');
-    my $extrasPath = $config->get('extrasPath');
-    $app = Plack::Middleware::Static->wrap($app, 
-        path => sub { s{^$extrasURL/}{} },
-        root => "$extrasPath/",
-    );
-    
-    # Uploads
-    my $uploadsURL = $config->get('uploadsURL');
-    my $uploadsPath = $config->get('uploadsPath');
-    $app = Plack::Middleware::Static->wrap($app, 
-        path => sub { s{^$uploadsURL/}{} }, 
-        root => "$uploadsPath/", 
-    );
 }  
 
 sub handle {
-    my ( $self, $session ) = @_;
+    my ( $session ) = @_;
     
     # uncomment the following to short-circuit contentHandlers (for benchmarking PSGI scaffolding vs. modperl)
     # $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking\n");

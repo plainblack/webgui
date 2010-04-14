@@ -45,6 +45,7 @@ sub call {
     } catch {
         # We don't have a logger object, so for now just warn() the error
         warn "Unable to instantiate WebGUI::Session - $_";
+        return; # make sure $session assignment is undef
     };
 
     if ( !$session ) {
@@ -85,7 +86,11 @@ sub call {
 
             # Close the Session
             $env->{'webgui.session'}->close();
+            #memory_cycle_ok( $env->{'webgui.session'} );
             delete $env->{'webgui.session'};
+            
+            #use Test::Memory::Cycle;
+            #memory_cycle_ok( $env );
         }
     );
 }

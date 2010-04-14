@@ -8,7 +8,7 @@ You can benchmark your server via:
 
  ab -t 3 -c 10 -k http://dev.localhost.localdomain:5000/ | grep Req
  
-I'm currently getting 23 requests/second, whereas I'm getting 30/second on the non-PSGI WebGUI8 branch.
+I'm currently getting 370 requests/second, whereas I'm getting 430/second on the non-PSGI WebGUI8 branch.
 
 = ARCHITECTURE =
 
