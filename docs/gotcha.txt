@@ -7,9 +7,16 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.9.3
+--------------------------------------------------------------------
+     * Test:Deep, which had been an optional dependency for testing, has been used
+       in components of the core for a while, since the release of the new Survey.
+       Test::Deep version 0.095 or higher is now required.
+
+
 7.9.2
 --------------------------------------------------------------------
-     * new dependency: DateTime::Event::ICal
+     * new dependency: DateTime::Event::ICal 0.10 or higher
 
 7.9.0
 --------------------------------------------------------------------
