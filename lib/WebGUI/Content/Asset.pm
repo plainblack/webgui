@@ -83,28 +83,11 @@ sub handler {
     my ($session) = @_;
     my ($errorHandler, $http, $var, $asset, $request, $config) = $session->quick(qw(errorHandler http var asset request config));
     my $output = "";
-    if ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
+    if (my $perfLog = $errorHandler->performanceLogger) { #show performance indicators if required
         my $t = [Time::HiRes::gettimeofday()];
         $output = page($session);
-        $t = Time::HiRes::tv_interval($t) ;
-        if ($output =~ /<\/title>/) {
-            $output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
-        } 
-        else {
-            # Kludge.
-            my $mimeType = $http->getMimeType();
-            if ($mimeType eq 'text/css') {
-                $session->output->print("\n/* Page generated in $t seconds. */\n");
-            } 
-            elsif ($mimeType =~ m{text/html}) {
-                $session->output->print("\nPage generated in $t seconds.\n");
-            } 
-            else {
-                # Don't apply to content when we don't know how
-                # to modify it semi-safely.
-            }
-        }
-    } 
+        $perfLog->({ time => Time::HiRes::tv_interval($t), type => 'Page'});
+    }
     else {
 
         my $asset = getAsset($session, getRequestedAssetUrl($session));

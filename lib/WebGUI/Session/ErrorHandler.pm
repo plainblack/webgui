@@ -21,6 +21,7 @@ use JSON;
 use HTML::Entities qw(encode_entities);
 use Log::Log4perl;
 use WebGUI::Exception;
+use Sub::Uplevel;
 
 =head1 NAME 
 
@@ -84,10 +85,13 @@ Returns true if the user meets the conditions to see performance indicators and 
 
 =cut
 
-sub canShowPerformanceIndicators {
-	my $self = shift;
-	return 0 unless $self->session->setting->get("showPerformanceIndicators");
-	return $self->canShowBasedOnIP('debugIp');
+sub performanceLogger {
+    my $self = shift;
+    my $request = $self->session->request;
+    return
+        unless $request;
+    my $logger = $request->env->{'webgui.perf.logger'};
+    return $logger;
 }
 
 

@@ -43,7 +43,8 @@ Defaults to 'url'. But if you want to use an assetId as the first parameter, the
 #-------------------------------------------------------------------
 sub process {
     my ($session, $identifier, $type) = @_;
-    my $t = ($session->errorHandler->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
+    my $perfLog = $session->log->performanceLogger;
+    my $t = $perfLog ? [Time::HiRes::gettimeofday()] : undef;
     my $asset;
     if ($type eq 'assetId') {
         $asset = eval { WebGUI::Asset->newById($session, $identifier); };
@@ -79,8 +80,8 @@ sub process {
         $asset->toggleToolbar;
         $asset->prepareView;
         my $output = $asset->view;
-        $output .= "AssetProxy:" . Time::HiRes::tv_interval($t)
-            if $t;
+        $perfLog->({ asset => $asset, time => Time::HiRes::tv_interval($t), type => 'Proxy'})
+            if $perfLog;
         return $output;
     }
     return '';

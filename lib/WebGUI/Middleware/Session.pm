@@ -7,6 +7,7 @@ use WebGUI::Utility ();
 use Try::Tiny;
 use Plack::Middleware::StackTrace;
 use Plack::Middleware::Debug;
+use WebGUI::Middleware::Debug::Performance;
 use WebGUI::Middleware::HTTPExceptions;
 use Plack::Middleware::ErrorDocument;
 use Plack::Middleware::SimpleLogger;
@@ -81,6 +82,7 @@ sub call {
                 [ 'MySQLTrace', skip_packages => qr/\AWebGUI::SQL(?:\z|::)/ ],
                 'Response',
                 'Logger',
+                sub { WebGUI::Middleware::Debug::Performance->wrap($_[0]) },
             ],
         );
     }
