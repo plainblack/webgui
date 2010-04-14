@@ -70,7 +70,18 @@ sub call {
     if ($debug) {
         $app = Plack::Middleware::StackTrace->wrap($app);
         $app = Plack::Middleware::Debug->wrap( $app,
-            panels => [qw(Environment Response Timer Memory Session DBITrace PerlConfig Response WgLogger)] );
+            panels => [
+                'Environment',
+                'Response',
+                'Timer',
+                'Memory',
+                'Session',
+                'PerlConfig',
+                [ 'MySQLTrace', skip_packages => qr/\AWebGUI::SQL(?:\z|::)/ ],
+                'Response',
+                'Logger',
+            ],
+        );
     }
 
     # Turn exceptions into HTTP errors

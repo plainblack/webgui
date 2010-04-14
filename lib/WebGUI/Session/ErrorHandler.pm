@@ -70,9 +70,10 @@ Whatever message you wish to insert into the log.
 =cut
 
 sub audit {
-	my $self = shift;
-	my $message = shift;
-        $self->info($self->session->user->username." (".$self->session->user->userId.") ".$message);
+    my $self = shift;
+    my $message = shift;
+    @_ = ($self->session->user->username." (".$self->session->user->userId.") ".$message);
+    goto $self->can('info');
 }
 
 
@@ -161,28 +162,11 @@ The message you wish to add to the log.
 =cut
 
 sub debug {
-	my $self = shift;
-	my $message = shift;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
-	$self->getLogger->({ level => 'debug', message => $message });
-    $self->{_debug_debug} .= $message."\n";
+    my $self = shift;
+    my $message = shift;
+    @_ = ({ level => 'debug', message => $message });
+    goto $self->getLogger;
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-	
-sub DESTROY {
-	my $self = shift;
-	undef $self;
-}
-
-
 
 #-------------------------------------------------------------------
 
@@ -197,12 +181,10 @@ The message you wish to add to the log.
 =cut
 
 sub error {
-	my $self = shift;
-	my $message = shift;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
-	$self->getLogger->({ level => 'error', message => $message});
-	$self->getLogger->({ level => 'debug', message => "Stack trace for ERROR ".$message."\n".$self->getStackTrace() });
-        $self->{_debug_error} .= $message."\n";
+    my $self = shift;
+    my $message = shift;
+    @_ = ({ level => 'error', message => $message});
+    goto $self->getLogger;
 }
 
 
@@ -219,49 +201,10 @@ The message to use.
 =cut
 
 sub fatal {
-	my $self = shift;
-	my $message = shift;
-
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
-	$self->getLogger->({ level => 'fatal', message => $message });
-	$self->getLogger->({ level => 'debug', message => "Stack trace for FATAL ".$message."\n".$self->getStackTrace() });
-
-    my $error;
-	if (! defined $self->session->db(1)) {
-		# We can't even _determine_ whether we can show the debug text.  Punt.
-		$error = q{<h1>Fatal Internal Error</h1>};
-	} 
-	elsif ($self->canShowDebug()) {
-	    my $stack = encode_entities($self->getStackTrace);
-	    my $debug = $self->showDebug();
-		$error = <<END_HTML;
-<h1>WebGUI Fatal Error</h1>
-<p>Something unexpected happened that caused this system to fault.</p>
-<p>$message</p>
-<pre>$stack</pre>
-$debug
-END_HTML
-	} 
-	else {
-		# NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
-		my $company = $self->session->setting->get("companyName");
-		my $email = $self->session->setting->get("companyEmail");
-		my $url = $self->session->setting->get("companyURL");
-		
-		$error = <<END_HTML;
-<h1>Problem With Request</h1>
-We have encountered a problem with your request. Please use your back button and try again.
-If this problem persists, please contact us with what you were trying to do and the time and date of the problem.<br />
-<br />$company
-<br />$email
-<br />$url
-END_HTML
-	}
-	
-	# Fatal errors cause an exception to be thrown - use WebGUI::Error::Fatal so
-	# that WebGUI knows to show this error message to all site users (instead of showing
-	# non-debug users the generic error screen)
-	WebGUI::Error::Fatal->throw( error => $error );
+    my $self = shift;
+    my $message = shift;
+    @_ = ({ level => 'fatal', message => $message});
+    goto $self->getLogger;
 }
 
 
@@ -310,11 +253,10 @@ The message you wish to add to the log.
 =cut
 
 sub info {
-	my $self = shift;
-	my $message = shift;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
-	$self->getLogger->({ level => 'info', message => $message });
-        $self->{_debug_info} .= $message."\n";
+    my $self = shift;
+    my $message = shift;
+    @_ = ({ level => 'info', message => $message});
+    goto $self->getLogger;
 }
 
 #-------------------------------------------------------------------
@@ -349,7 +291,7 @@ sub new {
         };
     }
 
-    bless { _queryCount => 0, _session => $session, _logger => $logger }, $class;
+    bless { _session => $session, _logger => $logger }, $class;
 }
 
 #----------------------------------------------------------------------------
@@ -370,47 +312,6 @@ sub preventDebugOutput {
 
 #-------------------------------------------------------------------
 
-=head2 query ( sql ) 
-
-Logs a sql statement for the debugger output.  Keeps track of the #.
-
-=head3 sql
-
-A sql statement string.
-
-=cut
-
-sub query {
-	my $self = shift;
-    return unless $self->canShowDebug; # TODO - re-enable || $self->getLogger->is_debug;
-	my $query = shift;
-	my $placeholders = shift;
-	$self->{_queryCount}++;
-	my $plac;
-	if (defined $placeholders and ref $placeholders eq "ARRAY" && scalar(@$placeholders)) {
-        my @placeholders = map {ref $_ ? "$_" : $_} @$placeholders; # stringify objects
-        $plac = "\n  with placeholders:  " . JSON->new->encode(\@placeholders);
-	}
-	else {
-		$plac = '';
-	}
-    my $depth = 0;
-    while (my ($caller) = caller(++$depth)) {
-        last
-            unless $caller eq __PACKAGE__ || $caller =~ /^WebGUI::SQL:?/;
-    }
-
-    $query =~ s/^/  /gms;
-    $self->{_debug_debug} .= sprintf "query %d - %s(%s) :\n%s%s\n",
-        $self->{_queryCount}, (caller($depth + 1))[3,2], $query, $plac;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + $depth + 2;
-    $self->getLogger->({ level => 'debug', message => "query $self->{_queryCount}:\n$query$plac" });
-}
-
-
-
-#-------------------------------------------------------------------
-
 =head2 security ( message )
 
 A convenience function that wraps warn() and includes the current username, user ID, and IP address in addition to the message being logged.
@@ -422,10 +323,11 @@ The message you wish to add to the log.
 =cut
 
 sub security {
-	my $self = shift;
-	my $message = shift;
-	$self->warn($self->session->user->username." (".$self->session->user->userId.") connecting from "
-	.$self->session->env->getIp." attempted to ".$message);
+    my $self = shift;
+    my $message = shift;
+    @_ = ($self->session->user->username." (".$self->session->user->userId.") connecting from "
+        .$self->session->env->getIp." attempted to ".$message);
+    goto $self->can('warn');
 }
 
 
@@ -442,45 +344,6 @@ sub session {
 	return $self->{_session};
 }
 
-#-------------------------------------------------------------------
-
-=head2 showDebug ( )
-
-Creates an HTML formatted string of all internally stored debug information, warns,
-errors, sql queries and form data.
-
-THIS METHOD IS DEPRECATED (See Plack::Middleware::Debug::WgLogger)
-
-=cut
-
-sub showDebug {
-	my $self = shift;
-    my $output = '<div class="webgui-debug" style="text-align: left;color: #000000; white-space: pre; float: left">';
-    my $text = $self->{_debug_error};
-    $text = encode_entities($text);
-    $output .= '<div style="background-color: #800000;color: #ffffff">'.$text."</div>";
-	$text = $self->{_debug_warn}; 
-    $text = encode_entities($text);
-    $output .= '<div style="background-color: #ffbdbd">'.$text."</div>";
-	$text = $self->{_debug_info}; 
-    $text = encode_entities($text);
-    $output .= '<div style="background-color: #bdffbd">'.$text."</div>";
-	my %form = %{ $self->session->form->paramsHashRef };
-    $form{password} = "*******"
-        if exists $form{password};
-    $form{identifier} = "*******"
-        if exists $form{identifier};
-    $text = JSON->new->pretty->encode(\%form);
-    $text = encode_entities($text);
-	$output .= '<div style="background-color: #aaaaee">'.$text."</div>";
-	$text = $self->{_debug_debug}; 
-    $text = encode_entities($text);
-	$output .= '<div style="background-color: #cccc55">'.$text."</div>";
-	$output .= '</div>';
-	return $output;
-}
-
-
 
 #-------------------------------------------------------------------
 
@@ -495,11 +358,10 @@ The message you wish to add to the log.
 =cut
 
 sub warn {
-	my $self = shift;
-	my $message = shift;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 2;
-	$self->getLogger->({ level => 'warn', message => $message });
-        $self->{_debug_warn} .= $message."\n";
+    my $self = shift;
+    my $message = shift;
+    @_ = ({ level => 'warn', message => $message});
+    goto $self->getLogger;
 }
 
 
