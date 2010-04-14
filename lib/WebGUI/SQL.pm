@@ -856,10 +856,7 @@ Returns a reference to the current session.
 sub session {
     my $self = shift;
     if (@_) {
-        my $session = $self->{private_webgui_session} = shift;
-        require WebGUI::SQL::Trace;
-        open my $trace_handle, '>:via(WebGUI::SQL::Trace)', $session;
-        $self->trace('2|SQL', $trace_handle);
+        $self->{private_webgui_session} = shift;
     }
     return $self->{private_webgui_session};
 }

@@ -203,8 +203,8 @@ The message to use.
 sub fatal {
     my $self = shift;
     my $message = shift;
-    @_ = ({ level => 'fatal', message => $message});
-    goto $self->getLogger;
+    Sub::Uplevel::uplevel( 1, $self->getLogger, { level => 'fatal', message => $message});
+    WebGUI::Error::Fatal->throw( error => $message );
 }
 
 
@@ -216,7 +216,25 @@ Returns a reference to the logger.
 
 =cut
 
-sub getLogger { $_[0]->{_logger} }
+sub getLogger {
+    my $self = shift;
+    if (my $req = $self->session->request) {
+        my $logger = $req->logger;
+        return $logger
+            if $logger;
+    }
+
+    # Thanks to Plack, wG has been decoupled from Log4Perl
+    # However when called outside a web context, we currently still fall back to Log4perl
+    # (pending a better idea)
+    Log::Log4perl->init_once( $self->session->config->getWebguiRoot . "/etc/log.conf" );
+    my $log4perl = Log::Log4perl->get_logger( $self->session->config->getFilename );
+    sub {
+        my $args  = shift;
+        my $level = $args->{level};
+        $log4perl->$level( $args->{message} );
+    };
+}
 
 
 #-------------------------------------------------------------------
@@ -276,21 +294,6 @@ sub new {
     my $session = shift;
 
     my $logger = $session->request && $session->request->logger;
-    if ( !$logger ) {
-
-        # Thanks to Plack, wG has been decoupled from Log4Perl
-        # However when called outside a web context, we currently still fall back to Log4perl
-        # (pending a better idea)
-        require Log::Log4perl;
-        Log::Log4perl->init_once( WebGUI::Paths->logConfig );
-        my $log4perl = Log::Log4perl->get_logger( $session->config->getFilename );
-        $logger = sub {
-            my $args  = shift;
-            my $level = $args->{level};
-            $log4perl->$level( $args->{message} );
-        };
-    }
-
     bless { _session => $session, _logger => $logger }, $class;
 }
 
@@ -363,7 +366,6 @@ sub warn {
     @_ = ({ level => 'warn', message => $message});
     goto $self->getLogger;
 }
-
 
 1;
 
