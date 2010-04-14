@@ -235,7 +235,7 @@ __DATA__
         </a>
     </div>
 
-    <div id="tabs" class="yui-navset">
+    <div id="tabBar" class="yui-navset">
         <ul class="yui-nav">
             <li class="selected"><a href="#tab1"><em>View</em></a></li>
             <li><a href="#tab2"><em>Tree</em></a></li>
@@ -245,8 +245,8 @@ __DATA__
                 <input type="button" id="backButton" value="&lt;" /><input type="button" id="forwardButton" value="&gt;" />
             </span>
             <div id="location">
-                <input type="text" id="locationUrl" value="/current/url" />
-                <span id="locationTitle">Current Title</span>
+                <input type="text" id="locationUrl" value="" />
+                <span id="locationTitle"></span>
             </div>
             <span id="right">
                 <input type="button" id="searchButton" value="S" /><input type="button" id="homeButton" value="H" />
@@ -264,11 +264,7 @@ __DATA__
 
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady( function() { 
-    var myTabs = new YAHOO.widget.TabView("tabs");
-    var bar = new WebGUI.Admin.LocationBar("locationBar");
-    window.admin = {
-        "bar" : bar,
-        "tabs" : myTabs
-    };
+    window.admin = new WebGUI.Admin( {
+    } );
 } );
 </script>

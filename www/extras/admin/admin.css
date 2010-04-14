@@ -37,18 +37,9 @@
     margin: auto 2px;
 }
 
-#locationBar .yui-button button, 
-#locationBar .yui-button a,
-#locationBar .yui-button a:visited 
-{
-    padding:    2px 5px;
-    line-height: 1.5;
-    min-height: 1.5em;
-}
-
 #locationBar #left {
     position:   absolute;
-    width:      8%;
+    width:      16%;
     top:        5px;
     left:       0;
 }
@@ -62,8 +53,8 @@
 
 #locationBar #location {
     position:   relative;
-    margin:     auto 7%;
-    width:      83%;
+    margin:     auto 7% auto 16%;
+    width:      75%;
     height:     80%;
     border: 1px solid #333;
     border-radius: 3px;
@@ -89,7 +80,7 @@
     text-align: right;
 }
 
-#tabs {
+#tabBar {
     clear: both;
 }
 

@@ -260,9 +260,27 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 	$var{'head.tags'} .= '<meta http-equiv="Cache-Control" content="must-revalidate" />'
 }
 
+
+    # TODO: Figure out if user is still in the admin console
+    if ( $session->asset ) {
+        my $assetDef    = { 
+            assetId     => $session->asset->getId,
+            title       => $session->asset->getTitle,
+            url         => $session->asset->getUrl,
+            icon        => $session->asset->getIcon(1),
+        };
+        $var{'head.tags'} .= sprintf <<'ADMINJS', JSON->new->encode( $assetDef );
+<script type="text/javascript">
+if ( window.parent && window.parent.admin ) {
+    window.parent.admin.navigate( %s );
+}
+</script>
+ADMINJS
+    }
+
     # Removing the newlines will probably annoy people. 
     # Perhaps turn it off under debug mode?
-    $var{'head.tags'} =~ s/\n//g;
+    #$var{'head.tags'} =~ s/\n//g;
 
 	# head.tags = head_attachments . body_attachments
 	# keeping head.tags for backwards compatibility
