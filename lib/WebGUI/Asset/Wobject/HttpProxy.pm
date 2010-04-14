@@ -20,7 +20,6 @@ use WebGUI::International;
 use WebGUI::Storage;
 use WebGUI::Asset::Wobject::HttpProxy::Parse;
 use WebGUI::Macro;
-use Apache2::Upload;
 use Tie::IxHash;
 
 use Moose;

@@ -9,6 +9,7 @@ use Plack::Middleware::Debug;
 use WebGUI::Middleware::HTTPExceptions;
 use Plack::Middleware::ErrorDocument;
 use Plack::Middleware::SimpleLogger;
+use Scalar::Util qw(weaken);
 
 use Plack::Util::Accessor qw( config error_docs );
 
@@ -33,6 +34,8 @@ sub call {
     my ( $self, $env ) = @_;
 
     my $app = $self->app;
+    weaken $self->{config};
+    
     my $config = $self->config or die 'Mandatory config parameter missing';
     
     # Logger fallback
@@ -59,6 +62,9 @@ sub call {
             return [ 500, [ 'Content-Type' => 'text/plain' ], [ 'Internal Server Error' ] ];
         }
     }
+    
+    # Perhaps I'm being paranoid..
+    weaken $session->{_config};
 
     my $debug = $session->log->canShowDebug;
     if ($debug) {

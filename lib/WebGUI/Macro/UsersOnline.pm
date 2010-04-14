@@ -19,7 +19,6 @@ package WebGUI::Macro::UsersOnline;
 =cut
 
 use strict;
-use Apache2::ServerRec;
 use Net::DNS;
 use WebGUI::Asset::Template;
 use WebGUI::International;

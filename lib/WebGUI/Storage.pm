@@ -363,8 +363,6 @@ sub addFileFromFormPost {
     my $session = $self->session;
     return ""
         if ($self->session->http->getStatus eq '413');
-    require Apache2::Request;
-    require Apache2::Upload;
     my $filename;
     my $attachmentCount = 1;
     foreach my $upload ($session->request->upload($formVariableName)) {

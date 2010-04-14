@@ -74,8 +74,6 @@ sub BUILD {
     $self->config($config);
 }
 
-use overload q(&{}) => sub { shift->psgi_app }, fallback => 1;
-
 sub psgi_app {
     my $self = shift;
     return $self->{psgi_app} ||= $self->compile_psgi_app;
@@ -83,6 +81,10 @@ sub psgi_app {
 
 sub compile_psgi_app {
     my $self = shift;
+    
+    # Preload all modules in the master (parent) thread before the Server does any
+    # child forking. This should save a lot of memory in copy-on-write friendly environments.
+    $self->preload;
     
     # WebGUI is a PSGI app is a Perl code reference. Let's create one.
     # Each web request results in a call to this sub
@@ -138,7 +140,58 @@ sub compile_psgi_app {
             }
         }
     };
-}  
+}
+
+sub preload {
+    my $self = shift;
+    my $debug = shift;
+    
+    warn 'Preloading modules..' if $debug;
+    my $modules = sub {
+        require Module::Versions;
+        my $m = Module::Versions->HASH;
+        $_ = $_->{VERSION} for values %$m;
+        return $m;
+    } if $debug;
+    my $pre = $modules->() if $debug;
+    
+    # The following is taken from preload.perl
+    my $readlines = sub {
+        my $file = shift;
+        my @lines;
+        if (open(my $fh, '<', $file)) {
+            while (my $line = <$fh>) {
+                $line =~ s/#.*//;
+                $line =~ s/^\s+//;
+                $line =~ s/\s+$//;
+                next if !$line;
+                push @lines, $line;
+            }
+            close $fh;
+        }
+        return @lines;
+    };
+    
+    my @excludes = $readlines->($self->root . '/sbin/preload.exclude');
+    
+    use DBI;
+    DBI->install_driver("mysql");
+    WebGUI::Pluggable::findAndLoad( "WebGUI", 
+        { 
+            exclude     => \@excludes, 
+            onLoadFail  => sub { die 'Error loading %s: %s', @_ },
+        }
+    );
+    
+    if ($debug) {
+        my $post = $modules->();
+        my @new;
+        for my $k (keys %$post) {
+            push @new, $k unless $pre->{$k};
+        }
+        warn join "\n", sort @new;
+    }
+}
 
 sub handle {
     my ( $session ) = @_;

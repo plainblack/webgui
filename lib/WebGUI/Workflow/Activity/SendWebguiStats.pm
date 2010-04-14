@@ -21,7 +21,6 @@ use HTTP::Request;
 use HTTP::Request::Common qw(POST);
 use LWP::UserAgent;
 use Digest::MD5;
-use Apache2::ServerUtil;
 
 =head1 NAME
 
@@ -80,7 +79,7 @@ sub execute {
     my $stats = {
         webguiVersion   => $WebGUI::VERSION,
         perlVersion     => sprintf("%vd", $^V),
-        apacheVersion   => Apache2::ServerUtil::get_server_version(),
+        apacheVersion   => 'X',
         osType          => $^O,
         siteId          => Digest::MD5::md5_base64($self->session->config->get("sitename")->[0]), # only here to identify the site if the user submits their info a second time
         userCount       => $db->quickScalar("select count(*) from users"),
