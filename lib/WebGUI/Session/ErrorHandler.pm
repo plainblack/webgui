@@ -447,6 +447,8 @@ sub session {
 Creates an HTML formatted string of all internally stored debug information, warns,
 errors, sql queries and form data.
 
+THIS METHOD IS DEPRECATED (See Plack::Middleware::Debug::WgLogger)
+
 =cut
 
 sub showDebug {

@@ -212,9 +212,6 @@ sub handle {
             # "chunked" or "empty" means it took care of its own output needs
             if (defined $output && ( $output eq "chunked" || $output eq "empty" )) {
                 #warn "chunked and empty no longer stream, use session->response->stream() instead";
-                if ($session->errorHandler->canShowDebug()) {
-                    $session->output->print($session->errorHandler->showDebug(),1);
-                }
                 return;
             }
             # non-empty output should be used as the response body
@@ -224,9 +221,6 @@ sub handle {
                 
                 # Use contentHandler's return value as the output
                 $session->output->print($output);
-                if ($session->errorHandler->canShowDebug()) {
-                    $session->output->print($session->errorHandler->showDebug(),1);
-                }
                 return;
             }
             # Keep processing for success codes
