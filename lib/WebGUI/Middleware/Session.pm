@@ -3,6 +3,7 @@ use strict;
 use parent qw(Plack::Middleware);
 use WebGUI::Config;
 use WebGUI::Session;
+use WebGUI::Utility ();
 use Try::Tiny;
 use Plack::Middleware::StackTrace;
 use Plack::Middleware::Debug;
@@ -37,7 +38,7 @@ sub call {
     weaken $self->{config};
     
     my $config = $self->config or die 'Mandatory config parameter missing';
-    
+
     # Logger fallback
     if (!$env->{'psgix.logger'}) {
         $app = Plack::Middleware::SimpleLogger->wrap( $app );
@@ -66,7 +67,7 @@ sub call {
     # Perhaps I'm being paranoid..
     weaken $session->{_config};
 
-    my $debug = $session->log->canShowDebug;
+    my $debug = $self->canShowDebug($env);
     if ($debug) {
         $app = Plack::Middleware::StackTrace->wrap($app);
         $app = Plack::Middleware::Debug->wrap( $app,
@@ -110,6 +111,24 @@ sub call {
             #memory_cycle_ok( $env );
         }
     );
+}
+
+sub canShowDebug {
+    my $self = shift;
+    my $env = shift;
+    my $session = $env->{'webgui.session'};
+
+    my $canShow = $session->setting->get("showDebug");
+    return
+        unless $canShow;
+
+    my $ips = $session->setting->get('ipDebug');
+    return 1
+        if $ips eq '';
+    $ips =~ s/\s+//g;
+    my @ips = split /,/, $ips;
+    my $ok = WebGUI::Utility::isInSubnet($session->env->getIp, [ @ips ] );
+    return $ok;
 }
 
 1;
