@@ -69,9 +69,5 @@ cmp_deeply(
     "appendFeaturedPageVars returns correct variables, prefixed with 'featured_'",
 );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
 
-}
 #vim:ft=perl
