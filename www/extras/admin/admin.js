@@ -148,7 +148,6 @@ WebGUI.Admin.LocationBar
  */
 WebGUI.Admin.LocationBar.prototype.addBackAsset
 = function ( assetDef ) {
-    var self = this; // Scope correction for event handlers
     var b = this.btnBack;
 
     // Button is enabled
@@ -159,12 +158,32 @@ WebGUI.Admin.LocationBar.prototype.addBackAsset
     b.getMenu().insertItem( {
         text    : this.getMenuItemLabel( assetDef ), 
         value   : assetDef.url,
-        onclick : function () { self.clickMenuItem( "back", assetDef ) }
+        onclick : { fn: this.clickBackMenuItem, obj: assetDef, scope: this }
     }, 0 );
     b.getMenu().render();
 
     // Remove a menu item if necessary
     // TODO
+};
+
+/**
+ * clickBackMenuItem( assetDef )
+ * Click an item in the back menu
+ */
+WebGUI.Admin.LocationBar.prototype.clickBackMenuItem
+= function ( type, e, assetDef ) {
+    window.admin.gotoAsset( assetDef.url );
+    this.swapBackToForward( assetDef );
+};
+
+/**
+ * clickForwardMenuItem( assetDef )
+ * Click an item in the forward menu
+ */
+WebGUI.Admin.LocationBar.prototype.clickForwardMenuItem
+= function ( type, e, assetDef ) {
+    window.admin.gotoAsset( assetDef.url );
+    this.swapForwardToBack( assetDef );
 };
 
 /**
@@ -197,6 +216,13 @@ WebGUI.Admin.LocationBar.prototype.goBack
  */
 WebGUI.Admin.LocationBar.prototype.goForward
 = function ( e ) {
+    var assetDef    = this.forwardAssetDefs[0];
+
+    // First, start the going
+    window.admin.gotoAsset( assetDef.url );
+
+    // Update the back and forward menus
+    this.swapForwardToBack( assetDef );
 };
 
 /**
@@ -227,6 +253,10 @@ WebGUI.Admin.LocationBar.prototype.inputFocus
  */
 WebGUI.Admin.LocationBar.prototype.navigate
 = function ( assetDef ) {
+    // Always update location bar
+    this.setTitle( assetDef.title );
+    this.setUrl( assetDef.url );
+
     if ( this.currentAssetDef ) {
         if ( this.currentAssetDef.assetId == assetDef.assetId ) {
             // Don't do the same asset twice
@@ -237,10 +267,6 @@ WebGUI.Admin.LocationBar.prototype.navigate
 
     // Current asset is now...
     this.currentAssetDef = assetDef;
-
-    // Update location bar
-    this.setTitle( assetDef.title );
-    this.setUrl( assetDef.url );
 
     return;
 };
@@ -273,21 +299,20 @@ WebGUI.Admin.LocationBar.prototype.setUrl
  */
 WebGUI.Admin.LocationBar.prototype.swapBackToForward
 = function ( assetDef ) {
-    var self = this; // scope correction for inner stuff
     while ( this.backAssetDefs.length > 0 && this.currentAssetDef.assetId != assetDef.assetId ) {
         var workingDef  = this.currentAssetDef;
         this.forwardAssetDefs.unshift( workingDef );
         this.btnForward.getMenu().insertItem( {
             text    : this.getMenuItemLabel( workingDef ),
             value   : workingDef.url,
-            onclick : function(){ self.clickForwardMenuItem( workingDef ) }
+            onclick : { fn: this.clickForwardMenuItem, obj: workingDef, scope: this }
         }, 0 );
         this.currentAssetDef = this.backAssetDefs.shift();
         this.btnBack.getMenu().removeItem(0);
     }
     this.btnForward.getMenu().render();
     this.btnForward.set("disabled", false);
-    this.btnBack.render();
+    this.btnBack.getMenu().render();
     if ( this.backAssetDefs.length == 0 ) {
         this.btnBack.set( "disabled", true );
     }
@@ -300,8 +325,23 @@ WebGUI.Admin.LocationBar.prototype.swapBackToForward
  */
 WebGUI.Admin.LocationBar.prototype.swapForwardToBack
 = function ( assetDef ) {
-
-
+    while ( this.forwardAssetDefs.length > 0 && this.currentAssetDef.assetId != assetDef.assetId ) {
+        var workingDef  = this.currentAssetDef;
+        this.backAssetDefs.unshift( workingDef );
+        this.btnBack.getMenu().insertItem( {
+            text    : this.getMenuItemLabel( workingDef ),
+            value   : workingDef.url,
+            onclick : { fn: this.clickBackMenuItem, obj: workingDef, scope : this }
+        }, 0 );
+        this.currentAssetDef = this.forwardAssetDefs.shift();
+        this.btnForward.getMenu().removeItem(0);
+    }
+    this.btnBack.getMenu().render();
+    this.btnBack.set("disabled", false);
+    this.btnForward.getMenu().render();
+    if ( this.forwardAssetDefs.length == 0 ) {
+        this.btnForward.set( "disabled", true );
+    }
 };
 
 
