@@ -55,7 +55,6 @@ sub handler {
         return Apache2::Const::OK
             unless -e $path . '.wgaccess';
 
-        my $fileContents;
         open my $FILE, '<' , $path . '.wgaccess';
         my $fileContents = do { local $/; <$FILE> };
         close($FILE);
