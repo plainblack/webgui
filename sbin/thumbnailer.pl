@@ -10,11 +10,14 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
+use strict;
+use File::Basename ();
+use File::Spec;
 
+my $webguiRoot;
 BEGIN {
-    $webguiRoot = "..";
-    unshift (@INC, $webguiRoot."/lib");
+    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
+    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
 }
 
 #-----------------------------------------

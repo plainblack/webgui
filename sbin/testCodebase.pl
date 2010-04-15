@@ -10,9 +10,18 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use strict;
+use File::Basename ();
+use File::Spec;
+
+my $webguiRoot;
+BEGIN {
+    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
+    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
+}
+
 $|=1;
 
-use strict;
 use FindBin;
 use File::Spec qw[];
 use Getopt::Long;
@@ -48,14 +57,13 @@ if (! -e $configFile) {
 	##Probably given the name of the config file with no path,
 	##attempt to prepend the path to it.
     warn "Config file $configFile does not exist, assuming that you supplied a bare config and are running from inside the sbin directory\n";
-	$configFile = File::Spec->canonpath($FindBin::Bin.'/../etc/'.$configFile);
+	$configFile = File::Spec->canonpath($webguiRoot . '/etc/' . $configFile);
 }
 
 die "Unable to use $configFile as a WebGUI config file\n"
 	unless(-e $configFile and -f _);
 
 my (undef, $directories, $file) = File::Spec->splitpath($configFile);
-my $webguiRoot = File::Spec->canonpath(File::Spec->catdir($directories, File::Spec->updir));
 my $webguiTest = File::Spec->catdir($webguiRoot, 't');
 
 my $prefix = "WEBGUI_CONFIG=".$configFile;

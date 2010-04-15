@@ -11,8 +11,16 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../lib";
 use strict;
+use File::Basename ();
+use File::Spec;
+
+my $webguiRoot;
+BEGIN {
+    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
+    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
+}
+
 use Getopt::Long;
 use Pod::Usage;
 use WebGUI::Pluggable;

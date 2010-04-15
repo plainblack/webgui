@@ -10,15 +10,17 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot, @nailable);
+use strict;
+use File::Basename ();
+use File::Spec;
 
-BEGIN { 
-	$webguiRoot = "..";
-	@nailable = qw(jpg jpeg png gif);
-	unshift (@INC, $webguiRoot."/lib"); 
+my $webguiRoot;
+BEGIN {
+    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
+    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
 }
 
-
+my @nailable = qw(jpg jpeg png gif);
 $| = 1;
 
 use File::Path;
@@ -27,7 +29,6 @@ use FileHandle;
 use Getopt::Long;
 use POSIX;
 use Pod::Usage;
-use strict;
 use WebGUI::Asset::File;
 use WebGUI::Asset::File::Image;
 use WebGUI::Session;
