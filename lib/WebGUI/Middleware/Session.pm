@@ -37,7 +37,7 @@ sub call {
 
     my $app = $self->app;
     weaken $self->{config};
-    
+
     my $config = $self->config or die 'Mandatory config parameter missing';
 
     # Logger fallback
@@ -46,7 +46,7 @@ sub call {
     }
 
     my $session = try {
-        $env->{'webgui.session'} = WebGUI::Session->open( $config->getWebguiRoot, $config, $env );
+        $env->{'webgui.session'} = WebGUI::Session->open( $config, $env );
     } catch {
         # We don't have a logger object, so for now just warn() the error
         warn "Unable to instantiate WebGUI::Session - $_";

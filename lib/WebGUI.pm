@@ -48,7 +48,6 @@ These subroutines are available from this package:
 
 =cut
 
-has root    => ( is => 'ro', isa => 'Str', default => '/data/WebGUI' );
 has site    => ( is => 'ro', isa => 'Str', default => 'dev.localhost.localdomain.conf' );
 has config  => ( is => 'rw', isa => 'WebGUI::Config' );
 
@@ -75,17 +74,13 @@ sub BUILD {
     $self->config($config);
 }
 
-sub psgi_app {
+sub to_app {
     my $self = shift;
     return $self->{psgi_app} ||= $self->compile_psgi_app;
 }
 
 sub compile_psgi_app {
     my $self = shift;
-    
-    # Preload all modules in the master (parent) thread before the Server does any
-    # child forking. This should save a lot of memory in copy-on-write friendly environments.
-    $self->preload;
     
     # WebGUI is a PSGI app is a Perl code reference. Let's create one.
     # Each web request results in a call to this sub
@@ -141,11 +136,6 @@ sub compile_psgi_app {
             }
         }
     };
-}
-
-
-sub preload {
-    WebGUI::Paths->preloadAll;
 }
 
 sub handle {

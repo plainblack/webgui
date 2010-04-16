@@ -1,66 +1,25 @@
 use strict;
 use Plack::Builder;
-use lib '/data/WebGUI/lib';
-use WebGUI;
+use WebGUI::Paths -inc;
+use WebGUI::Config;
+use File::Spec;
 
-my $root = '/data/WebGUI';
+my $standard_psgi = File::Spec->catfile(WebGUI::Paths->var, 'site.psgi');
 
 builder {
-    mount "http://dev.localhost.localdomain/" => builder {
-
-        my $wg = WebGUI->new( root => $root, site => 'dev.localhost.localdomain.conf' );
-        my $config = $wg->config;
-        enable 'Log4perl', category => 'mysite', conf => "$root/etc/log.conf";
-
-        # Reproduce URL handler functionality with middleware
-        enable '+WebGUI::Middleware::Snoop';
-        enable 'Static', root => $root, path => sub {s{^/\*give-credit-where-credit-is-due\*$}{docs/credits.txt}};
-        enable 'Status', path => qr{^/uploads/dictionaries}, status => 401;
-
-        # For PassThru, use Plack::Builder::mount
-
-        # Extras fallback (you should be using something else to serve static files in production)
-        my ( $extrasURL, $extrasPath ) = ( $config->get('extrasURL'), $config->get('extrasPath') );
-        enable 'Static', root => "$extrasPath/", path => sub {s{^$extrasURL/}{}};
-
-        # Open/close the WebGUI::Session at the outer-most onion layer
-        enable '+WebGUI::Middleware::Session',
-            config     => $config,
-            error_docs => { 500 => "$root/www/maintenance.html" };
-
-        # This one uses the Session object, so it comes after WebGUI::Middleware::Session
-        enable '+WebGUI::Middleware::WGAccess', config => $config;
-
-        # Return the app
-        $wg->psgi_app;
-    };
-    
-    mount "http://dev2.localhost.localdomain/" => builder {
-
-        my $wg = WebGUI->new( root => $root, site => 'dev2.localhost.localdomain.conf' );
-        my $config = $wg->config;
-        enable 'Log4perl', category => 'mysite', conf => "$root/etc/log.conf";
-
-        # Reproduce URL handler functionality with middleware
-        enable '+WebGUI::Middleware::Snoop';
-        enable 'Static', root => $root, path => sub {s{^/\*give-credit-where-credit-is-due\*$}{docs/credits.txt}};
-        enable 'Status', path => qr{^/uploads/dictionaries}, status => 401;
-
-        # For PassThru, use Plack::Builder::mount
-
-        # Extras fallback (you should be using something else to serve static files in production)
-        my ( $extrasURL, $extrasPath ) = ( $config->get('extrasURL'), $config->get('extrasPath') );
-        enable 'Static', root => "$extrasPath/", path => sub {s{^$extrasURL/}{}};
-
-        # Open/close the WebGUI::Session at the outer-most onion layer
-        enable '+WebGUI::Middleware::Session',
-            config     => $config,
-            error_docs => { 500 => "$root/www/maintenance.html" };
-
-        # This one uses the Session object, so it comes after WebGUI::Middleware::Session
-        enable '+WebGUI::Middleware::WGAccess', config => $config;
-
-        # Return the app
-        $wg->psgi_app;
-    };
+    my $first_app;
+    for my $config_file (WebGUI::Paths->siteConfigs) {
+        my $config = WebGUI::Config->new($config_file);
+        my $psgi = $config->get('psgiFile') || $standard_psgi;
+        my $app = do {
+            $ENV{WEBGUI_CONFIG} = $config_file;
+            Plack::Util::load_psgi($psgi);
+        };
+        $first_app ||= $app;
+        for my $sitename ( @{ $config->get('sitename') } ) {
+            mount "http://$sitename/" => $app;
+        }
+    }
+    mount '/' => $first_app;
 };
+

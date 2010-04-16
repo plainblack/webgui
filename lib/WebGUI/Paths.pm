@@ -201,7 +201,7 @@ Returns the list of modules to exclude from preloading as an array.
 
 sub preloadExclude {
     my $class = shift;
-    my @excludes = _readTextLines($class->preloadExclude);
+    my @excludes = _readTextLines($class->preloadExclusions);
     return @excludes;
 }
 
@@ -217,8 +217,9 @@ sub preloadAll {
 
     require WebGUI::Pluggable;
 
+    my @exclusions = $class->preloadExclude;
     WebGUI::Pluggable::findAndLoad( 'WebGUI', {
-        exclude     => \( $class->preloadExclude ),
+        exclude     => \@exclusions,
         onLoadFail  => sub { warn sprintf "Error loading %s: %s\n", @_ },
     });
 }
@@ -226,7 +227,7 @@ sub preloadAll {
 sub _readTextLines {
     my $file = shift;
     my @lines;
-    open my $fh, '<', $file or croak "Cannot open $file: $!";
+    open my $fh, '<', $file or return;
     while (my $line = <$fh>) {
         $line =~ s/#.*//;
         $line =~ s/^\s+//;
