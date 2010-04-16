@@ -5,15 +5,9 @@ use WebGUI::Config;
 use WebGUI::Session;
 use WebGUI::Utility ();
 use Try::Tiny;
-use Plack::Middleware::StackTrace;
-use Plack::Middleware::Debug;
-use WebGUI::Middleware::Debug::Performance;
 use WebGUI::Middleware::HTTPExceptions;
-use Plack::Middleware::ErrorDocument;
 use Plack::Middleware::SimpleLogger;
-use Scalar::Util qw(weaken);
-
-use Plack::Util::Accessor qw( config error_docs );
+use Plack::Util::Accessor qw( config );
 
 =head1 NAME
 
@@ -30,13 +24,14 @@ the session out of the PSGI env hash:
 
 and not worry about closing it.
 
+It also sets C<webgui.debug> as appropriate.
+
 =cut
 
 sub call {
     my ( $self, $env ) = @_;
 
     my $app = $self->app;
-    weaken $self->{config};
 
     my $config = $self->config or die 'Mandatory config parameter missing';
 
@@ -57,26 +52,10 @@ sub call {
 
         # We don't have access to a db connection to find out if the user is allowed to see
         # a verbose error message or not, so resort to a generic Internal Server Error
-        # (using the error_docs mapping)
-        if ($self->error_docs) {
-            return Plack::Middleware::ErrorDocument->wrap( sub { [ 500, [], [] ] }, %{ $self->error_docs } )->($env);
-        } else {
-            return [ 500, [ 'Content-Type' => 'text/plain' ], [ 'Internal Server Error' ] ];
-        }
+        return [ 500, [ 'Content-Type' => 'text/plain' ], [ 'Internal Server Error' ] ];
     }
-
-    # Perhaps I'm being paranoid..
-    weaken $session->{_config};
 
     my $debug = $env->{'webgui.debug'} = $self->canShowDebug($env);
-
-    # Turn exceptions into HTTP errors
-    $app = WebGUI::Middleware::HTTPExceptions->wrap($app);
-
-    # HTTP error document mapping
-    if ( !$debug && $self->error_docs ) {
-        $app = Plack::Middleware::ErrorDocument->wrap( $app, %{ $self->error_docs } );
-    }
 
     # Run the app
     my $res = $app->($env);
@@ -91,7 +70,7 @@ sub call {
             $env->{'webgui.session'}->close();
             #memory_cycle_ok( $env->{'webgui.session'} );
             delete $env->{'webgui.session'};
-            
+
             #use Test::Memory::Cycle;
             #memory_cycle_ok( $env );
         }

@@ -1,7 +1,9 @@
 use strict;
 use Plack::Builder;
+use Plack::App::File;
 use WebGUI;
 use WebGUI::Paths;
+use WebGUI::Middleware::Debug::Performance;
 
 my $config = $ENV{WEBGUI_CONFIG};
 builder {
@@ -18,13 +20,14 @@ builder {
 
     # Extras fallback (you should be using something else to serve static files in production)
     my ( $extrasURL, $extrasPath ) = ( $config->get('extrasURL'), $config->get('extrasPath') );
-    enable 'Static', root => "$extrasPath/", path => sub {s{^$extrasURL/}{}};
+    enable 'Static', root => "$extrasPath/", path => sub {s{^\Q$extrasURL/}{}};
 
     # Open/close the WebGUI::Session at the outer-most onion layer
-    enable '+WebGUI::Middleware::Session',
-        config     => $config,
-        error_docs => { 500 => $config->get('maintenancePage') };
+    enable '+WebGUI::Middleware::Session', config => $config;
 
+    enable '+WebGUI::Middleware::HTTPExceptions';
+
+    enable_if { ! $_[0]->{'webgui.debug'} } 'ErrorDocument', 500 => $config->get('maintenancePage');
     enable_if { $_[0]->{'webgui.debug'} } 'StackTrace';
     enable_if { $_[0]->{'webgui.debug'} } 'Debug', panels => [
         'Environment',
@@ -40,9 +43,12 @@ builder {
     ];
 
     # This one uses the Session object, so it comes after WebGUI::Middleware::Session
-    enable '+WebGUI::Middleware::WGAccess', config => $config;
+    mount $config->get('uploadsURL') => builder {
+        enable '+WebGUI::Middleware::WGAccess';
+        Plack::App::File->new(root => $config->get('uploadsPath'))->to_app;
+    };
 
     # Return the app
-    $wg->to_app;
+    mount '/' => $wg->to_app;
 };
 

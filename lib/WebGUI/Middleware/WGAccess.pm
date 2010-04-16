@@ -1,8 +1,9 @@
 package WebGUI::Middleware::WGAccess;
 use strict;
-use Plack::App::File;
 use parent qw(Plack::Middleware);
-use Path::Class 'dir';
+use Path::Class::File;
+use Scalar::Util;
+use JSON ();
 
 =head1 NAME
 
@@ -18,52 +19,52 @@ to be serving static files with something a lot faster.
 
 =cut
 
-use Plack::Util::Accessor qw( config );
-
 sub call {
     my $self = shift;
     my $env  = shift;
-    my $app = $self->app;
-    my $config = $self->config or die 'Mandatory config parameter missing';
-    my $uploadsPath = $config->get('uploadsPath');
-    my $uploadsURL = $config->get('uploadsURL');
-    
-    my $path = $env->{PATH_INFO};
-    my $matched = $path =~ s{^\Q$uploadsURL\E/}{};
-    return $app->($env) unless $matched;
-    
-    my $root = dir($uploadsPath);
-    my $file = $root->file(File::Spec::Unix->splitpath($path));
-    my $wgaccess = File::Spec::Unix->catfile($file->dir, '.wgaccess');
-    
-    if (-e $wgaccess) {
-        my $fileContents;
-        open(my $FILE, "<", $wgaccess);
-        while (my $line = <$FILE>) {
-            $fileContents .= $line;
-        }
-        close($FILE);
-        my @privs = split("\n", $fileContents);
-        
-        unless ($privs[1] eq "7" || $privs[1] eq "1") {
-            my $session = $env->{'webgui.session'};
-            my $hasPrivs = ($session->var->get("userId") eq $privs[0] || $session->user->isInGroup($privs[1]) || $session->user->isInGroup($privs[2]));
-            warn "has: $hasPrivs";
-            warn $session->var->get("userId");
-            warn $session->user->isInGroup($privs[1]);
-            warn $session->user->isInGroup($privs[2]);
-            if ($hasPrivs) {
-                $self->{file} ||= Plack::App::File->new;
-                return $self->{file}->serve_path($env, $file); # serve statically
-            }
-            else {
-                return [403, ['Content-Type' => 'text/plain'], ['Forbidden']];
-            }
-        }
+    my $session = $env->{'webgui.session'};
+    if (! $session) {
+        my $logger = $env->{'psgix.logger'};
+        $logger && $logger->({ level => 'error', message => 'WebGUI session missing!'});
+        return [500, ['Content-Type' => 'text/plain'], 'Internal Server Error'];
     }
-    
-    $self->{file} ||= Plack::App::File->new;
-    return $self->{file}->serve_path($env, $file); # serve statically
+
+    my $r = $self->app->($env);
+    $self->response_cb($r, sub {
+        my ($status, $headers, $body) = @$r;
+        return
+            unless Scalar::Util::blessed($body) && $body->can('path');
+
+        my $file = Path::Class::File->new($body->path);
+        my $wgaccess = $file->dir->file('.wgaccess');
+        return
+            unless -e $wgaccess;
+        my $contents = $wgaccess->slurp;
+        my $privs;
+        if ($contents =~ /\A(\d+|[A-Za-z0-9_-]{22})\n(\d+|[A-Za-z0-9_-]{22})\n(\d+|[A-Za-z0-9_-]{22})/) {
+            $privs = {
+                users => [ $1 ],
+                groups => [ $2, $3 ],
+                assets => [],
+            };
+        }
+        else {
+            $privs = JSON->new->utf8->decode($contents);
+        }
+
+        require WebGUI::Asset;
+        my $userId = $session->var->get('userId');
+
+        return
+            if grep { $_ eq '1' || $_ eq $userId }                      @{ $privs->{users} }
+            or grep { $_ eq '1' || $_ eq '7' }                          @{ $privs->{groups} }
+            or grep { $session->user->isInGroup($_) }                   @{ $privs->{groups} }
+            or grep { WebGUI::Asset->newById($session, $_)->canView }   @{ $privs->{assets} }
+            ;
+
+        # failed auto, change response into auth failure
+        @$r = (401, [ 'Content-Type' => 'text/plain' ], [ 'Authorization Required' ]);
+    });
 }
 
 1;
