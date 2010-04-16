@@ -64,28 +64,11 @@ sub call {
             return [ 500, [ 'Content-Type' => 'text/plain' ], [ 'Internal Server Error' ] ];
         }
     }
-    
+
     # Perhaps I'm being paranoid..
     weaken $session->{_config};
 
-    my $debug = $self->canShowDebug($env);
-    if ($debug) {
-        $app = Plack::Middleware::StackTrace->wrap($app);
-        $app = Plack::Middleware::Debug->wrap( $app,
-            panels => [
-                'Environment',
-                'Response',
-                'Timer',
-                'Memory',
-                'Session',
-                'PerlConfig',
-                [ 'MySQLTrace', skip_packages => qr/\AWebGUI::SQL(?:\z|::)/ ],
-                'Response',
-                'Logger',
-                sub { WebGUI::Middleware::Debug::Performance->wrap($_[0]) },
-            ],
-        );
-    }
+    my $debug = $env->{'webgui.debug'} = $self->canShowDebug($env);
 
     # Turn exceptions into HTTP errors
     $app = WebGUI::Middleware::HTTPExceptions->wrap($app);

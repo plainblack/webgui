@@ -25,6 +25,20 @@ builder {
         config     => $config,
         error_docs => { 500 => $config->get('maintenancePage') };
 
+    enable_if { $_[0]->{'webgui.debug'} } 'StackTrace';
+    enable_if { $_[0]->{'webgui.debug'} } 'Debug', panels => [
+        'Environment',
+        'Response',
+        'Timer',
+        'Memory',
+        'Session',
+        'PerlConfig',
+        [ 'MySQLTrace', skip_packages => qr/\AWebGUI::SQL(?:\z|::)/ ],
+        'Response',
+        'Logger',
+        sub { WebGUI::Middleware::Debug::Performance->wrap($_[0]) },
+    ];
+
     # This one uses the Session object, so it comes after WebGUI::Middleware::Session
     enable '+WebGUI::Middleware::WGAccess', config => $config;
 
