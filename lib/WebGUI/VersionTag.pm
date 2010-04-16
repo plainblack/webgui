@@ -438,15 +438,15 @@ sub getWorking {
     #First see if there is already a version tag
     $tag = $stow->get(q{versionTag});
 
-    return $tag if $tag;
+    return $tag if ($tag && !$tag->isLocked);
 
     $tagId = $session->scratch()->get(q{versionTag});
     if ($tagId) {
         $tag = $class->new($session, $tagId);
-
-        $stow->set(q{versionTag}, $tag);
-
-        return $tag;
+        unless ($tag->isLocked) {
+            $stow->set(q{versionTag}, $tag);
+            return $tag;
+        }
     }
 
     #No tag found. Create or reclaim one?
@@ -475,10 +475,10 @@ sub getWorking {
         # For now, we only reclaim if 1 tag open.
         if (scalar @openTags == 1) {
             $tag = $openTags[0];
-
-            $tag->setWorking();
-
-            return $tag;
+            unless ($tag->isLocked) {
+                $tag->setWorking();
+                return $tag;
+            }
         }
     }
     elsif ($mode eq q{siteWide}) {
@@ -486,7 +486,7 @@ sub getWorking {
 
       OPENTAG:
         foreach my $openTag (@{WebGUI::VersionTag->getOpenTags($session)}) {
-            if ($openTag->get(q{isSiteWide})) {
+            if ($openTag->get(q{isSiteWide}) && !$openTag->isLocked) {
 
                 $tag = $openTag;
 
@@ -512,6 +512,16 @@ sub getWorking {
 
     return $tag;
 } #getWorking
+
+#-------------------------------------------------------------------
+
+=head2 isLocked ( )
+
+Returns boolean value indicating whether tag is locked
+
+=cut
+
+sub isLocked { $_[0]{_data}{isLocked} }
 
 #-------------------------------------------------------------------
 
@@ -734,6 +744,7 @@ Sets this tag as the working tag for the current user.
 
 sub setWorking {
 	my $self = shift;
+	return if $self->isLocked;
 	$self->session->scratch->set("versionTag",$self->getId);
 	$self->session->stow->set("versionTag", $self);
 }
