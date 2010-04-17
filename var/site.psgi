@@ -45,10 +45,10 @@ builder {
     # This one uses the Session object, so it comes after WebGUI::Middleware::Session
     mount $config->get('uploadsURL') => builder {
         enable '+WebGUI::Middleware::WGAccess';
-        Plack::App::File->new(root => $config->get('uploadsPath'))->to_app;
+        Plack::App::File->new(root => $config->get('uploadsPath'));
     };
 
     # Return the app
-    mount '/' => $wg->to_app;
+    mount '/' => $wg;
 };
 
