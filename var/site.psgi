@@ -2,7 +2,9 @@ use strict;
 use Plack::Builder;
 use Plack::App::File;
 use WebGUI;
-use WebGUI::Paths;
+use WebGUI::Paths -preload;
+use DBI;
+DBI->install_driver("mysql");
 use WebGUI::Middleware::Debug::Performance;
 
 my $config = $ENV{WEBGUI_CONFIG};
