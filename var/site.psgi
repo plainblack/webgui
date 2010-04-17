@@ -10,6 +10,7 @@ builder {
     my $wg = WebGUI->new( site => $ENV{WEBGUI_CONFIG} );
     my $config = $wg->config;
 
+    enable 'ForwardedHeaders';
     enable 'Log4perl', category => $config->getFilename, conf => WebGUI::Paths->logConfig;
 
     # Reproduce URL handler functionality with middleware
