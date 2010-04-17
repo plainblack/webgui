@@ -36,22 +36,6 @@ These methods are available from this package:
 
 =cut
 
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-
 #-------------------------------------------------------------------
 
 =head2 get( varName ) 

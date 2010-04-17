@@ -294,7 +294,7 @@ Returns a WebGUI::Session::Env object.
 sub env {
 	my $self = shift;
 	unless (exists $self->{_env}) {
-		$self->{_env} = WebGUI::Session::Env->new;
+		$self->{_env} = WebGUI::Session::Env->new($self);
 	}
 	return $self->{_env};
 }

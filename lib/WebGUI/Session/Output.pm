@@ -16,6 +16,7 @@ package WebGUI::Session::Output;
 
 use strict;
 use WebGUI::Macro;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -38,20 +39,6 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 new ( session )
 
 Constructor. 
@@ -65,7 +52,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------

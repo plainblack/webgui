@@ -15,7 +15,6 @@ package WebGUI::Session::Form;
 =cut
 
 use strict qw(vars subs);
-use WebGUI::HTML;
 use Encode ();
 use Tie::IxHash;
 use base 'WebGUI::FormValidator';

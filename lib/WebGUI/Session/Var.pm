@@ -15,6 +15,7 @@ package WebGUI::Session::Var;
 =cut
 
 use strict;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -48,19 +49,6 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 end ( )
 
 Removes the specified user session from memory and database.
@@ -75,7 +63,6 @@ sub end {
     $session->scratch->deleteAll;
     $session->db->write("delete from userSession where sessionId=?",[$id]);
     delete $session->{_user};
-	$self->DESTROY;
 }
 
 #-------------------------------------------------------------------
@@ -171,7 +158,8 @@ normally be used by anyone.
 
 sub new {
     my ($class, $session, $sessionId, $noFuss) = @_;
-	my $self = bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
 	if ($sessionId eq "") { ##New session
 		$self->start(1);
 	}

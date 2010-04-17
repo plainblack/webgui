@@ -21,7 +21,8 @@ use DateTime::Format::Mail;
 use DateTime::TimeZone;
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility;
+use WebGUI::Utility qw(round);
+use Scalar::Util qw(weaken);
 
 
 =head1 NAME
@@ -222,19 +223,6 @@ sub dayStartEnd {
 	$end->set_minute(59);
 	$end->set_second(59);
         return ($dt->epoch, $end->epoch);
-}
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -808,7 +796,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------

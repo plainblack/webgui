@@ -16,7 +16,8 @@ package WebGUI::Session::Http;
 
 
 use strict;
-use WebGUI::Utility;
+use Scalar::Util qw(weaken);
+use HTTP::Date ();
 
 sub _deprecated {
     my $alt = shift;
@@ -58,21 +59,6 @@ This package allows the manipulation of HTTP protocol information.
 These methods are available from this package:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
 
 #-------------------------------------------------------------------
 
@@ -222,10 +208,9 @@ sub ifModifiedSince {
     my $self            = shift;
     my $epoch           = shift;
     my $maxCacheTimeout = shift;
-    require APR::Date;
     my $modified = $self->session->request->header('If-Modified-Since');
     return 1 if ($modified eq "");
-    $modified = APR::Date::parse_http($modified);
+    $modified = HTTP::Date::str2time($modified);
     ##Implement a step function that increments the epoch time in integer multiples of
     ##the maximum cache time.  Used to handle the case where layouts containing macros
     ##(like assetproxied Navigations) can be periodically updated.
@@ -265,7 +250,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 
@@ -282,7 +269,7 @@ sub sendHeader {
 	return undef if ($self->{_http}{noHeader});
 	return $self->_sendMinimalHeader unless defined $self->session->db(1);
 
-	my ($request, $response, $datetime, $config, $var) = $self->session->quick(qw(request response datetime config var));
+	my ($request, $response, $config, $var) = $self->session->quick(qw(request response config var));
 	return undef unless $request;
 	my $userId = $var->get("userId");
 	
@@ -298,7 +285,7 @@ sub sendHeader {
 	} else {
 		$response->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
-		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
+		my $date = ($userId eq "1") ? HTTP::Date::time2str($self->getLastModified) : HTTP::Date::time2str();
 		# under these circumstances, don't allow caching
 		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
 			$response->header("Cache-Control" => "private, max-age=1");
@@ -315,7 +302,7 @@ sub sendHeader {
             }
 			# do an extra incantation if the HTTP protocol is really old
 			if ($request->protocol =~ /(\d\.\d)/ && $1 < 1.1) {
-				my $date = $datetime->epochToHttp(time() + $cacheControl);
+				my $date = HTTP::Date::time2str(time() + $cacheControl);
   				$response->header( 'Expires' => $date );
 			}
   		}

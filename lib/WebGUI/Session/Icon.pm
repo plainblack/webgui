@@ -17,6 +17,7 @@ package WebGUI::Session::Icon;
 use strict;
 use WebGUI::International;
 use Tie::IxHash;
+use Scalar::Util qw(weaken);
 
 
 =head1 NAME
@@ -126,20 +127,6 @@ sub cut {
         $output .= '<img src="'.$self->getBaseURL().'cut.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Cut').'" title="'.$i18n->get('Cut').'" /></a></p>';
         return $output;
 }
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -511,7 +498,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 

@@ -17,13 +17,11 @@ package WebGUI::Session::ErrorHandler;
 
 use strict;
 use WebGUI::Paths;
-use JSON;
-use HTML::Entities qw(encode_entities);
-use Log::Log4perl;
 use WebGUI::Exception;
 use Sub::Uplevel;
+use Scalar::Util qw(weaken);
 
-=head1 NAME 
+=head1 NAME
 
 Package WebGUI::Session::ErrorHandler
 
@@ -201,6 +199,8 @@ sub new {
     my $class   = shift;
     my $session = shift;
 
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
     my $logger = $session->request && $session->request->logger;
     if ( !$logger ) {
 
@@ -215,8 +215,8 @@ sub new {
             $log4perl->$level( $args->{message} );
         };
     }
-
-    bless { _session => $session, _logger => $logger }, $class;
+    $self->{_logger} = $logger;
+    return $self;
 }
 
 #----------------------------------------------------------------------------

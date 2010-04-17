@@ -16,9 +16,10 @@ package WebGUI::Session::Id;
 =cut
 
 use strict;
-use Digest::MD5;
+use Digest::MD5 ();
 use Time::HiRes qw( gettimeofday usleep );
-use MIME::Base64;
+use MIME::Base64 qw(encode_base64 decode_base64);
+use Scalar::Util qw(weaken);
 
 my $idValidator = qr/^[A-Za-z0-9_-]{22}$/;
 
@@ -41,19 +42,6 @@ B<NOTE:> There is no such thing as perfectly unique ID's, but the chances of a d
 These methods are available from this class:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
 
 #-------------------------------------------------------------------
 
@@ -121,7 +109,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------
