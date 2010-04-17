@@ -4676,6 +4676,12 @@ Users may override this setting in their profile.
         context => 'Message shown to the user when data is being loaded, typically via AJAX, like in the Survey.'
     },
 
+    'Go' => {
+        message => 'Go',
+        lastUpdated => 0,
+        context => 'Label for buttons that take you someplace else'
+    },
+
 };
 
 1;

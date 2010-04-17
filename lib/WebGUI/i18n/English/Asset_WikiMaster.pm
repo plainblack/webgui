@@ -42,6 +42,18 @@ our $I18N = {
 		context => q|Hover help for edit wobject screen|,
 	},
 
+	'top level keywords' => {
+		message => q|Top Level Keywords|,
+		lastUpdated => 0,
+		context => q|Label for edit wobject screen|,
+	},
+
+	'top level keywords description' => {
+		message => q|These keywords provide the root for the hierarchial keyword display.|,
+		lastUpdated => 0,
+		context => q|Hover help for edit wobject screen|,
+	},
+
 	'content filter' => {
 		message => q|Use Content Filter?|,
 		lastUpdated => 0,
@@ -523,6 +535,43 @@ listing of pages that are related to a specific keyword?| },
         lastUpdated => 0,
         context     => q{Label for link to unsubscribe from e-mail notifications},
     },
+
+    'keywords_loop' => {
+        message     => q{A loop containing all the top level keywords, links to their keyword pages, and all sub pages below them.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword title' => {
+        message     => q{The name of a keyword.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword url' => {
+        message     => q{The URL to the keyword page for that keyword.  If no page exists, this variable will be empty.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword level' => {
+        message     => q{The depth of this keyword.  Top-level keywords for the wiki are level 0.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'indent_loop' => {
+        message     => q{A loop that runs 1 time for each level.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword indent' => {
+        message     => q{The loop iterator for the indent_loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
 };
 
 1;

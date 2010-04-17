@@ -22,6 +22,8 @@ use WebGUI::International;
 use WebGUI::Utility;
 use HTML::Parser;
 use URI::Escape;
+use WebGUI::Form;
+use Clone qw/clone/;
 
 #-------------------------------------------------------------------
 
@@ -43,12 +45,29 @@ sub appendFeaturedPageVars {
 
 #-------------------------------------------------------------------
 
+=head2 appendKeywordPageVars ( var )
+
+Append the template variables to C<var> for keyword (catagory) pages.
+
+=cut
+
+sub appendKeywordPageVars {
+    my ( $self, $var ) = @_;
+    my $session        = $self->session;
+    my $topKeywords    = $self->getTopLevelKeywordsList;
+    my $keywordHierarchy  = $self->getKeywordHierarchy( $topKeywords, );
+    $var->{keywords_loop} = $self->getKeywordVariables( $keywordHierarchy );
+    return $var;
+}
+
+#-------------------------------------------------------------------
+
 =head2 appendMostPopular ($var, [ $limit ])
 
 =head3 $var
 
 A hash reference of template variables.  An array reference containing the most popular wiki pages
-in order of popularity.
+in order of popularity will be appended to it.
 
 =head3 $limit
 
@@ -425,6 +444,13 @@ sub definition {
                         label=>$i18n->get('filter code'),
                         hoverHelp=>$i18n->get('filter code description'),
                         },
+                topLevelKeywords =>{
+                        fieldType    => "keywords",
+                        defaultValue => '',
+                        tab          => 'properties',
+                        label        => $i18n->get('top level keywords'),
+                        hoverHelp    => $i18n->get('top level keywords description'),
+                },
 		);
 
 	push @$definition,
@@ -457,6 +483,108 @@ sub getFeaturedPageIds {
     } );
     
     return $assetIds;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getKeywordHierarchy ( $keywords, $seen )
+
+Starting with the top level keywords, return the hierarchy of keywords as a recursive arrayref of hashrefs.
+The traversal is left-most, depth first.
+
+The hierarchy data structure that looks like this:
+
+    [
+        {
+            title => 'title', # same as the keyword, since this is a keyword (category) page
+            url   => 'url',   # url from the keyword page, via getUrl so it contains the gateway URL
+                              # If a keyword page does not exist for the keyword, this key/value pair will not be present.
+            children => [     # Array reference of sub-categories referenced by this category
+                {             # If there are no children, this key/value pair will not be present
+                    ...
+                }
+            ]
+        }
+    ]
+
+=head3 $keywords
+
+An array reference of keywords.  If this is blank, then it will use the top level keywords from
+itself as a default.
+
+=head3 $seen
+
+A hash reference that keeps track of which keywords have already been seen.  This prevents
+infinite loops from happening during the traversal.
+
+=cut
+
+sub getKeywordHierarchy {
+    my ( $self, $keywords, $seen ) = @_;
+    my $session     = $self->session;
+    my $hierarchy   = [];
+    $keywords     ||= $self->getTopLevelKeywordsList;
+    $seen         ||= {};
+    KEYWORD: foreach my $keyword (sort @{ $keywords }) {
+        my $page = $self->getLineage(['children'], {
+            returnObjects => 1,
+            whereClause   => 'assetData.title = '.$session->db->quote($keyword),
+            limit         => 1,
+            includeOnlyClasses => [qw/WebGUI::Asset::WikiPage/],
+        })->[0];
+        if (! $page) {
+            push @{ $hierarchy }, { title => $keyword, url => '', };
+            next KEYWORD;
+        }
+        my $datum = {
+            title => $keyword,  ##Note, same as keyword
+            url   => $page->getUrl,
+        };
+        ##Prevent recursion if seen again
+        if (! $seen->{$keyword}++) {
+            my $children =  $self->getKeywordHierarchy(WebGUI::Keyword::string2list($page->get('keywords')), $seen, );
+            if (@{ $children } ) {
+                $datum->{children} = $children;
+            }
+        }
+        push @{ $hierarchy }, $datum;
+    }
+    return $hierarchy;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getKeywordVariables ( $hierarchy, $level )
+
+Take a data structure representing a hierarchy of keywords, and append template variables
+to them similar to a Navigation so you can build useful things with them.
+
+=head3 $hierarchy
+
+A data structure similar to that produced by getKeywordHierarchy
+
+=head3 $level
+
+The current level in any part of the hierarchy.
+
+=cut
+
+sub getKeywordVariables {
+    my ( $self, $hierarchy, $level ) = @_;
+    $level ||= 0;
+    my $variables = [];
+
+    KEYWORD: foreach my $member (@{ $hierarchy }) {
+        my $varBlock             = clone $member;
+        $varBlock->{level}       = $level;
+        $varBlock->{indent_loop} = [ map { { indent => $_ } } 1..$level ];
+        delete $varBlock->{children};
+        push @{$variables}, $varBlock;
+        if ( exists $member->{children} ) {
+            push @{$variables}, @{ $self->getKeywordVariables($member->{children}, $level+1) };
+        }
+    }
+    return $variables;
 }
 
 #-------------------------------------------------------------------
@@ -518,6 +646,19 @@ sub getTemplateVars {
     };
     
     return $var;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getTopLevelKeywordsList ( )
+
+Return the top level keywords as an array reference.
+
+=cut
+
+sub getTopLevelKeywordsList {
+    my ( $self ) = @_;
+    return WebGUI::Keyword::string2list($self->get('topLevelKeywords'));
 }
 
 #-------------------------------------------------------------------
@@ -610,6 +751,7 @@ sub view {
 	$self->appendSearchBoxVars($var);
 	$self->appendRecentChanges($var, $self->get('recentChangesCountFront'));
 	$self->appendMostPopular($var, $self->get('mostPopularCountFront'));
+	$self->appendKeywordPageVars($var);
 	return $self->processTemplate($var, undef, $template);
 }
 

@@ -5,6 +5,8 @@
  - fixed #11520: Wiki Locked
  - fixed Missing Template variables for the Wiki Page view template.
  - added #10944: Wiki Keyword Page
+ - added #10946: Wiki - Hierarchical Keyword Report
+ - added #10945: Wiki - Top-level keyword list
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the

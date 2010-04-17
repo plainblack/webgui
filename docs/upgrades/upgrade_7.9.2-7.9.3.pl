@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 reindexSiteForDefaultSynopsis( $session );
+addTopLevelWikiKeywords( $session );
 
 finish($session); # this line required
 
@@ -43,6 +44,24 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub addTopLevelWikiKeywords {
+    my $session = shift;
+    print "\tAdding top level keywords page to WikiMaster... " unless $quiet;
+
+    my $sth = $session->db->read('DESCRIBE `WikiMaster`');
+    while (my ($col) = $sth->array) {
+        if ($col eq 'topLevelKeywords') {
+            print "Skipped.\n" unless $quiet;
+            return;
+        }
+    }
+    $session->db->write('ALTER TABLE WikiMaster ADD COLUMN topLevelKeywords LONGTEXT');
+
+    print "Done.\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 # Reindex the site to clear out default synopsis
