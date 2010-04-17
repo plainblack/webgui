@@ -151,19 +151,6 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( ) 
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-	undef $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 _filterKeywords ( $keywords )
 
 Perform filtering and cleaning up of the keywords before submitting them.  Ideographic characters are padded

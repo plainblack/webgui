@@ -163,21 +163,6 @@ sub demoteActivity {
         }
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
 #-------------------------------------------------------------------
 
 =head2 get ( name ) 

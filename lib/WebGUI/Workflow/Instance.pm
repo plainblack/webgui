@@ -106,7 +106,6 @@ sub delete {
 	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=?",[$self->getId]);
 	$self->session->db->deleteRow("WorkflowInstance","instanceId",$self->getId);
 	WebGUI::Workflow::Spectre->new($self->session)->notify("workflow/deleteInstance",$self->getId) unless ($skipNotify);
-	undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -143,7 +142,6 @@ sub DESTROY {
 		$self->start;
 	}
     delete $self->{_workflow};
-    undef $self;
 }
 
 

@@ -50,7 +50,6 @@ Gracefully shuts down the workflow manager.
 sub _stop {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];	
 	$self->debug("Stopping workflow manager.");
-	undef $self;
 }
 
 #-------------------------------------------------------------------

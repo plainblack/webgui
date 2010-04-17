@@ -182,7 +182,6 @@ sub delete {
         $item->delete;
     } 
     $self->session->db->write("delete from transaction where transactionId=?",[$self->getId]);
-    undef $self;
     return undef;
 }
 

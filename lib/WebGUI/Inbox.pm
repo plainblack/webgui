@@ -119,19 +119,6 @@ sub canRead {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getMessage ( messageId [, userId] ) 
 
 Returns a WebGUI::Inbox::Message object.

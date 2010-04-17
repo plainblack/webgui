@@ -93,20 +93,6 @@ sub AUTOLOAD {
         
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Disposes of the form object.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-	$self = undef;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 dynamicForm ( $formDefinition, $listName, $who ) 
 
 Build a form dynamically from an array of hash refs.  The format is

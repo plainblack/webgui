@@ -213,7 +213,6 @@ sub disconnect {
 	if (defined $self->{_dbh}) {
 		$self->{_dbh}->disconnect() unless ($self->getId eq "0");
 	}
-	undef $self;
 }
 
 #-------------------------------------------------------------------

@@ -96,19 +96,6 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 get ( name )
 
 Returns the value of a property.

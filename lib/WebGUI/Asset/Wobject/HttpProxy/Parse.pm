@@ -50,11 +50,6 @@ my %tag_attr = (
 	"script src" => 1
 	);
 
-sub DESTROY {
-	my $self = shift;
-	$self = undef;
-}
-
 =head2 new ( $class, $session)
 
 Constructor for parser.

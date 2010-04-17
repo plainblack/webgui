@@ -49,7 +49,6 @@ Gracefully shuts down the scheduler.
 sub _stop {
     my ($kernel, $self) = @_[KERNEL, OBJECT];
     $self->debug("Stopping the scheduler.");
-    undef $self;
 }
 
 #-------------------------------------------------------------------

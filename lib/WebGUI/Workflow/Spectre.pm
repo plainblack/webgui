@@ -39,19 +39,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 notify ( module, params )
 
 Sends a message to Spectre.

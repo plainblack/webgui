@@ -91,7 +91,6 @@ sub delete {
         $address->delete;
     } 
     $self->session->db->write("delete from addressBook where addressBookId=?",[$self->getId]);
-    undef $self;
     return undef;
 }
 

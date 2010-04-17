@@ -17,6 +17,7 @@ package WebGUI::FormValidator;
 use strict qw(vars subs);
 use WebGUI::HTML;
 use WebGUI::Pluggable;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -81,21 +82,6 @@ sub AUTOLOAD {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-
-#-------------------------------------------------------------------
-
 =head2 get ( )
 
 An alias for process()
@@ -120,9 +106,11 @@ A reference to the current session.
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $class = shift;
+    my $session = shift;
+    my $self = bless {_session=>$session}, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 
