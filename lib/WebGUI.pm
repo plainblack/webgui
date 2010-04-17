@@ -62,71 +62,60 @@ has site    => (
     },
 );
 
-sub prepare_app {
-    my $self = shift;
-    
-    # WebGUI is a PSGI app is a Perl code reference. Let's create one (once).
-    
-    # Each web request results in a call to this sub
-    $self->{psgi_app} = sub {
-        my $env = shift;
-
-        # Use the PSGI callback style response, which allows for nice things like 
-        # delayed response/streaming body (server push). For now we just use this for 
-        # unbuffered response writing
-        return sub {
-            my $responder = shift;
-            my $session = $env->{'webgui.session'}
-                or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
-
-            # Handle the request
-            handle($session);
-
-            # Construct the PSGI response
-            my $response = $session->response;
-            my $psgi_response = $response->finalize;
-
-            # See if the content handler is doing unbuffered response writing
-            if ( $response->streaming ) {
-                try {
-                    # Ask PSGI server for a streaming writer object by returning only the first
-                    # two elements of the array reference
-                    my $writer = $responder->( [ $psgi_response->[0], $psgi_response->[1] ] );
-
-                    # Store the writer object in the WebGUI::Session::Response object
-                    $response->writer($writer);
-
-                    # Now call the callback that does the streaming
-                    $response->streamer->($session);
-
-                    # And finally, clean up
-                    $writer->close;
-                }
-                catch {
-                    if ($response->writer) {
-                        # Response has already been started, so log error and close writer
-                        $session->request->TRACE("Error detected after streaming response started");
-                        $response->writer->close;
-                    }
-                    else {
-                        $responder->( [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error" ] ] );
-                    }
-                };
-            }
-            else {
-                # Not streaming, so immediately tell the callback to return 
-                # the response. In the future we could use an Event framework here 
-                # to make this a non-blocking delayed response.
-                $responder->($psgi_response);
-            }
-        };
-    };
-}
-
 # Each web request results in a call to this sub
 sub call {
     my $self = shift;
-    return $self->{psgi_app}->(@_);
+    my $env = shift;
+
+    # Use the PSGI callback style response, which allows for nice things like 
+    # delayed response/streaming body (server push). For now we just use this for 
+    # unbuffered response writing
+    return sub {
+        my $responder = shift;
+        my $session = $env->{'webgui.session'}
+            or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
+
+        # Handle the request
+        handle($session);
+
+        # Construct the PSGI response
+        my $response = $session->response;
+        my $psgi_response = $response->finalize;
+
+        # See if the content handler is doing unbuffered response writing
+        if ( $response->streaming ) {
+            try {
+                # Ask PSGI server for a streaming writer object by returning only the first
+                # two elements of the array reference
+                my $writer = $responder->( [ $psgi_response->[0], $psgi_response->[1] ] );
+
+                # Store the writer object in the WebGUI::Session::Response object
+                $response->writer($writer);
+
+                # Now call the callback that does the streaming
+                $response->streamer->($session);
+
+                # And finally, clean up
+                $writer->close;
+            }
+            catch {
+                if ($response->writer) {
+                    # Response has already been started, so log error and close writer
+                    $session->request->TRACE("Error detected after streaming response started");
+                    $response->writer->close;
+                }
+                else {
+                    $responder->( [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error" ] ] );
+                }
+            };
+        }
+        else {
+            # Not streaming, so immediately tell the callback to return 
+            # the response. In the future we could use an Event framework here 
+            # to make this a non-blocking delayed response.
+            $responder->($psgi_response);
+        }
+    };
 }
 
 sub handle {
