@@ -202,7 +202,7 @@ sub setPrivilege {
 	my $path = shift;
 	print "\t\tSetting filesystem privilege. " unless ($quiet);
 	
-	if ($session->os->get("type") eq "Linuxish") {
+    if ($^O ne 'MSWin32') {
 		unless (system("chown -R ".$webUser." ". $path)) {
 			print "Privileges set.\n" unless ($quiet);
 		}

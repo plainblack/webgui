@@ -26,7 +26,7 @@ use Pod::Usage;
 use Cwd ();
 
 
-my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help, $noprompt);
+my ($prereq, $dbi, $dbDrivers, $simpleReport, $help, $noprompt);
 
 GetOptions(
     'noprompt' => \$noprompt,

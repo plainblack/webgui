@@ -68,7 +68,6 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->icon
  $session->id
  $session->output
- $session->os
  $session->privilege
  $session->request
  $session->response
@@ -145,7 +144,7 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
 		delete $self->{$key};
 	}
 }
@@ -454,7 +453,7 @@ Uses simple session vars. See WebGUI::Session::Var::new() for more details.
 sub open {
     my ($class, $c, $env, $sessionId, $noFuss) = @_;
     my $config = ref $c ? $c : WebGUI::Config->new($c);
-    my $self = {_config=>$config }; # TODO - if we store reference here, should we weaken WebGUI->config?
+    my $self = { _config => $config };
     bless $self, $class;
 
     if ($env) {
@@ -490,23 +489,6 @@ sub output {
 		$self->{_output} = WebGUI::Session::Output->new($self);
 	}
 	return $self->{_output};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 os ( ) 
-
-Returns a WebGUI::Session::Os object.
-
-=cut
-
-sub os {
-	my $self = shift;
-	unless (exists $self->{_os}) {
-		$self->{_os} = WebGUI::Session::Os->new();
-	}
-	return $self->{_os};
 }
 
 
