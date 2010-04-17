@@ -810,6 +810,7 @@ sub www_getCredentials {
 
     $var->{checkoutButton} = WebGUI::Form::submit($session, {
         value => $i18n->get('checkout button', 'Shop'),
+        extras => 'onclick="this.disabled=true;this.form.submit(); return false;"',
     });
 
     my $template = eval { WebGUI::Asset::Template->newById($session, $self->get("credentialsTemplateId")); };

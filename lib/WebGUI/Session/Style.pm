@@ -19,8 +19,8 @@ use strict;
 use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Asset::Template;
-use WebGUI;
+require WebGUI::Asset;
+BEGIN { eval { require WebGUI; WebGUI->import } }
 use HTML::Entities ();
 
 =head1 NAME
@@ -260,16 +260,34 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 	$var{'head.tags'} .= '<meta http-equiv="Cache-Control" content="must-revalidate" />'
 }
 
+
+    # TODO: Figure out if user is still in the admin console
+    if ( $session->asset ) {
+        my $assetDef    = { 
+            assetId     => $session->asset->getId,
+            title       => $session->asset->getTitle,
+            url         => $session->asset->getUrl,
+            icon        => $session->asset->getIcon(1),
+        };
+        $var{'head.tags'} .= sprintf <<'ADMINJS', JSON->new->encode( $assetDef );
+<script type="text/javascript">
+if ( window.parent && window.parent.admin ) {
+    window.parent.admin.navigate( %s );
+}
+</script>
+ADMINJS
+    }
+
     # Removing the newlines will probably annoy people. 
     # Perhaps turn it off under debug mode?
-    $var{'head.tags'} =~ s/\n//g;
+    #$var{'head.tags'} =~ s/\n//g;
 
 	# head.tags = head_attachments . body_attachments
 	# keeping head.tags for backwards compatibility
 	$var{'head_attachments'} = $var{'head.tags'};
 	$var{'head.tags'}       .= ($var{'body_attachments'} = '<!--morebody-->');
 
-	my $style = eval { WebGUI::Asset::Template->newById($self->session, $templateId); };
+	my $style = eval { WebGUI::Asset->newById($self->session, $templateId); };
 	my $output;
 	if (! Exception::Class->caught()) {
 		my $meta = {};

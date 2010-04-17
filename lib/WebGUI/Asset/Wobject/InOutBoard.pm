@@ -139,13 +139,13 @@ Extend the base method to cleanup the status and statusLog tables.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self    = shift;
     my $session = $self->session;
     $session->db->write('delete from InOutBoard_status    where assetId=?', [$self->getId]);
     $session->db->write('delete from InOutBoard_statusLog where assetId=?', [$self->getId]);
-    $self->SUPER::purge(@_);
-}
+    super();
+};
 
 
 #-------------------------------------------------------------------
@@ -408,11 +408,11 @@ sub www_setStatus {
 		$db->write("delete from InOutBoard_status where userId=? and assetId=?", [ $sessionUserId, $self->getId ]);
 		$db->write(
             "insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (?,?,?,?,?)",
-            [$self->getId, $sessionUserId, $status, $session->datetime->time(), $message ], 
+            [$self->getId, $sessionUserId, $status, time(), $message ], 
         );
 		$db->write(
             "insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
-            [$self->getId, $sessionUserId, $session->user->userId, $status, $session->datetime->time(), $message ], 
+            [$self->getId, $sessionUserId, $session->user->userId, $status, time(), $message ], 
         );
 	}
 	else {
@@ -446,7 +446,7 @@ sub www_viewReport {
 		-name=>"doit",
 		-value=>"1"
 		);
-	my $startDate = $self->session->datetime->addToDate($self->session->datetime->time(),0,0,-15);
+	my $startDate = $self->session->datetime->addToDate(time(),0,0,-15);
 	$startDate = $self->session->form->date("startDate") if ($self->session->form->process("doit")); 
 	$f->date(
 		-name=>"startDate",

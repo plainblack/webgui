@@ -24,8 +24,10 @@ use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Survey;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
-# We need these as semi-globals so that utility subs (which are shared with the safe compartment)
+# We need these as file-scoped lexicals so that our utility subs (which are shared with the safe compartment)
 # can access them.
+# N.B. If you add any new ones, make sure you initialize them in L<run> otherwise they will be cached across
+# unrelated engine runs, which leads to bugs that are hairy to track down
 my $session;
 my $values;
 my $scores;
@@ -431,7 +433,7 @@ sub run {
     my ( $s, $expression, $opts )
         = validate_pos( @_, { isa => 'WebGUI::Session' }, { type => SCALAR }, { type => HASHREF, default => {} } );
 
-    # Init package globals
+    # Initialize all file-scoped lexicals that our Safe utility subs have access to
     $session = $s;
     $values = $opts->{values} || {};
     $scores = $opts->{scores} || {};
@@ -439,6 +441,7 @@ sub run {
     $validate = $opts->{validate};
     $validTargets = $opts->{validTargets};
     $tags = $opts->{tags} || {};
+    $otherInstances = {};
 
     if ( !$session->config->get('enableSurveyExpressionEngine') ) {
         $session->log->debug('enableSurveyExpressionEngine config option disabled, skipping');

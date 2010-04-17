@@ -337,11 +337,10 @@ is reserved for the WebGUI database.
 =cut
 
 sub new {
-	my ($class, $databaseLinkId, %databaseLink);
-	tie %databaseLink, 'Tie::CPHash';
-	$class = shift;
-	my $session = shift;
-	$databaseLinkId = shift;
+	my $class          = shift;
+	my $session        = shift;
+	my $databaseLinkId = shift;
+	tie my %databaseLink, 'Tie::CPHash';
 	unless ($databaseLinkId eq "") {
 		if ($databaseLinkId eq "0") {
 			%databaseLink = (

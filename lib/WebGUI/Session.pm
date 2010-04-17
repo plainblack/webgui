@@ -51,7 +51,7 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
 
  use WebGUI::Session;
 
- $session = WebGUI::Session->open($webguiRoot, $configFile);
+ $session = WebGUI::Session->open($configFile);
  $sessionId = $session->getId;
  ($form, $db, $user) = $session->quick("form", "db", "user");
  $session->close;
@@ -274,7 +274,6 @@ Creates a new session using the same WebGUI root, config file, and user.
 sub duplicate {
     my $self = shift;
     my $newSession = WebGUI::Session->open(
-        $self->config->getWebguiRoot,
         $self->config->getFilename,
         undef,
         undef,
@@ -453,14 +452,14 @@ Uses simple session vars. See WebGUI::Session::Var::new() for more details.
 =cut
 
 sub open {
-	my ($class, $webguiRoot, $c, $env, $sessionId, $noFuss) = @_;
-	my $config = ref $c ? $c : WebGUI::Config->new($webguiRoot,$c);
-	my $self = {_config=>$config }; # TODO - if we store reference here, should we weaken WebGUI->config?
-	bless $self, $class;
-	
-	if ($env) {
-	    my $request = WebGUI::Session::Request->new($env);
-	    $self->{_request} = $request;
+    my ($class, $c, $env, $sessionId, $noFuss) = @_;
+    my $config = ref $c ? $c : WebGUI::Config->new($c);
+    my $self = {_config=>$config }; # TODO - if we store reference here, should we weaken WebGUI->config?
+    bless $self, $class;
+
+    if ($env) {
+        my $request = WebGUI::Session::Request->new($env);
+        $self->{_request} = $request;
         $self->{_response} = $request->new_response( 200 );
         
         # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it

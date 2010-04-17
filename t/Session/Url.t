@@ -343,11 +343,11 @@ $session->config->delete('cdn');
 #
 #######################################
 
-my $escapeString = '10% is enough!';
+my $escapeString = '10% is enough;';
 my $escapedString = $session->url->escape($escapeString);
 my $unEscapedString = $session->url->unescape($escapeString);
-is($escapedString, '10%25%20is%20enough!', 'escape method');
-is($unEscapedString, '10% is enough!', 'unescape method');
+is($escapedString, '10%25%20is%20enough%3B', 'escape method');
+is($unEscapedString, '10% is enough;', 'unescape method');
 
 #######################################
 #

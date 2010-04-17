@@ -16,7 +16,8 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 18; # increment this value for each test you create
+use Test::More tests => 29; # increment this value for each test you create
+use Test::Deep;
 use WebGUI::Asset::Wobject::WikiMaster;
 use WebGUI::Asset::WikiPage;
 
@@ -25,15 +26,20 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 
-my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster'});
+my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster', title => 'Wiki Test', url => 'wikitest'});
+my @autoCommitCoda = (undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 $versionTag->commit;
-my $wikipage = $wiki->addChild({className=>'WebGUI::Asset::WikiPage'});
+my $wikipage = $wiki->addChild(
+    {className=>'WebGUI::Asset::WikiPage'},
+    @autoCommitCoda,
+);
 
 # Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
 my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
-WebGUI::Test->tagsToRollback($secondVersionTag );
+$secondVersionTag->commit;
+addToCleanup($secondVersionTag );
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');
@@ -87,9 +93,53 @@ is($wikipage->get('averageCommentRating'), 1, 'average rating is adjusted after 
 
 
 ##################
+# This section tests hierarchical keywords support
+##################
 
-TODO: {
-    local $TODO = "Tests to make later";
-    ok(0, 'Lots and lots to do');
-}
+#
+## setup some more wiki pages
+my $properties = {
+    className=>'WebGUI::Asset::WikiPage',
+    content => 'Now is the time for all good men to come to the aid of their country',
+    title => 'Keyword',
+    keywords => 'keyword'
+};
+my $wikipage2 = $wiki->addChild($properties, @autoCommitCoda);
+isa_ok($wikipage2, 'WebGUI::Asset::WikiPage');
 
+$properties = {
+    className=>'WebGUI::Asset::WikiPage',
+    content => 'The quick brown fox jumps over the lazy dog.',
+    title => 'Fox',
+    keywords => 'keyword'
+};
+my $wikipage3 = $wiki->addChild($properties, @autoCommitCoda);
+isa_ok($wikipage3, 'WebGUI::Asset::WikiPage');
+
+# Test keywords support
+my $keywords = $wikipage2->get('keywords');
+is($keywords,$properties->{'keywords'}, 'Keywords match');
+
+# Test isKeywordPage()
+ok   $wikipage2->isKeywordPage(), "'".$wikipage2->get('title')."' is a keyword page";
+my $templateVars = $wikipage2->getTemplateVars;
+ok   $templateVars->{isKeywordPage}, 'isKeywordPage template var, true';
+cmp_deeply
+    $templateVars->{keyword_page_loop},
+    [
+        { title => 'Fox',     url => '/wikitest/fox', },
+    ],
+    'populated keyword_page_loop, sorted by title';
+ok ! $wikipage3->isKeywordPage(), "'".$wikipage3->get('title')."' is not a keyword page";
+$templateVars = $wikipage3->getTemplateVars;
+ok ! $templateVars->{isKeywordPage}, 'isKeywordPage template var, false';
+cmp_deeply $templateVars->{keyword_page_loop}, [], 'empty keyword_page_loop';
+
+$wikipage3->update({keywords => $wikipage3->get('keywords').',Fox'});
+ok $wikipage3->isKeywordPage(), "'".$wikipage3->get('title')."' is now a keyword page";
+$templateVars = $wikipage3->getTemplateVars;
+ok $templateVars->{isKeywordPage}, 'isKeywordPage template var, false';
+cmp_deeply
+    $templateVars->{keyword_page_loop},
+    [ ],
+    'empty keyword_page_loop, self is not put into the loop';

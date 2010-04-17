@@ -77,9 +77,6 @@ with 'WebGUI::Role::Asset::AlwaysHidden';
 
 with 'WebGUI::Role::Asset::SetStoragePermissions';
 
-
-use WebGUI::Asset::Template;
-use WebGUI::Asset::Post::Thread;
 use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -139,27 +136,28 @@ Override the default method in order to deal with attachments.
 
 =cut
 
-sub addRevision {
-        my $self = shift;
-        my $newSelf = $self->SUPER::addRevision(@_);
-        if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
-                my $newStorage = WebGUI::Storage->get($self->session,$self->storageId)->copy;
-                $newSelf->update({storageId=>$newStorage->getId});
+override addRevision => sub {
+    my $self    = shift;
+    my $newSelf = super();
+    if ( $newSelf->storageId && $newSelf->storageId eq $self->storageId ) {
+        my $newStorage = WebGUI::Storage->get( $self->session, $self->storageId )->copy;
+        $newSelf->update( { storageId => $newStorage->getId } );
+    }
+    my $threadId = $newSelf->threadId;
+    my $now      = time();
+    if ( $threadId eq "" ) {    # new post
+        if ( $newSelf->getParent->isa("WebGUI::Asset::Wobject::Collaboration") ) {
+            $newSelf->update( { threadId => $newSelf->getId } );
         }
-	my $threadId = $newSelf->threadId;
-	my $now = time();
-	if ($threadId eq "") { # new post
-		if ($newSelf->getParent->isa("WebGUI::Asset::Wobject::Collaboration")) {
-			$newSelf->update({threadId=>$newSelf->getId});
-		} else {
-			$newSelf->update({threadId=>$newSelf->getParent->threadId});
-		}
-		delete $newSelf->{_thread};
-	}
-	$newSelf->getThread->unmarkRead;
+        else {
+            $newSelf->update( { threadId => $newSelf->getParent->threadId } );
+        }
+        delete $newSelf->{_thread};
+    }
+    $newSelf->getThread->unmarkRead;
 
-        return $newSelf;
-}
+    return $newSelf;
+};
 
 #-------------------------------------------------------------------
 
@@ -269,20 +267,20 @@ increment replies for the parent thread.
 
 =cut
 
-sub commit {
-	my $self = shift;
-	$self->SUPER::commit;
-    
-    $self->notifySubscribers unless ($self->shouldSkipNotification);
-           
-	if ($self->isNew) {
-		if ($self->session->setting->get("useKarma") && $self->getThread->getParent->karmaPerPost) {
-			my $u = WebGUI::User->new($self->session, $self->ownerUserId);
-			$u->karma($self->getThread->getParent->karmaPerPost, $self->getId, "Collaboration post");
-		}
-        	$self->getThread->incrementReplies($self->revisionDate,$self->getId);# if ($self->isReply);
-	}
-}
+override commit => sub {
+    my $self = shift;
+    super();
+
+    $self->notifySubscribers unless ( $self->shouldSkipNotification );
+
+    if ( $self->isNew ) {
+        if ( $self->session->setting->get("useKarma") && $self->getThread->getParent->karmaPerPost ) {
+            my $u = WebGUI::User->new( $self->session, $self->ownerUserId );
+            $u->karma( $self->getThread->getParent->karmaPerPost, $self->getId, "Collaboration post" );
+        }
+        $self->getThread->incrementReplies( $self->revisionDate, $self->getId );    # if ($self->isReply);
+    }
+};
 
 #-------------------------------------------------------------------
 
@@ -293,7 +291,7 @@ the parent thread.
 
 =cut
 
-sub cut {
+override cut => sub {
     my $self = shift;
 
     # Fetch the Thread and CS before cutting the asset.
@@ -301,7 +299,7 @@ sub cut {
     my $cs      = $thread->getParent;
 
     # Cut the asset
-    my $result = $self->SUPER::cut;
+    my $result = super();
 
     # If a post is being cut update the thread reply count first
     if ($thread->getId ne $self->getId) {
@@ -313,7 +311,7 @@ sub cut {
     $self->_fixReplyCount( $cs );
 
     return $result;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -323,11 +321,11 @@ Extend the base method to delete the locally cached thread object.
 
 =cut
 
-sub DESTROY {
+override DESTROY => sub {
 	my $self = shift;
 	$self->{_thread}->DESTROY if (exists $self->{_thread} && ref $self->{_thread} =~ /Thread/);
-	$self->SUPER::DESTROY;
-}
+	super();
+};
 
 
 #-------------------------------------------------------------------
@@ -338,12 +336,12 @@ Extend the base class to handle storage locations.
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
 	my $self = shift;
-	my $data = $self->SUPER::exportAssetData;
+	my $data = super();
 	push(@{$data->{storage}}, $self->storageId) if ($self->storageId ne "");
 	return $data;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -357,13 +355,14 @@ The url of the post
 
 =cut
 
-sub fixUrl {
-	my $self = shift;
-	my $url = shift;
-	$url =~ s/\./_/g;
+around fixUrl => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $url = shift;
+    $url =~ s/\./_/g;
 
-	$self->SUPER::fixUrl($url);
-}
+    $self->$orig($url);
+};
 
 #-------------------------------------------------------------------
 
@@ -458,6 +457,34 @@ sub getDeleteUrl {
 	my $self = shift;
 	return $self->getUrl("func=delete;revision=".$self->revisionDate);
 }
+
+#-------------------------------------------------------------------
+
+=head2 getThreadLinkUrl ( )
+
+Returns the URL for this Post, which links directly to its anchor and page.
+
+=cut
+
+sub getThreadLinkUrl {
+	my $self = shift;
+    my $url;
+    my $paginator = WebGUI::Paginator->new($self->session, '', $self->getThread->getParent->get('postsPerPage'));
+    my $page_size = $paginator->{_rpp}; ##To make sure defaults are handled correctly.
+    my $place     = $self->getRank+1;
+    my $page      = int($place/$page_size) + 1;
+    my $page_frag = 'pn='.$page;
+    if ($self->get("status") eq "pending") {
+        $url = $self->getUrl($page_frag.";revision=".$self->get("revisionDate"));
+    }
+    else {
+        $url = $self->getUrl($page_frag);
+    }
+    $url .= "#id".$self->getId;
+
+    return $url;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -674,30 +701,31 @@ Returns a hash reference of template variables for this Post.
 =cut
 
 sub getTemplateVars {
-	my $self    = shift;
+    my $self    = shift;
     my $session = $self->session;
-	my %var     = %{$self->get};
+    my %var     = %{$self->get};
     my $postUser   = WebGUI::User->new($session, $self->ownerUserId);
-	$var{"userId"} = $self->ownerUserId;
-	$var{"user.isPoster"} = $self->isPoster;
-	$var{"avatar.url"}    = $self->getAvatarUrl;
-	$var{"userProfile.url"} = $postUser->getProfileUrl($self->getUrl());
-	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->creationDate);
-	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->revisionDate);
-	$var{'title.short'} = $self->chopTitle;
-	$var{content} = $self->formatContent if ($self->getThread);
-	$var{'user.canEdit'} = $self->canEdit if ($self->getThread);
-	$var{"delete.url"} = $self->getDeleteUrl;
-	$var{"edit.url"} = $self->getEditUrl;
-	$var{"status"} = $self->getStatus;
-	$var{"reply.url"} = $self->getReplyUrl;
-	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
-	$var{'url'} = $self->getUrl.'#id'.$self->getId;
-        $var{'url.raw'} = $self->getUrl;
-	$var{'rating.value'} = $self->rating+0;
-	$var{'rate.url.thumbsUp'} = $self->getRateUrl(1);
-	$var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
-	$var{'hasRated'} = $self->hasRated;
+    $var{"userId"}              = $self->ownerUserId;
+    $var{"user.isPoster"}       = $self->isPoster;
+    $var{"avatar.url"}          = $self->getAvatarUrl;
+    $var{"userProfile.url"}     = $postUser->getProfileUrl($self->getUrl());
+    $var{"hideProfileUrl" }     = $self->ownerUserId eq '1' || $session->user->isVisitor;
+    $var{"dateSubmitted.human"} = $self->session->datetime->epochToHuman($self->creationDate);
+    $var{"dateUpdated.human"}   = $self->session->datetime->epochToHuman($self->revisionDate);
+    $var{'title.short'}         = $self->chopTitle;
+    $var{content}               = $self->formatContent if ($self->getThread);
+    $var{'user.canEdit'}        = $self->canEdit if ($self->getThread);
+    $var{"delete.url"}          = $self->getDeleteUrl;
+    $var{"edit.url"}            = $self->getEditUrl;
+    $var{"status"}              = $self->getStatus;
+    $var{"reply.url"}           = $self->getReplyUrl;
+    $var{'reply.withquote.url'} = $self->getReplyUrl(1);
+    $var{'url'}                 = $self->getUrl.'#id'.$self->getId;
+    $var{'url.raw'}             = $self->getUrl;
+    $var{'rating.value'}        = $self->rating+0;
+    $var{'rate.url.thumbsUp'}   = $self->getRateUrl(1);
+    $var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
+    $var{'hasRated'}            = $self->hasRated;
 	my $gotImage;
 	my $gotAttachment;
 	@{$var{'attachment_loop'}} = ();
@@ -804,21 +832,22 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 
 =cut
 
-sub indexContent {
-	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->content);
-	$indexer->addKeywords($self->userDefined1);
-	$indexer->addKeywords($self->userDefined2);
-	$indexer->addKeywords($self->userDefined3);
-	$indexer->addKeywords($self->userDefined4);
-	$indexer->addKeywords($self->userDefined5);
-	$indexer->addKeywords($self->username);
-	my $storage = $self->getStorageLocation;
-	foreach my $file (@{$storage->getFiles}) {
-               $indexer->addFile($storage->getPath($file));
-	}
-}
+around indexContent => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $indexer = $self->$orig(@_);
+    $indexer->addKeywords($self->content);
+    $indexer->addKeywords($self->userDefined1);
+    $indexer->addKeywords($self->userDefined2);
+    $indexer->addKeywords($self->userDefined3);
+    $indexer->addKeywords($self->userDefined4);
+    $indexer->addKeywords($self->userDefined5);
+    $indexer->addKeywords($self->username);
+    my $storage = $self->getStorageLocation;
+    foreach my $file (@{$storage->getFiles}) {
+        $indexer->addFile($storage->getPath($file));
+    }
+};
 
 #-------------------------------------------------------------------
 
@@ -854,7 +883,7 @@ sub insertUserPostRating {
 		[$self->getId,
 		 $self->session->user->userId,
 		 $self->session->env->getIp,
-		 $self->session->datetime->time(),
+		 time(),
 		 $rating,]
 	);
 }
@@ -990,10 +1019,10 @@ Extends the master method to handle incrementing replies.
 
 =cut
 
-sub paste {
+override paste => sub {
     my $self = shift;
 
-    $self->SUPER::paste(@_);
+    super();
 
     # First, figure out what Thread we're under
     my $thread = $self->getLineage( [ qw{ self ancestors } ], {
@@ -1025,7 +1054,7 @@ sub paste {
 
     # Recount the replies under the thread.
     $thread->sumReplies;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -1036,9 +1065,9 @@ non-sticky, locking and unlocking posts.  Calls postProcess when it is done.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;	
+	super();
     my $session = $self->session;
     my $form    = $session->form;
 	my $i18n = WebGUI::International->new($session);
@@ -1062,13 +1091,16 @@ sub processPropertiesFromFormPost {
     else {
         $self->getThread->unsubscribe;
     }
+    if ($self->canEdit && $form->process('skip_notification')) {
+        $self->setSkipNotification;
+    }
     if ($self->getThread->getParent->canEdit) {
         $form->process('isLocked') ?  $self->getThread->lock  : $self->getThread->unlock;
         $form->process('isSticky') ?  $self->getThread->stick : $self->getThread->unstick;
     }
 	delete $self->{_storageLocation};
 	$self->postProcess;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -1116,31 +1148,22 @@ sub postProcess {
 
 #-------------------------------------------------------------------
 
-#sub publish {
-#	my $self = shift;
-#	$self->SUPER::publish(@_);
-#
-#	$self->getThread->sumReplies;
-#}
-
-#-------------------------------------------------------------------
-
 =head2 purge 
 
 Extend the base method to handle cleaning up storage locations.
 
 =cut
 
-sub purge {
-        my $self = shift;
-        my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
-        while (my ($storageId) = $sth->array) {
-		my $storage = WebGUI::Storage->get($self->session, $storageId);
-                $storage->delete if defined $storage;
-        }
-        $sth->finish;
-        return $self->SUPER::purge;
-}
+override purge => sub {
+    my $self = shift;
+    my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
+    while (my ($storageId) = $sth->array) {
+    my $storage = WebGUI::Storage->get($self->session, $storageId);
+        $storage->delete if defined $storage;
+    }
+    $sth->finish;
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1150,11 +1173,11 @@ Extend the base class to handle caching.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
 	eval{$self->session->cache->delete("view_".$self->getThread->getId)} if ($self->getThread);
-	$self->SUPER::purgeCache;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1164,11 +1187,11 @@ Extend the base method to handle deleting the storage location.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
     $self->getStorageLocation->delete;
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 
 
@@ -1185,19 +1208,20 @@ An integer indicating either thumbss up (+1) or thumbs down (-1)
 =cut
 
 sub rate {
-	my $self = shift;
+	my $self   = shift;
 	my $rating = shift;
 	return undef unless ($rating == -1 || $rating == 1);
 	return undef if $self->hasRated;
+    my $session = $self->session;
 	$self->insertUserPostRating($rating);
 	$self->recalculatePostRating();
     my $thread = $self->getThread;
 	$thread->updateThreadRating();
-	if ($self->session->setting->get("useKarma")
-        && $self->session->user->karma > $thread->getParent->karmaSpentToRate) {
-		$self->session->user->karma(-$self->getThread->getParent->karmaSpentToRate, "Rated Post ".$self->getId, "Rated a CS Post.");
-		my $u = WebGUI::User->new($self->session, $self->ownerUserId);
-		$u->karma($self->getThread->getParent->karmaRatingMultiplier, "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
+	if ($session->setting->get("useKarma")
+        && $session->user->karma > $thread->getParent->karmaSpentToRate) {
+		$session->user->karma(-$thread->getParent->karmaSpentToRate, "Rated Post ".$self->getId, "Rated a CS Post.");
+		my $u = WebGUI::User->new($session, $self->ownerUserId);
+		$u->karma($thread->getParent->karmaRatingMultiplier, "Post ".$self->getId." Rated by ".$session->user->userId, "Had post rated.");
 	}
 }
 
@@ -1224,12 +1248,12 @@ the thread rating.
 
 =cut
 
-sub restore {
+override restore => sub {
     my $self = shift;
-    $self->SUPER::restore(@_);
+    super();
     $self->getThread->sumReplies;
     $self->getThread->updateThreadRating;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -1263,12 +1287,12 @@ An asset object to make the parent of this asset.
 
 =cut
 
-sub setParent {
+override setParent => sub {
     my $self = shift;
     my $newParent = shift;
     return 0 unless ($newParent->isa('WebGUI::Asset::Post'));
-    return $self->SUPER::setParent($newParent);
-}
+    return super();
+};
 
 
 #-------------------------------------------------------------------
@@ -1308,9 +1332,9 @@ Moves post to the trash, updates reply counter on thread and recalculates the th
 
 =cut
 
-sub trash {
+override trash => sub {
     my $self = shift;
-    $self->SUPER::trash;
+    super();
     $self->getThread->sumReplies if ($self->isReply);
     $self->getThread->updateThreadRating;
     if ($self->getThread->lastPostId eq $self->getId) {
@@ -1327,7 +1351,7 @@ sub trash {
             order by creationDate desc",[$forumLineage.'%', $self->getId]);
         $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
     }
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -1403,16 +1427,15 @@ Renders a template form for adding and editing posts.
 =cut
 
 sub www_edit {
-	my $self      = shift;
+    my $self      = shift;
     my $session   = $self->session;
     my $form      = $session->form;
     my $privilege = $session->privilege;
     my $user      = $session->user;
     my $func      = $form->process("func");
     
-	my (%var, $content, $title, $synopsis);
-	my $i18n = WebGUI::International->new($session);
-
+    my (%var, $content, $title, $synopsis);
+    my $i18n = WebGUI::International->new($session);
 
     my $className = $form->process("class","className") || $self->className;
 	if ($func eq "add" || ($func eq "editSave" && $form->process("assetId") eq "new")) { # new post
@@ -1618,7 +1641,12 @@ sub www_edit {
         });
     }
 	$var{'form.submit'} = WebGUI::Form::submit($session, {
-        extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave';return true;\""
+	    extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave';return true;\""
+	});
+	$var{'form.cancel'} = WebGUI::Form::button( $session, {
+	    name        => "cancel",
+	    value       => $i18n->get("cancel"),
+	    extras      => 'onclick="history.go(-1)"',
 	});
 	$var{'karmaScale.form'} = WebGUI::Form::integer($session, {
         name=>"karmaScale",
@@ -1627,7 +1655,7 @@ sub www_edit {
     });
 	$var{karmaIsEnabled} = $session->setting->useKarma;
 	$var{'form.preview'} = WebGUI::Form::submit($session, {
-        value=>$i18n->get("preview","Asset_Collaboration")
+	    value=>$i18n->get("preview","Asset_Collaboration")
     });
 	my $numberOfAttachments = $self->getThread->getParent->attachmentsPerPost;
 	$var{'attachment.form'} = WebGUI::Form::image($session, {
@@ -1640,6 +1668,10 @@ sub www_edit {
     $var{'contentType.form'} = WebGUI::Form::contentType($session, {
         name=>'contentType',
         value=>$self->contentType || "mixed",
+    });
+    $var{'skipNotification.form'} = WebGUI::Form::yesNo($session, {
+        name=>'skip_notification',
+        value=>$form->get("skip_notification",'yesNo') || 0,
     });
     if ($session->setting->get("metaDataEnabled")
      && $self->getThread->getParent->enablePostMetaData) {
@@ -1692,7 +1724,7 @@ We're extending www_editSave() here to deal with editing a post that has been de
 
 =cut
 
-sub www_editSave {
+override www_editSave => sub {
     my $self = shift;
     my $assetId = $self->session->form->param("assetId");
     if($assetId eq "new" && $self->getThread->getParent->useCaptcha) {
@@ -1716,12 +1748,12 @@ sub www_editSave {
             }
         }
     }
-    my $output = $self->SUPER::www_editSave();
+    my $output = super();
     if ($currentTag) { # Go back to our original tag
         $currentTag->setWorking;
     }
     return $output;
-}
+};
 
 #-------------------------------------------------------------------
 

@@ -204,6 +204,14 @@ sub definition {
         hoverHelp=>$i18n->get("Enable Metadata description"),
         defaultValue=>$setting->get("metaDataEnabled")
 		});
+	push(@fields, {
+		tab=>"content",
+		fieldType=>"interval",
+        name=>"maxCacheTimeout",
+        label=>$i18n->get("Maximum cache timeout"),
+        hoverHelp=>$i18n->get("Maximum cache timeout description"),
+        defaultValue=>$setting->get("maxCacheTimeout")
+		});
 	# user interface settings
 	push(@fields, {
 		tab=>"ui",
@@ -520,6 +528,7 @@ sub definition {
         groupIdAdminActiveSessions
         groupIdAdminAdSpace
         groupIdAdminCache
+        groupIdAdminClipboard
         groupIdAdminCron
         groupIdAdminDatabaseLink
         groupIdAdminFilePump
@@ -534,6 +543,7 @@ sub definition {
         groupIdAdminReplacements
         groupIdAdminSpectre
         groupIdAdminStatistics
+        groupIdAdminTrash
         groupIdAdminUser
         groupIdAdminUserAdd
         groupIdAdminVersionTag

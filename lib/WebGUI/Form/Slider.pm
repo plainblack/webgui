@@ -123,7 +123,7 @@ Returns the form element used for manual input. You must overload this method.
 sub getInputElement {
 	my $self = shift;
 
-	$self->session->errorHandler->fatal("Subclasses of WebGUI::Form::Session must overload getInputElement");
+	$self->session->errorHandler->fatal("Subclasses of WebGUI::Form::Slider must overload getInputElement");
 }
 
 #-------------------------------------------------------------------
@@ -174,7 +174,7 @@ from this class. For instance WebGUI::Form::SelectSlider.
 sub getOnChangeInputElement {
 	my $self = shift;
 
-	$self->session->errorHandler->fatal("Subclasses of WebGUI::Form::Session must overload getOnChangeInputElement");
+	$self->session->errorHandler->fatal("Subclasses of WebGUI::Form::Slider must overload getOnChangeInputElement");
 }
 
 #-------------------------------------------------------------------
@@ -195,7 +195,7 @@ from this class. For instance WebGUI::Form::SelectSlider.
 sub getOnChangeSlider {
 	my $self = shift;
 	
-	$self->session->errorHandler->fatal("Subclasses of WebGUI::Form::Session must overload getOnChangeSlider");
+	$self->session->errorHandler->fatal("Subclasses of WebGUI::Form::Slider must overload getOnChangeSlider");
 }
 
 #-------------------------------------------------------------------

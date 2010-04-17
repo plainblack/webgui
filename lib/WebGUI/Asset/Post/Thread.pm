@@ -75,6 +75,7 @@ use WebGUI::Group;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
+use POSIX qw/ceil/;
 
 
 #-------------------------------------------------------------------
@@ -85,18 +86,18 @@ Extend the base method to handle creating a subscription group for this Thread.
 
 =cut
 
-sub addRevision {
-    my $self = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+override addRevision => sub {
+    my $self    = shift;
+    my $newSelf = super();
     $newSelf->createSubscriptionGroup;
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 
 =head2 archive 
 
-Archives all posts under this thread.
+Archives all posts under this thread.  Update the thread count in the parent CS.
 
 =cut
 
@@ -105,6 +106,8 @@ sub archive {
 	foreach my $post (@{$self->getPosts}) {
 		$post->setStatusArchived;
 	}
+    my $cs = $self->getParent;
+    $cs->incrementThreads($cs->get("lastPostDate"), $cs->get("lastPostId"));
 }
 
 #-------------------------------------------------------------------
@@ -119,7 +122,7 @@ in the default asset, which better be a Collaboration System.
 sub canAdd {
     my $class   = shift;
     my $session = shift;
-    return $session->user->isInGroup($session->asset->canStartThreadGroupId);
+    return $session->asset->isa('WebGUI::Asset::Wobject::Collaboration') && $session->asset->canStartThread;
 }
 
 #-------------------------------------------------------------------
@@ -172,13 +175,13 @@ Extends the base method to increment the number of threads in the parent CS.
 
 =cut
 
-sub commit {
-	my $self = shift;
-	$self->SUPER::commit;
-	if ($self->isNew) {
-        	$self->getParent->incrementThreads($self->revisionDate,$self->getId);
-	}
-}
+override commit => sub {
+    my $self = shift;
+    super();
+    if ($self->isNew) {
+        $self->getParent->incrementThreads($self->revisionDate,$self->getId);
+    }
+};
 
 #-------------------------------------------------------------------
 # Override duplicateBranch here so that new posts get their threadId set correctly.
@@ -191,9 +194,9 @@ to update the Thread with the lastPost information.
 
 =cut
 
-sub duplicateBranch {
+override duplicateBranch => sub {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicateBranch(@_);
+	my $newAsset = super();
 
 	foreach my $post (@{$newAsset->getPosts}) {
 		$post->rethreadUnder($newAsset);
@@ -201,7 +204,7 @@ sub duplicateBranch {
 	$newAsset->normalizeLastPost;
 
 	return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -235,13 +238,13 @@ and next threads, and to delete the parent CS.
 
 =cut
 
-sub DESTROY {
+override DESTROY => sub {
 	my $self = shift;
 	return undef unless defined $self;
 	$self->{_next}->DESTROY if (defined $self->{_next});
 	$self->{_previous}->DESTROY if (defined $self->{_previous});
-	$self->SUPER::DESTROY;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -325,6 +328,77 @@ sub getAutoCommitWorkflowId {
 	my $self = shift;
 	return $self->getThread->getParent->threadApprovalWorkflow;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getCSLinkUrl ( )
+
+This URL links to the page of the CS containing this thread, similar
+to the getThreadLink for the Post.  It does not contain the gateway
+for the site.
+
+=cut
+
+sub getCSLinkUrl {
+    my $self    = shift;
+    if ($self->get('status') eq 'archived') {
+        return $self->get('url');
+    }
+    my $session = $self->session;
+    my $url;
+    my $cs         = $self->getParent;
+    my $page_size  = $cs->get('threadsPerPage');
+    my $sql        =<<EOSQL;
+select lineage from asset
+left join Thread    using (assetId)
+left join assetData using (assetId)
+ where parentId=?
+   and className='WebGUI::Asset::Post::Thread'
+   and state='published'
+   and status='approved'
+   group by assetData.assetId
+   order by Thread.isSticky DESC,
+            lineage         DESC
+EOSQL
+
+    my $sth     = $session->db->read($sql, [$cs->getId]);
+    my $place   = 1;  ##1 based indexing
+    my $found   = 0;
+    my $lineage = $self->get('lineage');
+    THREAD: while (my $arrayRef = $sth->arrayRef) {
+        if ($arrayRef->[0] eq $lineage) {
+            $found = 1;
+            last THREAD;
+        }
+        ++$place;
+    }
+    $sth->finish;
+    return $self->get('url') if !$found;
+    my $page  = ceil($place/$page_size);
+    my $page_frag  = 'pn='.$page.';sortBy=lineage;sortOrder=desc';
+    $url = $session->url->append($cs->get('url'), $page_frag);
+    return $url;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getThreadLinkUrl ( )
+
+Extend the base method from Post to remove the pagination query fragment
+
+=cut
+
+sub getThreadLinkUrl {
+	my $self = shift;
+    my $url = $self->SUPER::getThreadLinkUrl();
+    $url =~ s/\?pn=\d+//;
+    if ($url =~ m{;revision=\d+}) {
+        $url =~ s/;revision/?revision/;
+    }
+
+    return $url;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -657,15 +731,15 @@ Extend the base method from Post to process the karmaScale.
 
 =cut
 
-sub postProcess {
+override postProcess => sub {
 	my $self = shift;
 	if ($self->getParent->canEdit) {
 		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->defaultKarmaScale;
 		my $karmaRank = $self->karma/$karmaScale;
 		$self->update({karmaScale=>$karmaScale, karmaRank=>$karmaRank});
 	}
-	$self->SUPER::postProcess;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -675,7 +749,7 @@ Extend the base method to do captcha processing.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self = shift;
 
     if ($self->isNew && $self->getParent->useCaptcha) {
@@ -684,8 +758,8 @@ sub processPropertiesFromFormPost {
         return [ 'invalid captcha' ] unless $captchaOk;
     }
 
-    return $self->SUPER::processPropertiesFromFormPost;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -696,15 +770,15 @@ the subscriptionGroup for this thread.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write("delete from Thread_read where threadId=?",[$self->getId]);
     my $group = WebGUI::Group->new($self->session, $self->subscriptionGroupId);
     if ($group) {
         $group->delete;
     }
-    $self->SUPER::purge;
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -718,12 +792,12 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 
 =cut
 
-sub rate {
+override rate => sub {
 	my $self = shift;
 	my $rating = shift;
 	return undef unless ($rating == -1 || $rating == 1);
 	return undef if $self->hasRated;
-	$self->SUPER::rate($rating);
+	super();
 
 	##Thread specific karma adjustment for CS
 	if ($self->session->setting->get("useKarma")) {
@@ -733,7 +807,7 @@ sub rate {
 		$rater->karma(-$self->getParent->karmaSpentToRate,"collaboration rating","spent karma to rate post ".$self->getId);
 	}
 
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -848,9 +922,9 @@ Moves thread to the trash and updates reply counter on thread.
 
 =cut
 
-sub trash {
+override trash => sub {
     my $self = shift;
-    $self->SUPER::trash;
+    super();
     $self->getParent->sumReplies;
     if ($self->getParent->lastPostId eq $self->getId) {
         my $parentLineage = $self->getThread->lineage;
@@ -864,7 +938,7 @@ sub trash {
             $self->getParent->setLastPost('','');
         }
     }
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -950,15 +1024,17 @@ sub updateThreadRating {
     my $self        = shift;
     my $session     = $self->session;
 
-    my $calcRating  = 0; 
     my $postIds     = $self->getLineage(["descendants","self"], {
         includeOnlyClasses  => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
         includeArchived     => 1,
     });
 
-    $calcRating += $session->db->quickScalar(
-        "SELECT SUM(rating) FROM Post_rating WHERE assetId IN (".$session->db->quoteAndJoin($postIds).")"
-    );     
+    my $calcRating = 0;
+    if (scalar @{ $postIds }) {
+        $calcRating += $session->db->quickScalar(
+            "SELECT SUM(rating) FROM Post_rating WHERE assetId IN (".$session->db->quoteAndJoin($postIds).")"
+        );     
+    }
 
     $self->update({
         threadRating    => $calcRating
@@ -967,7 +1043,8 @@ sub updateThreadRating {
     my $parent = $self->getParent;
     if (defined $parent) {
         $parent->recalculateRating;
-    } else {
+    }
+    else {
         $self->session->errorHandler->error("Couldn't get parent for thread ".$self->getId);
     }    
 }

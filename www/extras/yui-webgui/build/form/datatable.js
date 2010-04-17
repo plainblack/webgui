@@ -49,7 +49,7 @@ WebGUI.Form.DataTable
             data        = {};
             var columns = this.dataTable.getColumnSet().getDefinitions();
             for ( var i = 0; i < columns.length; i++ ) {
-                data[ columns[ i ].key ] = "";
+                data[ columns[ i ].key ] = columns[i].formatter == "date" ? new Date : "";
             }
         }
         this.dataTable.addRow( data );
@@ -91,7 +91,6 @@ WebGUI.Form.DataTable
             delete data.columns[ i ].editorOptions;
         }
 
-        YAHOO.lang.JSON.dateToString = function(d) { return d.toString(); }; /* this overrides the default stringify date format */
         return YAHOO.lang.JSON.stringify( data );
     };
 
@@ -135,7 +134,7 @@ WebGUI.Form.DataTable
         /* If we set the focus now, something might (and sometimes does) set
          * it later in the event handling chain.  Let's defer the focus set
          * until this chain is finished. */
-        setTimeout(function() { obj.editor.focus() }, 0);
+        setTimeout(function() { obj.editor.focus(); }, 0);
     };
 
     /************************************************************************
@@ -475,7 +474,7 @@ WebGUI.Form.DataTable
             // Find the last indexed column
             var newIdx  = cols.length;
             // create a new column object
-            cols[newIdx] = new YAHOO.widget.Column;
+            cols[newIdx] = new YAHOO.widget.Column();
             // add it to the dialog box
             this.appendChild( createTableColumn(newIdx,cols) );
         };
@@ -526,13 +525,13 @@ WebGUI.Form.DataTable
                         fixedcenter : true
                     } );
                     dialog.setBody( this.i18n.get( "Form_DataTable", "save success" ) + "<br/>" );
-                    new YAHOO.widget.Button( {
+                    var button = new YAHOO.widget.Button( {
                         id          : "ok",
                         type        : "push",
                         label       : this.i18n.get( "Form_DataTable", "ok" ),
                         container   : dialog.body,
                         onclick     : {
-                            fn          : function () { this.destroy() },
+                            fn          : function () { this.destroy(); },
                             scope       : dialog
                         }
                     } );
@@ -544,13 +543,13 @@ WebGUI.Form.DataTable
                         fixedcenter : true
                     } );
                     dialog.setBody( this.i18n.get( "Form_DataTable", "save failure" ) + "<br/>" );
-                    new YAHOO.widget.Button( {
+                    var button = new YAHOO.widget.Button( {
                         id          : "ok",
                         type        : "push",
                         label       : this.i18n.get( "Form_DataTable", "ok" ),
                         container   : dialog.body,
                         onclick     : {
-                            fn          : function () { this.destroy() },
+                            fn          : function () { this.destroy(); },
                             scope       : dialog
                         }
                     } );
@@ -627,17 +626,10 @@ WebGUI.Form.DataTable
                 key         : newKey,
                 formatter   : format,
                 resizeable  : ( col ? col.resizeable : 1 ),
-                sortable    : ( col ? col.sortable : 1 )
+                sortable    : ( col ? col.sortable : 1 ),
+                editor      : ( format == "date" ? "date" : "textbox")
             };
             var newIndex    = col ? col.getKeyIndex() : undefined;
-
-            // Set the editor
-            if ( format == "date" ) {
-                newCol.editor   = "date";
-            }
-            else {
-                newCol.editor   = "textbox";
-            }
 
             this.dataTable.insertColumn( newCol, newIndex );
             if ( col ) {
@@ -651,11 +643,23 @@ WebGUI.Form.DataTable
                 }
                 this.dataTable.removeColumn( delCol );
             }
+            else {
+                //Set data in the new column to useful defaults.
+                var allRecords = this.dataTable.getRecordSet().getRecords();
+                var numRecords = allRecords.length;
+                for (j=0; j < numRecords; j++) {
+                    if (format == "date") {
+                        allRecords[j].setData(newKey, new Date);
+                    } else {
+                        allRecords[j].setData(newKey, '');
+                    }
+                }
+            }
             i++;
         }
 
         this.dataTable.render();
         this.schemaDialog.cancel();
-    }
+    };
 
 };

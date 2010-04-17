@@ -15,6 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use HTML::TokeParser;
+use WebGUI::Macro::EditableToggle;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -184,16 +185,9 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
-$numTests += 1 + 1; ##Empty session Asset plus use_ok
+$numTests += 1; ##Empty session Asset plus use_ok
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::EditableToggle';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 is(
 	WebGUI::Macro::EditableToggle::process($session,'on','off',''),
@@ -229,8 +223,6 @@ foreach my $testSet (@testSets) {
 	}
 }
 
-}
-
 sub simpleHTMLParser {
 	my ($text) = @_;
 	my $p = HTML::TokeParser->new(\$text);
@@ -245,8 +237,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
-	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
+	my ($url)   = $text =~ /HREF=(.+?)(\n?LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(\n?HREF|\Z)/;
 
 	return ($url, $label);
 }
@@ -255,7 +247,6 @@ sub setupTest {
 	my ($session, $defaultNode) = @_;
 	$session->user({userId=>3});
 	my $editGroup = WebGUI::Group->new($session, "new");
-    WebGUI::Test->groupsToDelete($editGroup);
 	my $tao = WebGUI::Group->find($session, "Turn Admin On");
 	##Create an asset with specific editing privileges
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -278,12 +269,6 @@ sub setupTest {
 	$users[1]->addToGroups([$editGroup->getId]);
 	##User 2 is an editor AND can turn on Admin
 	$users[2]->addToGroups([$editGroup->getId, $tao->getId]);
-    WebGUI::Test->usersToDelete(@users);
+    addToCleanup($versionTag, $editGroup, @users);
 	return ($versionTag, $asset, @users);
-}
-
-END { ##Clean-up after yourself, always
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
 }

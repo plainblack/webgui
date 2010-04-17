@@ -923,37 +923,37 @@ directly inside the answer_loop for other types of questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1149654771,
     },
-    
+
     response_feedback_url => {
         message => q|The URL of the individual response feedback page.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
-    
+
     response_id  => {
         message => q|The unique ID of the response.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
-    
+
     response_userId => {
         message => q|The userId of the user that completed the response.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
-    
+
     response_ip => {
         message => q|The IP Address of the user that completed the response.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
-    
+
     response_startDate => {
         message => q|The Start Date of the response.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
-    
+
     response_endDate => {
         message => q|The End Date of the response.|,
         context => q|Description of a template variable for a template Help page.|,
@@ -981,7 +981,7 @@ directly inside the answer_loop for other types of questions.|,
         message => q|A boolean flag indicating whether the Survey Response completed|,
         lastUpdated => 1242180657,
     },
-    
+
     'responseId help' => {
         message => q|The unique GUID for the response|,
         lastUpdated => 1242180657,
@@ -1031,7 +1031,7 @@ directly inside the answer_loop for other types of questions.|,
         message => q|All data tagged in survey expressions is also made available as template variables|,
         lastUpdated => 1242180657,
     },
-    
+
     'survey test results template title' => {
         message => q|Survey Test Results Template Variables|,
         lastUpdated => 1242256111,
@@ -1579,114 +1579,129 @@ section/answer.|,
         context => q|Finish button label on Take Survey page|,
         lastUpdated => 0,
     },
-    
+
     'add a test' => {
         message => q{Add a test},
         lastUpdated => 0,
     },
-    
+
     'confirm delete test' => {
         message => q{Are you sure you want to delete this test?},
         lastUpdated => 0,
     },
-    
+
     'test suite' => {
         message => q{Test Suite},
         lastUpdated => 0,
     },
-    
+
     'edit test' => {
         message => q{Edit Test},
         lastUpdated => 0,
     },
-    
+
     'run test' => {
         message => q{Run Test},
         lastUpdated => 0,
     },
-    
+
     'test name' => {
         message => q{Test Name},
         lastUpdated => 0,
     },
-    
+
     'tests run' => {
         message => q{Tests Run},
         lastUpdated => 0,
     },
-    
+
     'test name help' => {
         message => q{A descriptive name for this test},
         lastUpdated => 0,
     },
-    
+
     'test spec' => {
         message => q{Test Spec},
         lastUpdated => 0,
     },
-    
+
     'test spec help' => {
         message => q{The JSON-encoded specification for your test(s)},
         lastUpdated => 0,
     },
-    
+
     'run all tests' => {
         message => q{Run All Tests},
         lastUpdated => 0,
     },
-    
+
     'pass' => {
         message => q{Pass},
         lastUpdated => 0,
     },
-    
+
     'fail' => {
         message => q{Fail},
         lastUpdated => 0,
     },
-    
+
     'test results template' => {
         message => q{Test Results Template},
         lastUpdated => 0,
     },
-    
+
     'test results template help' => {
         message => q{Template used to display individual test and aggregate test results},
         lastUpdated => 0,
     },
-    
+
     'test results' => {
         message => q{Test Results},
         lastUpdated => 0,
     },
-    
+
     'test result' => {
         message => q{Test Result},
         lastUpdated => 0,
     },
-    
+
     'details' => {
         message => q{Details},
         lastUpdated => 0,
     },
-    
+
     'tests passed' => {
         message => q{Tests Passed},
         lastUpdated => 0,
     },
-    
+
     'tests failed' => {
         message => q{Tests Failed},
         lastUpdated => 0,
     },
-    
+
     'start date' => {
         message => q{Start Date},
         lastUpdated => 0,
     },
-    
+
     'end date' => {
         message => q{End Date},
+        lastUpdated => 0,
+    },
+
+    'Survey Objects' => {
+        message => q{Survey Objects},
+        lastUpdated => 0,
+    },
+
+    'Make Default Type' => {
+        message => q{Make Default Type},
+        lastUpdated => 0,
+    },
+
+    'Remove Default Type' => {
+        message => q{Remove Default Type},
         lastUpdated => 0,
     },
 

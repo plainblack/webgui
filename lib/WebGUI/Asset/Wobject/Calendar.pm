@@ -75,7 +75,6 @@ property groupIdSubscribed => (
             fieldType       => 'hidden',
         );
 
-
         ##### TEMPLATES - DISPLAY #####
         # Month
 property templateIdMonth => (
@@ -412,7 +411,8 @@ around the canEdit check when www_editSave is being used to add an asset).
 
 =cut
 
-sub canEdit {
+around canEdit => sub {
+    my $orig    = shift;
     my $self    = shift;
     my $userId  = shift     || $self->session->user->userId;
     my $form    = $self->session->form;
@@ -430,13 +430,13 @@ sub canEdit {
     );
 
     # Who can edit the Calendar can do everything
-    if ( $self->SUPER::canEdit( $userId ) ) {
+    if ( $self->$orig( $userId ) ) {
         return 1;
     }
 
     # Fails all checks
     return 0;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -460,7 +460,7 @@ sub canAddEvent {
 
     return 1 if (
         $user->isInGroup( $self->groupIdEventEdit ) 
-        || $self->SUPER::canEdit( $userId )
+        || $self->SUPER::canEdit($userId)
     );
 }
 
@@ -520,10 +520,10 @@ in other areas.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
-    my $form    = $self->SUPER::getEditForm;
+    my $form    = super();
     my $i18n    = WebGUI::International->new($session,"Asset_Calendar");
 
     my $tab     = $form->addTab("feeds",$i18n->get("feeds"), 6);
@@ -673,7 +673,7 @@ ENDHTML
 
     $tab->raw("</td></tr>");
     return $form;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -769,18 +769,18 @@ sub getEventsIn {
                     && Event.endTime   IS NULL 
                     && 
                         !(
-                            Event.startDate >= '$endDate' 
-                         || Event.endDate   <  '$startDate'
+                            Event.startDate > '$endDate' 
+                         || Event.endDate   < '$startDate'
                         )
                 ) 
-                || ( 
-                       CONCAT(Event.startDate,' ',Event.startTime) >= '$start' 
-                    && CONCAT(Event.startDate,' ',Event.startTime) <  '$end'
+                || !( 
+                       CONCAT(Event.startDate,' ',Event.startTime) >= '$end' 
+                    || CONCAT(Event.endDate,  ' ',Event.endTime  ) <= '$start'
                 )
         };
 
     my @order_priority 
-       = ( 'Event.startDate', 
+       = (  'Event.startDate', 
             'Event.startTime', 
             'Event.endDate', 
             'Event.endTime', 
@@ -994,11 +994,11 @@ Adds / removes feeds from the feed trough.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $self->session->form;
-    $self->SUPER::processPropertiesFromFormPost;
+    super();
 
     unless ($self->groupIdSubscribed) {
         $self->createSubscriptionGroup();
@@ -1036,7 +1036,7 @@ sub processPropertiesFromFormPost {
     }
 
     return;
-}
+};
 
 
 #----------------------------------------------------------------------------
@@ -1274,9 +1274,11 @@ sub viewList {
     my $session     = $self->session;
     my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
     my $var         = $self->getTemplateVars;
+    my $tz          = $session->datetime->getTimeZone();
 
     ### Get the events
-    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} )->truncate( to => "day" );
+    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} );
+    $dtStart->set_time_zone($tz);
     my $dtEnd       = $dtStart->clone->add( seconds => $self->listViewPageInterval );
 
     my @events
@@ -1445,8 +1447,8 @@ sub viewMonth {
     }
 
     # Day names
-    my @dayNames    = @{$dt->locale->day_names}[6,0..5]; # Put sunday first
-    my @dayAbbrs    = @{$dt->locale->day_abbreviations}[6,0..5];
+    my @dayNames    = @{$dt->locale->day_format_wide}[6,0..5]; # Put sunday first
+    my @dayAbbrs    = @{$dt->locale->day_format_abbreviated}[6,0..5];
     # Take from FirstDOW to the end and put it on the beginning
     unshift @dayNames,splice(@dayNames,$first_dow);
     unshift @dayAbbrs,splice(@dayAbbrs,$first_dow);
@@ -1884,7 +1886,7 @@ sub www_ical {
             );
     }
     else {
-        $dt_start = WebGUI::DateTime->new($self->session, time);
+        $dt_start = WebGUI::DateTime->new($session, time);
         $dt_start->set_time_zone( $session->datetime->getTimeZone );
     }
 
@@ -1892,7 +1894,7 @@ sub www_ical {
     my $end         = $form->param("end");
     if ($end) {
         $dt_end 
-            = WebGUI::DateTime->new($self->session, 
+            = WebGUI::DateTime->new($session, 
                 mysql       => $end, 
                 time_zone   => $session->datetime->getTimeZone,
             );
@@ -1900,8 +1902,6 @@ sub www_ical {
     else {
         $dt_end = $dt_start->clone->add( seconds => $self->icalInterval );
     }
-
-
 
     # Get all the events we're going to display
     my @events    = $self->getEventsIn($dt_start->toMysql,$dt_end->toMysql);
@@ -2103,6 +2103,7 @@ sub www_search {
     $var->{"form.header"}    
         = WebGUI::Form::formHeader($session, {
             action      => $self->getUrl,
+            method      => 'GET',
         })
         . WebGUI::Form::hidden($self->session, {
             name        => "func",

@@ -94,12 +94,12 @@ Extends the base method to add custom template variables for the Newsletter.
 
 =cut
 
-sub getViewTemplateVars {
+override getViewTemplateVars => sub {
     my $self = shift;
-    my $var = $self->SUPER::getViewTemplateVars;
+    my $var = super();
     $var->{mySubscriptionsUrl} = $self->getUrl("func=mySubscriptions");
     return $var;
-}
+};
 
 
 
@@ -111,11 +111,11 @@ Extend the base method to handle deleting information from the Newsletter_subscr
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write("delete from Newsletter_subscriptions where assetId=?", [$self->getId]);
-    $self->SUPER::purge(@_);
-}
+    super();
+};
 
 
 #-------------------------------------------------------------------

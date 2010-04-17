@@ -11,12 +11,22 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../lib";
 use strict;
+use File::Basename ();
+use File::Spec;
+
+my $webguiRoot;
+BEGIN {
+    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
+    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
+}
+
 use Getopt::Long;
 use Pod::Usage;
+use WebGUI::Paths -inc;
 use WebGUI::Pluggable;
 use WebGUI::Session;
+use WebGUI::Paths;
 
 $|++;
 
@@ -44,10 +54,10 @@ pod2usage("$0: Must specify a configFile")
     if !$configFile;
 
 die "Config file '$configFile' does not exist!\n"
-    if !-f '../etc/' . $configFile;
+    if !-f WebGUI::Paths->configBase . '/' . $configFile;
 
 # Open the session
-my $session = WebGUI::Session->open( "..", $configFile );
+my $session = WebGUI::Session->open( $configFile );
 $session->user( { userId => 3 } );
 
 # Install or uninstall the asset

@@ -37,7 +37,7 @@ my $snippet = $root->addChild({
     menuTitle => 'snippetMenuTitle',
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'A snippet of text',
-});
+}, undef, time()-3);
 
 my $snippetAssetId      = $snippet->getId;
 my $snippetRevisionDate = $snippet->get("revisionDate");
@@ -70,9 +70,6 @@ my $folder1a2 = $folder1a->addChild({
 
 $versionTag->commit;
 
-sleep 2;
-
-note "duplicate";
 my $duplicatedSnippet = $snippet->duplicate;
 
 is($duplicatedSnippet->title,   'snippet',        'duplicated snippet has correct title');

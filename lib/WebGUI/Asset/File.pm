@@ -93,9 +93,9 @@ Override the default method in order to deal with attachments.
 
 =cut
 
-sub addRevision {
-    my $self        = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+override addRevision => sub {
+    my $self    = shift;
+    my $newSelf = super();
 
     if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
         my $newStorage = $self->getStorageClass->get($self->session, $self->storageId)->copy;
@@ -103,7 +103,7 @@ sub addRevision {
     }
 
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -119,8 +119,17 @@ A hash reference of optional parameters. None at this time.
 
 sub applyConstraints {
     my $self = shift;
-	$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
+    $self->setPrivileges;
     $self->setSize;
+}
+
+sub setPrivileges {
+    my $self = shift;
+    $self->getStorageLocation->setPrivileges(
+        $self->ownerUserId,
+        $self->groupIdView,
+        $self->groupIdEdit,
+    );
 }
 
 
@@ -132,13 +141,13 @@ Extend the master method to duplicate the storage location.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset = super();
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
 	return $newAsset;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -149,12 +158,12 @@ See WebGUI::AssetPackage::exportAssetData() for details.
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
 	my $self = shift;
-	my $data = $self->SUPER::exportAssetData;
+	my $data = super();
 	push(@{$data->{storage}}, $self->storageId) if ($self->storageId ne "");
 	return $data;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -201,9 +210,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self        = shift;
-    my $tabform     = $self->SUPER::getEditForm();
+    my $tabform     = super();
     my $i18n        = WebGUI::International->new($self->session, 'Asset_File');
 
     $tabform->getTab("properties")->raw( 
@@ -213,7 +222,7 @@ sub getEditForm {
     );
 
     return $tabform;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -357,11 +366,12 @@ Indexing the content of the attachment. See WebGUI::Asset::indexContent() for ad
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->addFile($self->getStorageLocation->getPath($self->filename));
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -389,11 +399,11 @@ Extend the master method to handle file uploads and applying constraints.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
     my $session = $self->session;
 
-    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors  = super() || [];
     return $errors if @$errors;
 
     if (my $storageId = $session->form->get('newFile','File')) {
@@ -408,7 +418,7 @@ sub processPropertiesFromFormPost {
     }
 
     return undef;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -419,15 +429,15 @@ Extends the master method to delete all storage locations associated with this a
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	my $sth = $self->session->db->read("select storageId from FileAsset where assetId=".$self->session->db->quote($self->getId));
 	while (my ($storageId) = $sth->array) {
 		$self->getStorageClass->get($self->session,$storageId)->delete;
 	}
 	$sth->finish;
-	return $self->SUPER::purge;
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -437,11 +447,11 @@ Extends the master method to clear the view cache.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
 	eval{$self->session->cache->delete("view_".$self->getId)};
-	$self->SUPER::purgeCache;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -451,11 +461,11 @@ Extends the master method to delete the storage location for this asset.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
 	my $self = shift;
 	$self->getStorageLocation->delete;
-	return $self->SUPER::purgeRevision;
-}
+	return super();
+};
 
 #----------------------------------------------------------------------------
 
@@ -499,7 +509,8 @@ the asset size.
 
 =cut
 
-sub setSize {
+around setSize => sub {
+    my $orig        = shift;
     my $self        = shift;
     my $fileSize    = shift || 0;
     my $storage     = $self->getStorageLocation;
@@ -508,8 +519,8 @@ sub setSize {
             $fileSize += $storage->getFileSize($file);
         }
     }
-    return $self->SUPER::setSize($fileSize);
-}
+    return $self->$orig($fileSize);
+};
 
 #-------------------------------------------------------------------
 
@@ -573,7 +584,7 @@ Generate the view method for the Asset, and handle caching.
 sub view {
 	my $self = shift;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = eval{$self->session->cache->get("view_".$self->getId)};
+		my $out = eval{$self->session->cache->get($self->getViewCacheKey)};
 		return $out if $out;
 	}
 	my %var = %{$self->get};
@@ -583,7 +594,7 @@ sub view {
 	$var{fileSize} = formatBytes($self->get("assetSize"));
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		eval{$self->session->cache->set("view_".$self->getId, $out, $self->get("cacheTimeout"))};
+		eval{$self->session->cache->set($self->getViewCacheKey, $out, $self->get("cacheTimeout"))};
 	}
     return $out;
 }

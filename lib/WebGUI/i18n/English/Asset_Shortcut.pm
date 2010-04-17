@@ -106,9 +106,9 @@ Most Recent will select the most recent asset that matches the shortcut criteria
         },
 
         'Criteria description' => {
-                message => q|A statement to determine what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br />
-A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.|,
-                lastUpdated => 1167190118,
+                message => q|A statement to determine what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". A property or value must be quoted if it contains spaces.<br />
+The statement may be entered by hand, or it can be built graphically using the Criteria builder.  For each criteria that you want to enter, select the value for the metadata field and the operator.  Then, use the conjunction field to choose how it works with the other criteria, and hit the Add button for the field you want to add.|,
+                lastUpdated => 1270581368,
         },
 
 

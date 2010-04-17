@@ -1057,6 +1057,31 @@ our $I18N = {
 		lastUpdated => 1150169038,
 	},
 
+	'transferkarma.label' => {
+		message => q|The phrase "Transfer Karma".|,
+		lastUpdated => 1150169038,
+	},
+
+	'karmascale.label' => {
+		message => q|The phrase "Karma Scale".|,
+		lastUpdated => 1150169038,
+	},
+
+	'karmaRank.label' => {
+		message => q|The phrase "Karma Rank".|,
+		lastUpdated => 1150169038,
+	},
+
+	'captcha_label' => {
+		message => q|The word "Captcha".|,
+		lastUpdated => 1150169038,
+	},
+
+	'keywords.label' => {
+		message => q|The word "Keywords".|,
+		lastUpdated => 1150169038,
+	},
+
         'display last reply description' => {
                 message => q|If set to Yes, template variables will be added to allow the display of the last reply in this Thread.|,
                 lastUpdated => 1165449294,
@@ -1293,9 +1318,19 @@ the preview is displayed, the Post can either be edited or canceled.|,
 		lastUpdated => 1149655722,
 	},
 
-	'user.isVisitor' => {
+	'post_loop_user.isVisitor' => {
 		message => q|A conditional that is true if the poster is a visitor.|,
 		lastUpdated => 1149655722,
+	},
+
+	'user.isVisitor' => {
+		message => q|A conditional that is true if the current user is a visitor.|,
+		lastUpdated => 1149655722,
+	},
+
+	'hideProfileUrl' => {
+		message => q|A conditional that is true if the poster is a visitor, or the current user is a visitor.  In the first case, Visitor's profile is not visible to any user.  In the second case, Visitor is not allowed to view any user's profile|,
+		lastUpdated => 1254506340,
 	},
 
 	'edit.url' => {
@@ -1359,6 +1394,11 @@ user has an avatar.|,
 		lastUpdated => 1149655722,
 	},
 
+	'lastReply.hideProfileUrl' => {
+		message => q|A conditional that is true if the poster of the last reply is a visitor, or the current user is a visitor.  In the first case, Visitor's profile is not visible to any user.  In the second case, Visitor is not allowed to view any user's profile|,
+		lastUpdated => 1254506340,
+	},
+
 	'lastReply.username' => {
 		message => q|The name of user who submitted the last reply.|,
 		lastUpdated => 1149655722,
@@ -1387,6 +1427,12 @@ user has an avatar.|,
 	'user.canPost' => {
 		message => q|A conditional that is true if the current user can add posts to this Collaboration Asset.|,
 		lastUpdated => 1149655833,
+	},
+
+	'user.canStartThread' => {
+		message => q|A conditional that is true if the current user can add Threads to this Collaboration Asset.|,
+		lastUpdated => 1149655833,
+        context => q|Template variable help|,
 	},
 
 	'displayLastReply' => {
@@ -1495,8 +1541,18 @@ the Collaboration Asset, the user will be notified.|,
 		lastUpdated => 1149655909,
 	},
 
+	'form.footer' => {
+		message => q|HTML required to end the search form.|,
+		lastUpdated => 1149655909,
+	},
+
 	'back.url' => {
 		message => q|A URL for returning to the main view for this Collaboration Asset.|,
+		lastUpdated => 1149655909,
+	},
+
+	'doit' => {
+		message => q|A boolean that is true if a search has just been submitted|,
 		lastUpdated => 1149655909,
 	},
 
@@ -1520,112 +1576,6 @@ the Collaboration Asset, the user will be notified.|,
 		lastUpdated => 1180759724,
 	},
 
-	'collaboration rss template title' => {
-		message => q|Collaboration RSS Template Variables|,
-		lastUpdated => 1184905545,
-	},
-
-	'feed title' => {
-		message => q|The title of the rss feed (comes from the collaboration title).|,
-		lastUpdated => 1149656056,
-	},
-
-	'collab link' => {
-		message => q|The url to the collaboration.|,
-		lastUpdated => 1149656056,
-	},
-
-	'feed description' => {
-		message => q|The description of the rss feed (comes from the collaboration synopsis).|,
-		lastUpdated => 1216913516,
-	},
-
-	'generator' => {
-		message => q|The program used to generate the rss feed, i.e. WebGUI plus version information. (optional field)|,
-		lastUpdated => 1149656056,
-	},
-
-	'webMaster' => {
-		message => q|The email address of the person responsible for the technical issues relating to this rss feed. (optional field)|,
-		lastUpdated => 1149656056,
-	},
-
-	'docs' => {
-		message => q|The url of documentation about the format of this file, RSS 2.0 (optional field)|,
-		lastUpdated => 1149656056,
-	},
-
-	'lastBuildDate' => {
-		message => q|The date that this feed was last updated. (optional field)|,
-		lastUpdated => 1149656056,
-	},
-
-	'item_loop' => {
-		message => q|Loops over the posts to be transmitted in this RSS feed.|,
-		lastUpdated => 1149656056,
-	},
-
-	'author' => {
-		message => q|The username of the person who submitted the post.|,
-		lastUpdated => 1149656056,
-	},
-
-	'post title' => {
-		message => q|The title of the item (post).|,
-		lastUpdated => 1149656056,
-	},
-
-	'full text link' => {
-		message => q|The url to the full text of the item.|,
-		lastUpdated => 1149656056,
-	},
-
-	'item description' => {
-		message => q|A synopsis of the item.|,
-		lastUpdated => 1149656056,
-	},
-
-	'guid' => {
-		message => q|A unique identifier for this item.|,
-		lastUpdated => 1149656056,
-	},
-
-	'pubDate' => {
-		message => q|The date the item was published.|,
-		lastUpdated => 1149656056,
-	},
-
-	'epochDate' => {
-		message => q|The date the item was published as an epoch date so that the Date macro can be used for custom date formatting.|,
-		lastUpdated => 1222106027,
-	},
-
-	'attachmentLoop' => {
-		message => q|A loop containg all attachements to this item (post).|,
-		lastUpdated => 1149656056,
-	},
-
-	'attachment_thumbnail' => {
-		message => q|The URL to the thumbnail for this attachment.  Files will be represented by an
-		icon depending on their type.  Images will have a true thumbnail.|,
-		lastUpdated => 1169747804,
-	},
-
-	'attachment.url' => {
-		message => q|The URL to this attachment.|,
-		lastUpdated => 1149656056,
-	},
-
-	'attachment.path' => {
-		message => q|The path in the filesystem to this attachment.|,
-		lastUpdated => 1149656056,
-	},
-
-	'attachment.length' => {
-		message => q|The length in this attachment, in bytes.|,
-		lastUpdated => 1149656056,
-	},
-
 	'collaborationAssetId' => {
 		message => q|The assetId of this Collaboration System.  Unlike the variable assetId, this one will not be overridden by the assetIds inside of Threads or Posts.|,
 		lastUpdated => 1170543345,
@@ -1646,8 +1596,8 @@ the Collaboration Asset, the user will be notified.|,
         lastUpdated => 1206733328,
     },
     'group to edit hoverhelp' => {
-        message => q|Group to Edit Posts|,
-        lastUpdated => 1206733328,
+        message => q|A group that is allowed to edit posts after they have been submitted.|,
+        lastUpdated => 1269283819,
     },
     
     'use captcha label' => {
@@ -1719,6 +1669,18 @@ the Collaboration Asset, the user will be notified.|,
         message => q|has posted to one of your subscriptions|,
         context => q|i18n label for the notification template.  "user" has posted..|,
         lastUpdated => 1229910435,
+    },
+
+    'unarchive all' => {
+        message     => q{Unarchive All Threads},
+        context     => q{Label for link to unarchive all threads},
+        lastUpdated => 0,
+    },
+
+    'unarchive confirm' => {
+        message     => q{Are you sure? Any threads past the 'Archive After' interval will be re-archived.},
+        context     => q{Text for pop-up dialog to confirm unarchive all threads},
+        lastUpdated => 0,
     },
 
 };

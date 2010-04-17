@@ -341,15 +341,15 @@ Returns output parsed under the current style.  See also Asset::processStyle.
 
 =cut
 
-sub processStyle {
+override processStyle => sub {
 	my ($self, $output, $options) = @_;
-    $output   = $self->SUPER::processStyle($output, $options);
+    $output   = super();
     my $style = $self->session->style;
     if ($style->useMobileStyle) {
         return $style->process($output,$self->get("mobileStyleTemplateId"));
     }
     return $style->process($output,$self->get("styleTemplateId"));
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -508,12 +508,6 @@ sub www_view {
 	$self->session->http->setLastModified($self->getContentLastModified);
 	$self->session->http->sendHeader;
     ##Have to dupe this code here because Wobject does not call SUPER.
-    if ($self->get('synopsis')) {
-        $self->session->style->setMeta({
-                name    => 'Description',
-                content => $self->get('synopsis'),
-        });
-    }
 	$self->prepareView;
 	my $style = $self->processStyle($self->getSeparator, { noHeadTags => 1 });
 	my ($head, $foot) = split($self->getSeparator,$style);

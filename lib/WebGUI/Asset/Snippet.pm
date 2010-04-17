@@ -43,7 +43,6 @@ around snippet => sub {
         if ( $self->mimeType eq "text/html" ) {
             HTML::Packer::minify( \$packed, {
                 remove_comments     => 1,
-                remove_newlines     => 1,
                 do_javascript       => "shrink",
                 do_stylesheet       => "minify",
             } );
@@ -128,20 +127,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addRevision ( properties, ... )
-
-Force the packed snippet to be regenerated.
-
-=cut
-
-sub addRevision {
-    my ( $self, $properties, @args ) = @_;
-    delete $properties->{ snippetPacked };
-    return $self->SUPER::addRevision( $properties, @args );
-}
-
-#-------------------------------------------------------------------
-
 =head2 exportGetUrlAsPath ( index )
 
 Translates a URL into an appropriate path and filename for exporting.
@@ -180,17 +165,41 @@ sub exportGetUrlAsPath {
 
 #-------------------------------------------------------------------
 
+=head2 getCache ( $calledAsWebMethod )
+
+Overrides the base method to handle Snippet specific caching.
+
+=head3 $calledAsWebMethod
+
+If this is true, then change the cache key.
+
+=cut
+
+sub getCache {
+	my $self              = shift;
+	my $calledAsWebMethod = shift;
+    my $session           = $self->session;
+    my $cacheKey = "view_".$calledAsWebMethod.'_'.$self->getId;
+    if ($session->env->sslRequest) {
+        $cacheKey .= '_ssl';
+    }
+    my $cache = WebGUI::Cache->new($session, $cacheKey);
+    return $cache;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getToolbar ( )
 
 Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
 
 =cut
 
-sub getToolbar {
+override getToolbar => sub {
 	my $self = shift;
 	return undef if ($self->getToolbarState);
-	return '<p>'.$self->SUPER::getToolbar().'</p>';
-}
+	return '<p>'.super().'</p>';
+};
 
 #-------------------------------------------------------------------
 
@@ -200,12 +209,13 @@ Indexing the content of the snippet. See WebGUI::Asset::indexContent() for addit
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->addKeywords($self->snippet);
 	$indexer->setIsPublic(0);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -215,15 +225,17 @@ Extending purgeCache to handle caching of the rendered snippet
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
         $cache->delete("view__".$self->getId);
-	    $cache->delete("view_1_".$self->getId);	
+        $cache->delete("view_1_".$self->getId);
+        $cache->delete("view__".$self->getId . '_ssl');
+        $cache->delete("view_1_".$self->getId . '_ssl');
     };
-	$self->SUPER::purgeCache();
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -251,16 +263,17 @@ toolbar if in adminMode.
 =cut
 
 sub view {
-	my $self = shift;
+	my $self              = shift;
 	my $calledAsWebMethod = shift;
-    my $session = $self->session;
+    my $session    = $self->session;
     my $versionTag = WebGUI::VersionTag->getWorking($session, 1);
     my $noCache =
         $session->var->isAdminOn
         || $self->cacheTimeout <= 10
         || ($versionTag && $versionTag->getId eq $self->tagId);
+    my $cacheKey = $self->getWwwCacheKey('view', $calledAsWebMethod);
     unless ($noCache) {
-		my $out = eval{$session->cache->get("view_".$calledAsWebMethod."_".$self->getId)};
+        my $out = eval { $session->cache->get( $cacheKey )};
 		return $out if $out;
 	}
 	my $output = $self->usePacked
@@ -273,7 +286,7 @@ sub view {
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-		eval{$session->cache->set("view_".$calledAsWebMethod."_".$self->getId, $output, $self->cacheTimeout)};
+        eval { $session->cache->set( $cacheKey, $output, $self->cacheTimeout) };
 	}
     return $output;
 }

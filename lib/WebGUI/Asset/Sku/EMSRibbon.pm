@@ -18,22 +18,22 @@ use strict;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-define assetName           => ['ems ribbon', 'Asset_EMSRibbon'];
+define assetName           => ['ems ribbon', 'Asset_EventManagementSystem'];
 define icon                => 'EMSRibbon.gif';
 define tableName           => 'EMSRibbon';
 property price => (
             tab             => "shop",
             fieldType       => "float",
             default         => 0.00,
-            label           => ["price", 'Asset_EMSRibbon'],
-            hoverHelp       => ["price help", 'Asset_EMSRibbon'],
+            label           => ["price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["price help", 'Asset_EventManagementSystem'],
          );
 property percentageDiscount => (
             tab             => "shop",
             fieldType       => "float",
             default         => 10.0,
-            label           => ["percentage discount", 'Asset_EMSRibbon'],
-            hoverHelp       => ["percentage discount help", 'Asset_EMSRibbon'],
+            label           => ["percentage discount", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["percentage discount help", 'Asset_EventManagementSystem'],
          );
 
 use WebGUI::HTMLForm;
@@ -166,11 +166,11 @@ Deletes all entries in EMSRegistrationRibbon table for this sku. No refunds are 
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantRibbon where ribbonAssetId=?",[$self->getId]);
-	$self->SUPER::purge;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

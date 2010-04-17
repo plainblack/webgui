@@ -16,6 +16,7 @@ package WebGUI::Session::ErrorHandler;
 
 
 use strict;
+use WebGUI::Paths;
 use JSON;
 use HTML::Entities qw(encode_entities);
 use Log::Log4perl;
@@ -338,7 +339,8 @@ sub new {
         # Thanks to Plack, wG has been decoupled from Log4Perl
         # However when called outside a web context, we currently still fall back to Log4perl
         # (pending a better idea)
-        Log::Log4perl->init_once( $session->config->getWebguiRoot . "/etc/log.conf" );
+        require Log::Log4perl;
+        Log::Log4perl->init_once( WebGUI::Paths->logConfig );
         my $log4perl = Log::Log4perl->get_logger( $session->config->getFilename );
         $logger = sub {
             my $args  = shift;

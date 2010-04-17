@@ -16,12 +16,13 @@ use WebGUI::Test;
 use WebGUI::Session;
 use HTML::TokeParser;
 use Data::Dumper;
+use WebGUI::Macro::AdminToggle;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my ($versionTag, $template) = addTemplate();
+my $template = addTemplate();
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 $session->asset($homeAsset);
@@ -105,14 +106,7 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
-plan tests => $numTests + 2; ##conditional module load and TODO at end
-
-my $macro = 'WebGUI::Macro::AdminToggle';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+plan tests => $numTests + 1; ##conditional module load and TODO at end
 
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
@@ -136,8 +130,6 @@ foreach my $testSet (@testSets) {
 	}
 }
 
-}
-
 TODO: {
 	local $TODO = 'Tests to make later';
 	ok(0, 'Run tests with a user other than Admin');
@@ -159,7 +151,8 @@ sub addTemplate {
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
-	return ($versionTag, $template);
+    addToCleanup($versionTag);
+	return $template;
 }
 
 sub simpleHTMLParser {
@@ -180,10 +173,4 @@ sub simpleTextParser {
 	my ($label) = $text =~ /LABEL=(.+?)\Z/;
 
 	return ($url, $label);
-}
-
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
 }

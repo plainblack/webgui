@@ -180,6 +180,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+	'language help' => {
+		message => q|Select the default language for users on the site.|,
+		lastUpdated => 1258340387,
+	},
+
 	'559' => {
 		message => q|On Create User (User)|,
 		lastUpdated => 1185738895
@@ -3908,6 +3913,15 @@ LongTruncOk=1</p>
     },
 
 
+    'settings groupIdAdminClipboard label' => {
+        message     => q{Clipboard},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminClipboard hoverHelp' => {
+        message     => q{Group to manage the system clipboard.},
+        lastUpdated => 0,
+    },
+
 
     'settings groupIdAdminCron label' => {
         message     => q{Cron},
@@ -4052,6 +4066,15 @@ LongTruncOk=1</p>
     },
     'settings groupIdAdminStatistics hoverHelp' => {
         message     => q{Group to view statistics},
+        lastUpdated => 0,
+    },
+
+    'settings groupIdAdminTrash label' => {
+        message     => q{Trash},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminTrash hoverHelp' => {
+        message     => q{Group to manage the system trash.},
         lastUpdated => 0,
     },
 
@@ -4634,6 +4657,27 @@ Users may override this setting in their profile.
     'Comments' => {
         message => 'Comments',
         lastUpdated => 0,
+    },
+
+    'timezone help' => {
+        message => 'Set up the default time zone for the site.',
+        lastUpdated => 0,
+    },
+
+    'Maximum cache timeout' => {
+        message => 'Maximum cache timeout',
+        lastUpdated => 0,
+    },
+
+    'Maximum cache timeout description' => {
+        message => 'This timeout will override the content check that is done before generating a page.  It can help with caching problems for macros and Navigations.  Setting it to 0 will disable the timeout.  A setting of several hours is recommended.',
+        lastUpdated => 0,
+    },
+
+    'Loading...' => {
+        message => 'Loading...',
+        lastUpdated => 0,
+        context => 'Message shown to the user when data is being loaded, typically via AJAX, like in the Survey.'
     },
 
 };

@@ -25,7 +25,6 @@ use Test::More; # increment this value for each test you create
 my $numTests = 0;
 
 my $session = WebGUI::Test->session;
-my $lib = WebGUI::Test->lib;
 
 ##Find the name of the International macro in the user's config file.
 

@@ -619,6 +619,48 @@ sub newByGatewayId {
 
 #-------------------------------------------------------------------
 
+=head2 sendNotifications ( transaction )
+
+Sends out a receipt and a sale notification to the buyer and the store owner respectively.
+
+=cut
+
+sub sendNotifications {
+    my ($self)  = @_;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'PayDriver');
+    my $url     = $session->url;
+    my $var     = $self->getTransactionVars;
+
+    # render
+    my $template = WebGUI::Asset::Template->new( $session, $session->setting->get("shopReceiptEmailTemplateId") );
+    my $inbox    = WebGUI::Inbox->new($session);
+    my $receipt  = $template->process( $var );
+    WebGUI::Macro::process($session, \$receipt);
+
+    # purchase receipt
+    $inbox->addMessage( {
+        message     => $receipt,
+        subject     => $i18n->get('receipt subject') . ' ' . $self->get('orderNumber'),
+        userId      => $self->get('userId'),
+        status      => 'completed',
+    } );
+    
+    # shop owner notification
+    # Shop owner uses method=view rather than method=viewMy
+    $var->{viewDetailUrl} = $url->page( 'shop=transaction;method=view;transactionId='.$self->getId, 1 );
+    my $notification      = $template->process( $var );
+    WebGUI::Macro::process($session, \$notification);
+    $inbox->addMessage( {
+        message     => $notification,
+        subject     => $i18n->get('a sale has been made') . ' ' . $self->get('orderNumber'),
+        groupId     => $session->setting->get('shopSaleNotificationGroupId'),
+        status      => 'unread',
+    } );
+}
+
+#-------------------------------------------------------------------
+
 =head2 thankYou ()
 
 Displays the default thank you page.

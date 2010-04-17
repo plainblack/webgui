@@ -17,6 +17,7 @@ use WebGUI::Macro::Slash_gatewayUrl;
 use WebGUI::Session;
 use WebGUI::International;
 use WebGUI::DatabaseLink;
+use WebGUI::Macro::SQL;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -117,15 +118,11 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets;
-
-++$numTests; ##For the load check;
-++$numTests; ##For the allow macro access test;
-
+my $numTests = scalar @testSets
+             + 2
+             ;
+ 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::SQL';
-my $loaded = use_ok($macro);
 
 $WebGUIdbLink->set({allowMacroAccess=>0});
 
@@ -136,10 +133,6 @@ is($output, $i18n->get('database access not allowed'), 'Test allow access from m
 # set allowMacroAccess to 1 to allow other tests to run
 $WebGUIdbLink->set({allowMacroAccess=>1});
 
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
-
 foreach my $testSet (@testSets) {
     # we know some of these will fail.  Keep them quiet.
     local $SIG{__WARN__} = sub {};
@@ -148,11 +141,18 @@ foreach my $testSet (@testSets) {
 	is($output, $testSet->{output}, $testSet->{comment});
 }
 
-}
-
 # reset allowMacroAccess to original value
 $WebGUIdbLink->set({allowMacroAccess=>$originalMacroAccessValue});
 
+my $newLinkId = $WebGUIdbLink->copy;
+addToCleanup(WebGUI::DatabaseLink->new($session, $newLinkId));
+my $output = WebGUI::Macro::SQL::process(
+    $session,
+    q{show columns from testTable like 'zero'},
+    q{^0;},
+    $newLinkId,
+);
+is($output, 'zero', 'alternate linkId works');
 
 END {
 	$session->db->dbh->do('DROP TABLE testTable');

@@ -98,14 +98,14 @@ Checks to make sure there isn't already a coupon of this type in the cart.
 
 =cut
 
-sub addToCart {
-    my ($self, $options) = @_;
+override addToCart => sub {
+    my ($self) = @_;
 	my $found = $self->hasCoupon();
 	unless ($found) {
         $self->{_hasAddedToCart} = 1;
-		$self->SUPER::addToCart($options);
+		super();
 	}
-}
+};
 
 #-------------------------------------------------------------------
 

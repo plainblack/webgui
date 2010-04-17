@@ -85,7 +85,7 @@ C<options> is a hash reference of options and is currently not used.
 
 =cut
 
-sub applyConstraints {
+override applyConstraints => sub {
     my $self        = shift;
     my $options     = shift;
     my $gallery     = $self->getGallery;
@@ -108,8 +108,8 @@ sub applyConstraints {
     $self->generateThumbnail;
     $self->setSize;
     $self->updateExifDataFromFile;
-    $self->SUPER::applyConstraints( $options );
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -247,10 +247,10 @@ Get a hash reference of template variables shared by all views of this asset.
 
 =cut
 
-sub getTemplateVars {
+override getTemplateVars => sub {
     my $self        = shift;
     my $session     = $self->session;
-    my $var         = $self->SUPER::getTemplateVars;
+    my $var         = super();
 
     ### Download resolutions
     for my $resolution ( @{ $self->getResolutions } ) {
@@ -275,7 +275,7 @@ sub getTemplateVars {
     }
 
     return $var;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -338,10 +338,10 @@ Make the default title into the file name minus the extention.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
     my $form    = $self->session->form;
-    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors  = super() || [];
 
     # Return if errors
     return $errors if @$errors;
@@ -366,7 +366,7 @@ sub processPropertiesFromFormPost {
     }
 
     return undef;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -376,11 +376,11 @@ Extend the superclass setFile to automatically generate thumbnails.
 
 =cut
 
-sub setFile {
+override setFile => sub {
     my $self    = shift;
-    $self->SUPER::setFile(@_);
+    super();
     $self->generateThumbnail;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -456,10 +456,12 @@ This page is only available to those who can edit this Photo.
 sub www_edit {
     my $self    = shift;
     my $session = $self->session;
-    my $form    = $self->session->form;
+    my $form    = $session->form;
 
-    return $self->session->privilege->insufficient  unless $self->canEdit;
-    return $self->session->privilege->locked        unless $self->canEditIfLocked;
+    return $session->privilege->insufficient  unless $self->canEdit;
+    return $session->privilege->locked        unless $self->canEditIfLocked;
+
+    my $i18n = WebGUI::International->new($session, 'WebGUI');
 
     # Prepare the template variables
     # Cannot get all template vars since they require a storage location, doesn't work for
@@ -517,7 +519,7 @@ sub www_edit {
     $var->{ form_submit }
         = WebGUI::Form::submit( $session, {
             name        => "submit",
-            value       => "Save",
+            value       => $i18n->get('save'),
         });
 
     $var->{ form_title  }

@@ -120,16 +120,16 @@ Does some bookkeeping to keep track of limited quantities of tickets that are av
 
 =cut
 
-sub addToCart {
-	my ($self, $badgeInfo) = @_;
+around addToCart => sub {
+	my ($orig, $self, $badgeInfo) = @_;
 	my $db = $self->session->db;
 	my @params = ($badgeInfo->{badgeId},$self->getId);
 	# don't let them add a ticket they already have
 	unless ($db->quickScalar("select count(*) from EMSRegistrantTicket where badgeId=? and ticketAssetId=?",\@params)) {
 		$db->write("insert into EMSRegistrantTicket (badgeId, ticketAssetId) values (?,?)", \@params);
-		$self->SUPER::addToCart($badgeInfo);
+		$self->$orig($badgeInfo);
 	}
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -367,12 +367,13 @@ Adding location and eventNumber as a keyword. See WebGUI::Asset::indexContent() 
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
     $indexer->addKeywords($self->location.' '.$self->eventNumber);
 	return $indexer;
-}
+};
 
 
 
@@ -450,11 +451,11 @@ Deletes all ticket purchases of this type. No refunds are given.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantTicket where ticketAssetId=?",[$self->getId]);
-	$self->SUPER::purge;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

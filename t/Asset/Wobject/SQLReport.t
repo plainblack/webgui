@@ -22,6 +22,7 @@ use Data::Dumper;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Asset::Wobject::SQLReport;
 
 ################################################################
 #
@@ -31,34 +32,23 @@ use WebGUI::Session;
 
 my $session         = WebGUI::Test->session;
 
-my $tests = 4
-          ;
-plan tests => 1
-            + $tests;
+plan tests => 4;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $class  = 'WebGUI::Asset::Wobject::SQLReport';
-my $loaded = use_ok($class);
-
-SKIP: {
-
-skip "Unable to load module $class", $tests unless $loaded;
-
-
 my $defaultNode = WebGUI::Asset->getDefault($session);
 
 my $report = $defaultNode->addChild({
-    className     => $class,
+    className     => 'WebGUI::Asset::Wobject::SQLReport',
     title         => 'test report',
     cacheTimeout  => 50,
     dqQuery1      => 'select * from users',
 });
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
 $versionTag->commit;
+addToCleanup($versionTag);
 
 isa_ok($report, 'WebGUI::Asset::Wobject::SQLReport');
 
@@ -67,5 +57,3 @@ ok(abs($report->getContentLastModified - (time - 50)) < 2, 'getContentLastModifi
 
 $report->update({cacheTimeout => 250});
 ok(abs($report->getContentLastModified - (time - 250)) < 2, '... tracks cacheTimeout');
-
-}

@@ -42,7 +42,27 @@ my $album
     {
         skipAutoCommitWorkflows => 1,
     });
+my $previousPhoto
+    = $album->addChild({
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
+        ownerUserId         => 3,
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
+    });
 my $photo
+    = $album->addChild({
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
+        ownerUserId         => 3,
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
+    });
+my $nextPhoto
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         ownerUserId         => 3,
@@ -87,7 +107,23 @@ my $testTemplateVars    = {
     numberOfComments    => scalar @{ $photo->getCommentIds },
     exifLoop            => ignore(), # Tested elsewhere
     isPending           => ( $photo->get("status") eq "pending" ),
-
+    firstFile_url       => $previousPhoto->getUrl,
+    firstFile_thumbnailUrl 
+        => $previousPhoto->getThumbnailUrl,
+    firstFile_title     => $previousPhoto->get("title"),
+    previousFile_url    => $previousPhoto->getUrl,
+    previousFile_thumbnailUrl 
+        => $previousPhoto->getThumbnailUrl,    
+    previousFile_title  => $previousPhoto->get("title"),
+    nextFile_url        => $nextPhoto->getUrl,
+    nextFile_thumbnailUrl 
+        => $nextPhoto->getThumbnailUrl,    
+    nextFile_title      => $nextPhoto->get("title"),
+    firstFile_title     => $previousPhoto->get("title"),
+    lastFile_url        => $nextPhoto->getUrl,
+    lastFile_thumbnailUrl 
+        => $nextPhoto->getThumbnailUrl,    
+    lastFile_title      => $nextPhoto->get("title"),
 };
 
 # Ignore all EXIF tags, they're tested in exif.t

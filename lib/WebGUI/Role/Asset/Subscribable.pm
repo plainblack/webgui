@@ -15,7 +15,6 @@ package WebGUI::Role::Asset::Subscribable;
 =cut
 
 
-use WebGUI::International;
 use Moose::Role;
 use WebGUI::Definition::Asset;
 define tableName               => "assetAspect_Subscribable";
@@ -33,16 +32,14 @@ property subscriptionTemplateId => (
             namespace       => \&_subscriptionTemplateId_namespace,
             label           => ["Email Template", 'Role_Subscribable'],
             hoverHelp       => ["Email Template help", 'Role_Subscribable'],
+            default         => 'limMkk80fMB3fqNZVf162w',
          );
 sub _subscriptionTemplateId_namespace {
     my $self = shift;
     return $self->getSubscriptionTemplateNamespace($self->session);
 }
-property skipNotification => (
-            autoGenerate    => 0,
-            noFormPost      => 1,
-            fieldType       => 'yesNo',
-         );
+
+use WebGUI::Mail::Send;
 
 =head1 NAME
 
@@ -430,31 +427,9 @@ override purge => sub {
     my $options = shift;
 
     my $group   = $self->getSubscriptionGroup();
-    $group->delete;
-    super();
+    $group->delete if $group;
 
-    return;
-};
-
-#----------------------------------------------------------------------------
-
-=head2 setSkipNotification ( )
-
-Set a flag so that this asset does not send out notifications for this 
-revision.
-
-=cut
-
-override setSkipNotification => sub {
-    my $self    = shift;
-    my $value   = shift;
-    $value      = defined $value ? $value : 1;
-
-    $self->update( {
-        skipNotification        => $value,
-    } );
-
-    return;
+    return super();
 };
 
 #----------------------------------------------------------------------------

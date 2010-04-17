@@ -294,49 +294,51 @@ inserts the ad into the adspace...
 =cut
 
 sub onCompletePurchase {
-    my $self = shift;
-    my $item = shift;
+    my $self    = shift;
+    my $session = $self->session;
+    my $item    = shift;
     my $options = $self->getOptions;
     my $ad;
 
 # LATER: if we use Temp Storage for the image we need to move it to perm storage
 
+    my $userId = $item->transaction->get('userId');
     if( $options->{adId} ne '' ) {
-        $ad = WebGUI::AdSpace::Ad->new($self->session,$options->{adId});
-        my $clicks = $options->{clicks} + $ad->get('clicksBought');
+        $ad = WebGUI::AdSpace::Ad->new($session, $options->{adId});
+        my $clicks      = $options->{clicks}      + $ad->get('clicksBought');
         my $impressions = $options->{impressions} + $ad->get('impressionsBought');
         $ad->set({
-            title =>  $options->{'adtitle'},
-            clicksBought => $clicks,
-            impressionsBought => $impressions,
-            url =>   $options->{'link'},
-            storageId =>  $options->{'image'},
+            title               => $options->{'adtitle'},
+            clicksBought        => $clicks,
+            impressionsBought   => $impressions,
+            url                 => $options->{'link'},
+            storageId           => $options->{'image'},
         });
     }
     else {
-        $ad = WebGUI::AdSpace::Ad->create($self->session,$self->adSpace,{
-            title =>  $options->{'adtitle'},
-            clicksBought => $options->{'clicks'},
-            impressionsBought => $options->{'impressions'},
-            url =>   $options->{'link'},
-            storageId =>  $options->{'image'},
-            ownerUserId =>  $self->session->user->userId,
-            isActive => 1,
-            type =>  'image',
-            priority => $self->priority,
-            adSpace => $self->adSpace,
+        $ad = WebGUI::AdSpace::Ad->create($session, $self->adSpace, {
+            title               => $options->{'adtitle'},
+            clicksBought        => $options->{'clicks'},
+            impressionsBought   => $options->{'impressions'},
+            url                 => $options->{'link'},
+            storageId           => $options->{'image'},
+            ownerUserId         => $userId,
+            isActive            => 1,
+            type                => 'image',
+            priority            => $self->priority,
+            adSpace             => $self->adSpace,
         });
     }
 
-    WebGUI::AssetCollateral::Sku::Ad::Ad->create($self->session,{
-        userId => $item->transaction->get('userId'),
-        transactionItemId => $item->getId,
-        adId => $ad->getId,
-        clicksPurchased => $options->{'clicks'},
-        impressionsPurchased => $options->{'impressions'},
-        dateOfPurchase => $item->transaction->get('dateOfPurchase'),
-        storedImage =>  $options->{'image'},
-        isDeleted => 0,
+    WebGUI::AssetCollateral::Sku::Ad::Ad->create($session, {
+        userId                 => $userId,
+        transactionItemId      => $item->getId,
+        adId                   => $ad->getId,
+        clicksPurchased        => $options->{'clicks'},
+        impressionsPurchased   => $options->{'impressions'},
+        dateOfPurchase         => $item->transaction->get('dateOfPurchase'),
+        storedImage            => $options->{'image'},
+        isDeleted              => 0,
     });
 }
 
@@ -407,37 +409,21 @@ sub  parseDiscountText {
 
 #-------------------------------------------------------------------
 
-=head2 prepareManage
-
-Prepares the template.
-
-=cut
-
-sub prepareManage {
-    my $self = shift;
-    $self->SUPER::prepareView();
-    my $templateId = $self->manageTemplate;
-    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
-    $template->prepare($self->getMetaDataAsTemplateVariables);
-    $self->{_viewTemplate} = $template;
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView
 
-Prepares the template.
+Prepares the template for both www_view and www_manage
 
 =cut
 
-sub prepareView {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $templateId = $self->purchaseTemplate;
+    $self->$orig();
+    my $templateId = shift || $self->purchaseTemplate;
     my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -602,7 +588,7 @@ sub www_manage {
     return $check if (defined $check);
     $self->session->http->setLastModified($self->getContentLastModified);
     $self->session->http->sendHeader;
-    $self->prepareManage;
+    $self->prepareView($self->manageTemplate);
     my $style = $self->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head, 1);

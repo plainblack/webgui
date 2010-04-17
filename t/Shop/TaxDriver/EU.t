@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
+use Test::MockObject::Extends;
 use Exception::Class;
 use Data::Dumper;
 
@@ -31,22 +32,62 @@ use WebGUI::Shop::AddressBook;
 # Init
 my $session         = WebGUI::Test->session;
 
+# Test user
 my $taxUser     = WebGUI::User->new( $session, 'new' );
 $taxUser->username( 'Tex Evasion' );
 WebGUI::Test->usersToDelete($taxUser);
 
+# Test VAT numbers
+my $testVAT_NL  = 'NL123456789B12';
+my $testVAT_BE  = 'BE0123456789';
+my $noServiceVAT= 'NotGonnaWork';
+my $invalidVAT  = 'ByNoMeansAllowed';
+my $visitorUser = WebGUI::User->new( $session, 1 );
+
+my @EU_COUNTRIES = ( 
+    'Austria', 'Belgium', 'Bulgaria', 'Cyprus', 'Czech Republic',
+    'Germany', 'Denmark', 'Estonia', 'Greece', 'Spain', 'Finland',
+    'France', 'United Kingdom', 'Hungary', 'Ireland', 'Italy',
+    'Lithuania', 'Luxembourg', 'Latvia', 'Malta', 'Netherlands',
+    'Poland', 'Portugal', 'Romania', 'Sweden', 'Slovenia', 'Slovakia',
+);
+
+# Test SKU
 my $sku  = WebGUI::Asset->getRoot($session)->addChild( {
     className => 'WebGUI::Asset::Sku::Donation',
     title     => 'Taxable donation',
     defaultPrice => 100.00,
 } );
 
+my $book = WebGUI::Shop::AddressBook->create($session);
+
+# setup address in EU but not in residential country of merchant
+my $beAddress = $book->addAddress({
+    label => 'BE',
+    city  => 'Antwerpen',
+    country => 'Belgium',
+});
+
+# setup address in residential country of merchant 
+my $nlAddress = $book->addAddress({
+    label => 'NL',
+    city  => 'Delft',
+    country => 'Netherlands',
+});
+
+# setup address outside EU
+my $usAddress = $book->addAddress({
+    label => 'outside eu',
+    city => 'New Amsterdam',
+    country => 'US',
+});
+
 my $cart;
 
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 55;
+my $tests = 342;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -58,12 +99,12 @@ SKIP: {
 
     skip 'Unable to load module WebGUI::Shop::TaxDriver::EU', $tests unless $loaded;
 
-    #######################################################################
-    #
-    # new
-    #
-    #######################################################################
-
+#######################################################################
+#
+# new
+#
+#######################################################################
+{
     my $taxer = WebGUI::Shop::TaxDriver::EU->new($session);
 
     isa_ok($taxer, 'WebGUI::Shop::TaxDriver::EU');
@@ -71,83 +112,169 @@ SKIP: {
     isa_ok($taxer->session, 'WebGUI::Session', 'session method returns a session object');
 
     is($session->getId, $taxer->session->getId, 'session method returns OUR session object');
+}
 
-    #######################################################################
-    #
-    # className
-    #
-    #######################################################################
-
+#######################################################################
+#
+# className
+#
+#######################################################################
+{
+    my $taxer = WebGUI::Shop::TaxDriver::EU->new($session);
+    
     is( $taxer->className, 'WebGUI::Shop::TaxDriver::EU', 'className returns correct class name' );
+}
 
-    #######################################################################
-    #
-    # getConfigurationScreen
-    #
-    #######################################################################
+#######################################################################
+#
+# getConfigurationScreen
+#
+#######################################################################
 
-    #### TODO: Figure out how to test this.
+#### TODO: Figure out how to test this.
 
-    #######################################################################
-    #
-    # getCountryCode
-    #
-    #######################################################################
-
+#######################################################################
+#
+# getCountryCode / getCOuntryName
+#
+#######################################################################
+{
+    my $taxer = WebGUI::Shop::TaxDriver::EU->new($session);
+    
     is( $taxer->getCountryCode( 'Netherlands' ), 'NL', 'getCountryCode returns correct code for country inside EU.' );
     is( $taxer->getCountryCode( 'United States' ), undef, 'getCountryCode returns undef for countries outside EU.' );
 
-    #######################################################################
-    #
-    # getCountryName
-    #
-    #######################################################################
-
     is( $taxer->getCountryName( 'NL' ), 'Netherlands', 'getCountryName returns correct name for country code within EU.' );
     is( $taxer->getCountryName( 'US' ), undef, 'getCountryName returns undef for county codes outside EU.' );
+}
 
-    #######################################################################
-    #
-    # addVATNumber
-    #
-    #######################################################################
+#######################################################################
+#
+# updateVATNumber
+#
+#######################################################################
+{
+    my $taxer = WebGUI::Shop::TaxDriver::EU->new($session);
 
     $session->user( {userId=>$taxUser->userId} );
 
-    my $testVAT_NL  = 'NL123456789B12';
-    my $testVAT_BE  = 'BE0123456789';
-    my $invalidVAT  = 'ByNoMeansAllowed';
-    my $visitorUser = WebGUI::User->new( $session, 1 );
+    # Mock the Validation module
+    my $validator = Test::MockObject::Extends->new( Business::Tax::VAT::Validation->new );
+    local *Business::Tax::VAT::Validation::new;
+    $validator->fake_new( 'Business::Tax::VAT::Validation' );
 
-    eval { $taxer->addVATNumber };
+    eval { $taxer->updateVATNumber };
     my $e = Exception::Class->caught();
     isa_ok( $e, 'WebGUI::Error::InvalidParam', 'A VAT number is required' );
-    is( $e, 'A VAT number is required', 'addVATNumber returns correct message for missing VAT number' );
+    is( $e, 'A VAT number is required', 'updateVATNumber returns correct message for missing VAT number' );
 
-    eval { $taxer->addVATNumber( $testVAT_NL, 'NotAUserObject' ) };
+    eval { $taxer->updateVATNumber( $testVAT_NL, 'NotAUserObject' ) };
     $e = Exception::Class->caught();
     isa_ok( $e, 'WebGUI::Error::InvalidParam', 'Second argument must be a user object' );
-    is( $e, 'The second argument must be an instanciated WebGUI::User object', 'addVATNumber returns correct message when user object is of wrong type' );
+    is( $e, 'The second argument must be an instanciated WebGUI::User object', 'updateVATNumber returns correct message when user object is of wrong type' );
 
-    eval { $taxer->addVATNumber( $testVAT_NL, $visitorUser ) };
+    eval { $taxer->updateVATNumber( $testVAT_NL, $visitorUser ) };
     $e = Exception::Class->caught();
     isa_ok( $e, 'WebGUI::Error::InvalidParam', 'User may not be visitor' );
-    is( $e, 'Visitor cannot add VAT numbers', 'addVATNumber returns correct message when user is visitor' );
+    is( $e, 'Visitor cannot add VAT numbers', 'updateVATNumber returns correct message when user is visitor' );
 
-    my $response = $taxer->addVATNumber( $invalidVAT, $taxUser, 1 ); 
-    is( $response, 'The entered VAT number is invalid.', 'Invalid VAT numbers return an error message' );
+    for my $errorCode ( 0 .. 16 ) {
+        $validator->set_always( 'check', 0 );
+        $validator->set_always( 'get_last_error_code', $errorCode );
 
-    my $responseNL = $taxer->addVATNumber( $testVAT_NL, $taxUser, 1 );
-    my $responseBE = $taxer->addVATNumber( $testVAT_BE, $taxUser, 1 );
+        is( 
+            $taxer->updateVATNumber( $invalidVAT, $taxUser ), 
+            'INVALID', 
+            "updateVATNumber returns INVALID for error $errorCode",
+        );
+    }
 
-    ok( !defined $responseNL && !defined $responseBE, 'Valid VAT numbers return undef.' );
+    for my $errorCode ( 17 .. 255 ) {
+        $validator->set_always( 'check', 0 );
+        $validator->set_always( 'get_last_error_code', $errorCode );
 
-    #######################################################################
-    #
-    # getVATNumbers
-    #
-    #######################################################################
+        is( 
+            $taxer->updateVATNumber( $invalidVAT, $taxUser ), 
+            'UNKNOWN', 
+            "updateVATNumber returns UNKNOWN for error $errorCode",
+        );
+    }
+        
+    $validator->set_always( 'check', 1 );
+    $validator->set_always( 'get_last_error_code', undef );
+    is(
+        $taxer->updateVATNumber( $testVAT_NL, $taxUser ),
+        'VALID',
+        "updateVATNumber returns VALID for valid numbers",
+    );
+}
 
+#######################################################################
+#
+# addVATNumber
+#
+#######################################################################
+{
+    my $taxer = WebGUI::Shop::TaxDriver::EU->new($session);
+    
+    my $response;
+    local *WebGUI::Shop::TaxDriver::EU::updateVATNumber = sub { return $response };
+
+    #----- invalid vat number
+    $response = 'INVALID';
+    is( 
+        $taxer->addVATNumber( $invalidVAT, $taxUser ),
+        'The entered VAT number is invalid.',
+        'addVATNumber returns the correct error message for invalid numbers',
+    );
+
+    #----- service unavailable 
+    $response = 'UNKNOWN';
+    like( 
+        $taxer->addVATNumber( $noServiceVAT, $taxUser ),
+        qr{^Number validation is currently not available.},
+        'addVATNumber returns the correct message when VIES is unavailable',
+    );
+
+    my $workflows = WebGUI::Workflow::Instance->getAllInstances( $session );
+    my ($workflow) = grep { $_->get('parameters')->{ vatNumber } eq $noServiceVAT } @{ $workflows };
+    ok( defined $workflow , 'addVATNumber fires a recheck workflow when VIES is down' );
+
+    #----- valid number
+    $response = 'VALID';
+    ok(
+        !defined $taxer->addVATNumber( $testVAT_NL, $taxUser ),
+        'Valid VAT numbers return undef.',
+    );
+}
+
+#######################################################################
+#
+# recheckVATNumber
+#
+#######################################################################
+{
+    my $taxer = WebGUI::Shop::TaxDriver::EU->new($session);
+
+    for my $response ( qw{ INVALID VALID UNKNOWN } ) {
+        local *WebGUI::Shop::TaxDriver::EU::updateVATNumber = sub { return $response };
+
+        is(
+            $taxer->recheckVATNumber( $invalidVAT, $taxUser ),
+            $response,
+            "recheckVATNumber returns correct value when updateVATNumber returns $response",
+        );
+    }
+}
+
+#######################################################################
+#
+# getVATNumbers / deleteVATNumber
+#
+#######################################################################
+{
+    my $taxer = setupTestNumbers();
+    
     my $expectNL = {
         userId           => $taxUser->userId,
         countryCode      => 'NL',
@@ -171,25 +298,23 @@ SKIP: {
     $vatNumbers = $taxer->getVATNumbers( 'BE', $taxUser );
     cmp_bag( $vatNumbers, [ $expectBE ], 'getVATNumbers filters on country code when one is passed' );
 
-    #######################################################################
-    #
-    # deleteVATNumber
-    #
-    #######################################################################
-
     $taxer->deleteVATNumber( $testVAT_BE, $taxUser );
     $vatNumbers = $taxer->getVATNumbers( undef, $taxUser );
     cmp_bag( $vatNumbers, [ $expectNL ], 'deleteVATNumber deletes number' );
     
     $taxer->deleteVATNumber( $testVAT_NL, $taxUser );    
-    #######################################################################
-    #
-    # addGroupRate
-    #
-    #######################################################################
+}
+
+#######################################################################
+#
+# addGroup / getGroupRate / deleteGroup
+#
+#######################################################################
+{    
+    my $taxer = setupTestNumbers();
 
     eval { $taxer->addGroup };
-    $e = Exception::Class->caught();
+    my $e = Exception::Class->caught();
     isa_ok( $e, 'WebGUI::Error::InvalidParam', 'addGroup requires a group name' );
     is( $e, 'A group name is required', 'addGroup returns correct message for omitted group name' );
 
@@ -240,51 +365,54 @@ SKIP: {
     ];
     cmp_bag( $taxGroups, $expectGroups, 'addGroup saves correctly' );
 
-
-    #######################################################################
-    #
     # getGroupRate 
-    #
-    #######################################################################
-
-    ok( $taxer->getGroupRate( $id0    ) == 0
-            && $taxer->getGroupRate( $id100  ) == 100
-            && $taxer->getGroupRate( $id50_5 ) == 50.5,
+    ok( 
+           $taxer->getGroupRate( $id0    ) == 0
+        && $taxer->getGroupRate( $id100  ) == 100
+        && $taxer->getGroupRate( $id50_5 ) == 50.5,
         'getGroup rate gets correct rates'
     );
+    
+    # deleteGroup
+    eval { $taxer->deleteGroup };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'addGroup requires a group id' );
+    is( $e, 'A group id is required', 'addGroup returns correct message for missing group id' );
 
-    #######################################################################
-    #
-    # getTaxRate
-    #
-    #######################################################################
+    $taxer->deleteGroup( $id50_5 );
+
+    $taxGroups = $taxer->get( 'taxGroups' );
+    cmp_bag( $taxGroups, [
+        {
+            name    => 'Group0',
+            rate    => 0,
+            id      => $id0,
+        },
+        {
+            name    => 'Group100',
+            rate    => 100,
+            id      => $id100,
+        },
+    ], 'deleteGroup deletes correctly' );
+
+    # Clean up a bit.
+    $taxer->deleteGroup( $_ ) for ( $id0, $id100 );
+}
+
+#######################################################################
+#
+# getTaxRate
+#
+#######################################################################
+{
+    my $taxer   = setupTestNumbers();
+    my $id100   = $taxer->addGroup( 'Group100', 100   );
+    my $id50_5  = $taxer->addGroup( 'Group50.5', 50.5 );
 
     $taxer->update( { 'automaticViesApproval' => 1 } );
-    my $book = WebGUI::Shop::AddressBook->create($session);
-
-    # setup address in EU but not in residential country of merchant
-    my $beAddress = $book->addAddress({
-        label => 'BE',
-        city  => 'Antwerpen',
-        country => 'Belgium',
-    });
-
-    # setup address in residential country of merchant 
-    my $nlAddress = $book->addAddress({
-        label => 'NL',
-        city  => 'Delft',
-        country => 'Netherlands',
-    });
-
-    # setup address outside EU
-    my $usAddress = $book->addAddress({
-        label => 'outside eu',
-        city => 'New Amsterdam',
-        country => 'US',
-    });
 
     eval { $taxer->getTaxRate(); };
-    $e = Exception::Class->caught();
+    my $e = Exception::Class->caught();
     isa_ok($e, 'WebGUI::Error::InvalidParam', 'getTaxRate: error handling for not sending a sku');
     is($e->error, 'Must pass in a WebGUI::Asset::Sku object', 'getTaxRate: error handling for not sending a sku');
 
@@ -298,27 +426,38 @@ SKIP: {
     $sku->setTaxConfiguration( 'WebGUI::Shop::TaxDriver::EU', { taxGroup => $id100 } );
     is( $taxer->getTaxRate( $sku ), 100, 'getTaxRate returns tax group set by sku when no address is given');
 
-    # Address outside EU
-    is( $taxer->getTaxRate( $sku, $usAddress ), 0, 'getTaxRate: shipping addresses outside EU are tax exempt' );
-    
-    # Addresses inside EU
-    is( $taxer->getTaxRate( $sku, $beAddress ), 100, 'getTaxRate: shipping addresses inside EU w/o VAT number pay tax' );
-    is( $taxer->getTaxRate( $sku, $nlAddress ), 100, 'getTaxRate: shipping addresses in country of merchant w/o VAT number pay tax' );
-
-    # Add VAT numbers
-    $taxer->addVATNumber( $testVAT_NL, $taxUser, 1);
-    $taxer->addVATNumber( $testVAT_BE, $taxUser, 1);
-
+    # Addresses inside EU with VAT number
     is( $taxer->getTaxRate( $sku, $beAddress ), 0, 
         'getTaxRate: shipping addresses inside EU but other country than merchant w/ VAT number are tax exempt.' 
     );
     is( $taxer->getTaxRate( $sku, $nlAddress ), 100, 'getTaxRate: shipping addresses in country of merchant w/ VAT number pay tax' );
 
-    #######################################################################
-    #
-    # appendCartItemVars
-    #
-    #######################################################################
+    $taxer->deleteVATNumber( $testVAT_NL, $taxUser );
+    $taxer->deleteVATNumber( $testVAT_BE, $taxUser );
+
+    # Addresses inside EU without VAT number
+    foreach my $country ( @EU_COUNTRIES ) {
+        next if $country eq $nlAddress->get('country');     # Residents of merchant country should be checked separately.
+
+        $beAddress->update( { country => $country } );
+        is( $taxer->getTaxRate( $sku, $beAddress ), 100, "getTaxRate: shipping addresses in $country w/o VAT number pay tax" );
+    }
+    $beAddress->update( { country => 'Belgium' } );
+    is( $taxer->getTaxRate( $sku, $nlAddress ), 100, 'getTaxRate: shipping addresses in country of merchant w/o VAT number pay tax' );
+
+    
+    # Address outside EU
+    is( $taxer->getTaxRate( $sku, $usAddress ), 0, 'getTaxRate: shipping addresses outside EU are tax exempt' );
+    
+}
+
+#######################################################################
+#
+# appendCartItemVars
+#
+#######################################################################
+{
+    my $taxer = setupTestNumbers();
 
     eval { $taxer->appendCartItemVars };
     my $e = Exception::Class->caught();
@@ -374,12 +513,16 @@ SKIP: {
         taxAmount               => '0.00',
         must                    => 'be kept',
     }, 'appendCartItemVars returns correct data for address outside EU.' );
+}
 
-    #######################################################################
-    #
-    # getTransactionTaxData
-    #
-    #######################################################################
+#######################################################################
+#
+# getTransactionTaxData
+#
+#######################################################################
+{
+    my $taxer = setupTestNumbers();
+    $taxer->update( { 'automaticViesApproval' => 1 } );
 
     my $details = $taxer->getTransactionTaxData( $sku, $usAddress );
     cmp_deeply( $details, {
@@ -408,34 +551,24 @@ SKIP: {
         className       => 'WebGUI::Shop::TaxDriver::EU',
         useVATNumber    => 0,
     }, 'getTransactionTaxData returns correct hashref for addresses in EU w/o VAT number' );
-
-    #######################################################################
-    #
-    # deleteGroup
-    #
-    #######################################################################
-
-    eval { $taxer->deleteGroup };
-    $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'addGroup requires a group id' );
-    is( $e, 'A group id is required', 'addGroup returns correct message for missing group id' );
-
-    $taxer->deleteGroup( $id50_5 );
-
-    $taxGroups = $taxer->get( 'taxGroups' );
-    cmp_bag( $taxGroups, [
-        {
-            name    => 'Group0',
-            rate    => 0,
-            id      => $id0,
-        },
-        {
-            name    => 'Group100',
-            rate    => 100,
-            id      => $id100,
-        },
-    ], 'deleteGroup deletes correctly' );
 }
+
+
+} #SKIP BLOCK
+
+#----------------------------------------------------------------------------
+sub setupTestNumbers {
+    my $taxer = WebGUI::Shop::TaxDriver::EU->new($session);
+
+    $session->db->write('delete from taxDriver where className=?', [ 'WebGUI::Shop::TaxDriver::EU' ]);
+    $session->db->write('delete from tax_eu_vatNumbers');
+
+    $taxer->addVATNumber( $testVAT_NL, $taxUser, 1);
+    $taxer->addVATNumber( $testVAT_BE, $taxUser, 1);
+
+    return $taxer;
+}
+
 
 #----------------------------------------------------------------------------
 # Cleanup

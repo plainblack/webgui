@@ -209,13 +209,7 @@ sub exportAssetCollateral {
             $reportSession->output->print(
                 '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $message . '<br />');
         }
-        my $exportSession = WebGUI::Session->open(
-            $self->session->config->getWebguiRoot,
-            $self->session->config->getFilename,
-            undef,
-            undef,
-            $self->session->getId,
-        );
+        my $exportSession = WebGUI::Session->duplicate;
 
         # open another session as the user doing the exporting...
         my $selfdupe = WebGUI::Asset->newById( $exportSession, $self->getId );
@@ -459,7 +453,7 @@ sub getFeed {
     $feed->description( $self->feedDescription || $self->synopsis );
     $feed->pubDate( $self->getContentLastModified );
     $feed->copyright( $self->feedCopyright );
-    $feed->link( $self->getUrl );
+    $feed->link( $self->session->url->getSiteURL . $self->getUrl );
     # $feed->language( $lang );
     if ($self->feedImage) {
         my $storage = WebGUI::Storage->get($self->session, $self->feedImage);

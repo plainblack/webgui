@@ -62,6 +62,7 @@ $creationDateSth->execute([$weekAgo, $weekStory->getId]);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
+addToCleanup($versionTag);
 
 my $workflow  = WebGUI::Workflow->create($session,
     {
@@ -70,6 +71,8 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
+addToCleanup($workflow);
+
 my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ArchiveOldStories');
 
 my $instance1 = WebGUI::Workflow::Instance->create($session,
@@ -118,10 +121,4 @@ $archivedAssets = $home->getLineage(
 );
 
 cmp_bag( $archivedAssets, [ $weekStory->getId, $weekFolder->getId ], 'Nothing archived.');
-
-END {
-    $creationDateSth->finish;
-    $versionTag->rollback;
-    $workflow->delete;
-}
-
+$creationDateSth->finish;

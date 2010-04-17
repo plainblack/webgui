@@ -189,7 +189,7 @@ sub canEdit {
     my $album       = $self->getParent;
 
     return 1 if $userId eq $self->ownerUserId;
-    return $album->canEdit($userId);
+    return $album && $album->canEdit($userId);
 }
 
 #----------------------------------------------------------------------------
@@ -224,7 +224,7 @@ sub canView {
     my $userId      = shift || $self->session->user->userId;
 
     my $album       = $self->getParent;
-    return 0 unless $album->canView($userId);
+    return 0 unless $album && $album->canView($userId);
 
     if ($self->isFriendsOnly && $userId ne $self->ownerUserId ) {
         my $owner       = WebGUI::User->new( $self->session, $self->ownerUserId );
@@ -343,7 +343,7 @@ are authorized to see them.
 
 =cut
 
-sub getCurrentRevisionDate {
+override getCurrentRevisionDate => sub {
     my $class       = shift;
     my $session     = shift;
     my $assetId     = shift;
@@ -362,13 +362,13 @@ sub getCurrentRevisionDate {
 
     return undef unless $asset;
 
-    if ( $asset->approved || $asset->canEdit ) {
+    if ( $asset->status eq 'approved' || $asset->canEdit ) {
         return $revisionDate;
     }
     else {
-        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+        return super();
     }
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -395,13 +395,20 @@ Get the parent GalleryAlbum. If the only revision of the GalleryAlbum is
 
 =cut
 
-sub getParent {
+override getParent => sub {
     my $self        = shift;
-    if ( my $album = $self->SUPER::getParent ) {
+    if ( my $album = super() ) {
         return $album;
     }
     # Only get the pending version if we're allowed to see this photo in its pending status
-    elsif ( $self->getGallery->canEdit || $self->ownerUserId eq $self->session->user->userId ) {
+    my $gallery
+        = $self->getLineage( ['ancestors'], {
+            includeOnlyClasses  => [ 'WebGUI::Asset::Wobject::Gallery' ],
+            returnObjects       => 1,
+            statusToInclude     => [ 'pending', 'approved' ],
+            invertTree          => 1,
+        } )->[ 0 ];
+    if ( ($gallery && $gallery->canEdit) || $self->ownerUserId eq $self->session->user->userId ) {
         my $album
             = $self->getLineage( ['ancestors'], {
                 includeOnlyClasses  => [ 'WebGUI::Asset::Wobject::GalleryAlbum' ],
@@ -411,6 +418,77 @@ sub getParent {
             } )->[ 0 ];
         return $album;
     }
+    return undef;
+};
+
+#----------------------------------------------------------------------------
+
+=head2 getFirstFile ( ) 
+
+Get the first file in the GalleryAlbum. Returns an instance of a GalleryFile
+or undef if there is no first file.
+
+=cut
+
+sub getFirstFile {
+    my $self       = shift;
+    my $allFileIds = $self->getParent->getFileIds;
+
+    return undef unless @{ $allFileIds };
+    return WebGUI::Asset->newByDynamicClass( $self->session, shift @{ $allFileIds });
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getLastFile ( ) 
+
+Get the last file in the GalleryAlbum. Returns an instance of a GalleryFile
+or undef if there is no last file.
+
+=cut
+
+sub getLastFile {
+    my $self       = shift;
+    my $allFileIds = $self->getParent->getFileIds;
+
+    return undef unless @{ $allFileIds };
+    return WebGUI::Asset->newByDynamicClass( $self->session, pop @{ $allFileIds });
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getNextFile ( ) 
+
+Get the next file in the GalleryAlbum. Returns an instance of a GalleryFile,
+or undef if there is no next file.
+
+=cut
+
+sub getNextFile {
+    my $self = shift;
+    return $self->{_nextFile} if $self->{_nextFile};
+    my $nextId = $self->getParent->getNextFileId( $self->getId );
+    return undef unless $nextId;
+    $self->{_nextFile} = WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    return $self->{_nextFile};
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPreviousFile ( ) 
+
+Get the previous file in the GalleryAlbum. Returns an instance of a GalleryFile,
+or undef if there is no previous file.
+
+=cut
+
+sub getPreviousFile {
+    my $self = shift;
+    return $self->{_previousFile} if $self->{_previousFile};
+    my $previousId  = $self->getParent->getPreviousFileId( $self->getId );
+    return undef unless $previousId;
+    $self->{_previousFile} = WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    return $self->{_previousFile};
 }
 
 #----------------------------------------------------------------------------
@@ -489,9 +567,29 @@ sub getTemplateVars {
         = $self->getGallery->getUrl('func=listFilesForUser;userId=' . $self->ownerUserId);
     $var->{ url_promote         } = $self->getUrl('func=promote');
 
+    if ( my $firstFile = $self->getFirstFile ) {
+        $var->{ firstFile_url             } = $firstFile->getUrl;
+        $var->{ firstFile_title           } = $firstFile->get( "title" );
+        $var->{ firstFile_thumbnailUrl    } = $firstFile->getThumbnailUrl;
+    }
+    if ( my $nextFile  = $self->getNextFile ) {
+        $var->{ nextFile_url              } = $nextFile->getUrl;
+        $var->{ nextFile_title            } = $nextFile->get( "title" );
+        $var->{ nextFile_thumbnailUrl     } = $nextFile->getThumbnailUrl;
+    }
+    if ( my $prevFile  = $self->getPreviousFile ) {
+        $var->{ previousFile_url          } = $prevFile->getUrl;
+        $var->{ previousFile_title        } = $prevFile->get( "title" );
+        $var->{ previousFile_thumbnailUrl } = $prevFile->getThumbnailUrl;
+    }
+    if ( my $lastFile = $self->getLastFile ) {
+        $var->{ lastFile_url              } = $lastFile->getUrl;
+        $var->{ lastFile_title            } = $lastFile->get( "title" );
+        $var->{ lastFile_thumbnailUrl     } = $lastFile->getThumbnailUrl;
+    }
+
     return $var;
 }
-
 
 #----------------------------------------------------------------------------
 
@@ -538,6 +636,13 @@ sub makeShortcut {
     if ($overrides) {
         $shortcut->setOverride( $overrides );
     }
+
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return 'redirect';
+    };
 
     return $shortcut;
 }
@@ -615,11 +720,11 @@ sub processCommentEditForm {
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
     my $self    = shift;
     my $i18n    = WebGUI::International->new( $self->session,'Asset_Photo' );
     my $form    = $self->session->form;
-    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors  = super() || [];
 
     # Make sure we have the disk space for this
     if ( !$self->getGallery->hasSpaceAvailable( $self->assetSize ) ) {
@@ -639,7 +744,7 @@ sub processPropertiesFromFormPost {
     }
 
     return;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -662,15 +767,15 @@ Purge the asset. Remove all comments on the GalleryFile.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self        = shift;
     
     for my $commentId ( @{ $self->getCommentIds } ) {
         $self->deleteComment( $commentId );
     }
 
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #----------------------------------------------------------------------------
 
@@ -722,6 +827,19 @@ sub valid_parent_classes {
 
 #----------------------------------------------------------------------------
 
+=head2 validParent ( )
+
+Override validParent to only allow GalleryAlbums to hold GalleryFiles.
+
+=cut
+
+sub validParent {
+    my ($class, $session) = @_;
+    return $session->asset->isa('WebGUI::Asset::Wobject::GalleryAlbum');
+}
+
+#----------------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the container www_view method. 
@@ -765,13 +883,13 @@ sub view {
             keyword             => $keyword,
             url_searchKeyword   
                 => $self->getGallery->getUrl(
-                    "func=search;submit=1;keywords=" . uri_escape($keyword) 
+                    "func=search;submit=1;keywords=" . uri_escape_utf8($keyword) 
                 ),
             url_searchKeywordUser
                 => $self->getGallery->getUrl(
                     "func=search;submit=1;"
                     . "userId=" . $self->ownerUserId . ';'
-                    . 'keywords=' . uri_escape( $keyword ) 
+                    . 'keywords=' . uri_escape_utf8( $keyword )
                 ),
         };
     }
@@ -1058,6 +1176,11 @@ sub www_view {
     $self->session->output->print($self->view);
     $self->session->output->print($foot, 1);
     return "chunked";
+}
+
+sub setPrivileges {
+    my $self = shift;
+    $self->getStorageLocation->setPrivileges($self);
 }
 
 

@@ -13,13 +13,12 @@ use strict;
 use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 14; # increment this value for each test you create
 use Test::Deep;
 use File::Basename qw(basename);
 
 my $config     = WebGUI::Test->config;
 my $configFile = WebGUI::Test->file;
-my $webguiRoot = WebGUI::Test->root;
 
 ok( defined $config, "load config" );
 ok( $config->get("dsn") ne "", "get()" );
@@ -27,8 +26,7 @@ is( ref $config->get("macros"), "HASH", "get() macros hash" );
 is( ref $config->get("assets"), "HASH", "get() assets hash" );
 is( ref $config->get("shippingDrivers"), "ARRAY", "get() shippingDrivers array" );
 is( $config->getFilename, basename($configFile), "getFilename()" );
-is( $config->getWebguiRoot, $webguiRoot, "getWebguiRoot()" );
-ok( defined WebGUI::Config->readAllConfigs($webguiRoot), "readAllConfigs" );
+ok( defined WebGUI::Config->readAllConfigs, "readAllConfigs" );
 $config->addToArray("shippingDrivers","TEST");
 my $found = 0;
 foreach my $driver ( @{$config->get("shippingDrivers")}) {

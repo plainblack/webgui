@@ -5,6 +5,22 @@ The information contained herein documents the API changes that have occurred in
 
 
 
+WebGUI::Config
+=============
+WebGUI::Config->new has a new API.  Its WebGUI root parameter has been eliminated.  It now only accepts a config file as either an absolute path, or a path relative to WebGUI's etc directory.
+
+my $config = WebGUI::Config->new($filename);
+
+
+
+WebGUI::Session
+=============
+WebGUI::Session->open has a new API.  Its WebGUI root parameter has been eliminated.  The config file it is given can be either an absolute path, or a path relative to WebGUI's etc directory.
+
+my $session = WebGUI::Session->open($configFile, $request, $server);
+
+
+
 WebGUI::Cache
 =============
 WebGUI::Cache has been completely rewritten. If you were using the cache API in the past, you'll need to update your code to reflect the changes. NOTE: you can get a cached reference to the cache object from WebGUI::Session, which will be substantially faster than instantiating the object yourself.

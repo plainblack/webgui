@@ -13,12 +13,123 @@ save you many hours of grief.
    code, chances are you'll need to update it to make it work with
    WebGUI 8.
 
- * WebGUI now requires memcached.
+ * WebGUI now requires the following modules
+    - Moose
+    - CHI
 
- * WebGUI now requires the following Perl Modules:
-	- Memcached::libmemcached (0.3102)
+7.9.3
+--------------------------------------------------------------------
+     * Test:Deep, which had been an optional dependency for testing, has been used
+       in components of the core for a while, since the release of the new Survey.
+       Test::Deep version 0.095 or higher is now required.
+
+7.9.2
+--------------------------------------------------------------------
+     * new dependency: DateTime::Event::ICal 0.10 or higher
+
+7.9.0
+--------------------------------------------------------------------
+     * WebGUI new requires Test::Harness 3.17 or higher to enable the testing functions
+       the Survey.
+
+7.8.13
+--------------------------------------------------------------------
+     * A new gotcha was not documented in the 7.8.11 release, the new required version
+       of Javascript::Packer, 0.04.  The correct version was put into the testEnvironment
+       script.
+
+7.8.11
+--------------------------------------------------------------------
+     * WebGUI now requires DateTime::Format::HTTP, to handle parsing HTTP dates.
+
+     * WebGUI now requires JavaScript Packer v0.04, for compressing javascript.
+
+     * The Google sitemap generator in WebGUI was including hidden pages in the list of
+       pages.  This is now configurable, with the default being to NOT show hidden pages.
+       If you wish hidden pages to be shown, then in the config file set showHiddenPages
+       to 1.
+
+7.8.6
+--------------------------------------------------------------------
+    * WebGUI now requires LWP 5.833 or higher, to fix a bug in that module.
+
+7.8.5
+--------------------------------------------------------------------
+    * WebGUI now requires Locales 0.10 or higher, to replace the deprecated
+      module Locales::Country.
+
+    * WebGUI now requires Net::CIDR::Lite 0.20 or higher, to replace the deprecated
+      module Net::Subnets.
+
+    * Users, no matter if they are created via anonymous registration,
+      via the Admin Console Users screen, or via code, now always get
+      their default values from the Profile Fields instead of via
+      the Visitor account.  Previously, based on how the user was created,
+      they would get default values from different places.
+
+    * The following style templates have been cleaned up by the TWG:
+      - WebGUI 6 Blank Style, Style 01; Style 02, Style 03:
+          - no structural changes
+      - Fail safe:
+          - added new CSS that is more robust and validates (in external file: style.css);
+          - it was also necessary to update the css to work with the new navigation templates
+          - changed the markup and the order of the home/login/user/admin controls at the bottom
+      - All of the above templates:
+          - added a link tag to wg-base.css
+          - added conditional comments at the top and bottom of the body tag to be able to target
+            IE versions easily with css
+
+    * Added wg-base.css, which is linked to in each style template. This stylesheet is for css that
+      is used in more than one tempalte, like pagination inline icons etc. Inline styles that are
+      removed from templates, will be replaced with styles in wg-base.css (and example is RFE 11182).
+      Elements that are styled in wg-base.css have a classname that starts with "wg-".
+
+      wg-base.css replaces webgui.css, which will be removed from the site.
+
+7.8.4
+--------------------------------------------------------------------
+    * A bug introduced in 7.8.1 could cause the Shop sale notification
+      group to be reset to the group Everyone.  The bug has been fixed,
+      and the group has been reset to Admins.  If you were using a different
+      group, you will need to edit the Shop Settings and reselect the
+      proper group.
+
+7.8.3
+--------------------------------------------------------------------
+    * WebGUI now requires Locales::Country 0.05 or higher to use
+      the UPS shipping driver.
+
+7.8.2
+--------------------------------------------------------------------
+    * WebGUI now requires Business::PayPal::API 0.62 or higher.
 
 
+7.8.1
+--------------------------------------------------------------------
+    * The EventManagementSystem schedule template was accidently given
+      the same namespace as the main EMS template.  This allowed the
+      wrong template to be chosen for the main EMS template and the
+      schedule template.  The upgrade from 7.8.0 to 7.8.1 will attempt
+      to fix this when default templates have been used.
+
+    * In the past, it was possible to leave WebguiRoot undefined
+      or incorrectly specified, and WebGUI would still function.  It
+      must now be properly specified, which means it must be configured
+      in the global Apache section (outside any VirtualHost or
+      Directory sections) and point to the correct WebGUI root
+      directory.  For example:
+        PerlSetVar WebguiRoot /data/WebGUI
+
+    * WebGUI creates thumbnails for uploaded images.  The name for
+      those thumbnail files is created by prepending "thumb-" to the
+      name of the file.  If a file that start with "thumb-" is created
+      then WebGUI would throw an error.  Starting with 7.8.1, files
+      that start with "thumb-" will be renamed by removing that
+      prefix from the filename.
+
+
+
+>>>>>>> master
 7.8.0
 --------------------------------------------------------------------
 

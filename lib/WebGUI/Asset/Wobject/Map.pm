@@ -90,6 +90,7 @@ property templateIdEditPoint => (
             tab         => "display",
             fieldType   => "template",
             namespace   => "MapPoint/Edit",
+            default     => 'oHh0UqAJeY7u2n--WD-BAA',
             label       => ["templateIdEditPoint label", 'Asset_Map'],
             hoverHelp   => ["templateIdEditPoint description", 'Asset_Map'],
          );
@@ -97,6 +98,7 @@ property templateIdView => (
             tab         => "display",
             fieldType   => "template",
             namespace   => "Map/View",
+            default     => '9j0_Z1j3Jd0QBbY2akb6qw',
             label       => ["templateIdView label", 'Asset_Map'],
             hoverHelp   => ["templateIdView description", 'Asset_Map'],
          );
@@ -104,6 +106,7 @@ property templateIdViewPoint => (
             tab         => "display",
             fieldType   => "template",
             namespace   => "MapPoint/View",
+            default     => 'u9vfx33XDk5la1-QC5FK7g',
             label       => ["templateIdViewPoint label", 'Asset_Map'],
             hoverHelp   => ["templateIdViewPoint description", 'Asset_Map'],
          );
@@ -291,6 +294,8 @@ sub loadMapApiTags {
     my $style   = $self->session->style;
     my $url     = $self->session->url;
 
+    $style->setLink($url->extras('yui/build/container/assets/skins/sam/container.css'),{type=>'text/css',rel=>'stylesheet'});
+    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),{type=>'text/css',rel=>'stylesheet'});
     $style->setScript("http://www.google.com/jsapi?key=" . $self->mapApiKey,{type=>"text/javascript"});
     $style->setRawHeadTags(<<'ENDHTML');
 <script type="text/javascript">
@@ -300,6 +305,10 @@ ENDHTML
     $style->setScript('http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js', {type=>"text/javascript"});
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),{type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/connection/connection-min.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/element/element-min.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/button/button-min.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/container/container-min.js'),{type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/json/json-min.js'),{type=>'text/javascript'});
     $style->setScript($url->extras('yui-webgui/build/map/map.js'),{type=>'text/javascript'});
 
@@ -355,14 +364,17 @@ sub view {
                     ;
 
     # The script to load the map into the container
-    $mapHtml    .= sprintf <<'ENDHTML', $self->getId, $self->getUrl, $self->startLatitude, $self->startLongitude, $self->startZoom;
+    $mapHtml    .= sprintf <<'ENDHTML', $self->getId, $self->getUrl, $self->startLatitude, $self->startLongitude, $self->startZoom, $session->url->extras;
 <script type="text/javascript">
     google.setOnLoadCallback( function() {
         var mapId           = "%s";
         var mapUrl          = "%s";
         var map             = new GMap2( document.getElementById("map_" + mapId) );
+        map.url             = mapUrl;
+        map.assetId         = mapId;
         map.setCenter(new GLatLng(%s, %s), %s);
         map.setUIToDefault();
+        map.extrasUrl       = "%s";
 
         var markermanager   = new MarkerManager(map, {trackMarkers: true});
 ENDHTML
@@ -386,7 +398,7 @@ ENDHTML
         }
 
         $mapHtml    .= <<'ENDHTML';
-            markermanager.addMarkers( WebGUI.Map.preparePoints(map, markermanager, mapUrl, points), 1 );
+            markermanager.addMarkers( WebGUI.Map.preparePoints(map, markermanager, points), 0 );
 ENDHTML
     }
 
@@ -406,13 +418,13 @@ ENDHTML
         if ( document.getElementById( "setCenter_" + mapId ) ) {
             var button = document.getElementById( "setCenter_" + mapId );
             GEvent.addDomListener( button, "click", function () { 
-                WebGUI.Map.setCenter( map, mapUrl );
+                WebGUI.Map.setCenter( map );
             } );
         }
         if ( document.getElementById( "addPoint_" + mapId ) ) {
             var button = document.getElementById( "addPoint_" + mapId );
             GEvent.addDomListener( button, "click", function () {
-                WebGUI.Map.editPoint( map, markermanager, mapUrl );
+                WebGUI.Map.editPoint( map, markermanager );
             } );
         }
     });
@@ -433,6 +445,22 @@ ENDHTML
         = WebGUI::Form::Button( $session, {
             value       => $i18n->get("set default viewing area label"),
             id          => sprintf( 'setCenter_%s', $self->getId ),
+        } );
+
+    # Select box to choose a map point
+    tie my %selectPointOptions, 'Tie::IxHash', (
+        ""      => '-- ' . $i18n->get('select a point'),
+    );
+    if ( $var->{mapPoints} ) {
+        for my $point ( sort { $a->{title} cmp $b->{title} } @{$var->{mapPoints}} ) {
+            $selectPointOptions{ $point->{assetId} } = $point->{title}; 
+        }
+    }
+    $var->{ selectPoint }
+        = WebGUI::Form::selectBox( $session, {
+            extras      => q{onchange="WebGUI.Map.focusOn(this.options[this.selectedIndex].value);"},
+            id          => sprintf( q{selectPoint_%s}, $self->getId ),
+            options     => \%selectPointOptions,
         } );
 
     return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
@@ -528,8 +556,19 @@ sub www_ajaxEditPointSave {
     my $errors  = $asset->processAjaxEditForm;
 
     # Commit!
-    if ($asset->getAutoCommitWorkflowId && $self->hasBeenCommitted) {
-        $asset->requestAutoCommit;
+    if ( $asset->getAutoCommitWorkflowId ) {
+        if ( $self->hasBeenCommitted) {
+            $asset->requestAutoCommit;
+        }
+        else {
+            # Add mappoint to map's version tag
+            my $oldTagId = $asset->get('tagId');
+            $asset->setVersionTag( $self->get('tagId') );
+            my $oldTag = WebGUI::VersionTag->new( $session, $oldTagId );
+            if ( $oldTag->getAssetCount <= 0 ) {
+                $oldTag->rollback;
+            }
+        }
     }
 
     # Encode entities because we're returning as HTML

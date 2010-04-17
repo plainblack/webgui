@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::FetchMimeType;
 
 use Test::More; # increment this value for each test you create
 
@@ -41,6 +42,11 @@ my @testSets = (
 		comment => q|Null path returns application/octet-stream|,
 	},
 	{
+		input  => 'foo.rtf',
+		output => 'application/rtf',
+		comment => q|RTF file|, ##Added test due to a bug on some operating systems.
+	},
+	{
 		input  => undef,
 		output => undef,
 		comment => q|Undef path returns undef|,
@@ -49,23 +55,12 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
-$numTests += 1; #For the use_ok
-
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::FetchMimeType';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $file = $testSet->{input}
-		 ? join '/', WebGUI::Test->root, 'www/extras', $testSet->{input}
+		 ? join '/', WebGUI::Paths->extras, $testSet->{input}
 		 : $testSet->{input};
 	my $output = WebGUI::Macro::FetchMimeType::process($session, $file);
 	is($output, $testSet->{output}, $testSet->{comment} );
-}
-
 }

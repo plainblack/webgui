@@ -15,7 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Paginator;
+require WebGUI::Paginator;
 use WebGUI::VersionTag;
 use WebGUI::Search::Index;
 
@@ -65,7 +65,7 @@ A hash reference containing a list of properties to associate with the child.
 =head3 revisionDate
 
 An epoch date representing the date/time stamp that this revision was 
-created. Defaults to $self->session->datetime->time().
+created. Defaults to time().
 
 =head3 options
 
@@ -85,15 +85,15 @@ Posts) will know not to send them under certain conditions.
 =cut
 
 sub addRevision {
-    my $self          = shift;
-    my $session       = $self->session;
-    my $properties    = shift || {};
-    my $now           = shift || $session->datetime->time();
-    my $options       = shift;
+    my $self        = shift;
+    my $session     = $self->session;
+    my $properties  = shift || {};
+    my $now         = shift || time();
+    my $options     = shift;
 
     my $autoCommitId  = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
 
-    my $workingTag;
+    my ($workingTag, $oldWorking);
     if ( $autoCommitId ) {
         $workingTag  
             = WebGUI::VersionTag->create( $session, { 
@@ -102,7 +102,18 @@ sub addRevision {
             } ); 
     }
     else {
-        $workingTag = WebGUI::VersionTag->getWorking($session);
+        my $parentAsset;
+        if ( not defined( $parentAsset = $self->getParent ) ) {
+            $parentAsset = WebGUI::Asset->newPending( $session, $self->parentId );
+        }
+        if ( $parentAsset->hasBeenCommitted ) {
+            $workingTag = WebGUI::VersionTag->getWorking( $session );
+        }
+        else {
+            my $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
+            $workingTag = WebGUI::VersionTag->new( $session, $parentAsset->tagId );
+            $workingTag->setWorking();
+        }
     }
 
     #Create a dummy revision to be updated with real data later
@@ -124,6 +135,7 @@ sub addRevision {
     $newVersion->setVersionLock;
     $newVersion->update(\%mergedProperties);
     $newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
+    $oldWorking->setWorking if $oldWorking;
 
     return $newVersion;
 }
@@ -235,7 +247,8 @@ sub getRevisionCount {
 
 =head2 getRevisions ( [ status ] )
 
-Returns an array reference of the revision objects of this asset.
+Returns an array reference of the revision objects of this asset, sorted by revision date in descending
+order.  The most recent version will always be first.
 
 =head3 status
 
@@ -443,6 +456,7 @@ Sets a flag so that developers know whether to send notifications out on certain
 sub setSkipNotification {
 	my $self = shift;
 	$self->session->db->write("update assetData set skipNotification=1 where assetId=? and revisionDate=?", [$self->getId, $self->get("revisionDate")]);
+    $self->{_properties}->{skipNotification} = 1;
 }
 
 #-------------------------------------------------------------------
@@ -537,7 +551,7 @@ sub updateHistory {
     my $session = $self->session;
 	my $action = shift;
 	my $userId = shift || $session->user->userId || '3';
-	my $dateStamp =$session->datetime->time();
+	my $dateStamp =time();
 	$session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp, url) values (?,?,?,?,?)", [$self->getId, $userId, $action, $dateStamp, $self->get('url')]);
 }
 

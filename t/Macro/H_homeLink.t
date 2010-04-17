@@ -121,8 +121,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
-	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
+	my ($url)   = $text =~ /HREF=(.+?)(\n?LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(\n?HREF|\Z)/;
 
 	return ($url, $label);
 }

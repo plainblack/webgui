@@ -15,6 +15,7 @@ package WebGUI::Session::Scratch;
 =cut
 
 use strict;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -169,6 +170,19 @@ sub get {
 	return $self->{_data}{$var};
 }
 
+#-------------------------------------------------------------------
+
+=head2 getLanguageOverride ()
+
+Retrieves the language of the session scratch
+
+=cut
+
+sub getLanguageOverride {
+	my $self = shift;
+	my $languageOverride = $self->session->scratch->get('language');
+	return $languageOverride;
+}
 
 #-------------------------------------------------------------------
 
@@ -191,7 +205,18 @@ sub new {
 	bless {_session=>$session, _data=>$scratch}, $class;
 }
 
+#-------------------------------------------------------------------
 
+=head2 removeLanguageOverride()
+
+Removes the language scratch variable from the session
+
+=cut
+
+sub removeLanguageOverride {
+	my $self = shift;
+	$self->session->scratch->delete('language');
+}
 #-------------------------------------------------------------------
 
 =head2 session ( )
@@ -232,5 +257,30 @@ sub set {
 	$session->db->write("replace into userSessionScratch (sessionId, name, value) values (?,?,?)", [$id, $name, $value]);
 }
 
+#----------------------------------------------------------------------
+
+=head2 setLanguageOverride ( language )
+
+Sets a scratch variable language in the session if the language is installed
+
+=head3 language
+
+The language that should be set into the session
+
+=cut
+
+sub setLanguageOverride {
+	my $self = shift;
+	my $language = shift;
+        my $i18n = WebGUI::International->new($self->session);
+        if($i18n->getLanguages()->{$language}) {
+                $self->session->scratch->set("language",$language);
+                return undef;
+        }
+        else {
+                $self->session->log->error("Language $language is not installed in this site");
+                return undef;
+	}
+}
 
 1;

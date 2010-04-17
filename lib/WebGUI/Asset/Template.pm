@@ -38,7 +38,6 @@ sub _template_autopack {
     my $packed  = $new;
     HTML::Packer::minify( \$packed, {
         remove_comments     => 1,
-        remove_newlines     => 1,
         do_javascript       => "shrink",
         do_stylesheet       => "minify",
     } );
@@ -132,20 +131,16 @@ sub addAttachments {
 
     my $db = $self->session->db;
 
-    my $sql = q{
-        INSERT INTO template_attachments
-            (templateId, revisionDate, url, type, sequence)
-        VALUES
-            (?,          ?,            ?,   ?,    ?)
-    };
-
     foreach my $a (@$attachments) {
-        my @params = (
-            $self->getId, 
-            $self->revisionDate,
-            @{$a}{qw(url type sequence)}
+        my %params = (
+            templateId   => $self->getId,
+            revisionDate => $self->revisionDate,
+            url          => $a->{url},
+            type         => $a->{type},
+            sequence     => $a->{sequence},
+            attachId     => 'new',
         );
-        $db->write($sql, \@params);
+        $db->setRow('template_attachments', 'attachId', \%params);
     }
 }
 
@@ -157,13 +152,13 @@ Override the master addRevision to copy attachments
 
 =cut
 
-sub addRevision {
+override addRevision => sub {
     my ( $self, $properties, @args ) = @_;
-    my $asset = $self->SUPER::addRevision($properties, @args);
+    my $asset = super();
     delete $properties->{templatePacked};
     $asset->addAttachments($self->getAttachments);
     return $asset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -174,14 +169,14 @@ Extra Head Tags.
 
 =cut
 
-sub drawExtraHeadTags {
-	my ($self, $params) = @_;
+override drawExtraHeadTags => sub {
+	my ($self) = @_;
     if ($self->namespace eq 'style') {
         my $i18n = WebGUI::International->new($self->session);
         return $i18n->get(881);
     }
-    return $self->SUPER::drawExtraHeadTags($params);
-}
+    return super();
+};
 
 
 #-------------------------------------------------------------------
@@ -193,12 +188,13 @@ copy.
 
 =cut
 
-sub duplicate {
-	my $self = shift;
-	my $newTemplate = $self->SUPER::duplicate;
+override duplicate => sub {
+    my $self = shift;
+    my $newTemplate = super();
     $newTemplate->update({isDefault => 0});
+    $newTemplate->addAttachments($self->getAttachments);
     return $newTemplate;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -208,12 +204,12 @@ Override to add attachments to package data
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
     my ( $self ) = @_;
-    my $data    = $self->SUPER::exportAssetData;
+    my $data    = super();
     $data->{template_attachments} = $self->getAttachments;
     return $data;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -262,9 +258,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
 	$tabform->hidden({
 		name=>"returnUrl",
@@ -380,9 +376,12 @@ sub getEditForm {
 	);
 
 	my ($style, $url) = $self->session->quick(qw(style url));
-	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'), {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/json/json-min.js'),   {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/dom/dom-min.js'),     {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),           {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/json/json-min.js'),             {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/dom/dom-min.js'),               {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/event/event-min.js'),           {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
+	$style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),          {type => 'text/javascript'});
 
 	pop(@headers);
 	my $scriptUrl = $url->extras('templateAttachments.js');
@@ -392,7 +391,7 @@ sub getEditForm {
 	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
 
 	return $tabform;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -481,12 +480,12 @@ Override to import attachments
 
 =cut
 
-sub importAssetCollateralData {
+override importAssetCollateralData => sub {
     my ( $self, $data, @args ) = @_;
     $self->removeAttachments;
     $self->addAttachments( $data->{template_attachments} );
-    return $self->SUPER::importAssetCollateralData( $data, @args );
-}
+    return super();
+};
     
 #-------------------------------------------------------------------
 
@@ -496,12 +495,13 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->addKeywords($self->namespace);
 	$indexer->setIsPublic(0);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -619,9 +619,9 @@ Extends the master class to handle template parsers, namespaces and template att
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
     # TODO: Perhaps add a way to check template syntax before it blows stuff up?
     my %data;
     my $needsUpdate = 0;
@@ -667,7 +667,7 @@ sub processPropertiesFromFormPost {
     $self->addAttachments(\@add);
 
     return;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -704,17 +704,31 @@ sub processRaw {
 
 #-------------------------------------------------------------------
 
-=head2 purgeRevision ( )
+=head2 purge ( )
 
-Override the master purgeRevision to purge attachments
+Extend the master to purge attachments in all revisions.
 
 =cut
 
-sub purgeRevision {
+sub purge {
+    my $self = shift;
+    $self->session->db->write('delete from template_attachments where templateId=?', [$self->getId]);
+    return $self->SUPER::purge(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 purgeRevision ( )
+
+Extend the master purgeRevision to purge attachments
+
+=cut
+
+override purgeRevision => sub {
     my $self = shift;
     $self->removeAttachments;
-    return $self->SUPER::purgeRevision(@_);
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

@@ -14,10 +14,12 @@ package WebGUI::Config;
 
 =cut
 
-use strict;
-use Class::InsideOut qw(readonly id register);
+use Moose;
+extends 'Config::JSON';
+
+use WebGUI::Paths;
 use Cwd ();
-use base 'Config::JSON';
+use File::Spec;
 
 my %config = ();
 
@@ -35,9 +37,9 @@ This package parses the WebGUI config file.
 
  WebGUI::Config->loadAllConfigs($webguiRoot);
  
- my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
+ my $configs = WebGUI::Config->readAllConfigs;
 
- my $config = WebGUI::Config->new($webguiRoot, $configFileName);
+ my $config = WebGUI::Config->new($configFileName);
 
  my $value = $config->get($param);
  $config->set($param,$value);
@@ -50,7 +52,6 @@ This package parses the WebGUI config file.
  $config->addToArray($name, $value);
 
  my $configFileName = $config->getFilename;
- my $webguiRoot = $config->getWebguiRoot;
 
 =head1 ISA
 
@@ -111,17 +112,6 @@ sub getCookieTTL {
 
 #-------------------------------------------------------------------
 
-=head2 getWebguiRoot ( )
-
-Returns the path to the WebGUI installation.
-
-=cut
-
-readonly getWebguiRoot => my %webguiRoot;
-
-
-#-------------------------------------------------------------------
-
 =head2 loadAllConfigs ( webguiRoot )
 
 Reads all the config file data for all defined sites into an in-memory cache. This is a class method.
@@ -134,8 +124,7 @@ The path to the WebGUI installation.
 
 sub loadAllConfigs {
 	my $class = shift;
-	my $webguiPath = shift;
-	my $configs = $class->readAllConfigs($webguiPath);
+	my $configs = $class->readAllConfigs;
 	foreach my $filename (keys %{$configs}) {
 		unless ($filename =~ /^demo\d/) {
 			print "\tLoading ".$filename."\n";	
@@ -165,58 +154,41 @@ A boolean value that when set to true tells the config system not to store the c
 
 =cut
 
-sub new {
-	my $class = shift;
-	my $webguiPath = Cwd::realpath(shift);
-	my $filename = shift;
-	my $noCache = shift;
-    my $fullPath = $webguiPath.'/etc/'.$filename;
-	if (exists $config{$filename}) {
-		return $config{$filename};
-	} else {
-        my $self = Config::JSON->new($fullPath);
-        register($self, $class);
-        $webguiRoot{id $self} = $webguiPath;
-		$config{$filename} = $self unless $noCache;
-		return $self;
-	}
-}
+around new => sub {
+    my $orig = shift;
+    my $class = shift;
+    my $filename = shift;
+    my $noCache = shift;
+    if (!File::Spec->file_name_is_absolute($filename)) {
+        $filename = Cwd::realpath(File::Spec->catfile(WebGUI::Paths->configBase, $filename));
+    }
+    if (exists $config{$filename}) {
+        return $config{$filename};
+    }
+    else {
+        my $self = $class->$orig($filename);
+        $config{$filename} = $self unless $noCache;
+        return $self;
+    }
+};
 
 
 #-------------------------------------------------------------------
 
-=head2 readAllConfigs ( webguiRoot )
+=head2 readAllConfigs ( )
 
 Reads all the config file data for all defined sites and returns a hash reference containing WebGUI::Config objects keyed by filename. This is a class method.
 
 Example: $configs->{$filename};
 
-=head3 webguiRoot
-
-The path to the WebGUI installation.
-
 =cut
 
 sub readAllConfigs {
 	my $class = shift;
-	my $webguiPath = shift;
-    opendir my $dh, $webguiPath."/etc";
-    my @files = readdir $dh;
-    closedir $dh;
-	my %configs;
-	foreach my $file (@files) {
-        next
-            if $file !~ /\.conf$/
-            || $file =~ /^\./
-            || $file eq 'log.conf'
-            || $file eq 'spectre.conf';
-        eval {
-            $configs{$file} = WebGUI::Config->new($webguiPath,$file)
-        };
-        if ($@) {
-            warn "Config file ".$file." looks to be corrupt or have a syntax error.";
-        }
-    }
+    my @configs = WebGUI::Paths->siteConfigs;
+    my %configs = map {
+        $_ => $class->new($_);
+    } @configs;
     return \%configs;
 }
 

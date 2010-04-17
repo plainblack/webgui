@@ -205,7 +205,7 @@ Add the javascript needed for the edit form
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my ($self) = @_;
     $self->session->style->setScript(
         $self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
@@ -228,8 +228,8 @@ sub getEditForm {
 YAHOO.util.Event.onDOMReady( function () { var thingForm = YAHOO.util.Dom.get('thingId_formId'); WebGUI.ThingyRecord.getThingFields(thingForm.options[thingForm.selectedIndex].value,'thingFields_formId')} );
 </script>
 EOSCRIPT
-    return $self->SUPER::getEditForm;
-} ## end sub getEditForm
+    return super();
+}; ## end sub getEditForm
 
 #----------------------------------------------------------------------------
 
@@ -253,10 +253,10 @@ it is purchased. C<item> is the WebGUI::Shop::TransactionItem for this item
 
 =cut
 
-sub getPostPurchaseActions {
+override getPostPurchaseActions => sub {
     my ( $self, $item ) = @_;
     my $session  = $self->session;
-    my $opts     = $self->SUPER::getPostPurchaseActions();
+    my $opts     = super();
     my $i18n     = WebGUI::International->new( $session, "Asset_ThingyRecord" );
     my $recordId = $item->get('options')->{recordId};
 
@@ -265,7 +265,7 @@ sub getPostPurchaseActions {
         = $self->getUrl( 'func=editRecord;recordid=' . $recordId );
 
     return $opts;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -508,7 +508,7 @@ Remove all collateral associated with the ThingyRecord sku
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
 
     my $options = { constraints => [ { 'assetId = ?' => $self->getId } ] };
@@ -520,8 +520,8 @@ sub purge {
 
     # XXX: Should we also remove the records from the Thingy?
 
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

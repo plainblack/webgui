@@ -10,31 +10,26 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-$|++; # disable output buffering
-our ($webguiRoot, $configFile, $help, $man);
-
-BEGIN {
-    $webguiRoot = "..";
-    unshift (@INC, $webguiRoot."/lib");
-}
-
 use strict;
 use Pod::Usage;
 use Getopt::Long;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
+
+$|++; # disable output buffering
 
 # Get parameters here, including $help
 GetOptions(
-    'configFile=s'  => \$configFile,
-    'help'          => \$help,
-    'man'           => \$man,
+    'configFile=s'  => \(my $configFile),
+    'help'          => \(my $help),
+    'man'           => \(my $man),
 );
 
 pod2usage( verbose => 1 ) if $help;
 pod2usage( verbose => 2 ) if $man;
-pod2usage( msg => "Must specify a config file!" ) unless $configFile;  
+pod2usage( msg => "Must specify a config file!" ) unless $configFile;
 
-my $session = start( $webguiRoot, $configFile );
+my $session = start( $configFile );
 # Do your work here
 finish($session);
 
@@ -43,9 +38,8 @@ finish($session);
 
 #----------------------------------------------------------------------------
 sub start {
-    my $webguiRoot  = shift;
     my $configFile  = shift;
-    my $session = WebGUI::Session->open($webguiRoot,$configFile);
+    my $session = WebGUI::Session->open($configFile);
     $session->user({userId=>3});
     
     ## If your script is adding or changing content you need these lines, otherwise leave them commented

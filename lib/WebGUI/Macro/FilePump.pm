@@ -150,7 +150,7 @@ sub process {
             elsif ($scheme eq 'http' or $scheme eq 'https') {
                 $url = $uri->as_string;
             }
-            $url =~ tr{/}{/}s;
+            $url =~ s$(?<!:)/{2,}$/$g;  ##Remove //, unless it's after a :, which is not a valid URL character
             $output .= $type eq 'js' ? scriptTag($session, $url, $extras) : linkTag($session, $url, $extras);
         }
         return $output;

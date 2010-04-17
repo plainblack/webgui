@@ -149,6 +149,12 @@ wobject can always view and edit all data.|,
         lastUpdated => 1223372150,
     },
 
+    'owner' => {
+        message => q|Owner|,
+        lastUpdated => 1253828331,
+        context => q|The person who owns, or submits, or creates a row of data in the Thingy.|
+    },
+
     'save button label label' => {
         message => q|Save Button Label|,
         lastUpdated => 1104630516,

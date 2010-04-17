@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::CanEditText;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
@@ -21,7 +22,7 @@ my $session = WebGUI::Test->session;
 use Test::More; # increment this value for each test you create
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
-my ($versionTag, $asset, $group, @users) = setupTest($session, $homeAsset);
+my ($asset, $group, @users) = setupTest($session, $homeAsset);
 
 my @testSets = (
 	{
@@ -61,16 +62,9 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets + 2;
+my $numTests = scalar @testSets + 1;
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::CanEditText';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 is(
 	WebGUI::Macro::CanEditText::process($session,''),
@@ -83,8 +77,6 @@ foreach my $testSet (@testSets) {
 	$session->asset($testSet->{asset});
 	my $output = WebGUI::Macro::CanEditText::process($session, $testSet->{text});
 	is($output, $testSet->{output}, $testSet->{comment});
-}
-
 }
 
 sub setupTest {
@@ -111,17 +103,6 @@ sub setupTest {
 	$users[1]->addToGroups([$cm->getId]);
 	##User 2 is a member of a content manager sub-group
 	$users[2]->addToGroups([$editGroup->getId]);
-	return ($versionTag, $asset, $editGroup, @users);
-}
-
-END { ##Clean-up after yourself, always
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
-	foreach my $testGroup ($group) {
-		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
-	}
-	foreach my $dude (@users) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
+    addToCleanup($versionTag, $editGroup, @users);
+	return ($asset, $editGroup, @users);
 }

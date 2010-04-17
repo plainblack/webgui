@@ -39,9 +39,11 @@ i.e., it does not validate their username or ensure their account is active.
 =cut
 
 sub _isValidLDAPUser {
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
     my ($error, $ldap, $search, $auth, $connectDN);
-    my $i18n = WebGUI::International->new($self->session);
+    my $i18n = WebGUI::International->new($session);
 
     my $connection = $self->getLDAPConnection;
     return 0 unless $connection;
@@ -52,8 +54,8 @@ sub _isValidLDAPUser {
         $self->error('<li>'.$i18n->get(2,'AuthLDAP').'</li>');
         return 0;
     }
-    my $username = $self->session->form->get("authLDAP_ldapId") || $self->session->form->get("username");
-    my $password = $self->session->form->get("authLDAP_identifier") || $self->session->form->get("identifier");
+    my $username = $form->get("authLDAP_ldapId")     || $form->get("username");
+    my $password = $form->get("authLDAP_identifier") || $form->get("identifier");
 
     my $uri = URI->new($connection->{ldapUrl}) or $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
 
@@ -63,7 +65,7 @@ sub _isValidLDAPUser {
     }
 
     # Create an LDAP object
-    if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
+    if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port,scheme=>$uri->scheme))) {
 
         # Bind as a proxy user to search for the user trying to login
         if($connection->{connectDn}) {
@@ -101,27 +103,27 @@ sub _isValidLDAPUser {
                 # Invalid login credentials, directory did not authenticate the user
                 if ($auth->code == 48 || $auth->code == 49) {
                     $error .= '<li>'.$i18n->get(68).'</li>';
-                    $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process('authLDAP_ldapId'));
+                    $session->log->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process('authLDAP_ldapId'));
                 }
                 elsif ($auth->code > 0) {  # Some other LDAP error occured
                     $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured. '.$i18n->get(69).'</li>';
-                    $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
+                    $session->log->error("LDAP error: ".$self->ldapStatusCode($auth->code));
                 }
                 $ldap->unbind;
             }
             else { # Could not find the user in the directory to build a DN
                 $error .= '<li>'.$i18n->get(68).'</li>';
-                $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("authLDAP_ldapId"));
+                $session->log->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("authLDAP_ldapId"));
             }
         }
         else { # Unable to bind with proxy user credentials or anonymously for our search
             $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
-            $self->session->errorHandler->error("Couldn't bind to LDAP server: ".$connection->{ldapUrl});
+            $session->log->error("Couldn't bind to LDAP server: ".$connection->{ldapUrl});
         }
    }
    else { # Could not create our LDAP object
       $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
-      $self->session->errorHandler->error("Couldn't create LDAP object: ".$connection->{ldapUrl});
+      $session->log->error("Couldn't create LDAP object: ".$connection->{ldapUrl});
    }
 
    $self->error($error);
@@ -175,21 +177,32 @@ sub authenticate {
 
         # Try to bind using the users dn and password
         $auth = $ldap->bind(dn=>$userData->{connectDN}, password=>$identifier);
+
+        # Failure to bind could have resulted from change to in DN on LDAP server.
+        # Test for new DN and update user account as needed
+        if ($auth->code > 0 && $self->_isValidLDAPUser()) {
+            # Update user profile and log change
+            # _isValidLDAPUser will set _connectDN to new correct value
+            $auth = $ldap->bind(dn=>$self->{_connectDN}, password=>$identifier);
+            my $message = "DN has been changed for user ".$_[0]." from \"".$userData->{connectDN}."\" to \"".$self->{_connectDN}."\"";
+            $self->saveParams($self->user->userId, $self->authMethod, { connectDN => $self->{_connectDN} });
+            $self->session->errorHandler->warn($message);
+        }
         
         # Authentication failed
-        if ($auth->code == 48 || $auth->code == 49){
+        if ($auth->code == 48 || $auth->code == 49 || $auth->code == 32){
             $error .= $self->SUPER::authenticationError;
         }
         elsif ($auth->code > 0) { # Some other LDAP error happened
             $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured.'.$i18n->get(69).'</li>';
-            $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
+            $self->session->log->error("LDAP error: ".$self->ldapStatusCode($auth->code));
         }
 
         $ldap->unbind;
     }
     else { 
         $error .= '<li>'.$i18n->get(13,'AuthLDAP').'</li>';
-        $self->session->errorHandler->error("Could not process this LDAP URL: ".$userData->{ldapUrl});
+        $self->session->log->error("Could not process this LDAP URL: ".$userData->{ldapUrl});
     }
 
     if($error ne ""){
@@ -311,7 +324,7 @@ sub createAccountSave {
     }
     #Get connectDN from settings   
     my $uri = URI->new($connection->{ldapUrl});
-    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
+    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port,scheme=>$uri->scheme));
     my $auth;
     if($connection->{connectDn}) {
         $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
@@ -480,7 +493,7 @@ sub editUserForm {
 	);
 	$f->text(
 		-name => "authLDAP_connectDN",
-		-label => $i18n->get(4),
+		-label => $i18n->get('LDAP User DN'),
 		-value => $connectDN,
 	);
 	$self->session->style->setRawHeadTags($jscript);
@@ -586,7 +599,34 @@ sub getCreateAccountTemplateId {
     my $self = shift;
     my $ldapConnect = $self->getLDAPConnection;
     return "PBtmpl0000000000000005" unless $ldapConnect;
-	return ($self->getLDAPConnection->{ldapCreateAccountTemplate} || "PBtmpl0000000000000005");
+	return ($ldapConnect->{ldapCreateAccountTemplate} || "PBtmpl0000000000000005");
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDeactivateAccountTemplateId ( )
+
+Get the default template ID for the deactivate account form.
+
+=cut
+
+sub getDeactivateAccountTemplateId {
+    my $self = shift;
+    my $ldapConnect = $self->getLDAPConnection;
+    return $self->SUPER::getDeactivateAccountTemplateId unless $ldapConnect;
+    return ($ldapConnect->{ldapDeactivateAccountTemplate} || $self->SUPER::getDeactivateAccountTemplateId);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDefaultLoginTemplateId ( )
+
+Get the default template ID for the login form.
+
+=cut
+
+sub getDefaultLoginTemplateId {
+    return "PBtmpl0000000000000006";
 }
 
 #-------------------------------------------------------------------
@@ -629,8 +669,8 @@ Get the template ID for the login form.
 sub getLoginTemplateId {
     my $self = shift;
     my $ldapConnect = $self->getLDAPConnection;
-    return "PBtmpl0000000000000006" unless $ldapConnect;
-    return ($self->getLDAPConnection->{ldapLoginTemplate} || "PBtmpl0000000000000006");
+    return $self->getDefaultLoginTemplateId unless $ldapConnect;
+    return ($self->getLDAPConnection->{ldapLoginTemplate} || $self->getDefaultLoginTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -644,8 +684,8 @@ Process the login form. Create a new account if auto registration is enabled.
 sub login {
     my $self = shift;
     my $i18n = WebGUI::International->new($self->session);
-    my $username = $self->session->form->process("username");
-    my $identifier = $self->session->form->process("identifier");
+    my $username         = $self->session->form->process("username");
+    my $identifier       = $self->session->form->process("identifier");
     my $autoRegistration = $self->session->setting->get("automaticLDAPRegistration");
     my $hasAuthenticated = 0;
 
@@ -683,7 +723,7 @@ sub login {
    }
    return $self->SUPER::login() if $hasAuthenticated;  #Standard login routine for login
 
-   $self->session->errorHandler->security("login to account ".$self->session->form->process("username")." with invalid information.");
+   $self->session->log->security("login to account ".$self->session->form->process("username")." with invalid information.");
    return $self->displayLogin("<h1>".$i18n->get(70)."</h1>".$self->error);
 }
 

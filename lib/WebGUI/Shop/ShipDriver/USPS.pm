@@ -6,6 +6,7 @@ use WebGUI::Exception;
 use XML::Simple;
 use LWP;
 use Tie::IxHash;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -13,7 +14,7 @@ Package WebGUI::Shop::ShipDriver::USPS
 
 =head1 DESCRIPTION
 
-Shipping driver for the United States Postal Service.
+Shipping driver for the United States Postal Service, domestic shipping services.
 
 =head1 SYNOPSIS
 
@@ -53,9 +54,12 @@ sub buildXML {
     $xmlTop->{Package} = [];
     ##Do a request for each package.
     my $packageIndex;
-    my $shipType = $self->get('shipType');
-    my $service  = $shipType eq 'PRIORITY VARIABLE' ? 'PRIORITY'
-                 : $shipType;
+    my $shipType  = $self->get('shipType');
+    my $service   = $shipType eq 'PRIORITY VARIABLE'
+                  ? 'PRIORITY'
+                  : $shipType;
+    my $sourceZip = $self->get('sourceZip');
+    $sourceZip    =~ s/^(\d{5}).*$/$1/;
     PACKAGE: for(my $packageIndex = 0; $packageIndex < scalar @packages; $packageIndex++) {
         my $package = $packages[$packageIndex];
         next PACKAGE unless scalar @{ $package };
@@ -72,9 +76,13 @@ sub buildXML {
             $weight += $itemWeight;
         }
         my $pounds = int($weight);
-        my $ounces = int(16 * ($weight - $pounds));
+        my $ounces = sprintf '%3.1f', (16 * ($weight - $pounds));
+        if ($pounds == 0 && $ounces eq '0.0' ) {
+            $ounces = 0.1;
+        }
         my $destination = $package->[0]->getShippingAddress;
         my $destZipCode = $destination->get('code');
+        $destZipCode    =~ s/^(\d{5}).*$/$1/;
         $packageData{ID}              = $packageIndex;
         $packageData{Service}         = [ $service                ];
         $packageData{ZipOrigination}  = [ $self->get('sourceZip') ];
@@ -126,6 +134,9 @@ sub calculate {
     if (! $self->get('userId')) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a USPS userId.});
     }
+    if ($cart->getShippingAddress->get('country') ne 'United States') {
+        WebGUI::Error::InvalidParam->throw(error => q{Driver only handles domestic shipping});
+    }
     my $cost = 0;
     ##Sort the items into shippable bundles.
     my @shippableUnits = $self->_getShippableUnits($cart);
@@ -142,15 +153,16 @@ sub calculate {
     my $response = $self->_doXmlRequest($xml);
     ##Error handling
     if (! $response->is_success) {
-        WebGUI::Error::RemoteShippingRate->throw(error => 'Problem connecting to USPS Web Tools: '. $response->status_line);
+        WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Problem connecting to USPS Web Tools: '. $response->status_line);
     }
     my $returnedXML = $response->content;
-    my $xmlData     = XMLin($returnedXML, ForceArray => [qw/Package/]);
+    my $xmlData     = XMLin($returnedXML, KeepRoot => 1, ForceArray => [qw/Package/]);
     if (exists $xmlData->{Error}) {
-        WebGUI::Error::RemoteShippingRate->throw(error => 'Problem with USPS Web Tools XML: '. $xmlData->{Description});
+        WebGUI::Error::Shop::RemoteShippingRate->throw(error => 'Problem with USPS Web Tools XML: '. $xmlData->{Error}->{Description});
     }
     ##Summarize costs from returned data
     $cost = $self->_calculateFromXML($xmlData, @shippableUnits);
+    $cost += $self->_calculateInsurance(@shippableUnits);
     return $cost;
 }
 
@@ -166,14 +178,16 @@ Processed XML data from an XML rate request, processed in perl data structure.  
 have this structure:
 
     {
-        Package => [
-            {
-                ID => 0,
-                Postage => {
-                    Rate => some_number
-                }
-            },
-        ]
+        RateV3Response => {
+            Package => [
+                {
+                    ID => 0,
+                    Postage => {
+                        Rate => some_number
+                    }
+                },
+            ]
+        }
     }
 
 =head3 @shippableUnits
@@ -185,12 +199,15 @@ The set of shippable units, which are required to do quantity lookups.
 sub _calculateFromXML {
     my ($self, $xmlData, @shippableUnits) = @_;
     my $cost = 0;
-    foreach my $package (@{ $xmlData->{Package} }) {
+    foreach my $package (@{ $xmlData->{RateV3Response}->{Package} }) {
         my $id   = $package->{ID};
         my $rate = $package->{Postage}->{Rate};
         ##Error check for invalid index
-        if ($id < 0 || $id > $#shippableUnits) {
-            WebGUI::Error::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
+        if ($id < 0 || $id > $#shippableUnits || $id !~ /^\d+$/) {
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => "Illegal package index returned by USPS: $id");
+        }
+        if (exists $package->{Error}) {
+            WebGUI::Error::Shop::RemoteShippingRate->throw(error => $package->{Error}->{Description});
         }
         my $unit = $shippableUnits[$id];
         if ($unit->[0]->getSku->isShippingSeparately) {
@@ -204,6 +221,74 @@ sub _calculateFromXML {
         }
     }
     return $cost;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _calculateInsurance ( @shippableUnits )
+
+Takes data from the USPS and returns the calculated shipping price.
+
+=head3 @shippableUnits
+
+The set of shippable units, which are required to do quantity and cost lookups.
+
+=cut
+
+sub _calculateInsurance {
+    my ($self, @shippableUnits) = @_;
+    my $insuranceCost  = 0;
+    return $insuranceCost unless $self->get('addInsurance') && $self->get('insuranceRates');
+    my @insuranceTable = _parseInsuranceRates($self->get('insuranceRates'));
+    ##Sort by decreasing value for easy post processing
+    @insuranceTable = sort { $a->[0] <=> $b->[0] } @insuranceTable;
+    foreach my $package (@shippableUnits) {
+        my $value = 0;
+        ITEM: foreach my $item (@{ $package }) {
+            $value += $item->getSku->getPrice() * $item->get('quantity');
+        }
+        my $pricePoint;
+        POINT: foreach my $point (@insuranceTable) {
+            if ($value < $point->[0]) {
+                $pricePoint = $point;
+                last POINT;
+            }
+        }
+        if (!defined $pricePoint) {
+            $pricePoint = $insuranceTable[-1];
+        }
+        $insuranceCost += $pricePoint->[1];
+    }
+    return $insuranceCost;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _parseInsuranceRates ( $rates )
+
+Take the user entered data, a string, and turn it into an array.
+
+=head3 $rates
+
+The rate data entered by the user.  One set of data per line.  Each line has the value of
+shipment, a colon, and the cost of insuring a shipment of that value.
+
+=cut
+
+sub _parseInsuranceRates {
+    my $rates = shift;
+    $rates =~ tr/\r//d;
+    my $number = qr/\d+(?:\.\d+)?/;
+    my $rate   = qr{ \s* $number \s* : \s* $number \s* }x;
+    return () if ($rates !~ m{ \A (?: $rate \r?\n )* $rate (?:\r\n)? \Z }x);
+    my @lines = split /\n/, $rates;
+    my @table = ();
+    foreach my $line (@lines) {
+        $line =~ s/\s+//g;
+        my ($value, $cost) = split /:/, $line;
+        push @table, [ $value, $cost ];
+    }
+    return @table;
 }
 
 #-------------------------------------------------------------------
@@ -262,6 +347,18 @@ sub definition {
             options      => \%shippingTypes,
             defaultValue => 'PARCEL',
         },
+        addInsurance => {
+            fieldType    => 'yesNo',
+            label        => $i18n->get('add insurance'),
+            hoverHelp    => $i18n->get('add insurance help'),
+            defaultValue => 0,
+        },
+        insuranceRates => {
+            fieldType    => 'textarea',
+            label        => $i18n->get('insurance rates'),
+            hoverHelp    => $i18n->get('insurance rates help'),
+            defaultValue => "50:1.75\n100:2.25",
+        },
 ##Note, if a flat fee is added to this driver, then according to the license
 ##terms the website must display a note to the user (shop customer) that additional
 ##fees have been added.
@@ -299,6 +396,7 @@ sub _doXmlRequest {
     my $userAgent = LWP::UserAgent->new;
     $userAgent->env_proxy;
     $userAgent->agent('WebGUI');
+    $userAgent->timeout('45');
     my $url = 'http://production.shippingapis.com/ShippingAPI.dll?API=RateV3&XML=';
     $url .= $xml;
     my $request = HTTP::Request->new(GET => $url);
@@ -344,6 +442,9 @@ sub _getShippableUnits {
         }
         else {
             my $zip = $item->getShippingAddress->get('code');
+            if ($item->getShippingAddress->get('country') ne 'United States') {
+                WebGUI::Error::InvalidParam->throw(error => q{Driver only handles domestic shipping});
+            }
             push @{ $looseUnits{$zip} }, $item;
         }
     }

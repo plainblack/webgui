@@ -204,9 +204,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session,'Asset_RichEdit');
 	my %buttons;
 	tie %buttons, "Tie::IxHash";
@@ -441,7 +441,7 @@ sub getEditForm {
         name        => "allowMedia",
     );
 	return $tabform;
-}
+};
 
 
 
@@ -477,11 +477,11 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 =cut
 
-sub getToolbar {
+override getToolbar => sub {
 	my $self = shift;
 	return undef if ($self->getToolbarState);
-	return $self->SUPER::getToolbar();
-}
+	return super();
+};
 
 
 
@@ -600,7 +600,7 @@ sub getRichEditor {
 			$config{theme_advanced_source_editor_height} = $self->sourceEditorHeight if ($self->sourceEditorHeight > 0);
 		}
 	}
-	my $language  = $i18n->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
+	my $language  = $i18n->getLanguage('' ,"languageAbbreviation");
 	unless ($language) {
 		$language = $i18n->getLanguage("English","languageAbbreviation");
 	}
@@ -651,11 +651,12 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->setIsPublic(0);
-}
+};
 
 
 #-------------------------------------------------------------------

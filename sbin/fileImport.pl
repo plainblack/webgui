@@ -10,29 +10,23 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot, @nailable);
-
-BEGIN { 
-	$webguiRoot = "..";
-	@nailable = qw(jpg jpeg png gif);
-	unshift (@INC, $webguiRoot."/lib"); 
-}
-
-
-$| = 1;
-
+use strict;
 use File::Path;
 use File::stat;
 use FileHandle;
 use Getopt::Long;
 use POSIX;
 use Pod::Usage;
-use strict;
+use WebGUI::Paths -inc;
 use WebGUI::Asset::File;
 use WebGUI::Asset::File::Image;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Utility;
+
+$| = 1;
+
+my @nailable = qw(jpg jpeg png gif);
 
 # TB : Get the time as soon as possible. Use $now as global variable.
 # $now is used for skipOlderThan feature.
@@ -89,7 +83,7 @@ my %ListAssetExists;
 my %filelisthash;
 
 print "Starting..." unless ($quiet);
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 $session->user({userId=>3});
 print "OK\n" unless ($quiet);
 
@@ -266,14 +260,15 @@ sub buildFileList {
 					exit 2;
 				}
 
+                my $filename = $session->url->urlize($file);
 				push(@filelist, {
 					ext=>$ext, 
-					filename=>$file, 
+					filename=>$filename, 
 					fullPathFile => $fullpathfile,
 				});
 
-				$filelisthash{$file} = $fullpathfile;
-				print "Found file $file.\n" unless ($quiet);
+				$filelisthash{$filename} = $fullpathfile;
+				print "Found file $file as $filename.\n" unless ($quiet);
 			}
 			# TB : the recursive call
 			push(@filelist, buildFileList($now,"$fullpathfile")) if ((-d "$fullpathfile") && $recursive);

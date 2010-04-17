@@ -137,9 +137,11 @@ sub new
 
 	#use Data::Dumper;
 	#warn "Args to DateTime->new: ".Dumper \@_;
-	
-	if (@_ > 1 && grep /^mysql$/, @_)
-	{
+
+    if (! scalar(@_)  || $_[0] eq '') {
+        $self = $class->SUPER::now();
+    }
+	elsif (@_ > 1 && grep /^mysql$/, @_) {
 		my %hash	= @_;
 		$hash{time_zone} ||= "UTC";
 		my $string	= delete $hash{mysql};
@@ -149,12 +151,10 @@ sub new
 		
 		$self	= $class->SUPER::new(%hash);
 	}
-	elsif (@_ > 1)
-	{
+	elsif (@_ > 1) {
 		$self	= $class->SUPER::new(@_);
 	}
-	elsif ($_[0] =~ /^\d+$/)
-	{
+	elsif ($_[0] =~ /^-?\d+$/) {
 		$self	= DateTime->from_epoch(epoch=>$_[0], time_zone=>"UTC", locale=>$locale);
 	}
     else {
@@ -594,19 +594,27 @@ sub _splitMysql
 
     @hash{ qw( year month day hour minute second ) } 	
         = $string =~ m{
-          (\d+)   # Year
+          ^
           \D*
-          (\d+)   # Month
+          (\d{1,4})   # Year
+          \D+
+          (\d{1,2})   # Month
+          \D+
+          (\d{1,2})   # Day
+          (?: \D+
+              (\d{1,2})   # Hours
+              \D+
+              (\d{1,2})   # Minutes
+              \D+
+              (\d{1,2})   # Seconds
+          )?
           \D*
-          (\d+)   # Day
-          \D*
-          (\d+)   # Hours
-          \D*
-          (\d+)   # Minutes
-          \D*
-          (\d+)   # Seconds
+          $
         }x;
 
+    $hash{ hour   } ||= 0;
+    $hash{ minute } ||= 0;
+    $hash{ second } ||= 0;
 	return %hash;
 }
 

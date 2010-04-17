@@ -23,7 +23,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::MockObject;
-plan tests => 10;
+plan tests => 14;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -50,12 +50,20 @@ my $targetFolder = $root->addChild({
     className => 'WebGUI::Asset::Wobject::Folder',
 });
 
-my $snippet = $folder->addChild({
+my $subSnippet = $folder->addChild({
     url => 'testSnippet',
     title => 'snippet',
     menuTitle => 'snippetMenuTitle',
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'A snippet of text',
+});
+
+my $snippet = $root->addChild({
+    url       => 'snip_snip',
+    title     => 'snip snip',
+    className => 'WebGUI::Asset::Snippet',
+    snippet   => 'Always upgrade to the latest version',
+    isPackage => 1,
 });
 
 my $packageAssetId = $folder->getId;
@@ -68,6 +76,17 @@ is(scalar @{ $targetFolderChildren }, 0, 'target folder has no children');
 $versionTag->commit;
 
 sleep 2;
+
+my $storage = $snippet->exportPackage();
+isa_ok($storage, 'WebGUI::Storage', 'exportPackage returns a WebGUI::Storage object');
+
+my $snippetRev = $snippet->addRevision({ snippet => 'Only upgrade existing data if revisionDate is newer' });
+is($snippetRev->get('snippet'), 'Only upgrade existing data if revisionDate is newer', 'importPackage, overwriteLatest: precondition check, content');
+cmp_ok( $snippetRev->get('revisionDate'), '>', $snippet->get('revisionDate'), '... precondition check, revisionDate');
+
+my $vt2 = WebGUI::VersionTag->getWorking($session);
+$vt2->commit;
+WebGUI::Test->tagsToRollback($vt2);
 
 $targetFolder->www_deployPackage();
 
@@ -93,7 +112,18 @@ $newVersionTag->commit;
 
 my $newFolder = WebGUI::Asset->new($session, $folder->getId);
 ok(! $newFolder->get('isPackage'), 'Disabled isPackage in original folder asset');
-is(scalar @{ $root->getPackageList }, 0, 'getPackageList does not pick up old versions of assets that used to be packages');
+
+sleep 1;
+
+my $updatedSnippet = WebGUI::Asset->new($session, $snippet->getId);
+
+$root->importPackage($storage, { overwriteLatest => 1 });
+$updatedSnippet = WebGUI::Asset->new($session, $snippet->getId);
+is($updatedSnippet->get('snippet'), 'Always upgrade to the latest version', 'importPackage: overwriteLatest causes revision dates to be ignored');
+cmp_ok( $updatedSnippet->get('revisionDate'), '>', $snippetRev->get('revisionDate'), '... revisionDate check on imported package with overwriteLatest');
+
+my $lastTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($lastTag);
 
 TODO: {
     local $TODO = "Tests to make later";

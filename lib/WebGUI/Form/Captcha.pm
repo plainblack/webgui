@@ -162,7 +162,7 @@ sub toHtml {
         my $pubKey = $self->session->setting->get('recaptchaPublicKey');
         my $server = "http://api.recaptcha.net";
         if ($env->sslRequest) {
-            $server = "http://api-secure.recaptcha.net";
+            $server = "https://api-secure.recaptcha.net";
         }
         return
             '<script type="text/javascript" src="' . $server . '/challenge?k=' . $pubKey . '"></script>'
@@ -178,8 +178,9 @@ sub toHtml {
     my ($filename, $challenge) = $storage->addFileFromCaptcha;
     $self->set("size", 6);
     $self->set("maxlength", 6);
+    $self->set("extras", 'class="wg-captchaForm"');
     $self->session->scratch->set("captcha_".$self->get("name"), $challenge);
-    return $self->SUPER::toHtml.'<p style="display:inline;vertical-align:middle;"><img src="'.$storage->getUrl($filename).'" style="border-style:none;vertical-align:middle;" alt="captcha" /></p>';
+    return $self->SUPER::toHtml.'<img src="'.$storage->getUrl($filename).'" class="wg-captchaImage" alt="captcha" />';
 }
 
 =head2 getErrorMessage ( )

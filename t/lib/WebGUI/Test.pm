@@ -28,8 +28,8 @@ use base qw(Test::Builder::Module);
 
 use Test::MockObject;
 use Test::MockObject::Extends;
+use Log::Log4perl;  # load early to ensure proper order of END blocks
 use Clone               qw(clone);
-use Config              ();
 use IO::Handle          ();
 use File::Spec          ();
 use IO::Select          ();
@@ -39,37 +39,21 @@ use List::MoreUtils     qw( any );
 use Carp                qw( carp croak );
 use JSON                qw( from_json to_json );
 use Scope::Guard;
+use WebGUI::Paths -inc;
 
-BEGIN {
-    my $file_root = File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], '');
+our $WEBGUI_TEST_ROOT = File::Spec->catdir(
+    File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], ''),
+    (File::Spec->updir) x 2
+);
+our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir(
+    $WEBGUI_TEST_ROOT,
+    'supporting_collateral'
+);
 
-    our $WEBGUI_ROOT = Cwd::realpath( File::Spec->catdir( $file_root, (File::Spec->updir) x 3 ));
-    our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
-    our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_ROOT, 'lib' );
-
-    push @INC, $WEBGUI_LIB;
-
-    ##Handle custom loaded library paths
-    my $customPreload = File::Spec->catfile( $WEBGUI_ROOT, 'sbin', 'preload.custom');
-    if (-e $customPreload) {
-        open my $PRELOAD, '<', $customPreload or
-            croak "Unload to open $customPreload: $!\n";
-        LINE: while (my $line = <$PRELOAD>) {
-            $line =~ s/#.*//;
-            $line =~ s/^\s+//;
-            $line =~ s/\s+$//;
-            next LINE if !$line;
-            unshift @INC, $line;
-        }
-        close $PRELOAD;
-    }
-}
-
-use WebGUI::Session;
 use WebGUI::PseudoRequest;
 
 our @EXPORT = qw(cleanupGuard addToCleanup);
-our @EXPORT_OK = qw(session config);
+our @EXPORT_OK = qw(session config collateral);
 
 my $CLASS = __PACKAGE__;
 
@@ -87,7 +71,12 @@ sub import {
     die "WEBGUI_CONFIG path '$CONFIG_FILE' is not readable by effective uid '$>'.\n"
         unless -r _;
 
-    $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, File::Spec->catdir($CLASS->root, 'etc'));
+    $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, WebGUI::Paths->configBase);
+
+    goto &{ $_[0]->can('SUPER::import') };
+}
+
+sub _initSession {
     my $session = our $SESSION = $CLASS->newSession(1);
 
     my $originalSetting = clone $session->setting->get;
@@ -132,8 +121,6 @@ sub import {
             }
         });
     }
-
-    goto &{ $_[0]->can('SUPER::import') };
 }
 
 END {
@@ -168,7 +155,8 @@ If true, the session won't be registered for automatic deletion.
 sub newSession {
     my $noCleanup = shift;
     my $pseudoRequest = WebGUI::PseudoRequest->new;
-    my $session = WebGUI::Session->open( $CLASS->root, $CLASS->file );
+    require WebGUI::Session;
+    my $session = WebGUI::Session->open( $CLASS->config );
     $session->{_request} = $pseudoRequest;
     if ( ! $noCleanup ) {
         $CLASS->sessionsToDelete($session);
@@ -335,9 +323,13 @@ Returns the config object from the session.
 
 =cut
 
+my $config;
 sub config {
-    return undef unless defined $CLASS->session;
-    return $CLASS->session->config;
+    return $config
+        if $config;
+    require WebGUI::Config;
+    $config = WebGUI::Config->new(our $CONFIG_FILE);
+    return $config;
 }
 
 #----------------------------------------------------------------------------
@@ -381,7 +373,6 @@ sub getPage {
                                 #              precedence
 
     my $session = $CLASS->session;
-
     # Set the appropriate user
     my $oldUser     = $session->user;
     if ($optionsRef->{user}) {
@@ -437,8 +428,12 @@ Optionally adds a filename to the end.
 
 sub getTestCollateralPath {
     my $class           = shift;
-    my $filename        = shift;
-    return File::Spec->catfile(our $WEBGUI_TEST_COLLATERAL, $filename);
+    my @path            = @_;
+    return File::Spec->catfile(our $WEBGUI_TEST_COLLATERAL, @path);
+}
+
+sub collateral {
+    return $CLASS->getTestCollateralPath(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -449,20 +444,10 @@ Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
 
 =cut
 
+our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_TEST_ROOT, File::Spec->updir );
+
 sub lib {
     return our $WEBGUI_LIB;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 root ( )
-
-Returns the full path to the WebGUI root directory, usually /data/WebGUI.
-
-=cut
-
-sub root {
-    return our $WEBGUI_ROOT;
 }
 
 #----------------------------------------------------------------------------
@@ -481,7 +466,11 @@ disabled.
 =cut
 
 sub session {
-    return our $SESSION;
+    our $SESSION;
+    if (! $SESSION) {
+        _initSession();
+    }
+    return $SESSION;
 }
 
 #----------------------------------------------------------------------------
@@ -819,6 +808,10 @@ Example call:
             my ($class, $ident) = @_;
             return WebGUI::Storage->get($CLASS->session, $ident);
         },
+        'SQL' => sub {
+            my (undef, $sql) = @_;
+            return $CLASS->session->db->dbh->prepare($sql);
+        },
     );
 
     my %clone = (
@@ -895,6 +888,10 @@ Example call:
             my $link = shift;
             $link->session->db->write("delete from ldapLink where ldapLinkId=?", [$link->{ldapLinkId}]);
         },
+        'CODE' => sub {
+            (shift)->();
+        },
+        'SQL' => 'execute',
     );
 
     sub cleanupGuard {
@@ -906,9 +903,9 @@ Example call:
             my $construct;
             if ( ref $class ) {
                 my $object = $class;
+                $class = ref $class;
                 my $cloneSub = $CLASS->_findByIsa($class, \%clone);
                 $construct = $cloneSub ? sub { $object->$cloneSub } : sub { $object };
-                $class = ref $class;
             }
             else {
                 my $id = shift;
@@ -958,7 +955,7 @@ sub _findByIsa {
     my $toFind = shift;
     my $hash = shift;
     for my $key ( sort { length $b <=> length $a} keys %$hash ) {
-        if ($toFind->isa($key)) {
+        if ($toFind eq $key || $toFind->isa($key)) {
             return $hash->{$key};
         }
     }

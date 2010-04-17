@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::Page;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -46,22 +47,13 @@ foreach my $testSet (@testSets) {
 	$numTests += scalar keys %{ $testSet };
 }
 
-$numTests += 1; #For the use_ok
 $numTests += 1; #For macro call with undefined session asset
 
 plan tests => $numTests;
 
-my $macro = 'WebGUI::Macro::Page';
-my $loaded = use_ok($macro);
-
 my $homeAsset = WebGUI::Asset->getDefault($session);
-my $versionTag;
 
-($versionTag, @testSets) = setupTest($session, $homeAsset, @testSets);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+@testSets = setupTest($session, $homeAsset, @testSets);
 
 is(
 	WebGUI::Macro::Page::process($session,'url'),
@@ -80,8 +72,6 @@ foreach my $testSet (@testSets) {
 	}
 }
 
-}
-
 sub setupTest {
 	my ($session, $homeAsset, @testSets) = @_;
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -92,9 +82,6 @@ sub setupTest {
 		$testSet->{asset} = $asset;
 	}
 	$versionTag->commit;
-	return $versionTag, @testSets;
-}
-
-END { ##Clean-up after yourself, always
-	$versionTag->rollback;
+    addToCleanup($versionTag);
+	return @testSets;
 }

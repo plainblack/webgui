@@ -123,37 +123,37 @@ property warranty => (
         );
 property variantsJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property accessoryJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property relatedJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property specificationJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property featureJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
 property benefitJSON => (
             ##Collateral data is stored as JSON in here
-            noFormPost   => 0,
+            noFormPost   => 1,
             default      => '[]',
             fieldType    => "textarea",
         );
@@ -178,9 +178,9 @@ Override the default method in order to deal with attachments.
 
 =cut
 
-sub addRevision {
+override addRevision => sub {
     my $self = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+    my $newSelf = super();
     if ($newSelf->getRevisionCount > 1) {
         foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
             if ($self->get($field)) {
@@ -190,7 +190,7 @@ sub addRevision {
         }
     }
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -233,9 +233,9 @@ Override the duplicate method so uploaded files and images also get copied.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self = shift;
-    my $newAsset = $self->SUPER::duplicate(@_);
+    my $newAsset = super;
 
     foreach my $file ('image1', 'image2', 'image3', 'manual', 'brochure', 'warranty') {
         $self->_duplicateFile($newAsset, $file);
@@ -243,7 +243,7 @@ sub duplicate {
 
     return $newAsset;
 
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -646,10 +646,10 @@ The WebGUI::Shop::CartItem that will be refunded.
 
 =cut
 
-sub onRefund {
+override onRefund => sub {
     my $self   = shift;
     my $item   = shift;
-    $self->SUPER::onRefund($item);
+    super();
     my $amount = $item->get('quantity');
     ##Update myself, as options
     $self->getOptions->{quantity} += $amount;
@@ -658,7 +658,7 @@ sub onRefund {
     my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
     $collateral->{quantity} += $amount;
     $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -746,7 +746,7 @@ Extend the base class to handle all file collateral.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     my $sth = $self->session->db->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=?", [$self->getId]);
     while (my @array = $sth->array) {
@@ -756,8 +756,8 @@ sub purge {
         }
     }
     $sth->finish;
-    $self->SUPER::purge();
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -767,11 +767,11 @@ Extends the base class to handle cleaning up the cache for this asset.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
     my $self = shift;
     $self->session->cache->delete("view_".$self->getId);
-    $self->SUPER::purgeCache;
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -781,7 +781,7 @@ Extend the base method to handle deleting file collateral.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
     WebGUI::Storage->get($self->session, $self->get("image1"))->delete   if ($self->get("image1"));
     WebGUI::Storage->get($self->session, $self->get("image2"))->delete   if ($self->get("image2"));
@@ -789,8 +789,8 @@ sub purgeRevision {
     WebGUI::Storage->get($self->session, $self->get("brochure"))->delete if ($self->get("brochure"));
     WebGUI::Storage->get($self->session, $self->get("manual"))->delete   if ($self->get("manual"));
     WebGUI::Storage->get($self->session, $self->get("warranty"))->delete if ($self->get("warranty"));
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 #-----------------------------------------------------------------
 
@@ -1655,8 +1655,9 @@ sub view {
     my $error = shift;
     my $session = $self->session;
     my $cache = $session->cache;
+    my $cacheKey = $self->getWwwCacheKey( 'view' );
     if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10){
-        my $out = $cache->get("view_".$self->getId);
+        my $out = $cache->get( $cacheKey );
         return $out if $out;
     }
     my (%data, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
@@ -1859,7 +1860,7 @@ sub view {
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && $self->{_hasAddedToCart} != 1){
-        $cache->set("view_".$self->getId, $out, $self->cacheTimeout);
+        $cache->set( $cacheKey, $out, $self->cacheTimeout );
     }
     return $out;
 }
@@ -1872,11 +1873,11 @@ Extend the base method to handle caching.
 
 =cut
 
-sub www_view {
+override www_view => sub {
     my $self = shift;
     $self->session->http->setCacheControl($self->cacheTimeout);
-    $self->SUPER::www_view(@_);
-}
+    super();
+};
 
 1;
 

@@ -18,18 +18,13 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 46;
-plan tests => $tests + 1;
+plan tests => 47;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey');
 my ($survey);
 
-SKIP: {
-
-skip $tests, "Unable to load Survey" unless $usedOk;
 my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->usersToDelete($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
@@ -252,7 +247,6 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     is($survey->responseJSON->nextResponseSection()->{text}, 'new text', '..wheras the original response uses the original text');
 
 }
-}
 
 # Test visualization
 eval 'use GraphViz';
@@ -272,6 +266,7 @@ like($storage->getFileContentsAsScalar($filename), qr{
 
 }
 
+$survey->getAdminConsole();
 my $adminConsole = $survey->getAdminConsole();
 cmp_deeply(
     $adminConsole->{_submenuItem},
@@ -314,3 +309,13 @@ cmp_deeply(
     ],
     "Admin console submenu",
 );
+
+####################################################
+#
+# www_loadSurvey
+#
+####################################################
+
+my $survey_json = $survey->www_loadSurvey({});
+my $survey_data = JSON::from_json($survey_json);
+unlike($survey_data->{edithtml}, qr/\^International/, 'www_loadSurvey process macros');

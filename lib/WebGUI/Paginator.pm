@@ -63,7 +63,7 @@ Private method which retrieves a data set from a database and replaces whatever 
 
 This method should only ever be called by the public setDataByQuery method and is only called in the case that dynamicPageNumberKey is set.
 
-The public setDataByQuery method is not capable of efficiently handling requests that dyncmically set the page number by value
+The public setDataByQuery method is not capable of efficiently handling requests that dynamically set the page number by value
 due to the fact that only one page of results is ever returned.   In this method, all the results are returned making this possible.
 
 =head3 query
@@ -405,7 +405,7 @@ sub getPage {
 
 =head2 getPageData ( [ pageNumber ] )
 
-Returns the data from the page specified as an array reference.
+Returns the data from the specified page as an array reference.
 
 =head3 pageNumber
 
@@ -414,40 +414,41 @@ Defaults to the page you're currently viewing. This is mostly here as an overrid
 =cut
 
 sub getPageData {
-	my $self = shift;
-        my $pageNumber = shift || $self->getPageNumber;
-    my $allRows = $self->{_rowRef};
-    
-        my $pageCount = $self->getNumberOfPages;
-        return [] if ($pageNumber > $pageCount);
+    my $self       = shift;
+    my $pageNumber = shift || $self->getPageNumber;
+    my $allRows    = $self->{_rowRef};
+
+    my $pageCount = $self->getNumberOfPages;
+    return [] if ($pageNumber > $pageCount);
 
     if($self->{_setByQuery}) {
         #Return the cached page
         return $allRows if($pageNumber == $self->getPageNumber);
         return [];
-	}
+    }
 
-   #Handle setByArrayRef or the old setDataByQuery method
-	my @pageRows = ();
+    #Handle setByArrayRef or the old setDataByQuery method
+    my @pageRows = ();
     my $rowsPerPage = $self->{_rpp};
     my $pageStartRow = ($pageNumber*$rowsPerPage)-$rowsPerPage;
     my $pageEndRow = $pageNumber*$rowsPerPage;
     for (my $i=$pageStartRow; $i<$pageEndRow; $i++) {
-	   $pageRows[$i-$pageStartRow] = $allRows->[$i] if ($i <= $#{$self->{_rowRef}});
-        }
-	return \@pageRows;
+       $pageRows[$i-$pageStartRow] = $allRows->[$i] if ($i <= $#{$self->{_rowRef}});
+    }
+    return \@pageRows;
 }
 
 #-------------------------------------------------------------------
 
-=head2 getPageNumber ( )
+=head2 getPageIterator (  )
 
-Returns the current page number. If no page number can be found then it returns 1.
+Returns the iterator that was created by setDataByCallback
 
 =cut
 
-sub getPageNumber {
-        return $_[0]->{_pn};
+sub getPageIterator {
+    my $self = shift;
+    return $self->{_iteratorObj};
 }
 
 #-------------------------------------------------------------------
@@ -458,7 +459,7 @@ Returns links to all pages in this paginator.
 
 =head3 limit
 
-An integer representing the maximum number of page links to return. Defaultly all page links will be returned.
+An integer representing the maximum number of page links to return. By default, all page links will be returned.
 
 =cut
 
@@ -522,6 +523,18 @@ sub getPageLinks {
 	}
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getPageNumber ( )
+
+Returns the current page number. If no page number can be found then it returns 1.
+
+=cut
+
+sub getPageNumber {
+        return $_[0]->{_pn};
+}
 
 #-------------------------------------------------------------------
 
@@ -589,13 +602,13 @@ By default the page number will be determined by looking at $self->session->form
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
-	my $currentURL = shift;
-	my $rowsPerPage = shift || 25;
-	my $formVar = shift || "pn";
-	my $pn = shift || $session->form->process($formVar) || 1;
-        bless {_session=>$session, _url => $currentURL, _rpp => $rowsPerPage, _formVar => $formVar, _pn => $pn}, $class;
+    my $class       = shift;
+    my $session     = shift;
+    my $currentURL  = shift;
+    my $rowsPerPage = shift || 25;
+    my $formVar     = shift || "pn";
+    my $pn          = shift || $session->form->process($formVar) || 1;
+    bless {_session=>$session, _url => $currentURL, _rpp => $rowsPerPage, _formVar => $formVar, _pn => $pn}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -648,6 +661,42 @@ sub setDataByArrayRef {
 	$self->{_rowRef} = $rowRef;
 	$self->{_totalRows} = $#{$rowRef} + 1;
     $self->{_setByQuery} = 0;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 setDataByCallback ( callback )
+
+Provide the paginator with data by giving it a callback.  This interface does not support
+having alphabetical keys ala C<setAlphabeticalKey> because the data is never stored in
+the Paginator object.
+
+=head3 callback
+
+A callback to invoke that returns an iterator.  The callback method should
+accept two optional parameters, an offset to start, and the rows per page
+to return.  The iterator should return the total number of rows in
+the query, without limits, when the first argument it is passed is 'rowCount'.
+
+=cut
+
+sub setDataByCallback {
+	my $self     = shift;
+	my $callback = shift;
+
+    my $pageNumber  = $self->getPageNumber;
+    my $rowsPerPage = $self->{_rpp};
+    my $start       = ( ($pageNumber - 1) * $rowsPerPage );
+
+    my $obj = $callback->($start, $rowsPerPage);
+    $self->{_totalRows} = $obj->('rowCount');
+
+    $self->{_iteratorObj}   = $obj;
+    $self->{_setByQuery}    = 0;
+    $self->{_setByArrayRef} = 0;
+    $self->{_setByCallback} = 1;
+    return '';
 }
 
 
@@ -738,7 +787,9 @@ sub setDataByQuery {
 =head2 setAlphabeticalKey ( string, abInitialOnly )
 
 Provide the paginator with a key of your data so it can display 
-alphabetic helpers in the "alt" tag of the page links.
+alphabetic helpers in the "alt" tag of the page links.  This only works well
+when _all_ the data is provided to the Paginator.  This means that the
+setDataByQuery and setDataByCallback methods cannot use this.
 
 =head3 keyName
 

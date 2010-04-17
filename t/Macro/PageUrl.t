@@ -65,7 +65,3 @@ $output = WebGUI::Macro::PageUrl::process($session, '/sub/page', 'query=this');
 like($output, qr{/sub/page\?noCache=\d+:\d+;query=this$}, 'checking that the query arg works with preventProxyCache');
 
 }
-
-END {
-	# See note in the Slash_gateway macro test about this.
-}

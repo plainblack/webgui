@@ -10,16 +10,11 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN {
-    $webguiRoot = "..";
-    unshift (@INC, $webguiRoot."/lib");
-}
-
 use strict;
 use Getopt::Long;
 use Pod::Usage;
+use File::Find ();
+use WebGUI::Paths -inc;
 use WebGUI::Config;
 
 local $| = 1; #disable output buffering
@@ -31,8 +26,7 @@ GetOptions(
 pod2usage( verbose => 2 ) if $help;
 pod2usage() if $configFile eq '';
 
-my $config = WebGUI::Config->new($webguiRoot,$configFile);
-use File::Find;
+my $config = WebGUI::Config->new($configFile);
 
 print "\tRemoving unnecessary .wgaccess files.\n";
 my $uploadsPath = $config->get('uploadsPath');

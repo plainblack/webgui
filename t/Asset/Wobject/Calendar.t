@@ -57,7 +57,7 @@ use Data::Dumper;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
-plan tests => 15 + scalar @icalWrapTests;
+plan tests => 14 + scalar @icalWrapTests;
 
 my $session = WebGUI::Test->session;
 
@@ -66,7 +66,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Calendar Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 
 my $cal = $node->addChild({className=>'WebGUI::Asset::Wobject::Calendar'});
 my $windowCal = $node->addChild({
@@ -137,7 +137,7 @@ my $inside = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $inside2 = $windowCal->addChild({
+my $insidewt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Inside window, with times',
     startDate   => $bday->toDatabaseDate,
@@ -171,7 +171,17 @@ my $straddle = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $straddleLow = $windowCal->addChild({
+my $straddlewt = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Straddles the window with times, inclusive',
+    startDate   => $startDt->clone->subtract(hours => 12)->toDatabaseDate,
+    endDate     => $endDt->clone->add(hours => 12)->toDatabaseDate,
+    startTime   => $startDt->clone->subtract(hours => 12)->toDatabaseTime,
+    endTime     => $endDt->clone->add(hours => 12)->toDatabaseTime,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $straddleLowwt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Straddles the window, lower side',
     startDate   => $startDt->clone->subtract(hours => 12)->toDatabaseDate,
@@ -181,7 +191,7 @@ my $straddleLow = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $straddleHigh = $windowCal->addChild({
+my $straddleHighwt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Straddles the window, higher side',
     startDate   => $endDt->clone->subtract(hours => 12)->toDatabaseDate,
@@ -191,7 +201,7 @@ my $straddleHigh = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $justBefore = $windowCal->addChild({
+my $justBeforewt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Just before the window.  Ending time coincident with window start',
     startDate   => $startDt->clone->subtract(hours => 1)->toDatabaseDate,
@@ -201,7 +211,7 @@ my $justBefore = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
-my $justAfter = $windowCal->addChild({
+my $justAfterwt = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Just after the window.  Start time coincident with window end',
     startDate   => $endDt->toDatabaseDate,
@@ -211,11 +221,52 @@ my $justAfter = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
+my $coincident = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Coincident with the window start and window end',
+    startDate   => $startDt->toDatabaseDate,
+    endDate     => $endDt->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $coincidentLow = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Coincident with the window start',
+    startDate   => $startDt->toDatabaseDate,
+    endDate     => $endDt->clone->add(days => 1)->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $coincidentHigh = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Coincident with the window end',
+    startDate   => $startDt->clone->add( days => -1, )->toDatabaseDate,
+    endDate     => $endDt->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+#    wt suffix = with times
+#                      inside
+#                      insidewt
+#          |-------------straddle-----------------|
+#          |-------------straddlewt---------------|
+#      straddleLowwt
+#                                           straddleHighwt
+#              |----------coincident-----------|
+#              |----------coincidentLow------------------|
+#    |--------------------coincidentHigh-------|
+# window:      |-------------------------------|
+#   justBeforewt                               justAfterwt
+#                                                 outside high
+# outside low
+#
+# Everything above the window should be included in the set of events returned.
+
 my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
-WebGUI::Test->tagsToRollback($tag2);
+addToCleanup($tag2);
 
-is(scalar @{ $windowCal->getLineage(['children'])}, 9, 'added events to the window calendar');
+is(scalar @{ $windowCal->getLineage(['children'])}, 13, 'added events to the window calendar');
 
 my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
 
@@ -223,11 +274,14 @@ my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
 #note join "\n", map { join ' ', $_->get('title'), $_->get('startDate'), $_->get('startTime')} @window;
 #note $endDt->toDatabase;
 
-is(scalar @window, 4, 'getEventsIn returned 4 events');
 cmp_bag(
     [ map { $_->get('title') } @window ],
-    [ map { $_->get('title') } ($inside, $inside2, $straddle, $straddleHigh)],
-    '..returns correct 4 events'
+    [ map { $_->get('title') }
+        ($inside,     $insidewt,
+         $straddle,   $straddleHighwt, $straddleLowwt, $straddlewt,
+         $coincident, $coincidentLow,  $coincidentHigh, )
+    ],
+    '..returns correct set of events'
 );
 
 ######################################################################
@@ -267,7 +321,7 @@ my $endOfWeek = $weekCal->addChild({
 
 my $tag3 = WebGUI::VersionTag->getWorking($session);
 $tag3->commit;
-WebGUI::Test->tagsToRollback($tag3);
+addToCleanup($tag3);
 
 my $weekVars = $weekCal->viewWeek({ start => $bday });
 my @eventBins = ();
@@ -347,7 +401,7 @@ my $endOfMonth = $monthCal->addChild({
 
 my $tag4 = WebGUI::VersionTag->getWorking($session);
 $tag4->commit;
-WebGUI::Test->tagsToRollback($tag4);
+addToCleanup($tag4);
 
 my $monthVars = $monthCal->viewMonth({ start => $bday });
 @eventBins = ();
@@ -393,7 +447,7 @@ my $dayCal = $node->addChild({
     title     => 'Calendar for doing event span testing, day',
 });
 
-$allDayDt  = $bday->cloneToUserTimeZone;
+$allDayDt     = $bday->cloneToUserTimeZone;
 my $nextDayDt = $bday->cloneToUserTimeZone->add(days => 1)->truncate( to => 'day')->add(hours => 19);
 
 $allDay = $dayCal->addChild({
@@ -418,7 +472,7 @@ my $nextDay = $dayCal->addChild({
 
 my $tag5 = WebGUI::VersionTag->getWorking($session);
 $tag5->commit;
-WebGUI::Test->tagsToRollback($tag5);
+addToCleanup($tag5);
 
 my $hourVars = $dayCal->viewDay({ start => $nextDayDt });
 @eventBins = ();
@@ -436,6 +490,62 @@ cmp_deeply(
 
 ######################################################################
 #
+# viewList
+#
+######################################################################
+
+my $listCal = $node->addChild({
+    className            => 'WebGUI::Asset::Wobject::Calendar',
+    title                => 'Calendar for doing event span testing, list',
+    listViewPageInterval => 3600*24*3,
+});
+
+$allDayDt     = $bday->cloneToUserTimeZone->truncate( to => 'day' );
+my $prevDayDt = $bday->cloneToUserTimeZone->truncate( to => 'day' )->subtract(days => 1)->add(hours => 19);
+
+note $allDayDt->toDatabase;
+note $prevDayDt->toDatabase;
+
+$allDay = $listCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'An event with explicit times that lasts all day',
+    startDate   => $allDayDt->toDatabaseDate,
+    endDate     => $allDayDt->clone->add(days => 1)->toDatabaseDate,
+    startTime   => $allDayDt->toDatabaseTime,
+    endTime     => $allDayDt->clone->add(days => 1)->toDatabaseTime,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $prevDay = $listCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Event at the end of the previous day',
+    startDate   => $prevDayDt->toDatabaseDate,
+    endDate     => $prevDayDt->toDatabaseDate,
+    startTime   => $prevDayDt->toDatabaseTime,
+    endTime     => $prevDayDt->clone->add(hours => 1)->toDatabaseTime,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $tag6 = WebGUI::VersionTag->getWorking($session);
+$tag6->commit;
+addToCleanup($tag6);
+
+my $listVars = $listCal->viewList({ start => $bday });
+
+@eventBins = ();
+foreach my $event (@{ $listVars->{events} }) {
+    push @eventBins, $event->{eventAssetId};
+}
+
+cmp_deeply(
+    \@eventBins,
+    [ $allDay->getId ],
+    '... correct set of events in list view'
+);
+
+
+######################################################################
+#
 # getFeeds
 #
 ######################################################################
@@ -447,7 +557,7 @@ my $feedCal = $node->addChild({
 
 my $feedTag = WebGUI::VersionTag->getWorking($session);
 $feedTag->set({name=>"Calendar Feed Test"});
-WebGUI::Test->tagsToRollback($feedTag);
+addToCleanup($feedTag);
 $feedTag->commit;
 
 cmp_deeply(
@@ -455,8 +565,3 @@ cmp_deeply(
     [],
     'getFeeds: returns an empty array ref with no feeds'
 );
-
-TODO: {
-        local $TODO = "Tests to make later";
-        ok(0, 'Lots more to test');
-}

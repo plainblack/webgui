@@ -1,0 +1,124 @@
+package WebGUI::Shop::PayDriver::Skeleton; #change the Skeleton with your own PayDriver name
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+use strict;
+use WebGUI::Shop::PayDriver;
+use base qw/WebGUI::Shop::PayDriver/;
+
+#-------------------------------------------------------------------
+
+=head2 definition ( )
+
+In the definition you can add your own properties
+=cut
+
+sub definition {
+    my $class       = shift;
+    my $session     = shift;
+    my $definition  = shift;
+
+    WebGUI::Error::InvalidParam->throw( error => q{Must provide a session variable} )
+        unless $session && ref $session eq 'WebGUI::Session';
+
+    tie my %fields, 'Tie::IxHash';
+
+#add some fields if you need your own parameters
+#    %fields = (
+#        currency => {
+#            fieldType       => 'text',
+#            label           => 'currency',
+#            hoverHelp       => 'Fill in your currency',
+#            defaultValue    => 'EUR',
+#            maxlength       => 3,
+#            size            => 3,
+#        },
+#    );
+
+    push @{ $definition }, {
+        name => 'Skeleton', #change the Skeleton with your own PayDriver name
+    	properties  => \%fields,
+    };
+    return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 canCheckoutCart ( )
+
+Returns whether the cart can be checked out by this plugin.
+
+=cut
+
+sub canCheckoutCart {
+    my $self    = shift;
+    my $cart    = $self->getCart;
+    return 0 unless $cart->readyForCheckout;
+    return 0 if $cart->requiresRecurringPayment;
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getButton ( )
+
+Create a button for the screen where you select the payment method. Redirect it
+to your first www_ method you need
+
+=cut
+
+sub getButton {
+    my $self    = shift;
+    my $button  = WebGUI::Form::formHeader($self->session) .
+        $self->getDoFormTags('finish') .
+        WebGUI::Form::submit($self->session, {value => $self->get('label') }) .
+        WebGUI::Form::formFooter($self->session);
+    return $button;
+}
+
+#-------------------------------------------------------------------
+
+=head2 processPayment ( )
+
+Should interact with the payment gateway and then return an array containing
+success/failure (as 1 or 0), transaction code (or payment gateway's transaction
+id), status code, and status message.
+
+=cut
+
+sub processPayment {
+    return (1, undef, 1, 'Success');
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_dosomething ( )
+
+Create your own www_ method. They are available from the outside.
+So www_finish can be called directly with:
+http://www.mysite.com/?shop=pay;method=do;do=finish
+
+=cut
+
+sub www_finish {
+    my ($self)    = @_;
+    #prcess the transaction (it needs an WebGUI::Shop::Address object)
+    my $transaction = $self->processTransaction(
+        $self->getCart->getShippingAddress
+    );
+    #return the thankyou page to the user
+    return $transaction->thankYou();
+}
+1;

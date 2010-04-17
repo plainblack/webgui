@@ -95,6 +95,26 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
+=head2 new ( )
+
+Extend the base method to handle spaces in the value and/or default value.
+
+=cut
+
+sub new {
+	my $class = shift;
+    my $self  = $class->SUPER::new(@_);
+    my $value = $self->get('value');
+    $value =~ tr/ /_/;
+    $self->set('value', $value);
+    my $defaultValue = $self->get('defaultValue');
+    $defaultValue =~ tr/ /_/;
+    $self->set('defaultValue', $defaultValue);
+    return $self;
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders a database connection picker control.

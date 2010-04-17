@@ -65,15 +65,19 @@ while the second question mark will contain the form variable "field1".</p>
         },
 
         '14 description' => {
-                message => q|<p>How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?
+                message => q|<p>How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?  Setting this to 0 will not disable pagination, but will use an internal default of 25, instead.
 </p>|,
-                lastUpdated => 1119841649,
+                lastUpdated => 1266860050,
         },
 
 	'17' => {
 		message => q|<b>Debug:</b> Query:|,
 		lastUpdated => 1031514049
 	},
+    'No query specified for query' => {
+        message => q|No query specified for query %s|,
+        lastUpdated => 1263483624,
+    },
 	'debug placeholder parameters' => {
                 message => q|<b>Debug:</b> Processed Placeholder parameters:|,
                 lastUpdated => 1031514049
@@ -319,8 +323,24 @@ will always be false for query5.|,
 	},
 
 	'download type description' => {
-		message => "The type of download to create.",
-		lastUpdated => 0,
+		message => "The type of download to create.  No download will prevent a download from being created.  CSV will cause a CSV file to be returned.  Template will use the Download Template to generate the file to download.",
+		lastUpdated => 1258417417,
+	},
+
+	'No Download' => {
+		message => "No Download",
+		lastUpdated => 1258417417,
+	},
+
+	'CSV' => {
+		message => "CSV",
+		lastUpdated => 1258417417,
+        context => q|Short for Comma Separated Variables|,
+	},
+
+	'Template' => {
+		message => "Template",
+		lastUpdated => 1258417417,
 	},
 
 	'download filename' => {
@@ -329,8 +349,8 @@ will always be false for query5.|,
 	},
 
 	'download filename description' => {
-		message => "The filename of the file to download. If left blank, will autogenerate.",
-		lastUpdated => 0,
+		message => "The filename of the file to download. If left blank, a name will be created.",
+		lastUpdated => 1258417288,
 	},
 
 	'download template' => {

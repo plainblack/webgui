@@ -49,7 +49,7 @@ $versionTag->set({name=>"EventManagementSystem Test"});
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 34 ;        # Increment this number for each test you create
+plan tests => 41;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ isa_ok($ems, 'WebGUI::Asset::Wobject::EventManagementSystem');
 
 # Test to see if we can set new values
 my $newEMSSettings = {
-    timezone => 'America/New York',
+    timezone => 'America/New_York',
 };
 
 # update the new values for this instance
@@ -128,16 +128,26 @@ ok(scalar(@$badges) == 2, 'Two Badges exist');
 # Add tickets
 my @tickets;
 push(@tickets, $ems->addChild({
-    className   => 'WebGUI::Asset::Sku::EMSTicket',
-    startDate   => '2009-01-01 14:00:00',
-    eventNumber => 1,
-    location    => 'qq',
+    className      => 'WebGUI::Asset::Sku::EMSTicket',
+    title          => 'Test Ticket 1',
+    url            => 'test-ems/ticket-1',
+    startDate      => '2009-01-01 14:00:00',
+    eventNumber    => 1,
+    location       => 'qq',
+    seatsAvailable => 5,
+    price          => 5,
+    duration       => 1,
 }));
 push(@tickets, $ems->addChild({
-    className   => 'WebGUI::Asset::Sku::EMSTicket',
-    startDate   => '2009-01-01 14:00:00',
-    eventNumber => 2,
-    location    => 'qq',
+    className      => 'WebGUI::Asset::Sku::EMSTicket',
+    title          => 'Test Ticket 2',
+    url            => 'test-ems/ticket-2',
+    startDate      => '2009-01-01 14:00:00',
+    eventNumber    => 2,
+    location       => 'qq',
+    seatsAvailable => 3,
+    price          => 10,
+    duration       => 2,
 }));
 
 foreach my $ticket(@tickets) {
@@ -163,17 +173,208 @@ ok(scalar(@$ribbons) == 2, 'Two ribbons exist');
 
 ok( $ems->can('www_getScheduleDataJSON'), 'Can call get Schedule data' );
 ok( $ems->can('www_viewSchedule'), 'Can call view Schedule' );
+ok( $ems->can('www_printRemainingTickets'), 'Can call print remaining tickets' );
 
+
+#Test that the default template is correct
+my $printRemainingTicketsTemplateId = $ems->get('printRemainingTicketsTemplateId');
+is($printRemainingTicketsTemplateId, "hreA_bgxiTX-EzWCSZCZJw", 'Default print remaining tickets template id ok');
+
+#Make sure printRemainingTickets template returns the right data
+my $templateMock = Test::MockObject->new({});
+$templateMock->set_isa('WebGUI::Asset::Template');
+$templateMock->set_always('getId', $printRemainingTicketsTemplateId);
+my $templateVars;
+$templateMock->mock('process', sub { $templateVars = $_[1]; } );
+
+{
+    WebGUI::Test->mockAssetId($printRemainingTicketsTemplateId, $templateMock);
+    $ems->www_printRemainingTickets();
+
+    my $ticket1 = {
+        'seatsRemaining'        => '5',
+        'ticketTitle'           => 'Test Ticket 1',
+        'newWindow'             => ignore(),
+        'extraHeadTagsPacked'   => ignore(),
+        'synopsis'              => ignore(),
+        'extraHeadTags'         => ignore(),
+        'ownerUserId'           => ignore(),
+        'url'                   => 'test-ems/ticket-1',
+        'assetId'               => ignore(),
+        'isPrototype'           => ignore(),
+        'isHidden'              => ignore(),
+        'groupIdEdit'           => ignore(),
+        'inheritUrlFromParent'  => ignore(),
+        'ticketEventNumber'     => '1',
+        'lastModified'          => ignore(),
+        'price'                 => '5',
+        'title'                 => 'Test Ticket 1',
+        'groupIdView'           => ignore(),
+        'ticketLocation'        => 'qq',
+        'skipNotification'      => ignore(),
+        'status'                => ignore(),
+        'menuTitle'             => 'Test Ticket 1',
+        'assetSize'             => ignore(),
+        'ticketDuration'        => '1',
+        'relatedRibbons'        => ignore(),
+        'revisionDate'          => ignore(),
+        'relatedBadgeGroups'    => ignore(),
+        'isPackage'             => ignore(),
+        'usePackedHeadTags'     => ignore(),
+        'encryptPage'           => ignore(),
+        'eventMetaData'         => ignore(),
+        'tagId'                 => ignore(),
+        'seatsAvailable'        => '5',
+        'revisedBy'             => ignore(),
+        'isExportable'          => ignore(),
+        'creationDate'          => ignore(),
+        'ticketStart'           => '2009-01-01 09:00',
+        'ticketStart_epoch'     => '1230818400',
+    };
+
+    my $ticket2 = {
+        'seatsRemaining'        => '3',
+        'ticketTitle'           => 'Test Ticket 2',
+        'newWindow'             => ignore(),
+        'extraHeadTagsPacked'   => ignore(),
+        'synopsis'              => ignore(),
+        'extraHeadTags'         => ignore(),
+        'ownerUserId'           => ignore(),
+        'url'                   => 'test-ems/ticket-2',
+        'assetId'               => ignore(),
+        'isPrototype'           => ignore(),
+        'isHidden'              => ignore(),
+        'groupIdEdit'           => ignore(),
+        'inheritUrlFromParent'  => ignore(),
+        'ticketEventNumber'     => '2',
+        'lastModified'          => ignore(),
+        'price'                 => '10',
+        'title'                 => 'Test Ticket 2',
+        'groupIdView'           => ignore(),
+        'ticketLocation'        => 'qq',
+        'skipNotification'      => ignore(),
+        'status'                => ignore(),
+        'menuTitle'             => 'Test Ticket 2',
+        'assetSize'             => ignore(),
+        'ticketDuration'        => '2',
+        'relatedRibbons'        => ignore(),
+        'revisionDate'          => ignore(),
+        'relatedBadgeGroups'    => ignore(),
+        'isPackage'             => ignore(),
+        'usePackedHeadTags'     => ignore(),
+        'encryptPage'           => ignore(),
+        'tagId'                 => ignore(),
+        'eventMetaData'         => ignore(),
+        'seatsAvailable'        => '3',
+        'revisedBy'             => ignore(),
+        'isExportable'          => ignore(),
+        'creationDate'          => ignore(),
+        'ticketStart'           => '2009-01-01 09:00',
+        'ticketStart_epoch'     => '1230818400',
+    };
+    
+    my @ticketArray = ();
+    for(1..3) {
+        push(@ticketArray,$ticket2);
+    }
+    for(1..5) {
+        push(@ticketArray,$ticket1);
+    }
+
+    cmp_deeply(
+        $templateVars,
+        {
+            'badgeInstructions'                 => ignore(),
+            'displayTitle'                      => ignore(),
+            'createdBy'                         => ignore(),
+            'lastExportedAs'                    => ignore(),
+            'printRemainingTicketsTemplateId'   => ignore(),
+            'state'                             => ignore(),
+            'printTicketTemplateId'             => ignore(),
+            'newWindow'                         => ignore(),
+            'scheduleColumnsPerPage'            => ignore(),
+            'synopsis'                          => ignore(),
+            'extraHeadTagsPacked'               => ignore(),
+            'ownerUserId'                       => ignore(),
+            'extraHeadTags'                     => ignore(),
+            'assetId'                           => ignore(),
+            'assetIdHex'                        => ignore(),
+            'url'                               => 'test-ems',
+            'isHidden'                          => ignore(),
+            'isPrototype'                       => ignore(),
+            'groupIdEdit'                       => ignore(),
+            'timezone'                          => ignore(),
+            'styleTemplateId'                   => ignore(),
+            'inheritUrlFromParent'              => ignore(),
+            'description'                       => 'This is a test ems',
+            'stateChangedBy'                    => ignore(),
+            'lineage'                           => ignore(),
+            'className'                         => 'WebGUI::Asset::Wobject::EventManagementSystem',
+            'groupToApproveEvents'              => ignore(),
+            'lastModified'                      => ignore(),
+            'title'                             => 'Test EMS',
+            'groupIdView'                       => ignore(),
+            'mobileStyleTemplateId'             => ignore(),
+            'skipNotification'                  => ignore(),
+            'scheduleTemplateId'                => ignore(),
+            'status'                            => ignore(),
+            'menuTitle'                         => 'Test EMS',
+            'assetSize'                         => ignore(),
+            'lookupRegistrantTemplateId'        => ignore(),
+            'isLockedBy'                        => ignore(),
+            'stateChanged'                      => ignore(),
+            'revisionDate'                      => ignore(),
+            'ribbonInstructions'                => ignore(),
+            'isPackage'                         => ignore(),
+            'usePackedHeadTags'                 => ignore(),
+            'templateId'                        => ignore(),
+            'badgeBuilderTemplateId'            => ignore(),
+            'printBadgeTemplateId'              => ignore(),
+            'encryptPage'                       => ignore(),
+            'tagId'                             => ignore(),
+            'isSystem'                          => ignore(),
+            'revisedBy'                         => ignore(),
+            'isExportable'                      => ignore(),
+            'creationDate'                      => ignore(),
+            'registrationStaffGroupId'          => ignore(),
+            'parentId'                          => ignore(),
+            'tokenInstructions'                 => ignore(),
+            'printableStyleTemplateId'          => ignore(),
+            'ticketInstructions'                => ignore(),
+            'eventSubmissionGroups'             => ignore(),
+            'eventSubmissionMainTemplateId'     => ignore(),
+            'eventSubmissionQueueTemplateId'    => ignore(),
+            'eventSubmissionTemplateId'         => ignore(),
+            'submittedLocationsList'            => ignore(),
+            'tickets_loop'                      => \@ticketArray,
+         },
+        "www_printRemainingTickets: template variables valid"
+    );
+
+    WebGUI::Test->unmockAssetId($printRemainingTicketsTemplateId);
+}
+
+#Make sure permissions work on pages
 my $data;
 $session->user({userId => $crasher->getId});
 $session->http->setStatus(201);
 $data = $ems->www_viewSchedule();
 is($session->http->getStatus, 401, 'www_viewSchedule: visitor may not see the schedule');
+$data = $ems->www_printRemainingTickets();
+is($session->http->getStatus, 401, 'www_printRemainingTickets: visitor may not print the remaining tickets');
 
 $session->http->setStatus(201);
 $session->user({userId => $attender->getId});
 $data = $ems->www_viewSchedule();
 is($session->http->getStatus, 201, '... attender user can see the schedule');
+$data = $ems->www_printRemainingTickets();
+is($session->http->getStatus, 401, 'www_printRemainingTickets: attender may not print the remaining tickets');
+
+$session->http->setStatus(201);
+$session->user({userId => $registrar->getId});
+$data = $ems->www_printRemainingTickets();
+is($session->http->getStatus, 201, 'www_printRemainingTickets: registration staff may print the remaining tickets');
+
 
 $session->http->setStatus(201);
 $session->user({userId => $crasher->getId});
@@ -185,7 +386,7 @@ cmp_deeply($records, [], 'www_getScheduleDataJSON: visitor may not see the sched
 $session->user({userId => $attender->getId});
 $json    = $ems->www_getScheduleDataJSON();
 $records = eval { JSON::from_json($json)->{records} };
-cmp_deeply($records, [ignore(), ignore()], '... attender can see the schedule JSON');
+cmp_deeply($records, [ignore(), ignore(), ignore()], '... attender can see the schedule JSON');
 
 foreach my $ticket (@tickets) {
     $ticket->purge;
@@ -297,12 +498,26 @@ my @tickets= (
     startDate => '2009-01-01 14:00:00',
     location => 'f',
     }),
+    $ems->addChild({
+    className => "WebGUI::Asset::Sku::EMSTicket",
+    title => 'lecture 13 blank location 2 pm',
+    eventNumber => 13,
+    startDate => '2009-01-01 14:00:00',
+    location => '',
+    }),
+    $ems->addChild({
+    className => "WebGUI::Asset::Sku::EMSTicket",
+    title => 'lecture 14 blank location 2 pm',
+    eventNumber => 14,
+    startDate => '2009-01-01 14:00:00',
+    location => '',
+    }),
 );
-is( scalar(@tickets), 12, 'created tickets for ems');
+is( scalar(@tickets), 14, 'created tickets for ems');
 my $tickets = $ems->getTickets;
-is(scalar(@{ $tickets }), 12, 'Fourteen tickets exist');
+is(scalar(@{ $tickets }), 14, 'Fourteen tickets exist');
 my $locations = [ $ems->getLocations ];
-cmp_deeply($locations, [ 'a','b','c','d','e','f' ], 'get locations returns all expected locations');
+cmp_deeply($locations, [ 'a','b','c','d','e','f','' ], 'get locations returns all expected locations');
 # print 'locations=[', join( ',', @$locations ),"]\n";
 
 $data = $ems->www_getScheduleDataJSON();
@@ -312,7 +527,7 @@ sub ticketInfo { my $tk = shift; return {
     title => $tk->get('title'),
     assetId => $tk->get('assetId'),
     description => $tk->get('description'),
-    location => $tk->get('location'),
+    location => $tk->get('location') || '&nbsp;',
     startDate => $tk->get('startDate'),
 }; }
 cmp_deeply( JSON::from_json($data), { 
@@ -373,6 +588,47 @@ cmp_deeply( JSON::from_json($data), {
          pageSize => 10,
          rowsPerPage => 6,
        },
-     'twelve tickets: schedule data looks good'
+     'Fourteen tickets: schedule data looks good'
+);
+$session->request->setup_body({ locationPage => 2 } );
+$data = $ems->www_getScheduleDataJSON();
+cmp_deeply( JSON::from_json($data), { 
+         records => [
+       { colDate => '',
+         col1 => { type => 'label', title => 'f' },
+         col2 => { type => 'label', title => '&nbsp;' },
+         col3 => { type => 'label', title => '' },
+         col4 => { type => 'label', title => '' },
+         col5 => { type => 'label', title => '' },
+       },
+       { colDate => $tickets[11]->get('startDate'),
+         col1 => ticketInfo( $tickets[11] ),
+         col2 => ticketInfo( $tickets[13] ),
+         col3 => { type => 'empty' },
+         col4 => { type => 'empty' },
+         col5 => { type => 'empty' },
+       },
+       { colDate => $tickets[13]->get('startDate'),
+         col1 => { type => 'empty' },
+         col2 => ticketInfo( $tickets[12] ),
+         col3 => { type => 'empty' },
+         col4 => { type => 'empty' },
+         col5 => { type => 'empty' },
+       },
+     ],
+     totalRecords => 3,
+         recordsReturned => 3,
+         startIndex => 0,
+         sort => undef,
+         dir => 'asc',
+         totalLocationPages => 2,
+         currentLocationPage => 2,
+         totalDatePages => 1,
+         currentDatePage => 1,
+         dateRecords => [ '2009-01-01' ],
+         pageSize => 10,
+         rowsPerPage => 3,
+       },
+     'Location page #2 looks good'
 );
 

@@ -621,6 +621,12 @@ our $I18N = {
 		context => q|field label|
 	},
 
+	'Status' => { 
+		message => q|Status|,
+		lastUpdated => 0,
+		context => q|Whether a transaction was successful, or not.|
+	},
+
 	'payment method' => { 
 		message => q|Payment Method|,
 		lastUpdated => 0,
@@ -659,6 +665,18 @@ our $I18N = {
 
 	'edit address template help' => { 
 		message => q|This template determines what the address editor will look like.|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'select gateway template' => { 
+		message => q|Select Gateway Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'select gateway template help' => { 
+		message => q|This template is the template for the Select Payment Gateway step.|,
 		lastUpdated => 0,
 		context => q|commerce setting help|
 	},
@@ -1588,6 +1606,24 @@ our $I18N = {
         context => q|Table heading in the vendor payout manager.|,
     },
 
+    'vp select vendor' => {
+        message => q|Please select a vendor from the list above to manage individual payouts.|,
+        lastUpdated => 0,
+        context => q|Message in the vendor payouts manager when no vendor has been selected.|,
+    },
+
+    'vp vendors' => {
+        message => q|Vendors|,
+        lastUpdated => 0,
+        context => q|Label for the vendors section of the vendor payouts manager|,
+    },
+
+    'vp payouts' => {
+        message => q|Payouts|,
+        lastUpdated => 0,
+        context => q|Label for the vendors section of the vendor payouts manager|,
+    },
+   
     'vp item id'  => {
         message => q|Item ID|,
         lastUpdated => 0,
@@ -1658,6 +1694,54 @@ our $I18N = {
         lastUpdated => 0,
         context => q|Error message in the manage ship driver screen.|,
     },
+
+    'Choose a shipping method' => {
+        message => q|Choose a shipping method|,
+        lastUpdated => 0,
+        context => q|Label to make the user choose a shipping method|,
+    },
+
+    'Choose a shipping method and update the cart to checkout' => {
+        message => q|Choose a shipping method and update the cart to checkout|,
+        lastUpdated => 0,
+        context => q|Label to make the user choose a shipping method|,
+    },
+
+	'receipt email template' => { 
+		message => q|Receipt Email Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'receipt email template help' => { 
+		message => q|Which template should be used to generate an email that will be sent to the user to acknowledge their purchase?|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'sale notification group' => { 
+		message => q|Sale Notification Group|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'sale notification group help' => { 
+		message => q|Who should be notified of new transactions?|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'Success' => { 
+		message => q|Success|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'Failed' => { 
+		message => q|Failure|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
 
 };
 

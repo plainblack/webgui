@@ -14,22 +14,16 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::At_username;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-my $numTests = 2 + 1; # For conditional load and skip
+my $numTests = 2; # For conditional load and skip
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::At_username';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $output;
 
@@ -41,4 +35,3 @@ $session->user({userId => 3});
 $output = WebGUI::Macro::At_username::process($session);
 is($output, 'Admin', 'username = Admin');
 
-}

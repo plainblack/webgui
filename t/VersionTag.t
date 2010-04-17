@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
-use Test::More tests => 68; # increment this value for each test you create
+use Test::More tests => 81; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -105,14 +105,36 @@ $tag->clearWorking;
 ok(!defined getWorking(1), 'working tag unset');
 
 ok(!scalar $tag->get('isLocked'), 'tag is initially unlocked');
+ok(!$tag->isLocked,'accessor for isLocked works on false');
 $tag->lock;
 ok(scalar $tag->get('isLocked'), 'tag is locked');
+ok($tag->isLocked, 'accessor for isLocked works on true');
 ok_open($tag->getId, 0, 'locked tag');
 $tag->unlock;
 ok(!scalar $tag->get('isLocked'), 'tag is again unlocked');
 ok_open($tag->getId, 1, 'unlocked tag');
 
-# TODO: test interaction between lock/unlock and working tags
+# test interaction between lock/unlock and working tags
+my $locker = WebGUI::VersionTag->create($session);
+$locker->setWorking();
+is getWorking(1), $locker, 'working tag is the one we are about to lock';
+
+$locker->lock();
+ok !defined getWorking(1), 'lock clears working';
+
+my $unlocked = WebGUI::VersionTag->create($session);
+$unlocked->setWorking();
+is getWorking(1), $unlocked, 'working tag is fresh';
+$locker->setWorking();
+is getWorking(1), $unlocked, 'setWorking on locked tag does nothing';
+$unlocked->clearWorking;
+$unlocked->rollback;
+
+$session->stow->set(versionTag => $locker);
+$session->scratch->set(versionTag => $locker->getId);
+isnt getWorking(1), $locker, 'getWorking never returns locked tag';
+$locker->clearWorking;
+$locker->rollback;
 
 my $tagAgain1 = WebGUI::VersionTag->new($session, $tag->getId);
 isa_ok($tagAgain1, 'WebGUI::VersionTag', 'tag retrieved again while valid');
@@ -214,8 +236,9 @@ is($siteWideTag->getId(), $siteWideTagId, 'versionTagMode siteWide: reclaim site
 
 
 ## Through in a new session as different user
-my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+my $admin_session = WebGUI::Session->open($WebGUI::Test->file);
 $admin_session->user({'userId' => 3});
+WebGUI::Test->sessionsToDelete($admin_session);
 
 setUserVersionTagMode($admin_session->user(), q{singlePerUser});
 
@@ -278,7 +301,8 @@ $adminUserTag->rollback();
     is($tag->getAssetCount, 1, qq{$test_prefix [singlePerUser] tag with 1 asset});
 
     # create admin session
-    my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+    my $admin_session = WebGUI::Session->open($WebGUI::Test->file);
+    addToCleanup($session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -329,7 +353,8 @@ $adminUserTag->rollback();
     is($tag->getAssetCount, 1, qq{$test_prefix [siteWide] tag with 1 asset});
 
     # create admin session
-    $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+    $admin_session = WebGUI::Session->open(WebGUI::Test->file);
+    addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -376,6 +401,38 @@ $adminUserTag->rollback();
 setSiteVersionTagMode($session, q{multiPerUser});
 setUserVersionTagMode($user, q{inherited});
 
+my $andySession = WebGUI::Test->newSession();
+my $redSession  = WebGUI::Test->newSession();
+
+my $andy = WebGUI::User->create($andySession);
+my $red  = WebGUI::User->create($redSession);
+addToCleanup($andy, $red);
+
+my $andyTag = WebGUI::VersionTag->getWorking($andySession);
+addToCleanup($andyTag);
+my $redTag  = WebGUI::VersionTag->new($redSession, $andyTag->getId);
+$redTag->setWorking();
+is($andyTag->getId, $redTag->getId, 'users share the same version tag');
+
+$andyTag->leaveTag;
+{
+    my $andyTagCheck = WebGUI::VersionTag->getWorking($andySession, 'nocreate');
+    is($andyTagCheck, undef, 'leaveTag: user andy does not have tag');
+    my $redTagCheck  = WebGUI::VersionTag->getWorking($redSession, 'nocreate');
+    isa_ok($redTagCheck, 'WebGUI::VersionTag', '... user red does');
+    is($redTagCheck->getId, $redTag->getId, '... user red still has the same tag as before');
+}
+
+my $andyTag2 = WebGUI::VersionTag->new($session, $redTag->getId);
+$andyTag2->clearWorking;
+{
+    my $andyTagCheck = WebGUI::VersionTag->getWorking($andySession, 'nocreate');
+    is($andyTagCheck, undef, 'clearWorking: user andy does not have tag');
+    my $redSession2  = $redSession->duplicate;
+    addToCleanup($redSession2);
+    my $redTagCheck  = WebGUI::VersionTag->getWorking($redSession2, 'nocreate');
+    is($redTagCheck, undef, 'red does not either');
+}
 
 # Local variables:
 # mode: cperl

@@ -32,11 +32,13 @@ my $donation = $root->addChild({
 });
 my $tag = WebGUI::VersionTag->getWorking($session);
 $tag->commit;
+WebGUI::Test->tagsToRollback($tag);
 
 
 my $cart1 = WebGUI::Shop::Cart->create($session);
 
-my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+my $session2 = WebGUI::Session->open(WebGUI::Test->file);
+addToCleanup($session2);
 my $cart2 = WebGUI::Shop::Cart->create($session2);
 $cart2->update({creationDate => time()-10000});
 
@@ -67,6 +69,9 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
+my $guard0 = cleanupGuard($workflow);
+my $guard1 = cleanupGuard($cart1);
+my $guard2 = cleanupGuard($cart2);
 my $cartNuker = $workflow->addActivity('WebGUI::Workflow::Activity::RemoveOldCarts');
 $cartNuker->set('cartTimeout', 3600);
 
@@ -101,10 +106,4 @@ cmp_bag(
 
 END {
     $instance1->delete('skipNotify');
-    $workflow->delete;
-    $cart1->delete;
-    $cart2->delete;
-    $session2->close;
-    $donation->purge;
-    $tag->rollback;
 }

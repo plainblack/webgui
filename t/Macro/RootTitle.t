@@ -13,8 +13,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::RootTitle;
 use WebGUI::Session;
+use WebGUI::Macro::RootTitle;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -178,8 +178,4 @@ foreach my $testSet (@testSets) {
 	$session->asset($testSet->{asset});
 	my $output =  WebGUI::Macro::RootTitle::process($session);
 	is($output, $testSet->{title}, $testSet->{comment});
-}
-
-END { ##Clean-up after yourself, always
-	$session->db->write('update asset set lineage=? where assetId=?',[$origLineage, $asset_->getId]);
 }

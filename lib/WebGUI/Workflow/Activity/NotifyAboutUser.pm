@@ -107,7 +107,8 @@ sub execute {
 	$mail->addText($message);
 	$mail->addFooter;
 	$self->session->user({user=>$previousUser});
-	return $mail->send ? $self->COMPLETE : $self->ERROR;
+	$mail->queue;
+    return $self->COMPLETE;
 }
 
 

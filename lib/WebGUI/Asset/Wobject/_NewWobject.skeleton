@@ -136,13 +136,13 @@ wobject instances, you will need to purge them here.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
 
     #purge your wobject-specific data here.  This does not include fields
     # you create for your NewWobject asset/wobject table.
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

@@ -21,4 +21,14 @@ sub list_of_tables {
      return [qw/assetData wobject Article/];
 }
 
+sub getStorageLocation : Test(2) {
+    my $test    = shift;
+    my $session = $test->session;
+    my $asset   = $test->class->new({session => $session});
+    my $storage = $asset->getStorageLocation();
+    isa_ok $storage, 'WebGUI::Storage';
+    is $asset->storageId, $storage->getId, 'asset updated with storageId';
+    WebGUI::Test->addToCleanup($storage);
+}
+
 1;

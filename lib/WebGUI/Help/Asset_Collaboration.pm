@@ -18,6 +18,7 @@ our $HELP = {
             { 'name' => 'back.label' },
             { 'name' => 'compensation.label' },
             { 'name' => 'open.label' },
+            { 'name' => 'captcha_label' },
             { 'name' => 'close.label' },
             { 'name' => 'closed.label' },
             { 'name' => 'critical.label' },
@@ -34,6 +35,9 @@ our $HELP = {
             { 'name' => 'job.title.label' },
             { 'name' => 'job.description.label' },
             { 'name' => 'job.requirements.label' },
+            { 'name' => 'karmascale.label' },
+            { 'name' => 'karmaRank.label' },
+            { 'name' => 'keywords.label' },
             { 'name' => 'location.label' },
             { 'name' => 'layout.flat.label' },
             { 'name' => 'link.header.label' },
@@ -64,6 +68,7 @@ our $HELP = {
             { 'name' => 'synopsis.label' },
             { 'name' => 'thumbnail.label' },
             { 'name' => 'title.label' },
+            { 'name' => 'transferkarma.label' },
             { 'name' => 'unlock.label' },
             { 'name' => 'unstick.label' },
             { 'name' => 'unsubscribe.label' },
@@ -80,6 +85,11 @@ our $HELP = {
         title     => 'collaboration post list template variables title',
         body      => '',
         fields    => [],
+        isa       => [
+            {   tag       => 'pagination template variables',
+                namespace => 'WebGUI'
+            },
+        ],
         variables => [
             {   'name'      => 'post_loop',
                 'variables' => [
@@ -103,7 +113,9 @@ our $HELP = {
                     { 'name' => 'timeSubmitted.human' },
                     { 'name' => 'timeUpdated.human' },
                     { 'name' => 'userProfile.url' },
-                    { 'name' => 'user.isVisitor' },
+                    { 'name' => 'hideProfileUrl' },
+                    { 'name' => 'user.isVisitor',
+                      'description' => 'post_loop_user.isVisitor' },
                     { 'name' => 'edit.url' },
                     { 'name' => 'controls' },
                     { 'name' => 'isSecond' },
@@ -116,6 +128,7 @@ our $HELP = {
                     { 'name' => 'lastReply.url' },
                     { 'name' => 'lastReply.title' },
                     { 'name' => 'lastReply.user.isVisitor' },
+                    { 'name' => 'lastReply.hideProfileUrl' },
                     { 'name' => 'lastReply.username' },
                     { 'name' => 'lastReply.userProfile.url' },
                     { 'name' => 'lastReply.dateSubmitted.human' },
@@ -136,6 +149,7 @@ our $HELP = {
         fields    => [],
         variables => [
             { 'name' => 'displayLastReply' },
+            { 'name' => 'user.canStartThread' },
             { 'name' => 'user.canPost' },
             { 'name' => 'user.isModerator' },
             { 'name' => 'user.isVisitor', },
@@ -156,7 +170,7 @@ our $HELP = {
             { 'name' => 'sortby.rating.url' },
             { 'name' => 'collaborationAssetId' },
         ],
-        related => [
+        isa => [
             {   tag       => 'collaboration template labels',
                 namespace => 'Asset_Collaboration',
             },
@@ -170,76 +184,19 @@ our $HELP = {
         title     => 'collaboration search template title',
         body      => '',
         fields    => [],
+        isa       => [
+            {   namespace => "Asset_Collaboration",
+                tag       => "collaboration post list template variables"
+            },
+        ],
         variables => [
             { 'name' => 'form.header' },
             { 'name' => 'query.form' },
             { 'name' => 'form.search' },
+            { 'name' => 'form.footer' },
             { 'name' => 'back.url' },
-            { 'name' => 'unsubscribe.url', },
-            { 'name' => 'sortby.title.url', },
-            { 'name' => 'sortby.username.url', },
-            { 'name' => 'sortby.date.url', },
-            { 'name' => 'sortby.lastreply.url', },
-            { 'name' => 'sortby.views.url', },
-            { 'name' => 'sortby.replies.url', },
-            { 'name' => 'sortby.rating.url', }
         ],
-        related => [
-            {   tag       => 'collaboration post list template variables',
-                namespace => 'Asset_Collaboration',
-            },
-        ]
-    },
-
-    'collaboration rss template' => {
-        title     => 'collaboration rss template title',
-        body      => '',
-        fields    => [],
-        variables => [
-            {   'name'        => 'title',
-                'description' => 'feed title'
-            },
-            {   'name'        => 'link',
-                'description' => 'collab link'
-            },
-            {   'name'        => 'description',
-                'description' => 'feed description'
-            },
-            { 'name' => 'generator' },
-            { 'name' => 'webMaster' },
-            { 'name' => 'docs' },
-            { 'name' => 'lastBuildDate' },
-            {   'name'      => 'item_loop',
-                'variables' => [
-                    { 'name' => 'author' },
-                    {   'name'        => 'title',
-                        'description' => 'post title'
-                    },
-                    {   'name'        => 'link',
-                        'description' => 'full text link'
-                    },
-                    {   'name'        => 'description',
-                        'description' => 'item description'
-                    },
-                    { 'name' => 'guid' },
-                    { 'name' => 'pubDate' },
-                    { 'name' => 'epochDate' },
-                    {   'name'      => 'attachmentLoop',
-                        'variables' => [
-                            { 'name' => 'attachment_thumbnail' },
-                            { 'name' => 'attachment.url' },
-                            { 'name' => 'attachment.path' },
-                            { 'name' => 'attachment.length' }
-                        ]
-                    }
-                ]
-            }
-        ],
-        related => [
-            {   tag       => 'collaboration post list template variables',
-                namespace => 'Asset_Collaboration',
-            },
-        ]
+        related => [ ],
     },
 
 };

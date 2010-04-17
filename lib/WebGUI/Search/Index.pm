@@ -125,7 +125,7 @@ sub create {
         $description, WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$asset}));
     $keywords = $self->_filterKeywords($keywords);
 
-	my $synopsis = $asset->get("synopsis") || substr($description,0,255) || substr($keywords,0,255);
+	my $synopsis = $asset->get("synopsis") || substr($description,0,255);
 	my $add = $self->session->db->prepare("insert into assetIndex (assetId, title, url, creationDate, revisionDate, 
 		ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
 	$add->execute([$asset->getId, $asset->get("title"), $asset->get("url"), $asset->get("creationDate"),

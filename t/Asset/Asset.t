@@ -239,7 +239,7 @@ $session->{_request} = $origRequest;
 ################################################################
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
+addToCleanup($versionTag);
 $versionTag->set({name=>"Asset tests"});
 
 my $properties = {
@@ -544,9 +544,14 @@ isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Ass
 ################################################################
 note "getIsa";
 my $node = WebGUI::Asset->getRoot($session);
-my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
-my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
-my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
+my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
+my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
+my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
+my $pTag = WebGUI::VersionTag->getWorking($session);
+$pTag->commit;
+addToCleanup($pTag);
+my $product4 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
+addToCleanup($product4);
 
 my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
 isa_ok($getAProduct, 'CODE');
@@ -569,9 +574,17 @@ while( my $sku = $getASku->()) {
 is($counter, 3, 'getIsa: returned only 3 Products for a parent class');
 cmp_bag($skuIds, [$product1->getId, $product2->getId, $product3->getId], 'getIsa returned the correct 3 products for a parent class');
 
+my $getAnotherSku = WebGUI::Asset::Sku->getIsa($session, 0, { returnAll => 1, });
+$counter = 0;
+while( my $sku = $getAnotherSku->()) {
+    ++$counter;
+}
+is($counter, 4, 'getIsa: returned all 4 skus with returnAll => 1');
+
 $product1->purge;
 $product2->purge;
 $product3->purge;
+$product4->purge;
 
 ################################################################
 #
@@ -581,7 +594,7 @@ $product3->purge;
 note "inheritUrlFromParent";
 
 my $versionTag4 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag4);
+addToCleanup($versionTag4);
 $versionTag4->set( { name => 'inheritUrlFromParent tests' } );
 
 $properties = {
@@ -653,67 +666,83 @@ is($iufpAsset2->url, 'inheriturlfromparent01/iufp2', '... update works propertly
 
 ################################################################
 #
-# requestAutoCommit to move uncommitted child to uncommitted parent
+# addRevision to uncommitted child of uncommitted parent
 #
 ################################################################
 
 my $versionTag5 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag5);
-$versionTag5->set( { name => 'move commit of child to uncommitted parent on requestAutoCommit tests vt1' } );
+$versionTag5->set( { name => 'move revision of uncommitted child to uncommitted parent tests vt1' } );
 
 $properties = {
+
     #              '1234567890123456789012'
-    id          => 'moveVersionToParent_01',
-    title       => 'moveVersionToParent_01',
-    className   => 'WebGUI::Asset::Wobject::Layout',
-    url         => 'moveVersionToParent_01',
+    id        => 'moveVersionToParent_01',
+    title     => 'moveVersionToParent_01',
+    className => 'WebGUI::Asset::Wobject::Layout',
+    url       => 'moveVersionToParent_01',
 };
 
-my $parentAsset      = $defaultAsset->addChild($properties, $properties->{id});
+my $parentAsset = $defaultAsset->addChild( $properties, $properties->{id}, undef, { skipAutoCommitWorkflows => 1 } );
 my $parentVersionTag = WebGUI::VersionTag->new($session, $parentAsset->tagId);
-is($parentVersionTag->get('isCommitted'), 0, 'built non-committed parent asset');
+is( $parentVersionTag->get('isCommitted'), 0, 'built non-committed parent asset' );
 
 
-my $versionTag6 = WebGUI::VersionTag->create($session, {});
-WebGUI::Test->tagsToRollback($versionTag6);
-$versionTag6->set( { name => 'move commit of child to uncommitted parent on requestAutoCommit tests vt2' } );
+my $versionTag6 = WebGUI::VersionTag->create( $session, {} );
+$versionTag6->set( { name => 'move revision of uncommitted child to uncommitted parent tests vt2' } );
 $versionTag6->setWorking;
 
 $properties2 = {
+
     #              '1234567890123456789012'
-    id          => 'moveVersionToParent_03',
-    title       => 'moveVersionToParent_03',
-    className   => 'WebGUI::Asset::Wobject::Layout',
-    url         => 'moveVersionToParent_03',
+    id        => 'moveVersionToParent_03',
+    title     => 'moveVersionToParent_03',
+    className => 'WebGUI::Asset::Wobject::Layout',
+    url       => 'moveVersionToParent_03',
 };
 
-my $childAsset     = $parentAsset->addChild($properties, $properties2->{id});
-my $testAsset      = WebGUI::Asset->newPending($session, $childAsset->parentId);
-my $testVersionTag = WebGUI::VersionTag->new($session, $testAsset->tagId);
+my $childAsset = $parentAsset->addChild(
+    $properties2, $properties2->{id},
+    time(),
+    { skipAutoCommitWorkflows => 1 }
+);
+my $testAsset      = WebGUI::Asset->newPending( $session, $childAsset->parentId );
+my $testVersionTag = WebGUI::VersionTag->new( $session,   $testAsset->tagId );
 
 my $childVersionTag;
-$childVersionTag = WebGUI::VersionTag->new($session, $childAsset->tagId);
-is($childVersionTag->get('isCommitted'), 0, 'built non-committed child asset');
+$childVersionTag = WebGUI::VersionTag->new( $session, $childAsset->tagId );
+is( $childVersionTag->get('isCommitted'), 0, 'built non-committed child asset' );
 
-isnt($testAsset->tagId,      $childAsset->tagId,      'parent asset and child asset have different version tags');
-isnt($testVersionTag->getId, $childVersionTag->getId, 'parent asset and child asset version tags unmatched');
+is( $testAsset->tagId,
+    $childAsset->tagId,
+    'uncommitted parent asset and uncommitted child asset have same version tag at addChild'
+);
 
-eval {
-    $childAsset->requestAutoCommit;
-    $childVersionTag = WebGUI::VersionTag->new($session, $childAsset->tagId);
+$properties2 = {
+
+    #              '1234567890123456789012'
+    id        => 'moveVersionToParent_03',
+    title     => 'moveVersionToParent_03a',
+    className => 'WebGUI::Asset::Wobject::Layout',
+    url       => 'moveVersionToParent_03a',
 };
-is($childVersionTag->get('isCommitted'), 0, 'confirm non-committed child asset');
+sleep 2;
+$childAsset->addRevision( $properties2, time(), { skipAutoCommitWorkflows => 1 } );
 
-is($testAsset->tagId, $childAsset->tagId, 'parent asset and child asset have same version tags');
+is( $parentVersionTag->get('isCommitted'), 0, 'confimr non-committed parent asset after revision' );
+is( $childVersionTag->get('isCommitted'),  0, 'confirm non-committed child asset after revision' );
 
-eval {
-    $testVersionTag->commit;
-};
+is( $testAsset->get('tagId'),
+    $childAsset->get('tagId'),
+    'uncommitted parent asset and uncommitted child asset have same version tag after addRevision'
+);
 
-is($testVersionTag->get('isCommitted'),1,'parent asset is now committed');
+eval { $testVersionTag->commit; };
 
-$childVersionTag = WebGUI::VersionTag->new($session, $childAsset->get('tagId'));
-is($childVersionTag->get('isCommitted'),1,'child asset is now committed');
+$session->log->warn('parent asset is now committed');
+is( $testVersionTag->get('isCommitted'), 1, 'parent asset is now committed' );
+
+$childVersionTag = WebGUI::VersionTag->new( $session, $childAsset->get('tagId') );
+is( $childVersionTag->get('isCommitted'), 1, 'child asset is now committed' );
 
 ################################################################
 #
@@ -723,11 +752,57 @@ is($childVersionTag->get('isCommitted'),1,'child asset is now committed');
 
 my $assetToCommit = $defaultAsset->addChild({ className => 'WebGUI::Asset::Snippet', title => 'Snippet to commit and clone from db', });
 my $cloneTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($cloneTag);
+addToCleanup($cloneTag);
 $cloneTag->commit;
 is($assetToCommit->get('status'), 'pending', 'cloneFromDb: local asset is still pending');
 $assetToCommit = $assetToCommit->cloneFromDb;
 is($assetToCommit->get('status'), 'approved', '... returns fresh, commited asset from the db');
+
+################################################################
+#
+# checkView
+#
+################################################################
+
+my $trashedAsset = $defaultAsset->addChild({
+    className => 'WebGUI::Asset::Snippet', title     => 'Trashy',
+});
+
+my $clippedAsset = $defaultAsset->addChild({
+    className => 'WebGUI::Asset::Snippet', title     => 'Clippy',
+});
+
+my $checkTag = WebGUI::VersionTag->getWorking($session);
+$checkTag->commit;
+addToCleanup($checkTag);
+$trashedAsset = $trashedAsset->cloneFromDb;
+$clippedAsset = $clippedAsset->cloneFromDb;
+$trashedAsset->trash;
+$clippedAsset->cut;
+is $trashedAsset->get('state'), 'trash',     'checkView setup: trashed an asset';
+is $clippedAsset->get('state'), 'clipboard', '... clipped an asset';
+
+$session->var->switchAdminOff;
+$session->http->setRedirectLocation('');
+$session->http->setStatus(200, 'OK');
+
+$trashedAsset->checkView();
+is $session->http->getStatus, 410, '... status set to 410 for trashed asset';
+is $session->http->getRedirectLocation, '', '... no redirect set';
+
+$session->http->setStatus(200, 'OK');
+$clippedAsset->checkView();
+is $session->http->getStatus, 410, '... status set to 410 for cut asset';
+is $session->http->getRedirectLocation, '', '... no redirect set';
+
+$session->var->switchAdminOn;
+$session->http->setStatus(200, 'OK');
+is $trashedAsset->checkView(), 'chunked', '... returns "chunked" when admin is on for trashed asset';
+is $session->http->getRedirectLocation, $trashedAsset->getUrl('func=manageTrash'), '... trashed asset sets redirect to manageTrash';
+
+$session->http->setRedirectLocation('');
+is $clippedAsset->checkView(), 'chunked', 'checkView: returns "chunked" when admin is on for cut asset';
+is $session->http->getRedirectLocation, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
 
 ##Return an array of hashrefs.  Each hashref describes a test
 

@@ -70,11 +70,11 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
 	eval{$self->session->cache->delete("view_".$self->getId)};
-	$self->SUPER::purgeCache;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -166,11 +166,11 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
 	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
-	$self->SUPER::www_view(@_);
-}
+	super();
+};
 
 1;
 

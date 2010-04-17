@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 41; # increment this value for each test you create
+use Test::More tests => 42; # increment this value for each test you create
 use Test::Deep;
 use JSON qw{ from_json };
 
@@ -99,6 +99,14 @@ ok(exists $session->style->{_javascript}->{$_}, "$_ in style") for qw(foo bar bo
 # sleep so the revisiondate isn't duplicated
 sleep 1;
 
+my $template3dup = $template3->duplicate;
+my @atts3dup = map { delete @{ $_ }{qw/attachId templateId revisionDate/}; $_; } @{ $template3dup->getAttachments };
+cmp_bag(
+    [@atts3dup],
+    [@atts],
+    'attachments are duplicated'
+);
+
 my $template3rev = $template3->addRevision();
 my $att4 = $template3rev->getAttachments('headScript');
 is($att4->[0]->{url}, 'foo', 'rev has foo');
@@ -116,6 +124,10 @@ is($att4->[0]->{url}, 'foo', 'rev still has foo');
 is($att4->[1]->{url}, 'bar', 'rev still has bar');
 is($att4->[2]->{url}, 'baz', 'rev does have new thing');
 is(@$att4, 3, 'rev is proper size');
+
+##This is a non-test.  Duplicate URLs will not cause the test to blow-up with
+##an untrappable error.
+$template3rev->addAttachments([{ type => 'headScript', sequence => 3, url => 'baz'}]);
 
 $template3rev->purgeRevision();
 
@@ -164,6 +176,7 @@ like($brokenOutput, qr/$brokenUrl/, '... and the template url');
 like($brokenOutput, qr/$brokenId/, '... and the template id');
 like($logError, qr/$brokenUrl/, 'process: logged error has the url');
 like($logError, qr/$brokenId/, '... and the template id');
+WebGUI::Test->restoreLogging;
 
 WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
 

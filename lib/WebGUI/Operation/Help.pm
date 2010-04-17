@@ -17,6 +17,7 @@ use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::TabForm;
+use WebGUI::Pluggable;
 
 =head1 NAME
 
@@ -190,29 +191,6 @@ sub _linkTOC {
 
 #-------------------------------------------------------------------
 
-=head2 _getHelpFilesList ( $session )
-
-Utility routine for returning a list of all Help files in the lib/WebGUI/Help folder.
-
-=cut
-
-sub _getHelpFilesList {
-	my $session = shift;
-        my $dir = join '/', $session->config->getWebguiRoot,"lib","WebGUI","Help";
-        opendir (DIR,$dir) or $session->errorHandler->fatal("Can't open Help directory!");
-	my @files;
-	foreach my $file (readdir DIR) {
-		next unless $file =~ /.pm$/;
-		my $modName;
-		($modName = $file) =~ s/\.pm$//;
-		push @files, [ $file, $modName ];
-	}
-        closedir(DIR);
-	return @files;
-}
-
-#-------------------------------------------------------------------
-
 =head2 _related ( $session, $related )
 
 Utility routine for returning a list of topics related the the current help
@@ -380,18 +358,18 @@ sub www_viewHelpIndex {
 	my $session = shift;
 	return $session->privilege->insufficient() unless canView($session);
 	my $i18n = WebGUI::International->new($session);
-        my @helpIndex;
-	my @files = _getHelpFilesList($session,);
-        foreach my $fileSet (@files) {
-		my $namespace = $fileSet->[1];
-		my $help = _load($session,$namespace);
-		foreach my $key (keys %{$help}) {
+    my @helpIndex;
+    my @modules = WebGUI::Pluggable::findAndLoad('WebGUI::Help');
+    for my $namespace (@modules) {
+        $namespace =~ s/^WebGUI::Help:://;
+        my $help = _load($session,$namespace);
+        foreach my $key (keys %{$help}) {
             next if $help->{$key}{private};
             my $title = $i18n->get($help->{$key}{title},$namespace);
             next unless $title;
-			push @helpIndex, [$namespace, $key, $title];
-		}
+            push @helpIndex, [$namespace, $key, $title];
         }
+    }
 	my $output = '<table width="100%" class="content"><tr><td valign="top">';
 	my $halfway = round(@helpIndex / 2);
 	my $i = 0;

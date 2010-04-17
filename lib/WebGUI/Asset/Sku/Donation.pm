@@ -67,7 +67,7 @@ This asset makes donations possible.
 
 =head1 SYNOPSIS
 
-use WebGUI::Asset::Sku::Dnoation;
+use WebGUI::Asset::Sku::Donation;
 
 =head1 METHODS
 
@@ -134,14 +134,14 @@ Prepares the template.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
+	super();
 	my $templateId = $self->templateId;
 	my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 

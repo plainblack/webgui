@@ -120,7 +120,7 @@ sub _notify {
 
     my $html = sprintf $i18n->get('email message'), $dataHashRef->{count}, $s, $hostname, $hostname;
     $mail->addHtml($html);
-    $mail->send();
+    $mail->queue();
 }
 
 1;

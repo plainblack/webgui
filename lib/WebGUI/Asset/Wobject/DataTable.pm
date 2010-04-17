@@ -16,7 +16,7 @@ use strict;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
-define assetName         => ['assetName', 'Asset_EMSRibbon'];
+define assetName         => ['assetName', 'Asset_DataTable'];
 define icon              => 'DataTable.gif';
 define tableName         => 'DataTable';
 property data => (
@@ -102,7 +102,7 @@ sub getDataTemplateVars {
     my $self = shift;
 
     my $json = $self->getDataJson;
-    my $dt   = JSON->new->decode($json);
+    my $dt   = eval { JSON->new->decode($json) };
 
     # Make row data more friendly to templates
     my %cols = map { $_->{key} => $_ } @{ $dt->{columns} };
@@ -126,12 +126,13 @@ Add the data table to the edit form.
 =cut
 
 # TODO Get the DataSource's edit form
-sub getEditForm {
+override getEditForm => sub {
     my $self    = shift;
-    my $tabform = $self->SUPER::getEditForm(@_);
+    my $tabform = super();
 
     $tabform->getTab("data")->raw(
-        WebGUI::Form::DataTable->new(
+        q{<tr><td>}
+      . WebGUI::Form::DataTable->new(
             $self->session, {
                 name         => "data",
                 value        => $self->data,
@@ -139,10 +140,11 @@ sub getEditForm {
                 showEdit     => 1,
             }
             )->toHtml
+      . q{</td></tr>}
     );
 
     return $tabform;
-} ## end sub getEditForm
+}; ## end sub getEditForm
 
 #----------------------------------------------------------------------------
 
@@ -152,12 +154,12 @@ Add a tab for the data table.
 
 =cut
 
-sub getEditTabs {
+override getEditTabs => sub {
     my $self = shift;
     my $i18n = WebGUI::International->new( $self->session, "Asset_DataTable" );
 
-    return ( $self->SUPER::getEditTabs, [ "data" => $i18n->get("tab label data") ], );
-}
+    return ( super(), [ "data" => $i18n->get("tab label data") ], );
+};
 
 #----------------------------------------------------------------------------
 

@@ -93,8 +93,10 @@ cmp_bag(
     [
         'WebGUI::Shop::ShipDriver::FlatRate',
         'WebGUI::Shop::ShipDriver::USPS',
+        'WebGUI::Shop::ShipDriver::USPSInternational',
+        'WebGUI::Shop::ShipDriver::UPS',
     ],
-    'getDrivers: WebGUI only ships with 1 default shipping driver',
+    'getDrivers: All default shipping drivers present',
 );
 
 #######################################################################

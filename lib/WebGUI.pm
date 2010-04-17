@@ -1,7 +1,7 @@
 package WebGUI;
 
 
-our $VERSION = '7.8.1';
+our $VERSION = '8.0.0';
 our $STATUS = 'beta';
 
 
@@ -26,6 +26,7 @@ use WebGUI::Pluggable;
 use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Session::Request;
+use WebGUI::Paths;
 use Moose;
 use Try::Tiny;
 
@@ -70,7 +71,7 @@ sub BUILD {
     my $self = shift;
 
     # Instantiate the WebGUI::Config object
-    my $config = WebGUI::Config->new( $self->root, $self->site );
+    my $config = WebGUI::Config->new( $self->site );
     $self->config($config);
 }
 
@@ -142,55 +143,9 @@ sub compile_psgi_app {
     };
 }
 
+
 sub preload {
-    my $self = shift;
-    my $debug = shift;
-    
-    warn 'Preloading modules..' if $debug;
-    my $modules = sub {
-        require Module::Versions;
-        my $m = Module::Versions->HASH;
-        $_ = $_->{VERSION} for values %$m;
-        return $m;
-    } if $debug;
-    my $pre = $modules->() if $debug;
-    
-    # The following is taken from preload.perl
-    my $readlines = sub {
-        my $file = shift;
-        my @lines;
-        if (open(my $fh, '<', $file)) {
-            while (my $line = <$fh>) {
-                $line =~ s/#.*//;
-                $line =~ s/^\s+//;
-                $line =~ s/\s+$//;
-                next if !$line;
-                push @lines, $line;
-            }
-            close $fh;
-        }
-        return @lines;
-    };
-    
-    my @excludes = $readlines->($self->root . '/sbin/preload.exclude');
-    
-    use DBI;
-    DBI->install_driver("mysql");
-    WebGUI::Pluggable::findAndLoad( "WebGUI", 
-        { 
-            exclude     => \@excludes, 
-            onLoadFail  => sub { die 'Error loading %s: %s', @_ },
-        }
-    );
-    
-    if ($debug) {
-        my $post = $modules->();
-        my @new;
-        for my $k (keys %$post) {
-            push @new, $k unless $pre->{$k};
-        }
-        warn join "\n", sort @new;
-    }
+    WebGUI::Paths->preloadAll;
 }
 
 sub handle {

@@ -21,6 +21,8 @@ use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::Transaction;
+use WebGUI::Inbox;
+use Clone qw/clone/;
 
 #----------------------------------------------------------------------------
 # Init
@@ -30,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 68;        # Increment this number for each test you create
+plan tests => 77;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -64,6 +66,7 @@ my $transaction = WebGUI::Shop::Transaction->create($session,{
     paymentDriverLabel  => 'kkk',
     taxes               => 7,
     });
+addToCleanup($transaction);
 
 # objects work
 isa_ok($transaction, "WebGUI::Shop::Transaction");
@@ -223,15 +226,72 @@ TODO: {
     ok(0, 'test keywords');
 }
 
+#######################################################################
+#
+# sendNotification
+#
+#######################################################################
+
+my $shopUser   = WebGUI::User->create($session);
+$shopUser->username('shopUser');
+my $shopGroup  = WebGUI::Group->new($session, 'new');
+my $shopAdmin  = WebGUI::User->create($session);
+$shopUser->username('shopAdmin');
+$shopGroup->addUsers([$shopAdmin->getId]);
+addToCleanup($shopUser, $shopAdmin, $shopGroup);
+$session->setting->set('shopSaleNotificationGroupId', $shopGroup->getId);
+$session->user({userId => $shopUser->getId});
+
+my $trans = WebGUI::Shop::Transaction->create($session, {});
+ok($trans->can('sendNotifications'), 'sendNotifications: valid method for transactions');
+addToCleanup($trans);
+
+##Disable sending email
+my $sendmock = Test::MockObject->new( {} );
+$sendmock->set_isa('WebGUI::Mail::Send');
+$sendmock->set_true('addText', 'send', 'addHeaderField', 'addHtml', 'queue', 'addFooter');
+local *WebGUI::Mail::Send::create;
+$sendmock->fake_module('WebGUI::Mail::Send',
+    create => sub { return $sendmock },
+);
+
+                 #1234567890123456789012#
+my $templateId = 'SHOP_NOTIFICATION_____';
+
+my $templateMock = Test::MockObject->new({});
+$templateMock->set_isa('WebGUI::Asset::Template');
+$templateMock->set_always('getId', $templateId);
+my @templateVars;
+$templateMock->mock('process', sub { push @templateVars, clone $_[1]; } );
+
+$session->setting->set('shopReceiptEmailTemplateId', $templateId);
+
+{
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $trans->sendNotifications;
+    is(@templateVars, 2, '... called template->process twice');
+    my $inbox = WebGUI::Inbox->new($session);
+    my $userMessages  = $inbox->getMessagesForUser($shopUser);
+    my $adminMessages = $inbox->getMessagesForUser($shopAdmin);
+    is(@{ $userMessages },  1, '... sent one message to shop user');
+    is(@{ $adminMessages }, 1, '... sent one message to shop admin, via shopSaleNotificationGroupId');
+    like($userMessages->[0]->get('subject'),  qr/^Receipt for Order #/,  '... subject for user email okay');
+    like($adminMessages->[0]->get('subject'), qr/^A sale has been made/, '... subject for admin email okay');
+    like($templateVars[0]->{viewDetailUrl}, qr/shop=transaction;method=viewMy;/, '... viewDetailUrl okay for user');
+    like($templateVars[1]->{viewDetailUrl}, qr/shop=transaction;method=view;/  , '... viewDetailUrl okay for admin');
+    WebGUI::Test->unmockAssetId($templateId);
+}
+
+#######################################################################
+#
+# delete
+#
+#######################################################################
 
 $transaction->delete;
-is($session->db->quickScalar("select transactionId from transaction where transactionId=?",[$transaction->getId]), undef, "can delete transactions");
+is($session->db->quickScalar("select count(*) from transaction     where transactionId=?",[$transaction->getId]),
+   0, "delete: deleted transaction");
+is($session->db->quickScalar("select count(*) from transactionItem where transactionId=?",[$transaction->getId]),
+   0, "... deleted transactionItems associated with this transaction");
 
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $session->db->write('delete from transaction');
-    $session->db->write('delete from transactionItem');
-}

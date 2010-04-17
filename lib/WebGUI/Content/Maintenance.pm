@@ -48,12 +48,9 @@ sub handler {
     my $session = shift;
     if ($session->setting->get("specialState") eq "upgrading") {
         $session->http->sendHeader;
-        my $output = "";
-        open(my $FILE,"<",$session->config->getWebguiRoot."/www/maintenance.html");
-        while (<$FILE>) {
-            $output .= $_;
-        }
-        close($FILE);
+        open my $fh, '<', $session->config->get('maintenancePage');
+        my $output = do { local $/; <$fh> };
+        close $fh;
         return $output;
     }
     return undef;

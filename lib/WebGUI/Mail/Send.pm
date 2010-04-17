@@ -115,7 +115,8 @@ sub addHeaderField {
 	my $self = shift;
 	my $name = shift;
 	my $value = shift;
-	$self->getMimeEntity->head->add($name, $value);
+	#$self->getMimeEntity->head->add($name, $value);
+	$self->getMimeEntity->head->add($name, encode('MIME-Q', $value));
 }
 
 

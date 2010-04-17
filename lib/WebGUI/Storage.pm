@@ -26,6 +26,8 @@ use Image::Magick;
 use Path::Class::Dir;
 use Storable ();
 use WebGUI::Utility qw(isIn);
+use WebGUI::Paths;
+use JSON ();
 
 
 =head1 NAME
@@ -257,7 +259,7 @@ sub addFileFromCaptcha {
         $self->session->errorHandler->warn("Error adding noise: $error");
     }
     # AddNoise generates a different average color depending on library.  This is ugly, but the best I can see for now
-    $error = $image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
+    $error = $image->Annotate(font=>WebGUI::Paths->var.'/default.ttf', pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
 	if($error) {
         $self->session->errorHandler->warn("Error Annotating image: $error");
     }
@@ -379,6 +381,7 @@ sub addFileFromFormPost {
         next
             if ($upload->size > 1024 * $self->session->setting->get("maxAttachmentSize"));
         $clientFilename =~ s/.*[\/\\]//;
+        $clientFilename =~ s/^thumb-//;
         my $type = $self->getFileExtension($clientFilename);
         if (isIn($type, qw(pl perl sh cgi php asp html htm))) { # make us safe from malicious uploads
             $clientFilename =~ s/\./\_/g;
@@ -507,6 +510,7 @@ deletion of this location's files, to CDN queue.
 sub clear {
 	my $self = shift;
     my $dir  = $self->getPathClassDir;
+    return undef if !defined $dir;
     my $errors;
     CHILD: while (my $child = $dir->next()) {
         my $rel = $child->relative($dir);
@@ -1052,6 +1056,7 @@ sub getFiles {
     my $self    = shift;
     my $showAll = shift;
     my $dir     = $self->getPathClassDir;
+    return [] if ! defined $dir;
     my $dirStr  = $dir->stringify;
     my @list;
     $dir->recurse(
@@ -1172,6 +1177,10 @@ sub getPathClassDir {
 		return undef;
     }
     my $dir = Path::Class::Dir->new($self->session->config->get("uploadsPath"), @{ $self->{_pathParts} });
+    if (! -e $dir->stringify) {
+        $self->_addError("directory for storage location ". $self->getId." does not exist");
+        return undef;
+    }
     return $dir;
 }
 
@@ -1235,17 +1244,21 @@ The file to retrieve the thumbnail for.
 =cut
 
 sub getThumbnailUrl {
-	my $self = shift;
-	my $filename = shift;
+    my $self     = shift;
+    my $filename = shift;
 	if (! defined $filename) {
-		$self->session->errorHandler->error("Can't make a thumbnail url without a filename.");
+		$self->session->errorHandler->error("Can't find a thumbnail url without a filename.");
 		return '';
 	}
-    if (! isIn($filename, @{ $self->getFiles() })) {
-        $self->session->errorHandler->error("Can't make a thumbnail for a file named '$filename' that is not in my storage location.");
+    if (! $self->isImage($filename)) {
         return '';
     }
-	return $self->getUrl("thumb-".$filename);
+    my $thumbname = 'thumb-' . $filename;
+    if (! -e $self->getPath($thumbname)) {
+        $self->session->errorHandler->error("Can't find a thumbnail for a file named '$filename' that is not in my storage location.");
+        return '';
+    }
+	return $self->getUrl($thumbname);
 }
 
 #-------------------------------------------------------------------
@@ -1652,23 +1665,56 @@ The groupId that is allowed to edit the files in this storage location.
 =cut
 
 sub setPrivileges {
-	my $self = shift;
-	my $owner = shift;
-	my $viewGroup = shift;
-	my $editGroup = shift;
+    my $self = shift;
+    my %privs = (
+        users => [],
+        groups => [],
+        assets => [],
+    );
+    if (@_ == 3 && !ref $_[0] && !ref $_[1] && !ref $_[0]) {
+        push @{ $privs{users} }, $_[0];
+        push @{ $privs{groups} }, @_[1,2];
+    }
+    else {
+        for my $object (@_) {
+            if ($object->isa('WebGUI::User')) {
+                push @{ $privs{users} }, $object->getId;
+            }
+            elsif ($object->isa('WebGUI::Group')) {
+                push @{ $privs{groups} }, $object->getId;
+            }
+            elsif ($object->isa('WebGUI::Asset')) {
+                push @{ $privs{assets} }, $object->getId;
+            }
+        }
+    }
+
+    my $public;
+    for my $user (@{ $privs{users} }) {
+        if ($user eq '1') {
+            $public = 1;
+        }
+    }
+    for my $group (@{ $privs{groups} }) {
+        if ($group eq '1' || $group eq '7') {
+            $public = 1;
+        }
+    }
+    my $accessFile = JSON->new->encode( \%privs );
 
     my $dirObj = $self->getPathClassDir();
+    return undef if ! defined $dirObj;
     $dirObj->recurse(
         callback => sub {
             my $obj = shift;
             return unless $obj->is_dir;
             my $rel = $obj->relative($dirObj);
 
-            if ($owner eq '1' || $viewGroup eq '1' || $viewGroup eq '7' || $editGroup eq '1' || $editGroup eq '7') {
+            if ($public) {
                 $self->deleteFile($rel->file('.wgaccess')->stringify);
             }
             else {
-                $self->addFileFromScalar($rel->file('.wgaccess')->stringify,$owner."\n".$viewGroup."\n".$editGroup);
+                $self->addFileFromScalar($rel->file('.wgaccess')->stringify, $accessFile);
             }
         }
     );

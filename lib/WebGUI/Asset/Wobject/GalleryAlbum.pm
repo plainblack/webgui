@@ -47,8 +47,10 @@ use Carp qw( croak );
 use File::Find;
 use File::Spec;
 use File::Temp qw{ tempdir };
+use JSON ();
 use WebGUI::International;
 use WebGUI::HTML;
+use WebGUI::ProgressBar;
 
 use Archive::Any;
 
@@ -61,10 +63,11 @@ use Archive::Any;
 =head1 DIAGNOSTICS
 
 =head1 METHODS
+=cut
 
 #----------------------------------------------------------------------------
 
-=head2 addArchive ( filename, properties )
+=head2 addArchive ( filename, properties, [$outputSub] )
 
 Add an archive of Files to this Album. C<filename> is the full path of the 
 archive. C<properties> is a hash reference of properties to assign to the
@@ -75,13 +78,29 @@ a directory outside of the storage location.
 
 Will only handle file types handled by the parent Gallery.
 
+=head3 filename
+
+The name of the file archive to import.
+
+=head3 properties
+
+A base set of properties to add to each file in the archive.
+
+=head3 $outputSub
+
+A callback to use for outputting data, most likely to a progress bar.  It expects the
+callback to accept an i18n key for use in sprintf, and then any extra fields to stuff
+into the translated key.
+
 =cut
 
 sub addArchive {
     my $self        = shift;
     my $filename    = shift;
     my $properties  = shift;
+    my $outputSub   = shift || sub {};
     my $gallery     = $self->getParent;
+    my $session     = $self->session;
     
     my $archive     = Archive::Any->new( $filename );
 
@@ -89,11 +108,12 @@ sub addArchive {
         if $archive->is_naughty;
 
     my $tempdirName = tempdir( "WebGUI-Gallery-XXXXXXXX", TMPDIR => 1, CLEANUP => 1);
+    $outputSub->('Extracting archive');
     $archive->extract( $tempdirName );
 
     # Get all the files in the archive
     my @files;
-    my $wanted      = sub { push @files, $File::Find::name };
+    my $wanted      = sub { push @files, $File::Find::name; $outputSub->('Found file: %s', $File::Find::name); };
     find( {
         wanted      => $wanted,
     }, $tempdirName );
@@ -106,23 +126,26 @@ sub addArchive {
         my $class       = $gallery->getAssetClassForFile( $filePath );
         next unless $class; # class is undef for those files the Gallery can't handle
 
-        $self->session->errorHandler->info( "Adding $filename to album!" );
-        # Remove the file extention
+        $session->errorHandler->info( "Adding $filename to album!" );
+        $outputSub->('Adding %s to album', $filename);
+        # Remove the file extension
         $filename   =~ s{\.[^.]+}{};
 
         $properties->{ className        } = $class;
         $properties->{ menuTitle        } = $filename;
         $properties->{ title            } = $filename;
-        $properties->{ url              } = $self->session->url->urlize( $self->getUrl . "/" . $filename );
+        $properties->{ ownerUserId      } = $session->user->userId;
+        $properties->{ url              } = $session->url->urlize( $self->getUrl . "/" . $filename );
 
         my $asset   = $self->addChild( $properties, undef, undef, { skipAutoCommitWorkflows => 1 } );
         $asset->setFile( $filePath );
     }
 
-    my $versionTag      = WebGUI::VersionTag->getWorking( $self->session );
+    my $versionTag      = WebGUI::VersionTag->getWorking( $session );
     $versionTag->set({ 
         "workflowId" => $self->getParent->workflowIdCommit,
     });
+    $outputSub->('Requesting commit for version tag');
     $versionTag->requestCommit;
 
     return undef;
@@ -236,16 +259,12 @@ sub canEdit {
     my $form        = $self->session->form;
 
     # Handle adding a photo
-    if ( $form->get("func") eq "add" ) {
-        return $self->canAddFile;
-    }
-    elsif ( $form->get("func") eq "editSave" && $form->get("className") eq __PACKAGE__ ) {
+    if ( $form->get("func") eq "add" || $form->get("func") eq "editSave" ) {
         return $self->canAddFile;
     }
     else {
         return 1 if $userId eq $self->ownerUserId;
-            
-        return $gallery->canEdit($userId);
+        return $gallery && $gallery->canEdit($userId);
     }
 }
 
@@ -390,6 +409,58 @@ sub getFileIds {
     }
 
     return $self->session->stow->get( "fileIds-" . $self->getId );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getNextFileId ( fileId )
+
+Gets the next fileId from the list of fileIds. C<fileId> is the base 
+fileId we want to find the next file for.
+
+Returns C<undef> if there is no next fileId.
+
+=cut
+
+sub getNextFileId {
+    my $self       = shift;
+    my $fileId     = shift;
+    my $allFileIds = $self->getFileIds;
+
+    while ( my $checkId = shift @{ $allFileIds } ) {
+        # If this is the last albumId
+        return undef unless @{ $allFileIds };
+
+        if ( $fileId eq $checkId ) {
+            return shift @{ $allFileIds };
+        }
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPreviousFileId ( fileId )
+
+Gets the previous fileId from the list of fileIds. C<fileId> is the base 
+fileId we want to find the previous file for.
+
+Returns C<undef> if there is no previous fileId.
+
+=cut
+
+sub getPreviousFileId {
+    my $self       = shift;
+    my $fileId     = shift;
+    my $allFileIds = $self->getFileIds; 
+
+    while ( my $checkId = pop @{ $allFileIds } ) {
+        # If this is the last albumId
+        return undef unless @{ $allFileIds };
+
+        if ( $fileId eq $checkId ) {
+            return pop @{ $allFileIds };
+        }
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -854,7 +925,7 @@ sub www_addArchive {
 
     my $i18n = WebGUI::International->new($session);
 
-    $var->{ error           } = $params->{ error };
+    $var->{ error           } = $params->{ error } || $form->get('error');
 
     $var->{ form_start      } 
         = WebGUI::Form::formHeader( $session, {
@@ -909,32 +980,27 @@ sub www_addArchiveSave {
     my $session     = $self->session;
     my $form        = $self->session->form;
     my $i18n        = WebGUI::International->new( $session, 'Asset_GalleryAlbum' );
+    my $pb          = WebGUI::ProgressBar->new($session);
     my $properties  = {
         keywords        => $form->get("keywords"),
         friendsOnly     => $form->get("friendsOnly"),
     };
     
+    $pb->start($i18n->get('Uploading archive'), $session->url->extras('adminConsole/assets.gif'));
     my $storageId   = $form->get("archive", "File");
     my $storage     = WebGUI::Storage->get( $session, $storageId );
     if (!$storage) {
-        return $self->www_addArchive({
-            error       => sprintf $i18n->get('addArchive error too big'),
-        });
+        return $pb->finish($self->getUrl('func=addArchive;error='.$i18n->get('addArchive error too big')));
     }
     my $filename    = $storage->getPath( $storage->getFiles->[0] );
 
-    eval { $self->addArchive( $filename, $properties ) };
+    eval { $self->addArchive( $filename, $properties, sub{ $pb->update(sprintf $i18n->get(shift), @_); }); };
+    $storage->delete;
     if ( my $error = $@ ) {
-        return $self->www_addArchive({
-            error       => sprintf( $i18n->get('addArchive error generic'), $error ),
-        });
+        return $pb->finish($self->getUrl('func=addArchive;error='.sprintf $i18n->get('addArchive error generic'), $error ));
     }
 
-    $storage->delete;
-
-    return $self->processStyle(
-        sprintf $i18n->get('addArchive message'), $self->getUrl,
-    );
+    return $pb->finish($self->getUrl);
 }
 
 #----------------------------------------------------------------------------
@@ -1072,6 +1138,172 @@ sub www_deleteConfirm {
     return $self->processStyle(
         sprintf $i18n->get('delete message'), $self->getParent->getUrl,
     );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_ajax ( )
+
+Generic AJAX service for gallery. 
+
+Arguments are accepted in JSON format in the form variable C<args>. The single
+obligatory argument is C<action> determining the service to be called. A list
+of available services is given in the following. Additional arguments may be
+required depending on the service.
+
+Results are returned in JSON format. The information returned depends on the 
+service called. Generally, success is indicated by a value of 0 in C<err>.
+
+=head3 moveFile
+
+Service for changing the rank of files. Accepts the asset Id of the photo to be moved
+in C<target>. The asset Id of the photo to be replaced is specified in C<before>
+or C<after> depending on the desired order. Returns -1 in C<err> and an error
+message in C<errMessage> if moving of the photo failed.
+
+=cut
+
+sub www_ajax {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $form        = $self->session->form;
+    my $result;
+
+    # Get arguments encoded in json format
+    my $args = decode_json($form->get("args"));
+    
+    # Log some debug information
+    $session->log->debug("Ajax service called with args=" . $form->get("args"));
+    
+    # Process requests depending on action argument
+    SWITCH: {
+
+        # Return if no action was specified
+        if ( $args->{action} eq '' ) {
+            $session->log->error("Call of ajax service without action argument.");            
+            $result->{ errMessage } = "Action argument is missing.";
+            last;
+        }
+                
+        # ----- Move file action -----
+        $args->{action} eq 'moveFile' && do { $result = $self->_moveFileAjaxRequest( $args ); last; };
+                    
+        # ----- Unkown action -----
+        $session->log->error("Call of ajax service with unknown action '" . $args->{action} . "'.");
+        $result->{ errMessage } = "Action '" . $args->{action} ."' is unknown.";
+    }
+    
+    # Set error flag if error message exists
+    $result->{ err } = -1 if $result->{ errMessage };
+    
+    # Return results encoded in json format
+    return encode_json( $result );
+}
+
+
+#----------------------------------------------------------------------------
+
+=head2 _moveFileAjaxRequest ( args )
+
+AJAX service for changing the rank of single files. Returns a hash ref with
+error information. Arguments passed to the ajax service are provided via the 
+hash ref C<args>. Note that this is a private function owned by www_ajax. It 
+should not be used directly.
+
+=cut
+
+sub _moveFileAjaxRequest {
+    my $self        = shift;
+    my $args        = shift;
+    
+    my $session     = $self->session; 
+    my %result;
+            
+    # Return if current user is not allowed to edit this album
+    unless ( $self->canEdit ) {
+        $session->log->error("Call of moveFile action without having edit permission.");
+        $result{ errMessage } = "You do not have permission to move files.";
+        return \%result;
+    }            
+    # Return if no target was specified
+    if ( $args->{target} eq '') {
+        $session->log->error("Call of moveFile action without target argument.");
+        $result{ errMessage } = "Target argument is missing.";
+        return \%result;
+    }
+    # Return if before or after argument is missing
+    unless( $args->{before} or $args->{after} ) {
+        $session->log->error("Call of moveFile action without before/after argument.");
+        $result{ errMessage } = "Before/after argument is missing.";
+        return \%result;
+    }            
+    # Return if before and after arguments were specified
+    unless( $args->{before} xor $args->{after} ) {
+        $session->log->error("Call of moveFile action with before *and* after argument.");
+        $result{ errMessage } = "Both, before and after arguments were specified.";
+        return \%result;
+    }
+
+    # Get Id of target photo and instantiate asset
+    my $targetId = $args->{target};
+    my $target = WebGUI::Asset->newByDynamicClass( $session, $targetId );
+
+    # Return if target photo could not be instantiated
+    unless ( $target ) {
+        $session->log->error("Couldn't move file '$targetId' because we couldn't instantiate it.");
+        $result{ errMessage } = "ID of target file seems to be invalid.";
+        return \%result;
+    }
+    # Return if target is not a child of the current album
+    unless ( $target->getParent->getId eq $self->getId ) {
+        $session->log->error("Couldn't move file '$targetId' because it is not a child of this album.");
+        $result{ errMessage } = "ID of target file seems to be invalid.";
+        return \%result;
+    }               
+
+    my ($destId, $dest);
+
+    # Instantiate file with ID in before/after argument
+    $destId = $args->{before} ? $args->{before} : $args->{after};            
+    $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+
+    # Return if destination file could not be instantiated
+    unless ( $dest ) {
+        $session->log->error("Couldn't move file '$targetId' before/after file '$destId' because we couldn't instantiate the latter.");
+        $result{ errMessage } = "ID in before/after argument seems to be invalid.";
+        return \%result;
+    }               
+    # Return if destination file is not a child of the current album
+    unless ( $dest->getParent->getId eq $self->getId ) {
+        $session->log->error("Couldn't move file '$targetId' before/after file '$destId' because the latter is not a child of the same album.");
+        $result{ errMessage } = "ID in before/after argument seems to be invalid.";
+        return \%result;
+    }               
+
+    # Check for use of after argument when lowering the rank
+    if ( $args->{after} && $target->getRank() > $dest->getRank() ) {
+        # Get ID of next sibling
+        $destId = $self->getNextFileId( $destId );
+        # Instantiate next sibling
+        $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+    }
+    # Check for use of before argument when increasing the rank
+    if ( $args->{before} && $target->getRank() < $dest->getRank() ) {
+        # Get ID of previous sibling
+        $destId = $self->getPreviousFileId( $destId );
+        # Instantiate previous sibling
+        $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+    }
+    
+    # Update rank of target photo
+    $target->setRank( $dest->getRank );
+    
+    # Log some debug information
+    $session->log->debug("Successfully moved file '$targetId' before/after file '$destId'.");
+    
+    # Return reporting success
+    $result{ err } = 0;        
+    return \%result;
 }
 
 #----------------------------------------------------------------------------

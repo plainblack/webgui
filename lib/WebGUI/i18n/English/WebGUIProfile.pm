@@ -57,10 +57,10 @@ our $I18N = {
 		lastUpdated => 1036964807
 	},
 
-        '475 description' => {
-                message => q|The name of the field, used internally in the database.|,
-                lastUpdated => 1122316558,
-        },
+    '475 description' => {
+        message => q|The name of the field, used internally in the database.  Field names may not contain spaces.  Certain field names are reserved, such as "op", "func", "username", "shop", "karma", "status", "lastUpdated", "dateCreated".|,
+        lastUpdated => 1264448486,
+    },
 
         '472 description' => {
                 message => q|A short, descriptive label displayed to the user.  This can be a call to WebGUI's

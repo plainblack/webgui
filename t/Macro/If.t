@@ -14,22 +14,16 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Macro::If;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-my $numTests = 8 + 1; # For conditional load and skip
+my $numTests = 8; # For conditional load and skip
 
 plan tests => $numTests;
-
-my $macro = 'WebGUI::Macro::If';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $output;
 
@@ -56,5 +50,3 @@ is($output, 'There are 5 lights', 'true text works with sprintf');
 
 $output = WebGUI::Macro::If::process($session, 0, 'Full', 'There are %s lights');
 is($output, 'There are %s lights', '...false text does not');
-
-}

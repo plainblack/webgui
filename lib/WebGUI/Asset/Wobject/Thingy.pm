@@ -65,12 +65,13 @@ always taken from the field hashref.
 
 sub addField {
 
-    my $self = shift;
-    my $field = shift;
-    my $isImport = shift;
+    my $self       = shift;
+    my $field      = shift;
+    my $isImport   = shift;
     my $dbDataType = shift || $self->_getDbDataType($field->{fieldType});
-    my $db = $self->session->db;
-    my $error = $self->session->errorHandler;
+    my $session    = $self->session;
+    my $db         = $session->db;
+    my $error      = $session->errorHandler;
     my ($oldFieldId, $newFieldId,$useAssetId,$useSequence);
 
     $error->info("Adding Field, label: ".$field->{label}.", fieldId: ".$field->{fieldId}.",thingId: ".$field->{thingId});
@@ -263,10 +264,10 @@ Duplicates a Thingy, including the definitions of the Things in this Thingy and 
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self = shift;
     my $options = shift;
-	my $newAsset = $self->SUPER::duplicate($options);
+	my $newAsset = super();
     my $db = $self->session->db;
     my $assetId = $self->getId;
     my $fields;
@@ -310,7 +311,7 @@ sub duplicate {
                     $otherThingFields->{$otherThingField}->{fieldInOtherThingId}, $newAsset->getId]);
     }
     return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -415,13 +416,37 @@ The id of row of data that should be copied.
 =cut
 
 sub copyThingData {
-    my $self = shift;
-    my $thingId = shift;
+    my $self        = shift;
+    my $thingId     = shift;
     my $thingDataId = shift;
-    my $db = $self->session->db;
-    return undef unless $self->canEditThingData($thingId, $thingDataId);;
+    my $session     = $self->session;
+    my $db          = $session->db;
+    return undef unless $self->canEditThingData($thingId, $thingDataId);
 
-    $self->copyCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
+    my $origCollateral = $self->getCollateral("Thingy_".$thingId, "thingDataId", $thingDataId);
+    use Data::Dumper;
+    $session->log->warn(Dumper $origCollateral);
+    $origCollateral->{thingDataId} = "new";
+    ##Get all fields
+    my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
+            ,[$self->getId,$thingId]);
+    my @storage_field_ids = ();
+    ##Check to see if any of them are File or Image
+    foreach my $field (@{ $fields }) {
+        if ($field->{fieldType} eq 'File' or $field->{fieldType} eq 'Image') {
+            push @storage_field_ids, $field->{fieldId};
+        }
+    }
+    ##Instance the storage object and duplicate it
+    foreach my $fieldId (@storage_field_ids) {
+        my $currentId = $origCollateral->{"field_". $fieldId};
+        my $storage   = WebGUI::Storage->get($session, $currentId);
+        my $new_store = $storage->copy;
+        ##Update the copy with the new storageId.
+        $origCollateral->{"field_". $fieldId} = $new_store->getId;
+    }
+    ##Update the copy
+    $self->setCollateral("Thingy_".$thingId, "thingDataId", $origCollateral, 0, 0);
 
     return undef;
 }
@@ -445,12 +470,13 @@ The id of row of data that should be deleted.
 
 sub deleteThingData {
 
-    my $self = shift;
-    my $thingId = shift;
+    my $self        = shift;
+    my $thingId     = shift;
     my $thingDataId = shift;
-    my $db = $self->session->db;
+    my $session     = $self->session;
+    my $db          = $session->db;
 
-    return undef unless $self->canEditThingData($thingId, $thingDataId);;
+    return undef unless $self->canEditThingData($thingId, $thingDataId);
 
     my ($onDeleteWorkflowId) = $db->quickArray("select onDeleteWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
@@ -458,7 +484,22 @@ sub deleteThingData {
         $self->triggerWorkflow($onDeleteWorkflowId, $thingId,$thingDataId);
     }
 
+    my $origCollateral = $self->getCollateral("Thingy_".$thingId, "thingDataId", $thingDataId);
     $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
+    my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
+            ,[$self->getId,$thingId]);
+    my @storage_field_ids = ();
+    ##Check to see if any of them are File or Image
+    foreach my $field (@{ $fields }) {
+        if ($field->{fieldType} eq 'File' or $field->{fieldType} eq 'Image') {
+            push @storage_field_ids, $field->{fieldId};
+        }
+    }
+    foreach my $fieldId (@storage_field_ids) {
+        my $currentId = $origCollateral->{"field_". $fieldId};
+        my $storage   = WebGUI::Storage->get($session, $currentId);
+        $storage->delete;
+    }
 
     return undef;
 }
@@ -598,9 +639,9 @@ See WebGUI::AssetPackage::exportAssetData() for details.
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
     my $self = shift;
-    my $data = $self->SUPER::exportAssetData;
+    my $data = super();
     my $db = $self->session->db;
     my $assetId = $self->getId;
 
@@ -608,7 +649,7 @@ sub exportAssetData {
     $data->{fields} = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId = ?',[$assetId]);
 
     return $data;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -839,10 +880,10 @@ sub getFieldValue {
     my $processedValue = $value;    
     my $dbh = $self->session->db->dbh;
 
-    if ($field->{fieldType} eq "date"){
+    if (lc $field->{fieldType} eq "date"){
         $processedValue = $self->session->datetime->epochToHuman($value,$dateFormat);
     }
-    elsif ($field->{fieldType} eq "dateTime"){
+    elsif (lc $field->{fieldType} eq "datetime"){
         $processedValue = $self->session->datetime->epochToHuman($value,$dateTimeFormat);
     }
     # TODO: The otherThing field type is probably also handled by getFormPlugin, so the elsif below can probably be
@@ -895,7 +936,7 @@ sub getFormElement {
 
 Returns an instanciated WebGUI::Form::* plugin.
 
-=head3 proeprties
+=head3 properties
 
 The properties to configure the form plugin with. The fieldType key should contain the type of the form plugin.
 
@@ -912,19 +953,19 @@ sub getFormPlugin {
 
     my %param;
     my $session = $self->session;
-    my $db = $session->db;
-    my $dbh = $db->dbh;
-    my $i18n = WebGUI::International->new($session,"Asset_Thingy");
+    my $db      = $session->db;
+    my $dbh     = $db->dbh;
+    my $i18n    = WebGUI::International->new($session,"Asset_Thingy");
 
     $param{name} = "field_".$data->{fieldId};
-    my $name = $param{name};
+    my $name     = $param{name};
     $name =~ s/\^.*?\;//xgs ; # remove macro's from user input
-    $param{value}  = $data->{value} || $data->{defaultValue};
-    $param{size}   = $data->{size};
-    $param{height} = $data->{height};
-    $param{width}  = $data->{width};
-    $param{extras} = $data->{extras};
-    $param{vertical} = $data->{vertical};
+    $param{value}     = $data->{value} || $data->{defaultValue};
+    $param{size}      = $data->{size};
+    $param{height}    = $data->{height};
+    $param{width}     = $data->{width};
+    $param{extras}    = $data->{extras};
+    $param{vertical}  = $data->{vertical};
     $param{fieldType} = $data->{fieldType};
 
     if ($data->{fieldType} eq "Checkbox") {
@@ -936,7 +977,7 @@ sub getFormPlugin {
 
     if ( WebGUI::Utility::isIn( $data->{fieldType}, qw(SelectList CheckList SelectBox Attachments) ) ) {
         my @values;
-        if ( $useFormPostData && $self->session->form->param($name) ) {
+        if ( $useFormPostData && $session->form->param($name) ) {
             $param{ value } = [ $session->form->process( $name, $data->{fieldType} ) ];
         }
         elsif ( $data->{ value } ) {
@@ -947,7 +988,7 @@ sub getFormPlugin {
             $param{value} = \@values;
         }
     }
-    elsif ( $useFormPostData && $self->session->form->param($name) ) {
+    elsif ( $useFormPostData && $session->form->param($name) ) {
         $param{value} = $session->form->process( $name, $data->{fieldType} );
     }
 
@@ -981,30 +1022,36 @@ sub getFormPlugin {
     }
 
     if ($data->{fieldType} =~ m/^otherThing/x){
-        my $otherThingId = $data->{fieldType}; 
-        $otherThingId =~ s/^otherThing_(.*)/$1/x;
-        $param{fieldType} = "SelectList"; 
-        $class = 'WebGUI::Form::'. $param{fieldType};
+        my $otherThingId  =  $data->{fieldType}; 
+        $otherThingId     =~ s/^otherThing_(.*)/$1/x;
+        $param{fieldType} =  "SelectList"; 
+        $class      = 'WebGUI::Form::'. $param{fieldType};
         my $options = ();
 
-        my $tableName = 'Thingy_'.$otherThingId;
-        my $fieldName = 'field_'.$data->{fieldInOtherThingId};
+        my $tableName    = 'Thingy_'.$otherThingId;
+        my $fieldName    = 'field_'.$data->{fieldInOtherThingId};
         my $errorMessage = $self->badOtherThing($tableName, $fieldName);
         return $errorMessage if $errorMessage;
 
-        $options = $db->buildHashRef('select thingDataId, '
+        my $sth = $session->db->read('select thingDataId, '
             .$dbh->quote_identifier($fieldName)
             .' from '.$dbh->quote_identifier($tableName));
     
+        while (my $result = $sth->hashRef){
+            if ($self->canViewThingData($otherThingId,$result->{thingDataId})){
+                $options->{$result->{thingDataId}} = $result->{$fieldName}
+            }
+        }
+ 
         my $value = $data->{value} || $data->{defaultValue};
         ($param{value}) = $db->quickArray('select '
             .$dbh->quote_identifier($fieldName)
             .' from '.$dbh->quote_identifier($tableName)
             .' where thingDataId = ?',[$value]);
-        $param{size} = 1;
+        $param{size}     = 1;
         $param{multiple} = 0;
-        $param{options} = $options;
-        $param{value} = $data->{value} || $data->{defaultValue};
+        $param{options}  = $options;
+        $param{value}    = $data->{value} || $data->{defaultValue};
     }
 
     my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$session, \%param ])};
@@ -1321,7 +1368,7 @@ purges it's data.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
     my $session = $self->session;
 	my $db = $self->session->db;
@@ -1332,8 +1379,8 @@ sub purge {
     $db->write("delete from Thingy_things where assetId = ?",[$self->getId]);
     $db->write("delete from Thingy_fields where assetId = ?",[$self->getId]);
 
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1874,7 +1921,7 @@ sub www_editThing {
     );
 
     # create the options hash for the 'Who can edit' and 'Who can view' selectBoxes.
-    %editViewOptions = ('owner'=>'owner',$session->db->buildHash(
+    %editViewOptions = ('owner'=>$i18n->get('owner'),$session->db->buildHash(
         "select groupId,groupName from groups where showInForms=1 order by groupName"
     ));
 
@@ -2161,53 +2208,53 @@ Processes and saves a field. Returns the edited/added fieldId and the inner html
 
 sub www_editFieldSave {
 
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canEdit;
     my ($fieldId, $fieldTypeChanged, $newFieldId, $formClass, $dbDataType, $thingyTableName, $columnName);
     my (%properties,$listItemHTML,$formElement);
-    my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
-    my $label = $session->form->process("label");
-    my $thingId = $self->session->form->process("thingId");
-    my $error = $self->session->errorHandler;
+    my $i18n    = WebGUI::International->new($session, "Asset_Thingy");
+    my $label   = $session->form->process("label");
+    my $thingId = $session->form->process("thingId");
+    my $log     = $session->log;
     my $defaultValue = $session->form->process("defaultValue");
-    my $fieldType = $session->form->process("fieldType") || "ReadOnly";
+    my $fieldType    = $session->form->process("fieldType") || "ReadOnly";
 
     if ($fieldType =~ m/^otherThing/){
         $defaultValue = $session->form->process("defaultFieldInThing");
     }
     
-    $fieldId = $self->session->form->process("fieldId");
+    $fieldId = $session->form->process("fieldId");
     %properties = (
-        fieldId=>$fieldId,
-        thingId=>$thingId,
-        label=>$label,
-        fieldType=>$fieldType,
-        defaultValue=>$defaultValue,
-        possibleValues=>$self->session->form->process("possibleValues"),
-        pretext=>$self->session->form->process("pretext"),
-        subtext=>$self->session->form->process("subtext"),
-        status=>$self->session->form->process("status"),
-        size=>$self->session->form->process("size"),
-        width=>$self->session->form->process("width"),
-        height=>$self->session->form->process("height"),
-        vertical=>$self->session->form->process("vertical"),
-        extras=>$self->session->form->process("extras"),
-        display=>$self->session->form->process("display") || 1,
-        viewScreenTitle=>$self->session->form->process("viewScreenTitle") || 0,
-        fieldInOtherThingId=>$session->form->process("fieldInOtherThingId") || "",
+        fieldId             => $fieldId,
+        thingId             => $thingId,
+        label               => $label,
+        fieldType           => $fieldType,
+        defaultValue        => $defaultValue,
+        possibleValues      => $session->form->process("possibleValues"),
+        pretext             => $session->form->process("pretext"),
+        subtext             => $session->form->process("subtext"),
+        status              => $session->form->process("status"),
+        size                => $session->form->process("size"),
+        width               => $session->form->process("width"),
+        height              => $session->form->process("height"),
+        vertical            => $session->form->process("vertical"),
+        extras              => $session->form->process("extras"),
+        display             => $session->form->process("display")             || 1,
+        viewScreenTitle     => $session->form->process("viewScreenTitle")     || 0,
+        fieldInOtherThingId => $session->form->process("fieldInOtherThingId") || "",
     );
     # Get the field's data type
     $dbDataType = $self->_getDbDataType($properties{fieldType});
 
     if ($fieldId eq "new") {
         $properties{dateCreated} = time();
-        $properties{createdBy} = $self->session->user->userId;
+        $properties{createdBy} = $session->user->userId;
         $newFieldId = $self->addField(\%properties,0,$dbDataType);
     }
     else{
         $properties{dateUpdated} = time();
-        $properties{updatedBy} = $self->session->user->userId;
+        $properties{updatedBy} = $session->user->userId;
         # Check if column has to be altered for existing fields.
         $self->_updateFieldType($fieldType,$fieldId,$thingId,$self->getId,$dbDataType);
         $newFieldId = $self->setCollateral("Thingy_fields","fieldId",\%properties,1,1,"thingId",$thingId);
@@ -2231,13 +2278,13 @@ sub www_editFieldSave {
 
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
         ."<td style='width:370px;'>".$formElement."</td>\n"
-        ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
+        ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$session->url->page()
         ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
-        ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$newFieldId
+        ."<input onClick=\"deleteListItem('".$session->url->page()."','".$newFieldId
         ."','".$properties{thingId}."')\" value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>";
 
     # Make sure we send debug information along with the field.
-    $session->log->preventDebugOutput;
+    $log->preventDebugOutput;
 
     $session->output->print($newFieldId.$listItemHTML);
     return "chunked";

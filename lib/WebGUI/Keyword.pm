@@ -386,6 +386,80 @@ sub getMatchingAssets {
     return $self->session->db->buildArrayRef($query, \@params);
 }
 
+#-------------------------------------------------------------------
+
+=head2 getTopKeywords ( $options )
+
+Returns a hashref of the the top N keywords as well as the total number returned sorted in alphabetical order
+
+=head3 $options
+
+A hashref of options to change the behavior of the method.
+
+=head4 asset
+
+Find all keywords for all assets below an asset, providing a WebGUI::Asset object.
+
+=head4 assetId
+
+Find all keywords for all assets below an asset, providing an assetId.
+
+=head4 search
+
+Find all keywords using the SQL clause LIKE.  This can be used in tandem with asset or assetId.
+
+=head4 limit
+
+Limit the number of top keywords that are returned.
+
+=cut
+
+sub getTopKeywords {
+    my $self    = shift;
+    my $options = shift;
+    my $sql     = q|
+        SELECT
+            keyword,occurrance
+        FROM (
+            SELECT
+                keyword, count(keyword) as occurrance
+            FROM
+                assetKeyword
+    |;
+    my @where;
+    my @placeholders;
+    my $parentAsset;
+    if ($options->{asset}) {
+        $parentAsset = $options->{asset};
+    }
+    if ($options->{assetId}) {
+        $parentAsset = WebGUI::Asset->new($self->session, $options->{assetId});
+    }
+    if ($parentAsset) {
+        $sql .= ' INNER JOIN asset USING (assetId)';
+        push @where, 'lineage LIKE ?';
+        push @placeholders, $parentAsset->get('lineage') . '%';
+    }
+    if ($options->{search}) {
+        push @where, 'keyword LIKE ?';
+        push @placeholders, '%' . $options->{search} . '%';
+    }
+    if (@where) {
+        $sql .= ' WHERE ' . join(' AND ', @where);
+    }
+    $sql .= ' GROUP BY keyword';
+    $sql .= ' ORDER BY occurrance desc';
+    if ($options->{limit}) {
+        $sql .= ' LIMIT ' . $options->{limit};
+    }
+    $sql .= q|
+        ) as keywords
+        order by keyword
+    |;
+    my $keywords = $self->session->db->buildHashRef($sql, \@placeholders);
+    return $keywords;
+}
+
 
 #-------------------------------------------------------------------
 

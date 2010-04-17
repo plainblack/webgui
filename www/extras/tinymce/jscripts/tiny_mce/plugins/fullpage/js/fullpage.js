@@ -123,7 +123,7 @@ function init() {
 	// Parse xml and doctype
 	xmlVer = getReItem(/<\?\s*?xml.*?version\s*?=\s*?"(.*?)".*?\?>/gi, h, 1);
 	xmlEnc = getReItem(/<\?\s*?xml.*?encoding\s*?=\s*?"(.*?)".*?\?>/gi, h, 1);
-	docType = getReItem(/<\!DOCTYPE.*?>/gi, h, 0);
+	docType = getReItem(/<\!DOCTYPE.*?>/gi, h.replace(/\n/g, ''), 0).replace(/ +/g, ' ');
 	f.langcode.value = getReItem(/lang="(.*?)"/gi, h, 1);
 
 	// Parse title
@@ -143,7 +143,7 @@ function init() {
 
 		switch (eq.toLowerCase()) {
 			case "content-type":
-				tmp = getReItem(/charset\s*=\s*(.*)\s*/gi, value, 1);
+				tmp = getReItem(/charset\s*=\s*(.*)\s*/gi, va, 1);
 
 				// Override XML encoding
 				if (tmp != "")
@@ -374,7 +374,6 @@ function updateAction() {
 }
 
 function changedStyleField(field) {
-	//alert(field.id);
 }
 
 function setMeta(he, k, v) {

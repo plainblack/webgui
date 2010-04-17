@@ -16,6 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Storage;
 use Data::Dumper;
+use WebGUI::Macro::FileUrl;
 
 use Test::More; # increment this value for each test you create
 
@@ -85,21 +86,13 @@ my @testSets = (
 
 
 my $numTests = scalar @testSets;
-$numTests += 1; #For the use_ok
 $numTests += 1; #non-existant URL
 
 plan tests => $numTests;
 
-my $macro = 'WebGUI::Macro::FileUrl';
-my $loaded = use_ok($macro);
-
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
-
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
-my ($versionTag, @testSets) = setupTest($session, $homeAsset, @testSets);
+my @testSets = setupTest($session, $homeAsset, @testSets);
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::FileUrl::process($session, $testSet->{url});
@@ -113,8 +106,6 @@ foreach my $testSet (@testSets) {
 
 my $output = WebGUI::Macro::FileUrl::process($session, "non-existant-url");
 is($output, $i18n->get('invalid url'), "Non-existant url returns error message");
-
-}
 
 sub setupTest {
 	my ($session, $homeAsset, @testSets) = @_;
@@ -145,9 +136,6 @@ sub setupTest {
 		++$testNum;
 	}
 	$versionTag->commit;
-    WebGUI::Test->tagsToRollback($versionTag);
-	return $versionTag, @testSets;
-}
-
-END { ##Clean-up after yourself, always
+    addToCleanup($versionTag);
+	return @testSets;
 }

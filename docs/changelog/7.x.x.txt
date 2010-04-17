@@ -1,4 +1,310 @@
+7.9.3
+ - added #11477: No synopsis in asset now means no synopsis in search index
+ - added #11007: Added drag'n'drop sorting in Gallery Album Edit View (Bernd Kalbfuß-Zimmermann)
+ - added Better comment rating icons.
+ - fixed #11520: Wiki Locked
+ - fixed Missing Template variables for the Wiki Page view template.
+ - added #10944: Wiki Keyword Page
+
+7.9.2
+ - added: Workflow to extend recurring Calendar events 2 years from the
+   current date (now part of weekly maintenence)
+ - fixed #11507: Spectre Reports Wrong Workflow Count
+ - added #11412: Additional navigation in Gallery Photo View (Bernd Kalbfuß-Zimmermann)
+ - added: Sort Items switch to Syndicated Content asset
+ - fixed #11493: i18n AssetCalendar::pageNextUrl monthVar
+ - fixed #11496: No linkable RSS feeds from gallery
+ - fixed #11497: default profile settings
+ - fixed #11492: photo details
+ - fixed #11503: Gallery: Wrong owner after uploading of ZIP archives
+ - fixed #11494: Error message on mysql down
+ - fixed: Viewing a Gallery File with non-ASCII keywords crashes
+ - fixed #11509: System trash not sticky
+ - fixed #11506: Cruft on i18n dirs in the released .tar.gz
+ - fixed #11510: Scratch variables for sort direction and key can break the CS
+ - fixed #11511: Approval Notifications: URL in mails only plain text
+ - fixed #11513: white text, broken account mgmt
+ - fixed #11514: Added JS-type cancel button to edit view of WebGUI::Asset::Post (Bernd Kalbfuß-Zimmermann)
+ - fixed #11469: Survey Ruler
+ - fixed Shortcut i18n for the Criteria Builder.
+ - fixed #11516: Shortcut Asset: Properties panel messed up in edit view
+
+7.9.1
+ - fixed #11464: blank page after setting posts per page in Collaboration System to 0 (zero)
+ - fixed #11472: View Calendar Month help missing
+ - fixed #11471: Errors in Calendar Event Edit template (Dale Trexel / U of MN Law School)
+ - fixed #11475: Inherit permissions on imported package fails if asset already exists.
+ - fixed #11476: Missing override in Page Layout shortcut
+ - fixed: Unable to add threads with permission to edit CS but not in post group
+ - fixed #11478: Overzealous removal of double slashes in FilePump macro
+ - fixed thread pagination on search results, off by 1 error and modal direction
+ - fixed #11482: Template hard-coded in deactivateAccount
+ - fixed #11485: RedirectAfterLoginUrl Setting should not override returnUrl and redirectAfterLogin scratch
+ - fixed #11466: Can't delete attached file in CS
+ - fixed #11481: Problem assignment group Admin to an User
+ - fixed #11486: Bad matrix sorting
+
+7.9.0
+ - added #11383: AJAX username checks at registration (Luke Robinson / Orchard Solutions)
+ - added: Optimized macro parser for perl 5.10
+ - fixed #11445: NotifyAboutUsers sends infinite e-mails
+ - fixed #11446: Delete a wiki
+ - fixed #11401: Remove hacks in Asset::Wobject::Weather
+ - fixed #11449: List of macros in my config file has HASH(0x45223ab3) entry
+ - fixed #11443: no language switch in rich edit
+ - fixed #11450: How to lock yourself out of your WebGUI site...
+ - fixed #11402: Survey TAP module requirements
+ - fixed #11453: fileUpload.pl does not handle files with spaces, overwriting
+ - fixed #11458: Use packed template removes wanted whitespace
+ - fixed #11459: "default template" warning after upgrade to 7.8.14
+ - added #11460: Override the search root asset. (United Knowledge)
+ - fixed #11456: Delete a wiki (Reopen #11446 - subscription groups)
+
+7.8.13
+ - fixed #11418: confusing typ-o in gotcha
+ - fixed #11415: Wiki - Edit page appearing below the content
+ - fixed #11414: SQLReport Pagination Setting
+ - fixed #11420: Snippet not save mimetype
+ - fixed #11422: Disabled scheduled task run by spectre
+ - fixed #11431: Prototypes cache attribute lost
+ - fixed #11428: Dataform Date Field Problem
+ - fixed #11409: 7.7.32 Breaks Code Editor
+ - fixed #11426: Logout page gets cached
+ - fixed #11428: Dataform Date Field Problem
+ - fixed #11434: Inbox invitation adds text to email instead of html
+ - fixed #11436: Inbox invitation use mail send instead of mail queue
+ - fixed #11385: Wrong user in onCompletePurchase
+ - fixed #11435: Invitation mail uses wrong mail 'from' header
+ - fixed #11440: Search for thread with containers
+ - fixed #11439: Wrong page after login
+
+7.8.12
+ - fixed #11285: Pasting HTML into Code Editor in IE
+ - fixed #11349: Code editor returns newline for blank content
+ - fixed #11322: Code editor broken
+ - fixed #11390: Meta description duplicated in asset Folder
+ - fixed #11391: Duplicated Thingy maintains ids for storage fields
+ - fixed #11381: Captcha of DataForm cached
+ - fixed #11392: account.message var sometimes returns invalid html
+ - fixed #11395: i18n LDAP field name in user properties wrong
+ - fixed #11396: WebGUI Workflow Cache Error.
+ - fixed #11393: Map template variables missing
+ - fixed #11336: Duplicate Version Tag Created.
+ - fixed #11398: Recent post information keeps disappearing from my forums
+ - fixed #11394: Map points does not show all the data that was entered
+ - fixed #11400: Active Sessions Deletion
+ - fixed #11399: m4a missin
+ - fixed #11406: AdSku table mssing karma column
+ - fixed #11410: Too much errors in log after fix #11346
+ - fixed #11169: MapPoint asset does not have an icon
+ - fixed Typo in Subscription Sku prevented karma from being transferred to users.
+ - fixed #11411: Photo Asset: Error in template help
+
+7.8.11
+ - fixed #11362: Unable to checkout with ITransact plugin
+ - fixed #11364: Notify About Low Stock workflow activity email is not user friendly
+ - fixed #11371: Spaces in the names of custom profile fields
+ - fixed #11372: All Search Forms should use GET
+ - fixed #11373: Problem creating FilePump bundles
+ - fixed #11374: USPS shipping drivers take 3 minutes to timeout
+ - fixed #11044: Optionally include hidden pages in sitemap.xml
+ - fixed #11379: Certain fields in some Assets cannot be overridden in the config file
+ - fixed #11380: "Use this Address" button in Shop needs to be green!
+ - fixed: Due to a typo France was not considered part of the EU by the EU TaxDriver. ( Martin Kamerbeek / Oqapi )
+ - fixed #11292: Made search less sticky
+ - fixed #11377: Normal users can delete revisions in wiki
+ - fixed #11378: Cross publishing gallery files does not auto commit
+ - fixed #11387: editing a style template
+
+7.8.10
+ - fixed #11332: Pagination in webgui.org forum urls
+ - fixed #11341: tmpl_var forum.threads
+ - fixed #11337: Parameters persist
+ - fixed #11343: Notify About Low Stock workflow activity not sending out emails
+ - fixed #11345: New Image Asset template does now work well with AssetProxy macro and some layouts
+ - fixed #11344: Badge Builder doesn't allow pagination
+ - fixed #11348: Typ-o in debug notice SQLReport
+ - fixed #11350: Story Topic asset missing description...
+ - fixed #11351: Double submits on ITransact checkout
+ - fixed #11353: shop - sales - error
+ - fixed #11355: Duplicate template error
+ - fixed #11347: copy forum
+ - fixed #11359: USPS International shipping does not work on United Kingdom
+ - fixed #11034: Upgrade errors -- 7.6.35 to 7.7.17
+ - fixed #11346: Slow rendering of Thread asset with a lot of attachments
+
+7.8.9
+ - fixed #11235: wiki search
+ - fixed #10679: i18n TaxDriver_EU::accept when vies unavailable help (Martin Kamerbeek / Oqapi)
+ - fixed #11313: bullet list template for navigation
+ - fixed #11311: Search object and modifiers
+ - fixed #11314: hover help clarity
+ - fixed #11317: wrong error message in AssetProxy
+ - fixed #11318: searching in a collaborationsystem
+
+7.8.8
+ - fixed #11289: Gallery with pending version tag causes search engine indexer to puke.
+ - fixed #11292: Search function limited to onje search?
+ - fixed #11286: Workflow Instance deleted when reaching an Activity that fails to load
+ - fixed #11296: listLDAPLinks op permissions problems
+ - fixed #11294: Matrix - Best/Worse Rated Calculations
+ - fixed getIsa returns undef for pending assets
+ - fixed #11299: Matrix - Cannot hide title
+ - fixed #11293: Matrix - Search not working correctly
+ - fixed #11301: Matrix - Comparing too many products error message
+ - fixed #11297: YUI Rich Editor fails to load when editing Survey in 7.7.27
+ - fixed #11306: Survey i18n: Loading....
+ - fixed #11307: Survey i18n #2
+ - fixed #11295: asset addChild failure when parent is not committed
+
+7.8.7
+ - fixed #11278: Wrong test for Template::Toolkit in testEnvironment.pl
+ - fixed #11282: USPS Shipping Driver does not accept ZIP+4
+ - fixed #11284: Collaboration System Cron jobs for email
+ - fixed #11287: api pod WebGUI::Shop::Vendor
+
+7.8.6
+ - fixed #11250: i18n Asset_EMSSubmissionForm::delete created items label help
+ - fixed #11251: perload.perl tries to load t/lib/WebGUI/Test.pm
+ - fixed #11249: Recaptcha https bug
+ - fixed #11200: Navigation in AssetProxy cached in browser
+ - fixed #11143: cancel button
+ - fixed #11259: Snippet content never cached
+ - fixed #11254: RTF files are streamed with the wrong content-type
+ - fixed #10932: code showing
+ - fixed #11265: typo i18n
+ - fixed #11263: CleanLoginHistory can cause workflow errors
+ - fixed #11185: Code editor broken in IE8 for SQLReport
+ - fixed #11177: Code editor steals focus on load
+ - fixed #10888: Final touches on map point bugs
+ - fixed #11274: Add attachment broken in template
+ - fixed #11272: Security issue with asset manager search
+
+7.8.5
+ - added the EMS submission subsystem
+ - The captcha form control had it's built in styles removed in favor of two classes: "wg-captchaForm" and "wg-captchaImage"
+ - fixed #11134: Tree Navigation menu colapses sub items of current page
+ - fixed #11203: Manage groups in group: everyone added on save
+ - fixed #11101: 7.6.35-7.7 upgrade leaves packages
+ - fixed #11209: Form::HTMLArea uses invalid javascript identifier
+ - fixed #11186: Template Attachments i18n
+ - fixed #11218: LDAPS does not create users automatically
+ - fixed #11205: DataTable borked in IE
+ - fixed #11215: Los Angeles cannot be default timezone
+ - fixed #11220: Map asset badly broken
+ - fixed #11222: testEnvironment.pl Missing Dependencies
+ - fixed #11226: New stylesheet (wg-base.css), new style templates (from the TWG)
+ - fixed #11216: LDAP Connections status incorrect
+ - fixed #11229: ProgressBar throws errors on some messages.
+ - fixed #11217: LDAP authentication fails if user DN changes
+ - fixed #11228: Gallery image upload to other users folder permission denied
+ - added USPS International driver.
+ - added #10727: language choice during site adding
+ - added file globbing to preload.exclude
+ - fixed #11242: Macros not executing in Download Templates
+ - added TimeZone form controls accepts spaces or underscores in zone names.
+ - fixed #11245: send stats
+ - fixed #11247: Survey edit screen broken
+ - fixed #11246: Image.pm - Validation error
+ - fixed #11221: wrong version of Locales::Country in testEnvironment
+ - Net::Subnets has been deprecated.
+
+7.8.4
+ - Fixed a compatibility problem between WRE and new Spectre code.
+ - fixed #11198: Typo in i18n
+ - fixed #11202: USPS driver does not log authentication errors
+ - fixed #10985: Survey: can't add multiple choice answer
+ - fixed #11197: Survey Edit Console is not i18n'ed
+ - fixed USPS driver only works on domestic addresses.
+ - fixed Shop is not sending notification emails to the user, or to the notification group.
+ - Set a minimum package weight of 0.1 oz for the USPS driver.
+ - Handle per package errors in USPS response data.
+ - fixed #11207: Shop Email receipts going out to everyone.
+ - fixed tag-caching bug in Survey ExpressionEngine
+
+7.8.3
+ - Rewrote Spectre's workflow queues to prevent it from "forgetting" about some workflows.
+ - fixed: RSS feeds generated with incorrect link for channel
+ - Fixed an error being thrown by the CalendarUpdateFeeds workflow activity.
+ - The auto add to group and auto delete from group operations that are used with the GroupAdd and GroupDelete macros were fixed to make the user log in if they aren't already.
+ - fixed #11074: Links to CS posts not working
+ - fixed #11152: Image edits do not autocommit version tags
+ - fixed template attachments are not cleaned up during purge
+ - fixed #11150: matrix - search boxes all ticked
+ - fixed #11063: template_attachments
+ - fixed #11002: Matrix shows backend stuff on load
+ - added #10082: Unarchive all collaboration posts
+ - fixed #11086: bad urls in wiki
+ - fixed #11047: required field on dataform
+ - fixed #11162: Can't delete calendar Related Material Link
+ - fixed #11154: vendor payouts screen borked ( Martin Kamerbeek / Oqapi )
+ - fixed #11166: Documentation bug - addChild
+ - fixed #11116: Deleted user's version tags and revisions
+ - fixed #11168: Points do not work with uncommitted Map
+ - fixed #10888: Add Point... how do I enter details?
+ - fixed #10887: Map Point dropdown doesn't update
+ - fixed #11172: Collaboration broken vars: isSecond, isThird etc.
+ - fixed #11165: DatePicker broken in IE7
+ - added: Manage System Clipboard group setting
+ - added: Manage System Trash group setting
+ - fixed #11069: "More" options menu in asset manager 
+ - rfe #10755: Adding SetLanguage bazaar item
+ - fixed #11176: New upgrade error in 7.6.35 to 7.7.17
+ - fixed #11181: ableToBeFriend label not i18n
+ - fixed #11179: user.CanStartThread missing from help
+ - fixed #11183: Calendar List View
+ - fixed #11135: Tree Navigation menu template shows a drop down fly-out menu
+ - fixed #10984: Edit Survey Screen isn't right in demo
+ - added: getTopKeywords method to Keywords API
+ - added: print remaining tickets feature to EMS
+ - fixed #11188: Incoherence in Navigation edit form
+ - fixed #11189: Controls variable missing in image asset in AssetProxy
+ - fixed #11190: event tmpl_var in help but not available
+ - fixed #11194: Event Asset Recurrence form is not i18n'ed
+ - fixed #11192: newByLineage tries to instantiate asset even if no assetId found
+ - fixed #11195: Shop, sometimes free checkout does not work
+ - added: UPS Shipping Driver
+
+7.8.2
+ - Added scheduled vendor payout workflow activity. (Special thanks to Martin @ Oqapi)
+ - fixed #11098: Leaving a version tag makes everyone leave
+ - fixed #11096: Error on deleting FAQ(CS)-item
+ - fixed #11060: Some tables have latin1 as the default character set
+ - fixed #11089: No message body in Notification
+ - fixed #2569: robots.txt issues
+ - refixed #2569: robots.txt issues
+ - fixed #11104: Wrong name for request tracker post form template
+ - fixed #11077: Untested result in WebGUI::Storage->getFiles
+ - fixed #11080: Asset Manage Crumb Trail flyout menu
+ - fixed #10874: EMS Schedule displaying incorrectly
+ - fixed #10956: Account, Profile system bad rendering with lots of 
+ - fixed #11112: story archive RSS feed
+ - added Insurance estimator for the USPS shipping driver
+ - fixed #11121: Syndicated Content search terms require both title and description match
+ - fixed #11057: Deleting wiki attachments
+ - fixed #11122: Survey icon is missing from admin console
+ - fixed #11107: linked image with caption
+ - fixed #10914: Shop: No email notifications sent when the cart has net value 0
+ - fixed #11126: WebGUI database has varchar fields
+ - fixed #10989: DataForm List: No pagination
+ - fixed #11128: Thing breaks w/ default value for date field
+ - fixed #10888: Issues with adding points to Maps
+ - fixed #10993: Editor drops last letter if s
+ - fixed #11139: referencing an item in the clipboard
+ - fixed #11146: Upgrade Error 7.7.21 to 7.7.22 
+ - fixed #11147: fail safe template is missing embedded style
+ - fixed #11137: Customers see failed orders
+ - fixed #11156: Syndicated Content doesn't show all headlines in feed
+ - fixed #11138: RichEdit, upload image does not commit a version tag
+ - fixed ExpireIncompleteSurveyResponses Workflow: process responses for deleted users
+ - fixed #11157: calendar tool for entering add event date
+ - fixed #11158: Calendar iCal feed doesn't show today's all-day events
+ - added #10614: Force rich editor to use strong and em instead of b and i
+ - fixed #11131: https / http URLs still caching across secure/insecure boundary
+ - fixed #11093: Spectre cron can DoS server with many sites
+
 7.8.1
+ - mark $session->datetime->time as deprecated and remove its use from core code
  - fixed: Wikis broken by 7.8.0 upgrade
  - fixed #11024: In/Out Board Busted
  - fixed #11025: Yo dudely in Wiki Keyword Search Template
@@ -6,6 +312,42 @@
  - fixed #11031: AssetProxy refering to trash-limbo asset
  - fixed #11028: IOB: Not choosing status causes Problem With Request
  - fixed #11029: enableStreamingUploads
+ - fixed #11018: no lowercase typing possible in addressbook
+ - fixed #11033: Calendar, recurring dates
+ - fixed #11038: My Carousel Broke
+ - fixed ExpireIncompleteSurveyResponses workflow sending one email per asset revision
+ - fixed #10994: Gallery: Problems with uploading ZIP-archives
+ - fixed #11032: The Thingy form field "otherThingy" not checking for privilege
+ - fixed #11037: Maintenance page is being cached
+ - fixed #11056: No history in wiki 
+ - added RFE #10940: Force the user to pick a shipping method before checking out.
+ - fixed #10988: EMS Schedule -- Data Error
+ - fixed: DataForm allows edits when locked by another version tag
+ - fixed #11001: Shipping plugin returning nothing, causing price formatter to puke
+ - fixed #11059: WebGUI upgrade packages do not overwrite versions in the db
+ - fixed #11064: spelling error
+ - fixed #11062: subscriptionCode
+ - fixed #11061: SQLForm_fieldOrder
+ - fixed #11066: wrong definitions
+ - fixed #11070: i18n Asset_Navigation::assetsToInclude
+ - fixed #11068: ITransact_recurringStatus
+ - fixed #11075: product destroys variants
+ - fixed #11073: preview interchanges width and height properties
+ - fixed #11079: Datepicker, without times, does not highlight my birthday
+ - fixed #11071: Form::Date / Session::DateTime
+ - fixed #11076: WebGUI::Account::Friends message_rpp
+ - fixed #11067: My Purchases Detail Template - Status Message broken
+ - fixed #11081: Prop style in 7.8.0?
+ - fixed #11083: TGC template bug fixes, round #1
+ - fixed #10544: Child assets under uncommitted parents
+ - fixed failure in test 250 of t/00_compile.t
+ - fixed #11084: option to view private profiles
+ - fixed #11082: Admin group in Visitor group?
+ - fixed #11049: form caching incorrectly
+ - fixed #11088: i18n Survey Section Information
+ - fixed #11087: SC asset repeats its own description in feeds
+ - fixed #10916: png icon
+ - fixed #11100: syncToCdn's help is not proper POD
 
 7.8.0
  - upgraded YUI to 2.8.0r4
@@ -68,6 +410,7 @@
  - fixed #11008: Test::Class
  - fixed #10990: Survey: View Transposed Results not working
  - fixed #11022: Deleting user shows "TRUE" prompt
+ - fixed 
 
 7.7.19
  - fixed #10838: Forwarded forum post email to new CS adds reply to original thread

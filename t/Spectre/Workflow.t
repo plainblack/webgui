@@ -18,6 +18,7 @@ use Test::More;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::Paths;
 use WebGUI::Session;
 use Spectre::Admin;
 use WebGUI::Config;
@@ -28,14 +29,14 @@ use POE::Component::IKC::ClientLite;
 use JSON;
 use Config::JSON;
 use Carp qw(croak);
-plan tests => 20;
+plan tests => 19;
 
 
 
 $|++;
 
 my $session             = WebGUI::Test->session;
-my $spectreConfigFile   = WebGUI::Test->root . '/etc/spectre.conf';
+my $spectreConfigFile   = WebGUI::Paths->spectreConfig;
 my $spectreConfig       = Config::JSON->new($spectreConfigFile);
 my $ip                  = $spectreConfig->get('ip');
 my $port                = $spectreConfig->get('port');
@@ -47,7 +48,7 @@ $sitename = $session->config->get('sitename')->[0];
 # tests for retrieving more than one site, the default
 SKIP: {
     if (! eval { spectre_ping($spectreConfig) } ) {
-        skip "Spectre doesn't seem to be running: $@", 8;
+        skip "Spectre doesn't seem to be running: $@", 7;
     }
     # XXX kinda evil kludge to put an activity in the scheduler so that the
     # below calls return data; suggestions on a better way to do this welcomed.

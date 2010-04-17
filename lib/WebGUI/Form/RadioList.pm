@@ -110,19 +110,6 @@ sub getDefaultValue {
 
 #-------------------------------------------------------------------
 
-=head2 getOriginalValue( [ value ] )
-
-See WebGUI::Form::Control::getOriginalValue()
-
-=cut
-
-sub getOriginalValue{
-	my $self = shift;
-    return $self->WebGUI::Form::Control::getOriginalValue(@_);
-}
-
-#-------------------------------------------------------------------
-
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.

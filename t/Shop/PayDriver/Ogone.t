@@ -372,7 +372,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 20, 'getEditForm: the form has 20 controls');
+is          (scalar @inputs, 17, 'getEditForm: the form has 17 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -426,18 +426,6 @@ cmp_deeply(
         },
         {
             name    => '__groupToUse_isIn',
-            type    => 'hidden',
-        },
-        {
-            name    => 'receiptEmailTemplateId',
-            type    => 'option',
-        },
-        {
-            name    => 'saleNotificationGroupId',
-            type    => 'option',
-        },
-        {
-            name    => '__saleNotificationGroupId_isIn',
             type    => 'hidden',
         },
         {

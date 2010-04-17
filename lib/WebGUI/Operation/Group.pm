@@ -195,7 +195,7 @@ sub getGroupSearchForm {
 	}
 	my $output = '<div align="center">';
 	my $i18n = WebGUI::International->new($session);
-	my $f = WebGUI::HTMLForm->new($session,1);
+	my $f = WebGUI::HTMLForm->new($session, method => 'GET', );
 	foreach my $key (keys %{$params}) {
                 $f->hidden(
                         -name=>$key,
@@ -291,7 +291,7 @@ sub www_addGroupsToGroupSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")) && $session->form->validToken);
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
-	my @groups = $session->form->group('groups');
+	my @groups = $session->form->process('groups', 'group', []);
 	$group->addGroups(\@groups);
 	return www_manageGroupsInGroup($session);
 }
@@ -336,7 +336,7 @@ A WebGUI::Session object
 
 sub www_autoAddToGroup {
 	my $session = shift;
-        return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->userId ne 1);
+        return $session->privilege->noAccess() if ($session->user->isVisitor);
 	my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
 	if ($group && $group->autoAdd) {
 		$group->addUsers([$session->user->userId],[$session->form->process("groupId")]);
@@ -360,7 +360,7 @@ A WebGUI::Session object
 
 sub www_autoDeleteFromGroup {
 	my $session = shift;
-        return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->userId ne 1);
+        return $session->privilege->noAccess() if ($session->user->isVisitor);
 	my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
 	if ($group && $group->autoDelete) {
 		$group->deleteUsers([$session->user->userId],[$session->form->process("groupId")]);
@@ -1011,7 +1011,7 @@ sub www_manageUsersInGroup {
 	my $session = shift;
     return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
-	my $output = WebGUI::Form::formHeader($session,)
+	my $output = WebGUI::Form::formHeader($session)
 		.WebGUI::Form::hidden($session,{
 			name=>"gid",
 			value=>$session->form->process("gid")

@@ -137,7 +137,7 @@ sub create {
 	my $properties = shift;
 	my $tagId = $session->db->setRow("assetVersionTag","tagId",{
 		tagId=>"new",
-		creationDate=>$session->datetime->time(),
+		creationDate=>time(),
 		createdBy=>$session->user->userId
 		});
 	my $tag = $class->new($session, $tagId);
@@ -178,7 +178,7 @@ sub commit {
 	if ($finished) {
 		$self->{_data}{isCommitted} = 1;
 		$self->{_data}{committedBy} = $self->session->user->userId unless ($self->{_data}{committedBy});
-		$self->{_data}{commitDate} = $self->session->datetime->time();
+		$self->{_data}{commitDate} = time();
 		$self->session->db->setRow("assetVersionTag", "tagId", $self->{_data});
 		$self->clearWorking;
 		return 1;
@@ -309,13 +309,13 @@ sub getAssets {
 		$pending = " and assetData.status='pending' ";
 	}
 	my $sth = $self->session->db->read("select asset.assetId,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? ".$pending." order by ".$sort." ".$direction, [$self->getId]);
-	while (my ($id,$version) = $sth->array) {
-		my $asset = WebGUI::Asset->newById($self->session,$id,$version);
-                unless (defined $asset) {
-                        $self->session->errorHandler->error("Asset $id $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
-                        next;
-                }
-                push(@assets, $asset);
+	ASSETID: while (my ($id,$version) = $sth->array) {
+		my $asset = eval { WebGUI::Asset->newById($self->session,$id,$version); };
+            unless (defined $asset) {
+                $self->session->errorHandler->error("Asset $id $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
+                next ASSETID;
+            }
+            push(@assets, $asset);
 	}
 	return \@assets;
 }
@@ -486,15 +486,15 @@ sub getWorking {
     #First see if there is already a version tag
     $tag = $stow->get(q{versionTag});
 
-    return $tag if $tag;
+    return $tag if ($tag && !$tag->isLocked);
 
     $tagId = $session->scratch()->get(q{versionTag});
     if ($tagId) {
         $tag = $class->new($session, $tagId);
-
-        $stow->set(q{versionTag}, $tag);
-
-        return $tag;
+        unless ($tag->isLocked) {
+            $stow->set(q{versionTag}, $tag);
+            return $tag;
+        }
     }
 
     #No tag found. Create or reclaim one?
@@ -523,10 +523,10 @@ sub getWorking {
         # For now, we only reclaim if 1 tag open.
         if (scalar @openTags == 1) {
             $tag = $openTags[0];
-
-            $tag->setWorking();
-
-            return $tag;
+            unless ($tag->isLocked) {
+                $tag->setWorking();
+                return $tag;
+            }
         }
     }
     elsif ($mode eq q{siteWide}) {
@@ -534,7 +534,7 @@ sub getWorking {
 
       OPENTAG:
         foreach my $openTag (@{WebGUI::VersionTag->getOpenTags($session)}) {
-            if ($openTag->get(q{isSiteWide})) {
+            if ($openTag->get(q{isSiteWide}) && !$openTag->isLocked) {
 
                 $tag = $openTag;
 
@@ -560,6 +560,30 @@ sub getWorking {
 
     return $tag;
 } #getWorking
+
+#-------------------------------------------------------------------
+
+=head2 isLocked ( )
+
+Returns boolean value indicating whether tag is locked
+
+=cut
+
+sub isLocked { $_[0]{_data}{isLocked} }
+
+#-------------------------------------------------------------------
+
+=head2 leaveTag ( )
+
+Make the user leave their current tag.
+
+=cut
+
+sub leaveTag {
+	my $self = shift;
+	$self->session->scratch->delete('versionTag');
+	$self->session->stow->delete("versionTag");
+}
 
 #-------------------------------------------------------------------
 
@@ -722,7 +746,7 @@ sub set {
     my $self = shift;
     my $properties = shift;
 
-    my $now        = $self->session->datetime->time();
+    my $now        = time();
     my $startTime  = WebGUI::DateTime->new($self->session,$now)->toDatabase;
     my $endTime    = WebGUI::DateTime->new($self->session,'2036-01-01 00:00:00')->toDatabase;
 
@@ -768,6 +792,7 @@ Sets this tag as the working tag for the current user.
 
 sub setWorking {
 	my $self = shift;
+	return if $self->isLocked;
 	$self->session->scratch->set("versionTag",$self->getId);
 	$self->session->stow->set("versionTag", $self);
 }

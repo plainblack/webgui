@@ -56,11 +56,9 @@ An epoch representing the time this asset was created.
 
 =head3 options
 
-A hash reference that allows passed in options to change how this method behaves.
-
-=head4 skipAutoCommitWorkflows
-
-If this is set to 1 assets that normally autocommit their workflows (like CS Posts) won't do that.
+A hash reference that allows passed in options to change how this method behaves.  Currently,
+these options are passed down to L<addRevision>, and are not actually used by C<addChild>.
+Please see the POD for L<addRevision> for a list of options.
 
 =cut
 
@@ -69,7 +67,7 @@ sub addChild {
     my $session     = $self->session;
 	my $properties  = shift;
 	my $id          = shift || $session->id->generate();
-	my $now         = shift || $session->datetime->time();
+	my $now         = shift || time();
 	my $options     = shift;
     # Check for valid parentage using validParent on child's class
     WebGUI::Asset->loadModule($properties->{className});
@@ -829,6 +827,10 @@ sub newByLineage {
 	my $id           = $assetLineage->{$lineage}{id};
     unless ($id) {
         ($id) = $session->db->quickArray("select assetId from asset where lineage=?",[$lineage]);
+        if (!$id) {
+            $session->errorHandler->error("Couldn't instantiate asset from lineage: ".$lineage. ": assetId missing");
+            return undef;
+        }
         $assetLineage->{$lineage}{id} = $id;
         $session->stow->set("assetLineage",$assetLineage);
 	}

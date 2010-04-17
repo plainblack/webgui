@@ -313,7 +313,7 @@ sub appendSearchBoxVars {
 	my $queryText = shift;
 	my $submitText = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('searchLabel');
 	$var->{'searchFormHeader'} = join '',
-	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl}),
+	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl, method => 'GET', }),
 	     WebGUI::Form::hidden($self->session, { name => 'func', value => 'search' }));
 	$var->{'searchQuery'} = WebGUI::Form::text($self->session, { name => 'query', value => $queryText });
 	$var->{'searchSubmit'} = WebGUI::Form::submit($self->session, { value => $submitText });
@@ -324,7 +324,7 @@ sub appendSearchBoxVars {
 
 #-------------------------------------------------------------------
 
-=head2 autolinkHtml ($html)
+=head2 autolinkHtml ($html, [options])
 
 Scan HTML for words and phrases that match wiki titles, and automatically
 link them to those wiki pages.  Returns the modified HTML.
@@ -333,6 +333,14 @@ link them to those wiki pages.  Returns the modified HTML.
 
 The HTML to scan.
 
+=head3 options
+
+Either a hashref, or a hash of options.
+
+=head4 skipTitles
+
+An array reference of titles that should not be autolinked.
+
 =cut
 
 sub autolinkHtml {
@@ -340,18 +348,21 @@ sub autolinkHtml {
 	my $html = shift;
     # opts is always the last parameter, and a hash ref
     my %opts = ref $_[-1] eq 'HASH' ? %{pop @_} : ();
-    my $skipTitles = $opts{skipTitles} || [];
+    $opts{skipTitles} ||= [];
+
+    # LC all the skip titles once, for efficiency
+    my @skipTitles = map { lc $_ } @{ $opts{skipTitles} };
     # TODO: ignore caching for now, but maybe do it later.
-	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage' and i.state='published' and d.status='approved'", [$self->getId]);
-	foreach my $key (keys %mapping) {
-        if (grep {lc $_ eq $key} @$skipTitles) {
-            delete $mapping{$key};
-            next;
-        }
-        $key =~ s{\(}{\\\(}gxms; # escape parens
-        $key =~ s{\)}{\\\)}gxms; # escape parens
-		$mapping{$key} = $self->session->url->gateway($mapping{$key});
-	}
+    # This query returns multiple entries for each asset, so we order by revisionDate and count on the hash to only have the
+    # latest version.
+    my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage' and i.state='published' and d.status='approved' order by d.revisionDate ASC", [$self->getId]);
+    TITLE: foreach my $title (keys %mapping) {
+        my $url = delete $mapping{$title};
+        ##isIn short circuits and is faster than grep and/or first
+        next TITLE if isIn($title, @skipTitles);
+        $mapping{$title} = $self->session->url->gateway($url);
+    }   
+
 	return $html unless %mapping;
     # sort by length so it prefers matching longer titles 
 	my $matchString = join('|', map{quotemeta} sort {length($b) <=> length($a)} keys %mapping);
@@ -385,7 +396,7 @@ sub autolinkHtml {
 =head2 canAdminister 
 
 Returns true if the current user is in the groupToAdminister group, or the user can edit
-this WikiMaster.
+this WikiMaster due to groupIdEdit or ownerUserId.
 
 =cut
 
@@ -398,33 +409,28 @@ sub canAdminister {
 
 =head2 canEdit ( )
 
-Overriding canEdit method to check permissions correctly when someone is adding a wikipage
+Overriding canEdit method to check permissions correctly when someone is adding a wikipage.
 
 =cut
 
-sub canEdit {
-        my $self = shift;
-        return (
-                (
-                        (
-                                $self->session->form->process("func") eq "add" ||
-                                (
-                                        $self->session->form->process("assetId") eq "new" &&
-                                        $self->session->form->process("func") eq "editSave" &&
-                                        $self->session->form->process("class") eq "WebGUI::Asset::WikiPage"
-                                )
-                        ) &&
-                        $self->canEditPages
-                ) || # account for new posts
-                $self->next::method()
-        );
-}
+around canEdit => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $form      = $self->session->form;
+    my $addNew    = $form->process("func"              ) eq "add";
+    my $editSave  = $form->process("assetId"           ) eq "new"
+                 && $form->process("func"              ) eq "editSave"
+                 && $form->process("class","className" ) eq "WebGUI::Asset::WikiPage";
+    my $canEdit = ( ($addNew || $editSave) && $self->canEditPages )
+        || $self->$orig(@_);
+    return $canEdit;
+};
 
 #-------------------------------------------------------------------
 
 =head2 canEditPages 
 
-Returns true is the current user is in the group that can edit page, or if
+Returns true is the current user is in the group that can edit pages, or if
 they can administer the wiki (canAdminister).
 
 =cut

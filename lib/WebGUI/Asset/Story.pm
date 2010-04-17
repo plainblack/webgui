@@ -136,16 +136,17 @@ You can't add children to a Story.
 
 =cut
 
-sub canEdit {
+around canEdit => sub {
+    my $orig    = shift;
     my $self = shift;
     my $userId = shift || $self->session->user->userId;
     if ($userId eq $self->ownerUserId) {
         return 1;
     }
     my $user = WebGUI::User->new($self->session, $userId);
-    return $self->SUPER::canEdit($userId)
+    return $self->$orig($userId)
         || $self->getArchive->canPostStories($userId);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -503,7 +504,7 @@ sub getRssData {
 	my $self = shift;
     my $data = {
         title       => $self->headline || $self->getTitle,
-        description => $self->subtitle,
+        description => $self->story,
         'link'      => $self->getUrl,
         author      => $self->byline,
         date        => $self->lastModified,
@@ -519,11 +520,12 @@ Extend the base class to index Story properties like headline, byline, etc.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig    = shift;
 	my $self    = shift;
-    my $indexer = $self->next::method();
+    my $indexer = $self->$orig(@_);
     $indexer->addKeywords($self->headline, $self->subtitle, $self->location, $self->highlights, $self->byline, $self->story, );
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -633,7 +635,7 @@ Cleaning up all storage objects in all revisions.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     ##Delete all storage locations from all revisions of the Asset
     my $sth = $self->session->db->read("select photo from Story where assetId=?",[$self->getId]);
@@ -646,8 +648,8 @@ sub purge {
         }
 	}
     $sth->finish;
-    return $self->next::method;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -657,15 +659,15 @@ Remove the storage locations for this revision of the Asset.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
 	my $self    = shift;
     my $session = $self->session;
     foreach my $photo ( @{ $self->getPhotoData} ) {
         my $storage = WebGUI::Storage->get($session, $self-$photo->{storageId});
         $storage->delete if $storage;
     }
-	return $self->next::method;
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 

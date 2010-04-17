@@ -169,14 +169,19 @@ sub toHtml {
     $style->setScript($url->extras("yui/build/resize/resize-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui/build/editor/editor-min.js"),{type=>"text/javascript"});
     $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"),{type=>"text/javascript"});
+    #$style->setLink($url->extras("yui/build/logger/assets/logger.css"), {type=>"text/css", rel=>"stylesheet"});
+    #$style->setLink($url->extras("yui/build/logger/assets/skins/sam/logger.css"), {type=>"text/css", rel=>"stylesheet"});
+    #$style->setScript($url->extras("yui/build/logger/logger.js"),{type=>"text/javascript"});
     my $codeCss = $url->extras("yui-webgui/build/code-editor/code.css");
     my $out = <<"END_HTML";
 <textarea id="$id" name="$name" $extras rows="10" cols="60" style="font-family: monospace; $styleAttr; height: 100%; width: 100%; resize: none;">$value</textarea>
 <script type="text/javascript">
 (function(){
     YAHOO.util.Event.onDOMReady( function () {
-        var myeditor = new YAHOO.widget.CodeEditor('${id}', { handleSubmit: true, css_url: '${codeCss}', height: '${height}px', width: '${width}px', status: true, resize: true });
+        var myeditor = new YAHOO.widget.CodeEditor('${id}', { toggleButton: true, handleSubmit: true, css_url: '${codeCss}', height: '${height}px', width: '${width}px', status: true, resize: true });
         myeditor.render();
+
+        //var myLogReader = new YAHOO.widget.LogReader();
     } );
 }());
 </script>

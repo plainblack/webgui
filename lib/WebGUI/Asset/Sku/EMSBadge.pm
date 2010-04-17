@@ -113,17 +113,17 @@ Adds this badge as configured for an individual to the cart.
 
 =cut
 
-sub addToCart {
-	my ($self, $badgeInfo) = @_;
+around addToCart => sub {
+    my ($orig, $self, $badgeInfo) = @_;
     if($self->getQuantityAvailable() < 1){ 
         return WebGUI::International->new($self->session, "Asset_EventManagementSystem")->get('no more available');
     }
-	$badgeInfo->{badgeId} = "new";
-	$badgeInfo->{badgeAssetId} = $self->getId;
-	$badgeInfo->{emsAssetId} = $self->getParent->getId;
-	my $badgeId = $self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
-	$self->SUPER::addToCart({badgeId=>$badgeId});
-}
+    $badgeInfo->{badgeId} = "new";
+    $badgeInfo->{badgeAssetId} = $self->getId;
+    $badgeInfo->{emsAssetId} = $self->getParent->getId;
+    my $badgeId = $self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
+    $self->$orig({badgeId=>$badgeId});
+};
 
 #-------------------------------------------------------------------
 
@@ -236,7 +236,7 @@ sub onCompletePurchase {
 	my ($self, $item) = @_;
 	my $badgeInfo = $self->getOptions;
 	$badgeInfo->{purchaseComplete} = 1;
-	$badgeInfo->{userId} = $self->session->user->userId; # they have to be logged in at this point
+	$badgeInfo->{userId} = $item->transaction->get('userId'); # they have to be logged in at this point
 	$badgeInfo->{transactionItemId} = $item->getId;
 	$self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
 	return undef;
@@ -342,15 +342,15 @@ Deletes all badges and things attached to the badges. No refunds are given.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	my $db = $self->session->db;
 	$db->write("delete from EMSRegistrantTicket where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrantToken where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrantRibbon where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrant where badgeId=?",[$self->getId]);
-	$self->SUPER::purge;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 

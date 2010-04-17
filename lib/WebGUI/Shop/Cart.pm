@@ -14,6 +14,7 @@ use WebGUI::Shop::Credit;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
 use WebGUI::User;
+use Tie::IxHash;
 
 =head1 NAME
 
@@ -520,6 +521,9 @@ sub readyForCheckout {
         return 0 if $total < $requiredAmount;
     }
 
+    ##Must have a configured shipping id.
+    return 0 if ! $self->get('shipperId');
+
     ##Check for any other logged errors
     return 0 if $error{ id $self };
 
@@ -843,21 +847,36 @@ sub www_view {
         $var{shippingAddress} = $address->getHtmlFormatted;
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
-        my %formOptions = ();
-        my $defaultOption = "";
-        foreach my $option (keys %{$options}) {
-            $defaultOption = $option;
-            $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
-        }
-        if ($defaultOption) {
-            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, defaultValue=>$defaultOption, value=>$self->get("shipperId")});
-            $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
-            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
-        }
-        else {
+        my $numberOfOptions = scalar keys %{ $options };
+        if ($numberOfOptions < 1) {
             $var{shippingOptions} = '';
             $var{shippingPrice}   = 0;
             $error{id $self}      = $i18n->get("No shipping plugins configured");
+        }
+        elsif ($numberOfOptions == 1) {
+            my ($option) = keys %{ $options };
+            $self->update({ shipperId => $option });
+            $var{shippingPrice} = $options->{$self->get("shipperId")}->{price};
+            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
+        }
+        else {
+            tie my %formOptions, 'Tie::IxHash';
+            $formOptions{''} = $i18n->get('Choose a shipping method');
+            foreach my $option (keys %{$options}) {
+                $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
+            }
+            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$self->get("shipperId")});
+            if (!exists $options->{$self->get('shipperId')}) {
+                $self->update({shipperId => ''});
+            }
+            if (my $shipperId = $self->get('shipperId')) {
+                $var{shippingPrice} = $options->{$shipperId}->{price};
+            }
+            else {
+                $var{shippingPrice} = 0;
+                $error{id $self}    = ($i18n->get('Choose a shipping method and update the cart to checkout'));
+            }
+            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
         }
     }
   

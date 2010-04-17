@@ -178,11 +178,25 @@ will be a plain text area.|,
 		lastUpdated => 1149829706,
 	},
 
+	'skipNotification.form' => {
+		message => q|A field to that allows a user with the correct editing privileges to skip email notification|,
+		lastUpdated => 1269289137,
+	},
+
+	'Skip notification' => {
+		message => q|Skip notification|,
+		lastUpdated => 1269289137,
+	},
+
 	'form.submit' => {
 		message => q|A button to submit the post.|,
 		lastUpdated => 1149829706,
 	},
-
+	
+	'form.cancel' => {
+		message => q|A button to cancel the post.|,
+		lastUpdated => 1270240208,
+	},
 	'karmaScale.form' => {
 		message => q|A form element that allows moderators to set the scale of an individual thread. This is only available for threads.|,
 		lastUpdated => 1149829706,

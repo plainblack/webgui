@@ -10,15 +10,9 @@
 # http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN {
-    $webguiRoot = "..";
-    unshift (@INC, $webguiRoot."/lib");
-}
-
 use strict;
 use Getopt::Long;
+use WebGUI::Paths -inc;
 use WebGUI::Asset;
 use WebGUI::Config;
 use WebGUI::Session;
@@ -47,7 +41,7 @@ GetOptions(
 pod2usage( verbose => 2 ) if $help;
 
 if ($configFile) {
-	my $session = WebGUI::Session->open($webguiRoot, $configFile);
+	my $session = WebGUI::Session->open($configFile);
 	if ($indexsite) {
 		reindexSite($session);
 	} elsif ($updatesite) {
@@ -67,10 +61,10 @@ if ($configFile) {
 
 #-------------------------------------------------------------------
 sub reindexAllSites {
-	my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
+	my $configs = WebGUI::Config->readAllConfigs;
 	foreach my $site (keys %{$configs}) {
 		print "Indexing ".$site."...\n";
-		my $session = WebGUI::Session->open($webguiRoot,$site);
+		my $session = WebGUI::Session->open($site);
 		reindexSite($session);
 		$session->var->end;
 		$session->close;

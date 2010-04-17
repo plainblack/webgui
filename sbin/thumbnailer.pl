@@ -10,18 +10,12 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN {
-    $webguiRoot = "..";
-    unshift (@INC, $webguiRoot."/lib");
-}
-
 #-----------------------------------------
 # A little utility to generate WebGUI
 # thumbnails. 
 #-----------------------------------------
 
+use strict;
 use File::stat;
 use File::Find ();
 use Getopt::Long;
@@ -29,6 +23,7 @@ use Pod::Usage;
 use Image::Magick;
 
 
+use WebGUI::Paths -inc;
 use WebGUI::Utility;
 
 my $thumbnailSize;

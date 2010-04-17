@@ -60,46 +60,37 @@ time - time component formatted as HH:MM:SS
 sub process {
     my ( $session, $toTZ, $format, $date, $time ) = @_;
 
-    my $uTZ     = 'UTC';
-    my $uFormat = '%F %T';
+    my $uTZ     = $session->user->profileField("timeZone");
+    my $uFormat = $session->user->profileField("dateFormat");
 
-    # Change defaults only if we have a user defined and they have these set.
-    eval { $session->user };
-    unless ($@) {
-        $uTZ     = $session->user->profileField("timeZone");
-        $uFormat = $session->user->profileField("dateFormat");
-    }
-    
     $toTZ   ||= $uTZ;
     $format ||= $uFormat;
 
-    # remove all whitespace including newlines
-    $date =~ s/\s//msg;
-
-    # Additional date delimiters accepted for edge cases
-    my ( $year, $month, $day ) = split /[\/\-\.]/, $date;
+    my ( $year, $month, $day );
+    if ($date) {
+      ( $year, $month, $day ) = split /[\/\-\.]/, $date;
+      $date =~ s/\s//msg; # remove all whitespace including newlines
+    }
 
     my $dt = WebGUI::DateTime->now;
 
-    unless ( length($year) ) {
+    unless ( $year ) {
         $year = $dt->year;
     }
 
-    unless ( length($month) ) {
+    unless ( $month ) {
         $month = $dt->month;
     }
 
-    unless ( length($day) ) {
+    unless ( $day ) {
         $day = $dt->day;
     }
 
     my $formatter = DateTime::Format::Strptime->new( pattern => $format );
 
-    # Macro calls also seem to include any spaces between commas
-    $time =~ s/^\s+//msg;
-
     my ( $hour, $minute, $second );
-    if ( length($time) ) {
+    if ( $time ) {
+        $time =~ s/^\s+//msg;  # remove all whitespace including newlines
         ( $hour, $minute, $second ) = split /\:/, $time;
     }
     my $dtOut = DateTime->new(
@@ -114,7 +105,7 @@ sub process {
 
     # If no time component, we use the date as provided with no conversion
     #   Without a time to convert between, there is no point to altering the date
-    if ( length($time) ) {
+    if ( $time ) {
         $dtOut->set_time_zone($toTZ);
     }
     $dtOut->set_formatter($formatter);

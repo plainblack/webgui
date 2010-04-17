@@ -313,20 +313,6 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 purge ( )
-
-removes collateral data associated with a StockData when the system
-purges it's data.
-
-=cut
-
-sub purge {
-	my $self = shift;
-	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template

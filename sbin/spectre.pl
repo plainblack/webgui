@@ -10,20 +10,16 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN {
-    $webguiRoot = "..";
-    unshift (@INC, $webguiRoot."/lib");
-}
-
-use Pod::Usage;
 use strict;
 use warnings;
+use Pod::Usage;
 use Getopt::Long;
+use File::Spec;
 use POE::Component::IKC::ClientLite;
 use Spectre::Admin;
+use WebGUI::Paths -inc;
 use WebGUI::Config;
+use JSON;
 
 $|=1; # disable output buffering
 my $help;
@@ -51,9 +47,7 @@ GetOptions(
 pod2usage( verbose => 2 ) if $help;
 pod2usage() unless ($ping||$shutdown||$daemon||$run||$test||$status);
 
-require File::Spec;
-# Convert to absolute since we'll be changing directory
-my $config = WebGUI::Config->new(File::Spec->rel2abs($webguiRoot),"spectre.conf",1);
+my $config = WebGUI::Config->new( WebGUI::Paths->spectreConfig, 1);
 unless (defined $config) {
 	print <<STOP;
 
@@ -158,7 +152,17 @@ sub getStatusReport {
 	return $POE::Component::IKC::ClientLite::error unless defined $result;
 	$remote->disconnect;
 	undef $remote;
-	return $result;
+	my $pattern = "%8.8s  %-9.9s  %-30.30s  %-22.22s  %-15.15s %-20.20s\n";
+	my $total = 0;
+	my $output = sprintf $pattern, "Priority", "Status", "Sitename", "Instance Id", "Last Run", "Last Run Time";
+    foreach my $instance (@{JSON->new->decode($result)}) {
+		my $originalPriority = ($instance->{priority} - 1) * 10;
+        my $priority = $instance->{workingPriority}."/".$originalPriority;
+		$output .= sprintf $pattern, $priority, $instance->{status}, $instance->{sitename}, $instance->{instanceId}, $instance->{lastState}, $instance->{lastRunTime};
+        $total++;
+    }
+    $output .= sprintf "\n%19.19s %4d\n", "Total Workflows", $total;
+	return $output;
 }
 
 __END__

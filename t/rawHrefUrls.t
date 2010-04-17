@@ -26,7 +26,6 @@ use Test::More; # increment this value for each test you create
 my $numTests = 0;
 
 my $session = WebGUI::Test->session;
-my $lib = WebGUI::Test->lib;
 
 ##Find the name of the International macro in the user's config file.
 
@@ -43,19 +42,28 @@ my $macro     = qr{
 
 $numTests = $session->db->quickScalar('select count(distinct(assetId)) from template');
 
-plan tests => $numTests;
+plan tests => 2*$numTests;
 
 my $validLinks = 0;
+
+my $nonRootLink = qr{
+    ^
+    \s*                       #Optional whitespace
+    (?: \^ (?: / | Extras))   #Gateway or Extras macro
+    |                         # OR
+    <tmpl_var                 #A template variable
+}x;
 
 sub checkLinks {
     my ($tag, $attrs) = @_;
     if ($tag eq 'link' && $attrs->{href}) {
-        if ($attrs->{href} !~ /\s*\^(?:\/|Extras)/) {
+        note sprintf '%s: %s', $tag, $attrs->{href};
+        if ($attrs->{href} !~ $nonRootLink) {
             $validLinks = 0;
         }
     }
     elsif ($tag eq 'script' && $attrs->{src}) {
-        if ($attrs->{src} !~ /\s*\^(?:\/|Extras)/) {
+        if ($attrs->{src} !~ $nonRootLink) {
             $validLinks = 0;
         }
     }
@@ -70,15 +78,22 @@ my $parser = HTML::Parser->new(
 my $getATemplate = WebGUI::Asset::Template->getIsa($session);
 
 TEMPLATE: while (my $templateAsset = $getATemplate->()) {
-    my $template = $templateAsset->get('template');
     my $header   = $templateAsset->get('extraHeadTags');
     if(! $header) {
-        ok(1, sprintf "%s: %s (%s) has no rooted link urls", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
-        next TEMPLATE;
+        ok(1, sprintf "%s: %s (%s) has no rooted link urls in the head tags", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
     }
-    $validLinks = 1;
-    $parser->parse($header);
-    ok($validLinks, sprintf "%s: %s (%s) has no rooted link urls", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
+    else {
+        $validLinks = 1;
+        $parser->parse($header);
+        ok($validLinks, sprintf "%s: %s (%s) has no rooted link urls in the head tags", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
+    }
+    my $template   = $templateAsset->get('template');
+    if(! $template) {
+        ok(1, sprintf "%s: %s (%s) has no rooted link urls in the template", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
+    }
+    else {
+        $validLinks = 1;
+        $parser->parse($template);
+        ok($validLinks, sprintf "%s: %s (%s) has no rooted link urls in the template", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
+    }
 }
-
-

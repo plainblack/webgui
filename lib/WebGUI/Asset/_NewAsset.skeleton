@@ -143,11 +143,12 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+    my $orig    = shift;
     my $self    = shift;
-    my $indexer = $self->SUPER::indexContent;
+    my $indexer = $self->$orig(@_);
     $indexer->setIsPublic(0);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -192,10 +193,10 @@ asset instances, you will need to purge them here.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -205,10 +206,10 @@ This method is called when data is purged by the system.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

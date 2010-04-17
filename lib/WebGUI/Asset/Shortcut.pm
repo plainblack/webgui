@@ -117,7 +117,7 @@ sub _drawQueryBuilder {
 			"AND" => $i18n->get("AND"),
 			"OR" => $i18n->get("OR")},
 			value=>["OR"],
-			extras=>'class="qbselect"',
+			extras=>'class="qbselect" '. $self->{_disabled},
 		}
 	);
 
@@ -129,6 +129,7 @@ sub _drawQueryBuilder {
 
 	# Here starts the field loop
 	my $i = 1;
+    my $addLabel = $i18n->get('add', 'Asset_Wobject');
 	foreach my $field (keys %$fields) {
 		my $fieldLabel = $fields->{$field}{fieldName};
 		my $fieldType = $fields->{$field}{fieldType} || "text";
@@ -139,7 +140,7 @@ sub _drawQueryBuilder {
 			name=>$opFieldName,
 			uiLevel=>5,
 			options=>$operator{$fieldType},
-			extras=>'class="qbselect"'
+			extras=>'class="qbselect" '. $self->{_disabled},
 		});
 		# The value select field
 		my $valFieldName = "val_field".$i;
@@ -148,13 +149,14 @@ sub _drawQueryBuilder {
 			fieldType=>$fieldType,
 			name=>$valFieldName,
 			uiLevel=>5,
-			extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
+			extras=>qq/title="$fields->{$field}{description}" class="qbselect" /. $self->{_disabled},
 			options=>$options,
 		);
 		# An empty row
 		$output .= qq|<tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr>|;
 
 		# Table row with field info
+        my $disabled = $self->{_disabled};
 		$output .= qq|
 		<tr>
 		<td class="qbtdleft"><p class="qbfieldLabel">$fieldLabel</p></td>
@@ -166,7 +168,7 @@ sub _drawQueryBuilder {
 		</td>
 		<td class="qbtd"></td>
 		<td class="qbtdright">
-		<input class="qbButton" type=button value=Add onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
+		<input class="qbButton" type=button value=$addLabel onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)" $disabled></td>
 		</tr>
 		|;
 		$i++;
@@ -200,11 +202,12 @@ can manage the parent you can edit this Shortcut.
 
 =cut
 
-sub canEdit {
-	my $self = shift;
-return 1 if ($self->SUPER::canEdit || ($self->isDashlet && $self->getParent->canManage));
-	return 0;
-}
+around canEdit => sub {
+    my $orig = shift;
+    my $self = shift;
+    return 1 if ($self->$orig(@_) || ($self->isDashlet && $self->getParent->canManage));
+    return 0;
+};
 
 #-------------------------------------------------------------------
 
@@ -241,9 +244,9 @@ Extend the base method to duplicate shortcut overrides.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self = shift;
-    my $newAsset = $self->SUPER::duplicate(@_);
+    my $newAsset = super();
     $self->session->db->write(<<'END_SQL', [$newAsset->getId, $self->getId]);
 INSERT INTO Shortcut_overrides (assetId, fieldName, newValue)
 SELECT ?, fieldName, newValue
@@ -251,7 +254,7 @@ FROM Shortcut_overrides
 WHERE assetId = ?
 END_SQL
     return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -265,8 +268,14 @@ Return the largest of either the asset revision date, or the shortcut revision d
 sub getContentLastModified {
     my $self = shift;
     my $assetRev = $self->get('revisionDate');
-    my $shortcuttedRev = $self->getShortcut->get('revisionDate');
-    return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
+    my $shortcut = $self->getShortcut;
+    my $shortcuttedRev;
+    if (defined $shortcut) {
+        $shortcuttedRev = $shortcut->get('revisionDate');
+        return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
+    } else {
+        return 0;
+    }
 }
 
 #-------------------------------------------------------------------
@@ -277,9 +286,9 @@ Extend the base class to handle hand drawing the query build and other pieces.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $originalTemplate;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my $shortcut = $self->getShortcut;
@@ -302,19 +311,12 @@ sub getEditForm {
 	);
 	if($self->session->setting->get("metaDataEnabled")) {
 		$tabform->getTab("properties")->yesNo(
-			-name=>"shortcutByCriteria",
-			-value=>$self->getValue("shortcutByCriteria"),
-			-label=>$i18n->get("Shortcut by alternate criteria"),
-			-hoverHelp=>$i18n->get("Shortcut by alternate criteria description"),
-			-extras=>q|onchange="
-				if (this.form.shortcutByCriteria[0].checked) { 
- 					this.form.resolveMultiples.disabled=false;
-					this.form.shortcutCriteria.disabled=false;
-				} else {
- 					this.form.resolveMultiples.disabled=true;
-					this.form.shortcutCriteria.disabled=true;
-				}"|
-                );
+			-name     => "shortcutByCriteria",
+			-value    => $self->getValue("shortcutByCriteria"),
+			-label    => $i18n->get("Shortcut by alternate criteria"),
+			-hoverHelp=> $i18n->get("Shortcut by alternate criteria description"),
+			-extras   => q|onchange="wgCriteriaDisable(this.form, this.form.shortcutByCriteria[0].checked)"|,
+        );
 		$tabform->getTab("properties")->yesNo(
 			-name=>"disableContentLock",
 			-value=>$self->getValue("disableContentLock"),
@@ -354,7 +356,7 @@ sub getEditForm {
 		);
 	}
 	return $tabform;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -813,13 +815,13 @@ the scratch variables, and to uncache the overrides.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processPropertiesFromFormPost => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
 	my $scratchId = "Shortcut_" . $self->getId;
 	$self->session->scratch->delete($scratchId);
 	$self->uncacheOverrides;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -858,14 +860,14 @@ overrides.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write(<<'END_SQL', [$self->getId]);
 DELETE FROM Shortcut_overrides
 WHERE assetId = ?
 END_SQL
-    return $self->SUPER::purge(@_);
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1280,6 +1282,8 @@ sub getShortcutsForAssetId {
 
     $properties->{ joinClass            } = 'WebGUI::Asset::Shortcut';
     $properties->{ whereClause          } = 'Shortcut.shortcutToAssetId = ' . $db->quote($assetId);
+    $properties->{ statesToInclude      } = ['published', 'trash', 'clipboard', 'clipboard-limbo', 'trash-limbo'];
+    $properties->{ statusToInclude      } = ['approved', 'pending', 'archived'];
 
     return WebGUI::Asset->getRoot($session)->getLineage(['descendants'], $properties); 
 }

@@ -74,6 +74,11 @@ our $I18N = {
 		lastUpdated => 1078852969
 	},
 
+	'deactivate account template' => {
+		message => q|Deactivate Account Template|,
+		lastUpdated => 1269278436,
+	},
+
 	'login template' => {
 		message => q|Login Template|,
 		lastUpdated => 1078852969
@@ -82,6 +87,11 @@ our $I18N = {
 	'display account template title' => {
 		message => q|LDAP Authentication Display Account Template Variables|,
 		lastUpdated => 1184793098
+	},
+
+	'deactivate account template title' => {
+		message => q|LDAP Authentication Deactivate Account Template Variables|,
+		lastUpdated => 1269279436,
 	},
 
 	'11' => {
@@ -157,6 +167,12 @@ our $I18N = {
 	'4' => {
 		message => q|LDAP Proxy User DN|,
 		lastUpdated => 1031514049,
+	},
+
+	'LDAP User DN' => {
+		message => q|LDAP User DN|,
+		lastUpdated => 1265671176,
+        context => q|The actual DN for the user to use when logging in.|,
 	},
 
 	'connect_dn_help' => {
@@ -614,6 +630,11 @@ and should be entered as such.</p>|,
         'create account template description' => {
                 message => q|Template to be used to show the form for creating an account.|,
                 lastUpdated => 1120164594,
+        },
+
+        'deactivate account template description' => {
+                message => q|Template to be used to show the form for deactivating an account.|,
+                lastUpdated => 1269278461,
         },
 
         'login template description' => {

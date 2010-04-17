@@ -139,23 +139,6 @@ These methods are available from this class:
 
 =cut
 
-
-
-#-------------------------------------------------------------------
-
-=head2 addRevision
-
-   This method exists for demonstration purposes only.  The superclass
-   handles revisions to MatrixListing Assets.
-
-=cut
-
-sub addRevision {
-	my $self = shift;
-	my $newSelf = $self->next::method(@_);
-	return $newSelf;
-}
-
 #----------------------------------------------------------------------------
 
 =head2 canAdd ( )
@@ -191,22 +174,6 @@ sub canEdit {
 
         return $self->getParent->canEdit();
     }
-}
-
-#-------------------------------------------------------------------
-
-=head2 duplicate
-
-   This method exists for demonstration purposes only.  The superclass
-   handles duplicating MatrixListing Assets.  This method will be called 
-   whenever a copy action is executed
-
-=cut
-
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->next::method(@_);
-	return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -424,12 +391,13 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->next::method;
+	my $indexer = $self->$orig(@_);
 	$indexer->setIsPublic(0);
     return undef;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -525,7 +493,7 @@ purges it's data.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self    = shift;
     my $db      = $self->session->db;
 
@@ -533,21 +501,8 @@ sub purge {
     $db->write("delete from MatrixListing_rating        where listingId=?"      ,[$self->getId]);
     $db->write("delete from MatrixListing_ratingSummary where listingId=?"      ,[$self->getId]);
 
-	return $self->next::method;
-}
-
-#-------------------------------------------------------------------
-
-=head2 purgeRevision ( )
-
-This method is called when data is purged by the system.
-
-=cut
-
-sub purgeRevision {
-	my $self = shift;
-	return $self->next::method;
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -572,7 +527,7 @@ sub setRatings {
         if ($ratings->{$category}) {
             $db->write("insert into MatrixListing_rating 
                 (userId, category, rating, timeStamp, listingId, ipAddress, assetId) values (?,?,?,?,?,?,?)",
-                [$session->user->userId,$category,$ratings->{$category},$session->datetime->time(),$self->getId,
+                [$session->user->userId,$category,$ratings->{$category},time(),$self->getId,
                 $session->env->get("HTTP_X_FORWARDED_FOR"),$matrixId]);
         }
         my $sql     = "from MatrixListing_rating where listingId=? and category=?";

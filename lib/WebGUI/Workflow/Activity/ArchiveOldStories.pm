@@ -71,7 +71,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
     my $self    = shift;
     my $session = $self->session;
-    my $epoch   = $self->session->datetime->time();
+    my $epoch   = time();
     my $getAnArchive = WebGUI::Asset::Wobject::StoryArchive->getIsa($session);
     ARCHIVE: while (my $archive = $getAnArchive->()) {
         next ARCHIVE unless $archive && $archive->get("archiveAfter");

@@ -55,7 +55,7 @@ my $testBlock = [
 	{
 		key => 'Zip5',
 		testValue => 'abcde',
-		expected  => undef,
+		expected  => 'ABCDE',
 		comment   => 'lower case',
 	},
 ];
@@ -124,13 +124,13 @@ is($cntl->getValue('ABCDE'), 'ABCDE', 'alpha');
 is($cntl->getValue('02468'), '02468', 'numeric');
 is($cntl->getValue('NO WHERE'), 'NO WHERE', 'alpha space');
 is($cntl->getValue('-'), '-', 'bare dash');
-is($cntl->getValue('abcde'), undef, 'lower case');
+is($cntl->getValue('abcde'), 'ABCDE', 'lower case is uppercased');
 
 is($session->form->zipcode(undef,'ABCDE'), 'ABCDE', 'alpha');
 is($session->form->zipcode(undef,'02468'), '02468', 'numeric');
 is($session->form->zipcode(undef,'NO WHERE'), 'NO WHERE', 'alpha space');
 is($session->form->zipcode(undef,'-'), '-', 'bare dash');
-is($session->form->zipcode(undef,'abcde'), undef, 'lower case');
+is($session->form->zipcode(undef,'abcde'), 'ABCDE', 'lower case uppercased');
 
 
 __END__

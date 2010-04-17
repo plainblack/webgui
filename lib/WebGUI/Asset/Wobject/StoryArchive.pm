@@ -196,13 +196,7 @@ sub exportAssetCollateral {
     }
 
     # open another session to handle printing...
-    my $printSession = WebGUI::Session->open(
-        $self->session->config->getWebguiRoot,
-        $self->session->config->getFilename,
-        undef,
-        undef,
-        $self->session->getId,
-    );
+    my $printSession = WebGUI::Session->duplicate;
 
     my $keywordObj = WebGUI::Keyword->new($printSession);
     my $keywords = $keywordObj->findKeywords({
@@ -355,7 +349,7 @@ sub getKeywordStaticURL {
     my $url = $self->getUrl;
     my @parts = split /\//, $url;
     my $lastPart = pop @parts;
-    if (index $lastPart, '.' == -1) {
+    if (index( $lastPart, '.' ) == -1) {
         return join '/', $self->getUrl, $self->getKeywordFilename($keyword);
     }
     else {
@@ -573,7 +567,7 @@ sub viewTemplateVariables {
     }
     $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud($cloudOptions);
     if (! $exporting) {
-        $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
+        $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl, method => 'GET',  })
                              . WebGUI::Form::hidden($session, { name   => 'func',   value => 'view' });
         $var->{searchFooter} = WebGUI::Form::formFooter($session);
         $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search','Asset')});

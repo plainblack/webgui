@@ -60,7 +60,7 @@ sub add {
                        [
                         $session->id->generate(),        $session->user->userId,
                         $session->var->get("sessionId"), $assetId,
-                        $session->datetime->time(),
+                        time(),
                        ]);
     return undef;
 }

@@ -626,19 +626,6 @@ sub processErrors {
 
 #-------------------------------------------------------------------
 
-=head2 purge 
-
-=cut
-
-sub purge {
-	my $self = shift;
-	#purge your wobject-specific data here.  This does not include fields 
-	# you create for your NewWobject asset/wobject table.
-	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-
 =head2 setSessionVars 
 
 =cut

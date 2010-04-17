@@ -19,9 +19,10 @@ use Test::More;
 use Test::Deep;
 use Data::Dumper;
 use MIME::Parser;
-use Encode qw/decode/;
+use Encode qw/decode encode/;
 
 use WebGUI::Test;
+use WebGUI::Paths;
 
 use WebGUI::Mail::Send;
 
@@ -42,7 +43,7 @@ if ( $@ ) { diag( "Can't prepare mail server: $@" ) }
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 16;        # Increment this number for each test you create
+plan tests => 17;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test create
@@ -115,6 +116,16 @@ is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
     "addHtmlRaw should add newlines after 78 characters",
 );
 
+use utf8;
+$mail = WebGUI::Mail::Send->create( $session, {
+    to      => 'norton@localhost',
+    subject => "H\x{00C4}ufige Fragen",
+});
+$mail->addHeaderField('List-ID', "H\x{00C4}ufige Fragen");
+my $messageId = $mail->queue;
+my $dbMail = WebGUI::Mail::Send->retrieve($session, $messageId);
+is($dbMail->getMimeEntity->head->get('List-ID'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", 'addHeaderField: handles utf-8 correctly');
+
 # TODO: Test that addHtml creates a body with the right content type
 my $smtpServerOk = 0;
 
@@ -124,7 +135,7 @@ SKIP: {
     my $numtests        = 2; # Number of tests in this block
 
     # Must be able to write the config, or we'll die
-    if ( !-w File::Spec->catfile( WebGUI::Test::root, 'etc', WebGUI::Test::file() ) ) {
+    if ( !-w File::Spec->catfile( WebGUI::Paths->configBase, WebGUI::Test->file ) ) {
         skip "Cannot test emailOverride: Can't write new configuration value", $numtests;
     }
 
@@ -325,7 +336,7 @@ $mail->send;
 is(scalar @mailIds, $startingMessages+2, 'sending a message with a group added two messages');
 
 @mailIds = $session->db->buildArray("select messageId from mailQueue where message like ?",['%Mail::Send test message%']);
-is(scalar @mailIds, $startingMessages+2, 'sending a message with a group added the right two messages');
+is(scalar @mailIds, 2, 'sending a message with a group added the right two messages');
 
 my @emailAddresses = ();
 foreach my $mailId (@mailIds) {

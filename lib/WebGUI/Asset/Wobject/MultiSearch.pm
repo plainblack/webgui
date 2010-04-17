@@ -80,11 +80,11 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
 	eval{$self->session->cache->delete("view_".$self->getId)};
-	$self->SUPER::purgeCache;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -98,8 +98,9 @@ to be displayed within the page style
 sub view {
 	my $self = shift;	
     my $cache = $self->session->cache;
-	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
-		my $out = eval{$cache->get("view_".$self->getId)};
+    my $cacheKey = $self->getWwwCacheKey( 'view' );
+    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+        my $out = eval { $cache->get( $cacheKey ) };
 		return $out if $out;
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');
@@ -111,10 +112,10 @@ sub view {
 	$var{'submit'} = WebGUI::Form::Submit->new($self->session, {name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
 
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
-	}
-       	return $out;
+    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+        eval { $cache->set( $cacheKey, $out, $self->cacheTimeout) };
+    }
+    return $out;
 }
 
 #-------------------------------------------------------------------
@@ -125,10 +126,10 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
 	$self->session->http->setCacheControl($self->cacheTimeout);
-	$self->SUPER::www_view(@_);
-}
+	super();
+};
 
 1;

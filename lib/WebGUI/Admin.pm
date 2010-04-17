@@ -16,6 +16,9 @@ sub BUILDARGS {
     return { session => $session, @args };
 }
 
+# Use the template data located in our DATA block
+my $tdata   = do { local $/ = undef; <WebGUI::Admin::DATA> };
+
 #----------------------------------------------------------------------
 
 sub getAdminPluginTemplateVars {
@@ -175,6 +178,12 @@ sub www_view {
 
     $var->{viewUrl} = $url->page;
 
+    # All this needs to be template attachments
+    $style->setLink( $url->extras('yui/build/button/assets/skins/sam/button.css'), {type=>"text/css",rel=>"stylesheet"});
+    $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {type=>"text/css",rel=>"stylesheet"});
+    $style->setLink( $url->extras('yui/build/tabview/assets/skins/sam/tabview.css'), {type=>"text/css",rel=>"stylesheet"});
+    $style->setLink( $url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
+    $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/utilities/utilities.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('accordion/accordion.js'), {type=>'text/javascript'});
@@ -184,14 +193,8 @@ sub www_view {
     $style->setScript($url->extras('yui/build/container/container_core-min.js'), {type=>"text/javascript"});
     $style->setScript($url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
     $style->setScript($url->extras('yui/build/button/button-min.js'), {type=>"text/javascript"});
-    $style->setLink( $url->extras('yui/build/button/assets/skins/sam/button.css'), {type=>"text/css",rel=>"stylesheet"});
-    $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {type=>"text/css",rel=>"stylesheet"});
-    $style->setLink( $url->extras('yui/build/tabview/assets/skins/sam/tabview.css'), {type=>"text/css",rel=>"stylesheet"});
-    $style->setLink($url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
-    $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
 
     # Use the template in our __DATA__ block
-    my $tdata   = do { local $/ = undef; <WebGUI::Admin::DATA> };
     my $tmpl    = WebGUI::Asset::Template::HTMLTemplate->new( $session );
 
     # Use the blank style
@@ -232,12 +235,24 @@ __DATA__
         </a>
     </div>
 
-    <div id="tabs" class="yui-navset">
+    <div id="tabBar" class="yui-navset">
         <ul class="yui-nav">
             <li class="selected"><a href="#tab1"><em>View</em></a></li>
             <li><a href="#tab2"><em>Tree</em></a></li>
         </ul>
-        <div id="locationBar"></div>
+        <div id="locationBar">
+            <span id="left">
+                <input type="button" id="backButton" value="&lt;" /><input type="button" id="forwardButton" value="&gt;" />
+            </span>
+            <div id="location">
+                <input type="text" id="locationUrl" value="" />
+                <span id="locationTitle"></span>
+            </div>
+            <span id="right">
+                <input type="button" id="searchButton" value="S" /><input type="button" id="homeButton" value="H" />
+            </span>
+            <div id="search"></div>
+        </div>
         <div class="yui-content">
             <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view" style="width: 100%; height: 80%"></iframe></div>
             <div id="treeTab"><p>Tab Two Content</p></div>
@@ -249,7 +264,7 @@ __DATA__
 
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady( function() { 
-    var myTabs = new YAHOO.widget.TabView("tabs");
-    var bar = new WebGUI.Admin.LocationBar("locationBar");
+    window.admin = new WebGUI.Admin( {
+    } );
 } );
 </script>

@@ -410,10 +410,11 @@ sub www_selectPaymentGateway {
     
     # Complete Transaction if it's a $0 transaction.
     my $total = $cart->calculateTotal;
-    if (($total + $cart->calculateShopCreditDeduction($total)) == 0) {
+    if (sprintf('%.2f', $total + $cart->calculateShopCreditDeduction($total)) eq '0.00') {
         my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $cart});
         $transaction->completePurchase('zero', 'success', 'success');
         $cart->onCompletePurchase;
+        $transaction->sendNotifications();
         return $transaction->thankYou();
     }
 
@@ -423,12 +424,15 @@ sub www_selectPaymentGateway {
     # TODO: If only one payOption exists, just send us there
     # In order to do this, the PayDriver must give us a direct URL to go to
 
-    my $output .= $i18n->get('choose payment gateway message');
+    my $var;
+    my @paymentGateways;
     foreach my $payOption ( values %{$payOptions} ) {
-        $output .= $payOption->{button} . '<br />';
+        push @paymentGateways, $payOption;
     }
-   
-    return $session->style->userStyle( $output );
+    $var->{ paymentGateways     }   = \@paymentGateways;
+    $var->{ choose              }   = $i18n->get('choose payment gateway message');
+    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("selectGatewayTemplateId"));
+    return $session->style->userStyle($template->process($var));
 }
 
 1;

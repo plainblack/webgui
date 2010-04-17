@@ -162,8 +162,9 @@ sub checkSchedule {
 		&& $self->checkSegment($now->day, $job->{dayOfMonth}, [1..31])
 		&& $self->checkSegment($now->month, $job->{monthOfYear}, [1..12])
 		&& $self->checkSegment($now->dow % 7, $job->{dayOfWeek}, [0..6]) ) {
-		$self->debug("It's time to run ".$jobId.". Creating workflow instance.");
-		$kernel->yield("runJob",$jobId);
+		$self->debug("It's time to run ".$jobId.". Creating workflow instance in ".$self->{_jobDelay}." seconds.");
+		$kernel->delay_set("runJob", $self->{_jobDelay}, $jobId);
+        $self->{_jobDelay} += $self->config->get('timeBetweenRunningWorkflows');
 	}
 }
 
@@ -180,8 +181,9 @@ sub checkSchedules {
 	$self->debug("Checking schedules against current time.");
 	my $now = DateTime->now(time_zone => 'local');
 	foreach my $id (keys %{$self->{_jobs}}) {
-		$kernel->yield("checkSchedule", $id, $now)
+		$kernel->delay_set("checkSchedule", $self->{_jobDelay}, $id, $now)
 	}
+    $self->{_jobDelay} = $self->config->get('timeBetweenRunningWorkflows');
 	$kernel->delay_set("checkSchedules",60);
 }
 
@@ -380,7 +382,13 @@ sub new {
 	my $config  = shift;
 	my $logger = shift;
 	my $debug = shift;
-	my $self = {_jobs=>{}, _debug=>$debug, _config=>$config, _logger=>$logger};
+	my $self = {
+        _jobs     => {},
+        _debug    => $debug,
+        _config   => $config,
+        _logger   => $logger,
+        _jobDelay => $config->get('timeBetweenRunningWorkflows'),
+    };
 	bless $self, $class;
 	my @publicEvents = qw(runJob runJobResponse addJob deleteJob getJsonStatus);
 	POE::Session->create(

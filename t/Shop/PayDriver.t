@@ -93,19 +93,6 @@ cmp_deeply  (
                 hoverHelp       => ignore(),
                 defaultValue    => 7,
             },
-            receiptEmailTemplateId  => {
-                fieldType       => 'template',
-                label           => ignore(),
-                hoverHelp       => ignore(),
-                defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
-                namespace       => 'Shop/EmailReceipt',
-            },
-            saleNotificationGroupId  => {
-                fieldType       => 'group',
-                label           => ignore(),
-                hoverHelp       => ignore(),
-                defaultValue    => 3,
-            },
         }
     } ],
     ,
@@ -286,7 +273,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 14, 'getEditForm: the form has 14 controls');
+is          (scalar @inputs, 11, 'getEditForm: the form has 11 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -340,18 +327,6 @@ cmp_deeply(
         },
         {
             name    => '__groupToUse_isIn',
-            type    => 'hidden',
-        },
-        {
-            name    => 'receiptEmailTemplateId',
-            type    => 'option',
-        },
-        {
-            name    => 'saleNotificationGroupId',
-            type    => 'option',
-        },
-        {
-            name    => '__saleNotificationGroupId_isIn',
             type    => 'hidden',
         },
     ],

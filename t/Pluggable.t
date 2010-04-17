@@ -41,7 +41,7 @@ use WebGUI::Pluggable;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 12;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -65,13 +65,13 @@ is($dumper->Dump, q|$VAR1 = {
 #----------------------------------------------------------------------------
 # Test find and findAndLoad
 { # Block to localize @INC
-    my $lib     = WebGUI::Test->lib;
+    my $lib = File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'Pluggable', 'lib' );
     local @INC  = ( $lib );
 
     # Use the i18n files to test
     my @testFiles   = ();
-    File::Find::find( 
-        sub { 
+    File::Find::find(
+        sub {
             if ( !/^[.]/ && /[.]pm$/ ) {
                 my $name    = $File::Find::name;
                 $name   =~ s{^$lib[/]}{};
@@ -80,30 +80,57 @@ is($dumper->Dump, q|$VAR1 = {
                 push @testFiles, $name;
             }
         },
-        File::Spec->catfile( $lib, 'WebGUI', 'i18n' ),
+        File::Spec->catfile( $lib, 'WebGUI', 'Test', 'Pluggable' ),
     );
-    
+
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n' ) ],
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable' ) ],
         bag( @testFiles ),
         "find() finds all modules by default",
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { onelevel => 1 } ) ],
-        bag( grep { /^WebGUI::i18n::[^:]+$/ } @testFiles ),
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { onelevel => 1 } ) ],
+        bag( grep { /^WebGUI::Test::Pluggable::[^:]+$/ } @testFiles ),
         "find() with onelevel",
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English::WebGUI' ] } ) ],
-        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' } @testFiles ),
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ 'WebGUI::Test::Pluggable::Second' ] } ) ],
+        bag( grep { $_ ne 'WebGUI::Test::Pluggable::Second' } @testFiles ),
         "find() with exclude",
     );
-    
-    cmp_deeply( 
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { onelevel => 1, return => "name" } ) ],
-        bag( map { /::([^:]+)$/; $1 } grep { /^WebGUI::i18n::[^:]+$/ } @testFiles ),
+
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ 'WebGUI::Test::Pluggable::First*' ] } ) ],
+        bag( grep { $_ ne 'WebGUI::Test::Pluggable::First' && $_ ne 'WebGUI::Test::Pluggable::FirstOne' } @testFiles ),
+        "find() with exclude with glob",
+    );
+
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ 'WebGUI::Test::Pluggable*' ] } ) ],
+        [], 
+        "find() with exclude with massive glob",
+    );
+
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ 'WebGUI::Test::Pluggable::First.*' ] } ) ],
+        bag( grep { $_ ne 'WebGUI::Test::Pluggable::First' && $_ ne 'WebGUI::Test::Pluggable::FirstOne' } @testFiles ),
+        "find() with exclude with regex",
+    );
+
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ qw/WebGUI::Test::Pluggable::First WebGUI::Test::Pluggable::Second::Child/ ] } ) ],
+        bag( grep {
+            $_ ne 'WebGUI::Test::Pluggable::First'
+         && $_ ne 'WebGUI::Test::Pluggable::Second::Child'
+        } @testFiles ),
+        "find() with multiple excludes",
+    );
+
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { onelevel => 1, return => "name" } ) ],
+        bag( map { /::([^:]+)$/; $1 } grep { /^WebGUI::Test::Pluggable::[^:]+$/ } @testFiles ),
         "find() with return => name",
     );
 };

@@ -10,29 +10,16 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN {
-        $webguiRoot = "..";
-        unshift (@INC, $webguiRoot."/lib");
-}
-
 use strict;
 use Cwd ();
 use File::Path ();
+use File::Spec;
 use Getopt::Long ();
 use Pod::Usage ();
+use WebGUI::Paths -inc;
 
-foreach my $libDir ( readLines( "$webguiRoot/sbin/preload.custom" ) ) {
-    if ( !-d $libDir ) {
-        warn "WARNING: Not adding lib directory '$libDir' from $webguiRoot/sbin/preload.custom: Directory does not exist.\n";
-        next;
-    }
-    unshift @INC, $libDir;
-}
-
-require WebGUI::Config;
-require WebGUI::Session;
+use WebGUI::Config;
+use WebGUI::Session;
 
 my $help;
 my $history;
@@ -108,14 +95,14 @@ if ($^O =~ /^Win/i) {
 } else {
 	$slash = "/";
 }
-our $upgradesPath = $webguiRoot.$slash."docs".$slash."upgrades".$slash;
+our $upgradesPath = WebGUI::Paths->upgrades;
 our (%upgrade, %config);
 
 
 ## Find site configs.
 
 print "\nGetting site configs...\n" unless ($quiet);
-my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
+my $configs = WebGUI::Config->readAllConfigs;
 foreach my $filename (keys %{$configs}) {
 	print "\tProcessing $filename.\n" unless ($quiet);
 	$config{$filename}{configFile} = $filename;
@@ -130,7 +117,7 @@ foreach my $filename (keys %{$configs}) {
 		$config{$filename}{mysqlCLI} = $configs->{$filename}->get("mysqlCLI");
 		$config{$filename}{mysqlDump} = $configs->{$filename}->get("mysqlDump");
 		$config{$filename}{backupPath} = $configs->{$filename}->get("backupPath");
-		my $session = WebGUI::Session->open($webguiRoot,$filename);
+		my $session = WebGUI::Session->open($filename);
 		($config{$filename}{version}) = $session->db->quickArray("select webguiVersion from webguiVersion order by
         dateApplied desc, length(webguiVersion) desc, webguiVersion desc limit 1");
 		unless ($history) {
@@ -141,10 +128,10 @@ foreach my $filename (keys %{$configs}) {
 			}
 			unless ($skipDelete) {
 				print "\tDeleting temp files.\n" unless ($quiet);
-				my $path = $configs->{$filename}->get("uploadsPath").$slash."temp";
+				my $path = File::Spec->catdir($configs->{$filename}->get("uploadsPath"), 'temp');
 				File::Path::rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
 				print "\tDeleting file cache.\n" unless ($quiet);
-				$path = $configs->{$filename}->get("fileCacheRoot")||"/tmp/WebGUICache";
+				$path = $configs->{$filename}->get("fileCacheRoot") || "/tmp/WebGUICache";
 				File::Path::rmtree($path)  unless ($path eq "" || $path eq "/" || $path eq "/data");
 			}
 		}
@@ -159,7 +146,7 @@ if ($history) {
 	print "\nDisplaying upgrade history for each site.\n";
 	foreach my $file (keys %config) {
 		print "\n".$file."\n";
-		my $session = WebGUI::Session->open($webguiRoot,$file);
+		my $session = WebGUI::Session->open($file);
 		my $sth = $session->db->read("select * from webguiVersion order by dateApplied asc, webguiVersion asc");
 		while (my $data = $sth->hashRef) {
 			print "\t".sprintf("%-8s  %-15s  %-15s",
@@ -220,7 +207,7 @@ foreach my $filename (keys %config) {
 			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});
 			$cmd .= " --port=".$config{$filename}{port} if ($config{$filename}{port});
 			$cmd .= " --add-drop-table ".$config{$filename}{db}." --result-file="
-				.$backupTo.$slash.$config{$filename}{db}."_".$upgrade{$upgrade}{from}."_".time.".sql";
+				.File::Spec->catfile($backupTo, $config{$filename}{db}."_".$upgrade{$upgrade}{from}."_".time.".sql");
 			unless (system($cmd)) {
 				print "OK\n" unless ($quiet);
 			} else {
@@ -267,7 +254,7 @@ foreach my $filename (keys %config) {
         sleep 1; # Sleep a second to avoid adding asset revisions too quickly
 	}
     chdir($currentPath);
-	my $session = WebGUI::Session->open($webguiRoot,$filename);
+	my $session = WebGUI::Session->open($filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);
 	$session->setting->remove('specialState');
 	$session->close();

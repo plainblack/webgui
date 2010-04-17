@@ -94,9 +94,9 @@ Manually build the edit form due to javascript elements.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm;
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session, "Asset_Navigation");
    	$tabform->getTab("display")->template(
       		-value=>$self->templateId,
@@ -278,22 +278,8 @@ sub getEditForm {
 		".($ancestorsChecked ? "" : "toggleAncestorEndPoint();")."
 		//]]>
 		</script>");
-	my $previewButton;# = qq{
-                          # <INPUT TYPE="button" VALUE="Preview" NAME="preview"
-                          #  OnClick="
-                          #      window.open('', 'navPreview', 'toolbar=no,status=no,location=no,scrollbars=yes,resizable=yes');
-                          #      this.form.func.value='preview';
-                          #      this.form.target = 'navPreview';
-                          #      this.form.submit()">};
-	my $saveButton = ' <input type="button" class="forwardButton" value="'.$i18n->get(62,'WebGUI').'" onclick="
-		this.value=\''.$i18n->get(452,'WebGUI').'\';
-		this.form.func.value=\'editSave\';
-		this.form.target=\'_self\';
-		this.form.submit();
-		" />';
-	$tabform->{_submit} = $previewButton." ".$saveButton;
 	return $tabform;
-}
+};
 
 
 
@@ -305,7 +291,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 =cut
 
-sub getToolbar {
+override getToolbar => sub {
 	my $self = shift;
     return undef
         unless $self->canEdit && $self->session->var->isAdminOn;
@@ -341,8 +327,8 @@ sub getToolbar {
             . $self->getUrl . '">' . $i18n->get("view") . '</a></li>'
             . "</ul></div></div>$toolbar</div>";
     }
-    return $self->SUPER::getToolbar;
-}
+    return super();
+};
 
 
 
@@ -558,18 +544,18 @@ other types aside from text/html.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
 	my $mimeType = $self->mimeType || 'text/html';
 	if ($mimeType eq 'text/html') {
-		return $self->SUPER::www_view();
+		return super();
 	}
 	else {
 		$self->prepareView();
-		$self->session->http->setMimeType($mimeType || 'text/html');
+		$self->session->http->setMimeType($mimeType);
 		return $self->view();
 	}
-}
+};
 
 1;
 

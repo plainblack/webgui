@@ -10,16 +10,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
-
-BEGIN { 
-	$webguiRoot = "..";
-	unshift (@INC, $webguiRoot."/lib"); 
-}
-
+use strict;
+use WebGUI::Paths -inc;
 use Getopt::Long;
 use Pod::Usage;
-use strict;
 use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Inbox;
@@ -74,7 +68,7 @@ if ($userMessageFile) {
 
 print "Searching for users with a status of $currentStatus ...\n" unless ($quiet);
 my $userList;
-my $now = $session->datetime->time();
+my $now = time();
 my $inbox = WebGUI::Inbox->new($session);
 my $sth = $session->db->read("select userId,assetId from InOutBoard_status where status=?",[$currentStatus]);
 while (my ($userId,$assetId) = $sth->array) {
@@ -100,7 +94,7 @@ if (length($userList) > 0) {
 		message=>$userMessage
 		});
 }
-	
+
 print "Cleaning up..." unless ($quiet);
 $session->var->end;
 $session->close;

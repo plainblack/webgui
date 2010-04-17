@@ -63,41 +63,42 @@ YAHOO.WebGUI.Form.DatePicker = {
             MDY_YEAR_POSITION: 1,
             MDY_MONTH_POSITION: 2,
             MDY_DAY_POSITION: 3,
+            START_WEEKDAY: getWebguiProperty('firstDayOfWeek'),
             WEEKDAYS_LONG: [
+                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'sunday'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'monday'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'tuesday'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'wednesday'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'thursday'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'friday'),
-                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'saturday'),
-                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'sunday')
+                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'saturday')
             ],
             WEEKDAYS_MEDIUM: [
+                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'sunday med'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'monday med'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'tuesday med'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'wednesday med'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'thursday med'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'friday med'),
-                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'saturday med'),
-                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'sunday med')
+                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'saturday med')
             ],
             WEEKDAYS_SHORT: [
+                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'sunday short'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'monday short'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'tuesday short'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'wednesday short'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'thursday short'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'friday short'),
-                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'saturday short'),
-                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'sunday short')
+                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'saturday short')
             ],
             WEEKDAYS_1CHAR: [
+                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'sunday 1char'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'monday 1char'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'tuesday 1char'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'wednesday 1char'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'thursday 1char'),
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'friday 1char'),
-                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'saturday 1char'),
-                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'sunday 1char')
+                YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'saturday 1char')
             ],
             MONTHS_SHORT: [
                 YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime', 'january short'),
@@ -129,18 +130,14 @@ YAHOO.WebGUI.Form.DatePicker = {
             ],
             NAVIGATOR: {
                 strings : {
-                    'submit'       : YAHOO.WebGUI.Form.DatePicker.i18n.get('WebGUI',    'submit'),
-                    'cancel'       : YAHOO.WebGUI.Form.DatePicker.i18n.get('WebGUI',    'cancel'),
-                    'month'        : YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime',  'Month'),
-                    'year'         : YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime',  'Year'),
-                    'invalid year' : YAHOO.WebGUI.Form.DatePicker.i18n.get('Form_Date', 'Invalid year'),
+                    'submit'      : YAHOO.WebGUI.Form.DatePicker.i18n.get('WebGUI',    'submit'),
+                    'cancel'      : YAHOO.WebGUI.Form.DatePicker.i18n.get('WebGUI',    'cancel'),
+                    'month'       : YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime',  'Month'),
+                    'year'        : YAHOO.WebGUI.Form.DatePicker.i18n.get('DateTime',  'Year'),
+                    'invalidYear' : YAHOO.WebGUI.Form.DatePicker.i18n.get('Form_Date', 'Invalid year')
                 }
             }
         };
-        var firstDayOfWeek = getWebguiProperty('firstDayOfWeek');
-        if (firstDayOfWeek) {
-            config.START_WEEKDAY = firstDayOfWeek;
-        }
         this.calendar = new YAHOO.widget.Calendar(null, cal, config);
         this.calendar.selectEvent.subscribe(this.handleSelect, this, true);
         this.calendar.beforeShowEvent.subscribe(this.handleBeforeShow, this, true);

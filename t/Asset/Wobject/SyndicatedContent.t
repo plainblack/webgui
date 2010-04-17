@@ -20,13 +20,14 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 19; # increment this value for each test you create
+use Test::More tests => 22; # increment this value for each test you create
+use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
+use WebGUI::Cache;
 
 my $session = WebGUI::Test->session;
 my %var;
-my (@rss_feeds);
 
 ##############################
 ##          SETUP           ##
@@ -37,6 +38,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Create a version tag to work in
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"SyndicatedContent Test"});
+addToCleanup($versionTag);
 my $syndicated_content = $node->addChild({className=>'WebGUI::Asset::Wobject::SyndicatedContent'});
 
 ##############################
@@ -106,8 +108,99 @@ cmp_ok(scalar(@{$var->{item_loop}}), '>', 0, 'the item loop has items');
 my $processed_template = eval {$syndicated_content->processTemplate($var,undef,$template) };
 ok($processed_template, "A response was received from processTemplate.");
 
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-}
+####################################################################
+#
+#  getTemplateVariables
+#
+####################################################################
+
+##Construct a feed with no description, so the resulting template variables can
+##be checked for an undef description
+my $feed = XML::FeedPP->new(<<EOFEED);
+<?xml version="1.0" encoding="UTF-8" ?>
+<feed xmlns="http://purl.org/atom/ns#" version="0.3" xmlns:admin="http://webns.net/mvcb/" xmlns:syn="http://purl.org/rss/1.0/modules/syndication/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/">
+<title type="text/plain">Revision Log - /WebGUI/</title>
+<link rel="alternate" type="text/html" href="https://svn.webgui.org/svnweb/plainblack/log/WebGUI/" />
+<author>
+<name></name>
+</author>
+<modified>1970-01-01T00:53:41</modified>
+<entry>
+<title type="text/plain">12312 - Ready for 7.7.20 development.
+</title>
+<link rel="alternate" type="text/html" href="https://svn.webgui.org/svnweb/plainblack/revision?rev=12312" />
+<author>
+<name>colin</name>
+</author>
+<id>https://svn.webgui.org/svnweb/plainblack/revision?rev=12312</id>
+<issued>1970-01-01T00:53:41</issued>
+<modified>1970-01-01T00:53:41</modified>
+</entry>
+EOFEED
+
+my $vars = $syndicated_content->getTemplateVariables($feed);
+ok( defined $vars->{item_loop}->[0]->{description}, 'getTemplateVariables: description is not undefined');
+
+####################################################################
+#
+#  generateFeed, hasTerms
+#
+####################################################################
+
+my $tbbUrl = 'http://www.plainblack.com/tbb.rss';
+$syndicated_content->update({
+    rssUrl   => $tbbUrl,
+    hasTerms => 'WebGUI',
+});
+
+my $cache = WebGUI::Cache->new($session, $tbbUrl, 'RSS');
+open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('tbb.rss')
+    or die "Unable to get RSS file";
+my $rssContent = do { local $/; <$rssFile>; };
+close $rssFile;
+$cache->set($rssContent, 60);
+
+my $filteredFeed = $syndicated_content->generateFeed();
+
+cmp_deeply(
+    [ map { $_->title } $filteredFeed->get_item() ],
+    [
+        'Google Picasa Plugin for WebGUI Gallery',
+        'WebGUI Roadmap',
+        'WebGUI 8 Performance',
+    ],
+    'generateFeed: filters items based on the terms being in title, or description'
+);
+
+$cache->delete;
+
+####################################################################
+#
+#  Odd feeds
+#
+####################################################################
+
+
+##Feed with no links or pubDates.
+my $oncpUrl = 'http://www.oncp.gob.ve/oncp.xml';
+$syndicated_content->update({
+    rssUrl       => $oncpUrl,
+    hasTerms     => '',
+    maxHeadlines => 50,
+});
+
+my $cache = WebGUI::Cache->new($session, $oncpUrl, 'RSS');
+open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('oncp.xml')
+    or die "Unable to get RSS file: oncp.xml";
+my $rssContent = do { local $/; <$rssFile>; };
+close $rssFile;
+$cache->set($rssContent, 60);
+
+my $oddFeed1 = $syndicated_content->generateFeed();
+
+my @oddItems = $oddFeed1->get_item();
+is (@oddItems, 13, 'feed has items even without pubDates or links');
+
+$cache->delete;
+
 

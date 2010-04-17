@@ -204,7 +204,7 @@ sub exportAsHtml {
     my $i18n = WebGUI::International->new($self->session, 'Asset');
 
     # take down when we started to tell the user how long the process took.
-    my $startTime           = $session->datetime->time;
+    my $startTime           = time;
 
     # get the export path and ensure it is valid.
     my $exportPath          = $self->exportCheckPath;
@@ -264,10 +264,7 @@ sub exportAsHtml {
 
     # now, create a new session as the user doing the exports. this is so that
     # the exported assets are taken from that user's perspective.
-    my $exportSession = WebGUI::Session->open(
-        $session->config->getWebguiRoot,
-        $session->config->getFilename,
-    );
+    my $exportSession = WebGUI::Session->open($session->config);
     my $esGuard = Scope::Guard->new(sub {
         $exportSession->var->end;
         $exportSession->close;
@@ -297,7 +294,7 @@ sub exportAsHtml {
     }
 
     # we're done. give the user a status report.
-    my $timeRequired = $session->datetime->time - $startTime;
+    my $timeRequired = time - $startTime;
     my $message = sprintf $i18n->get('export information'), $exportedCount, $timeRequired;
     return $message;
 }
@@ -498,10 +495,7 @@ sub exportGetDescendants {
         # open a temporary session as the user doing the exporting so we don't get
         # assets that they can't see
         if ( ref $user && $user->isa('WebGUI::User') ) {
-            $session = WebGUI::Session->open(
-                $session->config->getWebguiRoot,
-                $session->config->getFilename,
-            );
+            $session = WebGUI::Session->open($session->config);
             $session->user( { userId => $user->userId } );
             $sGuard = Scope::Guard->new(sub {
                 $session->var->end;
@@ -789,14 +783,15 @@ sub exportWriteFile {
     my $dest = $self->exportGetUrlAsPath;
     my $parent = $dest->parent;
 
-    eval { $parent->absolute->mkpath };
-    if($@) {
-        WebGUI::Error->throw(error => "could not make directory " . $parent->absolute->stringify);
+    $parent->absolute->mkpath( {error => \my $err} );
+    if (@$err) {
+        (undef, my $message) = %{ $err->[0] };
+        WebGUI::Error->throw(error => "Could not make directory " . $parent->absolute->stringify . ": " . $message);
     }
 
     # next, get the contents, open the file, and write the contents to the file.
     my $fh = eval { $dest->open('>:utf8') };
-    if($@) {
+    if(! $fh) {
         WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
     }
     $self->session->asset($self);
@@ -807,6 +802,7 @@ sub exportWriteFile {
     unless($contents eq 'chunked') {
         $self->session->output->print($contents);
     }
+    $fh->close;
 }
 
 #-------------------------------------------------------------------
