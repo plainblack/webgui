@@ -803,24 +803,6 @@ sub quoteIdentifier {
 
 #-------------------------------------------------------------------
 
-=head2 quoteIdentifier ( string ) 
-
-Returns a string quoted as an identifier to be used as a table name, column name, etc.
-
-=head3 string
-
-Any scalar variable that needs to be escaped to be inserted into the database.
-
-=cut
-
-sub quoteIdentifier {
-    my $self  = shift;
-    my $value = shift;
-    return $self->dbh->quote_identifier($value);
-}
-
-#-------------------------------------------------------------------
-
 =head2 read ( sql [ , placeholders ] )
 
 This is a convenience method for WebGUI::SQL::ResultSet->read().  It returns the statement
