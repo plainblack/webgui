@@ -11,9 +11,9 @@
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Paths -inc;
 use Getopt::Long;
 use Pod::Usage;
-use WebGUI::Paths -inc;
 use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Inbox;
@@ -45,7 +45,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() unless $configFile;
 
 print "Starting up...\n" unless ($quiet);
-my $session = WebGUI::Session->open($configFile);
+my $session = WebGUI::Session->open($webguiRoot,$configFile);
 
 if ($userMessageFile) {
 	print "Opening message file.." unless ($quiet);
@@ -94,7 +94,7 @@ if (length($userList) > 0) {
 		message=>$userMessage
 		});
 }
-	
+
 print "Cleaning up..." unless ($quiet);
 $session->var->end;
 $session->close;

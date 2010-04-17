@@ -11,6 +11,16 @@
 # -------------------------------------------------------------------
 
 use strict;
+use File::Basename ();
+use File::Spec;
+
+my $webguiRoot;
+BEGIN {
+    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
+    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
+}
+
+$|=1;
 use Carp qw( carp croak );
 use File::Find;
 use Getopt::Long;

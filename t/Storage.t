@@ -32,7 +32,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 134; # increment this value for each test you create
+my $numTests = 136; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -508,7 +508,7 @@ my $shallowDir = $shallowStorage->getPathClassDir();
 ok(-e $shallowDir->file('.wgaccess')->stringify, 'setPrivilege: .wgaccess file created in shallow storage');
 my $privs;
 $privs = $shallowStorage->getFileContentsAsScalar('.wgaccess');
-is ($privs, "3\n3\n3", '... correct group contents');
+is ($privs, '{"assets":[],"groups":["3","3"],"users":["3"]}', '... correct group contents');
 $shallowStorage->deleteFile('.wgaccess');
 
 my $deepStorage = WebGUI::Storage->create($session);
@@ -524,9 +524,21 @@ ok(-e $deepDir->file('.wgaccess')->stringify,     '.wgaccess file created in dee
 ok(-e $deepDeepDir->file('.wgaccess')->stringify, '.wgaccess file created in deep storage subdir');
 
 $privs = $deepStorage->getFileContentsAsScalar('.wgaccess');
-is ($privs, "3\n3\n3", '... correct group contents, deep storage');
+is ($privs, '{"assets":[],"groups":["3","3"],"users":["3"]}', '... correct group contents, deep storage');
 $privs = $deepStorage->getFileContentsAsScalar('deep/.wgaccess');
-is ($privs, "3\n3\n3", '... correct group contents, deep storage subdir');
+is ($privs, '{"assets":[],"groups":["3","3"],"users":["3"]}', '... correct group contents, deep storage subdir');
+
+{
+    my $storage = WebGUI::Storage->create($session);
+    addToCleanup($storage);
+    my $asset = WebGUI::Asset->getRoot($session);
+    $storage->setPrivileges( $asset );
+    my $accessFile = $storage->getPathClassDir->file('.wgaccess');
+    ok(-e $accessFile, 'setPrivilege: .wgaccess file created for asset permissions');
+    my $privs = $accessFile->slurp;
+    is ($privs, '{"assets":["' . $asset->getId . '"],"groups":[],"users":[]}', '... correct asset contents');
+}
+
 
 ####################################################
 #

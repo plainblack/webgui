@@ -15,6 +15,7 @@
 # thumbnails. 
 #-----------------------------------------
 
+use strict;
 use File::stat;
 use File::Find ();
 use Getopt::Long;

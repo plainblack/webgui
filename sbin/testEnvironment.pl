@@ -10,15 +10,16 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use strict;
+use File::Basename ();
+use File::Spec;
 
-our $webguiRoot;
-
+my $webguiRoot;
 BEGIN {
-        $webguiRoot = "..";
-        unshift (@INC, $webguiRoot."/lib");
+    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
+    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
 }
 
-use strict;
 use CPAN;
 use Getopt::Long;
 use Pod::Usage;
@@ -65,7 +66,7 @@ checkModule("HTTP::Request",                1.40         );
 checkModule("HTTP::Headers",                1.61         );
 checkModule("Test::More",                   0.82,      2 );
 checkModule("Test::MockObject",             1.02,      2 );
-checkModule("Test::Deep",                   0.095,     2 );
+checkModule("Test::Deep",                   0.095,       );
 checkModule("Test::Exception",              0.27,      2 );
 checkModule("Test::Class",                  0.31,      2 );
 checkModule("Pod::Coverage",                0.19,      2 );

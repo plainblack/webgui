@@ -10,7 +10,6 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-
 use strict;
 use Getopt::Long;
 use Pod::Usage;

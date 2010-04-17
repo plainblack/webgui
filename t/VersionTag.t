@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
-use Test::More tests => 74; # increment this value for each test you create
+use Test::More tests => 81; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -105,14 +105,36 @@ $tag->clearWorking;
 ok(!defined getWorking(1), 'working tag unset');
 
 ok(!scalar $tag->get('isLocked'), 'tag is initially unlocked');
+ok(!$tag->isLocked,'accessor for isLocked works on false');
 $tag->lock;
 ok(scalar $tag->get('isLocked'), 'tag is locked');
+ok($tag->isLocked, 'accessor for isLocked works on true');
 ok_open($tag->getId, 0, 'locked tag');
 $tag->unlock;
 ok(!scalar $tag->get('isLocked'), 'tag is again unlocked');
 ok_open($tag->getId, 1, 'unlocked tag');
 
-# TODO: test interaction between lock/unlock and working tags
+# test interaction between lock/unlock and working tags
+my $locker = WebGUI::VersionTag->create($session);
+$locker->setWorking();
+is getWorking(1), $locker, 'working tag is the one we are about to lock';
+
+$locker->lock();
+ok !defined getWorking(1), 'lock clears working';
+
+my $unlocked = WebGUI::VersionTag->create($session);
+$unlocked->setWorking();
+is getWorking(1), $unlocked, 'working tag is fresh';
+$locker->setWorking();
+is getWorking(1), $unlocked, 'setWorking on locked tag does nothing';
+$unlocked->clearWorking;
+$unlocked->rollback;
+
+$session->stow->set(versionTag => $locker);
+$session->scratch->set(versionTag => $locker->getId);
+isnt getWorking(1), $locker, 'getWorking never returns locked tag';
+$locker->clearWorking;
+$locker->rollback;
 
 my $tagAgain1 = WebGUI::VersionTag->new($session, $tag->getId);
 isa_ok($tagAgain1, 'WebGUI::VersionTag', 'tag retrieved again while valid');
