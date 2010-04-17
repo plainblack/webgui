@@ -26,7 +26,6 @@ use WebGUI::Session::Form;
 use WebGUI::Session::Http;
 use WebGUI::Session::Icon;
 use WebGUI::Session::Id;
-use WebGUI::Session::Os;
 use WebGUI::Session::Output;
 use WebGUI::Session::Privilege;
 use WebGUI::Session::Request;

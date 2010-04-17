@@ -50,6 +50,6 @@ builder {
     };
 
     # Return the app
-    mount '/' => $wg;
+    mount '/' => $wg->to_app;
 };
 

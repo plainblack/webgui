@@ -68,11 +68,7 @@ sub call {
 
             # Close the Session
             $env->{'webgui.session'}->close();
-            #memory_cycle_ok( $env->{'webgui.session'} );
             delete $env->{'webgui.session'};
-
-            #use Test::Memory::Cycle;
-            #memory_cycle_ok( $env );
         }
     );
 }

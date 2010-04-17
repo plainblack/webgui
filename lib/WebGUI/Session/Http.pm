@@ -231,7 +231,8 @@ Returns a boolean value indicating whether the current page will redirect to som
 
 sub isRedirect {
 	my $self = shift;
-	return isIn($self->getStatus(), qw(302 301));
+	my $status = $self->getStatus;
+	return $status == 302 || $status == 301;
 }
 
 

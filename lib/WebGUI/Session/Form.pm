@@ -63,6 +63,7 @@ sub AUTOLOAD {
 	my @args = @_;
 	our $AUTOLOAD;
 	my $method = "SUPER::".(split /::/, $AUTOLOAD)[-1];
+	return if $method eq 'SUPER::DESTROY';
 	return $self->$method(@args);
 }
 
