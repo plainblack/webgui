@@ -1011,5 +1011,6 @@ sub www_redeemSubscriptionCode {
     return $self->processStyle($self->processTemplate($var, $self->redeemSubscriptionCodeTemplateId));
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

@@ -631,6 +631,7 @@ sub www_ajaxSetPointLocation {
     return JSON->new->encode( {message => $i18n->get("message set point location")} ); 
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 #vim:ft=perl

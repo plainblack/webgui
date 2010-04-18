@@ -883,4 +883,5 @@ sub _buildRow {
 
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

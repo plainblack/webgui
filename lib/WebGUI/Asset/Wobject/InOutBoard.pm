@@ -566,5 +566,6 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 	return $self->processStyle($self->processTemplate(\%var, $self->reportTemplateId));
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

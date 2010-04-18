@@ -2766,5 +2766,6 @@ sub www_viewSubmissionQueue {
                $self->processTemplate( $params, $self->get('eventSubmissionMainTemplateId')));
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

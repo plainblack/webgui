@@ -288,6 +288,6 @@ sub www_view {
     return $output;
 }
 
-
+__PACKAGE__->meta->make_immutable;
 1;
 

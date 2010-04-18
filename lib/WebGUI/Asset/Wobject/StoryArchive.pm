@@ -602,5 +602,6 @@ sub www_add {
     $todayFolder->www_add;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 #vim:ft=perl

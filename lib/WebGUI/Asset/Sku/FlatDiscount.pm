@@ -239,4 +239,5 @@ sub www_addToCart {
     return $self->www_view;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

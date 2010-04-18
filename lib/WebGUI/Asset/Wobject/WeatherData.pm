@@ -141,4 +141,5 @@ sub view {
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

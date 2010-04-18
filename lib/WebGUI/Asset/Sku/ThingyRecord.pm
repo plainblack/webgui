@@ -721,6 +721,7 @@ sub www_renew {
     return $self->www_editRecord( { message => $i18n->get('renewal added to cart') . ' ^ViewCart;' } );
 } ## end sub www_renew
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 #vim:ft=perl

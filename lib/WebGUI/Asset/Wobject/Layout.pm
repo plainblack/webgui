@@ -443,5 +443,6 @@ override www_view => sub {
     return super();
 };
 
+__PACKAGE__->meta->make_immutable;
 1;
 

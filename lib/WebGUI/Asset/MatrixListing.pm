@@ -1090,6 +1090,8 @@ sub www_viewScreenshots {
 
     return $self->processTemplate($var,$self->getParent->get("screenshotsTemplateId"));
 }
+
+__PACKAGE__->meta->make_immutable;
 1;
 
 #vim:ft=perl

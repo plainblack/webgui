@@ -2844,4 +2844,5 @@ sub www_widgetView {
         return $self->outputWidgetMarkup($width, $height, $templateId, $styleTemplateId);
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

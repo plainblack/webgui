@@ -591,4 +591,5 @@ sub www_viewAll {
 
 
 
+__PACKAGE__->meta->make_immutable;
 1;

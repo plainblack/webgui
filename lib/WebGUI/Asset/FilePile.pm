@@ -270,5 +270,6 @@ sub www_edit {
 	}
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

@@ -136,5 +136,6 @@ sub www_view {
     return $i18n->get('self_referential');
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

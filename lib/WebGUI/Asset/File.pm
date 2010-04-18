@@ -649,5 +649,5 @@ sub www_view {
     return 'chunked';
 }
 
-
+__PACKAGE__->meta->make_immutable;
 1;
