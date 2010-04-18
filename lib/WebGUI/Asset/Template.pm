@@ -35,13 +35,7 @@ property template => (
 sub _template_autopack {
     my ($self, $new, $old) = @_;
     return if $new eq $old;
-    my $packed  = $new;
-    HTML::Packer::minify( \$packed, {
-        remove_comments     => 1,
-        do_javascript       => "shrink",
-        do_stylesheet       => "minify",
-    } );
-    $self->templatePacked($packed);
+    $self->_clear_templatePacked;
 }
 property isEditable => (
              noFormPost      => 1,
@@ -78,9 +72,21 @@ property namespace => (
          );
 property templatePacked => (
              fieldType       => 'hidden',
-             default         => undef,
              noFormPost      => 1,
+             lazy            => 1,
+             clearer         => '_clear_templatePacked',
+             builder         => '_build_templatePacked',
          );
+sub _build_templatePacked {
+    my $self = shift;
+    my $template = $self->template;
+    HTML::Packer::minify( \$template, {
+        remove_comments     => 1,
+        do_javascript       => 'shrink',
+        do_stylesheet       => 'minify',
+    } );
+}
+
 property usePacked => (
              fieldType       => 'yesNo',
              default         => 0,
