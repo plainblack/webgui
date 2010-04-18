@@ -456,7 +456,7 @@ sub page {
     if ($useFullUrl) {
         $url = $self->getSiteURL();
     }
-    my $path = $self->session->asset ? $self->session->asset->get("url") : URI::Escape::uri_escape_utf8($self->getRequestedUrl, "^A-Za-z0-9\-_.!~*'()/");
+    my $path = $self->session->asset ? $self->session->asset->url : URI::Escape::uri_escape_utf8($self->getRequestedUrl, "^A-Za-z0-9\-_.!~*'()/");
     $url .= $self->gateway($path, $pairs, $skipPreventProxyCache);
     return $url;
 }

@@ -483,7 +483,7 @@ Returns the number of Asset members in an Asset's lineage.
 
 sub getLineageLength {
 	my $self = shift;
-	return length($self->get("lineage"))/6;
+	return length($self->lineage)/6;
 }
 
 #-------------------------------------------------------------------
@@ -773,7 +773,7 @@ Optional specified lineage.
 
 sub getRank {
 	my $self = shift;
-	my $lineage = shift || $self->get("lineage");
+	my $lineage = shift || $self->lineage;
 	$lineage =~ m/(.{6})$/;
 	my $rank = $1 - 0; # gets rid of preceeding 0s.
 	return $rank;
