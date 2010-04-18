@@ -1,8 +1,8 @@
 TODO
 * Deprecate WebGUI::Session::HTTP - replace with WebGUI::Request/Response
-* Delete lib/WebGUI/URL and replace with new Middleware(s)
 * Investigate moving Cookie handling into middleware
-* Turn html debug output into a Plack::Middleware::Debug panel
+* Replace WebGUI::authen with something equivalent
+* Refactor assets to use streaming response
 
 DONE
 * $session->request is now a Plack::Request object
@@ -12,6 +12,8 @@ DONE
 * Streaming response body
 * Mostly decoupled WebGUI from Log4perl
 * Exception handling and error doc mapping
+* Plack::Middleware::Debug panels
+* Replaces all URL Handlers with Middleware
 
 NB
 * Periodically do a big stress-test and check for leaks, mysql overload etc..

@@ -76,7 +76,7 @@ sub call {
             or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
 
         # Handle the request
-        handle($session);
+        $self->handle($session);
 
         # Construct the PSGI response
         my $response = $session->response;
@@ -119,7 +119,7 @@ sub call {
 }
 
 sub handle {
-    my ( $session ) = @_;
+    my ( $self, $session ) = @_;
     
     # uncomment the following to short-circuit contentHandlers (for benchmarking PSGI scaffolding vs. modperl)
     # $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking\n");
