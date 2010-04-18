@@ -193,6 +193,9 @@ object.
 sub instanciate {
     my ($module, $sub, $params) = @_;
     if ( ! eval { load($module); 1 } ) {
+        if ( ref $@ ) {
+            die $@;
+        }
         croak "Could not instanciate object using $sub on $module: $@";
     }
     # Module loaded properly
@@ -229,7 +232,7 @@ my %moduleError;
 sub load {
     my $module = shift;
     if ($moduleError{$module}) {
-        croak "Could not load $module because $moduleError{$module}";
+        croak $moduleError{$module};
     }
 
     # Try to load the module
@@ -239,8 +242,13 @@ sub load {
         return 1;
     }
     else {
-        $moduleError{$module} = $@;
-        croak "Could not load $module because $@";
+        if ( ref $@ ) {
+            $moduleError{$module} = $@;
+        }
+        else {
+            $moduleError{$module} = "Could not load $module because $@";
+        }
+        croak $moduleError{$module};
     }
 }
 
@@ -267,6 +275,8 @@ An array reference of parameters to pass in to the sub routine.
 sub run {
     my ($module, $sub, $params) = @_;
     if (! eval { load($module); 1 }) {
+        die $@
+            if ref $@;
         croak "Unable to run $sub on $module: $@";
     }
     elsif (my $sub = $module->can($sub)) {
