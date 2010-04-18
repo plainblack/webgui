@@ -663,27 +663,6 @@ sub drawExtraHeadTags {
     });
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Completely remove an asset from existence.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-
-	# Let the parent be garbage collected if no one else is referencing
-	# him.  firstChild and lastChild are weak references, so no need to
-	# worry about them here.
-	delete $self->{_parent};
-
-	$self = undef;
-}
-
-
 #-------------------------------------------------------------------
 
 =head2 extraHeadTags ( value )
