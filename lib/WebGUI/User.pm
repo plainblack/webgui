@@ -1075,7 +1075,8 @@ sub new {
 
         # Fill in dataDefault
         my $default = $session->db->buildHashRef(
-            "SELECT fieldName, dataDefault FROM userProfileField"
+            "SELECT fieldName, dataDefault FROM userProfileField", [],
+            { noOrder => 1 },
         );
         for my $key (keys %profile) {
             if (!defined $profile{$key} || $profile{$key} eq '') {
