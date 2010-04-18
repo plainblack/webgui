@@ -2200,5 +2200,6 @@ toUserTimeZone methods of WebGUI::DateTime for to make less confusion.
 
 =cut
 
+__PACKAGE__->meta->make_immutable;
 1;
 

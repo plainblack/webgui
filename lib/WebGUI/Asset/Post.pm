@@ -1818,6 +1818,6 @@ sub www_view {
 	return $self->getThread->www_view($self);
 }
 
-
+__PACKAGE__->meta->make_immutable;
 1;
 

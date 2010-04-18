@@ -256,5 +256,6 @@ sub www_viewStory {
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 #vim:ft=perl

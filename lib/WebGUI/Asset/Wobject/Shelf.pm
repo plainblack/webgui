@@ -419,4 +419,5 @@ sub www_importProducts {
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;

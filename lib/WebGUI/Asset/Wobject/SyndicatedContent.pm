@@ -403,5 +403,6 @@ sub www_viewRSS20 {
 	return $self->www_viewRss;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

@@ -1985,5 +1985,5 @@ sub www_viewProject {
 	return $self->processStyle($self->processTemplate($var,$self->projectDisplayTemplateId));
 }
 
-
+__PACKAGE__->meta->make_immutable;
 1;

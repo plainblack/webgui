@@ -2185,5 +2185,6 @@ sub www_process {
     return '';
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

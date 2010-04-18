@@ -557,5 +557,6 @@ sub www_vote {
 
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 

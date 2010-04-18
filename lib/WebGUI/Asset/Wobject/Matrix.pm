@@ -1447,4 +1447,5 @@ sub www_setStickied {
     return undef;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

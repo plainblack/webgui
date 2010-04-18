@@ -1288,5 +1288,6 @@ sub getShortcutsForAssetId {
     return WebGUI::Asset->getRoot($session)->getLineage(['descendants'], $properties); 
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

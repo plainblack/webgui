@@ -519,4 +519,5 @@ sub www_edit {
 	return $self->processStyle('<h1>'.$i18n->get('ems badge').'</h1>'.$self->getEditForm->print);
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -2360,5 +2360,6 @@ equal and then choose by assetId.
 
 =cut
 
+__PACKAGE__->meta->make_immutable;
 1;
 

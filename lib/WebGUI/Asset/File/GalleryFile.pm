@@ -1184,4 +1184,5 @@ sub setPrivileges {
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1; # Who knew the truth would be so obvious?

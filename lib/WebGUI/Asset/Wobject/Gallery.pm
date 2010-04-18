@@ -1580,4 +1580,5 @@ sub www_listFilesForUserRss {
     return $self->processTemplate( $var, $self->templateIdListFilesForUserRss );
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

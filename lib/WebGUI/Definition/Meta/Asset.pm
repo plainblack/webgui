@@ -76,9 +76,17 @@ Returns an array of the names of all tables in every class used by this class.
 =cut
 
 sub get_tables {
+    my $self = shift;
+    if ($self->is_immutable) {
+        return @{ $self->{__immutable}{get_tables_methods} ||= [ $self->_get_tables ] };
+    }
+    goto &_get_tables;
+}
+
+sub _get_tables {
     my $self   = shift;
     my %seen   = ();
-    my @tables = 
+    my @tables =
         grep { ! $seen{$_}++ }
         map  { $_->tableName }
         $self->get_all_properties

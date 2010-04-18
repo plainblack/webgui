@@ -278,4 +278,5 @@ sub www_ajaxUpdateData {
     return $data;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

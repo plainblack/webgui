@@ -824,4 +824,5 @@ sub www_crop {
     return $self->getAdminConsole->render($f->print.$image,$i18n->get("crop image"));
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

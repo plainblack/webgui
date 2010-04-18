@@ -751,4 +751,5 @@ sub www_search {
 	return $self->processStyle($self->processTemplate($var, $self->searchTemplateId));
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -1612,4 +1612,5 @@ sub www_viewRss {
     return $self->processTemplate( $var, $self->getParent->templateIdViewAlbumRss );
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
