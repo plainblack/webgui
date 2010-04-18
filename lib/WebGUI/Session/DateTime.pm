@@ -21,7 +21,7 @@ use DateTime::Format::Mail;
 use DateTime::TimeZone;
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility qw(round);
+use WebGUI::Utility qw(round isIn);
 use Scalar::Util qw(weaken);
 
 
