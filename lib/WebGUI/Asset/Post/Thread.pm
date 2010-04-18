@@ -238,13 +238,12 @@ and next threads, and to delete the parent CS.
 
 =cut
 
-override DESTROY => sub {
-	my $self = shift;
-	return undef unless defined $self;
-	$self->{_next}->DESTROY if (defined $self->{_next});
-	$self->{_previous}->DESTROY if (defined $self->{_previous});
-	super();
-};
+sub DEMOLISH {
+    my $self = shift;
+    return undef unless defined $self;
+    $self->{_next}->DESTROY if (defined $self->{_next});
+    $self->{_previous}->DESTROY if (defined $self->{_previous});
+}
 
 #-------------------------------------------------------------------
 

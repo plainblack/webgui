@@ -321,11 +321,10 @@ Extend the base method to delete the locally cached thread object.
 
 =cut
 
-override DESTROY => sub {
-	my $self = shift;
-	$self->{_thread}->DESTROY if (exists $self->{_thread} && ref $self->{_thread} =~ /Thread/);
-	super();
-};
+sub DEMOLISH {
+    my $self = shift;
+    $self->{_thread}->DESTROY if (exists $self->{_thread} && ref $self->{_thread} =~ /Thread/);
+}
 
 
 #-------------------------------------------------------------------
