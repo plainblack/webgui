@@ -304,7 +304,7 @@ override getToolbar => sub {
             if ($self->session->asset) {
                 $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
             }
-            $toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->get("url"))
+            $toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->url)
                 if ($userUiLevel >= $uiLevels->{"edit"});
         }
         $self->session->style->setLink($self->session->url->extras('assetToolbar/assetToolbar.css'), {rel=>"stylesheet",type=>"text/css"});
@@ -343,11 +343,11 @@ Extend the superclass to add metadata and to preprocess the template.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -376,29 +376,29 @@ sub view {
         $current = WebGUI::Asset->getDefault($self->session);
     }
 
-	if ($self->get("startType") eq "specificUrl") {
-		$start = WebGUI::Asset->newByUrl($self->session,$self->get("startPoint"));
-	} elsif ($self->get("startType") eq "relativeToRoot") {
-		unless (($self->get("startPoint")+1) >= $current->getLineageLength) {
-			$start = WebGUI::Asset->newByLineage($self->session,substr($current->get("lineage"),0, ($self->get("startPoint") + 1) * 6));
+	if ($self->startType eq "specificUrl") {
+		$start = WebGUI::Asset->newByUrl($self->session,$self->startPoint);
+	} elsif ($self->startType eq "relativeToRoot") {
+		unless (($self->startPoint+1) >= $current->getLineageLength) {
+			$start = WebGUI::Asset->newByLineage($self->session,substr($current->lineage,0, ($self->startPoint + 1) * 6));
 		}
-	} elsif ($self->get("startType") eq "relativeToCurrentUrl") {
-		$start = WebGUI::Asset->newByLineage($self->session,substr($current->get("lineage"),0, ($current->getLineageLength + $self->get("startPoint")) * 6));
+	} elsif ($self->startType eq "relativeToCurrentUrl") {
+		$start = WebGUI::Asset->newByLineage($self->session,substr($current->lineage,0, ($current->getLineageLength + $self->startPoint) * 6));
 	}
 	$start = $current unless (defined $start); # if none of the above results in a start point, then the current page must be it
-	my @includedRelationships = split("\n",$self->get("assetsToInclude"));
+	my @includedRelationships = split("\n",$self->assetsToInclude);
 
 	my %rules;
 	$rules{returnObjects} = 1;
-	$rules{endingLineageLength} = $start->getLineageLength+$self->get("descendantEndPoint");
+	$rules{endingLineageLength} = $start->getLineageLength+$self->descendantEndPoint;
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
-	$rules{ancestorLimit} = $self->get("ancestorEndPoint");
-	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->get('reversePageLoop'));
+	$rules{ancestorLimit} = $self->ancestorEndPoint;
+	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->reversePageLoop);
 	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $var = {'page_loop' => []};
     foreach my $property (@interestingProperties) {
-		$var->{'currentPage.'.$property} = $current->get($property);
+		$var->{'currentPage.'.$property} = $current->$property;
 	}
 	$var->{'currentPage.menuTitle'} = $current->getMenuTitle;
 	$var->{'currentPage.title'}     = $current->getTitle;
@@ -407,7 +407,7 @@ sub view {
     	$var->{'currentPage.hasChild'} = $current->hasChildren;
     	$var->{'currentPage.rank'} = $current->getRank;
     	$var->{'currentPage.rankIs'.$current->getRank} = 1;
-	my $currentLineage = $current->get("lineage");
+	my $currentLineage = $current->lineage;
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
     my $absoluteDepthOfFirstPage;   # Will set on first iteration of loop, below
@@ -417,18 +417,18 @@ sub view {
 	foreach my $asset (@{$assets}) {
 
 		# skip pages we shouldn't see
-		my $pageLineage = $asset->get("lineage");
+		my $pageLineage = $asset->lineage;
 		next if ($pageLineage =~ m/^$lineageToSkip/);
 		
-		if ($asset->get("isHidden") && !$self->get("showHiddenPages")) {
+		if ($asset->isHidden && !$self->showHiddenPages) {
 			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
 		}
-		if ($asset->get("isSystem") && !$self->get("showSystemPages")) {
+		if ($asset->isSystem && !$self->showSystemPages) {
 			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
 		}
-		unless ($self->get("showUnprivilegedPages") || $asset->canView) {
+		unless ($self->showUnprivilegedPages || $asset->canView) {
 			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
 		}
@@ -450,11 +450,11 @@ sub view {
 		$pageData->{"page.rank"}     = $asset->getRank;
 		$pageData->{"page.absDepth"} = $asset->getLineageLength;
 		$pageData->{"page.relDepth"} = $asset->getLineageLength - $absoluteDepthOfFirstPage;
-		$pageData->{"page.isSystem"} = $asset->get("isSystem");
-		$pageData->{"page.isHidden"} = $asset->get("isHidden");
+		$pageData->{"page.isSystem"} = $asset->isSystem;
+		$pageData->{"page.isHidden"} = $asset->isHidden;
 		$pageData->{"page.isViewable"} = $asset->canView;
-		$pageData->{'page.isContainer'} = $self->session->config->get("assets/".$asset->get("className")."/isContainer");
-  		$pageData->{'page.isUtility'} = $self->session->config->get("assets/".$asset->get("className")."/category") eq "utilities";
+		$pageData->{'page.isContainer'} = $self->session->config->get("assets/".$asset->className."/isContainer");
+  		$pageData->{'page.isUtility'} = $self->session->config->get("assets/".$asset->className."/category") eq "utilities";
 		$pageData->{"page.url"} = $asset->getUrl;
 		my $indent = $asset->getLineageLength - $absoluteDepthOfFirstPage;
 		$pageData->{"page.indent_loop"} = [];
@@ -462,15 +462,15 @@ sub view {
 		$pageData->{"page.indent"} = "&nbsp;&nbsp;&nbsp;" x $indent;
 		$pageData->{"page.isBranchRoot"} = ($pageData->{"page.absDepth"} == 1);
 		$pageData->{"page.isTopOfBranch"} = ($pageData->{"page.absDepth"} == 2);
-		$pageData->{"page.isChild"} = ($asset->get("parentId") eq $current->getId);
-		$pageData->{"page.isParent"} = ($asset->getId eq $current->get("parentId"));
+		$pageData->{"page.isChild"} = ($asset->parentId eq $current->getId);
+		$pageData->{"page.isParent"} = ($asset->getId eq $current->parentId);
 		$pageData->{"page.isCurrent"} = ($asset->getId eq $current->getId);
 		$pageData->{"page.isDescendant"} = ( $pageLineage =~ m/^$currentLineage/ && !$pageData->{"page.isCurrent"});
 		$pageData->{"page.isAncestor"} = ( $currentLineage =~ m/^$pageLineage/ && !$pageData->{"page.isCurrent"});
 		my $currentBranchLineage = substr($currentLineage,0,12);
 		$pageData->{"page.inBranchRoot"} = ($pageLineage =~ m/^$currentBranchLineage/);
 		$pageData->{"page.isSibling"} = (
-			$asset->get("parentId") eq $current->get("parentId") &&
+			$asset->parentId eq $current->parentId &&
 			$asset->getId ne $current->getId
 			);
 		$pageData->{"page.inBranch"} = ( 
@@ -499,7 +499,7 @@ sub view {
 		my $parent = $asset->getParent;
 		if (defined $parent) {
             foreach my $property (@interestingProperties) {
-				$pageData->{"page.parent.".$property} = $parent->get($property);
+				$pageData->{"page.parent.".$property} = $parent->$property;
 			}
 			$pageData->{'page.parent.menuTitle'} = $parent->getMenuTitle;
 			$pageData->{'page.parent.title'} = $parent->getTitle;

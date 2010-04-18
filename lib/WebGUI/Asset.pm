@@ -564,10 +564,10 @@ sub canView {
         $user =  $self->session->user;
         $userId = $user->userId();
     }
-    if ($userId eq $self->get("ownerUserId")) {
+    if ($userId eq $self->ownerUserId) {
         return 1;
     }
-    elsif ($user->isInGroup($self->get("groupIdView"))) {
+    elsif ($user->isInGroup($self->groupIdView)) {
         return 1;
     }
     return $self->canEdit($userId);
@@ -1181,9 +1181,9 @@ Returns the extraHeadTags stored in the asset.  Called in $self->session->style-
 
 sub getExtraHeadTags {
 	my $self = shift;
-	return $self->get('usePackedHeadTags') 
-            ? $self->get('extraHeadTagsPacked')
-            : $self->get("extraHeadTags")
+	return $self->usePackedHeadTags
+            ? $self->extraHeadTagsPacked
+            : $self->extraHeadTags
             ;
 }
 
@@ -1368,11 +1368,12 @@ Returns the menu title of this asset. If it's not specified or it's "Untitled" t
 =cut
 
 sub getMenuTitle {
-	my $self = shift;
-	if ($self->get("menuTitle") eq "" || lc($self->get("menuTitle")) eq "untitled") {
-		return $self->getName;
-	}
-	return $self->get("menuTitle");
+    my $self = shift;
+    my $menuTitle = $self->menuTitle;
+    if ( $menuTitle eq '' || lc $menuTitle eq 'untitled' ) {
+        return $self->getName;
+    }
+    return $menuTitle;
 }
 
 
