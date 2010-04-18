@@ -1,8 +1,9 @@
 TODO
 * Deprecate WebGUI::Session::HTTP - replace with WebGUI::Request/Response
 * Investigate moving Cookie handling into middleware
-* Replace WebGUI::authen with something equivalent
+* Reinstate WebGUI::authen with something equivalent
 * Refactor assets to use streaming response
+* Fix WebGUI::Form::param
 
 DONE
 * $session->request is now a Plack::Request object

@@ -1,16 +1,13 @@
 use strict;
 use Plack::Builder;
-use WebGUI::Paths -inc;
+use WebGUI::Paths -preload;
 use WebGUI::Config;
-use File::Spec;
-
-my $standard_psgi = File::Spec->catfile(WebGUI::Paths->var, 'site.psgi');
 
 builder {
     my $first_app;
     for my $config_file (WebGUI::Paths->siteConfigs) {
         my $config = WebGUI::Config->new($config_file);
-        my $psgi = $config->get('psgiFile') || $standard_psgi;
+        my $psgi = $config->get('psgiFile') || WebGUI::Paths->defaultPsgi;
         my $app = do {
             $ENV{WEBGUI_CONFIG} = $config_file;
             Plack::Util::load_psgi($psgi);

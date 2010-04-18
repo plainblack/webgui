@@ -2,16 +2,8 @@ use strict;
 use Plack::Builder;
 use Plack::App::File;
 use WebGUI;
-
-# Temporary preload hack
-use WebGUI::Paths -preload;
-use DBI;
-DBI->install_driver("mysql");
-# end hack
-
 use WebGUI::Middleware::Debug::Performance;
 
-my $config = $ENV{WEBGUI_CONFIG};
 builder {
     my $wg = WebGUI->new( site => $ENV{WEBGUI_CONFIG} );
     my $config = $wg->config;
