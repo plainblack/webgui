@@ -80,6 +80,9 @@ sub AUTOLOAD {
 	return $control->getValue(@args);
 }
 
+# so it doesn't get autoloaded
+sub DESTROY {}
+
 #-------------------------------------------------------------------
 
 =head2 get ( )
