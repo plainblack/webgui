@@ -9,6 +9,7 @@
  - added #10945: Wiki - Top-level keyword list
  - fixed #11444: Strange spectre problem
  - fixed #10189: pbworkflow000000000007 Hanging
+ - fixed #11526: Wrong log error in file AssetClipboard.pm
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
