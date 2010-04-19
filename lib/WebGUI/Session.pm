@@ -115,7 +115,7 @@ sub asset {
 
 =head2 cache ( ) 
 
-Returns a WebGUI::Cache object, which is connected to the WebGUI memcached server.
+Returns a CHI object, configured according to the settings in the config file.
 
 =cut
 
