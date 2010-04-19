@@ -40,7 +40,10 @@ sub migrateToNewCache {
     unlink "../../lib/WebGUI/Workflow/Activity/CleanDatabaseCache.pm";
     unlink "../../lib/WebGUI/Workflow/Activity/CleanFileCache.pm";
     my $config = $session->config;
-    $config->set("cacheServers", [ { "socket" => "/data/wre/var/memcached.sock", "host" => "127.0.0.1", "port" => "11211" } ]);
+    $config->set("cache", {
+        "driver"            => "FastMmap",
+        "expires_variance"  => "0.10",
+    });
     $config->set("hotSessionFlushToDb", 600);
     $config->delete("disableCache");
     $config->delete("cacheType");
