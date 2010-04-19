@@ -99,9 +99,10 @@ WebGUI.Admin.prototype.navigate
  *  WebGUI.Admin.LocationBar
  */
 WebGUI.Admin.LocationBar 
-= function (id) {
+= function (id, cfg) {
     // Public properties
     this.id                 = id;   // ID of the element containing the location bar
+    this.cfg                = cfg;  // Configuration
     this.currentAssetDef    = null; // Object containing assetId, title, url, icon
     this.backAssetDefs      = [ ];  // Asset defs to go back to
     this.forwardAssetDefs   = [ ];  // Asset defs to go forward to
@@ -129,12 +130,20 @@ WebGUI.Admin.LocationBar
             menu            : []
         } );
         self.btnSearch  = new YAHOO.widget.Button( "searchButton", {
-            label       : '<img src="' + getWebguiProperty("extrasURL") + 'icon/magnifier.png" />'
+            label       : '<img src="' + getWebguiProperty("extrasURL") + 'icon/magnifier.png" />',
+            onclick     : { fn: self.clickSearchButton, scope: self }
         } );
         self.btnHome    = new YAHOO.widget.Button( "homeButton", {
-            label       : '<img src="' + getWebguiProperty("extrasURL") + 'icon/house.png" />'
+            type        : "button",
+            label       : '<img src="' + getWebguiProperty("extrasURL") + 'icon/house.png" />',
+            onclick     : { fn: self.goHome, scope: self }
         } );
         // Take control of the location input
+        self.klInput = new YAHOO.util.KeyListener( "locationUrl", { keys: 13 }, {
+            fn: self.doInputSearch,
+            scope: self,
+            correctScope: true
+        } );
         YAHOO.util.Event.addListener( "locationUrl", "focus", self.inputFocus, self, true );
         YAHOO.util.Event.addListener( "locationUrl", "blur", self.inputBlur, self, true );
     }
@@ -187,6 +196,29 @@ WebGUI.Admin.LocationBar.prototype.clickForwardMenuItem
 };
 
 /**
+ * doInputSearch()
+ * Perform the search as described in the location bar
+ */
+WebGUI.Admin.LocationBar.prototype.doInputSearch
+= function ( ) {
+    var input = document.getElementById("locationUrl").value;
+    // If input starts with a / and doesn't contain a ? go to the asset
+    if ( input.match(/^\//) ) {
+        if ( !input.match(/\?/) ) {
+            window.admin.gotoAsset( input );
+        }
+        // If does contain a ?, go to url
+        else { 
+            window.admin.go( input );
+        }
+    }
+    // Otherwise ask WebGUI what do
+    else {
+        alert("TODO");
+    }
+};
+
+/**
  * getMenuItemLabel( assetDef )
  * Build a menu item label for the given assetDef
  */
@@ -234,6 +266,7 @@ WebGUI.Admin.LocationBar.prototype.inputBlur
     if ( e.target.value.match(/^\s*$/) ) {
         e.target.value = this.currentAssetDef.url;
     }
+    this.klInput.disable();
 };
 
 /**
@@ -245,6 +278,7 @@ WebGUI.Admin.LocationBar.prototype.inputFocus
     if ( e.target.value == this.currentAssetDef.url ) {
         e.target.value = "";
     }
+    this.klInput.enable();
 };
 
 /**
@@ -257,12 +291,14 @@ WebGUI.Admin.LocationBar.prototype.navigate
     this.setTitle( assetDef.title );
     this.setUrl( assetDef.url );
 
-    if ( this.currentAssetDef ) {
-        if ( this.currentAssetDef.assetId == assetDef.assetId ) {
-            // Don't do the same asset twice
-            return;
-        }
+    // Don't do the same asset twice
+    if ( this.currentAssetDef && this.currentAssetDef.assetId != assetDef.assetId ) {
         this.addBackAsset( this.currentAssetDef );
+        // We navigated, so destroy the forward queue
+        //this.forwardAssetDefs = [];
+        //this.btnForward.getMenu().clearItems();
+        //this.btnForward.getMenu().render();
+        //this.btnForward.set( "disabled", true );
     }
 
     // Current asset is now...

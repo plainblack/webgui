@@ -177,6 +177,7 @@ sub www_view {
     }
 
     $var->{viewUrl} = $url->page;
+    $var->{homeUrl} = WebGUI::Asset->getDefault( $session )->getUrl;
 
     # All this needs to be template attachments
     $style->setLink( $url->extras('yui/build/button/assets/skins/sam/button.css'), {type=>"text/css",rel=>"stylesheet"});
@@ -265,6 +266,7 @@ __DATA__
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady( function() { 
     window.admin = new WebGUI.Admin( {
+        homeUrl : '<tmpl_var homeUrl>'
     } );
 } );
 </script>

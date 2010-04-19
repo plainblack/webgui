@@ -39,22 +39,22 @@
 
 #locationBar #left {
     position:   absolute;
-    width:      16%;
+    width:      12%;
     top:        5px;
     left:       0;
 }
 
 #locationBar #right {
     position:   absolute;
-    width:      8%;
+    width:      10%;
     top:        5px;
     right:      0;
 }
 
 #locationBar #location {
     position:   relative;
-    margin:     auto 7% auto 16%;
-    width:      75%;
+    margin:     auto 10% auto 12%;
+    width:      77%;
     height:     80%;
     border: 1px solid #333;
     border-radius: 3px;
