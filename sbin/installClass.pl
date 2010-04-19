@@ -94,7 +94,7 @@ installClass.pl -- Run class install methods
 
 =head1 SYNOPSIS
 
- installAsset.pl [--remove|--check|--upgrade] <class> --configFile=<configFile>
+ installClass.pl [--remove|--check|--upgrade] <class> --configFile=<configFile>
 
 =head1 DESCRIPTION
 
@@ -108,7 +108,7 @@ If your class has not told you to use this script, then it probably won't work!
 
 =item class
 
-The class name of the class to install. Something like WebGUI::Asset::Yourasset
+The class name of the asset to install. Something like WebGUI::Asset::Yourasset
 
 =back
 
