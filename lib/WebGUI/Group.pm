@@ -126,7 +126,7 @@ not be added to any group.  Groups may not be added to themselves.
 sub addGroups {
 	my $self = shift;
 	my $groups = shift;
-	$self->session->cache->remove($self->getId);
+	$self->session->cache->remove("group_" . $self->getId); 
 	GROUP: foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
 		next if ($gid eq $self->getId);
@@ -233,7 +233,7 @@ sub clearCaches {
 	my $groups = $self->getAllGroupsFor();
     my $cache = $self->session->cache;
 	foreach my $group ( $self->getId, @{ $groups } ) {
-		$cache->remove($group);
+		$cache->remove("group_".$group);
 	}
     my $stow = $self->session->stow;
 	$stow->delete("groupObj");
@@ -562,7 +562,7 @@ sub getAllUsers {
 	my $loopCount = shift;
 	my $expireTime = 0;
 	my $cache = $self->session->cache;
-	my $value = $cache->get($self->getId);
+	my $value = $cache->get("group_".$self->getId);
 	return $value if defined $value;
 	my @users = ();
 	push @users,
@@ -587,7 +587,7 @@ sub getAllUsers {
 	}
 	my %users = map { $_ => 1 } @users;
 	@users = keys %users;
-	$cache->set($self->getId, \@users, $self->groupCacheTimeout);
+	$cache->set("group_".$self->getId, \@users, $self->groupCacheTimeout);
 	return \@users;
 }
 
