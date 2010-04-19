@@ -11,6 +11,7 @@
  - fixed #10189: pbworkflow000000000007 Hanging
  - fixed #11526: Wrong log error in file AssetClipboard.pm
  - fixed #11525: Paste assets inside CS
+ - added #620: Add buttons to the GalleryAlbum edit view so users can rotate photos by 90 deg (Bernd Kalbfuß-Zimmermann)
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
