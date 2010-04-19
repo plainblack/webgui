@@ -71,7 +71,7 @@ sub end {
     my $self = shift;
     my $session = $self->session;
     my $id = $self->getId;
-    $session->cache->delete($id);
+    $session->cache->remove($id);
     $session->scratch->deleteAll;
     $session->db->write("delete from userSession where sessionId=?",[$id]);
     delete $session->{_user};

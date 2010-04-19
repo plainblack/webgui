@@ -769,7 +769,7 @@ Extends the base class to handle cleaning up the cache for this asset.
 
 override purgeCache => sub {
     my $self = shift;
-    $self->session->cache->delete("view_".$self->getId);
+    $self->session->cache->remove("view_".$self->getId);
     super();
 };
 

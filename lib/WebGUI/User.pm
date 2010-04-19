@@ -1332,7 +1332,7 @@ Deletes this user object out of the cache.
 
 sub uncache {
 	my $self = shift;
-	$self->session->cache->delete($self->userId);
+	$self->session->cache->remove($self->userId);
 }
 
 #----------------------------------------------------------------------------

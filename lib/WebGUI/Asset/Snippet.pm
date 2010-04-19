@@ -205,10 +205,10 @@ override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
-        $cache->delete("view__".$self->getId);
-        $cache->delete("view_1_".$self->getId);
-        $cache->delete("view__".$self->getId . '_ssl');
-        $cache->delete("view_1_".$self->getId . '_ssl');
+        $cache->remove("view__".$self->getId);
+        $cache->remove("view_1_".$self->getId);
+        $cache->remove("view__".$self->getId . '_ssl');
+        $cache->remove("view_1_".$self->getId . '_ssl');
     };
 	super();
 };

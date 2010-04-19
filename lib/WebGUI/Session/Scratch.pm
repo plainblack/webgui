@@ -84,7 +84,7 @@ sub deleteAll {
 	delete $self->{_data};
     my $session = $self->session;
     my $id = $session->getId;
-    $session->cache->delete("sessionscratch_".$id);
+    $session->cache->remove("sessionscratch_".$id);
 	$session->db->write("delete from userSessionScratch where sessionId=?", [$id]);
 }
 

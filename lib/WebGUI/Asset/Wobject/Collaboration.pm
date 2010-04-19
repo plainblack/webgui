@@ -1436,8 +1436,8 @@ override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
-        $cache->delete("view_".$self->getId);
-	    $cache->delete($self->_visitorCacheKey);
+        $cache->remove("view_".$self->getId);
+	    $cache->remove($self->_visitorCacheKey);
     };
 	super();
 };

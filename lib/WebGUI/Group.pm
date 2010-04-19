@@ -126,7 +126,7 @@ not be added to any group.  Groups may not be added to themselves.
 sub addGroups {
 	my $self = shift;
 	my $groups = shift;
-	$self->session->cache->delete($self->getId);
+	$self->session->cache->remove($self->getId);
 	GROUP: foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
 		next if ($gid eq $self->getId);
@@ -233,7 +233,7 @@ sub clearCaches {
 	my $groups = $self->getAllGroupsFor();
     my $cache = $self->session->cache;
 	foreach my $group ( $self->getId, @{ $groups } ) {
-		$cache->delete($group);
+		$cache->remove($group);
 	}
     my $stow = $self->session->stow;
 	$stow->delete("groupObj");

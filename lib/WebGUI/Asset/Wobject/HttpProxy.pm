@@ -270,8 +270,8 @@ override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
-        $cache->delete($self->proxiedUrl."_URL");
-	    $cache->delete($self->proxiedUrl."_HEADER");
+        $cache->remove($self->proxiedUrl."_URL");
+	    $cache->remove($self->proxiedUrl."_HEADER");
     };
 	super();
 };

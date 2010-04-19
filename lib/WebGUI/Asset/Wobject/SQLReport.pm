@@ -559,7 +559,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 override purgeCache => sub {
 	my $self = shift;
-	eval{$self->session->cache->delete("view_".$self->getId)};
+	$self->session->cache->remove("view_".$self->getId);
 	super();
 };
 

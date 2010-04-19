@@ -879,7 +879,7 @@ Delete any cached overrides.
 
 sub uncacheOverrides {
 	my $self = shift;
-	$self->session->cache->delete($self->_overridesCacheTag);
+	$self->session->cache->remove($self->_overridesCacheTag);
 }
 
 #-------------------------------------------------------------------

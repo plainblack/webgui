@@ -449,7 +449,7 @@ Extends the master method to clear the view cache.
 
 override purgeCache => sub {
 	my $self = shift;
-	$self->session->cache->delete("view_".$self->getId);
+	$self->session->cache->remove("view_".$self->getId);
 	super();
 };
 
