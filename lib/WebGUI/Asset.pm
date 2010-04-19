@@ -261,6 +261,12 @@ property  tagId => (
             fieldType       => 'guid',
             default         => 0,
           );
+property  skipNotification => (
+             autoGenerate    => 0,
+             noFormPost      => 1,
+             fieldType       => 'yesNo',
+          );
+
 has       session => (
             is              => 'ro',
             required        => 1,
