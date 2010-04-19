@@ -7,6 +7,8 @@
  - added #10944: Wiki Keyword Page
  - added #10946: Wiki - Hierarchical Keyword Report
  - added #10945: Wiki - Top-level keyword list
+ - fixed #11444: Strange spectre problem
+ - fixed #10189: pbworkflow000000000007 Hanging
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
