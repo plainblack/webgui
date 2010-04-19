@@ -182,13 +182,26 @@ sub www_viewStatistics {
     return $session->privilege->adminOnly() unless canView($session);
     my ($output, $data);
 	my $i18n = WebGUI::International->new($session);
-	my $url = "http://update.webgui.org/latest-version.txt";
+	
+        # Get the latest WebGUI version
+        my $url = "http://update.webgui.org/latest-version.txt";
 	my $cache = $session->cache;
-	my $version = eval{$cache->get($url)};
-	if (not defined $version) {
-		$version = eval{$cache->setByHttp($url, 43200)};
-	}
-	chomp $version;
+        my $value = $cache->compute( $url, sub { 
+            my $ua = LWP::UserAgent->new(
+                env_proxy       => 1,
+                agent           => "WebGUI/" . $WebGUI::VERSION,
+                timeout         => 30,
+            );
+
+            my $r = $ua->get( $url );
+            if ( $r->is_error ) {
+                $session->log->warn( "Could not get latest WebGUI version from '$url': " . $r->status_line );
+            }
+            else {
+                return $r->decoded_content;
+            }
+        } );
+
 	$output .= '<table>';
 	$output .= '<tr><td align="right" class="tableHeader">'.$i18n->get(145).':</td><td class="tableData">'.$WebGUI::VERSION.'-'.$WebGUI::STATUS.'</td></tr>';
 	if ($version ne $WebGUI::VERSION) {

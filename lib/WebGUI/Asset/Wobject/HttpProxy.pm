@@ -270,8 +270,8 @@ override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
-        $cache->delete([$self->proxiedUrl,"URL"]);
-	    $cache->delete([$self->proxiedUrl,"HEADER"]);
+        $cache->delete($self->proxiedUrl."_URL");
+	    $cache->delete($self->proxiedUrl."_HEADER");
     };
 	super();
 };
@@ -317,8 +317,8 @@ sub view {
     my $cache = $self->session->cache;
 	if ($requestMethod =~ /^GET$/i) {
         eval {
-		    $var{header} 	= $cache->get([$proxiedUrl,'HEADER']);
-		    $var{content} 	= $cache->get([$proxiedUrl,"URL"]);
+		    $var{header} 	= $cache->get($proxiedUrl.'_HEADER');
+		    $var{content} 	= $cache->get($proxiedUrl."_URL");
         };
 	}
 	
@@ -460,8 +460,8 @@ sub view {
 		}
 		unless ($self->cacheTimeout <= 10) {
 			eval{
-                $cache->set([$proxiedUrl,'URL'], $var{content}, $self->cacheTimeout);
-			    $cache->set([$proxiedUrl,'HEADER'], $var{header}, $self->cacheTimeout);
+                $cache->set($proxiedUrl.'URL', $var{content}, $self->cacheTimeout);
+			    $cache->set($proxiedUrl.'HEADER', $var{header}, $self->cacheTimeout);
             };
 		}
 	}

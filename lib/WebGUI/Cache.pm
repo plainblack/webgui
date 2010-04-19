@@ -457,16 +457,19 @@ sub setByHttp {
     if ($debug) {
         $self->session->log->debug("Called setByHttp() with URL $url.");
     }
-    my $userAgent = new LWP::UserAgent;
-	$userAgent->env_proxy;
-        $userAgent->agent("WebGUI/".$WebGUI::VERSION);
-        $userAgent->timeout(30);
-        my $header = new HTTP::Headers;
-        my $referer = "http://webgui.http.request/".$self->session->env->get("SERVER_NAME").$self->session->env->get("REQUEST_URI");
-        chomp $referer;
-        $header->referer($referer);
-    my $request = HTTP::Request->new(GET => $url, $header);
-    my $response = $userAgent->request($request);
+
+    # Why is this being done?
+    my $referer = "http://webgui.http.request/".$self->session->env->get("SERVER_NAME").$self->session->env->get("REQUEST_URI");
+    chomp $referer;
+
+    my $ua = LWP::UserAgent->new(
+        env_proxy       => 1,
+        agent           => "WebGUI/" . $WebGUI::VERSION,
+        timeout         => 30,
+        default_headers => HTTP::Headers->new( referer => $referer ),
+    );
+
+    my $response = $ua->get( $url );
     if ($response->is_error) {
         $self->session->log->error("$url could not be retrieved.");
         if ($debug) {

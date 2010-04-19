@@ -165,30 +165,6 @@ sub exportGetUrlAsPath {
 
 #-------------------------------------------------------------------
 
-=head2 getCache ( $calledAsWebMethod )
-
-Overrides the base method to handle Snippet specific caching.
-
-=head3 $calledAsWebMethod
-
-If this is true, then change the cache key.
-
-=cut
-
-sub getCache {
-	my $self              = shift;
-	my $calledAsWebMethod = shift;
-    my $session           = $self->session;
-    my $cacheKey = "view_".$calledAsWebMethod.'_'.$self->getId;
-    if ($session->env->sslRequest) {
-        $cacheKey .= '_ssl';
-    }
-    my $cache = WebGUI::Cache->new($session, $cacheKey);
-    return $cache;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getToolbar ( )
 
 Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.

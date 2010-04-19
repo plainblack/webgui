@@ -282,7 +282,7 @@ sub cache {
     for my $k (qw(_userId _user _profile)) {
         $userData{$k} = $self->{$k};
     }
-    eval{$self->session->cache->set(["user",$self->userId], \%userData, 60*60*24)};
+    eval{$self->session->cache->set($self->userId, \%userData, 60*60*24)};
 }
 
 #-------------------------------------------------------------------
@@ -1058,7 +1058,7 @@ sub new {
     my $userId      = shift || 1;
     my $overrideId  = shift;
     $userId         = _create($session, $overrideId) if ($userId eq "new");
-    my $self        = eval{$session->cache->get(["user",$userId])} || {};
+    my $self        = eval{$session->cache->get($userId)} || {};
     bless $self, $class;
     $self->{_session} = $session;
     unless ($self->{_userId} && $self->{_user}{username}) {
@@ -1332,7 +1332,7 @@ Deletes this user object out of the cache.
 
 sub uncache {
 	my $self = shift;
-	eval{$self->session->cache->delete(["user",$self->userId])};
+	eval{$self->session->cache->delete($self->userId)};
 }
 
 #----------------------------------------------------------------------------
