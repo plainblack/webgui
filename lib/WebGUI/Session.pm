@@ -15,7 +15,10 @@ package WebGUI::Session;
 =cut
 
 use strict;
-use WebGUI::Cache;
+use 5.010;
+
+use CHI;
+use File::Temp;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
@@ -117,17 +120,39 @@ Returns a WebGUI::Cache object, which is connected to the WebGUI memcached serve
 =cut
 
 sub cache {
-	my $self = shift;
-	unless (exists $self->{_cache}) {
-        my $cache = WebGUI::Cache->new($self);
-		if (defined $cache) {
-			$self->{_cache} = $cache;
-		}
-		else {
-		    $self->log->fatal("Couldn't connect to WebGUI memcached server, and can't continue without it.");
-		}
-	}
-	return $self->{_cache};
+    my $self = shift;
+    unless (exists $self->{_cache}) {
+        my $cacheConf    = $self->config->get('cache');
+
+        # Default values
+        my $resolveConf = sub {
+            my ($config) = @_;
+            given ( $config->{driver} ) {
+                when ( /DBI/ ) {
+                    $config->{ dbh } = $self->db->dbh;
+                    continue;
+                }
+                when ( /File|FastMmap|BerkeleyDB/ ) {
+                    $config->{ root_dir } ||= tempdir();
+                    continue;
+                }
+                when ( /FastMmap/ ) {
+                    #$config->{ cache_size } = '64m';
+                    continue;
+                }
+            }
+            $config->{namespace} ||= $self->config->get('sitename')->[0];
+        };
+        
+        $resolveConf->( $cacheConf );
+        if ( $cacheConf->{l1_cache} ) {
+            $resolveConf->( $cacheConf->{l1_cache} );
+        }
+
+        my $cache   = CHI->new( %{$cacheConf} );
+        $self->{_cache} = $cache;
+    }
+    return $self->{_cache};
 }
 
 #-------------------------------------------------------------------
