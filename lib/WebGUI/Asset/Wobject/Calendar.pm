@@ -298,27 +298,6 @@ sub definition {
 
 #----------------------------------------------------------------------------
 
-=head2 addChild ( properties [, more ] )
-
-Only allows Events to be added as a child of this asset.
-
-=cut
-
-sub addChild {
-    my $self        = shift;
-    my $properties  = shift;
-    my @other       = @_;
-
-    if ($properties->{className} ne "WebGUI::Asset::Event") {
-        $self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
-        return undef;
-    }
-
-    return $self->SUPER::addChild($properties, @other);
-}
-
-#----------------------------------------------------------------------------
-
 =head2 addFeed ( $feedParams )
 
 Adds a new Feed to this calendar.  This is a wrapper around WebGUI::JSONCollateral's setJSONCollateral
