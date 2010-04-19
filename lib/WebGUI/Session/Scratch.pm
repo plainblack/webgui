@@ -107,7 +107,7 @@ sub deleteName {
 	return undef unless ($name);	
 	delete $self->{_data}{$name};
     my $session = $self->session;
-    $session->cache->flush;
+    $session->cache->clear;
 	$session->db->write("delete from userSessionScratch where name=?", [$name]);
 }
 
@@ -134,7 +134,7 @@ sub deleteNameByValue {
 	return undef unless ($name and defined $value);
 	delete $self->{_data}{$name} if ($self->{_data}{$name} eq $value);
     my $session = $self->session;
-    $session->cache->flush;
+    $session->cache->clear;
 	$session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
 
