@@ -18,7 +18,7 @@ use strict;
 use 5.010;
 
 use CHI;
-use File::Temp;
+use File::Temp qw( tempdir );
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
