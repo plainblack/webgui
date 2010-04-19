@@ -152,7 +152,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 127
+plan tests => 126
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -611,14 +611,6 @@ is($fixTitleAsset->getUiLevel, 8, 'getUiLevel: Snippet has a configured uiLevel 
     ok (!WebGUI::Asset->assetExists($session, $id,  $class, $date+1), 'assetExists with wrong revisionDate does not exist');
 
 }
-
-################################################################
-#
-# isValidRssItem
-#
-################################################################
-
-is($canViewAsset->isValidRssItem, 1, 'isValidRssItem: By default, all Assets are valid RSS items');
 
 ################################################################
 #
