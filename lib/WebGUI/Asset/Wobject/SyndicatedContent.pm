@@ -319,7 +319,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 override purgeCache => sub {
 	my $self = shift;
-    eval{$self->session->cache->delete("view_".$self->getId)};
+    $self->session->cache->delete("view_".$self->getId);
 	super();
 };
 
@@ -337,7 +337,7 @@ sub view {
 
 	# try the cached version
 	my $cache = $session->cache; 
-	my $out = eval{$cache->get("view_".$self->getId)};
+	my $out = $cache->get("view_".$self->getId);
 	return $out if ($out ne "" && !$session->var->isAdminOn);
     #return $out if $out;
 
@@ -345,7 +345,7 @@ sub view {
 	my $feed = $self->generateFeed;
 	$out = $self->processTemplate($self->getTemplateVariables($feed),undef,$self->{_viewTemplate});
 	if (!$session->var->isAdminOn && $self->cacheTimeout > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
+		$cache->set("view_".$self->getId, $out, $self->cacheTimeout);
 	}
 	return $out;
 }

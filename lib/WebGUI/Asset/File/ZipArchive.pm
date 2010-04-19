@@ -186,7 +186,7 @@ sub view {
     my $cache = $self->session->cache;
     my $cacheKey = $self->getWwwCacheKey('view');
     if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
-        my $out = eval { $cache->get( $cacheKey ) };
+        my $out = $cache->get( $cacheKey );
 		return $out if $out;
 	}
 	my %var = %{$self->get};
@@ -209,7 +209,7 @@ sub view {
 	$var{noFileSpecified} = $i18n->get('noFileSpecified');
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
-        eval{ $cache->set( $cacheKey, $out, $self->cacheTimeout) };
+        $cache->set( $cacheKey, $out, $self->cacheTimeout);
     }
     return $out;
 }

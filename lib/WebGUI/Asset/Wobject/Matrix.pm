@@ -486,7 +486,7 @@ sub getListings {
         || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cache = $session->cache;
     unless ($noCache) {
-        $listingsEncoded = eval{$cache->get("matrixListings_".$self->getId)};
+        $listingsEncoded = $cache->get("matrixListings_".$self->getId);
     }
 
     if ($listingsEncoded){
@@ -526,7 +526,7 @@ assetData.revisionDate
         }
 
         $listingsEncoded = JSON->new->encode($listings);
-        eval{$cache->set("matrixListings_".$self->getId, $listingsEncoded, $self->listingsCacheTimeout)};
+        $cache->set("matrixListings_".$self->getId, $listingsEncoded, $self->listingsCacheTimeout);
     }
     return $listings;
 }
@@ -647,7 +647,7 @@ sub view {
         || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cache = $session->cache;
     unless ($noCache) {
-        $varStatisticsEncoded = eval{$cache->get("matrixStatistics_".$self->getId)};
+        $varStatisticsEncoded = $cache->get("matrixStatistics_".$self->getId);
     }
 
     if ($varStatisticsEncoded){
@@ -797,7 +797,7 @@ sub view {
         [$self->getId]);
 
         $varStatisticsEncoded = JSON->new->encode($varStatistics);
-        eval{$cache->set("matrixStatistics_".$self->getId, $varStatisticsEncoded, $self->statisticsCacheTimeout)};
+        $cache->set("matrixStatistics_".$self->getId, $varStatisticsEncoded, $self->statisticsCacheTimeout);
     }
 
     foreach my $statistic (keys %{$varStatistics}) {

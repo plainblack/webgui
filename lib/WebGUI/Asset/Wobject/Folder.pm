@@ -190,7 +190,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 override purgeCache => sub {
 	my $self = shift;
-	eval{$self->session->cache->delete("view_".$self->getId)};
+	$self->session->cache->delete("view_".$self->getId);
 	super();
 };
 
@@ -209,7 +209,7 @@ sub view {
     # Use cached version for visitors
     my $cache = $self->session->cache;
 	if ($self->session->user->isVisitor) {
-		my $out = eval{$cache->get("view_".$self->getId)};
+		my $out = $cache->get("view_".$self->getId);
 		return $out if $out;
 	}
 
@@ -274,7 +274,7 @@ sub view {
 
     # Update the cache
 	if ($self->session->user->isVisitor) {
-		eval{$cache->set("view_".$self->getId, $out, $self->visitorCacheTimeout)};
+		$cache->set("view_".$self->getId, $out, $self->visitorCacheTimeout);
 	}
 
     return $out;

@@ -1584,7 +1584,7 @@ sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
 	if ($self->_visitorCacheOk) {
-		my $out = eval{$cache->get($self->_visitorCacheKey)};
+		my $out = $cache->get($self->_visitorCacheKey);
 		$self->session->errorHandler->debug("HIT") if $out;
 		return $out if $out;
 	}
@@ -1595,7 +1595,7 @@ sub view {
 	$self->prepareView unless ($self->{_viewTemplate});
     my $out = $self->processTemplate($self->getViewTemplateVars,undef,$self->{_viewTemplate});
 	if ($self->_visitorCacheOk) {
-		eval{$cache->set($self->_visitorCacheKey, $out, $self->visitorCacheTimeout)};
+		$cache->set($self->_visitorCacheKey, $out, $self->visitorCacheTimeout);
 	}
     return $out;
 }

@@ -449,7 +449,7 @@ Extends the master method to clear the view cache.
 
 override purgeCache => sub {
 	my $self = shift;
-	eval{$self->session->cache->delete("view_".$self->getId)};
+	$self->session->cache->delete("view_".$self->getId);
 	super();
 };
 
@@ -584,7 +584,7 @@ Generate the view method for the Asset, and handle caching.
 sub view {
 	my $self = shift;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = eval{$self->session->cache->get($self->getViewCacheKey)};
+		my $out = $self->session->cache->get($self->getViewCacheKey);
 		return $out if $out;
 	}
 	my %var = %{$self->get};
@@ -594,7 +594,7 @@ sub view {
 	$var{fileSize} = formatBytes($self->get("assetSize"));
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		eval{$self->session->cache->set($self->getViewCacheKey, $out, $self->get("cacheTimeout"))};
+		$self->session->cache->set($self->getViewCacheKey, $out, $self->get("cacheTimeout"));
 	}
     return $out;
 }

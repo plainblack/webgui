@@ -152,7 +152,7 @@ sub cascadeLineage {
         [$newLineage, length($oldLineage) + 1, $oldLineage . '%']
     );
     if ($records > 20) {
-        eval{$self->session->cache->flush};
+        $self->session->cache->flush;
     }
     else {
         my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage . '%']);

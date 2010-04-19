@@ -419,12 +419,12 @@ override www_view => sub {
         return $check if (defined $check);
         my $cacheKey = $self->getWwwCacheKey('view');
         my $cache = $session->cache;
-        my $out = eval{ $cache->get($cacheKey) };
+        my $out = $cache->get($cacheKey);
         unless ($out) {
             $self->prepareView;
             $session->stow->set("cacheFixOverride", 1);
             $out = $self->processStyle($self->view, { noHeadTags => 1 });
-            eval{ $cache->set($cacheKey, $out, 60) };
+            $cache->set($cacheKey, $out, 60);
             $session->stow->delete("cacheFixOverride");
         }
         # keep those ads rotating even though the output is cached

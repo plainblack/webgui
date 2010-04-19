@@ -249,7 +249,7 @@ sub view {
         || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cacheKey = $self->getWwwCacheKey('view', $calledAsWebMethod);
     unless ($noCache) {
-        my $out = eval { $session->cache->get( $cacheKey )};
+        my $out = $session->cache->get( $cacheKey );
 		return $out if $out;
 	}
 	my $output = $self->usePacked
@@ -262,7 +262,7 @@ sub view {
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-        eval { $session->cache->set( $cacheKey, $output, $self->cacheTimeout) };
+        $session->cache->set( $cacheKey, $output, $self->cacheTimeout);
 	}
     return $output;
 }
