@@ -201,7 +201,7 @@ Returns the list of modules to exclude from preloading as an array.
 
 sub preloadExclude {
     my $class = shift;
-    my @excludes = _readTextLines($class->preloadExclude);
+    my @excludes = _readTextLines($class->preloadExclusions);
     return @excludes;
 }
 
