@@ -306,9 +306,13 @@ sub www_runCronJob {
                 }
                 
                 # Run the instance
-                $instance->start( 1 );
-		$task->delete( 1 ) if ( $task->get("runOnce") );
-		return "done";
+        my $error = $instance->start( 1 );
+        if ($error) {
+            $task->delete(1);
+            return "error";
+        }
+        $task->delete( 1 ) if ( $task->get("runOnce") );
+        return "done";
 	}
 	$session->errorHandler->warn("No task ID passed to cron job runner.");
 	return "error";
