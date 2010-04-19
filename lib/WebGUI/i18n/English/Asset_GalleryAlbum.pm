@@ -23,6 +23,18 @@ our $I18N = {
         context     => "Label for Save button",
     },
     
+    'rotate left' => {
+        message     => "90&deg; CCW",
+        lastUpdated => 1270582436,
+        context     => "Label for rotate left button",
+    },
+    
+    'rotate right' => {
+        message     => "90&deg; CW",
+        lastUpdated => 1270582436,
+        context     => "Label for rotate right button",
+    },    
+    
     'save message' => {
         message     => 'Album settings saved.',
         lastUpdated => 0,
@@ -38,12 +50,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
-
     'delete message' => {
         message     => 'Album has been deleted. <a href="%s">Return to Gallery</a>',
         lastUpdated => 0,
     },
-
+        
     'help common title' => {
         message     => 'Gallery Album Variables (Common)',
         lastUpdated => 0,
@@ -524,6 +535,18 @@ our $I18N = {
         lastUpdated => 1213631346,
         context     => q{Description of template variable},
     },
+    
+    'helpvar form_rotateLeft' => {
+        message     => q{A button to rotate the photo by 90&deg; counter clockwise.},
+        lastUpdated => 1270582436,
+        context     => q{Description of template variable},
+    },
+    
+    'helpvar form_rotateRight' => {
+        message     => q{A button to rotate the photo by 90&deg; clockwise.},
+        lastUpdated => 1270582436,
+        context     => q{Description of template variable},
+    },    
 
     'helpvar form_delete' => {
         message     => q{A button to delete the image.},

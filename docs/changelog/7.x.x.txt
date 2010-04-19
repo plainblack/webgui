@@ -1,3 +1,6 @@
+7.9.3
+ - added #620: Add buttons to the GalleryAlbum edit view so users can rotate photos by 90 deg
+
 7.9.2
  - fixed #11507: Spectre Reports Wrong Workflow Count
  - added #11412: Additional navigation in Gallery Photo View 

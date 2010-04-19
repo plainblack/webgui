@@ -22,6 +22,7 @@ use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::HTML;
 use WebGUI::ProgressBar;
+use WebGUI::Storage;
 
 use Archive::Any;
 
@@ -992,6 +993,7 @@ sub www_addArchive {
     $var->{ form_start      } 
         = WebGUI::Form::formHeader( $session, {
             action          => $self->getUrl('func=addArchiveSave'),
+            name            => 'name="galleryAlbumAddArchive"',
         });
     $var->{ form_end        }
         = WebGUI::Form::formFooter( $session );
@@ -1257,6 +1259,43 @@ sub www_edit {
             $session->errorHandler->error("Couldn't demote asset '$assetId' because we couldn't instantiate it.");
         }
     }
+    # Rotate to the left
+    elsif ( grep { $_ =~ /^rotateLeft-(.{22})$/ } $form->param ) {
+        my $assetId     = ( grep { $_ =~ /^rotateLeft-(.{22})$/ } $form->param )[0];
+        $assetId        =~ s/^rotateLeft-//;              
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        
+        if ( $asset ) {
+            # Add revision and create a new version tag by doing so
+            my $newRevision = $asset->addRevision;
+            # Rotate photo (i.e. all attached image files) by 90° CCW
+            $newRevision->rotate(-90);           
+            # Auto-commit version tag 
+            $newRevision->requestAutoCommit;
+       }
+        else {
+            $session->log->error("Couldn't rotate asset '$assetId' because we couldn't instantiate it.");
+        }        
+    }
+    # Rotate to the right
+    elsif ( grep { $_ =~ /^rotateRight-(.{22})$/ } $form->param ) {
+        my $assetId     = ( grep { $_ =~ /^rotateRight-(.{22})$/ } $form->param )[0];
+        $assetId        =~ s/^rotateRight-//;                
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+
+        if ( $asset ) {
+            # Add revision and create a new version tag by doing so
+            my $newRevision = $asset->addRevision;
+            # Rotate photo (i.e. all attached image files) by 90° CW
+            $newRevision->rotate(90);           
+            # Auto-commit version tag 
+            $newRevision->requestAutoCommit;
+        }
+        else {
+            $session->log->error("Couldn't rotate asset '$assetId' because we couldn't instantiate it.");
+        }        
+    }
+    # Delete the file
     elsif ( grep { $_ =~ /^delete-(.{22})$/ } $form->param ) {
         my $assetId     = ( grep { $_ =~ /^delete-(.{22})$/ } $form->param )[0];
         $assetId        =~ s/^delete-//;
@@ -1276,6 +1315,7 @@ sub www_edit {
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
                 action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),
+                extras      => 'name="galleryAlbumAdd"',
             })
             . WebGUI::Form::hidden( $session, {
                 name        => "ownerUserId",
@@ -1294,6 +1334,7 @@ sub www_edit {
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
                 action      => $self->getUrl('func=edit'),
+                extras      => 'name="galleryAlbumEdit"',
             })
             . WebGUI::Form::hidden( $session, {
                 name        => "ownerUserId",
@@ -1355,23 +1396,44 @@ sub www_edit {
                 id          => "assetIdThumbnail_$file->{ assetId }",
             } );
 
-        # Raw HTML here to provide proper value for the image
         my $promoteLabel    = $i18n->get( 'Move Up', 'Icon' );
         $file->{ form_promote }
-            = qq{<input type="submit" name="promote-$file->{assetId}" class="promote" value="$promoteLabel" />}
-            ;
+            = WebGUI::Form::submit( $session, {
+                name        => "promote-$file->{assetId}",
+                value       => $i18n->get( 'Move Up', 'Icon' ),
+                class       => "promote",
+            });
 
         my $demoteLabel     = $i18n->get( 'Move Down', 'Icon' );
         $file->{ form_demote }
-            = qq{<input type="submit" name="demote-$file->{assetId}" class="demote" value="$demoteLabel" />}
-            ;
+            = WebGUI::Form::submit( $session, {
+                name        => "demote-$file->{assetId}",
+                value       => $i18n->get( 'Move Down', 'Icon' ),
+                class       => "demote",
+            });
 
         my $deleteConfirm   = $i18n->get( 'template delete message', 'Asset_Photo' );
-        my $deleteLabel     = $i18n->get( 'Delete', 'Icon' );
         $file->{ form_delete }
-            = qq{<input type="submit" name="delete-$file->{assetId}" class="delete" value="$deleteLabel" }
-            . qq{ onclick="return confirm('$deleteConfirm')" />}
-            ;
+            = WebGUI::Form::submit( $session, {
+                name        => "delete-$file->{assetId}",
+                value       => $i18n->get( 'Delete', 'Icon' ),
+                class       => "delete",
+                extras      => "onclick=\"return confirm('$deleteConfirm')\"",
+            });
+            
+        $file->{ form_rotateLeft }
+            = WebGUI::Form::submit( $session, {
+                name        => "rotateLeft-$file->{assetId}",
+                value       => $i18n->get( 'rotate left' ),
+                class       => "rotateLeft",
+            });
+               
+        $file->{ form_rotateRight } 
+            = WebGUI::Form::submit( $session, {
+                name        => "rotateRight-$file->{assetId}",
+                value       => $i18n->get( 'rotate right' ),
+                class       => "rotateRight",
+            });
 
         $file->{ form_synopsis }
             = WebGUI::Form::HTMLArea( $session, {
