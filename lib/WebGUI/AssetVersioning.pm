@@ -110,7 +110,7 @@ sub addRevision {
             $workingTag = WebGUI::VersionTag->getWorking( $session );
         }
         else {
-            my $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
+            $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
             $workingTag = WebGUI::VersionTag->new( $session, $parentAsset->tagId );
             $workingTag->setWorking();
         }
