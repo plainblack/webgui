@@ -35,6 +35,8 @@ use Archive::Any;
 
 =head1 METHODS
 
+=cut
+
 #-------------------------------------------------------------------
 
 =head2 definition ( )
