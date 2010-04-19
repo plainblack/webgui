@@ -57,7 +57,7 @@ use Data::Dumper;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
-plan tests => 14 + scalar @icalWrapTests;
+plan tests => 12 + scalar @icalWrapTests;
 
 my $session = WebGUI::Test->session;
 
@@ -81,10 +81,6 @@ isa_ok($cal, 'WebGUI::Asset::Wobject::Calendar');
 # Test addChild to make sure we can only add Event assets as children to the calendar
 my $event = $cal->addChild({className=>'WebGUI::Asset::Event'});
 isa_ok($event, 'WebGUI::Asset::Event','Can add Events as a child to the calendar.');
-
-my $article = $cal->addChild({className=>"WebGUI::Asset::Wobject::Article"});
-isnt(ref $article, 'WebGUI::Asset::Wobject::Article', "Can't add an article as a child to the calendar.");
-ok(! defined $article, '... addChild returned undef');
 
 my $dt = WebGUI::DateTime->new($session, mysql => '2001-08-16 8:00:00', time_zone => 'America/Chicago');
 
@@ -269,10 +265,6 @@ addToCleanup($tag2);
 is(scalar @{ $windowCal->getLineage(['children'])}, 13, 'added events to the window calendar');
 
 my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
-
-#note $startDt->toDatabase;
-#note join "\n", map { join ' ', $_->get('title'), $_->get('startDate'), $_->get('startTime')} @window;
-#note $endDt->toDatabase;
 
 cmp_bag(
     [ map { $_->get('title') } @window ],
@@ -502,9 +494,6 @@ my $listCal = $node->addChild({
 
 $allDayDt     = $bday->cloneToUserTimeZone->truncate( to => 'day' );
 my $prevDayDt = $bday->cloneToUserTimeZone->truncate( to => 'day' )->subtract(days => 1)->add(hours => 19);
-
-note $allDayDt->toDatabase;
-note $prevDayDt->toDatabase;
 
 $allDay = $listCal->addChild({
     className   => 'WebGUI::Asset::Event',

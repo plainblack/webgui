@@ -173,37 +173,6 @@ sub addArchive {
 
 #----------------------------------------------------------------------------
 
-=head2 addChild ( properties [, ... ] )
-
-Add a child to this GalleryAlbum. See C<WebGUI::AssetLineage> for more info.
-
-Override to ensure only appropriate classes get added to GalleryAlbums.
-
-=cut
-
-sub addChild {
-    my $self        = shift;
-    my $properties  = shift;
-    my $fileClass   = 'WebGUI::Asset::File::GalleryFile';
-    
-    # Load the class
-    WebGUI::Pluggable::load( $properties->{className} );
-
-    # Make sure we only add appropriate child classes
-    if ( !$properties->{className}->isa( $fileClass ) 
-        && !$properties->{ className }->isa( "WebGUI::Asset::Shortcut" ) 
-        ) {
-        $self->session->errorHandler->security(
-            "add a ".$properties->{className}." to a ".$self->get("className")
-        );
-        return undef;
-    }
-
-    return $self->next::method( $properties, @_ );
-}
-
-#----------------------------------------------------------------------------
-
 =head2 appendTemplateVarsFileLoop ( vars, assetIds )
 
 Append template vars for a file loop for the specified assetIds. C<vars> is

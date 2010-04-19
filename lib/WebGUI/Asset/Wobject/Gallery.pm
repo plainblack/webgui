@@ -345,34 +345,6 @@ sub definition {
 
 #----------------------------------------------------------------------------
 
-=head2 addChild ( properties, [...] )
-
-Add a child to this asset. See C<WebGUI::AssetLineage> for more info.
-
-Overridden to ensure that only GalleryAlbums are added to Galleries.
-
-=cut
-
-sub addChild {
-    my $self        = shift;
-    my $properties  = shift;
-    my $albumClass  = "WebGUI::Asset::Wobject::GalleryAlbum";
-
-    # Load the class
-    WebGUI::Pluggable::load( $properties->{className} );
-
-    if ( !$properties->{className}->isa( $albumClass ) ) {
-        $self->session->errorHandler->security(
-            "add a ".$properties->{className}." to a ".$self->get("className")
-        );
-        return undef;
-    }
-
-    return $self->next::method( $properties, @_ );
-}
-
-#----------------------------------------------------------------------------
-
 =head2 appendTemplateVarsSearchForm ( var )
 
 Appends the template vars for the search form to the hash reference C<var>.
