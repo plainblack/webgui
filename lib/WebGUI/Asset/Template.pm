@@ -85,6 +85,7 @@ sub _build_templatePacked {
         do_javascript       => 'shrink',
         do_stylesheet       => 'minify',
     } );
+    $template;
 }
 
 property usePacked => (

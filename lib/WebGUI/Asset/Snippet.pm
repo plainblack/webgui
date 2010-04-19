@@ -35,38 +35,44 @@ property snippet => (
 	hoverHelp       => ['snippet description','Asset_Snippet'],
     default         => undef,
 );
-around snippet => sub {
-    my $orig = shift;
+sub _trigger_snippet {
     my $self = shift;
-    if (@_ > 1) {
-        my $packed  = $_[0];
-        if ( $self->mimeType eq "text/html" ) {
-            HTML::Packer::minify( \$packed, {
-                remove_comments     => 1,
-                do_javascript       => "shrink",
-                do_stylesheet       => "minify",
-            } );
-        }
-        elsif ( $self->mimeType eq "text/css" ) {
-            CSS::Packer::minify( \$packed, {
-                compress            => 'minify',
-            });
-        }
-        elsif ( $self->mimeType eq 'text/javascript' ) {
-            JavaScript::Packer::minify( \$packed, {
-                compress            => "shrink",
-            });
-        }
-        $self->snippetPacked($packed);
+    my ($new, $old) = @_;
+    if ($new ne $old) {
+        $self->_clear_snippetPacked;
     }
-    $self->$orig(@_);
-};
-
+}
 property snippetPacked => (
     fieldType       => "hidden",
-    default         => undef,
     noFormPost      => 1,
+    lazy            => 1,
+    clearer         => '_clear_snippetPacked',
+    builder         => '_build_snippetPacked',
 );
+
+sub _build_snippetPacked {
+    my $self = shift;
+    my $snippet = $self->snippet;
+    if ( $self->mimeType eq "text/html" ) {
+        HTML::Packer::minify( \$snippet, {
+            remove_comments     => 1,
+            do_javascript       => "shrink",
+            do_stylesheet       => "minify",
+        } );
+    }
+    elsif ( $self->mimeType eq "text/css" ) {
+        CSS::Packer::minify( \$snippet, {
+            compress            => 'minify',
+        });
+    }
+    elsif ( $self->mimeType eq 'text/javascript' ) {
+        JavaScript::Packer::minify( \$snippet, {
+            compress            => "shrink",
+        });
+    }
+    $snippet;
+}
+
 property usePacked => (
     tab             => 'properties',
     fieldType       => 'yesNo',
