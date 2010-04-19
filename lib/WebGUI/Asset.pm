@@ -2369,7 +2369,7 @@ sub purgeCache {
 	$stow->delete('assetLineage');
 	$stow->delete('assetClass');
 	$stow->delete('assetRevision');
-    eval{$self->session->cache->delete("asset".$self->getId.$self->get("revisionDate"))};
+    $self->session->cache->remove("asset".$self->getId.$self->get("revisionDate"));
 }
 
 
