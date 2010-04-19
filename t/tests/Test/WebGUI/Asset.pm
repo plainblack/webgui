@@ -255,40 +255,6 @@ sub getParent : Test(2) {
     $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
 }
 
-sub addRevision : Test(6) {
-    my $test    = shift;
-    my $session = $test->session;
-    note "addRevision";
-    my $testId1      = 'wg8TestAsset0000000001';
-    my $testId2      = 'wg8TestAsset0000000002';
-    my $now          = time();
-    my $revisionDate = $now - 50;
-    my $baseLineage  = $session->db->quickScalar('select lineage from asset where assetId=?',['PBasset000000000000002']);
-    my $testLineage  = $baseLineage. '909090';
-    $session->db->write("insert into asset (assetId, className, lineage) VALUES (?,?,?)",       [$testId1, 'WebGUI::Asset', $testLineage]);
-    $session->db->write("insert into assetData (assetId, revisionDate, status) VALUES (?,?,?)", [$testId1, $revisionDate, 'approved']);
-    my $testLineage2 = $testLineage . '000001';
-    $session->db->write("insert into asset (assetId, className, parentId, lineage) VALUES (?,?,?,?)", [$testId2, 'WebGUI::Asset', $testId1, $testLineage2]);
-    $session->db->write("insert into assetData (assetId, revisionDate) VALUES (?,?)", [$testId2, $revisionDate]);
-
-    my $testAsset = WebGUI::Asset->new($session, $testId2, $revisionDate);
-    $testAsset->title('test title 43');
-    $testAsset->write();
-    my $tag = WebGUI::VersionTag->getWorking($session);
-    my $revAsset  = $testAsset->addRevision({}, $now);
-    isa_ok $revAsset, 'WebGUI::Asset';
-    is $revAsset->revisionDate, $now, 'revisionDate set correctly on new revision';
-    is $revAsset->title, 'test title 43', 'data fetch from database correct';
-    is $revAsset->revisedBy, $session->user->userId, 'revisedBy is current session user';
-    is $revAsset->tagId, $tag->getId, 'tagId is current working tagId';
-    my $count = $session->db->quickScalar('SELECT COUNT(*) from assetData where assetId=?',[$testId2]);
-    is $count, 2, 'two records in the database';
-    WebGUI::Test->addToCleanup($tag);
-
-    $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");
-    $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
-}
-
 sub newByPropertyHashRef : Test(2) {
     my $test    = shift;
     my $session = $test->session;
