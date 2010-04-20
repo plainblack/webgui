@@ -3,6 +3,7 @@
  - fixed #10189: pbworkflow000000000007 Hanging
  - fixed #11526: Wrong log error in file AssetClipboard.pm
  - fixed #11525: Paste assets inside CS
+ - fixed #11530: account deactivation not working (United Knowledge)
 
 7.8.17
  - fixed #11507: Spectre Reports Wrong Workflow Count

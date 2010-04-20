@@ -406,7 +406,7 @@ sub deactivateAccount {
 	$var{'yes.label'} = $i18n->get(44);
    	$var{'no.url'} = $self->session->url->page();
 	$var{'no.label'} = $i18n->get(45);
-	return WebGUI::Asset::Template->new($self->session,$self->get('getDeactivateAccountTemplateId'))->process(\%var);
+	return WebGUI::Asset::Template->new($self->session,$self->getDeactivateAccountTemplateId)->process(\%var);
 }
 
 #-------------------------------------------------------------------
