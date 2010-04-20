@@ -12,6 +12,7 @@
  - fixed #11526: Wrong log error in file AssetClipboard.pm
  - fixed #11525: Paste assets inside CS
  - added #620: Add buttons to the GalleryAlbum edit view so users can rotate photos by 90 deg (Bernd Kalbfuß-Zimmermann)
+ - fixed #11530: account deactivation not working (United Knowledge)
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
