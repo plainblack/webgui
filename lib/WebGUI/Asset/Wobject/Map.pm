@@ -85,6 +85,7 @@ property startZoom => (
             maximum     => 19,
             label       => ["startZoom label", 'Asset_Map'],
             hoverHelp   => ["startZoom description", 'Asset_Map'],
+            default     => 1,
          );
 property templateIdEditPoint => (
             tab         => "display",
@@ -116,6 +117,7 @@ property workflowIdPoint => (
             label       => ["workflowIdPoint label", 'Asset_Map'],
             hoverHelp   => ["workflowIdPoint description", 'Asset_Map'],
             type        => 'WebGUI::VersionTag',
+            default     => "pbworkflow000000000003",
          );
 
 #-------------------------------------------------------------------
