@@ -187,6 +187,7 @@ with 'WebGUI::Role::Asset::RssFeed';
 use WebGUI::International;
 use HTML::Parser;
 use URI::Escape;
+use WebGUI::Utility qw/isIn/;
 
 #-------------------------------------------------------------------
 
