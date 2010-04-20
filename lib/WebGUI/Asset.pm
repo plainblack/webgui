@@ -2311,7 +2311,7 @@ sub publish {
 	my $stateList = $self->session->db->quoteAndJoin($statesToPublish);
 	my $where = ($statesToPublish) ? "and state in (".$stateList.")" : "";
 	
-	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%')." $where");
+	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->lineage.'%')." $where");
         my $idList = $self->session->db->quoteAndJoin($assetIds);
         
 	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".time()." where assetId in (".$idList.")");
@@ -2349,7 +2349,7 @@ sub purgeCache {
 	$stow->delete('assetLineage');
 	$stow->delete('assetClass');
 	$stow->delete('assetRevision');
-    $self->session->cache->remove("asset".$self->getId.$self->get("revisionDate"));
+    $self->session->cache->remove("asset".$self->getId.$self->revisionDate);
 }
 
 
