@@ -64,7 +64,7 @@ sub cut {
     my $session = $self->session;
 	return undef if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage"));
 	$session->db->beginTransaction;
-	$session->db->write("update asset set state='clipboard-limbo' where lineage like ? and state='published'",[$self->get("lineage").'%']);
+	$session->db->write("update asset set state='clipboard-limbo' where lineage like ? and state='published'",[$self->lineage.'%']);
 	$session->db->write("update asset set state='clipboard', stateChangedBy=?, stateChanged=? where assetId=?", [$session->user->userId, time(), $self->getId]);
 	$session->db->commit;
 	$self->state("clipboard");
