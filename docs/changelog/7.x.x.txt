@@ -13,6 +13,8 @@
  - fixed #11525: Paste assets inside CS
  - added #620: Add buttons to the GalleryAlbum edit view so users can rotate photos by 90 deg (Bernd Kalbfuß-Zimmermann)
  - fixed #11530: account deactivation not working (United Knowledge)
+ - fixed #11531: MapPoint property conflict
+ - fixed #11532: MapPoint, no i18n
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
