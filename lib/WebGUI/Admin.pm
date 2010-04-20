@@ -3,6 +3,7 @@ package WebGUI::Admin;
 # The new WebGUI Admin console
 
 use Moose;
+use JSON qw( from_json to_json );
 use namespace::autoclean;
 
 has 'session' => (
@@ -112,6 +113,40 @@ sub getNewContentTemplateVars {
     my $vars    = [];
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getTreePaginator ( $asset )
+
+Get a page for the Asset Tree view. Returns a WebGUI::Paginator object 
+filled with asset IDs.
+
+=cut
+
+sub getTreePaginator {
+    my ( $self, $asset ) = @_;
+    my $session = $self->session;
+
+    my $orderByColumn       = $session->form->get( 'orderByColumn' ) 
+                            || "lineage"
+                            ;
+    my $orderByDirection    = lc $session->form->get( 'orderByDirection' ) eq "desc"
+                            ? "DESC"
+                            : "ASC"
+                            ;
+
+    my $recordOffset        = $session->form->get( 'recordOffset' ) || 1;
+    my $rowsPerPage         = $session->form->get( 'rowsPerPage' ) || 100;
+    my $currentPage         = int ( $recordOffset / $rowsPerPage ) + 1;
+
+    my $p           = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
+
+    my $orderBy     = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection;
+    $p->setDataByArrayRef( $asset->getLineage( ['children'], { orderByClause => $orderBy } ) );
+    
+    return $p;
+}
+
+
 #----------------------------------------------------------------------
 
 =head2 getVersionTagTemplateVars
@@ -143,6 +178,61 @@ sub getVersionTagTemplateVars {
 
 #----------------------------------------------------------------------
 
+=head2 www_getTreeData ( ) 
+
+Get the Tree data for a given asset URL
+
+=cut
+
+sub www_getTreeData {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $user, $form ) = $session->quick(qw{ user form });
+
+    my $assetUrl    = $form->get('assetUrl');
+    my $asset       = WebGUI::Asset->newByUrl( $session, $assetUrl );
+
+    my $i18n        = WebGUI::International->new( $session, "Asset" );
+    my $assetInfo   = { assets => [] };
+    my $p           = $self->getTreePaginator( $asset );
+
+    for my $assetId ( @{ $p->getPageData } ) {
+        my $asset       = WebGUI::Asset->newById( $session, $assetId );
+
+        # Populate the required fields to fill in
+        my %fields      = (
+            assetId         => $asset->getId,
+            url             => $asset->getUrl,
+            lineage         => $asset->lineage,
+            title           => $asset->menuTitle,
+            revisionDate    => $asset->revisionDate,
+            childCount      => $asset->getChildCount,
+            assetSize       => $asset->assetSize,
+            lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
+            actions         => $asset->canEdit && $asset->canEditIfLocked,
+        );
+
+        $fields{ className } = {};
+        # The asset icon
+        $fields{ icon } = $asset->getIcon("small");
+
+        # The asset type (i18n name)
+        $fields{ className } = $asset->getName;
+
+        push @{ $assetInfo->{ assets } }, \%fields;
+    }
+
+    $assetInfo->{ totalAssets   } = $p->getRowCount;
+    $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
+    $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
+
+    $session->http->setMimeType( 'application/json' );
+
+    return to_json( $assetInfo );
+}
+
+#----------------------------------------------------------------------
+
 =head2 www_view ( session )
 
 Show the main Admin console wrapper
@@ -150,7 +240,7 @@ Show the main Admin console wrapper
 =cut
 
 sub www_view {
-    my ($self) = @_;
+    my ( $self ) = @_;
     my $session = $self->session;
     my ( $user, $url, $style ) = $session->quick(qw{ user url style });
 
