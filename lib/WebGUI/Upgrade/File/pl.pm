@@ -11,9 +11,12 @@ use Exporter qw(import);
 
 sub _runCode {
     eval sprintf <<'END_CODE', $_[0], $_[1];
-package WebGUI::Upgrade::File::pl::script;
+package
+    WebGUI::Upgrade::File::pl::script;
+use 5.010;
 use strict;
 use warnings;
+no warnings 'uninitialized';
 local @_;
 local $_;
 use WebGUI::Upgrade::File::pl qw(:script);
@@ -24,6 +27,7 @@ use namespace::clean;
 END_CODE
 }
 our @EXPORT_OK = qw(
+    quiet
     report
     done
     config
@@ -77,19 +81,53 @@ sub run {
     return (wantarray ? @res : $res[0]);
 }
 
+=head2 quiet
+
+Returns the value of the quiet flag.
+
+=cut
+
+sub quiet () {
+    return $quiet;
+}
+
+=head2 report ( $message )
+
+Outputs $message unless quiet mode has been enabled.
+
+=cut
+
 sub report {
     print @_ unless $quiet;
 }
 
+=head2 done
+
+Reports that the current step has been completed.
+
+=cut
+
 sub done () {
     print "Done.\n" unless $quiet;
 }
+
+=head2 config
+
+Returns the WebGUI::Config object for the site.
+
+=cut
 
 sub config () {
     require WebGUI::Config;
     $config ||= WebGUI::Config->new($configFile, 1);
     return $config;
 }
+
+=head2 session
+
+Returns a session for the site.
+
+=cut
 
 sub session () {
     return $session
@@ -101,6 +139,12 @@ sub session () {
     return $session;
 }
 
+=head2 dbh
+
+Returns a database handle for the site's database.
+
+=cut
+
 sub dbh () {
     return $dbh
         if $dbh;
@@ -108,6 +152,19 @@ sub dbh () {
     $dbh = WebGUI::Upgrade->dbhForConfig(config);
     return $dbh;
 }
+
+=head2 version_tag ( [ $name ] )
+
+If $name is specified, creates a new version tag with that name,
+sets it as the active version tag, and returns it
+
+If $name is not specified, returns the current working version tag,
+creating it if needed.
+
+The actual name of the version tag will automatically include a
+note specifying that it is an upgrade version tag.
+
+=cut
 
 sub version_tag {
     my $name = shift;
@@ -130,6 +187,14 @@ sub version_tag {
     return $versionTag;
 }
 
+=head2 rm_lib ( $module )
+
+Deletes the specified Perl module.  The module should be specified
+as a colon separated name, and it will be removed from all include
+paths.
+
+=cut
+
 sub rm_lib {
     my @modules = @_;
     for my $module (@modules) {
@@ -142,6 +207,14 @@ sub rm_lib {
     }
 }
 
+=head2 collateral
+
+Returns a Path::Class::Dir object for the upgrade script's collateral
+path.  The collateral path is the same as the name of the upgrade
+script with the extension stripped off.
+
+=cut
+
 sub collateral () {
     if (! $collateral) {
         (my $vol, my $dir, my $shortname) = File::Spec->splitpath($file);
@@ -151,6 +224,12 @@ sub collateral () {
     }
     return $collateral;
 }
+
+=head2 import_package ( $package_file )
+
+Imports the specified package from the upgrade script's collateral path.
+
+=cut
 
 sub import_package {
     my $fullPath = collateral->file(@_);
