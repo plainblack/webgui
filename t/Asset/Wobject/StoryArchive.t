@@ -419,12 +419,15 @@ $archive->update({storiesPerPage => 25});
 $templateVars = $archive->viewTemplateVariables('search');
 is($templateVars->{mode}, 'search', 'viewTemplateVariables mode == search');
 
+use Data::Dumper;
+diag Dumper $templateVars->{date_loop};
+
 cmp_bag(
     $templateVars->{date_loop},
     [
         {
             epochDate => ignore(),
-            story_loop => [
+            story_loop => bag(
                 {
                     creationDate => ignore(),
                     url          => ignore(),
@@ -439,7 +442,7 @@ cmp_bag(
                     editIcon     => ignore(),
                     deleteIcon   => ignore(),
                 },
-            ],
+            ),
         },
         {
             epochDate => $wgBdayMorn,
