@@ -1,4 +1,4 @@
-package WebGUI::Help::MapPoint;
+package WebGUI::Help::Asset_MapPoint;
 use strict;
 
 our $HELP = {
