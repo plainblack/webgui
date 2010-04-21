@@ -186,7 +186,7 @@ sub www_viewStatistics {
         # Get the latest WebGUI version
         my $url = "http://update.webgui.org/latest-version.txt";
 	my $cache = $session->cache;
-        my $value = $cache->compute( $url, sub { 
+        my $version = $cache->compute( $url, sub { 
             my $ua = LWP::UserAgent->new(
                 env_proxy       => 1,
                 agent           => "WebGUI/" . $WebGUI::VERSION,
