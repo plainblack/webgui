@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.8.18
+--------------------------------------------------------------------
+     * Starting with version 7.8.0, WebGUI has been using YUI 2.8.0r4.  This was noted in
+       the changelog, but not in this gotchas file like it has been in the past.  If you
+       have custom javascript that depends on YUI 2.7 and you were using WebGUI's install
+       of YUI to supply it, you can switch to pulling YUI2.7 directly from Yahoo.
+
 7.8.13
 --------------------------------------------------------------------
      * A new gotcha was not documented in the 7.8.11 release, the new required version
