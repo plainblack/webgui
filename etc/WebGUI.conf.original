@@ -110,7 +110,8 @@
 #
 "cache" : {
     "driver" : "FastMmap",
-    "expires_variance" : "0.10"
+    "expires_variance" : "0.10",
+    "root_dir" : "/tmp/WebGUICache"
 },
 
 # Sessions that are "hot", those that are not only not expired,
