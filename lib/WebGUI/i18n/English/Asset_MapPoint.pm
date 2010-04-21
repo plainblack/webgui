@@ -326,6 +326,24 @@ our $I18N = {
         context     => "template variable help",
     },
 
+    'map point asset template variables' => {
+        message     => "Map Point Asset Template Variables",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'latitude' => {
+        message     => "The latitude of the MapPoint",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'longitude' => {
+        message     => "The longitude of the MapPoint",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
 };
 
 1;
