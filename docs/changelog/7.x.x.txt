@@ -1,3 +1,5 @@
+7.9.4
+
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
  - added #11007: Added drag'n'drop sorting in Gallery Album Edit View (Bernd Kalbfuß-Zimmermann)
