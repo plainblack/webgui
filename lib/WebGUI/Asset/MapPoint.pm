@@ -304,6 +304,8 @@ sub getTemplateVarsEditForm {
     my $definition  = __PACKAGE__->definition($session)->[0]->{properties};
     for my $key ( keys %{$definition} ) {
         next if $definition->{$key}->{noFormPost};
+        next if $key eq 'latitude' 
+             || $key eq 'longitude';
         $definition->{$key}->{name}     = $key;
         $definition->{$key}->{value}    = $self->getValue($key);
         $var->{ "form_$key" } 
