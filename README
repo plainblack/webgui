@@ -1,5 +1,11 @@
 This is the PSGI branch of WebGUI8
 
+To try this out:
+
+ 1) Run testEnvironment.pl to install Plack
+ 2) $ cd <WebGUI directory>
+ 3) $ plackup app.psgi
+
 Currently, the best performance is achieved via:
 
  plackup -E none -s Starman --workers 10 --disable-keepalive
