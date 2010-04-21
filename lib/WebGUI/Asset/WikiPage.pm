@@ -309,35 +309,11 @@ sub getTemplateVars {
             $self->scrubContent,
             {skipTitles => [$self->get('title')]},
         ),	
-        isKeywordPage       => $self->isKeywordPage,
         isSubscribed        => $self->isSubscribed,
         subscribeUrl        => $self->getSubscribeUrl,
         unsubscribeUrl      => $self->getUnsubscribeUrl,
         owner               => $owner->get('alias'),
     };
-    my @keyword_pages = ();
-    if ($var->{isKeywordPage}) {
-        my $paginator = $keyObj->getMatchingAssets({
-            startAsset   => $self->getWiki,
-            keyword      => $self->get('title'),
-            usePaginator => 1,
-        });
-        PAGE: foreach my $assetId (@{ $paginator->getPageData }) {
-            next PAGE if $assetId->{assetId} eq $self->getId;
-            my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId->{assetId});
-            next PAGE unless $asset;
-            push @keyword_pages, {
-                title => $asset->getTitle,
-                url   => $asset->getUrl,
-            };
-        }
-        $paginator->appendTemplateVars($var);
-        @keyword_pages = map { $_->[1] }
-                         sort
-                         map { [ lc $_->{title}, $_ ] }
-                         @keyword_pages;
-    }
-    $var->{keyword_page_loop} = \@keyword_pages;
     return $var;
 }
 

@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 29; # increment this value for each test you create
+use Test::More tests => 17; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::WikiMaster;
 use WebGUI::Asset::WikiPage;
@@ -91,55 +91,3 @@ $comments = $wikipage->get('comments');
 is($comments->[0]{comment}, $secondComment, "you can delete a comment");
 is($wikipage->get('averageCommentRating'), 1, 'average rating is adjusted after deleting a comment');
 
-
-##################
-# This section tests hierarchical keywords support
-##################
-
-#
-## setup some more wiki pages
-my $properties = {
-    className=>'WebGUI::Asset::WikiPage',
-    content => 'Now is the time for all good men to come to the aid of their country',
-    title => 'Keyword',
-    keywords => 'keyword'
-};
-my $wikipage2 = $wiki->addChild($properties, @autoCommitCoda);
-isa_ok($wikipage2, 'WebGUI::Asset::WikiPage');
-
-$properties = {
-    className=>'WebGUI::Asset::WikiPage',
-    content => 'The quick brown fox jumps over the lazy dog.',
-    title => 'Fox',
-    keywords => 'keyword'
-};
-my $wikipage3 = $wiki->addChild($properties, @autoCommitCoda);
-isa_ok($wikipage3, 'WebGUI::Asset::WikiPage');
-
-# Test keywords support
-my $keywords = $wikipage2->get('keywords');
-is($keywords,$properties->{'keywords'}, 'Keywords match');
-
-# Test isKeywordPage()
-ok   $wikipage2->isKeywordPage(), "'".$wikipage2->get('title')."' is a keyword page";
-my $templateVars = $wikipage2->getTemplateVars;
-ok   $templateVars->{isKeywordPage}, 'isKeywordPage template var, true';
-cmp_deeply
-    $templateVars->{keyword_page_loop},
-    [
-        { title => 'Fox',     url => '/wikitest/fox', },
-    ],
-    'populated keyword_page_loop, sorted by title';
-ok ! $wikipage3->isKeywordPage(), "'".$wikipage3->get('title')."' is not a keyword page";
-$templateVars = $wikipage3->getTemplateVars;
-ok ! $templateVars->{isKeywordPage}, 'isKeywordPage template var, false';
-cmp_deeply $templateVars->{keyword_page_loop}, [], 'empty keyword_page_loop';
-
-$wikipage3->update({keywords => $wikipage3->get('keywords').',Fox'});
-ok $wikipage3->isKeywordPage(), "'".$wikipage3->get('title')."' is now a keyword page";
-$templateVars = $wikipage3->getTemplateVars;
-ok $templateVars->{isKeywordPage}, 'isKeywordPage template var, false';
-cmp_deeply
-    $templateVars->{keyword_page_loop},
-    [ ],
-    'empty keyword_page_loop, self is not put into the loop';

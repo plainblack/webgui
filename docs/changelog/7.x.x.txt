@@ -1,5 +1,6 @@
 7.9.4
  - fixed #11535: i18n - Asset_MapPoint - Tag form_fax - wrong text
+ - Implement hierarchial keywords differently.
 
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
