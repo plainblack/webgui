@@ -723,18 +723,18 @@ WebGUI.Admin.Tree.prototype.formatTitle
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML = '<span class="hasChildren">' 
         + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
-        + '</span> <a href="' + appendToUrl(oRecord.getData( 'url' ), 'op=assetManager;method=manage') + '">'
+        + '</span> <span class="clickable">'
         + oRecord.getData( 'title' )
-        + '</a>'
+        + '</span>'
         ;
 };
 
 WebGUI.Admin.Tree.prototype.goto
 = function ( assetUrl ) {
     var callback = {
-        success : this.dataTable.onDataReturnInitializeTable,
-        failure : this.dataTable.onDataReturnInitializeTable,
-        scope   : this.dataTable,
+        success : this.onDataReturnInitializeTable,
+        failure : this.onDataReturnInitializeTable,
+        scope   : this,
         argument: this.dataTable.getState()
     };
 
@@ -746,6 +746,16 @@ WebGUI.Admin.Tree.prototype.goto
         ),
         callback
     );
+};
+
+/**
+ * onDataReturnInitializeTable ( sRequest, oResponse, oPayload )
+ * Initialize the table with a new response from the server
+ */
+WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
+= function ( sRequest, oResponse, oPayload ) {
+    this.dataTable.onDataReturnInitializeTable.call( this.dataTable, sRequest, oResponse, oPayload );
+
 };
 
 /**

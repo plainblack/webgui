@@ -210,6 +210,7 @@ sub www_getTreeData {
             assetSize       => $asset->assetSize,
             lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
             actions         => $asset->canEdit && $asset->canEditIfLocked,
+            helpers         => $asset->getHelpers,
         );
 
         $fields{ className } = {};
@@ -225,6 +226,15 @@ sub www_getTreeData {
     $assetInfo->{ totalAssets   } = $p->getRowCount;
     $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
+    $assetInfo->{ currentAsset  } = { title => $asset->getTitle, helpers => $asset->getHelpers };
+
+    $assetInfo->{ crumbtrail    } = [];
+    for my $asset ( @{ $asset->getLineage( ['ancestors'], { returnObjects => 1 } ) } ) {
+        push @{ $assetInfo->{crumbtrail} }, {
+            title       => $asset->getTitle,
+            url         => $asset->getUrl
+        };
+    }
 
     $session->http->setMimeType( 'application/json' );
 
@@ -357,10 +367,9 @@ __DATA__
         <div class="yui-content">
             <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view" style="width: 100%; height: 80%"></iframe></div>
             <div id="treeTab">
-                <div id="treeDataTableContainer">
-                </div>
-                <div id="treePagination">
-                </div>
+                <div id="treeCrumbtrail"></div>
+                <div id="treeDataTableContainer"></div>
+                <div id="treePagination"></div>
             </div>
         </div>
     </div>

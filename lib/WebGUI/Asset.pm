@@ -1172,6 +1172,34 @@ sub getExtraHeadTags {
             ;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getHelpers ( )
+
+Get the AssetHelpers for this asset.
+
+=cut
+
+sub getHelpers {
+    my ( $self ) = @_;
+
+    my $default = [
+        { 
+            class   => 'WebGUI::AssetHelper::EditBranch',
+            label   => 'Edit Branch',
+        },
+        {
+            url     => $self->getUrl( 'func=edit' ),
+            label   => 'Edit',
+        },
+        {
+            url     => $self->getUrl( 'func=view' ),
+            label   => 'View',
+        },
+    ];
+
+    return $default;
+}
 
 #-------------------------------------------------------------------
 
