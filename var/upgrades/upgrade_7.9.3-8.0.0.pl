@@ -43,6 +43,7 @@ sub migrateToNewCache {
     $config->set("cache", {
         "driver"            => "FastMmap",
         "expires_variance"  => "0.10",
+        "root_dir"          => "/tmp/WebGUICache",
     });
     $config->set("hotSessionFlushToDb", 600);
     $config->delete("disableCache");
