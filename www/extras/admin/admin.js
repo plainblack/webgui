@@ -96,7 +96,7 @@ WebGUI.Admin.prototype.gotoAsset
     }
     else if ( this.currentTab == "tree" ) {
         // Make tree request
-        this.tree.goto( this.currentAssetDef.url );
+        this.tree.goto( url );
         this.viewDirty = 1;
     }
 };
@@ -453,7 +453,9 @@ WebGUI.Admin.Tree
                 { key: 'childCount' }
             ],
             metaFields: {
-                totalRecords: "totalAssets" // Access to value in the server response
+                totalRecords: "totalAssets", // Access to value in the server response
+                crumbtrail : "crumbtrail",
+                currentAsset : "currentAsset"
             }
         };
 
@@ -731,6 +733,7 @@ WebGUI.Admin.Tree.prototype.formatTitle
 
 WebGUI.Admin.Tree.prototype.goto
 = function ( assetUrl ) {
+    // TODO: Show loading screen
     var callback = {
         success : this.onDataReturnInitializeTable,
         failure : this.onDataReturnInitializeTable,
@@ -756,6 +759,32 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
 = function ( sRequest, oResponse, oPayload ) {
     this.dataTable.onDataReturnInitializeTable.call( this.dataTable, sRequest, oResponse, oPayload );
 
+    // Rebuild the crumbtrail
+    var crumb       = oResponse.meta.crumbtrail;
+    var elCrumb     = document.getElementById( "treeCrumbtrail" );
+    elCrumb.innerHTML  = '';
+    for ( var i = 0; i < crumb.length; i++ ) {
+        var item      = crumb[i];
+        var elItem    = document.createElement( "span" );
+        elItem.className = "clickable";
+        YAHOO.util.Event.addListener( elItem, "click", function(){ this.goto( item.url ) }, this, true );
+        elItem.appendChild( document.createTextNode( item.title ) );
+
+        elCrumb.appendChild( elItem );
+        elCrumb.appendChild( document.createTextNode( " > " ) );
+    }
+
+    // Final crumb item has a menu
+    var elItem  = document.createElement( "span" );
+    elItem.className    = "clickable";
+    YAHOO.util.Event.addListener( elItem, "click", function(){ alert( "TOADO" ) }, this, true );
+    elItem.appendChild( document.createTextNode( oResponse.meta.currentAsset.title ) );
+    elCrumb.appendChild( elItem );
+
+    // TODO: Update current asset
+    window.admin.navigate( oResponse.meta.currentAsset );
+
+    // TODO Hide loading screen
 };
 
 /**
