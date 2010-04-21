@@ -6,6 +6,7 @@
  - fixed #11530: account deactivation not working (United Knowledge)
  - fixed #11531: MapPoint property conflict
  - fixed #11532: MapPoint, no i18n
+ - fixed #11535: i18n - Asset_MapPoint - Tag form_fax - wrong text
 
 7.8.17
  - fixed #11507: Spectre Reports Wrong Workflow Count
