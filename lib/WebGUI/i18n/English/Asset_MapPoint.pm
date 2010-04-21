@@ -133,11 +133,199 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Description of asset property',
     },
+
     'assetName' => {
         message     => "MapPoint",
         lastUpdated => 0,
         context     => "Name of this asset",
     },
+
+    'edit template' => {
+        message     => "MapPoint Edit Point Template",
+        lastUpdated => 0,
+        context     => "template variable section title",
+    },
+
+    'form_header' => {
+        message     => "HTML code to start the edit form.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_footer' => {
+        message     => "HTML code to end the edit form.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_submit' => {
+        message     => "A button to submit the edit form.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_title' => {
+        message     => "A text form element for entering the title.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_synopsis' => {
+        message     => "A textarea form element for entering the synopsis.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_storageIdPhoto' => {
+        message     => "A file form element for uploading a photo relating to the map point.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'currentPhoto' => {
+        message     => "An image tag linking to any currently uploaded photo.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_website' => {
+        message     => "A text field for entering in a URL related to the map point.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_address1' => {
+        message     => "A text field for entering in one part of an address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_address2' => {
+        message     => "A text field for entering in another part of an address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_address3' => {
+        message     => "A text field for entering in the last past of an address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_city' => {
+        message     => "A text field for entering in city part of the address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_region' => {
+        message     => "A text field for entering in region, or state, part of the address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_zipCode' => {
+        message     => "A text field for entering in the zip code part of the address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_country' => {
+        message     => "A text field for entering in the country part of the address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_phone' => {
+        message     => "A text field for entering in a phone number.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_fax' => {
+        message     => "A text field for entering in a phone number.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_email' => {
+        message     => "A text field for entering in an email address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'storageIdPhoto' => {
+        message     => "The storage location for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'website' => {
+        message     => "The website for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'address1' => {
+        message     => "The first line of the address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'address2' => {
+        message     => "The second line of the address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'address3' => {
+        message     => "The third line of the address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'city' => {
+        message     => "The city for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'region' => {
+        message     => "The region, or state or province, for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'zipCode' => {
+        message     => "The zip code for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'country' => {
+        message     => "The country for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'phone' => {
+        message     => "The phone number for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'fax' => {
+        message     => "The fax number for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'email' => {
+        message     => "The email address for this MapPoint.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
 };
 
 1;
