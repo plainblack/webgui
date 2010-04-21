@@ -99,7 +99,7 @@ sub definition {
             label       => $i18n->get("city label"),
             hoverHelp   => $i18n->get("city description"),
         },
-        state => {
+        region => {
             tab         => "properties",
             fieldType   => "text",
             label       => $i18n->get("state label"),

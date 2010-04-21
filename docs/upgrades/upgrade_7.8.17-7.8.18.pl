@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+renameMapPointStateColumn( $session );
 
 finish($session); # this line required
 
@@ -43,6 +44,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub renameMapPointStateColumn {
+    my $session = shift;
+    print "\tRename the MapPoint column state to region... " unless $quiet;
+
+    $session->db->write('ALTER TABLE MapPoint CHANGE state region char(35)');
+
+    print "Done.\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
