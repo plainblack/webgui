@@ -273,6 +273,10 @@ sub www_view {
     $style->setLink( $url->extras('yui/build/button/assets/skins/sam/button.css'), {type=>"text/css",rel=>"stylesheet"});
     $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {type=>"text/css",rel=>"stylesheet"});
     $style->setLink( $url->extras('yui/build/tabview/assets/skins/sam/tabview.css'), {type=>"text/css",rel=>"stylesheet"});
+    $style->setLink( $url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink( $url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $style->setLink( $url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
     $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
@@ -280,10 +284,16 @@ sub www_view {
     $style->setScript($url->extras('accordion/accordion.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('admin/admin.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/element/element-min.js'), {type=>"text/javascript"});
+    $style->setScript( $url->extras( 'yui/build/paginator/paginator-min.js ' ) );
+    $style->setScript( $url->extras( 'yui/build/datasource/datasource-min.js ' ) );
+    $style->setScript( $url->extras( 'yui/build/datatable/datatable-min.js ' ) );
+    $style->setScript( $url->extras( 'yui/build/container/container-min.js' ) );
     $style->setScript($url->extras('yui/build/tabview/tabview-min.js'), {type=>"text/javascript"});
-    $style->setScript($url->extras('yui/build/container/container_core-min.js'), {type=>"text/javascript"});
     $style->setScript($url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
     $style->setScript($url->extras('yui/build/button/button-min.js'), {type=>"text/javascript"});
+
+    $style->setScript( $url->extras( 'yui/build/json/json-min.js' ) );
+    $style->setScript( $url->extras( 'yui-webgui/build/i18n/i18n.js' ) );
 
     # Use the template in our __DATA__ block
     my $tmpl    = WebGUI::Asset::Template::HTMLTemplate->new( $session );
@@ -346,7 +356,12 @@ __DATA__
         </div>
         <div class="yui-content">
             <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view" style="width: 100%; height: 80%"></iframe></div>
-            <div id="treeTab"><p>Tab Two Content</p></div>
+            <div id="treeTab">
+                <div id="treeDataTableContainer">
+                </div>
+                <div id="treePagination">
+                </div>
+            </div>
         </div>
     </div>
 

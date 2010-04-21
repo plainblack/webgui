@@ -53,7 +53,14 @@ sub handler {
         }
         else {
             my $admin   = WebGUI::Admin->new( $session );
-            return $admin->www_view;
+            my $method  = $session->form->get('method') || "view";
+
+            if ( $admin->can( "www_" . $method ) ) {
+                return $admin->can( "www_" . $method )->($admin);
+            }
+            else {
+                return $admin->www_view;
+            }
         }
     }
 

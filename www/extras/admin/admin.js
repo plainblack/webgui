@@ -7,11 +7,12 @@
 if ( typeof WebGUI == "undefined" ) {
     WebGUI = {};
 }
-WebGUI.Admin = function(){
+WebGUI.Admin = function(cfg){
     // Public properties
     this.cfg = cfg;
     this.currentAssetDef    = null;
-    this.viewOrTree         = 0; // 0 - Last on View tab. 1 - Last on Tree tab
+    this.currentTab         = "view"; // "view" or "tree" or other ID
+    this.treeDirty          = true;
 
     // Default configuration
     if ( !this.cfg.locationBarId ) {
@@ -21,13 +22,30 @@ WebGUI.Admin = function(){
         this.cfg.tabBarId = "tabBar";
     }
 
-    this.locationBar    = new WebGUI.Admin.LocationBar( this.cfg.locationBarId );
-    this.tabBar         = new YAHOO.widget.TabView( this.cfg.tabBarId );
-    // Keep track of View and Tree tabs
-    this.tabBar.getTab(0).addListener('click',this.afterShowViewTab,this,true);
-    this.tabBar.getTab(1).addListener('click',this.afterShowTreeTab,this,true);
-
     // Private methods
+    var self = this;
+    // Initialize these things AFTER the i18n is fetched
+    var _init = function () {
+        self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId );
+        self.tree           = new WebGUI.Admin.Tree();
+        self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
+        // Keep track of View and Tree tabs
+        self.tabBar.getTab(0).addListener('click',self.afterShowViewTab,self,true);
+        self.tabBar.getTab(1).addListener('click',self.afterShowTreeTab,self,true);
+    };
+
+    // Get I18N
+    this.i18n = new WebGUI.i18n( {
+        namespaces : {
+            'WebGUI' : [ '< prev', 'next >', 'locked by' ],
+            'Asset'  : [ 'rank', '99', 'type', 'revision date', 'size', 'locked', 'More', 'unlocked', 'edit' ]
+        },
+        onpreload : {
+            fn : _init
+        }
+    } );
+
+
 };
 
 /**
@@ -37,8 +55,12 @@ WebGUI.Admin = function(){
 WebGUI.Admin.prototype.afterShowTreeTab 
 = function () {
     // Refresh if necessary
+    if ( this.treeDirty ) {
+        this.tree.goto( this.currentAssetDef.url );
+        this.treeDirty = 0;
+    }
     // Update last shown view/tree
-    this.viewOrTree = 1;
+    this.currentTab = "tree";
 };
 
 /**
@@ -48,8 +70,12 @@ WebGUI.Admin.prototype.afterShowTreeTab
 WebGUI.Admin.prototype.afterShowViewTab
 = function () {
     // Refresh if necessary
+    if ( this.viewDirty ) {
+        window.frames[ "view" ].location.href = this.currentAssetDef.url;
+        this.viewDirty = 0;
+    }
     // Update last shown view/tree
-    this.viewOrTree = 0;
+    this.currentTab = "view";
 };
 
 /**
@@ -64,7 +90,15 @@ WebGUI.Admin.prototype.afterShowViewTab
  */
 WebGUI.Admin.prototype.gotoAsset
 = function ( url ) {
-    window.frames[ "view" ].location.href = url;
+    if ( this.currentTab == "view" ) {
+        window.frames[ "view" ].location.href = url;
+        this.treeDirty = 1;
+    }
+    else if ( this.currentTab == "tree" ) {
+        // Make tree request
+        this.tree.goto( this.currentAssetDef.url );
+        this.viewDirty = 1;
+    }
 };
 
 /**
@@ -78,11 +112,17 @@ WebGUI.Admin.prototype.navigate
     if ( this.currentAssetDef && this.currentAssetDef.assetId == assetDef.assetId ) {
         return;
     }
-    
+
+    // Defer until the locationBar is created
+    if ( !this.locationBar ) {
+        var self = this; // Scope correction
+        return setTimeout( function(){ self.navigate( assetDef ) }, 1000 );
+    }
+
     // Update the location bar
     this.locationBar.navigate( assetDef );
 
-    // Mark the other frame dirty
+    this.currentAssetDef = assetDef;
 };
 
 /****************************************************************************
@@ -373,266 +413,30 @@ WebGUI.Admin.LocationBar.prototype.swapForwardToBack
  * WebGUI.Admin.Tree
  */
 
-WebGUI.Admin.Tree = function(){
+WebGUI.Admin.Tree 
+= function(){
     this.moreMenusDisplayed = {};
     this.crumbMoreMenu = null;
-};
-
-/**
- * appendToUrl( url, params )
- * Add URL components to a URL;
- */
-WebGUI.Admin.Tree.prototype.appendToUrl = function ( url, params ) {
-    var components = [ url ];
-    if (url.match(/\?/)) {
-        components.push(";");
-    }
-    else {
-        components.push("?");
-    }
-    components.push(params);
-    return components.join(''); 
-};
-
-/**
- * addHighlightToRow ( child )
- * Highlight the row containing this element by adding to it the "highlight"
- * class
- */
-WebGUI.Admin.Tree.prototype.addHighlightToRow = function ( child ) {
-    var row     = this.findRow( child );
-    if ( !YAHOO.util.Dom.hasClass( row, "highlight" ) ) {
-        YAHOO.util.Dom.addClass( row, "highlight" );
-    }
-};
-
-/**
- * buildMoreMenu ( url, linkElement )
- * Build a WebGUI style "More" menu for the asset referred to by url
- */
-WebGUI.AssetManager.buildMoreMenu = function ( url, linkElement, isNotLocked ) {
-    var rawItems    = this.moreMenuItems;
-    var menuItems   = [];
-    var isLocked    = !isNotLocked;
-    for ( var i = 0; i < rawItems.length; i++ ) {
-        var itemUrl     = rawItems[i].url
-                        ? this.appendToUrl(url, rawItems[i].url)
-                        : url
-                        ;
-        if (! (itemUrl.match( /func=edit;/) && isLocked )) {
-            menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
-        }
-    }
-    var options = {
-        "zindex"                    : 1000,
-        "clicktohide"               : true,
-        "position"                  : "dynamic",
-        "context"                   : [ linkElement, "tl", "bl", ["beforeShow", "windowResize"] ],
-        "itemdata"                  : menuItems
+    this.defaultSortBy = {
+        "key"       : "lineage",
+        "dir"       : YAHOO.widget.DataTable.CLASS_ASC
     };
 
-    return options;
-};
-
-/**
- * findRow ( child )
- * Find the row that contains this child element.
- */
-WebGUI.Admin.Tree.prototype.findRow = function ( child ) {
-    var node    = child;
-    while ( node ) {
-        if ( node.tagName == "TR" ) {
-            return node;
-        }
-        node = node.parentNode;
-    }
-};
-
-/**
- * formatActions ( )
- * Format the Edit and More links for the row
- */
-WebGUI.AssetManager.formatActions = function ( elCell, oRecord, oColumn, orderNumber ) {
-    if ( oRecord.getData( 'actions' ) ) {
-        elCell.innerHTML 
-            = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">'
-            + WebGUI.AssetManager.i18n.get('Asset', 'edit') + '</a>'
-            + ' | '
-            ;
-    }
-    else {
-        elCell.innerHTML = "";
-    }
-    var more    = document.createElement( 'a' );
-    elCell.appendChild( more );
-    more.appendChild( document.createTextNode( WebGUI.AssetManager.i18n.get('Asset','More' ) ) );
-    more.href   = '#';
-
-    // Delete the old menu
-    if ( document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) ) ) {
-        var oldMenu = document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) );
-        oldMenu.parentNode.removeChild( oldMenu );
-    }
-
-    var options = WebGUI.AssetManager.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'actions' ));
-
-    var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
-    YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ); } );
-    YAHOO.util.Event.addListener( more, "click", function (e) { YAHOO.util.Event.stopEvent(e); menu.show(); menu.focus(); }, null, menu );
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.formatAssetIdCheckbox ( )
-    Format the checkbox for the asset ID.
-*/
-WebGUI.AssetManager.formatAssetIdCheckbox = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML = '<input type="checkbox" name="assetId" value="' + oRecord.getData("assetId") + '"'
-        + 'onchange="WebGUI.AssetManager.toggleHighlightForRow( this )" />';
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.formatAssetSize ( )
-    Format the asset class name
-*/
-WebGUI.AssetManager.formatAssetSize = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML = oRecord.getData( "assetSize" );
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.formatClassName ( )
-    Format the asset class name
-*/
-WebGUI.AssetManager.formatClassName = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML = '<img src="' + oRecord.getData( 'icon' ) + '" /> '
-        + oRecord.getData( "className" );
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.formatLockedBy ( )
-    Format the asset class name
-*/
-WebGUI.AssetManager.formatLockedBy = function ( elCell, oRecord, oColumn, orderNumber ) {
-    var extras  = getWebguiProperty('extrasURL');
-    elCell.innerHTML 
-        = oRecord.getData( 'lockedBy' )
-        ? '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/locked.gif" alt="' + WebGUI.AssetManager.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" '
-            + 'title="' + WebGUI.AssetManager.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
-            + '</a>'
-        : '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="' + WebGUI.AssetManager.i18n.get('Asset', 'unlocked') + '" '
-            + 'title="' + WebGUI.AssetManager.i18n.get('Asset', 'unlocked') +'" border="0" />'
-            + '</a>'
-        ;
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.formatRank ( )
-    Format the input for the rank box
-*/
-WebGUI.AssetManager.formatRank = function ( elCell, oRecord, oColumn, orderNumber ) {
-    var rank    = oRecord.getData("lineage").match(/[1-9][0-9]{0,5}$/); 
-    elCell.innerHTML = '<input type="text" name="' + oRecord.getData("assetId") + '_rank" '
-        + 'value="' + rank + '" size="3" '
-        + 'onchange="WebGUI.AssetManager.selectRow( this )" />';
-};
-
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.DefaultSortedBy ( )
-*/
-WebGUI.AssetManager.DefaultSortedBy = { 
-    "key"       : "lineage",
-    "dir"       : YAHOO.widget.DataTable.CLASS_ASC
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.BuildQueryString ( )
-*/
-WebGUI.AssetManager.BuildQueryString = function ( state, dt ) {
-    var query = "recordOffset=" + state.pagination.recordOffset 
-            + ';orderByDirection=' + ((state.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
-            + ';rowsPerPage=' + state.pagination.rowsPerPage
-            + ';orderByColumn=' + state.sortedBy.key
-            ;
-        return query;
-    };
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.formatRevisionDate ( )
-    Format the asset class name
-*/
-WebGUI.AssetManager.formatRevisionDate = function ( elCell, oRecord, oColumn, orderNumber ) {
-    var revisionDate    = new Date( oRecord.getData( "revisionDate" ) * 1000 );
-    var minutes = revisionDate.getMinutes();
-    if (minutes < 10) {
-        minutes = "0" + minutes;
-    }
-    elCell.innerHTML    = revisionDate.getFullYear() + '-' + ( revisionDate.getMonth() + 1 )
-                        + '-' + revisionDate.getDate() + ' ' + ( revisionDate.getHours() )
-                        + ':' + minutes
-                        ;
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.formatTitle ( )
-    Format the link for the title
-*/
-WebGUI.AssetManager.formatTitle = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML = '<span class="hasChildren">' 
-        + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
-        + '</span> <a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'op=assetManager;method=manage') + '">'
-        + oRecord.getData( 'title' )
-        + '</a>'
-        ;
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.initManager ( )
-    Initialize the i18n interface
-*/
-WebGUI.AssetManager.initManager = function (o) {
-    WebGUI.AssetManager.i18n
-    = new WebGUI.i18n( { 
-            namespaces  : {
-                'Asset' : [
-                    "edit",
-                    "More",
-                    "unlocked",
-                    "locked by"
-                ],
-                'WebGUI' : [
-                    "< prev",
-                    "next >"
-                ]
-            },
-            onpreload   : {
-                fn       : WebGUI.AssetManager.initDataTable
-            }
-        } );
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.initDataTable ( )
-    Initialize the www_manage page
-*/
-WebGUI.AssetManager.initDataTable = function (o) {
     var assetPaginator = new YAHOO.widget.Paginator({
-        containers            : ['pagination'],
+        containers            : ['treePagination'],
         pageLinks             : 7,
         rowsPerPage           : 100,
-        previousPageLinkLabel : WebGUI.AssetManager.i18n.get('WebGUI', '< prev'),
-        nextPageLinkLabel     : WebGUI.AssetManager.i18n.get('WebGUI', 'next >'),
+        previousPageLinkLabel : window.admin.i18n.get('WebGUI', '< prev'),
+        nextPageLinkLabel     : window.admin.i18n.get('WebGUI', 'next >'),
         template              : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
     });
 
-
    // initialize the data source
-   WebGUI.AssetManager.DataSource
-        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage;',{connTimeout:30000} );
-    WebGUI.AssetManager.DataSource.responseType
+   this.dataSource
+        = new YAHOO.util.DataSource( '?op=admin;method=getTreeData;', {connTimeout:30000} );
+   this.dataSource.responseType
         = YAHOO.util.DataSource.TYPE_JSON;
-    WebGUI.AssetManager.DataSource.responseSchema
+   this.dataSource.responseSchema
         = {
             resultsList: 'assets',
             fields: [
@@ -653,49 +457,319 @@ WebGUI.AssetManager.initDataTable = function (o) {
             }
         };
 
-
+    this.columnDefs 
+        = [ 
+            { key: 'assetId', label: 'Select All Button', formatter: this.formatAssetIdCheckbox },
+            { key: 'lineage', label: window.admin.i18n.get('Asset','rank'), sortable: true, formatter: this.formatRank },
+            { key: 'actions', label: "", formatter: this.formatActions },
+            { key: 'title', label: window.admin.i18n.get('Asset', '99'), formatter: this.formatTitle, sortable: true },
+            { key: 'className', label: window.admin.i18n.get('Asset','type'), sortable: true, formatter: this.formatClassName },
+            { key: 'revisionDate', label: window.admin.i18n.get('Asset','revision date' ), formatter: this.formatRevisionDate, sortable: true },
+            { key: 'assetSize', label: window.admin.i18n.get('Asset','size' ), formatter: this.formatAssetSize, sortable: true },
+            { key: 'lockedBy', label: window.admin.i18n.get('Asset','locked' ), formatter: this.formatLockedBy }
+        ];
 
     // Initialize the data table
-    WebGUI.AssetManager.DataTable 
-        = new YAHOO.widget.DataTable( 'dataTableContainer', 
-            WebGUI.AssetManager.ColumnDefs, 
-            WebGUI.AssetManager.DataSource, 
+    this.dataTable
+        = new YAHOO.widget.DataTable( 'treeDataTableContainer', 
+            this.columnDefs,
+            this.dataSource, 
             {
-                initialRequest          : 'recordOffset=0',
+                initialLoad             : false,
                 dynamicData             : true,
                 paginator               : assetPaginator,
-                sortedBy                : WebGUI.AssetManager.DefaultSortedBy,
-                generateRequest         : WebGUI.AssetManager.BuildQueryString
+                sortedBy                : this.defaultSortedBy,
+                generateRequest         : this.buildQueryString
             }
         );
+    // Save the Tree
+    this.dataTable.tree = this;
 
-    WebGUI.AssetManager.DataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
-        oPayload.totalRecords = oResponse.meta.totalRecords;
-        return oPayload;
-    };
+    this.dataTable.handleDataReturnPayload
+        = function(oRequest, oResponse, oPayload) {
+            oPayload.totalRecords = oResponse.meta.totalRecords;
+            return oPayload;
+        };
 
 };
 
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.removeHighlightFromRow ( child )
-    Remove the highlight from a row by removing the "highlight" class.
-*/
-WebGUI.AssetManager.removeHighlightFromRow = function ( child ) {
-    var row     = WebGUI.AssetManager.findRow( child );
+/**
+ * appendToUrl( url, params )
+ * Add URL components to a URL;
+ */
+appendToUrl 
+= function ( url, params ) {
+    var components = [ url ];
+    if (url.match(/\?/)) {
+        components.push(";");
+    }
+    else {
+        components.push("?");
+    }
+    components.push(params);
+    return components.join(''); 
+};
+
+/**
+ * addHighlightToRow ( child )
+ * Highlight the row containing this element by adding to it the "highlight"
+ * class
+ */
+WebGUI.Admin.Tree.prototype.addHighlightToRow 
+= function ( child ) {
+    var row     = this.findRow( child );
+    if ( !YAHOO.util.Dom.hasClass( row, "highlight" ) ) {
+        YAHOO.util.Dom.addClass( row, "highlight" );
+    }
+};
+
+/**
+ * buildMoreMenu ( url, linkElement )
+ * Build a WebGUI style "More" menu for the asset referred to by url
+ */
+WebGUI.Admin.Tree.prototype.buildMoreMenu 
+= function ( url, linkElement, isNotLocked ) {
+    var rawItems    = this.moreMenuItems;
+    var menuItems   = [];
+    var isLocked    = !isNotLocked;
+    for ( var i = 0; i < rawItems.length; i++ ) {
+        var itemUrl     = rawItems[i].url
+                        ? appendToUrl(url, rawItems[i].url)
+                        : url
+                        ;
+        if (! (itemUrl.match( /func=edit;/) && isLocked )) {
+            menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
+        }
+    }
+    var options = {
+        "zindex"                    : 1000,
+        "clicktohide"               : true,
+        "position"                  : "dynamic",
+        "context"                   : [ linkElement, "tl", "bl", ["beforeShow", "windowResize"] ],
+        "itemdata"                  : menuItems
+    };
+
+    return options;
+};
+
+/**
+ * buildQueryString ( )
+ * Build a query string
+ */
+WebGUI.Admin.Tree.prototype.buildQueryString 
+= function ( state, dt, newUrl ) {
+    var assetUrl;
+    if ( !newUrl ) {
+        assetUrl = window.admin.currentAssetDef.url;
+    }
+    else {
+        assetUrl = newUrl;
+    }
+
+    var recordOffset    = state.pagination ? state.pagination.recordOffset : 0;
+    var rowsPerPage     = state.pagination ? state.pagination.rowsPerPage : 0;
+    var orderByColumn   = state.sortedBy ? state.sortedBy.key : "lineage";
+    var orderByDir      = state.sortedBy 
+                        ? ( (state.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC" )
+                        : "ASC"
+                        ;
+
+    var query = "assetUrl=" + assetUrl
+        + ";recordOffset=" + recordOffset
+        + ';orderByDirection=' + orderByDir
+        + ';rowsPerPage=' + rowsPerPage
+        + ';orderByColumn=' + orderByColumn
+        ;
+
+    return query;
+};
+
+/**
+ * findRow ( child )
+ * Find the row that contains this child element.
+ */
+WebGUI.Admin.Tree.prototype.findRow
+= function ( child ) {
+    var node    = child;
+    while ( node ) {
+        if ( node.tagName == "TR" ) {
+            return node;
+        }
+        node = node.parentNode;
+    }
+};
+
+/**
+ * formatActions ( )
+ * Format the Edit and More links for the row
+ */
+WebGUI.Admin.Tree.prototype.formatActions 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    if ( oRecord.getData( 'actions' ) ) {
+        elCell.innerHTML
+            = '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">'
+            + window.admin.i18n.get('Asset', 'edit') + '</a>'
+            + ' | '
+            ;
+    }
+    else {
+        elCell.innerHTML = "";
+    }
+    return; // TODO
+    var more    = document.createElement( 'a' );
+    elCell.appendChild( more );
+    more.appendChild( document.createTextNode( window.admin.i18n.get('Asset','More' ) ) );
+    more.href   = '#';
+
+    // Delete the old menu
+    if ( document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) ) ) {
+        var oldMenu = document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) );
+        oldMenu.parentNode.removeChild( oldMenu );
+    }
+
+    var options = this.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'actions' ));
+
+    var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
+    YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ); } );
+    YAHOO.util.Event.addListener( more, "click", function (e) { YAHOO.util.Event.stopEvent(e); menu.show(); menu.focus(); }, null, menu );
+};
+
+/**
+ * formatAssetIdCheckbox ( )
+ * Format the checkbox for the asset ID.
+ */
+WebGUI.Admin.Tree.prototype.formatAssetIdCheckbox
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<input type="checkbox" name="assetId" value="' + oRecord.getData("assetId") + '"'
+        + ' />';
+    // TODO: Add onchange handler to toggle checkbox
+};
+
+/**
+ * formatAssetSize ( )
+ * Format the asset class name
+ */
+WebGUI.Admin.Tree.prototype.formatAssetSize 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = oRecord.getData( "assetSize" );
+};
+
+/**
+ * formatClassName ( )
+ * Format the asset class name
+ */
+WebGUI.Admin.Tree.prototype.formatClassName 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<img src="' + oRecord.getData( 'icon' ) + '" /> '
+        + oRecord.getData( "className" );
+};
+
+/**
+ * formatLockedBy ( )
+ * Format the locked icon
+ */
+WebGUI.Admin.Tree.prototype.formatLockedBy 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var extras  = getWebguiProperty('extrasURL');
+    elCell.innerHTML 
+        = oRecord.getData( 'lockedBy' )
+        ? '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
+            + '<img src="' + extras + '/assetManager/locked.gif" alt="' + window.admin.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" '
+            + 'title="' + window.admin.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
+            + '</a>'
+        : '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
+            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="' + window.admin.i18n.get('Asset', 'unlocked') + '" '
+            + 'title="' + window.admin.i18n.get('Asset', 'unlocked') + '" border="0" />'
+            + '</a>'
+        ;
+};
+
+/**
+ * formatRank ( )
+ * Format the input for the rank box
+ */
+WebGUI.Admin.Tree.prototype.formatRank 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var rank    = oRecord.getData("lineage").match(/[1-9][0-9]{0,5}$/); 
+    elCell.innerHTML = '<input type="text" name="' + oRecord.getData("assetId") + '_rank" '
+        + 'value="' + rank + '" size="3" '
+        + '/>';
+    // TODO: Add onchange handler to select row
+};
+
+/**
+ * formatRevisionDate ( )
+ * Format the asset class name
+ */
+WebGUI.Admin.Tree.prototype.formatRevisionDate 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var revisionDate    = new Date( oRecord.getData( "revisionDate" ) * 1000 );
+    var minutes = revisionDate.getMinutes();
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    elCell.innerHTML
+        = revisionDate.getFullYear() + '-' + ( revisionDate.getMonth() + 1 )
+        + '-' + revisionDate.getDate() + ' ' + ( revisionDate.getHours() )
+        + ':' + minutes
+        ;
+};
+
+/**
+ * formatTitle ( )
+ * Format the link for the title
+ */
+WebGUI.Admin.Tree.prototype.formatTitle 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<span class="hasChildren">' 
+        + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
+        + '</span> <a href="' + appendToUrl(oRecord.getData( 'url' ), 'op=assetManager;method=manage') + '">'
+        + oRecord.getData( 'title' )
+        + '</a>'
+        ;
+};
+
+WebGUI.Admin.Tree.prototype.goto
+= function ( assetUrl ) {
+    var callback = {
+        success : this.dataTable.onDataReturnInitializeTable,
+        failure : this.dataTable.onDataReturnInitializeTable,
+        scope   : this.dataTable,
+        argument: this.dataTable.getState()
+    };
+
+    this.dataSource.sendRequest( 
+        this.buildQueryString( 
+            this.dataTable.getState(),
+            this.dataTable,
+            assetUrl
+        ),
+        callback
+    );
+};
+
+/**
+ * removeHighlightFromRow ( child )
+ * Remove the highlight from a row by removing the "highlight" class.
+ */
+WebGUI.Admin.Tree.prototype.removeHighlightFromRow
+= function ( child ) {
+    var row     = this.findRow( child );
     if ( YAHOO.util.Dom.hasClass( row, "highlight" ) ) {
         YAHOO.util.Dom.removeClass( row, "highlight" );
     }
 };
 
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.selectRow ( child )
-    Check the assetId checkbox in the row that contains the given child. 
-    Used when something in the row changes.
-*/
-WebGUI.AssetManager.selectRow = function ( child ) {
+/**
+ * selectRow ( child )
+ * Check the assetId checkbox in the row that contains the given child. 
+ * Used when something in the row changes.
+ */
+WebGUI.Admin.Tree.prototype.selectRow 
+= function ( child ) {
     // First find the row
-    var node    = WebGUI.AssetManager.findRow( child );
-    WebGUI.AssetManager.addHighlightToRow( child );
+    var node    = this.findRow( child );
+    this.addHighlightToRow( child );
 
     // Now find the assetId checkbox in the first element
     var inputs   = node.getElementsByTagName( "input" );
@@ -707,48 +781,49 @@ WebGUI.AssetManager.selectRow = function ( child ) {
     }
 };
 
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.showMoreMenu ( url, linkTextId )
-    Build a More menu for the last element of the Crumb trail
-*/
-WebGUI.AssetManager.showMoreMenu 
+/**
+ * showMoreMenu ( url, linkTextId )
+ * Build a More menu for the last element of the Crumb trail
+ */
+WebGUI.Admin.Tree.prototype.showMoreMenu 
 = function ( url, linkTextId, isNotLocked ) {
-
+    return; // TODO
     var menu;
-    if ( typeof WebGUI.AssetManager.CrumbMoreMenu == "undefined" ) {
+    if ( typeof this.crumbMoreMenu == "undefined" ) {
         var more    = document.getElementById(linkTextId);
-        var options = WebGUI.AssetManager.buildMoreMenu(url, more, isNotLocked);
+        var options = this.buildMoreMenu(url, more, isNotLocked);
         menu    = new YAHOO.widget.Menu( "crumbMoreMenu", options );
         menu.render( document.getElementById( 'assetManager' ) );
-        WebGUI.AssetManager.CrumbMoreMenu = menu;
+        this.crumbMoreMenu = menu;
     }
     else {
-        menu = WebGUI.AssetManager.CrumbMoreMenu;
+        menu = this.crumbMoreMenu;
     }
     menu.show();
     menu.focus();
 };
 
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.toggleHighlightForRow ( checkbox )
-    Toggle the highlight for the row based on the state of the checkbox
-*/
-WebGUI.AssetManager.toggleHighlightForRow = function ( checkbox ) {
+/**
+ * toggleHighlightForRow ( checkbox )
+ * Toggle the highlight for the row based on the state of the checkbox
+ */
+WebGUI.Admin.Tree.prototype.toggleHighlightForRow 
+= function ( checkbox ) {
     if ( checkbox.checked ) {
-        WebGUI.AssetManager.addHighlightToRow( checkbox );
+        this.addHighlightToRow( checkbox );
     }
     else {
-        WebGUI.AssetManager.removeHighlightFromRow( checkbox );
+        this.removeHighlightFromRow( checkbox );
     }
 };
 
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.toggleRow ( child )
-    Toggles the entire row by finding the checkbox and doing what needs to be
-    done.
-*/
-WebGUI.AssetManager.toggleRow = function ( child ) {
-    var row     = WebGUI.AssetManager.findRow( child );
+/**
+ * toggleRow ( child )
+ * Toggles the entire row by finding the checkbox and doing what needs to be
+ * done.
+ */
+WebGUI.Admin.Tree.prototype.toggleRow = function ( child ) {
+    var row     = this.findRow( child );
     
     // Find the checkbox
     var inputs  = row.getElementsByTagName( "input" );
@@ -758,7 +833,7 @@ WebGUI.AssetManager.toggleRow = function ( child ) {
                                 ? false
                                 : true
                                 ;
-            WebGUI.AssetManager.toggleHighlightForRow( inputs[i] );
+            this.toggleHighlightForRow( inputs[i] );
             break;
         }
     }
