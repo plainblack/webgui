@@ -59,7 +59,7 @@ sub end {
     my $self = shift;
     my $session = $self->session;
     my $id = $self->getId;
-    eval{$session->cache->delete(['session',$id])};
+    $session->cache->remove($id);
     $session->scratch->deleteAll;
     $session->db->write("delete from userSession where sessionId=?",[$id]);
     delete $session->{_user};
@@ -164,7 +164,7 @@ sub new {
 		$self->start(1);
 	}
     else { ##existing session requested
-        $self->{_var} = eval{$session->cache->get(['session',$sessionId])};
+        $self->{_var} = $session->cache->get($sessionId);
         unless ($self->{_var}{sessionId} eq $sessionId) {
             $self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=?",[$sessionId]);
         }
@@ -190,7 +190,7 @@ sub new {
             }
             else {
                 $self->{_var}{nextCacheFlush} = $time + $session->config->get("hotSessionFlushToDb");
-                eval{$session->cache->set(['session',$sessionId], $self->{_var}, $timeout)};
+                $session->cache->set($sessionId, $self->{_var}, $timeout);
             }
 			$self->session->{_sessionId} = $self->{_var}{sessionId};
             return $self;
@@ -252,7 +252,7 @@ sub start {
 		userId       => $userId
 	};
     $self->session->{_sessionId} = $sessionId;
-    eval{$session->cache->set(['session',$sessionId], $self->{_var}, $timeout)};
+    $session->cache->set($sessionId, $self->{_var}, $timeout);
     delete $self->{_var}{nextCacheFlush};
 	$session->db->setRow("userSession","sessionId",$self->{_var},$sessionId);
 	$self->{_sessionId} = $sessionId;
@@ -271,7 +271,7 @@ sub switchAdminOff {
     my $self = shift;
     $self->{_var}{adminOn} = 0;
     my $session = $self->session;
-    eval{$session->cache->set(['session',$self->getId], $self->{_var}, $session->setting->get('sessionTimeout'))};
+    $session->cache->set($self->getId, $self->{_var}, $session->setting->get('sessionTimeout'));
     delete $self->{_var}{nextCacheFlush};
     $session->db->setRow("userSession","sessionId", $self->{_var});
 }
@@ -288,7 +288,7 @@ sub switchAdminOn {
     my $self = shift;
     $self->{_var}{adminOn} = 1;
     my $session = $self->session;
-    eval{$session->cache->set(['session',$self->getId], $self->{_var}, $session->setting->get('sessionTimeout'))};
+    $session->cache->set($self->getId, $self->{_var}, $session->setting->get('sessionTimeout'));
     delete $self->{_var}{nextCacheFlush};
     $self->session->db->setRow("userSession","sessionId", $self->{_var});
 }

@@ -88,17 +88,30 @@
 
 #"webServerPort" : 80,
 
-# The cacheServers directive tells WebGUI how to connect to
-# memcached. If a "socket" is specified it will be used instead
-# of the host and port info, and this should be the
-# path to the unix socket that you started memcached with. "host"
-# and "port" are used to tell WebGUI how to connect to
-# memcached over TCP. And since this is an array you can specify
-# as many server connections as you have memcached servers
-
-"cacheServers" : [
-	{ "socket" : "/tmp/memcached.sock", "host" : "127.0.0.1", "port" : "11211" }
-],
+# The cache key defines the configuration of the caching mechanism.
+# Required keys:
+#   driver  -> one of "Memory", "DBI", "FastMmap", "Memcached"
+#               FastMmap is recommended for single-server sites
+#               Memcached is recommended for multi-server sites
+#
+# Optional keys:
+#   expires_variance    -> Define a percentage of variance in a cache item's 
+#                       expiration. This prevents "cache miss stampedes" where
+#                       many things will attempt to refresh the cache at once.
+#                       Set as a decimal percentage: "0.10" = 10% variance
+#   l1_cache    -> Define a Level 1 cache, a faster cache to use for commonly-
+#               accessed stuff. Uses the same format and keys as the top level.
+#               ex:
+#                   "l1_cache" : { 
+#                       "driver"  : "Memory"
+#                   },
+#   mirror_cache    -> Define a write-only mirror. Used to warm up a new cache
+#                   before switching over to it. Defined exactly like an l1_cache
+#
+"cache" : {
+    "driver" : "FastMmap",
+    "expires_variance" : "0.10"
+},
 
 # Sessions that are "hot", those that are not only not expired,
 # but that are currently active on the site are kept in memory

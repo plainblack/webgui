@@ -35,38 +35,44 @@ property snippet => (
 	hoverHelp       => ['snippet description','Asset_Snippet'],
     default         => undef,
 );
-around snippet => sub {
-    my $orig = shift;
+sub _trigger_snippet {
     my $self = shift;
-    if (@_ > 1) {
-        my $packed  = $_[0];
-        if ( $self->mimeType eq "text/html" ) {
-            HTML::Packer::minify( \$packed, {
-                remove_comments     => 1,
-                do_javascript       => "shrink",
-                do_stylesheet       => "minify",
-            } );
-        }
-        elsif ( $self->mimeType eq "text/css" ) {
-            CSS::Packer::minify( \$packed, {
-                compress            => 'minify',
-            });
-        }
-        elsif ( $self->mimeType eq 'text/javascript' ) {
-            JavaScript::Packer::minify( \$packed, {
-                compress            => "shrink",
-            });
-        }
-        $self->snippetPacked($packed);
+    my ($new, $old) = @_;
+    if ($new ne $old) {
+        $self->_clear_snippetPacked;
     }
-    $self->$orig(@_);
-};
-
+}
 property snippetPacked => (
     fieldType       => "hidden",
-    default         => undef,
     noFormPost      => 1,
+    lazy            => 1,
+    clearer         => '_clear_snippetPacked',
+    builder         => '_build_snippetPacked',
 );
+
+sub _build_snippetPacked {
+    my $self = shift;
+    my $snippet = $self->snippet;
+    if ( $self->mimeType eq "text/html" ) {
+        HTML::Packer::minify( \$snippet, {
+            remove_comments     => 1,
+            do_javascript       => "shrink",
+            do_stylesheet       => "minify",
+        } );
+    }
+    elsif ( $self->mimeType eq "text/css" ) {
+        CSS::Packer::minify( \$snippet, {
+            compress            => 'minify',
+        });
+    }
+    elsif ( $self->mimeType eq 'text/javascript' ) {
+        JavaScript::Packer::minify( \$snippet, {
+            compress            => "shrink",
+        });
+    }
+    $snippet;
+}
+
 property usePacked => (
     tab             => 'properties',
     fieldType       => 'yesNo',
@@ -165,30 +171,6 @@ sub exportGetUrlAsPath {
 
 #-------------------------------------------------------------------
 
-=head2 getCache ( $calledAsWebMethod )
-
-Overrides the base method to handle Snippet specific caching.
-
-=head3 $calledAsWebMethod
-
-If this is true, then change the cache key.
-
-=cut
-
-sub getCache {
-	my $self              = shift;
-	my $calledAsWebMethod = shift;
-    my $session           = $self->session;
-    my $cacheKey = "view_".$calledAsWebMethod.'_'.$self->getId;
-    if ($session->env->sslRequest) {
-        $cacheKey .= '_ssl';
-    }
-    my $cache = WebGUI::Cache->new($session, $cacheKey);
-    return $cache;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getToolbar ( )
 
 Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
@@ -229,10 +211,10 @@ override purgeCache => sub {
 	my $self = shift;
     my $cache = $self->session->cache;
 	eval {
-        $cache->delete("view__".$self->getId);
-        $cache->delete("view_1_".$self->getId);
-        $cache->delete("view__".$self->getId . '_ssl');
-        $cache->delete("view_1_".$self->getId . '_ssl');
+        $cache->remove("view__".$self->getId);
+        $cache->remove("view_1_".$self->getId);
+        $cache->remove("view__".$self->getId . '_ssl');
+        $cache->remove("view_1_".$self->getId . '_ssl');
     };
 	super();
 };
@@ -273,7 +255,7 @@ sub view {
         || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cacheKey = $self->getWwwCacheKey('view', $calledAsWebMethod);
     unless ($noCache) {
-        my $out = eval { $session->cache->get( $cacheKey )};
+        my $out = $session->cache->get( $cacheKey );
 		return $out if $out;
 	}
 	my $output = $self->usePacked
@@ -286,7 +268,7 @@ sub view {
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-        eval { $session->cache->set( $cacheKey, $output, $self->cacheTimeout) };
+        $session->cache->set( $cacheKey, $output, $self->cacheTimeout);
 	}
     return $output;
 }

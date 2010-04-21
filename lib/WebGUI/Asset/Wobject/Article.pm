@@ -290,7 +290,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 override purgeCache => sub {
 	my $self = shift;
-	eval{$self->session->cache->delete("view_".$self->getId)};
+	$self->session->cache->remove("view_".$self->getId);
 	super();
 };
 
@@ -322,7 +322,7 @@ sub view {
     my $cache = $self->session->cache;
 	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
-		my $out = eval{$cache->get($self->getViewCacheKey)};
+		my $out = $cache->get($self->getViewCacheKey);
 		return $out if $out;
 	}
 	my %var;
@@ -386,7 +386,7 @@ sub view {
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && !$self->session->form->process("overrideTemplateId") &&
             !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
-		eval{$cache->set($self->getViewCacheKey, $out, $self->cacheTimeout)};
+		$cache->set($self->getViewCacheKey, $out, $self->cacheTimeout);
 	}
        	return $out;
 }

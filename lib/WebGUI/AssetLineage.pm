@@ -89,6 +89,7 @@ sub addChild {
 	$session->db->commit;
 	$properties->{assetId}  = $id;
 	$properties->{parentId} = $self->getId;
+    $properties->{state}    = 'published';
 	my $temp = WebGUI::Asset->newByPropertyHashRef($session, $properties) || croak "Couldn't create a new $properties->{className} asset!";
 	my $newAsset = $temp->addRevision($properties, $now, $options); 
 	$self->updateHistory("added child ".$id);
@@ -152,7 +153,7 @@ sub cascadeLineage {
         [$newLineage, length($oldLineage) + 1, $oldLineage . '%']
     );
     if ($records > 20) {
-        eval{$self->session->cache->flush};
+        $self->session->cache->clear;
     }
     else {
         my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage . '%']);

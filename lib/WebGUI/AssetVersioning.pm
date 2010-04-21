@@ -110,7 +110,7 @@ sub addRevision {
             $workingTag = WebGUI::VersionTag->getWorking( $session );
         }
         else {
-            my $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
+            $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
             $workingTag = WebGUI::VersionTag->new( $session, $parentAsset->tagId );
             $workingTag->setWorking();
         }
@@ -456,7 +456,7 @@ Sets a flag so that developers know whether to send notifications out on certain
 sub setSkipNotification {
 	my $self = shift;
 	$self->session->db->write("update assetData set skipNotification=1 where assetId=? and revisionDate=?", [$self->getId, $self->get("revisionDate")]);
-    $self->{_properties}->{skipNotification} = 1;
+    $self->skipNotification(1);
 }
 
 #-------------------------------------------------------------------

@@ -224,7 +224,7 @@ sub view {
     my $cache = $session->cache;
     my $cacheKey = $self->getWwwCacheKey('view');
     if (!$session->var->isAdminOn && $self->cacheTimeout > 10) {
-        my $out = eval { $cache->get( $cacheKey ) };
+        my $out = $cache->get( $cacheKey );
 		return $out if $out;
 	}
 	my %var = %{$self->get};
@@ -247,7 +247,7 @@ sub view {
     $var{parameters} .= sprintf("id=%s", $self->getId);
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$session->var->isAdminOn && $self->cacheTimeout > 10) {
-        eval{ $cache->set( $cacheKey, $out, $self->get("cacheTimeout") ) };
+        $cache->set( $cacheKey, $out, $self->get("cacheTimeout") );
     }
     return $out;
 }

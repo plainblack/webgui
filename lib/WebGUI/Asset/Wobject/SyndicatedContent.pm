@@ -115,23 +115,36 @@ Combines all feeds into a single XML::FeedPP object.
 sub generateFeed {
 	my $self = shift;
     my $limit = shift || $self->maxHeadlines;
+    my $session = $self->session;
+    my ( $log, $cache ) = $session->quick(qw( log cache ));
 	my $feed = XML::FeedPP::Atom->new();
-	my $log = $self->session->log;
 
 	# build one feed out of many
     my $newlyCached = 0;
-	my $cache = $self->session->cache;
 	foreach my $url (split(/\s+/, $self->rssUrl)) {
 		$log->info("Processing FEED: ".$url);
 		$url =~ s/^feed:/http:/;
 		if ($self->processMacroInRssUrl) {
 			WebGUI::Macro::process($self->session, \$url);
 		}
-		my $value = eval{$cache->get($url)};
-		unless ($value) {
-            $value = eval{$cache->setByHttp($url, $self->cacheTimeout)};
-            $newlyCached = 1;
-        }
+
+            my $value = $cache->compute( $url, sub { 
+                my $ua = LWP::UserAgent->new(
+                    env_proxy       => 1,
+                    agent           => "WebGUI/" . $WebGUI::VERSION,
+                    timeout         => 30,
+                );
+
+                my $r = $ua->get( $url );
+                if ( $r->is_error ) {
+                    $session->log->warn( "Could not get syndicated content from '$url': " . $r->status_line );
+                }
+                else {
+                    $newlyCached = 1;
+                    return $r->decoded_content;
+                }
+            }, $self->cacheTimeout );
+
         # if the content can be downgraded, it is either valid latin1 or didn't have
         # an HTTP Content-Encoding header.  In the second case, XML::FeedPP will take
         # care of any encoding specified in the XML prolog
@@ -142,7 +155,7 @@ sub generateFeed {
             $feed->merge_item($singleFeed);
         };
         if ($@) {
-            $log->error("Syndicated Content asset (".$self->getId.") has a bad feed URL (".$url."). Failed with ".$@);
+            $log->warn("Syndicated Content asset (".$self->getId.") has a bad feed URL (".$url."). Failed with ".$@);
         }
 	}
 
@@ -159,7 +172,7 @@ sub generateFeed {
         }
 	}
 
-    my %seen = {};
+    my %seen = ();
     my @items = $feed->get_item;
     $feed->clear_item;
     ITEM: foreach my $item (@items) {
@@ -306,7 +319,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 override purgeCache => sub {
 	my $self = shift;
-    eval{$self->session->cache->delete("view_".$self->getId)};
+    $self->session->cache->remove("view_".$self->getId);
 	super();
 };
 
@@ -324,7 +337,7 @@ sub view {
 
 	# try the cached version
 	my $cache = $session->cache; 
-	my $out = eval{$cache->get("view_".$self->getId)};
+	my $out = $cache->get("view_".$self->getId);
 	return $out if ($out ne "" && !$session->var->isAdminOn);
     #return $out if $out;
 
@@ -332,7 +345,7 @@ sub view {
 	my $feed = $self->generateFeed;
 	$out = $self->processTemplate($self->getTemplateVariables($feed),undef,$self->{_viewTemplate});
 	if (!$session->var->isAdminOn && $self->cacheTimeout > 10) {
-		eval{$cache->set("view_".$self->getId, $out, $self->cacheTimeout)};
+		$cache->set("view_".$self->getId, $out, $self->cacheTimeout);
 	}
 	return $out;
 }

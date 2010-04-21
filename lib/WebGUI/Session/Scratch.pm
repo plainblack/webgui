@@ -66,7 +66,7 @@ sub delete {
 	my $value = delete $self->{_data}{$name};
     my $session = $self->session;
     my $id = $session->getId;
-    eval{$session->cache->set(["sessionscratch",$id], $self->{_data}, $session->setting->get('sessionTimeout'))};
+    $session->cache->set("sessionscratch_".$id, $self->{_data}, $session->setting->get('sessionTimeout'));
 	$session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $id]);
 	return $value;
 }
@@ -85,7 +85,7 @@ sub deleteAll {
 	delete $self->{_data};
     my $session = $self->session;
     my $id = $session->getId;
-    eval{$session->cache->delete(["sessionscratch",$id])};
+    $session->cache->remove("sessionscratch_".$id);
 	$session->db->write("delete from userSessionScratch where sessionId=?", [$id]);
 }
 
@@ -108,7 +108,7 @@ sub deleteName {
 	return undef unless ($name);	
 	delete $self->{_data}{$name};
     my $session = $self->session;
-    eval{$session->cache->flush};
+    $session->cache->clear;
 	$session->db->write("delete from userSessionScratch where name=?", [$name]);
 }
 
@@ -135,7 +135,7 @@ sub deleteNameByValue {
 	return undef unless ($name and defined $value);
 	delete $self->{_data}{$name} if ($self->{_data}{$name} eq $value);
     my $session = $self->session;
-    eval{$session->cache->flush};
+    $session->cache->clear;
 	$session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
 
@@ -186,7 +186,7 @@ sub new {
     my ($class, $session) = @_;
     my $self = bless { _session => $session }, $class;
     weaken $self->{_session};
-    my $scratch = eval{$session->cache->get(["sessionscratch",$session->getId])};
+    my $scratch = $session->cache->get("sessionscratch_".$session->getId);
     unless (ref $scratch eq "HASH") {
 	    $scratch = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId], {noOrder => 1});
     }
@@ -242,7 +242,7 @@ sub set {
 	$self->{_data}{$name} = $value;
     my $session = $self->session;
     my $id = $session->getId;
-    eval{$session->cache->set(["sessionscratch",$id], $self->{_data}, $session->setting->get('sessionTimeout'))};
+    $session->cache->set("sessionscratch_".$id, $self->{_data}, $session->setting->get('sessionTimeout'));
 	$session->db->write("replace into userSessionScratch (sessionId, name, value) values (?,?,?)", [$id, $name, $value]);
 }
 

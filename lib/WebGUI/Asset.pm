@@ -261,6 +261,12 @@ property  tagId => (
             fieldType       => 'guid',
             default         => 0,
           );
+property  skipNotification => (
+             autoGenerate    => 0,
+             noFormPost      => 1,
+             fieldType       => 'yesNo',
+          );
+
 has       session => (
             is              => 'ro',
             required        => 1,
@@ -344,7 +350,7 @@ around BUILDARGS => sub {
         }
     }
 
-    my $properties = eval{$session->cache->get(["asset",$assetId,$revisionDate])};
+    my $properties = $session->cache->get("asset".$assetId.$revisionDate);
     unless (exists $properties->{assetId}) { # can we get it from cache?
         my $sql = "select * from asset";
         my $where = " where asset.assetId=?";
@@ -362,7 +368,7 @@ around BUILDARGS => sub {
             $session->errorHandler->error("Asset $assetId $className $revisionDate is missing properties. Consult your database tables for corruption. ");
             return undef;
         }
-        eval{ $session->cache->set(["asset",$assetId,$revisionDate], $properties, 60*60*24) };
+        $session->cache->set("asset".$assetId.$revisionDate, $properties, 60*60*24);
     }
 
     if (defined $properties) {
@@ -1166,6 +1172,34 @@ sub getExtraHeadTags {
             ;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getHelpers ( )
+
+Get the AssetHelpers for this asset.
+
+=cut
+
+sub getHelpers {
+    my ( $self ) = @_;
+
+    my $default = [
+        { 
+            class   => 'WebGUI::AssetHelper::EditBranch',
+            label   => 'Edit Branch',
+        },
+        {
+            url     => $self->getUrl( 'func=edit' ),
+            label   => 'Edit',
+        },
+        {
+            url     => $self->getUrl( 'func=view' ),
+            label   => 'View',
+        },
+    ];
+
+    return $default;
+}
 
 #-------------------------------------------------------------------
 
@@ -2305,7 +2339,7 @@ sub publish {
 	my $stateList = $self->session->db->quoteAndJoin($statesToPublish);
 	my $where = ($statesToPublish) ? "and state in (".$stateList.")" : "";
 	
-	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%')." $where");
+	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->lineage.'%')." $where");
         my $idList = $self->session->db->quoteAndJoin($assetIds);
         
 	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".time()." where assetId in (".$idList.")");
@@ -2343,7 +2377,7 @@ sub purgeCache {
 	$stow->delete('assetLineage');
 	$stow->delete('assetClass');
 	$stow->delete('assetRevision');
-    eval{$self->session->cache->delete(["asset",$self->getId,$self->get("revisionDate")])};
+    $self->session->cache->remove("asset".$self->getId.$self->revisionDate);
 }
 
 

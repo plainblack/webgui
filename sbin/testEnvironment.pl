@@ -150,6 +150,8 @@ checkModule("Business::PayPal::API",        "0.62"       );
 checkModule("Locales",                      "0.10"       );
 checkModule("Test::Harness",                "3.17"       );
 checkModule("DateTime::Event::ICal",        "0.10"       );
+checkModule( "CHI",                                      );
+checkModule( "Cache::FastMmap",                          );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

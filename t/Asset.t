@@ -21,7 +21,7 @@ use Test::Deep;
 use Test::Exception;
 use WebGUI::Exception;
 
-plan tests => 62;
+plan tests => 65;
 
 my $session = WebGUI::Test->session;
 
@@ -157,6 +157,29 @@ my $session = WebGUI::Test->session;
     $asset = WebGUI::Asset->new($session, 'PBasset000000000000001');
     isa_ok $asset, 'WebGUI::Asset';
     is $asset->title, 'Root', 'got the right asset';
+}
+
+{
+    note "new (caching), purgeCache";
+    my $testId       = 'wg8TestAsset0000000001';
+    my $revisionDate = time();
+    $session->db->write("insert into asset (assetId) VALUES (?)", [$testId]);
+    $session->db->write("insert into assetData (assetId, revisionDate) VALUES (?,?)", [$testId, $revisionDate]);
+
+    my $datum;
+    $datum     = $session->cache->get("asset".$testId.$revisionDate);
+    is $datum, undef, 'no cache exists for the test assetId, yet';
+
+    my $testAsset = WebGUI::Asset->new($session, $testId, $revisionDate);
+    $datum     = $session->cache->get("asset".$testId.$revisionDate);
+    isnt $datum, undef, 'cache was created on new (from db)';
+
+    $testAsset->purgeCache();
+    $datum     = $session->cache->get("asset".$testId.$revisionDate);
+    is $datum, undef, 'purgeCache removes the cache entry';
+
+    $session->db->write("delete from asset where assetId=?", [$testId]);
+    $session->db->write("delete from assetData where assetId=?", [$testId]);
 }
 
 {
