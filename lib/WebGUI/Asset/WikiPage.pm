@@ -363,24 +363,6 @@ sub isProtected {
 
 #-------------------------------------------------------------------
 
-=head2 isKeywordPage
-
-Returns a boolean indicating whether or not the name of this WikiPage matches any keyword in the Wiki that
-contains it.
-
-=cut
-
-sub isKeywordPage {
-    my $self  = shift;
-    my $keywords = WebGUI::Keyword->new($self->session)->getMatchingAssets({
-        asset   => $self->getWiki,
-        keyword => $self->get('title'),
-    });
-    return scalar @{ $keywords };
-}
-
-#-------------------------------------------------------------------
-
 =head2 preparePageTemplate 
 
 This is essentially prepareView, but is smart and will only do the template
