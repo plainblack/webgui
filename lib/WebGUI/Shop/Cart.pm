@@ -776,7 +776,14 @@ sub www_view {
         my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
         return $session->style->userStyle($template->process(\%var));
     }
-    
+
+    # get the shipping address    
+    my $address          = eval { $self->getShippingAddress };
+    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
+        # choose another address cuz we've got a problem
+        $self->update({shippingAddressId=>''});
+    }
+
     # generate template variables for the items in the cart
     foreach my $item (@cartItems) {
         my $sku = $item->getSku;
@@ -794,9 +801,12 @@ sub www_view {
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
                 extras=>q|onclick="setCallbackForAddressChooser(this.form,'|.$item->getId.q|');"|}),
             );
-        my $address = eval {$item->getShippingAddress};
-        unless (WebGUI::Error->caught) {
-            $properties{shippingAddress} = $address->getHtmlFormatted;
+        my $itemAddress = eval {$item->getShippingAddress};
+        if ((!WebGUI::Error->caught) && $itemAddress && $address && $itemAddress->getId ne $address->getId) {
+            $properties{shippingAddress} = $itemAddress->getHtmlFormatted;
+        }
+        else {
+            $properties{shippingAddress} = '';
         }
 
         $taxDriver->appendCartItemVars( \%properties, $item );
@@ -828,21 +838,13 @@ sub www_view {
                                  ,
         );
 
-    # get the shipping address    
-    my $address          = eval { $self->getShippingAddress };
-    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
-        # choose another address cuz we've got a problem
-        $self->update({shippingAddressId=>''});
-        
-    }
-   
     # if there is no shipping address we can't check out
     if (WebGUI::Error->caught) {
        $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
     }
-    
+
     # if there is a shipping address calculate tax and shipping options
-    else {
+    if ($address) {
         $var{hasShippingAddress} = 1;
         $var{shippingAddress} = $address->getHtmlFormatted;
         my $ship = WebGUI::Shop::Ship->new($self->session);
