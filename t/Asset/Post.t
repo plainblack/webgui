@@ -19,7 +19,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 16; # increment this value for each test you create
+use Test::More tests => 17; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Post::Thread;
@@ -113,6 +113,7 @@ ok($post->canEdit(), "User in groupIdEditUserGroup group can edit post after the
 #
 ######################################################################
 
+can_ok($post, 'getSynopsisAndContent');
 my ($synopsis, $content) = $post->getSynopsisAndContent('', q|Brandheiße Neuigkeiten rund um's Klettern für euch aus der Region |);
 is($synopsis, q|Brandheiße Neuigkeiten rund um's Klettern für euch aus der Region |, 'getSynopsisAndContent: UTF8 characters okay');
 

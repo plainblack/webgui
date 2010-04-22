@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 17; # increment this value for each test you create
+use Test::More tests => 18; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::WikiMaster;
 use WebGUI::Asset::WikiPage;
@@ -91,3 +91,4 @@ $comments = $wikipage->get('comments');
 is($comments->[0]{comment}, $secondComment, "you can delete a comment");
 is($wikipage->get('averageCommentRating'), 1, 'average rating is adjusted after deleting a comment');
 
+can_ok($wikipage, 'getSynopsisAndContent');

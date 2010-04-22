@@ -32,7 +32,11 @@ use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::VersionTag;
-our @ISA = qw(WebGUI::Asset);
+use Class::C3;
+use base qw(
+   WebGUI::AssetAspect::AutoSynopsis
+   WebGUI::Asset 
+);
 
 #-------------------------------------------------------------------
 
@@ -86,7 +90,7 @@ sub addChild {
 		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
 		return undef;
 	}
-	return $self->SUPER::addChild($properties, @other);
+	return $self->next::method($properties, @other);
 }
 
 #-------------------------------------------------------------------
@@ -99,7 +103,7 @@ Override the default method in order to deal with attachments.
 
 sub addRevision {
         my $self = shift;
-        my $newSelf = $self->SUPER::addRevision(@_);
+        my $newSelf = $self->next::method(@_);
         if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
                 my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
                 $newSelf->update({storageId=>$newStorage->getId});
@@ -130,7 +134,7 @@ Extend the master class to make the default group 7.
 sub canAdd {
 	my $class = shift;
 	my $session = shift;
-	$class->SUPER::canAdd($session, undef, '7');
+	$class->next::method($session, undef, '7');
 }
 
 #-------------------------------------------------------------------
@@ -229,7 +233,7 @@ increment replies for the parent thread.
 
 sub commit {
 	my $self = shift;
-	$self->SUPER::commit;
+	$self->next::method;
     
     $self->notifySubscribers unless ($self->shouldSkipNotification);
            
@@ -259,7 +263,7 @@ sub cut {
     my $cs      = $thread->getParent;
 
     # Cut the asset
-    my $result = $self->SUPER::cut;
+    my $result = $self->next::method;
 
     # If a post is being cut update the thread reply count first
     if ($thread->getId ne $self->getId) {
@@ -347,7 +351,7 @@ sub definition {
         className=>'WebGUI::Asset::Post',
         properties=>$properties,
     });
-    return $class->SUPER::definition($session,$definition);
+    return $class->next::method($session,$definition);
 }
 
 
@@ -362,7 +366,7 @@ Extend the base method to delete the locally cached thread object.
 sub DESTROY {
 	my $self = shift;
 	$self->{_thread}->DESTROY if (exists $self->{_thread} && ref $self->{_thread} =~ /Thread/);
-	$self->SUPER::DESTROY;
+	$self->next::method;
 }
 
 
@@ -376,7 +380,7 @@ Extend the base class to handle storage locations.
 
 sub exportAssetData {
 	my $self = shift;
-	my $data = $self->SUPER::exportAssetData;
+	my $data = $self->next::method;
 	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
 	return $data;
 }
@@ -398,7 +402,7 @@ sub fixUrl {
 	my $url = shift;
 	$url =~ s/\./_/g;
 
-	$self->SUPER::fixUrl($url);
+	$self->next::method($url);
 }
 
 #-------------------------------------------------------------------
@@ -655,49 +659,6 @@ sub getStorageLocation {
 
 #-------------------------------------------------------------------
 
-=head2 getSynopsisAndContent ($synopsis, $body)
-
-Returns a synopsis taken from the body of the Post, based on either the separator
-macro, the first html paragraph, or the first physical line of text as defined by
-newlines.
-
-Returns both the synopsis, and the original body content.
-
-=head3 $synopsis
-
-If passed in, it returns that instead of the calculated synopsis.
-
-=head3 $body
-
-Body of the Post to use a source for the synopsis.
-
-=cut
-
-sub getSynopsisAndContent {
-	my $self = shift;
-	my $synopsis = shift;
-	my $body = shift;
-	unless ($synopsis) {
-           my @content;
-           if( $body =~ /\^\-\;/ ) {
-               my @pieces = WebGUI::HTML::splitSeparator($body);
-               $content[0] = shift @pieces;
-               $content[1] = join '', @pieces;
-           }
-           elsif( $body =~ /<p>/ ) {
-               @content = WebGUI::HTML::splitTag($body);
-           }
-           else {
-       	       @content = split("\n",$body);
-           }
-           shift @content if $content[0] =~ /^\s*$/;
-           $synopsis = WebGUI::HTML::filter($content[0],"all");
-	}
-	return ($synopsis,$body);
-}
-
-#-------------------------------------------------------------------
-
 =head2 getTemplateMetadataVars ( $var )
 
 Append metadata as template variables.
@@ -871,7 +832,7 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 
 sub indexContent {
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->next::method;
 	$indexer->addKeywords($self->get("content"));
 	$indexer->addKeywords($self->get("userDefined1"));
 	$indexer->addKeywords($self->get("userDefined2"));
@@ -1058,7 +1019,7 @@ Extends the master method to handle incrementing replies.
 sub paste {
     my $self = shift;
 
-    $self->SUPER::paste(@_);
+    $self->next::method(@_);
 
     # First, figure out what Thread we're under
     my $thread = $self->getLineage( [ qw{ self ancestors } ], {
@@ -1103,7 +1064,7 @@ non-sticky, locking and unlocking posts.  Calls postProcess when it is done.
 
 sub processPropertiesFromFormPost {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;	
+	$self->next::method;	
     my $session = $self->session;
     my $form    = $session->form;
 	my $i18n = WebGUI::International->new($session);
@@ -1184,15 +1145,6 @@ sub postProcess {
 
 #-------------------------------------------------------------------
 
-#sub publish {
-#	my $self = shift;
-#	$self->SUPER::publish(@_);
-#
-#	$self->getThread->sumReplies;
-#}
-
-#-------------------------------------------------------------------
-
 =head2 purge 
 
 Extend the base method to handle cleaning up storage locations.
@@ -1207,7 +1159,7 @@ sub purge {
                 $storage->delete if defined $storage;
         }
         $sth->finish;
-        return $self->SUPER::purge;
+        return $self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -1221,7 +1173,7 @@ Extend the base class to handle caching.
 sub purgeCache {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"view_".$self->getThread->getId)->delete if ($self->getThread);
-	$self->SUPER::purgeCache;
+	$self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -1235,7 +1187,7 @@ Extend the base method to handle deleting the storage location.
 sub purgeRevision {
     my $self = shift;
     $self->getStorageLocation->delete;
-    return $self->SUPER::purgeRevision;
+    return $self->next::method;
 }
 
 
@@ -1295,7 +1247,7 @@ the thread rating.
 
 sub restore {
     my $self = shift;
-    $self->SUPER::restore(@_);
+    $self->next::method(@_);
     $self->getThread->sumReplies;
     $self->getThread->updateThreadRating;
 }
@@ -1336,7 +1288,7 @@ sub setParent {
         my $self = shift;
         my $newParent = shift;
         return 0 unless ($newParent->get("className") eq "WebGUI::Asset::Post" || $newParent->get("className") eq "WebGUI::Asset::Post::Thread");
-        return $self->SUPER::setParent($newParent);
+        return $self->next::method($newParent);
 }
 
 
@@ -1379,7 +1331,7 @@ Moves post to the trash, updates reply counter on thread and recalculates the th
 
 sub trash {
     my $self = shift;
-    $self->SUPER::trash;
+    $self->next::method;
     $self->getThread->sumReplies if ($self->isReply);
     $self->getThread->updateThreadRating;
     if ($self->getThread->get("lastPostId") eq $self->getId) {
@@ -1414,7 +1366,7 @@ sub update {
         view => $self->get("groupIdView"),
         edit => $self->get("groupIdEdit")
     );
-    $self->SUPER::update({%$properties, isHidden => 1});
+    $self->next::method({%$properties, isHidden => 1});
     if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
     my $storage = $self->getStorageLocation;
         if (-d $storage->getPath) {
@@ -1433,7 +1385,7 @@ Extend the base method to also prepare the Thread containing this Post.
 
 sub prepareView {
 	my $self = shift;
-	$self->SUPER::prepareView;
+	$self->next::method;
 	unless ($self->getThread->getId eq $self->getId) {
 		# Need the unless to avoid infinite recursion.
 		$self->getThread->prepareView;
@@ -1801,7 +1753,7 @@ sub www_editSave {
             }
         }
     }
-    my $output = $self->SUPER::www_editSave();
+    my $output = $self->next::method();
     if ($currentTag) { # Go back to our original tag
         $currentTag->setWorking;
     }

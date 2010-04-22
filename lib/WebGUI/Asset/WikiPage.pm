@@ -15,6 +15,7 @@ use Class::C3;
 use base qw(
     WebGUI::AssetAspect::Subscribable
     WebGUI::AssetAspect::Comments 
+    WebGUI::AssetAspect::AutoSynopsis
     WebGUI::Asset
 );
 use Tie::IxHash;
@@ -420,6 +421,8 @@ sub processPropertiesFromFormPost {
         $properties->{isFeatured}  = $session->form->get("isFeatured");
     }
 
+    ($properties->{synopsis}) = $self->getSynopsisAndContent(undef, $self->get('content'));
+
 	$self->update($properties);
 
     # deal with attachments from the attachments form control
@@ -473,6 +476,7 @@ sub scrubContent {
         my $self = shift;
         my $content = shift || $self->get("content");
 
+        $content =~ s/\^-\;//g;
         my $scrubbedContent = WebGUI::HTML::filter($content, $self->getWiki->get("filterCode"));
 
         if ($self->getWiki->get("useContentFilter")) {
