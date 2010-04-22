@@ -22,6 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::WikiPage;
+use WebGUI::Exception;
 
 
 my $toVersion = '7.9.4';
@@ -31,6 +33,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addWikiSubKeywords($session);
+addSynopsistoEachWikiPage($session);
 
 finish($session); # this line required
 
@@ -43,6 +47,37 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub addWikiSubKeywords {
+    my $session = shift;
+    print "\tAdd the WikiMaster sub-keywords table... " unless $quiet;
+    # and here's our code
+    $session->db->write(<<EOSQL);
+CREATE TABLE IF NOT EXISTS WikiMasterKeywords (
+    assetId CHAR(22) binary not null primary key,
+    keyword CHAR(64),
+    subkeyword CHAR(64)
+)
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addSynopsistoEachWikiPage {
+    my $session = shift;
+    print "\tAdd a synopsis to each wiki page this may take a while... " unless $quiet;
+    my $pager = WebGUI::Asset::WikiPage->getIsa($session);
+    PAGE: while (1) {
+       my $page = eval {$pager->()};
+       next PAGE if Exception::Class->caught();
+       last PAGE unless $page;
+       my ($synopsis) = $page->getSynopsisAndContent(undef, $page->get('content'));
+       $page->update({synopsis => $synopsis});
+    }
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
