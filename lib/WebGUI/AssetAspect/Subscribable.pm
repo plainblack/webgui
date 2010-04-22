@@ -2,6 +2,7 @@ package WebGUI::AssetAspect::Subscribable;
 
 use strict;
 use Class::C3;
+use WebGUI::Mail::Send;
 use WebGUI::International;
 
 =head1 NAME
