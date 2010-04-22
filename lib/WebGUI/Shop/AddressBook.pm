@@ -287,14 +287,9 @@ sub newByUserId {
     }
     
     # check to see if this user or his session already has an address book
-    my @ids = $session->db->buildArray("select addressBookId from addressBook where (userId<>'1' and userId=?) or sessionId=?",[$session->user->userId, $session->getId]);
+    my @ids = $session->db->buildArray("select addressBookId from addressBook where userId=?",[$userId]);
     if (scalar(@ids) > 0) {
         my $book = $class->new($session, $ids[0]);
-        
-        # convert it to a specific user if we can
-        if ($userId ne '1') {
-            $book->update({userId => $userId, sessionId => ''});
-        }
         
         # merge others if needed
         if (scalar(@ids) > 1) {
@@ -331,10 +326,6 @@ A hash reference that contains one of the following:
 
 Assign the user that owns this address book.
 
-=head4 sessionId
-
-Assign the session, by id, that owns this address book. Will automatically be set to "" if a user owns it.
-
 =head4 defaultAddressId
 
 The id of the address to be made the default for this address book.
@@ -344,12 +335,8 @@ The id of the address to be made the default for this address book.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    foreach my $field (qw(userId sessionId defaultAddressId)) {
+    foreach my $field (qw(userId defaultAddressId)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
-    }
-    ##Having both a userId and sessionId will confuse create.
-    if ($properties{$id}{userId} ne "") {
-        $properties{$id}{sessionId} = "";
     }
     $self->session->db->setRow("addressBook","addressBookId",$properties{$id});
 }
