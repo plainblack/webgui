@@ -35,6 +35,8 @@ my $session = start(); # this line required
 # upgrade functions go here
 addWikiSubKeywords($session);
 addSynopsistoEachWikiPage($session);
+dropVisitorAddressBooks($session);
+alterAddressBookTable($session);
 
 finish($session); # this line required
 
@@ -79,6 +81,27 @@ sub addSynopsistoEachWikiPage {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub dropVisitorAddressBooks {
+    my $session = shift;
+    print "\tDrop AddressBooks owned by Visitor... " unless $quiet;
+    my $sth = $session->db->read(q|SELECT addressBookId FROM addressBook where userId='1'|);
+    BOOK: while (my ($addressBookId) = $sth->array) {
+        my $book = eval { WebGUI::Shop::AddressBook->new($session, $addressBookId); };
+        next BOOK if Exception::Class->caught();
+        $book->delete;
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub alterAddressBookTable {
+    my $session = shift;
+    print "\tDrop sessionId from the Address Book database table... " unless $quiet;
+    # and here's our code
+    $session->db->write("ALTER TABLE addressBook DROP COLUMN sessionId");
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

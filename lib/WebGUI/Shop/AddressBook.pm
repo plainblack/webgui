@@ -56,22 +56,31 @@ sub addAddress {
 
 #-------------------------------------------------------------------
 
-=head2 create ( session )
+=head2 create ( session, userId )
 
-Constructor. Creates a new address book for this user or session if no user is logged in.
+Constructor. Creates a new address book for this user.
 
 =head3 session
 
 A reference to the current session.
 
+=head3 userId
+
+The userId for the user.  Throws an exception if it is Visitor.  Defaults to the session
+user if omitted.
+
 =cut
 
 sub create {
-    my ($class, $session) = @_;
+    my ($class, $session, $userId) = @_;
     unless (defined $session && $session->isa("WebGUI::Session")) {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
-    my $id = $session->db->setRow("addressBook", "addressBookId", {addressBookId=>"new", userId=>$session->user->userId, sessionId=>$session->getId}); 
+    $userId ||= $session->user->userId;
+    if ($userId eq '1') {
+        WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
+    }
+    my $id = $session->db->setRow("addressBook", "addressBookId", {addressBookId=>"new", userId=>$userId}); 
     return $class->new($session, $id);
 }
 
@@ -252,22 +261,30 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 newBySession ( session )
+=head2 newByUserId ( session, userId )
 
-Constructor. Creates a new address book for this user if they don't have one. If the user is not logged in creates an address book attached to the session if there isn't one for the session. In any case returns a reference to the address book.
+Constructor. Creates a new address book for this user if they don't have one.  In any case returns a reference to the address book.
 
 =head3 session
 
 A reference to the current session.
 
+=head3 userId
+
+The userId for the user.  Throws an exception if it is Visitor.  Defaults to the session
+user if omitted.
+
 =cut
 
-sub newBySession {
-    my ($class, $session) = @_;
+sub newByUserId {
+    my ($class, $session, $userId) = @_;
     unless (defined $session && $session->isa("WebGUI::Session")) {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
-    my $userId = $session->user->userId;
+    $userId ||= $session->user->userId;
+    if ($userId eq '1') {
+        WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
+    }
     
     # check to see if this user or his session already has an address book
     my @ids = $session->db->buildArray("select addressBookId from addressBook where (userId<>'1' and userId=?) or sessionId=?",[$session->user->userId, $session->getId]);

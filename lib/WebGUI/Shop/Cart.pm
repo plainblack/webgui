@@ -263,7 +263,7 @@ sub getAddressBook {
     my $self = shift;
     my $id = id $self;
     unless (exists $addressBookCache{$id}) {
-        $addressBookCache{$id} = WebGUI::Shop::AddressBook->newBySession($self->session);
+        $addressBookCache{$id} = WebGUI::Shop::AddressBook->newByUserId($self->session);
     }    
     return $addressBookCache{$id};
 }
