@@ -785,6 +785,7 @@ sub www_view {
     }
 
     # generate template variables for the items in the cart
+    my $shippableItemsInCart = 0;
     foreach my $item (@cartItems) {
         my $sku = $item->getSku;
         $sku->applyOptions($item->get("options"));
@@ -800,6 +801,7 @@ sub www_view {
                extras=>q|onclick="this.form.method.value='removeItem';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("Special shipping"), }),
         );
+        $shippableItemsInCart ||= $properties{isShippable};
         my $itemAddress = eval {$item->getShippingAddress};
         if ((!WebGUI::Error->caught) && $itemAddress && $address && $itemAddress->getId ne $address->getId) {
             $properties{shippingAddress} = $itemAddress->getHtmlFormatted;
@@ -833,7 +835,8 @@ sub www_view {
                                  ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
                                  : 0
                                  ,
-        );
+        shippableItemsInCart    => $shippableItemsInCart,
+    );
 
     # if there is no shipping address we can't check out
 #    if (WebGUI::Error->caught) {
