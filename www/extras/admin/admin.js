@@ -103,7 +103,7 @@ WebGUI.Admin.prototype.gotoAsset
 
 /**
  * navigate( assetDef )
- * We've navigated to a new asset. Called by one of the iframes when a new 
+ * We've navigated to a new asset. Called by the view iframe when a new 
  * page is reached
  */
 WebGUI.Admin.prototype.navigate
@@ -122,7 +122,10 @@ WebGUI.Admin.prototype.navigate
     // Update the location bar
     this.locationBar.navigate( assetDef );
 
-    this.currentAssetDef = assetDef;
+    if ( !this.currentAssetDef || this.currentAssetDef.assetId != assetDef.assetId ) {
+        this.currentAssetDef = assetDef;
+        this.treeDirty = 1;
+    }
 };
 
 /****************************************************************************
@@ -676,11 +679,11 @@ WebGUI.Admin.Tree.prototype.formatLockedBy
     elCell.innerHTML 
         = oRecord.getData( 'lockedBy' )
         ? '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/locked.gif" alt="' + window.admin.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" '
+            + '<img src="' + extras + '/icon/lock.png" alt="' + window.admin.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" '
             + 'title="' + window.admin.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
             + '</a>'
         : '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="' + window.admin.i18n.get('Asset', 'unlocked') + '" '
+            + '<img src="' + extras + '/icon/lock_open.png" alt="' + window.admin.i18n.get('Asset', 'unlocked') + '" '
             + 'title="' + window.admin.i18n.get('Asset', 'unlocked') + '" border="0" />'
             + '</a>'
         ;
@@ -723,14 +726,27 @@ WebGUI.Admin.Tree.prototype.formatRevisionDate
  */
 WebGUI.Admin.Tree.prototype.formatTitle 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML = '<span class="hasChildren">' 
-        + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
-        + '</span> <span class="clickable">'
-        + oRecord.getData( 'title' )
-        + '</span>'
-        ;
+    var hasChildren = document.createElement("span");
+    hasChildren.className = "hasChildren";
+    if ( oRecord.getData('childCount') > 0 ) {
+        hasChildren.appendChild( document.createTextNode( "+" ) );
+    }
+    else {
+        hasChildren.appendChild( document.createTextNode( " " ) );
+    }
+    elCell.appendChild( hasChildren );
+
+    var title   = document.createElement("span");
+    title.className = "clickable";
+    title.appendChild( document.createTextNode( oRecord.getData('title') ) );
+    YAHOO.util.Event.addListener( title, "click", function(){ window.admin.gotoAsset(oRecord.getData('url')) }, this, true );
+    elCell.appendChild( title );
 };
 
+/**
+ * Update the tree with a new asset
+ * Do not call this directly, use Admin.gotoAsset(url)
+ */
 WebGUI.Admin.Tree.prototype.goto
 = function ( assetUrl ) {
     // TODO: Show loading screen
@@ -767,7 +783,7 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
         var item      = crumb[i];
         var elItem    = document.createElement( "span" );
         elItem.className = "clickable";
-        YAHOO.util.Event.addListener( elItem, "click", function(){ this.goto( item.url ) }, this, true );
+        YAHOO.util.Event.addListener( elItem, "click", function(){ window.admin.gotoAsset( item.url ) }, this, true );
         elItem.appendChild( document.createTextNode( item.title ) );
 
         elCrumb.appendChild( elItem );

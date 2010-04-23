@@ -92,6 +92,11 @@
     margin: 0; padding: 0;
 }
 
+.clickable {
+    cursor: pointer;
+    color: blue;
+}
+
 img.icon {
     vertical-align: baseline;
 }
