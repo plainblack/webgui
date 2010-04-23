@@ -201,12 +201,6 @@ our $I18N = {
 		context		=> q|a help description|,
 	},
 
-	'checkoutButton help' => {
-		message 	=> q|The button the user pushes to choose a payment method.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-
 	'continueShoppingButton help' => {
 		message 	=> q|Clicking this button will take the user back to the site.|,
 		lastUpdated	=> 0,
@@ -215,18 +209,6 @@ our $I18N = {
 
 	'updateButton help' => {
 		message 	=> q|Clicking this button will apply the changes you made to the cart and recalculate all the prices.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-
-	'chooseShippingButton help' => {
-		message 	=> q|Clicking this button will let the user pick a shipping address from the address book.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-
-	'shipToButton help' => {
-		message 	=> q|Does the same as the chooseShippingButton.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
@@ -974,6 +956,12 @@ our $I18N = {
 		message => q|Ship To|,
 		lastUpdated => 0,
 		context => q|a button the user clicks on to set shipping information|
+	},
+
+	'Special shipping' => { 
+		message => q|Special shipping|,
+		lastUpdated => 0,
+		context => q|a button the user clicks on to set shipping information on an item|
 	},
 
 	'shipping address' => { 

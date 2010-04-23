@@ -798,9 +798,8 @@ sub www_view {
             price                   => $self->formatCurrency($sku->getPrice),
             removeButton            => WebGUI::Form::submit($session, {value=>$i18n->get("remove button"),
                extras=>q|onclick="this.form.method.value='removeItem';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
-            shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-                extras=>q|onclick="setCallbackForAddressChooser(this.form,'|.$item->getId.q|');"|}),
-            );
+            shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("Special shipping"), }),
+        );
         my $itemAddress = eval {$item->getShippingAddress};
         if ((!WebGUI::Error->caught) && $itemAddress && $address && $itemAddress->getId ne $address->getId) {
             $properties{shippingAddress} = $itemAddress->getHtmlFormatted;
@@ -823,14 +822,12 @@ sub www_view {
             . WebGUI::Form::hidden($session, {name=>"callback", value=>""}),
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
-        checkoutButton          => WebGUI::Form::submit($session, {value=>$i18n->get("checkout button"), 
-            extras=>q|onclick="this.form.method.value='checkout';this.form.submit;" id="checkoutButton"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;" id="continueShoppingButton"|}),
-        chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
-            extras=>q|onclick="setCallbackForAddressChooser(this.form);" id="chooseAddressButton"|}),
-        shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-            extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
+#        chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
+#            extras=>q|onclick="setCallbackForAddressChooser(this.form);" id="chooseAddressButton"|}),
+#        shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
+#            extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
         minimumCartAmount       => $session->setting->get( 'shopCartCheckoutMinimum' ) > 0
                                  ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
@@ -839,51 +836,74 @@ sub www_view {
         );
 
     # if there is no shipping address we can't check out
-    if (WebGUI::Error->caught) {
-       $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
-    }
+#    if (WebGUI::Error->caught) {
+#       $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
+#    }
+#
+#    # if there is a shipping address calculate tax and shipping options
+#    if ($address) {
+#        $var{hasShippingAddress} = 1;
+#        $var{shippingAddress} = $address->getHtmlFormatted;
+#        my $ship = WebGUI::Shop::Ship->new($self->session);
+#        my $options = $ship->getOptions($self);
+#        my $numberOfOptions = scalar keys %{ $options };
+#        if ($numberOfOptions < 1) {
+#            $var{shippingOptions} = '';
+#            $var{shippingPrice}   = 0;
+#            $error{id $self}      = $i18n->get("No shipping plugins configured");
+#        }
+#        elsif ($numberOfOptions == 1) {
+#            my ($option) = keys %{ $options };
+#            $self->update({ shipperId => $option });
+#            $var{shippingPrice} = $options->{$self->get("shipperId")}->{price};
+#            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
+#        }
+#        else {
+#            tie my %formOptions, 'Tie::IxHash';
+#            $formOptions{''} = $i18n->get('Choose a shipping method');
+#            foreach my $option (keys %{$options}) {
+#                $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
+#            }
+#            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$self->get("shipperId")});
+#            if (!exists $options->{$self->get('shipperId')}) {
+#                $self->update({shipperId => ''});
+#            }
+#            if (my $shipperId = $self->get('shipperId')) {
+#                $var{shippingPrice} = $options->{$shipperId}->{price};
+#            }
+#            else {
+#                $var{shippingPrice} = 0;
+#                $error{id $self}    = ($i18n->get('Choose a shipping method and update the cart to checkout'));
+#            }
+#            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
+#        }
+#    }
+#  
+#    # Tax variables
+#    $var{tax} = $self->calculateTaxes;
 
-    # if there is a shipping address calculate tax and shipping options
-    if ($address) {
-        $var{hasShippingAddress} = 1;
-        $var{shippingAddress} = $address->getHtmlFormatted;
-        my $ship = WebGUI::Shop::Ship->new($self->session);
-        my $options = $ship->getOptions($self);
-        my $numberOfOptions = scalar keys %{ $options };
-        if ($numberOfOptions < 1) {
-            $var{shippingOptions} = '';
-            $var{shippingPrice}   = 0;
-            $error{id $self}      = $i18n->get("No shipping plugins configured");
-        }
-        elsif ($numberOfOptions == 1) {
-            my ($option) = keys %{ $options };
-            $self->update({ shipperId => $option });
-            $var{shippingPrice} = $options->{$self->get("shipperId")}->{price};
-            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
-        }
-        else {
-            tie my %formOptions, 'Tie::IxHash';
-            $formOptions{''} = $i18n->get('Choose a shipping method');
-            foreach my $option (keys %{$options}) {
-                $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
-            }
-            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$self->get("shipperId")});
-            if (!exists $options->{$self->get('shipperId')}) {
-                $self->update({shipperId => ''});
-            }
-            if (my $shipperId = $self->get('shipperId')) {
-                $var{shippingPrice} = $options->{$shipperId}->{price};
-            }
-            else {
-                $var{shippingPrice} = 0;
-                $error{id $self}    = ($i18n->get('Choose a shipping method and update the cart to checkout'));
-            }
-            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
-        }
+    #Address form variables
+    $var{userIsVisitor} = $session->user->isVisitor;
+    if ($var{userIsVisitor}) {
+        ##Make login form
+        #Form variable returnUrl
+        $var{loginFormHeader} = WebGUI::Form::formHeader($session, {action => $session->url->page})
+                              . WebGUI::Form::hidden($session,{ name => 'op',     value => 'auth'})
+                              . WebGUI::Form::hidden($session,{ name => 'method', value => 'login'})
+                              ;
+        $var{loginFormUsername} = WebGUI::Form::text($session, { name => 'username', size => 12, });
+        $var{loginFormPassword} = WebGUI::Form::password($session, { name => 'identifier', size => 12, });
+        $var{loginFormButton}   = WebGUI::Form::submit($session, { value => $i18n->get(52,'WebGUI'), });
+        $var{registerLink}      = $session->url->page('op=auth;method=createAccount');
+        $session->scratch->set('redirectAfterLogin', $session->url->page('shop=cart'));
+        $var{loginFormFooter}   = WebGUI::Form::formFooter($session)
     }
-  
-    # Tax variables
-    $var{tax} = $self->calculateTaxes;
+    else {
+        ##Address form variables
+        my $addressBook = $self->getAddressBook;
+        %var = (%var, $addressBook->getAddressFormVars('shipping', {}));
+        %var = (%var, $addressBook->getAddressFormVars('billing', {}));
+    }
 
     # POS variables
     $var{isCashier} = WebGUI::Shop::Admin->new($session)->isCashier;
@@ -895,7 +915,7 @@ sub www_view {
     $var{posUserId} = $posUser->userId;
 
     # calculate price adjusted for in-store credit
-    $var{totalPrice} = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
+    $var{totalPrice} = $var{subtotalPrice}; # + $var{shippingPrice} + $var{tax};
     my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
     $var{ inShopCreditAvailable } = $credit->getSum;
     $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});

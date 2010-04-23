@@ -144,11 +144,6 @@ our $HELP = {
 				required	=> 1,
 			},
 			{
-				name		=> "checkoutButton",
-				description	=> "checkoutButton help",
-				required	=> 1,
-			},
-			{
 				name		=> "updateButton",
 				description	=> "updateButton help",
 				required	=> 1,
@@ -156,15 +151,6 @@ our $HELP = {
 			{
 				name		=> "continueShoppingButton",
 				description	=> "continueShoppingButton help",
-			},
-			{
-				name		=> "chooseShippingButton",
-				description	=> "chooseShippingButton help",
-				required	=> 1,
-			},
-			{
-				name		=> "shipToButton",
-				description	=> "shipToButton help",
 			},
 			{
 				name		=> "subtotalPrice",
