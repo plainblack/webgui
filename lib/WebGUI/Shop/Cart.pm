@@ -901,8 +901,8 @@ sub www_view {
     else {
         ##Address form variables
         my $addressBook = $self->getAddressBook;
-        %var = (%var, $addressBook->getAddressFormVars('shipping', {}));
-        %var = (%var, $addressBook->getAddressFormVars('billing', {}));
+        $addressBook->appendAddressFormVars(\%var, 'shipping_', {});
+        $addressBook->appendAddressFormVars(\%var, 'billing_',  {});
     }
 
     # POS variables

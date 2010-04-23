@@ -56,6 +56,61 @@ sub addAddress {
 
 #-------------------------------------------------------------------
 
+=head2 appendAddressFormVars ( $var, $properties, $prefix )
+
+Add template variables for building a form to edit an address to an existing set of template variables.
+
+=head3 $var
+
+A hash ref of template variables.
+
+=head3 $properties
+
+A hash ref of properties to assign to as default to the form variables.
+
+=head3 $prefix
+
+An optional prefix to add to each variable name, and form name.
+
+=cut
+
+sub appendAddressFormVars {
+    my ($self, $var, $prefix, $properties ) = @_;
+    my $session   = $self->session;
+    $properties ||= {};
+    $prefix     ||= '';
+    $var        ||= {};
+    for ( qw{ address1 address2 address3 label firstName lastName city state organization } ) {
+        $var->{ $prefix . $_ . 'Field' } = WebGUI::Form::text( $session, {
+            name            => $prefix . $_, 
+            maxlength       => 35, 
+            defaultValue    => $properties->{ $_ }
+        } );
+    }
+    $var->{ $prefix . 'countryField' } = 
+        WebGUI::Form::country( $session,{
+            name            => $prefix . 'country', 
+            defaultValue    => $properties->{ country }
+        } );
+    $var->{ $prefix . 'codeField' } =
+        WebGUI::Form::zipcode( $session, {
+            name            => $prefix . 'code', 
+            defaultValue    => $properties->{ code }
+        } );
+    $var->{ $prefix . 'phoneNumberField' } =
+        WebGUI::Form::phone( $session, {
+            name            => $prefix . 'phoneNumber', 
+            defaultValue    => $properties->{ phoneNumber }
+        } );
+    $var->{ $prefix . 'emailField' } =
+        WebGUI::Form::email( $session, {
+            name            => $prefix . 'email', 
+            defaultValue    => $properties->{ email }
+        } );
+}
+
+#-------------------------------------------------------------------
+
 =head2 create ( session, userId )
 
 Constructor. Creates a new address book for this user.
@@ -181,58 +236,6 @@ sub getAddresses {
         push(@addressObjects, $self->getAddress($addressId));
     }
     return \@addressObjects;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getAddressFormVars ( $properties, $prefix )
-
-Return a hashref of template variables for building a form to edit an address.
-
-=head3 $properties
-
-A hash ref of properties to assign to as default to the form variables.
-
-=head3 $prefix
-
-An optional prefix to add to each variable name, and form name.
-
-=cut
-
-sub getAddressFormVars {
-    my ($self, $prefix, $properties ) = @_;
-    my $session   = $self->session;
-    $properties ||= {};
-    $prefix     ||= '';
-    my $var       = {};
-    for ( qw{ address1 address2 address3 label firstName lastName city state organization } ) {
-        $var->{ $prefix . $_ . 'Field' } = WebGUI::Form::text( $session, {
-            name            => $prefix . $_, 
-            maxlength       => 35, 
-            defaultValue    => $properties->{ $_ }
-        } );
-    }
-    $var->{ $prefix . 'countryField' } = 
-        WebGUI::Form::country( $session,{
-            name            => $prefix . 'country', 
-            defaultValue    => $properties->{ country }
-        } );
-    $var->{ $prefix . 'codeField' } =
-        WebGUI::Form::zipcode( $session, {
-            name            => $prefix . 'code', 
-            defaultValue    => $properties->{ code }
-        } );
-    $var->{ $prefix . 'phoneNumberField' } =
-        WebGUI::Form::phone( $session, {
-            name            => $prefix . 'phoneNumber', 
-            defaultValue    => $properties->{ phoneNumber }
-        } );
-    $var->{ $prefix . 'emailField' } =
-        WebGUI::Form::email( $session, {
-            name            => $prefix . 'email', 
-            defaultValue    => $properties->{ email }
-        } );
-    return $var;
 }
 
 #-------------------------------------------------------------------
