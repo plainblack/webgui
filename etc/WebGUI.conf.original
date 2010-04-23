@@ -976,6 +976,7 @@
     "WebGUI::Content::Account",
     "WebGUI::Content::AssetHistory",
     "WebGUI::Content::FilePump",
+    "WebGUI::Content::Wizard",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",

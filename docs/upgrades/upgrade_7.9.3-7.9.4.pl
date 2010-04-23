@@ -37,6 +37,7 @@ addWikiSubKeywords($session);
 addSynopsistoEachWikiPage($session);
 dropVisitorAddressBooks($session);
 alterAddressBookTable($session);
+addWizardHandler( $session );
 
 finish($session); # this line required
 
@@ -49,6 +50,27 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+
+sub addWizardHandler {
+    my ( $sesssion ) = @_;
+    print "\tAdding WebGUI::Wizard... " unless $quiet;
+
+    if ( !grep { $_ eq 'WebGUI::Content::Wizard' } @{$session->config->get('contentHandlers')} ) {
+        # Find the place of Operation and add before
+        my @handlers = ();
+        for my $handler ( @{$session->config->get('contentHandlers')} ) {
+            if ( $handler eq 'WebGUI::Content::Operation' ) {
+                push @handlers, 'WebGUI::Content::Wizard';
+            }
+            push @handlers, $handler;
+        }
+        $session->config->set('contentHandlers',\@handlers);
+    }
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addWikiSubKeywords {
