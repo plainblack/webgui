@@ -79,10 +79,37 @@ WebGUI.Admin.prototype.afterShowViewTab
 };
 
 /**
- * go( url )
- * Open the view tab and go to the given URL.
- * Should not be used for assets, use gotoAsset() instead
+ * appendToUrl( url, params )
+ * Add URL components to a URL;
  */
+appendToUrl 
+= function ( url, params ) {
+    var components = [ url ];
+    if (url.match(/\?/)) {
+        components.push(";");
+    }
+    else {
+        components.push("?");
+    }
+    components.push(params);
+    return components.join(''); 
+};
+
+/**
+ * editAsset( url )
+ * Show the edit form for the asset at the given URL
+ */
+WebGUI.Admin.prototype.editAsset
+= function ( url ) {
+    // Open the edit form
+    window.frames["view"].location.href = appendToUrl( url, "func=edit" );
+
+    // Mark undirty, as we'll clean it ourselves
+    this.viewDirty = 0;
+
+    // Show the view tab
+    this.tabBar.selectTab( 0 );
+};
 
 /**
  * gotoAsset( url )
@@ -99,6 +126,30 @@ WebGUI.Admin.prototype.gotoAsset
         this.tree.goto( url );
         this.viewDirty = 1;
     }
+};
+
+/**
+ * makeEditAsset( url ) 
+ * Create a callback to edit an asset. Use when attaching to event listeners
+ */
+WebGUI.Admin.prototype.makeEditAsset
+= function (url) {
+    var self = this;
+    return function() {
+        self.editAsset( url );
+    };
+};
+
+/**
+ * makeGotoAsset( url )
+ * Create a callback to view an asset. Use when attaching to event listeners
+ */
+WebGUI.Admin.prototype.makeGotoAsset
+= function ( url ) {
+    var self = this;
+    return function() {
+        self.gotoAsset( url );
+    };
 };
 
 /**
@@ -445,7 +496,7 @@ WebGUI.Admin.Tree
             fields: [
                 { key: 'assetId' },
                 { key: 'lineage' },
-                { key: 'actions' },
+                { key: 'canEdit' },
                 { key: 'title' },
                 { key: 'className' },
                 { key: 'revisionDate' },
@@ -496,23 +547,6 @@ WebGUI.Admin.Tree
             return oPayload;
         };
 
-};
-
-/**
- * appendToUrl( url, params )
- * Add URL components to a URL;
- */
-appendToUrl 
-= function ( url, params ) {
-    var components = [ url ];
-    if (url.match(/\?/)) {
-        components.push(";");
-    }
-    else {
-        components.push("?");
-    }
-    components.push(params);
-    return components.join(''); 
 };
 
 /**
@@ -610,16 +644,17 @@ WebGUI.Admin.Tree.prototype.findRow
  */
 WebGUI.Admin.Tree.prototype.formatActions 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
-    if ( oRecord.getData( 'actions' ) ) {
-        elCell.innerHTML
-            = '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">'
-            + window.admin.i18n.get('Asset', 'edit') + '</a>'
-            + ' | '
-            ;
+    if ( oRecord.getData( 'canEdit' ) ) {
+        var edit    = document.createElement("span");
+        edit.className = "clickable";
+        YAHOO.util.Event.addListener( edit, "click", function(){
+            window.admin.editAsset( oRecord.getData('url') );
+        }, window.admin, true );
+        edit.appendChild( document.createTextNode( window.admin.i18n.get('Asset', 'edit') ) );
+        elCell.appendChild( edit );
+        elCell.appendChild( document.createTextNode( " | " ) );
     }
-    else {
-        elCell.innerHTML = "";
-    }
+
     return; // TODO
     var more    = document.createElement( 'a' );
     elCell.appendChild( more );
@@ -632,7 +667,7 @@ WebGUI.Admin.Tree.prototype.formatActions
         oldMenu.parentNode.removeChild( oldMenu );
     }
 
-    var options = this.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'actions' ));
+    var options = this.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'canEdit' ));
 
     var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
     YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ); } );
@@ -783,7 +818,7 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
         var item      = crumb[i];
         var elItem    = document.createElement( "span" );
         elItem.className = "clickable";
-        YAHOO.util.Event.addListener( elItem, "click", function(){ window.admin.gotoAsset( item.url ) }, this, true );
+        YAHOO.util.Event.addListener( elItem, "click", window.admin.makeGotoAsset(item.url) );
         elItem.appendChild( document.createTextNode( item.title ) );
 
         elCrumb.appendChild( elItem );
@@ -879,7 +914,7 @@ WebGUI.Admin.Tree.prototype.toggleHighlightForRow
  */
 WebGUI.Admin.Tree.prototype.toggleRow = function ( child ) {
     var row     = this.findRow( child );
-    
+
     // Find the checkbox
     var inputs  = row.getElementsByTagName( "input" );
     for ( var i = 0; i < inputs.length; i++ ) {

@@ -209,7 +209,7 @@ sub www_getTreeData {
             childCount      => $asset->getChildCount,
             assetSize       => $asset->assetSize,
             lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
-            actions         => $asset->canEdit && $asset->canEditIfLocked,
+            canEdit         => $asset->canEdit && $asset->canEditIfLocked,
             helpers         => $asset->getHelpers,
         );
 
