@@ -9,7 +9,8 @@ builder {
         my $config = WebGUI::Config->new($config_file);
         my $psgi = $config->get('psgiFile') || WebGUI::Paths->defaultPSGI;
         my $app = do {
-            $ENV{WEBGUI_CONFIG} = $config_file;
+            # default psgi file uses environment variable to find config file
+            local $ENV{WEBGUI_CONFIG} = $config_file;
             Plack::Util::load_psgi($psgi);
         };
         $first_app ||= $app;
@@ -17,6 +18,8 @@ builder {
             mount "http://$sitename/" => $app;
         }
     }
+
+    # use the first config found as a fallback
     mount '/' => $first_app;
 };
 

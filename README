@@ -9,22 +9,25 @@ To try this out:
 Currently, the best performance is achieved via:
 
  plackup -E none -s Starman --workers 10 --disable-keepalive
- 
+
 You can benchmark your server via:
 
  ab -t 3 -c 10 -k http://dev.localhost.localdomain:5000/ | grep Req
- 
+
 I'm currently getting 370 requests/second, whereas I'm getting 430/second on the non-PSGI WebGUI8 branch.
 
 = ARCHITECTURE =
 
-* The .psgi file gets to set WEBGUI_ROOT and WEBGUI_CONFIG.
+* The root level app.psgi file loads all the config files found and
+  loads the site specific psgi file for each, linking them to the
+  proper host names.
+* The site psgi file uses the WEBGUI_CONFIG environment variable to find the config.
 * It instantiates the $wg WebGUI object (one per app).
 * $wg creates and stores the WebGUI::Config (one per app)
 * $wg creates the $app PSGI app code ref (one per app)
 * WebGUI::Middleware::Session is wrapped around $app at the outer-most layer so that it can open and
   close the $session WebGUI::Session. Any other wG middleware that needs $session should go in between
   it and $app ($session created one per request)
-* $session creates the $request WebGUI::Session::Request and $response WebGUI::Session::Response 
+* $session creates the $request WebGUI::Session::Request and $response WebGUI::Session::Response
   objects (one per request)
-  
+
