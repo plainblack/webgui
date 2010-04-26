@@ -36,6 +36,7 @@ my $session = start(); # this line required
 addWikiSubKeywords($session);
 addSynopsistoEachWikiPage($session);
 dropVisitorAddressBooks($session);
+alterCartTable($session);
 alterAddressBookTable($session);
 addWizardHandler( $session );
 
@@ -122,6 +123,15 @@ sub alterAddressBookTable {
     print "\tDrop sessionId from the Address Book database table... " unless $quiet;
     # and here's our code
     $session->db->write("ALTER TABLE addressBook DROP COLUMN sessionId");
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub alterCartTable {
+    my $session = shift;
+    print "\tAdd billing address column to the Cart table... " unless $quiet;
+    # and here's our code
+    $session->db->write("ALTER TABLE cart ADD COLUMN billingAddressId CHAR(22)");
     print "DONE!\n" unless $quiet;
 }
 

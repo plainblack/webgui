@@ -369,6 +369,51 @@ sub newByUserId {
 
 #-------------------------------------------------------------------
 
+=head2 processAddressForm ( $prefix )
+
+Process the current set of form variables for any belonging to the address book.  Returns
+a hash ref of address information.
+
+=head3 $prefix
+
+An optional prefix to be added to each form variable.
+
+=cut
+
+sub processAddressForm {
+    my ($self, $prefix) = @_;
+    $prefix  ||= '';
+    my $form   = $self->session->form;
+    my %addressData = (
+        label           => $form->get($prefix . "label"),
+        firstName       => $form->get($prefix . "firstName"),
+        lastName        => $form->get($prefix . "lastName"),
+        address1        => $form->get($prefix . "address1"),
+        address2        => $form->get($prefix . "address2"),
+        address3        => $form->get($prefix . "address3"),
+        city            => $form->get($prefix . "city"),
+        state           => $form->get($prefix . "state"),
+        code            => $form->get($prefix . "code",        "zipcode"),
+        country         => $form->get($prefix . "country",     "country"),
+        phoneNumber     => $form->get($prefix . "phoneNumber", "phone"),
+        email           => $form->get($prefix . "email",       "email"),
+        organization    => $form->get($prefix . "organization"),
+    );
+    my $i18n = WebGUI::International->new($self->session, "Shop");
+    foreach my $field (qw/label firstName lastName address1 city code country phoneNumber/) {
+        my $label = $field eq 'address1'    ? 'address'
+                  : $field eq 'phoneNumber' ? 'phone number'
+                  : $field
+                  ;
+        if ($addressData{$field} eq "") {
+            $addressData{error} = sprintf($i18n->get('is a required field'), $i18n->get($label));
+        }    
+    }
+    return %addressData;
+}
+
+#-------------------------------------------------------------------
+
 =head2 update ( properties )
 
 Sets properties in the addressBook
@@ -540,46 +585,10 @@ Saves the address. If there is a problem generates www_editAddress() with an err
 sub www_editAddressSave {
     my $self = shift;
     my $form = $self->session->form;
-    my $i18n = WebGUI::International->new($self->session,"Shop");
-    if ($form->get("label") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('label')));
-    }    
-    if ($form->get("firstName") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('firstName')));
-    }    
-    if ($form->get("lastName") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('lastName')));
-    }    
-    if ($form->get("address1") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('address')));
-    }    
-    if ($form->get("city") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('city')));
-    }    
-    if ($form->get("code") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('code')));
-    }    
-    if ($form->get("country") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('country')));
-    }    
-    if ($form->get("phoneNumber") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('phone number')));
-    }    
-    my %addressData = (
-        label           => $form->get("label"),
-        firstName       => $form->get("firstName"),
-        lastName        => $form->get("lastName"),
-        address1        => $form->get("address1"),
-        address2        => $form->get("address2"),
-        address3        => $form->get("address3"),
-        city            => $form->get("city"),
-        state           => $form->get("state"),
-        code            => $form->get("code","zipcode"),
-        country         => $form->get("country","country"),
-        phoneNumber     => $form->get("phoneNumber","phone"),
-        email           => $form->get("email","email"),
-        organization    => $form->get("organization"),
-        );
+    my %addressData = $self->processAddressForm();
+    if (exists $addressData{error}) {
+        return $self->www_editAddress($addressData{error});
+    }
     if ($form->get('addressId') eq '') {
         $self->addAddress(\%addressData);
     }

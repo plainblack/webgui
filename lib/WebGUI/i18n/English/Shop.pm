@@ -1731,6 +1731,24 @@ our $I18N = {
 		context => q|commerce setting help|
 	},
 
+	'Billing Address' => { 
+		message => q|Billing Address|,
+		lastUpdated => 0,
+		context => q|template label for the cart|
+	},
+
+	'Shipping Address' => { 
+		message => q|Shipping Address|,
+		lastUpdated => 0,
+		context => q|template label for the cart|
+	},
+
+	'use same shipping as billing' => { 
+		message => q|Use the same shipping address as billing address.|,
+		lastUpdated => 0,
+		context => q|template label for the cart|
+	},
+
 };
 
 1;

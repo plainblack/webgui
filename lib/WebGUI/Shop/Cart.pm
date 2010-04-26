@@ -565,6 +565,10 @@ A hash reference that contains one of the following:
 
 The unique id for a shipping address attached to this cart.
 
+=head4 billingAddressId
+
+The unique id for a billing address attached to this cart.
+
 =head4 shipperId
 
 The unique id of the configured shipping driver that will be used to ship these goods.
@@ -585,7 +589,7 @@ sub update {
         WebGUI::Error::InvalidParam->throw(error=>"Need a properties hash ref.");
     }
     my $id = id $self;
-    foreach my $field (qw(shippingAddressId posUserId shipperId creationDate)) {
+    foreach my $field (qw(billingAddressId shippingAddressId posUserId shipperId creationDate)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->session->db->setRow("cart","cartId",$properties{$id});
@@ -595,7 +599,7 @@ sub update {
 
 =head2 updateFromForm ( )
 
-Updates the cart totals.
+Updates the cart totals from form data.
 
 =cut
 
@@ -618,8 +622,10 @@ sub updateFromForm {
          my $i18n = WebGUI::International->new($self->session, "Shop");
         $error{id $self} = $i18n->get('mixed items warning');
     }
+    my $book = $self->getAddressBook;
+    #$book->processAddressForm()
     my $cartProperties = {};
-    $cartProperties->{ shipperId    } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
+    $cartProperties->{ shipperId } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
     $self->update( $cartProperties );
 }
 
@@ -700,6 +706,22 @@ sub www_removeItem {
 
 #-------------------------------------------------------------------
 
+=head2 www_setBillingAddress ()
+
+Sets the billing address for the cart.
+
+=cut
+
+sub www_setBillingAddress {
+    my $self = shift;
+    my $form = $self->session->form;
+    $self->update({billingAddressId=>$form->get('billingAddressId')});
+    return $self->www_view;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_setShippingAddress ()
 
 Sets the shipping address for the cart or for a cart item if itemId is one of the form params.
@@ -710,10 +732,10 @@ sub www_setShippingAddress {
     my $self = shift;
     my $form = $self->session->form;
     if ($form->get("itemId") ne "") {
-        $self->getItem($form->get("itemId"))->update({shippingAddressId=>$form->get('addressId')}); 
+        $self->getItem($form->get("itemId"))->update({shippingAddressId=>$form->get('shippingAddressId')}); 
     }
     else {
-        $self->update({shippingAddressId=>$form->get('addressId')});
+        $self->update({shippingAddressId=>$form->get('shippingAddressId')});
     }
     return $self->www_view;
 }
@@ -742,11 +764,12 @@ Displays the shopping cart.
 =cut
 
 sub www_view {
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
-    my $url = $session->url;
-    my $i18n = WebGUI::International->new($session, "Shop");
-    my @items = ();
+    my $url     = $session->url;
+    my $form    = $session->form;
+    my $i18n    = WebGUI::International->new($session, "Shop");
+    my @items   = ();
     my $taxDriver = WebGUI::Shop::Tax->getDriver( $session );
 
     if($url->forceSecureConnection()){
@@ -888,8 +911,6 @@ sub www_view {
     #Address form variables
     $var{userIsVisitor} = $session->user->isVisitor;
     if ($var{userIsVisitor}) {
-        ##Make login form
-        #Form variable returnUrl
         $var{loginFormHeader} = WebGUI::Form::formHeader($session, {action => $session->url->page})
                               . WebGUI::Form::hidden($session,{ name => 'op',     value => 'auth'})
                               . WebGUI::Form::hidden($session,{ name => 'method', value => 'login'})
@@ -906,6 +927,7 @@ sub www_view {
         my $addressBook = $self->getAddressBook;
         $addressBook->appendAddressFormVars(\%var, 'shipping_', {});
         $addressBook->appendAddressFormVars(\%var, 'billing_',  {});
+        $var{sameShippingAsBilling} = WebGUI::Form::yesNo($session, {name => 'sameShippingAsBilling', value => $form->get('sameShippingAsBilling','yesNo')});
     }
 
     # POS variables
