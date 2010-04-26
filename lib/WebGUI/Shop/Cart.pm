@@ -642,6 +642,7 @@ sub updateFromForm {
          my $i18n = WebGUI::International->new($self->session, "Shop");
         $error{id $self} = $i18n->get('mixed items warning');
     }
+
     my $book        = $self->getAddressBook;
 
     my %billingData = $book->processAddressForm('billing_');
@@ -649,25 +650,50 @@ sub updateFromForm {
     $self->session->log->warn('billing addressId: '. $billingAddressId);
     if ($billingAddressId eq 'new_address' && ! exists $billingData{'error'}) {
         ##Add a new address
-        $self->session->log->warn('add a new address');
+        $self->session->log->warn('add a new billing address');
         my $newAddress = $book->addAddress(\%billingData);
         $self->update({billingAddressId => $newAddress->get('addressId'), });
     }
     elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId')) {
-        $self->session->log->warn('update an existing address');
+        $self->session->log->warn('update an existing billing address');
         ##User changed the address selector
         my $address = $self->getBillingAddress();
         $address->update(\%billingData);
     }
     elsif ($billingAddressId ne 'new_address' && $billingAddressId) {
-        $self->session->log->warn('change an address');
+        $self->session->log->warn('change an billing address');
         $self->update({billingAddressId => $billingAddressId});
     }
     else {
-        $self->session->log->warn('address: something else: '. $billingData{error});
+        $self->session->log->warn('billing address: something else: '. $billingData{error});
     }
 
-    #$book->processAddressForm()
+    my %shippingData = $book->processAddressForm('shipping_');
+    my $shippingAddressId = $form->process('shippingAddressId');
+    $self->session->log->warn('shipping addressId: '. $shippingAddressId);
+    if ($form->process('sameShippingAsBilling', 'yesNo')) {
+        $self->update({shippingAddressId => $self->get('billingAddressId'), });
+    }
+    elsif ($shippingAddressId eq 'new_address' && ! exists $shippingData{'error'}) {
+        ##Add a new address
+        $self->session->log->warn('add a new shipping address');
+        my $newAddress = $book->addAddress(\%shippingData);
+        $self->update({shippingAddressId => $newAddress->get('addressId'), });
+    }
+    elsif ($shippingAddressId eq 'update_address' && $self->get('shippingAddressId')) {
+        $self->session->log->warn('update an existing shipping address');
+        ##User changed the address selector
+        my $address = $self->getBillingAddress();
+        $address->update(\%shippingData);
+    }
+    elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
+        $self->session->log->warn('change an shipping address');
+        $self->update({shippingAddressId => $shippingAddressId});
+    }
+    else {
+        $self->session->log->warn('shipping address: something else: '. $shippingData{error});
+    }
+
     my $cartProperties = {};
     $cartProperties->{ shipperId } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
     $self->update( $cartProperties );
