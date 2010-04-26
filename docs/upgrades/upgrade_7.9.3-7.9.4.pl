@@ -39,6 +39,7 @@ dropVisitorAddressBooks($session);
 alterCartTable($session);
 alterAddressBookTable($session);
 addWizardHandler( $session );
+addTemplateExampleImage( $session );
 
 finish($session); # this line required
 
@@ -51,6 +52,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add example images to templates
+sub addTemplateExampleImage {
+    my $session = shift;
+    print "\tAdding example image field to template... " unless $quiet;
+
+    $session->db->write( q{
+        ALTER TABLE template ADD storageIdExample CHAR(22)
+    } );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 

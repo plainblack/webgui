@@ -109,6 +109,9 @@ sub definition {
                 fieldType       => 'yesNo',
                 defaultValue    => 0,
             },
+            storageIdExample => {
+                fieldType       => 'image',
+            },
         },
     };
     return $class->SUPER::definition($session,$definition);
@@ -190,6 +193,10 @@ sub duplicate {
 	my $newTemplate = $self->SUPER::duplicate;
     $newTemplate->update({isDefault => 0});
     $newTemplate->addAttachments($self->getAttachments);
+    if ( my $storageId = $self->get('storageIdExample') ) {
+        my $newStorage  = WebGUI::Storage->get( $self->session, $storageId )->copy;
+        $newTemplate->update({ storageIdExample => $newStorage->getId });
+    }
     return $newTemplate;
 }
 
@@ -205,6 +212,9 @@ sub exportAssetData {
     my ( $self ) = @_;
     my $data    = $self->SUPER::exportAssetData;
     $data->{template_attachments} = $self->getAttachments;
+    if ( $self->get('storageIdExample') ) {
+        push @{$data->{storage}}, $self->get('storageIdExample');
+    }
     return $data;
 }
 
@@ -386,6 +396,13 @@ sub getEditForm {
 	$table .= qq(<script type="text/javascript" src="$scriptUrl"></script>);
 	$label = $i18n->get('attachment add field label');
 	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
+
+        $properties->image( 
+            name        => 'storageIdExample',
+            value       => $self->getValue('storageIdExample'),
+            label       => $i18n->get('field storageIdExample'),
+            hoverHelp   => $i18n->get('field storageIdExample description'),
+        );
 
 	return $tabform;
 }
