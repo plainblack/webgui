@@ -908,10 +908,6 @@ sub www_view {
     );
 
     # if there is no shipping address we can't check out
-#    if (WebGUI::Error->caught) {
-#       $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
-#    }
-#
     # if there is a shipping address calculate tax and shipping options
     if ($address) {
         my $ship = WebGUI::Shop::Ship->new($self->session);
@@ -953,9 +949,12 @@ sub www_view {
             $var{shippingPrice} = $shipperId && $options->{$shipperId}->{hasPrice} ? $self->formatCurrency($var{shippingPrice}) : '';
         }
     }
-#  
-#    # Tax variables
-#    $var{tax} = $self->calculateTaxes;
+    else {
+       $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
+    }
+
+    # Tax variables
+    $var{tax} = $self->calculateTaxes;
 
     #Address form variables
     $var{userIsVisitor} = $session->user->isVisitor;
