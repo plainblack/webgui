@@ -1019,7 +1019,7 @@ sub www_view {
     $var{posUserId} = $posUser->userId;
 
     # calculate price adjusted for in-store credit
-    $var{totalPrice} = $var{subtotalPrice}; # + $var{shippingPrice} + $var{tax};
+    $var{totalPrice} = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
     my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
     $var{ inShopCreditAvailable } = $credit->getSum;
     $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
