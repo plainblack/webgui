@@ -846,18 +846,6 @@ sub www_view {
     if($url->forceSecureConnection()){
             return "redirect";
     }
-    # set up html header
-    $session->style->setRawHeadTags(q|
-        <script type="text/javascript">
-        function setCallbackForAddressChooser (form, itemId) {
-            form.shop.value='address';
-            form.method.value='view';
-            itemId = (itemId == undefined) ? 'null' : "'" + itemId + "'";
-            form.callback.value='{"url":"|.$url->page.q|","params":[{"name":"shop","value":"cart"},{"name":"method","value":"setShippingAddress"},{"name":"itemId","value":'+itemId+'}]}';
-            form.submit();
-        }
-        </script>
-        |);
 
     my @cartItems = @{$self->getItems};
     if(scalar(@cartItems) < 1) {
@@ -886,7 +874,7 @@ sub www_view {
         my %properties = (
             %{$item->get},
             url                     => $sku->getUrl("shop=cart;method=viewItem;itemId=".$item->getId),
-            quantityField           => WebGUI::Form::integer($session, {name=>"quantity-".$item->getId, value=>$item->get("quantity")}),
+            quantityField           => WebGUI::Form::integer($session, {name=>"quantity-".$item->getId, value=>$item->get("quantity"), size=>5,}),
             isUnique                => ($sku->getMaxAllowedInCart == 1),
             isShippable             => $sku->isShippingRequired,
             extendedPrice           => $self->formatCurrency($sku->getPrice * $item->get("quantity")),
@@ -912,18 +900,14 @@ sub www_view {
         %{$self->get},
         items                   => \@items,
         formHeader              => WebGUI::Form::formHeader($session)
-            . WebGUI::Form::hidden($session, {name=>"shop", value=>"cart"})
-            . WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
-            . WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
-            . WebGUI::Form::hidden($session, {name=>"callback", value=>""}),
+                                .  WebGUI::Form::hidden($session, {name=>"shop",   value=>"cart"})
+                                .  WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
+                                .  WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
+                                ,
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;" id="continueShoppingButton"|}),
-#        chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
-#            extras=>q|onclick="setCallbackForAddressChooser(this.form);" id="chooseAddressButton"|}),
-#        shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-#            extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
         minimumCartAmount       => $session->setting->get( 'shopCartCheckoutMinimum' ) > 0
                                  ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
@@ -931,50 +915,54 @@ sub www_view {
                                  ,
         shippableItemsInCart    => $shippableItemsInCart,
     );
+    $session->log->warn('after item loop');
 
     # if there is no shipping address we can't check out
 #    if (WebGUI::Error->caught) {
 #       $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
 #    }
 #
-#    # if there is a shipping address calculate tax and shipping options
-#    if ($address) {
-#        $var{hasShippingAddress} = 1;
-#        $var{shippingAddress} = $address->getHtmlFormatted;
-#        my $ship = WebGUI::Shop::Ship->new($self->session);
-#        my $options = $ship->getOptions($self);
-#        my $numberOfOptions = scalar keys %{ $options };
-#        if ($numberOfOptions < 1) {
-#            $var{shippingOptions} = '';
-#            $var{shippingPrice}   = 0;
-#            $error{id $self}      = $i18n->get("No shipping plugins configured");
-#        }
-#        elsif ($numberOfOptions == 1) {
-#            my ($option) = keys %{ $options };
-#            $self->update({ shipperId => $option });
-#            $var{shippingPrice} = $options->{$self->get("shipperId")}->{price};
-#            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
-#        }
-#        else {
-#            tie my %formOptions, 'Tie::IxHash';
-#            $formOptions{''} = $i18n->get('Choose a shipping method');
-#            foreach my $option (keys %{$options}) {
-#                $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
-#            }
-#            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$self->get("shipperId")});
-#            if (!exists $options->{$self->get('shipperId')}) {
-#                $self->update({shipperId => ''});
-#            }
-#            if (my $shipperId = $self->get('shipperId')) {
-#                $var{shippingPrice} = $options->{$shipperId}->{price};
-#            }
-#            else {
-#                $var{shippingPrice} = 0;
-#                $error{id $self}    = ($i18n->get('Choose a shipping method and update the cart to checkout'));
-#            }
-#            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
-#        }
-#    }
+    # if there is a shipping address calculate tax and shipping options
+    if ($address) {
+        $session->log->warn('has address');
+        my $ship = WebGUI::Shop::Ship->new($self->session);
+        my $options = $ship->getOptions($self);
+        my $numberOfOptions = scalar keys %{ $options };
+        if ($numberOfOptions < 1) {
+            $session->log->warn('no shipping plugins');
+            $var{shippingOptions} = '';
+            $var{shippingPrice}   = 0;
+            $error{id $self}      = $i18n->get("No shipping plugins configured");
+        }
+        elsif ($numberOfOptions == 1) {
+            $session->log->warn('only 1 shipping plugin');
+            my ($option) = keys %{ $options };
+            $self->update({ shipperId => $option });
+            $session->log->warn('shipping price: '. $options->{$options}->{price});
+            $var{shippingPrice}   = $options->{$option}->{hasPrice} ? $self->formatCurrency($options->{$option}->{price}) : '';
+            $var{shippingOptions} = $options->{$option}->{label};
+        }
+        else {
+            $session->log->warn('building dropdown');
+            tie my %formOptions, 'Tie::IxHash';
+            $formOptions{''} = $i18n->get('Choose a shipping method');
+            foreach my $option (keys %{$options}) {
+                $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price} || 0).")";
+            }
+            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$self->get("shipperId") || ''});
+            if (!exists $options->{$self->get('shipperId')}) {
+                $self->update({shipperId => ''});
+            }
+            if (my $shipperId = $self->get('shipperId')) {
+                $var{shippingPrice} = $options->{$shipperId}->{price};
+            }
+            else {
+                $var{shippingPrice} = 0;
+                $error{id $self}    = ($i18n->get('Choose a shipping method and update the cart to checkout'));
+            }
+            $var{shippingPrice} = $options->{$shipperId}->{hasPrice} ? $self->formatCurrency($var{shippingPrice}) : '';
+        }
+    }
 #  
 #    # Tax variables
 #    $var{tax} = $self->calculateTaxes;
