@@ -51,16 +51,14 @@ is( $wizard->getCurrentStep, "one", "SetCurrentStep" );
 #----------------------------------------------------------------------------
 # Form Start and End
 
-my $o   = $wizard->getFormStart;
-like( $o, qr/<form/, 'getFormStart gives form' );
-like( $o, qr/wizard_class.+WebGUI::Wizard/, 'getFormStart wizard_class' );
-like( $o, qr/wizard_step.+one/, 'getFormStart wizard_step' );
+my $f   = $wizard->getForm;
+isa_ok( $f, 'WebGUI::HTMLForm' );
+my $html = $f->print;
+like( $html, qr/wizard_class.+WebGUI::Wizard/, 'getFormStart wizard_class' );
+like( $html, qr/wizard_step.+one/, 'getFormStart wizard_step' );
 
-$o   = $wizard->getFormStart( "two" );
-like( $o, qr/wizard_step.+two/, 'getFormStart wizard_step override step' );
-
-$o  = $wizard->getFormEnd;
-like( $o, qr{</form>}, 'getFormEnd' );
+$html   = $wizard->getForm( "two" )->print;
+like( $html, qr/wizard_step.+two/, 'getFormStart wizard_step override step' );
 
 #----------------------------------------------------------------------------
 # Steps
@@ -69,7 +67,13 @@ $wizard = WebGUI::Wizard::Test->new( $session );
 $session->request->setup_body( {
     wizard_step     => "one",
 } );
-is( $wizard->getCurrentStep, "one", "getCurrentStep from form" );
+is( $wizard->getCurrentStep, undef, "getCurrentStep requires correct wizard_class");
+
+$session->request->setup_body( {
+    wizard_class    => 'WebGUI::Wizard::Test',
+    wizard_step     => 'one',
+} );
+is( $wizard->getCurrentStep, 'one', 'getCurrent step from form' );
 is( $wizard->getNextStep, "two", "getNextStep" );
 
 is( $wizard->getNextStep( "three" ), "four", "getNextStep with arg" );

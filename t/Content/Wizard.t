@@ -35,13 +35,13 @@ plan tests => 3;        # Increment this number for each test you create
 
 use_ok( 'WebGUI::Content::Wizard' );
 
-ok( !WebGUI::Content::Wizard::process( $session ), "Declines correctly" );
+ok( !WebGUI::Content::Wizard::handler( $session ), "Declines correctly" );
 
 $session->request->setup_body( {
     op              => 'wizard',
     wizard_class    => 'WebGUI::Wizard::HelloWorld',
 } );
-is( WebGUI::Content::Wizard::process( $session ), "Hello World!\n", "Accepts request and returns response" );
+is( WebGUI::Content::Wizard::handler( $session ), "Hello World!\n", "Accepts request and returns response" );
 
 package WebGUI::Wizard::HelloWorld;
 

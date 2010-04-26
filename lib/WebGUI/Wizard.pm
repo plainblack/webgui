@@ -101,16 +101,20 @@ sub dispatch {
 
     # See if we process a form
     if ( my $step = $self->getCurrentStep ) { 
+        $self->session->log->info( "Processing " . $step );
         # First fold in the new form bits
         $self->thaw;
         my $processSub   = $self->can( 'www_' . $step . 'Save' );
         my $errorMessage = $processSub->($self);
         if ($errorMessage) {
+            $self->session->log->info( "Error in " . $step );
             my $formSub = $self->can( 'www_' . $step );
             return $self->wrapStyle( $errorMessage . $formSub->($self) );
         }
         else {
             my $step = $self->getNextStep;
+            $self->session->log->info( "Showing next step: " . $step );
+            $self->setCurrentStep( $step );
             my $formSub = $self->can( 'www_' . $step );
             my $output = $formSub->($self);
             $self->freeze;
@@ -121,7 +125,10 @@ sub dispatch {
         # Starting over
         $self->{_params}    = {};
         $self->freeze;
-        my $formSub = $self->can( 'www_' . $self->_get_steps->[0] );
+        my $step = $self->_get_steps->[0];
+        $self->setCurrentStep( $step );
+        $self->session->log->info( "Starting wizard: " . $step );
+        my $formSub = $self->can( 'www_' . $step );
         my $output = $formSub->($self);
         $self->freeze;
         return $self->wrapStyle( $output );
@@ -180,36 +187,30 @@ Get the name of the current step.
 
 sub getCurrentStep {
     my ( $self ) = @_;
-    return $self->{_step} || $self->session->form->get( 'wizard_step' );
+    if ( $self->{_step} ) {
+        return $self->{_step};
+    }
+    elsif ( $self->session->form->get('wizard_class') eq blessed($self) ) {
+        return $self->session->form->get('wizard_step');
+    }
+    return; # No step, so start at the beginning
 }
 
 #----------------------------------------------------------------------------
 
-=head2 getFormEnd ( )
+=head2 getForm ( [step] )
 
-Get the end of the form, including the </form> tag
-
-=cut
-
-sub getFormEnd {
-    my ( $self ) = @_;
-    return WebGUI::Form::formFooter;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 getFormStart ( [step] )
-
-Get the start of a form for a given step, defaulting to the current step.
+Get a WebGUI::HTMLForm object for a given step, defaulting to the current step.
 
 =cut
 
-sub getFormStart {
+sub getForm {
     my ( $self, $step ) = @_;
     $step ||= $self->getCurrentStep;
-    return WebGUI::Form::formHeader( $self->session, {
+    my $form = WebGUI::HTMLForm->new( $self->session, 
         action      => '?op=wizard;wizard_class=' . blessed( $self ) . ';wizard_step=' . $step,
-    } );
+    );
+    return $form;
 }
 
 #----------------------------------------------------------------------------
@@ -281,7 +282,7 @@ parameters.
 sub thaw {
     my ( $self ) = @_;
     my $json = $self->session->scratch->get( $self->getCacheKey );
-    return $self->{_params} = JSON->new->decode( $json );
+    return $self->{_params} = $json ? JSON->new->decode( $json ) : {};
 }
 
 #----------------------------------------------------------------------------

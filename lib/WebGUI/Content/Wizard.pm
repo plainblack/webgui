@@ -1,6 +1,6 @@
 package WebGUI::Content::Wizard;
 
-sub process {
+sub handler {
     my ( $session ) = @_;
 
     if ( $session->form->get('op') eq 'wizard' && $session->form->get('wizard_class') ) {
