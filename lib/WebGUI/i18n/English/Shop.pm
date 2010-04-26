@@ -1750,7 +1750,13 @@ our $I18N = {
 	},
 
 	'Add new address' => { 
-		message => q|Add new address.|,
+		message => q|Add new address|,
+		lastUpdated => 0,
+		context => q|form label for the cart.  Allows user to build a new address.|
+	},
+
+	'Update this address' => { 
+		message => q|Update this address|,
 		lastUpdated => 0,
 		context => q|form label for the cart.  Allows user to build a new address.|
 	},

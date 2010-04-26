@@ -624,6 +624,7 @@ Updates the cart totals from form data.
 
 sub updateFromForm {
     my $self = shift;
+    $self->session->log->warn('updateFromForm');
     my $form = $self->session->form;
     foreach my $item (@{$self->getItems}) {
         if ($form->get("quantity-".$item->getId) ne "") {
@@ -645,12 +646,25 @@ sub updateFromForm {
 
     my %billingData = $book->processAddressForm('billing_');
     my $billingAddressId = $form->process('billingAddressId');
+    $self->session->log->warn('billing addressId: '. $billingAddressId);
     if ($billingAddressId eq 'new_address' && ! exists $billingData{'error'}) {
-        my $billingAddress = $book->addAddress(\%billingData);
-        $self->update({billingAddressId => $billingAddress->get('addressId'), });
+        ##Add a new address
+        $self->session->log->warn('add a new address');
+        my $newAddress = $book->addAddress(\%billingData);
+        $self->update({billingAddressId => $newAddress->get('addressId'), });
     }
-    elsif ($billingAddressId ne 'new_address') {
-        $self->update({billinbAddressId => $billingAddressId});
+    elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId')) {
+        $self->session->log->warn('update an existing address');
+        ##User changed the address selector
+        my $address = $self->getBillingAddress();
+        $address->update(\%billingData);
+    }
+    elsif ($billingAddressId ne 'new_address' && $billingAddressId) {
+        $self->session->log->warn('change an address');
+        $self->update({billingAddressId => $billingAddressId});
+    }
+    else {
+        $self->session->log->warn('address: something else: '. $billingData{error});
     }
 
     #$book->processAddressForm()
@@ -781,6 +795,7 @@ Updates the cart totals and then displays the cart again.
 
 sub www_update {
     my $self = shift;
+    $self->session->log->warn('www_update');
     $self->updateFromForm;
     return $self->www_view;
 }
@@ -958,18 +973,30 @@ sub www_view {
         my $addresses   = $addressBook->getAddresses;
         tie my %addressOptions, 'Tie::IxHash';
         $addressOptions{'new_address'} = $i18n->get('Add new address');
+
+        my $billingAddressId = $self->get('billingAddressId');
+        if ($billingAddressId) {
+            $addressOptions{'update_address'} = $i18n->get('Update this address');
+        }
+
         foreach my $address (@{ $addresses }) {
             $addressOptions{$address->get('addressId')} = $address->get('label');
         }
-        $var{'shippingAddressChooser'} = WebGUI::Form::selectBox($session, {
-            name    => 'shipping_addressId',
-            options => \%addressOptions,
-            value   => $self->get('shippingAddressId') ? $self->get('shippingAddressId') : 'new_address',
-        });
+
         $var{'billingAddressChooser'} = WebGUI::Form::selectBox($session, {
-            name    => 'billing_addressId',
+            name    => 'billingAddressId',
             options => \%addressOptions,
-            value   => $self->get('billingAddressId') ? $self->get('billingAddressId') : 'new_address',
+            value   => $billingAddressId ? $billingAddressId : 'new_address',
+        });
+
+        my $shippingAddressId = $self->get('shippingAddressId');
+        if (!$shippingAddressId) {
+            delete $addressOptions{'update_address'};
+        }
+        $var{'shippingAddressChooser'} = WebGUI::Form::selectBox($session, {
+            name    => 'shippingAddressId',
+            options => \%addressOptions,
+            value   => $shippingAddressId ? $shippingAddressId : 'new_address',
         });
         my $shippingAddressData = $self->get('shippingAddressId') ? $self->getShippingAddress->get() : {};
         my $billingAddressData  = $self->get('billingAddressId')  ? $self->getBillingAddress->get()  : {};
