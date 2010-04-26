@@ -270,6 +270,25 @@ sub getAddressBook {
 
 #-------------------------------------------------------------------
 
+=head2 getBillingAddress ()
+
+Returns the WebGUI::Shop::Address object that is attached to this cart for billing.
+
+=cut
+
+sub getBillingAddress {
+    my $self = shift;
+    my $book = $self->getAddressBook;
+    if (my $addressId = $self->get("billingAddressId")) {
+        return $book->getAddress($addressId);
+    }
+    my $address = $book->getDefaultAddress;
+    $self->update({billingAddressId=>$address->getId});
+    return $address;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ()
 
 Returns the unique id for this cart.
@@ -622,7 +641,18 @@ sub updateFromForm {
          my $i18n = WebGUI::International->new($self->session, "Shop");
         $error{id $self} = $i18n->get('mixed items warning');
     }
-    my $book = $self->getAddressBook;
+    my $book        = $self->getAddressBook;
+
+    my %billingData = $book->processAddressForm('billing_');
+    my $billingAddressId = $form->process('billingAddressId');
+    if ($billingAddressId eq 'new_address' && ! exists $billingData{'error'}) {
+        my $billingAddress = $book->addAddress(\%billingData);
+        $self->update({billingAddressId => $billingAddress->get('addressId'), });
+    }
+    elsif ($billingAddressId ne 'new_address') {
+        $self->update({billinbAddressId => $billingAddressId});
+    }
+
     #$book->processAddressForm()
     my $cartProperties = {};
     $cartProperties->{ shipperId } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
@@ -925,8 +955,26 @@ sub www_view {
     else {
         ##Address form variables
         my $addressBook = $self->getAddressBook;
-        $addressBook->appendAddressFormVars(\%var, 'shipping_', {});
-        $addressBook->appendAddressFormVars(\%var, 'billing_',  {});
+        my $addresses   = $addressBook->getAddresses;
+        tie my %addressOptions, 'Tie::IxHash';
+        $addressOptions{'new_address'} = $i18n->get('Add new address');
+        foreach my $address (@{ $addresses }) {
+            $addressOptions{$address->get('addressId')} = $address->get('label');
+        }
+        $var{'shippingAddressChooser'} = WebGUI::Form::selectBox($session, {
+            name    => 'shipping_addressId',
+            options => \%addressOptions,
+            value   => $self->get('shippingAddressId') ? $self->get('shippingAddressId') : 'new_address',
+        });
+        $var{'billingAddressChooser'} = WebGUI::Form::selectBox($session, {
+            name    => 'billing_addressId',
+            options => \%addressOptions,
+            value   => $self->get('billingAddressId') ? $self->get('billingAddressId') : 'new_address',
+        });
+        my $shippingAddressData = $self->get('shippingAddressId') ? $self->getShippingAddress->get() : {};
+        my $billingAddressData  = $self->get('billingAddressId')  ? $self->getBillingAddress->get()  : {};
+        $addressBook->appendAddressFormVars(\%var, 'shipping_', $shippingAddressData);
+        $addressBook->appendAddressFormVars(\%var, 'billing_',  $billingAddressData);
         $var{sameShippingAsBilling} = WebGUI::Form::yesNo($session, {name => 'sameShippingAsBilling', value => $form->get('sameShippingAsBilling','yesNo')});
     }
 

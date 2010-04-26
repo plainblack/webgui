@@ -77,6 +77,7 @@ An optional prefix to add to each variable name, and form name.
 sub appendAddressFormVars {
     my ($self, $var, $prefix, $properties ) = @_;
     my $session   = $self->session;
+    my $form      = $session->form;
     $properties ||= {};
     $prefix     ||= '';
     $var        ||= {};
@@ -84,28 +85,28 @@ sub appendAddressFormVars {
         $var->{ $prefix . $_ . 'Field' } = WebGUI::Form::text( $session, {
             name            => $prefix . $_, 
             maxlength       => 35, 
-            defaultValue    => $properties->{ $_ }
+            defaultValue    => $properties->{ $_ } || $form->get($prefix . $_),
         } );
     }
     $var->{ $prefix . 'countryField' } = 
         WebGUI::Form::country( $session,{
             name            => $prefix . 'country', 
-            defaultValue    => $properties->{ country }
+            defaultValue    => $properties->{ country } || $form->get($prefix . 'country' ),
         } );
     $var->{ $prefix . 'codeField' } =
         WebGUI::Form::zipcode( $session, {
             name            => $prefix . 'code', 
-            defaultValue    => $properties->{ code }
+            defaultValue    => $properties->{ code } || $form->get($prefix . 'code' ),
         } );
     $var->{ $prefix . 'phoneNumberField' } =
         WebGUI::Form::phone( $session, {
             name            => $prefix . 'phoneNumber', 
-            defaultValue    => $properties->{ phoneNumber }
+            defaultValue    => $properties->{ phoneNumber } || $form->get($prefix . 'phoneNumber' ),
         } );
     $var->{ $prefix . 'emailField' } =
         WebGUI::Form::email( $session, {
             name            => $prefix . 'email', 
-            defaultValue    => $properties->{ email }
+            defaultValue    => $properties->{ email } || $form->get($prefix . 'email' ),
         } );
 }
 
@@ -400,13 +401,14 @@ sub processAddressForm {
         organization    => $form->get($prefix . "organization"),
     );
     my $i18n = WebGUI::International->new($self->session, "Shop");
-    foreach my $field (qw/label firstName lastName address1 city code country phoneNumber/) {
+    FIELD: foreach my $field (qw/label firstName lastName address1 city code country phoneNumber/) {
         my $label = $field eq 'address1'    ? 'address'
                   : $field eq 'phoneNumber' ? 'phone number'
                   : $field
                   ;
         if ($addressData{$field} eq "") {
             $addressData{error} = sprintf($i18n->get('is a required field'), $i18n->get($label));
+            last FIELD;
         }    
     }
     return %addressData;

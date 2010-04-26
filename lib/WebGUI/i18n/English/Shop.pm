@@ -1749,6 +1749,12 @@ our $I18N = {
 		context => q|template label for the cart|
 	},
 
+	'Add new address' => { 
+		message => q|Add new address.|,
+		lastUpdated => 0,
+		context => q|form label for the cart.  Allows user to build a new address.|
+	},
+
 };
 
 1;
