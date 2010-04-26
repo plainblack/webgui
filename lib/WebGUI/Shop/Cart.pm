@@ -947,20 +947,25 @@ sub www_view {
             tie my %formOptions, 'Tie::IxHash';
             $formOptions{''} = $i18n->get('Choose a shipping method');
             foreach my $option (keys %{$options}) {
-                $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price} || 0).")";
+                $formOptions{$option} = $options->{$option}{label};
+                if ($options->{$options}->{hasPrice}) {
+                    $formOptions{$option} .= ' ('.$self->formatCurrency($options->{$option}{price}).')';
+                }
             }
             $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$self->get("shipperId") || ''});
-            if (!exists $options->{$self->get('shipperId')}) {
+            my $shipperId = $self->get('shipperId');
+            if (!exists $options->{$shipperId}) {
                 $self->update({shipperId => ''});
+                $shipperId = '';
             }
-            if (my $shipperId = $self->get('shipperId')) {
+            if ($shipperId) {
                 $var{shippingPrice} = $options->{$shipperId}->{price};
             }
             else {
                 $var{shippingPrice} = 0;
                 $error{id $self}    = ($i18n->get('Choose a shipping method and update the cart to checkout'));
             }
-            $var{shippingPrice} = $options->{$shipperId}->{hasPrice} ? $self->formatCurrency($var{shippingPrice}) : '';
+            $var{shippingPrice} = $shipperId && $options->{$shipperId}->{hasPrice} ? $self->formatCurrency($var{shippingPrice}) : '';
         }
     }
 #  
