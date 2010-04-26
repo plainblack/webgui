@@ -109,7 +109,7 @@ sub getOptions {
         next SHIPPER unless $shipper->canUse;
         my ($price, $hasPrice);
         if ($cart->get('shippingAddressId')) {
-            my $price = eval { $shipper->calculate($cart) };
+            $price = eval { $shipper->calculate($cart) };
             if (my $e = WebGUI::Error->caught()) {
                 $self->session->log->warn($e->error);
                 next SHIPPER;
