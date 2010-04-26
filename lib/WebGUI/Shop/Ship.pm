@@ -123,7 +123,7 @@ sub getOptions {
         $options{$shipper->getId} = {
             label    => $shipper->get("label"),
             price    => $price,
-            hasPrice => 0,
+            hasPrice => $hasPrice,
         };
     }
     return \%options;

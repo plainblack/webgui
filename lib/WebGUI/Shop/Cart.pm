@@ -15,6 +15,7 @@ use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
 use WebGUI::User;
 use Tie::IxHash;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -624,7 +625,6 @@ Updates the cart totals from form data.
 
 sub updateFromForm {
     my $self = shift;
-    $self->session->log->warn('updateFromForm');
     my $form = $self->session->form;
     foreach my $item (@{$self->getItems}) {
         if ($form->get("quantity-".$item->getId) ne "") {
@@ -647,21 +647,17 @@ sub updateFromForm {
 
     my %billingData = $book->processAddressForm('billing_');
     my $billingAddressId = $form->process('billingAddressId');
-    $self->session->log->warn('billing addressId: '. $billingAddressId);
     if ($billingAddressId eq 'new_address' && ! exists $billingData{'error'}) {
         ##Add a new address
-        $self->session->log->warn('add a new billing address');
         my $newAddress = $book->addAddress(\%billingData);
         $self->update({billingAddressId => $newAddress->get('addressId'), });
     }
     elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId')) {
-        $self->session->log->warn('update an existing billing address');
         ##User changed the address selector
         my $address = $self->getBillingAddress();
         $address->update(\%billingData);
     }
     elsif ($billingAddressId ne 'new_address' && $billingAddressId) {
-        $self->session->log->warn('change an billing address');
         $self->update({billingAddressId => $billingAddressId});
     }
     else {
@@ -670,24 +666,20 @@ sub updateFromForm {
 
     my %shippingData = $book->processAddressForm('shipping_');
     my $shippingAddressId = $form->process('shippingAddressId');
-    $self->session->log->warn('shipping addressId: '. $shippingAddressId);
     if ($form->process('sameShippingAsBilling', 'yesNo')) {
         $self->update({shippingAddressId => $self->get('billingAddressId'), });
     }
     elsif ($shippingAddressId eq 'new_address' && ! exists $shippingData{'error'}) {
         ##Add a new address
-        $self->session->log->warn('add a new shipping address');
         my $newAddress = $book->addAddress(\%shippingData);
         $self->update({shippingAddressId => $newAddress->get('addressId'), });
     }
     elsif ($shippingAddressId eq 'update_address' && $self->get('shippingAddressId')) {
-        $self->session->log->warn('update an existing shipping address');
         ##User changed the address selector
         my $address = $self->getBillingAddress();
         $address->update(\%shippingData);
     }
     elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
-        $self->session->log->warn('change an shipping address');
         $self->update({shippingAddressId => $shippingAddressId});
     }
     else {
@@ -821,7 +813,6 @@ Updates the cart totals and then displays the cart again.
 
 sub www_update {
     my $self = shift;
-    $self->session->log->warn('www_update');
     $self->updateFromForm;
     return $self->www_view;
 }
@@ -915,7 +906,6 @@ sub www_view {
                                  ,
         shippableItemsInCart    => $shippableItemsInCart,
     );
-    $session->log->warn('after item loop');
 
     # if there is no shipping address we can't check out
 #    if (WebGUI::Error->caught) {
@@ -924,36 +914,31 @@ sub www_view {
 #
     # if there is a shipping address calculate tax and shipping options
     if ($address) {
-        $session->log->warn('has address');
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
         my $numberOfOptions = scalar keys %{ $options };
         if ($numberOfOptions < 1) {
-            $session->log->warn('no shipping plugins');
             $var{shippingOptions} = '';
             $var{shippingPrice}   = 0;
             $error{id $self}      = $i18n->get("No shipping plugins configured");
         }
         elsif ($numberOfOptions == 1) {
-            $session->log->warn('only 1 shipping plugin');
             my ($option) = keys %{ $options };
             $self->update({ shipperId => $option });
-            $session->log->warn('shipping price: '. $options->{$options}->{price});
             $var{shippingPrice}   = $options->{$option}->{hasPrice} ? $self->formatCurrency($options->{$option}->{price}) : '';
             $var{shippingOptions} = $options->{$option}->{label};
         }
         else {
-            $session->log->warn('building dropdown');
             tie my %formOptions, 'Tie::IxHash';
             $formOptions{''} = $i18n->get('Choose a shipping method');
-            foreach my $option (keys %{$options}) {
-                $formOptions{$option} = $options->{$option}{label};
-                if ($options->{$options}->{hasPrice}) {
-                    $formOptions{$option} .= ' ('.$self->formatCurrency($options->{$option}{price}).')';
+            foreach my $optionId (keys %{$options}) {
+                $formOptions{$optionId} = $options->{$optionId}{label};
+                if ($options->{$optionId}->{hasPrice}) {
+                    $formOptions{$optionId} .= ' ('.$self->formatCurrency($options->{$optionId}{price}).')';
                 }
             }
-            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$self->get("shipperId") || ''});
             my $shipperId = $self->get('shipperId');
+            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$shipperId || ''});
             if (!exists $options->{$shipperId}) {
                 $self->update({shipperId => ''});
                 $shipperId = '';
