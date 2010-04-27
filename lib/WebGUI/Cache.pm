@@ -132,13 +132,15 @@ A subdivider to store this cache under. When building your own cache plug-in def
 sub new {
 	my $class = shift;
 	my $session = shift;
-	if ($session->config->get("cacheType") eq "WebGUI::Cache::Database") {
-		require WebGUI::Cache::Database;
-		return WebGUI::Cache::Database->new($session,@_);
-	} else {
-		require WebGUI::Cache::FileCache;
-		return WebGUI::Cache::FileCache->new($session,@_);
-	}
+        my $type    = $session->config->get('cacheType');
+        eval{ WebGUI::Pluggable::load( $type ) };
+        if ( !$@ && $type->isa( "WebGUI::Cache" ) ) {
+            return $type->new( $session, @_ );
+        }
+        else {
+            require WebGUI::Cache::FileCache;
+            return WebGUI::Cache::FileCache->new( $session, @_ );
+        }
 }
 
 #-------------------------------------------------------------------
