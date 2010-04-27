@@ -1005,7 +1005,10 @@ sub www_view {
         my $billingAddressData  = $self->get('billingAddressId')  ? $self->getBillingAddress->get()  : {};
         $addressBook->appendAddressFormVars(\%var, 'shipping_', $shippingAddressData);
         $addressBook->appendAddressFormVars(\%var, 'billing_',  $billingAddressData);
-        $var{sameShippingAsBilling} = WebGUI::Form::yesNo($session, {name => 'sameShippingAsBilling', value => $form->get('sameShippingAsBilling','yesNo')});
+        $var{sameShippingAsBilling} = WebGUI::Form::yesNo($session, {
+            name => 'sameShippingAsBilling',
+            value => $self->get('billingAddressId') && $self->get('billingAddressId') eq $self->get('shippingAddressId'),
+        });
     }
 
     # POS variables
