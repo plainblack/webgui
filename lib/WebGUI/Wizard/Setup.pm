@@ -67,11 +67,21 @@ h1 {
 }
 
 .stylePicker img {
-    margin-top: 1em;
-    float: left;
+    margin: 1em 0;
+    float: right;
 }
 .stylePicker {
-    clear: left;
+    overflow: hidden;
+    clear: both;
+}
+.stylePicker.odd {
+    background-color: #eee;
+}
+.stylePicker input {
+    float: left;
+}
+.stylePicker .title {
+    font-size: larger;
 }
 
     </style>
@@ -252,13 +262,16 @@ sub www_defaultStyle {
 sub www_defaultStyleSave {
     my ( $self, @args ) = @_;
     my $output = WebGUI::Wizard::HomePage::www_pickStyleSave( $self, @args );
+    my $session = $self->session;
     # update default site style
-    my $home    = WebGUI::Asset->getDefault( $self->session );
+    $session->setting->set( "userFunctionStyleId", $self->get('styleTemplateId') );
+    my $home    = WebGUI::Asset->getDefault( $session );
     foreach my $asset ( @{ $home->getLineage( [ "self", "descendants" ], { returnObjects => 1 } ) } ) {
         if ( defined $asset ) {
             $asset->update( { styleTemplateId => $self->get("styleTemplateId") } );
         }
     }
+
     return $output;
 }
 

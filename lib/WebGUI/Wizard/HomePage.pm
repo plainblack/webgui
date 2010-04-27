@@ -104,12 +104,19 @@ sub www_pickStyle {
         push @styles, $style;
     }
 
+    my $row = 0;
     for my $style ( sort { $a->getTitle cmp $b->getTitle } @styles ) {
+        my $class = ++$row % 2 ? " odd" : "";
+
+        # Prepare the synopsis
+        my $synopsis = WebGUI::HTML::format( $style->get('synopsis') );
+        $synopsis =~ s{(https?://\S+)}{<a href="$1">$1</a>}g;
+
         $f->raw(
-            '<div class="stylePicker"><label><input type="radio" name="styleTemplateId" value="' . $style->getId . '"/>'
+            '<div class="stylePicker' . $class . '"><label><input type="radio" name="styleTemplateId" value="' . $style->getId . '"/>'
             . '<img src="' . $style->getExampleImageUrl . '" height="150" />' 
             . '<div class="title">' . $style->getTitle . '</div>'
-            . '<div class="synopsis">' . $style->get('synopsis') . '</div></label>'
+            . '<div class="synopsis">' . $synopsis . '</div></label>'
             . '</div>'
         );
     }
@@ -187,6 +194,7 @@ sub www_chooseContentSave {
     }
 
     # update default site style
+    $session->setting->set( "userFunctionStyleId", $self->get('styleTemplateId') );
     foreach my $asset ( @{ $home->getLineage( [ "self", "descendants" ], { returnObjects => 1 } ) } ) {
         if ( defined $asset ) {
             $asset->update( { styleTemplateId => $self->get("styleTemplateId") } );
