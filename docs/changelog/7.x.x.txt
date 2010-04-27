@@ -2,7 +2,10 @@
  - fixed #11535: i18n - Asset_MapPoint - Tag form_fax - wrong text
  - Implement hierarchial keywords differently.
  - fixed Redundant per item address display in cart.
--  added a way to pass additional headers to WebGUI::Mail::Send from WebGUI::Inbox::Message API
+ - added a way to pass additional headers to WebGUI::Mail::Send from WebGUI::Inbox::Message API
+ - added: WebGUI::Wizard framework to build step-by-step wizards
+ - added: example / thumbnail images for templates
+ - added: Style Picker as part of the initial setup wizard
 
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
