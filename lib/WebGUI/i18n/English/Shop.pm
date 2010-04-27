@@ -1761,6 +1761,12 @@ our $I18N = {
 		context => q|form label for the cart.  Allows user to build a new address.|
 	},
 
+	'Choose a payment method' => { 
+		message => q|Choose a payment method|,
+		lastUpdated => 0,
+		context => q|form label for the cart.  Allows user to choose a payment method.  Bart Jol for Minister in 2012!|
+	},
+
 };
 
 1;

@@ -77,7 +77,7 @@ our $I18N = {
     },
 
     'payment methods' => {
-        message => q|Payment Methods.|,
+        message => q|Payment Methods|,
         lastUpdated => 1213313375,
         context => q|Help body for the email receipt template|,
     },

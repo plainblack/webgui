@@ -104,9 +104,9 @@ sub getDrivers {
 =head2 getOptions ( $cart )
 
 Returns a set of options for the user to pay to.  It is a hash of
-hashrefs, with the key of the primary hash being the paymentGatewayId
-of the driver, and sub keys of label and button.  The hash will only
-contain payment gateways that this user is allowed to use.
+gatewayIds and labels.
+
+The hash will only contain payment gateways that this user is allowed to use.
 
 =head3 $cart
 
@@ -120,17 +120,13 @@ sub getOptions {
 
     WebGUI::Error::InvalidParam->throw(error => q{Need a cart.}) unless defined $cart and $cart->isa("WebGUI::Shop::Cart");
 
-    my $session = $cart->session; 
     my $recurringRequired = $cart->requiresRecurringPayment;
     my %options = ();
 
     foreach my $gateway (@{ $self->getPaymentGateways() }) {
         next unless $gateway->canUse;
         if (!$recurringRequired || $gateway->handlesRecurring) {
-            $options{$gateway->getId} = {
-                label   => $gateway->get("label"),
-                button  => $gateway->getButton( $cart ),
-            };    
+            $options{$gateway->getId} = $gateway->get("label");
         }
     }
     return \%options;

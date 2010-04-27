@@ -146,6 +146,7 @@ sub alterCartTable {
     print "\tAdd billing address column to the Cart table... " unless $quiet;
     # and here's our code
     $session->db->write("ALTER TABLE cart ADD COLUMN billingAddressId CHAR(22)");
+    $session->db->write("ALTER TABLE cart ADD COLUMN gatewayId        CHAR(22)");
     print "DONE!\n" unless $quiet;
 }
 

@@ -12,6 +12,7 @@ use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::CartItem;
 use WebGUI::Shop::Credit;
 use WebGUI::Shop::Ship;
+use WebGUI::Shop::Pay;
 use WebGUI::Shop::Tax;
 use WebGUI::User;
 use Tie::IxHash;
@@ -645,12 +646,13 @@ sub updateFromForm {
 
     my $book        = $self->getAddressBook;
 
+    my $cartProperties = {};
     my %billingData = $book->processAddressForm('billing_');
     my $billingAddressId = $form->process('billingAddressId');
     if ($billingAddressId eq 'new_address' && ! exists $billingData{'error'}) {
         ##Add a new address
         my $newAddress = $book->addAddress(\%billingData);
-        $self->update({billingAddressId => $newAddress->get('addressId'), });
+        $cartProperties{billingAddressId} = $newAddress->get('addressId');
     }
     elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId')) {
         ##User changed the address selector
@@ -658,7 +660,7 @@ sub updateFromForm {
         $address->update(\%billingData);
     }
     elsif ($billingAddressId ne 'new_address' && $billingAddressId) {
-        $self->update({billingAddressId => $billingAddressId});
+        $cartProperties{billingAddressId} = $billingAddressId;
     }
     else {
         $self->session->log->warn('billing address: something else: '. $billingData{error});
@@ -667,12 +669,12 @@ sub updateFromForm {
     my %shippingData = $book->processAddressForm('shipping_');
     my $shippingAddressId = $form->process('shippingAddressId');
     if ($form->process('sameShippingAsBilling', 'yesNo')) {
-        $self->update({shippingAddressId => $self->get('billingAddressId'), });
+        $cartProperties{shippingAddressId} = $self->get('billingAddressId');
     }
     elsif ($shippingAddressId eq 'new_address' && ! exists $shippingData{'error'}) {
         ##Add a new address
         my $newAddress = $book->addAddress(\%shippingData);
-        $self->update({shippingAddressId => $newAddress->get('addressId'), });
+        $cartProperties{shippingAddressId} = $newAddress->get('addressId');
     }
     elsif ($shippingAddressId eq 'update_address' && $self->get('shippingAddressId')) {
         ##User changed the address selector
@@ -680,14 +682,14 @@ sub updateFromForm {
         $address->update(\%shippingData);
     }
     elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
-        $self->update({shippingAddressId => $shippingAddressId});
+        $cartProperties{shippingAddressId} = $shippingAddressId};
     }
     else {
         $self->session->log->warn('shipping address: something else: '. $shippingData{error});
     }
 
-    my $cartProperties = {};
     $cartProperties->{ shipperId } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
+    $cartProperties->{ gatewayId } = $form->process( 'gatewayId' ) if $form->process( 'gatewayId' );
     $self->update( $cartProperties );
 }
 
@@ -897,6 +899,7 @@ sub www_view {
                                 ,
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
+        checkoutButton          => WebGUI::Form::submit($session, {name => 'checkout', value=>$i18n->get("checkout button"), extras=>q|id="checkoutButton"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;" id="continueShoppingButton"|}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
@@ -1010,6 +1013,20 @@ sub www_view {
             value => $self->get('billingAddressId') && $self->get('billingAddressId') eq $self->get('shippingAddressId'),
         });
     }
+
+    # Payment methods
+    my $pay = WebGUI::Shop::Pay->new($session);
+    tie my %paymentOptions, 'Tie::IxHash';
+    $paymentOptions{''} = $i18n->get('Choose a payment method');
+    my $gateways = $pay->getOptions($self);
+    while (my ($gatewayId, $label) = each %{ $gateways }) {
+        $paymentOptions{$gatewayId} = $label;
+    }
+    $var{paymentOptions} = WebGUI::Form::selectBox($session, {
+        name    => 'gatewayId',
+        options => \%paymentOptions,
+        value   => $self->get('gatewayId') || $form->get('gatewayId') || '',
+    });
 
     # POS variables
     $var{isCashier} = WebGUI::Shop::Admin->new($session)->isCashier;
