@@ -118,7 +118,11 @@ sub applyConstraints {
     my $parameters      = $self->get("parameters");
     my $storage         = $self->getStorageLocation;
     my $file            = $self->get("filename");
-
+   
+    # Adjust orientation based on exif data. Do this before we start to 
+    # generate resolutions so that all images have the correct orientation.
+    $self->adjustOrientation;
+    
     # Make resolutions before fixing image, so that we can get higher quality 
     # resolutions
     $self->makeResolutions;
@@ -130,7 +134,62 @@ sub applyConstraints {
     $self->generateThumbnail;
     $self->setSize;
     $self->updateExifDataFromFile;
+    
     $self->SUPER::applyConstraints( $options );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 adjustOrientation ( )
+
+Read orientation information from EXIF data and rotate image if required.
+EXIF data is updated to reflect the new orientation of the image.
+
+=cut
+
+sub adjustOrientation {    
+    my $self    = shift;
+    my $storage = $self->getStorageLocation;
+    
+    # Extract orientation information from EXIF data
+    my $exifTool = Image::ExifTool->new;
+    $exifTool->ExtractInfo( $storage->getPath( $self->get('filename') ) );    
+    my $orientation = $exifTool->GetValue('Orientation', 'ValueConv');
+
+    # Check whether orientation information is present and transform image if
+    # required. At the moment we handle only images that need to be rotated by 
+    # (-)90 or 180 deg. Flipping of images is not supported yet.
+    if ( $orientation ) {
+
+        # We are going to update orientation information before the image is
+        # rotated. Otherwise we would have to re-extract EXIF data due to 
+        # manipulation by Image Magick.
+
+        # Update orientation information
+        $exifTool->SetNewValue( 'Exif:Orientation' => 1, Type => 'ValueConv');
+        
+        # Set the following options to make this as robust as possible
+        $exifTool->Options( 'IgnoreMinorErrors', FixBase => '' );
+        # Write updated exif data to disk
+        $exifTool->WriteInfo( $storage->getPath( $self->get('filename') ) );
+        
+        # Log any errors
+        my $error = $exifTool->GetValue('Error');
+        $self->session->log->error( "Error on updating exif data: $error" ) if $error;       
+        
+        # Image rotated by 180°
+        if ( $orientation == 3 || $orientation == 4 ) {
+            $self->rotate(180);
+        }
+        # Image rotated by 90° CCW
+        elsif ( $orientation == 5 || $orientation == 6 ) {            
+            $self->rotate(90);
+        }
+        # Image rotated by 90° CW
+        elsif ( $orientation == 7 || $orientation == 8 ) {
+            $self->rotate(-90);
+        }
+    }    
 }
 
 #-------------------------------------------------------------------

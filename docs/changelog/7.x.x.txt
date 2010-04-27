@@ -10,6 +10,7 @@
  - added: example / thumbnail images for templates
  - added: Style Picker as part of the initial setup wizard
  - added: CHI cache driver
+ - added #11498: Gallery: Automatically adjust orientation of images based on EXIF data
 
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
