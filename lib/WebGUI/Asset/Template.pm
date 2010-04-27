@@ -407,6 +407,22 @@ sub getEditForm {
 	return $tabform;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getExampleImageUrl ( )
+
+Get the URL to the example image of this template, if any
+
+=cut
+
+sub getExampleImageUrl {
+    my ( $self ) = @_;
+    if ( my $storageId = $self->get('storageIdExample') ) {
+        my $storage = WebGUI::Storage->get( $self->session, $storageId );
+        return $storage->getUrl( $storage->getFiles->[0] );
+    }
+    return;
+}
 
 #-------------------------------------------------------------------
 
