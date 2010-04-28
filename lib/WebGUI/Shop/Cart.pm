@@ -991,12 +991,10 @@ sub www_view {
                                  ,
         shippableItemsInCart    => $self->requiresShipping,
     );
-    $session->log->warn('below var block');
 
-    # if there is no shipping address we can't check out
-    # if there is a shipping address calculate tax and shipping options
-    if ($address) {
-        $session->log->warn('have address');
+    $var{shippableItemsInCart} = $self->requiresShipping;
+    if ($var{shippableItemsInCart}) {
+        $session->log->warn('shipping required');
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
         my $numberOfOptions = scalar keys %{ $options };
