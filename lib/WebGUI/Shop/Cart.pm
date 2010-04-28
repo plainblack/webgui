@@ -40,7 +40,7 @@ These subroutines are available from this package:
 
 readonly session => my %session;
 private properties => my %properties;
-private error => my %error;
+public error => my %error;
 private addressBookCache => my %addressBookCache;
 
 #-------------------------------------------------------------------
@@ -521,8 +521,12 @@ Returns whether all the required properties of the the cart are set.
 sub readyForCheckout {
     my $self    = shift;
 
+    # Check if the billing address is set and correct
+    my $address = eval{$self->getBillingAddress};
+    return 0 if WebGUI::Error->caught;
+
     # Check if the shipping address is set and correct
-    my $address = eval{$self->getShippingAddress};
+    my $shipAddress = eval{$self->getShippingAddress};
     return 0 if WebGUI::Error->caught;
 
     # Check if the cart has items
@@ -534,7 +538,7 @@ sub readyForCheckout {
     # Check minimum cart checkout requirement
     my $total = eval { $self->calculateTotal };
     if (my $e = WebGUI::Error->caught) {
-        $error{id $self} = $e->error;
+        $self->error($e->error);
         return 0;
     }
     my $requiredAmount = $self->session->setting->get( 'shopCartCheckoutMinimum' );
@@ -566,6 +570,26 @@ sub requiresRecurringPayment {
     # Look for recurring items in the cart
     foreach my $item (@{ $self->getItems }) {
         return 1 if $item->getSku->isRecurring;
+    }
+
+    # No recurring items in cart so return false
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 requiresShipping ( )
+
+Returns whether any item in this cart requires shipping.
+
+=cut
+
+sub requiresShipping {
+    my $self    = shift;
+
+    # Look for recurring items in the cart
+    foreach my $item (@{ $self->getItems }) {
+        return 1 if $item->getSku->isShippingRequired;
     }
 
     # No recurring items in cart so return false
@@ -620,7 +644,7 @@ sub update {
 
 =head2 updateFromForm ( )
 
-Updates the cart totals from form data.
+Updates the cart totals, the address fields and the shipping and billing options from form data.
 
 =cut
 
@@ -648,13 +672,17 @@ sub updateFromForm {
 
     my $cartProperties = {};
     my %billingData = $book->processAddressForm('billing_');
+    my @missingBillingFields = $book->missingFields(\%billingData);
+    if (@missingBillingFields) {
+        $self->error('missing billing '.$missingBillingFields[0]);
+    }
     my $billingAddressId = $form->process('billingAddressId');
-    if ($billingAddressId eq 'new_address' && ! exists $billingData{'error'}) {
+    if ($billingAddressId eq 'new_address' && ! @missingBillingFields) {
         ##Add a new address
         my $newAddress = $book->addAddress(\%billingData);
         $cartProperties->{billingAddressId} = $newAddress->get('addressId');
     }
-    elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId')) {
+    elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId') && ! @missingBillingFields) {
         ##User changed the address selector
         my $address = $self->getBillingAddress();
         $address->update(\%billingData);
@@ -663,29 +691,35 @@ sub updateFromForm {
         $cartProperties->{billingAddressId} = $billingAddressId;
     }
     else {
-        $self->session->log->warn('billing address: something else: '. $billingData{error});
+        $self->session->log->warn('billing address: something else: ');
     }
 
-    my %shippingData = $book->processAddressForm('shipping_');
-    my $shippingAddressId = $form->process('shippingAddressId');
-    if ($form->process('sameShippingAsBilling', 'yesNo')) {
-        $cartProperties->{shippingAddressId} = $self->get('billingAddressId');
-    }
-    elsif ($shippingAddressId eq 'new_address' && ! exists $shippingData{'error'}) {
-        ##Add a new address
-        my $newAddress = $book->addAddress(\%shippingData);
-        $cartProperties->{shippingAddressId} = $newAddress->get('addressId');
-    }
-    elsif ($shippingAddressId eq 'update_address' && $self->get('shippingAddressId')) {
-        ##User changed the address selector
-        my $address = $self->getBillingAddress();
-        $address->update(\%shippingData);
-    }
-    elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
-        $cartProperties->{shippingAddressId} = $shippingAddressId;
-    }
-    else {
-        $self->session->log->warn('shipping address: something else: '. $shippingData{error});
+    if ($self->requiresShipping) {
+        my %shippingData = $book->processAddressForm('shipping_');
+        my @missingShippingFields = $book->missingFields(\%shippingData);
+        if (@missingShippingFields) {
+            $self->error('missing shipping '.$missingShippingFields[0]);
+        }
+        my $shippingAddressId = $form->process('shippingAddressId');
+        if ($form->process('sameShippingAsBilling', 'yesNo')) {
+            $cartProperties->{shippingAddressId} = $self->get('billingAddressId');
+        }
+        elsif ($shippingAddressId eq 'new_address' && ! @missingShippingFields) {
+            ##Add a new address
+            my $newAddress = $book->addAddress(\%shippingData);
+            $cartProperties->{shippingAddressId} = $newAddress->get('addressId');
+        }
+        elsif ($shippingAddressId eq 'update_address' && $self->get('shippingAddressId') && ! @missingShippingFields) {
+            ##User changed the address selector
+            my $address = $self->getBillingAddress();
+            $address->update(\%shippingData);
+        }
+        elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
+            $cartProperties->{shippingAddressId} = $shippingAddressId;
+        }
+        else {
+            $self->session->log->warn('shipping address: something else: ');
+        }
     }
 
     $cartProperties->{ shipperId } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
@@ -860,7 +894,6 @@ sub www_view {
     }
 
     # generate template variables for the items in the cart
-    my $shippableItemsInCart = 0;
     foreach my $item (@cartItems) {
         my $sku = $item->getSku;
         $sku->applyOptions($item->get("options"));
@@ -876,7 +909,6 @@ sub www_view {
                extras=>q|onclick="this.form.method.value='removeItem';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("Special shipping"), }),
         );
-        $shippableItemsInCart ||= $properties{isShippable};
         my $itemAddress = eval {$item->getShippingAddress};
         if ((!WebGUI::Error->caught) && $itemAddress && $address && $itemAddress->getId ne $address->getId) {
             $properties{shippingAddress} = $itemAddress->getHtmlFormatted;
@@ -909,7 +941,7 @@ sub www_view {
                                  ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
                                  : 0
                                  ,
-        shippableItemsInCart    => $shippableItemsInCart,
+        shippableItemsInCart    => $self->requiresShipping,
     );
     $session->log->warn('below var block');
 
@@ -923,7 +955,7 @@ sub www_view {
         if ($numberOfOptions < 1) {
             $var{shippingOptions} = '';
             $var{shippingPrice}   = 0;
-            $error{id $self}      = $i18n->get("No shipping plugins configured");
+            $self->error($i18n->get("No shipping plugins configured"));
         }
         elsif ($numberOfOptions == 1) {
             my ($option) = keys %{ $options };
@@ -951,7 +983,7 @@ sub www_view {
             }
             else {
                 $var{shippingPrice} = 0;
-                $error{id $self}    = ($i18n->get('Choose a shipping method and update the cart to checkout'));
+                $self->error($i18n->get('Choose a shipping method and update the cart to checkout'));
             }
             $var{shippingPrice} = $shipperId && $options->{$shipperId}->{hasPrice} ? $self->formatCurrency($var{shippingPrice}) : '';
             $var{tax} = $self->calculateTaxes;
@@ -1052,8 +1084,8 @@ sub www_view {
     $var{ inShopCreditAvailable } = $credit->getSum;
     $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
     $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
-    $var{ readyForCheckout      } = $self->readyForCheckout;
-    $var{ error                 } = $error{id $self}; 
+    #$var{ readyForCheckout      } = $self->readyForCheckout;
+    $var{ error                 } = $self->error; 
 
     # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));

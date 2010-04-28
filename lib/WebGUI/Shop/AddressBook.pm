@@ -9,6 +9,7 @@ use WebGUI::Exception::Shop;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Shop::Address;
+use Scalar::Util qw/blessed/;
 
 =head1 NAME
 
@@ -282,6 +283,36 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 missingFields ( $address ) 
+
+Returns a list of missing, required fields in this address.
+
+=head3 $address
+
+An address.  If it's an WebGUI::Shop::Address object, it will use the data
+from it.  Otherwise, it will assume that $address is just a hashref.
+
+=cut
+
+sub missingFields {
+    my $self    = shift;
+    my $address = shift;
+    my $addressData;
+    if (blessed $address && $address->isa('WebGUI::Shop::Address')) {
+        $addressData = $address->get();
+    }
+    else {
+        $addressData = $address;
+    }
+    my @missingFields = ();
+    FIELD: foreach my $field (qw/label firstName lastName address1 city code country phoneNumber/) {
+        push @missingFields, $field if $addressData->{$field} eq '';
+    }
+    return @missingFields;
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, addressBookId )
 
 Constructor.  Instanciates an addressBook based upon a addressBookId.
@@ -400,17 +431,11 @@ sub processAddressForm {
         email           => $form->get($prefix . "email",       "email"),
         organization    => $form->get($prefix . "organization"),
     );
-    my $i18n = WebGUI::International->new($self->session, "Shop");
-    FIELD: foreach my $field (qw/label firstName lastName address1 city code country phoneNumber/) {
-        my $label = $field eq 'address1'    ? 'address'
-                  : $field eq 'phoneNumber' ? 'phone number'
-                  : $field
-                  ;
-        if ($addressData{$field} eq "") {
-            $addressData{error} = sprintf($i18n->get('is a required field'), $i18n->get($label));
-            last FIELD;
-        }    
-    }
+    #my $label = $field eq 'address1'    ? 'address'
+    #          : $field eq 'phoneNumber' ? 'phone number'
+    #          : $field
+    #          ;
+
     return %addressData;
 }
 
@@ -588,8 +613,9 @@ sub www_editAddressSave {
     my $self = shift;
     my $form = $self->session->form;
     my %addressData = $self->processAddressForm();
-    if (exists $addressData{error}) {
-        return $self->www_editAddress($addressData{error});
+    my @missingFields = $self->missingFields(\%addressData);
+    if (@missingFields) {
+        return $self->www_editAddress(pop @missingFields);
     }
     if ($form->get('addressId') eq '') {
         $self->addAddress(\%addressData);
