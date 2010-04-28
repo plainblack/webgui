@@ -165,6 +165,9 @@ sub addPayDriverTemplates {
         if ($gateway->isa('WebGUI::Shop::PayDriver::Cash')) {
             $properties->{summaryTemplateId} = '30h5rHxzE_Q0CyI3Gg7EJw';
         }
+        elsif ($gateway->isa('WebGUI::Shop::PayDriver::Ogone')) {
+            $properties->{summaryTemplateId} = 'jysVZeUR0Bx2NfrKs5sulg';
+        }
         $gateway->update($properties);
     }
     print "DONE!\n" unless $quiet;

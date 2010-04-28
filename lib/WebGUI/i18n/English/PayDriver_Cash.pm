@@ -164,7 +164,7 @@ our $I18N = {
         lastUpdated => 0,
         context => q|Form label in the configuration form of the Cash module.|
     },
-       'summary template help' => {
+    'summary template help' => {
         message => q|Pick a template to display the screen where the user confirms the cart summary info and agrees to pay.|,
         lastUpdated => 0,
         context => q|Hover help for the summary template field in the configuration form of the Cash module.|

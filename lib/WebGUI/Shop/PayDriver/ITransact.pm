@@ -469,27 +469,6 @@ sub doXmlRequest {
 
 #-------------------------------------------------------------------
 
-=head2 getButton 
-
-Return a form to select this payment driver and to accept credentials from those
-who wish to use it.
-
-=cut
-
-sub getButton {
-    my $self    = shift;
-    my $session = $self->session;
-
-    my $payForm = WebGUI::Form::formHeader($session)
-        . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $self->get('label') })
-        . WebGUI::Form::formFooter($session);
-
-    return $payForm;
-}
-
-#-------------------------------------------------------------------
-
 =head2 handlesRecurring
 
 Tells the commerce system that this payment plugin can handle recurring payments.
