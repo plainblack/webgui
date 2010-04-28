@@ -55,6 +55,15 @@ sub definition {
     my $i18n = WebGUI::International->new($session, 'PayDriver_Cash');
 
     tie my %fields, 'Tie::IxHash';
+    %fields = (
+        summaryTemplateId  => {
+            fieldType    => 'template',
+            label        => $i18n->get('summary template'),
+            hoverHelp    => $i18n->get('summary template help'),
+            namespace    => 'Shop/Credentials',
+            defaultValue => '30h5rHxzE_Q0CyI3Gg7EJw',
+        },
+    );
 
     push @{ $definition }, {
         name        => $i18n->get('label'),
@@ -92,46 +101,28 @@ sub www_getCredentials {
     my ($self, $addressId)    = @_;
     my $session = $self->session;
 
-    # Process address from address book if passed
-    $addressId   = $session->form->process( 'addressId' );
-    my $address;
-    if ( $addressId ) {
-        $address    = eval{ $self->getAddress( $addressId ) };
-    }
-    else { 
-        $address    = $self->getCart->getShippingAddress;
-    }
-    my $billingAddressHtml = $address->getHtmlFormatted;
-
-    # Generate the json string that defines where the address book posts the selected address
-    my $callbackParams = {
-        url     => $session->url->page,
-        params  => [
-            { name => 'shop',               value => 'pay' },
-            { name => 'method',             value => 'do' },
-            { name => 'do',                 value => 'setBillingAddress' },
-            { name => 'paymentGatewayId',   value => $self->getId },
-        ],
-    };
-    my $callbackJson = JSON::to_json( $callbackParams );
-
-    # Generate 'Choose billing address' button
-    my $addressButton = WebGUI::Form::formHeader( $session )
-        . WebGUI::Form::hidden( $session, { name => 'shop',     value => 'address' } )
-        . WebGUI::Form::hidden( $session, { name => 'method',   value => 'view' } )
-        . WebGUI::Form::hidden( $session, { name => 'callback', value => $callbackJson } )
-        . WebGUI::Form::submit( $session, { value => 'Choose billing address' } )
-        . WebGUI::Form::formFooter( $session);
-
-
     # Generate 'Proceed' button
-    my $proceedButton = WebGUI::Form::formHeader( $session )
-        . $self->getDoFormTags('pay')
-        . WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
-        . WebGUI::Form::submit( $session, { value => 'Pay' } )
-        . WebGUI::Form::formFooter( $session);
+    my $i18n = WebGUI::International->new($session, 'PayDriver_Cash');
+    my $var = {
+        proceedButton => WebGUI::Form::formHeader( $session )
+                       . $self->getDoFormTags('pay')
+                       . WebGUI::Form::submit( $session, { value => $i18n->get('Pay') } )
+                       . WebGUI::Form::formFooter( $session)
+                       ,
+    };
+    $self->appendCartVariables($var);
 
-    return $session->style->userStyle($addressButton.'<br />'.$billingAddressHtml.'<br />'.$proceedButton);
+    my $template = WebGUI::Asset::Template->new($session, $self->get("summaryTemplateId"));
+    my $output;
+    if (defined $template) {
+        $template->prepare;
+        $output = $template->process($var);
+    }
+    else {
+        $output = $i18n->get('template gone', 'PayDriver_ITransact');
+    }
+
+    return $session->style->userStyle($output);
 }
 
 #-------------------------------------------------------------------
@@ -144,36 +135,14 @@ Checks credentials, and completes the transaction if those are correct.
 
 sub www_pay {
     my $self    = shift;
-    my $session = $self->session;
-    my $cart    = $self->getCart;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_Cash');
     my $var;
 
     # Make sure we can checkout the cart
     return "" unless $self->canCheckoutCart;
 
-    # Make sure all required credentials have been supplied
-    my $billingAddress = $self->getAddress( $session->form->process('addressId') );
-    return $self->www_getCredentials unless $billingAddress;
-
     # Complete the transaction
-    my $transaction = $self->processTransaction( $billingAddress );
+    my $transaction = $self->processTransaction( );
     return $transaction->thankYou();
 }
 
-#-------------------------------------------------------------------
-
-=head2 www_setBillingAddress {
-
-Stores the selected billing address in this instance.
-
-=cut
-
-sub www_setBillingAddress {
-    my $self    = shift;
-    my $session = $self->session;
-    return $self->www_getCredentials($session->form->process('addressId'));
-}
-
 1;
-

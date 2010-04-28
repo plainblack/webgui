@@ -24,6 +24,7 @@ use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Asset::WikiPage;
 use WebGUI::Exception;
+use WebGUI::Shop::Pay;
 
 
 my $toVersion = '7.9.4';
@@ -40,6 +41,7 @@ alterCartTable($session);
 alterAddressBookTable($session);
 addWizardHandler( $session );
 addTemplateExampleImage( $session );
+addPayDriverTemplates( $session );
 
 finish($session); # this line required
 
@@ -147,6 +149,24 @@ sub alterCartTable {
     # and here's our code
     $session->db->write("ALTER TABLE cart ADD COLUMN billingAddressId CHAR(22)");
     $session->db->write("ALTER TABLE cart ADD COLUMN gatewayId        CHAR(22)");
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addPayDriverTemplates {
+    my $session = shift;
+    print "\tAdd templates to the Payment Drivers that need them... " unless $quiet;
+    # and here's our code
+    my $pay = WebGUI::Shop::Pay->new($session);
+    my @gateways = @{ $pay->getPaymentGateways };
+    GATEWAY: foreach my $gateway (@gateways) {
+        next GATEWAY unless $gateway;
+        my $properties = $gateway->get;
+        if ($gateway->isa('WebGUI::Shop::PayDriver::Cash')) {
+            $properties->{summaryTemplateId} = '30h5rHxzE_Q0CyI3Gg7EJw';
+        }
+        $gateway->update($properties);
+    }
     print "DONE!\n" unless $quiet;
 }
 

@@ -158,6 +158,33 @@ our $I18N = {
 		message => q|When set to 'yes', the transaction is completed when the user submits payment details.  When set to 'no', the transaction is set to pending and must be manually set to complete.  This may be useful if you wish to allow site visitors to select the Cash Payment method, but would like to wait for payment to clear before completing the transaction.|,
 		lastUpdated => 0,
 	},
+
+    'summary template' => {
+        message => q|Summary Template|,
+        lastUpdated => 0,
+        context => q|Form label in the configuration form of the Cash module.|
+    },
+       'summary template help' => {
+        message => q|Pick a template to display the screen where the user confirms the cart summary info and agrees to pay.|,
+        lastUpdated => 0,
+        context => q|Hover help for the summary template field in the configuration form of the Cash module.|
+    },
+ 
+	'password' => {
+		message => q|Password|,
+		lastUpdated => 0,
+		context => q|Form label in the configuration form of the iTransact module.|
+	},
+	'password help' => {
+		message => q|The password for your ITransact account.|,
+		lastUpdated => 0,
+		context => q|Hover help for the password field in the configuration form of the iTransact module.|
+	},
+	'Pay' => {
+		message => q|Pay|,
+		lastUpdated => 0,
+		context => q|Button label|
+	},
 };
 
 1;

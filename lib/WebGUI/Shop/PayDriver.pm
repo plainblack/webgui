@@ -82,6 +82,33 @@ sub _buildObj {
 
 #-------------------------------------------------------------------
 
+=head2 appendCartVariables ( $var )
+
+Append the subtotal, shipping, tax, and shop credeductions to a set of template
+variables.
+
+=cut
+
+sub appendCartVariables {
+    my ($self, $var) = @_;
+    $var      ||= {};
+    my $cart    = $self->getCart;
+    $var->{shippableItemsInCart} = $cart->requiresShipping;
+    $var->{subtotal} = $cart->calculateSubtotal;
+    $var->{shipping} = $cart->calculateShipping;
+    $var->{taxes}    = $cart->calculateTaxes;
+    my $totalPrice   = $var->{subtotal} + $var->{shipping} + $var->{taxes};
+    my $session = $self->session;
+    my $credit = WebGUI::Shop::Credit->new($session, $cart->getPosUser->userId);
+    $var->{inShopCreditAvailable} = $credit->getSum;
+    $var->{inShopCreditDeduction} = $credit->calculateDeduction($var->{totalPrice});
+    $var->{totalPrice           } = $self->formatCurrency($totalPrice + $var->{inShopCreditDeduction});
+    return $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 cancelRecurringPayment ( transaction )
 
 Cancels a recurring transaction. Returns an array containing ( isSuccess, gatewayStatus, gatewayError). Needs to be overridden by subclasses capable of dealing with recurring payments.

@@ -78,15 +78,11 @@ The amount to calculate the deduction against. Defaults to calculateTotal().
 
 sub calculateShopCreditDeduction {
     my ($self, $total) = @_;
-    # cannot use in-shop credit on recurring items
-    foreach my $item (@{$self->getItems}) {
-        if ($item->getSku->isRecurring) {
-            return $self->formatCurrency(0);
-        }
-    }
     unless (defined $total) {
         $total = $self->calculateTotal
     }
+    # cannot use in-shop credit on recurring items
+    return $self->formatCurrency(0) if $self->requiresRecurringPayment;
     return $self->formatCurrency(WebGUI::Shop::Credit->new($self->session, $self->get('posUserId'))->calculateDeduction($total));
 }
 
