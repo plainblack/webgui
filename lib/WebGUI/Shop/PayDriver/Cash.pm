@@ -66,27 +66,6 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getButton ( )
-
-Returns the HTML for a form containing a button that, when clicked, will take the user to the checkout screen of
-this plugin.
-
-=cut
-
-sub getButton {
-    my $self    = shift;
-    my $session = $self->session;
-
-    my $payForm = WebGUI::Form::formHeader($session)
-        . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $self->get('label') })
-        . WebGUI::Form::formFooter($session);
-
-    return $payForm;
-}
-
-#-------------------------------------------------------------------
-
 =head2 processPayment ( )
 
 Returns (1, undef, 1, 'Success'), meaning that the payments whith this plugin always are successful.

@@ -338,18 +338,6 @@ sub getAddress {
 
 #-------------------------------------------------------------------
 
-=head2 getButton ( )
-
-Returns the form that will take the user to check out.
-
-=cut
-
-sub getButton {
-    my $self = shift;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getCart ( )
 
 Returns the WebGUI::Shop::Cart object for the current session.
