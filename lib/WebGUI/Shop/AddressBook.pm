@@ -224,6 +224,30 @@ sub getAddress {
 
 #-------------------------------------------------------------------
 
+=head2 getAddressByLabel ( label )
+
+Returns an address object.
+
+=head3 id
+
+An address object's label, e.g. 'Home', 'Work'
+
+=cut
+
+sub getAddressByLabel {
+    my ($self, $label) = @_;
+    my $sql = q{
+        SELECT addressId
+        FROM   address
+        WHERE  addressBookId = ?
+        AND    label         = ?
+    };
+    my $id = $self->session->db->quickScalar($sql, [$self->getId, $label]);
+    return $id && $self->getAddress($id);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAddresses ( )
 
 Returns an array reference of address objects that are in this book.
@@ -466,6 +490,48 @@ sub update {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->session->db->setRow("addressBook","addressBookId",$properties{$id});
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_ajaxGetAddress ( )
+
+Gets a JSON object representing the address given by the addressId form
+parameter
+
+=cut
+
+sub www_ajaxGetAddress {
+    my $self    = shift;
+    my $session = $self->session;
+    $session->http->setMimeType('text/plain');
+
+    my $addressId = $session->form->get('addressId');
+    my $address   = $self->getAddress($addressId) or return;
+    return JSON->new->encode($address->get);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_ajaxSave ( )
+
+Saves an address book entry
+
+=cut
+
+sub www_ajaxSave {
+    my $self    = shift;
+    my $session = $self->session;
+    my $address = JSON->new->decode($session->form->get('address'));
+    my $obj     = $self->getAddressByLabel($address->{label});
+    if ($obj) {
+        $obj->update($address);
+    }
+    else {
+        $obj = $self->addAddress($address);
+    }
+    $session->http->setMimeType('text/plain');
+    return $obj->getId;
 }
 
 #-------------------------------------------------------------------
