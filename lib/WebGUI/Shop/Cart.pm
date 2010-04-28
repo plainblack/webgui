@@ -526,13 +526,15 @@ sub readyForCheckout {
     return 0 if WebGUI::Error->caught;
 
     # Check if the shipping address is set and correct
-    my $shipAddress = eval{$self->getShippingAddress};
-    return 0 if WebGUI::Error->caught;
+    if ($self->requiresShipping) {
+        my $shipAddress = eval{$self->getShippingAddress};
+        return 0 if WebGUI::Error->caught;
+    }
 
     # Check if the cart has items
     return 0 unless scalar @{ $self->getItems };
     
-    # fail if there are multiple recurring items or if
+    # fail if there are multiple recurring items
     return 0 if ($self->hasMixedItems);
 
     # Check minimum cart checkout requirement
@@ -548,6 +550,9 @@ sub readyForCheckout {
 
     ##Must have a configured shipping id.
     return 0 if ! $self->get('shipperId');
+
+    ##Must have a configured payment method.
+    return 0 if ! $self->get('gatewayId');
 
     ##Check for any other logged errors
     return 0 if $error{ id $self };
