@@ -106,6 +106,14 @@ sub definition {
     $fields{paypal}{defaultValue} = 'https://www.paypal.com/webscr';
     $fields{api}{defaultValue}    = 'https://api-3t.payPal.com/nvp';
 
+    $fields{summaryTemplateId}  = {
+        fieldType    => 'template',
+        label        => $i18n->get('summary template'),
+        hoverHelp    => $i18n->get('summary template help'),
+        namespace    => 'Shop/Credentials',
+        defaultValue => 'GqnZPB0gLoZmqQzYFaq7bg',
+    },
+
     push @{$definition}, {
         name       => $i18n->get('name'),
         properties => \%fields,

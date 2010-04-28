@@ -168,6 +168,15 @@ sub addPayDriverTemplates {
         elsif ($gateway->isa('WebGUI::Shop::PayDriver::Ogone')) {
             $properties->{summaryTemplateId} = 'jysVZeUR0Bx2NfrKs5sulg';
         }
+        elsif ($gateway->isa('WebGUI::Shop::PayDriver::PayPal::PayPalStd')) {
+            $properties->{summaryTemplateId} = '300AozDaeveAjB_KN0ljlQ';
+        }
+        elsif ($gateway->isa('WebGUI::Shop::PayDriver::PayPal::ExpressCheckout')) {
+            $properties->{summaryTemplateId} = 'GqnZPB0gLoZmqQzYFaq7bg';
+        }
+        else {
+            die "Unknown payment driver type found.  Unable to automatically upgrade.\n";
+        }
         $gateway->update($properties);
     }
     print "DONE!\n" unless $quiet;

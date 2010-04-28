@@ -204,6 +204,34 @@ Additionally, set the &quot;Return URL&quot; to:|,
         lastUpdated => 1245364211,
         context     => q|An informational message that's shown in the configuration form of this plugin.|
     },
+
+    'summary template' => {
+        message => q|Summary Template|,
+        lastUpdated => 0,
+        context => q|Form label in the configuration form|
+    },
+    'summary template help' => {
+        message => q|Pick a template to display the screen where the user confirms the cart summary info and agrees to pay.|,
+        lastUpdated => 0,
+        context => q|Hover help for the summary template field in the configuration form|
+    },
+ 
+	'password' => {
+		message => q|Password|,
+		lastUpdated => 0,
+		context => q|Form label in the configuration form of the iTransact module.|
+	},
+	'password help' => {
+		message => q|The password for your ITransact account.|,
+		lastUpdated => 0,
+		context => q|Hover help for the password field in the configuration form of the iTransact module.|
+	},
+	'Pay' => {
+		message => q|Pay|,
+		lastUpdated => 0,
+		context => q|Button label|
+	},
+};
 };
 
 1;
