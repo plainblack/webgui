@@ -232,7 +232,6 @@ Additionally, set the &quot;Return URL&quot; to:|,
 		context => q|Button label|
 	},
 };
-};
 
 1;
 

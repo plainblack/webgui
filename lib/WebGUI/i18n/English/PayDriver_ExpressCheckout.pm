@@ -123,7 +123,6 @@ our $I18N = {
 		context => q|Button label|
 	},
 };
-};
 
 1;
 
