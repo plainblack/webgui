@@ -102,7 +102,7 @@ sub appendCartVariables {
     my $credit = WebGUI::Shop::Credit->new($session, $cart->getPosUser->userId);
     $var->{inShopCreditAvailable} = $credit->getSum;
     $var->{inShopCreditDeduction} = $credit->calculateDeduction($var->{totalPrice});
-    $var->{totalPrice           } = $self->formatCurrency($totalPrice + $var->{inShopCreditDeduction});
+    $var->{totalPrice           } = $cart->formatCurrency($totalPrice + $var->{inShopCreditDeduction});
     return $self;
 }
 

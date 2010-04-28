@@ -533,12 +533,18 @@ sub readyForCheckout {
 
     # Check if the billing address is set and correct
     my $address = eval{$self->getBillingAddress};
-    return 0 if WebGUI::Error->caught;
+    if (WebGUI::Error->caught) {
+        $self->error('no billing address');
+        return 0;
+    }
 
     # Check if the shipping address is set and correct
     if ($self->requiresShipping) {
         my $shipAddress = eval{$self->getShippingAddress};
-        return 0 if WebGUI::Error->caught;
+        if (WebGUI::Error->caught) {
+            $self->error('no shipping address');
+            return 0;
+        }
     }
 
     # Check if the cart has items
@@ -554,12 +560,16 @@ sub readyForCheckout {
         return 0;
     }
     my $requiredAmount = $self->session->setting->get( 'shopCartCheckoutMinimum' );
-    if ( $requiredAmount > 0 ) {
-        return 0 if $total < $requiredAmount;
+    if ( $requiredAmount > 0 && $total < $requiredAmount) {
+        $self->error('required amount not met in cart');
+        return 0;
     }
 
     ##Must have a configured shipping id.
-    return 0 if ! $self->get('shipperId');
+    if (! $self->get('shipperId')) {
+        $self->error('no shipping method set');
+        return 0;
+    }
 
     my $shipper = eval { WebGUI::Shop::ShipDriver->new($session, $self->get('shipperId'))};
     if (my $e = WebGUI::Error->caught) {
@@ -568,7 +578,10 @@ sub readyForCheckout {
     }
 
     ##Must have a configured payment method.
-    return 0 if ! $self->get('gatewayId');
+    if (! $self->get('gatewayId')) {
+        $self->error('no payment gateway set');
+        return 0;
+    }
 
     my $gateway = eval { WebGUI::Shop::PayDriver->new($session, $self->get('gatewayId'))};
     if (my $e = WebGUI::Error->caught) {
@@ -661,7 +674,7 @@ sub update {
         WebGUI::Error::InvalidParam->throw(error=>"Need a properties hash ref.");
     }
     my $id = id $self;
-    foreach my $field (qw(billingAddressId shippingAddressId posUserId shipperId creationDate)) {
+    foreach my $field (qw(billingAddressId shippingAddressId posUserId gatewayId shipperId creationDate)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->session->db->setRow("cart","cartId",$properties{$id});
@@ -875,11 +888,16 @@ Updates the cart totals and then displays the cart again.
 =cut
 
 sub www_update {
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
     $self->updateFromForm;
-    if ($self->session->form->get('checkout') && $self->readyForCheckout()) {
-
+    $session->log->warn('checkout form: '. $session->form->get('checkout'));
+    if ($session->form->get('checkout') && $self->readyForCheckout()) {
+        my $gateway = WebGUI::Shop::Pay->new($session)->getPaymentGateway($self->get('gatewayId'));
+        return $gateway->www_getCredentials;
     }
+    $session->log->warn('checkout form: '. $session->form->get('checkout'));
+    $session->log->warn('ready for checkout: '. $self->readyForCheckout());
     return $self->www_view;
 }
 
