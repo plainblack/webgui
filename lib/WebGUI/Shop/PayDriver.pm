@@ -625,7 +625,6 @@ sub processTransaction {
         my $transactionProperties;
         $transactionProperties->{ paymentMethod     } = $self;
         $transactionProperties->{ cart              } = $cart;
-        $transactionProperties->{ paymentAddress    } = $paymentAddress if defined $paymentAddress;
         $transactionProperties->{ isRecurring       } = $cart->requiresRecurringPayment;
     
         # Create a transaction...

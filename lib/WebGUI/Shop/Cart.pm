@@ -291,6 +291,19 @@ sub getBillingAddress {
 
 #-------------------------------------------------------------------
 
+=head2 getPaymentGateway ()
+
+Returns the WebGUI::Shop::PayDriver object that is attached to this cart for payment.
+
+=cut
+
+sub getPaymentGateway {
+    my $self = shift;
+    return WebGUI::Shop::Pay->new($self->session)->getPaymentGateway($self->get("gatewayId"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ()
 
 Returns the unique id for this cart.
@@ -520,6 +533,7 @@ Returns whether all the required properties of the the cart are set.
 
 sub readyForCheckout {
     my $self    = shift;
+    my $session = $self->session;
 
     # Check if the billing address is set and correct
     my $address = eval{$self->getBillingAddress};
@@ -551,8 +565,20 @@ sub readyForCheckout {
     ##Must have a configured shipping id.
     return 0 if ! $self->get('shipperId');
 
+    my $shipper = eval { WebGUI::Shop::ShipDriver->new($session, $self->get('shipperId'))};
+    if (my $e = WebGUI::Error->caught) {
+        $self->error($e->error);
+        return 0;
+    }
+
     ##Must have a configured payment method.
     return 0 if ! $self->get('gatewayId');
+
+    my $gateway = eval { WebGUI::Shop::PayDriver->new($session, $self->get('gatewayId'))};
+    if (my $e = WebGUI::Error->caught) {
+        $self->error($e->error);
+        return 0;
+    }
 
     ##Check for any other logged errors
     return 0 if $error{ id $self };
@@ -733,23 +759,23 @@ sub updateFromForm {
 }
 
 #-------------------------------------------------------------------
-
-=head2 www_checkout ( )
-
-Update the cart and then redirect the user to the payment gateway screen.
-
-=cut
-
-sub www_checkout {
-    my $self = shift;
-    $self->updateFromForm;
-    if ($error{id $self} ne "") {
-        return $self->www_view;
-    }
-    $self->session->http->setRedirect($self->session->url->page('shop=pay;method=selectPaymentGateway'));
-    return undef;
-}
-
+#
+#=head2 www_checkout ( )
+#
+#Update the cart and then redirect the user to the payment gateway screen.
+#
+#=cut
+#
+#sub www_checkout {
+#    my $self = shift;
+#    $self->updateFromForm;
+#    if ($error{id $self} ne "") {
+#        return $self->www_view;
+#    }
+#    $self->session->http->setRedirect($self->session->url->page('shop=pay;method=selectPaymentGateway'));
+#    return undef;
+#}
+#
 #-------------------------------------------------------------------
 
 =head2 www_continueShopping ( )
@@ -855,6 +881,9 @@ Updates the cart totals and then displays the cart again.
 sub www_update {
     my $self = shift;
     $self->updateFromForm;
+    if ($self->session->form->get('checkout') && $self->readyForCheckout()) {
+
+    }
     return $self->www_view;
 }
 

@@ -32,7 +32,7 @@ This package keeps records of every puchase made.
  my $transaction = WebGUI::Shop::Transaction->new($session, $id);
  
  # typical transaction goes like this:
- my $transaction = WebGUI::Shop::Transaction->create({ cart=>$cart, paymentMethod=>$paymentMethod, paymentAddress=>$address});
+ my $transaction = WebGUI::Shop::Transaction->create({ cart=>$cart });
  my ($transactionNumber, $status, $message) = $paymentMethod->tryTransaction;
  if ($status eq "somekindofsuccess") {
     $transaction->completePurchase($cart, $transactionNumber, $status, $message);
@@ -745,44 +745,49 @@ sub update {
     if (exists $newProperties->{cart}) {
         my $cart = $newProperties->{cart};
         $newProperties->{taxes} = $cart->calculateTaxes;
-        my $address = $cart->getShippingAddress;
-        $newProperties->{shippingAddressId} = $address->getId;
-        $newProperties->{shippingAddressName} = $address->get('firstName') . " " .$address->get('lastName');
-        $newProperties->{shippingAddress1} = $address->get('address1');
-        $newProperties->{shippingAddress2} = $address->get('address2');
-        $newProperties->{shippingAddress3} = $address->get('address3');
-        $newProperties->{shippingCity} = $address->get('city');
-        $newProperties->{shippingState} = $address->get('state');
-        $newProperties->{shippingCountry} = $address->get('country');
-        $newProperties->{shippingCode} = $address->get('code');
-        $newProperties->{shippingPhoneNumber} = $address->get('phoneNumber');
+        my $shippingAddress = $cart->getShippingAddress;
+        $newProperties->{shippingAddressId}   = $shippingAddress->getId;
+        $newProperties->{shippingAddressName} = $shippingAddress->get('firstName') . " " . $shippingAddress->get('lastName');
+        $newProperties->{shippingAddress1}    = $shippingAddress->get('address1');
+        $newProperties->{shippingAddress2}    = $shippingAddress->get('address2');
+        $newProperties->{shippingAddress3}    = $shippingAddress->get('address3');
+        $newProperties->{shippingCity}        = $shippingAddress->get('city');
+        $newProperties->{shippingState}       = $shippingAddress->get('state');
+        $newProperties->{shippingCountry}     = $shippingAddress->get('country');
+        $newProperties->{shippingCode}        = $shippingAddress->get('code');
+        $newProperties->{shippingPhoneNumber} = $shippingAddress->get('phoneNumber');
+
+        my $billingAddress = $cart->getBillingAddress;
+        $newProperties->{paymentAddressId}   = $billingAddress->getId;
+        $newProperties->{paymentAddressName} = $billingAddress->get('firstName') . " " . $billingAddress->get('lastName');
+        $newProperties->{paymentAddress1}    = $billingAddress->get('address1');
+        $newProperties->{paymentAddress2}    = $billingAddress->get('address2');
+        $newProperties->{paymentAddress3}    = $billingAddress->get('address3');
+        $newProperties->{paymentCity}        = $billingAddress->get('city');
+        $newProperties->{paymentState}       = $billingAddress->get('state');
+        $newProperties->{paymentCountry}     = $billingAddress->get('country');
+        $newProperties->{paymentCode}        = $billingAddress->get('code');
+        $newProperties->{paymentPhoneNumber} = $billingAddress->get('phoneNumber');
+
         my $shipper = $cart->getShipper;
-        $newProperties->{shippingDriverId} = $shipper->getId;
+        $newProperties->{shippingDriverId}    = $shipper->getId;
         $newProperties->{shippingDriverLabel} = $shipper->get('label');
-        $newProperties->{shippingPrice} = $shipper->calculate($cart);
-        $newProperties->{amount} = $cart->calculateTotal + $newProperties->{shopCreditDeduction};
+        $newProperties->{shippingPrice}       = $shipper->calculate($cart);
+        $newProperties->{amount}              = $cart->calculateTotal + $newProperties->{shopCreditDeduction};
         $newProperties->{shopCreditDeduction} = $cart->calculateShopCreditDeduction($newProperties->{amount});
-        $newProperties->{amount} += $newProperties->{shopCreditDeduction};
+        $newProperties->{amount}             += $newProperties->{shopCreditDeduction};
+
+        my $pay = $cart->getPaymentGateway;
+        $newProperties->{paymentDriverId}    = $pay->getId;
+        $newProperties->{paymentDriverLabel} = $pay->get('label');
+
         foreach my $item (@{$cart->getItems}) {
             $self->addItem({item=>$item});
         }
     }
-    if (exists $newProperties->{paymentAddress}) {
-        my $address = $newProperties->{paymentAddress};
-        $newProperties->{paymentAddressId} = $address->getId;
-        $newProperties->{paymentAddressName} = $address->get('firstName') ." ". $address->get('lastName');
-        $newProperties->{paymentAddress1} = $address->get('address1');
-        $newProperties->{paymentAddress2} = $address->get('address2');
-        $newProperties->{paymentAddress3} = $address->get('address3');
-        $newProperties->{paymentCity} = $address->get('city');
-        $newProperties->{paymentState} = $address->get('state');
-        $newProperties->{paymentCountry} = $address->get('country');
-        $newProperties->{paymentCode} = $address->get('code');
-        $newProperties->{paymentPhoneNumber} = $address->get('phoneNumber');
-    }
     if (exists $newProperties->{paymentMethod}) {
         my $pay = $newProperties->{paymentMethod};
-        $newProperties->{paymentDriverId} = $pay->getId;
+        $newProperties->{paymentDriverId}    = $pay->getId;
         $newProperties->{paymentDriverLabel} = $pay->get('label');
     }
     my @fields = (qw( isSuccessful transactionCode statusCode statusMessage amount shippingAddressId
