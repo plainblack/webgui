@@ -85,7 +85,7 @@ to the current site's configuration file name
 
 sub new { 
     my ( $class, $session, $key, $namespace ) = @_;
-    my $namespace ||= $session->config->getFilename;
+    $namespace ||= $session->config->getFilename;
     $key    = $class->parseKey( $key );
 
     # Create CHI object from config
