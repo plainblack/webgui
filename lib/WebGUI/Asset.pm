@@ -1825,11 +1825,7 @@ no revision date is available it will return undef.
 =cut
 
 sub new {
-    my $class           = shift;
-    my $session         = shift;
-    my $assetId         = shift;
-    my $className       = shift;
-    my $revisionDate    = shift;
+    my ( $class, $session, $assetId, $className, $revisionDate ) = @_;
 
     unless (defined $assetId) {
         $session->errorHandler->error("Asset constructor new() requires an assetId.");
@@ -1867,18 +1863,19 @@ sub new {
             $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
             return undef;
         }
+        # Deserialize
+        foreach my $definition (@{ $class->definition($session) }) {
+            foreach my $property (keys %{ $definition->{properties} }) {
+                if ($definition->{properties}->{$property}->{serialize} && $properties->{$property} ne '') {
+                    $properties->{$property} = JSON->new->canonical->decode($properties->{$property});
+                }
+            }
+        }
         $cache->set($properties,60*60*24);
     }
     if (defined $properties) {
         my $object = { _session=>$session, _properties => $properties };
         bless $object, $class;
-        foreach my $definition (@{ $object->definition($session) }) {
-            foreach my $property (keys %{ $definition->{properties} }) {
-                if ($definition->{properties}->{$property}->{serialize} && $object->{_properties}->{$property} ne '') {
-                    $object->{_properties}->{$property} = JSON->new->canonical->decode($object->{_properties}->{$property});
-                }
-            }
-        }
         return $object;
     }	
     $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
