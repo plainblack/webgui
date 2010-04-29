@@ -365,6 +365,19 @@ sub getAddress {
 
 #-------------------------------------------------------------------
 
+=head2 getButton ( )
+
+Used for the generic, vanilla checkout form.  Must be overridden by any methods that
+use the default www_getCredentials.
+
+=cut
+
+sub getButton {
+    return '';
+}
+
+#-------------------------------------------------------------------
+
 =head2 getCart ( )
 
 Returns the WebGUI::Shop::Cart object for the current session.
@@ -373,9 +386,7 @@ Returns the WebGUI::Shop::Cart object for the current session.
 
 sub getCart {
     my $self = shift;
-
     my $cart = WebGUI::Shop::Cart->newBySession( $self->session );
-
     return $cart;
 }
 
@@ -719,6 +730,40 @@ Accessor for the unique identifier for this PayDriver.  The paymentGatewayId is
 a GUID.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 www_getCredentials ( )
+
+Displays a summary of the cart, and a button to checkout.  Plugins that need to get additional
+information, or perform additional checks, should override this method.  Uses the getButton
+method to create the checkout button.
+
+=cut
+
+sub www_getCredentials {
+    my ($self)    = @_;
+    my $session = $self->session;
+
+    # Generate 'Proceed' button
+    my $i18n = WebGUI::International->new($session, 'PayDriver_Cash');
+    my $var = {
+        proceedButton => $self->getButton,
+    };
+    $self->appendCartVariables($var);
+
+    my $template = WebGUI::Asset::Template->new($session, $self->get("summaryTemplateId"));
+    my $output;
+    if (defined $template) {
+        $template->prepare;
+        $output = $template->process($var);
+    }
+    else {
+        $output = $i18n->get('template gone', 'PayDriver_ITransact');
+    }
+
+    return $session->style->userStyle($output);
+}
 
 #-------------------------------------------------------------------
 

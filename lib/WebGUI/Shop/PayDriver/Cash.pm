@@ -75,6 +75,27 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getButton ( )
+
+Return a form with button to finalize checkout from the Shop.
+
+=cut
+
+sub getButton {
+    my ($self)    = @_;
+    my $session = $self->session;
+
+    # Generate 'Proceed' button
+    my $i18n = WebGUI::International->new($session, 'PayDriver_Cash');
+    return   WebGUI::Form::formHeader( $session )
+           . $self->getDoFormTags('pay')
+           . WebGUI::Form::submit( $session, { value => $i18n->get('Pay') } )
+           . WebGUI::Form::formFooter( $session)
+           ;
+}
+
+#-------------------------------------------------------------------
+
 =head2 processPayment ( )
 
 Returns (1, undef, 1, 'Success'), meaning that the payments whith this plugin always are successful.
@@ -83,46 +104,6 @@ Returns (1, undef, 1, 'Success'), meaning that the payments whith this plugin al
 
 sub processPayment {
     return (1, undef, 1, 'Success');
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_getCredentials ( [ addressId ] )
-
-Displays the checkout form for this plugin.
-
-=head3 addressId
-
-Optionally supply this variable which will set the payment address to this addressId.
-
-=cut
-
-sub www_getCredentials {
-    my ($self, $addressId)    = @_;
-    my $session = $self->session;
-
-    # Generate 'Proceed' button
-    my $i18n = WebGUI::International->new($session, 'PayDriver_Cash');
-    my $var = {
-        proceedButton => WebGUI::Form::formHeader( $session )
-                       . $self->getDoFormTags('pay')
-                       . WebGUI::Form::submit( $session, { value => $i18n->get('Pay') } )
-                       . WebGUI::Form::formFooter( $session)
-                       ,
-    };
-    $self->appendCartVariables($var);
-
-    my $template = WebGUI::Asset::Template->new($session, $self->get("summaryTemplateId"));
-    my $output;
-    if (defined $template) {
-        $template->prepare;
-        $output = $template->process($var);
-    }
-    else {
-        $output = $i18n->get('template gone', 'PayDriver_ITransact');
-    }
-
-    return $session->style->userStyle($output);
 }
 
 #-------------------------------------------------------------------
