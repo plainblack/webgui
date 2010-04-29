@@ -530,6 +530,7 @@ Returns whether all the required properties of the the cart are set.
 sub readyForCheckout {
     my $self    = shift;
     my $session = $self->session;
+    my $book    = $self->getAddressBook;
 
     # Check if the billing address is set and correct
     my $address = eval{$self->getBillingAddress};
@@ -538,11 +539,21 @@ sub readyForCheckout {
         return 0;
     }
 
+    if (my @missingFields = $book->missingFields($address->get)) {
+        $self->error($missingFields[0]);
+        return 0;
+    }
+
     # Check if the shipping address is set and correct
     if ($self->requiresShipping) {
         my $shipAddress = eval{$self->getShippingAddress};
         if (WebGUI::Error->caught) {
             $self->error('no shipping address');
+            return 0;
+        }
+
+        if (my @missingFields = $book->missingFields($shipAddress->get)) {
+            $self->error($missingFields[0]);
             return 0;
         }
     }
@@ -713,23 +724,26 @@ sub updateFromForm {
     my $cartProperties = {};
     my %billingData = $book->processAddressForm('billing_');
     my @missingBillingFields = $book->missingFields(\%billingData);
-    if (@missingBillingFields) {
-        $self->error('missing billing '.$missingBillingFields[0]);
-    }
     my $billingAddressId = $form->process('billingAddressId');
     if ($billingAddressId eq 'new_address' && ! @missingBillingFields) {
         ##Add a new address
+        $self->session->log->warn('add a new address');
         my $newAddress = $book->addAddress(\%billingData);
         $cartProperties->{billingAddressId} = $newAddress->get('addressId');
     }
     elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId') && ! @missingBillingFields) {
+        $self->session->log->warn('update this address: '.$billingAddressId);
         ##User updated the current address
         my $address = $self->getBillingAddress();
         $address->update(\%billingData);
     }
     elsif ($billingAddressId ne 'new_address' && $billingAddressId) {
         ##User changed the address selector to another address field
+        $self->session->log->warn('change address to: '.$billingAddressId);
         $cartProperties->{billingAddressId} = $billingAddressId;
+    }
+    elsif (@missingBillingFields) {
+        $self->error('missing billing '.$missingBillingFields[0]);
     }
     else {
         $self->session->log->warn('billing address: something else: ');
@@ -740,28 +754,31 @@ sub updateFromForm {
     if ($self->requiresShipping) {
         my %shippingData = $book->processAddressForm('shipping_');
         my @missingShippingFields = $book->missingFields(\%shippingData);
-        if (@missingShippingFields) {
-            $self->error('missing shipping '.$missingShippingFields[0]);
-        }
         my $shippingAddressId = $form->process('shippingAddressId');
         if ($form->process('sameShippingAsBilling', 'yesNo')) {
             $cartProperties->{shippingAddressId} = $self->get('billingAddressId');
         }
-        elsif ($shippingAddressId eq 'new_address' && ! @missingShippingFields) {
-            ##Add a new address
-            my $newAddress = $book->addAddress(\%shippingData);
-            $cartProperties->{shippingAddressId} = $newAddress->get('addressId');
-        }
-        elsif ($shippingAddressId eq 'update_address' && $self->get('shippingAddressId') && ! @missingShippingFields) {
-            ##User changed the address selector
-            my $address = $self->getBillingAddress();
-            $address->update(\%shippingData);
-        }
-        elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
-            $cartProperties->{shippingAddressId} = $shippingAddressId;
-        }
         else {
-            $self->session->log->warn('shipping address: something else: ');
+            ##No missing shipping fields, if we set to the same as the billing fields
+            if (@missingShippingFields) {
+                $self->error('missing shipping '.$missingShippingFields[0]);
+            }
+            if ($shippingAddressId eq 'new_address' && ! @missingShippingFields) {
+                ##Add a new address
+                my $newAddress = $book->addAddress(\%shippingData);
+                $cartProperties->{shippingAddressId} = $newAddress->get('addressId');
+            }
+            elsif ($shippingAddressId eq 'update_address' && $self->get('shippingAddressId') && ! @missingShippingFields) {
+                ##User changed the address selector
+                my $address = $self->getBillingAddress();
+                $address->update(\%shippingData);
+            }
+            elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
+                $cartProperties->{shippingAddressId} = $shippingAddressId;
+            }
+            else {
+                $self->session->log->warn('shipping address: something else: ');
+            }
         }
     }
 
@@ -972,7 +989,7 @@ sub www_view {
 
         push(@items, \%properties);
     }
-    $session->log->warn('below item loop');
+    #$session->log->warn('below item loop');
 
     my %var = (
         %{$self->get},
@@ -997,7 +1014,7 @@ sub www_view {
 
     $var{shippableItemsInCart} = $self->requiresShipping;
     if ($var{shippableItemsInCart}) {
-        $session->log->warn('shipping required');
+        #$session->log->warn('shipping required');
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
         my $numberOfOptions = scalar keys %{ $options };
@@ -1041,14 +1058,14 @@ sub www_view {
     else {
        $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
     }
-    $session->log->warn('current user is visitor');
+    #$session->log->warn('current user is visitor');
 
     # Tax variables
 
     #Address form variables
     $var{userIsVisitor} = $session->user->isVisitor;
     if ($var{userIsVisitor}) {
-        $session->log->warn('current user is visitor');
+        #$session->log->warn('current user is visitor');
         $var{loginFormHeader} = WebGUI::Form::formHeader($session, {action => $session->url->page})
                               . WebGUI::Form::hidden($session,{ name => 'op',     value => 'auth'})
                               . WebGUI::Form::hidden($session,{ name => 'method', value => 'login'})
@@ -1061,7 +1078,7 @@ sub www_view {
         $var{loginFormFooter}   = WebGUI::Form::formFooter($session)
     }
     else {
-        $session->log->warn('current user is okay');
+        #$session->log->warn('current user is okay');
         ##Address form variables
         my $addressBook = $self->getAddressBook;
         my $addresses   = $addressBook->getAddresses;
@@ -1115,7 +1132,7 @@ sub www_view {
         options => \%paymentOptions,
         value   => $self->get('gatewayId') || $form->get('gatewayId') || '',
     });
-    $session->log->warn('below payment block');
+    #$session->log->warn('below payment block');
 
     # POS variables
     $var{isCashier}     = WebGUI::Shop::Admin->new($session)->isCashier;
@@ -1125,7 +1142,7 @@ sub www_view {
     my $posUser       = $self->getPosUser;
     $var{posUsername} = $posUser->username;
     $var{posUserId}   = $posUser->userId;
-    $session->log->warn('below POS');
+    #$session->log->warn('below POS');
 
     # calculate price adjusted for in-store credit
     $var{totalPrice}              = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
