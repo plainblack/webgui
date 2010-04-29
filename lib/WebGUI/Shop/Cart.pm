@@ -913,6 +913,14 @@ sub www_update {
             $self->update({shippingAddressId => $self->get('billingAddressId')});
         }
         if ($self->readyForCheckout()) {
+            my $total = $self->calculateTotal;
+            if (sprintf('%.2f', $total + $self->calculateShopCreditDeduction($total)) eq '0.00') {
+                my $transaction = WebGUI::Shop::Transaction->create($session, {self => $self});
+                $transaction->completePurchase('zero', 'success', 'success');
+                $self->onCompletePurchase;
+                $transaction->sendNotifications();
+                return $transaction->thankYou();
+            }
             my $gateway = WebGUI::Shop::Pay->new($session)->getPaymentGateway($self->get('gatewayId'));
             return $gateway->www_getCredentials;
         }
