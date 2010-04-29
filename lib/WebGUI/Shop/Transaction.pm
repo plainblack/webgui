@@ -745,17 +745,6 @@ sub update {
     if (exists $newProperties->{cart}) {
         my $cart = $newProperties->{cart};
         $newProperties->{taxes} = $cart->calculateTaxes;
-        my $shippingAddress = $cart->getShippingAddress;
-        $newProperties->{shippingAddressId}   = $shippingAddress->getId;
-        $newProperties->{shippingAddressName} = $shippingAddress->get('firstName') . " " . $shippingAddress->get('lastName');
-        $newProperties->{shippingAddress1}    = $shippingAddress->get('address1');
-        $newProperties->{shippingAddress2}    = $shippingAddress->get('address2');
-        $newProperties->{shippingAddress3}    = $shippingAddress->get('address3');
-        $newProperties->{shippingCity}        = $shippingAddress->get('city');
-        $newProperties->{shippingState}       = $shippingAddress->get('state');
-        $newProperties->{shippingCountry}     = $shippingAddress->get('country');
-        $newProperties->{shippingCode}        = $shippingAddress->get('code');
-        $newProperties->{shippingPhoneNumber} = $shippingAddress->get('phoneNumber');
 
         my $billingAddress = $cart->getBillingAddress;
         $newProperties->{paymentAddressId}   = $billingAddress->getId;
@@ -769,10 +758,29 @@ sub update {
         $newProperties->{paymentCode}        = $billingAddress->get('code');
         $newProperties->{paymentPhoneNumber} = $billingAddress->get('phoneNumber');
 
-        my $shipper = $cart->getShipper;
-        $newProperties->{shippingDriverId}    = $shipper->getId;
-        $newProperties->{shippingDriverLabel} = $shipper->get('label');
-        $newProperties->{shippingPrice}       = $shipper->calculate($cart);
+        my $shippingAddress = $cart->getShippingAddress;
+        $newProperties->{shippingAddressId}   = $shippingAddress->getId;
+        $newProperties->{shippingAddressName} = $shippingAddress->get('firstName') . " " . $shippingAddress->get('lastName');
+        $newProperties->{shippingAddress1}    = $shippingAddress->get('address1');
+        $newProperties->{shippingAddress2}    = $shippingAddress->get('address2');
+        $newProperties->{shippingAddress3}    = $shippingAddress->get('address3');
+        $newProperties->{shippingCity}        = $shippingAddress->get('city');
+        $newProperties->{shippingState}       = $shippingAddress->get('state');
+        $newProperties->{shippingCountry}     = $shippingAddress->get('country');
+        $newProperties->{shippingCode}        = $shippingAddress->get('code');
+        $newProperties->{shippingPhoneNumber} = $shippingAddress->get('phoneNumber');
+
+        if ($cart->requiresShipping) {
+            my $shipper = $cart->getShipper;
+            $newProperties->{shippingDriverId}    = $shipper->getId;
+            $newProperties->{shippingDriverLabel} = $shipper->get('label');
+            $newProperties->{shippingPrice}       = $shipper->calculate($cart);
+        }
+        else {
+            $newProperties->{shippingDriverLabel} = "NO SHIPPING";
+            $newProperties->{shippingPrice}       = 0;
+        }
+
         $newProperties->{amount}              = $cart->calculateTotal + $newProperties->{shopCreditDeduction};
         $newProperties->{shopCreditDeduction} = $cart->calculateShopCreditDeduction($newProperties->{amount});
         $newProperties->{amount}             += $newProperties->{shopCreditDeduction};
