@@ -723,16 +723,19 @@ sub updateFromForm {
         $cartProperties->{billingAddressId} = $newAddress->get('addressId');
     }
     elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId') && ! @missingBillingFields) {
-        ##User changed the address selector
+        ##User updated the current address
         my $address = $self->getBillingAddress();
         $address->update(\%billingData);
     }
     elsif ($billingAddressId ne 'new_address' && $billingAddressId) {
+        ##User changed the address selector to another address field
         $cartProperties->{billingAddressId} = $billingAddressId;
     }
     else {
         $self->session->log->warn('billing address: something else: ');
     }
+    ##Update now, so that you can add an address AND set the shipping address to be the same at the same time.
+    $self->update($cartProperties);
 
     if ($self->requiresShipping) {
         my %shippingData = $book->processAddressForm('shipping_');
