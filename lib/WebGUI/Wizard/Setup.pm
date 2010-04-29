@@ -20,6 +20,15 @@ sub _get_steps {
     )];
 }
 
+sub canView {
+    my ( $self ) = @_;
+    my $session = $self->session;
+
+    # Only specialState="init" or admin user
+    return $session->setting->get('specialState') eq 'init' 
+        || $session->user->getId eq '3';
+}
+
 sub wrapStyle {
     my ( $self, $output ) = @_;
     my $session = $self->session;
@@ -49,7 +58,7 @@ body {
     background-color:   #ccf;
 }
 
-h1 { 
+h1 {
     position: absolute; 
     top: 10px;
     padding: 0;
@@ -154,6 +163,8 @@ sub www_adminAccountSave {
     $u->profileField( "timeZone", $timezone );
     $u->profileField( "language", $language );
     $u->identifier( Digest::MD5::md5_base64( $form->process( "identifier", "password", "123qwe" ) ) );
+    # The user is now Admin
+    $session->user({ userId => "3" });
 
     $u = WebGUI::User->new( $session, "1" );
     $u->profileField( "timeZone", $timezone );

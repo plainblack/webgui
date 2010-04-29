@@ -99,6 +99,10 @@ them again after everything's done.
 sub dispatch {
     my ($self) = @_;
 
+    if ( !$self->canView ) {
+        return $self->session->privilege->noAccess;
+    }
+
     # See if we process a form
     if ( my $step = $self->getCurrentStep ) { 
         $self->session->log->info( "Processing " . $step );

@@ -68,6 +68,11 @@ sub addPage {
     return addAsset( $parent, { title => $title, className => "WebGUI::Asset::Wobject::Layout", displayTitle => 0 } );
 }
 
+sub canView {
+    my ( $self ) = @_;
+    return $self->session->user->isAdmin;
+}
+
 sub wrapStyle { 
     return WebGUI::Wizard::Setup::wrapStyle( @_ );
 }
