@@ -315,7 +315,9 @@ sub getId {
 
 =head2 getItem ( itemId )
 
-Returns a reference to a WebGUI::Shop::CartItem object.
+Returns a reference to a WebGUI::Shop::CartItem object.  Throws an WebGUI::Error::InvalidParam
+exception if no itemId is passed, or if an invalid itemId is passed.  It will not catch any
+exceptions thrown by actually creating the CartItem, the caller of this method should do that.
 
 =head3 itemId
 
@@ -325,7 +327,7 @@ The id of the item to retrieve.
 
 sub getItem {
     my ($self, $itemId) = @_;
-    unless (defined $itemId && $itemId =~ m/^[A-Za-z0-9_-]{22}$/) {
+    unless (defined $itemId && $self->session->id->valid($itemId)) {
         WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
     }
     my $item = WebGUI::Shop::CartItem->new($self, $itemId);
@@ -782,6 +784,12 @@ sub updateFromForm {
     $cartProperties->{ shipperId } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
     $cartProperties->{ gatewayId } = $form->process( 'gatewayId' ) if $form->process( 'gatewayId' );
     $self->update( $cartProperties );
+
+    my @cartItemIds = $form->process('remove_item', 'checkList');
+    foreach my $cartItemId (@cartItemIds) {
+        my $item = eval { $self->getItem($cartItemId); };
+        $item->remove if ! Exception::Class->caught();
+    }
 }
 
 #-------------------------------------------------------------------
@@ -956,14 +964,13 @@ sub www_view {
         $sku->applyOptions($item->get("options"));
         my %properties = (
             %{$item->get},
-            url                     => $sku->getUrl("shop=cart;method=viewItem;itemId=".$item->getId),
-            quantityField           => WebGUI::Form::integer($session, {name=>"quantity-".$item->getId, value=>$item->get("quantity"), size=>5,}),
-            isUnique                => ($sku->getMaxAllowedInCart == 1),
-            isShippable             => $sku->isShippingRequired,
-            extendedPrice           => $self->formatCurrency($sku->getPrice * $item->get("quantity")),
-            price                   => $self->formatCurrency($sku->getPrice),
-            removeButton            => WebGUI::Form::submit($session, {value=>$i18n->get("remove button"),
-               extras=>q|onclick="this.form.method.value='removeItem';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
+            url             => $sku->getUrl("shop=cart;method=viewItem;itemId=".$item->getId),
+            quantityField   => WebGUI::Form::integer($session, {name=>"quantity-".$item->getId, value=>$item->get("quantity"), size=>5,}),
+            isUnique        => ($sku->getMaxAllowedInCart == 1),
+            isShippable     => $sku->isShippingRequired,
+            extendedPrice   => $self->formatCurrency($sku->getPrice * $item->get("quantity")),
+            price           => $self->formatCurrency($sku->getPrice),
+            removeBox       => WebGUI::Form::checkbox($session, {name => 'remove_item', value => $item->get('itemId')}),
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("Special shipping"), }),
         );
         my $itemAddress = eval {$item->getShippingAddress};
@@ -989,7 +996,7 @@ sub www_view {
                                 ,
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
-        checkoutButton          => WebGUI::Form::submit($session, {name => 'checkout', value=>$i18n->get("checkout button"), extras=>q|id="checkoutButton"|}),
+        #checkoutBox             => WebGUI::Form::checkbox($session, {name => 'remove_item', value=>$i18n->get("checkout button"), }),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;" id="continueShoppingButton"|}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
