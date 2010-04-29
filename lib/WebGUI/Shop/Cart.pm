@@ -785,24 +785,6 @@ sub updateFromForm {
 }
 
 #-------------------------------------------------------------------
-#
-#=head2 www_checkout ( )
-#
-#Update the cart and then redirect the user to the payment gateway screen.
-#
-#=cut
-#
-#sub www_checkout {
-#    my $self = shift;
-#    $self->updateFromForm;
-#    if ($error{id $self} ne "") {
-#        return $self->www_view;
-#    }
-#    $self->session->http->setRedirect($self->session->url->page('shop=pay;method=selectPaymentGateway'));
-#    return undef;
-#}
-#
-#-------------------------------------------------------------------
 
 =head2 www_continueShopping ( )
 
