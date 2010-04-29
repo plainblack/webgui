@@ -335,41 +335,5 @@ sub www_completeTransaction {
         : $self->displayPaymentError($transaction);
 }
 
-#-------------------------------------------------------------------
-
-=head2 www_getCredentials ( [ addressId ] )
-
-Displays the checkout form for this plugin.
-
-=head3 addressId
-
-Optionally supply this variable which will set the payment address to this addressId.
-
-=cut
-
-sub www_getCredentials {
-    my ($self, $addressId)    = @_;
-    my $session = $self->session;
-
-    # Generate 'Proceed' button
-    my $i18n = WebGUI::International->new($session, 'PayDriver_PayPalStd');
-    my $var = {
-        proceedButton => $self->getButton,
-    };
-    $self->appendCartVariables($var);
-
-    my $template = WebGUI::Asset::Template->new($session, $self->get("summaryTemplateId"));
-    my $output;
-    if (defined $template) {
-        $template->prepare;
-        $output = $template->process($var);
-    }
-    else {
-        $output = $i18n->get('template gone', 'PayDriver_ITransact');
-    }
-
-    return $session->style->userStyle($output);
-}
-
 
 1;
