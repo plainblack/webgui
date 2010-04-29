@@ -114,7 +114,7 @@
                 els     = elements[name],
                 label   = els.label.value,
                 oels    = elements[other],
-                copy    = oels.label.value === label,
+                copy    = oels && oels.label.value === label,
                 cached  = addressCache[label],
                 dirty;
 
@@ -174,6 +174,17 @@
         };
     }
 
+    function handleBlur(name) {
+        var values = omap(elements[name], function (k, v) {
+            return v;
+        });
+        $event.on(values, 'focusout', addressChange(name));
+    }
+
+    function handleDropdown(name) {
+        $event.on(elements.dropdowns[name], 'change', addressUpdater(name));
+    }
+
     function main() {
         var checks;
         addAddressKind('billing');
@@ -181,26 +192,21 @@
         getDomElements(elements);
 
         elements.form = document.forms[0];
-        checks = elements.form.sameShippingAsBilling;
-        elements.same = checks[0];
-        $event.on(checks, 'change', sameChange);
-        sameChange();
 
-        function handleBlur(name) {
-            var values = omap(elements[name], function (k, v) {
-                return v;
-            });
-            $event.on(values, 'focusout', addressChange(name));
-        }
         handleBlur('billing');
-        handleBlur('shipping');
-
-        function handleDropdown(name) {
-            $event.on(elements.dropdowns[name], 'change', addressUpdater(name));
-        }
-
         handleDropdown('billing');
-        handleDropdown('shipping');
+
+        checks = elements.form.sameShippingAsBilling;
+        if (checks) {
+            elements.same = checks[0];
+            $event.on(checks, 'change', sameChange);
+            sameChange();
+            handleBlur('shipping');
+            handleDropdown('shipping');
+        }
+        else {
+            delete elements.shipping;
+        }
     }
 
     $event.onDOMReady(main);
