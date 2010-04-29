@@ -1018,16 +1018,10 @@ sub www_view {
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
         my $numberOfOptions = scalar keys %{ $options };
-        if ($numberOfOptions < 1) {
+        if (! $numberOfOptions) {
             $var{shippingOptions} = '';
             $var{shippingPrice}   = 0;
             $self->error($i18n->get("No shipping plugins configured"));
-        }
-        elsif ($numberOfOptions == 1) {
-            my ($option) = keys %{ $options };
-            $self->update({ shipperId => $option });
-            $var{shippingPrice}   = $options->{$option}->{hasPrice} ? $self->formatCurrency($options->{$option}->{price}) : '';
-            $var{shippingOptions} = $options->{$option}->{label};
         }
         else {
             tie my %formOptions, 'Tie::IxHash';
@@ -1039,6 +1033,11 @@ sub www_view {
                 }
             }
             my $shipperId = $self->get('shipperId');
+            if (!$shipperId && $numberOfOptions == 1) {
+                my ($option) = keys %{ $options };
+                $self->update({shipperId => $option});
+                $shipperId = $option;
+            }
             $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, value=>$shipperId || ''});
             if (!exists $options->{$shipperId}) {
                 $self->update({shipperId => ''});
