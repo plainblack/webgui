@@ -93,6 +93,11 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Link to begin checkout again after failure},
     },
+	'template gone' => {
+		message => q|The template for entering in credentials has been deleted.  Please notify the site administrator.|,
+		lastUpdated => 0,
+		context => q|Error message when a template cannot be accessed.|
+	},
 };
 
 1;

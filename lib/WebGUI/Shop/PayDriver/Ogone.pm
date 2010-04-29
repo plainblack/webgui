@@ -257,54 +257,6 @@ sub ogoneCheckoutButton {
 
 #-------------------------------------------------------------------
 
-=head2 www_getCredentials ( [ addressId ] )
-
-Displays the checkout form for this plugin.
-
-=head3 addressId
-
-Optionally supply this variable which will set the payment address to this addressId.
-
-=cut
-
-sub www_getCredentials {
-    my ($self, $addressId)    = @_;
-    my $session = $self->session;
-    my $i18n    = WebGUI::International->new( $session, 'PayDriver_Ogone' );
-
-    # Fetch transaction
-    my $transactionId = $session->form->process('transactionId');
-    my $transaction;
-    if ($transactionId) {
-        $transaction = WebGUI::Shop::Transaction->new( $session, $transactionId );
-    }
-
-    # Or generate a new one
-    unless ($transaction) {
-        $transaction = $self->processTransaction( );
-    }
-
-    # Generate 'Proceed' button
-    my $var = {
-        proceedButton => $self->ogoneCheckoutButton,
-    };
-    $self->appendCartVariables($var);
-
-    my $template = WebGUI::Asset::Template->new($session, $self->get("summaryTemplateId"));
-    my $output;
-    if (defined $template) {
-        $template->prepare;
-        $output = $template->process($var);
-    }
-    else {
-        $output = $i18n->get('template gone', 'PayDriver_ITransact');
-    }
-
-    return $session->style->userStyle($output);
-}
-
-#-------------------------------------------------------------------
-
 =head2 checkPostbackSHA ( )
 
 Processes the postback data Ogone sends after a payment/cancelation. Figures out which transaction the data belongs
@@ -501,6 +453,40 @@ sub www_edit {
     $output .= sprintf $i18n->get('ogone setup'), $processUrl, $processUrl;
         
     return $admin->getAdminConsole->render($form->print.$output, $i18n->get('payment methods','PayDriver'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getCredentials ( )
+
+Displays the checkout form for this plugin.
+
+=cut
+
+sub www_getCredentials {
+    my ($self)    = @_;
+    my $session = $self->session;
+
+    # Fetch transaction
+    my $transactionId = $session->form->process('transactionId');
+    my $transaction;
+    if ($transactionId) {
+        $transaction = WebGUI::Shop::Transaction->new( $session, $transactionId );
+    }
+
+    # Or generate a new one
+    unless ($transaction) {
+        $transaction = $self->processTransaction( );
+    }
+
+    # Generate 'Proceed' button
+    my $var = {
+        proceedButton => $self->ogoneCheckoutButton,
+    };
+    $self->appendCartVariables($var);
+
+    my $output = $self->processTemplate($self->get("summaryTemplateId"), $var);
+    return $session->style->userStyle($output);
 }
 
 #-------------------------------------------------------------------

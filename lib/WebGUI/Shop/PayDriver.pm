@@ -607,6 +607,35 @@ sub processPayment {
 
 =head2 processPropertiesFromFormPost ( )
 
+Updates pay driver with data from Form.
+
+=cut
+
+sub processTemplate {
+    my $self       = shift;
+    my $session    = $self->session;
+    my $templateId = shift;
+    my $var        = shift;
+    my $i18n       = WebGUI::International->new($session, 'PayDriver');
+
+    my $template = WebGUI::Asset::Template->new($session, $templateId);
+    my $output;
+    if (defined $template) {
+        $template->prepare;
+        $output = $template->process($var);
+    }
+    else {
+        $output = $i18n->get('template gone');
+    }
+    return $output;
+
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
 Updates ship driver with data from Form.
 
 =cut
@@ -752,16 +781,7 @@ sub www_getCredentials {
     };
     $self->appendCartVariables($var);
 
-    my $template = WebGUI::Asset::Template->new($session, $self->get("summaryTemplateId"));
-    my $output;
-    if (defined $template) {
-        $template->prepare;
-        $output = $template->process($var);
-    }
-    else {
-        $output = $i18n->get('template gone', 'PayDriver_ITransact');
-    }
-
+    my $output   = $self->processTemplate($self->get("summaryTemplateId"), $var);
     return $session->style->userStyle($output);
 }
 

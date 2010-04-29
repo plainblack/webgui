@@ -669,16 +669,7 @@ sub www_getCredentials {
     });
     $self->appendCartVariables($var);
 
-    my $template = WebGUI::Asset::Template->new($session, $self->get("credentialsTemplateId"));
-    my $output;
-    if (defined $template) {
-        $template->prepare;
-        $output = $template->process($var);
-    }
-    else {
-        $output = $i18n->get('template gone');
-    }
-
+    my $output   = $self->processTemplate($self->get("credentialsTemplateId"), $var);
     return $session->style->userStyle($output);
 }
 
