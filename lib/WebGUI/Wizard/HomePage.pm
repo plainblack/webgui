@@ -7,6 +7,13 @@ use base 'WebGUI::Wizard';
 
 WebGUI::Wizard::HomePage - Create or replace a Home Page with new content
 
+=head1 DESCRIPTION
+
+The HomePage wizard will create a new home page with a given style and with 
+the desired types of content.
+
+=head1 METHODS
+
 =cut
 
 sub _get_steps {
@@ -68,14 +75,38 @@ sub addPage {
     return addAsset( $parent, { title => $title, className => "WebGUI::Asset::Wobject::Layout", displayTitle => 0 } );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( ) 
+
+A user can view this wizard if they are an Admin
+
+=cut
+
 sub canView {
     my ( $self ) = @_;
     return $self->session->user->isAdmin;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 wrapStyle ( $output ) 
+
+Wrap the output in the wizard style.
+
+=cut
+
 sub wrapStyle { 
     return WebGUI::Wizard::Setup::wrapStyle( @_ );
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_pickStyle ( ) 
+
+Choose the style for the new home page
+
+=cut
 
 sub www_pickStyle {
     my ( $self ) = @_;
@@ -132,6 +163,14 @@ sub www_pickStyle {
     return $output . '<div style="clear: both;">&nbsp;</div>';
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_pickStyleSave ( )
+
+Store the style to use later when we create the content
+
+=cut
+
 sub www_pickStyleSave {
     my ( $self ) = @_;
     my $session = $self->session;
@@ -146,6 +185,14 @@ sub www_pickStyleSave {
 
     return;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_chooseContent ( ) 
+
+Choose and configure the content on the home page
+
+=cut
 
 sub www_chooseContent {
     my ($self)  = @_;
@@ -182,6 +229,14 @@ sub www_chooseContent {
 
     return $output;
 } ## end sub www_chooseContent
+
+#----------------------------------------------------------------------------
+
+=head2 www_chooseContentSave ( ) 
+
+Create the new content with the correct style.
+
+=cut
 
 sub www_chooseContentSave {
     my ($self)  = @_;
@@ -368,6 +423,14 @@ sub www_chooseContentSave {
 
     return;
 } ## end sub www_chooseContentSave
+
+#----------------------------------------------------------------------------
+
+=head2 www_finalize ( $output ) 
+
+Redirect the user to to the home page
+
+=cut
 
 sub www_finalize {
     my ($self) = @_;

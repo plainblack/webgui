@@ -7,8 +7,14 @@ use base 'WebGUI::Wizard';
 
 WebGUI::Wizard::Setup -- Initial site setup
 
-=cut
+=head1 DESCRIPTION
 
+A WebGUI::Wizard to perform initial site setup tasks like defining the Admin 
+account, entering basic information, and choosing a default style.
+
+=head1 METHODS
+
+=cut
 
 sub _get_steps {
     return [qw(
@@ -20,6 +26,15 @@ sub _get_steps {
     )];
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( ) 
+
+A user can view this wizard if the site is newly created or if they are the
+admin user
+
+=cut
+
 sub canView {
     my ( $self ) = @_;
     my $session = $self->session;
@@ -28,6 +43,14 @@ sub canView {
     return $session->setting->get('specialState') eq 'init' 
         || $session->user->getId eq '3';
 }
+
+#----------------------------------------------------------------------------
+
+=head2 wrapStyle ( $output ) 
+
+Wrap the output in the wizard style.
+
+=cut
 
 sub wrapStyle {
     my ( $self, $output ) = @_;
@@ -101,6 +124,13 @@ h1 {
     return $page;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_adminAccount ( ) 
+
+Display the form to configure the admin account
+
+=cut
 
 sub www_adminAccount {
     my ( $self ) = @_;
@@ -148,6 +178,14 @@ sub www_adminAccount {
     return '<h1>' . $legend . '</h1>' . $f->print;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_adminAccountSave ( ) 
+
+Process the form and update the Admin account
+
+=cut
+
 sub www_adminAccountSave {
     my ( $self ) = @_;
     my $session = $self->session;
@@ -186,6 +224,14 @@ sub www_adminAccountSave {
     return;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_companyInformation ( ) 
+
+Enter basic company information
+
+=cut
+
 sub www_companyInformation {
     my ( $self ) = @_;
     my $session = $self->session;
@@ -221,6 +267,14 @@ sub www_companyInformation {
     return $output;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_companyInformationSave ( ) 
+
+Update the company information
+
+=cut
+
 sub www_companyInformationSave {
     my ( $self ) = @_;
     my $session = $self->session;
@@ -230,6 +284,14 @@ sub www_companyInformationSave {
     $session->setting->set( 'companyEmail', $form->email("companyEmail") ) if ( $form->get("companyEmail") );
     return;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_siteStats ( ) 
+
+Opt-in to the global WebGUI statistics
+
+=cut
 
 sub www_siteStats {
     my ( $self ) = @_;
@@ -258,6 +320,14 @@ sub www_siteStats {
     return $output;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_siteStatsSave ( ) 
+
+Opt-in to the global WebGUI statistics
+
+=cut
+
 sub www_siteStatsSave {
     my ( $self ) = @_;
     my $session = $self->session;
@@ -266,9 +336,26 @@ sub www_siteStatsSave {
     return;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_defaultStyle ( ) 
+
+Choose the default site style
+
+=cut
+
 sub www_defaultStyle {
     return WebGUI::Wizard::HomePage::www_pickStyle( @_ );
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_defaultStyleSave ( ) 
+
+Save the default style to all existing pages and the user function style
+
+=cut
+
 
 sub www_defaultStyleSave {
     my ( $self, @args ) = @_;
@@ -285,6 +372,14 @@ sub www_defaultStyleSave {
 
     return $output;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_finalize ( ) 
+
+Give the user a choice to do the Home Page wizard
+
+=cut
 
 sub www_finalize {
     my ( $self ) = @_;
@@ -317,6 +412,14 @@ sub www_finalize {
 
     return $output;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_finalizeSave ( ) 
+
+User has declined to do the Home Page wizard
+
+=cut
 
 sub www_finalizeSave {
     my ( $self ) = @_;
