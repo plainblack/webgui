@@ -996,7 +996,7 @@ sub www_view {
                                 ,
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
-        #checkoutBox             => WebGUI::Form::checkbox($session, {name => 'remove_item', value=>$i18n->get("checkout button"), }),
+        checkoutButton          => WebGUI::Form::submit($session, {name => 'checkout', value=>$i18n->get("checkout button"), extras=>q|id="checkoutButton"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;" id="continueShoppingButton"|}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
