@@ -1039,6 +1039,7 @@ sub www_view {
                                                   name    => "itemAddress_".$item->getId,
                                                   value   => $itemAddressId,
                                                   options => \%specialAddressOptions,
+                                                  extras  => q|class="itemAddressMenu"|,
                                               });
         }
 
