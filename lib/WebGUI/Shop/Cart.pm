@@ -794,6 +794,57 @@ sub updateFromForm {
 
 #-------------------------------------------------------------------
 
+=head2 www_ajaxPrices
+
+Input: shippingId (an addressId)
+       billingId  (an addressId)
+
+Output: {
+    tax      : 1.25,
+    subtotal : 12.00,
+    shipping : {
+        slfjaldjfalfja: {   
+            label    : 'USPS',
+            price    : 12.50,
+            hasPrice : 1 || 0
+        },
+        { ... },
+        { ... }
+    }
+}
+
+Takes an addressId and returns JSON shipping options for it, in the form .
+
+=cut
+
+sub www_ajaxPrices {
+    my $self     = shift;
+    my $session  = $self->session;
+    my $form     = $session->form;
+    my $billing  = $form->get('billingId');
+    my $shipping = $form->get('shippingId');
+    my $response = {
+        subtotal => $self->calculateSubtotal(),
+
+        tax      => eval {
+            my $addr = $shipping || $billing or die;
+            $self->update({ shippingAddressId => $addr });
+            $self->calculateTaxes();
+        } || 0,
+
+        shipping => eval {
+            die unless $shipping;
+            $self->update({ shippingAddressId => $shipping });
+            my $ship = WebGUI::Shop::Ship->new($self->session);
+            $ship->getOptions($self);
+        } || [],
+    };
+    $session->http->setMimeType('text/plain');
+    return JSON->new->encode($response);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_continueShopping ( )
 
 Update the cart and the return the user back to the asset.
@@ -1160,6 +1211,9 @@ sub www_view {
     my $yui = $url->extras('/yui/build');
     $style->setScript("$yui/yahoo/yahoo-min.js");
     $style->setScript("$yui/json/json-min.js");
+    $style->setScript("$yui/event/event-min.js");
+    $style->setScript("$yui/connection/connection-min.js");
+    $style->setScript($url->extras('underscore/underscore-min.js'));
     $style->setScript($url->extras('shop/cart.js'), undef, 1);
     return $session->style->userStyle($template->process(\%var));
 }

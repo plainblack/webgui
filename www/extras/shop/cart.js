@@ -1,62 +1,120 @@
-/*global window, document, YAHOO */
+/*global _, window, document, YAHOO */
 
 (function () {
     var $event       = YAHOO.util.Event,
         $connect     = YAHOO.util.Connect,
         $json        = YAHOO.lang.JSON,
+        prices       = null,
         addressCache = {},
         elements     = {
-            dropdowns: {
-                billing: 'billingAddressId_formId',
+            shipper   : 'shipperId_formId',
+            tax       : 'taxWrap',
+            total     : 'totalPriceWrap',
+            credit    : {
+                available : 'inShopCreditAvailableWrap',
+                used      : 'inShopCreditDeductionWrap'
+            },
+            dropdowns : {
+                billing : 'billingAddressId_formId',
                 shipping: 'shippingAddressId_formId'
             }
         },
         addressParts = [
             'label', 'firstName', 'lastName', 'organization', 'address1',
-            'address2', 'address3', 'city', 'state', 'code', 'country', 
+            'address2', 'address3', 'city', 'state', 'code', 'country',
             'phoneNumber', 'email'
         ];
 
-    function omap(o, fn) {
-        var r = [], k;
-        for (k in o) {
-            if (o.hasOwnProperty(k)) {
-                r.push(fn.call(o, k, o[k]));
-            }
-        }
-        return r;
-    }
-
-    function oeach(o, fn) {
-        omap(o, fn);
-        return;
+    function formatCurrency(n) {
+        return parseFloat(n.toString()).toFixed(2);
     }
 
     function addAddressKind(name) {
-        var i, key, obj = elements[name] = {};
-        for (i = 0; i < addressParts.length; i += 1) {
-            key = addressParts[i];
+        var obj = elements[name] = {};
+        _.each(addressParts, function (key) {
             obj[key] = name + '_' + key + '_formId';
-        }
+        });
     }
 
     function getDomElements(o) {
-        oeach(o, function (k, v) {
+        _.each(o, function (v, k) {
             if (typeof v === 'object') {
                 getDomElements(v);
             }
             else {
-                this[k] = document.getElementById(v);
+                o[k] = document.getElementById(v);
             }
         });
     }
 
     function sameChange() {
         var d = elements.same.checked;
-        oeach(elements.shipping, function (k, v) {
+        _.each(elements.shipping, function (v, k) {
             v.disabled = d;
         });
-        elements.dropdowns.shipping.disabled = d; 
+        elements.dropdowns.shipping.disabled = d;
+    }
+
+    function calculateSummary() {
+        var shipping     = prices.shipping[elements.shipper.value],
+            shipPrice    = (shipping ?
+                (shipping.hasPrice ?
+                    parseFloat(shipping.price) :
+                    0)
+                : 0),
+            tax          = parseFloat(prices.tax),
+            subtotal     = parseFloat(prices.subtotal),
+            beforeCredit = tax + subtotal + shipPrice,
+            creditAvail  = parseFloat(elements.credit.available.innerHTML),
+            creditUsed   = Math.min(beforeCredit, creditAvail),
+            afterCredit  = beforeCredit - creditUsed;
+
+        elements.credit.used.innerHTML = formatCurrency(creditUsed);
+        elements.total.innerHTML = formatCurrency(afterCredit);
+    }
+
+    function updatePrices() {
+        var selectedShipper = elements.shipper.value,
+            shipping        = elements.dropdowns.shipping.value,
+            billing         = elements.dropdowns.billing.value,
+            shipper         = elements.shipper,
+            url             = window.location.pathname +
+                '?shop=cart;method=ajaxPrices;' +
+                ( shipping === 'new_address' ?
+                  '' : 'shippingId=' + shipping) +
+                ( billing === 'new_address' ?
+                  '' : 'billingId=' + billing);
+            cb = {
+                success: function (o) {
+                    var response = $json.parse(o.responseText);
+                    if (response.error) {
+                        return;
+                    }
+                    prices = response;
+                    elements.tax.innerHTML = formatCurrency(response.tax);
+                    _(shipper.options)
+                        .chain()
+                        .map(_.identity)
+                        .each(function (o) {
+                            if (o.value) {
+                                o.parentNode.removeChild(o);
+                            }
+                        });
+                    _.each(response.shipping, function (o, id) {
+                        var opt = document.createElement('option'),
+                            label = o.label;
+                        if (o.hasPrice) {
+                            label += ' (' + formatCurrency(o.price) + ')';
+                        }
+                        opt.innerHTML = label;
+                        opt.value = id;
+                        shipper.appendChild(opt);
+                    });
+                    shipper.value = selectedShipper;
+                    calculateSummary();
+                }
+            };
+        $connect.asyncRequest('GET', url, cb);
     }
 
     function updateAddressDropdowns(o) {
@@ -64,24 +122,22 @@
             id      = o.responseText;
 
         function updateOne(dropdown) {
-            var options = dropdown.options, i, opt;
-            for (i = 0; i < options.length; i += 1) {
-                opt = options[i];
-                if (opt.text === label) {
-                    opt.value = id;
-                    return;
-                }
-            }
+            var opt = _.detect(dropdown.options, function (o) {
+                return o.text === label;
+            });
 
-            opt = document.createElement('option');
+            if (!opt) {
+                opt = document.createElement('option');
+                opt.text  = label;
+                dropdown.appendChild(opt);
+            }
             opt.value = id;
-            opt.text  = label;
-            dropdown.appendChild(opt);
         }
 
         updateOne(elements.dropdowns.billing);
         updateOne(elements.dropdowns.shipping);
         elements.dropdowns[o.argument.name].value = id;
+        updatePrices();
     }
 
     function saveAddress(a, name) {
@@ -89,7 +145,7 @@
             success: updateAddressDropdowns,
             argument: { address: a, name: name }
         },
-            post = 'shop=address;method=ajaxSave;address=' + 
+            post = 'shop=address;method=ajaxSave;address=' +
                 $json.stringify(a),
             url = window.location.pathname;
 
@@ -97,13 +153,13 @@
     }
 
     function validAddress(a) {
-        return a.label  && 
-            a.firstName && 
-            a.lastName  && 
-            a.address1  && 
-            a.city      && 
-            a.state     && 
-            a.code      && 
+        return a.label  &&
+            a.firstName &&
+            a.lastName  &&
+            a.address1  &&
+            a.city      &&
+            a.state     &&
+            a.code      &&
             a.country;
     }
 
@@ -122,7 +178,7 @@
                 cached = addressCache[label] = {};
             }
 
-            oeach(elements[name], function (k, v) {
+            _.each(elements[name], function (v, k) {
                 v = v.value;
                 address[k] = v;
                 if (cached[k] !== v) {
@@ -142,12 +198,13 @@
     function addressUpdater(name) {
         var elems = elements[name];
         function update(address) {
-            oeach(address, function (k, v) {
+            _.each(address, function (v, k) {
                 var dom = elems[k];
                 if (dom) {
                     dom.value = v;
                 }
             });
+            updatePrices();
         }
         return function () {
             var id     = this.value,
@@ -159,8 +216,8 @@
                 return update(cached);
             }
 
-            url = window.location.pathname + 
-                '?shop=address;method=ajaxGetAddress;addressId=' + 
+            url = window.location.pathname +
+                '?shop=address;method=ajaxGetAddress;addressId=' +
                 id;
 
             cb = {
@@ -175,10 +232,7 @@
     }
 
     function handleBlur(name) {
-        var values = omap(elements[name], function (k, v) {
-            return v;
-        });
-        $event.on(values, 'focusout', addressChange(name));
+        $event.on(_.values(elements[name]), 'focusout', addressChange(name));
     }
 
     function handleDropdown(name) {
@@ -207,6 +261,9 @@
         else {
             delete elements.shipping;
         }
+
+        $event.on(elements.shipper, 'change', calculateSummary);
+        updatePrices();
     }
 
     $event.onDOMReady(main);
