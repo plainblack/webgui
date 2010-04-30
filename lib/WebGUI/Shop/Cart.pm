@@ -715,6 +715,9 @@ sub updateFromForm {
                 $error{id $self} = "An unknown error has occured: ".$e->message;
             }
         }
+        if (my $itemAddressId = $form->get("itemAddress_".$item->getId)) {
+            $item->update({shippingAddressId => $itemAddressId});
+        }
     }
     if ($self->hasMixedItems) {
          my $i18n = WebGUI::International->new($self->session, "Shop");
@@ -887,58 +890,6 @@ sub www_lookupPosUser {
 
 #-------------------------------------------------------------------
 
-=head2 www_removeItem ( )
-
-Remove an item from the cart and then display the cart again.
-
-=cut
-
-sub www_removeItem {
-    my $self = shift;
-    my $item = $self->getItem($self->session->form->get("itemId"));
-    $item->remove;
-    return $self->www_view;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_setBillingAddress ()
-
-Sets the billing address for the cart.
-
-=cut
-
-sub www_setBillingAddress {
-    my $self = shift;
-    my $form = $self->session->form;
-    $self->update({billingAddressId=>$form->get('billingAddressId')});
-    return $self->www_view;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_setShippingAddress ()
-
-Sets the shipping address for the cart or for a cart item if itemId is one of the form params.
-
-=cut
-
-sub www_setShippingAddress {
-    my $self = shift;
-    my $form = $self->session->form;
-    if ($form->get("itemId") ne "") {
-        $self->getItem($form->get("itemId"))->update({shippingAddressId=>$form->get('shippingAddressId')}); 
-    }
-    else {
-        $self->update({shippingAddressId=>$form->get('shippingAddressId')});
-    }
-    return $self->www_view;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_update ( )
 
 Updates the cart totals, addresses, shipping driver and payment gateway. If requested, and the
@@ -955,7 +906,10 @@ sub www_update {
     my $self    = shift;
     my $session = $self->session;
     $self->updateFromForm;
-    if ($session->form->get('checkout')) {
+    if ($session->form->get('continue_shopping')) {
+        return undef;
+    }
+    elsif ($session->form->get('checkout')) {
         ##Setting a shipping address greatly simplifies the Transaction
         if (! $self->requiresShipping && ! $self->get('shippingAddressId')) {
             $self->update({shippingAddressId => $self->get('billingAddressId')});
@@ -992,7 +946,6 @@ sub www_view {
     my $url     = $session->url;
     my $form    = $session->form;
     my $i18n    = WebGUI::International->new($session, "Shop");
-    my @items   = ();
     my $taxDriver = WebGUI::Shop::Tax->getDriver( $session );
 
     if($url->forceSecureConnection()){
@@ -1011,14 +964,52 @@ sub www_view {
         return $session->style->userStyle($template->process(\%var));
     }
 
+    my %var = (
+        %{$self->get},
+        formHeader              => WebGUI::Form::formHeader($session)
+                                .  WebGUI::Form::hidden($session, {name=>"shop",   value=>"cart"})
+                                .  WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
+                                .  WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
+                                ,
+        formFooter              => WebGUI::Form::formFooter($session),
+        updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
+        checkoutButton          => WebGUI::Form::submit($session, {name => 'checkout', value=>$i18n->get("checkout button"), extras=>q|id="checkoutButton"|}),
+        continueShoppingButton  => WebGUI::Form::submit($session, {
+                                        name   => 'continue_shopping',
+                                        value  => $i18n->get("continue shopping button"), 
+                                        extras => q|id="continueShoppingButton"|
+                                   }),
+        minimumCartAmount       => $session->setting->get( 'shopCartCheckoutMinimum' ) > 0
+                                 ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
+                                 : 0
+                                 ,
+        userIsVisitor           => $session->user->isVisitor,
+        shippableItemsInCart    => $self->requiresShipping,
+    );
+
+
     # get the shipping address    
-    my $address          = eval { $self->getShippingAddress };
-    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
+    my $address = eval { $self->getShippingAddress };
+    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound") && $self->get('shippingAddressId')) {
         # choose another address cuz we've got a problem
         $self->update({shippingAddressId=>''});
     }
 
     # generate template variables for the items in the cart
+    my @items   = ();
+    tie my %addressOptions,        'Tie::IxHash';
+    if (! $var{userIsVisitor}) {
+        my $addressBook = $self->getAddressBook;
+        my $addresses   = $addressBook->getAddresses;
+        foreach my $address (@{ $addresses }) {
+            $addressOptions{$address->get('addressId')} = $address->get('label');
+        }
+    }
+
+    tie my %specialAddressOptions, 'Tie::IxHash';
+    $specialAddressOptions{''} = $i18n->get("Special shipping");
+    %specialAddressOptions = (%specialAddressOptions, %addressOptions);
+
     foreach my $item (@cartItems) {
         my $sku = $item->getSku;
         $sku->applyOptions($item->get("options"));
@@ -1031,14 +1022,24 @@ sub www_view {
             extendedPrice   => $self->formatCurrency($sku->getPrice * $item->get("quantity")),
             price           => $self->formatCurrency($sku->getPrice),
             removeBox       => WebGUI::Form::checkbox($session, {name => 'remove_item', value => $item->get('itemId')}),
-            shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("Special shipping"), }),
+            #shipToButton    => WebGUI::Form::submit($session, {value=>, }),
         );
         my $itemAddress = eval {$item->getShippingAddress};
+        my $itemAddressId;
         if ((!WebGUI::Error->caught) && $itemAddress && $address && $itemAddress->getId ne $address->getId) {
             $properties{shippingAddress} = $itemAddress->getHtmlFormatted;
+            $itemAddressId               = $itemAddress->getId;
         }
         else {
             $properties{shippingAddress} = '';
+            $itemAddressId               = '';
+        }
+        if (! $var{userIsVisitor}) {
+            $properties{itemAddressChooser} = WebGUI::Form::selectBox($session, {
+                                                  name    => "itemAddress_".$item->getId,
+                                                  value   => $itemAddressId,
+                                                  options => \%specialAddressOptions,
+                                              });
         }
 
         $taxDriver->appendCartItemVars( \%properties, $item );
@@ -1046,27 +1047,7 @@ sub www_view {
         push(@items, \%properties);
     }
 
-    my %var = (
-        %{$self->get},
-        items                   => \@items,
-        formHeader              => WebGUI::Form::formHeader($session)
-                                .  WebGUI::Form::hidden($session, {name=>"shop",   value=>"cart"})
-                                .  WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
-                                .  WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
-                                ,
-        formFooter              => WebGUI::Form::formFooter($session),
-        updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
-        checkoutButton          => WebGUI::Form::submit($session, {name => 'checkout', value=>$i18n->get("checkout button"), extras=>q|id="checkoutButton"|}),
-        continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
-            extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;" id="continueShoppingButton"|}),
-        minimumCartAmount       => $session->setting->get( 'shopCartCheckoutMinimum' ) > 0
-                                 ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
-                                 : 0
-                                 ,
-        shippableItemsInCart    => $self->requiresShipping,
-    );
-
-    $var{shippableItemsInCart} = $self->requiresShipping;
+    $var{items}                = \@items;
     if ($var{shippableItemsInCart}) {
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
@@ -1115,7 +1096,6 @@ sub www_view {
     # Tax variables
 
     #Address form variables
-    $var{userIsVisitor} = $session->user->isVisitor;
     if ($var{userIsVisitor}) {
         $var{loginFormHeader} = WebGUI::Form::formHeader($session, {action => $session->url->page})
                               . WebGUI::Form::hidden($session,{ name => 'op',     value => 'auth'})
@@ -1130,39 +1110,43 @@ sub www_view {
     }
     else {
         ##Address form variables
-        my $addressBook = $self->getAddressBook;
-        my $addresses   = $addressBook->getAddresses;
-        tie my %addressOptions, 'Tie::IxHash';
-        $addressOptions{'new_address'} = $i18n->get('Add new address');
+        tie my %billingAddressOptions, 'Tie::IxHash';
+        $billingAddressOptions{'new_address'} = $i18n->get('Add new address');
 
         my $billingAddressId = $self->get('billingAddressId');
         if ($billingAddressId) {
-            $addressOptions{'update_address'} = $i18n->get('Update this address');
+            $billingAddressOptions{'update_address'} = $i18n->get('Update this address');
         }
 
-        foreach my $address (@{ $addresses }) {
-            $addressOptions{$address->get('addressId')} = $address->get('label');
-        }
+        %billingAddressOptions = (%billingAddressOptions, %addressOptions);
 
         $var{'billingAddressChooser'} = WebGUI::Form::selectBox($session, {
             name    => 'billingAddressId',
-            options => \%addressOptions,
+            options => \%billingAddressOptions,
             value   => $billingAddressId ? $billingAddressId : 'new_address',
         });
 
+        tie my %shippingAddressOptions, 'Tie::IxHash';
+        $shippingAddressOptions{'new_address'} = $i18n->get('Add new address');
+
         my $shippingAddressId = $self->get('shippingAddressId');
-        if (!$shippingAddressId) {
-            delete $addressOptions{'update_address'};
+        if ($shippingAddressId) {
+            $shippingAddressOptions{'update_address'} = $i18n->get('Update this address');
         }
+        %shippingAddressOptions = (%shippingAddressOptions, %addressOptions);
+
         $var{'shippingAddressChooser'} = WebGUI::Form::selectBox($session, {
             name    => 'shippingAddressId',
-            options => \%addressOptions,
+            options => \%shippingAddressOptions,
             value   => $shippingAddressId ? $shippingAddressId : 'new_address',
         });
+
         my $shippingAddressData = $self->get('shippingAddressId') ? $self->getShippingAddress->get() : {};
         my $billingAddressData  = $self->get('billingAddressId')  ? $self->getBillingAddress->get()  : {};
+        my $addressBook = $self->getAddressBook;
         $addressBook->appendAddressFormVars(\%var, 'shipping_', $shippingAddressData);
         $addressBook->appendAddressFormVars(\%var, 'billing_',  $billingAddressData);
+
         $var{sameShippingAsBilling} = WebGUI::Form::yesNo($session, {
             name => 'sameShippingAsBilling',
             value => $self->get('billingAddressId') && $self->get('billingAddressId') eq $self->get('shippingAddressId'),
