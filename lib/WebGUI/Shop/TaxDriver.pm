@@ -104,33 +104,6 @@ sub appendCartItemVars {
 
 #-----------------------------------------------------------
 
-=head2 appendCartVars ( var, cart )
-
-Extend this method to add tax driver specific template variables to those supplied to the cart template.
-
-=head3 var
-
-The hash ref to add the template variables to.
-
-=head3 cart
-
-The instance of WebGUI::Shop::Cart to add the template variables for.
-
-=cut
-
-sub appendCartVars {
-    my $self = shift;
-    my $var  = shift;
-    my $cart = shift;
-
-    WebGUI::Error::InvalidParam->throw( 'Must supply a hash ref' )
-        unless $var && ref $var eq 'HASH';
-    WebGUI::Error::InvalidObject->throw( expected => 'WebGUI::Shop::Cart', got => ref $cart, error => 'Must pass a cart' )
-        unless $cart && $cart->isa( 'WebGUI::Shop::Cart' );
-}
-
-#-----------------------------------------------------------
-
 =head2 canManage ( )
 
 Returns true if the current user can manage taxes.
@@ -155,9 +128,9 @@ Returns the class name of your plugin. You must overload this method in you own 
 sub className {
     my $self = shift;
 
-    $self->session->log->fatal( "Tax plugin ($self) is required to overload the className method" );
+    $self->session->log->fatal( "Tax plugin (".$self->className.") is required to overload the className method" );
 
-    return 'WebGUI::Shop:TaxDriver';
+    return 'WebGUI::Shop::TaxDriver';
 }
 
 #-----------------------------------------------------------
