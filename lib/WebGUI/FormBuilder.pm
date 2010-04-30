@@ -159,10 +159,21 @@ Return the HTML for the form
 
 sub toHtml {
     my ( $self ) = @_;
-    
+    my ( $style, $url ) = $self->session->quick(qw{ style url });
+
+    $style->setLink( $url->extras('hoverhelp.css'), { rel => "stylesheet", type => "text/css" } );
+    $style->setScript( $url->extras('hoverhelp.js') );
+
     my $html = $self->getHeader;
     # Add individual objects
-    $html   .= join "", map { $_->toHtml } @{$self->objects};
+    for my $obj ( @{ $self->objects } ) {
+        if ( $obj->isa('WebGUI::Form::Control') ) {
+            $html .= $obj->toHtmlWithWrapper;
+        }
+        else {
+            $html .= $obj->toHtml;
+        }
+    }
     $html   .= $self->getFooter;
 
     return $html;

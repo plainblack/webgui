@@ -26,6 +26,7 @@ define icon      => 'layout.gif';
 define tableName => 'Layout';
 
 property templateId => (
+             tab          => "display",
              fieldType    => "template",
              namespace    => "Layout",
              default      => 'PBtmpl0000000000000054',
@@ -34,6 +35,7 @@ property templateId => (
          );
 property mobileTemplateId => (
              #fieldType    => ( $session->style->useMobileStyle ? 'template' : 'hidden' ),
+             tab          => "display",
              fieldType    => 'template',
              namespace    => 'Layout',
              default      => 'PBtmpl0000000000000054',
@@ -48,11 +50,16 @@ property contentPositions => (
              noFormPost   => 1,
          );
 property assetsToHide => (
+             tab          => "properties",
              default      => undef,
              fieldType    => "checkList",
              noFormPost   => 1,
+             label          => ['assets to hide', 'Asset_Layout'],
+             hoverHelp      => ['assets to hide description', 'Asset_Layout'],
+             options        => sub { },
          );
 property assetOrder => (
+             tab          => "display",
              default      => 'asc',
              fieldType    => 'selectBox',
              label        => ['asset order label', 'Asset_Layout'],
@@ -87,7 +94,6 @@ These methods are available from this class:
 
 Extends the base method to  handle the optional mobileTemplateId and assetsToHide.
 
-=cut
 
 override getEditForm => sub {
     my $self = shift;
@@ -192,6 +198,8 @@ override getEditForm => sub {
 
     return $tabform;
 };
+
+=cut
 
 #-------------------------------------------------------------------
 

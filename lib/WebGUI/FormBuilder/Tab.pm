@@ -93,7 +93,15 @@ Render the objects in this tab
 
 sub toHtml {
     my ( $self ) = @_;
-    my $html    = join "", map { $_->toHtml } @{$self->objects};
+    my $html;
+    for my $obj ( @{ $self->objects } ) {
+        if ( $obj->isa('WebGUI::Form::Control') ) {
+            $html .= $obj->toHtmlWithWrapper;
+        }
+        else {
+            $html .= $obj->toHtml;
+        }
+    }
     return $html;
 }
 

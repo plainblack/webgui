@@ -205,45 +205,6 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 displayForm ( )
-
-Depricated, see toHtml().
-
-=cut
-
-sub displayForm {
-	my $self = shift;
-	return $self->toHtml(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 displayFormWithWrapper ( )
-
-Depricated, see toHtmlWithWrapper().
-
-=cut
-
-sub displayFormWithWrapper {
-	my $self = shift;
-    return $self->toHtmlWithWrapper(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 displayValue ( )
-
-Depricated, see getValueAsHtml().
-
-=cut
-
-sub displayValue {
-	my ($self) = @_;
-	return $self->getValueAsHtml;
-}
-
-#-------------------------------------------------------------------
-
 =head2 fixMacros ( string ) 
 
 Returns the string having converted all macros in the string to HTML entities so that they won't be processed by the macro engine, but instead will be displayed.
@@ -369,6 +330,18 @@ sub getDatabaseFieldType {
     return "CHAR(255)";
 }
 
+sub getLabel {
+    my ( $self ) = @_;
+
+    my $labelClass = $self->get("labelClass");
+    $labelClass = qq| class="$labelClass" | if($self->get("labelClass"));
+
+    my $hoverHelp = $self->get("hoverHelp") || '';
+    $hoverHelp =~ s/^\s+//;
+    $hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
+
+    return '<label'.$labelClass.' for="'.$self->get("id").'">'.$self->get("label").'</label>' . $hoverHelp;
+}
 
 #-------------------------------------------------------------------
 
@@ -445,7 +418,6 @@ sub getDefaultValue {
 	return $self->get("defaultValue");
 }
 
-
 #-------------------------------------------------------------------
 
 =head2 getValueAsHtml ( )
@@ -506,21 +478,6 @@ sub isInRequest {
     my $self = shift;
     return $self->session->form->hasParam($self->get('name'));
 }
-
-#-------------------------------------------------------------------
-
-=head2 isProfileEnabled ( session )
-
-Depricated. See isDynamicCompatible().
-
-=cut
-
-
-sub isProfileEnabled {
-    my $class = shift;
-    return $class->isDynamicCompatible();
-}
-
 
 #-------------------------------------------------------------------
 
@@ -617,15 +574,11 @@ sub prepareWrapper {
 	my $self = shift;
 	my $rowClass = $self->get("rowClass");
 	$rowClass = qq| class="$rowClass" | if($self->get("rowClass"));
-	my $labelClass = $self->get("labelClass");
-	$labelClass = qq| class="$labelClass" | if($self->get("labelClass"));
 	my $fieldClass = $self->get("fieldClass");
 	$fieldClass = qq| class="$fieldClass" | if($self->get("fieldClass"));
-	my $hoverHelp = $self->get("hoverHelp") || '';
-	$hoverHelp =~ s/^\s+//;
     my $subtext = $self->get("subtext");
 	$subtext = qq| <span class="formSubtext">$subtext</span>| if ($subtext);
-	return ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext);
+	return ($fieldClass, $rowClass, $subtext);
 }
 
 
@@ -715,18 +668,18 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 =cut
 
 sub toHtmlWithWrapper {
-	my $self = shift;
-	if ($self->passUiLevelCheck) {
-		my $rawField = $self->toHtml(); # has to be called before prepareWrapper for some controls, namely captcha.
-		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
-        $hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
-        return '<tr'.$rowClass.' id="'.$self->get("id").'_row">
-				<td'.$labelClass.' valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label>' . $hoverHelp . '</td>
-				<td valign="top"'.$fieldClass.'>'.$rawField . $subtext . "</td>
-			</tr>\n";
-	} else {
-		return $self->toHtmlAsHidden;
-	}
+    my $self = shift;
+    if ($self->passUiLevelCheck) {
+        my $rawField = $self->toHtml(); # has to be called before prepareWrapper for some controls, namely captcha.
+        my ($fieldClass, $rowClass, $subtext)  = $self->prepareWrapper;
+        return '<div'.$rowClass.' id="'.$self->get("id").'_row">'
+            . $self->getLabel 
+            . $rawField 
+            . $subtext 
+            . "</div>\n";
+    } else {
+        return $self->toHtmlAsHidden;
+    }
 }
 
 

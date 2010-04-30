@@ -154,25 +154,6 @@ override addRevision => sub {
 
 #-------------------------------------------------------------------
 
-=head2 drawExtraHeadTags ( )
-
-Override the master drawExtraHeadTags to prevent Style template from having
-Extra Head Tags.
-
-=cut
-
-override drawExtraHeadTags => sub {
-	my ($self) = @_;
-    if ($self->namespace eq 'style') {
-        my $i18n = WebGUI::International->new($self->session);
-        return $i18n->get(881);
-    }
-    return super();
-};
-
-
-#-------------------------------------------------------------------
-
 =head2 duplicate
 
 Subclass the duplicate method so that the isDefault flag is set to 0 on any

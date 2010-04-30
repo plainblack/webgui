@@ -125,7 +125,14 @@ sub toHtml {
     my ( $self ) = @_;
 
     my $html = $self->getHeader;
-    $html   .= join "", map { $_->toHtml } @{$self->objects};
+    for my $obj ( @{ $self->objects } ) {
+        if ( $obj->isa('WebGUI::Form::Control') ) {
+            $html .= $obj->toHtmlWithWrapper;
+        }
+        else {
+            $html .= $obj->toHtml;
+        }
+    }
     $html   .= $self->getFooter;
 
     return $html;

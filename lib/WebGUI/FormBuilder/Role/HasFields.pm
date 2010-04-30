@@ -56,8 +56,8 @@ sub addField {
         # Load the class
         # Try to load the WebGUI Field first in case we conveniently overlap with a common name
         # (like Readonly)
-        if ( $INC{'WebGUI/Form/'.$file} || try { require 'WebGUI/Form/' . $file } ) {
-            $type = 'WebGUI::Form::' . $type;
+        if ( $INC{'WebGUI/Form/'. ucfirst $file} || try { require 'WebGUI/Form/' . ucfirst $file } ) {
+            $type = 'WebGUI::Form::' . ucfirst $type;
         }
         elsif ( !$INC{$file} && !try { require $file; } ) {
             confess sprintf "Could not load form control class %s", $type;

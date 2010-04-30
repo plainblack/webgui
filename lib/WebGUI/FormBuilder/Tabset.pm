@@ -62,10 +62,17 @@ sub addTab {
 
 sub toHtml {
     my ( $self ) = @_;
+    my ( $style, $url ) = $self->session->quick(qw( style url ));
+
+    $style->setLink( $url->extras("yui/build/tabview/assets/skins/sam/tabview.css"), { rel => "stylesheet", type => "text/css" } );
+    $style->setScript( $url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js") );
+    $style->setScript( $url->extras("yui/build/element/element-min.js") );
+    $style->setScript( $url->extras("yui/build/tabview/tabview-min.js") );
+
     my $html    = sprintf( '<div id="%s" class="yui-navset">', $self->name )
                 . '<ul class="yui-nav">'
                 ;
-    
+
     for ( my $i = 0; $i < @{$self->tabs}; $i++ ) {
         my $tab = $self->tabs->[$i];
         $html   .= sprintf '<li><a href="#tab%i"><em>%s</em></a></li>', $i, $tab->label;
@@ -83,7 +90,9 @@ sub toHtml {
     $html       .= '</div>'
                 . '</div>'
                 . q{<script type="text/javascript">}
-                . sprintf( q{var tabView = new YAHOO.widget.TabView('%s');}, $self->name )
+                . sprintf( q'YAHOO.util.Event.onContentReady( "%s", function () {', $self->name )
+                . sprintf( q'new YAHOO.widget.TabView("%s");', $self->name )
+                . q' } );'
                 . q{</script>}
                 ;
 
