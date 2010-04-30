@@ -111,6 +111,7 @@ sub import {
             Carts               => 'cart',
             Transactions        => 'transaction',
             'Transaction Items' => 'transactionItem',
+            'Address Books'     => 'addressBook',
             'Ship Drivers'      => 'shipper',
             'Payment Drivers'   => 'paymentGateway',
             'Database Links'    => 'databaseLink',
@@ -795,6 +796,7 @@ were passed in.  Currently able to destroy:
     WebGUI::Shop::ShipDriver
     WebGUI::Shop::PayDriver
     WebGUI::Shop::Transaction
+    WebGUI::Shop::AddressBook
     WebGUI::DatabaseLink
     WebGUI::LDAPLink
 
@@ -881,6 +883,7 @@ Example call:
         'WebGUI::VersionTag'        => 'rollback',
         'WebGUI::Workflow'          => 'delete',
         'WebGUI::DatabaseLink'      => 'delete',
+        'WebGUI::Shop::AddressBook' => 'delete',
         'WebGUI::Shop::Transaction' => 'delete',
         'WebGUI::Shop::ShipDriver'  => 'delete',
         'WebGUI::Shop::PayDriver'   => 'delete',
