@@ -1145,7 +1145,7 @@ sub www_view {
     $var{ inShopCreditAvailable } = $credit->getSum;
     $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
     $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
-    foreach my $field (qw/subtotalPrice totalPrice inShopCreditAvailable inShopCreditDeduction totalPrice shippingPrice tax/) {
+    foreach my $field (qw/subtotalPrice inShopCreditAvailable inShopCreditDeduction totalPrice shippingPrice tax/) {
         $var{$field} = sprintf q|<span id="%sWrap">%s</span>|, $field, $var{$field};
     }
     $var{ error                 } = $self->error; 
