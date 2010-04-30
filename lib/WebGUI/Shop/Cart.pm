@@ -751,13 +751,13 @@ sub updateFromForm {
     $self->update($cartProperties);
 
     if ($self->requiresShipping) {
-        my %shippingData = $book->processAddressForm('shipping_');
-        my @missingShippingFields = $book->missingFields(\%shippingData);
-        my $shippingAddressId = $form->process('shippingAddressId');
         if ($form->process('sameShippingAsBilling', 'yesNo')) {
             $cartProperties->{shippingAddressId} = $self->get('billingAddressId');
         }
         else {
+            my %shippingData = $book->processAddressForm('shipping_');
+            my @missingShippingFields = $book->missingFields(\%shippingData);
+            my $shippingAddressId = $form->process('shippingAddressId');
             ##No missing shipping fields, if we set to the same as the billing fields
             if (@missingShippingFields) {
                 $self->error('missing shipping '.$missingShippingFields[0]);
@@ -905,6 +905,7 @@ sub www_update {
     my $session = $self->session;
     $self->updateFromForm;
     if ($session->form->get('checkout')) {
+        ##Setting a shipping address greatly simplifies the Transaction
         if (! $self->requiresShipping && ! $self->get('shippingAddressId')) {
             $self->update({shippingAddressId => $self->get('billingAddressId')});
         }
