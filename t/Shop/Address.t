@@ -74,8 +74,11 @@ cmp_deeply(
     'create takes exception to giving it a session variable',
 );
 
+$session->user({userId => 3});
+
 my $book  = WebGUI::Shop::AddressBook->create($session);
 my $book2 = WebGUI::Shop::AddressBook->create($session);
+WebGUI::Test->addToCleanup($book, $book2);
 
 eval { $address = WebGUI::Shop::Address->create($book); };
 $e = Exception::Class->caught();
@@ -242,8 +245,3 @@ cmp_deeply(
 $address->delete;
 my $check = $session->db->quickScalar('select count(*) from address where addressId=?',[$address->getId]);
 is( $check, 0, 'delete worked');
-
-END {
-    $session->db->write('delete from addressBook');
-    $session->db->write('delete from address');
-}
