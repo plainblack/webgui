@@ -23,32 +23,40 @@ use WebGUI::Session;
 use WebGUI::Shop::Cart;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Transaction;
+use WebGUI::Shop::PayDriver::ITransact;
 use JSON;
 use HTML::Form;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+$session->user({userId => 3});
 
 
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 28;
-plan tests => 1 + $tests;
+plan tests => 28;
 
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
 
-note('Testing existence');
-my $loaded = use_ok('WebGUI::Shop::PayDriver::ITransact');
 
 my $e;
 my $ship = WebGUI::Shop::Ship->new($session);
 my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart);
 my $shipper = $ship->getShipper('defaultfreeshipping000');
-my $address = $cart->getAddressBook->addAddress( { firstName => 'Ellis Boyd', lastName => 'Redding'} );
+my $address = $cart->getAddressBook->addAddress( {
+    label     => 'red',
+    firstName => 'Ellis Boyd', lastName => 'Redding',
+    address1  => 'cell block #5',
+    city      => 'Shawshank',      state     => 'MN',
+    code      => '55555',          country   => 'United States of America',
+    phoneNumber => '555.555.5555', email     => 'red@shawshank.gov',
+} );
 $cart->update({
+    billingAddressId  => $address->getId,
     shippingAddressId => $address->getId,
     shipperId         => $shipper->getId,
 });
@@ -86,9 +94,6 @@ WebGUI::Test->tagsToRollback($versionTag);
 
 my $hammerItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::PayDriver::ITransact', $tests unless $loaded;
 
 #######################################################################
 #
@@ -259,24 +264,12 @@ $driver->{_cardData} = {
     cvv2     => '1234',
 };
 
-$driver->{_billingAddress} = {
-    firstName   => 'Ellis Boyd',
-    lastName    => 'Redding',
-    address1    => '#2 Row 30265',
-    city        => 'Shawshank',
-    state       => 'Maine',
-    code        => '97025',
-    country     => 'USA',
-    phoneNumber => '555.555.5555',
-    email       => '30265@shawshank.gov',
-};
-
-
+$cart->update({gatewayId => $driver->getId,});
 $transaction = WebGUI::Shop::Transaction->create($session, {
-    paymentMethod => $driver,
     cart          => $cart,
     isRecurring   => $cart->requiresRecurringPayment,
 });
+WebGUI::Test->addToCleanup($transaction);
 
 my $xml = $driver->_generatePaymentRequestXML($transaction);
 
@@ -332,13 +325,4 @@ is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
-#----------------------------------------------------------------------------
-# Cleanup
-
-}
-
-END: {
-    $cart->delete;
-    $transaction->delete if defined $transaction;
-}
 #vim:ft=perl
