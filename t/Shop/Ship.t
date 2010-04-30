@@ -205,10 +205,12 @@ cmp_deeply(
         $defaultDriver->getId => {
             label => $defaultDriver->get('label'),
             price => ignore(),
+            hasPrice => 0,
         },
         $driver->getId => {
             label => $driver->get('label'),
             price => ignore(),
+            hasPrice => 0,
         },
     },
     'getOptions returns the two enabled shipping drivers'
