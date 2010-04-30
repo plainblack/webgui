@@ -890,7 +890,13 @@ sub www_setShippingAddress {
 
 =head2 www_update ( )
 
-Updates the cart totals and then displays the cart again.
+Updates the cart totals, addresses, shipping driver and payment gateway. If requested, and the
+cart is ready, calls the www_getCredentials method from the selected payment gateway.
+
+If the cart total, after taxes, shipping, coupons and shop credit is zero, does the checkout
+immediately without calling a payment gateway.
+
+Otherwise, returns the user back to the cart.
 
 =cut
 
@@ -999,7 +1005,6 @@ sub www_view {
         checkoutButton          => WebGUI::Form::submit($session, {name => 'checkout', value=>$i18n->get("checkout button"), extras=>q|id="checkoutButton"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;" id="continueShoppingButton"|}),
-        subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
         minimumCartAmount       => $session->setting->get( 'shopCartCheckoutMinimum' ) > 0
                                  ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
                                  : 0
@@ -1051,6 +1056,7 @@ sub www_view {
     else {
        $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
     }
+
 
     # Tax variables
 
@@ -1133,12 +1139,15 @@ sub www_view {
     $var{posUserId}   = $posUser->userId;
 
     # calculate price adjusted for in-store credit
+    $var{subtotalPrice}           = $self->formatCurrency($self->calculateSubtotal());
     $var{totalPrice}              = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
     my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
     $var{ inShopCreditAvailable } = $credit->getSum;
     $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
     $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
-    #$var{ readyForCheckout      } = $self->readyForCheckout;
+    foreach my $field (qw/subtotalPrice totalPrice inShopCreditAvailable inShopCreditDeduction totalPrice shippingPrice tax/) {
+        $var{$field} = sprintf q|<span id="%sWrap">%s</span>|, $field, $var{$field};
+    }
     $var{ error                 } = $self->error; 
 
     # render the cart
