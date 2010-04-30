@@ -20,7 +20,6 @@ sub _get_steps {
     return [ qw(
             pickStyle
             chooseContent
-            finalize
             )
     ];
 }
@@ -424,20 +423,5 @@ sub www_chooseContentSave {
     return;
 } ## end sub www_chooseContentSave
 
-#----------------------------------------------------------------------------
-
-=head2 www_finalize ( $output ) 
-
-Redirect the user to to the home page
-
-=cut
-
-sub www_finalize {
-    my ($self) = @_;
-    my $session = $self->session;
-    $session->http->setCacheControl("none");
-    $session->http->setRedirect( $session->url->gateway );
-    return "redirect";
-}
 
 1;

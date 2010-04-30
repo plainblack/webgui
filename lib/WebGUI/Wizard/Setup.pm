@@ -22,7 +22,6 @@ sub _get_steps {
         companyInformation
         siteStats
         defaultStyle
-        finalize
     )];
 }
 
@@ -375,19 +374,20 @@ sub www_defaultStyleSave {
 
 #----------------------------------------------------------------------------
 
-=head2 www_finalize ( ) 
+=head2 www_cleanup ( ) 
 
 Give the user a choice to do the Home Page wizard
 
 =cut
 
-sub www_finalize {
+sub www_cleanup {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
     $session->http->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
+    $self->cleanup;
     # Delete specialState
     $session->setting->remove( "specialState" );
 
@@ -399,34 +399,18 @@ sub www_finalize {
     $starterForm->hidden( name => "styleTemplateId", value => $self->get('styleTemplateId') );
     $starterForm->submit( value => $i18n->get( 'yes please' ) );
 
-    my $finishForm  = $self->getForm;
-    $finishForm->hidden( name => "runStarter", value => 0 );
-    $finishForm->submit( value => $i18n->get( 'no thanks' ) );
-
     my $output = '<h1>' . $i18n->get('site starter title') . '</h1>';
     $output .= ' <p>' . $i18n->get('site starter body') . '</p>'
         . '<div style="float: left">' . $starterForm->print . '</div>'
-        . '<div style="float: left">' . $finishForm->print . '</div>'
+        . sprintf( 
+            '<div style="float: left"><a href="%s">%s</a></div>',
+            $session->url->gateway,
+            $i18n->get('no thanks'),
+        )
         . '<div style="clear: both">&nbsp;</div>'
         ;
 
     return $output;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_finalizeSave ( ) 
-
-User has declined to do the Home Page wizard
-
-=cut
-
-sub www_finalizeSave {
-    my ( $self ) = @_;
-    my $session = $self->session;
-    my ( $form ) = $session->quick(qw( form ));
-
-    $session->http->setRedirect( $session->url->gateway );
 }
 
 1;

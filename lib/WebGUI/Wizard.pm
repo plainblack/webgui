@@ -13,15 +13,17 @@ WebGUI::Wizard -- Generate wizards
 
  use base 'WebGUI::Wizard';
 
- sub _get_steps { [qw( step1 finish )] }
+ sub _get_steps { [qw( step1 )] }
 
+ # Show a form for the first step
  sub www_step1 { 
     my ( $self ) = @_;
-    return $self->getFormStart 
-        . '<input type="text" name="user" />' 
-        . $self->getFormEnd;
+    my $f   = $self->getForm; # Get a WebGUI::HTMLForm
+    $f->text( name => "user" );
+    return $f->print;
  }
 
+ # Process the form for the first step
  sub www_step1Save {
      my ( $self ) = @_;
      if ( my $user = $self->session->form->get('user') ) {
@@ -33,8 +35,10 @@ WebGUI::Wizard -- Generate wizards
      }
  }
 
- sub www_finish { 
+ # Override cleanup to provide a friendly message
+ sub www_cleanup {
      my ( $self ) = @_;
+     $self->cleanup;
      return "Thank you! " . $self->get('user');
  }
 
@@ -48,11 +52,14 @@ WebGUI shows the first step's form (in the synopsis above, step1 / www_step1 ).
 
 Once the user completes the form, the www_step1Save subroutine is run. If an 
 error is returned, the user is shown the error and the same form again. 
-Otherwise, the wizard continues to the next step (finish).
+Otherwise, the wizard continues to the next step.
+
+After all the steps in the wizard are complete, the wizard runs www_cleanup
+to clean up after the wizard and return the user to their previous page.
 
 All parameters gathered by the wizard are saved between page loads into 
-the user's session scratch. Only by restarting the wizard will their progress
-be lost.
+the user's session scratch. Only by finishing or restarting the wizard will 
+their progress be lost.
 
 =head1 METHODS
 
@@ -89,6 +96,33 @@ sub _get_steps {
 
 #----------------------------------------------------------------------------
 
+=head2 canView ( ) 
+
+Returns true if the current user is allowed to view this wizard. You should
+override this.
+
+=cut
+
+sub canView {
+    return 1;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 cleanup ( )
+
+Remove any leftovers after the wizard is finished
+
+=cut
+
+sub cleanup {
+    my ( $self ) = @_;
+    $self->session->scratch->delete( $self->getCacheKey );
+    return;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 dispatch ( ) 
 
 Dispatch the request to the correct step(s). Thaw the user's params and freeze
@@ -117,18 +151,24 @@ sub dispatch {
         }
         else {
             my $step = $self->getNextStep;
-            $self->session->log->info( "Showing next step: " . $step );
-            $self->setCurrentStep( $step );
-            my $formSub = $self->can( 'www_' . $step );
-            my $output = $formSub->($self);
-            $self->freeze;
-            return $self->wrapStyle( $output );
+            if ( $step ) {
+                # Not done, run the next step
+                $self->session->log->info( "Showing next step: " . $step );
+                $self->setCurrentStep( $step );
+                my $formSub = $self->can( 'www_' . $step );
+                my $output = $formSub->($self);
+                $self->freeze;
+                return $self->wrapStyle( $output );
+            }
+            else {
+                # We're done, run the cleanup
+                return $self->wrapStyle( $self->www_cleanup );
+            }
         }
     }
     else {
         # Starting over
-        $self->{_params}    = {};
-        $self->freeze;
+        $self->cleanup;
         my $step = $self->_get_steps->[0];
         $self->setCurrentStep( $step );
         $self->session->log->info( "Starting wizard: " . $step );
@@ -149,7 +189,7 @@ Save the current params to long-term storage.
 
 sub freeze {
     my ( $self ) = @_;
-    $self->session->scratch->set( $self->getCacheKey, JSON->new->encode( $self->{_params} ) );
+    $self->session->scratch->set( $self->getCacheKey, JSON->new->encode( $self->{_params} || {} ) );
 }
 
 #----------------------------------------------------------------------------
@@ -212,7 +252,7 @@ sub getForm {
     my ( $self, $step ) = @_;
     $step ||= $self->getCurrentStep;
     my $form = WebGUI::HTMLForm->new( $self->session, 
-        action      => '?op=wizard;wizard_class=' . blessed( $self ) . ';wizard_step=' . $step,
+        action      => $self->getStepUrl( $step ),
     );
     return $form;
 }
@@ -233,6 +273,23 @@ sub getNextStep {
             return $self->_get_steps->[ $i + 1 ];
         }
     }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getStepUrl ( step )
+
+Get the URL to go to a specific step. Only used when there is no processing
+to do.
+
+=cut
+
+sub getStepUrl {
+    my ( $self, $step ) = @_;
+    return unless $step;
+    return $self->session->url->page( 
+        'op=wizard;wizard_class=' . (blessed $self) . ';wizard_step=' . $step
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -303,6 +360,25 @@ sub wrapStyle {
     my ( $self, $output ) = @_;
 
     return $output;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_cleanup ( ) 
+
+Clean up after the user, removing the variables, and return them to their 
+previous place.
+
+NOTE: If you override this, you must remember to call C<cleanup> manually!
+
+=cut
+
+sub www_cleanup {
+    my ( $self ) = @_;
+
+    $self->cleanup;
+    $self->session->http->setRedirect( $self->session->url->page );
+    return "redirect";
 }
 
 1;

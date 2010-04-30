@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 29;        # Increment this number for each test you create
+plan tests => 31;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Basic API
@@ -127,6 +127,12 @@ cmp_deeply(
     "thaw overwrites params"
 );
 
+$wizard->cleanup;
+cmp_deeply(
+    $wizard->thaw,
+    { },
+    "cleanup clears scratch"
+);
 
 #----------------------------------------------------------------------------
 # dispatch
@@ -183,6 +189,15 @@ cmp_deeply(
     'dispatch did not freeze error data'
 );
 
+# Cleanup
+$wizard = WebGUI::Wizard::Test->new( $session ); # new object to clear currentStep
+$session->request->setup_body({
+    wizard_class    => 'WebGUI::Wizard::Test',
+    wizard_step     => 'five',
+});
+is( $wizard->dispatch, "cleanup", "cleanup sub run after last step saved" );
+
+
 package WebGUI::Wizard::Test;
 use base 'WebGUI::Wizard';
 sub _get_steps { return [qw( one two three four five )] }
@@ -209,5 +224,12 @@ sub www_twoSave {
     return "error";
 }
 
+sub www_fiveSave {
+    return; # Success!
+}
+
+sub www_cleanup {
+    return "cleanup";
+}
 
 #vim:ft=perl
