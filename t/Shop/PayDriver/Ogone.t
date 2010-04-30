@@ -110,6 +110,13 @@ my $expectDefinition =  {
             hoverHelp       => ignore(),
             defaultValue    => 1,
         },
+        summaryTemplateId => {
+            fieldType       => 'template',
+            label           => ignore(),
+            hoverHelp       => ignore(),
+            defaultValue    => ignore(),
+            namespace       => 'Shop/Credentials',
+        },
     },
 };
 
@@ -372,7 +379,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 17, 'getEditForm: the form has 17 controls');
+is          (scalar @inputs, 18, 'getEditForm: the form has 18 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -451,6 +458,10 @@ cmp_deeply(
         {
             name    => 'useTestMode',
             type    => 'radio',
+        },
+        {
+            name    => 'summaryTemplateId',
+            type    => 'option',
         },
     ],
     'getEditForm made the correct form with all the elements'
