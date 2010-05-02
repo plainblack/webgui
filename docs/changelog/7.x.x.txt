@@ -1,4 +1,5 @@
 7.8.19
+ - fixed #11547: Default Inbox View Template Delete buttton failure
 
 7.8.18
  - fixed #11444: Strange spectre problem
