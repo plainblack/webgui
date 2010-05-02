@@ -12,6 +12,7 @@
  - added: CHI cache driver
  - added #11498: Gallery: Automatically adjust orientation of images based on EXIF data
  - fixed #11547: Default Inbox View Template Delete buttton failure
+ - fixed #11542: Date macro can pass in epoch values that do not pass regex checks
 
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
