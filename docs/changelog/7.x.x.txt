@@ -1,5 +1,6 @@
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure
+ - fixed #11542: Date macro can pass in epoch values that do not pass regex checks
 
 7.8.18
  - fixed #11444: Strange spectre problem
