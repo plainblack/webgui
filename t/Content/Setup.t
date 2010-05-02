@@ -29,9 +29,10 @@ $session->setting->remove("specialState");
 is(WebGUI::Content::Setup::handler($session), undef, "Setup shouldn't return anything when no special state is present");
 
 $session->request->setup_body({ 
-    step     => 2,
-    timeZone => 'America/New_York',
-    language => 'Spanish',
+    wizard_class => 'WebGUI::Wizard::Setup',
+    wizard_step  => 'adminAccount',
+    timeZone     => 'America/New_York',
+    language     => 'Spanish',
 });
 
 $session->setting->set("specialState", "init");
