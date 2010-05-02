@@ -23,6 +23,7 @@ use HTML::Form;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Shop::PayDriver;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,21 +32,12 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 54;
-plan tests => 1 + $tests;
+plan tests => 54;
 
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
 
 my $e;
-
-my $loaded = use_ok('WebGUI::Shop::PayDriver');
-
-my $storage;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::PayDriver', $tests unless $loaded;
 
 #######################################################################
 #
@@ -255,6 +247,7 @@ isnt(
 
 my $cart = $driver->getCart;
 isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGUI::Shop::Cart object');
+addToCleanup($cart);
 
 #######################################################################
 #
@@ -475,10 +468,3 @@ is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
-
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-}
