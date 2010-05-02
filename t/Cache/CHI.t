@@ -34,6 +34,10 @@ plan tests => 3;        # Increment this number for each test you create
 # put your tests here
 
 use_ok( 'WebGUI::Cache::CHI' );
+WebGUI::Test->originalConfig('cacheType');
+WebGUI::Test->originalConfig('cache');
+$session->config->set('cacheType', 'WebGUI::Cache::CHI');
+$session->config->set('cache', { driver => 'FastMmap', });
 
 my $cache = WebGUI::Cache::CHI->new($session, "this", "that");
 my $testValue = "a rock that has no earthly business in that field";
@@ -42,6 +46,5 @@ $cache->set($testValue);
 is($cache->get, $testValue, "set/get works");
 $cache->delete;
 is($cache->get, undef, "delete works");
-
 
 #vim:ft=perl

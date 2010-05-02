@@ -2,6 +2,7 @@ package WebGUI::Cache::CHI;
 
 use strict;
 use base 'WebGUI::Cache';
+use File::Temp qw/tempdir/;
 use CHI;
 
 =head1 NAME
