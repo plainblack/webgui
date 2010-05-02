@@ -361,6 +361,7 @@ isnt(
 
 my $cart = $driver->getCart;
 isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGUI::Shop::Cart object');
+WebGUI::Test->addToCleanup($cart);
 
 #######################################################################
 #
@@ -587,16 +588,4 @@ is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
-
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-
-
-
-}
-END {
-
-}
 #vim:ft=perl

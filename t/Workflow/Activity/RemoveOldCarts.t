@@ -24,6 +24,7 @@ use Test::Deep;
 plan tests => 6; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
+$session->user({userId => 3});
 
 my $root = WebGUI::Asset->getRoot($session);
 my $donation = $root->addChild({
@@ -38,6 +39,7 @@ WebGUI::Test->tagsToRollback($tag);
 my $cart1 = WebGUI::Shop::Cart->create($session);
 
 my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+$session2->user({userId => 3});
 WebGUI::Test->sessionsToDelete($session2);
 my $cart2 = WebGUI::Shop::Cart->create($session2);
 $cart2->update({creationDate => time()-10000});
@@ -81,6 +83,7 @@ my $instance1 = WebGUI::Workflow::Instance->create($session,
         skipSpectreNotification => 1,
     }
 );
+WebGUI::Test->addToCleanup($instance1);
 
 my $retVal;
 
@@ -88,7 +91,7 @@ $retVal = $instance1->run();
 is($retVal, 'complete', 'cleanup: activity complete');
 $retVal = $instance1->run();
 is($retVal, 'done', 'cleanup: activity is done');
-$instance1->delete;
+$instance1->delete('skipNotify');
 
 @cartIds = $session->db->buildArray('select cartId from cart');
 cmp_bag(
@@ -103,7 +106,3 @@ cmp_bag(
     [ $item1->getId, ],
     'Deleted 1 item, the correct one'
 );
-
-END {
-    $instance1->delete('skipNotify');
-}
