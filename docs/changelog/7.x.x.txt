@@ -1,3 +1,6 @@
+7.9.5
+ - added #11502: Gallery: Allow specification of location when uploading ZIP archives
+
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility
    functions.  Include it from www/extras/underscore/underscore-min.js.

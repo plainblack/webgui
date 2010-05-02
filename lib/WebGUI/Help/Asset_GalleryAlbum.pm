@@ -251,6 +251,10 @@ our $HELP = {
                 description => 'helpvar form_keywords',
             },
             {
+                name        => 'form_location',
+                description => 'helpvar form_location',
+            },            
+            {
                 name        => 'form_friendsOnly',
                 description => 'helpvar form_friendsOnly',
             },

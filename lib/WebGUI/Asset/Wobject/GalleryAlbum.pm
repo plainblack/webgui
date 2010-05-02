@@ -988,6 +988,12 @@ sub www_addArchive {
             name            => "keywords",
             value           => ( $form->get("keywords") ),
         });
+        
+    $var->{ form_location }
+        = WebGUI::Form::Text( $session, {
+            name        => "location",
+            value       => ( $form->get("location") ),
+        });        
 
     $var->{ form_friendsOnly }
         = WebGUI::Form::yesNo( $session, {
@@ -1019,6 +1025,7 @@ sub www_addArchiveSave {
     my $pb          = WebGUI::ProgressBar->new($session);
     my $properties  = {
         keywords        => $form->get("keywords"),
+        location        => $form->get("location"),
         friendsOnly     => $form->get("friendsOnly"),
     };
     

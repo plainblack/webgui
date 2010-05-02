@@ -46,12 +46,19 @@ my $album
         skipAutoCommitWorkflows => 1,
     });
 
-$album->addArchive( WebGUI::Test->getTestCollateralPath('elephant_images.zip') );
+# Properties applied to every photo in the archive
+my $properties  = {
+    keywords        => "something",
+    location        => "somewhere",
+    friendsOnly     => "1",
+};
+
+$album->addArchive( WebGUI::Test->getTestCollateralPath('elephant_images.zip'), $properties );
 $versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 5;
+plan tests => 8;
 
 #----------------------------------------------------------------------------
 # Test the addArchive sub
@@ -59,28 +66,50 @@ plan tests => 5;
 my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });
 
 is( scalar @$images, 3, "addArchive() adds one asset per image" );
-cmp_deeply(
+cmp_bag(
     [ map { $_->get("filename") } @$images ],
-    bag( "Aana1.jpg", "Aana2.jpg", "Aana3.jpg" ),
+    [ "Aana1.jpg", "Aana2.jpg", "Aana3.jpg" ],
+    "Names of files attached to Photo assets match filenames in archive"
 );
 
-cmp_deeply(
+cmp_bag(
     [ map { $_->get("title") } @$images ],
-    bag( "Aana1", "Aana2", "Aana3" ),
+    [ "Aana1", "Aana2", "Aana3" ],
+    "Titles of Photo assets match filenames in archive excluding extensions"
 );
 
-cmp_deeply(
+cmp_bag(
     [ map { $_->get("menuTitle") } @$images ],
-    bag( "Aana1", "Aana2", "Aana3" ),
+    [ "Aana1", "Aana2", "Aana3" ],
+    "Menu titles of Photo assets match filenames in archive excluding extensions"    
 );
 
-cmp_deeply(
+cmp_bag(
     [ map { $_->get("url") } @$images ],
-    bag( 
+    [
         $session->url->urlize( $album->getUrl . "/Aana1" ), 
         $session->url->urlize( $album->getUrl . "/Aana2" ), 
         $session->url->urlize( $album->getUrl . "/Aana3" ), 
-    ),
+    ],
+    "URLs of Photo assets match filenames in archive excluding extensions"
+);
+
+cmp_bag(
+    [ map { $_->get("keywords") } @$images ],
+    [ "something", "something", "something" ],
+    "Keywords of Photo assets match keywords in properties"
+);
+
+cmp_bag(
+    [ map { $_->get("location") } @$images ],
+    [ "somewhere", "somewhere", "somewhere" ],
+    "Location of Photo assets match keywords in properties"
+);
+
+cmp_bag(
+    [ map { $_->get("friendsOnly") } @$images ],
+    [ "1", "1", "1" ],
+    "Photo assets are viewable by friends only"
 );
 
 #----------------------------------------------------------------------------

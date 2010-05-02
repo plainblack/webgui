@@ -277,6 +277,11 @@ our $I18N = {
         message     => 'The keywords for the files being uploaded.',
         lastUpdated => 0,
     },
+    
+    'helpvar form_location' => {
+        message     => 'The location for the files being uploaded.',
+        lastUpdated => 0,
+    },    
 
     'helpvar form_friendsOnly' => {
         message     => 'Should the file be friends only?',
@@ -451,7 +456,13 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Label for the "keywords" field of the Add Archive page',
     },
-
+    
+    'addArchive location' => {
+        message     => 'Location',
+        lastUpdated => 0,
+        context     => 'Label for the "location" field of the Add Archive page',
+    },
+    
     'addArchive friendsOnly' => {
         message     => 'Friends Only',
         lastUpdated => 0,
