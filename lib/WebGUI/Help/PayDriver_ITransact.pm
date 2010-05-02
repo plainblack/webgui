@@ -92,7 +92,6 @@ our $HELP = {
 				name		=> "checkoutButton",
 				description	=> "checkoutButton help",
 				required	=> 1,
-                namespace   => 'Shop',
 			},
 		],
 		related 	=> [  
