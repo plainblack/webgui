@@ -11,6 +11,7 @@
  - added: Style Picker as part of the initial setup wizard
  - added: CHI cache driver
  - added #11498: Gallery: Automatically adjust orientation of images based on EXIF data
+ - fixed #11547: Default Inbox View Template Delete buttton failure
 
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
