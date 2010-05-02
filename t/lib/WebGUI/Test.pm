@@ -876,22 +876,26 @@ Example call:
     );
 
     my %cleanup = (
-        'WebGUI::User'              => 'delete',
-        'WebGUI::Group'             => 'delete',
-        'WebGUI::Storage'           => 'delete',
-        'WebGUI::Asset'             => 'purge',
-        'WebGUI::VersionTag'        => 'rollback',
-        'WebGUI::Workflow'          => 'delete',
-        'WebGUI::DatabaseLink'      => 'delete',
-        'WebGUI::Shop::AddressBook' => 'delete',
-        'WebGUI::Shop::Transaction' => 'delete',
-        'WebGUI::Shop::ShipDriver'  => 'delete',
-        'WebGUI::Shop::PayDriver'   => 'delete',
-        'WebGUI::Shop::Cart'        => sub {
+        'WebGUI::User'               => 'delete',
+        'WebGUI::Group'              => 'delete',
+        'WebGUI::Storage'            => 'delete',
+        'WebGUI::Asset'              => 'purge',
+        'WebGUI::VersionTag'         => 'rollback',
+        'WebGUI::Workflow'           => 'delete',
+        'WebGUI::DatabaseLink'       => 'delete',
+        'WebGUI::Shop::AddressBook'  => 'delete',
+        'WebGUI::Shop::Transaction'  => 'delete',
+        'WebGUI::Shop::ShipDriver'   => 'delete',
+        'WebGUI::Shop::PayDriver'    => 'delete',
+        'WebGUI::Shop::Cart'         => sub {
             my $cart        = shift;
             my $addressBook = $cart->getAddressBook();
             $addressBook->delete if $addressBook;  ##Should we call cleanupGuard instead???
             $cart->delete;
+        },
+        'WebGUI::Workflow::Instance' => sub {
+            my $instance = shift;
+            $instance->delete('skipNotify');
         },
         'WebGUI::Session'          => sub {
             my $session = shift;
