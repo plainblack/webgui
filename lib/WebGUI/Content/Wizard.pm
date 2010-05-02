@@ -1,5 +1,31 @@
 package WebGUI::Content::Wizard;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=head1 NAME
+
+Package WebGUI::Content::Wizard
+
+=head1 DESCRIPTION
+
+A content handler for WebGUI::Wizard modules.  Dispatches to WebGUI::Wizard after process form variables.
+
+=head2 handler ( session ) 
+
+The content handler for this package.
+
+=cut
+
 sub handler {
     my ( $session ) = @_;
 
