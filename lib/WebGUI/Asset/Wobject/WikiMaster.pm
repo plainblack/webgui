@@ -76,10 +76,10 @@ If passed in, this will override the mostPopularCount set in the object.
 =cut
 
 sub appendMostPopular {
-	my $self = shift;
-	my $var = shift;
-	my $limit = shift || $self->get("mostPopularCount");
-	foreach my $asset (@{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"]})}) { 
+    my $self  = shift;
+    my $var   = shift;
+    my $limit = shift || $self->get("mostPopularCount");
+	foreach my $asset (@{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"], joinClass => 'WebGUI::Asset::WikiPage', orderByClause => 'WikiPage.views DESC'})}) { 
 		if (defined $asset) {
 			push(@{$var->{mostPopular}}, {
 				title=>$asset->getTitle,
