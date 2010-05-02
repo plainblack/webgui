@@ -22,6 +22,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use JSON;
 use HTML::Form;
+use WebGUI::Shop::PayDriver::Ogone;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,20 +32,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 45;
-plan tests => 1 + $tests;
+plan tests => 45;
 
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
 
 my $e;
-
-note('Testing existence');
-my $loaded = use_ok('WebGUI::Shop::PayDriver::Ogone');
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::PayDriver::Ogone', $tests unless $loaded;
 
 #######################################################################
 #
