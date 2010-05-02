@@ -15,14 +15,7 @@ package WebGUI::Content::Setup;
 =cut
 
 use strict;
-use Digest::MD5;
-use WebGUI::Asset;
-use WebGUI::HTMLForm;
-use WebGUI::International;
-use WebGUI::Storage;
-use WebGUI::VersionTag;
-use WebGUI::Utility;
-use WebGUI::Operation::Statistics;
+use WebGUI::Wizard::Setup;
 
 =head1 NAME
 
