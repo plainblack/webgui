@@ -12,56 +12,6 @@ our $I18N = {
         lastUpdated => 0,
         context => q|The name of the ITransact plugin|,
     },
-	'label' => {
-        message => q|Credit Card|,
-        lastUpdated => 0,
-        context => q|Default ITransact payment gateway label|
-    },
-    'phone' => {
-        message => q|Telephone Number|,
-        lastUpdated => 0,
-        context => q|Form label in the checkout form of the iTransact module.|
-    },
-    'country' => {
-        message => q|Country|,
-        lastUpdated => 0,
-        context => q|Form label in the checkout form of the iTransact module.|
-    },
-	'firstName' => {
-		message => q|First name|,
-		lastUpdated => 0,
-		context => q|Form label in the checkout form of the iTransact module.|
-	},
-	'lastName' => {
-		message => q|Last name|,
-		lastUpdated => 0,
-		context => q|Form label in the checkout form of the iTransact module.|
-	},
-	'address' => {
-		message => q|Address|,
-		lastUpdated => 1101772170,
-		context => q|Form label in the checkout form of the iTransact module.|
-	},
-	'city' => {
-		message => q|City|,
-		lastUpdated => 1101772171,
-		context => q|Form label in the checkout form of the iTransact module.|
-	},
-	'state' => {
-		message => q|State|,
-		lastUpdated => 1101772173,
-		context => q|Form label in the checkout form of the iTransact module.|
-	},
-	'zipcode' => {
-		message => q|Zipcode|,
-		lastUpdated => 1101772174,
-		context => q|Form label in the checkout form of the iTransact module.|
-	},
-	'email' => {
-		message => q|Email|,
-		lastUpdated => 1101772176,
-		context => q|Form label in the checkout form of the iTransact module.|
-	},
 	'cardNumber' => {
 		message => q|Credit card number|,
 		lastUpdated => 1101772177,
@@ -149,18 +99,6 @@ our $I18N = {
    	'checkoutButton help' => {
 		message => q|A button with an internationalized label to submit the form and continue the checkout process.|,
 		lastUpdated => 0,
-		context => q|Template variable help.|
-	},
-
-   	'addressField help' => {
-		message => q|A single text field for the user to enter in their street address.|,
-		lastUpdated => 0,
-		context => q|Template variable help.|
-	},
-
-   	'emailField help' => {
-		message => q|A single text field for the user to enter in their email address.|,
-		lastUpdated => 1231192368,
 		context => q|Template variable help.|
 	},
 

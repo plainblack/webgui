@@ -341,6 +341,8 @@ our $HELP = {
                 description => 'totalPrice help',
                 namespace   => 'Shop',
             },
+        ],
+    },
 
 };
 
