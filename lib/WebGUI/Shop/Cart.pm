@@ -848,23 +848,6 @@ sub www_ajaxPrices {
 
 #-------------------------------------------------------------------
 
-=head2 www_continueShopping ( )
-
-Update the cart and the return the user back to the asset.
-
-=cut
-
-sub www_continueShopping {
-    my $self = shift;
-    $self->updateFromForm;
-    if ($error{id $self} ne "") {
-        return $self->www_view;
-    }
-    return undef;
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_lookupPosUser ( )
 
 Adds a Point of Sale user to the cart.
@@ -925,7 +908,7 @@ sub www_update {
                 $transaction->sendNotifications();
                 return $transaction->thankYou();
             }
-            my $gateway = WebGUI::Shop::Pay->new($session)->getPaymentGateway($self->get('gatewayId'));
+            my $gateway = $self->getPaymentGateway;
             return $gateway->www_getCredentials;
         }
     }
