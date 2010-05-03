@@ -353,13 +353,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extend the base method to handle the answers and the Graphing plugin.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
 	my $self = shift;
 	super();
 	my $property = {};

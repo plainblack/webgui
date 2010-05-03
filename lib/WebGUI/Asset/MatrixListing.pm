@@ -420,13 +420,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Used to process properties from the form posted.  
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
 	my $self    = shift;
     my $session = $self->session;
     my $score   = 0;

@@ -152,14 +152,14 @@ override getEditForm => sub {
 
 Add a tab for the data table.
 
-=cut
-
 override getEditTabs => sub {
     my $self = shift;
     my $i18n = WebGUI::International->new( $self->session, "Asset_DataTable" );
 
     return ( super(), [ "data" => $i18n->get("tab label data") ], );
 };
+
+=cut
 
 #----------------------------------------------------------------------------
 

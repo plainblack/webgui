@@ -715,12 +715,12 @@ sub processCommentEditForm {
 
 #----------------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
     my $self    = shift;
     my $i18n    = WebGUI::International->new( $self->session,'Asset_Photo' );
     my $form    = $self->session->form;

@@ -168,7 +168,7 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Used to process properties from the form posted.  Do custom things with
 noFormPost fields here, or do whatever you want.  This method is called
@@ -176,9 +176,9 @@ when /yourAssetUrl?func=editSave is requested/posted.
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
     my $self = shift;
-    $self->SUPER::processPropertiesFromFormPost;
+    $self->SUPER::processEditForm;
 }
 
 #-------------------------------------------------------------------

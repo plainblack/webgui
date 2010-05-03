@@ -162,6 +162,8 @@ sub toHtml {
     my ( $style, $url ) = $self->session->quick(qw{ style url });
 
     $style->setLink( $url->extras('hoverhelp.css'), { rel => "stylesheet", type => "text/css" } );
+    $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
+    $style->setScript( $url->extras('yui/build/container/container-min.js') );
     $style->setScript( $url->extras('hoverhelp.js') );
 
     my $html = $self->getHeader;

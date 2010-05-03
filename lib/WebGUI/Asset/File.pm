@@ -394,13 +394,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extend the master method to handle file uploads and applying constraints.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
 

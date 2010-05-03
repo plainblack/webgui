@@ -184,6 +184,10 @@ Asset API
 ->get will still work, but will be slightly slower since inside it calls the direct Moose accessor.  Similarly,
 getId is slightly slower than ->assetId.
 
+processPropertiesFromFormPost
+-----------------------------
+Absurdly long and non-descriptive name, changed to processEditForm
+
 WebGUI::Shop::Vendor
 ====================
 Object properties are no longer written to the database when an object is created from scratch.  The write method needs

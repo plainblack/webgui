@@ -855,7 +855,7 @@ sub prepareView {
 
 #----------------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Process the Calendar Edit form.
 
@@ -865,7 +865,7 @@ Adds / removes feeds from the feed trough.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $self->session->form;

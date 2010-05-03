@@ -808,14 +808,14 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
-See WebGUI::Asset::processPropertiesFromFormPost () for details.  Extends the base class to delete
+See WebGUI::Asset::processEditForm () for details.  Extends the base class to delete
 the scratch variables, and to uncache the overrides.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
 	my $self = shift;
 	super();
 	my $scratchId = "Shortcut_" . $self->getId;

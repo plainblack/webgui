@@ -1297,7 +1297,7 @@ sub prepareView {
 
 ####################################################################
 
-=head2 processPropertiesFromFormPost
+=head2 processEditForm
 
 Processes the Event Edit form.
 
@@ -1316,7 +1316,7 @@ Requests that the events be committed
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
     my $self    = shift;
     super();
     my $session = $self->session;

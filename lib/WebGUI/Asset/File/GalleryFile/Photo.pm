@@ -76,7 +76,7 @@ These methods are available from this class:
 =head2 applyConstraints ( options )
 
 Apply the constraints to the original file. Called automatically by C<setFile>
-and C<processPropertiesFromFormPost>.
+and C<processEditForm>.
 
 This is a sort of catch-all method for applying things to the file after it's
 uploaded. This method simply calls other methods to do its work.
@@ -411,7 +411,7 @@ sub makeResolutions {
 
 #----------------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Process the asset edit form. 
 
@@ -419,7 +419,7 @@ Make the default title into the file name minus the extention.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
     my $self    = shift;
     my $i18n    = WebGUI::International->new( $self->session,'Asset_Photo' );
     my $form    = $self->session->form;

@@ -75,7 +75,9 @@ sub toHtml {
 
     for ( my $i = 0; $i < @{$self->tabs}; $i++ ) {
         my $tab = $self->tabs->[$i];
-        $html   .= sprintf '<li><a href="#tab%i"><em>%s</em></a></li>', $i, $tab->label;
+        $html   .= '<li' . ( $i == 0 ? ' class="selected"' : '' ) . '>'
+                . sprintf( '<a href="#tab%i"><em>%s</em></a>', $i, $tab->label )
+                . '</li>';
     }
 
     $html       .= '</ul>'

@@ -803,14 +803,14 @@ sub processStyle {
 
 #----------------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Process the form to save the asset. Request approval from the Gallery's 
 approval workflow.
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
     my $self        = shift;
     my $form        = $self->session->form;
     my $errors      = $self->next::method || [];

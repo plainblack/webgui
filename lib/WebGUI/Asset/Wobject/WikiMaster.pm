@@ -727,13 +727,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extend the master method to propagate view and edit permissions down to the wiki pages.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
 	my $self = shift;
 	my $groupsChanged =
 	    (($self->session->form->process('groupIdView') ne $self->groupIdView)

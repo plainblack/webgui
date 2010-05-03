@@ -742,13 +742,13 @@ override postProcess => sub {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extend the base method to do captcha processing.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
     my $self = shift;
 
     if ($self->isNew && $self->getParent->useCaptcha) {

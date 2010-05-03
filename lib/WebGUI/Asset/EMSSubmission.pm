@@ -484,13 +484,14 @@ the shop tab is created here to mimic the function of the sku-created
 shop tab.  this class holds data like Sku assets so that they can be assigned
 in the future when the sku asset is created from this data.
 
-=cut
 
 override getEditTabs => sub {
     my $self = shift;
     my $sku_i18n = WebGUI::International->new($self->session,"Asset_Sku");
     return (super(), ['shop', $sku_i18n->get('shop'), 9],);
 };
+
+=cut
 
 #-------------------------------------------------------------------
 

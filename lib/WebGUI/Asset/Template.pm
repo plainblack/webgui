@@ -568,13 +568,13 @@ sub process {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extends the master class to handle template parsers, namespaces and template attachments.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
 	my $self = shift;
 	super();
         my $session = $self->session;

@@ -218,13 +218,14 @@ override getEditForm => sub {
 
 Not to be modified, just defines a new tab.
 
-=cut
 
 override getEditTabs => sub {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Sku");
 	return (super(), ['shop', $i18n->get('shop'), 9]);
 };
+
+=cut
 
 #-------------------------------------------------------------------
 
@@ -565,13 +566,13 @@ sub onRemoveFromCart {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Extends the base class to process the tax data.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
     my $self = shift;
 
     my $output = super();

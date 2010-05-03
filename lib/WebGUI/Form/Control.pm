@@ -133,7 +133,7 @@ A text string that will be appended after the field when toHtmlWithWrapper() is 
 
 =head4 labelClass
 
-A stylesheet class assigned to the label with toHtmlWithWrapper() is called. Defaults to "formDescription".
+A stylesheet class assigned to the label with toHtmlWithWrapper() is called.
 
 =head4 fieldClass
 
@@ -176,7 +176,7 @@ sub definition {
 			defaultValue=>1
 			},
 		labelClass=>{
-			defaultValue=>"formDescription"
+			defaultValue=>""
 			},
 		fieldClass=>{
 			defaultValue=>"tableData"
@@ -333,8 +333,10 @@ sub getDatabaseFieldType {
 sub getLabel {
     my ( $self ) = @_;
 
-    my $labelClass = $self->get("labelClass");
-    $labelClass = qq| class="$labelClass" | if($self->get("labelClass"));
+    return '' if !$self->get('label');
+
+    my $labelClass = " " . $self->get("labelClass");
+    $labelClass = qq| class="formDescription${labelClass}"|;
 
     my $hoverHelp = $self->get("hoverHelp") || '';
     $hoverHelp =~ s/^\s+//;

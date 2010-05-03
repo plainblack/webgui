@@ -559,13 +559,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Handle photos and photo metadata, like captions, etc.
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
     my $self = shift;
     my $session = $self->session;
     $self->next::method;

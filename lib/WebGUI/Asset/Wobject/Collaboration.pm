@@ -982,13 +982,14 @@ sub duplicateBranch {
 
 Add a tab for the mail interface.
 
-=cut
 
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
 	return ($self->next::method, ['mail', $i18n->get('mail'), 9]);
 }
+
+=cut
 
 #-------------------------------------------------------------------
 
@@ -1389,7 +1390,7 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extend the base method to handle creating subscription groups, propagating
 group privileges to all descendants and clearing scratch variables for sort key
@@ -1397,7 +1398,7 @@ and direction.
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
 	my $self = shift;
     my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->groupIdView || $self->session->form->process("groupIdEdit") ne $self->groupIdEdit);
 	$self->next::method;

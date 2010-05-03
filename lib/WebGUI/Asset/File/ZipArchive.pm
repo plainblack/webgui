@@ -135,14 +135,14 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Used to process properties from the form posted.  In this asset, we use
 this method to deflate the zip file into the proper folder
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
 	my $self = shift;
 	#File should be saved here by the superclass
 	super();

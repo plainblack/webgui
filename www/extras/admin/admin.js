@@ -101,14 +101,15 @@ appendToUrl
  */
 WebGUI.Admin.prototype.editAsset
 = function ( url ) {
+    // Show the view tab
+    this.tabBar.selectTab( 0 );
+    this.currentTab = "view";
+
     // Open the edit form
     window.frames["view"].location.href = appendToUrl( url, "func=edit" );
 
     // Mark undirty, as we'll clean it ourselves
     this.viewDirty = 0;
-
-    // Show the view tab
-    this.tabBar.selectTab( 0 );
 };
 
 /**

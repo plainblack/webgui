@@ -577,7 +577,6 @@ sub www_viewRss {
 
 Adds an RSS tab to the Edit Tabs.
 
-=cut
 
 around getEditTabs => sub {
     my $orig = shift;
@@ -587,6 +586,8 @@ around getEditTabs => sub {
     push @{ $tabs }, ['rss', $i18n->get('RSS tab'), 1];
     return $tabs;
 };
+
+=cut
 
 1;
 

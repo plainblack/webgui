@@ -243,14 +243,14 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Extend the super class to calculate total asset size from
 any files stored in the storage location.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
     my $self = shift;
     super();
     my $size = 0;

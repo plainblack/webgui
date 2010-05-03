@@ -350,13 +350,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extends the master method to handle properties and attachments.
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
     my $self    = shift;
     my $session = $self->session;
     $self->next::method(@_);

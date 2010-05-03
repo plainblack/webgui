@@ -870,53 +870,43 @@ sub getEditForm {
     my $session   = $self->session;
     my $i18n      = WebGUI::International->new( $session, "Asset" );
     my $f         = WebGUI::FormBuilder->new( $session );
-    my $overrides = $session->config->get( "assets/" . $self->get("className") );
+    my $overrides = $session->config->get( "assets/" . $self->get("className") . '/fields' ) || {};
 
     ###
     # Buttons
-    $f->addField( 'Submit',
+    my $buttonGroup = $f->addField( 'ButtonGroup', name => "saveButtons", rowClass => 'saveButtons' );
+    $buttonGroup->addButton( "submit", {
         name        => "save",
         value       => $i18n->get('save'),
-    );
+    } );
 
     if ( $session->config->get("enableSaveAndCommit") ) {
-        $f->addField( 'Submit',
+        $buttonGroup->addButton( 'Submit', {
             name  => "saveAndCommit",
             value => $i18n->get("save and commit"),
-        );
+        } );
     }
 
-    $f->addField( 'Submit',
+    $buttonGroup->addButton( 'Submit', {
         name  => "saveAndReturn",
         value => $i18n->get("apply"),
-    );
+    } );
 
-    $f->addField( 'Submit',
+    $buttonGroup->addButton( 'Submit', {
         name    => 'cancel',
-        value   => $i18n->get('cancel'),
-    );
+        value   => $i18n->get('cancel','WebGUI'),
+    } );
 
     ### 
     # Create the main tabset
-
+    # Not using loop to maintain correct order
+    $f->addTab( name => "properties", label => $i18n->get("properties") );
+    $f->addTab( name => "display", label => $i18n->get(105) );
+    $f->addTab( name => "security", label => $i18n->get(107) );
+    $f->addTab( name => "meta", label => $i18n->get("Metadata") );
 
     ###
     # Asset ID and class name
-    #    assetId => {
-    #        fieldType => "guid",
-    #        label     => [ "asset id", 'Asset' ],
-    #        value     => $assetId,
-    #        hoverHelp => [ 'asset id description', 'Asset' ],
-    #        uiLevel   => 9,
-    #        tab       => "meta",
-    #    },
-    #    class => {
-    #        fieldType => "className",
-    #        label     => [ "class name", 'WebGUI' ],
-    #        value     => $class,
-    #        uiLevel   => 9,
-    #        tab       => "meta",
-    #    },
     my $assetId;
     my $class;
     if ( $self->getId eq "new" ) {
@@ -927,41 +917,56 @@ sub getEditForm {
         $assetId = $self->getId;
         $class   = $self->get('className');
     }
+    $f->getTab("meta")->addField( "Guid", 
+        name        => "assetId",
+        value       => $assetId,
+        label       => $i18n->get( 'asset id' ),
+        hoverHelp   => $i18n->get('asset id description'),
+        uiLevel     => 9,
+    );
+    $f->getTab("meta")->addField( "ClassName", 
+        name        => "class",
+        value       => $class,
+        label       => $i18n->get('class name', 'WebGUI'),
+        uiLevel     => 9,
+    );
 
     ###
     # Keywords
-    # keywords => {
-    #        label     => [ 'keywords',      'Asset' ],
-    #        hoverHelp => [ 'keywords help', 'Asset' ],
-    #        value     => $self->get('keywords'),
-    #        fieldType => 'keywords',
-    #        tab       => 'meta',
-    #    },
+    $f->getTab( "meta" )->addField( 'Keywords', 
+        name        => 'keywords',
+        value       => $self->get('keywords'),
+        label       => $i18n->get( 'keywords' ),
+        hoverHelp   => $i18n->get( 'keywords help' ),
+    );
 
     ###
     # Properties
     foreach my $property ( $self->getProperties ) {
         next if $self->meta->find_attribute_by_name( $property )->noFormPost;
-        $self->session->log->warn( "Property: $property" );
-        $self->session->log->warn( Dumper $self->meta->find_attribute_by_name( $property )->form );
-        $self->session->log->warn( Dumper $self->getFormProperties( $property ) );
-        my $fieldHash   = {
-                            tab         => "properties",
-                            name        => $property,
-                            value       => $self->$property,
-                            %{ $self->getFormProperties( $property ) },
-                        };
-        my $fieldType   = $self->meta->find_attribute_by_name( $property )->fieldType;
+        my $fieldType       = $self->meta->find_attribute_by_name( $property )->fieldType;
+        my $fieldOverrides  = $overrides->{ $property } || {};
+        my $fieldHash       = {
+                                tab         => "properties",
+                                %{ $self->getFormProperties( $property ) },
+                                %{ $overrides },
+                                name        => $property,
+                                value       => $self->$property,
+                            };
 
-        if ( !$f->getTab( $fieldHash->{tab} ) ) {
-            $f->addTab( name => $fieldHash->{tab} );
+        # Kludge...
+        if ( isIn( $fieldHash->{fieldType}, 'selectBox', 'workflow' ) and ref $fieldHash->{value} ne 'ARRAY' ) {
+            $fieldHash->{value} = [ $fieldHash->{value} ];
         }
+
+        # Create tabs to have labels added later
+        if ( !$f->getTab( $fieldHash->{tab} ) ) {
+            $f->addTab( name => $fieldHash->{tab}, label => $fieldHash->{tab} );
+        }
+
         $f->getTab( $fieldHash->{tab} )->addField( $fieldType, %{$fieldHash} );
     }
 
-    return $f;
-}
-=cut
     ###
     # Meta data
     if ( $session->setting->get("metaDataEnabled") ) {
@@ -975,65 +980,21 @@ sub getEditForm {
             if ( "\l$fieldType" eq "selectBox" ) {
                 $options = "|" . $i18n->get("Select") . "\n" . $options;
             }
-            push @properties, "metadata_"
-                . $meta->{$field}{fieldId} => {
-                tab          => "meta",
+            my $fieldName   = "metadata_" . $meta->{$field}{fieldId};
+            my $fieldData   = {
                 label        => $meta->{$field}{fieldName},
                 uiLevel      => 5,
                 value        => $meta->{$field}{value},
-                extras       => qq/title="$meta->{$field}{description}"/,
+                hoverHelp    => $meta->{$field}{description},
                 options      => $options,
                 defaultValue => $meta->{$field}{defaultValue},
-                fieldType    => $fieldType
-                };
-        } ## end foreach my $field ( keys %$meta)
-
-        # add metadata management
-        if ( $session->user->isAdmin ) {
-            push @properties, '_metadatamanagement' => {
-                tab       => "meta",
-                fieldType => "readOnly",
-                value     => '<p><a href="'
-                    . $self->session->url->page("func=editMetaDataField;fid=new") . '">'
-                    . $i18n->get('Add new field')
-                    . '</a></p>',
-                hoverHelp => $i18n->get('Add new field description'),
             };
-        }
+            $f->getTab('meta')->addField( $fieldType, %{ $fieldData } );
+        } ## end foreach my $field ( keys %$meta)
     } ## end if ( $session->setting...)
 
-    # generate the form
-    for ( my $i = 0; $i < @properties; $i += 2 ) {
-        my $fieldName = $properties[$i];
-        my %fieldHash = %{ $properties[ $i + 1 ] };
-        my %params    = ( name => $fieldName, value => $self->get($fieldName) );
-
-        # apply config file changes
-        foreach my $key ( keys %{ $overrides->{fields}{$fieldName} } ) {
-            $fieldHash{$key} = $overrides->{fields}{$fieldName}{$key};
-        }
-
-        # Kludge.
-        if ( isIn( $fieldHash{fieldType}, 'selectBox', 'workflow' ) and ref $params{value} ne 'ARRAY' ) {
-            $params{value} = [ $params{value} ];
-        }
-
-        %params = ( %fieldHash, %params );
-        delete $params{tab};
-        delete $params{tableName};
-
-        # if there isnt a tab specified lets define one
-        my $tab = $fieldHash{tab} || "properties";
-
-        #draw the field
-        $tabform->getTab($tab)->dynamicField(%params);
-    } ## end for ( my $i = 0; $i < @properties...)
-
-    # send back the object
-    return $tabform;
+    return $f;
 } ## end sub getEditForm
-
-=cut 
 
 sub setupFormField {
     my ( $self, $tabform, $fieldName, $extraFields, $overrides ) = @_;
@@ -2083,7 +2044,7 @@ sub prepareWidgetView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Updates current Asset with data from Form. You can feed back errors by returning an
 arrayref containing the error messages. If there is no error you do not have to return
@@ -2091,14 +2052,14 @@ anything.
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
 	my $self = shift;
 	my %data;
     my $form = $self->session->form;
 	my $overrides = $self->session->config->get("assets/".$self->get("className")."/fields");
 
 	foreach my $property ($self->getProperties) {
-		my %params = %{$self->getProperty($property)};
+		my %params = %{$self->getFormProperties($property)};
 
 		# apply config file changes
 		foreach my $key (keys %{$overrides->{$property}}) {
@@ -2115,7 +2076,7 @@ sub processPropertiesFromFormPost {
 		
 		# process the form element
 		$params{name} = $property;
-		$params{value} = $self->get($property);
+		$params{value} = $self->$property;
 		$data{$property} = $form->process(
 			$property,
 			$params{fieldType},
@@ -2604,9 +2565,18 @@ sub www_edit {
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
 
-    my $f   = $self->getEditForm;
+    my $f   = eval { $self->getEditForm };
+    return $@ if $@;
     $f->addField( "Hidden", name => "func", value => "editSave" );
     $f->action( $self->getUrl );
+
+    # TODO: Make this whole thing a template instead!
+    $self->session->style->setRawHeadTags( 
+        '<style type="text/css">
+            label.formDescription { display: block; margin-top: 1em; font-weight: bold }
+            .saveButtons { position: absolute; top: 3px; right: 5px; z-index: 9001; }
+        </style>'
+    );
 
     return $self->session->style->process(
         '<div class="yui-skin-sam">' . $f->toHtml . '</div>',
@@ -2620,7 +2590,7 @@ sub www_edit {
 
 Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().  Will return an insufficient Privilege if canEdit returns False, or if the submitted form does not pass the C<$session->form->validToken> check.
 
-NOTE: Don't try to override or overload this method. It won't work. What you are looking for is processPropertiesFromFormPost().
+NOTE: Don't try to override or overload this method. It won't work. What you are looking for is processEditForm().
 
 =cut
 
@@ -2654,7 +2624,7 @@ sub www_editSave {
     }
 
     # Process properties from form post
-    my $errors = $object->processPropertiesFromFormPost;
+    my $errors = $object->processEditForm;
     if (ref $errors eq 'ARRAY') {
         $session->stow->set('editFormErrors', $errors);
         if ($session->form->process('assetId') eq 'new') {

@@ -422,15 +422,15 @@ sub onRemoveFromCart {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Extended to support event meta fields.
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost(@_);
+	$self->SUPER::processEditForm(@_);
 	my $form = $self->session->form;
 	my %metadata = ();
 	foreach my $field (@{$self->getParent->getEventMetaFields}) {

@@ -1068,14 +1068,14 @@ override paste => sub {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extend the base method to handle archiving and unarchiving, making sticky and
 non-sticky, locking and unlocking posts.  Calls postProcess when it is done.
 
 =cut
 
-override processPropertiesFromFormPost => sub {
+override processEditForm => sub {
 	my $self = shift;
 	super();
     my $session = $self->session;
