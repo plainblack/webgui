@@ -117,11 +117,19 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Hover help for the password field in the configuration form of the iTransact module.|
 	},
+
 	'Pay' => {
 		message => q|Pay|,
 		lastUpdated => 0,
 		context => q|Button label|
 	},
+
+	'cart summary template' => {
+		message => q|PayPal Express Checkout Cart Summary Template|,
+		lastUpdated => 0,
+		context => q||
+	},
+
 };
 
 1;

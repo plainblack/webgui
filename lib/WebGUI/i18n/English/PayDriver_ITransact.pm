@@ -74,7 +74,7 @@ our $I18N = {
 	},
 
 	'edit credentials template' => {
-		message => q|Edit Credentials Template|,
+		message => q|ITransact Edit Credentials Template|,
 		lastUpdated => 0,
 		context => q|Title of the help page.|
 	},
