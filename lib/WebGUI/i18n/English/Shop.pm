@@ -1767,6 +1767,12 @@ our $I18N = {
 		context => q|form label for the cart.  Allows user to choose a payment method.  Bart Jol for Minister in 2012!|
 	},
 
+	'shippableItemsInCart' => { 
+		message => q|A boolean which will be true if any item in the cart requires shipping.|,
+		lastUpdated => 0,
+		context => q|form label for the cart.  Allows user to choose a payment method.  Bart Jol for Minister in 2012!|
+	},
+
 };
 
 1;

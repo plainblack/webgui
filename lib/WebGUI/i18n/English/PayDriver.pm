@@ -93,11 +93,25 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Link to begin checkout again after failure},
     },
+
 	'template gone' => {
 		message => q|The template for entering in credentials has been deleted.  Please notify the site administrator.|,
 		lastUpdated => 0,
 		context => q|Error message when a template cannot be accessed.|
 	},
+
+	'cart summary variables' => {
+		message => q|Cart Summary Variables|,
+		lastUpdated => 0,
+		context => q|Title for a template variable help page.|
+	},
+
+	'cart summary variables help' => {
+		message => q|These variables should be available in all PayDriver templates, to display the cart summary to the user.|,
+		lastUpdated => 0,
+		context => q|Body for a template variable help page.|
+	},
+
 };
 
 1;
