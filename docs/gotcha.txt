@@ -22,6 +22,13 @@ save you many hours of grief.
      the user must be logged in has been moved back in the checkout process.  Before a user is allowed
      to enter in any address information, they must be logged in.
 
+     * There are only two cart screens now.  The main cart, where address information is entered, and
+     second screen where the summary of all charges (taxes, shipping, etc.) are summarized before the
+     user pays.   Both screens are templatable.
+
+     * The Cart will now work without javascript.  Javascript is used to make parts of the cart easier,
+     and to automatically update the user's cart so they don't have to manually update it.
+
 7.9.3
 --------------------------------------------------------------------
      * Test:Deep, which had been an optional dependency for testing, has been used

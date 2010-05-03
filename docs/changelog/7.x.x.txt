@@ -3,7 +3,7 @@
    functions.  Include it from www/extras/underscore/underscore-min.js.
    Documentation is available at http://documentcloud.github.com/underscore/.
  - fixed #11535: i18n - Asset_MapPoint - Tag form_fax - wrong text
- - Implement hierarchial keywords differently.
+ - Implement hierarchial wiki keywords differently.
  - fixed Redundant per item address display in cart.
  - added a way to pass additional headers to WebGUI::Mail::Send from WebGUI::Inbox::Message API
  - added: WebGUI::Wizard framework to build step-by-step wizards
@@ -14,6 +14,7 @@
  - fixed #11547: Default Inbox View Template Delete buttton failure
  - fixed #11542: Date macro can pass in epoch values that do not pass regex checks
  - fixed #11537: Wiki, sorting by most popular
+ - added: Rewrite of the Shop and Cart.
 
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
