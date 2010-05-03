@@ -848,6 +848,25 @@ sub www_ajaxPrices {
 
 #-------------------------------------------------------------------
 
+=head2 www_ajaxSetCartItemShippingId
+
+Sets the shippingAddressId for a particular cartItem
+
+=cut
+
+sub www_ajaxSetCartItemShippingId {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+    my $item    = $self->getItem($form->get('itemId'));
+    my $address = $form->get('addressId') || undef;
+    $item && $item->update({ shippingAddressId => $address });
+    $session->http->setMimeType('text/plain');
+    return 'ok';
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_lookupPosUser ( )
 
 Adds a Point of Sale user to the cart.
