@@ -112,6 +112,12 @@ our $I18N = {
 		context => q|Body for a template variable help page.|
 	},
 
+    'proceedButton' => {
+        message => q|A combined button and form for the user to press when they have reviewed the charges that will be submitted to this payment gateway.|,
+        lastUpdated => 0,
+        context => q|Status message|,
+    },
+
 };
 
 1;

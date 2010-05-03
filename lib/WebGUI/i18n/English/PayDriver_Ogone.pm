@@ -140,6 +140,13 @@ our $I18N = {
         lastUpdated => 0,
         context => q|Text that describes the required Ogone settings.|,
     },
+
+    'cart summary template' => {
+        message => q|Ogone Payment Gateway Summary Template.|,
+        lastUpdated => 0,
+        context => q|Status message|,
+    },
+
 };
 
 1;
