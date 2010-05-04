@@ -572,6 +572,42 @@ listing of pages that are related to a specific keyword?| },
         context     => q{Help for template variable},
     },
 
+    'by keyword template title' => {
+        message     => q{Wiki By Keyword Template Variables},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword keyword' => {
+        message     => q{The keyword that was requested.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword pagesLoop' => {
+        message     => q{A loop of pages that contain the requested keyword.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword title' => {
+        message     => q{The title of this page in the loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword url' => {
+        message     => q{The url of this page in the loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword synopsis' => {
+        message     => q{The synopsis of this page in the loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
 };
 
 1;
