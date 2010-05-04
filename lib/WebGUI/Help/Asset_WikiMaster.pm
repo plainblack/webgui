@@ -258,6 +258,35 @@ our $HELP = {
         related => [],
     },
 
+    'by keyword template' => {
+        title => 'by keyword template title',
+        body  => '',
+        isa   => [
+            {   namespace => "WebGUI",
+                tag       => "pagination template variables"
+            },
+        ],
+        variables => [
+            {   name        => 'keyword',
+                description => 'by keyword keyword',
+            },
+            {   name        => 'pagesLoop',
+                description => 'by keyword pagesLoop',
+                variables   => [
+                    {   name        => 'title',
+                        description => 'by keyword title',
+                    },
+                    {   name        => 'url',
+                        description => 'by keyword url',
+                    },
+                ],
+            },
+        ],
+        fields  => [],
+        related => [],
+    },
+
+
 };
 
 1;

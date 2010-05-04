@@ -523,6 +523,73 @@ listing of pages that are related to a specific keyword?| },
         lastUpdated => 0,
         context     => q{Label for link to unsubscribe from e-mail notifications},
     },
+
+    'keywords_loop' => {
+        message     => q{A loop containing all the top level keywords, links to their keyword pages, and all sub pages below them.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword title' => {
+        message     => q{The name of a keyword.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword url' => {
+        message     => q{The URL to the keyword page for that keyword.  If no page exists, this variable will be empty.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword level' => {
+        message     => q{The depth of this keyword.  Top-level keywords for the wiki are level 0.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'indent_loop' => {
+        message     => q{A loop that runs 1 time for each level.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'keyword indent' => {
+        message     => q{The loop iterator for the indent_loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword template title' => {
+        message     => q{Wiki By Keyword Template Variables},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword keyword' => {
+        message     => q{The keyword that was requested.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword pagesLoop' => {
+        message     => q{A loop of pages that contain the requested keyword.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword title' => {
+        message     => q{The title of this page in the loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword url' => {
+        message     => q{The url of this page in the loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
 };
 
 1;
