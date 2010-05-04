@@ -520,7 +520,9 @@ The hierarchy data structure that looks like this:
                 {                 # If there are no children, this key/value pair will not be present
                     ...
                 }
-            ]
+            ],
+            descendants => 25,    # The total number of wiki pages that this keyword, and any other sub-keywords
+                                  # of this keyword, refer to.
         }
     ]
 
@@ -542,16 +544,21 @@ sub getKeywordHierarchy {
     my $hierarchy   = [];
     $keywords     ||= $self->getTopLevelKeywordsList;
     $seen         ||= {};
+    my $assetKeyword = WebGUI::Keyword->new($session);
     KEYWORD: foreach my $keyword (sort @{ $keywords }) {
         my $datum = {
-            title => $keyword,  ##Note, same as keyword
-            url   => $self->getUrl('func=byKeyword;keyword='.$keyword),
+            title       => $keyword,  ##Note, same as keyword
+            url         => $self->getUrl('func=byKeyword;keyword='.$keyword),
+            descendants => scalar @{ $assetKeyword->getMatchingAssets( { startAsset => $self, keyword => $keyword, }) },
         };
         ##Prevent recursion if seen again
         if (! $seen->{$keyword}++) {
             ##Replace this with a call to getSubKeywords.
             my $children =  $self->getKeywordHierarchy($self->getSubKeywords($keyword), $seen, );
             if (@{ $children } ) {
+                foreach my $child (@{ $children }) {
+                    $datum->{descendants} += $child->{descendants};
+                }
                 $datum->{children} = $children;
             }
         }

@@ -85,8 +85,9 @@ my $variables = $wiki->getKeywordVariables($hierarchy);
 cmp_deeply(
     $hierarchy->[0],
     {
-        title => 'criminals',
-        url   => '/testwiki?func=byKeyword;keyword=criminals',
+        title       => 'criminals',
+        url         => '/testwiki?func=byKeyword;keyword=criminals',
+        descendants => 0,
     },
     "getKeywordVariables, does not alter the original hierarchy passed in",
 );
@@ -99,18 +100,21 @@ cmp_deeply(
             url   => '/testwiki?func=byKeyword;keyword=criminals',
             level => 0,
             indent_loop => [],
+            descendants => 0,
         },
         {
             title => 'inmates',
             url   => '/testwiki?func=byKeyword;keyword=inmates',
             level => 0,
             indent_loop => [],
+            descendants => 0,
         },
         {
             title => 'staff',
             url   => '/testwiki?func=byKeyword;keyword=staff',
             level => 0,
             indent_loop => [],
+            descendants => 0,
         },
     ],
     "... variables",
@@ -157,6 +161,7 @@ cmp_bag(
                 superhashof({ title => 'red', }),
                 superhashof({ title => 'andy', }),
             ),
+            descendants => 0,
         },
         {
             title => 'inmates', url   => '/testwiki?func=byKeyword;keyword=inmates',
@@ -164,6 +169,7 @@ cmp_bag(
                 superhashof({ title => 'heywood', }),
                 superhashof({ title => 'brooks', }),
             ),
+            descendants => 0,
         },
         {
             title => 'staff', url   => '/testwiki?func=byKeyword;keyword=staff',
@@ -171,6 +177,7 @@ cmp_bag(
                 superhashof({ title => 'norton', }),
                 superhashof({ title => 'hadley', }),
             ),
+            descendants => 0,
         },
     ],
     "getKeywordHierarchy: simple hierarchy",
