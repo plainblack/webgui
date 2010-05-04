@@ -119,6 +119,7 @@
             this.getSelectAddress(d.billing, function (address) {
                 fillIn(e.shipping, address);
                 self.computePerItemShippingOptions();
+                self.updateSummary();
             });
         },
 
