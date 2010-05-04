@@ -608,6 +608,24 @@ listing of pages that are related to a specific keyword?| },
         context     => q{Help for template variable},
     },
 
+    'by keyword formHeader' => {
+        message     => q{HTML code to start the form for entering in sub-keywords.  This will be empty unless the current user can administer this wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword formFooter' => {
+        message     => q{HTML code to end the form for entering in sub-keywords.  This will be empty unless the current user can administer this wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword keywordForm' => {
+        message     => q{HTML code for the field for entering in sub-keywords.  This will be empty unless the current user can administer this wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
 };
 
 1;
