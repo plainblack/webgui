@@ -86,7 +86,7 @@ cmp_deeply(
     $hierarchy->[0],
     {
         title => 'criminals',
-        url   => '/testwiki/criminals',
+        url   => '/testwiki?func=byKeyword;keyword=criminals',
     },
     "getKeywordVariables, does not alter the original hierarchy passed in",
 );
@@ -96,19 +96,19 @@ cmp_deeply(
     [
         {
             title => 'criminals',
-            url   => '/testwiki/criminals',
+            url   => '/testwiki?func=byKeyword;keyword=criminals',
             level => 0,
             indent_loop => [],
         },
         {
             title => 'inmates',
-            url   => '/testwiki/inmates',
+            url   => '/testwiki?func=byKeyword;keyword=inmates',
             level => 0,
             indent_loop => [],
         },
         {
             title => 'staff',
-            url   => '/testwiki/staff',
+            url   => '/testwiki?func=byKeyword;keyword=staff',
             level => 0,
             indent_loop => [],
         },
@@ -133,9 +133,9 @@ cmp_deeply(
 );
 
 $wiki->update({topLevelKeywords => 'criminals,inmates,staff'});
-$page_set{criminals}->update({keywords => 'red,andy'});
-$page_set{inmates}->update({keywords => 'brooks,heywood'});
-$page_set{staff}->update({keywords => 'norton,hadley'});
+$wiki->setSubKeywords('criminals', 'red', 'andy');
+$wiki->setSubKeywords('inmates', 'brooks', 'heywood');
+$wiki->setSubKeywords('staff', 'norton', 'hadley');
 
 foreach my $title (qw/red andy brooks heywood norton hadley/) {
     $page_set{$title} = $wiki->addChild({
@@ -152,21 +152,21 @@ cmp_bag(
     $wiki->getKeywordHierarchy(),
     [
         {
-            title => 'criminals', url   => '/testwiki/criminals',
+            title => 'criminals', url   => '/testwiki?func=byKeyword;keyword=criminals',
             children => bag(
                 superhashof({ title => 'red', }),
                 superhashof({ title => 'andy', }),
             ),
         },
         {
-            title => 'inmates', url   => '/testwiki/inmates',
+            title => 'inmates', url   => '/testwiki?func=byKeyword;keyword=inmates',
             children => bag(
                 superhashof({ title => 'heywood', }),
                 superhashof({ title => 'brooks', }),
             ),
         },
         {
-            title => 'staff', url   => '/testwiki/staff',
+            title => 'staff', url   => '/testwiki?func=byKeyword;keyword=staff',
             children => bag(
                 superhashof({ title => 'norton', }),
                 superhashof({ title => 'hadley', }),
@@ -177,8 +177,8 @@ cmp_bag(
 );
 
 ##Check depth-first display, and try to make a keyword loop
-$page_set{andy}->update({keywords => 'criminals,inmates'});
-$page_set{brooks}->update({keywords => 'criminals'});
+$wiki->setSubKeywords('andy', 'criminals', 'inmates');
+$wiki->setSubKeywords('brooks', 'criminals');
 
 my $tag_set3 = WebGUI::VersionTag->getWorking($session);
 $tag_set3->commit;

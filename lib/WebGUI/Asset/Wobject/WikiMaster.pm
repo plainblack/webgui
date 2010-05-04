@@ -481,7 +481,7 @@ The main keyword to key off of.
 
 sub deleteSubKeywords {
     my ( $self, $keyword ) = @_;
-    return $self->session->db->buildArrayRef('delete from WikiMasterKeywords where assetId=? and keyword=?', [$self->getId, $keyword]);
+    return $self->session->db->write('delete from WikiMasterKeywords where assetId=? and keyword=?', [$self->getId, $keyword]);
 }
 
 #-------------------------------------------------------------------
@@ -545,7 +545,7 @@ sub getKeywordHierarchy {
     KEYWORD: foreach my $keyword (sort @{ $keywords }) {
         my $datum = {
             title => $keyword,  ##Note, same as keyword
-            url   => $self->getUrl('?func=byKeyword;keyword='.$keyword),
+            url   => $self->getUrl('func=byKeyword;keyword='.$keyword),
         };
         ##Prevent recursion if seen again
         if (! $seen->{$keyword}++) {
@@ -768,11 +768,12 @@ The new set of keywords.
 sub setSubKeywords {
     my ( $self, $keyword, @subKeywords ) = @_;
     $self->deleteSubKeywords($keyword);
-    my $stuffIt = $self->session->db->prepare('insert into WikiMasterKeyword (assetId, keyword, subKeyword) values (?,?,?))');
+    my $stuffIt = $self->session->db->prepare('insert into WikiMasterKeywords (assetId, keyword, subKeyword) values (?,?,?)');
     KEYWORD: foreach my $subKeyword (@subKeywords) {
         next unless $keyword;
         $stuffIt->execute([$self->getId, $keyword, $subKeyword]);
     }
+    $stuffIt->finish;
     return 1;
 }
 

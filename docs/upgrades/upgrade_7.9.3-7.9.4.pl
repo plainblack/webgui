@@ -96,9 +96,13 @@ sub addWikiSubKeywords {
     # and here's our code
     $session->db->write(<<EOSQL);
 CREATE TABLE IF NOT EXISTS WikiMasterKeywords (
-    assetId CHAR(22) binary not null primary key,
-    keyword CHAR(64),
-    subkeyword CHAR(64)
+    assetId CHAR(22) binary not null,
+    keyword CHAR(64) not null,
+    subKeyword CHAR(64),
+    PRIMARY KEY (`assetId`,`keyword`, `subKeyword`),
+    KEY `assetId` (`assetId`),
+    KEY `keyword` (`keyword`),
+    KEY `subKeyword` (`subKeyword`)
 )
 EOSQL
     print "DONE!\n" unless $quiet;
