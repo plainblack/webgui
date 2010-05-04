@@ -16,7 +16,7 @@ sub makeUrlCompliant {
         $value =~ s/^\s+//;                     #removes leading whitespace
         $value =~ s/ /-/g;                      #replaces whitespace with hyphens
         $value =~ s/\.$//;                      #removes trailing period
-        $value =~ s/[^A-Za-z0-9\-\.\_\/]//g;    #removes all funky characters
+        $value =~ s/[^\w\-\.\_\/]//g;           #removes characters that would interfere with the url
         $value =~ s/^\///;                      #removes a leading /
         $value =~ s/\/$//;                      #removes a trailing /
         $value =~ s/\/\//\//g;                  #removes double /

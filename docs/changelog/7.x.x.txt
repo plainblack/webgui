@@ -15,6 +15,7 @@
  - fixed #11542: Date macro can pass in epoch values that do not pass regex checks
  - fixed #11537: Wiki, sorting by most popular
  - added: Rewrite of the Shop and Cart.
+ - fixed: Urls in English WebGUI sites can now support valid utf-8 characters that do not otherwise interfere with the url.
 
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
