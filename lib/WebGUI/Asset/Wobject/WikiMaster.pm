@@ -47,7 +47,7 @@ sub appendFeaturedPageVars {
 
 =head2 appendKeywordPageVars ( var )
 
-Append the template variables to C<var> for keyword (catagory) pages.
+Append the template variables to C<var> for keyword (category) pages.
 
 =cut
 
@@ -61,6 +61,7 @@ sub appendKeywordPageVars {
 }
 
 #-------------------------------------------------------------------
+
 
 =head2 appendMostPopular ($var, [ $limit ])
 
@@ -468,6 +469,23 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 deleteSubKeywords ( $keyword )
+
+Delete all keywords that are associated with a particular keyword for this wiki.
+
+=head3 $keyword
+
+The main keyword to key off of.
+
+=cut
+
+sub deleteSubKeywords {
+    my ( $self, $keyword ) = @_;
+    return $self->session->db->buildArrayRef('delete from WikiMasterKeywords where assetId=? and keyword=?', [$self->getId, $keyword]);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getFeaturedPageIds ( )
 
 Get the asset IDs of the pages that are marked as Featured.
@@ -550,6 +568,23 @@ sub getKeywordHierarchy {
         push @{ $hierarchy }, $datum;
     }
     return $hierarchy;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSubKeywords ( $keyword )
+
+Return all keywords that are associated with a particular keyword for this wiki.
+
+=head3 $keyword
+
+The main keyword to key off of.
+
+=cut
+
+sub getSubKeywords {
+    my ( $self, $keyword ) = @_;
+    return $self->session->db->buildArrayRef('select subKeyword from WikiMasterKeywords where assetId=? and keyword=?', [$self->getId, $keyword]);
 }
 
 #-------------------------------------------------------------------
@@ -709,6 +744,47 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
+=head2 purge 
+
+Extend the master method to delete all keyword entries.
+
+=cut
+
+sub purge {
+	my $self = shift;
+    $self->session->db->write('delete from WikiMasterKeywords where assetId=?',[$self->getId]);
+    return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setSubKeywords ( $keyword, @keywords )
+
+Store the set of keywords for this WikiMaster in the db.  Returns true.
+
+=head3 $keyword
+
+The keyword that gets the new keywords.
+
+=head3 @keywords
+
+The new set of keywords.
+
+=cut
+
+sub setSubKeywords {
+    my ( $self, $keyword, @subKeywords ) = @_;
+    $self->deleteSubKeywords($keyword);
+    my $stuffIt = $self->session->db->prepare('insert into WikiMasterKeyword (assetId, keyword, subKeyword) values (?,?,?))');
+    KEYWORD: foreach my $subKeyword (@subKeywords) {
+        next unless $keyword;
+        $stuffIt->execute([$self->getId, $keyword, $subKeyword]);
+    }
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 shouldSkipNotification ( )
 
 WikiMasters do not send notification
@@ -765,21 +841,25 @@ Return search results that match the keyword from the form variable C<keyword>.
 =cut
 
 sub www_byKeyword {
-    my $self = shift;
-    my $keyword = $self->session->form->process("keyword");
-    my @pages = ();
-    my $p = WebGUI::Keyword->new($self->session)->getMatchingAssets({
+    my $self    = shift;
+    my $session = $self->session;
+    my $keyword = $session->form->process("keyword");
+
+    my $p = WebGUI::Keyword->new($session)->getMatchingAssets({
         startAsset      => $self,
         keyword         => $keyword,   
         usePaginator    => 1,
-        });
+    });
     $p->setBaseUrl($self->getUrl("func=byKeyword;keyword=".$keyword));
+
+    my @pages  = ();
     foreach my $assetData (@{$p->getPageData}) {
-        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetData->{assetId});
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetData->{assetId});
         next unless defined $asset;
         push(@pages, {
-            title   => $asset->getTitle,
-            url     => $asset->getUrl,
+            title    => $asset->getTitle,
+            url      => $asset->getUrl,
+            synopsis => $asset->get('synopsis'),
             });
     }
     @pages = sort { lc($a->{title}) cmp lc($b->{title}) } @pages;
@@ -788,6 +868,17 @@ sub www_byKeyword {
         pagesLoop => \@pages,
         };
     $p->appendTemplateVars($var);
+    if ($self->canAdminister) {
+        $var->{formHeader}  = WebGUI::Form::formHeader($session, {action => $self->getUrl, method => 'GET'})
+                            . WebGUI::Form::hidden($session, { name => 'func',        value => 'keywordKeywordSave',})
+                            . WebGUI::Form::hidden($session, { name => 'thisKeyword', value => $keyword,});
+        my $subKeywords = join ', ', $self->getSubKeywords($keyword);
+        $var->{keywordForm} = WebGUI::Form::keyword($session, {
+                                                       name  => 'subKeywords',
+                                                       value => $session->form->get('subKeywords') || $subKeywords,
+                                                       });
+        $var->{formFooter}  = WebGU::Form::formHeader($session);
+    }
 	return $self->processStyle($self->processTemplate($var, $self->get('byKeywordTemplateId')));
 }
 
