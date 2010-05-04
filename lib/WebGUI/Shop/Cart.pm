@@ -974,12 +974,12 @@ sub www_view {
                                 .  WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
                                 ,
         formFooter              => WebGUI::Form::formFooter($session),
-        updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
-        checkoutButton          => WebGUI::Form::submit($session, {name => 'checkout', value=>$i18n->get("checkout button"), extras=>q|id="checkoutButton"|}),
+        updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), id=>"updateCartButton"}),
+        checkoutButton          => WebGUI::Form::submit($session, {name => 'checkout', value=>$i18n->get("checkout button"), id=>"checkoutButton"}),
         continueShoppingButton  => WebGUI::Form::submit($session, {
                                         name   => 'continue_shopping',
                                         value  => $i18n->get("continue shopping button"), 
-                                        extras => q|id="continueShoppingButton"|
+                                        id     => 'continueShoppingButton',
                                    }),
         minimumCartAmount       => $session->setting->get( 'shopCartCheckoutMinimum' ) > 0
                                  ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
@@ -1024,7 +1024,6 @@ sub www_view {
             extendedPrice   => $self->formatCurrency($sku->getPrice * $item->get("quantity")),
             price           => $self->formatCurrency($sku->getPrice),
             removeBox       => WebGUI::Form::checkbox($session, {name => 'remove_item', value => $item->get('itemId')}),
-            #shipToButton    => WebGUI::Form::submit($session, {value=>, }),
         );
         my $itemAddress = eval {$item->getShippingAddress};
         my $itemAddressId;
@@ -1036,7 +1035,7 @@ sub www_view {
             $properties{shippingAddress} = '';
             $itemAddressId               = '';
         }
-        if (! $var{userIsVisitor}) {
+        if (! $var{userIsVisitor} && @cartItems > 1) {
             $properties{itemAddressChooser} = WebGUI::Form::selectBox($session, {
                                                   name    => "itemAddress_".$item->getId,
                                                   value   => $itemAddressId,
