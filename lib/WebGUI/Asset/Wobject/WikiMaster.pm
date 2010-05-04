@@ -514,11 +514,10 @@ The hierarchy data structure that looks like this:
 
     [
         {
-            title => 'title', # same as the keyword, since this is a keyword (category) page
-            url   => 'url',   # url from the keyword page, via getUrl so it contains the gateway URL
-                              # If a keyword page does not exist for the keyword, this key/value pair will not be present.
-            children => [     # Array reference of sub-categories referenced by this category
-                {             # If there are no children, this key/value pair will not be present
+            keyword => 'keyword', # same as the keyword, since this is a keyword (category) page
+            url     => 'url',     # url from the keyword page, via getUrl so it contains the gateway URL
+            children => [         # Array reference of sub-categories referenced by this category
+                {                 # If there are no children, this key/value pair will not be present
                     ...
                 }
             ]
@@ -544,23 +543,14 @@ sub getKeywordHierarchy {
     $keywords     ||= $self->getTopLevelKeywordsList;
     $seen         ||= {};
     KEYWORD: foreach my $keyword (sort @{ $keywords }) {
-        my $page = $self->getLineage(['children'], {
-            returnObjects => 1,
-            whereClause   => 'assetData.title = '.$session->db->quote($keyword),
-            limit         => 1,
-            includeOnlyClasses => [qw/WebGUI::Asset::WikiPage/],
-        })->[0];
-        if (! $page) {
-            push @{ $hierarchy }, { title => $keyword, url => '', };
-            next KEYWORD;
-        }
         my $datum = {
             title => $keyword,  ##Note, same as keyword
-            url   => $page->getUrl,
+            url   => $self->getUrl('?func=byKeyword;keyword='.$keyword),
         };
         ##Prevent recursion if seen again
         if (! $seen->{$keyword}++) {
-            my $children =  $self->getKeywordHierarchy(WebGUI::Keyword::string2list($page->get('keywords')), $seen, );
+            ##Replace this with a call to getSubKeywords.
+            my $children =  $self->getKeywordHierarchy($self->getSubKeywords($keyword), $seen, );
             if (@{ $children } ) {
                 $datum->{children} = $children;
             }
@@ -584,7 +574,10 @@ The main keyword to key off of.
 
 sub getSubKeywords {
     my ( $self, $keyword ) = @_;
-    return $self->session->db->buildArrayRef('select subKeyword from WikiMasterKeywords where assetId=? and keyword=?', [$self->getId, $keyword]);
+    return $self->session->db->buildArrayRef(
+        'select subKeyword from WikiMasterKeywords where assetId=? and keyword=?',
+        [$self->getId, $keyword]
+    );
 }
 
 #-------------------------------------------------------------------
@@ -872,7 +865,7 @@ sub www_byKeyword {
         $var->{formHeader}  = WebGUI::Form::formHeader($session, {action => $self->getUrl, method => 'GET'})
                             . WebGUI::Form::hidden($session, { name => 'func',        value => 'subKeywordSave',})
                             . WebGUI::Form::hidden($session, { name => 'thisKeyword', value => $keyword,});
-        my $subKeywords = join ', ', $self->getSubKeywords($keyword);
+        my $subKeywords = join ', ', @{ $self->getSubKeywords($keyword) };
         $var->{keywordForm} = WebGUI::Form::keyword($session, {
                                                        name  => 'subKeywords',
                                                        value => $session->form->get('subKeywords') || $subKeywords,
