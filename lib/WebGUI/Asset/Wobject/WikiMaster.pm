@@ -870,7 +870,7 @@ sub www_byKeyword {
     $p->appendTemplateVars($var);
     if ($self->canAdminister) {
         $var->{formHeader}  = WebGUI::Form::formHeader($session, {action => $self->getUrl, method => 'GET'})
-                            . WebGUI::Form::hidden($session, { name => 'func',        value => 'keywordKeywordSave',})
+                            . WebGUI::Form::hidden($session, { name => 'func',        value => 'subKeywordSave',})
                             . WebGUI::Form::hidden($session, { name => 'thisKeyword', value => $keyword,});
         my $subKeywords = join ', ', $self->getSubKeywords($keyword);
         $var->{keywordForm} = WebGUI::Form::keyword($session, {
@@ -982,6 +982,26 @@ sub www_search {
 		$var->{'performSearch'} = 1;
 	}
 	return $self->processStyle($self->processTemplate($var, $self->get('searchTemplateId')));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_subKeywordSave 
+
+Process the form from www_byKeyword and update the subkeywords for a keyword in this wiki.
+
+=cut
+
+sub www_subKeywordSave {
+	my $self = shift;
+    my $form = $self->session->form;
+
+    my $subKeywords = $form->process('subKeywords', 'keywords');
+    my $keyword     = $form->process('thisKeyword');
+    my @subKeywords = @{ WebGUI::Keyword::string2list($subKeywords) };
+    $self->setSubKeywords($keyword, @subKeywords);
+
+	return $self->www_byKeyword;
 }
 
 1;
