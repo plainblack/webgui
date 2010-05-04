@@ -344,12 +344,14 @@
                     method: 'ajaxPrices'
                 };
 
-            if (addressIdCounts(shipping)) {
-                params.shippingId = shipping;
-            }
-
             if (addressIdCounts(billing)) {
                 params.billingId = billing;
+            }
+
+            if (this.sameShipping()) {
+                params.shippingId = params.billingId;
+            } else if (addressIdCounts(shipping)) {
+                params.shippingId = shipping;
             }
 
             this.request('GET', params, function (o) {
