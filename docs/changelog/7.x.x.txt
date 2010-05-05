@@ -1,4 +1,5 @@
 7.9.5
+ - fixed #11556: New cart doesn't work with other forms on the same page
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility

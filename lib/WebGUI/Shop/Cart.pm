@@ -968,7 +968,7 @@ sub www_view {
 
     my %var = (
         %{$self->get},
-        formHeader              => WebGUI::Form::formHeader($session)
+        formHeader              => WebGUI::Form::formHeader($session, { extras => q|id="wgCartId"|, })
                                 .  WebGUI::Form::hidden($session, {name=>"shop",   value=>"cart"})
                                 .  WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
                                 .  WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
