@@ -733,7 +733,7 @@ sub getParent {
     return $self if ($self->getId eq "PBasset000000000000001");
 
     unless ( $self->{_parent} ) {
-        $self->{_parent} = WebGUI::Asset->newById($self->session,$self->parentId);
+        $self->{_parent} = eval { WebGUI::Asset->newById($self->session, $self->parentId); };
     }
 
     return $self->{_parent};

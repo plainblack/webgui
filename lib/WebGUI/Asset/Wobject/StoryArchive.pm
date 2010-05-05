@@ -306,7 +306,7 @@ sub getFolder {
     $oldVersionTag->setWorking() if $oldVersionTag;
 
     ##Get a new version of the asset from the db with the correct state
-    $folder = WebGUI::Asset->newByUrl($session, $folderUrl);
+    $folder = $folder->cloneFromDb();
     return $folder;
 }
 
