@@ -101,6 +101,7 @@ cmp_deeply(
             level => 0,
             indent_loop => [],
             descendants => 0,
+            isTopLevel  => 1,
         },
         {
             title => 'inmates',
@@ -108,6 +109,7 @@ cmp_deeply(
             level => 0,
             indent_loop => [],
             descendants => 0,
+            isTopLevel  => 1,
         },
         {
             title => 'staff',
@@ -115,6 +117,7 @@ cmp_deeply(
             level => 0,
             indent_loop => [],
             descendants => 0,
+            isTopLevel  => 1,
         },
     ],
     "... variables",
@@ -245,9 +248,9 @@ cmp_deeply(
         },
     ]),
     [
-        {   title => 'title 0', url   => 'url 0', level => 0, indent_loop => [], },
-        {   title => 'title 1', url   => 'url 1', level => 1, indent_loop => [{indent => 1}], },
-        {   title => 'title 2', url   => 'url 2', level => 2, indent_loop => [{indent => 1,}, {indent => 2,},], },
+        {   title => 'title 0', url   => 'url 0', level => 0, isTopLevel => 1,  indent_loop => [], },
+        {   title => 'title 1', url   => 'url 1', level => 1, isTopLevel => '', indent_loop => [{indent => 1}], },
+        {   title => 'title 2', url   => 'url 2', level => 2, isTopLevel => '', indent_loop => [{indent => 1,}, {indent => 2,},], },
     ],
     'getKeywordVariables: checking deeply'
 );
