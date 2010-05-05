@@ -399,14 +399,13 @@ sub www_cleanup {
     $starterForm->hidden( name => "styleTemplateId", value => $self->get('styleTemplateId') );
     $starterForm->submit( value => $i18n->get( 'yes please' ) );
 
-    my $output = '<h1>' . $i18n->get('site starter title') . '</h1>';
-    $output .= ' <p>' . $i18n->get('site starter body') . '</p>'
+    my $homeForm    = WebGUI::HTMLForm->new( $session, { action => $session->url->gateway, method => "GET" } );
+    $homeForm->submit( value => $i18n->get('no thanks') );
+
+    my $output = '<h1>' . $i18n->get('page builder title') . '</h1>';
+    $output .= ' <p>' . $i18n->get('page builder body') . '</p>'
         . '<div style="float: left">' . $starterForm->print . '</div>'
-        . sprintf( 
-            '<div style="float: left"><a href="%s">%s</a></div>',
-            $session->url->gateway,
-            $i18n->get('no thanks'),
-        )
+        . '<div style="float: left">' . $homeForm->print . '</div>'
         . '<div style="clear: both">&nbsp;</div>'
         ;
 

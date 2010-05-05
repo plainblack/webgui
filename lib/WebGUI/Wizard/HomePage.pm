@@ -113,7 +113,8 @@ sub www_pickStyle {
     my $f       = $self->getForm;
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
-    my $output  = '<h1>' . $i18n->get('1073') . '</h1>';
+    my $output  = '<h1>' . $i18n->get('pick style') . '</h1>' 
+                . '<p>' . $i18n->get('pick style description') . '</p>';
 
     my @styleIds
         = $session->db->buildArray( 
@@ -144,8 +145,9 @@ sub www_pickStyle {
         my $class = ++$row % 2 ? " odd" : "";
 
         # Prepare the synopsis
-        my $synopsis = WebGUI::HTML::format( $style->get('synopsis') );
+        my $synopsis = $style->get('synopsis');
         $synopsis =~ s{(https?://\S+)}{<a href="$1">$1</a>}g;
+        $synopsis = WebGUI::HTML::format( $synopsis );
 
         $f->raw(
             '<div class="stylePicker' . $class . '"><label><input type="radio" name="styleTemplateId" value="' . $style->getId . '"/>'
