@@ -87,7 +87,7 @@ h1 {
     margin: 0;
     padding-left: 120px; 
 
-    background: url(' . $session->url->extras('wg.gif') . ') no-repeat;
+    background: url(' . $session->url->extras('wg.png') . ') no-repeat;
     line-height: 100px;
 }
 
