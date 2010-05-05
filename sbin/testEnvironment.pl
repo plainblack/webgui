@@ -137,7 +137,6 @@ checkModule('Digest::SHA',                  '5.47'       );
 checkModule("CSS::Minifier::XS",            "0.03"       );
 checkModule("JavaScript::Minifier::XS",     "0.05"       );
 checkModule("Readonly",                     "1.03"       );
-checkModule("Memcached::libmemcached",      "0.3102"     );
 checkModule("Moose",                        "0.93"       );
 checkModule("MooseX::Storage",              "0.23"       );
 checkModule("namespace::autoclean",         "0.09"       );
