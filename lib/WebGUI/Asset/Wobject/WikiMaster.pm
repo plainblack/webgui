@@ -53,7 +53,6 @@ Append the template variables to C<var> for keyword (category) pages.
 
 sub appendKeywordPageVars {
     my ( $self, $var ) = @_;
-    my $session        = $self->session;
     my $topKeywords    = $self->getTopLevelKeywordsList;
     my $keywordHierarchy  = $self->getKeywordHierarchy( $topKeywords, );
     $var->{keywords_loop} = $self->getKeywordVariables( $keywordHierarchy );
@@ -612,6 +611,7 @@ sub getKeywordVariables {
     KEYWORD: foreach my $member (@{ $hierarchy }) {
         my $varBlock             = clone $member;
         $varBlock->{level}       = $level;
+        $varBlock->{isTopLevel}  = $level == 0;
         $varBlock->{indent_loop} = [ map { { indent => $_ } } 1..$level ];
         delete $varBlock->{children};
         push @{$variables}, $varBlock;
@@ -865,20 +865,30 @@ sub www_byKeyword {
     }
     @pages = sort { lc($a->{title}) cmp lc($b->{title}) } @pages;
     my $var = {
-        keyword => $keyword,
-        pagesLoop => \@pages,
-        };
+        keyword          => $keyword,
+        pagesLoop        => \@pages,
+        canAdminister    => $self->canAdminister,
+		recentChangesUrl => $self->getUrl("func=recentChanges"),
+		mostPopularUrl   => $self->getUrl("func=mostPopular"),
+		wikiHomeUrl      => $self->getUrl,
+    };
     $p->appendTemplateVars($var);
-    if ($self->canAdminister) {
-        $var->{formHeader}  = WebGUI::Form::formHeader($session, {action => $self->getUrl, method => 'GET'})
-                            . WebGUI::Form::hidden($session, { name => 'func',        value => 'subKeywordSave',})
-                            . WebGUI::Form::hidden($session, { name => 'thisKeyword', value => $keyword,});
+
+    my $subKeywords       = $self->getSubKeywords($keyword);
+    my $keywordHierarchy  = $self->getKeywordHierarchy($subKeywords);
+    $var->{keywords_loop} = $self->getKeywordVariables($keywordHierarchy);
+
+    if ($var->{canAdminister}) {
+        $var->{formHeader}  = WebGUI::Form::formHeader($session, {action => $self->getUrl})
+                            . WebGUI::Form::hidden($session, { name => 'func',    value => 'subKeywordSave',})
+                            . WebGUI::Form::hidden($session, { name => 'keyword', value => $keyword,});
         my $subKeywords = join ', ', @{ $self->getSubKeywords($keyword) };
-        $var->{keywordForm} = WebGUI::Form::keyword($session, {
+        $var->{keywordForm} = WebGUI::Form::keywords($session, {
                                                        name  => 'subKeywords',
                                                        value => $session->form->get('subKeywords') || $subKeywords,
                                                        });
-        $var->{formFooter}  = WebGU::Form::formHeader($session);
+        $var->{submitForm} = WebGUI::Form::submit($session, {});
+        $var->{formFooter} = WebGUI::Form::formFooter($session);
     }
 	return $self->processStyle($self->processTemplate($var, $self->get('byKeywordTemplateId')));
 }
@@ -998,7 +1008,7 @@ sub www_subKeywordSave {
     my $form = $self->session->form;
 
     my $subKeywords = $form->process('subKeywords', 'keywords');
-    my $keyword     = $form->process('thisKeyword');
+    my $keyword     = $form->process('keyword');
     my @subKeywords = @{ WebGUI::Keyword::string2list($subKeywords) };
     $self->setSubKeywords($keyword, @subKeywords);
 
