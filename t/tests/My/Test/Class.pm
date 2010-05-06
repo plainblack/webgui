@@ -32,7 +32,8 @@ sub _00_init : Test(startup => 1) {
     my $session = WebGUI::Test->session;
     $test->session($session);
     my $class = ref $test;
-    $class =~ s/Test:://;
+    $class =~ s/^Test:://;
+    return ('Not a WebGUI class') unless $class =~ /^WebGUI/;
     $test->class($class);
     lives_ok { WebGUI::Asset->loadModule($class); } "loaded module class $class";
 }
