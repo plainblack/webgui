@@ -20,6 +20,8 @@ use Tie::IxHash ();
 use Text::CSV_XS ();
 use WebGUI::Utility ();
 use WebGUI::SQL::ResultSet ();
+use WebGUI::Exception;
+use Scalar::Util ();
 use Try::Tiny;
 use namespace::clean;
 
@@ -136,7 +138,7 @@ sub connect {
     $params->{AutoCommit} = 1;
     $params->{ShowErrorStatement} = 1;
     $params->{HandleError} = sub {
-        $session->errorHandler->fatal(Carp::longmess(shift));
+        WebGUI::Error::Database->throw(shift);
     };
     if ( ($class->parse_dsn($dsn))[1] eq 'mysql' ) {
         $params->{mysql_enable_utf8} = 1;
@@ -839,6 +841,7 @@ sub session {
     my $self = shift;
     if (@_) {
         $self->{private_webgui_session} = shift;
+        Scalar::Util::weaken $self->{private_webgui_session};
     }
     return $self->{private_webgui_session};
 }
