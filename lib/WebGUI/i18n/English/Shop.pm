@@ -567,6 +567,12 @@ our $I18N = {
 		context => q|field label|
 	},
 
+	'current credit message' => { 
+		message => q|%s has a total credit of %s.|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
 	'amount' => { 
 		message => q|Amount|,
 		lastUpdated => 1213632324,
