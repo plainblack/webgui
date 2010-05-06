@@ -112,7 +112,6 @@ checkModule("Plack::Request");
 checkModule("Plack::Response");
 checkModule("Plack::Middleware::Status");
 checkModule("Plack::Middleware::Debug");
-checkModule("Plack::Middleware::ForwardedHeaders");
 checkModule("URI::Escape",                  "3.29"       );
 checkModule("POSIX"                                      );
 checkModule("List::Util"                                 );
