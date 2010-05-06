@@ -898,7 +898,7 @@ sub www_view {
     $var{totalPrice} = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
     my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
     $var{ inShopCreditAvailable } = $credit->getSum;
-    $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
+    $var{ inShopCreditDeduction } = $self->calculateShopCreditDeduction($var{totalPrice});
     $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
     $var{ readyForCheckout      } = $self->readyForCheckout;
     $var{ error                 } = $error{id $self}; 
