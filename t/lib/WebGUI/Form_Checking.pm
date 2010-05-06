@@ -74,7 +74,7 @@ Usage:
  
  # Reset the session back
  $session->{_request} = $old_session;
- 
+
 =cut
 
 sub get_request

@@ -48,7 +48,7 @@ This is an aspect which makes adding comments to existing assets trivial.
 =head1 SYNOPSIS
 
  with 'WebGUI::Role::Asset::Comments';
- 
+
 =head1 METHODS
 
 These methods are available from this class:

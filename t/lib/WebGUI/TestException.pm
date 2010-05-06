@@ -26,6 +26,7 @@ functions _quiet_caller and _try_as_caller are directly copied from Test::Except
 hocuspocus is being in that module however, since doing 'eval { uplevel 1, $codeRef }' seems to work too. On my
 platform at least =). For the time being, I leave those subs in here so that they may be used. They are commented
 out by default, though.
+
 =cut
 
 #----------------------------------------------------------------------------
