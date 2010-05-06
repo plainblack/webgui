@@ -398,10 +398,16 @@ The string to make compliant. This is usually a page title or a filename.
 =cut
 
 sub makeCompliant {
-	my $self = shift;
-	my $url = shift;
-	my $i18n = WebGUI::International->new($self->session);
-	return $i18n->makeUrlCompliant($url);
+    my $self = shift;
+    my $url = shift;
+    $url =~ s{^\s+}{};          # remove leading whitespace
+    $url =~ s{\s+$}{};          # remove trailing whitespace
+    $url =~ s{^/+}{};           # remove leading slashes
+    $url =~ s{/+$}{};           # remove trailing slashes
+    $url =~ s{[^\w/:._-]+}{-}g; # replace anything aside from word or other allowed characters with dashes
+    $url =~ s{//+}{/}g;         # remove double slashes
+    $url =~ s{--+}{-}g;         # remove double dashes
+    return $url;
 }
 
 #-------------------------------------------------------------------

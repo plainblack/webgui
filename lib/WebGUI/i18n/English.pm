@@ -11,16 +11,8 @@ our $LANGUAGE = {
 };
 
 sub makeUrlCompliant {
-        my $value = shift; 
-        $value =~ s/\s+$//;                     #removes trailing whitespace
-        $value =~ s/^\s+//;                     #removes leading whitespace
-        $value =~ s/ /-/g;                      #replaces whitespace with hyphens
-        $value =~ s/\.$//;                      #removes trailing period
-        $value =~ s/[^\w\-\.\_\/]//g;           #removes characters that would interfere with the url
-        $value =~ s/^\///;                      #removes a leading /
-        $value =~ s/\/$//;                      #removes a trailing /
-        $value =~ s/\/\//\//g;                  #removes double /
-        return $value;
+    my $url = shift;
+    return $url;
 }
 
 
