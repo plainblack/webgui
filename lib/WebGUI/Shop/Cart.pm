@@ -1183,7 +1183,7 @@ sub www_view {
     $var{totalPrice}              = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
     my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
     $var{ inShopCreditAvailable } = $credit->getSum;
-    $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
+    $var{ inShopCreditDeduction } = $self->calculateShopCreditDeduction($var{totalPrice});
     $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
     foreach my $field (qw/subtotalPrice inShopCreditAvailable inShopCreditDeduction totalPrice shippingPrice tax/) {
         $var{$field} = sprintf q|<span id="%sWrap">%s</span>|, $field, $var{$field};
