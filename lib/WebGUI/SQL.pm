@@ -962,9 +962,8 @@ Use this ID to create a new row. Same as setting the key value to "new" except t
 
 sub setRow {
 	my ($self, $table, $keyColumn, $data, $id) = @_;
-    $data->{$keyColumn} ||= $id;
-	if ($data->{$keyColumn} eq "new") {
-		$data->{$keyColumn} = $self->session->id->generate();
+	if ($data->{$keyColumn} eq "new" || $id) {
+		$data->{$keyColumn} = $id || $self->session->id->generate();
 	}
     my $dbh = $self->dbh;
 	my @fields = ();

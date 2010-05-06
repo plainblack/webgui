@@ -15,7 +15,6 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Utility;
-use WebGUI::Cache;
 #use Exception::Class;
 
 use WebGUI::User;
@@ -28,8 +27,9 @@ use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
-my $testCache = WebGUI::Cache->new($session, 'myTestKey');
-$testCache->flush;
+#my $testCache = WebGUI::Cache->new($session, 'myTestKey');
+#$testCache->flush;
+$session->cache->remove('myTestKey');
 
 my $user;
 my $lastUpdate;
@@ -1063,6 +1063,6 @@ END {
 
     $newProfileField->delete() if $newProfileField;
 
-	$testCache->flush;
+	$session->cache->delete('myTestKey');
 }
 
