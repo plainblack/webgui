@@ -109,8 +109,17 @@ sub definition {
 				},
             sortItems => {
                 tab             => 'properties',
-                fieldType       => 'yesNo',
-                defaultValue    => 1,
+                fieldType       => 'selectBox',
+                options         => do {
+                    tie my %o, 'Tie::IxHash', (
+                        none        => $i18n->get('no order'),
+                        feed        => $i18n->get('feed order'),
+                        pubDate_asc => $i18n->get('publication date ascending'),
+                        pubDate_des =>
+                            $i18n->get('publication date descending'),
+                    ); \%o;
+                },
+                defaultValue    => 'none',
                 label           => $i18n->get('sortItemsLabel'),
                 hoverHelp       => $i18n->get('sortItemsLabel description'),
             },
@@ -136,10 +145,13 @@ Combines all feeds into a single XML::FeedPP object.
 =cut
 
 sub generateFeed {
-	my $self = shift;
+	my $self  = shift;
     my $limit = shift || $self->get('maxHeadlines');
-	my $feed = XML::FeedPP::Atom->new();
-	my $log = $self->session->log;
+	my $log   = $self->session->log;
+	my $sort  = $self->get('sortItems');
+
+	my @opt   = (use_ixhash => 1) if $sort eq 'feed';
+	my $feed  = XML::FeedPP::Atom->new(@opt);
 
 	# build one feed out of many
     my $newlyCached = 0;
@@ -160,7 +172,7 @@ sub generateFeed {
         # care of any encoding specified in the XML prolog
         utf8::downgrade($value, 1);
         eval {
-            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string');
+            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string', @opt);
             $feed->merge_channel($singleFeed);
             $feed->merge_item($singleFeed);
         };
@@ -192,8 +204,13 @@ sub generateFeed {
     }
 
 	# sort them by date and remove any duplicate from the OR based term matching above
-    if ($self->get('sortItems')) {
+    if ($sort =~ /^pubDate/) {
         $feed->sort_item();
+    }
+    if ($sort =~ /_asc$/) {
+        my @items = $feed->get_item;
+        $feed->clear_item;
+        $feed->add_item($_) for (reverse @items);
     }
 
 	# limit the feed to the maximum number of headlines (or the feed generator limit).

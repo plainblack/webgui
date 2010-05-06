@@ -20,7 +20,7 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 22; # increment this value for each test you create
+use Test::More tests => 25; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
@@ -147,32 +147,40 @@ ok( defined $vars->{item_loop}->[0]->{description}, 'getTemplateVariables: descr
 #
 ####################################################################
 
-my $tbbUrl = 'http://www.plainblack.com/tbb.rss';
-$syndicated_content->update({
-    rssUrl   => $tbbUrl,
-    hasTerms => 'WebGUI',
-});
+sub withCachedFeed {
+    my ($url, $path, $block) = @_;
+    $syndicated_content->update({ rssUrl => $url });
 
-my $cache = WebGUI::Cache->new($session, $tbbUrl, 'RSS');
-open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('tbb.rss')
-    or die "Unable to get RSS file";
-my $rssContent = do { local $/; <$rssFile>; };
-close $rssFile;
-$cache->set($rssContent, 60);
+    open my $file, '<', WebGUI::Test->getTestCollateralPath($path)
+        or die "Unable to get RSS file: $path";
+    my $content = do { local $/; <$file> };
+    close $file;
 
-my $filteredFeed = $syndicated_content->generateFeed();
+    my $cache = WebGUI::Cache->new($session, $url, 'RSS');
+    $cache->set($content, 60);
+    $block->();
+    $cache->delete;
+}
 
-cmp_deeply(
-    [ map { $_->title } $filteredFeed->get_item() ],
-    [
-        'Google Picasa Plugin for WebGUI Gallery',
-        'WebGUI Roadmap',
-        'WebGUI 8 Performance',
-    ],
-    'generateFeed: filters items based on the terms being in title, or description'
-);
+sub titles_are {
+    my ($expected, $message) = @_;
+    my $feed = $syndicated_content->generateFeed;
+    my @got = map { $_->title } $feed->get_item;
+    cmp_deeply \@got, $expected, $message;
+}
 
-$cache->delete;
+$syndicated_content->update({ hasTerms => 'WebGUI' });
+
+withCachedFeed 'http://www.plainblack.com/tbb.rss', 'tbb.rss', sub {
+    titles_are(
+        [
+            'Google Picasa Plugin for WebGUI Gallery',
+            'WebGUI Roadmap',
+            'WebGUI 8 Performance',
+        ],
+        'generateFeed: filters items based on the terms being in title, or description'
+    );
+};
 
 ####################################################################
 #
@@ -180,27 +188,47 @@ $cache->delete;
 #
 ####################################################################
 
-
 ##Feed with no links or pubDates.
-my $oncpUrl = 'http://www.oncp.gob.ve/oncp.xml';
 $syndicated_content->update({
-    rssUrl       => $oncpUrl,
     hasTerms     => '',
     maxHeadlines => 50,
 });
 
-my $cache = WebGUI::Cache->new($session, $oncpUrl, 'RSS');
-open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('oncp.xml')
-    or die "Unable to get RSS file: oncp.xml";
-my $rssContent = do { local $/; <$rssFile>; };
-close $rssFile;
-$cache->set($rssContent, 60);
+withCachedFeed 'http://www.oncp.gob.ve/oncp.xml', 'oncp.xml', sub {
+    my $oddFeed1 = $syndicated_content->generateFeed();
 
-my $oddFeed1 = $syndicated_content->generateFeed();
+    my @oddItems = $oddFeed1->get_item();
+    is (@oddItems, 13, 'feed has items even without pubDates or links');
+};
 
-my @oddItems = $oddFeed1->get_item();
-is (@oddItems, 13, 'feed has items even without pubDates or links');
+####################################################################
+#
+#  sorting
+#
+####################################################################
 
-$cache->delete;
 
+withCachedFeed 'http://www.plainblack.com/tbb.rss', 'tbb_odd.rss', sub {
+    my @ascending  = (
+        'I have arrived in Lisboa!',
+        'WebGUI 8 Performance',
+        'WebGUI Roadmap',
+        'Google Picasa Plugin for WebGUI Gallery',
+    );
+    my @descending = reverse @ascending;
+    my @feed       = (
+        'WebGUI Roadmap',
+        'Google Picasa Plugin for WebGUI Gallery',
+        'I have arrived in Lisboa!',
+        'WebGUI 8 Performance',
+    );
 
+    $syndicated_content->update({ sortItems => 'pubDate_asc' });
+    titles_are \@ascending, 'ascending sort';
+
+    $syndicated_content->update({ sortItems => 'pubDate_des' });
+    titles_are \@descending, 'descending sort';
+
+    $syndicated_content->update({ sortItems => 'feed' });
+    titles_are \@feed, 'feed order';
+};

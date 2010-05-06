@@ -31,9 +31,9 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+modifySortItems();
 
 finish($session); # this line required
-
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -44,6 +44,33 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Changes sortItems to a SelectBox
+sub modifySortItems {
+    my $session = shift;
+    print "\tUpdating SyndicatedContent...\n" unless $quiet;
+
+    require WebGUI::Form::SelectBox;
+
+    print "\t\tModifying table...\n" unless $quiet;
+    my $type = WebGUI::Form::SelectBox->getDatabaseFieldType;
+    $session->db->write("ALTER TABLE SyndicatedContent MODIFY sortItems $type");
+
+    print "\t\tConverting old values...\n" unless $quiet;
+    $session->db->write(q{
+        UPDATE SyndicatedContent
+        SET    sortItems = 'none'
+        WHERE  sortItems <> '1'
+    });
+    $session->db->write(q{
+        UPDATE SyndicatedContent
+        SET    sortItems = 'pubDate_des'
+        WHERE  sortItems = '1'
+    });
+
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
