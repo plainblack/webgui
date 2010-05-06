@@ -370,6 +370,7 @@ $expectedMetas = [
            },
 ];
 cmp_bag(\@metas, $expectedMetas, 'process, headBlock:no duped headBlock from style template');
+
 ####################################################
 #
 # process 
@@ -485,7 +486,7 @@ sub setup_assets {
 		url => 'headblock_style',
 		namespace => 'Style',
 		template => 'HEADBLOCK STYLE TEMPLATE\n\nBODY=<tmpl_var body.content>\n\nHEAD=<tmpl_var head.tags>',
-		headBlock => q|<meta name="keywords" content="keyword1,keyword2" />|,
+		extraHeadTags => q|<meta name="keywords" content="keyword1,keyword2" />|,
 		id => 'testTemplate_headblock',
 		#     '1234567890123456789012'
 	};
