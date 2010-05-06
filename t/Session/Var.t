@@ -138,13 +138,13 @@ $session->db->write("update userSession set expires=? where sessionId=?",
 my %copyOfVar2 = %{$var2->{_var}};
 $copyOfVar2{expires} = $var2->get('lastPageView')-1;
 $copyOfVar2{userId} = 3;
-$session->cache->set(['session',$var2->getId], \%copyOfVar2);
+$session->cache->set($var2->getId, \%copyOfVar2);
 
 my $var3 = WebGUI::Session::Var->new($session, $var2->getId);
-is($var3->getId,           $var2->getId, 'new Var object has correct id');
-isnt($var3->isAdminOn,     $var2->isAdminOn, 'new adminOn not equal to old adminOn');
-is($var3->isAdminOn,       0, 'new Var object has default adminOn');
-isnt($var3->get('userId'), 3, 'new userId not equal to old userId');
+is   $var3->getId,         $var2->getId,     'new Var object has correct id';
+isnt $var3->isAdminOn,     $var2->isAdminOn, 'new adminOn not equal to old adminOn';
+is   $var3->isAdminOn,     0, 'new Var object has default adminOn';
+isnt $var3->get('userId'), 3, 'new userId not equal to old userId';
 $var2->end;
 $var3->end;
 
