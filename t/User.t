@@ -27,8 +27,6 @@ use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
-#my $testCache = WebGUI::Cache->new($session, 'myTestKey');
-#$testCache->flush;
 $session->cache->remove('myTestKey');
 
 my $user;
