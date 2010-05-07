@@ -1063,6 +1063,6 @@ END {
 
     $newProfileField->delete() if $newProfileField;
 
-	$session->cache->delete('myTestKey');
+	$session->cache->remove('myTestKey');
 }
 
