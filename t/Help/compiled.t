@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Pluggable;
 use WebGUI::Operation::Help;
 
 #The goal of this test is to verify that all entries in the lib/WebGUI/Help
@@ -26,14 +27,14 @@ my $numTests = 0;
 
 my $session = WebGUI::Test->session;
 
-my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
+my @helpFileSet = WebGUI::Pluggable::findAndLoad('WebGUI::Help');
 
 $numTests = scalar @helpFileSet; #One for each help compile
 
 plan tests => $numTests;
 
-foreach my $helpSet (@helpFileSet) {
-	my $helpName = $helpSet->[1];
-	my $help = WebGUI::Operation::Help::_load($session, $helpName);
-	ok(keys %{ $help }, "$helpName compiled");
+foreach my $helpFile (@helpFileSet) {
+    my ($namespace) = $helpFile =~ m{WebGUI::Help::(.+$)};
+    my $help = WebGUI::Operation::Help::_load($session, $namespace);
+    ok(keys %{ $help }, "$namespace compiled");
 }
