@@ -308,6 +308,56 @@ sub t_05_purge : Test(3) {
     ok ! $exists_in_table, 'assetId removed from all asset tables';
 }
 
+sub cut_paste : Test(5) {
+    note "cut";
+    my $test    = shift;
+    my $session = $test->session;
+    my ($tag, $asset, @parents) = $test->getAnchoredAsset();
+    ok $asset->cut, 'cut returns true if it was cut';
+    is $asset->state, 'clipboard', 'asset state updated';
+    my $session_asset = $session->asset();
+    $session->asset($parents[-1]);
+    ok $asset->canPaste, 'canPaste: allowed to paste here';
+    ok $parents[-1]->paste($asset->assetId), 'paste returns true when it pastes';
+    $asset_prime = $asset->cloneFromDb;
+    is $asset_prime->state, 'published', 'asset state updated';
+    $session->asset($session_asset);
+}
+
+sub addRevision : Tests {
+    note "addRevision";
+    my ( $test ) = @_;
+    my $session = $test->session;
+    my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
+    $tag->setWorking;
+
+    my $newRevision = $asset->addRevision( { title => "Newly Revised Title" }, $asset->revisionDate+2 );
+    isa_ok( $newRevision, Scalar::Util::blessed( $asset ), "addRevision returns new revision of asset object" );
+    is( $newRevision->title, "Newly Revised Title", "properties set correctly" );
+    is( $newRevision->revisionDate, $asset->revisionDate+2, 'revisionDate set correctly' );
+    is( $newRevision->tagId, $tag->getId, "Added to existing working tag" );
+   
+    $newRevision->purgeRevision;
+}
+
+sub www_editSave : Tests {
+    note "www_editSave";
+    my ( $test ) = @_;
+    my $session = $test->session;
+    my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
+    $tag->setWorking;
+    $session->request->setup_body({
+        title       => "Newly Saved Title",
+    } );
+    $asset->www_editSave;
+
+    # Get the newly-created revision of the asset
+    my $newRevision = WebGUI::Asset->newPending( $session, $asset->getId );
+    ok( $newRevision->tagId, 'new revision has a tag' );
+    is( $newRevision->tagId, $tag->getId, 'new revision tagId is current working tag' );
+
+}
+
 1;
 
 __END__

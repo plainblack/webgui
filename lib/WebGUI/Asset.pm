@@ -2053,50 +2053,42 @@ anything.
 =cut
 
 sub processEditForm {
-	my $self = shift;
-	my %data;
-    my $form = $self->session->form;
-	my $overrides = $self->session->config->get("assets/".$self->get("className")."/fields");
+    my $self = shift;
+    my %data;
+    my $form      = $self->session->form;
+    my $overrides = $self->session->config->get( "assets/" . $self->get("className") . "/fields" );
 
-	foreach my $property ($self->getProperties) {
-		my %params = %{$self->getFormProperties($property)};
+    foreach my $property ( $self->getProperties ) {
+        my $fieldType      = $self->meta->find_attribute_by_name($property)->fieldType;
+        my $fieldOverrides = $overrides->{$property} || {};
+        my $fieldHash      = {
+            tab => "properties",
+            %{ $self->getFormProperties($property) },
+            %{$overrides},
+            name  => $property,
+            value => $self->$property,
+        };
 
-		# apply config file changes
-		foreach my $key (keys %{$overrides->{$property}}) {
-			$params{$key} = $overrides->{$property}{$key};
-		}
-		
-		# deal with properties that can't be posted through the form
-		if ($params{noFormPost}) {
-			if ($form->process("assetId") eq "new" && $self->get($property) eq "") {
-				$data{$property} = $params{defaultValue};
-			}
-			next;
-		}
-		
-		# process the form element
-		$params{name} = $property;
-		$params{value} = $self->$property;
-		$data{$property} = $form->process(
-			$property,
-			$params{fieldType},
-			$params{defaultValue},
-			\%params
-			);
-	}
+        next if ( $fieldHash->{noFormPost} );
+
+        # process the form element
+        $data{$property} = $form->process( $property, $fieldType, $fieldHash->{defaultValue}, $fieldHash );
+    } ## end foreach my $property ( $self...)
+
     $data{keywords} = $form->process("keywords");
-    if ($self->session->setting->get("metaDataEnabled")) {
+    if ( $self->session->setting->get("metaDataEnabled") ) {
         my $meta = $self->getMetaDataFields;
-	    foreach my $field (keys %{$meta}) {
-            my $value = $form->process("metadata_".$field, $meta->{$field}{fieldType}, $meta->{$field}{defaultValue});
-		   	$self->updateMetaData($field, $value);
-	    }
+        foreach my $field ( keys %{$meta} ) {
+            my $value
+                = $form->process( "metadata_" . $field, $meta->{$field}{fieldType}, $meta->{$field}{defaultValue} );
+            $self->updateMetaData( $field, $value );
+        }
     }
-	$self->session->db->beginTransaction;
-	$self->update(\%data);
-	$self->session->db->commit;
+    $self->session->db->beginTransaction;
+    $self->update( \%data );
+    $self->session->db->commit;
     return undef;
-}
+} ## end sub processEditForm
 
 
 #-------------------------------------------------------------------
@@ -2601,7 +2593,7 @@ sub www_editSave {
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
     my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
     return $session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
-    return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
+    return $session->privilege->insufficient() unless $self->canEdit;
     if ($self->session->config("maximumAssets")) {
         my ($count) = $self->session->db->quickArray("select count(*) from asset");
         my $i18n = WebGUI::International->new($self->session, "Asset");
