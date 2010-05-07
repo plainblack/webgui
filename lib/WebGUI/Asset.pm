@@ -1042,7 +1042,7 @@ sub getHelpers {
     my ( $self ) = @_;
 
     my $default = [
-        { 
+        {
             class   => 'WebGUI::AssetHelper::EditBranch',
             label   => 'Edit Branch',
         },
@@ -2059,6 +2059,8 @@ sub processEditForm {
     my $overrides = $self->session->config->get( "assets/" . $self->get("className") . "/fields" );
 
     foreach my $property ( $self->getProperties ) {
+        next if $self->meta->find_attribute_by_name( $property )->noFormPost;
+
         my $fieldType      = $self->meta->find_attribute_by_name($property)->fieldType;
         my $fieldOverrides = $overrides->{$property} || {};
         my $fieldHash      = {
@@ -2069,7 +2071,6 @@ sub processEditForm {
             value => $self->$property,
         };
 
-        next if ( $fieldHash->{noFormPost} );
 
         # process the form element
         $data{$property} = $form->process( $property, $fieldType, $fieldHash->{defaultValue}, $fieldHash );
@@ -2084,6 +2085,9 @@ sub processEditForm {
             $self->updateMetaData( $field, $value );
         }
     }
+
+    $self->session->log->info( Dumper \%data );
+
     $self->session->db->beginTransaction;
     $self->update( \%data );
     $self->session->db->commit;

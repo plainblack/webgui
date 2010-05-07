@@ -3,6 +3,14 @@ WebGUI 8 Migration Guide
 
 The information contained herein documents the API changes that have occurred in the WebGUI 8 development effort and how to migrate your code to accomodate the new APIs.
 
+WebGUI::Macro::AdminBar
+==========================
+There is no Admin Bar for normal pages. Only the admin mode can see the admin bar.
+
+WebGUI::Macro::AdminToggle
+==========================
+The Admin Toggle can only enter admin mode, it cannot leave it, so there is no "Turn Off" text. The second 
+parameter is now the template ID.
 
 
 WebGUI::Config

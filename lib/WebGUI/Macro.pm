@@ -43,7 +43,7 @@ These functions are available from this package:
 =cut
 
 #-------------------------------------------------------------------
-my $macro_re = qr{
+our $macro_re = qr{
     (                               # capture #1 - entire macro call
         \^                              # start with carat
         ([-a-zA-Z0-9_@#/*]{1,64})       # capture #2 - macro name

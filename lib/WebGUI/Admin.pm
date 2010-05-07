@@ -327,7 +327,7 @@ __DATA__
     <dt class="a-m-t">^International("admin console","AdminConsole");</dt>
     <dd class="a-m-d"><div class="bd">
         <TMPL_LOOP adminPlugins>
-        <a class="link" href="<tmpl_var url>">
+        <a class="link" target="view" href="<tmpl_var url>">
             <img src="<tmpl_var icon.small>" style="border: 0px; vertical-align: middle;" alt="icon" />
             <tmpl_var title>
         </a>

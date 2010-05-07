@@ -48,16 +48,15 @@ sub process {
     my $session = shift;
     return ""
         unless $session->user->canUseAdminMode;
-    my ($turnOn, $turnOff, $templateName) = @_;
+    my ($turnOn, $templateName) = @_;
     my $i18n = WebGUI::International->new($session,'Macro_AdminToggle');
     my %var;
+    $var{'toggle.text'} = $turnOn || $i18n->get(516);
     if ($session->var->isAdminOn) {
-        $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
-        $var{'toggle.text'} = $turnOff || $i18n->get(517);
+        $var{'toggle.url'} = '#'
     }
     else {
-        $var{'toggle.url'} = $session->url->page('op=switchOnAdmin');
-        $var{'toggle.text'} = $turnOn || $i18n->get(516);
+        $var{'toggle.url'} = $session->url->page('op=admin');
     }
     my $template = $templateName    ? WebGUI::Asset::Template->newByUrl($session, $templateName)
                                     : WebGUI::Asset::Template->newById($session, "PBtmpl0000000000000036");
