@@ -57,8 +57,6 @@ our @EXPORT_OK = qw(session config collateral);
 
 my $CLASS = __PACKAGE__;
 
-my @guarded;
-
 sub import {
     our $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
 
@@ -80,7 +78,7 @@ sub _initSession {
     my $session = our $SESSION = $CLASS->newSession(1);
 
     my $originalSetting = clone $session->setting->get;
-    push @guarded, Scope::Guard->new(sub {
+    $CLASS->addToCleanup(sub {
         while (my ($param, $value) = each %{ $originalSetting }) {
             $session->setting->set($param, $value);
         }
@@ -110,7 +108,7 @@ sub _initSession {
             my ($label, $table) = @checkCount[$i, $i+1];
             $initCounts{$table} = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
         }
-        push @guarded, Scope::Guard->new(sub {
+        $CLASS->addToCleanup(sub {
             for ( my $i = 0; $i < @checkCount; $i += 2) {
                 my ($label, $table) = @checkCount[$i, $i+1];
                 my $quant = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
@@ -125,19 +123,6 @@ sub _initSession {
 
 END {
     $CLASS->cleanup;
-}
-
-sub cleanup {
-    # remove guards in reverse order they were added, triggering all of the
-    # requested cleanup operations
-    pop @guarded
-        while @guarded;
-
-    if ( our $SESSION ) {
-        $SESSION->var->end;
-        $SESSION->close;
-        undef $SESSION;
-    }
 }
 
 #----------------------------------------------------------------------------
@@ -159,7 +144,7 @@ sub newSession {
     my $session = WebGUI::Session->open( $CLASS->config );
     $session->{_request} = $pseudoRequest;
     if ( ! $noCleanup ) {
-        $CLASS->sessionsToDelete($session);
+        $CLASS->addToCleanup($session);
     }
     return $session;
 }
@@ -570,7 +555,7 @@ sub prepareMailServer {
     # Let it start up yo
     sleep 2;
 
-    push @guarded, Scope::Guard->new(sub {
+    $CLASS->addToCleanup(sub {
         # Close SMTPD
         if ($smtpdPid) {
             kill INT => $smtpdPid;
@@ -603,7 +588,7 @@ sub originalConfig {
     }
     # add cleanup handler if this is the first time we were run
     if (! keys %originalConfig) {
-        push @guarded, Scope::Guard->new(sub {
+        $class->addToCleanup(sub {
             while (my ($key, $value) = each %originalConfig) {
                 if (defined $value) {
                     $CLASS->session->config->set($key, $value);
@@ -619,7 +604,7 @@ sub originalConfig {
 
 #----------------------------------------------------------------------------
 
-=head2 getMail ( ) 
+=head2 getMail ( )
 
 Read a sent mail from the prepared mail server (L<prepareMailServer>)
 
@@ -627,7 +612,7 @@ Read a sent mail from the prepared mail server (L<prepareMailServer>)
 
 sub getMail {
     my $json;
-    
+
     if ( !$smtpdSelect ) {
         return from_json ' { "error": "mail server not prepared" }';
     }
@@ -638,11 +623,11 @@ sub getMail {
     else {
         $json = ' { "error": "mail not sent" } ';
     }
-    
+
     if (!$json) {
         $json = ' { "error": "error in getting mail" } ';
     }
-    
+
     return from_json( $json );
 }
 
@@ -662,7 +647,7 @@ sub getMailFromQueue {
     if ( !$smtpdSelect ) {
         $class->prepareMailServer;
     }
-    
+
     my $messageId = $CLASS->session->db->quickScalar( "SELECT messageId FROM mailQueue" );
     warn $messageId;
     return unless $messageId; 
@@ -673,6 +658,7 @@ sub getMailFromQueue {
 
     return $class->getMail;
 }
+
 #----------------------------------------------------------------------------
 
 =head2 sessionsToDelete ( $session, [$session, ...] )
@@ -687,7 +673,7 @@ This is a class method.
 
 sub sessionsToDelete {
     my $class = shift;
-    push @guarded, cleanupGuard(@_);
+    $class->addToCleanup(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -704,7 +690,7 @@ This is a class method.
 
 sub assetsToPurge {
     my $class = shift;
-    push @guarded, cleanupGuard(@_);
+    $class->addToCleanup(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -720,7 +706,7 @@ This is a class method.
 
 sub groupsToDelete {
     my $class = shift;
-    push @guarded, cleanupGuard(@_);
+    $class->addToCleanup(@_);
 }
 
 
@@ -737,7 +723,7 @@ This is a class method.
 
 sub storagesToDelete {
     my $class = shift;
-    push @guarded, cleanupGuard(map {
+    $class->addToCleanup(map {
         ref $_ ? $_ : ('WebGUI::Storage' => $_)
     } @_);
 }
@@ -754,7 +740,7 @@ This is a class method.
 
 sub tagsToRollback {
     my $class = shift;
-    push @guarded, cleanupGuard(@_);
+    $class->addToCleanup(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -770,7 +756,7 @@ This is a class method.
 
 sub usersToDelete {
     my $class = shift;
-    push @guarded, cleanupGuard(@_);
+    $class->addToCleanup(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -786,7 +772,7 @@ This is a class method.
 
 sub workflowsToDelete {
     my $class = shift;
-    push @guarded, cleanupGuard(@_);
+    $class->addToCleanup(@_);
 }
 
 
@@ -1004,10 +990,24 @@ This is a class method.
 
 =cut
 
+my @guarded;
 sub addToCleanup {
     shift
         if eval { $_[0]->isa($CLASS) };
     push @guarded, cleanupGuard(@_);
+}
+
+sub cleanup {
+    # remove guards in reverse order they were added, triggering all of the
+    # requested cleanup operations
+    pop @guarded
+        while @guarded;
+
+    if ( our $SESSION ) {
+        $SESSION->var->end;
+        $SESSION->close;
+        undef $SESSION;
+    }
 }
 
 #----------------------------------------------------------------------------
