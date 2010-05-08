@@ -76,7 +76,7 @@ Returns an array of all attribute names across all meta classes.
 =cut
 
 sub get_all_attributes_list {
-    my $self = shift;
+    my ($self) = @_;
     if ($self->is_immutable) {
         return @{ $self->{__immutable}{get_all_attributes_list} ||= [ $self->_get_all_attributes_list ] };
     }
