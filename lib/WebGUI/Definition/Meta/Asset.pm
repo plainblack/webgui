@@ -76,7 +76,7 @@ Returns an array of the names of all tables in every class used by this class.
 =cut
 
 sub get_tables {
-    my $self = shift;
+    my ($self) = @_;
     if ($self->is_immutable) {
         return @{ $self->{__immutable}{get_tables_methods} ||= [ $self->_get_tables ] };
     }
