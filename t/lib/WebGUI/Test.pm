@@ -444,7 +444,7 @@ Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
 
 =cut
 
-our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_TEST_ROOT, File::Spec->updir );
+our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_TEST_ROOT, File::Spec->updir, 'lib' );
 
 sub lib {
     return our $WEBGUI_LIB;
