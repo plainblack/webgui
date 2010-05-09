@@ -8,6 +8,11 @@ builder {
     my $config = $wg->config;
 
     enable 'Log4perl', category => $config->getFilename, conf => WebGUI::Paths->logConfig;
+    enable 'SimpleContentFilter', filter => sub {
+        if ( utf8::is_utf8($_) ) {
+            utf8::encode($_);
+        }
+    };
 
     # Reproduce URL handler functionality with middleware
     enable '+WebGUI::Middleware::Snoop';

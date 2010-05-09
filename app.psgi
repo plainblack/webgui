@@ -1,7 +1,11 @@
 use strict;
 use Plack::Builder;
-use WebGUI::Paths -preload;
+use WebGUI::Paths -inc;
 use WebGUI::Config;
+
+if ($ENV{PLACK_ENV} ne 'development') {
+    WebGUI::Paths->preloadAll;
+}
 
 builder {
     my $first_app;
