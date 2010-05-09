@@ -829,8 +829,7 @@ sub newByLineage {
     unless ($id) {
         ($id) = $session->db->quickArray("select assetId from asset where lineage=?",[$lineage]);
         if (!$id) {
-            $session->errorHandler->error("Couldn't instantiate asset from lineage: ".$lineage. ": assetId missing");
-            return undef;
+            WebGUI::Error::InvalidParam->throw(error => "Cannot find lineage date for assetId", param => $id);
         }
         $assetLineage->{$lineage}{id} = $id;
         $session->stow->set("assetLineage",$assetLineage);
