@@ -164,7 +164,7 @@ exhausted the recurrence, false otherwise.
 sub processRecurrence {
     my ( $self, $recurId, $timeLimit ) = @_;
     my $eventId = $self->findLastEventId($recurId);
-    my $event   = WebGUI::Asset::Event->new( $self->session, $eventId );
+    my $event   = WebGUI::Asset::Event->newById( $self->session, $eventId );
     my $recur   = $event->getRecurrence;
 
     my $start   = $event->getDateTimeStart->truncate(to => 'day');
