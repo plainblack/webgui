@@ -37,15 +37,7 @@ plan tests => 1 + $tests;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::ShipDriver::FlatRate');
-
-my $storage;
-my ($driver, $cart, $car, $key);
-my $versionTag;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::ShipDriver::FlatRate', $tests unless $loaded;
+use_ok('WebGUI::Shop::ShipDriver::FlatRate');
 
 #######################################################################
 #
@@ -142,11 +134,11 @@ my $options = {
                 pricePerItem      => 0.1,
               };
 
-$driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
+my $driver2 = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
 
-isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver::FlatRate');
 
-isa_ok($driver, 'WebGUI::Shop::ShipDriver');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 
 #######################################################################
 #
@@ -162,7 +154,7 @@ is (WebGUI::Shop::ShipDriver::FlatRate->getName($session), 'Flat Rate', 'getName
 #
 #######################################################################
 
-my $form = $driver->getEditForm;
+my $form = $driver2->getEditForm;
 
 isa_ok($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
 
@@ -252,13 +244,13 @@ cmp_deeply(
 #
 #######################################################################
 
-my $driverId = $driver->getId;
-$driver->delete;
+my $driverId = $driver2->getId;
+$driver2->delete;
 
 my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driverId]);
 is($count, 0, 'delete deleted the object');
 
-undef $driver;
+undef $driver2;
 
 #######################################################################
 #
@@ -266,11 +258,12 @@ undef $driver;
 #
 #######################################################################
 
-$car = WebGUI::Asset->getImportNode($session)->addChild({
+my $car = WebGUI::Asset->getImportNode($session)->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
     title              => 'Automobiles',
     isShippingRequired => 1,
 });
+WebGUI::Test->addToCleanup($car);
 
 my $crappyCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
     {
@@ -302,8 +295,10 @@ my $reallyNiceCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
     }
 );
 
-$versionTag = WebGUI::VersionTag->getWorking($session);
+my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
+WebGUI::Test->addToCleanup($versionTag);
+$car = $car->cloneFromDb;
 
 $options = {
     label   => 'flat rate, ship weight',
@@ -314,9 +309,11 @@ $options = {
     pricePerItem      => 10,
 };
 
-$driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
+my $driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
+WebGUI::Test->addToCleanup($driver);
 
-$cart = WebGUI::Shop::Cart->newBySession($session);
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart);
 
 $car->addToCart($car->getCollateral('variantsJSON', 'variantId', $crappyCar));
 is($driver->calculate($cart), 1511, 'calculate by weight, perItem and flat fee work');
@@ -345,7 +342,7 @@ $driver->update({
     pricePerItem      => 0,
 });
 
-$key = WebGUI::Asset->getImportNode($session)->addChild({
+my $key = WebGUI::Asset->getImportNode($session)->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
     title              => 'Key',
     isShippingRequired => 1,
@@ -372,6 +369,8 @@ my $bioKey = $key->setCollateral('variantsJSON', 'variantId', 'new',
     }
 );
 
+WebGUI::Test->addToCleanup($key);
+
 my $boughtCar = $car->addToCart($car->getCollateral('variantsJSON', 'variantId', $reallyNiceCar));
 my $firstKey  = $key->addToCart($key->getCollateral('variantsJSON', 'variantId', $metalKey));
 is($driver->calculate($cart), 2, 'shipsSeparately: returns two, one for ships separately, one for ships bundled');
@@ -388,25 +387,3 @@ is($driver->calculate($cart), 1, '... returns one, since all can be bundled toge
 $car->update({shipsSeparately => 1});
 $key->update({shipsSeparately => 1});
 is($driver->calculate($cart), 4, '... returns four, since all must be shipped separately now');
-
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    if (defined $driver && ref $driver eq 'WebGUI::Shop::ShipDriver::FlatRate') {
-        $driver->delete;
-    }
-    if (defined $cart && ref $cart eq 'WebGUI::Shop::Cart') {
-        $cart->delete;
-    }
-    if (defined $car && (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
-        $car->purge;
-    }
-    if (defined $key && (ref($key) eq 'WebGUI::Asset::Sku::Product')) {
-        $key->purge;
-    }
-    if (defined $versionTag) {
-        $versionTag->rollback;
-    }
-}
