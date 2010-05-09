@@ -240,15 +240,15 @@ sub _mockAssetInits {
         if $mockedNew;
     require WebGUI::Asset;
     my $original_new = \&WebGUI::Asset::new;
-    *WebGUI::Asset::new = sub {
-        my ($class, $session, $assetId, $className, $revisionDate) = @_;
-        if ($mockedAssetIds{$assetId}) {
-            return $mockedAssetIds{$assetId};
-        }
-        goto $original_new;
-    };
-    my $original_newByDynamicClass = \&WebGUI::Asset::newByDynamicClass;
-    *WebGUI::Asset::newByDynamicClass = sub {
+#    *WebGUI::Asset::new = sub {
+#        my ($class, $session, $assetId, $className, $revisionDate) = @_;
+#        if ($mockedAssetIds{$assetId}) {
+#            return $mockedAssetIds{$assetId};
+#        }
+#        goto $original_new;
+#    };
+    my $original_newByDynamicClass = \&WebGUI::Asset::newById;
+    *WebGUI::Asset::newById = sub {
         my ($class, $session, $assetId, $revisionDate) = @_;
         if ($mockedAssetIds{$assetId}) {
             return $mockedAssetIds{$assetId};
@@ -262,6 +262,14 @@ sub _mockAssetInits {
             return $mockedAssetIds{$assetId};
         }
         goto $original_newPending;
+    };
+    my $original_newByPropertyHashRef = \&WebGUI::Asset::newByPropertyHashRef;
+    *WebGUI::Asset::newByPropertyHashRef = sub {
+        my ($class, $session, $url, $revisionDate) = @_;
+        if ($url && $mockedAssetUrls{$url}) {
+            return $mockedAssetUrls{$url};
+        }
+        goto $original_newByPropertyHashRef;
     };
     my $original_newByUrl = \&WebGUI::Asset::newByUrl;
     *WebGUI::Asset::newByUrl = sub {
