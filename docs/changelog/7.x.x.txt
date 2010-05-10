@@ -7,6 +7,7 @@
  - fixed #11555: Wiki subcategories entry field is not labeled
  - fixed: UserList asset has SQL injection bug
  - fixed #11558: wiki results for visitors 
+ - fixed #11533: Saving entered data at registration
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility
