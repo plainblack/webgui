@@ -1,4 +1,5 @@
 7.9.5
+ - Asset->www_copy now has a progress bar
  - fixed #11556: New cart doesn't work with other forms on the same page
  - fixed #11557: Shop credit deduction calculated incorrectly
  - fixed #11561: PayDriver_Cash - password help

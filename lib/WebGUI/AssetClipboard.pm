@@ -229,36 +229,98 @@ sub paste {
 
 =head2 www_copy ( )
 
-Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit. Otherwise returns an AdminConsole rendered as insufficient privilege.
+Duplicates self, cuts duplicate, returns self->getContainer->www_view if
+canEdit. Otherwise returns an AdminConsole rendered as insufficient privilege.
+If with children/descendants is selected, a progress bar will be rendered.
 
 =cut
 
 sub www_copy {
-    my $self = shift;
-    return $self->session->privilege->insufficient
-        unless $self->canEdit;
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient unless $self->canEdit;
 
-
-    # with: 'children' || 'descendants' || ''
-    my $with = $self->session->form->get('with') || '';
-    my $newAsset;
-    if ($with) {
-        my $childrenOnly = $with eq 'children';
-        $newAsset = $self->duplicateBranch($childrenOnly);
+    my $with = $session->form->get('with');
+    if ($with eq 'children') {
+        $self->_wwwCopyChildren;
+    }
+    elsif ($with eq 'descendants') {
+        $self->_wwwCopyDescendants;
     }
     else {
-        $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
+        $self->_wwwCopySingle;
     }
-    my $i18n = WebGUI::International->new($self->session, 'Asset');
-    $newAsset->update({ title=>sprintf("%s (%s)",$self->getTitle,$i18n->get('copy'))});
+}
+
+#-------------------------------------------------------------------
+sub _wwwCopyChildren { shift->_wwwCopyProgress(1) }
+
+#-------------------------------------------------------------------
+sub _wwwCopyDescendants { shift->_wwwCopyProgress(0) }
+
+#-------------------------------------------------------------------
+sub _wwwCopyFinish {
+    my ($self, $newAsset) = @_;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $title   = sprintf("%s (%s)", $self->getTitle, $i18n->get('copy'));
+    $newAsset->update({ title => $title });
     $newAsset->cut;
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
-        allowComments   => 1,
-        returnUrl       => $self->getUrl,
-    }) eq 'redirect') {
-        return undef;
-    };
-    return $self->session->asset($self->getContainer)->www_view;
+    my $result = WebGUI::VersionTag->autoCommitWorkingIfEnabled(
+        $session, {
+            allowComments => 1,
+            returnUrl     => $self->getUrl,
+        }
+    );
+    my $redirect = $result eq 'redirect';
+    $session->asset($self->getContainer) unless $redirect;
+    return $redirect;
+}
+
+#-------------------------------------------------------------------
+sub _wwwCopyProgress {
+    my ($self, $childrenOnly) = @_;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+
+    # This could potentially time out, so we'll render a progress bar.
+    my $pb = WebGUI::ProgressBar->new($session);
+    my @stack;
+
+    return $pb->run(
+        title => $i18n->get('Copy Assets'),
+        icon  => $session->url->extras('adminConsole/assets.gif'),
+        code  => sub {
+            my $bar = shift;
+            my $newAsset = $self->duplicateBranch($childrenOnly);
+            $bar->update($i18n->get('cut'));
+            my $redirect = $self->_wwwCopyFinish($newAsset);
+            return $redirect ? $self->getUrl : $self->getContainer->getUrl;
+        },
+        wrap  => {
+            'WebGUI::Asset::duplicateBranch' => sub {
+                my ($bar, $original, $asset, @args) = @_;
+                push(@stack, $asset->getTitle);
+                my $ret = $asset->$original(@args);
+                pop(@stack);
+                return $ret;
+            },
+            'WebGUI::Asset::duplicate' => sub {
+                my ($bar, $original, $asset, @args) = @_;
+                my $name = join '/', @stack, $asset->getTitle;
+                $bar->update($name);
+                return $asset->$original(@args);
+            },
+        }
+    );
+}
+
+#-------------------------------------------------------------------
+sub _wwwCopySingle {
+    my $self = shift;
+    my $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
+    my $redirect = $self->_wwwCopyFinish($newAsset);
+    return $redirect ? undef : $self->getContainer->www_view;
 }
 
 #-------------------------------------------------------------------
