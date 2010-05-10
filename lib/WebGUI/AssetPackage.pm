@@ -48,6 +48,7 @@ Converts all the properties of this asset into a hash reference and then returns
 sub exportAssetData {
 	my $self = shift;
 	my %data = %{$self->get};
+    delete $data{'session'};
 	my %hash = ( properties => \%data, storage=>[] );
 	return \%hash;
 }
