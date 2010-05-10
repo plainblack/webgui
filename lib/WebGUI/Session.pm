@@ -172,6 +172,12 @@ sub close {
 	foreach my $key (qw/_asset _datetime _icon _slave _db _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
 		delete $self->{$key};
 	}
+    $self->{closed} = 1;
+}
+
+sub closed {
+    my $self = shift;
+    return $self->{closed};
 }
 
 #-------------------------------------------------------------------

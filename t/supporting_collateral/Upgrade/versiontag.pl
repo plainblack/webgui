@@ -1,3 +1,4 @@
+use WebGUI::Upgrade::Script;
 my $vt = version_tag;
 ::addToCleanup($vt);
 

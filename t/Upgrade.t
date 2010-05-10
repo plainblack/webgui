@@ -14,11 +14,6 @@ use Test::MockObject::Extends;
 use File::Temp;
 use File::Path qw(make_path);
 
-BEGIN {
-    $INC{'WebGUI.pm'} = 1;
-    $WebGUI::VERSION = '8.4.3';
-}
-
 use WebGUI::Paths;
 use WebGUI::Upgrade;
 use WebGUI::Session::Id;
@@ -37,6 +32,13 @@ our $configFile = WebGUI::Test->config->getFilename;
 
 my $upgrade = Test::MockObject::Extends->new('WebGUI::Upgrade');
 $upgrade->set_always('getCurrentVersion', '8.0.0');
+$upgrade->set_always('getCodeVersion', '8.4.3');
+
+{
+    no warnings 'redefine';
+    *WebGUI::Paths::upgrades = sub { collateral('Upgrade', 'non-existant') } ;
+}
+ok ! try { $upgrade->calcUpgradePath('8.0.0', '8.4.3'); 1 }, "calcUpgradePath dies when upgrades path doesn't exist";
 
 {
     no warnings 'redefine';
@@ -65,9 +67,11 @@ capture {
 };
 
 $upgrade->called_pos_ok(1, 'getCurrentVersion');
-$upgrade->called_pos_ok(2, 'runUpgradeFile');
-my $upgradeFile = $upgrade->call_args_pos(2, 4);
-ok $upgradeFile =~ /\b00_simple\.pl$/, 'correct upgrade file run';
+SKIP: {
+    $upgrade->called_pos_ok(2, 'runUpgradeFile') || skip 'upgrade not run', 1;
+    my $upgradeFile = $upgrade->call_args_pos(2, 4);
+    ok $upgradeFile =~ /\b00_simple\.pl$/, 'correct upgrade file run';
+}
 
 $upgrade->clear;
 $upgrade->unmock('runUpgradeFile');

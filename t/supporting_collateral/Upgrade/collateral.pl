@@ -1,3 +1,4 @@
+use WebGUI::Upgrade::Script;
 my $c = collateral;
 
 ::isa_ok $c, 'Path::Class::Dir';

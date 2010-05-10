@@ -1,3 +1,4 @@
+use WebGUI::Upgrade::Script;
 use WebGUI::Asset;
 use WebGUI::Asset::Snippet;
 WebGUI::Asset->getRoot(session)->addChild({

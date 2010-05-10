@@ -1,3 +1,4 @@
+use WebGUI::Upgrade::Script;
 ::addToCleanup(version_tag);
 
 import_package('test-template.wgpkg');

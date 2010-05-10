@@ -13,6 +13,7 @@ my $exporter = Sub::Exporter::build_exporter({
     },
 });
 
+my $caller_upgrade_file;
 sub import {
     my ($class, @args) = @_;
     my $extra = shift @args if ref $args[0] eq 'HASH';
@@ -21,6 +22,8 @@ sub import {
         $extra->{into_level} ||= 0;
         $extra->{into_level}++;
     }
+
+    $caller_upgrade_file = (caller 0)[1];
 
     feature->import(':5.10');
     strict->import;
@@ -32,7 +35,7 @@ sub import {
 my @cleanups;
 
 sub _build_exports {
-    my $configFile = $ENV{WEBGUI_CONFIG};
+    my $configFile = $ENV{WEBGUI_CONFIG} || die 'WEBGUI_CONFIG environment variable must be specified';
     my $version    = $ENV{WEBGUI_UPGRADE_VERSION};
     my $quiet      = $ENV{WEBGUI_UPGRADE_QUIET};
 
@@ -41,6 +44,7 @@ sub _build_exports {
     my $dbh;
     my $collateral;
     my $versionTag;
+    my $upgrade_file = File::Spec->rel2abs( $caller_upgrade_file );
 
     my $subs;
 
@@ -66,7 +70,7 @@ sub _build_exports {
         quiet => sub () {
             return $quiet;
         },
-        report => sub {
+        report => sub (@) {
             print @_
                 unless $quiet;
         },
@@ -100,7 +104,7 @@ sub _build_exports {
             $dbh = WebGUI::Upgrade->dbhForConfig($subs->{config}->());
             return $dbh;
         },
-        version_tag => sub {
+        version_tag => sub (;$) {
             my $name = shift;
             $check_cleanup->();
             require WebGUI::VersionTag;
@@ -108,12 +112,13 @@ sub _build_exports {
                 if ($name) {
                     $versionTag->commit;
                 }
-                elsif ( ! $versionTag->isCommitted ) {
+                elsif ( ! $versionTag->get('isCommitted') ) {
                     return $versionTag;
                 }
             }
             if (! $name) {
-                (undef, undef, my $shortname) = File::Spec->splitpath((caller(0))[1]);
+                no warnings 'uninitialized';
+                (undef, undef, my $shortname) = File::Spec->splitpath($upgrade_file);
                 $shortname =~ s/\.[^.]*$//;
                 $name = $shortname;
             }
@@ -121,7 +126,7 @@ sub _build_exports {
             $versionTag->set({name => "Upgrade to $version - $name"});
             return $versionTag;
         },
-        rm_lib => sub {
+        rm_lib => sub (@) {
             my @modules = @_;
             for my $module (@modules) {
                 $module =~ s{::}{/}g;
@@ -135,18 +140,39 @@ sub _build_exports {
         collateral => sub () {
             return $collateral
                 if $collateral;
-            (my $vol, my $dir, my $shortname) = File::Spec->splitpath(
-                File::Spec->rel2abs( (caller(0))[1] )
-            );
+            (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
             $shortname =~ s/\.[^.]*$//;
             my $path = File::Spec->catpath($vol, File::Spec->catdir($dir, $shortname), '');
             $collateral = Path::Class::Dir->new($path);
             return $collateral;
         },
-        import_package => sub {
+        import_package => sub (@) {
             my $fullPath = $subs->{collateral}->()->file(@_);
             require WebGUI::Upgrade::File::wgpkg;
             WebGUI::Upgrade::File::wgpkg->import_package($subs->{session}->(), $fullPath);
+        },
+        root_asset => sub () {
+            require WebGUI::Asset;
+            return WebGUI::Asset->getRoot($subs->{session}->());
+        },
+        import_node => sub () {
+            require WebGUI::Asset;
+            return WebGUI::Asset->getImportNode($subs->{session}->());
+        },
+        asset => sub ($) {
+            require WebGUI::Asset;
+            my $session = $subs->session->();
+            my $assetId = shift;
+            my $asset;
+            if ($session->id->valid($assetId)) {
+                try {
+                    $asset = WebGUI::Asset->newById($session, $assetId);
+                };
+            }
+            if ( ! $asset ) {
+                $asset = WebGUI::Asset->newByUrl($session, $assetId);
+            }
+            return $asset;
         },
     };
     return $subs;
@@ -251,6 +277,18 @@ script with the extension stripped off.
 =head2 import_package ( $package_file )
 
 Imports the specified package from the upgrade script's collateral path.
+
+=head2 root_asset
+
+Returns the site's root asset.
+
+=head2 import_node
+
+Returns the site's import node.
+
+=head2 asset ( $assetId_or_URL )
+
+Returns an asset based on an asset ID or URL.
 
 =head1 METHODS
 

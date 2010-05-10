@@ -1,13 +1,12 @@
 package WebGUI::Upgrade;
-
 use strict;
 use warnings;
+
 use WebGUI::Paths;
-use WebGUI;
-use Try::Tiny;
 use WebGUI::Pluggable;
-use DBI;
 use WebGUI::Config;
+use Try::Tiny;
+use DBI;
 
 sub upgradeSites {
     my $class = shift;
@@ -27,11 +26,17 @@ sub upgradeSites {
     return 1;
 }
 
+sub getCodeVersion {
+    require WebGUI;
+    return WebGUI->VERSION;
+}
+
 sub upgradeSite {
     my $class = shift;
     my ($configFile, $quiet) = @_;
     my $fromVersion = $class->getCurrentVersion($configFile);
-    my @steps = $class->calcUpgradePath($fromVersion, $WebGUI::VERSION);
+    my $toVersion = $class->getCodeVersion;
+    my @steps = $class->calcUpgradePath($fromVersion, $toVersion);
     for my $step ( @steps ) {
         $class->runUpgradeStep($configFile, $step, $quiet);
     }
@@ -44,7 +49,8 @@ sub calcUpgradePath {
     my $toVersion = $class->numericVersion($toVersionStr);
 
     my %upgrades;
-    opendir my $dh, WebGUI::Paths->upgrades;
+    opendir my $dh, WebGUI::Paths->upgrades
+        or die "Upgrades directory doesn't exist.\n";
     while ( my $dir = readdir $dh ) {
         next
             if $dir =~ /^\./;
