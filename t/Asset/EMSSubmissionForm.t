@@ -122,6 +122,7 @@ my $i18n = $ems->i18n;
 $versionTag->commit;
 $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag);
+$ems = $ems->cloneFromDb;
 
 my $id1 = $ems->getNextSubmissionId;
 my $id2 = $ems->getNextSubmissionId;

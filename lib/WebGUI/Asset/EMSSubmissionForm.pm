@@ -16,10 +16,70 @@ package WebGUI::Asset::EMSSubmissionForm;
 =cut
 
 use strict;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+define assetName  => ['assetName','Asset_EMSSubmissionForm'];
+define icon       => 'EMSSubmissionForm.gif';
+define tableName  => 'EMSSubmissionForm';
+
+property canSubmitGroupId => ( 
+            tab          => "security",
+            fieldType    => "group",
+            default      => 2,
+            label        => ["can submit group label", 'Asset_EMSSubmissionForm'],
+            hoverHelp    => ["can submit group label help", 'Asset_EMSSubmissionForm']
+         );
+property daysBeforeCleanup => ( 
+            tab          => "properties",
+            fieldType    => "integer",
+            default      => 7,
+            label        => ["days before cleanup label", 'Asset_EMSSubmissionForm'],
+            hoverHelp    => ["days before cleanup label help", 'Asset_EMSSubmissionForm']
+         );
+property deleteCreatedItems => ( 
+            tab          => "properties",
+            fieldType    => "yesNo",
+            default      => undef,
+            label        => ["delete created items label", 'Asset_EMSSubmissionForm'],
+            hoverHelp    => ["delete created items label help", 'Asset_EMSSubmissionForm']
+         );
+property submissionDeadline => ( 
+            tab          => "properties",
+            fieldType    => "Date",
+            builder      => '_default_submissionDeadline',
+            label        => ["submission deadline label", 'Asset_EMSSubmissionForm'],
+            hoverHelp    => ["submission deadline label help", 'Asset_EMSSubmissionForm']
+         );
+sub _default_submissionDeadline {
+    return time() + ( 30 * 24 * 60 * 60 ); # 30 days
+}
+property pastDeadlineMessage => ( 
+            tab          => "properties",
+            fieldType    => "HTMLArea",
+            builder      => '_default_pastDeadlineMessage',
+            lazy         => 1,
+            label        => ["past deadline label", 'Asset_EMSSubmissionForm'],
+            hoverHelp    => ["past deadline label help", 'Asset_EMSSubmissionForm']
+         );
+sub _default_pastDeadlineMessage {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_EMSSubmissionForm');
+    return $i18n->get('past deadline message');
+}
+property formDescription => ( 
+            tab          => "properties",
+            fieldType    => "textarea",
+            default      => '{ }',
+            label        => ["form dscription label", 'Asset_EMSSubmissionForm'],
+            hoverHelp    => ["form dscription label help", 'Asset_EMSSubmissionForm']
+         );
+
 use Tie::IxHash;
-use base 'WebGUI::Asset';
 use JSON;
 use WebGUI::Utility;
+with 'WebGUI::Role::Asset::AlwaysHidden';
 
 =head1 NAME
 
@@ -81,81 +141,6 @@ sub canSubmit {
 
     return $self->session->user->isInGroup($self->get('canSubmitGroupId'));
 }
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-defines asset properties for New Asset instances.  You absolutely need 
-this method in your new Assets. 
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmissionForm" );
-    tie my %properties, 'Tie::IxHash', (
-        canSubmitGroupId => { 
-            tab          => "security",
-            fieldType    => "group",
-            defaultValue => 2,
-            label        => $i18n->get("can submit group label"),
-            hoverHelp    => $i18n->get("can submit group label help")
-        },
-        daysBeforeCleanup => { 
-            tab          => "properties",
-            fieldType    => "integer",
-            defaultValue => 7,
-            label        => $i18n->get("days before cleanup label"),
-            hoverHelp    => $i18n->get("days before cleanup label help")
-        },
-        deleteCreatedItems => { 
-            tab          => "properties",
-            fieldType    => "yesNo",
-            defaultValue => undef,
-            label        => $i18n->get("delete created items label"),
-            hoverHelp    => $i18n->get("delete created items label help")
-        },
-        submissionDeadline => { 
-            tab          => "properties",
-            fieldType    => "Date",
-            defaultValue => time + ( 30 * 24 * 60 * 60 ) , # 30 days
-            label        => $i18n->get("submission deadline label"),
-            hoverHelp    => $i18n->get("submission deadline label help")
-        },
-        pastDeadlineMessage => { 
-            tab          => "properties",
-            fieldType    => "HTMLArea",
-            defaultValue => $i18n->get('past deadline message'),
-            label        => $i18n->get("past deadline label"),
-            hoverHelp    => $i18n->get("past deadline label help")
-        },
-        formDescription => { 
-            tab          => "properties",
-            fieldType    => "textarea",
-            defaultValue => '{ }',
-            label        => $i18n->get("form dscription label"),
-            hoverHelp    => $i18n->get("form dscription label help")
-        },
-    );
-    push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'EMSSubmissionForm.gif',
-        autoGenerateForms => 1,
-        tableName         => 'EMSSubmissionForm',
-        className         => 'WebGUI::Asset::EMSSubmissionForm',
-        properties        => \%properties,
-    };
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
 
 #-------------------------------------------------------------------
 
@@ -231,7 +216,7 @@ sub www_editSubmissionForm {
 		}
 	    }
         } elsif( $assetId ne 'new' ) {
-	    $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);
+	    $self ||= WebGUI::Asset->newById($session, $assetId);
 	    if (!defined($self)) { 
 		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
 	    }
@@ -491,14 +476,15 @@ We overload the update method from WebGUI::Asset in order to handle file system 
 
 =cut
 
-sub update {
+around update => sub {
+    my $orig = shift;
     my $self = shift;
     my $properties = shift;
     if( ref $properties->{formDescription} eq 'HASH' ) {
         $properties->{formDescription} = JSON->new->encode($properties->{formDescription});
     }
-    $self->SUPER::update({%$properties, isHidden => 1});
-}
+    $self->$orig({%$properties});
+};
 
 1;
 
