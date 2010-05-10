@@ -15,6 +15,7 @@ use HTML::Entities;
 use WebGUI::Exception;
 use WebGUI::HTML;
 use WebGUI::International;
+use LWP::UserAgent;
 
 use Moose;
 use WebGUI::Definition::Asset;
