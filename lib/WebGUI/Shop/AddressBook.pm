@@ -82,32 +82,33 @@ sub appendAddressFormVars {
     $properties ||= {};
     $prefix     ||= '';
     $var        ||= {};
+    my $hasAddress = keys %{ $properties };
     for ( qw{ address1 address2 address3 label firstName lastName city state organization } ) {
         $var->{ $prefix . $_ . 'Field' } = WebGUI::Form::text( $session, {
             name            => $prefix . $_, 
             maxlength       => 35, 
-            defaultValue    => $properties->{ $_ } || $form->get($prefix . $_),
+            defaultValue    => $hasAddress ? $properties->{ $_ } : $form->get($prefix . $_),
         } );
     }
     $var->{ $prefix . 'countryField' } = 
         WebGUI::Form::country( $session,{
             name            => $prefix . 'country', 
-            defaultValue    => $properties->{ country } || $form->get($prefix . 'country' ),
+            defaultValue    => $hasAddress ? $properties->{ country } : $form->get($prefix . 'country' ),
         } );
     $var->{ $prefix . 'codeField' } =
         WebGUI::Form::zipcode( $session, {
             name            => $prefix . 'code', 
-            defaultValue    => $properties->{ code } || $form->get($prefix . 'code' ),
+            defaultValue    => $hasAddress ? $properties->{ code } : $form->get($prefix . 'code' ),
         } );
     $var->{ $prefix . 'phoneNumberField' } =
         WebGUI::Form::phone( $session, {
             name            => $prefix . 'phoneNumber', 
-            defaultValue    => $properties->{ phoneNumber } || $form->get($prefix . 'phoneNumber' ),
+            defaultValue    => $hasAddress ? $properties->{ phoneNumber } : $form->get($prefix . 'phoneNumber' ),
         } );
     $var->{ $prefix . 'emailField' } =
         WebGUI::Form::email( $session, {
             name            => $prefix . 'email', 
-            defaultValue    => $properties->{ email } || $form->get($prefix . 'email' ),
+            defaultValue    => $hasAddress ? $properties->{ email } : $form->get($prefix . 'email' ),
         } );
 }
 
