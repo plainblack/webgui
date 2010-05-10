@@ -209,7 +209,7 @@ sub www_getTreeData {
             childCount      => $asset->getChildCount,
             assetSize       => $asset->assetSize,
             lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
-            actions         => $asset->canEdit && $asset->canEditIfLocked,
+            canEdit         => $asset->canEdit && $asset->canEditIfLocked,
             helpers         => $asset->getHelpers,
         );
 
@@ -226,7 +226,13 @@ sub www_getTreeData {
     $assetInfo->{ totalAssets   } = $p->getRowCount;
     $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
-    $assetInfo->{ currentAsset  } = { title => $asset->getTitle, helpers => $asset->getHelpers };
+    $assetInfo->{ currentAsset  } = { 
+        assetId => $asset->getId,
+        url     => $asset->getUrl,
+        title => $asset->getTitle,
+        icon    => $asset->getIcon("small"),
+        helpers => $asset->getHelpers,
+    };
 
     $assetInfo->{ crumbtrail    } = [];
     for my $asset ( @{ $asset->getLineage( ['ancestors'], { returnObjects => 1 } ) } ) {

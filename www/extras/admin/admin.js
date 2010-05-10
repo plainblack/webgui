@@ -79,10 +79,37 @@ WebGUI.Admin.prototype.afterShowViewTab
 };
 
 /**
- * go( url )
- * Open the view tab and go to the given URL.
- * Should not be used for assets, use gotoAsset() instead
+ * appendToUrl( url, params )
+ * Add URL components to a URL;
  */
+appendToUrl 
+= function ( url, params ) {
+    var components = [ url ];
+    if (url.match(/\?/)) {
+        components.push(";");
+    }
+    else {
+        components.push("?");
+    }
+    components.push(params);
+    return components.join(''); 
+};
+
+/**
+ * editAsset( url )
+ * Show the edit form for the asset at the given URL
+ */
+WebGUI.Admin.prototype.editAsset
+= function ( url ) {
+    // Open the edit form
+    window.frames["view"].location.href = appendToUrl( url, "func=edit" );
+
+    // Mark undirty, as we'll clean it ourselves
+    this.viewDirty = 0;
+
+    // Show the view tab
+    this.tabBar.selectTab( 0 );
+};
 
 /**
  * gotoAsset( url )
@@ -96,14 +123,38 @@ WebGUI.Admin.prototype.gotoAsset
     }
     else if ( this.currentTab == "tree" ) {
         // Make tree request
-        this.tree.goto( this.currentAssetDef.url );
+        this.tree.goto( url );
         this.viewDirty = 1;
     }
 };
 
 /**
+ * makeEditAsset( url ) 
+ * Create a callback to edit an asset. Use when attaching to event listeners
+ */
+WebGUI.Admin.prototype.makeEditAsset
+= function (url) {
+    var self = this;
+    return function() {
+        self.editAsset( url );
+    };
+};
+
+/**
+ * makeGotoAsset( url )
+ * Create a callback to view an asset. Use when attaching to event listeners
+ */
+WebGUI.Admin.prototype.makeGotoAsset
+= function ( url ) {
+    var self = this;
+    return function() {
+        self.gotoAsset( url );
+    };
+};
+
+/**
  * navigate( assetDef )
- * We've navigated to a new asset. Called by one of the iframes when a new 
+ * We've navigated to a new asset. Called by the view iframe when a new 
  * page is reached
  */
 WebGUI.Admin.prototype.navigate
@@ -122,7 +173,10 @@ WebGUI.Admin.prototype.navigate
     // Update the location bar
     this.locationBar.navigate( assetDef );
 
-    this.currentAssetDef = assetDef;
+    if ( !this.currentAssetDef || this.currentAssetDef.assetId != assetDef.assetId ) {
+        this.currentAssetDef = assetDef;
+        this.treeDirty = 1;
+    }
 };
 
 /****************************************************************************
@@ -442,7 +496,7 @@ WebGUI.Admin.Tree
             fields: [
                 { key: 'assetId' },
                 { key: 'lineage' },
-                { key: 'actions' },
+                { key: 'canEdit' },
                 { key: 'title' },
                 { key: 'className' },
                 { key: 'revisionDate' },
@@ -453,7 +507,9 @@ WebGUI.Admin.Tree
                 { key: 'childCount' }
             ],
             metaFields: {
-                totalRecords: "totalAssets" // Access to value in the server response
+                totalRecords: "totalAssets", // Access to value in the server response
+                crumbtrail : "crumbtrail",
+                currentAsset : "currentAsset"
             }
         };
 
@@ -491,23 +547,6 @@ WebGUI.Admin.Tree
             return oPayload;
         };
 
-};
-
-/**
- * appendToUrl( url, params )
- * Add URL components to a URL;
- */
-appendToUrl 
-= function ( url, params ) {
-    var components = [ url ];
-    if (url.match(/\?/)) {
-        components.push(";");
-    }
-    else {
-        components.push("?");
-    }
-    components.push(params);
-    return components.join(''); 
 };
 
 /**
@@ -605,16 +644,17 @@ WebGUI.Admin.Tree.prototype.findRow
  */
 WebGUI.Admin.Tree.prototype.formatActions 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
-    if ( oRecord.getData( 'actions' ) ) {
-        elCell.innerHTML
-            = '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">'
-            + window.admin.i18n.get('Asset', 'edit') + '</a>'
-            + ' | '
-            ;
+    if ( oRecord.getData( 'canEdit' ) ) {
+        var edit    = document.createElement("span");
+        edit.className = "clickable";
+        YAHOO.util.Event.addListener( edit, "click", function(){
+            window.admin.editAsset( oRecord.getData('url') );
+        }, window.admin, true );
+        edit.appendChild( document.createTextNode( window.admin.i18n.get('Asset', 'edit') ) );
+        elCell.appendChild( edit );
+        elCell.appendChild( document.createTextNode( " | " ) );
     }
-    else {
-        elCell.innerHTML = "";
-    }
+
     return; // TODO
     var more    = document.createElement( 'a' );
     elCell.appendChild( more );
@@ -627,7 +667,7 @@ WebGUI.Admin.Tree.prototype.formatActions
         oldMenu.parentNode.removeChild( oldMenu );
     }
 
-    var options = this.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'actions' ));
+    var options = this.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'canEdit' ));
 
     var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
     YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ); } );
@@ -674,11 +714,11 @@ WebGUI.Admin.Tree.prototype.formatLockedBy
     elCell.innerHTML 
         = oRecord.getData( 'lockedBy' )
         ? '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/locked.gif" alt="' + window.admin.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" '
+            + '<img src="' + extras + '/icon/lock.png" alt="' + window.admin.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" '
             + 'title="' + window.admin.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
             + '</a>'
         : '<a href="' + appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="' + window.admin.i18n.get('Asset', 'unlocked') + '" '
+            + '<img src="' + extras + '/icon/lock_open.png" alt="' + window.admin.i18n.get('Asset', 'unlocked') + '" '
             + 'title="' + window.admin.i18n.get('Asset', 'unlocked') + '" border="0" />'
             + '</a>'
         ;
@@ -721,16 +761,30 @@ WebGUI.Admin.Tree.prototype.formatRevisionDate
  */
 WebGUI.Admin.Tree.prototype.formatTitle 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML = '<span class="hasChildren">' 
-        + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
-        + '</span> <span class="clickable">'
-        + oRecord.getData( 'title' )
-        + '</span>'
-        ;
+    var hasChildren = document.createElement("span");
+    hasChildren.className = "hasChildren";
+    if ( oRecord.getData('childCount') > 0 ) {
+        hasChildren.appendChild( document.createTextNode( "+" ) );
+    }
+    else {
+        hasChildren.appendChild( document.createTextNode( " " ) );
+    }
+    elCell.appendChild( hasChildren );
+
+    var title   = document.createElement("span");
+    title.className = "clickable";
+    title.appendChild( document.createTextNode( oRecord.getData('title') ) );
+    YAHOO.util.Event.addListener( title, "click", function(){ window.admin.gotoAsset(oRecord.getData('url')) }, this, true );
+    elCell.appendChild( title );
 };
 
+/**
+ * Update the tree with a new asset
+ * Do not call this directly, use Admin.gotoAsset(url)
+ */
 WebGUI.Admin.Tree.prototype.goto
 = function ( assetUrl ) {
+    // TODO: Show loading screen
     var callback = {
         success : this.onDataReturnInitializeTable,
         failure : this.onDataReturnInitializeTable,
@@ -756,6 +810,32 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
 = function ( sRequest, oResponse, oPayload ) {
     this.dataTable.onDataReturnInitializeTable.call( this.dataTable, sRequest, oResponse, oPayload );
 
+    // Rebuild the crumbtrail
+    var crumb       = oResponse.meta.crumbtrail;
+    var elCrumb     = document.getElementById( "treeCrumbtrail" );
+    elCrumb.innerHTML  = '';
+    for ( var i = 0; i < crumb.length; i++ ) {
+        var item      = crumb[i];
+        var elItem    = document.createElement( "span" );
+        elItem.className = "clickable";
+        YAHOO.util.Event.addListener( elItem, "click", window.admin.makeGotoAsset(item.url) );
+        elItem.appendChild( document.createTextNode( item.title ) );
+
+        elCrumb.appendChild( elItem );
+        elCrumb.appendChild( document.createTextNode( " > " ) );
+    }
+
+    // Final crumb item has a menu
+    var elItem  = document.createElement( "span" );
+    elItem.className    = "clickable";
+    YAHOO.util.Event.addListener( elItem, "click", function(){ alert( "TOADO" ) }, this, true );
+    elItem.appendChild( document.createTextNode( oResponse.meta.currentAsset.title ) );
+    elCrumb.appendChild( elItem );
+
+    // TODO: Update current asset
+    window.admin.navigate( oResponse.meta.currentAsset );
+
+    // TODO Hide loading screen
 };
 
 /**
@@ -834,7 +914,7 @@ WebGUI.Admin.Tree.prototype.toggleHighlightForRow
  */
 WebGUI.Admin.Tree.prototype.toggleRow = function ( child ) {
     var row     = this.findRow( child );
-    
+
     // Find the checkbox
     var inputs  = row.getElementsByTagName( "input" );
     for ( var i = 0; i < inputs.length; i++ ) {

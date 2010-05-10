@@ -289,7 +289,7 @@ ok (!(-e $storage1->getPath("testfile-hash.file")), "rename file original file i
 ####################################################
 
 $storage1->addFileFromFilesystem(
-    WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
+    WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin/WebGUI.pm'),
 );
 
 ok(
@@ -473,7 +473,7 @@ is($formStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns
 
 $session->request->uploadFiles(
     'oneFile',
-    [ WebGUI::Test->getTestCollateralPath('WebGUI.pm') ],
+    [ WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin/WebGUI.pm') ],
 );
 is($formStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', '... returns the name of the uploaded file');
 cmp_bag($formStore->getFiles, [ qw/WebGUI.pm/ ], '... adds the file to the storage location');

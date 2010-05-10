@@ -45,7 +45,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() unless $configFile;
 
 print "Starting up...\n" unless ($quiet);
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 
 if ($userMessageFile) {
 	print "Opening message file.." unless ($quiet);

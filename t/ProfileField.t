@@ -33,7 +33,7 @@ WebGUI::Test->usersToDelete($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 48;        # Increment this number for each test you create
+plan tests => 50;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -91,6 +91,8 @@ my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {
 });
 
 is($newProfileField->get('fieldType'), 'Float', 'create: makes field with correct type');
+is $newProfileField->get('fieldName'), 'testField', '...correct fieldName';
+is $newProfileField->getId, 'testField', '...correct id';
 is($newProfileField->get('label'), 'Test Field', 'correct label');
 is($newProfileField->getLabel, 'Test Field', 'getLabel works, too');
 

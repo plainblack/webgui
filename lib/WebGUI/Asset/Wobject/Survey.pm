@@ -1975,7 +1975,7 @@ sub prepareShowSurveyTemplate {
 Serializes the SurveyJSON instance and persists it to the database.
 
 Calling this method is only required if you have directly accessed and modified 
-the L<"surveyJSON"> object.
+the L<WebGUI::Asset::Wobject::Survey::surveyJSON> object.
 
 =cut
 

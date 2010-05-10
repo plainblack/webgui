@@ -897,7 +897,6 @@ sub setRow {
     return $id;
 }
 
-
 #-------------------------------------------------------------------
 
 =head2 unconditionalRead ( sql [, placeholders ] )

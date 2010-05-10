@@ -165,7 +165,7 @@ plan tests => $numTests;
 
 foreach my $tmpl ( @tmplVarTable ) {
 	my $tmplId = $tmpl->{id};
-	my $tmplAsset = WebGUI::Asset->newByDynamicClass($session, $tmplId);
+	my $tmplAsset = eval { WebGUI::Asset->newById($session, $tmplId); };
 	my $tmplExists = is(ref($tmplAsset), 'WebGUI::Asset::Template', "$tmplId exists");
 	SKIP: {
 		skip("$tmplId could not be found",  $tmpl->{numTests} ) unless $tmplExists;

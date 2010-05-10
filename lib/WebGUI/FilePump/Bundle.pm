@@ -3,6 +3,7 @@ package WebGUI::FilePump::Bundle;
 use base qw/WebGUI::Crud WebGUI::JSONCollateral/;
 use strict;
 use WebGUI::International;
+use WebGUI::Exception;
 use WebGUI::Utility;
 use URI;
 use Path::Class;
@@ -508,8 +509,8 @@ sub fetchAsset {
 
     my $url = $uri->opaque;
     $url =~ s{^/+}{};
-    my $asset = WebGUI::Asset->newByUrl($self->session, $url);
-    return {} unless $asset;
+    my $asset = eval {WebGUI::Asset->newByUrl($self->session, $url);};
+    return {} if Exception::Class->caught();
     ##Check for a snippet, or snippet subclass?
     my $guts = {
         lastModified => $asset->get('lastModified'),

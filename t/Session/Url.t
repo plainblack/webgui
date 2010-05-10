@@ -417,21 +417,21 @@ my $statefulAsset = WebGUI::Asset->getRoot($session)->addChild({ className => 'W
 $versionTag->commit;
 $session->asset( $statefulAsset );
 
-$statefulAsset->{_properties}{state} = 'published';
+$statefulAsset->state('published');
 is(
     $session->url->getBackToSiteURL, 
     WebGUI::Asset->getRoot($session)->getUrl,
     q!getBackToSiteURL: When asset state is published, it returns you to the Assets container!
 );
 
-$statefulAsset->{_properties}{state} = 'trash';
+$statefulAsset->state( 'trash');
 is(
     $session->url->getBackToSiteURL, 
     $defaultAssetUrl,
     q!getBackToSiteURL: When asset state is trash, it returns you to the default Asset!
 );
 
-$statefulAsset->{_properties}{state} = 'clipboard';
+$statefulAsset->state('clipboard');
 is(
     $session->url->getBackToSiteURL, 
     $defaultAssetUrl,

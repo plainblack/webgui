@@ -17,7 +17,7 @@ use WebGUI::Session;
 use Data::Dumper;
 use Test::Deep;
 
-use Test::More tests => 56; # increment this value for each test you create
+use Test::More tests => 57; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -145,6 +145,8 @@ my $setRowId = $session->db->setRow("incrementer","incrementerId",{incrementerId
 ok($setRowId ne "", "setRow() - return ID");
 my ($setRowResult) = $session->db->quickArray("select nextValue from incrementer where incrementerId=".$session->db->quote($setRowId));
 is($setRowResult, 47, "setRow() - set data");
+is $session->db->setRow("incrementer", "incrementerId",{incrementerId=>'new', nextValue => 48}, 'oogeyBoogeyBoo'),
+   'oogeyBoogeyBoo', 'overriding default id with a custom one';
 
 # getRow
 my $getRow = $session->db->getRow("incrementer","incrementerId",$setRowId);

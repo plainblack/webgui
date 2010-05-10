@@ -328,14 +328,14 @@ TODO: {
 ####################################################
 #
 # process 
-# no duped headBlockContent
+# no duped extraHeadTagsContent
 #
 ####################################################
 
 $style->useEmptyStyle(1);
 $style->sent(0);
 
-$session->scratch->set('personalStyleId', $templates->{headBlock}->getId);
+$session->scratch->set('personalStyleId', $templates->{extraHeadTags}->getId);
 
 $styled = $style->process('body.content', 'notATemplateId');
 
@@ -369,7 +369,8 @@ $expectedMetas = [
              'content' => 'must-revalidate'
            },
 ];
-cmp_bag(\@metas, $expectedMetas, 'process, headBlock:no duped headBlock from style template');
+cmp_bag(\@metas, $expectedMetas, 'process, extraHeadTags:no duped extraHeadTags from style template');
+
 ####################################################
 #
 # process 
@@ -480,16 +481,16 @@ sub setup_assets {
 	};
 	$templates->{personal} = $importNode->addChild($properties, $properties->{id});
 	$properties = {
-		title => 'personal style test template with headBlock',
+		title => 'personal style test template with extraHeadTags',
 		className => 'WebGUI::Asset::Template',
 		url => 'headblock_style',
 		namespace => 'Style',
 		template => 'HEADBLOCK STYLE TEMPLATE\n\nBODY=<tmpl_var body.content>\n\nHEAD=<tmpl_var head.tags>',
-		headBlock => q|<meta name="keywords" content="keyword1,keyword2" />|,
+		extraHeadTags => q|<meta name="keywords" content="keyword1,keyword2" />|,
 		id => 'testTemplate_headblock',
 		#     '1234567890123456789012'
 	};
-	$templates->{headBlock} = $importNode->addChild($properties, $properties->{id});
+	$templates->{extraHeadTags} = $importNode->addChild($properties, $properties->{id});
 	$properties = {
 		title => 'personal style test template for printing',
 		className => 'WebGUI::Asset::Template',

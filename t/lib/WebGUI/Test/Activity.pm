@@ -3,16 +3,16 @@ package WebGUI::Test::Activity;
 use WebGUI::Workflow;
 use WebGUI::Test;
 
-=head Name
+=head1 Name
 
 package WebGUI::Test::Activity;
 
-=head Description
+=head1 Description
 
  This package encapsulates the code required to run
  an activity.
 
-=head Usage
+=head1 Usage
 
 use WebGUI::Test::Activity;
 
@@ -27,17 +27,21 @@ is( $instance->run, 'complete', 'activity complete' );
 is( $instance->run, 'done', 'activity done' );
 $instance->delete;
 
-=head methods
+=head1 methods
 
 =head2 create
 
-=params
+=head3 session
 
-session -- the session variable
+the session variable
 
-class -- the class for the activity to run
+=head3 class
 
-params -- params to set in the workflow
+the class for the activity to run
+
+=head3 params
+
+params to set in the workflow
 
 =cut
 
