@@ -515,7 +515,7 @@ sub view {
     if(isIn($sortBy,@sortByUserProperties)){
             $sortBy = 'users.'.$sortBy;
     }
-    $sortBy = join '.', map { $self->session->db->quoteIdentifier } split /\./, $sortBy;
+    $sortBy = join '.', map { $self->session->db->quoteIdentifier($_) } split /\./, $sortBy;
 	$sql .= " order by ".$sortBy." ".$sortOrder;
 
 	($defaultPublicProfile) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicProfile'");
