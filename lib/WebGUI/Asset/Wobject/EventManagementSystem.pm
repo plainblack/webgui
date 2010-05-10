@@ -836,9 +836,9 @@ sub www_addSubmission {
                 }
             }
     }
-    $form = WebGUI::Asset->newByDynamicClass($session,$formId);
-    if (!defined $form) {
-	$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
+    $form = eval { WebGUI::Asset->newById($session, $formId); };
+    if (Exception::Class->caught()) {
+        $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
     }
     return $form->www_addSubmission;
 }
@@ -1351,7 +1351,7 @@ sub www_getAllSubmissions {
     $tableInfo->{'records'        } = [];
     
     for my $record ( @{ $p->getPageData } ) {
-        my $asset = WebGUI::Asset->newByDynamicClass( $session, $record->{assetId} );
+        my $asset = WebGUI::Asset->newById( $session, $record->{assetId} );
         
         my $lastReplyBy = $asset->get("lastReplyBy");
         if ($lastReplyBy) {
