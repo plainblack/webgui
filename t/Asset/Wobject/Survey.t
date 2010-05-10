@@ -210,7 +210,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     # Push revisionDate into the past because we can't have 2 revision dates with the same epoch (this is very hacky)
     $revisionDate--;
     $session->stow->deleteAll();
-    WebGUI::Cache->new($session)->flush;
+    $session->cache->clear;
     $session->db->write('update Survey set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update assetData set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update wobject set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
