@@ -35,7 +35,7 @@ my $session = WebGUI::Test->session;
 
 my @getTitleTests = getTitleTests($session);
 
-plan tests => 110
+plan tests => 121
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             ;
 
