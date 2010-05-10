@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 21; # increment this value for each test you create
+use Test::More tests => 23; # increment this value for each test you create
 use Test::Exception;
 use WebGUI::Asset::Snippet;
 
@@ -111,6 +111,12 @@ $snippet2->update({mimeType => 'text/javascript'});
 $tag2->commit;
 addToCleanup($tag2);
 
+$snippet2->snippet('uncompressable');
+is $snippet2->snippetPacked, 'uncompressable', 'packed snippet content was set';
+
+$snippet2->snippet("two\n\nwords");
+is $snippet2->snippetPacked, "two words", '... and packed';
+
 open my $JSFILE, WebGUI::Test->getTestCollateralPath('jquery.js')
     or die "Unable to open jquery test collateral file: $!";
 my $jquery;
@@ -120,6 +126,7 @@ my $jquery;
 };
 close $JSFILE;
 
+$snippet2 = $snippet2->cloneFromDb;
 is $snippet2->get('snippetPacked'), undef, 'no packed content';
 lives_ok { $snippet2->update({snippet => $jquery}); } 'did not die during packing jquery';
 ok $snippet2->get('snippetPacked'), 'snippet content was packed';
