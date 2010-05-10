@@ -8,6 +8,7 @@
  - fixed #11544: VersionTag Workflows with missing Version Tags run forever
  - fixed: UserList asset has SQL injection bug
  - fixed #11558: wiki results for visitors 
+ - fixed #11533: Saving entered data at registration
 
 7.8.18
  - fixed #11444: Strange spectre problem
