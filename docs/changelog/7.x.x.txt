@@ -5,6 +5,7 @@
  - fixed #11557: Shop credit deduction calculated incorrectly
  - fixed #11561: PayDriver_Cash - password help
  - fixed #11541: running workflows screen
+ - fixed #11544: VersionTag Workflows with missing Version Tags run forever
 
 7.8.18
  - fixed #11444: Strange spectre problem
