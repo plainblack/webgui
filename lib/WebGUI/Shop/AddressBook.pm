@@ -329,7 +329,7 @@ sub missingFields {
         $addressData = $address;
     }
     my @missingFields = ();
-    FIELD: foreach my $field (qw/label firstName lastName address1 city code country phoneNumber/) {
+    FIELD: foreach my $field (qw/label firstName lastName address1 city state code country phoneNumber/) {
         push @missingFields, $field if $addressData->{$field} eq '';
     }
     return @missingFields;
