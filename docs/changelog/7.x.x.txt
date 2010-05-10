@@ -3,6 +3,7 @@
  - fixed #11542: Date macro can pass in epoch values that do not pass regex checks
  - fixed #11537: Wiki, sorting by most popular
  - fixed #11557: Shop credit deduction calculated incorrectly
+ - fixed #11561: PayDriver_Cash - password help
 
 7.8.18
  - fixed #11444: Strange spectre problem
