@@ -435,7 +435,6 @@ cmp_bag($mobUsers, [map {$_->userId} @mob], 'verify SQL table built correctly');
 is( $gY->databaseLinkId, 0, "Group Y's databaseLinkId is set to WebGUI");
 $gY->dbQuery(q!select userId from myUserTable!);
 is( $session->stow->get('isInGroup'), undef, 'setting dbQuery clears cached isInGroup');
-#WebGUI::Cache->new($session, $gZ->getId)->delete();  ##Delete cached key for testing
 $session->cache->remove($gZ->getId);
 
 my @mobIds = map { $_->userId } @mob;
