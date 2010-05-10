@@ -54,7 +54,10 @@ property snippetPacked => (
 sub _build_snippetPacked {
     my $self = shift;
     my $snippet = $self->snippet;
-    if ( $self->mimeType eq "text/html" ) {
+    if ( !defined $snippet ) {
+        # do nothing
+    }
+    elsif ( $self->mimeType eq "text/html" ) {
         HTML::Packer::minify( \$snippet, {
             remove_comments     => 1,
             do_javascript       => "shrink",
