@@ -41,6 +41,7 @@ my $posters = $import->addChild({
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit();
 addToCleanup($versionTag);
+$posters = $posters->cloneFromDb;
 
 my $ritaVarId = $posters->setCollateral('variantsJSON', 'variantId', 'new',
     {
@@ -190,7 +191,8 @@ my $instance4 = WebGUI::Workflow::Instance->create($session,
 );
 #break the asset
 $session->db->write('delete from asset where assetId=?', [$otherPosters->getId]);
-is(WebGUI::Asset->new($session, $otherPosters->getId), undef, 'middle asset broken');
+$otherPosters->purgeCache;
+dies_ok { WebGUI::Asset->newById($session, $otherPosters->getId); } 'middle asset broken';
 
 $retVal = $instance4->run();
 $retVal = $instance4->run();
