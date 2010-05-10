@@ -206,13 +206,16 @@ my $siteWideTag;
 
 $tag->clearWorking();
 
-ok(defined ($userTag = getWorking(1)), 'versionTagMode singlePerUser: reclaim version tag after clearWorking');
-is ($userTag->getId(), $userTagId, q{versionTagMode singlePerUser:  reclaimed version tag has same id});
+my $gotTag = ok(defined ($userTag = getWorking(1)), 'versionTagMode singlePerUser: reclaim version tag after clearWorking');
+SKIP: {
+    skip 1, 'userTag not set' unless $gotTag;
+    is ($userTag->getId(), $userTagId, q{versionTagMode singlePerUser:  reclaimed version tag has same id});
+    $userTag->clearWorking();
+}
 
 
 #switch to sitewide mode
 
-$userTag->clearWorking();
 
 setSiteVersionTagMode($session, q{siteWide});
 
