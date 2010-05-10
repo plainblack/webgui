@@ -5,6 +5,7 @@
  - fixed #11541: running workflows screen
  - fixed #11544: VersionTag Workflows with missing Version Tags run forever
  - fixed #11555: Wiki subcategories entry field is not labeled
+ - fixed: UserList asset has SQL injection bug
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility

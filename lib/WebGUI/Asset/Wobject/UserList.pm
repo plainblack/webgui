@@ -506,12 +506,16 @@ sub view {
 	$sql .= " and ".$constraint if ($constraint);
 
 	my $sortBy = $form->process('sortBy') || $self->get('sortBy') || 'users.username';
-	my $sortOrder = $form->process('sortOrder') || $self->get('sortOrder') || 'asc';
+	my $sortOrder = $form->process('sortOrder') || $self->get('sortOrder');
+    if (lc $sortOrder ne 'desc') {
+        $sortOrder = 'asc';
+    }
 	
     my @sortByUserProperties = ('dateCreated', 'lastUpdated', 'karma', 'userId');
     if(isIn($sortBy,@sortByUserProperties)){
             $sortBy = 'users.'.$sortBy;
     }
+    $sortBy = join '.', map { $self->session->db->quoteIdentifier } split /\./, $sortBy;
 	$sql .= " order by ".$sortBy." ".$sortOrder;
 
 	($defaultPublicProfile) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicProfile'");
