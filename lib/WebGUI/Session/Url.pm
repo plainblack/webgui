@@ -193,6 +193,9 @@ sub gateway {
 sub make_urlmap_work {
     my $self = shift;
     my $url = shift;
+    if (! $self->session->request) {
+        return $url;
+    }
 	my $uri = $self->session->request->base;
     $uri->path($uri->path . $url);
     my $path = $uri->path;
