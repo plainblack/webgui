@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.9.5
+--------------------------------------------------------------------
+     * Starting in WebGUI 7.9.4, the CHI and Cache::FastMmap modules are required.
+
 7.9.4
 --------------------------------------------------------------------
      * Shop and Cart changes
