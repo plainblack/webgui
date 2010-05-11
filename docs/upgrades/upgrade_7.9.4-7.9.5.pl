@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Workflow::Instance;
 
 
 my $toVersion = '7.9.5';
@@ -32,6 +33,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 modifySortItems( $session );
+fixRequestForApprovalScratch($session);
 
 finish($session); # this line required
 
@@ -45,6 +47,22 @@ finish($session); # this line required
 #}
 
 #----------------------------------------------------------------------------
+# Describe what our function does
+sub fixRequestForApprovalScratch {
+    my $session = shift;
+    print "\tCorrect RequestApprovalForVersionTag workflow instance data with leading commas... " unless $quiet;
+    # and here's our code
+    my $instances = WebGUI::Workflow::Instance->getAllInstances($session);
+    INSTANCE: foreach my $instance (@{ $instances }) {
+        my $messageId = $instance->getScratch('messageId');
+        next INSTANCE unless $messageId;
+        $messageId =~ s/^,//;
+        $instance->setScratch('messageId', $messageId);
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 # Changes sortItems to a SelectBox
 sub modifySortItems {
     my $session = shift;
@@ -56,7 +74,7 @@ sub modifySortItems {
     my $type = WebGUI::Form::SelectBox->getDatabaseFieldType;
     $session->db->write("ALTER TABLE SyndicatedContent MODIFY sortItems $type");
 
-    print "\t\tConverting old values...\n" unless $quiet;
+    print "\t\tConverting old values..." unless $quiet;
     $session->db->write(q{
         UPDATE SyndicatedContent
         SET    sortItems = 'none'
