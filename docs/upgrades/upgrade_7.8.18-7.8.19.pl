@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Workflow::Instance;
 
 
 my $toVersion = '7.8.19';
@@ -31,6 +32,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixRequestForApprovalScratch($session);
 
 finish($session); # this line required
 
@@ -43,6 +45,21 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+# Describe what our function does
+sub fixRequestForApprovalScratch {
+    my $session = shift;
+    print "\tCorrect RequestApprovalForVersionTag workflow instance data with leading commas... " unless $quiet;
+    # and here's our code
+    my $instances = WebGUI::Workflow::Instance->getAllInstances($session);
+    INSTANCE: foreach my $instance (@{ $instances }) {
+        my $messageId = $instance->getScratch('messageId');
+        next INSTANCE unless $messageId;
+        $messageId =~ s/^,//;
+        $instance->setScratch('messageId', $messageId);
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

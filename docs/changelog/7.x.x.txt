@@ -9,6 +9,7 @@
  - fixed: UserList asset has SQL injection bug
  - fixed #11558: wiki results for visitors 
  - fixed #11533: Saving entered data at registration
+ - fixed #11540: Pending version tags are not completed on approval under certain conditions
 
 7.8.18
  - fixed #11444: Strange spectre problem
