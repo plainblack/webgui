@@ -59,7 +59,7 @@ Delete the entire cache namespace
 
 sub flush {
     my ( $self ) = @_;
-    $self->{_chi}->purge;
+    $self->{_chi}->clear;
 }
 
 #----------------------------------------------------------------------------
@@ -93,7 +93,8 @@ sub new {
     my $chi;
     unless ( $chi = $session->stow->get( "CHI" ) ) {
         my $cacheConf    = $session->config->get('cache');
-        $cacheConf->{namespace} = $namespace;
+        $cacheConf->{namespace}     = $namespace;
+        $cacheConf->{is_size_aware} = 1;
 
         # Default values
         my $resolveConf = sub {
