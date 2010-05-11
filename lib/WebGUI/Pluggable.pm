@@ -235,9 +235,15 @@ sub load {
         croak $moduleError{$module};
     }
 
+    # Check if we already have it
     # Try to load the module
     my $modulePath = $module . ".pm";
     $modulePath =~ s{::|'}{/}g;
+
+    if ( $INC{$modulePath} ) {
+        return 1;
+    }
+
     if (eval { require $modulePath; 1 }) {
         return 1;
     }

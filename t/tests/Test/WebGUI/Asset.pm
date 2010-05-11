@@ -340,15 +340,26 @@ sub addRevision : Tests {
     $newRevision->purgeRevision;
 }
 
+sub getEditForm : Tests {
+    note "getEditForm";
+    my ( $test ) = @_;
+    my $session = $test->session;
+    my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
+
+}
+
 sub www_editSave : Tests {
     note "www_editSave";
     my ( $test ) = @_;
     my $session = $test->session;
     my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
+    my $oldGroupId = $asset->groupIdEdit;
+    $asset->groupIdEdit( 7 ); # Everybody! Everybody!
+
     $tag->setWorking;
     $session->request->setup_body({
         title       => "Newly Saved Title",
-    } );
+    });
     $asset->www_editSave;
 
     # Get the newly-created revision of the asset
@@ -356,6 +367,7 @@ sub www_editSave : Tests {
     ok( $newRevision->tagId, 'new revision has a tag' );
     is( $newRevision->tagId, $tag->getId, 'new revision tagId is current working tag' );
 
+    $asset->groupIdEdit( $oldGroupId );
 }
 
 1;

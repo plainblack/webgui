@@ -253,6 +253,7 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 
 
     # TODO: Figure out if user is still in the admin console
+    $var{'head.tags'} .= '<script type="text/javascript">';
     if ( $session->asset ) {
         my $assetDef    = { 
             assetId     => $session->asset->getId,
@@ -261,13 +262,12 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
             icon        => $session->asset->getIcon(1),
         };
         $var{'head.tags'} .= sprintf <<'ADMINJS', JSON->new->encode( $assetDef );
-<script type="text/javascript">
 if ( window.parent && window.parent.admin ) {
     window.parent.admin.navigate( %s );
 }
-</script>
 ADMINJS
     }
+    $var{'head.tags'} .= '</script>';
 
     # Removing the newlines will probably annoy people. 
     # Perhaps turn it off under debug mode?
