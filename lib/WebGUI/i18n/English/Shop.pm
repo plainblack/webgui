@@ -1761,10 +1761,10 @@ our $I18N = {
 		context => q|form label for the cart.  Allows user to build a new address.|
 	},
 
-	'Update this address' => { 
-		message => q|Update this address|,
+	'Update %s' => { 
+		message => q|Update address: %s|,
 		lastUpdated => 0,
-		context => q|form label for the cart.  Allows user to build a new address.|
+		context => q|form label for the cart.  Allows user to edit an existing address. %s will be replaced by the label for the currently selected address, if there is one.|
 	},
 
 	'Choose a payment method' => { 

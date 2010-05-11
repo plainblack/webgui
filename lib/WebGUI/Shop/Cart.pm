@@ -702,8 +702,9 @@ Updates the cart totals, the address fields and the shipping and billing options
 =cut
 
 sub updateFromForm {
-    my $self = shift;
-    my $form = $self->session->form;
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
     foreach my $item (@{$self->getItems}) {
         if ($form->get("quantity-".$item->getId) ne "") {
             eval { $item->setQuantity($form->get("quantity-".$item->getId)) };
@@ -740,7 +741,7 @@ sub updateFromForm {
         my $address = $self->getBillingAddress();
         $address->update(\%billingData);
     }
-    elsif ($billingAddressId ne 'new_address' && $billingAddressId) {
+    elsif ($billingAddressId ne 'new_address' && $billingAddressId ne 'update_address' && $billingAddressId) {
         ##User changed the address selector to another address field
         $cartProperties->{billingAddressId} = $billingAddressId;
     }
@@ -775,7 +776,7 @@ sub updateFromForm {
                 my $address = $self->getBillingAddress();
                 $address->update(\%shippingData);
             }
-            elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
+            elsif ($shippingAddressId ne 'new_address' && $shippingAddressId ne 'update_address' && $shippingAddressId) {
                 $cartProperties->{shippingAddressId} = $shippingAddressId;
             }
             else {
@@ -1117,7 +1118,7 @@ sub www_view {
 
         my $billingAddressId = $self->get('billingAddressId');
         if ($billingAddressId) {
-            $billingAddressOptions{'update_address'} = $i18n->get('Update this address');
+            $billingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getBillingAddress->get('label');
         }
 
         %billingAddressOptions = (%billingAddressOptions, %addressOptions);
@@ -1133,7 +1134,7 @@ sub www_view {
 
         my $shippingAddressId = $self->get('shippingAddressId');
         if ($shippingAddressId) {
-            $shippingAddressOptions{'update_address'} = $i18n->get('Update this address');
+            $shippingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getShippingAddress->get('label');
         }
         %shippingAddressOptions = (%shippingAddressOptions, %addressOptions);
 
