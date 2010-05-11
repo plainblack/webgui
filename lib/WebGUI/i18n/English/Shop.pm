@@ -1701,6 +1701,12 @@ our $I18N = {
         context => q|Label to make the user choose a shipping method|,
     },
 
+    'Choose a payment gateway and update the cart to checkout' => {
+        message => q|Choose a payment gateway and update the cart to checkout|,
+        lastUpdated => 0,
+        context => q|Label to make the user choose a payment gateway|,
+    },
+
 	'receipt email template' => { 
 		message => q|Receipt Email Template|,
 		lastUpdated => 0,
@@ -1778,6 +1784,126 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|form label for the cart.  Allows user to choose a payment method.  Bart Jol for Minister in 2012!|
 	},
+
+    'no billing address' => { 
+        message => q|Please enter a billing address, or select an existing one.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'no shipping address' => { 
+        message => q|Please enter a shipping address, or select an existing one.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing label' => { 
+        message => q|Please enter a label for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing firstName' => { 
+        message => q|Please enter a first name for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing lastName' => { 
+        message => q|Please enter a last name for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing address1' => { 
+        message => q|Please enter a street address for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing city' => { 
+        message => q|Please enter a city for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing code' => { 
+        message => q|Please enter a postal code for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing state' => { 
+        message => q|Please enter a state or province for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing country' => { 
+        message => q|Please enter a country for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'billing phoneNumber' => { 
+        message => q|Please enter a phone number for the billing address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping label' => { 
+        message => q|Please enter a label for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping firstName' => { 
+        message => q|Please enter a first name for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping lastName' => { 
+        message => q|Please enter a last name for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping address1' => { 
+        message => q|Please enter a street address for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping city' => { 
+        message => q|Please enter a city for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping code' => { 
+        message => q|Please enter a postal code for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping state' => { 
+        message => q|Please enter a state or province for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping country' => { 
+        message => q|Please enter a country for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
+
+    'shipping phoneNumber' => { 
+        message => q|Please enter a phone number for the shipping address.|,
+        lastUpdated => 0,
+        context => q|Cart error message|
+    },
 
 };
 

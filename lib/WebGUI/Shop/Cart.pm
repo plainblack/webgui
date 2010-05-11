@@ -287,15 +287,39 @@ sub getBillingAddress {
 
 #-------------------------------------------------------------------
 
-=head2 getPaymentGateway ()
+=head2 getI18nError ()
 
-Returns the WebGUI::Shop::PayDriver object that is attached to this cart for payment.
+Returns an internationalized version of the current error, if it exists.
 
 =cut
 
-sub getPaymentGateway {
-    my $self = shift;
-    return WebGUI::Shop::Pay->new($self->session)->getPaymentGateway($self->get("gatewayId"));
+sub getI18nError {
+    my ($self) = @_;
+    my $error  = $self->error;
+    my $i18n   = WebGUI::International->new($self->session, 'Shop');
+    return $error eq 'no billing address'     ? $i18n->get('no billing address')
+         : $error eq 'no shipping address'    ? $i18n->get('no shipping address')
+         : $error eq 'billing label'          ? $i18n->get('billing label')
+         : $error eq 'billing firstName'      ? $i18n->get('billing firstName')
+         : $error eq 'billing lastName'       ? $i18n->get('billing lastName')
+         : $error eq 'billing address1'       ? $i18n->get('billing address1')
+         : $error eq 'billing city'           ? $i18n->get('billing city')
+         : $error eq 'billing code'           ? $i18n->get('billing code')
+         : $error eq 'billing state'          ? $i18n->get('billing state')
+         : $error eq 'billing country'        ? $i18n->get('billing country')
+         : $error eq 'billing phoneNumber'    ? $i18n->get('billing phoneNumber')
+         : $error eq 'shipping label'         ? $i18n->get('shipping label')
+         : $error eq 'shipping firstName'     ? $i18n->get('shipping firstName')
+         : $error eq 'shipping lastName'      ? $i18n->get('shipping lastName')
+         : $error eq 'shipping address1'      ? $i18n->get('shipping address1')
+         : $error eq 'shipping city'          ? $i18n->get('shipping city')
+         : $error eq 'shipping code'          ? $i18n->get('shipping code')
+         : $error eq 'shipping state'         ? $i18n->get('shipping state')
+         : $error eq 'shipping country'       ? $i18n->get('shipping country')
+         : $error eq 'shipping phoneNumber'   ? $i18n->get('shipping phoneNumber')
+         : $error eq 'no shipping method set' ? $i18n->get('Choose a shipping method and update the cart to checkout')
+         : $error eq 'no payment gateway set' ? $i18n->get('Choose a payment gateway and update the cart to checkout')
+         : $error ;
 }
 
 #-------------------------------------------------------------------
@@ -373,6 +397,19 @@ sub getItemsByAssetId {
         push(@itemsObjects, $self->getItem($itemId));
     }
     return \@itemsObjects;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getPaymentGateway ()
+
+Returns the WebGUI::Shop::PayDriver object that is attached to this cart for payment.
+
+=cut
+
+sub getPaymentGateway {
+    my $self = shift;
+    return WebGUI::Shop::Pay->new($self->session)->getPaymentGateway($self->get("gatewayId"));
 }
 
 #-------------------------------------------------------------------
@@ -542,7 +579,7 @@ sub readyForCheckout {
     }
 
     if (my @missingFields = $book->missingFields($address->get)) {
-        $self->error($missingFields[0]);
+        $self->error('billing '.$missingFields[0]);
         return 0;
     }
 
@@ -554,7 +591,7 @@ sub readyForCheckout {
     }
 
     if (my @missingFields = $book->missingFields($shipAddress->get)) {
-        $self->error($missingFields[0]);
+        $self->error('shipping '.$missingFields[0]);
         return 0;
     }
 
@@ -746,7 +783,7 @@ sub updateFromForm {
         $cartProperties->{billingAddressId} = $billingAddressId;
     }
     elsif (@missingBillingFields) {
-        $self->error('missing billing '.$missingBillingFields[0]);
+        $self->error('billing '.$missingBillingFields[0]);
     }
     else {
         $self->session->log->warn('billing address: something else: ');
@@ -764,7 +801,7 @@ sub updateFromForm {
             my $shippingAddressId = $form->process('shippingAddressId');
             ##No missing shipping fields, if we set to the same as the billing fields
             if (@missingShippingFields) {
-                $self->error('missing shipping '.$missingShippingFields[0]);
+                $self->error('shipping '.$missingShippingFields[0]);
             }
             if ($shippingAddressId eq 'new_address' && ! @missingShippingFields) {
                 ##Add a new address
@@ -1189,7 +1226,7 @@ sub www_view {
     foreach my $field (qw/subtotalPrice inShopCreditAvailable inShopCreditDeduction totalPrice shippingPrice tax/) {
         $var{$field} = sprintf q|<span id="%sWrap">%s</span>|, $field, $var{$field};
     }
-    $var{ error                 } = $self->error; 
+    $var{ error } = $self->getI18nError; 
 
     # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
