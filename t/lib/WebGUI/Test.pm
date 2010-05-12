@@ -1023,6 +1023,12 @@ sub addToCleanup {
 }
 
 sub cleanup {
+    if ($ENV{WEBGUI_TEST_NOCLEANUP}) {
+        (pop @guarded)->dismiss
+            while @guarded;
+        return;
+    }
+
     # remove guards in reverse order they were added, triggering all of the
     # requested cleanup operations
     pop @guarded
