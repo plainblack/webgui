@@ -577,12 +577,11 @@ sub getAllUsers {
 		$self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
 	}
 	my $groups = $self->getGroupsIn();
-	##Have to iterate twice due to the withoutExpired clause.
 	foreach my $groupId (@{ $groups }) {
 		my $subGroup = WebGUI::Group->new($self->session, $groupId);
         next
             if !$subGroup;
-        push @users, @{ $subGroup->getAllUsers(1, $withoutExpired, $loopCount) };
+        push @users, @{ $subGroup->getAllUsers($withoutExpired, $loopCount) };
 	}
 	my %users = map { $_ => 1 } @users;
 	@users = keys %users;
