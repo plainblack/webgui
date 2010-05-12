@@ -172,131 +172,154 @@ optional set of possibly incorrect submission form params
 =cut
 
 sub www_editSubmissionForm {
-	my $this             = shift;
-        my $self;
-        my $parent;
-        if( $this eq __PACKAGE__ ) {  # called as constructor or menu
-	    $parent             = shift;
-        } else {
-            $self = $this;
-            $parent = $self->getParent;
-        }
-	my $params           = shift || { };
-	my $session = $parent->session;
-	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
-        my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId');
+    my $this = shift;
+    my $self;
+    my $parent;
+    if ( $this eq __PACKAGE__ ) {    # called as constructor or menu
+        $parent = shift;
+    }
+    else {
+        $self   = $this;
+        $parent = $self->getParent;
+    }
+    my $params  = shift || {};
+    my $session = $parent->session;
+    my $i18n    = WebGUI::International->new( $session, 'Asset_EventManagementSystem' );
+    my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId');
 
-        if( ! defined( $assetId ) ) {
-	   my $res = $parent->getLineage(['children'],{ returnObjects => 1,
-		 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
-	     } );
-	    if( scalar(@$res) == 1 ) {
-	        $self = $res->[0];
-		$assetId = $self->getId;
-	    } else {
-	        my $makeAnchorList =sub{ my $u=shift; my $n=shift; my $d=shift;
-		            return qq{<li><a href='$u' title='$d'>$n</a></li>} } ;
-	        my $listOfLinks = join '', ( map {
-		      $makeAnchorList->(
-		                $_->getQueueUrl,
-				$_->get('title'),
-				WebGUI::HTML::filter($_->get('description'),'all')
-		             )
-		           } ( @$res ) );
-		my $title =  $i18n->get('select form to edit') ;
-		my $content = '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
-                if( $params->{asHashRef} ) {
-		    return { text => $content, title => $title, } ;
-		} elsif( $session->form->get('asJson') ) {
-		    $session->http->setMimeType( 'application/json' );
-		    return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
-		} else {
-		    $session->http->setMimeType( 'text/html' );
-		    return $parent->ems->processStyle( $content );
-		}
-	    }
-        } elsif( $assetId ne 'new' ) {
-	    $self ||= WebGUI::Asset->newById($session, $assetId);
-	    if (!defined($self)) { 
-		$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
-	    }
+    if ( !defined($assetId) ) {
+        my $res = $parent->getLineage(
+            ['children'], {
+                returnObjects      => 1,
+                includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+            }
+        );
+        if ( scalar(@$res) == 1 ) {
+            $self    = $res->[0];
+            $assetId = $self->getId;
         }
-        my $asset = $self || $parent;
-        my $url = $asset->getUrl('func=editSubmissionFormSave');
-	my $newform = WebGUI::HTMLForm->new( $session, action => $url );
-	$newform->hidden(name => 'assetId', value => $assetId);
-	my @fieldNames = qw/title description startDate duration seatsAvailable location/;
-	my $fields;
-	my @defs = reverse @{WebGUI::Asset::EMSSubmission->definition($session)};
-	for my $def ( @defs ) {
-	    foreach my $fieldName ( @fieldNames ) {
-                my $properties = $def->{properties};
-	        if( defined $properties->{$fieldName} ) {
-		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
-		      # field definitions don't contain their own name, we will need it later on
-		      $fields->{$fieldName}{fieldId} = $fieldName;
-		  };
-	    }
-	}
-	for my $metaField ( @{$parent->getEventMetaFields} ) {
-	    push @fieldNames, $metaField->{fieldId};
-	    $fields->{$metaField->{fieldId}} = { %$metaField }; # a simple first level copy
-	    # meta fields call it data type, we copy it to simplify later on
-	    $fields->{$metaField->{fieldId}}{fieldType} = $metaField->{dataType};
-	    $fields->{$metaField->{fieldId}}{hoverHelp} = $metaField->{helpText};
-	}
-	$newform->hidden( name => 'fieldNames', value => join( ' ', @fieldNames ) );
-	@defs = reverse @{WebGUI::Asset::EMSSubmissionForm->definition($session)};
-        for my $def ( @defs ) {
-	    my $properties = $def->{properties};
-	    for my $fieldName ( qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
-                               deleteCreatedItems submissionDeadline pastDeadlineMessage/ ) {
-	        if( defined $properties->{$fieldName} ) {
-                    my %fieldParams = %{$properties->{$fieldName}};
-		    $fieldParams{name} = $fieldName;
-		    $fieldParams{value} = $params->{$fieldName} || $self ? $self->get($fieldName) : undef ;
-		    $newform->dynamicField(%fieldParams);
-		}
-	    }
+        else {
+            my $makeAnchorList = sub {
+                my $u = shift;
+                my $n = shift;
+                my $d = shift;
+                return qq{<li><a href='$u' title='$d'>$n</a></li>};
+            };
+            my $listOfLinks = join '', (
+                map {
+                    $makeAnchorList->(
+                        $_->getQueueUrl, $_->get('title'), WebGUI::HTML::filter( $_->get('description'), 'all' )
+                        )
+                    } (@$res)
+            );
+            my $title   = $i18n->get('select form to edit');
+            my $content = '<h1>' . $title . '</h1><ul>' . $listOfLinks . '</ul>';
+            if ( $params->{asHashRef} ) {
+                return { text => $content, title => $title, };
+            }
+            elsif ( $session->form->get('asJson') ) {
+                $session->http->setMimeType('application/json');
+                return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
+            }
+            else {
+                $session->http->setMimeType('text/html');
+                return $parent->ems->processStyle($content);
+            }
+        } ## end else [ if ( scalar(@$res) == ...)]
+    } ## end if ( !defined($assetId...))
+    elsif ( $assetId ne 'new' ) {
+        $self ||= WebGUI::Asset->newById( $session, $assetId );
+        if ( !defined($self) ) {
+            $session->errorHandler->error( __PACKAGE__ . " - failed to instanciate asset with assetId $assetId" );
         }
+    }
+    my $asset   = $self || $parent;
+    my $url     = $asset->getUrl('func=editSubmissionFormSave');
+    my $newform = WebGUI::HTMLForm->new( $session, action => $url );
+    $newform->hidden( name => 'assetId', value => $assetId );
+    my @fieldNames = qw/title description startDate duration seatsAvailable location/;
+    my $fields;
+    my @defs = reverse @{ WebGUI::Asset::EMSSubmission->definition($session) };
 
-	my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : { };
-        for my $fieldId ( @fieldNames ) {
-            next if $fieldId eq 'submissionStatus';
-	    my $field = $fields->{$fieldId};
-	    $newform->yesNo(
-	             label => $field->{label},
-		     name => $field->{fieldId} . '_yesNo',
-		     defaultValue => 0,
-		     value => $formDescription->{$field->{fieldId}},
-	    );
-	}
-	$newform->submit; 
-        my $title = $assetId eq 'new' ? $i18n->get('new form') || 'new' : $asset->get('title');
-	if( $params->{asHashRef} ) {
-              ; # not setting mimie type
-	} elsif( $session->form->get('asJson') ) {
-	    $session->http->setMimeType( 'application/json' );
-	} else {
-	    $session->http->setMimeType( 'text/html' );
-	}
-	my $content = $asset->processTemplate({
-		      errors => $params->{errors} || [],
-                      isDynamic => $session->form->get('asJson') || 0,
-                      backUrl => $parent->getUrl,
-		      pageTitle => $title,
-		      pageForm => $newform->print,
-                  },$parent->get('eventSubmissionTemplateId'));
-         WebGUI::Macro::process( $session, \$content );
-	if( $params->{asHashRef} ) {
-	    return { text => $content, title => $title };
-	} elsif( $session->form->get('asJson') ) {
-	    return JSON->new->encode( { text => $content, title => $title, id => $assetId ne 'new' ? $assetId : 'new' . rand } );
-	} else {
-	    return $asset->ems->processStyle( $content );
-	}
+    for my $def (@defs) {
+        foreach my $fieldName (@fieldNames) {
+            my $properties = $def->{properties};
+            if ( defined $properties->{$fieldName} ) {
+                $fields->{$fieldName} = { %{ $properties->{$fieldName} } };    # a simple first level copy
+                     # field definitions don't contain their own name, we will need it later on
+                $fields->{$fieldName}{fieldId} = $fieldName;
+            }
+        }
+    }
+    for my $metaField ( @{ $parent->getEventMetaFields } ) {
+        push @fieldNames, $metaField->{fieldId};
+        $fields->{ $metaField->{fieldId} } = {%$metaField};    # a simple first level copy
+             # meta fields call it data type, we copy it to simplify later on
+        $fields->{ $metaField->{fieldId} }{fieldType} = $metaField->{dataType};
+        $fields->{ $metaField->{fieldId} }{hoverHelp} = $metaField->{helpText};
+    }
+    $newform->hidden( name => 'fieldNames', value => join( ' ', @fieldNames ) );
+    @defs = reverse @{ WebGUI::Asset::EMSSubmissionForm->definition($session) };
+    for my $def (@defs) {
+        my $properties = $def->{properties};
+        for my $fieldName (
+            qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
+            deleteCreatedItems submissionDeadline pastDeadlineMessage/
+            )
+        {
+            if ( defined $properties->{$fieldName} ) {
+                my %fieldParams = %{ $properties->{$fieldName} };
+                $fieldParams{name} = $fieldName;
+                $fieldParams{value} = $params->{$fieldName} || $self ? $self->get($fieldName) : undef;
+                $newform->dynamicField(%fieldParams);
+            }
+        }
+    }
 
-}
+    my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : {};
+    for my $fieldId (@fieldNames) {
+        next if $fieldId eq 'submissionStatus';
+        my $field = $fields->{$fieldId};
+        $newform->yesNo(
+            label        => $field->{label},
+            name         => $field->{fieldId} . '_yesNo',
+            defaultValue => 0,
+            value        => $formDescription->{ $field->{fieldId} },
+        );
+    }
+    $newform->submit;
+    my $title = $assetId eq 'new' ? $i18n->get('new form') || 'new' : $asset->get('title');
+    if ( $params->{asHashRef} ) {
+        ;    # not setting mimie type
+    }
+    elsif ( $session->form->get('asJson') ) {
+        $session->http->setMimeType('application/json');
+    }
+    else {
+        $session->http->setMimeType('text/html');
+    }
+    my $content = $asset->processTemplate( {
+            errors    => $params->{errors}             || [],
+            isDynamic => $session->form->get('asJson') || 0,
+            backUrl   => $parent->getUrl,
+            pageTitle => $title,
+            pageForm  => $newform->print,
+        },
+        $parent->get('eventSubmissionTemplateId')
+    );
+    WebGUI::Macro::process( $session, \$content );
+    if ( $params->{asHashRef} ) {
+        return { text => $content, title => $title };
+    }
+    elsif ( $session->form->get('asJson') ) {
+        return JSON->new->encode(
+            { text => $content, title => $title, id => $assetId ne 'new' ? $assetId : 'new' . rand } );
+    }
+    else {
+        return $asset->ems->processStyle($content);
+    }
+
+} ## end sub www_editSubmissionForm
 
 #-------------------------------------------------------------------
 
