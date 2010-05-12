@@ -67,9 +67,10 @@ capture {
 };
 
 $upgrade->called_pos_ok(1, 'getCurrentVersion');
+$upgrade->called_pos_ok(2, 'getCodeVersion');
 SKIP: {
-    $upgrade->called_pos_ok(2, 'runUpgradeFile') || skip 'upgrade not run', 1;
-    my $upgradeFile = $upgrade->call_args_pos(2, 4);
+    $upgrade->called_pos_ok(3, 'runUpgradeFile') || skip 'upgrade not run', 1;
+    my $upgradeFile = $upgrade->call_args_pos(3, 4);
     ok $upgradeFile =~ /\b00_simple\.pl$/, 'correct upgrade file run';
 }
 
@@ -108,7 +109,7 @@ $upgrade->testUpgrade('config.pl');
 {
     my $sId = $upgrade->testUpgrade('session.pl');
 
-    ok +WebGUI::Session::Id::valid({}, $sId), 'valid session id generated';
+    ok +WebGUI::Session::Id->valid($sId), 'valid session id generated';
     my $hasSession = $dbh->selectrow_array('SELECT COUNT(*) FROM userSession WHERE sessionId = ?', {}, $sId);
     ok !$hasSession, 'session properly closed';
 }

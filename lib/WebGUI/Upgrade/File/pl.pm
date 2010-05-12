@@ -8,37 +8,43 @@ use Path::Class::Dir ();
 use Try::Tiny;
 use namespace::clean;
 
+my $namespace = 0;
+my $namespacePrefix = __PACKAGE__ . '::__ANON__::';
 sub _runScript {
     my $file = shift;
     my @res;
     my $err;
     {
+        local $@;
         local *_;
         my $guard = WebGUI::Upgrade::Script->cleanup_guard;
-        # place this in a specific separate package to prevent namespace
-        # pollution and to allow us to clean it up afterward
-        package
-            WebGUI::Upgrade::File::pl::script;
-        # maintain context
-        if (wantarray) {
-            @res = do $file;
-        }
-        elsif (defined wantarray) {
-            $res[0] = do $file;
-        }
-        else {
-            do $file;
-        }
-        # save error as soon as possible
-        $err = $@;
+        my $wanted = wantarray;
+        eval sprintf(<<'END_CODE', $namespacePrefix . $namespace);
+            # place this in a specific separate package to prevent namespace
+            # pollution and to allow us to clean it up afterward
+            package %s;
+            # maintain context
+            if ($wanted) {
+                @res = do $file;
+            }
+            elsif (defined $wanted) {
+                $res[0] = do $file;
+            }
+            else {
+                do $file;
+            }
+            # save error as soon as possible
+            $err = $@;
+END_CODE
     }
     {
         # delete entire namespace that script was run in
         no strict 'refs';
-        delete ${'WebGUI::Upgrade::File::pl::'}{'script::'};
+        delete ${ $namespacePrefix }{ $namespace . '::' };
     }
-    die $@
-        if $@;
+    $namespace++;
+    die $err
+        if $err;
     return (wantarray ? @res : $res[0]);
 }
 

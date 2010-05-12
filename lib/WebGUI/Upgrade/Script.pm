@@ -23,7 +23,7 @@ sub import {
         $extra->{into_level}++;
     }
 
-    $caller_upgrade_file = (caller 0)[1];
+    $caller_upgrade_file = File::Spec->rel2abs( (caller 0)[1] );
 
     feature->import(':5.10');
     strict->import;
@@ -44,7 +44,7 @@ sub _build_exports {
     my $dbh;
     my $collateral;
     my $versionTag;
-    my $upgrade_file = File::Spec->rel2abs( $caller_upgrade_file );
+    my $upgrade_file = $caller_upgrade_file;
 
     my $subs;
 
