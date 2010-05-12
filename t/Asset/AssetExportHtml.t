@@ -188,6 +188,10 @@ my $grandChild = $firstChild->addChild({
 });
 $versionTag->commit;
 
+foreach my $asset ($parent, $firstChild, $grandChild) {
+    $asset = $asset->cloneFromDb;
+}
+
 
 my $isExportable;
 # simple test first. the asset we're checking isn't exportable. should of course return 0.
@@ -748,11 +752,11 @@ is($@, '', "exportAsHtml on parent does not throw an error"); ##Note, string com
     [ qw/ parent                                   index.html /],
 );
 
-my $numberCreatedAll = scalar @createdFiles;
-like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml on parent returns correct message");
-
 # turn them into Path::Class::File objects
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
+
+my $numberCreatedAll = scalar @createdFiles;
+like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml on parent returns correct message");
 
 # ensure that the files that should exist do exist
 my @doExist;
