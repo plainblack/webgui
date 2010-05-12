@@ -133,7 +133,7 @@ sub connect {
         }
         $params = { @params };
     }
-    $params->{RaiseError} = 1;
+    $params->{RaiseError} = 0;
     $params->{PrintError} = 0;
     $params->{AutoCommit} = 1;
     $params->{ShowErrorStatement} = 1;
@@ -157,6 +157,7 @@ sub connect {
 
 
 package WebGUI::SQL::db;
+use Try::Tiny;
 our @ISA = qw(DBI::db);
 
 #-------------------------------------------------------------------
@@ -879,21 +880,24 @@ sub setRow {
     if ($data->{$keyColumn} eq 'new' || $id) {
         $id ||= $self->session->id->generate;
         $data->{$keyColumn} = $id;
-        $self->do("REPLACE INTO $table ($key) VALUES (?)", {}, $id);
+    }
+    else {
+        $id = $data->{$keyColumn};
     }
 
-    my @fields = map { $self->quote_identifier($_) . '=?' } keys %$data;
-    my @data = values %$data;
-
-    if (@fields) {
-        $self->do(
-            "UPDATE $table SET " . join(", ", @fields)
-            . " WHERE $key = ?",
-            {},
-            @data,
-            $id,
-        );
+    try {
+        my $fields = join ', ', map { $self->quote_identifier($_) } keys %$data;
+        my $values = join ', ', ('?') x values %$data;
+        $self->do("INSERT INTO $table ($fields) VALUES ($values)", {}, values %$data);
     }
+    catch {
+        my %data = %$data;
+        delete $data{$keyColumn};
+
+        my $fields = join ', ', map { $self->quote_identifier($_). '=?' } keys %data;
+        $self->do("UPDATE $table SET $fields WHERE $key = ?", {}, values %data, $id);
+    };
+
     return $id;
 }
 
