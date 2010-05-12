@@ -14,6 +14,7 @@
  - fixed #11565: Can't clear cache on plainblack.com
  - fixed #11540: Pending version tags are not completed on approval under certain conditions
  - fixed #11566: Group API: group membership cannot be checked without consideration of expiration dates.
+ - fixed #11567: EMS: Build badge page, ticket tab, pagination
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility
