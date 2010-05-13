@@ -431,7 +431,7 @@ our $I18N = {
     },
 
     'invitation confirm message' => {
-        message     => q{The following users were notified:},
+        message     => q{The following actions were taken:},
         lastUpdated => 1225724810,
     },
 
@@ -815,6 +815,18 @@ our $I18N = {
 
     'inbox sms notification template help' => {
         message => q|Choose a template that will be used to display Inbox SMS Notifications.|,
+        lastUpdated => 1242274703,
+    },
+
+
+    'send reject notice' => {
+        message => q|Send Reject Friend Notifications|,
+        context => q|Site setting.  A notification is an email that is sent to the user being rejected.|,
+        lastUpdated => 1242274705,
+    },
+
+    'send reject notice help' => {
+        message => q|Choose whether or not, upon rejecting a friend request, a notification should be sent to the user being rejected.|,
         lastUpdated => 1242274703,
     },
 

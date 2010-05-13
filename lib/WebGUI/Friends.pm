@@ -288,7 +288,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 rejectAddRequest ( inviteId )
+=head2 rejectAddRequest ( inviteId[,sendNotification] )
 
 Sends a rejection notice, and deletes the invitation.
 
@@ -296,21 +296,30 @@ Sends a rejection notice, and deletes the invitation.
 
 The id of an invitation.
 
+=head3 sendNotification
+
+Boolean indicating whether or not to send out the deny notification.  Defaults to true
+
 =cut
 
 sub rejectAddRequest {
-    my $self = shift;
+    my $self     = shift;
     my $inviteId = shift;
+    my $notify   = shift;
+
     my $db = $self->session->db;
     my $invite = $self->getAddRequest($inviteId);
     my $i18n = WebGUI::International->new($self->session, "Friends");
     my $inbox = WebGUI::Inbox->new($self->session);
-    $inbox->addMessage({
-        message => sprintf($i18n->get("friends invitation not accepted by user"), $self->user->getWholeName),
-        subject => $i18n->get('friends invitation not accepted'),
-        userId  => $invite->{inviterId},
-        status  => 'unread',
-    });
+    
+    unless (defined $notify && !$notify) {  #Notify is defined but not true
+        $inbox->addMessage({
+            message => sprintf($i18n->get("friends invitation not accepted by user"), $self->user->getWholeName),
+            subject => $i18n->get('friends invitation not accepted'),
+            userId  => $invite->{inviterId},
+            status  => 'unread',
+        });
+    }
     $inbox->getMessage($invite->{messageId})->setStatus('completed');
     $self->session->db->deleteRow("friendInvitations", "inviteId", $inviteId);
 }

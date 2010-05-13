@@ -34,6 +34,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 modifySortItems( $session );
 fixRequestForApprovalScratch($session);
+addRejectNoticeSetting($session);
 
 finish($session); # this line required
 
@@ -45,6 +46,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Adds setting which allows users to set whether or not to send reject notices
+sub addRejectNoticeSetting {
+    my $session = shift;
+    print "\tAdding reject notice setting... " unless $quiet;
+    $session->setting->add('sendRejectNotice',1);
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
