@@ -72,6 +72,7 @@ my $photo
     {
         skipAutoCommitWorkflows => 1,
     });
+$versionTag->commit;
 
 my $photo2 = $photo->cloneFromDb;
 my $album2 = $album->cloneFromDb;
