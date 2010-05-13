@@ -497,9 +497,9 @@ sub getOverrides {
     my $orig = $self->getShortcutOriginal;
     if (defined $orig) {
         unless ( exists $orig->{_propertyDefinitions}) {
-        my %properties;
-            foreach my $definition (@{$orig->definition($self->session)}) {
-                %properties = (%properties, %{$definition->{properties}});
+            my %properties;
+            foreach my $property ($orig->getProperties) {
+                $properties{$property} = $orig->getFormProperties($property);
             }
             $orig->{_propertyDefinitions} = \%properties;
         }
@@ -1150,14 +1150,7 @@ sub www_editOverride {
 	);
 
 	# Fetch the parameters for the dynamic field.
-	my (%params, %props);
-	foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
-		%props = (%props,%{$def->{properties}});
-	}
-	foreach my $key (keys %{$props{$fieldName}}) {
-		next if ($key eq "tab");
-		$params{$key} = $props{$fieldName}{$key};
-	}
+    my %params = %{ $self->getShortcutOriginal->getFormProperties($fieldName) };
 	$params{value} = $origValue;
 	$params{name} = $fieldName;
 	$params{label} = $params{label} || $i18n->get("Edit Field Directly");
