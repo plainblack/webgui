@@ -15,7 +15,7 @@
  - fixed #11540: Pending version tags are not completed on approval under certain conditions
  - fixed #11566: Group API: group membership cannot be checked without consideration of expiration dates.
  - fixed #11567: EMS: Build badge page, ticket tab, pagination
- - added: a new inbox setting which allows administrators to choose not to send out friend rejection notices
+ - added: a new inbox setting which supresses friend rejection notices
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility

@@ -87,7 +87,7 @@ sub execute {
     while (my $invite = $pending->hashRef) {
         my $sentOn = WebGUI::DateTime->new($session, $invite->{dateSent});
         if (DateTime::Duration->compare($now - $sentOn, $outdated) == 1) {
-            WebGUI::Friends->new($session, WebGUI::User->new($session, $invite->{friendId}))->rejectAddRequest($invite->{inviteId},,$session->setting->get("sendRejectNotice"));
+            WebGUI::Friends->new($session, WebGUI::User->new($session, $invite->{friendId}))->rejectAddRequest($invite->{inviteId},$session->setting->get("sendRejectNotice"));
         }
         if (time() - $start > $ttl) {
             $pending->finish;
