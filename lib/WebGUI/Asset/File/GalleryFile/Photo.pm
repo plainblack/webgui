@@ -93,7 +93,6 @@ override applyConstraints => sub {
     # Update the asset's size and make a thumbnail
     my $maxImageSize    = $gallery->imageViewSize 
                         || $self->session->setting->get("maxImageSize");
-    my $parameters      = $self->parameters;
     my $storage         = $self->getStorageLocation;
     my $file            = $self->filename;
 
