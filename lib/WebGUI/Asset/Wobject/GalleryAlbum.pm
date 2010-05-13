@@ -1247,10 +1247,10 @@ sub _moveFileAjaxRequest {
 
     # Get Id of target photo and instantiate asset
     my $targetId = $args->{target};
-    my $target = WebGUI::Asset->newByDynamicClass( $session, $targetId );
+    my $target = eval { WebGUI::Asset->newById( $session, $targetId ); };
 
     # Return if target photo could not be instantiated
-    unless ( $target ) {
+    if ( Exception::Class->caught() ) {
         $session->log->error("Couldn't move file '$targetId' because we couldn't instantiate it.");
         $result{ errMessage } = "ID of target file seems to be invalid.";
         return \%result;
@@ -1266,10 +1266,10 @@ sub _moveFileAjaxRequest {
 
     # Instantiate file with ID in before/after argument
     $destId = $args->{before} ? $args->{before} : $args->{after};            
-    $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+    $dest = WebGUI::Asset->newById( $session, $destId );
 
     # Return if destination file could not be instantiated
-    unless ( $dest ) {
+    if ( Expeption::Class->caught() ) {
         $session->log->error("Couldn't move file '$targetId' before/after file '$destId' because we couldn't instantiate the latter.");
         $result{ errMessage } = "ID in before/after argument seems to be invalid.";
         return \%result;
@@ -1286,14 +1286,14 @@ sub _moveFileAjaxRequest {
         # Get ID of next sibling
         $destId = $self->getNextFileId( $destId );
         # Instantiate next sibling
-        $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+        $dest = WebGUI::Asset->newById( $session, $destId );
     }
     # Check for use of before argument when increasing the rank
     if ( $args->{before} && $target->getRank() < $dest->getRank() ) {
         # Get ID of previous sibling
         $destId = $self->getPreviousFileId( $destId );
         # Instantiate previous sibling
-        $dest = WebGUI::Asset->newByDynamicClass( $session, $destId );
+        $dest = WebGUI::Asset->newById( $session, $destId );
     }
     
     # Update rank of target photo
