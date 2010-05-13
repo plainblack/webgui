@@ -31,6 +31,7 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
+WebGUI::Test->addToCleanup($versionTags[-1]);
 
 my @addArguments    = ( undef, undef, { skipAutoCommitWorkflows => 1 } );
 my $gallery
@@ -326,13 +327,3 @@ TODO: {
     # TODO
     ok( 0, "Visitor has their IP logged in visitorIp field" );
 }
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    foreach my $versionTag (@versionTags) {
-        $versionTag->rollback;
-    }
-};
-
-
