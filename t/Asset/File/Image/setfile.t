@@ -26,6 +26,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Image Test"});
+WebGUI::Test->addToCleanup($versionTag);
 my $image
     = $node->addChild({
         className           => "WebGUI::Asset::File::Image",
@@ -54,9 +55,3 @@ ok(
     "Thumbnail file exists on the filesystem",
 );
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
