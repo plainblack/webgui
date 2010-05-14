@@ -64,7 +64,7 @@ sub getAssetsInTrash {
 	my $sth = $self->session->db->read("
         select 
                 asset.assetId, 
-                assetData.revisionDate,
+                assetData.revisionDate
         from 
                 asset                 
         left join 
