@@ -999,6 +999,7 @@ sub validParent {
     my $class          = shift;
     my $session        = shift;
     my $asset          = shift || $session->asset;
+    return 0 unless $asset;
     my $parent_classes = $class->valid_parent_classes;
     foreach my $parentClass (@{ $class->valid_parent_classes}) {
         return 1 if $asset->isa($parentClass);
