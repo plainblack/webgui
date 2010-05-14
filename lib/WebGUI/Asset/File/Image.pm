@@ -93,7 +93,7 @@ override applyConstraints => sub {
     my $self = shift;
     my $options = shift;
     super();
-    my $maxImageSize  = $options->{maxImageSize}  || $self->maxImageSize  || $self->session->setting->get("maxImageSize");
+    my $maxImageSize  = $options->{maxImageSize}  || $self->session->setting->get("maxImageSize");
     my $thumbnailSize = $options->{thumbnailSize} || $self->thumbnailSize || $self->session->setting->get("thumbnailSize");
     my $storage = $self->getStorageLocation;
     my $file = $self->filename;
