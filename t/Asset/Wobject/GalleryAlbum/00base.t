@@ -67,7 +67,7 @@ my $properties  = $album->get;
 $album->purge;
 
 is(
-    WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
+    WebGUI::Asset->newById($session, $properties->{assetId}), undef,
     "Album no longer able to be instanciated",
 );
 

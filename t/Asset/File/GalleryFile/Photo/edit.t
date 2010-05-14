@@ -120,11 +120,11 @@ SKIP: {
     };
 
     # Make sure properties were saved
-    my $photo   = WebGUI::Asset->newByDynamicClass( $session, $album->getFileIds->[0] );
+    my $photo   = WebGUI::Asset->newById( $session, $album->getFileIds->[0] );
     cmp_deeply( $photo->get, superhashof( $properties ), "Photo properties saved correctly" );
 
     # First File in an album should update assetIdThumbnail
-    my $album   = WebGUI::Asset->newByDynamicClass( $session, $album->getId );
+    my $album   = WebGUI::Asset->newById( $session, $album->getId );
     is( 
         $album->get('assetIdThumbnail'), $photo->getId, 
         "Album assetIdThumbnail gets set by first File added",

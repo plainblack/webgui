@@ -109,7 +109,7 @@ $mech->content_contains(
 );
 
 # Creates the album with the appropriate properties
-my $album   = WebGUI::Asset->newByDynamicClass( $session, $gallery->getAlbumIds->[0] );
+my $album   = WebGUI::Asset->newById( $session, $gallery->getAlbumIds->[0] );
 cmp_deeply( $properties, subhashof( $album->get ), "Properties from edit form are set correctly" );
 
 #----------------------------------------------------------------------------

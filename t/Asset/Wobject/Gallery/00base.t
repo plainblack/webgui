@@ -62,7 +62,7 @@ my $properties  = $gallery->get;
 $gallery->purge;
 
 is(
-    WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
+    WebGUI::Asset->newById($session, $properties->{assetId}), undef,
     "Gallery no longer able to be instanciated",
 );
 

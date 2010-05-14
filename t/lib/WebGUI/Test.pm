@@ -247,13 +247,13 @@ sub _mockAssetInits {
 #        }
 #        goto $original_new;
 #    };
-    my $original_newByDynamicClass = \&WebGUI::Asset::newById;
+    my $original_newById = \&WebGUI::Asset::newById;
     *WebGUI::Asset::newById = sub {
         my ($class, $session, $assetId, $revisionDate) = @_;
         if ($mockedAssetIds{$assetId}) {
             return $mockedAssetIds{$assetId};
         }
-        goto $original_newByDynamicClass;
+        goto $original_newById;
     };
     my $original_newPending = \&WebGUI::Asset::newPending;
     *WebGUI::Asset::newPending = sub {

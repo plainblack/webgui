@@ -107,7 +107,7 @@ is($userActivity->get('groupId'), $activityGroup->getId, 'group in Workflow Acti
 
 $assetGroup->delete;
 
-my $newSnippet1 = WebGUI::Asset->newByDynamicClass($session, $snippet1->getId);
+my $newSnippet1 = WebGUI::Asset->newById($session, $snippet1->getId);
 
 cmp_deeply(
     $newSnippet1->get,
@@ -118,7 +118,7 @@ cmp_deeply(
     'groupIdEdit updated on test snippet'
 );
 
-my $newSnippet2 = WebGUI::Asset->newByDynamicClass($session, $snippet2->getId);
+my $newSnippet2 = WebGUI::Asset->newById($session, $snippet2->getId);
 
 cmp_deeply(
     $newSnippet2->get,
@@ -129,7 +129,7 @@ cmp_deeply(
     'other snippet not touched'
 );
 
-my $newSnippet3 = WebGUI::Asset->newByDynamicClass($session, $snippet3->getId);
+my $newSnippet3 = WebGUI::Asset->newById($session, $snippet3->getId);
 
 cmp_deeply(
     $newSnippet3->get,
@@ -140,7 +140,7 @@ cmp_deeply(
     'multiple fields updated'
 );
 
-my $newGallery1 = WebGUI::Asset->newByDynamicClass($session, $gallery1->getId);
+my $newGallery1 = WebGUI::Asset->newById($session, $gallery1->getId);
 
 cmp_deeply(
     $newGallery1->get,

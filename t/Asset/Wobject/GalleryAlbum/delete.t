@@ -96,7 +96,7 @@ $maker->prepare({
 $maker->run;
 
 is(
-    WebGUI::Asset->newByDynamicClass( $session, $assetId ),
+    WebGUI::Asset->newById( $session, $assetId ),
     undef,
     "GalleryAlbum cannot be instanciated after www_deleteConfirm",
 );
