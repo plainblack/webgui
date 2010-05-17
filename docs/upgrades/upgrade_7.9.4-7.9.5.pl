@@ -62,10 +62,18 @@ sub addRejectNoticeSetting {
 sub updateGroupGroupingsTable {
     my $session = shift;
     print "\tAdding primary key and indicies to groupGroupings table... " unless $quiet;
-    $session->db->write("alter table groupGroupings add primary key (groupId,inGroup)");
-    $session->db->write("alter table groupGroupings add index inGroup (inGroup)");
+    my $sth = $session->db->read('show create table groupGroupings');
+    my ($field,$stmt) = $sth->array;
+    $sth->finish;
+    unless ($stmt =~ m/PRIMARY KEY/i) {
+        $session->db->write("alter table groupGroupings add primary key (groupId,inGroup)");
+    }
+    unless ($stmt =~ m/KEY `inGroup`/i) {
+        $session->db->write("alter table groupGroupings add index inGroup (inGroup)");
+    }
     print "DONE!\n" unless $quiet;
 }
+
 
 #----------------------------------------------------------------------------
 # Describe what our function does
