@@ -11,6 +11,9 @@ save you many hours of grief.
 --------------------------------------------------------------------
      * Starting in WebGUI 7.9.4, the CHI and Cache::FastMmap modules are required.
 
+     * Starting in WebGUI 7.9.5, you cannot enter in a URL that is a has more than 2 dashes,
+     "-", in a row.  They will be collapsed down into 1 dash.
+
 7.9.4
 --------------------------------------------------------------------
      * Shop and Cart changes
