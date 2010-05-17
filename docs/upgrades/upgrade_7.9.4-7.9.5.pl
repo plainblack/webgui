@@ -35,6 +35,7 @@ my $session = start(); # this line required
 modifySortItems( $session );
 fixRequestForApprovalScratch($session);
 addRejectNoticeSetting($session);
+updateGroupGroupingsTable($session);
 
 finish($session); # this line required
 
@@ -53,6 +54,16 @@ sub addRejectNoticeSetting {
     my $session = shift;
     print "\tAdding reject notice setting... " unless $quiet;
     $session->setting->add('sendRejectNotice',1);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add keys and indicies to groupGroupings to help speed up group queries
+sub updateGroupGroupingsTable {
+    my $session = shift;
+    print "\tAdding primary key and indicies to groupGroupings table... " unless $quiet;
+    $session->db->write("alter table groupGroupings add primary key (groupId,inGroup)");
+    $session->db->write("alter table groupGroupings add index inGroup (inGroup)");
     print "DONE!\n" unless $quiet;
 }
 
