@@ -20,7 +20,7 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 25; # increment this value for each test you create
+use Test::More tests => 27; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
@@ -114,7 +114,7 @@ ok($processed_template, "A response was received from processTemplate.");
 #
 ####################################################################
 
-##Construct a feed with no description, so the resulting template variables can
+##Construct a feed with no description so the resulting template variables can
 ##be checked for an undef description
 my $feed = XML::FeedPP->new(<<EOFEED);
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -140,6 +140,43 @@ EOFEED
 
 my $vars = $syndicated_content->getTemplateVariables($feed);
 ok( defined $vars->{item_loop}->[0]->{description}, 'getTemplateVariables: description is not undefined');
+
+##Construct a feed with a wrapped description, to check for paragraph handling.
+$feed = XML::FeedPP->new(<<EOFEED);
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+<title>The WebGUI buglist</title>
+<link>/tbb</link>
+<copyright /><pubDate>Mon, 12 Oct 2009 11:54:28 -0500</pubDate>
+<description />
+<item>
+<title>Description with wrapped HTML paragraphs</title>
+<link>http://www.webgui.org/use/bugs/tracker/11563</link>
+<author>serif</author>
+<epochDate>1254854387</epochDate>
+<guid isPermaLink="true">http://www.webgui.org/use/bugs/tracker/11563</guid>
+<pubDate>Mon, 14 May 2010 8:12:00 -0500</pubDate>
+<description>
+&lt;p&gt;In the attached feed, there is a hidden return line character from the
+Rich Text editor in the first sentence of the description. When using a Syndicated Content
+for the feed, the variable descriptionFirstParagraph variable cuts off at this return line
+character, creating invalid markup.&lt;/p&gt;
+&lt;p&gt;No more text is shown of the first paragraph beyond the bold characters of the first line.&lt;/p&gt;
+&lt;p&gt;Third paragraph, for completeness.&lt;/p&gt;
+</description>
+</item>
+</channel>
+</rss>
+EOFEED
+
+$vars = $syndicated_content->getTemplateVariables($feed);
+is $vars->{item_loop}->[0]->{descriptionFirstParagraph},
+"<p>In the attached feed, there is a hidden return line character from the Rich Text editor in the first sentence of the description. When using a Syndicated Content for the feed, the variable descriptionFirstParagraph variable cuts off at this return line character, creating invalid markup.</p>",
+'... first paragraph, when HTML is used';
+is $vars->{item_loop}->[0]->{descriptionFirst2paragraphs},
+"<p>In the attached feed, there is a hidden return line character from the Rich Text editor in the first sentence of the description. When using a Syndicated Content for the feed, the variable descriptionFirstParagraph variable cuts off at this return line character, creating invalid markup.</p><p>No more text is shown of the first paragraph beyond the bold characters of the first line.</p>",
+'... first paragraph, when HTML is used';
 
 ####################################################################
 #
