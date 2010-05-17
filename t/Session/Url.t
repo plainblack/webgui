@@ -52,7 +52,7 @@ my @getRefererUrlTests = (
 
 use Test::More;
 use Test::MockObject::Extends;
-plan tests => 81 + scalar(@getRefererUrlTests);
+plan tests => 85 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -362,10 +362,14 @@ is($session->url->urlize('HOME/PATH1'), 'home/path1', 'urlize: urls are lower ca
 is($session->url->urlize('home/'), 'home', '... trailing slashes removed');
 is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart-is', '... makeCompliant translates spaces to dashes');
 is($session->url->urlize('/home'), 'home', '... removes initial slash');
-is($session->url->urlize('home/../out-of-bounds'),    'home/out-of-bounds', '... removes multiple ../');
-is($session->url->urlize('home/./here'),              'home/here', '... removes multiple ./');
+is($session->url->urlize('home/../out-of-bounds'),    'home/out-of-bounds', '... removes ../');
+is($session->url->urlize('home/./here'),              'home/here', '... removes ./');
 is($session->url->urlize('home/../../out-of-bounds'), 'home/out-of-bounds', '... removes multiple ../');
 is($session->url->urlize('home/././here'),            'home/here', '... removes multiple ./');
+is($session->url->urlize('home -- here'),             'home-here', 'multiple dashes collapsed');
+is($session->url->urlize('home!@#$%^&*here'),         'home-here', 'non-word characters collapsed to single dash');
+is($session->url->urlize("home\x{2267}here"),         'home-here', 'non-word international characters removed');
+is($session->url->urlize("home\x{1EE9}here"),         "home\x{1EE9}here", 'word international characters not removed');
 
 #######################################
 #
