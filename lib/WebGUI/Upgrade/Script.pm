@@ -104,6 +104,12 @@ sub _build_exports {
             $dbh = WebGUI::Upgrade->dbhForConfig($subs->{config}->());
             return $dbh;
         },
+        sql => sub (@) {
+            my $sql = shift;
+            my $dbh = $subs->{dbh}->();
+            my $sth = $dbh->prepare($sql);
+            $sth->execute(@_);
+        },
         version_tag => sub (;$) {
             my $name = shift;
             $check_cleanup->();
@@ -161,7 +167,7 @@ sub _build_exports {
         },
         asset => sub ($) {
             require WebGUI::Asset;
-            my $session = $subs->session->();
+            my $session = $subs->{session}->();
             my $assetId = shift;
             my $asset;
             if ($session->id->valid($assetId)) {
@@ -173,6 +179,11 @@ sub _build_exports {
                 $asset = WebGUI::Asset->newByUrl($session, $assetId);
             }
             return $asset;
+        },
+        clear_cache => sub () {
+            my $session = $subs->{session}->();
+            my $cache = $session->cache;
+            $cache->clear;
         },
     };
     return $subs;

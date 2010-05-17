@@ -29,7 +29,10 @@ builder {
 
     enable '+WebGUI::Middleware::HTTPExceptions';
 
+    enable 'ErrorDocument', 503 => $config->get('maintenancePage');
     enable_if { ! $_[0]->{'webgui.debug'} } 'ErrorDocument', 500 => $config->get('maintenancePage');
+
+    enable '+WebGUI::Middleware::Maintenance';
 
     enable_if { $_[0]->{'webgui.debug'} } 'StackTrace';
     enable_if { $_[0]->{'webgui.debug'} } 'Debug', panels => [

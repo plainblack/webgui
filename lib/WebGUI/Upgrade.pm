@@ -1,27 +1,57 @@
 package WebGUI::Upgrade;
-use strict;
-use warnings;
 
+use Moose;
 use WebGUI::Paths;
 use WebGUI::Pluggable;
 use WebGUI::Config;
+use WebGUI::SQL;
 use Try::Tiny;
-use DBI;
+use File::Spec;
+use File::Path qw(make_path);
+use namespace::autoclean;
+
+has quiet => (
+    is => 'rw',
+    default => undef,
+);
+has mysql => (
+    is => 'rw',
+    default => 'mysql',
+);
+has mysqldump => (
+    is => 'rw',
+    default => 'mysqldump',
+);
+has clearCache => (
+    is      => 'rw',
+    default => 1,
+);
+has createBackups => (
+    is      => 'rw',
+    default => 1,
+);
+has useMaintenanceMode => (
+    is      => 'rw',
+    default => 1,
+);
+has backupPath => (
+    is      => 'rw',
+    default => File::Spec->catdir(File::Spec->tmpdir, 'backups'),
+);
 
 sub upgradeSites {
-    my $class = shift;
-    my $quiet = shift;
+    my $self = shift;
     my @configs = WebGUI::Paths->siteConfigs;
     for my $configFile (@configs) {
         my $bareFilename = $configFile;
         $bareFilename =~ s{.*/}{};
         print "Upgrading $bareFilename:\n";
         try {
-            $class->upgradeSite($configFile, $quiet);
+            $self->upgradeSite($configFile);
         }
         catch {
             print "Error upgrading $bareFilename: $_\n";
-        }
+        };
     }
     return 1;
 }
@@ -32,13 +62,17 @@ sub getCodeVersion {
 }
 
 sub upgradeSite {
-    my $class = shift;
-    my ($configFile, $quiet) = @_;
-    my $fromVersion = $class->getCurrentVersion($configFile);
-    my $toVersion = $class->getCodeVersion;
-    my @steps = $class->calcUpgradePath($fromVersion, $toVersion);
+    my $self = shift;
+    my ($configFile) = @_;
+    my $fromVersion = $self->getCurrentVersion($configFile);
+    my $toVersion = $self->getCodeVersion;
+    my @steps = $self->calcUpgradePath($fromVersion, $toVersion);
+    if ( $self->useMaintenanceMode ) {
+        my $dbh = $self->dbhForConfig( $configFile );
+        $dbh->do('REPLACE INTO settings (name, value) VALUES (?, ?)', {}, 'upgradeState', 'started');
+    }
     for my $step ( @steps ) {
-        $class->runUpgradeStep($configFile, $step, $quiet);
+        $self->runUpgradeStep($configFile, $step);
     }
 }
 
@@ -90,8 +124,8 @@ sub calcUpgradePath {
 }
 
 sub runUpgradeStep {
-    my $class = shift;
-    my ($configFile, $step, $quiet) = @_;
+    my $self = shift;
+    my ($configFile, $step) = @_;
 
     my ($version) = $step =~ /-(\d+\.\d+\.\d+)$/;
     print "Running upgrades for $step.\n";
@@ -103,14 +137,14 @@ sub runUpgradeStep {
         my $filename = File::Spec->catfile($upgradesDir, $upgradeFile);
         next
             unless -f $filename;
-        $class->runUpgradeFile($configFile, $version, $filename, $quiet);
+        $self->runUpgradeFile($configFile, $version, $filename);
     }
     closedir $dh;
-    $class->markVersionUpgrade($configFile, $version);
+    $self->markVersionUpgrade($configFile, $version);
 }
 
 sub runUpgradeFile {
-    my $class = shift;
+    my $self = shift;
     my ($configFile, $version, $filename, $quiet) = @_;
 
     my ($extension) = $filename =~ /\.([^.]+)$/;
@@ -119,31 +153,64 @@ sub runUpgradeFile {
 
     my $package = 'WebGUI::Upgrade::File::' . $extension;
     if ( try { WebGUI::Pluggable::load($package) } && $package->can('run') ) {
-        return $package->run($configFile, $version, $filename, $quiet);
+        return $package->run($configFile, $version, $filename, $self->quiet);
     }
     warn "Don't know how to use $extension upgrade file\n";
     return;
 }
 
 sub markVersionUpgrade {
-    my $class = shift;
+    my $self = shift;
     my $configFile = shift;
     my $version = shift;
 
-    my $config = WebGUI::Config->new($configFile, 1);
-    my $dbh = $class->dbhForConfig($config);
+    my $dbh = $self->dbhForConfig($configFile);
 
     $dbh->do(
         'INSERT INTO webguiVersion (webguiVersion, versionType, dateApplied) VALUES (?,?,?)', {},
         $version, 'upgrade', time,
     );
+    if ( $self->useMaintenanceMode ) {
+        $dbh->do('REPLACE INTO settings (name, value) VALUES (?, ?)', {}, 'upgradeState', $version);
+    }
+}
+
+sub createBackup {
+    my $self = shift;
+    my $config = shift;
+
+    make_path($self->backupPath);
+    my $configFile = ( File::Spec->splitpath($config->pathToFile) )[2];
+    my $resultFile = File::Spec->catfile(
+        $self->backupPath,
+        $configFile . '_' . $self->getCurrentVersion($config) . '_' . time . '.sql',
+    );
+    my @command_line = (
+        $self->mysql,
+        $self->mysqlCommandLine($config),
+        '--add-drop-table',
+        '--result-file=' . $resultFile,
+    );
+    system { $command_line[0] } @command_line
+        and die "$!";
+}
+
+sub siteHistory {
+    my $class = shift;
+    my $config = shift;
+    my $dbh = $class->dbhForConfig($config);
+    my $sth = $dbh->prepare('SELECT webguiVersion, dateApplies, versionType FROM webguiVersion ORDER BY dateApplied ASC, webguiVersion ASC');
+    $sth->execute;
+    while ( my @data = $sth->fetchrow_array ) {
+        printf "\t%-8s  %-15s  %-15s\n", $data[0], POSIX::strftime('%D %T', $data[1]), $data[2];
+    }
+    $sth->finish;
 }
 
 sub getCurrentVersion {
     my $class = shift;
     my $configFile = shift;
-    my $config = WebGUI::Config->new($configFile, 1);
-    my $dbh = $class->dbhForConfig($config);
+    my $dbh = $class->dbhForConfig($configFile);
 
     my $sth = $dbh->prepare('SELECT webguiVersion FROM webguiVersion');
     $sth->execute;
@@ -158,19 +225,44 @@ sub getCurrentVersion {
 sub dbhForConfig {
     my $class = shift;
     my $config = shift;
+    if (! ref $config) {
+        $config = WebGUI::Config->new($config, 1);
+    }
+    return WebGUI::SQL->connect($config);
+}
+
+sub mysqlCommandLine {
+    my $class = shift;
+    my $config = shift;
 
     my $dsn = $config->get('dsn');
-    my $user = $config->get('dbuser');
-    my $pass = $config->get('dbpass');
+    my $username = $config->get('dbuser');
+    my $password = $config->get('dbpass');
+    my $database = ( split /[:;]/msx, $dsn )[2];
+    my $hostname = 'localhost';
+    my $port = '3306';
+    while ( $dsn =~ /([^=;:]+)=([^;:]+)/msxg ) {
+        if ( $1 eq 'host' || $1 eq 'hostname' ) {
+            $hostname = $2;
+        }
+        elsif ( $1 eq 'db' || $1 eq 'database' || $1 eq 'dbname' ) {
+            $database = $2;
+        }
+        elsif ( $1 eq 'port' ) {
+            $port = $2;
+        }
+    }
 
-    my (undef, $driver) = DBI->parse_dsn($dsn);
-    my $dbh = DBI->connect($dsn, $user, $pass, {
-        RaiseError => 1,
-        AutoCommit => 1,
-        PrintError => 0,
-        $driver eq 'mysql' ? (mysql_enable_utf8 => 1) : (),
-    });
-    return $dbh;
+    my @command_line = (
+        '-h' . $hostname,
+        '-P' . $port,
+        $database,
+        '-u' . $username,
+        ( $password ? '-p' . $password : () ),
+        '--default-character-set=utf8',
+        '--batch',
+    );
+    return @command_line;
 }
 
 sub numericVersion {
@@ -184,5 +276,6 @@ sub numericVersion {
     return $decVersion;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

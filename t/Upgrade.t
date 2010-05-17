@@ -30,7 +30,12 @@ our $configFile = WebGUI::Test->config->getFilename;
     *WebGUI::Paths::siteConfigs = sub { $configFile };
 }
 
-my $upgrade = Test::MockObject::Extends->new('WebGUI::Upgrade');
+my $upgrade = Test::MockObject::Extends->new(
+    WebGUI::Upgrade->new(
+        createBackups => 0,
+        useMaintenanceMode => 0,
+    ),
+);
 $upgrade->set_always('getCurrentVersion', '8.0.0');
 $upgrade->set_always('getCodeVersion', '8.4.3');
 
@@ -90,7 +95,8 @@ $upgrade->mock(testUpgrade => sub {
 }
 
 {
-    my $stdout = capture { $upgrade->testUpgrade('output.pl', 1) };
+    $upgrade->quiet(1);
+    my $stdout = capture { $upgrade->testUpgrade('output.pl') };
     ok $stdout !~ 'Simple Output', 'quiet flag silences report command';
     ok $stdout !~ 'Done', 'quiet flag silences done command';
 }
@@ -102,6 +108,7 @@ my $session = WebGUI::Test->session;
 
 my $dbh = $upgrade->dbhForConfig(WebGUI::Test->config);
 our $totalAssets = $dbh->selectrow_array('SELECT COUNT(*) FROM asset');
+
 $upgrade->testUpgrade('dbh.pl');
 
 $upgrade->testUpgrade('config.pl');
