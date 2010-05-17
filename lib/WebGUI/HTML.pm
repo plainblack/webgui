@@ -501,6 +501,7 @@ sub splitTag {
     return @result if wantarray;
     return $result[0];
 }
+
 #-------------------------------------------------------------------
 
 =head2 WebGUI::HTML::splitHeadBody($html);
@@ -554,4 +555,3 @@ sub splitHeadBody {
 }
 
 1;
-
