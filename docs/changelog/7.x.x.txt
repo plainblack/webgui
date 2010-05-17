@@ -1,6 +1,7 @@
 7.8.20
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
  - fixed #11572: visitors can enter editProfile
+ - fixed #11563: Syndicated Content - descriptionFirstParagraph cuts off
 
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure

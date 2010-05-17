@@ -290,10 +290,19 @@ sub getTemplateVariables {
         $item{descriptionFirst25words} =~ s/(((\S+)\s+){25}).*/$1/s;
         $item{descriptionFirst10words} = $item{descriptionFirst25words};
         $item{descriptionFirst10words} =~ s/(((\S+)\s+){10}).*/$1/s;
-        $item{descriptionFirst2paragraphs} = $item{description};
-        $item{descriptionFirst2paragraphs} =~ s/^((.*?\n){2}).*/$1/s;
-        $item{descriptionFirstParagraph} = $item{descriptionFirst2paragraphs};
-        $item{descriptionFirstParagraph} =~ s/^(.*?\n).*/$1/s;
+        if ($description =~ /<p>/) {
+            my $html = $description;
+            $html =~ tr/\n/ /s;
+            my @paragraphs = map { "<p>".$_."</p>" } WebGUI::HTML::splitTag($html,3);
+            $item{descriptionFirstParagraph}   = $paragraphs[0];
+            $item{descriptionFirst2paragraphs} = join '', @paragraphs[0..1];
+        }
+        else {
+            $item{descriptionFirst2paragraphs} = $item{description};
+            $item{descriptionFirst2paragraphs} =~ s/^((.*?\n){2}).*/$1/s;
+            $item{descriptionFirstParagraph} = $item{descriptionFirst2paragraphs};
+            $item{descriptionFirstParagraph} =~ s/^(.*?\n).*/$1/s;
+        }
         $item{descriptionFirst4sentences} = $item{description};
         $item{descriptionFirst4sentences} =~ s/^((.*?\.){4}).*/$1/s;
         $item{descriptionFirst3sentences} = $item{descriptionFirst4sentences};
