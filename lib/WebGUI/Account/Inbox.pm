@@ -953,7 +953,7 @@ sub www_inviteUserSave {
         );
 
         ## No sneaky attack paths...
-        $var->{'message'} = WebGUI::HTML::html2text( WebGUI::HTML::filter($message) );
+        $var->{'message'} = WebGUI::HTML::format(WebGUI::HTML::filter($message));
 
         my $emailBody = $self->processTemplate( $var, $self->getInviteUserMessageTemplateId );
 

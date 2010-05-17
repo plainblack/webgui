@@ -2,6 +2,7 @@
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
  - fixed #11572: visitors can enter editProfile
  - fixed #11563: Syndicated Content - descriptionFirstParagraph cuts off
+ - fixed #11538: User invite mail: whitespace in message lost
 
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure
