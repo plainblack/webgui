@@ -287,6 +287,11 @@ our $I18N = {
         message     => 'Should the file be friends only?',
         lastUpdated => 0,
     },
+    
+    'helpvar form_sortBy' => {
+        message     => 'Property according to which photos should be sorted.',
+        lastUpdated => 0,
+    },    
 
     'helpvar url_yes' => {
         message     => 'Confirm the delete of this Album.',
@@ -466,9 +471,33 @@ our $I18N = {
     'addArchive friendsOnly' => {
         message     => 'Friends Only',
         lastUpdated => 0,
-        context     => 'Label for the "friends only" field of the Add Archive page',
+        context     => 'Label for the "friendsOnly" field of the Add Archive page',
+    },
+    
+    'addArchive sortBy' => {
+        message     => 'Sort By',
+        lastUpdated => 0,
+        context     => 'Label for the "sortBy" field of the Add Archive page',
     },
 
+    'addArchive sortBy name' => {
+        message     => 'Name',
+        lastUpdated => 0,
+        context     => 'Label for the "Name" radio button',
+    },
+    
+    'addArchive sortBy date' => {
+        message     => 'Date',
+        lastUpdated => 0,
+        context     => 'Label for the "Date" radio button',
+    },
+        
+    'addArchive sortBy fileOrder' => {
+        message     => 'File Order',
+        lastUpdated => 0,
+        context     => 'Label for the "File Order" radio button',
+    },
+    
     'template addArchive title' => {
         message     => "Add Zip Archive",
         lastUpdated => 0,

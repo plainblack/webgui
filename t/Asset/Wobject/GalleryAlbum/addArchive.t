@@ -25,7 +25,10 @@ use Test::Deep;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Album Test"});
+
+$versionTag->set({name=>"Add Archive to Album Test"});
+addToCleanup($versionTag);
+
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -35,6 +38,7 @@ my $gallery
         groupIdEdit         => 3,   # Admins
         ownerUserId         => 3,   # Admin
     });
+
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
@@ -53,16 +57,21 @@ my $properties  = {
     friendsOnly     => "1",
 };
 
-$album->addArchive( WebGUI::Test->getTestCollateralPath('elephant_images.zip'), $properties );
 $versionTag->commit;
+
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 8;
+plan tests => 11;
+
 
 #----------------------------------------------------------------------------
 # Test the addArchive sub
 # elephant_images.zip contains three jpgs: Aana1.jpg, Aana2.jpg, Aana3.jpg
+
+$versionTag = WebGUI::VersionTag->getWorking($session);
+$album->addArchive( WebGUI::Test->getTestCollateralPath('elephant_images.zip'), $properties );
+
 my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });
 
 is( scalar @$images, 3, "addArchive() adds one asset per image" );
@@ -112,11 +121,56 @@ cmp_bag(
     "Photo assets are viewable by friends only"
 );
 
-#----------------------------------------------------------------------------
-# Test the www_addArchive page
+# Empty gallery album
+$versionTag->rollback;
 
 #----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback;
-}
+# Test the sorting option of addArchive sub
+# gallery_archive_sorting_test.zip contains four jpgs: photo1.jpg, photo2.jpg, photo3.jpg and photo4.jpg
+# The following test covers sorting by date, name and file order (default).
+
+$versionTag = WebGUI::VersionTag->getWorking($session);
+# Add photos sorted by file order (default)
+$album->addArchive( WebGUI::Test->getTestCollateralPath('gallery_archive_sorting_test.zip'), $properties, 'fileOrder' );
+# Get all children
+my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });
+# Check order
+cmp_deeply(
+    [ map { $_->get("filename") } @$images ],
+    [ "photo1.jpg", "photo2.jpg", "photo4.jpg", "photo3.jpg" ],
+    "Photos sorted by file order"
+);
+# Empty gallery album
+$versionTag->rollback;
+
+$versionTag = WebGUI::VersionTag->getWorking($session);
+# Add photos sorted by date
+$album->addArchive( WebGUI::Test->getTestCollateralPath('gallery_archive_sorting_test.zip'), $properties, 'date' );
+# Get all children
+my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });
+# Check order
+cmp_deeply(
+    [ map { $_->get("filename") } @$images ],
+    [ "photo4.jpg", "photo1.jpg", "photo3.jpg", "photo2.jpg" ],
+    "Photos sorted by date"
+);
+# Empty gallery album
+$versionTag->rollback;
+
+$versionTag = WebGUI::VersionTag->getWorking($session);
+# Add photos sorted by name
+$album->addArchive( WebGUI::Test->getTestCollateralPath('gallery_archive_sorting_test.zip'), $properties, 'name' );
+# Get all children
+my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });
+# Check order
+cmp_deeply(
+    [ map { $_->get("filename") } @$images ],
+    [ "photo1.jpg", "photo2.jpg", "photo3.jpg", "photo4.jpg" ],
+    "Photos sorted by name"
+);
+# Empty gallery album
+$versionTag->rollback;
+
+
+#----------------------------------------------------------------------------
+# Test the www_addArchive page

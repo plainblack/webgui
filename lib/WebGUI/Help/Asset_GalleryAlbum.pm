@@ -258,6 +258,10 @@ our $HELP = {
                 name        => 'form_friendsOnly',
                 description => 'helpvar form_friendsOnly',
             },
+            {
+                name        => 'form_sortBy',
+                description => 'helpvar form_sortBy',
+            },            
         ],
     },
 
