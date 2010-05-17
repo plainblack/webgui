@@ -152,7 +152,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 126
+plan tests => 127
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -368,8 +368,9 @@ $versionTag->commit;
 
 $session->setting->set('urlExtension', undef);
 
-is($importNode->fixUrl('1234'.'-'x235 . 'abcdefghij'), '1234'.'-'x235 . 'abcdefghij', 'fixUrl leaves long URLs under 250 characters alone');
-is($importNode->fixUrl('1234'.'-'x250 . 'abcdefghij'), '1234'.'-'x216, 'fixUrl truncates long URLs over 250 characters to 220 characters');
+is($importNode->fixUrl('1234'.'_'x235 . 'abcdefghij'), '1234'.'_'x235 . 'abcdefghij', 'fixUrl leaves long URLs under 250 characters alone');
+is($importNode->fixUrl('1234'.'_'x250 . 'abcdefghij'), '1234'.'_'x216, 'fixUrl truncates long URLs over 250 characters to 220 characters');
+is $importNode->fixUrl('---'), '---', '... 3 dashes are legal';
 
 WebGUI::Test->originalConfig('extrasURL');
 WebGUI::Test->originalConfig('uploadsURL');
