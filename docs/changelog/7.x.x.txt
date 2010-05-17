@@ -1,4 +1,5 @@
 7.8.20
+ - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
 
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure

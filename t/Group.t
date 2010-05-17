@@ -74,8 +74,26 @@ my @ipTests = (
 			},
 );
 
+my @ldapTests = (
+            {
+				dn => 'uid=Byron Hadley,o=shawshank',
+				comment => 'bad dn for group',
+				expect  => 0,
+			},
+			{
+				dn => 'uid=Andy Dufresne,o=shawshank',
+				comment => 'good dn for group',
+				expect  => 1,
+			},
+            {
+				dn => 'uid=Bogs Diamond,o=shawshank',
+				comment => 'another good dn for group',
+				expect  => 1,
+			},
+);
 
-plan tests => (151 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+
+plan tests => (164 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -167,16 +185,44 @@ $optionGroup->delete;
 #
 ################################################################
 
+my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
+$session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
+my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
+is($ldap->getValue("ldapLinkId"),$ldapProps->{ldapLinkId},'ldap link created properly');
+addToCleanup($ldap);
+
+my @shawshank;
+
+foreach my $idx (0..$#ldapTests) {
+	$shawshank[$idx] = WebGUI::User->new($session, "new");
+	$shawshank[$idx]->username("shawshank$idx");
+    $shawshank[$idx]->authMethod("LDAP");
+    my $auth     = $shawshank[$idx]->authInstance;
+    $auth->saveParams($shawshank[$idx]->getId,$shawshank[$idx]->authMethod,{
+        connectDN      => $ldapTests[$idx]->{dn},
+        ldapConnection => $ldap->getValue("ldapLinkId"),
+        ldapUrl        => $ldap->getValue("ldapUrl"),
+    });
+}
+
+WebGUI::Test->usersToDelete(@shawshank);
+
 my $lGroup = WebGUI::Group->new($session, 'new');
 
-$lGroup->ldapGroup('LDAP group');
-is($lGroup->ldapGroup(), 'LDAP group', 'ldapGroup set and fetched correctly');
+$lGroup->ldapGroup('cn=Convicts,o=shawshank');
+is($lGroup->ldapGroup(), 'cn=Convicts,o=shawshank', 'ldapGroup set and fetched correctly');
 
-$lGroup->ldapGroupProperty('LDAP group property');
-is($lGroup->ldapGroupProperty(), 'LDAP group property', 'ldapGroup set and fetched correctly');
+$lGroup->ldapGroupProperty('member');
+is($lGroup->ldapGroupProperty(), 'member', 'ldapGroup set and fetched correctly');
 
-$lGroup->ldapLinkId('LDAP link id');
-is($lGroup->ldapLinkId(), 'LDAP link id', 'ldapLinkId set and fetched correctly');
+$lGroup->ldapLinkId($ldapProps->{ldapLinkId});
+is($lGroup->ldapLinkId(),$ldapProps->{ldapLinkId}, 'ldapLinkId set and fetched correctly');
+
+is_deeply(
+	[ (map { $lGroup->hasLDAPUser($_->getId) }  @shawshank) ],
+	[0, 1, 1],
+	'shawshank user 2, and 3 found in lGroup users from LDAP'
+);
 
 $lGroup->ldapRecursiveProperty('LDAP recursive property');
 is($lGroup->ldapRecursiveProperty(), 'LDAP recursive property', 'ldapRecursiveProperty set and fetched correctly');
@@ -242,6 +288,7 @@ cmp_bag($gB->getGroupsIn(),  [$gA->getId, 3], 'Group A is in Group B');
 cmp_bag($gA->getGroupsFor(), [$gB->getId], 'Group B contains Group A');
 cmp_bag($gA->getGroupsIn(),  [3], 'Admin added to group A automatically');
 
+diag $gA->getId;
 $gA->addGroups([$gB->getId]);
 cmp_bag($gA->getGroupsIn(), [3], 'Not allowed to create recursive group loops');
 
@@ -416,7 +463,7 @@ cmp_ok($expirationDate-time(), '>', 50, 'checking expire offset override on addU
 
 ################################################################
 #
-# getDatabaseUsers
+# getDatabaseUsers & hasDatabaseUsers
 #
 ################################################################
 
@@ -437,7 +484,17 @@ cmp_bag($mobUsers, [map {$_->userId} @mob], 'verify SQL table built correctly');
 is( $gY->databaseLinkId, 0, "Group Y's databaseLinkId is set to WebGUI");
 $gY->dbQuery(q!select userId from myUserTable!);
 is( $session->stow->get('isInGroup'), undef, 'setting dbQuery clears cached isInGroup');
-WebGUI::Cache->new($session, $gZ->getId)->delete();  ##Delete cached key for testing
+
+is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQuery');
+is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] isInGroup Z');
+
+ok( isIn($mob[0]->userId, @{ $gY->getAllUsers() }), 'mob[0] in list of group Y users');
+ok( !isIn($mob[0]->userId, @{ $gZ->getUsers() }), 'mob[0] not in list of group Z users');
+
+ok( isIn($mob[0]->userId, @{ $gZ->getAllUsers() }), 'mob[0] in list of group Z users, recursively');
+
+WebGUI::Cache->new($session, $gY->getId)->delete();  ##Delete cached key for testing
+$session->stow->delete("isInGroup");
 
 my @mobIds = map { $_->userId } @mob;
 
@@ -447,13 +504,17 @@ cmp_bag(
 	'all mob users in list of group Y users from database'
 );
 
-is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQuery');
-is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] isInGroup Z');
+$session->db->write('delete from myUserTable where userId=?',[$mob[0]->getId]);
+my $inDb = $session->db->quickScalar("select count(*) from myUserTable where userId=?",[$mob[0]->getId]);
+ok ( !$inDb, 'mob[0] no longer in myUserTable');
+WebGUI::Cache->new($session, ["groupMembers",$gY->getId])->delete;  #Delete cache so we get a good test
+$session->stow->delete("isInGroup");                                #Delete stow so we get a good test
 
-ok( isIn($mob[0]->userId, @{ $gY->getAllUsers() }), 'mob[0] in list of group Y users');
-ok( !isIn($mob[0]->userId, @{ $gZ->getUsers() }), 'mob[0] not in list of group Z users');
-
-ok( isIn($mob[0]->userId, @{ $gZ->getAllUsers() }), 'mob[0] in list of group Z users, recursively');
+is_deeply(
+	[ (map { $gY->hasDatabaseUser($_->getId) }  @mob) ],
+	[0, 1, 1],
+	'mob users 1,2 found in list of group Y users from database'
+);
 
 ##Karma tests
 
@@ -499,6 +560,12 @@ is_deeply(
 	'karma disabled in settings, no users in group'
 );
 
+is_deeply(
+	[ (map { $gK->hasKarmaUser($_->getId) }  @chameleons) ],
+	[0, 0, 0, 0],
+	'karma disabled in settings, group K has no users via karma threshold'
+);
+
 $session->setting->set('useKarma', 1);
 $gK->clearCaches; ##Clear cache since previous data is wrong
 
@@ -506,6 +573,12 @@ is_deeply(
 	[ (map { $_->isInGroup($gK->getId) }  @chameleons) ],
 	[0, 1, 1, 1],
 	'chameleons 1, 2 and 3 are in group K via karma threshold'
+);
+
+is_deeply(
+	[ (map { $gK->hasKarmaUser($_->getId) }  @chameleons) ],
+	[0, 1, 1, 1],
+	'group K has chameleons 1, 2 and 3 via karma threshold'
 );
 
 cmp_bag(
@@ -562,9 +635,19 @@ foreach my $idx (0..$#scratchTests) {
 WebGUI::Test->usersToDelete(@itchies);
 WebGUI::Test->sessionsToDelete(@sessionBank);
 
+#isInGroup test
 foreach my $scratchTest (@scratchTests) {
 	is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
 }
+
+WebGUI::Cache->new($session, $gS->getId)->delete();  ##Delete cached key for testing
+$session->stow->delete("isInGroup");
+
+#hasScratchUser test
+foreach my $scratchTest (@scratchTests) {
+	is($gS->hasScratchUser($scratchTest->{user}->getId), $scratchTest->{expect}, $scratchTest->{comment}." - hasScratchUser");
+}
+
 
 cmp_bag(
 	$gS->getScratchUsers,
@@ -577,6 +660,33 @@ cmp_bag(
 	[ ( (map { $_->{user}->userId() }  grep { $_->{expect} } @scratchTests), 3) ],
 	'getAllUsers for group with scratch'
 );
+
+{  ##Add scope to force cleanup
+
+    note "Checking for user Visitor session leak";
+
+    my $remoteSession = WebGUI::Test->newSession;
+    $remoteSession->user({userId => 1});
+    $remoteSession->scratch->set('remote','nok');
+
+    my $localScratchGroup = WebGUI::Group->new($session, 'new');
+    $localScratchGroup->name("Local IP Group");
+    $localScratchGroup->scratchFilter('local=ok');
+
+    ok !$remoteSession->user->isInGroup($localScratchGroup->getId), 'Remote Visitor fails to be in the scratch group';
+
+    my $localSession = WebGUI::Test->newSession;
+    WebGUI::Test->addToCleanup($localScratchGroup, $remoteSession, $localSession);
+    $localSession->user({userId => 1});
+    $remoteSession->scratch->set('local','ok');
+    $localScratchGroup->clearCaches;
+
+    ok $localSession->user->isInGroup($localScratchGroup->getId), 'Local Visitor is in the scratch group';
+
+    $remoteSession->stow->delete('isInGroup');
+    ok !$remoteSession->user->isInGroup($localScratchGroup->getId), 'Remove Visitor is not in the scratch group, even though a different Visitor passed';
+
+}
 
 @sessionBank = ();
 my @tcps =  ();
@@ -619,9 +729,44 @@ cmp_bag(
 	'getUsers for group with IP filter'
 );
 
+is_deeply(
+	[ (map { $gI->hasIpUser($_->{user}->getId) }  @ipTests) ],
+	[ (map { $_->{expect} } @ipTests) ],
+	'hasIpUsers for group with IP filter'
+);
+
 foreach my $ipTest (@ipTests) {
 	is($ipTest->{user}->isInGroup($gI->getId), $ipTest->{expect}, $ipTest->{comment});
 }
+
+{  ##Add scope to force cleanup
+
+    note "Checking for user Visitor session leak";
+
+    $ENV{REMOTE_ADDR} = '191.168.1.1';
+    my $remoteSession = WebGUI::Test->newSession;
+    $remoteSession->user({userId => 1});
+
+    my $localIpGroup = WebGUI::Group->new($session, 'new');
+    $localIpGroup->name("Local IP Group");
+    $localIpGroup->ipFilter('192.168.33.0/24');
+
+    ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remote Visitor fails to be in the group';
+
+    $ENV{REMOTE_ADDR} = '192.168.33.1';
+    my $localSession = WebGUI::Test->newSession;
+    WebGUI::Test->addToCleanup($localIpGroup, $remoteSession, $localSession);
+    $localSession->user({userId => 1});
+    $localIpGroup->clearCaches;
+
+    ok $localSession->user->isInGroup($localIpGroup->getId), 'Local Visitor is in the group';
+
+    $remoteSession->stow->delete('isInGroup');
+    ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remove Visitor is not in the group, even though a different Visitor passed';
+
+}
+
+
 
 ##Cache check.
 

@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+updateGroupGroupingsTable($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add keys and indicies to groupGroupings to help speed up group queries
+sub updateGroupGroupingsTable {
+    my $session = shift;
+    print "\tAdding primary key and indicies to groupGroupings table... " unless $quiet;
+    $session->db->write("alter table groupGroupings add primary key (groupId,inGroup)");
+    $session->db->write("alter table groupGroupings add index inGroup (inGroup)");
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
