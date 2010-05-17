@@ -17,6 +17,7 @@
  - fixed #11567: EMS: Build badge page, ticket tab, pagination
  - added: a new inbox setting which supresses friend rejection notices
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
+ - fixed #11572: visitors can enter editProfile
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility
