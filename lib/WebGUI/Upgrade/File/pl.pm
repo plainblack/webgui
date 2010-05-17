@@ -7,9 +7,9 @@ use WebGUI::Upgrade::Script ();
 use Path::Class::Dir ();
 use Try::Tiny;
 use namespace::clean;
+use Class::MOP;
+use Class::MOP::Class;
 
-my $namespace = 0;
-my $namespacePrefix = __PACKAGE__ . '::__ANON__::';
 sub _runScript {
     my $file = shift;
     my @res;
@@ -17,9 +17,9 @@ sub _runScript {
     {
         local $@;
         local *_;
-        my $guard = WebGUI::Upgrade::Script->cleanup_guard;
+        my $anon_class = Class::MOP::Class->create_anon_class;
         my $wanted = wantarray;
-        eval sprintf(<<'END_CODE', $namespacePrefix . $namespace);
+        eval sprintf(<<'END_CODE', $anon_class->name);
             # place this in a specific separate package to prevent namespace
             # pollution and to allow us to clean it up afterward
             package %s;
@@ -37,12 +37,6 @@ sub _runScript {
             $err = $@;
 END_CODE
     }
-    {
-        # delete entire namespace that script was run in
-        no strict 'refs';
-        delete ${ $namespacePrefix }{ $namespace . '::' };
-    }
-    $namespace++;
     die $err
         if $err;
     return (wantarray ? @res : $res[0]);

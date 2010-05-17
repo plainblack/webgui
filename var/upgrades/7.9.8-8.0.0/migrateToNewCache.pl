@@ -1,7 +1,7 @@
 use WebGUI::Upgrade::Script;
 use Module::Find;
 
-report "\tMigrating to new cache ";
+report "\tMigrating to new cache ... ";
 
 rm_lib
     findallmod('WebGUI::Cache'),
@@ -22,14 +22,15 @@ config->delete('fileCacheRoot');
 config->deleteFromArray('workflowActivities/None', 'WebGUI::Workflow::Activity::CleanDatabaseCache');
 config->deleteFromArray('workflowActivities/None', 'WebGUI::Workflow::Activity::CleanFileCache');
 
-sql 'DROP TABLE cache';
+sql 'DROP TABLE IF EXISTS cache';
 sql 'DELETE FROM WorkflowActivity WHERE className in (?,?)',
-    'WebGUI::Workflow::Activity::CleanDatabaseCache',
-    'WebGUI::Workflow::Activity::CleanFileCache',
+        'WebGUI::Workflow::Activity::CleanDatabaseCache',
+        'WebGUI::Workflow::Activity::CleanFileCache',
 ;
 sql 'DELETE FROM WorkflowActivityData WHERE activityId IN (?,?)',
-    'pbwfactivity0000000002',
-    'pbwfactivity0000000022',
+        'pbwfactivity0000000002',
+        'pbwfactivity0000000022',
 ;
 
 done;
+

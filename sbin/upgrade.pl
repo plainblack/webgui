@@ -38,7 +38,11 @@ if ($help) {
     );
 }
 elsif ($history) {
-    print "print site history\n";
+    for my $config (WebGUI::Paths->siteConfigs) {
+        print "$config:\n";
+        WebGUI::Upgrade->reportHistory($config);
+        print "\n";
+    }
     exit;
 }
 elsif ( ! $doit ) {
@@ -77,13 +81,11 @@ if ( $^O ne 'MSWin32' && $> != 0 && !$override ) {
 
 ## Globals
 
-$| = 1;
-
 my $upgrade = WebGUI::Upgrade->new(
     quiet               => $quiet,
-    clearCache          => !$skipDelete,
-    createBackups       => !$skipBackup,
-    useMaintenanceMode  => !$skipMaintenance,
+    clearCache          => ! $skipDelete,
+    createBackups       => ! $skipBackup,
+    useMaintenanceMode  => ! $skipMaintenance,
     $mysql ? (
         mysql               => $mysql,
     ) : (),
@@ -99,15 +101,8 @@ $upgrade->upgradeSites;
 
 print <<STOP;
 
-UPGRADES COMPLETE
+Upgrades complete.
 Please restart your web server and test your sites.
-
-WARNING: If you saw any errors in the output during the upgrade, restore 
-your install and databases from backup immediately. Do not continue using 
-your site EVEN IF IT SEEMS TO WORK.
-
-NOTE: If you have not already done so, please consult
-docs/gotcha.txt for possible upgrade complications.
 
 STOP
 

@@ -8,6 +8,7 @@ use WebGUI::SQL;
 use Try::Tiny;
 use File::Spec;
 use File::Path qw(make_path);
+use POSIX qw(strftime);
 use namespace::autoclean;
 
 has quiet => (
@@ -41,11 +42,14 @@ has backupPath => (
 
 sub upgradeSites {
     my $self = shift;
+        require Carp;
     my @configs = WebGUI::Paths->siteConfigs;
+    my $i = 0;
     for my $configFile (@configs) {
+        $i++;
         my $bareFilename = $configFile;
         $bareFilename =~ s{.*/}{};
-        print "Upgrading $bareFilename:\n";
+        print "Upgrading $bareFilename (site $i/@{[ scalar @configs ]}):\n";
         try {
             $self->upgradeSite($configFile);
         }
@@ -71,7 +75,14 @@ sub upgradeSite {
         my $dbh = $self->dbhForConfig( $configFile );
         $dbh->do('REPLACE INTO settings (name, value) VALUES (?, ?)', {}, 'upgradeState', 'started');
     }
+    if (! @steps) {
+        print "No upgrades needed.\n";
+    }
+    my $i = 0;
     for my $step ( @steps ) {
+        $i++;
+        print "Running upgrades for $step (step $i/@{[ scalar @steps ]}):\n";
+        $self->createBackup($configFile);
         $self->runUpgradeStep($configFile, $step);
     }
 }
@@ -128,7 +139,6 @@ sub runUpgradeStep {
     my ($configFile, $step) = @_;
 
     my ($version) = $step =~ /-(\d+\.\d+\.\d+)$/;
-    print "Running upgrades for $step.\n";
     my $upgradesDir = File::Spec->catdir(WebGUI::Paths->upgrades, $step);
     opendir my($dh), $upgradesDir or die "Can't get upgrades for $step: $!\n";
     while ( my $upgradeFile = readdir $dh ) {
@@ -178,6 +188,9 @@ sub markVersionUpgrade {
 sub createBackup {
     my $self = shift;
     my $config = shift;
+    if (! ref $config) {
+        $config = WebGUI::Config->new($config, 1);
+    }
 
     make_path($self->backupPath);
     my $configFile = ( File::Spec->splitpath($config->pathToFile) )[2];
@@ -185,8 +198,9 @@ sub createBackup {
         $self->backupPath,
         $configFile . '_' . $self->getCurrentVersion($config) . '_' . time . '.sql',
     );
+    print "Backing up to $resultFile\n";
     my @command_line = (
-        $self->mysql,
+        $self->mysqldump,
         $self->mysqlCommandLine($config),
         '--add-drop-table',
         '--result-file=' . $resultFile,
@@ -195,14 +209,14 @@ sub createBackup {
         and die "$!";
 }
 
-sub siteHistory {
+sub reportHistory {
     my $class = shift;
     my $config = shift;
     my $dbh = $class->dbhForConfig($config);
-    my $sth = $dbh->prepare('SELECT webguiVersion, dateApplies, versionType FROM webguiVersion ORDER BY dateApplied ASC, webguiVersion ASC');
+    my $sth = $dbh->prepare('SELECT webguiVersion, dateApplied, versionType FROM webguiVersion ORDER BY dateApplied ASC, webguiVersion ASC');
     $sth->execute;
     while ( my @data = $sth->fetchrow_array ) {
-        printf "\t%-8s  %-15s  %-15s\n", $data[0], POSIX::strftime('%D %T', $data[1]), $data[2];
+        printf "\t%-8s  %-15s  %-15s\n", $data[0], strftime('%D %T', localtime $data[1]), $data[2];
     }
     $sth->finish;
 }
@@ -215,7 +229,7 @@ sub getCurrentVersion {
     my $sth = $dbh->prepare('SELECT webguiVersion FROM webguiVersion');
     $sth->execute;
     my ($version) = map { $_->[0] }
-        sort { $a->[1] <=> $b->[1] }
+        sort { $b->[1] <=> $a->[1] }
         map { [ $_->[0], $class->numericVersion($_->[0]) ] }
         @{ $sth->fetchall_arrayref( [0] ) };
     $sth->finish;
@@ -260,7 +274,6 @@ sub mysqlCommandLine {
         '-u' . $username,
         ( $password ? '-p' . $password : () ),
         '--default-character-set=utf8',
-        '--batch',
     );
     return @command_line;
 }

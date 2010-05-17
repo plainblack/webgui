@@ -6,6 +6,8 @@ use feature ();
 
 use Sub::Exporter;
 use WebGUI::Upgrade ();
+use Scope::Guard;
+use Scalar::Util qw(weaken);
 
 my $exporter = Sub::Exporter::build_exporter({
     groups => {
@@ -32,11 +34,11 @@ sub import {
     $class->$exporter( $extra, @args );
 }
 
-my @cleanups;
+our @cleanups;
 
 sub _build_exports {
     my $configFile = $ENV{WEBGUI_CONFIG} || die 'WEBGUI_CONFIG environment variable must be specified';
-    my $version    = $ENV{WEBGUI_UPGRADE_VERSION};
+    my $version    = $ENV{WEBGUI_UPGRADE_VERSION} || die 'WEBGUI_UPGRADE_VERSION must be set';
     my $quiet      = $ENV{WEBGUI_UPGRADE_QUIET};
 
     my $session;
@@ -46,13 +48,20 @@ sub _build_exports {
     my $versionTag;
     my $upgrade_file = $caller_upgrade_file;
 
-    my $subs;
+    my $session_sub;
+    my $config_sub;
+    my $dbh_sub;
+    my $collateral_sub;
+    my $version_tag_sub;
 
+    my $run_cleanup = 0;
     my $cleanup = sub {
+        return
+            if $run_cleanup++;
         if ($session) {
             require WebGUI::VersionTag;
             if (WebGUI::VersionTag->getWorking($session, 'nocreate')) {
-                $subs->{version_tag}->()->commit;
+                $version_tag_sub->()->commit;
             }
             $session->var->end;
             $session->close;
@@ -60,13 +69,74 @@ sub _build_exports {
         undef $session;
         undef $versionTag;
     };
-    my $cleanup_installed = 0;
-    my $check_cleanup = sub {
-        push @cleanups, $cleanup
-            unless $cleanup_installed++;
-    };
+    my $cleanup_guard = Scope::Guard->new( $cleanup );
 
-    $subs = {
+    push @cleanups, $cleanup;
+    weaken $cleanups[-1];
+
+    $config_sub = sub () {
+        return $config
+            if $config;
+        require WebGUI::Config;
+        $config = WebGUI::Config->new($configFile, 1);
+        return $config;
+    },
+    $session_sub = sub () {
+        return $session
+            if $session && ! $session->closed;
+
+        require WebGUI::Session;
+        $session = WebGUI::Session->open($config_sub->());
+        $session->user({userId => 3});
+        return $session;
+    };
+    $dbh_sub = sub () {
+        return $dbh
+            if $dbh;
+
+        $dbh = WebGUI::Upgrade->dbhForConfig($config_sub->());
+        return $dbh;
+    };
+    $version_tag_sub = sub (;$) {
+        my $name = shift;
+        require WebGUI::VersionTag;
+        if ($versionTag) {
+            if ($name) {
+                $versionTag->commit;
+            }
+            elsif ( ! $versionTag->get('isCommitted') ) {
+                return $versionTag;
+            }
+        }
+        if (! $name) {
+            no warnings 'uninitialized';
+            (undef, undef, my $shortname) = File::Spec->splitpath($upgrade_file);
+            $shortname =~ s/\.[^.]*$//;
+            $name = $shortname;
+        }
+        $versionTag = WebGUI::VersionTag->getWorking($session_sub->());
+        $versionTag->set({name => "Upgrade to $version - $name"});
+        return $versionTag;
+    };
+    $collateral_sub = sub () {
+        return $collateral
+            if $collateral;
+        (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
+        $shortname =~ s/\.[^.]*$//;
+        my $path = File::Spec->catpath($vol, File::Spec->catdir($dir, $shortname), '');
+        $collateral = Path::Class::Dir->new($path);
+        return $collateral;
+    };
+    return {
+        config      => $config_sub,
+        session     => $session_sub,
+        dbh         => $dbh_sub,
+        version_tag => $version_tag_sub,
+        collateral  => $collateral_sub,
+
+        _cleanup => sub {
+            undef $cleanup_guard;
+        },
         quiet => sub () {
             return $quiet;
         },
@@ -78,59 +148,11 @@ sub _build_exports {
             print "Done.\n"
                 unless $quiet;
         },
-        config => sub () {
-            return $config
-                if $config;
-            $check_cleanup->();
-            require WebGUI::Config;
-            $config = WebGUI::Config->new($configFile, 1);
-            return $config;
-        },
-        session => sub () {
-            return $session
-                if $session && ! $session->closed;
-
-            $check_cleanup->();
-            require WebGUI::Session;
-            $session = WebGUI::Session->open($subs->{config}->());
-            $session->user({userId => 3});
-            return $session;
-        },
-        dbh => sub () {
-            return $dbh
-                if $dbh;
-
-            $check_cleanup->();
-            $dbh = WebGUI::Upgrade->dbhForConfig($subs->{config}->());
-            return $dbh;
-        },
         sql => sub (@) {
             my $sql = shift;
-            my $dbh = $subs->{dbh}->();
+            my $dbh = $dbh_sub->();
             my $sth = $dbh->prepare($sql);
             $sth->execute(@_);
-        },
-        version_tag => sub (;$) {
-            my $name = shift;
-            $check_cleanup->();
-            require WebGUI::VersionTag;
-            if ($versionTag) {
-                if ($name) {
-                    $versionTag->commit;
-                }
-                elsif ( ! $versionTag->get('isCommitted') ) {
-                    return $versionTag;
-                }
-            }
-            if (! $name) {
-                no warnings 'uninitialized';
-                (undef, undef, my $shortname) = File::Spec->splitpath($upgrade_file);
-                $shortname =~ s/\.[^.]*$//;
-                $name = $shortname;
-            }
-            $versionTag = WebGUI::VersionTag->getWorking($subs->{session}->());
-            $versionTag->set({name => "Upgrade to $version - $name"});
-            return $versionTag;
         },
         rm_lib => sub (@) {
             my @modules = @_;
@@ -143,31 +165,22 @@ sub _build_exports {
                 }
             }
         },
-        collateral => sub () {
-            return $collateral
-                if $collateral;
-            (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
-            $shortname =~ s/\.[^.]*$//;
-            my $path = File::Spec->catpath($vol, File::Spec->catdir($dir, $shortname), '');
-            $collateral = Path::Class::Dir->new($path);
-            return $collateral;
-        },
         import_package => sub (@) {
-            my $fullPath = $subs->{collateral}->()->file(@_);
+            my $fullPath = $collateral_sub->()->file(@_);
             require WebGUI::Upgrade::File::wgpkg;
-            WebGUI::Upgrade::File::wgpkg->import_package($subs->{session}->(), $fullPath);
+            WebGUI::Upgrade::File::wgpkg->import_package($session_sub->(), $fullPath);
         },
         root_asset => sub () {
             require WebGUI::Asset;
-            return WebGUI::Asset->getRoot($subs->{session}->());
+            return WebGUI::Asset->getRoot($session_sub->());
         },
         import_node => sub () {
             require WebGUI::Asset;
-            return WebGUI::Asset->getImportNode($subs->{session}->());
+            return WebGUI::Asset->getImportNode($session_sub->());
         },
         asset => sub ($) {
             require WebGUI::Asset;
-            my $session = $subs->{session}->();
+            my $session = $session_sub->();
             my $assetId = shift;
             my $asset;
             if ($session->id->valid($assetId)) {
@@ -181,31 +194,19 @@ sub _build_exports {
             return $asset;
         },
         clear_cache => sub () {
-            my $session = $subs->{session}->();
+            my $session = $session_sub->();
             my $cache = $session->cache;
             $cache->clear;
         },
     };
-    return $subs;
-}
-
-sub cleanup_guard {
-    my $class = shift;
-    my @previous_cleanups = @cleanups;
-    @cleanups = ();
-    return Scope::Guard->new(sub {
-        $class->cleanup;
-        @cleanups = @previous_cleanups;
-    });
-}
-
-sub cleanup {
-    $_->() for @cleanups;
-    @cleanups = ();
 }
 
 END {
-    __PACKAGE__->cleanup;
+    for (@cleanups) {
+        next
+            unless $_;
+        $_->();
+    }
 }
 
 1;
@@ -300,18 +301,5 @@ Returns the site's import node.
 =head2 asset ( $assetId_or_URL )
 
 Returns an asset based on an asset ID or URL.
-
-=head1 METHODS
-
-These methods are primarily of interest to someone wrapping an upgrade script.
-
-=head2 cleanup
-
-Performs all needed cleanup
-
-=head2 cleanup_guard
-
-Returns a guard object that when destroyed will run all of the cleanup
-functions that have been added since it was created.
 
 =cut

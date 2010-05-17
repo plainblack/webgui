@@ -5,9 +5,9 @@ use Cwd qw(realpath);
 use File::Spec::Functions;
 use WebGUI::Paths;
 
-report "\tMoving preload files ";
+report "\tMoving preload files ... ";
 
-my $webgui_root = realpath( catdir( dirname( $INC{'WebGUI/Upgrade/Script.pm'} ), updir x 3 ) );
+my $webgui_root = realpath( catdir( dirname( $INC{'WebGUI/Upgrade/Script.pm'} ), (updir) x 3 ) );
 
 config->set('maintenancePage', catfile( $webgui_root, 'www', 'maintenance.html' );
 
