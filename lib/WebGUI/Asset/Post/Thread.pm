@@ -1021,18 +1021,22 @@ sub unstick {
 
 #-------------------------------------------------------------------
 
-=head2 unsubscribe (  )
+=head2 unsubscribe ( [$user] )
 
-Negates the subscribe method.
+Unsubscribes a user from this thread.
+
+=head3 $user
+
+An optional user object to unsubscribe.  If the object isn't passed, then it uses the session user.
 
 =cut
 
 sub unsubscribe {
-    my $self = shift;
+    my $self  = shift;
+    my $user  = shift || $self->session->user;
     my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
-    return
-        if !$group;
-    $group->deleteUsers([$self->session->user->userId]);
+    return unless $group;
+    $group->deleteUsers([$user->userId]);
 }
 
 
@@ -1381,16 +1385,60 @@ sub www_unstick {
 
 #-------------------------------------------------------------------
 
-=head2 www_unsubscribe ( )
+=head2 www_unsubscribe ( [$message] )
 
 The web method to unsubscribe from a thread.
+
+=head3 $message
+
+An error message to display to the user.
 
 =cut
 
 sub www_unsubscribe {
-	my $self = shift;
-	$self->unsubscribe if $self->canSubscribe;
-	return $self->www_view;
+    my $self    = shift;
+    my $message = shift;
+    if($self->canSubscribe){
+        $self->unsubscribe;
+        return $self->www_view;
+    }
+    else {
+        my $session = $self->session;
+        my $i18n    = WebGUI::International->new($session, 'Asset_Collaboration');
+        my $var     = $self->get();
+        $var->{title}       = $self->getTitle;
+        $var->{url}         = $self->getUrl;
+        $var->{formHeader}  = WebGUI::Form::formHeader($session)
+                            . WebGUI::Form::hidden($session, { name => 'func', value => 'unsubscribeConfirm', }, ),
+        $var->{formFooter}  = WebGUI::Form::formFooter($session),
+        $var->{formSubmit}  = WebGUI::Form::submit($session, { value => $i18n->get('unsubscribe'), }),
+        $var->{formEmail}   = WebGUI::Form::email($session, { name => 'userEmail', value => $session->form->process('userEmail'), }),
+        $var->{formMessage} = $message;
+        return $self->getParent->processStyle($self->processTemplate($var, $self->getParent->get("unsubscribeTemplateId")));
+    } 
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_unsubscribeConfirm (  )
+
+Process the unsubscribe form.
+
+=cut
+
+sub www_unsubscribeConfirm {
+    my $self    = shift;
+    my $session = $self->session;
+    return $self->www_view unless $session->form->validToken;
+    my $email   = $session->form->process('userEmail', 'email');
+    return $self->www_view unless $email;
+    my $user = WebGUI::User->newByEmail($session, $email);
+    my $i18n = WebGUI::International->new($session, 'Asset_Collaboration');
+    if (! $user) {
+        return $self->www_unsubscribe($i18n->get('no user email error message'));
+    }
+    $self->unsubscribe($user);
+    return $self->www_unsubscribe($i18n->get('You have been unsubscribed'));
 }
 
 #-------------------------------------------------------------------

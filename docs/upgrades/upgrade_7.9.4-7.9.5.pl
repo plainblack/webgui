@@ -36,6 +36,7 @@ modifySortItems( $session );
 fixRequestForApprovalScratch($session);
 addRejectNoticeSetting($session);
 updateGroupGroupingsTable($session);
+installNewCSUnsubscribeTemplate($session);
 
 finish($session); # this line required
 
@@ -54,6 +55,15 @@ sub addRejectNoticeSetting {
     my $session = shift;
     print "\tAdding reject notice setting... " unless $quiet;
     $session->setting->add('sendRejectNotice',1);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub installNewCSUnsubscribeTemplate {
+    my $session = shift;
+    print "\tAdding new unsubscribe template to the CS... " unless $quiet;
+    $session->db->write(q|ALTER TABLE Collaboration ADD COLUMN unsubscribeTemplateId CHAR(22) NOT NULL|);
+    $session->db->write(q|UPDATE Collaboration set unsubscribeTemplateId='default_CS_unsubscribe'|);
     print "DONE!\n" unless $quiet;
 }
 
