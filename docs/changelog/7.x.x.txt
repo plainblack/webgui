@@ -21,6 +21,8 @@
  - fixed #11563: Syndicated Content - descriptionFirstParagraph cuts off
  - fixed #11538: User invite mail: whitespace in message lost
  - fixed #11549: Shortcut Asset cannot override Page Layout
+ - added #11502: Gallery: Allow specification of location when uploading ZIP archives
+ - added #11517: Gallery: Sorting of files uploaded in zip archives
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility
