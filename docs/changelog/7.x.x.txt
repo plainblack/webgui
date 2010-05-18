@@ -20,6 +20,7 @@
  - fixed #11572: visitors can enter editProfile
  - fixed #11563: Syndicated Content - descriptionFirstParagraph cuts off
  - fixed #11538: User invite mail: whitespace in message lost
+ - fixed #11549: Shortcut Asset cannot override Page Layout
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility
