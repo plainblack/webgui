@@ -94,7 +94,7 @@ sub getValue {
 	my $self = shift;
 	my $value = $self->SUPER::getValue(@_);
 	$value =~ tr/\r\n//d;
-	$value =~ tr/a-z/A-Z/d;
+	$value =~ tr/a-z/A-Z/;
    	if ($value =~ /^[A-Z\d\s\-]+$/) {
 		return $value;
 	}
