@@ -567,7 +567,10 @@ sub getTemplateVars {
     $var->{ canComment          } = $self->canComment;
     $var->{ canEdit             } = $self->canEdit;
     $var->{ numberOfComments    } = scalar @{ $self->getCommentIds };
-    $var->{ ownerUsername       } = $owner->profileField("alias") || $owner->username;
+    $var->{ ownerUsername       } = $owner->get("username");
+    $var->{ ownerAlias          } = $owner->get("alias") || $owner->get("username");
+    $var->{ ownerId             } = $owner->getId;
+    $var->{ ownerProfileUrl     } = $owner->getProfileUrl;
     $var->{ url                 } = $self->getUrl;
     $var->{ url_addArchive      } = $self->getParent->getUrl('func=addArchive'),    
     $var->{ url_delete          } = $self->getUrl('func=delete');

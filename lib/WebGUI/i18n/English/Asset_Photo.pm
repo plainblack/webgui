@@ -88,17 +88,17 @@ our $I18N = {
     },
 
     'helpvar isNewPhoto' => {
-        message     => 'This variable is true if the user is adding a new Photo',
+        message     => 'This variable is true if the user is adding a new Photo.',
         lastUpdated => 0,
     },
 
     'helpvar commentForm_start' => {
-        message     => 'Begin the comment form',
+        message     => 'Begin the comment form.',
         lastUpdated => 0,
     }, 
 
     'helpvar commentForm_end' => {
-        message     => 'End the comment form',
+        message     => 'End the comment form.',
         lastUpdated => 0,
     },
 
@@ -108,37 +108,52 @@ our $I18N = {
     },
 
     'helpvar commentForm_submit' => {
-        message     => 'Submit the comment form',
+        message     => 'Submit the comment form.',
         lastUpdated => 0,
     },
 
     'helpvar canComment' => {
-        message     => 'This is true if the current user can comment on this photo',
+        message     => 'This is true if the current user can comment on this photo.',
         lastUpdated => 0,
     },
 
     'helpvar canEdit' => {
-        message     => 'This is true if the current user can edit this photo',
+        message     => 'This is true if the current user can edit this photo.',
         lastUpdated => 0,
     },
 
     'helpvar fileUrl' => {
-        message     => 'The URL to the normal-sized photo',
+        message     => 'The URL to the normal-sized photo.',
         lastUpdated => 0,
     },
 
     'helpvar numberOfComments' => {
-        message     => 'The total number of comments on this photo',
+        message     => 'The total number of comments on this photo.',
         lastUpdated => 0,
     },
 
     'helpvar ownerUsername' => {
-        message     => 'The username of the user who posted this photo',
+        message     => 'The username of the user who posted this photo.',
+        lastUpdated => 0,
+    },
+
+    'helpvar ownerAlias' => {
+        message     => 'The alias of the user who posted this photo. Defaults to the username if not available.',
+        lastUpdated => 0,
+    },
+
+    'helpvar ownerId' => {
+        message     => 'The Id of the user who posted this photo.',
+        lastUpdated => 0,
+    },
+
+    'helpvar ownerProfileUrl' => {
+        message     => 'The URL to the profile of the user who posted this photo.',
         lastUpdated => 0,
     },
 
     'helpvar thumbnailUrl' => {
-        message     => 'The URL to the thumbnail of this photo',
+        message     => 'The URL to the thumbnail of this photo.',
         lastUpdated => 0,
     },
 
@@ -148,12 +163,12 @@ our $I18N = {
     },
 
     'helpvar url_demote' => {
-        message     => 'The URL to demote this photo in rank. Will return the user directly to the parent GalleryAlbum edit form',
+        message     => 'The URL to demote this photo in rank. Will return the user directly to the parent GalleryAlbum edit form.',
         lastUpdated => 0,
     },
 
     'helpvar url_edit' => {
-        message     => 'The URL to edit this photo',
+        message     => 'The URL to edit this photo.',
         lastUpdated => 0,
     },
 
@@ -168,12 +183,12 @@ our $I18N = {
     },
 
     'helpvar url_listFilesForOwner' => {
-        message     => 'The URL to list files and albums posted by the owner of this photo',
+        message     => 'The URL to list files and albums posted by the owner of this photo.',
         lastUpdated => 0,
     },
 
     'helpvar url_promote' => {
-        message     => 'The URL to promote this photo in rank. Will return the user directly to the parent GalleryAlbum edit form',
+        message     => 'The URL to promote this photo in rank. Will return the user directly to the parent GalleryAlbum edit form.',
         lastUpdated => 0,
     },
 
@@ -193,22 +208,22 @@ our $I18N = {
     },
 
     'helpvar exifLoop' => {
-        message     => 'A loop of EXIF tags',
+        message     => 'A loop of EXIF tags.',
         lastUpdated => 0,
     },
 
     'helpvar exifLoop tag' => {
-        message     => 'The name of the EXIF tag',
+        message     => 'The name of the EXIF tag.',
         lastUpdated => 0,
     },
 
     'helpvar exifLoop value' => {
-        message     => 'The value of the EXIF tag',
+        message     => 'The value of the EXIF tag.',
         lastUpdated => 0,
     },
 
     'helpvar url_addArchive' => {
-        message     => 'The URL to add an archive to the parent Album',
+        message     => 'The URL to add an archive to the parent Album.',
         lastUpdated => 0,
     },
 
@@ -263,7 +278,7 @@ our $I18N = {
     },
 
     'helpvar commentLoop' => {
-        message     => 'Loop over a page of comments to this photo',
+        message     => 'Loop over a page of comments to this photo.',
         lastUpdated => 0,
     },
 
@@ -278,12 +293,12 @@ our $I18N = {
     },
 
     'helpvar commentLoop creationDate' => {
-        message     => 'The creation date of the comment',
+        message     => 'The creation date of the comment.',
         lastUpdated => 0,
     },
 
     'helpvar commentLoop bodyText' => {
-        message     => 'The body of the comment',
+        message     => 'The body of the comment.',
         lastUpdated => 0,
     },
 
@@ -298,7 +313,7 @@ our $I18N = {
     },
 
     'helpvar commentLoop_pageBar' => {
-        message     => 'The bar to navigate through pages of comments',
+        message     => 'The bar to navigate through pages of comments.',
         lastUpdated => 0,
     },
 
@@ -370,13 +385,13 @@ our $I18N = {
     'template view title' => {
         message     => 'Photo Details',
         lastUpdated => 0,
-        context     => 'The title of the default view of Photo assets',
+        context     => 'The title of the default view of Photo assets.',
     },
 
     'template view details' => {
         message     => 'Details',
         lastUpdated => 0,
-        context     => 'List of information about the photo',
+        context     => 'List of information about the photo.',
     },
 
     'more details' => {
@@ -492,6 +507,12 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Label for photos that are not friends only',
     },
+    
+    'template filesForUser' => {
+        message     => 'more photos',
+        lastUpdated => 0,
+        context     => 'Label for the link to the users\' photos.',
+    },    
 
     'template assetName' => {
         message     => 'Photo',
