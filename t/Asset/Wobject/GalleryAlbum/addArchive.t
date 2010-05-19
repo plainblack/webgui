@@ -136,8 +136,8 @@ $album->addArchive( WebGUI::Test->getTestCollateralPath('gallery_archive_sorting
 my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });
 # Check order
 cmp_deeply(
-    [ map { $_->get("filename") } @$images ],
-    [ "photo1.jpg", "photo2.jpg", "photo4.jpg", "photo3.jpg" ],
+    [ map { $_->get("filename") } @{ $images } ],
+    [ "photo1.jpg", "photo4.jpg", "photo3.jpg", "photo2.jpg", ],
     "Photos sorted by file order"
 );
 # Empty gallery album
