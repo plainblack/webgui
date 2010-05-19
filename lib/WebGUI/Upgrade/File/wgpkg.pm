@@ -1,7 +1,6 @@
 package WebGUI::Upgrade::File::wgpkg;
-use 5.010;
-use strict;
-use warnings;
+use Moose;
+with 'WebGUI::Upgrade::File';
 
 use WebGUI::Asset;
 use WebGUI::Session;
@@ -9,10 +8,11 @@ use WebGUI::Storage;
 use WebGUI::VersionTag;
 use File::Spec;
 use Try::Tiny;
+use namespace::clean;
 
 sub run {
     my $class = shift;
-    my ($configFile, $version, $file, $quiet) = @_;
+    my ($upgrade, $configFile, $version, $file) = @_;
 
     my $session = WebGUI::Session->open($configFile);
     $session->user({userId => 3});
@@ -23,6 +23,9 @@ sub run {
     $versionTag->set({name => "Upgrade to $version - $shortname"});
 
     my $package = $class->import_package($session, $file);
+    if (! $upgrade->quiet) {
+        printf "\tImported '%s'\n", $package->title;
+    }
 
     $versionTag->commit;
     $session->var->end;
@@ -34,8 +37,8 @@ sub run {
 sub import_package {
     my $class = shift;
     my ($session, $file) = @_;
-    # Make a storage location for the package
 
+    # Make a storage location for the package
     my $storage = WebGUI::Storage->createTemp( $session );
     $storage->addFileFromFilesystem( $file );
 
@@ -47,6 +50,10 @@ sub import_package {
             clearPackageFlag   => 1,
             setDefaultTemplate => 1,
         } );
+    }
+    catch {
+        $storage->delete;
+        die "Error during package import on $file: $_";
     };
 
     $storage->delete;
@@ -54,26 +61,10 @@ sub import_package {
     if ($package eq 'corrupt') {
         die "Corrupt package found in $file.\n";
     }
-    if ($@ || !defined $package) {
-        die "Error during package import on $file: $@\n";
-    }
 
-    # Turn off the package flag, and set the default flag for templates added
-    my $assetIds = $package->getLineage( ['self','descendants'] );
-    for my $assetId ( @{ $assetIds } ) {
-        my $asset = WebGUI::Asset->newById( $session, $assetId );
-        if ( !$asset ) {
-            print "Couldn't instantiate asset with ID '$assetId'. Please check package '$file' for corruption.\n";
-            next;
-        }
-        my $properties = { isPackage => 0 };
-        if ($asset->isa('WebGUI::Asset::Template')) {
-            $properties->{isDefault} = 1;
-        }
-        $asset->update( $properties );
-    }
     return $package;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

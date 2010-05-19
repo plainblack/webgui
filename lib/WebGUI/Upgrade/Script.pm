@@ -5,6 +5,7 @@ use warnings;
 use feature ();
 
 use Sub::Exporter;
+use Sub::Name;
 use WebGUI::Upgrade ();
 use Scope::Guard;
 use Scalar::Util qw(weaken);
@@ -25,6 +26,7 @@ sub import {
         $extra->{into_level}++;
     }
 
+    # save this in a lexical so _build_exports can pull it out
     $caller_upgrade_file = File::Spec->rel2abs( (caller 0)[1] );
 
     feature->import(':5.10');
@@ -34,30 +36,71 @@ sub import {
     $class->$exporter( $extra, @args );
 }
 
-our @cleanups;
+my @cleanups;
 
 sub _build_exports {
-    my $configFile = $ENV{WEBGUI_CONFIG} || die 'WEBGUI_CONFIG environment variable must be specified';
-    my $version    = $ENV{WEBGUI_UPGRADE_VERSION} || die 'WEBGUI_UPGRADE_VERSION must be set';
-    my $quiet      = $ENV{WEBGUI_UPGRADE_QUIET};
-
-    my $session;
-    my $config;
-    my $dbh;
-    my $collateral;
-    my $versionTag;
+    my $configFile   = $ENV{WEBGUI_CONFIG} || die 'WEBGUI_CONFIG environment variable must be specified';
+    my $version      = $ENV{WEBGUI_UPGRADE_VERSION} || die 'WEBGUI_UPGRADE_VERSION must be set';
+    my $quiet        = $ENV{WEBGUI_UPGRADE_QUIET};
     my $upgrade_file = $caller_upgrade_file;
+    (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
+    $shortname =~ s/\.[^.]*$//;
 
-    my $session_sub;
-    my $config_sub;
-    my $dbh_sub;
-    my $collateral_sub;
-    my $version_tag_sub;
+    # need to be able to reference these directly in the cleanup code
+    my $session;
+    my $versionTag;
 
-    my $run_cleanup = 0;
+    # these subs are kept separate so the others can call them
+    my $config_sub = sub () {
+        state $config = do {
+            require WebGUI::Config;
+            WebGUI::Config->new($configFile, 1);
+        };
+        return $config;
+    };
+    my $session_sub = sub () {
+        return $session
+            if $session && ! $session->closed;
+
+        require WebGUI::Session;
+        $session = WebGUI::Session->open($config_sub->());
+        $session->user({userId => 3});
+        return $session;
+    };
+    my $version_tag_sub = sub (;$) {
+        my $name = shift;
+        require WebGUI::VersionTag;
+        if ($versionTag) {
+            if ($name) {
+                $versionTag->commit;
+            }
+            elsif ( ! $versionTag->get('isCommitted') ) {
+                return $versionTag;
+            }
+        }
+        $name ||= $shortname;
+        $versionTag = WebGUI::VersionTag->getWorking($session_sub->());
+        $versionTag->set({name => "Upgrade to $version - $name"});
+        return $versionTag;
+    };
+    my $dbh_sub = sub () {
+        state $dbh = do {
+            WebGUI::Upgrade->dbhForConfig($config_sub->());
+        };
+        return $dbh;
+    };
+    my $collateral_sub = sub () {
+        state $collateral = do {
+            my $path = File::Spec->catpath($vol, File::Spec->catdir($dir, $shortname), '');
+            Path::Class::Dir->new($path);
+        };
+        return $collateral;
+    };
+
     my $cleanup = sub {
+        state $has_run = 0;
         return
-            if $run_cleanup++;
+            if $has_run++;
         if ($session) {
             require WebGUI::VersionTag;
             if (WebGUI::VersionTag->getWorking($session, 'nocreate')) {
@@ -71,72 +114,24 @@ sub _build_exports {
     };
     my $cleanup_guard = Scope::Guard->new( $cleanup );
 
+    # we keep a weakened copy around.  this prevents us from keeping a
+    # copy if the guard gets freed, but otherwise allows us to call it
+    # manually in END.
     push @cleanups, $cleanup;
     weaken $cleanups[-1];
 
-    $config_sub = sub () {
-        return $config
-            if $config;
-        require WebGUI::Config;
-        $config = WebGUI::Config->new($configFile, 1);
-        return $config;
-    },
-    $session_sub = sub () {
-        return $session
-            if $session && ! $session->closed;
-
-        require WebGUI::Session;
-        $session = WebGUI::Session->open($config_sub->());
-        $session->user({userId => 3});
-        return $session;
-    };
-    $dbh_sub = sub () {
-        return $dbh
-            if $dbh;
-
-        $dbh = WebGUI::Upgrade->dbhForConfig($config_sub->());
-        return $dbh;
-    };
-    $version_tag_sub = sub (;$) {
-        my $name = shift;
-        require WebGUI::VersionTag;
-        if ($versionTag) {
-            if ($name) {
-                $versionTag->commit;
-            }
-            elsif ( ! $versionTag->get('isCommitted') ) {
-                return $versionTag;
-            }
-        }
-        if (! $name) {
-            no warnings 'uninitialized';
-            (undef, undef, my $shortname) = File::Spec->splitpath($upgrade_file);
-            $shortname =~ s/\.[^.]*$//;
-            $name = $shortname;
-        }
-        $versionTag = WebGUI::VersionTag->getWorking($session_sub->());
-        $versionTag->set({name => "Upgrade to $version - $name"});
-        return $versionTag;
-    };
-    $collateral_sub = sub () {
-        return $collateral
-            if $collateral;
-        (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
-        $shortname =~ s/\.[^.]*$//;
-        my $path = File::Spec->catpath($vol, File::Spec->catdir($dir, $shortname), '');
-        $collateral = Path::Class::Dir->new($path);
-        return $collateral;
-    };
-    return {
-        config      => $config_sub,
-        session     => $session_sub,
-        dbh         => $dbh_sub,
-        version_tag => $version_tag_sub,
-        collateral  => $collateral_sub,
-
+    my $subs = {
+        # this closes over the guard, keeping it alive until the sub is either
+        # run or deleted.  WebGUI::Upgrade::File::pl will end up deleting
+        # the sub when it cleans up the temporary namespace it uses.
         _cleanup => sub {
             undef $cleanup_guard;
         },
+        config      => $config_sub,
+        session     => $session_sub,
+        version_tag => $version_tag_sub,
+        dbh         => $dbh_sub,
+        collateral  => $collateral_sub,
         quiet => sub () {
             return $quiet;
         },
@@ -199,13 +194,21 @@ sub _build_exports {
             $cache->clear;
         },
     };
+    # give the subs some names to help with diagnostics
+    my $sub_package = $shortname;
+    $sub_package =~ s/\W//g;
+    for my $sub_name ( keys %$subs ) {
+        subname join('::', __PACKAGE__, $sub_package, $sub_name) => $subs->{$sub_name};
+    }
+    return $subs;
 }
 
 END {
-    for (@cleanups) {
+    for my $cleanup (@cleanups) {
+        # could be a weakened ref that went away
         next
-            unless $_;
-        $_->();
+            unless $cleanup;
+        $cleanup->();
     }
 }
 

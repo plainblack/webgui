@@ -9,6 +9,7 @@ use Try::Tiny;
 use File::Spec;
 use File::Path qw(make_path);
 use POSIX qw(strftime);
+use Cwd ();
 use namespace::autoclean;
 
 has quiet => (
@@ -38,6 +39,10 @@ has useMaintenanceMode => (
 has backupPath => (
     is      => 'rw',
     default => File::Spec->catdir(File::Spec->tmpdir, 'backups'),
+);
+has _files_run => (
+    is      => 'rw',
+    default => sub { { } },
 );
 
 sub upgradeSites {
@@ -155,15 +160,19 @@ sub runUpgradeStep {
 
 sub runUpgradeFile {
     my $self = shift;
-    my ($configFile, $version, $filename, $quiet) = @_;
+    my ($configFile, $version, $filename) = @_;
+    my $has_run = $self->_files_run->{ Cwd::realpath($filename) } ++;
 
     my ($extension) = $filename =~ /\.([^.]+)$/;
     return
         unless $extension;
 
     my $package = 'WebGUI::Upgrade::File::' . $extension;
-    if ( try { WebGUI::Pluggable::load($package) } && $package->can('run') ) {
-        return $package->run($configFile, $version, $filename, $self->quiet);
+    if ( try { WebGUI::Pluggable::load($package) } && $package->DOES('WebGUI::Upgrade::File') ) {
+        if ($has_run && $package->once) {
+            return;
+        }
+        return $package->run($self, $configFile, $version, $filename);
     }
     warn "Don't know how to use $extension upgrade file\n";
     return;
@@ -248,6 +257,9 @@ sub dbhForConfig {
 sub mysqlCommandLine {
     my $class = shift;
     my $config = shift;
+    if (! ref $config) {
+        $config = WebGUI::Config->new($config, 1);
+    }
 
     my $dsn = $config->get('dsn');
     my $username = $config->get('dbuser');

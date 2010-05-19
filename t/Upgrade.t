@@ -38,6 +38,7 @@ my $upgrade = Test::MockObject::Extends->new(
 );
 $upgrade->set_always('getCurrentVersion', '8.0.0');
 $upgrade->set_always('getCodeVersion', '8.4.3');
+$upgrade->set_true('markVersionUpgrade');
 
 {
     no warnings 'redefine';
@@ -74,8 +75,8 @@ capture {
 $upgrade->called_pos_ok(1, 'getCurrentVersion');
 $upgrade->called_pos_ok(2, 'getCodeVersion');
 SKIP: {
-    $upgrade->called_pos_ok(3, 'runUpgradeFile') || skip 'upgrade not run', 1;
-    my $upgradeFile = $upgrade->call_args_pos(3, 4);
+    $upgrade->called_pos_ok(4, 'runUpgradeFile') || skip 'upgrade not run', 1;
+    my $upgradeFile = $upgrade->call_args_pos(4, 4);
     ok $upgradeFile =~ /\b00_simple\.pl$/, 'correct upgrade file run';
 }
 
@@ -89,14 +90,16 @@ $upgrade->mock(testUpgrade => sub {
 });
 
 {
-    my $stdout = capture { $upgrade->testUpgrade('output.pl') };
+    my $stdout = capture { eval {
+        $upgrade->testUpgrade('output.pl');
+    } };
     ok $stdout =~ 'Simple Output', 'report command functions correctly';
     ok $stdout =~ 'Done', 'done command functions correctly';
 }
 
 {
     $upgrade->quiet(1);
-    my $stdout = capture { $upgrade->testUpgrade('output.pl') };
+    my $stdout = capture { eval { $upgrade->testUpgrade('output.pl') } };
     ok $stdout !~ 'Simple Output', 'quiet flag silences report command';
     ok $stdout !~ 'Done', 'quiet flag silences done command';
 }
@@ -166,9 +169,9 @@ END_PM
 }
 
 {
-    my $stdout = capture {
+    my $stdout = capture { eval {
         $upgrade->testUpgrade('select.sql');
-    };
+    } };
     my @lines = split /[\r\n]+/, $stdout;
     my $dateApplied = $lines[1];
 

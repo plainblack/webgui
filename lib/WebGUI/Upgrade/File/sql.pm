@@ -1,17 +1,15 @@
 package WebGUI::Upgrade::File::sql;
-use strict;
-use warnings;
-
-use WebGUI::Config;
-use WebGUI::Upgrade;
+use Moose;
+with 'WebGUI::Upgrade::File';
 
 sub run {
-    my ($class, $configFile, $version, $file, $quiet) = @_;
+    my $class = shift;
+    my ($upgrade, $configFile, $version, $file) = @_;
 
-    my $config = WebGUI::Config->new($configFile, 1);
     my @command_line = (
-        'mysql',
-        WebGUI::Upgrade->mysqlCommandLine($config),
+        $upgrade->mysql,
+        $upgrade->mysqlCommandLine($configFile),
+        '--batch',
         '--execute=source ' . $file,
     );
 
@@ -20,5 +18,6 @@ sub run {
     return 1;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

@@ -1,14 +1,19 @@
 package WebGUI::Upgrade::File::pl;
-use 5.010;
-use strict;
-use warnings;
-
-use WebGUI::Upgrade::Script ();
-use Path::Class::Dir ();
-use Try::Tiny;
-use namespace::clean;
-use Class::MOP;
+use Moose;
 use Class::MOP::Class;
+use namespace::autoclean -also => qr/^_/;
+
+with 'WebGUI::Upgrade::File';
+
+sub run {
+    my $class = shift;
+    my ($upgrade, $configFile, $version, $file) = @_;
+
+    local $ENV{WEBGUI_CONFIG}           = $configFile;
+    local $ENV{WEBGUI_UPGRADE_VERSION}  = $version;
+    local $ENV{WEBGUI_UPGRADE_QUIET}    = $upgrade->quiet;
+    return _runScript($file);
+}
 
 sub _runScript {
     my $file = shift;
@@ -17,11 +22,11 @@ sub _runScript {
     {
         local $@;
         local *_;
+        # use an anonymous package for this code.  the namespace will
+        # automatically be deleted when this goes out of scope.
         my $anon_class = Class::MOP::Class->create_anon_class;
         my $wanted = wantarray;
         eval sprintf(<<'END_CODE', $anon_class->name);
-            # place this in a specific separate package to prevent namespace
-            # pollution and to allow us to clean it up afterward
             package %s;
             # maintain context
             if ($wanted) {
@@ -33,7 +38,7 @@ sub _runScript {
             else {
                 do $file;
             }
-            # save error as soon as possible
+            # save error as soon as possible, before local removes it
             $err = $@;
 END_CODE
     }
@@ -42,14 +47,5 @@ END_CODE
     return (wantarray ? @res : $res[0]);
 }
 
-sub run {
-    my $class = shift;
-    my ($configFile, $version, $file, $quiet) = @_;
-
-    local $ENV{WEBGUI_CONFIG}           = $configFile;
-    local $ENV{WEBGUI_UPGRADE_VERSION}  = $version;
-    local $ENV{WEBGUI_UPGRADE_QUIET}    = $quiet;
-    return _runScript($file);
-}
-
+__PACKAGE__->meta->make_immutable;
 1;
