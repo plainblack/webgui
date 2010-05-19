@@ -790,7 +790,7 @@
     "BackToSite"       : "BackToSite",
     "CanEditText"      : "CanEditText", 
     "CartItemCount"    : "CartItemCount",
-    "ConvertToUTC"     : "ConvertToUTC",
+    "ConvertUTCToTZ"   : "ConvertUTCToTZ",
     "c"                : "c_companyName", 
     "D"                : "D_date", 
     "DeactivateAccount": "DeactivateAccount",

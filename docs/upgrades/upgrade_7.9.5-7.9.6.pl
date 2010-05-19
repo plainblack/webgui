@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixConvertUTCMacroName($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,18 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixConvertUTCMacroName {
+    my $session = shift;
+    print "\tFix the name of the ConvertUTCToTZ macro in the config file... " unless $quiet;
+    $session->config->deleteFromHash('macros', 'ConvertToUTC');
+    $session->config->addToHash('macros', 'ConvertUTCToTZ', 'ConvertUTCToTZ');
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
