@@ -1,3 +1,5 @@
+7.9.6
+
 7.9.5
  - Asset->www_copy now has a progress bar
  - fixed #11556: New cart doesn't work with other forms on the same page
