@@ -1,4 +1,5 @@
 7.9.6
+ - fixed #11577: Gallery Album: "Sort by" radio list missing in "Add Archive" view
 
 7.9.5
  - Asset->www_copy now has a progress bar
