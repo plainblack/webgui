@@ -1745,6 +1745,12 @@ the Collaboration Asset, the user will be notified.|,
         lastUpdated => 0,
     },
 
+    'collaboration unsubscribe template title' => {
+        message     => q{Collaboration System Unsubscribe Template},
+        context     => q{status message},
+        lastUpdated => 0,
+    },
+
 };
 
 1;
