@@ -127,7 +127,8 @@ $versionTag->rollback;
 #----------------------------------------------------------------------------
 # Test the sorting option of addArchive sub
 # gallery_archive_sorting_test.zip contains four jpgs: photo1.jpg, photo2.jpg, photo3.jpg and photo4.jpg
-# The following test covers sorting by date, name and file order (default).
+# The following test covers sorting by date and name.  Testing fileOrder is not possible, because
+# it's machine dependent.
 
 $versionTag = WebGUI::VersionTag->getWorking($session);
 # Add photos sorted by file order (default)
@@ -135,10 +136,10 @@ $album->addArchive( WebGUI::Test->getTestCollateralPath('gallery_archive_sorting
 # Get all children
 my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });
 # Check order
-cmp_deeply(
+cmp_bag(
     [ map { $_->get("filename") } @{ $images } ],
     [ "photo1.jpg", "photo4.jpg", "photo3.jpg", "photo2.jpg", ],
-    "Photos sorted by file order"
+    "Photos sorted by file order (all files exist)"
 );
 # Empty gallery album
 $versionTag->rollback;
