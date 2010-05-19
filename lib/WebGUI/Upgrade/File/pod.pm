@@ -5,10 +5,9 @@ with 'WebGUI::Upgrade::File';
 sub once { 1 }
 
 sub run {
-    my $class = shift;
-    my ($upgrade, $configFile, $version, $file) = @_;
-    if ( ! $upgrade->quiet ) {
-        system { $^X } $^X, '-MPod::Perldoc', '-ePod::Perldoc->run', $file;
+    my $self = shift;
+    if ( ! $self->quiet ) {
+        system { $^X } $^X, '-MPod::Perldoc', '-ePod::Perldoc->run', $self->file;
     }
 
     return 1;

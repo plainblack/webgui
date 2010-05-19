@@ -5,10 +5,9 @@ with 'WebGUI::Upgrade::File';
 sub once { 1 }
 
 sub run {
-    my $class = shift;
-    my ($upgrade, $configFile, $version, $file) = @_;
-    if ( ! $upgrade->quiet ) {
-        open my $fh, '<', $file;
+    my $self = shift;
+    if ( ! $self->quiet ) {
+        open my $fh, '<', $self->file;
         while ( my $line = <$fh> ) {
             print $line;
         }

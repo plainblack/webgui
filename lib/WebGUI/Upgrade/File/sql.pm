@@ -3,14 +3,13 @@ use Moose;
 with 'WebGUI::Upgrade::File';
 
 sub run {
-    my $class = shift;
-    my ($upgrade, $configFile, $version, $file) = @_;
+    my $self = shift;
 
     my @command_line = (
-        $upgrade->mysql,
-        $upgrade->mysqlCommandLine($configFile),
+        $self->upgrade->mysql,
+        $self->upgrade->mysqlCommandLine($self->configFile),
         '--batch',
-        '--execute=source ' . $file,
+        '--execute=source ' . $self->file,
     );
 
     system { $command_line[0] } @command_line

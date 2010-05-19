@@ -1,5 +1,5 @@
 package WebGUI::Upgrade;
-
+use 5.010;
 use Moose;
 use WebGUI::Paths;
 use WebGUI::Pluggable;
@@ -163,19 +163,42 @@ sub runUpgradeFile {
     my ($configFile, $version, $filename) = @_;
     my $has_run = $self->_files_run->{ Cwd::realpath($filename) } ++;
 
-    my ($extension) = $filename =~ /\.([^.]+)$/;
-    return
-        unless $extension;
-
-    my $package = 'WebGUI::Upgrade::File::' . $extension;
-    if ( try { WebGUI::Pluggable::load($package) } && $package->DOES('WebGUI::Upgrade::File') ) {
-        if ($has_run && $package->once) {
+    try {
+        my $upgrade_class = $self->classForFile($filename);
+        my $upgrade_file = $upgrade_class->new(
+            version     => $version,
+            file        => $filename,
+            upgrade     => $self,
+            configFile  => $configFile,
+        );
+        if ($has_run && $upgrade_file->once) {
             return;
         }
-        return $package->run($self, $configFile, $version, $filename);
+        $upgrade_file->run;
     }
-    warn "Don't know how to use $extension upgrade file\n";
+    catch {
+        when (/^No upgrade package/) {
+            warn $_;
+        }
+        default {
+            die $_;
+        }
+    };
     return;
+}
+
+sub classForFile {
+    my $class = shift;
+    my $file = shift;
+    my ($extension) = $file =~ /\.([^.]+)$/;
+    if ($extension) {
+        my $package = 'WebGUI::Upgrade::File::' . $extension;
+        WebGUI::Pluggable::load($package);
+        return $package
+            if $package->DOES('WebGUI::Upgrade::File');
+    }
+    no warnings 'uninitialized';
+    die "No upgrade package for extension: $extension";
 }
 
 sub markVersionUpgrade {

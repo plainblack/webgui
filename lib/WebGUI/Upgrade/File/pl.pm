@@ -6,13 +6,12 @@ use namespace::autoclean -also => qr/^_/;
 with 'WebGUI::Upgrade::File';
 
 sub run {
-    my $class = shift;
-    my ($upgrade, $configFile, $version, $file) = @_;
+    my $self = shift;
 
-    local $ENV{WEBGUI_CONFIG}           = $configFile;
-    local $ENV{WEBGUI_UPGRADE_VERSION}  = $version;
-    local $ENV{WEBGUI_UPGRADE_QUIET}    = $upgrade->quiet;
-    return _runScript($file);
+    local $ENV{WEBGUI_CONFIG}           = $self->configFile;
+    local $ENV{WEBGUI_UPGRADE_VERSION}  = $self->version;
+    local $ENV{WEBGUI_UPGRADE_QUIET}    = $self->quiet;
+    return _runScript($self->file);
 }
 
 sub _runScript {

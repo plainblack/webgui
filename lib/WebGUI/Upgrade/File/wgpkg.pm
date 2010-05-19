@@ -11,19 +11,18 @@ use Try::Tiny;
 use namespace::clean;
 
 sub run {
-    my $class = shift;
-    my ($upgrade, $configFile, $version, $file) = @_;
+    my $self = shift;
 
-    my $session = WebGUI::Session->open($configFile);
+    my $session = WebGUI::Session->open($self->configFile);
     $session->user({userId => 3});
 
     my $versionTag = WebGUI::VersionTag->getWorking($session);
-    (undef, undef, my $shortname) = File::Spec->splitpath($file);
+    (undef, undef, my $shortname) = File::Spec->splitpath($self->file);
     $shortname =~ s/\.[^.]*$//;
-    $versionTag->set({name => "Upgrade to $version - $shortname"});
+    $versionTag->set({name => "Upgrade to @{[$self->version]} - $shortname"});
 
-    my $package = $class->import_package($session, $file);
-    if (! $upgrade->quiet) {
+    my $package = $class->import_package($session, $self->file);
+    if (! $self->quiet) {
         printf "\tImported '%s'\n", $package->title;
     }
 
