@@ -1161,10 +1161,9 @@ sub postProcess {
             $self->trash;
         }
     }
-	my $user = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
-		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$user->profileField("alias").") --- \n</p>";
+		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$self->session->user->profileField("alias").") --- \n</p>";
 	}
 	$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply && $self->isNew);
 	$data{groupIdView} = $self->getThread->getParent->get("groupIdView");

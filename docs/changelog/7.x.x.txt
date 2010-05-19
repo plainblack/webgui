@@ -5,6 +5,7 @@
  - fixed #11538: User invite mail: whitespace in message lost
  - fixed #11549: Shortcut Asset cannot override Page Layout
  - fixed #11576: Default WebGUI config has a bad macro
+ - fixed #11578: Collaboration System: add edit stamp uses wrong user
 
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure
