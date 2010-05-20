@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 fixConvertUTCMacroName($session);
+dropOldEMSTableColumn($session);
 
 finish($session); # this line required
 
@@ -53,6 +54,16 @@ sub fixConvertUTCMacroName {
     print "\tFix the name of the ConvertUTCToTZ macro in the config file... " unless $quiet;
     $session->config->deleteFromHash('macros', 'ConvertToUTC');
     $session->config->addToHash('macros', 'ConvertUTCToTZ', 'ConvertUTCToTZ');
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub dropOldEMSTableColumn {
+    my $session = shift;
+    print "\tDrop an old column from the EventMangementSystem table that is no longer used... " unless $quiet;
+    $session->db->write(q|ALTER TABLE EventManagementSystem DROP COLUMN groupToApproveEvents|);
     # and here's our code
     print "DONE!\n" unless $quiet;
 }

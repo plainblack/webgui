@@ -310,7 +310,6 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
             'stateChangedBy'                    => ignore(),
             'lineage'                           => ignore(),
             'className'                         => 'WebGUI::Asset::Wobject::EventManagementSystem',
-            'groupToApproveEvents'              => ignore(),
             'lastModified'                      => ignore(),
             'title'                             => 'Test EMS',
             'groupIdView'                       => ignore(),
