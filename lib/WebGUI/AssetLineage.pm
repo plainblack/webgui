@@ -275,7 +275,7 @@ sub getFirstChild {
 			$assetLineage->{firstChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
-		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$child = eval { WebGUI::Asset->newByLineage($self->session,$lineage); };
 		$self->cacheChild(first => $child);
 	}
 	return $child;
@@ -301,7 +301,7 @@ sub getLastChild {
 			$assetLineage->{lastChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
-		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$child = eval { WebGUI::Asset->newByLineage($self->session,$lineage); };
 		$self->cacheChild(last => $child);
 	}
 	return $child;
