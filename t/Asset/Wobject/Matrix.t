@@ -109,6 +109,7 @@ my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'
 my $secondVersionTag = WebGUI::VersionTag->new($session,$matrixListing->get("tagId"));
 $secondVersionTag->commit;
 WebGUI::Test->tagsToRollback($secondVersionTag);
+$matrixListing = $matrixListing->cloneFromDb;
 
 # Test for sane object type
 isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');
@@ -155,7 +156,7 @@ cmp_deeply(
 
 # Test Listings Caching
 
-my $listingsEncoded = WebGUI::Cache->new($session,"matrixListings_".$matrix->getId)->get;
+my $listingsEncoded = $session->cache->get("matrixListings_".$matrix->getId);
 $listings = JSON->new->decode($listingsEncoded);
 
 cmp_deeply(
@@ -229,9 +230,9 @@ cmp_deeply(
 
 # Test statistics caching by view method
 
-WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->delete;
+$session->cache->remove("matrixStatistics_".$matrix->getId);
 $matrix->view;
-my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatisticsEncoded = $session->cache->get("matrixStatistics_".$matrix->getId);
 my $varStatistics = JSON->new->decode($varStatisticsEncoded);
 
 cmp_deeply(
@@ -302,9 +303,9 @@ $matrixListing->setRatings({category1=>'1',category2=>'9'});
 $matrixListing->setRatings({category1=>'3',category2=>'5'});
 $matrixListing->setRatings({category1=>'1',category2=>'9'});
 
-WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->delete;
+$session->cache->remove("matrixStatistics_".$matrix->getId);
 $matrix->view;
-my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatisticsEncoded = $session->cache->get("matrixStatistics_".$matrix->getId);
 my $varStatistics = JSON->new->decode($varStatisticsEncoded);
 
 cmp_deeply(
@@ -349,10 +350,10 @@ cmp_deeply(
     'With only 9 ratings, still no statistics'
 );
 
-WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->delete;
+$session->cache->remove("matrixStatistics_".$matrix->getId);
 $matrixListing->setRatings({category1=>'3'});
 $matrix->view;
-my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatisticsEncoded = $session->cache->get("matrixStatistics_".$matrix->getId);
 my $varStatistics = JSON->new->decode($varStatisticsEncoded);
 
 cmp_deeply(
@@ -364,7 +365,7 @@ cmp_deeply(
         best_rating_loop => [{
             url     => '/'.$matrixListing->get('url'),
             category=> 'category1',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 2,
             median  => 3,
             count   => 10,
@@ -380,7 +381,7 @@ cmp_deeply(
         worst_rating_loop => [{
             url     => '/'.$matrixListing->get('url'),
             category=> 'category1',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 2,
             median  => 3,
             count   => 10,
@@ -397,10 +398,10 @@ cmp_deeply(
     'statistics calculated for the category with 10 ratings'
 );
 
-WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->delete;
+$session->cache->remove("matrixStatistics_".$matrix->getId);
 $matrixListing->setRatings({category2=>'5'});
 $matrix->view;
-my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatisticsEncoded = $session->cache->get("matrixStatistics_".$matrix->getId);
 my $varStatistics = JSON->new->decode($varStatisticsEncoded);
 
 cmp_deeply(
@@ -412,7 +413,7 @@ cmp_deeply(
         best_rating_loop => [{
             url     => '/'.$matrixListing->get('url'),
             category=> 'category1',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 2,
             median  => 3,
             count   => 10,
@@ -420,7 +421,7 @@ cmp_deeply(
         {
             url     => '/'.$matrixListing->get('url'),
             category=> 'category2',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 7,
             median  => 9,
             count   => 10,
@@ -428,7 +429,7 @@ cmp_deeply(
         worst_rating_loop => [{
             url     => '/'.$matrixListing->get('url'),
             category=> 'category1',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 2,
             median  => 3,
             count   => 10,
@@ -436,7 +437,7 @@ cmp_deeply(
         {
             url     => '/'.$matrixListing->get('url'),
             category=> 'category2',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 7,
             median  => 9,
             count   => 10,
