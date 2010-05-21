@@ -51,6 +51,7 @@ my $album
     });
 
 $versionTag->commit;
+WebGUI::Test->addToCleanup($versionTag);
 
 is(
     Scalar::Util::blessed($album), "WebGUI::Asset::Wobject::GalleryAlbum",
@@ -66,14 +67,5 @@ isa_ok(
 my $properties  = $album->get;
 $album->purge;
 
-is(
-    WebGUI::Asset->newById($session, $properties->{assetId}), undef,
-    "Album no longer able to be instanciated",
-);
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+eval { WebGUI::Asset->newById($session, $properties->{assetId}); };
+ok( Exception::Class->caught(), 'Album no longer able to be instanciated');
