@@ -217,6 +217,7 @@ sub getRssFeedItems {
             author          => $item->author,
             guid            => $item->guid,
         );
+        push @items, \%feed_item;
     }
     return \@items;
 }
@@ -294,11 +295,12 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
-    $self->next::method;
-    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
-    if (!$template) {
+    $self->$orig();
+    my $template = eval { WebGUI::Asset->newById($self->session, $self->templateId); };
+    if (Exception::Class->caught()) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
             templateId => $self->templateId,
@@ -307,7 +309,7 @@ sub prepareView {
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -359,11 +361,11 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
-	my $self = shift;
-	$self->session->http->setCacheControl($self->cacheTimeout);
-	$self->next::method(@_);
-}
+override www_view => sub {
+    my $self = shift;
+    $self->session->http->setCacheControl($self->cacheTimeout);
+    super();
+};
 
 __PACKAGE__->meta->make_immutable;
 1;
