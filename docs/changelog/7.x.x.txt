@@ -3,6 +3,7 @@
  - fixed #11576: Default WebGUI config has a bad macro
  - fixed #11578: Collaboration System: add edit stamp uses wrong user
  - added #9774: More owner information in the gallery
+ - fixed #11581: Calendar problems
 
 7.9.5
  - Asset->www_copy now has a progress bar

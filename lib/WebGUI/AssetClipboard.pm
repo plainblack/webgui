@@ -486,7 +486,7 @@ sub www_duplicateList {
 	foreach my $assetId ($session->form->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
 		if ($asset->canEdit) {
-			my $newAsset = $asset->duplicate;
+			my $newAsset = $asset->duplicate({skipAutoCommitWorkflows => 1, });
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
 		}
 	}
