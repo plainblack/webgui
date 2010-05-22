@@ -365,58 +365,6 @@ sub www_view {
 	$self->next::method(@_);
 }
 
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS090 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS090 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS091 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS091 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS10 ( )
-
-Deprecated. Use www_viewRdf() instead.
-
-=cut
-
-sub www_viewRSS10 {
-	my $self = shift;
-	return $self->www_viewRdf;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS20 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS20 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
 __PACKAGE__->meta->make_immutable;
 1;
 
