@@ -73,6 +73,20 @@ sub import {
     return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 init_meta ( )
+
+A custom init_meta, so that if inported into a class, it applies the roles
+to the class, and applies the meta-role to the meta-class.
+
+But, if it is applied to a Role, then only the meta-role is applied, since we want
+the final application to be in the end user of the Role.
+
+This permits using this to compose Asset Roles with their own database tables.
+
+=cut
+
 sub init_meta {
     my $class = shift;
     my %args = @_;
