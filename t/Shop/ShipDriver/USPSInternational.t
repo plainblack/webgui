@@ -109,6 +109,9 @@ my $singlePage = $bible->setCollateral('variantsJSON', 'variantId', 'new',
 
 $versionTag->commit;
 addToCleanup($versionTag);
+foreach my $asset ($rockHammer, $bible) {
+    $asset = $asset->cloneFromDb;
+}
 
 #######################################################################
 #
