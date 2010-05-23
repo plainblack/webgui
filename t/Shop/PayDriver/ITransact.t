@@ -25,6 +25,7 @@ use WebGUI::Shop::Ship;
 use WebGUI::Shop::Transaction;
 use JSON;
 use HTML::Form;
+use WebGUI::Shop::PayDriver::ITransact;
 
 #----------------------------------------------------------------------------
 # Init
@@ -34,26 +35,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 28;
-plan tests => 1 + $tests;
+plan tests => 28;
 
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
 
-note('Testing existence');
-my $loaded = use_ok('WebGUI::Shop::PayDriver::ITransact');
-
 my $e;
-my $ship = WebGUI::Shop::Ship->new($session);
-my $cart = WebGUI::Shop::Cart->newBySession($session);
-my $shipper = $ship->getShipper('defaultfreeshipping000');
-my $address = $cart->getAddressBook->addAddress( { firstName => 'Ellis Boyd', lastName => 'Redding'} );
-$cart->update({
-    shippingAddressId => $address->getId,
-    shipperId         => $shipper->getId,
-});
-my $transaction;
-
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 my $home = WebGUI::Asset->getDefault($session);
@@ -82,13 +69,21 @@ my $foreignHammer = $rockHammer->setCollateral('variantsJSON', 'variantId', 'new
 
 
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
+$rockHammer = $rockHammer->cloneFromDb;
+
+my $ship = WebGUI::Shop::Ship->new($session);
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart);
+my $shipper = $ship->getShipper('defaultfreeshipping000');
+my $address = $cart->getAddressBook->addAddress( { firstName => 'Ellis Boyd', lastName => 'Redding'} );
+$cart->update({
+    shippingAddressId => $address->getId,
+    shipperId         => $shipper->getId,
+});
+
 
 my $hammerItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::PayDriver::ITransact', $tests unless $loaded;
 
 #######################################################################
 #
@@ -272,11 +267,12 @@ $driver->{_billingAddress} = {
 };
 
 
-$transaction = WebGUI::Shop::Transaction->create($session, {
+my $transaction = WebGUI::Shop::Transaction->create($session, {
     paymentMethod => $driver,
     cart          => $cart,
     isRecurring   => $cart->requiresRecurringPayment,
 });
+WebGUI::Test->addToCleanup($transaction);
 
 my $xml = $driver->_generatePaymentRequestXML($transaction);
 
@@ -292,11 +288,14 @@ TODO: {
 #######################################################################
 
 SKIP: {
-    skip "Skipping XML requests to ITransact due to lack of userId and password", 2 unless $hasTestAccount;
-    my $response = eval { $driver->doXmlRequest($xml) };
+    skip "Skipping XML requests to ITransact due to lack of real userId and password", 2 unless $hasTestAccount;
     note 'doXmlrequest';
-    isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
-    ok( $response->is_success, '... was successful');
+    my $response = eval { $driver->doXmlRequest($xml) };
+    my $ok_response = isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
+    SKIP: {
+        skip "Skipping response check since we did not get a response", 1 unless $ok_response;
+        ok( $response->is_success, '... was successful');
+    }
 }
 
 my $hammer2 = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $foreignHammer));
@@ -313,7 +312,6 @@ SKIP: {
     my $response = eval { $driver->doXmlRequest($xml) };
     isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
     ok( $response->is_success, '... was successful');
-    note $response->content;
 }
 
 #######################################################################
@@ -332,13 +330,4 @@ is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
-#----------------------------------------------------------------------------
-# Cleanup
-
-}
-
-END: {
-    $cart->delete;
-    $transaction->delete if defined $transaction;
-}
 #vim:ft=perl
