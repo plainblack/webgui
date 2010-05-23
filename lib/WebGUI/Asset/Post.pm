@@ -730,23 +730,25 @@ sub getTemplateVars {
 	unless ($self->get("storageId") eq "") {
 		my $storage = $self->getStorageLocation;
 		foreach my $filename (@{$storage->getFiles}) {
-			if (!$gotImage && $storage->isImage($filename)) {
-				$var{"image.url"} = $storage->getUrl($filename);
+			my $isImage = $storage->isImage($filename);
+			my $fileUrl = $storage->getUrl($filename);
+			if (!$gotImage && $isImage) {
+				$var{"image.url"} = $fileUrl;
 				$var{"image.thumbnail"} = $storage->getThumbnailUrl($filename);
 				$gotImage = 1;
 			}
-			if (!$gotAttachment && !$storage->isImage($filename)) {
-				$var{"attachment.url"} = $storage->getUrl($filename);
+			if (!$gotAttachment && !$isImage) {
+				$var{"attachment.url"} = $fileUrl;
 				$var{"attachment.icon"} = $storage->getFileIconUrl($filename);
 				$var{"attachment.name"} = $filename;
 				$gotAttachment = 1;
        			}	
 			push(@{$var{"attachment_loop"}}, {
-				url=>$storage->getUrl($filename),
-				icon=>$storage->getFileIconUrl($filename),
-				filename=>$filename,
-				thumbnail=>$storage->getThumbnailUrl($filename),
-				isImage=>$storage->isImage($filename)
+				url       =>$fileUrl,
+				icon      =>$var{"attachment.icon"},
+				filename  =>$filename,
+				thumbnail =>$var{"image.thumbnail"},
+				isImage   =>$isImage
 				});
 		}
 	}
