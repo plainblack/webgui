@@ -110,6 +110,9 @@ my $blueFeather = $feather->setCollateral('variantsJSON', 'variantId', 'new',
 
 $versionTag->commit;
 addToCleanup($versionTag);
+foreach my $asset($rockHammer, $bible, $feather) {
+    $asset = $asset->cloneFromDb;
+}
 
 #######################################################################
 #
