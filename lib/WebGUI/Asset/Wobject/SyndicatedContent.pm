@@ -217,6 +217,7 @@ sub getRssFeedItems {
             author          => $item->author,
             guid            => $item->guid,
         );
+        push @items, \%feed_item;
     }
     return \@items;
 }
@@ -294,11 +295,12 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
-    $self->next::method;
-    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
-    if (!$template) {
+    $self->$orig();
+    my $template = eval { WebGUI::Asset->newById($self->session, $self->templateId); };
+    if (Exception::Class->caught()) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
             templateId => $self->templateId,
@@ -307,7 +309,7 @@ sub prepareView {
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -359,63 +361,11 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
-	my $self = shift;
-	$self->session->http->setCacheControl($self->cacheTimeout);
-	$self->next::method(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS090 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS090 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS091 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS091 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS10 ( )
-
-Deprecated. Use www_viewRdf() instead.
-
-=cut
-
-sub www_viewRSS10 {
-	my $self = shift;
-	return $self->www_viewRdf;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS20 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS20 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
+override www_view => sub {
+    my $self = shift;
+    $self->session->http->setCacheControl($self->cacheTimeout);
+    super();
+};
 
 __PACKAGE__->meta->make_immutable;
 1;

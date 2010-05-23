@@ -47,7 +47,7 @@ use Carp qw( croak );
 use File::Find;
 use File::Spec;
 use File::Temp qw{ tempdir };
-use JSON ();
+use JSON qw();
 use WebGUI::International;
 use WebGUI::HTML;
 use WebGUI::ProgressBar;
@@ -1171,7 +1171,7 @@ sub www_ajax {
     my $result;
 
     # Get arguments encoded in json format
-    my $args = decode_json($form->get("args"));
+    my $args = JSON::from_json($form->get("args"));
     
     # Log some debug information
     $session->log->debug("Ajax service called with args=" . $form->get("args"));
@@ -1198,7 +1198,7 @@ sub www_ajax {
     $result->{ err } = -1 if $result->{ errMessage };
     
     # Return results encoded in json format
-    return encode_json( $result );
+    return JSON::to_json( $result );
 }
 
 
@@ -1266,10 +1266,10 @@ sub _moveFileAjaxRequest {
 
     # Instantiate file with ID in before/after argument
     $destId = $args->{before} ? $args->{before} : $args->{after};            
-    $dest = WebGUI::Asset->newById( $session, $destId );
+    $dest = eval { WebGUI::Asset->newById( $session, $destId ); };
 
     # Return if destination file could not be instantiated
-    if ( Expeption::Class->caught() ) {
+    if ( Exception::Class->caught() ) {
         $session->log->error("Couldn't move file '$targetId' before/after file '$destId' because we couldn't instantiate the latter.");
         $result{ errMessage } = "ID in before/after argument seems to be invalid.";
         return \%result;

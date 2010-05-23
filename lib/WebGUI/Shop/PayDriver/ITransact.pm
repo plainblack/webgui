@@ -18,6 +18,8 @@ use strict;
 use XML::Simple;
 use Data::Dumper;
 use Tie::IxHash;
+use LWP::UserAgent;
+use HTTP::Request;
 
 use base qw/WebGUI::Shop::PayDriver/;
 

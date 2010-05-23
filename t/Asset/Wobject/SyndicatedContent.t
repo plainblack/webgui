@@ -156,7 +156,7 @@ open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('tbb.rss')
     or die "Unable to get RSS file";
 my $rssContent = do { local $/; <$rssFile>; };
 close $rssFile;
-$session->cache->set($tbbUrl.'RSS', $rssContent, 60);
+$session->cache->set($tbbUrl, $rssContent, 60);
 
 my $filteredFeed = $syndicated_content->generateFeed();
 
@@ -170,7 +170,7 @@ cmp_deeply(
     'generateFeed: filters items based on the terms being in title, or description'
 );
 
-$session->cache->clear;
+$session->cache->remove($tbbUrl);
 
 ####################################################################
 #
@@ -191,13 +191,12 @@ open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('oncp.xml')
     or die "Unable to get RSS file: oncp.xml";
 my $rssContent = do { local $/; <$rssFile>; };
 close $rssFile;
-$session->cache->set($oncpUrl.'RSS', $rssContent, 60);
+$session->cache->set($oncpUrl, $rssContent, 60);
 
 my $oddFeed1 = $syndicated_content->generateFeed();
 
 my @oddItems = $oddFeed1->get_item();
 is (@oddItems, 13, 'feed has items even without pubDates or links');
 
-$session->cache->clear;
-
+$session->cache->remove($oncpUrl);
 

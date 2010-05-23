@@ -265,8 +265,7 @@ part of the C<groupToAdd> group.
 
 =cut
 
-sub canEdit {
-    my $orig   = shift;
+override canEdit => sub {
     my $self   = shift;
     my $userId = shift || $self->session->user->userId;
 
@@ -276,14 +275,8 @@ sub canEdit {
       && $form->get( 'class' )->isa( 'WebGUI::Asset::MatrixListing' ) ) {
         return $self->canAddMatrixListing();
     }
-    else {
-        if ($userId eq $self->ownerUserId) {
-            return 1;
-        }
-        my $user = WebGUI::User->new($self->session, $userId);
-        return $user->isInGroup($self->groupIdEdit);
-    }
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

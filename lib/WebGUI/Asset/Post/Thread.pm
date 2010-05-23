@@ -410,12 +410,12 @@ Fetches the last post in this thread, otherwise, returns itself.
 sub getLastPost {
 	my $self = shift;
 	my $lastPostId = $self->lastPostId;
-	my $lastPost;
-	if ($lastPostId) {
-		$lastPost = WebGUI::Asset::Post->newById($self->session, $lastPostId);
-	}
-	return $lastPost if (defined $lastPost);
-	return $self;	
+    return $self unless $lastPostId;
+    my $lastPost = eval { WebGUI::Asset->newById($self->session, $lastPostId); };
+    if (Exception::Class->caught()) {
+        return $self;
+    }
+	return $lastPost;
 }
 
 #-------------------------------------------------------------------

@@ -40,6 +40,8 @@ my $gallery
     });
 
 $versionTag->commit;
+WebGUI::Test->addToCleanup($versionTag);
+$gallery->cloneFromDb;
 
 is(
     Scalar::Util::blessed($gallery), "WebGUI::Asset::Wobject::Gallery",
@@ -61,14 +63,5 @@ isa_ok(
 my $properties  = $gallery->get;
 $gallery->purge;
 
-is(
-    WebGUI::Asset->newById($session, $properties->{assetId}), undef,
-    "Gallery no longer able to be instanciated",
-);
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+eval { WebGUI::Asset->newById($session, $properties->{assetId}); };
+ok( Exception::Class->caught(), 'Gallery no longer able to be instanciated after purge');

@@ -49,6 +49,10 @@ my $album
     });
 
 $versionTag->commit;
+WebGUI::Test->addToCleanup($versionTag);
+foreach my $asset ($gallery, $album) {
+    $asset = $asset->cloneFromDb;
+}
 
 #----------------------------------------------------------------------------
 # Tests
@@ -95,15 +99,6 @@ $maker->prepare({
 });
 $maker->run;
 
-is(
-    WebGUI::Asset->newById( $session, $assetId ),
-    undef,
-    "GalleryAlbum cannot be instanciated after www_deleteConfirm",
-);
+eval { WebGUI::Asset->newById( $session, $assetId ); };
+ok (Exception::Class->caught(), "GalleryAlbum cannot be instanciated after www_deleteConfirm");
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
