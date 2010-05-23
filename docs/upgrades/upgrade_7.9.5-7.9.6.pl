@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 fixConvertUTCMacroName($session);
 dropOldEMSTableColumn($session);
+addIndexForInbox($session);
 
 finish($session); # this line required
 
@@ -46,6 +47,19 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Add keys and indicies to groupGroupings to help speed up group queries
+sub addIndexForInbox {
+    my $session = shift;
+    print "\tAdding index to inbox_messageState... " unless $quiet;
+    my $sth = $session->db->read('show create table inbox_messageState');
+    my ($field,$stmt) = $sth->array;
+    $sth->finish;
+    unless ($stmt =~ m/KEY `userId_deleted_isRead`/i) {
+        $session->db->write("alter table inbox_messageState add index userId_deleted_isRead (userId,deleted,isRead)");
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
