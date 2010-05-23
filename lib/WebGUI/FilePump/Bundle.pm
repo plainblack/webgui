@@ -2,6 +2,7 @@ package WebGUI::FilePump::Bundle;
 
 use base qw/WebGUI::Crud WebGUI::JSONCollateral/;
 use strict;
+use WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::Exception;
 use WebGUI::Utility;
