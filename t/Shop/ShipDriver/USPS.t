@@ -109,6 +109,9 @@ my $gospels = $bible->setCollateral('variantsJSON', 'variantId', 'new',
 
 $versionTag->commit;
 addToCleanup($versionTag);
+foreach my $asset ($bible, $rockHammer) {
+    $asset = $asset->cloneFromDb;
+}
 
 #######################################################################
 #
