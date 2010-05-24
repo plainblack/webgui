@@ -76,7 +76,7 @@ sub execute {
     # keep track of how much time it's taking
     my $start   = time;
     my $limit   = 2_500;
-    my $timeLimit = 60;
+    my $timeLimit = $self->getTTL;
 
     my $list = $root->getLineage( ['descendants'], { returnObjects => 1,
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],

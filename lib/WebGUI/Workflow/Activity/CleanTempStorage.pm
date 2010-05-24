@@ -119,7 +119,7 @@ sub execute {
             }
         }
         # taking too long, give up
-        return $self->WAITING(1) if (time() - $start > 50);
+        return $self->WAITING(1) if (time() - $start > $self->getTTL);
     }
 
     # kill temporary files
