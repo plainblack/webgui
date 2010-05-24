@@ -1957,7 +1957,8 @@ sub www_getTokensAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
     $results{records} = [];  ##Initialize to an empty array
-	foreach my $token (@{$self->getTokens}) {
+	TOKEN: foreach my $token (@{$self->getTokens}) {
+        next TOKEN unless $token->canView;
 		push(@{$results{records}}, {
 			title 				=> $token->getTitle,
 			description			=> $token->get('description'),

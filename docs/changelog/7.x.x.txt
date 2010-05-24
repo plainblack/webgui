@@ -4,6 +4,7 @@
  - fixed #11578: Collaboration System: add edit stamp uses wrong user
  - added #9774: More owner information in the gallery
  - fixed #11581: Calendar problems
+ - fixed #11583: EMS: Tokens do not follow their permissions
 
 7.9.5
  - Asset->www_copy now has a progress bar
