@@ -12,7 +12,7 @@ has 'name' => (
 
 has 'tabs' => (
     is => 'rw',
-    isa => 'ArrayRef[WebGUI::FormBuilder::Tab]',
+    isa => 'ArrayRef',
     default => sub { [] },
 );
 

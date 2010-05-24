@@ -22,6 +22,7 @@ use HTML::Packer;
 use Moose;
 use WebGUI::Types;
 use Data::Dumper;
+use WebGUI::FormBuilder;
 
 use WebGUI::Definition::Asset;
 define assetName  => ['asset', 'Asset'];

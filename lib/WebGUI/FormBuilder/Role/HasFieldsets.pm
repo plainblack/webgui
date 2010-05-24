@@ -5,7 +5,7 @@ use Moose::Role;
 
 has 'fieldsets' => (
     is      => 'rw',
-    isa     => 'ArrayRef[WebGUI::FormBuilder::Fieldset]',
+    isa     => 'ArrayRef',
     default => sub { [] },
 );
 

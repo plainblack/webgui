@@ -346,6 +346,23 @@ sub getEditForm : Tests {
     my $session = $test->session;
     my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
 
+    my $f   = $asset->getEditForm;
+
+    isa_ok( $f, 'WebGUI::FormBuilder' );
+
+    # assetId, className, keywords
+    isa_ok( $f->getField('assetId'), 'WebGUI::Form::Guid' );
+    isa_ok( $f->getField('className'), 'WebGUI::Form::ClassName' );
+    isa_ok( $f->getField('keywords'), 'WebGUI::Form::Keywords' );
+
+    # Properties
+
+    # Metadata
+
+    # Property overrides
+
+    not_ok( $f->getField('func'), 'form must not contain "func"' );
+
 }
 
 sub www_editSave : Tests {
@@ -353,6 +370,8 @@ sub www_editSave : Tests {
     my ( $test ) = @_;
     my $session = $test->session;
     my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
+
+    # Alter permissions so www_editSave works
     my $oldGroupId = $asset->groupIdEdit;
     $asset->groupIdEdit( 7 ); # Everybody! Everybody!
 
@@ -366,6 +385,11 @@ sub www_editSave : Tests {
     my $newRevision = WebGUI::Asset->newPending( $session, $asset->getId );
     ok( $newRevision->tagId, 'new revision has a tag' );
     is( $newRevision->tagId, $tag->getId, 'new revision tagId is current working tag' );
+
+
+    # Alter permissions so it does not work
+
+    # Set locked so it does not work
 
     $asset->groupIdEdit( $oldGroupId );
 }

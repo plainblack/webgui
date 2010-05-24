@@ -4,7 +4,7 @@ use Moose::Role;
 
 has 'objects' => (
     is => 'rw',
-    isa => 'ArrayRef[Object]',
+    isa => 'ArrayRef',
     default => sub { [] },
 );
 

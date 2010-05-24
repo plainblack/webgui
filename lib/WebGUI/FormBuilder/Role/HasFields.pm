@@ -9,7 +9,7 @@ requires 'session', 'pack', 'unpack';
 
 has 'fields' => (
     is      => 'rw',
-    isa     => 'ArrayRef[WebGUI::Form::Control]',
+    isa     => 'ArrayRef',
     default => sub { [] },
 );
 

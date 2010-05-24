@@ -9,7 +9,7 @@ requires 'session', 'pack', 'unpack';
 
 has 'tabsets' => (
     is      => 'rw',
-    isa     => 'ArrayRef[WebGUI::FormBuilder::Tabset]',
+    isa     => 'ArrayRef',
     default => sub { [] },
 );
 
@@ -137,6 +137,7 @@ Get a tabset object by name
 
 sub getTabset {
     my ( $self, $name ) = @_;
+    $name ||= "default";
     return $self->{_tabsetsByName}{$name};
 }
 
