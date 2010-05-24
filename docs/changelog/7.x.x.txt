@@ -6,6 +6,7 @@
  - fixed #11581: Calendar problems
  - fixed #11583: EMS: Tokens do not follow their permissions
  - fixed #11584: Errors on checkout when payment problems occur
+ - fixed #11582: Registering with a .mobi email address
 
 7.9.5
  - Asset->www_copy now has a progress bar
