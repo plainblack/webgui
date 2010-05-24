@@ -72,6 +72,7 @@ sub execute {
     my $self    = shift;
     my $session = $self->session;
     my $epoch   = time();
+    my $expireTime   = $epoch + $self->getTTL();
     my $getAnArchive = WebGUI::Asset::Wobject::StoryArchive->getIsa($session);
     ARCHIVE: while (my $archive = $getAnArchive->()) {
         next ARCHIVE unless $archive && $archive->get("archiveAfter");
@@ -92,6 +93,9 @@ sub execute {
             STORY: foreach my $story (@{ $stories }) {
                 next STORY unless $story;
                 $story->update({ status => 'archived' });
+                if (time() > $expireTime) {
+                    return $self->WAITING(1);
+                }
             }
             $folder->update({ status => 'archived' });
         }
