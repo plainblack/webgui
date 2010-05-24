@@ -7,6 +7,7 @@
  - fixed #11576: Default WebGUI config has a bad macro
  - fixed #11578: Collaboration System: add edit stamp uses wrong user
  - fixed #11581: Calendar problems
+ - fixed #11583: EMS: Tokens do not follow their permissions
 
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure
