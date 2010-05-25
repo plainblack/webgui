@@ -31,7 +31,7 @@
     function fillIn(dom, a) {
         _.each(a, function (v, k) {
             if (dom[k]) {
-                dom[k].value = v;
+                dom[k].value = v || '';
             }
         });
     }
@@ -148,7 +148,7 @@
                 }
 
                 _.each(e, function (v, k) {
-                    v = v.value;
+                    v = v.value || '';
                     address[k] = v;
                     if (cache[k] !== v) {
                         dirty = true;
@@ -307,7 +307,7 @@
 
                     if (!opt) {
                         opt = document.createElement('option');
-                        opt.text  = label;
+                        opt.innerHTML = label;
                         dropdown.appendChild(opt);
                     }
 
