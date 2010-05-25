@@ -3357,18 +3357,20 @@ sequenceNumber');
     WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
 
     $paginatePage = $self->session->form->param('pn') || 1;
-    $currentUrl = $self->session->url->append($currentUrl, "orderBy=".$orderBy) if $orderBy;
-    
+    $currentUrl   = $self->session->url->append($currentUrl, "orderBy=".$orderBy) if $orderBy;
+
     $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
 
-    my $sth = $self->session->db->read($query) if ! $noFields;
     my @visibleResults;
-    while (my $result = $sth->hashRef){
-        if ($self->canViewThingData($thingId,$result->{thingDataId})){
-            push(@visibleResults,$result);
+    if (! $noFields) {
+        my $sth = $self->session->db->read($query) if ! $noFields;
+        while (my $result = $sth->hashRef){
+            if ($self->canViewThingData($thingId,$result->{thingDataId})){
+                push(@visibleResults,$result);
+            }
         }
     }
-    $p->setDataByArrayRef(\@visibleResults) if ! $noFields;
+    $p->setDataByArrayRef(\@visibleResults);
 
     $searchResults = $p->getPageData($paginatePage);
     foreach my $searchResult (@$searchResults){
