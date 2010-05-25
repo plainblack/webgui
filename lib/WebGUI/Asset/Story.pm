@@ -539,8 +539,10 @@ sub getRssData {
         title       => $self->get('headline') || $self->getTitle,
         description => $self->get('story'),
         'link'      => $self->getUrl,
+        guid        => $self->getUrl,
         author      => $self->get('byline'),
         date        => $self->get('lastModified'),
+        pubDate     => $self->session->datetime->epochToMail($self->get('creationDate')),
     };
 	return $data;
 }

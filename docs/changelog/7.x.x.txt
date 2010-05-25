@@ -9,6 +9,7 @@
  - fixed #11581: Calendar problems
  - fixed #11583: EMS: Tokens do not follow their permissions
  - fixed #11582: Registering with a .mobi email address
+ - fixed #11580: Date not populated for Story Archive RSS feed
 
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure
