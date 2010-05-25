@@ -60,7 +60,8 @@
         calculateSummary: function () {
             var e            = this.elements,
                 prices       = this.prices,
-                shipping     = prices.shipping[e.shipper.value],
+                shipper      = e.shipper,
+                shipping     = shipper && prices.shipping[shipper.value],
                 shipPrice    = (shipping ?
                     (shipping.hasPrice ?
                         parseFloat(shipping.price) :
@@ -138,7 +139,7 @@
             return function () {
                 var address = {},
                     label   = e.label.value,
-                    copy    = o && o.label.value === label,
+                    copy    = o.label && o.label.value === label,
                     cache   = c[label],
                     dirty;
 
@@ -314,14 +315,16 @@
                 }
 
                 updateOne(d.billing);
-                updateOne(d.shipping);
+                if (d.shipping) {
+                    updateOne(d.shipping);
+                    if (name === 'billing' && self.sameShipping()) {
+                        self.copyBilling();
+                    }
+                    else {
+                        self.computePerItemShippingOptions();
+                    }
+                }
                 d[name].value = id;
-                if (name === 'billing' && self.sameShipping()) {
-                    self.copyBilling();
-                }
-                else {
-                    self.computePerItemShippingOptions();
-                }
                 self.updateSummary();
             });
         },
@@ -335,10 +338,9 @@
                 e        = this.elements,
                 tax      = e.tax,
                 shipper  = e.shipper,
-                selected = shipper.value,
                 d        = e.dropdowns,
-                shipping = d.shipping.value,
                 billing  = d.billing.value,
+                selected, shipping,
                 params   = {
                     shop: 'cart',
                     method: 'ajaxPrices'
@@ -348,10 +350,14 @@
                 params.billingId = billing;
             }
 
-            if (this.sameShipping()) {
-                params.shippingId = params.billingId;
-            } else if (addressIdCounts(shipping)) {
-                params.shippingId = shipping;
+            if (shipper) {
+                selected = shipper.value; // save so we can restore later
+                shipping = d.shipping.value;
+                if (this.sameShipping()) {
+                    params.shippingId = params.billingId;
+                } else if (addressIdCounts(shipping)) {
+                    params.shippingId = shipping;
+                }
             }
 
             this.request('GET', params, function (o) {
@@ -360,30 +366,32 @@
                 if (response.error) {
                     return;
                 }
+                if (shipper) {
+                    // We need to repopulate the shipper options dropdown
+                    // (but only if we have a shipper at all)
+                    _(shipper.options).chain().select(function (o) {
+                        return o.value;
+                    }).each(function (o) {
+                        o.parentNode.removeChild(o);
+                    });
 
+                    _.each(response.shipping, function (o, id) {
+                        var opt   = document.createElement('option'),
+                            label = o.label;
+
+                        if (o.hasPrice) {
+                            label += ' (' + formatCurrency(o.price) + ')';
+                        }
+
+                        opt.innerHTML = label;
+                        opt.value     = id;
+                        shipper.appendChild(opt);
+                    });
+
+                    shipper.value = selected;
+                }
                 self.prices   = response;
                 tax.innerHTML = formatCurrency(response.tax);
-
-                _(shipper.options).chain().select(function (o) {
-                    return o.value;
-                }).each(function (o) {
-                    o.parentNode.removeChild(o);
-                });
-
-                _.each(response.shipping, function (o, id) {
-                    var opt   = document.createElement('option'),
-                        label = o.label;
-
-                    if (o.hasPrice) {
-                        label += ' (' + formatCurrency(o.price) + ')';
-                    }
-
-                    opt.innerHTML = label;
-                    opt.value     = id;
-                    shipper.appendChild(opt);
-                });
-
-                shipper.value = selected;
                 self.calculateSummary();
             });
         },
@@ -405,7 +413,8 @@
         },
 
         sameShipping: function () {
-            return this.elements.same.checked;
+            var same = this.elements.same;
+            return same && same.checked;
         },
 
         setCartItemShippingId: function (select) {
