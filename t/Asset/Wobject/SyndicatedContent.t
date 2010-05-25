@@ -20,7 +20,7 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 24; # increment this value for each test you create
+use Test::More tests => 26; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
@@ -176,7 +176,14 @@ is $vars->{item_loop}->[0]->{descriptionFirstParagraph},
 '... first paragraph, when HTML is used';
 is $vars->{item_loop}->[0]->{descriptionFirst2paragraphs},
 "<p>In the attached feed, there is a hidden return line character from the Rich Text editor in the first sentence of the description. When using a Syndicated Content for the feed, the variable descriptionFirstParagraph variable cuts off at this return line character, creating invalid markup.</p><p>No more text is shown of the first paragraph beyond the bold characters of the first line.</p>",
-'... first paragraph, when HTML is used';
+'... first two paragraphs, when HTML is used';
+is $vars->{item_loop}->[0]->{descriptionFirst10words},
+"In the attached feed, there is a hidden return line ",
+'... first 10 words, with HTML stripped';
+is $vars->{item_loop}->[0]->{descriptionFirstSentence},
+"In the attached feed, there is a hidden return line character from the
+Rich Text editor in the first sentence of the description.",
+'... first sentence, with HTML stripped';
 
 ####################################################################
 #
