@@ -34,7 +34,12 @@ our $I18N = { ##hashref of hashes
                 message => q|The English name of the language.|,
                 lastUpdated => 1131394072,
                 context => q|A label of the language to use in the template|
-        },
+    },
+    'language_isCurrent' => {
+        message => q|A boolean which is true if this language is the current language.|,
+        lastUpdated => 1131394072,
+        context => q|A label of the language to use in the template|
+    },
 	'language_url' => {
                 message => q|The url that sets the WebGUI language to the selected language.|,
                 lastUpdated => 1131394072,
