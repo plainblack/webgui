@@ -32,6 +32,7 @@ use XML::Simple;
 =head1 DIAGNOSTICS
 
 =head1 METHODS
+=cut
 
 =cut
 
