@@ -10,6 +10,7 @@
  - fixed #11583: EMS: Tokens do not follow their permissions
  - fixed #11582: Registering with a .mobi email address
  - fixed #11580: Date not populated for Story Archive RSS feed
+ - fixed #11587: Thingy, no fields and undefined statement handles
 
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure
