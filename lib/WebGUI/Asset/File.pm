@@ -379,6 +379,7 @@ sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
 	$indexer->addFile($self->getStorageLocation->getPath($self->get("filename")));
+	return $indexer;
 }
 
 

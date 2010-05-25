@@ -372,6 +372,22 @@ sub getThumbnailUrl {
     );
 }
 
+#-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Indexing the content of the Photo. See WebGUI::Asset::indexContent() for 
+additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->addKeywords($self->get("location"));
+	return $indexer;
+}
+
 #----------------------------------------------------------------------------
 
 =head2 makeResolutions ( [resolutions] )
