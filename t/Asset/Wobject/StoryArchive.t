@@ -255,7 +255,7 @@ $session->user({userId => 1});
 cmp_deeply(
     $templateVars,
     {
-        canPostStories => 0,
+        canPostStories => bool(0),
         mode           => 'view',
         addStoryUrl    => '',
         date_loop      => [
