@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use WebGUI::Asset::Shortcut;
+use JSON;
 
 =head1 NAME
 
@@ -417,21 +418,37 @@ sub www_manageTrash {
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          \n";
+
+    # To avoid string escaping issues
+    my $json = JSON->new;
+    my $amethod = sub {
+        my ($method, @args) = @_;
+        my $array = $json->encode(\@args);
+        $array =~ s/^\[//;
+        $array =~ s/\]$//;
+        $output .= "assetManager.$method($array);\n";
+    };
 	foreach my $child (@{$self->getAssetsInTrash($limit)}) {
-		my $title = $child->getTitle;
-                $title =~ s/\'/\\\'/g;
+    		my $title = $child->getTitle;
     		my $plus =$child->getChildCount({includeTrash => 1}) ? "+ " : "&nbsp;&nbsp;&nbsp;&nbsp;";
-         	$output .= "assetManager.AddLine('"
-			.WebGUI::Form::checkbox($self->session, {
-				name=>'assetId',
-				value=>$child->getId
-				})
-			."','" . $plus . "<a href=\"".$child->getUrl("op=assetManager")."\">" . $title
-			."</a>','<p style=\"display:inline;vertical-align:middle;\"><img src=\"".$child->getIcon(1)."\" style=\"vertical-align:middle;border-style:none;\" alt=\"".$child->getName."\" /></p> ".$child->getName
-			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
-			."','".formatBytes($child->get("assetSize"))."');\n";
-         	$output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
-			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";
+            $amethod->('AddLine',
+                WebGUI::Form::checkbox($self->session, {
+                    name=>'assetId',
+                    value=>$child->getId
+                }),
+                qq($plus<a href=").$child->getUrl("op=assetManager")
+                .qq(">$title</a>),
+			    '<p style="display:inline;vertical-align:middle;"><img src="'
+                .$child->getIcon(1)
+                .'" style="vertical-align:middle;border-style:none;" alt='
+                .$child->getName .'" /></p> ' . $child->getName,
+                $self->session->datetime->epochToHuman($child->get("revisionDate")),
+                formatBytes($child->get("assetSize"))
+            );
+            $amethod->('AddLineSortData',
+                '', $title, $child->getName,
+                $child->get('revisionDate'), $child->get('assetSize')
+            );
 	}
 	$output .= '
             assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");

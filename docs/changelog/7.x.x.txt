@@ -1,4 +1,5 @@
 7.8.21
+ - fixed #11597: manageTrash and newlines
 
 7.8.20
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
