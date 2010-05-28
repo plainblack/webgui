@@ -126,7 +126,8 @@ sub addRevision {
     $session->db->commit;
 
 	# current values, and the user set properties
-	my %mergedProperties = (%{$self->get}, %{$properties}, (status => 'pending', revisedBy => $session->user->userId, tagId => $workingTag->getId), );
+	# my %mergedProperties = (%{$self->get}, %{$properties}, (status => 'pending', revisedBy => $session->user->userId, tagId => $workingTag->getId), ); # XXX results in the setting of read-only properties and nothing else seems to be done with this other than just set them again
+	my %mergedProperties = ( %{$properties}, status => 'pending', revisedBy => $session->user->userId, tagId => $workingTag->getId, );
 
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);

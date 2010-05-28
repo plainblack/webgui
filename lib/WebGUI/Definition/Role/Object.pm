@@ -85,13 +85,23 @@ is not an attribute of the object, then it is silently ignored.
 =cut
 
 sub set {
+
     my $self = shift;
     my $properties = @_ % 2 ? shift : { @_ };
-    my @orderedProperties = $self->getProperties;
-    KEY: for my $property ( @orderedProperties ) {
-        next KEY unless exists $properties->{$property};
-        $self->$property($properties->{$property});
+    my %seen;
+
+    my @settable = grep { ! $seen{$_}++ } (
+        $self->getProperties, # $self->meta->get_all_property_list,   # same as $self->getProperties
+        $self->getReadableAttributes, 
+    );
+
+    for my $attribute ( @settable ) {
+        next unless exists $properties->{$attribute};
+        $self->$attribute( $properties->{$attribute} );
     }
+
+    # ignore unknown properties
+
     return 1;
 }
 
@@ -179,6 +189,11 @@ Returns a list of the names of all properties of the object, as set by the Defin
 sub getProperties {
     my $self = shift;
     return $self->meta->get_all_property_list;
+}
+
+sub getReadableAttributes {
+    my $self = shift;
+    return map $_->name, grep $_->has_accessor || $_->has_writer, $self->meta->get_all_attributes;
 }
 
 1;
