@@ -1,3 +1,75 @@
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=head1 NAME
+
+WebGUI::Upgrade - Perform upgrades on WebGUI sites
+
+=head1 SYNOPSIS
+
+    use WebGUI::Upgrade;
+    my $upgrade = WebGUI::Upgrade->new;
+    $upgrade->upgradeSites;
+
+=head1 DESCRIPTION
+
+This package calculates upgrade paths and performs upgrades for WebGUI sites.
+
+=head1 Differences from WebGUI 7's upgrade system
+
+In WebGUI 7 and prior, a single upgrade for each version was created
+as F<docs/upgrades/upgrade_X.X.X-X.X.X.pl>.  This script would be
+run with a command line parameter of --configFile=F<site.conf>.
+This script contained all of the code to set up a session and do
+any other work that was needed.
+
+To cut down on the amount of boilerplate code and allow for more
+flexible upgrades, this has been changed.  Multiple upgrade files
+are placed in the directory F<var/upgrades/X.X.X-X.X.X/>, and are
+processed in alphabetical order, with the file extension determining
+how to process the file.
+
+=head1 Supported File Types
+
+The file extension determines the class that will be used to process them.  The class is determined by appending it to C<WebGUI::Upgrade::File::>.
+
+=head2 Perl Scripts - F<.pl>
+
+Perl scripts are processed by L<WebGUI::Upgrade::File::pl>, which
+runs them after setting the environment variables C<WEBGUI_CONFIG>
+and C<WEBGUI_UPGRADE_VERSION>.  Usually, these scripts should use
+the module L<WebGUI::Upgrade::Script> to load a number of subs to
+greatly simplify how they are written.
+
+=head2 SQL Scripts - F<.sql>
+
+SQL scripts are processed by L<WebGUI::Upgrade::File::sql>, which
+runs them with the F<mysql> command line client.
+
+=head2 WebGUI Packages - F<.wgpkg>
+
+WebGUI packages are processed by L<WebGUI::Upgrade::File::wgpkg>,
+which imports them into the WebGUI site.
+
+=head2 Text and POD Documents - F<.txt>/F<.pod>
+
+Text and POD documents are processed by L<WebGUI::Upgrade::File::txt>
+and L<WebGUI::Upgrade::File::pod> respectively.  The files will be
+shown to the user running the upgrade, and will wait for user
+confirmation before continuing.  This will only be done once per
+upgrade process.
+
+=cut
+
 package WebGUI::Upgrade;
 use 5.010;
 use Moose;
@@ -12,38 +84,107 @@ use POSIX qw(strftime);
 use Cwd ();
 use namespace::autoclean;
 
+=head1 ATTRIBUTES
+
+These attributes can be set when creating a WebGUI::Upgrade instance:
+
+=cut
+
+=head2 quiet
+
+Whether information about the upgrade progress will be output.  Defaults to false.
+
+=cut
+
 has quiet => (
     is => 'rw',
     default => undef,
 );
+
+=head2 mysql
+
+The path to the mysql command line client.  Defaults to 'mysql'.
+
+=cut
+
 has mysql => (
     is => 'rw',
     default => 'mysql',
 );
+
+=head2 mysqldump
+
+The path to the mysqldump command line client.  Defaults to 'mysqldump'.
+
+=cut
+
 has mysqldump => (
     is => 'rw',
     default => 'mysqldump',
 );
+
+=head2 clearCache
+
+If true, the cache will be cleared for each site before running
+any upgrade scripts.  Defaults to true.
+
+=cut
+
 has clearCache => (
     is      => 'rw',
     default => 1,
 );
-has createBackups => (
-    is      => 'rw',
-    default => 1,
-);
-has useMaintenanceMode => (
-    is      => 'rw',
-    default => 1,
-);
+
+=head2 backupPath
+
+The path where backups will be stored.  Defaults to 'backups' inside the temp directory.
+
+=cut
+
 has backupPath => (
     is      => 'rw',
     default => File::Spec->catdir(File::Spec->tmpdir, 'backups'),
 );
+
+=head2 createBackups
+
+If true, backups will be created before each version upgrade for
+each site.  The backup files will be named
+C<{config file}_{version}_{timestamp}.sql>.
+
+=cut
+
+has createBackups => (
+    is      => 'rw',
+    default => 1,
+);
+
+=head2 useMaintenanceMode
+
+If set, sites will be put into maintenance mode before any upgrades
+are run on them.  Defaults to true.
+
+=cut
+
+has useMaintenanceMode => (
+    is      => 'rw',
+    default => 1,
+);
+
+# this is used to store if a given upgrade file has been run yet.
+# Some upgrade files should only be processed once per upgrade.
 has _files_run => (
     is      => 'rw',
     default => sub { { } },
 );
+
+=head1 METHODS
+
+=head2 upgradeSites
+
+Upgrades all available sites to match the current WebGUI codebase.
+
+=cut
 
 sub upgradeSites {
     my $self = shift;
@@ -65,10 +206,26 @@ sub upgradeSites {
     return 1;
 }
 
+=head2 getCodeVersion
+
+Returns the current version of the codebase.
+
+=cut
+
 sub getCodeVersion {
     require WebGUI;
     return WebGUI->VERSION;
 }
+
+=head2 upgradeSite ( $config )
+
+Upgrades the given config file to the current codebase.
+
+=head3 $config
+
+The path to a WebGUI config file or a WebGUI::Config instance
+
+=cut
 
 sub upgradeSite {
     my $self = shift;
@@ -92,11 +249,21 @@ sub upgradeSite {
     }
 }
 
+=head1 calcUpgradePath ( $fromVerson , $toVersion )
+
+Class method to calculate the upgrade path between two versions.
+Tries to find the best path between the versions by looking in
+F<var/upgrades/> for directories that make a path between the versions.
+Returns either a list of directories to use, or throws an error if
+no path can be found.
+
+=cut
+
 sub calcUpgradePath {
     my $class = shift;
     my ($fromVersionStr, $toVersionStr) = @_;
-    my $fromVersion = $class->numericVersion($fromVersionStr);
-    my $toVersion = $class->numericVersion($toVersionStr);
+    my $fromVersion = $class->_numericVersion($fromVersionStr);
+    my $toVersion = $class->_numericVersion($toVersionStr);
 
     my %upgrades;
     opendir my $dh, WebGUI::Paths->upgrades
@@ -107,7 +274,7 @@ sub calcUpgradePath {
         next
             unless -d File::Spec->catdir(WebGUI::Paths->upgrades, $dir);
         if ($dir =~ /^((\d+\.\d+\.\d+)-(\d+\.\d+\.\d+))$/) {
-            $upgrades{ $class->numericVersion($2) }{ $class->numericVersion($3) } = $1;
+            $upgrades{ $class->_numericVersion($2) }{ $class->_numericVersion($3) } = $1;
         }
     }
     closedir $dh;
@@ -139,6 +306,12 @@ sub calcUpgradePath {
     return map { $_->[1] } @steps;
 }
 
+=head2 runUpgradeStep ( $config , $step )
+
+Runs the given upgrade step against the WebGUI config file.
+
+=cut
+
 sub runUpgradeStep {
     my $self = shift;
     my ($configFile, $step) = @_;
@@ -158,6 +331,16 @@ sub runUpgradeStep {
     $self->markVersionUpgrade($configFile, $version);
 }
 
+=head2 runUpgradeFile ( $config , $version , $filename )
+
+Runs the given upgrade file against a WebGUI config file.
+
+=head3 $version
+
+The destination version for the step this upgrade file is part of.
+
+=cut
+
 sub runUpgradeFile {
     my $self = shift;
     my ($configFile, $version, $filename) = @_;
@@ -169,12 +352,11 @@ sub runUpgradeFile {
             version     => $version,
             file        => $filename,
             upgrade     => $self,
-            configFile  => $configFile,
         );
         if ($has_run && $upgrade_file->once) {
             return;
         }
-        $upgrade_file->run;
+        $upgrade_file->run($configFile);
     }
     catch {
         when (/^No upgrade package/) {
@@ -186,6 +368,14 @@ sub runUpgradeFile {
     };
     return;
 }
+
+=head2 classForFile ( $file )
+
+Class method to find the class to use to run the upgrade file.
+Given a filename, it will either load and return a class name to
+use, or throw an error if no appropriate class is available.
+
+=cut
 
 sub classForFile {
     my $class = shift;
@@ -200,6 +390,12 @@ sub classForFile {
     no warnings 'uninitialized';
     die "No upgrade package for extension: $extension";
 }
+
+=head2 markVersionUpgrade ( $config , $version )
+
+Marks that a given version upgrade has been completed for a config file.
+
+=cut
 
 sub markVersionUpgrade {
     my $self = shift;
@@ -216,6 +412,12 @@ sub markVersionUpgrade {
         $dbh->do('REPLACE INTO settings (name, value) VALUES (?, ?)', {}, 'upgradeState', $version);
     }
 }
+
+=head2 createBackup ( $config )
+
+Creates a database backup file for a given config file.
+
+=cut
 
 sub createBackup {
     my $self = shift;
@@ -241,6 +443,12 @@ sub createBackup {
         and die "$!";
 }
 
+=head2 reportHistory ( $config )
+
+Class method to return the upgrade history for a given config file.
+
+=cut
+
 sub reportHistory {
     my $class = shift;
     my $config = shift;
@@ -253,6 +461,12 @@ sub reportHistory {
     $sth->finish;
 }
 
+=head2 getCurrentVersion ( $config )
+
+Class method that returns the current version of a WebGUI database.
+
+=cut
+
 sub getCurrentVersion {
     my $class = shift;
     my $configFile = shift;
@@ -262,11 +476,17 @@ sub getCurrentVersion {
     $sth->execute;
     my ($version) = map { $_->[0] }
         sort { $b->[1] <=> $a->[1] }
-        map { [ $_->[0], $class->numericVersion($_->[0]) ] }
+        map { [ $_->[0], $class->_numericVersion($_->[0]) ] }
         @{ $sth->fetchall_arrayref( [0] ) };
     $sth->finish;
     return $version;
 }
+
+=head2 dbhForConfig ( $config )
+
+Class method that creates a new WebGUI::SQL object given a config file.
+
+=cut
 
 sub dbhForConfig {
     my $class = shift;
@@ -276,6 +496,14 @@ sub dbhForConfig {
     }
     return WebGUI::SQL->connect($config);
 }
+
+=head2 mysqlCommandLine ( $config )
+
+Class method to return a list of options to pass to the mysql or
+mysqldump command line client to connect to the given config file's
+database.
+
+=cut
 
 sub mysqlCommandLine {
     my $class = shift;
@@ -313,7 +541,9 @@ sub mysqlCommandLine {
     return @command_line;
 }
 
-sub numericVersion {
+# converts a period separated version number into a form that can
+# be compared numerically.
+sub _numericVersion {
     my $class = shift;
     my $version = shift;
     my @parts = split /\./, $version;

@@ -39,8 +39,10 @@ sub import {
 my @cleanups;
 
 sub _build_exports {
-    my $configFile   = $ENV{WEBGUI_CONFIG} || die 'WEBGUI_CONFIG environment variable must be specified';
-    my $version      = $ENV{WEBGUI_UPGRADE_VERSION} || die 'WEBGUI_UPGRADE_VERSION must be set';
+    my $configFile   = $ENV{WEBGUI_CONFIG}
+        or die 'WEBGUI_CONFIG environment variable must be specified';
+    my $version      = $ENV{WEBGUI_UPGRADE_VERSION}
+        or die 'WEBGUI_UPGRADE_VERSION must be set';
     my $quiet        = $ENV{WEBGUI_UPGRADE_QUIET};
     my $upgrade_file = $caller_upgrade_file;
     (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
@@ -216,35 +218,58 @@ END {
 
 __END__
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
 =head1 NAME
 
-WebGUI::Upgrade::Script - Functions for WebGUI upgrade scripts
+WebGUI::Upgrade::Script - Utility package for WebGUI upgrade scripts
 
 =head1 SYNOPSIS
 
     use WebGUI::Upgrade::Script;
-    report "Performing upgrade...";
+
+    print "Adding new snippet.\n";
+    import_node->addChild({ className => 'WebGUI::Asset::Snippet', title => 'New Snippet'});
     config->set('config/item', 'new value');
     done;
 
 =head1 DESCRIPTION
 
-This module exports a number of functions to simplify upgrade scripts.  The
-WEBGUI_CONFIG, WEBGUI_UPGRADE_VERSION, and WEBGUI_UPGRADE_QUIET variables
-will be used to set up the subs.
+This is a package to be used in upgrade scripts to provide a number
+of functions and automatic cleanup to make writing upgrade scripts
+faster and simpler.
 
-In addition to the upgrade subs, it has a number of methods available to
-code that is wrapping an upgrade script.
+C<use>ing this module will also enable strictures, warnings, and
+all of Perl 5.10's syntax enhancements in the caller.
 
-Some cleanup needs to be done after running an upgrade script.  This will
-be done on program exit by default, but can also be managed manually with
-the methods.
+=head1 ENVIRONMENT
+
+This package will use the following environment variables to determine
+its operation.  These variables are automatically set by
+L<WebGUI::Upgrade::File::pl> if run through the main upgrade system.
+
+=head2 WEBGUI_CONFIG
+
+The WebGUI config file to operate against.
+
+=head2 WEBGUI_UPGRADE_VERSION
+
+The version being upgraded to.
 
 =head1 EXPORTED SUBROUTINES
 
-=head2 quiet
-
-Returns the value of the quiet flag.
+These subroutines are all exported by default using L<Sub::Exporter>.
+They cannot be called directly.
 
 =head2 report ( $message )
 
@@ -285,7 +310,7 @@ paths.
 
 =head2 collateral
 
-Returns a Path::Class::Dir object for the upgrade script's collateral
+Returns a L<Path::Class::Dir> object for the upgrade script's collateral
 path.  The collateral path is the same as the name of the upgrade
 script with the extension stripped off.
 
