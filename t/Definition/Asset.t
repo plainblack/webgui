@@ -258,3 +258,4 @@ use WebGUI::Test;
     $object->defaulted(undef);
     is $object->defaulted(), undef, 'Moose setters accept undef';
 }
+done_testing;
