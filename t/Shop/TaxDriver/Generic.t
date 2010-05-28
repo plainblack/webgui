@@ -45,7 +45,6 @@ plan tests => 78
 
 
 my $storage;
-my ($taxableDonation, $taxFreeDonation);
 
 #######################################################################
 #

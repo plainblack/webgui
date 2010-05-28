@@ -163,6 +163,7 @@ plan tests => $canAddMaker->plan
 
 $session->config->set('assets/WebGUI::Asset/addGroup', $testGroups{'canAdd asset'}->getId );
 
+$session->asset(WebGUI::Asset->getDefault($session));
 $canAddMaker->run;
 
 #Without proper group setup, Turn On Admin is excluded from adding assets via assetAddPrivilege

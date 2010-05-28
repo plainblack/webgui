@@ -109,12 +109,6 @@ use WebGUI::Test;
     );
 
     ::cmp_deeply(
-        [ $object->meta->get_all_properties ],
-        ::array_each(::isa('WebGUI::Definition::Meta::Property::Asset')),
-        '->meta->get_all_properties returns a list of Properties'
-    );
-
-    ::cmp_deeply(
         [$object->getProperties ],
         [qw/property2 property1/],
         'getProperties is an alias for ->meta->get_property_list'
