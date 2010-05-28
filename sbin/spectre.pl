@@ -105,10 +105,9 @@ elsif ($daemon) {
         die "Spectre is already running.\n";
     }
     elsif (-e $pidFileName){
-        # oh, ffs ... die "pidFile $pidFileName already exists\n";
         open my $pidFile, '<', $pidFileName or die "$pidFileName: $!";
         (my $pid) = readline $pidFile;
-        chomp $pid;
+        chomp $pid if defined $pid;
         if(defined $pid and $pid =~ m/^(\d+)$/) {
             if(kill 0, $1) {
                 die "$0: already running as PID $1";
