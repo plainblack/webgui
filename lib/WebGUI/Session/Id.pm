@@ -17,6 +17,7 @@ package WebGUI::Session::Id;
 
 use strict;
 use Digest::MD5;
+use Scalar::Util qw( weaken );
 use Time::HiRes qw( gettimeofday usleep );
 use MIME::Base64;
 
@@ -121,7 +122,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+	my $self = bless {_session=>$session}, $class;
+        weaken( $self->{_session} );
+        return $self;
 }
 
 #-------------------------------------------------------------------

@@ -15,7 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use Carp qw( croak confess );
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed weaken );
 use Clone qw(clone);
 use JSON;
 use HTML::Packer;
@@ -1826,6 +1826,7 @@ no revision date is available it will return undef.
 
 sub new {
     my ( $class, $session, $assetId, $className, $revisionDate ) = @_;
+    weaken( $session );
 
     unless (defined $assetId) {
         $session->errorHandler->error("Asset constructor new() requires an assetId.");

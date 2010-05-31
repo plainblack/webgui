@@ -15,6 +15,7 @@ package WebGUI::SQL;
 =cut
 
 use strict;
+use Scalar::Util qw( weaken );
 use DBI;
 use Tie::IxHash;
 use WebGUI::SQL::ResultSet;
@@ -445,7 +446,9 @@ sub connect {
         $dbh->{$paramName} = $paramValue;
     }
 
-	bless {_dbh=>$dbh, _session=>$session}, $class;
+	my $self = bless {_dbh=>$dbh, _session=>$session}, $class;
+        weaken( $self->{_session} );
+        return $self;
 }
 
 #-------------------------------------------------------------------

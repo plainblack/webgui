@@ -17,6 +17,7 @@ package WebGUI::Session::ErrorHandler;
 
 use strict;
 use Log::Log4perl;
+use Scalar::Util qw( weaken );
 #use Apache2::RequestUtil;
 use JSON;
 use HTML::Entities qw(encode_entities);
@@ -161,6 +162,7 @@ The message you wish to add to the log.
 
 sub debug {
 	my $self = shift;
+        return unless $self->canShowDebug || $self->getLogger->is_debug;
 	my $message = shift;
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->getLogger->debug($message);
@@ -197,6 +199,7 @@ The message you wish to add to the log.
 
 sub error {
 	my $self = shift;
+        return unless $self->canShowDebug || $self->getLogger->is_error;
 	my $message = shift;
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->getLogger->error($message);
@@ -303,6 +306,7 @@ The message you wish to add to the log.
 
 sub info {
 	my $self = shift;
+        return unless $self->canShowDebug || $self->getLogger->is_info;
 	my $message = shift;
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->getLogger->info($message);
@@ -326,7 +330,9 @@ sub new {
 	my $session = shift;
     Log::Log4perl->init_once( $session->config->getWebguiRoot."/etc/log.conf" );   
 	my $logger = Log::Log4perl->get_logger($session->config->getFilename);
-	bless {_queryCount=>0, _logger=>$logger, _session=>$session}, $class;
+	my $self = bless {_queryCount=>0, _logger=>$logger, _session=>$session}, $class;
+        weaken( $self->{_session} );
+        return $self;
 }
 
 #----------------------------------------------------------------------------
@@ -471,6 +477,7 @@ The message you wish to add to the log.
 
 sub warn {
 	my $self = shift;
+        return unless $self->canShowDebug || $self->getLogger->is_warn;
 	my $message = shift;
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->getLogger->warn($message);

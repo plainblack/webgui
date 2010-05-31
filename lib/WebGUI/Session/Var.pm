@@ -15,6 +15,7 @@ package WebGUI::Session::Var;
 =cut
 
 use strict;
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -171,6 +172,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $self = bless {_session=>$session}, $class;
+        weaken( $self->{_session} );
 	my $sessionId = shift;
 	my $noFuss = shift;
 	if ($sessionId eq "") { ##New session

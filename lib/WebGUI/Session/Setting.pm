@@ -15,6 +15,7 @@ package WebGUI::Session::Setting;
 =cut
 
 use strict;
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -146,7 +147,9 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $settings = $session->db->buildHashRef("select * from settings", [], {noOrder => 1});
-	bless {_settings=>$settings, _session=>$session}, $class;
+	my $self = bless {_settings=>$settings, _session=>$session}, $class;
+        weaken( $self->{_session} );
+        return $self;
 }
 
 

@@ -15,6 +15,7 @@ package WebGUI::Session;
 =cut
 
 use strict;
+use Scalar::Util qw( weaken );
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
@@ -103,6 +104,7 @@ sub asset {
 	my $asset = shift;
 	if ($asset) {
 		$self->{_asset} = $asset;
+            weaken( $self->{_asset} );
 	}
 	return $self->{_asset};
 }
@@ -121,7 +123,8 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _errorHandler/) {
+        # XXX Is this necessary when we have weakened session refs?
+	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _errorHandler _config /) {
 		delete $self->{$key};
 	}
 }

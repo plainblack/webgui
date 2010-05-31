@@ -21,6 +21,7 @@ use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::Pluggable;
 use WebGUI::International;
+use Scalar::Util qw( weaken );
 
 
 =head1 NAME
@@ -1519,6 +1520,7 @@ sub new {
     
     my $class           = shift;
     $self->{_session}   = shift;
+    weaken( $self->{_session} );
 	$self->{_groupId}   = shift;
 	my $override        = shift;
     my $noAdmin         = shift;

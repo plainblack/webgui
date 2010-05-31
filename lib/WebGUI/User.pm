@@ -26,6 +26,7 @@ use WebGUI::Shop::AddressBook;
 use JSON;
 use WebGUI::Exception;
 use WebGUI::ProfileField;
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -1077,6 +1078,7 @@ sub new {
     my $self        = $cache->get || {};
     bless $self, $class;
     $self->{_session} = $session;
+    weaken( $self->{_session} );
     unless ($self->{_userId} && $self->{_user}{username}) {
         my %user;
         tie %user, 'Tie::CPHash';

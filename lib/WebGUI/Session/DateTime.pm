@@ -19,6 +19,7 @@ use DateTime;
 use DateTime::Format::Strptime;
 use DateTime::Format::Mail;
 use DateTime::TimeZone;
+use Scalar::Util qw( weaken );
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
@@ -808,7 +809,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+	my $self = bless {_session=>$session}, $class;
+        weaken( $self->{_session} );
+        return $self;
 }
 
 #-------------------------------------------------------------------

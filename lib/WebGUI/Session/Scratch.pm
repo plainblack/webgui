@@ -16,6 +16,7 @@ package WebGUI::Session::Scratch;
 
 use strict;
 use WebGUI::International;
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -191,7 +192,9 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId], {noOrder => 1});
-	bless {_session=>$session, _data=>$data}, $class;
+	my $self = bless {_session=>$session, _data=>$data}, $class;
+        weaken( $self->{_session} );
+        return $self;
 }
 
 #-------------------------------------------------------------------

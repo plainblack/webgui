@@ -17,6 +17,7 @@ package WebGUI::FormValidator;
 use strict qw(vars subs);
 use WebGUI::HTML;
 use WebGUI::Pluggable;
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -122,7 +123,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+	my $self = bless {_session=>$session}, $class;
+        weaken( $self->{_session} );
+        return $self;
 }
 
 
