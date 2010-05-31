@@ -291,9 +291,9 @@ sub view {
 	SHELF: foreach my $child (@{$self->getLineage(['children'],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
         next SHELF unless $child->canView;
 		my $properties  = $child->get;
-		$child->{url}   = $child->getUrl;
-		$child->{title} = $child->getTitle;
-		push @childShelves, $child;
+		$properties->{url}   = $child->getUrl;
+		$properties->{title} = $child->getTitle;
+		push @childShelves, $properties;
 	}
 	
 	# get other child skus

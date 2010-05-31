@@ -16,6 +16,7 @@
  - fixed #11587: Thingy, no fields and undefined statement handles
  - fixed #11589: Syndicated Content: Return raw text for sentence and word template variables
  - fixed #11573: user has no way of knowing what they are currently using
+ - fixed #11603: Shelf, template variables for sub shelves
 
 7.8.19
  - fixed #11547: Default Inbox View Template Delete buttton failure
