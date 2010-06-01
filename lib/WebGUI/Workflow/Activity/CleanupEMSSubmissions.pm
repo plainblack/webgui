@@ -78,11 +78,18 @@ sub execute {
     my $limit   = 2_500;
     my $timeLimit = $self->getTTL;
 
-    my $list = $root->getLineage( ['descendants'], { returnObjects => 1,
+    my $emsFormIter = $root->getLineageIterator( ['descendants'], { 
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
              } );
     
-    for my $emsForm ( @$list ) {
+    while ( 1 ) {
+        my $emsForm;
+        eval { $emsForm = $emsFormIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $emsForm;
        my $daysBeforeCleanup = $emsForm->get('daysBeforeCleanup') ;
        next if ! $daysBeforeCleanup;
        my $whereClause = q{ submissionStatus='denied' };
@@ -91,12 +98,19 @@ sub execute {
        }
        my $checkDate = time - ( 60*60*24* $daysBeforeCleanup );
        $whereClause .= q{ and assetData.lastModified < } . $checkDate;
-       my $res = $emsForm->getLineage(['children'],{ returnObjects => 1,
+       my $submissionIter = $emsForm->getLineageIterator(['children'],{
 	     joinClass => 'WebGUI::Asset::EMSSubmission',
 	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	     whereClause => $whereClause,
 	 } );
-        for my $submission ( @$res ) {
+        while ( 1 ) {
+            my $submission;
+            eval { $submission = $submissionIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $submission;
 	    $submission->purge;
 	    $limit--;
 	    return $self->WAITING(1) if ! $limit or time > $start + $timeLimit;

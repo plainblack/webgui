@@ -256,10 +256,16 @@ sub www_chooseContentSave {
 
     # update default site style
     $session->setting->set( "userFunctionStyleId", $self->get('styleTemplateId') );
-    foreach my $asset ( @{ $home->getLineage( [ "self", "descendants" ], { returnObjects => 1 } ) } ) {
-        if ( defined $asset ) {
-            $asset->update( { styleTemplateId => $self->get("styleTemplateId") } );
+    my $assetIter = $home->getLineageIterator( [ "self", "descendants" ] );
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
         }
+        last unless $asset;
+        $asset->update( { styleTemplateId => $self->get("styleTemplateId") } );
     }
 
     # add new pages

@@ -579,8 +579,7 @@ sub getEventNext {
         'assetData.assetId',
     );
 
-    my $events = $self->getLineage(['siblings'], {
-        #returnObjects      => 1,
+    my $events = $self->getLineageIterator(['siblings'], {
         includeOnlyClasses  => ['WebGUI::Asset::Event'],
         joinClass           => 'WebGUI::Asset::Event',
         orderByClause       => join(",", @orderByColumns),
@@ -588,9 +587,12 @@ sub getEventNext {
         limit               => 1,
     });
 
-
-    return undef unless $events->[0];
-    return WebGUI::Asset->newByDynamicClass($self->session,$events->[0]);
+    my $nextEvent;
+    eval { $nextEvent = $events->() };
+    if ( WebGUI::Error->caught('WebGUI::Error::ObjecNotFound') ) {
+        return undef; # Normal error
+    }
+    return $nextEvent;
 }
 
 
@@ -636,8 +638,7 @@ sub getEventPrev {
         'assetData.assetId DESC',
     );
 
-    my $events    = $self->getLineage(['siblings'], {
-                #returnObjects      => 1,
+    my $events    = $self->getLineageIterator(['siblings'], {
                 includeOnlyClasses  => ['WebGUI::Asset::Event'],
                 joinClass           => 'WebGUI::Asset::Event',
                 orderByClause       => join(",",@orderByColumns),
@@ -645,8 +646,12 @@ sub getEventPrev {
                 limit               => 1,
             });
 
-    return undef unless $events->[0];
-    return WebGUI::Asset->newByDynamicClass($self->session,$events->[0]);
+    my $prevEvent;
+    eval { $prevEvent = $events->() };
+    if ( WebGUI::Error->caught( 'WebGUI::Error::ObjectNotFound' ) ) {
+        return undef; # Normal error
+    }
+    return $prevEvent;
 }
 
 
@@ -1483,35 +1488,46 @@ sub processPropertiesFromFormPost {
 
             # Delete old events
             if ($old_id) {
-                my $events = $self->getLineage(["siblings"], {
-                    returnObjects       => 1,
+                my $events = $self->getLineageIterator(["siblings"], {
                     includeOnlyClasses  => ['WebGUI::Asset::Event'],
                     joinClass           => 'WebGUI::Asset::Event',
                     whereClause         => qq{Event.recurId = "$old_id"},
                 });
-                $_->purge for @$events;
+                while ( 1 ) {
+                    my $event;
+                    eval { $event = $events->() };
+                    if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                        $session->log->error(sprintf "Couldn't instance event asset %s to delete it", $x->id);
+                        next;
+                    }
+                    last unless $event;
+                    $event->purge;
+                }
             }
         }
         else {
             # TODO: Give users a form property to decide what events to update
-            # TODO: Make a workflow activity to do this, so that updating
-            # 1 million events doesn't kill the server.
+            # TODO: Make this use WebGUI::ProgressBar so 1 million events doesn't kill the server.
             # Just update related events
             my %properties    = %{ $self->get };
             delete $properties{startDate};
             delete $properties{endDate};
             delete $properties{url};    # addRevision will create a new url for us
 
-            my $events = $self->getLineage(["siblings"], {
-                #returnObjects       => 1,
+            my $events = $self->getLineageIterator(["siblings"], {
                 includeOnlyClasses  => ['WebGUI::Asset::Event'],
                 joinClass           => 'WebGUI::Asset::Event',
                 whereClause         => q{Event.recurId = "}.$self->get("recurId").q{"},
             });
 
-            for my $eventId (@{$events}) {
-                my $event   = WebGUI::Asset->newByDynamicClass($session, $eventId);
-
+            while ( 1 ) {
+                my $event;
+                eval { $event = $events->() };
+                if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                    $session->log->error(sprintf "Couldn't instance event asset %s to update it", $x->id);
+                    next;
+                }
+                last unless $event;
                 # Add a revision
                 $properties{ startDate  } = $event->get("startDate");
                 $properties{ endDate    } = $event->get("endDate");

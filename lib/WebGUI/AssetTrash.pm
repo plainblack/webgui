@@ -141,24 +141,23 @@ sub purge {
     }
 
     # assassinate the offspring
-	my $kids = $self->getLineage(["children"],{
-        returnObjects   => 1,
+	my $childIter = $self->getLineageIterator(["children"],{
         statesToInclude => [qw(published clipboard clipboard-limbo trash trash-limbo)],
         statusToInclude => [qw(approved archived pending)],
     });
-	foreach my $kid (@{$kids}) {
-		# Technically get lineage should never return an undefined object from getLineage when called like this, but it did so this saves the world from destruction.
-        if (defined $kid) {
-            unless ($kid->purge) {
+        while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
+            unless ($child->purge) {
                 $session->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
                 $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
                 return 0;
             }
-        }
-        else {
-            $outputSub->($i18n->get('Undefined child'));
-			$session->errorHandler->error("getLineage returned an undefined object in the AssetTrash->purge method.  Unable to purge asset.");
-        }
 	}
 
     # Delete shortcuts to this asset
@@ -266,7 +265,8 @@ sub trash {
         return undef;
     }
 
-    foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
+    my $assets = $self->getLineage(['self','descendants']);
+    while ( my $asset = $assets->() ) {
         $outputSub->($i18n->get('Clearing search index'));
         my $index = WebGUI::Search::Index->new($asset);
         $index->delete;

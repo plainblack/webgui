@@ -383,13 +383,20 @@ ENDHTML
 
     ### Crumbtrail
     my $crumb_markup    = '<li><a href="%s">%s</a> &gt;</li>';
-    my $ancestors       = $currentAsset->getLineage( ['ancestors'], { returnObjects => 1 } );
+    my $ancestorIter    = $currentAsset->getLineageIterator( ['ancestors'] );
 
     $output             .=  '<ol id="crumbtrail">';
-    for my $asset ( @{ $ancestors } ) {
+    while ( 1 ) {
+        my $ancestor;
+        eval { $ancestor = $ancestorIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $ancestor;
         $output .= sprintf $crumb_markup, 
-                $asset->getUrl( 'op=assetManager;method=manage' ),
-                $asset->get( "menuTitle" ),
+                $ancestor->getUrl( 'op=assetManager;method=manage' ),
+                $ancestor->get( "menuTitle" ),
                 ;
     }
 

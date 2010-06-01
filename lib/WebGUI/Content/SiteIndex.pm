@@ -61,7 +61,6 @@ sub handler {
     }
     
     my $pages  = WebGUI::Asset->getRoot($session)->getLineageIterator(["self","descendants"],{
-        returnObjects      => 1,
         includeOnlyClasses => ["WebGUI::Asset::Wobject::Layout"],
         whereClause        => $whereClause,
         limit              => 20000

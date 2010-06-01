@@ -107,14 +107,20 @@ sub execute {
 
     # kill temporary assets
     my $tempspace = WebGUI::Asset->getTempspace($self->session);
-    my $children = $tempspace->getLineage(["children"], {
-        returnObjects   => 1, 
+    my $childIter = $tempspace->getLineageIterator(["children"], {
         statesToInclude => [qw(trash clipboard published)],
         statusToInclude => [qw(pending archived approved)],
         });
-    foreach my $asset (@{$children}) {
-        if (time() - $asset->get("revisionDate") > $self->get("storageTimeout")) {
-            unless ($asset->purge) {
+    while ( 1 ) {
+        my $child;
+        eval { $child = $childIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $child;
+        if (time() - $child->get("revisionDate") > $self->get("storageTimeout")) {
+            unless ($child->purge) {
                 return $self->ERROR;
             }
         }

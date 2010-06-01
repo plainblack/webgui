@@ -189,9 +189,16 @@ sub getEditForm {
 	my $i18n = WebGUI::International->new($self->session, "Asset_Dashboard");
 	if ($self->session->form->process("func") ne "add") {
 		my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
-		my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
+		my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
 		my %childIds;
-		foreach my $child (@{$children}) {
+                while ( 1 ) {
+                    my $child;
+                    eval { $child = $childIter->() };
+                    if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                        $session->log->error($x->full_message);
+                        next;
+                    }
+                    last unless $child;
 			$childIds{$child->getId} = $child->getTitle.' ['.ref($child).']';	
 		}
 		$tabform->getTab("display")->checkList(
@@ -255,9 +262,16 @@ their templates.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView;
-	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
 	my @hidden = split("\n",$self->get("assetsToHide"));
-	foreach my $child (@{$children}) {
+	my $childIter = $self->getLineageIterator( ["children"], {excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
+        while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
 		unless (isIn($child->getId, @hidden) || !($child->canView)) {
 			$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 			$child->prepareView;
@@ -323,8 +337,9 @@ sub view {
     );
 	
 	my $templateId = $self->get("templateId");
-	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
+        # XXX Not using getLineageIterator because we loop over the children three times...
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
+	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
 	my @positions = split(/\./,$self->getContentPositions);
 	my @hidden = split("\n",$self->get("assetsToHide"));
 	foreach my $child (@{$children}) {

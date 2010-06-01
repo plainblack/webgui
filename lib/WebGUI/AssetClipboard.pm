@@ -67,7 +67,15 @@ sub cut {
 	$session->db->write("update asset set state='clipboard', stateChangedBy=?, stateChanged=? where assetId=?", [$session->user->userId, time(), $self->getId]);
 	$session->db->commit;
 	$self->{_properties}{state} = "clipboard";
-    foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
+    my $assetIter = $self->getLineageIterator(['descendants']);
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $asset;
         $asset->purgeCache;
         $asset->updateHistory('cut');
     }
@@ -212,11 +220,18 @@ sub paste {
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
         
         # Update lineage in search index.
-        my $updateAssets = $pastedAsset->getLineage(['self', 'descendants'], {returnObjects => 1});
+        my $assetIter = $pastedAsset->getLineageIterator(['self', 'descendants']);
+        while ( 1 ) {
+            my $asset;
+            eval { $asset = $assetIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $asset;
  
-        foreach (@{$updateAssets}) {
             $outputSub->(sprintf $i18n->get('indexing %s'), $pastedAsset->getTitle) if defined $outputSub;
-            $_->indexContent();
+            $asset->indexContent();
         }
 
 		return 1;

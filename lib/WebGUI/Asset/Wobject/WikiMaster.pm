@@ -79,15 +79,19 @@ sub appendMostPopular {
     my $self  = shift;
     my $var   = shift;
     my $limit = shift || $self->get("mostPopularCount");
-	foreach my $asset (@{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"], joinClass => 'WebGUI::Asset::WikiPage', orderByClause => 'WikiPage.views DESC'})}) { 
-		if (defined $asset) {
+    my $assetIter = $self->getLineageIterator(["children"],{limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"], joinClass => 'WebGUI::Asset::WikiPage', orderByClause => 'WikiPage.views DESC'});
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $asset;
 			push(@{$var->{mostPopular}}, {
 				title=>$asset->getTitle,
 				url=>$asset->getUrl,
 				});
-		} else {
-			$self->session->errorHandler->error("Couldn't instanciate wikipage for master ".$self->getId);
-		}
 	}
 }
 
@@ -734,7 +738,16 @@ sub processPropertiesFromFormPost {
 	     or ($self->session->form->process('groupIdEdit') ne $self->get('groupIdEdit')));
 	my $ret = $self->next::method(@_);
 	if ($groupsChanged) {
-		foreach my $child (@{$self->getLineage(['children'], {returnObjects => 1})}) {
+                # XXX Should this do descendants for WikiPage attachments?
+                my $childIter = $self->getLineageIterator(['children']);
+                while ( 1 ) {
+                    my $child;
+                    eval { $child = $childIter->() };
+                    if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                        $session->log->error($x->full_message);
+                        next;
+                    }
+                    last unless $child;
 			$child->update({ groupIdView => $self->get('groupIdView'),
 					 groupIdEdit => $self->get('groupIdEdit') });
 		}

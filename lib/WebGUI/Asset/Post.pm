@@ -59,14 +59,12 @@ sub _fixReplyCount {
     my $self    = shift;
     my $asset   = shift;
 
-    my $lastPost = $asset->getLineage( [ qw{ self descendants } ], {
-        returnObjects   => 1,
+    my $lastPostId = $asset->getLineage( [ qw{ self descendants } ], {
         isa             => 'WebGUI::Asset::Post',
         orderByClause   => 'assetData.revisionDate desc',
-        limit           => 1,
     } )->[0];
 
-    if ($lastPost) {
+    if (my $lastPost = WebGUI::Asset->newByDynamicClass( $self->session, $lastPostId ) ) {
         $asset->incrementReplies( $lastPost->get( 'revisionDate' ), $lastPost->getId );
     }
     else {
@@ -1024,10 +1022,7 @@ sub paste {
     $self->next::method(@_);
 
     # First, figure out what Thread we're under
-    my $thread = $self->getLineage( [ qw{ self ancestors } ], {
-        returnObjects   => 1,
-        isa             => 'WebGUI::Asset::Post::Thread',
-    } )->[0];
+    my $thread = $self->getThread;
 
     # If the pasted asset is not a thread we'll have to update the threadId of it and all posts below it.
     if ( $self->get('threadId') ne $self->getId ) {

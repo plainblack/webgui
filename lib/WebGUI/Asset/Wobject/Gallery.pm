@@ -927,17 +927,21 @@ sub hasSpaceAvailable {
     # Compile the amount of disk space used
     my $maxSpace    = $self->get( "maxSpacePerUser" ) * ( 1_024 ** 2 ); # maxSpacePerUser is in MB
     my $spaceUsed   = 0;
-    my $fileIds
-        = $self->getLineage( [ 'descendants' ], { 
+    my $fileIter
+        = $self->getLineageIterator( [ 'descendants' ], { 
             joinClass       => 'WebGUI::Asset::File::GalleryFile',
             whereClause     => 'ownerUserId = ' . $db->quote( $userId ),
         } );
 
-    for my $assetId ( @{ $fileIds } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $self->session, $assetId );
-        next unless $asset;
-        $spaceUsed += $asset->get( 'assetSize' );
-
+    while ( 1 ) {
+        my $file;
+        eval { $file = $fileIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $file;
+        $spaceUsed += $file->get( 'assetSize' );
         return 0 if ( $spaceUsed + $spaceWanted >= $maxSpace );
     }
 

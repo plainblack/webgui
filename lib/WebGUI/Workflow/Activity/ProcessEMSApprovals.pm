@@ -78,7 +78,7 @@ sub execute {
     my $limit   = 2_500;
     my $timeLimit = 60;
 
-    my $list = $root->getLineage( ['descendants'], { returnObjects => 1,
+    my $list = $root->getLineage( ['descendants'], {
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
              } );
     

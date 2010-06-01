@@ -451,13 +451,23 @@ boolean indicating whether or not this asset is exportable.
 sub exportCheckExportable {
     my $self = shift;
 
+    # We have ourself already, check it first
+    return 0 unless $asset->get('isExportable');
+
     # get this asset's ancestors. return objects as a shortcut since we'd be
     # instantiating them all anyway.
-    my $assets = $self->getLineage( ['ancestors'], { returnObjects => 1 } );
+    my $assetIter = $self->getLineageIterator( ['self','ancestors'] );
 
     # process each one. return false if any of the assets in the lineage, or
     # this asset itself, isn't exportable.
-    foreach my $asset ( @{$assets}, $self ) {
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $asset;
         return 0 unless $asset->get('isExportable');
     }
 

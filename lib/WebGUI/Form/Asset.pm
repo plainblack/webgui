@@ -184,8 +184,15 @@ sub www_assetTree {
 	$session->http->setCacheControl("none");
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
-	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
-	foreach my $ancestor (@{$ancestors}) {
+	my $ancestorIter = $base->getLineageIterator(["self","ancestors"]);
+        while ( 1 ) {
+            my $ancestor;
+            eval { $ancestor = $ancestorIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $ancestor;
 		my $url = $ancestor->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$session->form->process("formId"));
 		$url .= ";classLimiter=".$session->form->process("classLimiter","className") if ($session->form->process("classLimiter","className"));
 		push(@crumb,'<a href="'.$url.'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
@@ -224,10 +231,17 @@ sub www_assetTree {
 		</style></head><body>
 		<div class="base">
 		<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n";
-	my $children = $base->getLineage(["children","self"],{returnObjects=>1});
+	my $childIter = $base->getLineageIterator(["children","self"]);
 	my $i18n = WebGUI::International->new($session);
 	my $limit = $session->form->process("classLimiter","className");
-	foreach my $child (@{$children}) {
+        while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
 		next unless $child->canView;
 		if ($limit eq "" || $child->get("className") =~ /^$limit/) {
             my $tempChild = $child->get("title");

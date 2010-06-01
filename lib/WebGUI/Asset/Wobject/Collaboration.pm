@@ -27,13 +27,13 @@ use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub _computePostCount {
 	my $self = shift;
-	return scalar @{$self->getLineage(['descendants'], {includeOnlyClasses => ['WebGUI::Asset::Post']})};
+	return $self->getDescendantCount({includeOnlyClasses => ['WebGUI::Asset::Post']});
 }
 
 #-------------------------------------------------------------------
 sub _computeThreadCount {
 	my $self = shift;
-	return scalar @{$self->getLineage(['children'], {includeOnlyClasses => ['WebGUI::Asset::Post::Thread']})};
+	return $self->getChildCount({includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
 }
 
 #-------------------------------------------------------------------
@@ -1387,11 +1387,19 @@ sub processPropertiesFromFormPost {
 		$self->createSubscriptionGroup;
 	}
         if ($updatePrivs) {
-                foreach my $descendant (@{$self->getLineage(["descendants"],{returnObjects=>1})}) {
-                        $descendant->update({
-                                groupIdView=>$self->get("groupIdView"),
-                                groupIdEdit=>$self->get("groupIdEdit")
-                                });
+                my $descendantIter = $self->getLineageIterator(['descendants']);
+                while ( 1 ) {
+                    my $descendant;
+                    eval { $descendant = $descendantIter->() };
+                    if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                        $session->log->error($x->full_message);
+                        next;
+                    }
+                    last unless $descendant;
+                    $descendant->update({
+                            groupIdView=>$self->get("groupIdView"),
+                            groupIdEdit=>$self->get("groupIdEdit")
+                            });
                 }
         }
 	$self->session->scratch->delete($self->getId."_sortBy");
@@ -1686,16 +1694,21 @@ sub www_unarchiveAll {
     my $pb      = WebGUI::ProgressBar->new($session);
     my $i18n     = WebGUI::International->new($session, 'Asset_Collaboration');
     $pb->start($i18n->get('unarchive all'), $self->getUrl('func=edit'));
-    my $threadIds = $self->getLineage(['children'],{
+    my $threadIter = $self->getLineageIterator(['children'],{
         includeOnlyClasses      => [ 'WebGUI::Asset::Post::Thread' ],
         statusToInclude         => [ 'archived' ],
     } );
-    ASSET: foreach my $threadId (@$threadIds) {
-        my $thread = WebGUI::Asset->newPending($session, $threadId);
-        if (!$thread || !$thread->canEdit) {
-            next ASSET;
+    ASSET: while ( 1 ) {
+        my $thread;
+        eval { $thread = $threadIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
         }
-        $thread->unarchive;
+        last unless $thread;
+        if ($thread->canEdit) {
+            $thread->unarchive;
+        }
     }
     return $pb->finish( $self->getUrl('func=edit') );
 }

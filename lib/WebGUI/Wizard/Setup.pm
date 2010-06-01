@@ -363,7 +363,15 @@ sub www_defaultStyleSave {
     # update default site style
     $session->setting->set( "userFunctionStyleId", $self->get('styleTemplateId') );
     my $home    = WebGUI::Asset->getDefault( $session );
-    foreach my $asset ( @{ $home->getLineage( [ "self", "descendants" ], { returnObjects => 1 } ) } ) {
+    my $assetIter  = $home->getLineageIterator( [ "self", "descendants" ] );
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $asset;
         if ( defined $asset ) {
             $asset->update( { styleTemplateId => $self->get("styleTemplateId") } );
         }

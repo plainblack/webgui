@@ -492,7 +492,7 @@ Returns a list of the post objects in this thread, including the thread post its
 
 sub getPosts {
     my $self = shift;
-    $self->getLineage(["self","descendants"], {
+    return $self->getLineage(["self","descendants"], {
         returnObjects       => 1,
         includeArchived     => 1,
         includeOnlyClasses  => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
