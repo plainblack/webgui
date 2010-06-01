@@ -1,4 +1,5 @@
 7.9.6
+ - new checkbox in the asset manager for clearing the package flag on import
  - fixed #11597: manageTrash and newlines
  - fixed #11577: Gallery Album: "Sort by" radio list missing in "Add Archive" view
  - fixed #11576: Default WebGUI config has a bad macro
