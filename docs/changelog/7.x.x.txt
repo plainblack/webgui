@@ -17,6 +17,7 @@
  - added #11504: Allow search by location in the gallery
  - migrate to getLineageIterator to save memory
  - add findBrokenAssets.pl to find and fix/delete broken assets
+ - change to use weaken() to save memory
 
 7.9.5
  - Asset->www_copy now has a progress bar
