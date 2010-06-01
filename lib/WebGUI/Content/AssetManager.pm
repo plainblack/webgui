@@ -475,6 +475,8 @@ EOHTML
         . WebGUI::Form::hidden($session, {name=>"func", value=>"importPackage"})
         . '<div><input type="file" name="packageFile" size="30" style="font-size: 10px;" /></div>'
         . '<div style="font-size: 10px">'
+        . WebGUI::Form::checkbox($session, { label => $i18n->get('clear package flag'), checked => 0, name => 'clearPackageFlag', value => 1 })
+        . '<br />'
         . WebGUI::Form::checkbox($session, { label => $i18n->get('inherit parent permissions'), checked => 1, name => 'inheritPermissions', value => 1 })
         . ' &nbsp; ' .  WebGUI::Form::submit($session, { value=>$i18n->get("import"), 'extras' => ' ' })
         . '</div>'

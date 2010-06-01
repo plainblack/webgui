@@ -357,7 +357,10 @@ sub www_importPackage {
 
 	my $error = "";
 	if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg") {
-		$error = $self->importPackage($storage, {inheritPermissions => $inheritPermissions});
+		$error = $self->importPackage($storage, {
+			inheritPermissions => $inheritPermissions,
+			clearPackageFlag   => $self->session->form->process('clearPackageFlag'),
+		});
 	}
 	if (!blessed $error) {
 		my $i18n = WebGUI::International->new($self->session, "Asset");
