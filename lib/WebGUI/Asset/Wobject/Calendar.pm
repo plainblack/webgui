@@ -765,7 +765,7 @@ sub getEventsIn {
                     && Event.endTime   IS NULL 
                     && 
                         !(
-                            Event.startDate > '$endDate' 
+                            Event.startDate > SUBDATE('$endDate', INTERVAL 1 DAY)
                          || Event.endDate   < '$startDate'
                         )
                 ) 
@@ -790,7 +790,7 @@ sub getEventsIn {
     my $orderby = join ',', @order_priority;
 
     my $events 
-        = $self->getLineage(["descendants"], {
+        = $self->getLineage(["children"], {
             returnObjects       => 1,
             includeOnlyClasses  => ['WebGUI::Asset::Event'],
             joinClass           => 'WebGUI::Asset::Event',

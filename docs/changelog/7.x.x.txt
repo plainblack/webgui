@@ -1,5 +1,6 @@
 7.8.21
  - fixed #11597: manageTrash and newlines
+ - fixed #11596: Calendar: all day events leaking
 
 7.8.20
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
