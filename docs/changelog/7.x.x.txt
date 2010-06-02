@@ -1,4 +1,5 @@
 7.9.7
+ - fixed #11596: Calendar: all day events leaking
 
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
