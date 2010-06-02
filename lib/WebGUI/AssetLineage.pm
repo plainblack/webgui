@@ -226,17 +226,24 @@ only those that are published or achived are counted.
 
 Only count these classes. Arrayref of class names
 
+=head4 statusToInclude
+
+Arrayref of status to include
 
 =cut
 
 sub getChildCount {
 	my $self = shift;
-    my $opts = shift || {};
+    my $opt = shift || {};
+    $opt->{ statusToInclude } ||= [ 'approved', 'archived' ];
+
+    my $db  = $self->session->db;
     my $sql = "select count(distinct asset.assetId) 
                 from asset, assetData 
                 where asset.assetId=assetData.assetId 
                     and parentId=? 
-                    and (assetData.status in ('approved', 'archived') or assetData.tagId=?)";
+                    and (assetData.status in (" . $db->quoteAndJoin( $opt->{statusToInclude} ) . ") 
+                        or assetData.tagId=?)";
     my @params  = ( $self->getId, $self->session->scratch->get('versionTag') );
 
     if ( !$opt->{ includeTrash } ) {
@@ -255,7 +262,7 @@ sub getChildCount {
         $sql .= "AND className IN (" . join( ',', ("?") x @classes ) . ")";
         push @params, @classes;
     }
-	my ($count) = $self->session->db->quickArray($sql, \@params);
+	my $count = $self->session->db->quickScalar($sql, \@params);
 	return $count;
 }
 
@@ -272,19 +279,27 @@ in the clipboard or trash.
 
 Only count these classes. Arrayref of class names
 
+=head4 statusToInclude
+
+Arrayref of status to include
+
 =cut
 
 sub getDescendantCount {
 	my $self = shift;
         my $opt = shift || {};
-        
+        $opt->{ statusToInclude } ||= [ 'approved', 'archived' ];
+
+        my $db  = $self->session->db;
+
         my $sql  = "select count(distinct asset.assetId) 
                     from asset, assetData
                     where asset.assetId = assetData.assetId 
+                        and asset.assetId != ?
                         and asset.state = 'published' 
-                        and assetData.status in ('approved','archived') 
+                        and assetData.status in (" . $db->quoteAndJoin( $opt->{statusToInclude} ) . ") 
                         and asset.lineage like ? ";
-        my @params = ( $self->get("lineage")."%" );
+        my @params = ( $self->getId, $self->get("lineage")."%" );
 
         # XXX This code is duplicated in getLineageSql and getChildCount. Merge the three ways?
         if ( $opt->{includeOnlyClasses} ) {
@@ -299,8 +314,7 @@ sub getDescendantCount {
             push @params, @classes;
         }
 
-	my ($count) = $self->session->db->quickArray($sql, \@params);
-	$count--; # have to subtract self
+	my $count = $self->session->db->quickScalar($sql, \@params);
 	return $count;
 }
 
@@ -990,7 +1004,7 @@ sub setRank {
             my $sibling;
             eval { $sibling = $siblingIter->() };
             if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
-                $session->log->error($x->full_message);
+                $self->session->log->error($x->full_message);
                 next;
             }
             last unless $sibling;

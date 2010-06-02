@@ -265,8 +265,15 @@ sub trash {
         return undef;
     }
 
-    my $assets = $self->getLineage(['self','descendants']);
-    while ( my $asset = $assets->() ) {
+    my $assetIter = $self->getLineageIterator(['self','descendants']);
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $asset;
         $outputSub->($i18n->get('Clearing search index'));
         my $index = WebGUI::Search::Index->new($asset);
         $index->delete;

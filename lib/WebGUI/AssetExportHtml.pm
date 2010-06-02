@@ -452,7 +452,7 @@ sub exportCheckExportable {
     my $self = shift;
 
     # We have ourself already, check it first
-    return 0 unless $asset->get('isExportable');
+    return 0 unless $self->get('isExportable');
 
     # get this asset's ancestors. return objects as a shortcut since we'd be
     # instantiating them all anyway.
@@ -464,7 +464,7 @@ sub exportCheckExportable {
         my $asset;
         eval { $asset = $assetIter->() };
         if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
-            $session->log->error($x->full_message);
+            $self->session->log->error($x->full_message);
             next;
         }
         last unless $asset;
@@ -553,8 +553,8 @@ sub exportGetDescendants {
         orderByClause       => 'assetData.url DESC',
     } );
 
-    use Data::Dumper;
-    warn "Assets: " . scalar( @$assetIds );
+    #use Data::Dumper;
+    #warn "Assets: " . scalar( @$assetIds );
 
     return $assetIds;
 }

@@ -27,13 +27,19 @@ use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub _computePostCount {
 	my $self = shift;
-	return $self->getDescendantCount({includeOnlyClasses => ['WebGUI::Asset::Post']});
+	return $self->getDescendantCount({
+            includeOnlyClasses => ['WebGUI::Asset::Post'],
+            statusToInclude     => ['approved'],
+        });
 }
 
 #-------------------------------------------------------------------
 sub _computeThreadCount {
 	my $self = shift;
-	return $self->getChildCount({includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
+	return $self->getChildCount({
+            includeOnlyClasses => ['WebGUI::Asset::Post::Thread'],
+            statusToInclude => ['approved'],
+        });
 }
 
 #-------------------------------------------------------------------
@@ -1392,7 +1398,7 @@ sub processPropertiesFromFormPost {
                     my $descendant;
                     eval { $descendant = $descendantIter->() };
                     if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
-                        $session->log->error($x->full_message);
+                        $self->session->log->error($x->full_message);
                         next;
                     }
                     last unless $descendant;

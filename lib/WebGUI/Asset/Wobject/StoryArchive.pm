@@ -411,7 +411,7 @@ sub getRssFeedItems {
         my $story;
         eval { $story = $storyIter->() };
         if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
-            $session->log->error($x->full_message);
+            $self->session->log->error($x->full_message);
             next;
         }
         last unless $story;

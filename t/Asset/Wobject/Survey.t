@@ -273,37 +273,37 @@ cmp_deeply(
     [
         {
           'extras' => undef,
-          'url' => '/home?func=edit',
+          'url' => re('func=edit$'),
           'label' => 'Edit'
         },
         {
           'extras' => undef,
-          'url' => '/home?func=editSurvey',
+          'url' => re('func=editSurvey$'),
           'label' => 'Edit Survey'
         },
         {
           'extras' => undef,
-          'url' => '/home?func=takeSurvey',
+          'url' => re('func=takeSurvey$'),
           'label' => 'Take Survey'
         },
         {
           'extras' => undef,
-          'url' => '/home?func=graph',
+          'url' => re('func=graph$'),
           'label' => 'Visualize'
         },
         {
           'extras' => undef,
-          'url' => '/home?func=editTestSuite',
+          'url' => re('func=editTestSuite$'),
           'label' => 'Test Suite'
         },
         {
           'extras' => undef,
-          'url' => '/home?func=runTests',
+          'url' => re('func=runTests$'),
           'label' => 'Run All Tests'
         },
         {
           'extras' => undef,
-          'url' => '/home?func=runTests;format=tap',
+          'url' => re('func=runTests;format=tap$'),
           'label' => 'Run All Tests (TAP)'
         }
     ],

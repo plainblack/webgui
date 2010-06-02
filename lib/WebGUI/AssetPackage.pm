@@ -63,8 +63,15 @@ Turns this package into a package file and returns the storage location object o
 sub exportPackage {
 	my $self = shift;
 	my $storage = WebGUI::Storage->createTemp($self->session);
-        my $assets = $self->getLineage(["self","descendants"],{statusToInclude=>['approved', 'archived']})
-	while ( my $asset = $assets->() ) {
+        my $assetIter = $self->getLineageIterator(["self","descendants"],{statusToInclude=>['approved', 'archived']});
+        while ( 1 ) {
+            my $asset;
+            eval { $asset = $assetIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $self->session->log->error($x->full_message);
+                next;
+            }
+            last unless $asset;
 		my $data = $asset->exportAssetData;
 		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON->new->utf8->pretty->encode($data));
 		foreach my $storageId (@{$data->{storage}}) {

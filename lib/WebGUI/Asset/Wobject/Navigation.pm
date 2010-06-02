@@ -381,6 +381,7 @@ sub view {
         $current = WebGUI::Asset->getDefault($self->session);
     }
 
+	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
     # Add properties from current asset
     foreach my $property (@interestingProperties) {
 		$var->{'currentPage.'.$property} = $current->get($property);
@@ -411,7 +412,6 @@ sub view {
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
 	$rules{ancestorLimit} = $self->get("ancestorEndPoint");
 	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->get('reversePageLoop'));
-	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $currentLineage = $current->get("lineage");
 	my $lineageToSkip = "noskip";

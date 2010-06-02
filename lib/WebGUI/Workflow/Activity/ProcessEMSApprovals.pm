@@ -80,6 +80,7 @@ sub execute {
 
     my $list = $root->getLineage( ['descendants'], {
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+                 returnObjects      => 1,
              } );
     
     for my $emsForm ( @$list ) {
@@ -88,6 +89,7 @@ sub execute {
 	     joinClass => 'WebGUI::Asset::EMSSubmission',
 	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	     whereClause => $whereClause,
+             returnObjects      => 1,
 	 } );
         for my $submission ( @$res ) {
 	    my $properties = { className => 'WebGUI::Asset::Sku::EMSTicket' };
