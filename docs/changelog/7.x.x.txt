@@ -1,3 +1,5 @@
+7.9.7
+
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
  - fixed #11597: manageTrash and newlines
