@@ -129,6 +129,20 @@ my $session = WebGUI::Test->session;
 }
 
 {
+    note "get, specific properties";
+    my $asset = WebGUI::Asset->new({
+        session   => $session,
+    });
+    my $properties = $asset->get();
+    ok !exists $properties->{session}, 'no session';
+    ok  exists $properties->{keywords}, 'keywords';  ##Test for function later
+    ok  exists $properties->{assetId}, 'assetId';
+    ok  exists $properties->{revisionDate}, 'assetId';
+    ok  exists $properties->{parentId}, 'parentId';
+    ok  exists $properties->{lineage}, 'lineage';
+}
+
+{
     note "getClassById";
     my $class;
     $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
