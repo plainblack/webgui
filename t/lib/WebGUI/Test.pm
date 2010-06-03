@@ -812,6 +812,10 @@ Example call:
             my ($class, $ident) = @_;
             return $class->new($CLASS->session, $ident);
         },
+        'WebGUI::Asset' => sub {
+            my ($class, $ident) = @_;
+            return WebGUI::Asset->newPending($CLASS->session, $ident);
+        },
         'WebGUI::Storage' => sub {
             my ($class, $ident) = @_;
             return WebGUI::Storage->get($CLASS->session, $ident);
