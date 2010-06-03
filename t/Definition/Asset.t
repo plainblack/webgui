@@ -15,7 +15,7 @@ no warnings qw(uninitialized);
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More 'no_plan'; #tests => 1;
+use Test::More;
 use Test::Deep;
 use Test::Exception;
 use WebGUI::Test;
