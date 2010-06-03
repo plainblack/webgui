@@ -199,18 +199,19 @@ sub paste {
     my $outputSub    = shift;
     my $session      = $self->session;
 	my $pastedAsset  = WebGUI::Asset->newById($session,$assetId);
-	return 0 unless ($self->get("state") eq "published");
+	return 0 unless ($self->state eq "published");
     return 0 unless ($pastedAsset->canPaste());  ##Allow pasted assets to have a say about pasting.
 
     # Don't allow a shortcut to create an endless loop
-	return 0 if ($pastedAsset->get("className") eq "WebGUI::Asset::Shortcut" && $pastedAsset->get("shortcutToAssetId") eq $self->getId);
+	return 0 if ($pastedAsset->isa("WebGUI::Asset::Shortcut") && $pastedAsset->shortcutToAssetId eq $self->getId);
     my $i18n=WebGUI::International->new($session, 'Asset');
     $outputSub->(sprintf $i18n->get('pasting %s'), $pastedAsset->getTitle) if defined $outputSub;
-	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
+	if ($self->getId eq $pastedAsset->parentId || $pastedAsset->setParent($self)) {
 		$pastedAsset->publish(['clipboard','clipboard-limbo']); # Paste only clipboard items
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
         
         # Update lineage in search index.
+        $self->purgeCache;
         my $updateAssets = $pastedAsset->getLineage(['self', 'descendants'], {returnObjects => 1});
  
         foreach (@{$updateAssets}) {
