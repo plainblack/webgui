@@ -9,8 +9,8 @@ save you many hours of grief.
 
 7.8.21
 --------------------------------------------------------------------
-     * Due to a bug introduced in 7.9.3, Scheduler tasks may have been deleted
-       from your site.  The 7.9.7 upgrade will restore all default tasks, and tasks
+     * Due to a bug introduced in 7.8.18, Scheduler tasks may have been deleted
+       from your site.  The 7.8.18 upgrade will restore all default tasks, and tasks
        for handling email from Collaboration Systems, but you should check any Scheduler
        tasks that you have created.
 
@@ -30,6 +30,8 @@ save you many hours of grief.
      * A new gotcha was not documented in the 7.8.11 release, the new required version
        of Javascript::Packer, 0.04.  The correct version was put into the testEnvironment
        script.
+
+     * You must upgrade to WebGUI 7.7.33 before upgrading to 7.8.13.
 
 7.8.11
 --------------------------------------------------------------------
