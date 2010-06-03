@@ -31,11 +31,6 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 5;        # Increment this number for each test you create
-
-#----------------------------------------------------------------------------
-# put your tests here
-
 my $output;
 my $home = WebGUI::Asset->getDefault($session);
 
@@ -69,11 +64,15 @@ cmp_deeply(
     },
     'AssetHelper/Cut returns a message and a redirect'
 );
-is $safe_page->get('state'), 'clipboard', '... and the asset was really cut';
+is $safe_page->state, 'clipboard', '... and the asset was really cut';
 
-$home->paste($safe_page->getId);
+$session->asset($home);
+ok $home->paste($safe_page->getId), 'page pasted correctly';
 
-$safe_page = $safe_page->cloneFromDb();
-is $safe_page->get('state'), 'published', 'reset asset for further testing';
+$session->cache->clear;
+my $safe_page2 = WebGUI::Asset->newById($session, $safe_page->assetId);
+is $safe_page2->state, 'published', 'reset asset for further testing';
+
+done_testing();
 
 #vim:ft=perl
