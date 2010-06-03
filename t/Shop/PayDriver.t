@@ -254,6 +254,7 @@ isnt(
 #######################################################################
 
 my $cart = $driver->getCart;
+WebGUI::Test->addToCleanup($cart);
 isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGUI::Shop::Cart object');
 
 #######################################################################
