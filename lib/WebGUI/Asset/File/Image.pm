@@ -244,7 +244,7 @@ sub view {
     $var{fileIcon}    = $self->getFileIconUrl;
     $var{thumbnail}   = $self->getThumbnailUrl;
     $var{annotateJs}  = $crop_js . $domMe;
-    $var{parameters} .= sprintf("id=%s", $self->getId);
+    $var{parameters} .= sprintf(q{ id="%s"}, $self->getId);
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$session->var->isAdminOn && $self->cacheTimeout > 10) {
         $cache->set( $cacheKey, $out, $self->get("cacheTimeout") );
