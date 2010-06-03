@@ -308,7 +308,6 @@ sub www_runCronJob {
                 # Run the instance
         my $error = $instance->start( 1 );
         if ($error) {
-            $task->delete(1);
             return "error";
         }
         $task->delete( 1 ) if ( $task->get("runOnce") );
