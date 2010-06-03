@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.8.21
+--------------------------------------------------------------------
+     * Due to a bug introduced in 7.9.3, Scheduler tasks may have been deleted
+       from your site.  The 7.9.7 upgrade will restore all default tasks, and tasks
+       for handling email from Collaboration Systems, but you should check any Scheduler
+       tasks that you have created.
+
 7.8.20
 --------------------------------------------------------------------
      * The javascript check for email addresses has been removed.
