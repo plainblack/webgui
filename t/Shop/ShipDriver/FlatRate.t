@@ -263,7 +263,6 @@ my $car = WebGUI::Asset->getImportNode($session)->addChild({
     title              => 'Automobiles',
     isShippingRequired => 1,
 });
-WebGUI::Test->addToCleanup($car);
 
 my $crappyCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
     {
