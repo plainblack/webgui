@@ -389,4 +389,15 @@ my $session = WebGUI::Test->session;
     cmp_deeply($classes, [qw/WebGUI::Asset/], 'Any asset okay');
 }
 
+{
+    note "url, inherited URLs from parent";
+    my $home  = WebGUI::Asset->getDefault($session);
+    my $asset = $home->addChild({
+        className => 'WebGUI::Asset::Wobject::Article',
+        title     => 'sub',
+    });
+    WebGUI::Test->addToCleanup($asset);
+    is $asset->url, 'home/sub', 'by default, asset gets a url from the title, and the parent';
+}
+
 done_testing;

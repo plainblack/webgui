@@ -80,7 +80,7 @@ property  url => (
             builder         => '_default_url',
           );
 sub _default_url {
-    return $_[0]->assetId;
+    return $_[0]->fixUrl;
 }
 
 around url => sub {
@@ -701,7 +701,9 @@ sub fixUrl {
 
 	# build a URL from the parent
 	unless ($url) {
-		$url = $self->getParent->url;
+        if (my $parent = $self->getParent) {
+            $url = $parent->url;
+        }
 		$url =~ s/(.*)\..*/$1/;
 		$url .= '/'.$self->menuTitle;
 	}
