@@ -3,6 +3,7 @@
  - fixed #11604: scheduled workflows getting deleted
  - fixed #11613: Thingy: If next action after add is to add more things, previous data remains
  - added API method commitAsUser allowing developers to commit version tags as other users
+ - fixed: The template form plugin would return an empty string when getValueAsHtml was called. ( Martin Kamerbeek / Oqapi )
 
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
