@@ -72,7 +72,7 @@ my $storage;
 my $versionTag;
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
-my @skipAutoCommit  = WebGUI::Test->addAssetSkipCoda;
+my @skipAutoCommit  = WebGUI::Test->getAssetSkipCoda;
 
 my $home = WebGUI::Asset->getDefault($session);
 
