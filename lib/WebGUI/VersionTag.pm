@@ -186,6 +186,64 @@ sub commit {
 	return 2;
 }
 
+#-------------------------------------------------------------------
+
+=head2 commitAsUser ( userId , options )
+
+Commits the working tab.  If userId is passed in, commit will be done as that user
+
+=head3 userId
+
+User to commit tag as
+
+=head3 options
+
+hash ref of options to pass in
+
+=head4 comments
+
+optional comments to set in the version tag
+
+=head4 commitNow
+
+optional boolean which, if set, will perform an immediate.
+
+=cut
+
+sub commitAsUser {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $config      = $session->config;
+    my $userId      = shift;
+    my $options     = shift;
+    my $commitNow   = $options->{commitNow};
+    my $comments    = $options->{comments};
+
+    return 0 unless (defined $userId);
+
+    #Open a new session
+    my $new_session = WebGUI::Session->open( $config->getWebguiRoot, $config->getFilename );
+    #Set the userId in the new session
+    $new_session->user( { userId => $userId } );
+
+    #Clone the tag into a new version tag in the new session
+    my $new_tag = __PACKAGE__->new( $new_session, $self->getId );
+    
+    if ( defined $new_tag ) {
+        $new_tag->set( { comments => $comments } );
+        if ($commitNow) {
+            $new_tag->commit;
+        }
+        else {
+            $new_tag->requestCommit;
+        }
+    }
+    #End the new session
+    $new_session->var->end;
+    $new_session->close;
+    return 1;
+}
+
 
 #-------------------------------------------------------------------
 
