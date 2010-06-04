@@ -346,7 +346,6 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
             'eventSubmissionTemplateId'         => ignore(),
             'submittedLocationsList'            => ignore(),
             'keywords'                          => ignore(),
-            'session'                           => ignore(),
             'uiLevel'                           => ignore(),
             'tickets_loop'                      => \@ticketArray,
          },
