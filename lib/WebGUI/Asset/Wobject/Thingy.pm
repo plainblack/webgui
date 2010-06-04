@@ -2619,7 +2619,7 @@ sub www_editThingDataSave {
     elsif ($thingProperties->{afterSave} =~ m/^addOther_/x){
         $otherThingId = $thingProperties->{afterSave};
         $otherThingId =~ s/^addOther_//x;
-        return $self->www_editThingData($otherThingId,"new",undef,"resetForm");
+        return $self->www_editThingData($otherThingId,"new",undef,undef,"resetForm");
     }
     # if afterSave is thingy default or in any other case return www_view()
     else {
