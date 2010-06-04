@@ -2,6 +2,8 @@
  - fixed #11597: manageTrash and newlines
  - fixed #11596: Calendar: all day events leaking
  - fixed #11604: scheduled workflows getting deleted
+ - added API method commitAsUser allowing developers to commit version tags as other users
+ - fixed: The template form plugin would return an empty string when getValueAsHtml was called. ( Martin Kamerbeek / Oqapi )
 
 7.8.20
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
