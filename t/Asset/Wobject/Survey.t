@@ -66,9 +66,9 @@ my $responseId = $survey->responseId;
     my $s = WebGUI::Asset::Wobject::Survey->newByResponseId($session, $responseId);
     is($s->getId, $survey->getId, 'newByResponseId returns same Survey');
 }
-is($survey->get('maxResponsesPerUser'), 1, 'maxResponsesPerUser defaults to 1');
+is($survey->maxResponsesPerUser, 1, 'maxResponsesPerUser defaults to 1');
 ok($survey->canTakeSurvey, '..which means user can take survey');
-is($survey->get('revisionDate'), $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 'Current revisionDate used');
+is($survey->revisionDate, $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 'Current revisionDate used');
 
 ####################################################
 #
@@ -234,7 +234,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     isa_ok($newerSurvey, 'WebGUI::Asset::Wobject::Survey', 'After change, re-retrieved Survey instance');
     is($newerSurvey->getId, $surveyId, '..which is the same survey');
     is($newerSurvey->getSurveyJSON->section([0])->{text}, 'newer text', '..with updated text');
-    ok($newerSurvey->get('revisionDate') > $revisionDate, '..and newer revisionDate');
+    ok($newerSurvey->revisionDate > $revisionDate, '..and newer revisionDate');
 
     # Create another response (this one will use the new revision)
     my $newUser = WebGUI::User->new( $session, 'new' );
