@@ -15,9 +15,14 @@ package WebGUI::Asset::RssAspectDummy;
 =cut
 
 use strict;
-use Tie::IxHash;
-use Class::C3;
-use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset/;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+define assetName => 'RssAspectDummy';
+define icon      => 'asset.gif';
+
+with 'WebGUI::Role::Asset::RssFeed';
 
 =head1 NAME
 
@@ -25,7 +30,7 @@ Package WebGUI::Asset::RssAspectDummy
 
 =head1 DESCRIPTION
 
-A dummy module for testing the RssAspect.  The module really doesn't
+A dummy module for testing the Rss Role.  The module really doesn't
 do anything, except provide suport modules for testing.
 
 The module inherits directly from WebGUI::Asset.
