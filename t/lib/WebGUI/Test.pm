@@ -496,6 +496,25 @@ sub webguiBirthday {
 
 #----------------------------------------------------------------------------
 
+=head2 getAssetSkipCoda ( )
+
+Coded here for the sake of consistency, this returns everything that should be
+appended to calls to addChild to autogenerate ids, revisionDates, and to skip
+autoCommit workflows, and notifications.
+
+=cut
+
+sub getAssetSkipCoda {
+    return undef,
+           undef,
+           {
+            skipAutoCommitWorkflows => 1,
+            skipNotification        => 1,
+           };
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getSmokeLDAPProps ( )
 
 Returns a hashref of properties for connecting to smoke's LDAP server.
