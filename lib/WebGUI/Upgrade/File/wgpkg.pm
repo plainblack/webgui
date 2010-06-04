@@ -39,7 +39,7 @@ sub run {
     $shortname =~ s/\.[^.]*$//;
     $versionTag->set({name => "Upgrade to @{[$self->version]} - $shortname"});
 
-    my $package = $class->import_package($session, $self->file);
+    my $package = $self->import_package($session, $self->file);
     if (! $self->quiet) {
         printf "\tImported '%s'\n", $package->title;
     }
