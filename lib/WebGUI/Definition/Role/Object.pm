@@ -62,7 +62,7 @@ sub get {
     my $self = shift;
     if (@_) {
         my $property = shift;
-        if ($self->meta->find_attribute_by_name($property)) {
+        if ($self->can($property)) {
             return $self->$property;
         }
         return undef;
@@ -88,7 +88,7 @@ is not an attribute of the object, then it is silently ignored.
 sub set {
     my $self = shift;
     my $properties = @_ % 2 ? shift : { @_ };
-    my @orderedProperties = $self->getProperties;
+    my @orderedProperties = $self->meta->get_all_settable_list;
     KEY: for my $property ( @orderedProperties ) {
         next KEY unless exists $properties->{$property};
         $self->$property($properties->{$property});

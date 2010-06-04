@@ -20,6 +20,8 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 use WebGUI::Exception;
+use WebGUI::Asset;
+use WebGUI::Keyword;
 
 
 my $session = WebGUI::Test->session;
@@ -359,11 +361,26 @@ my $session = WebGUI::Test->session;
     my $asset = $default->addChild({
         className => 'WebGUI::Asset::Snippet',
     });
-    addToCleanup($asset);
+    WebGUI::Test->addToCleanup($asset);
     can_ok($asset, 'keywords');
     $asset->keywords('chess set');
     is ($asset->keywords, 'chess set', 'set and get of keywords via direct accessor');
     is ($asset->get('keywords'), 'chess set', 'via get method');
+    my $keygate = WebGUI::Keyword->new($session);
+    is $keygate->getKeywordsForAsset({assetId => $asset->getId}), '', 'not persisted to the db';
+    $asset->write;
+    is $keygate->getKeywordsForAsset({assetId => $asset->assetId}), 'chess set', 'written to the db';
+
+    my $asset_copy = $asset->cloneFromDb;
+    is $asset->keywords, 'chess set', 'refreshed from db';
+
+    my $asset2 = $default->addChild({
+        className => 'WebGUI::Asset::Snippet',
+        keywords  => 'checkmate',
+    });
+    WebGUI::Test->addToCleanup($asset2);
+    is $asset2->keywords, 'checkmate', 'keywords set on addChild';
+    is $keygate->getKeywordsForAsset({assetId => $asset2->assetId}), 'checkmate', '... and persisted to the db';
 }
 
 {

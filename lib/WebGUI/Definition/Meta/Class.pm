@@ -148,6 +148,21 @@ sub get_all_property_list {
     return @names;
 }
 
+sub get_all_settable_list {
+    my $self       = shift;
+    my @names = ();
+    my %seen  = ();
+    foreach my $meta ($self->get_all_class_metas) {
+        push @names,
+            grep { !$seen{$_}++ }
+            map  { $_->name }
+            sort { $a->insertion_order <=> $b->insertion_order }
+            grep { $_->does('WebGUI::Definition::Meta::Settable') }
+            $meta->get_attributes;
+    }
+    return @names;
+}
+
 #-------------------------------------------------------------------
 
 =head2 get_attributes ( )

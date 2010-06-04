@@ -307,25 +307,16 @@ sub _build_className {
 }
 has       keywords       => (
             is              => 'rw',
-            init_arg        => undef,
             builder         => '_build_assetKeywords',
             lazy            => 1,
+            traits          => [ 'WebGUI::Definition::Meta::Settable' ],
 );
 sub _build_assetKeywords {
-    my $session = shift->session;
-    return WebGUI::Keyword->new($session);
-}
-
-around keywords => sub {
-    my $orig = shift;
     my $self = shift;
-    if (@_) {
-        return $self->$orig->setKeywordsForAsset({asset => $self, keywords => $_[0], });
-    }
-    else {
-        return $self->$orig->getKeywordsForAsset({asset => $self});
-    }
-};
+    my $session = $self->session;
+    my $keywords = WebGUI::Keyword->new($session);
+    return $keywords->getKeywordsForAsset({asset => $self, asArrayRef => 1 });
+}
 
 around BUILDARGS => sub {
     my $orig       = shift;
@@ -374,7 +365,7 @@ around BUILDARGS => sub {
     if (defined $properties) {
         $properties->{session} = $session;
         return $className->$orig($properties);
-    }	
+    }
     $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
     return undef;
 };
@@ -2481,6 +2472,7 @@ sub write {
 
     # update the asset's size, which also purges the cache.
     $self->setSize();
+    WebGUI::Keyword->new($self->session)->setKeywordsForAsset({ asset => $self, keywords => $self->keywords });
 
 }
 

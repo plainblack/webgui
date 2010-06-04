@@ -21,6 +21,8 @@ no warnings qw(uninitialized);
 
 our $VERSION = '0.0.1';
 
+with 'WebGUI::Definition::Meta::Settable';
+
 =head1 NAME
 
 Package WebGUI::Definition::Meta::Property
