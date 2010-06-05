@@ -139,16 +139,25 @@ If true, the session won't be registered for automatic deletion.
 
 sub newSession {
     my $noCleanup = shift;
-    my $pseudoRequest = WebGUI::PseudoRequest->new;
     require WebGUI::Session;
-    my $session = WebGUI::Session->open( $CLASS->config );
-    $session->{_request} = $pseudoRequest;
+    my $session = WebGUI::Session->open( $CLASS->config, newEnv() );
+    # my $pseudoRequest = WebGUI::PseudoRequest->new;
+    # $session->{_request} = $pseudoRequest;
     if ( ! $noCleanup ) {
         $CLASS->addToCleanup($session);
     }
     return $session;
 }
 
+sub newEnv {
+    my $form = shift;
+    require HTTP::Message::PSGI;
+    require HTTP::Request::Common;
+    my $config = $CLASS->config;
+    my $url = 'http://' . $config->get('sitename');
+    my $env = HTTP::Request->new( $form ? ( POST => $url, [ %$form ] ) : ( GET => $url ) )->to_psgi;
+    return $env;
+}
 
 #----------------------------------------------------------------------------
 
@@ -335,7 +344,7 @@ Returns the name of the WebGUI config file used for this test.
 
 sub file {
     return our $CONFIG_FILE;
-}
+}    
 
 #----------------------------------------------------------------------------
 
@@ -355,6 +364,9 @@ below.
 
 =cut
 
+
+# I think that getPage should be entirely replaced with calles to Plack::Test::test_psgi
+# - testing with the callback is better and it means we can run on any backend
 sub getPage {
     my $class       = shift;
     my $actor       = shift;    # The actor to work on
@@ -378,9 +390,10 @@ sub getPage {
 
     # Create a new request object
     my $oldRequest  = $session->request;
-    my $request     = WebGUI::PseudoRequest->new;
-    $request->setup_param($optionsRef->{formParams});
+    my $request     = WebGUI::Session::Request->new(newEnv($optionsRef->{formParams}));
+    # $request->setup_param($optionsRef->{formParams});
     local $session->{_request} = $request;
+    local $session->{_response} = $request->new_response( 200 );
     local $session->output->{_handle};
 
     # Fill the buffer
@@ -405,7 +418,8 @@ sub getPage {
     $session->user({ user => $oldUser });
 
     # Return the page's output
-    return $request->get_output;
+    return join '', @{$session->response->body};
+    
 }
 
 #----------------------------------------------------------------------------
