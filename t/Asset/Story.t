@@ -18,6 +18,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Group;
+use WebGUI::Asset::Story;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
@@ -82,17 +83,9 @@ WebGUI::Test->storagesToDelete($storage1, $storage2);
 ############################################################
 
 my $tests = 45;
-plan tests => 1
-            + $tests
+plan tests => $tests
             + $canEditMaker->plan
             ;
-
-my $class  = 'WebGUI::Asset::Story';
-my $loaded = use_ok($class);
-
-SKIP: {
-
-skip "Unable to load module $class", $tests unless $loaded;
 
 ############################################################
 #
@@ -438,8 +431,6 @@ cmp_bag(
     ],
     '...asset package data has the storage locations in it'
 );
-
-}
 
 END {
 }

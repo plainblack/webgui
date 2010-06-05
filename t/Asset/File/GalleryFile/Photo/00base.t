@@ -18,12 +18,14 @@ use Scalar::Util;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use Test::Exception; 
 
 #----------------------------------------------------------------------------
 # Init
 my $session    = WebGUI::Test->session;
 my $node       = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 
 $versionTag->set({name=>"Photo Test"});
 
@@ -90,15 +92,4 @@ is(
 my $properties  = $photo->get;
 $photo->purge;
 
-is(
-    WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
-    "Photo no longer able to be instanciated",
-);
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback;
-}
-
-
+dies_ok { WebGUI::Asset->newById($session, $properties->{assetId}) } "Photo no longer able to be instanciated";

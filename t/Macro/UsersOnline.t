@@ -39,7 +39,7 @@ ok(defined $defTemplate, 'default template is present');
 
 # Call with default values
 my $html = WebGUI::Macro::UsersOnline::process($session);
-cmp_ok((length $html), '>', 0, 'call with default template and values returns some output');
+ok($html, 'call with default template and values returns some output');
 
 
 # Test labels -------------------------------------------------------------

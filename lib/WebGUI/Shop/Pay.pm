@@ -431,7 +431,7 @@ sub www_selectPaymentGateway {
     }
     $var->{ paymentGateways     }   = \@paymentGateways;
     $var->{ choose              }   = $i18n->get('choose payment gateway message');
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("selectGatewayTemplateId"));
+    my $template = WebGUI::Asset::Template->newById($session, $session->setting->get("selectGatewayTemplateId"));
     return $session->style->userStyle($template->process($var));
 }
 

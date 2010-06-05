@@ -108,7 +108,7 @@ eval {
 };
 
 is(
-    $contentLastModified, 0,
+    $contentLastModified, undef,
     "Purged Linked Asset: getContentLastModified returns 0 when linked asset missing",
 );
 
@@ -122,10 +122,10 @@ init();
 $snippet->trash();
 
 $snippet->purge();
-$shortcut   = $shortcut->cloneFromDb();
+$shortcut   = eval { $shortcut->cloneFromDb(); };
 
 ok(
-    !defined $shortcut,
+    Exception::Class->caught(),
     "Purge Linked Asset: Shortcut is purged even though it's in the trash"
 );
 
@@ -135,10 +135,10 @@ init();
 #----------------------------------------------------------------------------
 # Test purging snippet purges shortcut also
 $snippet->purge;
-$shortcut   = $shortcut->cloneFromDb();
+$shortcut   = eval { $shortcut->cloneFromDb(); };
 
 ok( 
-    !defined $shortcut,
+    Exception::Class->caught(),
     "Purge Linked Asset: Shortcut is not defined",
 );
 

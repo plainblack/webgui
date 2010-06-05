@@ -35,13 +35,15 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag);
 $versionTag->set({name=>"Asset Package test"});
 
+my $time = time() -2;
+
 my $folder = $root->addChild({
     url   => 'testFolder',
     title => 'folder',
     menuTitle => 'folderMenuTitle',
     className => 'WebGUI::Asset::Wobject::Folder',
     isPackage => 1,
-});
+}, undef, $time);
 
 my $targetFolder = $root->addChild({
     url   => 'targetFolder',
@@ -56,7 +58,7 @@ my $subSnippet = $folder->addChild({
     menuTitle => 'snippetMenuTitle',
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'A snippet of text',
-});
+}, undef, $time);
 
 my $snippet = $root->addChild({
     url       => 'snip_snip',
@@ -64,7 +66,7 @@ my $snippet = $root->addChild({
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'Always upgrade to the latest version',
     isPackage => 1,
-});
+}, undef, $time);
 
 my $packageAssetId = $folder->getId;
 $session->request->setup_body({ assetId => $packageAssetId });
@@ -75,7 +77,7 @@ is(scalar @{ $targetFolderChildren }, 0, 'target folder has no children');
 
 $versionTag->commit;
 
-sleep 2;
+#sleep 2;
 
 my $storage = $snippet->exportPackage();
 isa_ok($storage, 'WebGUI::Storage', 'exportPackage returns a WebGUI::Storage object');
@@ -110,15 +112,15 @@ my $newVersionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($newVersionTag);
 $newVersionTag->commit;
 
-my $newFolder = WebGUI::Asset->new($session, $folder->getId);
+my $newFolder = WebGUI::Asset->newById($session, $folder->getId);
 ok(! $newFolder->get('isPackage'), 'Disabled isPackage in original folder asset');
 
 sleep 1;
 
-my $updatedSnippet = WebGUI::Asset->new($session, $snippet->getId);
+my $updatedSnippet = WebGUI::Asset->newById($session, $snippet->getId);
 
 $root->importPackage($storage, { overwriteLatest => 1 });
-$updatedSnippet = WebGUI::Asset->new($session, $snippet->getId);
+$updatedSnippet = WebGUI::Asset->newById($session, $snippet->getId);
 is($updatedSnippet->get('snippet'), 'Always upgrade to the latest version', 'importPackage: overwriteLatest causes revision dates to be ignored');
 cmp_ok( $updatedSnippet->get('revisionDate'), '>', $snippetRev->get('revisionDate'), '... revisionDate check on imported package with overwriteLatest');
 

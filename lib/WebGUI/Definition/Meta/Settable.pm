@@ -1,4 +1,4 @@
-package WebGUI::Definition::Meta::Property;
+package WebGUI::Definition::Meta::Settable;
 
 =head1 LEGAL
 
@@ -21,8 +21,6 @@ no warnings qw(uninitialized);
 
 our $VERSION = '0.0.1';
 
-with 'WebGUI::Definition::Meta::Settable';
-
 =head1 NAME
 
 Package WebGUI::Definition::Meta::Property
@@ -35,18 +33,6 @@ Moose-based meta class for all properties in WebGUI::Definition.
 
 WebGUI::Definition::Meta::Property extends Moose::Meta::Attribute to include
 a read-only form method, that provides the form properties for the attribute.
-
-=cut
-
-has 'form' => (
-    is  => 'ro',
-);
-
-#-------------------------------------------------------------------
-
-=head2 form ( )
-
-Returns a hashref of propertes that are specific to WebGUI::Forms.
 
 =cut
 

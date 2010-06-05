@@ -479,10 +479,11 @@ Extend the master class to insert head links via addHeaderLinks.
 
 =cut
 
-override prepareView => sub {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
     $self->addHeaderLinks;
-    return super();
+    return $self->$orig;
 };
 
 #-------------------------------------------------------------------

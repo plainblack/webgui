@@ -15,7 +15,7 @@ no warnings qw(uninitialized);
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More 'no_plan'; #tests => 1;
+use Test::More;
 use Test::Deep;
 use Test::Exception;
 use WebGUI::Test;
@@ -106,12 +106,6 @@ use WebGUI::Test;
         [ $object->meta->get_property_list ],
         [qw/property2 property1/],
         '->meta->get_property_list returns properties as a list in insertion order'
-    );
-
-    ::cmp_deeply(
-        [ $object->meta->get_all_properties ],
-        ::array_each(::isa('WebGUI::Definition::Meta::Property::Asset')),
-        '->meta->get_all_properties returns a list of Properties'
     );
 
     ::cmp_deeply(
@@ -264,3 +258,4 @@ use WebGUI::Test;
     $object->defaulted(undef);
     is $object->defaulted(), undef, 'Moose setters accept undef';
 }
+done_testing;

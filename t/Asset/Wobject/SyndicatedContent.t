@@ -24,7 +24,6 @@ use Test::More tests => 22; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
-use WebGUI::Cache;
 
 my $session = WebGUI::Test->session;
 my %var;
@@ -153,12 +152,11 @@ $syndicated_content->update({
     hasTerms => 'WebGUI',
 });
 
-my $cache = WebGUI::Cache->new($session, $tbbUrl, 'RSS');
 open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('tbb.rss')
     or die "Unable to get RSS file";
 my $rssContent = do { local $/; <$rssFile>; };
 close $rssFile;
-$cache->set($rssContent, 60);
+$session->cache->set($tbbUrl, $rssContent, 60);
 
 my $filteredFeed = $syndicated_content->generateFeed();
 
@@ -172,7 +170,7 @@ cmp_deeply(
     'generateFeed: filters items based on the terms being in title, or description'
 );
 
-$cache->delete;
+$session->cache->remove($tbbUrl);
 
 ####################################################################
 #
@@ -189,18 +187,16 @@ $syndicated_content->update({
     maxHeadlines => 50,
 });
 
-my $cache = WebGUI::Cache->new($session, $oncpUrl, 'RSS');
 open my $rssFile, '<', WebGUI::Test->getTestCollateralPath('oncp.xml')
     or die "Unable to get RSS file: oncp.xml";
 my $rssContent = do { local $/; <$rssFile>; };
 close $rssFile;
-$cache->set($rssContent, 60);
+$session->cache->set($oncpUrl, $rssContent, 60);
 
 my $oddFeed1 = $syndicated_content->generateFeed();
 
 my @oddItems = $oddFeed1->get_item();
 is (@oddItems, 13, 'feed has items even without pubDates or links');
 
-$cache->delete;
-
+$session->cache->remove($oncpUrl);
 

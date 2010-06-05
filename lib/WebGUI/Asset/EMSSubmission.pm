@@ -346,8 +346,8 @@ sub www_editSubmission {
         my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId') || 'new';
 
         if( $assetId ne 'new' ) {
-            $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);
-            if (!defined $self) {
+            $self ||= eval { WebGUI::Asset->newById($session,$assetId); };
+            if (Exception::Class->caught()) {
                 $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
             }
         }

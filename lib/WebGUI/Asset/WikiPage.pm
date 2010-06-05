@@ -289,8 +289,8 @@ sub getTemplateVars {
         });
         PAGE: foreach my $assetId (@{ $paginator->getPageData }) {
             next PAGE if $assetId->{assetId} eq $self->getId;
-            my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId->{assetId});
-            next PAGE unless $asset;
+            my $asset = eval { WebGUI::Asset->newById($session, $assetId->{assetId}); };
+            next PAGE if Exception::Class->caught();
             push @keyword_pages, {
                 title => $asset->getTitle,
                 url   => $asset->getUrl,

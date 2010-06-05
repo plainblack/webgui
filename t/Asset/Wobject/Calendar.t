@@ -57,7 +57,7 @@ use Data::Dumper;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
-plan tests => 14 + scalar @icalWrapTests;
+plan tests => 12 + scalar @icalWrapTests;
 
 my $session = WebGUI::Test->session;
 
@@ -81,10 +81,6 @@ isa_ok($cal, 'WebGUI::Asset::Wobject::Calendar');
 # Test addChild to make sure we can only add Event assets as children to the calendar
 my $event = $cal->addChild({className=>'WebGUI::Asset::Event'});
 isa_ok($event, 'WebGUI::Asset::Event','Can add Events as a child to the calendar.');
-
-my $article = $cal->addChild({className=>"WebGUI::Asset::Wobject::Article"});
-isnt(ref $article, 'WebGUI::Asset::Wobject::Article', "Can't add an article as a child to the calendar.");
-ok(! defined $article, '... addChild returned undef');
 
 my $dt = WebGUI::DateTime->new($session, mysql => '2001-08-16 8:00:00', time_zone => 'America/Chicago');
 

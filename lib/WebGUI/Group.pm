@@ -21,6 +21,7 @@ use WebGUI::Utility;
 use WebGUI::Pluggable;
 require WebGUI::Asset;
 use WebGUI::International;
+use WebGUI::DatabaseLink;
 
 =head1 NAME
 

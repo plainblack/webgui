@@ -28,14 +28,14 @@ my $numTests = 0;
 
 my $session = WebGUI::Test->session;
 
-my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
+my @helpFileSet = WebGUI::Pluggable::findAndLoad('WebGUI::Help');
 
 my %helpTable;
 
 foreach my $helpSet (@helpFileSet) {
-	my $helpName = $helpSet->[1];
-	my $help = WebGUI::Operation::Help::_load($session, $helpName);
-	$helpTable{ $helpName } = $help;
+    my ($namespace) = $helpSet =~ m{WebGUI::Help::(.+$)};
+	my $help = WebGUI::Operation::Help::_load($session, $namespace);
+	$helpTable{ $namespace } = $help;
 }
 
 ##Scan #1, how many tests do we expect?

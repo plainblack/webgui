@@ -62,6 +62,7 @@ $photo
         skipAutoCommitWorkflows => 1,
     });
 $versionTags[-1]->commit;
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 $photo->update({ filename => 'page_title.jpg' });
 
@@ -86,6 +87,7 @@ TODO: {
 # Array of resolutions passed to makeResolutions overrides defaults from 
 # parent asset
 push @versionTags, WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -139,8 +141,9 @@ TODO: {
 # makeResolutions allows API to specify resolutions to make as array reference
 # argument
 push @versionTags, WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $photo
-    = $node->addChild({
+    = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
@@ -176,8 +179,9 @@ TODO: {
 #----------------------------------------------------------------------------
 # makeResolutions throws a warning on an invalid resolution but keeps going
 push @versionTags, WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $photo
-    = $node->addChild({
+    = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
@@ -220,13 +224,3 @@ $photo->update({ filename => 'page_title.jpg' });
         "makeResolutions still makes valid resolutions when invalid resolutions given",
     );
 }
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    foreach my $versionTag (@versionTags) {
-        $versionTag->rollback;
-    }
-}
-
-

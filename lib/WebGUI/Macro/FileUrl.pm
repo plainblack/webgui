@@ -48,11 +48,11 @@ sub process {
     if (Exception::Class->caught()) {
         return $i18n->get('invalid url');
     }
-    my $storageId = $asset->storageId;
+    my $storageId = $asset->can('storageId') ? $asset->storageId : undef;
     if (not defined $storageId) {
         return $i18n->get('no storage');
     }
-    my $filename = $asset->filename;
+    my $filename = $asset->can('filename') ? $asset->filename : undef;
     if (not defined $filename) {
         return $i18n->get('no filename');
     }

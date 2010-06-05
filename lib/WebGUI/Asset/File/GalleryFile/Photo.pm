@@ -93,7 +93,6 @@ override applyConstraints => sub {
     # Update the asset's size and make a thumbnail
     my $maxImageSize    = $gallery->imageViewSize 
                         || $self->session->setting->get("maxImageSize");
-    my $parameters      = $self->parameters;
     my $storage         = $self->getStorageLocation;
     my $file            = $self->filename;
 
@@ -214,7 +213,7 @@ sub getExifData {
 =head2 getResolutions ( )
 
 Get an array reference of download resolutions that exist for this image. 
-Does not include the web view image or the thumbnail image.
+Does not include the web view image or the thumbnail images.
 
 =cut
 
@@ -223,7 +222,7 @@ sub getResolutions {
     my $storage     = $self->getStorageLocation;
 
     # Return a list not including the web view image.
-    return [ sort { $a <=> $b } grep { $_ ne $self->filename } @{ $storage->getFiles } ];
+    return [ sort { $a cmp $b } grep { $_ ne $self->filename } @{ $storage->getFiles } ];
 }
 
 #----------------------------------------------------------------------------

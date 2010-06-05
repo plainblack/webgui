@@ -23,6 +23,7 @@ use Exception::Class;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
+use WebGUI::Shop::AddressBook;
 
 #----------------------------------------------------------------------------
 # Init
@@ -195,7 +196,7 @@ is($bookCount, 1, 'delete: one book deleted');
 
 $bookClone->delete();
 $bookCount = $session->db->quickScalar('select count(*) from addressBook');
-my $addrCount = $session->db->quickScalar('select count(*) from address');
+$addrCount = $session->db->quickScalar('select count(*) from address');
 
 is($bookCount, 0, '... book deleted');
 is($addrCount, 0, '... also deletes addresses in the book');

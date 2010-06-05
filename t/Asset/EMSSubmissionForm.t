@@ -122,6 +122,7 @@ my $i18n = $ems->i18n;
 $versionTag->commit;
 $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($versionTag);
+$ems = $ems->cloneFromDb;
 
 my $id1 = $ems->getNextSubmissionId;
 my $id2 = $ems->getNextSubmissionId;
@@ -353,7 +354,7 @@ is($approveSubmissions->run, 'done', 'approval done');
 $sub1 = $sub1->cloneFromDb;
 is( $sub1->get('submissionStatus'),'created','approval successfull');
 
-my $ticket = WebGUI::Asset->newByDynamicClass($session, $sub1->get('ticketId'));
+my $ticket = WebGUI::Asset->newById($session, $sub1->get('ticketId'));
 WebGUI::Test->assetsToPurge( $ticket ) if $ticket ;
 SKIP: {
 skip 'no ticket created', 1 unless isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
@@ -372,7 +373,7 @@ $cleanupSubmissions->reset;
 is($cleanupSubmissions->run, 'complete', 'cleanup complete');
 is($cleanupSubmissions->run, 'done', 'cleanup done');
 
-$sub2 = WebGUI::Asset->newByDynamicClass($session, $sub2Id);
+$sub2 = WebGUI::Asset->newById($session, $sub2Id);
 is( $sub2, undef, 'submission deleted');
 
 } # end of workflow skip

@@ -32,7 +32,9 @@ my $import_node = WebGUI::Asset->getImportNode($session);
 # Create a Survey
 $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 my $tag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->assetsToPurge($survey);
+$tag->commit;
+$survey = $survey->cloneFromDb;
+WebGUI::Test->addToCleanup($survey);
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
 my $sJSON = $survey->getSurveyJSON;
@@ -66,9 +68,9 @@ my $responseId = $survey->responseId;
     my $s = WebGUI::Asset::Wobject::Survey->newByResponseId($session, $responseId);
     is($s->getId, $survey->getId, 'newByResponseId returns same Survey');
 }
-is($survey->get('maxResponsesPerUser'), 1, 'maxResponsesPerUser defaults to 1');
+is($survey->maxResponsesPerUser, 1, 'maxResponsesPerUser defaults to 1');
 ok($survey->canTakeSurvey, '..which means user can take survey');
-is($survey->get('revisionDate'), $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 'Current revisionDate used');
+is($survey->revisionDate, $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 'Current revisionDate used');
 
 ####################################################
 #
@@ -210,7 +212,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     # Push revisionDate into the past because we can't have 2 revision dates with the same epoch (this is very hacky)
     $revisionDate--;
     $session->stow->deleteAll();
-    WebGUI::Cache->new($session)->flush;
+    $session->cache->clear;
     $session->db->write('update Survey set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update assetData set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update wobject set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
@@ -234,7 +236,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     isa_ok($newerSurvey, 'WebGUI::Asset::Wobject::Survey', 'After change, re-retrieved Survey instance');
     is($newerSurvey->getId, $surveyId, '..which is the same survey');
     is($newerSurvey->getSurveyJSON->section([0])->{text}, 'newer text', '..with updated text');
-    ok($newerSurvey->get('revisionDate') > $revisionDate, '..and newer revisionDate');
+    ok($newerSurvey->revisionDate > $revisionDate, '..and newer revisionDate');
 
     # Create another response (this one will use the new revision)
     my $newUser = WebGUI::User->new( $session, 'new' );

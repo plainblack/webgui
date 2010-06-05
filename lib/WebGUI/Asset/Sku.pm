@@ -59,7 +59,7 @@ property vendorId => (
 property taxConfiguration => (
             noFormPost      => 1,
             fieldType       => 'hidden',
-            defaultValue    => '{}',
+            default         => '{}',
          );
 property shipsSeparately => (
             tab             => 'shop',

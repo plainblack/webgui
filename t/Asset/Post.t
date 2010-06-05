@@ -84,6 +84,7 @@ my $post = $collab->addChild($props, @addArgs);
 
 $versionTag->commit();
 WebGUI::Test->tagsToRollback($versionTag);
+$post = $post->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($post, 'WebGUI::Asset::Post::Thread');
@@ -120,7 +121,7 @@ $post->update({synopsis => $synopsis});
 
 ##There is a bug in DBD::mysql with not properly encoding 8-bit characters.  Also, HTML::Entities produces
 ##8-bit utf8 (not strict) characters.  So we write a quick test to make sure our patch in splitTag works correctly.
-my $dbPost = WebGUI::Asset->newByDynamicClass($session, $post->getId);
+my $dbPost = WebGUI::Asset->newById($session, $post->getId);
 like($dbPost->get('synopsis'), qr/Brandhei.e Neuigkeiten rund um's Klettern f.r euch aus der Region /, 'patch test for DBD::Mysql and HTML::Entities');
 
 ($synopsis, $content) = $post->getSynopsisAndContent('', q|less than &lt; greater than &gt;|);

@@ -18,7 +18,6 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use WebGUI::Cache;
 
 use Test::More;
 use Test::Deep;
@@ -78,8 +77,7 @@ my @ipTests = (
 plan tests => (151 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-my $testCache = WebGUI::Cache->new($session, 'myTestKey');
-$testCache->flush;
+$session->cache->remove('myTestKey');
 
 foreach my $gid ('new', '') {
 	my $g = WebGUI::Group->new($session, $gid);
@@ -437,7 +435,7 @@ cmp_bag($mobUsers, [map {$_->userId} @mob], 'verify SQL table built correctly');
 is( $gY->databaseLinkId, 0, "Group Y's databaseLinkId is set to WebGUI");
 $gY->dbQuery(q!select userId from myUserTable!);
 is( $session->stow->get('isInGroup'), undef, 'setting dbQuery clears cached isInGroup');
-WebGUI::Cache->new($session, $gZ->getId)->delete();  ##Delete cached key for testing
+$session->cache->remove($gZ->getId);
 
 my @mobIds = map { $_->userId } @mob;
 
@@ -684,5 +682,5 @@ ok(! WebGUI::Group->vitalGroup('27'), '... 27 is not vital');
 
 END {
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
-	$testCache->flush;
+    $session->cache->remove('myTestKey');
 }

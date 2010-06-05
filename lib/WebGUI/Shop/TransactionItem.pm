@@ -133,11 +133,11 @@ sub getSku {
     my ($self) = @_;
     my $asset = eval { WebGUI::Asset->newById($self->transaction->session, $self->get("assetId")); };
     if (Exception::Class->caught()) {
-        $asset->applyOptions($self->get("options"));
-        return $asset;
+        WebGUI::Error::ObjectNotFound->throw(error=>'SKU Asset '.$self->get('assetId').' could not be instanciated. Perhaps it no longer exists.', id=>$self->get('assetId'));
+        return undef;
     }
-    WebGUI::Error::ObjectNotFound->throw(error=>'SKU Asset '.$self->get('assetId').' could not be instanciated. Perhaps it no longer exists.', id=>$self->get('assetId'));
-    return undef;
+    $asset->applyOptions($self->get("options"));
+    return $asset;
 }
 
 #-------------------------------------------------------------------

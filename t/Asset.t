@@ -20,8 +20,9 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 use WebGUI::Exception;
+use WebGUI::Asset;
+use WebGUI::Keyword;
 
-plan tests => 65;
 
 my $session = WebGUI::Test->session;
 
@@ -130,6 +131,20 @@ my $session = WebGUI::Test->session;
 }
 
 {
+    note "get, specific properties";
+    my $asset = WebGUI::Asset->new({
+        session   => $session,
+    });
+    my $properties = $asset->get();
+    ok !exists $properties->{session}, 'no session';
+    ok  exists $properties->{keywords}, 'keywords';  ##Test for function later
+    ok  exists $properties->{assetId}, 'assetId';
+    ok  exists $properties->{revisionDate}, 'assetId';
+    ok  exists $properties->{parentId}, 'parentId';
+    ok  exists $properties->{lineage}, 'lineage';
+}
+
+{
     note "getClassById";
     my $class;
     $class = WebGUI::Asset->getClassById($session, 'PBasset000000000000001');
@@ -218,6 +233,32 @@ my $session = WebGUI::Test->session;
 }
 
 {
+    note "setVersionLock";
+    my $testId1      = 'wg8TestAsset0000000001';
+    my $testId2      = 'wg8TestAsset0000000002';
+    my $now          = time();
+    my $baseLineage  = $session->db->quickScalar('select lineage from asset where assetId=?',['PBasset000000000000002']);
+    my $testLineage  = $baseLineage. '909090';
+    $session->db->write("insert into asset (assetId, className, lineage) VALUES (?,?,?)",       [$testId1, 'WebGUI::Asset', $testLineage]);
+    $session->db->write("insert into assetData (assetId, revisionDate, status) VALUES (?,?,?)", [$testId1, $now, 'approved']);
+    my $testLineage2 = $testLineage . '000001';
+    $session->db->write("insert into asset (assetId, className, parentId, lineage) VALUES (?,?,?,?)", [$testId2, 'WebGUI::Asset', $testId1, $testLineage2]);
+    $session->db->write("insert into assetData (assetId, revisionDate) VALUES (?,?)", [$testId2, $now]);
+
+    my $testAsset = WebGUI::Asset->new($session, $testId2, $now);
+    my $originalSessionUser = $session->user->userId;
+    $session->user({userId => 7});
+    $testAsset->setVersionLock;
+    is $testAsset->isLockedBy, 7, 'locked by userId 7';
+    ok $testAsset->isLocked, 'asset is locked';
+    is $session->db->quickScalar('select isLockedBy from asset where assetId=?',[$testId2]), 7, 'userId written to db';
+
+    $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");
+    $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
+    $session->user({userId => $originalSessionUser});
+}
+
+{
     note "getParent";
     my $testId1      = 'wg8TestAsset0000000001';
     my $testId2      = 'wg8TestAsset0000000002';
@@ -254,21 +295,28 @@ my $session = WebGUI::Test->session;
     $session->db->write("insert into assetData (assetId, revisionDate) VALUES (?,?)", [$testId2, $revisionDate]);
 
     my $testAsset = WebGUI::Asset->new($session, $testId2, $revisionDate);
+    my $originalSessionUser = $session->user->userId;
+    $session->user({userId => 7});
     $testAsset->title('test title 43');
     $testAsset->write();
     my $tag = WebGUI::VersionTag->getWorking($session);
     my $revAsset  = $testAsset->addRevision({}, $now);
+    my $revAssetDb = $revAsset->cloneFromDb;
     isa_ok $revAsset, 'WebGUI::Asset';
     is $revAsset->revisionDate, $now, 'revisionDate set correctly on new revision';
     is $revAsset->title, 'test title 43', 'data fetch from database correct';
     is $revAsset->revisedBy, $session->user->userId, 'revisedBy is current session user';
     is $revAsset->tagId, $tag->getId, 'tagId is current working tagId';
+    ok $revAsset->isLocked, 'new revision is locked';
+    is $revAsset->isLockedBy, '7', 'locked by userId 7';
+    is $revAssetDb->isLockedBy, '7', 'database jives with asset data';
     my $count = $session->db->quickScalar('SELECT COUNT(*) from assetData where assetId=?',[$testId2]);
     is $count, 2, 'two records in the database';
     addToCleanup($tag);
 
     $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");
     $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");
+    $session->user({userId => $originalSessionUser});
 }
 
 {
@@ -313,11 +361,26 @@ my $session = WebGUI::Test->session;
     my $asset = $default->addChild({
         className => 'WebGUI::Asset::Snippet',
     });
-    addToCleanup($asset);
+    WebGUI::Test->addToCleanup($asset);
     can_ok($asset, 'keywords');
     $asset->keywords('chess set');
     is ($asset->keywords, 'chess set', 'set and get of keywords via direct accessor');
     is ($asset->get('keywords'), 'chess set', 'via get method');
+    my $keygate = WebGUI::Keyword->new($session);
+    is $keygate->getKeywordsForAsset({assetId => $asset->getId}), '', 'not persisted to the db';
+    $asset->write;
+    is $keygate->getKeywordsForAsset({assetId => $asset->assetId}), 'chess set', 'written to the db';
+
+    my $asset_copy = $asset->cloneFromDb;
+    is $asset->keywords, 'chess set', 'refreshed from db';
+
+    my $asset2 = $default->addChild({
+        className => 'WebGUI::Asset::Snippet',
+        keywords  => 'checkmate',
+    });
+    WebGUI::Test->addToCleanup($asset2);
+    is $asset2->keywords, 'checkmate', 'keywords set on addChild';
+    is $keygate->getKeywordsForAsset({assetId => $asset2->assetId}), 'checkmate', '... and persisted to the db';
 }
 
 {
@@ -325,3 +388,16 @@ my $session = WebGUI::Test->session;
     my $classes = WebGUI::Asset->valid_parent_classes;
     cmp_deeply($classes, [qw/WebGUI::Asset/], 'Any asset okay');
 }
+
+{
+    note "url, inherited URLs from parent";
+    my $home  = WebGUI::Asset->getDefault($session);
+    my $asset = $home->addChild({
+        className => 'WebGUI::Asset::Wobject::Article',
+        title     => 'sub',
+    });
+    WebGUI::Test->addToCleanup($asset);
+    is $asset->url, 'home/sub', 'by default, asset gets a url from the title, and the parent';
+}
+
+done_testing;

@@ -73,6 +73,10 @@ my $nextPhoto
         skipAutoCommitWorkflows => 1,
     });
 $versionTag->commit;
+foreach my $asset ($gallery, $album) {
+    $asset = $asset->cloneFromDb;
+}
+WebGUI::Test->addToCleanup($versionTag);
 $photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 
 #----------------------------------------------------------------------------
@@ -148,9 +152,3 @@ cmp_deeply(
     $testTemplateVars,
     "getTemplateVars is correct and complete",
 );
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}

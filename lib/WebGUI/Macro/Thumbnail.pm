@@ -32,13 +32,15 @@ Image Asset can be found with that URL, then undef will be returned.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
-        my $url = shift;
-	if (my $image = WebGUI::Asset::File::Image->newByUrl($session,$url)) {
-	        return $image->getThumbnailUrl;
-        } else {
-                return undef;
-        }
+    my $session = shift;
+    my $url     = shift;
+    my $image   = eval { WebGUI::Asset::File::Image->newByUrl($session,$url) };
+    if (Exception::Class->caught()) {
+        return undef;
+    }
+    else {
+        return $image->getThumbnailUrl;
+    }
 }
 
 

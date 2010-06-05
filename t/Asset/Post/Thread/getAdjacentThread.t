@@ -61,6 +61,10 @@ my @threads = (
 
 $_->setSkipNotification for @threads; 
 $versionTags[-1]->commit;
+WebGUI::Test->addToCleanup($versionTags[-1]);
+foreach my $asset(@threads, $collab) {
+    $asset = $asset->cloneFromDb;
+}
 
 #----------------------------------------------------------------------------
 # Tests
@@ -133,6 +137,7 @@ $collab->update({
     sortOrder   => 'desc',
 });
 push @versionTags, WebGUI::VersionTag->getWorking( $session );
+WebGUI::Test->addToCleanup($versionTags[-1]);
 push @threads, $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "Abababa",
@@ -147,12 +152,6 @@ $session->scratch->delete($collab->getId.'_sortBy');
 $session->scratch->delete($collab->getId.'_sortDir');
 
 #----------------------------------------------------------------------------
-# Cleanup
-END {
-    $_->rollback for @versionTags;
-}
-
-#----------------------------------------------------------------------------
 # testGetAdjacentThread ( label, sort, order, @threads )
 # Performs two tests for each thread in [order]
 # Label = a label for the test (usually the sort order)
@@ -161,10 +160,10 @@ END {
 # @threads = all the threads
 sub testGetAdjacentThread {
     my ( $label, $sort, $order, @threads ) = @_;
-    
+
     my $idxFirst    = shift @{$order};
     my $idxLast     = pop @{$order};
-    
+
     # First
     is( $threads[$idxFirst]->getNextThread->getId, 
         getNextThread( $sort, $threads[$idxFirst], @threads )->getId,
@@ -220,7 +219,7 @@ sub sortThreads {
 sub getNextThread {
     my ( $sortSub, $thread, @threads ) = @_;
     my @sorted  = @{ sortThreads( $sortSub, @threads ) };
-    
+
     for my $i ( 0..$#sorted ) {
         if ( $sorted[$i]->getId eq $thread->getId ) {
             return $sorted[$i+1];
@@ -232,7 +231,7 @@ sub getPreviousThread {
     my ( $sortSub, $thread, @threads ) = @_;
     # Use reverse so that $i-1 != -1 (which gets us the last thread)
     my @sorted  = reverse @{ sortThreads( $sortSub, @threads ) };
-    
+
     for my $i ( 0..$#sorted ) {
         if ( $sorted[$i]->getId eq $thread->getId ) {
             return $sorted[$i+1];

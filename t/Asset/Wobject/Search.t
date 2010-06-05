@@ -123,7 +123,6 @@ $search->update({
     $search->update({useContainers => 1});
     $search->view;
     like $templateVars->{result_set}->[0]->{url}, qr{\?pn=\d}, 'search returns paginated URL for a Thread when useContainers=1';
-    note Dumper $templateVars;
 
     WebGUI::Test->unmockAssetId($templateId);
     $session->request->setup_body({});

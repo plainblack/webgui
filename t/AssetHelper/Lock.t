@@ -27,12 +27,6 @@ use WebGUI::AssetHelper::Lock;
 # Init
 my $session         = WebGUI::Test->session;
 
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 3;        # Increment this number for each test you create
-
 #----------------------------------------------------------------------------
 # put your tests here
 
@@ -54,7 +48,7 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
 addToCleanup($versionTag);
 
-$newPage = $newPage->cloneFromDb;
+$newPage = WebGUI::Asset->newById($session, $newPage->assetId);
 
 $session->user({userId => 1});
 $output = WebGUI::AssetHelper::Lock->process($newPage);
@@ -76,10 +70,12 @@ cmp_deeply(
     '... locks the asset'
 );
 
-$newPage = $newPage->cloneFromDb;
-
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 addToCleanup($versionTag2);
+
+$newPage = WebGUI::Asset->newById($session, $newPage->assetId);
+ok $newPage->isLocked, 'Asset is locked, and ready for next test';
+is $newPage->getRevisionCount, 2, 'new revision added';
 
 $session->user({userId => $editor->getId});
 $output = WebGUI::AssetHelper::Lock->process($newPage);
@@ -90,3 +86,5 @@ cmp_deeply(
     },
     '... returns an error message if the asset is already locked'
 );
+
+done_testing;

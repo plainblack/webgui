@@ -50,7 +50,7 @@ plan tests => 1;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # www_unarchiveAll sets all threads to approved
 $collab->www_unarchiveAll;
-$threads[0] = WebGUI::Asset->newByDynamicClass( $session, $threads[0]->getId );
+$threads[0] = WebGUI::Asset->newById( $session, $threads[0]->getId );
 is( $threads[0]->get('status'), 'approved', "unarchiveAll sets thread to approved" );
 
 #vim:ft=perl

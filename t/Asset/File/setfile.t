@@ -25,6 +25,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"File Test"});
+WebGUI::Test->addToCleanup($versionTag);
 my $file
     = $node->addChild({
         className           => "WebGUI::Asset::File",
@@ -46,18 +47,10 @@ ok(
 #----------------------------------------------------------------------------
 # setFile allows file path argument and adds the file
 # plan tests => 1
-$file->setFile( WebGUI::Test->getTestCollateralPath("WebGUI.pm") );
+$file->setFile( WebGUI::Test->getTestCollateralPath("International/lib/WebGUI/i18n/PigLatin/WebGUI.pm") );
 my $storage = $file->getStorageLocation;
 
 is_deeply(
     $storage->getFiles, ['WebGUI.pm'],
     "Storage location contains only the file we added",
 );
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
-

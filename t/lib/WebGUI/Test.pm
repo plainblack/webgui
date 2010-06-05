@@ -225,20 +225,20 @@ sub _mockAssetInits {
         if $mockedNew;
     require WebGUI::Asset;
     my $original_new = \&WebGUI::Asset::new;
-    *WebGUI::Asset::new = sub {
-        my ($class, $session, $assetId, $className, $revisionDate) = @_;
-        if ($mockedAssetIds{$assetId}) {
-            return $mockedAssetIds{$assetId};
-        }
-        goto $original_new;
-    };
-    my $original_newByDynamicClass = \&WebGUI::Asset::newByDynamicClass;
-    *WebGUI::Asset::newByDynamicClass = sub {
+#    *WebGUI::Asset::new = sub {
+#        my ($class, $session, $assetId, $className, $revisionDate) = @_;
+#        if ($mockedAssetIds{$assetId}) {
+#            return $mockedAssetIds{$assetId};
+#        }
+#        goto $original_new;
+#    };
+    my $original_newById = \&WebGUI::Asset::newById;
+    *WebGUI::Asset::newById = sub {
         my ($class, $session, $assetId, $revisionDate) = @_;
         if ($mockedAssetIds{$assetId}) {
             return $mockedAssetIds{$assetId};
         }
-        goto $original_newByDynamicClass;
+        goto $original_newById;
     };
     my $original_newPending = \&WebGUI::Asset::newPending;
     *WebGUI::Asset::newPending = sub {
@@ -247,6 +247,14 @@ sub _mockAssetInits {
             return $mockedAssetIds{$assetId};
         }
         goto $original_newPending;
+    };
+    my $original_newByPropertyHashRef = \&WebGUI::Asset::newByPropertyHashRef;
+    *WebGUI::Asset::newByPropertyHashRef = sub {
+        my ($class, $session, $url, $revisionDate) = @_;
+        if ($url && $mockedAssetUrls{$url}) {
+            return $mockedAssetUrls{$url};
+        }
+        goto $original_newByPropertyHashRef;
     };
     my $original_newByUrl = \&WebGUI::Asset::newByUrl;
     *WebGUI::Asset::newByUrl = sub {
@@ -469,6 +477,25 @@ be found easy.  This is the epoch date when WebGUI was released.
 
 sub webguiBirthday {
     return 997966800 ;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getAssetSkipCoda ( )
+
+Coded here for the sake of consistency, this returns everything that should be
+appended to calls to addChild to autogenerate ids, revisionDates, and to skip
+autoCommit workflows, and notifications.
+
+=cut
+
+sub getAssetSkipCoda {
+    return undef,
+           undef,
+           {
+            skipAutoCommitWorkflows => 1,
+            skipNotification        => 1,
+           };
 }
 
 #----------------------------------------------------------------------------
@@ -789,6 +816,10 @@ Example call:
         '' => sub {
             my ($class, $ident) = @_;
             return $class->new($CLASS->session, $ident);
+        },
+        'WebGUI::Asset' => sub {
+            my ($class, $ident) = @_;
+            return WebGUI::Asset->newPending($CLASS->session, $ident);
         },
         'WebGUI::Storage' => sub {
             my ($class, $ident) = @_;

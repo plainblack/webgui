@@ -2,6 +2,7 @@ package WebGUI::AssetHelper::Lock;
 
 use strict;
 use Class::C3;
+use WebGUI::International;
 use base qw/WebGUI::AssetHelper/;
 
 =head1 LEGAL
@@ -18,7 +19,7 @@ use base qw/WebGUI::AssetHelper/;
 
 =head1 NAME
 
-Package WebGUI::AssetHelper::Locks
+Package WebGUI::AssetHelper::Lock
 
 =head1 DESCRIPTION
 
@@ -52,7 +53,6 @@ sub process {
     }
 
     $asset = $asset->addRevision;
-
     return {
         message         => sprintf($i18n->get('locked asset'), $asset->getTitle),
     };

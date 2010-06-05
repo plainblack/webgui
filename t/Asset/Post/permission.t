@@ -67,9 +67,9 @@ my $post
 $versionTag->commit( { timeout => 1_000_000 } );
 
 # Re-load the collab to get the newly committed properties
-$collab = WebGUI::Asset->newByDynamicClass( $session, $collab->getId );
-$thread = WebGUI::Asset->newByDynamicClass( $session, $thread->getId );
-$post   = WebGUI::Asset->newByDynamicClass( $session, $post->getId );
+$collab = WebGUI::Asset->newById( $session, $collab->getId );
+$thread = WebGUI::Asset->newById( $session, $thread->getId );
+$post   = WebGUI::Asset->newById( $session, $post->getId );
 
 #----------------------------------------------------------------------------
 # Tests

@@ -302,7 +302,7 @@ my $product6 = $root->addChild({
 $newVid = $product6->setCollateral('variantsJSON', 'vid', 'new', { wideChar => qq!on 16\x{201d} hand-crocheted Cord!
 , vid => 'new' });
 
-my $product6a = WebGUI::Asset->newByDynamicClass($session, $product6->getId);
+my $product6a = WebGUI::Asset->newById($session, $product6->getId);
 lives_ok { $product6a->getAllCollateral('variantsJSON', 'vid', $newVid); }, 'Product collateral handles wide-character encodings okay';
 
 $product6->purge;

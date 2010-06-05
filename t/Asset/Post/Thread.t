@@ -49,6 +49,8 @@ my $props = {
 my $thread = $collab->addChild($props, @addArgs);
 
 $versionTag->commit();
+$collab = $collab->cloneFromDb;
+$thread = $thread->cloneFromDb;
 
 my $uncommittedThread = $collab->addChild($props, @addArgs);
 

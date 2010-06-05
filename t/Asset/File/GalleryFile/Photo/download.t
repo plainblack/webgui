@@ -29,7 +29,7 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTags[-1]);
 
 my $gallery
     = $node->addChild({
@@ -83,14 +83,4 @@ ok(
     !eval{ $photo->getDownloadFileUrl("400"); 1 },
     "getDownloadFileUrl croaks if resolution doesn't exist",
 );
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    foreach my $versionTag (@versionTags) {
-        $versionTag->rollback;
-    }
-}
-
 

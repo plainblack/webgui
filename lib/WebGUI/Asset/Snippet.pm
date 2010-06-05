@@ -34,6 +34,7 @@ property snippet => (
 	label           => ['assetName','Asset_Snippet'],
 	hoverHelp       => ['snippet description','Asset_Snippet'],
     default         => undef,
+    trigger         => \&_trigger_snippet,
 );
 sub _trigger_snippet {
     my $self = shift;

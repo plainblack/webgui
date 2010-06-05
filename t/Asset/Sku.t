@@ -30,20 +30,21 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 22;        # Increment this number for each test you create
+plan tests => 23;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
 my $root = WebGUI::Asset->getRoot($session);
-warn "Make sku\n";
+note "Make sku\n";
 my $sku = $root->addChild({
         className=>"WebGUI::Asset::Sku",
         title=>"Test Sku",
         });
 isa_ok($sku, "WebGUI::Asset::Sku");
-addToCleanup($sku);
+WebGUI::Test->addToCleanup($sku);
 
 $sku->addToCart;
+WebGUI::Test->addToCleanup($sku->getCart);
 
 $sku->applyOptions({
         test1   => "YY"
@@ -53,6 +54,7 @@ my $options = $sku->getOptions;
 is($options->{test1}, "YY", "Can set and get an option.");
 
 
+is $sku->taxConfiguration, '{}', 'default tax configuration is a string with an empty hashref in it';
 is($sku->getMaxAllowedInCart, 99999999, "Got a valid default max in cart.");
 is($sku->getQuantityAvailable, 99999999, "skus should have an unlimited quantity by default");
 is($sku->getQuantityAvailable, $sku->getMaxAllowedInCart, "quantity available and max allowed in cart should be the same");
@@ -81,7 +83,7 @@ ok(! $sku->isShippingRequired, 'Making sure that GLOB is no longer in effect');
 isa_ok($sku->getCart, "WebGUI::Shop::Cart", "can get a cart object");
 my $item = $sku->addToCart;
 isa_ok($item, "WebGUI::Shop::CartItem", "can add to cart");
-$item->cart->delete;
 
 my $loadSku = WebGUI::Asset::Sku->newBySku($session, $sku->get("sku"));
 is($loadSku->getId, $sku->getId, "newBySku() works.");
+

@@ -143,6 +143,7 @@ checkModule("Readonly",                     "1.03"       );
 checkModule("Moose",                        "0.93"       );
 checkModule("MooseX::Storage",              "0.23"       );
 checkModule("MooseX::NonMoose",             '0.07'       );
+checkModule("MooseX::Storage::Format::JSON","0.27"       );
 checkModule("namespace::autoclean",         "0.09"       );
 checkModule("Business::PayPal::API",        "0.62"       );
 checkModule("Locales",                      "0.10"       );

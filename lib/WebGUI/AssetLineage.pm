@@ -275,7 +275,7 @@ sub getFirstChild {
 			$assetLineage->{firstChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
-		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$child = eval { WebGUI::Asset->newByLineage($self->session,$lineage); };
 		$self->cacheChild(first => $child);
 	}
 	return $child;
@@ -301,7 +301,7 @@ sub getLastChild {
 			$assetLineage->{lastChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
-		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$child = eval { WebGUI::Asset->newByLineage($self->session,$lineage); };
 		$self->cacheChild(last => $child);
 	}
 	return $child;
@@ -829,8 +829,7 @@ sub newByLineage {
     unless ($id) {
         ($id) = $session->db->quickArray("select assetId from asset where lineage=?",[$lineage]);
         if (!$id) {
-            $session->errorHandler->error("Couldn't instantiate asset from lineage: ".$lineage. ": assetId missing");
-            return undef;
+            WebGUI::Error::InvalidParam->throw(error => "Cannot find lineage date for assetId", param => $id);
         }
         $assetLineage->{$lineage}{id} = $id;
         $session->stow->set("assetLineage",$assetLineage);
@@ -1000,6 +999,7 @@ sub validParent {
     my $class          = shift;
     my $session        = shift;
     my $asset          = shift || $session->asset;
+    return 0 unless $asset;
     my $parent_classes = $class->valid_parent_classes;
     foreach my $parentClass (@{ $class->valid_parent_classes}) {
         return 1 if $asset->isa($parentClass);

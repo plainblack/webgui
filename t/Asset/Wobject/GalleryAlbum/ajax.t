@@ -77,6 +77,7 @@ for (my $i = 0; $i < 5; $i++)
 
 # Commit all changes
 $versionTag->commit;
+WebGUI::Test->addToCleanup($versionTag);
 
 # Make album default asset
 $session->asset( $album );
@@ -95,7 +96,7 @@ use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
 #----------------------------------------------------------------------------
 # Test calling without arguments
 
-diag("general testing");
+note("general testing");
 
 # Provide no arguments at all
 $result = callAjaxService({ });
@@ -105,7 +106,7 @@ ok( $result->{ err } != 0 && $result->{ errMessage }, "Error after call without 
 #----------------------------------------------------------------------------
 # Test moveFile action with incomplete of invalid arguments
 
-diag("moveFile action");
+note("moveFile action");
 
 # Omit target
 $result = callAjaxService({
@@ -255,10 +256,4 @@ sub callAjaxService {
     
     # Call ajax service function and decode reply
     return decode_json( $album->www_ajax() );
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
 }

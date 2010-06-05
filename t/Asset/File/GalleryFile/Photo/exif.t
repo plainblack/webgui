@@ -27,6 +27,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
+WebGUI::Test->addToCleanup($versionTag);
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -59,13 +60,6 @@ for my $key ( keys %$exif ) {
 # Also remove things that Photo explicitly removed
 for my $key ( qw{ Directory } ) {
     delete $exif->{ $key };
-}
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
 }
 
 #----------------------------------------------------------------------------

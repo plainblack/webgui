@@ -63,31 +63,21 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 50
-          + $canPostMaker->plan
-          ;
-plan tests => 1
-            + $tests;
-
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $class  = 'WebGUI::Asset::Wobject::StoryArchive';
-my $loaded = use_ok($class);
+use_ok('WebGUI::Asset::Wobject::StoryArchive');
 
 my $storage;
 my $versionTag;
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
-my @skipAutoCommit  = (undef, undef, { skipAutoCommitWorkflows => 1 });
+my @skipAutoCommit  = WebGUI::Test->getAssetSkipCoda;
 
-SKIP: {
-
-skip "Unable to load module $class", $tests unless $loaded;
 my $home = WebGUI::Asset->getDefault($session);
 
 $archive    = $home->addChild({
-                className => $class,
+                className => 'WebGUI::Asset::Wobject::StoryArchive',
                 title => 'My Stories',
                 url => '/home/mystories',
                 styleTemplateId => $home->get('styleTemplateId'),
@@ -661,13 +651,11 @@ $archive->update({ url => '/home/mystories.arch' });
 is($archive->getKeywordStaticURL('bar'), '/home/mystories/keyword_bar.html', '... correct URL with file extension');
 
 $archive->update({ url => '/home/mystories' });
-}
+
+$creationDateSth->finish;
+done_testing();
 
 #----------------------------------------------------------------------------
-# Cleanup
-END {
-    $creationDateSth->finish;
-}
 
 sub simpleHrefParser {
 	my ($text) = @_;

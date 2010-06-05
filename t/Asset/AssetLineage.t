@@ -19,6 +19,7 @@ use WebGUI::User;
 use WebGUI::Asset;
 use Test::More tests => 94; # increment this value for each test you create
 use Test::Deep;
+use Test::Exception;
 use Data::Dumper;
 
 # Test the methods in WebGUI::AssetLineage
@@ -505,7 +506,7 @@ delete $cachedLineage->{$snippet4->get('lineage')}->{class};
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
 is ($snippet4->getId, $snippets[4]->getId, '... failing class cache forces lookup');
 
-is(WebGUI::Asset->newByLineage($session, 'notALineage'), undef, '... returns undef');
+dies_ok { WebGUI::Asset->newByLineage($session, 'notALineage') }  '... throws an exception';
 ok(!exists $session->stow->get('assetLineage')->{assetLineage}, '... no entry for the bad lineage in stow');
 
 ####################################################

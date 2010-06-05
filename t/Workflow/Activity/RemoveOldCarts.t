@@ -36,11 +36,13 @@ WebGUI::Test->tagsToRollback($tag);
 
 
 my $cart1 = WebGUI::Shop::Cart->create($session);
+WebGUI::Test->addToCleanup($cart1);
 
 my $session2 = WebGUI::Session->open(WebGUI::Test->file);
 addToCleanup($session2);
 my $cart2 = WebGUI::Shop::Cart->create($session2);
 $cart2->update({creationDate => time()-10000});
+WebGUI::Test->addToCleanup($cart2);
 
 my @cartIds = $session->db->buildArray('select cartId from cart');
 cmp_bag(
@@ -69,9 +71,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
-my $guard0 = cleanupGuard($workflow);
-my $guard1 = cleanupGuard($cart1);
-my $guard2 = cleanupGuard($cart2);
+WebGUI::Test->addToCleanup($workflow);
 my $cartNuker = $workflow->addActivity('WebGUI::Workflow::Activity::RemoveOldCarts');
 $cartNuker->set('cartTimeout', 3600);
 
@@ -103,7 +103,3 @@ cmp_bag(
     [ $item1->getId, ],
     'Deleted 1 item, the correct one'
 );
-
-END {
-    $instance1->delete('skipNotify');
-}

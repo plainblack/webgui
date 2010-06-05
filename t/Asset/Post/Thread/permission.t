@@ -62,8 +62,8 @@ my $thread
 $versionTag->commit( { timeout => 1_000_000 } );
 
 # Re-load the collab to get the newly committed properties
-$collab = WebGUI::Asset->newByDynamicClass( $session, $collab->getId );
-$thread = WebGUI::Asset->newByDynamicClass( $session, $thread->getId );
+$collab = WebGUI::Asset->newById( $session, $collab->getId );
+$thread = WebGUI::Asset->newById( $session, $thread->getId );
 
 #----------------------------------------------------------------------------
 # Tests
@@ -104,7 +104,7 @@ $maker->prepare( {
 
 # Reply with allowReplies = 0
 $collab->update({ allowReplies => 0 });
-$thread = WebGUI::Asset->newByDynamicClass( $session, $thread->getId );
+$thread = WebGUI::Asset->newById( $session, $thread->getId );
 $maker->prepare( {
     object      => $thread,
     method      => 'canReply',

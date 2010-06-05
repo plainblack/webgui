@@ -31,7 +31,6 @@ use WebGUI::Form::File;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
-plan tests => 15;
 
 my $session = WebGUI::Test->session;
 
@@ -106,7 +105,7 @@ $templateMock->set_isa('WebGUI::Asset::Template');
 $templateMock->set_always('getId', $templateId);
 $templateMock->set_true('prepare');
 my $templateVars;
-$templateMock->mock('process', sub { $templateVars = $_[1]; } );
+$templateMock->mock('process', sub { $templateVars = $_[1]; return ''; } );
 
 $asset->update({
     parameters => 'alt="alternate"',
@@ -123,7 +122,9 @@ $asset->update({
 }
 
 $versionTag->commit;
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
+
+done_testing();
 
 sub isnt_array {
     my ($a, $b) = @_;

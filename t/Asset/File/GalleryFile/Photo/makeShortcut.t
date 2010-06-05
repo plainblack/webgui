@@ -20,7 +20,6 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
-use WebGUI::Test::Maker::HTML;
 use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
@@ -29,13 +28,28 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
-my $maker           = WebGUI::Test::Maker::HTML->new;
+WebGUI::Test->addToCleanup($versionTag);
 my $otherParent
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Layout",
     });
-my $photo
+my $gallery
     = $node->addChild({
+        className           => "WebGUI::Asset::Wobject::Gallery",
+        imageResolutions    => "1600x1200\n1024x768\n800x600\n640x480",
+    });
+my $album
+    = $gallery->addChild({
+        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
+    });
+
+my $photo
+    = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         userDefined1        => "ORIGINAL",
     },
@@ -118,11 +132,3 @@ cmp_deeply(
 
 #----------------------------------------------------------------------------
 # www_makeShortcut
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
-
-

@@ -48,6 +48,7 @@ my $dummy = WebGUI::Asset->getDefault($session)->addChild({
     synopsis    => 'Dummy Synopsis',
     description => 'Dummy Description',
 });
+WebGUI::Test->addToCleanup($dummy);
 
 #####################################################
 #
@@ -185,17 +186,4 @@ cmp_bag(
     'exportAssetCollateral: feed files exported, shawshank.html file'
 );
 
-#####################################################
-#
-# exportAssetCollateral
-#
-#####################################################
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $dummy->purge;
-    my $tag = WebGUI::VersionTag->getWorking($session, 'noCreate');
-    $tag->rollback if $tag;
-}
 #vim:ft=perl

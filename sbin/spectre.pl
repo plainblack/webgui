@@ -105,8 +105,19 @@ elsif ($daemon) {
         die "Spectre is already running.\n";
     }
     elsif (-e $pidFileName){
-        die "pidFile $pidFileName already exists\n";
+        open my $pidFile, '<', $pidFileName or die "$pidFileName: $!";
+        (my $pid) = readline $pidFile;
+        chomp $pid if defined $pid;
+        if(defined $pid and $pid =~ m/^(\d+)$/) {
+            if(kill 0, $1) {
+                die "$0: already running as PID $1";
+            } else { 
+                warn "pidfile contains $pid but that process seems to have terminated" 
+            }
+        }
+        close $pidFile;
     }
+    # XXXX warn if we can't open the log file before forking or else make it not fatal or else close STDOUT/STDERR afterwards; don't fail silently -- sdw
     #fork and exit(sleep(1) and print((ping())?"Spectre failed to start!\n":"Spectre started successfully!\n"));  #Can't have right now.
     require POSIX;
     fork and exit;

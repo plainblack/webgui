@@ -435,7 +435,7 @@ sub getFirstFile {
     my $allFileIds = $self->getParent->getFileIds;
 
     return undef unless @{ $allFileIds };
-    return WebGUI::Asset->newByDynamicClass( $self->session, shift @{ $allFileIds });
+    return WebGUI::Asset->newById( $self->session, shift @{ $allFileIds });
 }
 
 #----------------------------------------------------------------------------
@@ -452,7 +452,7 @@ sub getLastFile {
     my $allFileIds = $self->getParent->getFileIds;
 
     return undef unless @{ $allFileIds };
-    return WebGUI::Asset->newByDynamicClass( $self->session, pop @{ $allFileIds });
+    return WebGUI::Asset->newById( $self->session, pop @{ $allFileIds });
 }
 
 #----------------------------------------------------------------------------
@@ -469,7 +469,7 @@ sub getNextFile {
     return $self->{_nextFile} if $self->{_nextFile};
     my $nextId = $self->getParent->getNextFileId( $self->getId );
     return undef unless $nextId;
-    $self->{_nextFile} = WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    $self->{_nextFile} = WebGUI::Asset->newById( $self->session, $nextId );
     return $self->{_nextFile};
 }
 
@@ -487,7 +487,7 @@ sub getPreviousFile {
     return $self->{_previousFile} if $self->{_previousFile};
     my $previousId  = $self->getParent->getPreviousFileId( $self->getId );
     return undef unless $previousId;
-    $self->{_previousFile} = WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    $self->{_previousFile} = WebGUI::Asset->newById( $self->session, $previousId );
     return $self->{_previousFile};
 }
 

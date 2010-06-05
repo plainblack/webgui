@@ -551,7 +551,7 @@ sub getAlbumIds {
     my $orderBy     = $options->{ orderBy }
                     ? $options->{ orderBy }
                     : $self->viewListOrderBy
-                    ? join( " ", $self->getviewListOrderBy, $self->viewListOrderDirection )
+                    ? join( " ", $self->viewListOrderBy, $self->viewListOrderDirection )
                     : "lineage ASC"
                     ;
 
