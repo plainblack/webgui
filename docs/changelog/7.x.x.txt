@@ -7,6 +7,7 @@
  - fixed #11611: Thingy: The add field pop up box has multiple "Text" field types
  - fixed #11610: Bad hover help for CS sortBy field
  - fixed #11605: UserList refers to non-existent "publicEmail" user profiling field
+ - fixed #11595: Orphaned data in inbox_messageState
 
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
