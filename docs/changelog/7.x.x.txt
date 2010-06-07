@@ -9,6 +9,7 @@
  - fixed #11608: State field required - causing failed orders on iTransact
  - fixed #11605: UserList refers to non-existent "publicEmail" user profiling field
  - fixed #11595: Orphaned data in inbox_messageState
+ - fixed #11606: Syndicated Content feed returns a relative link
 
 7.8.20
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions

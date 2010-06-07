@@ -534,15 +534,17 @@ property of the Asset.
 =cut
 
 sub getRssData {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
+    my $url     = $session->url->getSiteURL.$self->getUrl;
     my $data = {
         title       => $self->get('headline') || $self->getTitle,
         description => $self->get('story'),
-        'link'      => $self->getUrl,
-        guid        => $self->getUrl,
+        'link'      => $url,
+        guid        => $url,
         author      => $self->get('byline'),
         date        => $self->get('lastModified'),
-        pubDate     => $self->session->datetime->epochToMail($self->get('creationDate')),
+        pubDate     => $session->datetime->epochToMail($self->get('creationDate')),
     };
 	return $data;
 }
