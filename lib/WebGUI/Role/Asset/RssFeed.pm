@@ -243,7 +243,7 @@ around exportAssetCollateral => sub {
             $reportSession->output->print($reporti18n->get('done'));
         }
     }
-    return $self->$orig(@_);
+    return $self->$orig($basepath, $args, $reportSession);
 };
 
 #-------------------------------------------------------------------
