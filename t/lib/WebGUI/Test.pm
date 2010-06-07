@@ -799,6 +799,7 @@ were passed in.  Currently able to destroy:
     WebGUI::Shop::AddressBook
     WebGUI::DatabaseLink
     WebGUI::LDAPLink
+    WebGUI::Inbox::Message
 
 Example call:
 
@@ -887,6 +888,7 @@ Example call:
         'WebGUI::Shop::Transaction'  => 'delete',
         'WebGUI::Shop::ShipDriver'   => 'delete',
         'WebGUI::Shop::PayDriver'    => 'delete',
+        'WebGUI::Inbox::Message'     => 'purge',
         'WebGUI::Shop::Cart'         => sub {
             my $cart        = shift;
             my $addressBook = $cart->getAddressBook();
