@@ -4,6 +4,7 @@
  - fixed #11604: scheduled workflows getting deleted
  - fixed: The template form plugin would return an empty string when getValueAsHtml was called. ( Martin Kamerbeek / Oqapi )
  - fixed #11613: Thingy: If next action after add is to add more things, previous data remains
+ - fixed #11611: Thingy: The add field pop up box has multiple "Text" field types
 
 7.8.20
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions

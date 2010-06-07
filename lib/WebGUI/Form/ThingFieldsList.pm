@@ -36,6 +36,31 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('user');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+Since this Form field requires a thingId to work it is not dynamic compatible.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
+}
+
 #----------------------------------------------------------------------------
 
 =head2 www_getThingFields ($session)
