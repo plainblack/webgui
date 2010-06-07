@@ -125,7 +125,9 @@ sub getTypes {
     }
     my %fields = ();
     foreach my $type (@types) {
-        $fields{$type} = WebGUI::Pluggable::instanciate('WebGUI::Form::'.ucfirst($type), 'getName', [$self->session]);
+        my $name = WebGUI::Pluggable::instanciate('WebGUI::Form::'.ucfirst($type), 'getName', [$self->session]);
+        $self->session->log->warn("type: $type; name: $name");
+        $fields{$type} = $name;
     }
     return \%fields;
 }

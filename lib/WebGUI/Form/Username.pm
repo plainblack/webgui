@@ -58,6 +58,19 @@ Defaults to the setting textBoxSize or 30 if that's not set. Specifies how big o
 
 #-------------------------------------------------------------------
 
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'Form_Username')->get('username');
+}
+
+#-------------------------------------------------------------------
+
 =head2 getValue ( [ value ] )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Strip newlines/carriage returns from the value.
