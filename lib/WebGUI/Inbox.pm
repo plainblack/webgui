@@ -132,6 +132,28 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 deleteMessagesForUser ( $user ) 
+
+Deletes all messages for a user.
+
+=head3 $user
+
+A WebGUI::User object, representing the user who will have all their messages deleted.
+
+=cut
+
+sub deleteMessagesForUser {
+	my $self    = shift;
+    my $user    = shift;
+
+    my $db      = $self->session->db;
+    my $userId  = $user->userId;
+    $db->write("DELETE FROM inbox_messageState WHERE userId=?",[$userId]);
+    $db->write("DELETE FROM inbox WHERE userId=? AND (groupId IS NULL OR groupId='')",[$userId]);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getMessage ( messageId [, userId] ) 
 
 Returns a WebGUI::Inbox::Message object.

@@ -8,6 +8,7 @@
  - fixed #11610: Bad hover help for CS sortBy field
  - fixed #11608: State field required - causing failed orders on iTransact
  - fixed #11605: UserList refers to non-existent "publicEmail" user profiling field
+ - fixed #11595: Orphaned data in inbox_messageState
 
 7.8.20
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions

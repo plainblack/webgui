@@ -17,7 +17,7 @@ package WebGUI::Workflow::Activity::PurgeOldInboxMessages;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
-use WebGUI::Asset;
+use WebGUI::Inbox::Message;
 
 =head1 NAME
 
@@ -77,45 +77,32 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-    my ($self, $nothing, $instance) = @_;
+    my ($self, undef, $instance) = @_;
     my $session     = $self->session;
-    my $log         = $session->errorHandler;
 
     # keep track of how much time it's taking
-    my $start   = time;
-    my $limit   = 2_500;
+    my $endTime   = time() + $self->getTTL;;
 
     my $sth 
         = $session->db->read(
             "SELECT messageId FROM inbox WHERE completedOn IS NOT NULL AND dateStamp < ?",
-            [ $start - $self->get('purgeAfter') ],
+            [ time() - $self->get('purgeAfter') ],
         );
 
-    while ( ( my $messageId ) = $sth->array ) {
-        $session->db->write(
-            "DELETE FROM inbox WHERE messageId = ?",
-            [ $messageId ],
-        );
-
+    MESSAGE: while ( ( my $messageId ) = $sth->array ) {
         # give up if we're taking too long
-        if (time - $start > 120) { 
+        if (time() > $endTime) {
             $sth->finish;
             return $self->WAITING(1);
-        } 
+        }
+
+        my $message = WebGUI::Inbox::Message->new($session, $messageId);
+        next MESSAGE unless $message;
+        $message->purge;
     }
     
-    # If there are more messages waiting to be purged, return WAITING
-    if ( $sth->rows >= $limit ) {
-        return $self->WAITING(1);
-    }
-    else {
-        return $self->COMPLETE;
-    }
+    $sth->finish;
+    return $self->COMPLETE;
 }
 
-
-
-
 1;
-
-

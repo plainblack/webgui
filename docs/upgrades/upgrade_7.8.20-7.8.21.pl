@@ -37,6 +37,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 restoreDefaultCronJobs($session);
 restoreCsCronJobs($session);
+cleanup_inbox_messageStateTable($session);
 
 finish($session); # this line required
 
@@ -49,6 +50,22 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub cleanup_inbox_messageStateTable {
+    my $session = shift;
+    print "\tDelete dead entries from the inbox_MessageState table.  This may take a long time... " unless $quiet;
+    # and here's our code
+    my $source = $session->db->read("select messageId from inbox_messageState s where not exists(select messageId from inbox where messageId = s.messageId)");
+    my $cleaner = $session->db->prepare("delete from inbox_messageState where messageId=?");
+    while (my ($messageId) = $source->array) {
+        $cleaner->execute([$messageId]);
+    }
+    $source->finish;
+    $cleaner->finish;
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

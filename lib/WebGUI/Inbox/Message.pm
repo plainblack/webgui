@@ -253,8 +253,7 @@ sub delete {
     );
     #Delete the message from the database if everyone who was sent the message has deleted it
     unless ($isActive) {
-        $db->write("delete from inbox where messageId=?",[$messageId]);
-        $db->write("delete from inbox_messageState where messageId=?",[$messageId]);
+        $self->purge;
     }
 }
 
@@ -433,6 +432,22 @@ sub new {
     my %properties  = (%{$inbox},%{$statusValues});
  
 	bless {_properties=>\%properties, _inbox=>$inbox, _session=>$session, _messageId=>$messageId, _userId=>$userId}, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 purge
+
+Completely deletes a message from the inbox.
+
+=cut
+
+sub purge {
+	my $self = shift;
+    my $db   = $self->session->db;
+    my $messageId = $self->getId;
+    $db->write("delete from inbox where messageId=?",[$messageId]);
+    $db->write("delete from inbox_messageState where messageId=?",[$messageId]);
 }
 
 #-------------------------------------------------------------------
