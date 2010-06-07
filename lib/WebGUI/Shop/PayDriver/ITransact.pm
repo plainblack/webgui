@@ -521,6 +521,7 @@ sub processCredentials {
 	push @error, $i18n->get( 'invalid lastName'     ) unless $form->process( 'lastName'  );
 	push @error, $i18n->get( 'invalid address'      ) unless $form->process( 'address'   );
 	push @error, $i18n->get( 'invalid city'         ) unless $form->process( 'city'      );
+	push @error, $i18n->get( 'invalid state'        ) unless $form->process( 'state'     );
 	push @error, $i18n->get( 'invalid email'        ) unless $form->email  ( 'email'     );
 	push @error, $i18n->get( 'invalid zip'          ) 
         if ( !$form->zipcode( 'zipcode' ) && $form->process( 'country' ) eq 'United States' );

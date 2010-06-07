@@ -252,6 +252,11 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|An error indicating that an invalid city has been entered.|
 	},
+	'invalid state' => {
+		message => q|You have to enter a state or province.  If your address does not have one, please enter in the city again.|,
+		lastUpdated => 0,
+		context => q|An error indicating that an invalid city has been entered.|
+	},
 	'invalid zip' => {
 		message => q|You have to enter a valid zipcode.|,
 		lastUpdated => 0,
