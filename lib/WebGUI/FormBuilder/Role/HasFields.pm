@@ -119,9 +119,17 @@ sub getFieldsRecursive {
 
     if ( $self->DOES('WebGUI::FormBuilder::Role::HasFieldsets') ) {
         # Add $self->{_fieldsets} fields
+        for my $fs ( @{$self->fieldsets} ) {
+            push @$fields, $fs->getFieldsRecursive;
+        }
     }
     if ( $self->DOES('WebGUI::FormBuilder::Role::HasTabs') ) {
         # Add $self->{_tabs} fields
+        for my $tabset ( @{$self->tabsets} ) {
+            for my $tab ( @{$tabset->tabs} ) {
+                push @$fields, $tab->getFieldsRecursive;
+            }
+        }
     }
     
     return $fields;

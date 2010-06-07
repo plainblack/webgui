@@ -308,23 +308,7 @@ sub t_05_purge : Test(3) {
     ok ! $exists_in_table, 'assetId removed from all asset tables';
 }
 
-sub cut_paste : Test(5) {
-    note "cut";
-    my $test    = shift;
-    my $session = $test->session;
-    my ($tag, $asset, @parents) = $test->getAnchoredAsset();
-    ok $asset->cut, 'cut returns true if it was cut';
-    is $asset->state, 'clipboard', 'asset state updated';
-    my $session_asset = $session->asset();
-    $session->asset($parents[-1]);
-    ok $asset->canPaste, 'canPaste: allowed to paste here';
-    ok $parents[-1]->paste($asset->assetId), 'paste returns true when it pastes';
-    $asset_prime = $asset->cloneFromDb;
-    is $asset_prime->state, 'published', 'asset state updated';
-    $session->asset($session_asset);
-}
-
-sub addRevision : Tests {
+sub t_10_addRevision : Tests {
     note "addRevision";
     my ( $test ) = @_;
     my $session = $test->session;
@@ -340,7 +324,7 @@ sub addRevision : Tests {
     $newRevision->purgeRevision;
 }
 
-sub getEditForm : Tests {
+sub t_11_getEditForm : Tests {
     note "getEditForm";
     my ( $test ) = @_;
     my $session = $test->session;
@@ -351,21 +335,35 @@ sub getEditForm : Tests {
     isa_ok( $f, 'WebGUI::FormBuilder' );
 
     # assetId, className, keywords
-    isa_ok( $f->getField('assetId'), 'WebGUI::Form::Guid' );
-    isa_ok( $f->getField('className'), 'WebGUI::Form::ClassName' );
-    isa_ok( $f->getField('keywords'), 'WebGUI::Form::Keywords' );
+    isa_ok( $f->getTab('meta')->getField('assetId'), 'WebGUI::Form::Guid' );
+    isa_ok( $f->getTab('meta')->getField('class'), 'WebGUI::Form::ClassName' );
+    isa_ok( $f->getTab('meta')->getField('keywords'), 'WebGUI::Form::Keywords' );
+
+    # Tabs
+    isa_ok( $f->getTab('properties'), 'WebGUI::FormBuilder::Tab' );
+    isa_ok( $f->getTab('display'), 'WebGUI::FormBuilder::Tab' );
+    isa_ok( $f->getTab('security'), 'WebGUI::FormBuilder::Tab' );
+    isa_ok( $f->getTab('meta'), 'WebGUI::FormBuilder::Tab' );
 
     # Properties
+    my $properties  = map { !$asset->meta->find_attribute_by_name( $_ )->noFormPost } $asset->getProperties;
+    use Data::Dumper;
+    note( Dumper $f->getFieldsRecursive );
+    exit;
+    cmp_deeply( 
+        $f->getFieldsRecursive, 
+        bag( map { superhashof( $asset->getFormProperties( $_ ) ) } @$properties ),
+    );
 
     # Metadata
 
     # Property overrides
 
-    not_ok( $f->getField('func'), 'form must not contain "func"' );
+    ok( !$f->getField('func'), 'form must not contain "func"' );
 
 }
 
-sub www_editSave : Tests {
+sub t_20_www_editSave : Tests {
     note "www_editSave";
     my ( $test ) = @_;
     my $session = $test->session;

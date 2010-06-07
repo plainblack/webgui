@@ -28,12 +28,15 @@ define tableName => 'Navigation';
 property    templateId => (
                 label        => ['1096', 'Asset_Navigation'],
                 hoverHelp    => ['1096 description', 'Asset_Navigation'],
+                tab          => 'display',
                 fieldType    => "template",
                 default      => 'PBtmpl0000000000000048',
+                namespace    => 'Navigation',
             );
 property    mimeType => (
                 label        => ['mimeType', 'Asset_Navigation'],
                 hoverHelp    => ['mimeType description', 'Asset_Navigation'],
+                tab          => 'display',
                 fieldType    => "mimeType",
                 default      => 'text/html',
             );
@@ -69,21 +72,25 @@ property    showSystemPages => (
                 label        => [30, 'Asset_Navigation'],
                 fieldType    => 'yesNo',
                 default      => 0,
+                tab         => "display",
             );
 property    showHiddenPages => (
                 label        => [31, 'Asset_Navigation'],
                 fieldType    => 'yesNo',
                 default      => 0,
+                tab         => "display",
             );
 property    showUnprivilegedPages => (
                 label        => [32, 'Asset_Navigation'],
                 fieldType    => 'yesNo',
                 default      => 0,
+                tab         => "display",
             );
 property    reversePageLoop => (
                 label        => ['reverse page loop', 'Asset_Navigation'],
                 fieldType    => 'yesNo',
                 default      => 0,
+                tab         => "display",
             );
 
 #-------------------------------------------------------------------
@@ -95,190 +102,197 @@ Manually build the edit form due to javascript elements.
 =cut
 
 override getEditForm => sub {
-	my $self = shift;
-	my $tabform = super();
-	my $i18n = WebGUI::International->new($self->session, "Asset_Navigation");
-   	$tabform->getTab("display")->template(
-      		-value=>$self->templateId,
-      		-namespace=>"Navigation",
-		-label=>$i18n->get(1096),
-		-hoverHelp=>$i18n->get('1096 description'),
-   		);
-   	$tabform->getTab("display")->mimeType(
-      		-value=>$self->mimeType,
-      		-name=>"mimeType",
-		-label=>$i18n->get('mimeType'),
-		-hoverHelp=>$i18n->get('mimeType description'),
-   		);
-	$tabform->hidden({
-		name=>"returnUrl",
-		value=>$self->session->form->process("returnUrl")
-		});
-	my ($descendantsChecked, $ancestorsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
-	my @assetsToInclude = split("\n",$self->assetsToInclude);
-	my $afterScript;
-	foreach my $item (@assetsToInclude) {
-		if ($item eq "self") {
-			$selfChecked = 1;
-		} elsif ($item eq "descendants") {
-			$descendantsChecked = 1;
-			$afterScript = "displayNavEndPoint = false;";
-		} elsif ($item eq "ancestors") {
-			$ancestorsChecked = 1;
-		} elsif ($item eq "siblings") {
-			$siblingsChecked = 1;
-		} elsif ($item eq "pedigree") {
-			$pedigreeChecked = 1;
-		}
-	}
-	$tabform->getTab("properties")->selectBox(
-		-name=>"startType",
-		-options=>{
-			specificUrl=>$i18n->get('Specific URL'),
-			relativeToCurrentUrl=>$i18n->get('Relative To Current URL'),
-			relativeToRoot=>$i18n->get('Relative To Root')
-			},
-		-value=>[$self->startType],
-		-label=>$i18n->get("Start Point Type"),
-		-hoverHelp=>$i18n->get("Start Point Type description"),
-		-id=>"navStartType",
-		-extras=>'onchange="changeStartPoint()"'
-		);
-	$tabform->getTab("properties")->readOnly(
-		-label=>$i18n->get("Start Point"),
-		-hoverHelp=>$i18n->get("Start Point description"),
-		-value=>'<div id="navStartPoint"></div>'
-		);
-	my %options = ();
-	tie %options, 'Tie::IxHash';
-	%options = (
-		'1'=>'../ (-1)',
-		'2'=>'../../ (-2)',
-		'3'=>'../../../ (-3)',
-		'4'=>'../../../../ (-4)',
-		'5'=>'../../../../../ (-5)',
-		'55'=>$i18n->get('Infinity')
-		);
-	$tabform->getTab("properties")->raw(
-		'</tbody><tbody id="navAncestorEnd"><tr><td class="formDescription">'.$i18n->get("Ancestor End Point").'</td><td>'
-		.WebGUI::Form::selectBox($self->session,{
-			name=>"ancestorEndPoint",
-			value=>[$self->ancestorEndPoint],
-			options=>\%options
-			})
-		.'</td></tr></tbody><tbody>'
-		);
-	$tabform->getTab("properties")->readOnly(
-		-label=>$i18n->get("Relatives To Include"),
-		-hoverHelp=>$i18n->get("Relatives To Include description"),
-		-value=>WebGUI::Form::checkbox($self->session,{
-				checked=>$ancestorsChecked,
-				name=>"assetsToInclude",
-				extras=>'onchange="toggleAncestorEndPoint()"',
-				value=>"ancestors"
-				}).$i18n->get('Ancestors').'<br />'
-			.WebGUI::Form::checkbox($self->session,{
-				checked=>$selfChecked,
-				name=>"assetsToInclude",
-				value=>"self"
-				}).$i18n->get('Self').'<br />'
-			.WebGUI::Form::checkbox($self->session,{
-				checked=>$siblingsChecked,
-				name=>"assetsToInclude",
-				value=>"siblings"
-				}).$i18n->get('Siblings').'<br />'
-			.WebGUI::Form::checkbox($self->session,{
-				checked=>$descendantsChecked,
-				name=>"assetsToInclude",
-				value=>"descendants",
-				extras=>'onchange="toggleDescendantEndPoint()"'
-				}).$i18n->get('Descendants').'<br />'
-			.WebGUI::Form::checkbox($self->session,{
-				checked=>$pedigreeChecked,
-				name=>"assetsToInclude",
-				value=>"pedigree"
-				}).$i18n->get('Pedigree').'<br />'
-		);
-	%options = ();
-	tie %options, 'Tie::IxHash';
-	%options = (
-		'1'=>'./a/ (+1)',
-		'2'=>'./a/b/ (+2)',
-		'3'=>'./a/b/c/ (+3)',
-		'4'=>'./a/b/c/d/ (+4)',
-		'5'=>'./a/b/c/d/e/ (+5)',
-		'55'=>$i18n->get('Infinity')
-		);
-	$tabform->getTab("properties")->raw(
-		'</tbody><tbody id="navDescendantEnd"><tr><td class="formDescription">'.$i18n->get('Descendant End Point').'</td><td>'
-		.WebGUI::Form::selectBox($self->session,{
-			name=>"descendantEndPoint",
-			value=>[$self->descendantEndPoint],
-			options=>\%options
-			})
-		.'</td></tr></tbody><tbody>'
-		);
-	$tabform->getTab("display")->yesNo(
-		-name=>'showSystemPages',
-		-label=>$i18n->get(30),
-		-hoverHelp=>$i18n->get('30 description'),
-		-value=>$self->showSystemPages
-		);
-        $tabform->getTab("display")->yesNo(
-                -name=>'showHiddenPages',
-                -label=>$i18n->get(31),
-                -hoverHelp=>$i18n->get('31 description'),
-                -value=>$self->showHiddenPages
-        	);
-        $tabform->getTab("display")->yesNo(
-                -name=>'showUnprivilegedPages',
-                -label=>$i18n->get(32),
-                -hoverHelp=>$i18n->get('32 description'),
-                -value=>$self->showUnprivilegedPages
-        	);
-	$tabform->getTab("display")->yesNo(
-		-name=>'reversePageLoop',
-		-label=>$i18n->get('reverse page loop'),
-		-hoverHelp => $i18n->get('reverse page loop description'),
-		-value=>$self->reversePageLoop,
-		);
-	my $start = $self->startPoint;
-	$tabform->getTab("properties")->raw("<script type=\"text/javascript\">
-		//<![CDATA[
-		var displayNavDescendantEndPoint = true;
-		var displayNavAncestorEndPoint = true;
-		function toggleDescendantEndPoint () {
-			if (displayNavDescendantEndPoint) {
-				document.getElementById('navDescendantEnd').style.display='none';
-				displayNavDescendantEndPoint = false;
-			} else {
-				document.getElementById('navDescendantEnd').style.display='';
-				displayNavDescendantEndPoint = true;
-			}
-		}
-		function toggleAncestorEndPoint () {
-			if (displayNavAncestorEndPoint) {
-				document.getElementById('navAncestorEnd').style.display='none';
-				displayNavAncestorEndPoint = false;
-			} else {
-				document.getElementById('navAncestorEnd').style.display='';
-				displayNavAncestorEndPoint = true;
-			}
-		}
-		function changeStartPoint () {
-			var types = new Array();
-			types['specificUrl']='<input type=\"text\" name=\"startPoint\" value=\"".$start."\" />';
-			types['relativeToRoot']='<select name=\"startPoint\"><option value=\"0\"".(($start == 0)?' selected=\"1\"':'').">/ (0)</option><option value=\"1\"".(($start eq "1")?' selected=\"1\"':'').">/a/ (+1)</option><option value=\"2\"".(($start eq "2")?' selected=\"1\"':'').">/a/b/ (+2)</option><option value=\"3\"".(($start eq "3")?' selected=\"1\"':'').">/a/b/c/ (+3)</option><option value=\"4\"".(($start eq "4")?' selected=\"1\"':'').">/a/b/c/d/ (+4)</option><option value=\"5\"".(($start eq "5")?' selected=\"1\"':'').">/a/b/c/d/e/ (+5)</option><option value=\"6\"".(($start eq "6")?' selected=\"1\"':'').">/a/b/c/d/e/f/ (+6)</option><option value=\"7\"".(($start eq "7")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/ (+7)</option><option value=\"8\"".(($start eq "8")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/h/ (+8)</option><option value=\"9\"".(($start eq "9")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/h/i/ (+9)</option></select>';
-			types['relativeToCurrentUrl']='<select name=\"startPoint\"><option value=\"-3\"".(($start eq "-3")?' selected=\"1\"':'').">../../.././ (-3)</option><option value=\"-2\"".(($start eq "-2")?' selected=\"1\"':'').">../.././ (-2)</option><option value=\"-1\"".(($start eq "-1")?' selected=\"1\"':'').">.././ (-1)</option><option value=\"0\"".(($start == 0 || $start > 0)?' selected=\"1\"':'').">./ (0)</option></select>';
-			document.getElementById('navStartPoint').innerHTML=types[document.getElementById('navStartType').options[document.getElementById('navStartType').selectedIndex].value];
-		}
-		".$afterScript."
-		changeStartPoint();
-		".($descendantsChecked ? "" : "toggleDescendantEndPoint();")."
-		".($ancestorsChecked ? "" : "toggleAncestorEndPoint();")."
-		//]]>
-		</script>");
-	return $tabform;
+    my $self = shift;
+    my $fb   = super();
+    my $i18n = WebGUI::International->new($self->session, "Navigation");
+    my ( $descendantsChecked, $ancestorsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked );
+    my @assetsToInclude = split( "\n", $self->assetsToInclude );
+    my $afterScript;
+    foreach my $item (@assetsToInclude) {
+        if ( $item eq "self" ) {
+            $selfChecked = 1;
+        }
+        elsif ( $item eq "descendants" ) {
+            $descendantsChecked = 1;
+            $afterScript        = "displayNavEndPoint = false;";
+        }
+        elsif ( $item eq "ancestors" ) {
+            $ancestorsChecked = 1;
+        }
+        elsif ( $item eq "siblings" ) {
+            $siblingsChecked = 1;
+        }
+        elsif ( $item eq "pedigree" ) {
+            $pedigreeChecked = 1;
+        }
+    } ## end foreach my $item (@assetsToInclude)
+    $fb->getTab("properties")->addField( "selectBox",
+        name    => "startType",
+        options => {
+            specificUrl          => $i18n->get('Specific URL'),
+            relativeToCurrentUrl => $i18n->get('Relative To Current URL'),
+            relativeToRoot       => $i18n->get('Relative To Root')
+        },
+        value     => [ $self->startType ],
+        label     => $i18n->get("Start Point Type"),
+        hoverHelp => $i18n->get("Start Point Type description"),
+        id        => "navStartType",
+        extras    => 'onchange="changeStartPoint()"'
+    );
+    $fb->getTab("properties")->addField( "ReadOnly",
+        label     => $i18n->get("Start Point"),
+        hoverHelp => $i18n->get("Start Point description"),
+        value     => '<div id="navStartPoint"></div>'
+    );
+    tie my %ancestorEndPointOptions, 'Tie::IxHash', (
+        '1'  => '../ (-1)',
+        '2'  => '../../ (-2)',
+        '3'  => '../../../ (-3)',
+        '4'  => '../../../../ (-4)',
+        '5'  => '../../../../../ (-5)',
+        '55' => $i18n->get('Infinity')
+    );
+    $fb->getTab("properties")->addField( "SelectBox" => 
+        name        => "ancestorEndPoint",
+        value       => [ $self->ancestorEndPoint ],
+        options     => \%ancestorEndPointOptions,
+        label       => $i18n->get('Ancestor End Point'),
+        rowClass    => 'navAncestorEnd',
+    );
+    $fb->getTab("properties")->addField( "ReadOnly" => 
+        label     => $i18n->get("Relatives To Include"),
+        hoverHelp => $i18n->get("Relatives To Include description"),
+        value     => WebGUI::Form::checkbox(
+            $self->session, {
+                checked => $ancestorsChecked,
+                name    => "assetsToInclude",
+                extras  => 'onchange="toggleAncestorEndPoint()"',
+                value   => "ancestors"
+            }
+            )
+            . $i18n->get('Ancestors')
+            . '<br />'
+            . WebGUI::Form::checkbox(
+            $self->session, {
+                checked => $selfChecked,
+                name    => "assetsToInclude",
+                value   => "self"
+            }
+            )
+            . $i18n->get('Self')
+            . '<br />'
+            . WebGUI::Form::checkbox(
+            $self->session, {
+                checked => $siblingsChecked,
+                name    => "assetsToInclude",
+                value   => "siblings"
+            }
+            )
+            . $i18n->get('Siblings')
+            . '<br />'
+            . WebGUI::Form::checkbox(
+            $self->session, {
+                checked => $descendantsChecked,
+                name    => "assetsToInclude",
+                value   => "descendants",
+                extras  => 'onchange="toggleDescendantEndPoint()"'
+            }
+            )
+            . $i18n->get('Descendants')
+            . '<br />'
+            . WebGUI::Form::checkbox(
+            $self->session, {
+                checked => $pedigreeChecked,
+                name    => "assetsToInclude",
+                value   => "pedigree"
+            }
+            )
+            . $i18n->get('Pedigree')
+            . '<br />'
+    );
+    tie my %descendantEndPointOptions, 'Tie::IxHash', (
+        '1'  => './a/ (+1)',
+        '2'  => './a/b/ (+2)',
+        '3'  => './a/b/c/ (+3)',
+        '4'  => './a/b/c/d/ (+4)',
+        '5'  => './a/b/c/d/e/ (+5)',
+        '55' => $i18n->get('Infinity')
+    );
+    $fb->getTab("properties")->addField( "selectBox",
+        name    => "descendantEndPoint",
+        label   => $i18n->get('Descendant End Point'),
+        value   => [ $self->descendantEndPoint ],
+        options => \%descendantEndPointOptions,
+        rowClass => "navDescendantEnd",
+    );
+    my $start = $self->startPoint;
+    $fb->addField( "ReadOnly",
+        value => 
+        "<script type=\"text/javascript\">
+            //<![CDATA[
+            var displayNavDescendantEndPoint = true;
+            var displayNavAncestorEndPoint = true;
+            function toggleDescendantEndPoint () {
+                    if (displayNavDescendantEndPoint) {
+                            document.getElementById('navDescendantEnd').style.display='none';
+                            displayNavDescendantEndPoint = false;
+                    } else {
+                            document.getElementById('navDescendantEnd').style.display='';
+                            displayNavDescendantEndPoint = true;
+                    }
+            }
+            function toggleAncestorEndPoint () {
+                    if (displayNavAncestorEndPoint) {
+                            document.getElementById('navAncestorEnd').style.display='none';
+                            displayNavAncestorEndPoint = false;
+                    } else {
+                            document.getElementById('navAncestorEnd').style.display='';
+                            displayNavAncestorEndPoint = true;
+                    }
+            }
+            function changeStartPoint () {
+                    var types = new Array();
+                    types['specificUrl']='<input type=\"text\" name=\"startPoint\" value=\"" . $start . "\" />';
+                    types['relativeToRoot']='<select name=\"startPoint\"><option value=\"0\""
+            . ( ( $start == 0 ) ? ' selected=\"1\"' : '' )
+            . ">/ (0)</option><option value=\"1\""
+            . ( ( $start eq "1" ) ? ' selected=\"1\"' : '' )
+            . ">/a/ (+1)</option><option value=\"2\""
+            . ( ( $start eq "2" ) ? ' selected=\"1\"' : '' )
+            . ">/a/b/ (+2)</option><option value=\"3\""
+            . ( ( $start eq "3" ) ? ' selected=\"1\"' : '' )
+            . ">/a/b/c/ (+3)</option><option value=\"4\""
+            . ( ( $start eq "4" ) ? ' selected=\"1\"' : '' )
+            . ">/a/b/c/d/ (+4)</option><option value=\"5\""
+            . ( ( $start eq "5" ) ? ' selected=\"1\"' : '' )
+            . ">/a/b/c/d/e/ (+5)</option><option value=\"6\""
+            . ( ( $start eq "6" ) ? ' selected=\"1\"' : '' )
+            . ">/a/b/c/d/e/f/ (+6)</option><option value=\"7\""
+            . ( ( $start eq "7" ) ? ' selected=\"1\"' : '' )
+            . ">/a/b/c/d/e/f/g/ (+7)</option><option value=\"8\""
+            . ( ( $start eq "8" ) ? ' selected=\"1\"' : '' )
+            . ">/a/b/c/d/e/f/g/h/ (+8)</option><option value=\"9\""
+            . ( ( $start eq "9" ) ? ' selected=\"1\"' : '' )
+            . ">/a/b/c/d/e/f/g/h/i/ (+9)</option></select>';
+                    types['relativeToCurrentUrl']='<select name=\"startPoint\"><option value=\"-3\""
+            . ( ( $start eq "-3" ) ? ' selected=\"1\"' : '' )
+            . ">../../.././ (-3)</option><option value=\"-2\""
+            . ( ( $start eq "-2" ) ? ' selected=\"1\"' : '' )
+            . ">../.././ (-2)</option><option value=\"-1\""
+            . ( ( $start eq "-1" ) ? ' selected=\"1\"' : '' )
+            . ">.././ (-1)</option><option value=\"0\""
+            . ( ( $start == 0 || $start > 0 ) ? ' selected=\"1\"' : '' )
+            . ">./ (0)</option></select>';
+                    document.getElementById('navStartPoint').innerHTML=types[document.getElementById('navStartType').descendantEndPointOptions,[document.getElementById('navStartType').selectedIndex].value];
+            }
+            " . $afterScript . "
+            changeStartPoint();
+            " . ( $descendantsChecked ? "" : "toggleDescendantEndPoint();" ) . "
+            " . ( $ancestorsChecked   ? "" : "toggleAncestorEndPoint();" ) . "
+            //]]>
+            </script>"
+    );
+    return $fb;
 };
 
 
