@@ -10,6 +10,7 @@
  - fixed #11595: Orphaned data in inbox_messageState
  - fixed AddressBook feedback for missing fields.
  - fixed #11606: Syndicated Content feed returns a relative link
+ - fixed #11614: Forums: Sort Fields
 
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
