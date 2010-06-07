@@ -278,7 +278,7 @@ cmp_deeply(
     {
         title       => 'Story 1',
         description => 'WebGUI was originally called Web Done Right.',
-        'link'      => re('story-1$'),
+        'link'      => all(re('^'.$session->url->getSiteURL),re('story-1$')),
         guid        => re('story-1$'),
         author      => 'JT Smith',
         date        => $story->get('lastModified'),

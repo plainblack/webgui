@@ -9,6 +9,7 @@
  - fixed #11605: UserList refers to non-existent "publicEmail" user profiling field
  - fixed #11595: Orphaned data in inbox_messageState
  - fixed AddressBook feedback for missing fields.
+ - fixed #11606: Syndicated Content feed returns a relative link
 
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
