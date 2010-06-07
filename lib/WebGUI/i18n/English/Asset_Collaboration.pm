@@ -1185,10 +1185,8 @@ submitted by a user.|,
         },
 
         'sort by description' => {
-                message => q|By default, all posts are displayed in a sorted order.  Use this
-field to choose by what property they are sorted.  Multiple properties
-may be selected.|,
-                lastUpdated => 1119070429,
+                message => q|By default, all posts are displayed in a sorted order.  Use this field to choose by what property they are sorted.|,
+                lastUpdated => 1275922704,
         },
 
         'sort order description' => {
