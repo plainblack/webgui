@@ -2924,6 +2924,10 @@ sub www_editSave {
         $session->asset($object->getParent);
         return $session->asset->www_view;
     }
+    elsif ($proceed eq "editParent") {
+        $session->asset($object->getParent);
+        return $session->asset->www_edit;
+    }    
     elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
         $session->http->setRedirect($session->form->process("returnUrl"));
         return undef;

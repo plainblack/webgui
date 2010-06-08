@@ -1,4 +1,6 @@
 7.9.7
+ - added #11571: Allow return from photo edit view to gallery edit view
+ - fixed: Reject form submissions without image selected for upload in edit view of Photo asset 
  - fixed #11596: Calendar: all day events leaking
  - fixed #11604: scheduled workflows getting deleted
  - fixed #11613: Thingy: If next action after add is to add more things, previous data remains
