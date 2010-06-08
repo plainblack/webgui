@@ -33,8 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 18;
-plan tests => 1 + $tests;
+plan tests => 18;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -44,10 +43,6 @@ my $loaded = use_ok('WebGUI::Shop::Pay');
 my $storage;
 my $newDriver;
 my $anotherDriver;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::Pay', $tests unless $loaded;
 
 #######################################################################
 #
@@ -127,6 +122,7 @@ my $options = {
     label   => 'Cold, stone hard cash',
 };
 $newDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', $options);
+WebGUI::Test->addToCleanup($newDriver);
 isa_ok($newDriver, 'WebGUI::Shop::PayDriver::Cash', 'added a new, configured Cash driver');
 is($newDriver->get('label'), 'Cold, stone hard cash', 'label passed correctly to paydriver');
 
@@ -207,6 +203,7 @@ my $otherOptions = {
     label       => 'Even harder cash',
 };
 $anotherDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', $otherOptions);
+WebGUI::Test->addToCleanup($anotherDriver);
 
 my $gateways = $pay->getPaymentGateways;
 my @returnedIds = map {$_->get('label')} @{ $gateways };
@@ -232,14 +229,3 @@ cmp_bag(
 #
 #######################################################################
 
-
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    defined $newDriver and $newDriver->delete;
-    defined $newDriver and $anotherDriver->delete;
-    my $count = $session->db->quickScalar('select count(*) from paymentGateway');
-    is($count, 2, 'WebGUI ships with two drivers by default');
-}
