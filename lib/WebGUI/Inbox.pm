@@ -483,7 +483,7 @@ sub getMessageSql {
     }
 
     if($whereClause) {
-        $whereClause = qq{WHERE $whereClause};
+        $whereClause = qq{AND $whereClause};
     }
 
     if($limit) {
@@ -508,14 +508,13 @@ SELECT
     my $sql = qq{
         SELECT
             $select
-        FROM (
-                ( SELECT messageId, subject, sentBy, dateStamp, status FROM inbox WHERE userId = '$userId' order by dateStamp desc limit $limitHalf)
-                UNION
-                ( SELECT messageId, subject, sentBy, dateStamp, status FROM inbox WHERE groupId IN ( $userGroups ) order by dateStamp desc limit $limitHalf )
-        ) AS ibox
-        JOIN inbox_messageState on inbox_messageState.messageId=ibox.messageId and inbox_messageState.userId='$userId' and inbox_messageState.deleted=0
-        LEFT JOIN users on users.userId=ibox.sentBy
-        LEFT JOIN userProfileData on userProfileData.userId=ibox.sentBy
+        FROM inbox_messageState
+        JOIN inbox ibox USING (messageId)
+        JOIN users on users.userId = ibox.sentBy
+        JOIN userProfileData on userProfileData.userId = ibox.sentBy
+        WHERE inbox_messageState.messageId = ibox.messageId 
+        AND   inbox_messageState.userId    = '$userId' 
+        AND   inbox_messageState.deleted   = 0
         $whereClause
         $sortBy
         $limit
