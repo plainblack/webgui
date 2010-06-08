@@ -282,6 +282,7 @@ sub clearCaches {
 	$session->stow->delete("groupObj");
 	$session->stow->delete("isInGroup");
 	$session->stow->delete("gotGroupsInGroup");
+    $session->stow->delete("gotGroupsForUser");
 }
 
 #-------------------------------------------------------------------
