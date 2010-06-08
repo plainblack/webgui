@@ -41,6 +41,8 @@ my $addExceptions = getAddExceptions($session);
 my $tests = 78 + 2*scalar(@{$addExceptions});
 plan tests => $tests;
 
+WebGUI::Test->addToCleanup(SQL => 'delete from tax_generic_rates');
+
 #----------------------------------------------------------------------------
 # put your tests here
 
@@ -680,12 +682,4 @@ sub getAddExceptions {
         },
     ];
 }
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-$session->db->write('delete from tax_generic_rates');
-$storage->delete;
-
-
-}
+#vim:ft=perl

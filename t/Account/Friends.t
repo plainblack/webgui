@@ -69,9 +69,5 @@ is( $account->getUrl( 'op=account' ), $session->url->page( 'op=account' ),
     'getUrl doesnt add op=account if already exists'
 );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
 
-}
 #vim:ft=perl

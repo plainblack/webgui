@@ -33,8 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 22;
-plan tests => 1 + $tests;
+plan tests => 22;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -42,13 +41,8 @@ plan tests => 1 + $tests;
 my $loaded = use_ok('WebGUI::Shop::Ship');
 
 my $storage;
-my $driver;
 my $driver2;
 my $ship;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::Ship', $tests unless $loaded;
 
 #######################################################################
 #
@@ -152,7 +146,8 @@ cmp_deeply(
     'addShipper croaks without options to build a object with',
 );
 
-$driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}, groupToUse=>7});
+my $driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}, groupToUse=>7});
+WebGUI::Test->addToCleanup($driver);
 isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured FlatRate driver');
 
 #######################################################################
@@ -162,7 +157,8 @@ isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured F
 #######################################################################
 
 my $shippers;
-$driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>0, label=>q{Tommy's cut-rate shipping}, groupToUse=>7});
+my $driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>0, label=>q{Tommy's cut-rate shipping}, groupToUse=>7});
+WebGUI::Test->addToCleanup($driver2);
 
 $shippers = $ship->getShippers();
 
@@ -217,13 +213,4 @@ cmp_deeply(
 );
 
 $cart->delete;
-
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $driver->delete;
-    $driver2->delete;
-    is(scalar @{$ship->getShippers()}, 1, 'getShippers: deleted all test shippers');
-}
+#vim:ft=perl
