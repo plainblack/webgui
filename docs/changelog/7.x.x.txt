@@ -11,6 +11,7 @@
  - fixed #11595: Orphaned data in inbox_messageState
  - fixed #11606: Syndicated Content feed returns a relative link
  - fixed #11614: Forums: Sort Fields
+ - fixed #11616: No access to /root
 
 7.8.20
  - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
