@@ -895,9 +895,10 @@ Example call:
         'WebGUI::Shop::Vendor'       => 'delete',
         'WebGUI::Inbox::Message'     => 'purge',
         'WebGUI::AdSpace'            => 'delete',
+        'WebGUI::FilePump::Bundle'   => 'delete',
         'WebGUI::Shop::Cart'         => sub {
             my $cart        = shift;
-            my $addressBook = $cart->getAddressBook();
+            my $addressBook = eval { $cart->getAddressBook(); };
             $addressBook->delete if $addressBook;  ##Should we call cleanupGuard instead???
             $cart->delete;
         },

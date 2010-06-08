@@ -22,6 +22,7 @@ use Test::More; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 
 my ($versionTag, $template) = addTemplate();
+WebGUI::Test->addToCleanup($versionTag);
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
@@ -126,9 +127,4 @@ sub simpleTextParser {
 
 	return ($url, $label);
 }
-
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
-}
+#vim:ft=perl

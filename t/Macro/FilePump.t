@@ -113,11 +113,5 @@ is(
     '... check illegal file type access returns empty string'
 );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
 
-$bundle->delete;
-
-}
 #vim:ft=perl

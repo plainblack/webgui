@@ -31,36 +31,29 @@ my $macro = 'WebGUI::Macro::CartItemCount';
 my $loaded = use_ok($macro);
 
 my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart);
 my $donation = WebGUI::Asset->getRoot($session)->addChild({
     className => 'WebGUI::Asset::Sku::Donation',
     title     => 'Charitable donation',
     defaultPrice => 10.00,
 });
+WebGUI::Test->addToCleanup($donation);
 
-SKIP: {
+my $output;
 
-skip "Unable to load $macro", $numTests-1 unless $loaded;
+$output = WebGUI::Macro::CartItemCount::process($session);
+is ($output, '0', 'Empty cart returns 0 items');
 
-    my $output;
+my $item1 = $cart->addItem($donation);
+$output = WebGUI::Macro::CartItemCount::process($session);
+is ($output, '1', 'Cart contains 1 item');
 
-    $output = WebGUI::Macro::CartItemCount::process($session);
-    is ($output, '0', 'Empty cart returns 0 items');
+my $item2 = $cart->addItem($donation);
+$output = WebGUI::Macro::CartItemCount::process($session);
+is ($output, '2', 'Cart contains 2 items, 1 each');
 
-    my $item1 = $cart->addItem($donation);
-    $output = WebGUI::Macro::CartItemCount::process($session);
-    is ($output, '1', 'Cart contains 1 item');
+$item2->setQuantity(10);
+$output = WebGUI::Macro::CartItemCount::process($session);
+is ($output, '11', 'Cart contains 11 items, 1 and 10');
 
-    my $item2 = $cart->addItem($donation);
-    $output = WebGUI::Macro::CartItemCount::process($session);
-    is ($output, '2', 'Cart contains 2 items, 1 each');
-
-    $item2->setQuantity(10);
-    $output = WebGUI::Macro::CartItemCount::process($session);
-    is ($output, '11', 'Cart contains 11 items, 1 and 10');
-
-}
-
-END {
-    $cart->delete;
-    $donation->purge;
-}
+#vim:ft=perl

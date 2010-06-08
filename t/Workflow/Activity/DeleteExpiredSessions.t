@@ -30,6 +30,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
+WebGUI::Test->addToCleanup($workflow);
 my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::DeleteExpiredSessions');
 
 my $instance1 = WebGUI::Workflow::Instance->create($session,
@@ -113,6 +114,4 @@ foreach my $testSession (@sessions) {
 ## Make sure that one scratch session was deleted and the other kept.
 ## Close and end all four sessions
 
-END {
-    $workflow->delete;
-}
+#vim:ft=perl

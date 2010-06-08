@@ -143,9 +143,4 @@ $post2mock->set_always('getId', $post2_id);
     WebGUI::Test->unmockAssetId($post_id);
 }
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
 #vim:ft=perl
