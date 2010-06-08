@@ -93,7 +93,7 @@ my @ldapTests = (
 );
 
 
-plan tests => (164 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (168 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -778,11 +778,15 @@ $gY->addUsers([$cacheDude->userId]);
 
 ok( $cacheDude->isInGroup($gY->getId), "Cache dude added to group Y");
 ok( $cacheDude->isInGroup($gZ->getId), "Cache dude is a member of group Z by group membership");
+ok((grep $_ eq $gY->getId, @{ $cacheDude->getGroupIdsRecursive } ), 'Cache dude in Y by getGroupIdsRecursive');
 
-$gY->deleteUsers([$cacheDude->userId]);
+ok(eval { $gY->deleteUsers([$cacheDude->userId]); 1; }, "Y deleteUsers on Cache dude");
 
-ok( !$cacheDude->isInGroup($gY->getId), "Cache dude removed from group Y");
-ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude removed from group Z too");
+ok((! grep $_ eq $gY->getId, @{ $cacheDude->getGroupIdsRecursive } ), 'Cache dude not in Y getGroupIdsRecursive');
+ok((! grep $_ eq $cacheDude->userId, @{ $gY->getAllUsers() } ), 'Cache dude not in Y getAllUsers');
+
+ok( !$cacheDude->isInGroup($gY->getId), "Cache dude removed from group Y by isInGroup");
+ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude removed from group Z too by isInGroup");
 
 my $gCache = WebGUI::Group->new($session, "new");
 WebGUI::Test->groupsToDelete($gCache);
