@@ -24,7 +24,7 @@ use WebGUI::User;
 
 use Test::More;
 
-plan tests => 13;
+plan tests => 14;
 
 use Data::Dumper;
 
