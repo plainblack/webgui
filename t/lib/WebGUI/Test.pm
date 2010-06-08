@@ -110,6 +110,8 @@ sub import {
             Workflows           => 'Workflow',
             Carts               => 'cart',
             Transactions        => 'transaction',
+            AdSpaces            => 'adSpace',
+            Ads                 => 'advertisement',
             'Transaction Items' => 'transactionItem',
             'Address Books'     => 'addressBook',
             'Ship Drivers'      => 'shipper',
@@ -785,6 +787,7 @@ object goes out of scope, it will automatically clean up all of the
 passed in objects.  Objects will be destroyed in the order they
 were passed in.  Currently able to destroy:
 
+    WebGUI::AdSpace
     WebGUI::Asset
     WebGUI::Group
     WebGUI::Session
@@ -891,6 +894,7 @@ Example call:
         'WebGUI::Shop::PayDriver'    => 'delete',
         'WebGUI::Shop::Vendor'       => 'delete',
         'WebGUI::Inbox::Message'     => 'purge',
+        'WebGUI::AdSpace'            => 'delete',
         'WebGUI::Shop::Cart'         => sub {
             my $cart        = shift;
             my $addressBook = $cart->getAddressBook();

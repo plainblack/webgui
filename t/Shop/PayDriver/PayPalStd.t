@@ -41,12 +41,6 @@ my $e;
 
 my $loaded = use_ok('WebGUI::Shop::PayDriver::PayPal::PayPalStd');
 
-my $storage;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::PayDriver::PayPal::PayPalStd', $tests unless $loaded;
-
 #######################################################################
 #
 # getName
@@ -77,9 +71,4 @@ $driver->delete;
 
 undef $driver;
 
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-}
+#vim:ft=perl
