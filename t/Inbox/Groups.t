@@ -81,16 +81,22 @@ is($message_cnt,  1, '... 1 messages according to getMessagesForUser');
 
 is($inbox->getUnreadMessageCount($userFred->userId), 1, '... 1 messages according to getUnreadMessageCount');
 
-$group->deleteUsers([ $userFred->userId ]);
+ok(eval { $group->deleteUsers([ $userFred->userId ]); 1; }, "Delete user from group");
 
-ok((! grep $_ eq $userFred->userId, @{ $group->getAllUsers() } ), 'User removed from group');
-ok((! grep $_ eq $group->getId, @{ $userFred->getGroupIdsRecursive } ), 'User removed from group');
+ok((! grep $_ eq $userFred->userId, @{ $group->getAllUsers() } ), '... removed from group according to getAllUsers');
+ok((! grep $_ eq $group->getId, @{ $userFred->getGroupIdsRecursive } ), '... removed from group according to getGroupIdsRecursive');
 
-note "group->getAllUsers: " .  Dumper $group->getAllUsers();
-note "getGroupIdsRecursive: " . Dumper $userFred->getGroupIdsRecursive;
-note "user->getGroups: " . Dumper $userFred->getGroups;
+# note "group->getAllUsers: " .  Dumper $group->getAllUsers();
+# note "getGroupIdsRecursive: " . Dumper $userFred->getGroupIdsRecursive;
+# note "user->getGroups: " . Dumper $userFred->getGroups;
 
-eval{    $userFred->session->stow->delete("gotGroupsForUser"); }; # blow the cache
+# eval {    $userFred->session->stow->delete("gotGroupsForUser"); }; # blow the cache
+
+# note "after blowing the cache:";
+
+# note "group->getAllUsers: " .  Dumper $group->getAllUsers();
+# note "getGroupIdsRecursive: " . Dumper $userFred->getGroupIdsRecursive;
+# note "user->getGroups: " . Dumper $userFred->getGroups;
 
 $messageList = $inbox->getMessagesForUser($userFred);
 $message_cnt = scalar(@{$messageList});
@@ -107,5 +113,4 @@ is(scalar(@{ $inbox->getMessagesForUser($userFred) }),  0, 'Message deleted:  Us
 
 #----------------------------------------------------------------------------
 
-done_testing();
 
