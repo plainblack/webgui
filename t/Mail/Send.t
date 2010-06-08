@@ -44,6 +44,8 @@ if ( $@ ) { diag( "Can't prepare mail server: $@" ) }
 
 plan tests => 17;        # Increment this number for each test you create
 
+WebGUI::Test->addToCleanup(SQL => 'delete from mailQueue');
+
 #----------------------------------------------------------------------------
 # Test create
 $mail   = WebGUI::Mail::Send->create( $session );
@@ -353,9 +355,3 @@ cmp_bag(
 );
 
 # TODO: Test the emailToLog config setting
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $session->db->write('delete from mailQueue');
-}
-

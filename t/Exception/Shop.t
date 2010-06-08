@@ -45,9 +45,4 @@ $e = Exception::Class->caught;
 isa_ok($e, 'WebGUI::Error');
 isa_ok($e, 'WebGUI::Error::Shop::RemoteShippingRate');
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
 #vim:ft=perl

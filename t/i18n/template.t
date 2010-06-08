@@ -31,6 +31,7 @@ my $session = WebGUI::Test->session;
 my $lib = WebGUI::Test->lib;
 
 ## Remove all macros but International, and set them to call WebGUI::Macro::Callback
+WebGUI::Test->originalConfig('macros');
 my $originalMacros = $session->config->get('macros');
 my $configFileMacros = {};
 for my $macro (keys %$originalMacros) {
@@ -84,9 +85,4 @@ foreach my $label ( @questionableTemplates ) {
 	fail(
         sprintf "Empty template:  %s, id: %s, url: %s", @{ $label }{qw/title id url/}
     );
-}
-
-END {
-    defined $session &&
-    $session->config->set('macros', $originalMacros);
 }
