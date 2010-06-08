@@ -85,7 +85,7 @@ if ($cookieName eq "") {
 }
 
 $config->set('privateArray', ['a', 'b', 'c']);
-WebGUI::Test->addToCleanup(sub { $config->delete('privateArray')});
+WebGUI::Test->addToCleanup(CODE => sub { $config->delete('privateArray')});
 cmp_bag($config->get('privateArray'), ['a', 'b', 'c'], 'set: array, not scalar');
 
 #vim:ft=perl
