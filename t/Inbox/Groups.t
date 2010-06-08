@@ -24,9 +24,9 @@ use WebGUI::User;
 
 use Test::More;
 
-use Data::Dumper;
+plan tests => 13;
 
-$| = 1;
+use Data::Dumper;
 
 #----------------------------------------------------------------------------
 
@@ -86,9 +86,9 @@ $group->deleteUsers([ $userFred->userId ]);
 ok((! grep $_ eq $userFred->userId, @{ $group->getAllUsers() } ), 'User removed from group');
 ok((! grep $_ eq $group->getId, @{ $userFred->getGroupIdsRecursive } ), 'User removed from group');
 
-warn "group->getAllUsers: " .  Dumper $group->getAllUsers();
-warn "getGroupIdsRecursive: " . Dumper $userFred->getGroupIdsRecursive;
-warn "user->getGroups: " . Dumper $userFred->getGroups;
+note "group->getAllUsers: " .  Dumper $group->getAllUsers();
+note "getGroupIdsRecursive: " . Dumper $userFred->getGroupIdsRecursive;
+note "user->getGroups: " . Dumper $userFred->getGroups;
 
 eval{    $userFred->session->stow->delete("gotGroupsForUser"); }; # blow the cache
 
