@@ -165,9 +165,10 @@ The session doing the full export.  Can be used to report status messages.
 
 =cut
 
-sub exportAssetCollateral {
+around exportAssetCollateral => sub {
     # Lots of copy/paste here from AssetExportHtml.pm, since none of the methods there were
     #   directly useful without ginormous refactoring.
+    my $orig = shift;
     my $self = shift;
     my $basepath = shift;
     my $args = shift;
@@ -209,7 +210,7 @@ sub exportAssetCollateral {
             $reportSession->output->print(
                 '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $message . '<br />');
         }
-        my $exportSession = WebGUI::Session->duplicate;
+        my $exportSession = $self->session->duplicate;
 
         # open another session as the user doing the exporting...
         my $selfdupe = WebGUI::Asset->newById( $exportSession, $self->getId );
@@ -242,8 +243,8 @@ sub exportAssetCollateral {
             $reportSession->output->print($reporti18n->get('done'));
         }
     }
-    return $self->next::method($basepath, $args, $reportSession);
-}
+    return $self->$orig($basepath, $args, $reportSession);
+};
 
 #-------------------------------------------------------------------
 

@@ -17,6 +17,7 @@ package WebGUI::Types;
 
 use Moose;
 use Moose::Util::TypeConstraints;
+use JSON ();
 
 =head1 NAME
 
