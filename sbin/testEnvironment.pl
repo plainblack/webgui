@@ -142,6 +142,7 @@ checkModule("Test::Harness",                "3.17"       );
 checkModule("DateTime::Event::ICal",        "0.10"       );
 checkModule("Cache::FastMmap",              "1.35"       );
 checkModule("CHI",                          "0.34"       );
+checkModule('IO::Socket::SSL',                           );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
