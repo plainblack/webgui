@@ -669,11 +669,7 @@ is($archive->getKeywordStaticURL('bar'), '/home/mystories/keyword_bar.html', '..
 $archive->update({ url => '/home/mystories' });
 }
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $creationDateSth->finish;
-}
+$creationDateSth->finish;
 
 sub simpleHrefParser {
 	my ($text) = @_;

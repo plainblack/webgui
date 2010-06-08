@@ -92,6 +92,7 @@ EOCD
 15@500000
 EOID
 });
+WebGUI::Test->addToCleanup($sku);
 
 $sku->applyOptions({
       adtitle => 'Sold!',
@@ -106,11 +107,4 @@ is($sku->getPrice, '19.00', 'get Price');
 # $sku->onCompletePurchase($item);  --> not really sure how to test the rest...
 # $sku->onRefund
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $sku->purge;
-}
-
-1;
-
+#vim:ft=perl

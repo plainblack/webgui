@@ -40,6 +40,7 @@ my $sku = $root->addChild({
         title=>"Test Sku",
         });
 isa_ok($sku, "WebGUI::Asset::Sku");
+WebGUI::Test->addToCleanup($sku);
 
 $sku->addToCart;
 
@@ -82,13 +83,5 @@ $item->cart->delete;
 
 my $loadSku = WebGUI::Asset::Sku->newBySku($session, $sku->get("sku"));
 is($loadSku->getId, $sku->getId, "newBySku() works.");
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-$sku->purge;
-
-}
 
 1;

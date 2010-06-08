@@ -61,6 +61,7 @@ my @threads = (
 
 $_->setSkipNotification for @threads; 
 $versionTags[-1]->commit;
+WebGUI::Test->addToCleanup($versionTags[-1]);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -133,6 +134,7 @@ $collab->update({
     sortOrder   => 'desc',
 });
 push @versionTags, WebGUI::VersionTag->getWorking( $session );
+WebGUI::Test->addToCleanup($versionTags[-1]);
 push @threads, $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "Abababa",
@@ -145,12 +147,6 @@ testGetAdjacentThread( "sort by default from asset with version tag", $sort, [ q
 # clear scratch to reset sort
 $session->scratch->delete($collab->getId.'_sortBy');
 $session->scratch->delete($collab->getId.'_sortDir');
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $_->rollback for @versionTags;
-}
 
 #----------------------------------------------------------------------------
 # testGetAdjacentThread ( label, sort, order, @threads )

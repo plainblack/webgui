@@ -30,6 +30,7 @@ my $file
         className           => "WebGUI::Asset::File",
     });
 $versionTag->commit;
+WebGUI::Test->addToCleanup($versionTag);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -53,11 +54,4 @@ is_deeply(
     $storage->getFiles, ['WebGUI.pm'],
     "Storage location contains only the file we added",
 );
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
-
+#vim:ft=perl

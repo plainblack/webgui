@@ -442,6 +442,4 @@ cmp_bag(
 );
 
 }
-
-END {
-}
+#vim:ft=perl
