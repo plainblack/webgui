@@ -120,9 +120,4 @@ like( $html, qr{<table[^>]*id="test-container-table"}, "getTableHtml table has I
 my $html    = $dt->toHtml;
 ok( $dt->get( "showEdit" ), "showEdit gets set by toHtml" );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
 #vim:ft=perl

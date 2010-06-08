@@ -67,9 +67,3 @@ like(
 ok( $adSpace->get('name') eq 'oldname', 'AdSpace does not get saved.' );
 
 $adSpace->delete;
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}

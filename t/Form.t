@@ -25,12 +25,6 @@ use WebGUI::Test;
 my $session         = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
-
-#----------------------------------------------------------------------------
 # Tests
 
 plan tests => 5;        # Increment this number for each test you create

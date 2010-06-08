@@ -454,10 +454,4 @@ cmp_deeply(
 );
 ok( !WebGUI::User->validUserId( $session, $userRed->getId ), "UserId no longer exists" );
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
 #vim:ft=perl
