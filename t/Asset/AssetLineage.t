@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 93; # increment this value for each test you create
+use Test::More tests => 96; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -445,6 +445,22 @@ cmp_bag(
     'getLineage: descendants of topFolder',
 );
 
+$ids = $root->getLineage(['ancestors']);
+cmp_deeply(
+    $ids,
+    [],
+    '... getting ancestors of root returns empty array'
+);
+
+####################################################
+#
+# getLineageSql
+#
+####################################################
+
+note "getLineageSql";
+ok $root->getLineageSql(['ancestors']), 'valid SQL returned in an error condition';
+
 ####################################################
 #
 # getLineageIterator
@@ -495,6 +511,13 @@ cmp_bag(
     [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
     $ids,
     'getLineageIterator: descendants of topFolder',
+);
+
+my $empty = getListFromIterator($root->getLineageIterator(['ancestors']));
+cmp_bag(
+    $empty,
+    [],
+    '... getting ancestors of root returns empty array'
 );
 
 ####################################################

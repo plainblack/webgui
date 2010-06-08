@@ -461,10 +461,6 @@ sub getLineage {
 	
     my $sql = $self->getLineageSql($relatives,$rules);
 
-    unless ($sql) {
-        return [];
-    }
-
 	my @lineage;
 	my %relativeCache;
 	my $sth = $self->session->db->read($sql);
@@ -732,7 +728,8 @@ sub getLineageSql {
 	}
 	## finish up our where clause
 	if (!scalar(@whereModifiers)) {
-        return "";
+        #Return valid SQL that will never select an asset.
+        return q|select * from asset where assetId="###---###"|;
     }
 	$where .= ' and ('.join(" or ",@whereModifiers).')';
 	if (exists $rules->{whereClause} && $rules->{whereClause}) {
