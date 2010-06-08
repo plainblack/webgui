@@ -24,7 +24,7 @@ use WebGUI::User;
 
 use Test::More;
 
-plan tests => 14;
+plan tests => 13;
 
 use Data::Dumper;
 
@@ -91,8 +91,6 @@ ok((! grep $_ eq $group->getId, @{ $userFred->getGroupIdsRecursive } ), '... rem
 # note "user->getGroups: " . Dumper $userFred->getGroups;
 
 # eval {    $userFred->session->stow->delete("gotGroupsForUser"); }; # blow the cache
-
-# note "after blowing the cache:";
 
 # note "group->getAllUsers: " .  Dumper $group->getAllUsers();
 # note "getGroupIdsRecursive: " . Dumper $userFred->getGroupIdsRecursive;
