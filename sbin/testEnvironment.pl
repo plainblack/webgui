@@ -137,6 +137,7 @@ checkModule("JavaScript::Minifier::XS",     "0.05"       );
 checkModule("Readonly",                     "1.03"       );
 checkModule("Business::PayPal::API",        "0.62"       );
 checkModule("Locales",                      "0.10"       );
+checkModule('IO::Socket::SSL',                           );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
