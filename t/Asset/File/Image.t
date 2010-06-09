@@ -22,6 +22,7 @@ BEGIN {
 }
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::Image;
 use WebGUI::Storage;
@@ -53,6 +54,7 @@ cmp_bag($storage->getFiles, ['blue.png'], 'Only 1 file in storage with correct n
 
 $session->user({userId=>3});
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"Image Asset test"});
 my $properties = {
 	#            '1234567890123456789012'
@@ -98,11 +100,12 @@ isnt($sth->hashRef, undef, 'Annotations column is defined');
 
 #------------------------------------------------------------------------------
 # Template variables
+{
+
 my $templateId = 'FILE_IMAGE_TEMPLATE___';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 $templateMock->set_true('prepare');
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; return ''; } );
@@ -112,17 +115,13 @@ $asset->update({
     templateId => $templateId,
 });
 
-{
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $asset->prepareView();
     $asset->view();
     like($templateVars->{parameters}, qr{ id="[^"]{22}"}, 'id in parameters is quoted');
     like($templateVars->{parameters}, qr{alt="alternate"}, 'original parameters included');
-    WebGUI::Test->unmockAssetId($templateId);
 }
 
 $versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
 
 done_testing();
 

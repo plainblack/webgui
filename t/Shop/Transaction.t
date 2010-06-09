@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::Shop::Transaction;
 use WebGUI::Inbox;
@@ -258,16 +259,14 @@ $sendmock->fake_module('WebGUI::Mail::Send',
                  #1234567890123456789012#
 my $templateId = 'SHOP_NOTIFICATION_____';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my @templateVars;
 $templateMock->mock('process', sub { push @templateVars, clone $_[1]; } );
 
 $session->setting->set('shopReceiptEmailTemplateId', $templateId);
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $trans->sendNotifications;
     is(@templateVars, 2, '... called template->process twice');
     my $inbox = WebGUI::Inbox->new($session);
@@ -279,7 +278,6 @@ $session->setting->set('shopReceiptEmailTemplateId', $templateId);
     like($adminMessages->[0]->get('subject'), qr/^A sale has been made/, '... subject for admin email okay');
     like($templateVars[0]->{viewDetailUrl}, qr/shop=transaction;method=viewMy;/, '... viewDetailUrl okay for user');
     like($templateVars[1]->{viewDetailUrl}, qr/shop=transaction;method=view;/  , '... viewDetailUrl okay for admin');
-    WebGUI::Test->unmockAssetId($templateId);
 }
 
 #######################################################################

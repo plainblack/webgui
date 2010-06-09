@@ -14,7 +14,9 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
+use WebGUI::Exception;
 use Test::MockObject;
 use Test::MockObject::Extends;
 
@@ -102,7 +104,7 @@ $post2mock->set_always('getId', $post2_id);
 
 {
     # simulate asset not found
-    WebGUI::Test->mockAssetId($post2_id, undef);
+    WebGUI::Test::MockAsset->mock_id($post2_id, sub { WebGUI::Error::ObjectNotFound->throw });
     $getmock->set_series('getNextMessage', {
         from => 'admin@localhost',
         parts => ['parts'],
@@ -112,11 +114,11 @@ $post2mock->set_always('getId', $post2_id);
     });
     $activity->execute($csmock);
     is $parentAsset->getId, $cs_id, 'add as new thread to current cs if reply to nonexistant post';
-    WebGUI::Test->unmockAssetId($post2_id);
+    WebGUI::Test::MockAsset->unmock_id($post2_id);
 }
 
 {
-    WebGUI::Test->mockAssetId($post2_id, $post2mock);
+    WebGUI::Test::MockAsset->mock_id($post2_id, $post2mock);
     $getmock->set_series('getNextMessage', {
         from => 'admin@localhost',
         parts => ['parts'],
@@ -126,11 +128,11 @@ $post2mock->set_always('getId', $post2_id);
     });
     $activity->execute($csmock);
     is $parentAsset->getId, $cs_id, 'add as new thread to current cs if reply to post in another CS';
-    WebGUI::Test->unmockAssetId($post2_id);
+    WebGUI::Test::MockAsset->unmock_id($post2_id);
 }
 
 {
-    WebGUI::Test->mockAssetId($post_id, $postmock);
+    WebGUI::Test::MockAsset->mock_id($post_id, $postmock);
     $getmock->set_series('getNextMessage', {
         from => 'admin@localhost',
         parts => ['parts'],
@@ -140,7 +142,7 @@ $post2mock->set_always('getId', $post2_id);
     });
     $activity->execute($csmock);
     is $parentAsset->getId, $post_id, 'add as reply to post if reply to post in current CS';
-    WebGUI::Test->unmockAssetId($post_id);
+    WebGUI::Test::MockAsset->unmock_id($post_id);
 }
 
 #vim:ft=perl

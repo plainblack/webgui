@@ -19,6 +19,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use Test::MockObject;
 use Test::MockObject::Extends;
+use WebGUI::Test::MockAsset;
 
 #----------------------------------------------------------------------------
 # Init
@@ -46,9 +47,8 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
                  #1234567890123456789012#
 my $templateId = 'NEWSLETTER_TEMPLATE___';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
@@ -97,7 +97,6 @@ $activity->set_always('getTTL', 60);
 $activity->set_always('COMPLETE', 'complete');
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $activity->execute();
     cmp_deeply(
         $templateVars,
@@ -116,7 +115,6 @@ $activity->set_always('COMPLETE', 'complete');
             ],
         }
     );
-    WebGUI::Test->unmockAssetId($templateId);
 }
 
 foreach my $metadataId (keys %{ $cs->getMetaDataFields }) {

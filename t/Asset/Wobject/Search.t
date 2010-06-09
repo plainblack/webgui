@@ -15,6 +15,7 @@ use lib "$FindBin::Bin/../../lib";
 ##The goal of this test is to test the creation of Search Wobjects.
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use Test::More tests => 11; # increment this value for each test you create
 use Test::Deep;
@@ -49,9 +50,8 @@ foreach my $newSetting (keys %{$newSearchSettings}) {
                  #1234567890123456789012#
 my $templateId = '_FAUX_SEARCH_TEMPLATE_';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 $templateMock->set_true('prepare');
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
@@ -68,7 +68,6 @@ $search->update({
         doit     => 1,
         keywords => 'building + applications',
     });
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $search->prepareView;
     eval { $search->view; };
     ok(! $@, 'view did now error out on standalone regexp wildcard')
@@ -85,7 +84,6 @@ $search->update({
     eval { $search->view; };
     ok(! $@, 'view did now error out on prefix regexp wildcard')
         or diag $@;
-    WebGUI::Test->unmockAssetId($templateId);
     $session->request->setup_body({});
 
 }
@@ -115,7 +113,6 @@ $search->update({
         doit     => 1,
         keywords => 'shale',
     });
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $search->prepareView;
     $search->view;
     $search->update({useContainers => 0});
@@ -124,7 +121,6 @@ $search->update({
     $search->view;
     like $templateVars->{result_set}->[0]->{url}, qr{\?pn=\d}, 'search returns paginated URL for a Thread when useContainers=1';
 
-    WebGUI::Test->unmockAssetId($templateId);
     $session->request->setup_body({});
     $search->update({useContainers => 0});
 }

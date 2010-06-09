@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Group;
@@ -181,14 +182,12 @@ my $printRemainingTicketsTemplateId = $ems->get('printRemainingTicketsTemplateId
 is($printRemainingTicketsTemplateId, "hreA_bgxiTX-EzWCSZCZJw", 'Default print remaining tickets template id ok');
 
 #Make sure printRemainingTickets template returns the right data
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $printRemainingTicketsTemplateId);
-my $templateVars;
-$templateMock->mock('process', sub { $templateVars = $_[1]; } );
-
 {
-    WebGUI::Test->mockAssetId($printRemainingTicketsTemplateId, $templateMock);
+    my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+    $templateMock->mock_id($printRemainingTicketsTemplateId);
+    my $templateVars;
+    $templateMock->mock('process', sub { $templateVars = $_[1]; } );
+
     $ems->www_printRemainingTickets();
 
     my $ticket1 = {
@@ -351,8 +350,6 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
          },
         "www_printRemainingTickets: template variables valid"
     );
-
-    WebGUI::Test->unmockAssetId($printRemainingTicketsTemplateId);
 }
 
 #Make sure permissions work on pages

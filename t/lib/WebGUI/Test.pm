@@ -38,7 +38,6 @@ use List::MoreUtils qw(any);
 use File::Copy ();
 use File::Temp ();
 use Try::Tiny;
-#use Plack::Test;
 use WebGUI::PseudoRequest;
 use Scope::Guard;
 use Try::Tiny;
@@ -159,124 +158,6 @@ sub newSession {
         $CLASS->addToCleanup($session);
     }
     return $session;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 mockAssetId ( $assetId, $object )
-
-Causes WebGUI::Asset->new* initializers to return the specified
-object instead of retreiving it from the database for the given
-asset ID.
-
-=cut
-
-my %mockedAssetIds;
-sub mockAssetId {
-    my ($class, $assetId, $object) = @_;
-    _mockAssetInits();
-    $mockedAssetIds{$assetId} = $object;
-}
-
-=head2 unmockAssetId ( $assetId )
-
-Removes a given asset ID from being mocked.
-
-=cut
-
-sub unmockAssetId {
-    my ($class, $assetId) = @_;
-    delete $mockedAssetIds{$assetId};
-}
-
-=head2 mockAssetUrl ( $url, $object )
-
-Causes WebGUI::Asset->newByUrl to return the specified object instead
-of retreiving it from the database for the given URL.
-
-=cut
-
-my %mockedAssetUrls;
-sub mockAssetUrl {
-    my ($class, $url, $object) = @_;
-    _mockAssetInits();
-    $mockedAssetUrls{$url} = $object;
-}
-
-=head2 unmockAssetUrl ( $url )
-
-Removes a given asset URL from being mocked.
-
-=cut
-
-sub unmockAssetUrl {
-    my ($class, $url) = @_;
-    delete $mockedAssetUrls{$url};
-}
-
-=head2 unmockAllAssets ( )
-
-Removes all asset IDs and URLs from being mocked.
-
-=cut
-
-sub unmockAllAssets {
-    my ($class) = @_;
-    keys %mockedAssetIds = ();
-    keys %mockedAssetUrls = ();
-    return;
-}
-
-
-my $mockedNew;
-sub _mockAssetInits {
-    no warnings 'redefine';
-
-    return
-        if $mockedNew;
-    require WebGUI::Asset;
-    my $original_new = \&WebGUI::Asset::new;
-#    *WebGUI::Asset::new = sub {
-#        my ($class, $session, $assetId, $className, $revisionDate) = @_;
-#        if ($mockedAssetIds{$assetId}) {
-#            return $mockedAssetIds{$assetId};
-#        }
-#        goto $original_new;
-#    };
-    my $original_newById = \&WebGUI::Asset::newById;
-    *WebGUI::Asset::newById = sub {
-        my ($class, $session, $assetId, $revisionDate) = @_;
-        if ($mockedAssetIds{$assetId}) {
-            return $mockedAssetIds{$assetId};
-        }
-        goto $original_newById;
-    };
-    my $original_newPending = \&WebGUI::Asset::newPending;
-    *WebGUI::Asset::newPending = sub {
-        my ($class, $session, $assetId, $revisionDate) = @_;
-        if ($assetId && $mockedAssetIds{$assetId}) {
-            return $mockedAssetIds{$assetId};
-        }
-        goto $original_newPending;
-    };
-    my $original_newByPropertyHashRef = \&WebGUI::Asset::newByPropertyHashRef;
-    *WebGUI::Asset::newByPropertyHashRef = sub {
-        my ($class, $session, $url, $revisionDate) = @_;
-        if ($url && $mockedAssetUrls{$url}) {
-            return $mockedAssetUrls{$url};
-        }
-        goto $original_newByPropertyHashRef;
-    };
-    my $original_newByUrl = \&WebGUI::Asset::newByUrl;
-    *WebGUI::Asset::newByUrl = sub {
-        my ($class, $session, $url, $revisionDate) = @_;
-        if ($url && $mockedAssetUrls{$url}) {
-            return $mockedAssetUrls{$url};
-        }
-        goto $original_newByUrl;
-    };
-
-    $mockedNew = 1;
 }
 
 #----------------------------------------------------------------------------

@@ -17,15 +17,15 @@ use Test::MockObject::Extends;
 ##The goal of this test is to test the creation of Article Wobjects.
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use Test::More tests => 8; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
 my $templateId = 'INOUTBOARD_TEMPLATE___';
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('prepare', sub {  } );
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
@@ -57,7 +57,6 @@ my $board = $node->addChild({
     inOutTemplateId => $templateId,
 });
 
-WebGUI::Test->mockAssetId($templateId, $templateMock);
 $board->prepareView();
 
 # Test for a sane object type
@@ -151,7 +150,6 @@ cmp_bag(
     'view: returns one entry for each user, entry is correct for user with status'
 );
 
-WebGUI::Test->unmockAssetId($templateId);
 ################################################################
 #
 #  purge

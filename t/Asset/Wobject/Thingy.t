@@ -15,6 +15,7 @@ use lib "$FindBin::Bin/../../lib";
 ##The goal of this test is to test the creation of Thingy Wobjects.
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use Test::More tests => 28; # increment this value for each test you create
 use Test::Deep;
@@ -28,9 +29,8 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 
 my $templateId = 'THING_EDIT_TEMPLATE___';
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
@@ -318,7 +318,6 @@ ok( ! $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser: retur
 my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $thingy->editThingData($otherThingId);
     my %miniVars;
     @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
@@ -338,7 +337,6 @@ $thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'oth
 ok( $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser returns true with one row entered, and maxEntriesPerUser=1');
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $thingy->editThingData($otherThingId);
     my %miniVars;
     @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
