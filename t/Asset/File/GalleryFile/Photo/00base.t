@@ -24,6 +24,7 @@ use Test::More;
 my $session    = WebGUI::Test->session;
 my $node       = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 
 $versionTag->set({name=>"Photo Test"});
 
@@ -95,10 +96,4 @@ is(
     "Photo no longer able to be instanciated",
 );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback;
-}
-
-
+#vim:ft=perl

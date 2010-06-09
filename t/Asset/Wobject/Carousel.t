@@ -26,6 +26,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Search Test"});
+WebGUI::Test->addToCleanup($versionTag);
 my $carousel = $node->addChild({className=>'WebGUI::Asset::Wobject::Carousel'});
 
 # Test for a sane object type
@@ -41,9 +42,4 @@ foreach my $newSetting (keys %{$newSettings}) {
 	is ($carousel->get($newSetting), $newSettings->{$newSetting}, "updated $newSetting is ".$newSettings->{$newSetting});
 }
 
-
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-}
-
+#vim:ft=perl

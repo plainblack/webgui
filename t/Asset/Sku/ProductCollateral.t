@@ -41,6 +41,8 @@ plan tests => 34;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # put your tests here
 my $root = WebGUI::Asset->getRoot($session);
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 my $product = $root->addChild({
     className => "WebGUI::Asset::Sku::Product",
     title     => "Rock Hammer",
@@ -303,16 +305,8 @@ $newVid = $product6->setCollateral('variantsJSON', 'vid', 'new', { wideChar => q
 , vid => 'new' });
 
 my $product6a = WebGUI::Asset->newByDynamicClass($session, $product6->getId);
-lives_ok { $product6a->getAllCollateral('variantsJSON', 'vid', $newVid); }, 'Product collateral handles wide-character encodings okay';
+lives_ok { $product6a->getAllCollateral('variantsJSON', 'vid', $newVid); } 'Product collateral handles wide-character encodings okay';
 
 $product6->purge;
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-    WebGUI::VersionTag->getWorking($session)->rollback;
-
-}
-
-1;
+#vim:ft=perl

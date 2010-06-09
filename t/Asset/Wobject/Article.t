@@ -136,8 +136,3 @@ TODO: {
 	ok(0, 'Test www_deleteFile method');
 	ok(0, 'Test www_view method... maybe?');
 }
-
-END {
-	# Clean up after thy self
-}
-
