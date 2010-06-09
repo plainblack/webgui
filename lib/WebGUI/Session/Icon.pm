@@ -87,7 +87,8 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
 
 =cut
 
@@ -113,7 +114,8 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
 
 =cut
 
@@ -206,8 +208,8 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
-
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
 =cut
 
 sub edit {
@@ -232,7 +234,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -283,7 +287,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -309,7 +315,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -335,7 +343,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -361,7 +371,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =head3 disabled
 
@@ -395,7 +407,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -421,7 +435,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -447,7 +463,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -473,7 +491,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =head3 disabled
 
@@ -543,7 +563,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -569,7 +591,9 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 =head3 pageURL
 
-The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
 
 =cut
 
@@ -584,6 +608,4 @@ sub view {
 }
 
 
-
 1;
-
