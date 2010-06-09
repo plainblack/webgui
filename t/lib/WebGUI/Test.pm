@@ -112,6 +112,7 @@ sub import {
             Transactions        => 'transaction',
             AdSpaces            => 'adSpace',
             Ads                 => 'advertisement',
+            Inbox               => 'inbox',
             'Transaction Items' => 'transactionItem',
             'Address Books'     => 'addressBook',
             'Ship Drivers'      => 'shipper',
