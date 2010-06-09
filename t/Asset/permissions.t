@@ -59,15 +59,15 @@ $testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
 $testUsers{'canEdit group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canEdit group user'}->addToGroups([$testGroups{'canEdit asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Edit Group User');
-WebGUI::Test->groupsToDelete($testGroups{'canEdit asset'});
+WebGUI::Test->addToCleanup($testGroups{'canEdit asset'});
 
 ##A group and user for groupIdEdit
 $testGroups{'canAdd asset'}     = WebGUI::Group->new($session, 'new');
 $testUsers{'canAdd group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canAdd group user'}->addToGroups([$testGroups{'canAdd asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Can Add Group User');
-WebGUI::Test->groupsToDelete($testGroups{'canAdd asset'});
-WebGUI::Test->usersToDelete(values %testUsers);
+WebGUI::Test->addToCleanup($testGroups{'canAdd asset'});
+WebGUI::Test->addToCleanup(values %testUsers);
 
 my $canAddMaker = WebGUI::Test::Maker::Permission->new();
 $canAddMaker->prepare({
@@ -100,7 +100,7 @@ $properties = {
 };
 
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag2);
+WebGUI::Test->addToCleanup($versionTag2);
 
 my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
 
@@ -116,7 +116,7 @@ $canEditMaker->prepare({
 });
 
 my $versionTag3 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag3);
+WebGUI::Test->addToCleanup($versionTag3);
 $properties = {
 	#            '1234567890123456789012'
 	id          => 'canViewAsset0000000010',

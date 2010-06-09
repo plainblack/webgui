@@ -43,7 +43,7 @@ my $dform = WebGUI::Asset->getDefault($session)->addChild({
 $dform->createField('gotCaptcha', { type => 'Captcha', name => 'humanCheck', });
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->commit;
 
 #----------------------------------------------------------------------------

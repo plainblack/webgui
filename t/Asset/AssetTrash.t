@@ -26,7 +26,7 @@ my $session = WebGUI::Test->session;
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"AssetLineage Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $root = WebGUI::Asset->getRoot($session);
 my $topFolder = $root->addChild({

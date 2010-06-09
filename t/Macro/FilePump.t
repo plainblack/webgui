@@ -54,14 +54,14 @@ $fileAsset->getStorageLocation->addFileFromScalar('pumpfile.css', qq|   body {\n
 is($fileAsset->getStorageLocation->getFileContentsAsScalar($fileAsset->get('filename')), qq|   body {\npadding:   0px;}\n\n|, 'Sanity check - got back expected file contents');
 
 my $snippetTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($snippetTag);
+WebGUI::Test->addToCleanup($snippetTag);
 $snippetTag->commit;
 
 ok($bundle->addFile('JS',  'asset://filePumpSnippet'), 'Added filePumpSnippet');
 ok($bundle->addFile('CSS', 'asset://filePumpFileAsset'), 'Added filePumpAsset');
 
 my $storedFile = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($storedFile);
+WebGUI::Test->addToCleanup($storedFile);
 $storedFile->addFileFromScalar('storedJS.js', qq|function helloWorld() { alert("Hellow world");}|, );
 # Turn into file:uploads/path/to/fileAsset (bc file uris must begin with either file:uploads/ or file:extras/)
 my $path = Path::Class::File->new($storedFile->getPath($storedFile->get('filename')));

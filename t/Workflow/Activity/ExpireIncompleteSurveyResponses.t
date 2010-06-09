@@ -26,19 +26,19 @@ my $wf = WebGUI::Workflow->create($session, {
     mode => 'realtime',
 });
 isa_ok($wf, 'WebGUI::Workflow', 'Test workflow');
-WebGUI::Test->workflowsToDelete($wf);
+WebGUI::Test->addToCleanup($wf);
 
 my $activity = $wf->addActivity('WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses');
 isa_ok($activity, 'WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses', 'Test wf activity');
 $activity->set('title', 'Test Expire Incomplete Survey Responses');
 
 my $user = WebGUI::User->new($session, 'new');
-WebGUI::Test->usersToDelete($user);
+WebGUI::Test->addToCleanup($user);
 
 # Create a Survey
 my $survey = WebGUI::Asset->getImportNode($session)->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
-WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
-WebGUI::Test->assetsToPurge($survey);
+WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
+WebGUI::Test->addToCleanup($survey);
 my $sJSON = $survey->surveyJSON;
 $sJSON->newObject([0]);    # add a question to 0th section
 $sJSON->update([0,0], { questionType => 'Yes/No' });
@@ -118,7 +118,7 @@ is( scalar $session->db->buildArray($SQL), 0, 'Afterwards, back to no incomplete
 
 # Create a new revision
 $survey->addRevision({}, time+1);
-WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
+WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
 
 # Undo out handiwork again
 is($session->db->quickScalar('select count(*) from Survey_response where Survey_responseId = ?', [$responseId]), 1, 'Start off with 1 response');

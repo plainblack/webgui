@@ -269,7 +269,7 @@ SKIP: {
 #----------------------------------------------------------------------------
 
 my $inboxUser = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($inboxUser);
+WebGUI::Test->addToCleanup($inboxUser);
 $inboxUser->username('red');
 $inboxUser->profileField('receiveInboxEmailNotifications', 1);
 $inboxUser->profileField('receiveInboxSmsNotifications',   0);
@@ -278,17 +278,17 @@ $inboxUser->profileField('cellPhone', '55555');
 $session->setting->set('smsGateway', 'textme.com');
 
 my $emailUser = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($emailUser);
+WebGUI::Test->addToCleanup($emailUser);
 $emailUser->username('heywood');
 $emailUser->profileField('email', 'heywood@shawshank.gov');
 
 my $lonelyUser = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($lonelyUser);
+WebGUI::Test->addToCleanup($lonelyUser);
 $lonelyUser->profileField('receiveInboxEmailNotifications', 0);
 $lonelyUser->profileField('email',   'jake@shawshank.gov');
 
 my $inboxGroup = WebGUI::Group->new($session, 'new');
-WebGUI::Test->groupsToDelete($inboxGroup);
+WebGUI::Test->addToCleanup($inboxGroup);
 $inboxGroup->addUsers([$emailUser->userId, $inboxUser->userId, $lonelyUser->userId]);
 
 SKIP: {

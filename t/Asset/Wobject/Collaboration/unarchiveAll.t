@@ -40,7 +40,7 @@ my @threads = (
 
 my $tag = WebGUI::VersionTag->getWorking( $session );
 $tag->commit;
-WebGUI::Test->tagsToRollback($tag);
+WebGUI::Test->addToCleanup($tag);
 
 #----------------------------------------------------------------------------
 # Tests

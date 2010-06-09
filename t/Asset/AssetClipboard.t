@@ -29,7 +29,7 @@ $session->user({userId => 3});
 my $root = WebGUI::Asset->getRoot($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Clipboard test"});
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $snippet = $root->addChild({
     url => 'testSnippet',
@@ -86,7 +86,7 @@ is($duplicatedSnippet->getParent->getId, $root->getId, 'duplicated snippet is al
 
 my $newVersionTag = WebGUI::VersionTag->getWorking($session);
 $newVersionTag->commit;
-WebGUI::Test->tagsToRollback($newVersionTag);
+WebGUI::Test->addToCleanup($newVersionTag);
 
 ####################################################
 #

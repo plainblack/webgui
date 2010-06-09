@@ -30,12 +30,12 @@ my $node            = WebGUI::Asset->getImportNode( $session );
 
 my %user;
 $user{"2"}          = WebGUI::User->new( $session, "new" );
-WebGUI::Test->usersToDelete($user{'2'});
+WebGUI::Test->addToCleanup($user{'2'});
 $user{"2"}->addToGroups( ['2'] ); # Registered user
 
 my $versionTag      = WebGUI::VersionTag->getWorking( $session );
 $versionTag->set( { name => "Collaboration Test" } );
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
 

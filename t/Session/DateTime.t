@@ -100,13 +100,13 @@ is ($dt->getTimeZone(), 'America/Chicago', 'getTimeZone: time zones not in the a
 my $dude = WebGUI::User->new($session, "new");
 $dude->profileField('timeZone', 'Australia/Perth');
 $session->user({user => $dude});
-WebGUI::Test->usersToDelete($dude);
+WebGUI::Test->addToCleanup($dude);
 is ($dt->getTimeZone(), 'Australia/Perth', 'getTimeZone: valid time zones are allowed');
 
 my $bud = WebGUI::User->new($session, "new");
 $bud->profileField('timeZone', '');
 $session->user({user => $bud});
-WebGUI::Test->usersToDelete($bud);
+WebGUI::Test->addToCleanup($bud);
 is ($dt->getTimeZone(), 'America/Chicago', q|getTimeZone: if user's time zone doesn't exist, then return America/Chicago|);
 
 $session->user({userId => 1});  ##back to Visitor

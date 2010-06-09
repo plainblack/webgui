@@ -32,7 +32,7 @@ my $wiki
         groupIdView             => '7', # Everyone
     } );
 
-WebGUI::Test->tagsToRollback( WebGUI::VersionTag->getWorking( $session ) );
+WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 #----------------------------------------------------------------------------
 # Tests

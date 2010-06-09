@@ -30,7 +30,7 @@ my $spectreConf = WebGUI::Paths->spectreConfig;
 my $goodFile = 'The contents of this file are accessible';
 my $twoLines = "This file contains two lines of text\nThis is the second line";
 my $storage = WebGUI::Storage->createTemp($session);
-WebGUI::Test->storagesToDelete($storage);
+WebGUI::Test->addToCleanup($storage);
 $storage->addFileFromScalar('goodFile', $goodFile);
 $storage->addFileFromScalar('twoLines', $twoLines);
 $storage->addFileFromScalar('unreadableFile', 'The contents of this file are not readable');

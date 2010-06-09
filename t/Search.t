@@ -72,7 +72,7 @@ SKIP: {
     } );
     my $tag = WebGUI::VersionTag->getWorking( $session );
     $tag->commit;
-    WebGUI::Test->tagsToRollback($tag);
+    WebGUI::Test->addToCleanup($tag);
     WebGUI::Search::Index->create( $article );
     my $searcher = WebGUI::Search->new($session);
     my $assetIds = $searcher->search({ keywords => "Chinese", })->getAssetIds;

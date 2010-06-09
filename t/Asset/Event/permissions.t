@@ -33,7 +33,7 @@ push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
 
 my $registeredUser  = WebGUI::User->new( $session, "new" );
-WebGUI::Test->usersToDelete($registeredUser);
+WebGUI::Test->addToCleanup($registeredUser);
 
 # Make a Calendar to add events do
 my $calendar = $node->addChild({

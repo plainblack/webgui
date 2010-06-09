@@ -148,7 +148,7 @@ ok(
 sub init {
     my $versionTag      = WebGUI::VersionTag->getWorking($session);
     $versionTag->set({name=>"Shortcut Test"});
-    WebGUI::Test->tagsToRollback($versionTag);
+    WebGUI::Test->addToCleanup($versionTag);
     # Make a snippet to shortcut
     $snippet 
         = $node->addChild({

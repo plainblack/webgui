@@ -188,7 +188,7 @@ SKIP: {
 
     # Create a test user
     $user = WebGUI::User->new( $session, 'new' );
-    WebGUI::Test->usersToDelete($user);
+    WebGUI::Test->addToCleanup($user);
     
     # Create a Survey
     $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -244,7 +244,7 @@ SKIP: {
         # Create a second test user
         my $survey2 = WebGUI::Asset::Wobject::Survey->new($session, $survey->getId);
         my $user2 = WebGUI::User->new( $session, 'new' );
-        WebGUI::Test->usersToDelete($user2);
+        WebGUI::Test->addToCleanup($user2);
         $session->user({userId => $user2->userId});
         my $responseId2 = $survey2->responseId( { userId => $user2->userId } );
         my $rJSON2 = $survey2->responseJSON(undef, $responseId2);

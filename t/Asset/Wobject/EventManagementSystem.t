@@ -32,10 +32,10 @@ my $session         = WebGUI::Test->session;
 my $registrar = WebGUI::User->create($session);
 my $attender  = WebGUI::User->create($session);
 my $crasher   = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($registrar, $attender, $crasher);
+WebGUI::Test->addToCleanup($registrar, $attender, $crasher);
 my $registrars = WebGUI::Group->new($session, 'new');
 my $attendees  = WebGUI::Group->new($session, 'new');
-WebGUI::Test->groupsToDelete($registrars, $attendees);
+WebGUI::Test->addToCleanup($registrars, $attendees);
 $registrars->addUsers([$registrar->getId]);
 $attendees->addUsers([$attender->getId]);
 
@@ -71,7 +71,7 @@ my $ems = $node->addChild({
     groupIdView              => $attendees->getId
 });
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Test for a sane object type
 isa_ok($ems, 'WebGUI::Asset::Wobject::EventManagementSystem');

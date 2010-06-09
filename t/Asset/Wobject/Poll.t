@@ -77,7 +77,7 @@ my $poll = $defaultNode->addChild({
 });
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->commit;
 
 isa_ok($poll, 'WebGUI::Asset::Wobject::Poll');

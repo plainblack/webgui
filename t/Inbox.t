@@ -75,7 +75,7 @@ my @senders = ();
 push @senders, WebGUI::User->create($session);
 push @senders, WebGUI::User->create($session);
 push @senders, WebGUI::User->create($session);
-WebGUI::Test->usersToDelete(@senders);
+WebGUI::Test->addToCleanup(@senders);
 $senders[0]->username('first');
 $senders[0]->profileField('firstName', 'First Only');
 $senders[1]->username('last');

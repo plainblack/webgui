@@ -35,7 +35,7 @@ my $lastUpdate;
 #Let's try to create a new user and make sure we get an object back
 my $userCreationTime = time();
 ok(defined ($user = WebGUI::User->new($session,"new")), 'new("new") -- object reference is defined');
-WebGUI::Test->usersToDelete($user);
+WebGUI::Test->addToCleanup($user);
 
 #New does not return undef if something breaks, so we'll see if the _profile hash was set.
 ok(exists $user->{_profile}, 'new("new") -- profile subhash exists');  
@@ -410,7 +410,7 @@ $cm->ipFilter(defined $origFilter ? $origFilter : '');
 
 ##Test for group membership
 $user = WebGUI::User->new($session, "new");
-WebGUI::Test->usersToDelete($user);
+WebGUI::Test->addToCleanup($user);
 ok($user->isInGroup(7), "addToGroups: New user is in group 7(Everyone)");
 ok(!$user->isInGroup(1),  "New user not in group 1 (Visitors)");
 ok($user->isRegistered, "User is not a visitor");
@@ -465,7 +465,7 @@ ok($visitor->isInGroup(7), "Visitor added back to group Everyone");
 ################################################################
 
 my $dude = WebGUI::User->new($session, "new");
-WebGUI::Test->usersToDelete($dude);
+WebGUI::Test->addToCleanup($dude);
 
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: newly created users cannot');
 
@@ -564,7 +564,7 @@ is($useru->userId, $dude->userId, '... and it is the right user object');
 ################################################################
 
 my $buster = WebGUI::User->new($session, "new");
-WebGUI::Test->usersToDelete($buster);
+WebGUI::Test->addToCleanup($buster);
 is( $buster->profileField('timeZone'), 'America/Chicago', 'buster received original user profile on user creation');
 
 my $profileField = WebGUI::ProfileField->new($session, 'timeZone');
@@ -593,7 +593,7 @@ $copiedAliasProfile{'dataDefault'} = "'aliasAlias'"; ##Non word characters;
 $aliasProfile->set(\%copiedAliasProfile);
 
 my $buster3 = WebGUI::User->new($session, $buster->userId);
-WebGUI::Test->usersToDelete($buster);
+WebGUI::Test->addToCleanup($buster);
 is($buster3->profileField('alias'), 'aliasAlias', 'default alias set');
 
 $copiedAliasProfile{'dataDefault'} = "'....^^^^....'"; ##Non word characters;
@@ -640,7 +640,7 @@ is($session->scratch->get('hack'), undef, 'userProfile dataDefault is not execut
 ##Set up a group that has expired.
 
 my $expiredGroup = WebGUI::Group->new($session, 'new');
-WebGUI::Test->groupsToDelete($expiredGroup);
+WebGUI::Test->addToCleanup($expiredGroup);
 $expiredGroup->name('Group that expires users automatically');
 $expiredGroup->expireOffset(-1000);
 
@@ -669,7 +669,7 @@ cmp_bag($dude->getGroups(1), [2, 7], 'Accessing the cached list of groups does n
 ################################################################
 
 my $friend = WebGUI::User->new($session, 'new');
-WebGUI::Test->usersToDelete($friend);
+WebGUI::Test->addToCleanup($friend);
 is($friend->getFirstName, undef, 'with no profile settings, getFirstName returns undef');
 
 $friend->username('friend');
@@ -686,7 +686,7 @@ is($friend->getFirstName, 'Mr', 'firstName is the highest priority profile setti
 ################################################################
 
 my $neighbor = WebGUI::User->new($session, 'new');
-WebGUI::Test->usersToDelete($neighbor);
+WebGUI::Test->addToCleanup($neighbor);
 
 is($neighbor->getWholeName, undef, 'with no profile settings, getWholeName returns undef');
 $neighbor->username('neighbor');
@@ -778,7 +778,7 @@ foreach my $groupName (qw/red pink orange blue turquoise lightBlue purple/) {
     $groupSet{$groupName} = WebGUI::Group->new($session, 'new');
     $groupSet{$groupName}->name($groupName);
 }
-WebGUI::Test->groupsToDelete(values %groupSet);
+WebGUI::Test->addToCleanup(values %groupSet);
 
 $groupSet{blue}->expireOffset(-1500);
 
@@ -789,7 +789,7 @@ $groupSet{pink}->addGroups(   [ map { $groupSet{$_}->getId } qw/red/ ] );
 $groupSet{orange}->addGroups( [ map { $groupSet{$_}->getId } qw/red/ ] );
 
 my $newFish = WebGUI::User->new($session, 'new');
-WebGUI::Test->usersToDelete($newFish);
+WebGUI::Test->addToCleanup($newFish);
 $newFish->addToGroups([ $groupSet{red}->getId, $groupSet{blue}->getId ]);
 
 cmp_bag(
@@ -823,7 +823,7 @@ SKIP: {
 ok( my $newCreateUser = WebGUI::User->create( $session ),
     'create() returns something'
 );
-WebGUI::Test->usersToDelete($newCreateUser);
+WebGUI::Test->addToCleanup($newCreateUser);
 isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 
 ################################################################
@@ -986,7 +986,7 @@ $friend->deleteFromGroups([$neighbor->friends->getId]);
 
 $session->setting->set('smsGateway', '');
 my $inmate = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($inmate);
+WebGUI::Test->addToCleanup($inmate);
 $inmate->profileField('email',     '');
 $inmate->profileField('cellPhone', '');
 $inmate->profileField('receiveInboxEmailNotifications', 0);
@@ -1039,7 +1039,7 @@ is($inmate->getInboxSmsNotificationAddress, '5555555555@textme.com', '... strips
 ##Specifically, cleaning up Address books
 
 my $shopUser = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($shopUser);
+WebGUI::Test->addToCleanup($shopUser);
 $session->user({user => $shopUser});
 my $book = WebGUI::Shop::AddressBook->create($session);
 is ($book->get('userId'), $shopUser->userId, 'delete: Address book created with proper user');

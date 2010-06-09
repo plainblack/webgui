@@ -241,7 +241,7 @@ is($siteWideTag->getId(), $siteWideTagId, 'versionTagMode siteWide: reclaim site
 ## Through in a new session as different user
 my $admin_session = WebGUI::Session->open(WebGUI::Test->file);
 $admin_session->user({'userId' => 3});
-WebGUI::Test->sessionsToDelete($admin_session);
+WebGUI::Test->addToCleanup($admin_session);
 
 setUserVersionTagMode($admin_session->user(), q{singlePerUser});
 

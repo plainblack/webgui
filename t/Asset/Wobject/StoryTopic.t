@@ -189,7 +189,7 @@ is($templateVars->{topStoryCreationDate}, $now, '... topStoryCreationDate');
 ok($templateVars->{standAlone}, '... standAlone mode=1');
 
 my $storage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($storage);
+WebGUI::Test->addToCleanup($storage);
 $storyHandler->{bogs}->setPhotoData([{
     caption   => "Octopus seen at the scene of Mrs. Dufresne's murder.",
     byLine    => 'Elmo Blatch',

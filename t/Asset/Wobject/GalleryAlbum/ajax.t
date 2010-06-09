@@ -28,9 +28,9 @@ my $versionTag      = WebGUI::VersionTag->getWorking($session);
 my %user;
 $user{'1'} = WebGUI::User->new( $session, "new" );
 $user{'1'}->addToGroups( ['3'] ); # Admins
-WebGUI::Test->usersToDelete($user{'1'});
+WebGUI::Test->addToCleanup($user{'1'});
 $user{'2'} = WebGUI::User->new( $session, "new" );
-WebGUI::Test->usersToDelete($user{'2'});
+WebGUI::Test->addToCleanup($user{'2'});
 
 # Create everything as user no. 1
 $session->user({ user => $user{'1'} });

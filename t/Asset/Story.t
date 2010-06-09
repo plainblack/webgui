@@ -39,8 +39,8 @@ my $reader       = WebGUI::User->create($session);
 $postUser->username('Can Post User');
 $reader->username('Average Reader');
 $archiveOwner->username('Archive Owner');
-WebGUI::Test->groupsToDelete($canPostGroup);
-WebGUI::Test->usersToDelete($postUser, $archiveOwner, $reader);
+WebGUI::Test->addToCleanup($canPostGroup);
+WebGUI::Test->addToCleanup($postUser, $archiveOwner, $reader);
 
 my $canEditMaker = WebGUI::Test::Maker::Permission->new();
 $canEditMaker->prepare({
@@ -70,11 +70,11 @@ my $topic       = $defaultNode->addChild({
 });
 my $archiveTag  = WebGUI::VersionTag->getWorking($session);
 $archiveTag->commit;
-WebGUI::Test->tagsToRollback($archiveTag);
+WebGUI::Test->addToCleanup($archiveTag);
 
 my $storage1 = WebGUI::Storage->create($session);
 my $storage2 = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($storage1, $storage2);
+WebGUI::Test->addToCleanup($storage1, $storage2);
 
 ############################################################
 #
@@ -412,7 +412,7 @@ cmp_deeply(
 isnt($newPhotoData->[0]->{storageId}, $photoData->[0]->{storageId}, '... and storage 0 is duplicated');
 isnt($newPhotoData->[1]->{storageId}, $photoData->[1]->{storageId}, '... and storage 1 is duplicated');
 
-WebGUI::Test->storagesToDelete( map { $_->{storageId} } @{ $newPhotoData } );
+WebGUI::Test->addToCleanup( map { 'WebGUI::Storage' => $_->{storageId} } @{ $newPhotoData } );
 
 ############################################################
 #

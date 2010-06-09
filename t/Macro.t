@@ -31,7 +31,7 @@ $session->asset($defaultAsset);
 ##Create a non-admin user who will be in the Registered User group
 my $registeredUser = WebGUI::User->new($session, "new");
 $registeredUser->username('TimBob');
-WebGUI::Test->usersToDelete($registeredUser);
+WebGUI::Test->addToCleanup($registeredUser);
 $session->user({user => $registeredUser});
 
 WebGUI::Test->originalConfig('macros');

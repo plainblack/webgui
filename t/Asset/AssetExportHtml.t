@@ -293,7 +293,7 @@ is($gcAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)->
 
 # now let's get tricky and test different file extensions
 my $storage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($storage->getId);
+WebGUI::Test->addToCleanup($storage->getId);
 my $filename = 'somePerlFile_pl.txt';
 $storage->addFileFromScalar($filename, $filename);
 $session->user({userId=>3});
@@ -326,7 +326,7 @@ is($fileAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)
 
 # test a different extension, the .foobar extension
 $storage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($storage->getId);
+WebGUI::Test->addToCleanup($storage);
 $filename = 'someFoobarFile.foobar';
 $storage->addFileFromScalar($filename, $filename);
 $properties = {
