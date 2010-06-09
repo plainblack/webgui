@@ -39,6 +39,7 @@ use List::MoreUtils     qw( any );
 use Carp                qw( carp croak );
 use JSON                qw( from_json to_json );
 use Scope::Guard;
+use Try::Tiny;
 use WebGUI::Paths -inc;
 
 our $WEBGUI_TEST_ROOT = File::Spec->catdir(
@@ -141,8 +142,6 @@ sub newSession {
     my $noCleanup = shift;
     require WebGUI::Session;
     my $session = WebGUI::Session->open( $CLASS->config, newEnv() );
-    # my $pseudoRequest = WebGUI::PseudoRequest->new;
-    # $session->{_request} = $pseudoRequest;
     if ( ! $noCleanup ) {
         $CLASS->addToCleanup($session);
     }
@@ -154,9 +153,22 @@ sub newEnv {
     require HTTP::Message::PSGI;
     require HTTP::Request::Common;
     my $config = $CLASS->config;
-    my $url = 'http://' . $config->get('sitename');
+    my $url = 'http://' . $config->get('sitename')->[0];
     my $env = HTTP::Request->new( $form ? ( POST => $url, [ %$form ] ) : ( GET => $url ) )->to_psgi;
     return $env;
+}
+
+sub clientTest (&) {
+    my $client = shift;
+    local $ENV{WEBGUI_CONFIG} = $CLASS->file;
+    my $test_psgi = Plack::Util::load_psgi(
+        $CLASS->config->get('psgiFile')
+        || WebGUI::Paths->defaultPSGI,
+    );
+    Plack::Test::test_psgi(
+        app => $test_psgi,
+        client => $client,
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -419,7 +431,6 @@ sub getPage {
 
     # Return the page's output
     return join '', @{$session->response->body};
-    
 }
 
 #----------------------------------------------------------------------------
@@ -841,7 +852,14 @@ Example call:
         },
         'SQL' => sub {
             my (undef, $sql) = @_;
-            return $CLASS->session->db->dbh->prepare($sql);
+            my $db = $CLASS->session->db;
+            my @params;
+            if ( ref $sql ) {
+                ( $sql, @params ) = @$sql;
+            }
+            return sub {
+                $db->do( $sql, {}, @params );
+            }
         },
     );
 
@@ -922,7 +940,9 @@ Example call:
         'CODE' => sub {
             (shift)->();
         },
-        'SQL' => 'execute',
+        'SQL' => sub {
+            (shift)->();
+        },
     );
 
     sub cleanupGuard {
@@ -1007,7 +1027,7 @@ This is a class method.
 my @guarded;
 sub addToCleanup {
     shift
-        if eval { $_[0]->isa($CLASS) };
+        if try { $_[0]->isa($CLASS) };
     push @guarded, cleanupGuard(@_);
 }
 
@@ -1029,14 +1049,5 @@ sub cleanup {
         undef $SESSION;
     }
 }
-
-#----------------------------------------------------------------------------
-
-=head1 BUGS
-
-When trying to load the APR module, perl invariably throws an Out Of Memory
-error. For this reason, getPage disables header processing.
-
-=cut
 
 1;
