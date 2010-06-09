@@ -1,4 +1,5 @@
 7.8.22
+ - fixed #11619: Trash Expired Events not trashing events
 
 7.8.21
  - fixed #11597: manageTrash and newlines
