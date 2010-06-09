@@ -577,16 +577,5 @@ is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
-
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-
-
-
-}
-END {
-
 }
 #vim:ft=perl
