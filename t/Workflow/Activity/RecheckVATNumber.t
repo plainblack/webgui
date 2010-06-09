@@ -110,11 +110,4 @@ sub createInstance {
     return $instance;
 };
 
-
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
 #vim:ft=perl

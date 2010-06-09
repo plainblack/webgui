@@ -53,11 +53,4 @@ is($sku->getConfiguredTitle, "Test Donation (200)", "getConfiguredTitle()");
 
 $sku->purge;
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
-
 1;

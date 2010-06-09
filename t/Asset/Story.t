@@ -432,5 +432,3 @@ cmp_bag(
     '...asset package data has the storage locations in it'
 );
 
-END {
-}

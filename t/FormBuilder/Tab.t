@@ -46,10 +46,4 @@ is( $tab->label, 'My Label' );
 is( $tab->label('New Label'), 'New Label' );
 is( $tab->label, 'New Label' );
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
 #vim:ft=perl

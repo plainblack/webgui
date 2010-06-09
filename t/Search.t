@@ -82,9 +82,4 @@ SKIP: {
     cmp_deeply( $assetIds, [ $article->getId ], 'ideograph search works');
 }
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
 #vim:ft=perl

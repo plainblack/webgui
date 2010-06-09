@@ -507,10 +507,4 @@ $sub1->getFormattedComments;
 
 #done_testing();
 #print 'press return to complete test' ; <>;
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-
-}
 #vim:ft=perl

@@ -55,9 +55,3 @@ unlike(
     "Hidden form elements for login NOT displayed to valid user",
 );
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-
-}
