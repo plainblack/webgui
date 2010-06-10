@@ -44,7 +44,7 @@ my $fenceUser = WebGUI::User->new($session, 'new');
 $fenceUser->username('fence');
 my $guardUser = WebGUI::User->new($session, 'new');
 $guardUser->username('guard');
-WebGUI::Test->usersToDelete($fenceUser, $guardUser);
+WebGUI::Test->addToCleanup($fenceUser, $guardUser);
 
 $numberOfVendors = scalar @{ WebGUI::Shop::Vendor->getVendors($session) };
 

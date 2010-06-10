@@ -24,7 +24,7 @@ plan tests => 4; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 
 my $user = WebGUI::User->new($session, "new");
-WebGUI::Test->usersToDelete($user);
+WebGUI::Test->addToCleanup($user);
 
 $session->user({user => $user});
 

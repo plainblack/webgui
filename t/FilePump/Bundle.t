@@ -273,12 +273,12 @@ my $fileAsset = $root->addChild({
 $fileAsset->getStorageLocation->addFileFromScalar('pumpfile', 'Pump up the jam');
 
 my $storage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($storage);
+WebGUI::Test->addToCleanup($storage);
 $storage->addFileFromScalar('addendum', 'Red was too');
 $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('ShawshankRedemptionMoviePoster.jpg'));
 
 my $snippetTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($snippetTag);
+WebGUI::Test->addToCleanup($snippetTag);
 $snippetTag->commit;
 
 my $guts;

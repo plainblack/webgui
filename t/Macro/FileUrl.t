@@ -115,7 +115,7 @@ sub setupTest {
 	foreach my $testSet (@testSets) {
 
 		my $storage = WebGUI::Storage->create($session);
-        WebGUI::Test->storagesToDelete($storage);
+        WebGUI::Test->addToCleanup($storage);
 		my $filename = join '.', 'fileName', $testNum;
 		$testSet->{filename} = $filename;
 

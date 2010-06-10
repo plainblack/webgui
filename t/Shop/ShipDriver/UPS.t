@@ -33,7 +33,7 @@ use Locales;
 # Init
 my $session   = WebGUI::Test->session;
 my $user      = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($user);
+WebGUI::Test->addToCleanup($user);
 $session->user({user => $user});
 
 #----------------------------------------------------------------------------

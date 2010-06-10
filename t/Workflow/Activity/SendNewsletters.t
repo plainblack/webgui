@@ -70,7 +70,7 @@ my $thread = $cs->addChild({
 }, undef, undef, {skipAutoCommitWorkflows => 1,});
 
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 ##Setup metadata
 $session->setting->set('metaDataEnabled', 1);
@@ -84,7 +84,7 @@ $thread->updateMetaData($metaDataFields->{newsletterCategory}, 'Andy');
 ##Create subscriber user
 my $subscriber = WebGUI::User->create($session);
 $subscriber->update({ 'email', 'going@nowhere.com' });
-WebGUI::Test->usersToDelete($subscriber);
+WebGUI::Test->addToCleanup($subscriber);
 $cs->setUserSubscriptions($metaDataFields->{newsletterCategory}."~Andy", $subscriber->getId);
 $session->db->write(<<EOSQL, [ time()-24*60*60, $cs->getId, $subscriber->getId ]);
 update Newsletter_subscriptions set lastTimeSent=? where assetId=? and userId=?

@@ -26,7 +26,7 @@ plan tests => 47;
 my ($survey);
 
 my $user = WebGUI::User->new( $session, 'new' );
-WebGUI::Test->usersToDelete($user);
+WebGUI::Test->addToCleanup($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey
@@ -119,7 +119,7 @@ ok($survey->responseId, '..(and similarly for responseId)');
 $survey->update({maxResponsesPerUser => 1});
 is($survey->takenCount( { userId => 1 } ), 0, 'Visitor has no responses');
 my $u = WebGUI::User->new( $session, 'new' );
-WebGUI::Test->usersToDelete($u);
+WebGUI::Test->addToCleanup($u);
 is($survey->takenCount( { userId => $u->userId } ), 0, 'New user has no responses');
 delete $survey->{canTake};
 delete $survey->{responseId};
@@ -240,7 +240,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
 
     # Create another response (this one will use the new revision)
     my $newUser = WebGUI::User->new( $session, 'new' );
-    WebGUI::Test->usersToDelete($newUser);
+    WebGUI::Test->addToCleanup($newUser);
     $session->user({ user => $newUser });
     my $newResponseId = $survey->responseId;
     is($newerSurvey->responseJSON->nextResponseSection()->{text}, 'newer text', 'New response uses the new text');

@@ -37,7 +37,7 @@ my $session         = WebGUI::Test->session;
 my $taxUser     = WebGUI::User->new( $session, 'new' );
 $taxUser->username( 'Tex Evasion' );
 $session->user({userId => $taxUser->getId});
-WebGUI::Test->usersToDelete($taxUser);
+WebGUI::Test->addToCleanup($taxUser);
 
 # Test VAT numbers
 my $testVAT_NL  = 'NL123456789B12';

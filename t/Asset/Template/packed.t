@@ -36,7 +36,7 @@ my $templates       = WebGUI::Asset->getRoot( $session )
                     ->getLineage( ['descendants'], { 
                         includeOnlyClasses => [ 'WebGUI::Asset::Template' ],
                     } );
-WebGUI::Test->tagsToRollback( WebGUI::VersionTag->getWorking( $session ) );
+WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 #----------------------------------------------------------------------------
 # Tests

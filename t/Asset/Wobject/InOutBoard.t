@@ -44,14 +44,14 @@ foreach my $name (@names) {
     $user->username($name);
     push @users, $user;
 }
-WebGUI::Test->usersToDelete(@users);
+WebGUI::Test->addToCleanup(@users);
 
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"InOutBoard Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 my $board = $node->addChild({
     className       => 'WebGUI::Asset::Wobject::InOutBoard',
     inOutTemplateId => $templateId,

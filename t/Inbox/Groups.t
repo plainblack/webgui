@@ -39,17 +39,17 @@ use Data::Dumper;
 my $session         = WebGUI::Test->session;
 
 my $userFred = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($userFred);
+WebGUI::Test->addToCleanup($userFred);
 $userFred->username('fred');
 $userFred->profileField('receiveInboxEmailNotifications', 0);
 
 my $userBill = WebGUI::User->create($session);
-WebGUI::Test->usersToDelete($userBill);
+WebGUI::Test->addToCleanup($userBill);
 $userBill->username('bill');
 $userBill->profileField('receiveInboxEmailNotifications', 0);
 
 my $group = WebGUI::Group->new($session, 'new');
-WebGUI::Test->groupsToDelete($group);
+WebGUI::Test->addToCleanup($group);
 $group->addUsers([$userFred->userId, $userBill->userId]);
 
 my $inbox = WebGUI::Inbox->new($session);

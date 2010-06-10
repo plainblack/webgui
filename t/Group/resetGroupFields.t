@@ -25,13 +25,13 @@ plan tests => 10;
 my $session = WebGUI::Test->session;
 
 my $assetGroup = WebGUI::Group->new($session, 'new');
-WebGUI::Test->groupsToDelete($assetGroup);
+WebGUI::Test->addToCleanup($assetGroup);
 
 my $settingGroup = WebGUI::Group->new($session, 'new');
-WebGUI::Test->groupsToDelete($settingGroup);
+WebGUI::Test->addToCleanup($settingGroup);
 
 my $activityGroup = WebGUI::Group->new($session, 'new');
-WebGUI::Test->groupsToDelete($activityGroup);
+WebGUI::Test->addToCleanup($activityGroup);
 
 my $home = WebGUI::Asset->getDefault($session);
 
@@ -89,7 +89,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
-WebGUI::Test->workflowsToDelete($workflow);
+WebGUI::Test->addToCleanup($workflow);
 
 WebGUI::Test->originalConfig('workflowActivities');
 $session->config->addToArray('workflowActivities/User', 'WebGUI::Workflow::Activity::AddUserToGroup');
@@ -177,4 +177,4 @@ $activityGroup->delete;
 my $userActivity2 = WebGUI::Workflow::Activity->new($session, $userActivity->getId);
 is ($userActivity2->get('groupId'), 3, 'group in Workflow Activity set to Admin');
 
-WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
+WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));

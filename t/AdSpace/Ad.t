@@ -48,7 +48,7 @@ my $session = WebGUI::Test->session;
 my $ad;
 my ($richAd, $textAd, $imageAd, $nonAd, $setAd);
 my $imageStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($imageStorage);
+WebGUI::Test->addToCleanup($imageStorage);
 $imageStorage->addFileFromScalar('foo.bmp', 'This is not really an image');
 
 

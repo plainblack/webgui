@@ -649,40 +649,6 @@ sub getMailFromQueue {
 
 #----------------------------------------------------------------------------
 
-=head2 sessionsToDelete ( $session, [$session, ...] )
-
-Push a list of session objects onto the stack of groups to be automatically deleted
-at the end of the test.  Note, this will be the last group of objects to be
-cleaned up.
-
-This is a class method.
-
-=cut
-
-sub sessionsToDelete {
-    my $class = shift;
-    $class->addToCleanup(@_);
-}
-
-#----------------------------------------------------------------------------
-
-=head2 assetsToPurge ( $asset, [$asset ] )
-
-Push a list of Asset objects onto the stack of assets to be automatically purged
-at the end of the test.  This will also clean-up all version tags associated
-with the Asset.
-
-This is a class method.
-
-=cut
-
-sub assetsToPurge {
-    my $class = shift;
-    $class->addToCleanup(@_);
-}
-
-#----------------------------------------------------------------------------
-
 =head2 cleanupAdminInbox ( )
 
 Push a list of Asset objects onto the stack of assets to be automatically purged
@@ -699,89 +665,6 @@ sub cleanupAdminInbox {
     my $inbox = WebGUI::Inbox->new($class->session);
     $inbox->deleteMessagesForUser($admin);
 }
-
-#----------------------------------------------------------------------------
-
-=head2 groupsToDelete ( $group, [$group ] )
-
-Push a list of group objects onto the stack of groups to be automatically deleted
-at the end of the test.
-
-This is a class method.
-
-=cut
-
-sub groupsToDelete {
-    my $class = shift;
-    $class->addToCleanup(@_);
-}
-
-
-#----------------------------------------------------------------------------
-
-=head2 storagesToDelete ( $storage, [$storageId ] )
-
-Push a list of storage objects or storageIds onto the stack of storage locaitons
-at the end of the test.
-
-This is a class method.
-
-=cut
-
-sub storagesToDelete {
-    my $class = shift;
-    $class->addToCleanup(map {
-        ref $_ ? $_ : ('WebGUI::Storage' => $_)
-    } @_);
-}
-
-#----------------------------------------------------------------------------
-
-=head2 tagsToRollback ( $tag )
-
-Push a list of version tags to rollback at the end of the test.
-
-This is a class method.
-
-=cut
-
-sub tagsToRollback {
-    my $class = shift;
-    $class->addToCleanup(@_);
-}
-
-#----------------------------------------------------------------------------
-
-=head2 usersToDelete ( $user, [$user, ...] )
-
-Push a list of user objects onto the stack of groups to be automatically deleted
-at the end of the test.  If found in the stack, the Admin and Visitor users will not be deleted.
-
-This is a class method.
-
-=cut
-
-sub usersToDelete {
-    my $class = shift;
-    $class->addToCleanup(@_);
-}
-
-#----------------------------------------------------------------------------
-
-=head2 workflowsToDelete ( $workflow, [$workflow, ...] )
-
-Push a list of workflow objects onto the stack of groups to be automatically deleted
-at the end of the test.
-
-This is a class method.
-
-=cut
-
-sub workflowsToDelete {
-    my $class = shift;
-    $class->addToCleanup(@_);
-}
-
 
 #----------------------------------------------------------------------------
 

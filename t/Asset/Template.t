@@ -182,5 +182,5 @@ like($logError, qr/$brokenUrl/, 'process: logged error has the url');
 like($logError, qr/$brokenId/, '... and the template id');
 WebGUI::Test->restoreLogging;
 
-WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
+WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
 

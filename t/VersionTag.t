@@ -261,7 +261,7 @@ is($siteWideTag->getId(), $siteWideTagId, 'versionTagMode siteWide: reclaim site
 ## Through in a new session as different user
 my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
 $admin_session->user({'userId' => 3});
-WebGUI::Test->sessionsToDelete($admin_session);
+WebGUI::Test->addToCleanup($admin_session);
 
 setUserVersionTagMode($admin_session->user(), q{singlePerUser});
 
@@ -325,7 +325,7 @@ $adminUserTag->rollback();
 
     # create admin session
     my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
-    WebGUI::Test->sessionsToDelete($admin_session);
+    WebGUI::Test->addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -377,7 +377,7 @@ $adminUserTag->rollback();
 
     # create admin session
     $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
-    WebGUI::Test->sessionsToDelete($admin_session);
+    WebGUI::Test->addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});

@@ -87,12 +87,12 @@ is($versionTagCheck, $originalVersionTags, 'version tag cleaned up by deleting l
 $template = $root->addChild($propertyHash);
 my $tag1 = WebGUI::VersionTag->getWorking($session);
 $tag1->commit;
-WebGUI::Test->tagsToRollback($tag1);
+WebGUI::Test->addToCleanup($tag1);
 sleep 1;
 $templatev2 = $template->addRevision({template => 'Vie gates.  Ich bin ein templater.'});
 my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
-WebGUI::Test->tagsToRollback($tag2);
+WebGUI::Test->addToCleanup($tag2);
 note "purge";
 checkTableEntries($templatev2->getId, 1,2,2);
 $versionTagCheck = $session->db->quickScalar(q{select count(*) from assetVersionTag});

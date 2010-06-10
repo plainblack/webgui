@@ -40,7 +40,7 @@ use DateTime;
 my $session         = WebGUI::Test->session;
 
 my $staff = WebGUI::Group->new($session, 'new');
-WebGUI::Test->groupsToDelete($staff);
+WebGUI::Test->addToCleanup($staff);
 $staff->name('Reporting Staff');
 
 my $reporter = WebGUI::User->new($session, 'new');
@@ -50,7 +50,7 @@ $editor->username('editor');
 my $reader   = WebGUI::User->new($session, 'new');
 $reader->username('reader');
 $staff->addUsers([$reporter->userId]);
-WebGUI::Test->usersToDelete($reporter, $editor, $reader);
+WebGUI::Test->addToCleanup($reporter, $editor, $reader);
 
 my $archive = 'placeholder for Test::Maker::Permission';
 
@@ -94,7 +94,7 @@ $archive    = $home->addChild({
               });
 $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 isa_ok($archive, 'WebGUI::Asset::Wobject::StoryArchive', 'created StoryArchive');
 
@@ -172,7 +172,7 @@ $child->purge;
 $child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'}, @skipAutoCommit);
 my $tag1 = WebGUI::VersionTag->getWorking($session);
 $tag1->commit;
-WebGUI::Test->tagsToRollback($tag1);
+WebGUI::Test->addToCleanup($tag1);
 isa_ok($child, 'WebGUI::Asset::Story', 'addChild added and returned a Story');
 is($archive->getChildCount, 1, '... added it to the archive');
 my $folder = $archive->getFirstChild();
@@ -210,7 +210,7 @@ my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title =>
 $creationDateSth->execute([$wgBday, $story->getId]);
 my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
-WebGUI::Test->tagsToRollback($tag2);
+WebGUI::Test->addToCleanup($tag2);
 
 {
     my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
@@ -221,7 +221,7 @@ my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', titl
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
 my $tag3 = WebGUI::VersionTag->getWorking($session);
 $tag3->commit;
-WebGUI::Test->tagsToRollback($tag3);
+WebGUI::Test->addToCleanup($tag3);
 
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
@@ -297,7 +297,7 @@ foreach my $storilet ($story2, $story3, $story4) {
 $archive->update({storiesPerPage => 3});
 my $tag4 = WebGUI::VersionTag->getWorking($session);
 $tag4->commit;
-WebGUI::Test->tagsToRollback($tag4);
+WebGUI::Test->addToCleanup($tag4);
 
 ##Don't assume that Admin and Visitor have the same timezone.
 $session->user({userId => 3});
@@ -585,7 +585,7 @@ cmp_deeply(
 ################################################################
 
 my $exportStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($exportStorage);
+WebGUI::Test->addToCleanup($exportStorage);
 my $basedir = Path::Class::Dir->new($exportStorage->getPath);
 $exportStorage->addFileFromScalar('index', 'export story archive content');
 my $assetDir  = $basedir->subdir('mystories');
