@@ -39,6 +39,7 @@ use List::MoreUtils     qw( any );
 use Carp                qw( carp croak );
 use JSON                qw( from_json to_json );
 use Scope::Guard;
+use Try::Tiny;
 use WebGUI::Paths -inc;
 
 our $WEBGUI_TEST_ROOT = File::Spec->catdir(
@@ -148,7 +149,6 @@ sub newSession {
     }
     return $session;
 }
-
 
 #----------------------------------------------------------------------------
 
@@ -827,7 +827,14 @@ Example call:
         },
         'SQL' => sub {
             my (undef, $sql) = @_;
-            return $CLASS->session->db->dbh->prepare($sql);
+            my $db = $CLASS->session->db;
+            my @params;
+            if ( ref $sql ) {
+                ( $sql, @params ) = @$sql;
+            }
+            return sub {
+                $db->do( $sql, {}, @params );
+            }
         },
     );
 
@@ -908,7 +915,9 @@ Example call:
         'CODE' => sub {
             (shift)->();
         },
-        'SQL' => 'execute',
+        'SQL' => sub {
+            (shift)->();
+        },
     );
 
     sub cleanupGuard {
@@ -993,7 +1002,7 @@ This is a class method.
 my @guarded;
 sub addToCleanup {
     shift
-        if eval { $_[0]->isa($CLASS) };
+        if try { $_[0]->isa($CLASS) };
     push @guarded, cleanupGuard(@_);
 }
 
@@ -1015,14 +1024,5 @@ sub cleanup {
         undef $SESSION;
     }
 }
-
-#----------------------------------------------------------------------------
-
-=head1 BUGS
-
-When trying to load the APR module, perl invariably throws an Out Of Memory
-error. For this reason, getPage disables header processing.
-
-=cut
 
 1;
