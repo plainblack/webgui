@@ -369,10 +369,18 @@ my $session = WebGUI::Test->session;
     my $keygate = WebGUI::Keyword->new($session);
     is $keygate->getKeywordsForAsset({assetId => $asset->getId}), '', 'not persisted to the db';
     $asset->write;
-    is $keygate->getKeywordsForAsset({assetId => $asset->assetId}), 'checkers board, chess set', 'written to the db';
+    cmp_bag(
+        $keygate->getKeywordsForAsset({assetId => $asset->assetId, asArrayRef => 1,}),
+        ['checkers board', 'chess set'],
+        'written to the db'
+    );
 
     my $asset_copy = $asset->cloneFromDb;
-    is $asset->keywords, 'chess set, checkers board', 'refreshed from db';
+    cmp_bag(
+        WebGUI::Keyword::string2list($asset_copy->keywords),
+        ['checkers board', 'chess set'],
+        'refreshed from db'
+    );
 
     my $asset2 = $default->addChild({
         className => 'WebGUI::Asset::Snippet',
