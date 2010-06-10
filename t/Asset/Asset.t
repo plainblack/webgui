@@ -371,10 +371,6 @@ $session->setting->set('urlExtension', undef);
 is($importNode->fixUrl('1234'.'-'x235 . 'abcdefghij'), '1234'.'-'x235 . 'abcdefghij', 'fixUrl leaves long URLs under 250 characters alone');
 is($importNode->fixUrl('1234'.'-'x250 . 'abcdefghij'), '1234'.'-'x216, 'fixUrl truncates long URLs over 250 characters to 220 characters');
 
-WebGUI::Test->originalConfig('extrasURL');
-WebGUI::Test->originalConfig('uploadsURL');
-WebGUI::Test->originalConfig('assets');
-
 $session->config->set('extrasURL',    '/extras');
 $session->config->set('uploadsURL',   '/uploads');
 

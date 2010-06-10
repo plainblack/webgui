@@ -91,7 +91,6 @@ my $workflow  = WebGUI::Workflow->create($session,
 );
 WebGUI::Test->addToCleanup($workflow);
 
-WebGUI::Test->originalConfig('workflowActivities');
 $session->config->addToArray('workflowActivities/User', 'WebGUI::Workflow::Activity::AddUserToGroup');
 
 my $userActivity = $workflow->addActivity('WebGUI::Workflow::Activity::AddUserToGroup');

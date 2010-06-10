@@ -36,7 +36,6 @@ SKIP: {
 
     my $e = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
 
-    WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
     $session->config->set( 'enableSurveyExpressionEngine', 0 );
     is( $e->run( $session, 'jump { 1 } target' ),
         undef, "Nothing happens unless we turn on enableSurveyExpressionEngine in config" );
