@@ -86,6 +86,8 @@ $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
 WebGUI::Test->tagsToRollback($versionTag);
 
+$archive = $archive->cloneFromDb;
+
 isa_ok($archive, 'WebGUI::Asset::Wobject::StoryArchive', 'created StoryArchive');
 
 ################################################################
