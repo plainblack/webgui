@@ -25,7 +25,7 @@ my $session = WebGUI::Test->session;
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Adding Calendar for Event Asset Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 my $cal = $defaultAsset->addChild({className=>'WebGUI::Asset::Wobject::Calendar'});
 $versionTag->commit;
@@ -119,7 +119,7 @@ $properties3->{url}       = 'event-asset-test6';
 $properties3->{className} = 'WebGUI::Asset::Event';
 
 my $eventStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($eventStorage);
+WebGUI::Test->addToCleanup($eventStorage);
 $properties3->{storageId} = $eventStorage->getId;
 
 my $event6 = $cal->addChild($properties3, $properties3->{id});
@@ -130,4 +130,4 @@ my $event6a = $event6->addRevision({ title => 'Event with storage', }, undef, { 
 ok($session->id->valid($event6a->get('storageId')), 'addRevision gives the new revision a valid storageId');
 isnt($event6a->get('storageId'), $event6->get('storageId'), '... and it is different from the previous revision');
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag2);
+WebGUI::Test->addToCleanup($versionTag2);

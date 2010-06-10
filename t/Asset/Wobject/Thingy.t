@@ -36,7 +36,7 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Thingy Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 my $thingy = $node->addChild({className=>'WebGUI::Asset::Wobject::Thingy'});
 
 # Test for a sane object type
@@ -385,7 +385,7 @@ is($table, undef, '... drops thing specific table');
     $thingy->editThingDataSave($newThingId, 'new', {"field_".$newFieldId => 'value 3'} );
 
     my $andy = WebGUI::User->create($session);
-    WebGUI::Test->usersToDelete($andy);
+    WebGUI::Test->addToCleanup($andy);
     $session->user({userId => $andy->userId});
 
     my $form = $thingy->getFormPlugin({

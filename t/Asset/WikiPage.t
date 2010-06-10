@@ -52,7 +52,7 @@ is($article, undef, "Can't add an Article wobject as a child to a Wiki Page.");
 my $wikiPageCopy = $wikipage->duplicate();
 isa_ok($wikiPageCopy, 'WebGUI::Asset::WikiPage');
 my $thirdVersionTag = WebGUI::VersionTag->new($session,$wikiPageCopy->get("tagId"));
-WebGUI::Test->tagsToRollback($thirdVersionTag);
+WebGUI::Test->addToCleanup($thirdVersionTag);
 
 ## isProtected
 

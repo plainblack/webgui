@@ -28,7 +28,7 @@ use WebGUI::Form::HTMLArea;
 my $session         = WebGUI::Test->session;
 
 my $newUser         = WebGUI::User->create( $session );
-WebGUI::Test->usersToDelete($newUser);
+WebGUI::Test->addToCleanup($newUser);
 
 #----------------------------------------------------------------------------
 # Tests

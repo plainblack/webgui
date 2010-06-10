@@ -82,7 +82,7 @@ my $foreignHammer = $rockHammer->setCollateral('variantsJSON', 'variantId', 'new
 
 
 $versionTag->commit;
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $hammerItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 

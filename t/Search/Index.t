@@ -33,7 +33,7 @@ my $article         = WebGUI::Asset->getImportNode( $session )->addChild( {
     title           => 'title',
     menuTitle       => 'menuTitle',
 } );
-WebGUI::Test->tagsToRollback(
+WebGUI::Test->addToCleanup(
     WebGUI::VersionTag->getWorking( $session ),
 );
 

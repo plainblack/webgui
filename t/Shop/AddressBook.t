@@ -210,7 +210,7 @@ undef $book;
 
 my $otherSession = WebGUI::Test->newSession;
 my $mergeUser    = WebGUI::User->create($otherSession);
-WebGUI::Test->usersToDelete($mergeUser);
+WebGUI::Test->addToCleanup($mergeUser);
 $otherSession->user({user => $mergeUser});
 my $adminBook   = WebGUI::Shop::AddressBook->create($otherSession);
 my $goodAddress = $adminBook->addAddress({label => 'first'});

@@ -58,9 +58,9 @@ $submitGroupA->addUsers([$userA->userId,$userC->userId]);
 $submitGroupB->addUsers([$userB->userId,$userC->userId]);
 $attendees->addUsers([$userA->getId, $userB->getId, $userC->getId]);
 
-WebGUI::Test->groupsToDelete($submitGroupA,$submitGroupB);
-WebGUI::Test->groupsToDelete($registrars, $attendees);
-WebGUI::Test->usersToDelete($userA,$userB,$userC,$registrar);
+WebGUI::Test->addToCleanup($submitGroupA,$submitGroupB);
+WebGUI::Test->addToCleanup($registrars, $attendees);
+WebGUI::Test->addToCleanup($userA,$userB,$userC,$registrar);
 
 sub loginAdmin { $session->user({userId => 3}); }
 sub loginRgstr { $session->user({userId => $registrar->userId}); }
@@ -77,7 +77,7 @@ loginAdmin;
 # Create a version tag to work in
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"EventManagementSystem Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
@@ -121,7 +121,7 @@ my $i18n = $ems->i18n;
 
 $versionTag->commit;
 $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $id1 = $ems->getNextSubmissionId;
 my $id2 = $ems->getNextSubmissionId;
@@ -210,7 +210,7 @@ my $submission = {
         };
 $session->request->setup_body($submission);
 my $sub1 = $frmA->addSubmission;
-WebGUI::Test->assetsToPurge( $sub1 );
+WebGUI::Test->addToCleanup( $sub1 );
 print join( "\n", @{$sub1->{errors}} ),"\n" if defined $sub1->{errors};
 my $isa1 = isa_ok( $sub1, 'WebGUI::Asset::EMSSubmission', "userA/formA valid submission succeeded" );
 ok( $ems->hasSubmissions, 'UserA has submissions on this ems' );
@@ -228,7 +228,7 @@ $submission = {
         };
 $session->request->setup_body($submission);
 my $sub2 = $frmB->addSubmission;
-WebGUI::Test->assetsToPurge( $sub2 );
+WebGUI::Test->addToCleanup( $sub2 );
 my $isa2 = isa_ok( $sub2, 'WebGUI::Asset::EMSSubmission', "userB/FormB valid submission succeeded" );
 
 loginUserC;
@@ -354,7 +354,7 @@ $sub1 = $sub1->cloneFromDb;
 is( $sub1->get('submissionStatus'),'created','approval successfull');
 
 my $ticket = WebGUI::Asset->newByDynamicClass($session, $sub1->get('ticketId'));
-WebGUI::Test->assetsToPurge( $ticket ) if $ticket ;
+WebGUI::Test->addToCleanup( $ticket ) if $ticket ;
 SKIP: {
 skip 'no ticket created', 1 unless isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
 is( $ticket->get('title'), $sub1->get('title'), 'Ticket title matches submission title' );

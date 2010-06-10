@@ -35,7 +35,7 @@ SKIP: {
 
 skip $tests, "Unable to load Survey" unless $usedOk;
 my $user = WebGUI::User->new( $session, 'new' );
-WebGUI::Test->usersToDelete($user);
+WebGUI::Test->addToCleanup($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey

@@ -134,7 +134,7 @@ is($session->db->quickScalar("select count(*) from cartItem where cartId=?",[ $c
 
 
 my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
-WebGUI::Test->sessionsToDelete($session2);
+WebGUI::Test->addToCleanup($session2);
 $session2->user({userId => 3});
 my $cart2 = WebGUI::Shop::Cart->newBySession($session2);
 isnt(

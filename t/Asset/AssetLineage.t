@@ -30,7 +30,7 @@ is($asset->formatRank(76), "000076", "formatRank()");
 is($asset->getLineageLength(), (length($asset->get("lineage")) / 6), "getLineageLength()");
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"AssetLineage Test"});
 
 my $root = WebGUI::Asset->getRoot($session);
@@ -58,7 +58,7 @@ my $folder2 = $topFolder->addChild({
 });
 
 my $editor = WebGUI::User->new($session, 'new');
-WebGUI::Test->usersToDelete($editor);
+WebGUI::Test->addToCleanup($editor);
 $editor->addToGroups([4]);
 
 my @snippets = ();
@@ -528,7 +528,7 @@ cmp_bag(
 
 my $vTag2 = WebGUI::VersionTag->getWorking($session);
 $vTag2->set({name=>"deep addChild test"});
-WebGUI::Test->tagsToRollback($vTag2);
+WebGUI::Test->addToCleanup($vTag2);
 
 WebGUI::Test->interceptLogging();
 

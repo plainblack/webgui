@@ -32,7 +32,7 @@ my $root = WebGUI::Asset->getRoot($session);
 is(scalar @{ $root->getPackageList }, 0, 'WebGUI does not ship with packages');
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"Asset Package test"});
 
 my $folder = $root->addChild({
@@ -86,7 +86,7 @@ cmp_ok( $snippetRev->get('revisionDate'), '>', $snippet->get('revisionDate'), '.
 
 my $vt2 = WebGUI::VersionTag->getWorking($session);
 $vt2->commit;
-WebGUI::Test->tagsToRollback($vt2);
+WebGUI::Test->addToCleanup($vt2);
 
 $targetFolder->www_deployPackage();
 
@@ -107,7 +107,7 @@ isa_ok($deployedFolderChildren->[0] , 'WebGUI::Asset::Snippet', 'deployed child 
 $folder->addRevision({isPackage => 0});
 
 my $newVersionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($newVersionTag);
+WebGUI::Test->addToCleanup($newVersionTag);
 $newVersionTag->commit;
 
 my $newFolder = WebGUI::Asset->new($session, $folder->getId);
@@ -123,7 +123,7 @@ is($updatedSnippet->get('snippet'), 'Always upgrade to the latest version', 'imp
 cmp_ok( $updatedSnippet->get('revisionDate'), '>', $snippetRev->get('revisionDate'), '... revisionDate check on imported package with overwriteLatest');
 
 my $lastTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($lastTag);
+WebGUI::Test->addToCleanup($lastTag);
 
 TODO: {
     local $TODO = "Tests to make later";

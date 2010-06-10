@@ -29,7 +29,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Matrix Test"});
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 my $matrix = $node->addChild({className=>'WebGUI::Asset::Wobject::Matrix'});
 
 # Test for a sane object type
@@ -108,7 +108,7 @@ my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'
 
 my $secondVersionTag = WebGUI::VersionTag->new($session,$matrixListing->get("tagId"));
 $secondVersionTag->commit;
-WebGUI::Test->tagsToRollback($secondVersionTag);
+WebGUI::Test->addToCleanup($secondVersionTag);
 
 # Test for sane object type
 isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');

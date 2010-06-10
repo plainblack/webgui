@@ -29,16 +29,16 @@ my $maker           = WebGUI::Test::Maker::Permission->new;
 $session->user({ userId => 3 });
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Add a new user to the test user's friends list
 my $friend  = WebGUI::User->new($session, "new");
-WebGUI::Test->usersToDelete($friend);
+WebGUI::Test->addToCleanup($friend);
 WebGUI::Friends->new($session)->add( [ $friend->userId ] );
 
 # Add a new registered user
 my $notFriend   = WebGUI::User->new( $session, "new" );
-WebGUI::Test->usersToDelete($notFriend);
+WebGUI::Test->addToCleanup($notFriend);
 
 my $gallery
     = $node->addChild({

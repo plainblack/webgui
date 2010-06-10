@@ -54,7 +54,7 @@ my $otherUser           = WebGUI::User->new($session, 'new');
 my $groupIdEditUser     = WebGUI::User->new($session, 'new');
 my $groupToEditPostId   = $collab->get('groupToEditPost');
 my $groupIdEdit         = $collab->get('groupIdEdit');
-WebGUI::Test->usersToDelete($postingUser, $otherUser, $groupIdEditUser);
+WebGUI::Test->addToCleanup($postingUser, $otherUser, $groupIdEditUser);
 $postingUser->username('userForPosting');
 $otherUser->username('otherUser');
 
@@ -83,7 +83,7 @@ my $props = {
 my $post = $collab->addChild($props, @addArgs);
 
 $versionTag->commit();
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Test for a sane object type
 isa_ok($post, 'WebGUI::Asset::Post::Thread');
@@ -147,7 +147,7 @@ my $post2 = $collab->addChild({
     ownerUserId => 1,
 }, @addArgs);
 $versionTag2->commit();
-WebGUI::Test->tagsToRollback($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 my $variables;
 $session->user({userId => 1});
 $variables = $post1->getTemplateVars();

@@ -447,7 +447,7 @@ SKIP: {
     ##Clear out this tag so we can do downstream work.
     my $tag = WebGUI::VersionTag->getWorking($session);
     $tag->commit;
-    WebGUI::Test->tagsToRollback($tag);
+    WebGUI::Test->addToCleanup($tag);
 
     #######################################################################
     #
@@ -457,9 +457,9 @@ SKIP: {
 
     my $tommy  = WebGUI::User->create($session);
     my $warden = WebGUI::User->create($session);
-    WebGUI::Test->usersToDelete($tommy, $warden);
+    WebGUI::Test->addToCleanup($tommy, $warden);
     my $inGroup = WebGUI::Group->new($session, 'new');
-    WebGUI::Test->groupsToDelete($inGroup);
+    WebGUI::Test->addToCleanup($inGroup);
     $inGroup->addUsers([$tommy->getId]);
 
     my $testTemplate = $root->addChild({
@@ -471,7 +471,7 @@ SKIP: {
         templateId => $testTemplate->getId,
     });
     my $tag2 = WebGUI::VersionTag->getWorking($session);
-    WebGUI::Test->tagsToRollback($tag2);
+    WebGUI::Test->addToCleanup($tag2);
     $tag2->commit;
     $session->user({userId => 1});
     $testShelf->prepareView;
@@ -486,7 +486,7 @@ SKIP: {
         title       => 'Private Product',
     });
     my $tag3 = WebGUI::VersionTag->getWorking($session);
-    WebGUI::Test->tagsToRollback($tag3);
+    WebGUI::Test->addToCleanup($tag3);
     $tag3->commit;
 
     $session->user({user => $tommy});

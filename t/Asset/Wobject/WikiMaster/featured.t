@@ -44,7 +44,7 @@ my $featuredPage
         content         => 'A how-to book',
     }, undef, undef, { skipAutoCommitWorkflows => 1 } );
 
-WebGUI::Test->tagsToRollback( WebGUI::VersionTag->getWorking( $session ) );
+WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 #----------------------------------------------------------------------------
 # Tests

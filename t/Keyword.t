@@ -69,7 +69,7 @@ my $snippet = $home->addChild({
 });
 
 my $tag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->tagsToRollback($tag);
+WebGUI::Test->addToCleanup($tag);
 $tag->commit;
 
 my $assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', });

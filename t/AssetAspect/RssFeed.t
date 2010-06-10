@@ -152,7 +152,7 @@ cmp_deeply(
 #####################################################
 
 my $exportStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($exportStorage);
+WebGUI::Test->addToCleanup($exportStorage);
 my $basedir = Path::Class::Dir->new($exportStorage->getPath);
 my $assetdir = $basedir->subdir('shawshank');
 my $indexfile = $assetdir->file('index.html');
@@ -170,7 +170,7 @@ cmp_bag(
 );
 
 $exportStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($exportStorage);
+WebGUI::Test->addToCleanup($exportStorage);
 $basedir   = Path::Class::Dir->new($exportStorage->getPath);
 my $assetfile = $basedir->file('shawshank.html');
 $dummy->exportAssetCollateral($assetfile, {}, $session);

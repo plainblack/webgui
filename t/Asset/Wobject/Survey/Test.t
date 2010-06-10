@@ -37,7 +37,7 @@ skip "Unable to load TAP::Parser and TAP::Parser::Aggregator", 88 unless $tp && 
 use_ok('WebGUI::Asset::Wobject::Survey::Test');
 
 my $user = WebGUI::User->new( $session, 'new' );
-WebGUI::Test->usersToDelete($user);
+WebGUI::Test->addToCleanup($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
 
 WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
