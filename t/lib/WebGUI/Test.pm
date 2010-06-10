@@ -30,7 +30,7 @@ use Test::MockObject;
 use Test::MockObject::Extends;
 use Log::Log4perl;  # load early to ensure proper order of END blocks
 use Clone               qw(clone);
-use File::Basename      qw(dirname);
+use File::Basename      qw(dirname fileparse);
 use File::Spec::Functions qw(abs2rel rel2abs catdir catfile updir);
 use IO::Select          ();
 use Scalar::Util        qw( blessed );
@@ -374,15 +374,21 @@ my $config_copy;
 sub file {
     return $config_copy
         if $config_copy;
-    my $config_base = $original_config_file;
-    $config_base =~ s/\.conf$//;
-    (undef, $config_copy) = File::Temp::tempfile("$config_base-XXXX", SUFFIX => '.conf', UNLINK => 0, OPEN => 0);
-    File::Copy::copy($original_config_file, $config_copy);
+    my $config_base = fileparse( $original_config_file, '.conf' );
+    my (undef, $config_copy_abs) = File::Temp::tempfile(
+        "$config_base-XXXX",
+        SUFFIX => '.conf',
+        UNLINK => 0,
+        OPEN => 0,
+        TMPDIR => 1,
+    );
+    File::Copy::copy($original_config_file, $config_copy_abs);
     $CLASS->addToCleanup(sub {
-        unlink $config_copy;
+        unlink $config_copy_abs;
         undef $config_copy;
         undef $config;
     });
+    $config_copy = abs2rel( $config_copy_abs, catdir( $WEBGUI_ROOT, 'etc') );
     return $config_copy;
 }
 
