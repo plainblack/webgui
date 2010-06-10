@@ -481,7 +481,6 @@ $dude->deleteFromGroups([12]);
 my $origEnvHash = $session->env->{_env};
 my %newEnv = ( REMOTE_ADDR => '194.168.0.2' );
 $session->env->{_env} = \%newEnv;
-WebGUI::Test->originalConfig('adminModeSubnets');
 $session->config->set('adminModeSubnets', ['194.168.0.0/24']);
 
 ok(!$dude->isInGroup(12), 'user is not in group 12');
@@ -833,7 +832,6 @@ isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 ################################################################
 $session->setting->set('preventProxyCache', 0);
 
-WebGUI::Test->originalConfig('profileModuleIdentifier');
 my $profileModuleId = $session->config->get('profileModuleIdentifier');
 is(
     $newFish->getProfileUrl('cellblock'),

@@ -69,7 +69,6 @@ sub setup_assets {
 }
 
 END {
-	$session->config->set('templateParsers', $originalParsers);
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}

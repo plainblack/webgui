@@ -55,6 +55,3 @@ $session->config->set('dbslave2', $slaveHash2);
 my $slave2 = $session->dbSlave;
 isa_ok($slave2, 'WebGUI::SQL');
 
-END {
-    $session->config->delete('dbslave2');
-}

@@ -30,48 +30,56 @@ use Test::MockObject;
 use Test::MockObject::Extends;
 use Log::Log4perl;  # load early to ensure proper order of END blocks
 use Clone               qw(clone);
-use IO::Handle          ();
-use File::Spec          ();
-use IO::Select          ();
-use Cwd                 ();
+use File::Basename      qw(dirname fileparse);
+use File::Spec::Functions qw(abs2rel rel2abs catdir catfile updir);
 use Scalar::Util        qw( blessed );
-use List::MoreUtils     qw( any );
 use Carp                qw( carp croak );
-use JSON                qw( from_json to_json );
+use List::MoreUtils qw(any);
+use File::Copy ();
+use File::Temp ();
+use Try::Tiny;
+use Plack::Test;
 use Scope::Guard;
 use Try::Tiny;
 use WebGUI::Paths -inc;
+use namespace::clean;
 
-our $WEBGUI_TEST_ROOT = File::Spec->catdir(
-    File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], ''),
-    (File::Spec->updir) x 2
-);
-our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir(
+our $WEBGUI_TEST_ROOT = rel2abs( catdir( dirname( __FILE__ ), (updir) x 2 ) );
+
+our $WEBGUI_TEST_COLLATERAL = catdir(
     $WEBGUI_TEST_ROOT,
     'supporting_collateral'
 );
-
-use WebGUI::PseudoRequest;
 
 our @EXPORT = qw(cleanupGuard addToCleanup);
 our @EXPORT_OK = qw(session config collateral);
 
 my $CLASS = __PACKAGE__;
 
+my $original_config_file;
 sub import {
-    our $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
+    if ( ! $original_config_file ) {
+        my $config = $ENV{WEBGUI_CONFIG};
+        die "Enviroment variable WEBGUI_CONFIG must be set to the full path to a WebGUI config file.\n"
+            unless $config;
 
-    die "Enviroment variable WEBGUI_CONFIG must be set to the full path to a WebGUI config file.\n"
-        unless $CONFIG_FILE;
-    die "WEBGUI_CONFIG path '$CONFIG_FILE' does not exist.\n"
-        unless -e $CONFIG_FILE;
-    die "WEBGUI_CONFIG path '$CONFIG_FILE' is not a file.\n"
-        unless -f _;
-    die "WEBGUI_CONFIG path '$CONFIG_FILE' is not readable by effective uid '$>'.\n"
-        unless -r _;
+        for my $tryPath (
+            rel2abs( $config ),
+            rel2abs( $config, WebGUI::Paths->configBase )
+        ) {
+            if ( -e $tryPath ) {
+                $config = $tryPath;
+            }
+        }
 
-    $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, WebGUI::Paths->configBase);
-
+        die "WEBGUI_CONFIG path '$config' does not exist.\n"
+            unless -e $config;
+        die "WEBGUI_CONFIG path '$config' is not a file.\n"
+            unless -f _;
+        die "WEBGUI_CONFIG path '$config' is not readable by effective uid '$>'.\n"
+            unless -r _;
+        $original_config_file = $config;
+    }
     goto &{ $_[0]->can('SUPER::import') };
 }
 
@@ -323,7 +331,7 @@ sub config {
     return $config
         if $config;
     require WebGUI::Config;
-    $config = WebGUI::Config->new(our $CONFIG_FILE);
+    $config = WebGUI::Config->new($CLASS->file, 1);
     return $config;
 }
 
@@ -335,8 +343,26 @@ Returns the name of the WebGUI config file used for this test.
 
 =cut
 
+my $config_copy;
 sub file {
-    return our $CONFIG_FILE;
+    return $config_copy
+        if $config_copy;
+    my $config_base = fileparse( $original_config_file, '.conf' );
+    (undef, $config_copy) = File::Temp::tempfile(
+        "$config_base-XXXX",
+        SUFFIX  => '.conf',
+        UNLINK  => 0,
+        OPEN    => 0,
+        TMPDIR  => 1,
+    );
+    File::Copy::copy($original_config_file, $config_copy)
+        or die "Error creating temp config file: $!";
+    $CLASS->addToCleanup(sub {
+        unlink $config_copy;
+        undef $config_copy;
+        undef $config;
+    });
+    return $config_copy;
 }
 
 #----------------------------------------------------------------------------
@@ -424,7 +450,7 @@ Optionally adds a filename to the end.
 sub getTestCollateralPath {
     my $class           = shift;
     my @path            = @_;
-    return File::Spec->catfile(our $WEBGUI_TEST_COLLATERAL, @path);
+    return catfile(our $WEBGUI_TEST_COLLATERAL, @path);
 }
 
 sub collateral {
@@ -439,10 +465,8 @@ Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
 
 =cut
 
-our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_TEST_ROOT, File::Spec->updir, 'lib' );
-
 sub lib {
-    return our $WEBGUI_LIB;
+    return catdir( $WEBGUI_TEST_ROOT, updir, 'lib' );
 }
 
 #----------------------------------------------------------------------------

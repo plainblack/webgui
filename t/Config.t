@@ -85,6 +85,3 @@ if ($cookieName eq "") {
 $config->set('privateArray', ['a', 'b', 'c']);
 cmp_bag($config->get('privateArray'), ['a', 'b', 'c'], 'set: array, not scalar');
 
-END {
-    $config->delete('privateArray');
-}

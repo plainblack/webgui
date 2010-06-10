@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::AdSpace;
+use WebGUI::AdSpace::Ad;
 
 use Test::More;
 use Test::Deep;
@@ -38,11 +39,8 @@ my $newAdSettings = {
 
 my $numTests = 33; # increment this value for each test you create
 $numTests += scalar keys %{ $newAdSettings };
-++$numTests; ##For conditional testing on module load
 
 plan tests => $numTests;
-
-my $loaded = use_ok('WebGUI::AdSpace::Ad');
 
 my $session = WebGUI::Test->session;
 my $ad;
@@ -51,10 +49,6 @@ my $adSpace;
 my $imageStorage = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($imageStorage);
 $imageStorage->addFileFromScalar('foo.bmp', 'This is not really an image');
-
-SKIP: {
-
-    skip "Unable to load WebGUI::AdSpace::Ad", $numTests-1 unless $loaded;
 
     local $ENV{REMOTE_ADDR} = '10.0.0.1';
     local $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
@@ -208,8 +202,6 @@ SKIP: {
     $setAd->set({ url => '', adText => ''});
     is($setAd->get('url'),    '', 'set: clearing url');
     is($setAd->get('adText'), '', 'set: clearing adText');
-
-}
 
 END {
         foreach my $advertisement ($ad, $richAd, $textAd, $imageAd, $nonAd, $setAd) {
