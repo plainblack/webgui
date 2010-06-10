@@ -128,7 +128,7 @@ END {
 
 #----------------------------------------------------------------------------
 
-=head2 newSession ( $noCleanup )
+=head2 newSession ( $noCleanup, [ $request ] )
 
 Builds a WebGUI session object for testing.
 
@@ -136,14 +136,19 @@ Builds a WebGUI session object for testing.
 
 If true, the session won't be registered for automatic deletion.
 
+=head3 $request
+
+Either a HTTP::Request object to use for this session, or a hash ref of form parameters.
+
 =cut
 
 sub newSession {
     shift
         if eval { $_[0]->isa($CLASS) };
     my $noCleanup = shift;
+    my $request = shift;
     require WebGUI::Session;
-    my $session = WebGUI::Session->open( $CLASS->config, newEnv() );
+    my $session = WebGUI::Session->open( $CLASS->config, newEnv( $request ) );
     if ( ! $noCleanup ) {
         $CLASS->addToCleanup($session);
     }
@@ -158,9 +163,18 @@ sub newEnv {
     require HTTP::Message::PSGI;
     require HTTP::Request::Common;
     my $config = $CLASS->config;
-    my $url = 'http://' . $config->get('sitename')->[0];
-    my $env = HTTP::Request->new( $form ? ( POST => $url, [ %$form ] ) : ( GET => $url ) )->to_psgi;
-    return $env;
+    my $request;
+    if ( try { $form->isa('HTTP::Request') } ) {
+        $request = $form;
+    }
+    else {
+        my $url = 'http://' . $config->get('sitename')->[0];
+        $request = $form
+            ? HTTP::Request::Common::POST( $url, [ %$form ] )
+            : HTTP::Request::Common::GET( $url )
+            ;
+    }
+    return $request->to_psgi;
 }
 
 sub clientTest (&) {

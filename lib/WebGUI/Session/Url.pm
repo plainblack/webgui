@@ -196,11 +196,12 @@ sub make_urlmap_work {
     if (! $self->session->request) {
         return $url;
     }
-	my $uri = $self->session->request->base;
+    if (URI->new($url, 'http')->host) {
+        return $url;
+    }
+    my $uri = $self->session->request->base;
     $uri->path($uri->path . $url);
-    my $path = $uri->path;
-    $path =~ s{^//}{/};
-    return $path;
+    return $uri->path;
 }
 
 #-------------------------------------------------------------------
