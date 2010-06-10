@@ -841,7 +841,14 @@ Example call:
         },
         'SQL' => sub {
             my (undef, $sql) = @_;
-            return $CLASS->session->db->dbh->prepare($sql);
+            my $db = $CLASS->session->db;
+            my @params;
+            if ( ref $sql ) {
+                ( $sql, @params ) = @$sql;
+            }
+            return sub {
+                $db->write( $sql, \@params );
+            }
         },
     );
 
@@ -923,7 +930,9 @@ Example call:
         'CODE' => sub {
             (shift)->();
         },
-        'SQL' => 'execute',
+        'SQL' => sub {
+            (shift)->();
+        },
     );
 
     sub cleanupGuard {
