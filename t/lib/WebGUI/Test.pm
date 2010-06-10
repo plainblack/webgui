@@ -28,8 +28,8 @@ use base qw(Test::Builder::Module);
 
 use Test::MockObject;
 use Test::MockObject::Extends;
+use Log::Log4perl;  # load early to ensure proper order of END blocks
 use Clone               qw(clone);
-use Config              ();
 use IO::Handle          ();
 use File::Spec          ();
 use IO::Select          ();
@@ -41,35 +41,47 @@ use JSON                qw( from_json to_json );
 use Scope::Guard;
 
 BEGIN {
-    my $file_root = File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], '');
 
-    our $WEBGUI_ROOT = Cwd::realpath( File::Spec->catdir( $file_root, (File::Spec->updir) x 3 ));
-    our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
-    our $WEBGUI_LIB = File::Spec->catdir( $WEBGUI_ROOT, 'lib' );
+our $WEBGUI_TEST_ROOT = File::Spec->catdir(
+    File::Spec->catpath((File::Spec->splitpath(__FILE__))[0,1], ''),
+    (File::Spec->updir) x 2
+);
+our $WEBGUI_TEST_COLLATERAL = File::Spec->catdir(
+    $WEBGUI_TEST_ROOT,
+    'supporting_collateral'
+);
+our $WEBGUI_ROOT = File::Spec->catdir(
+    $WEBGUI_TEST_ROOT,
+    File::Spec->updir,
+);
+our $WEBGUI_LIB = File::Spec->catdir(
+    $WEBGUI_ROOT,
+    'lib',
+);
 
-    push @INC, $WEBGUI_LIB;
+push @INC, $WEBGUI_LIB;
 
-    ##Handle custom loaded library paths
-    my $customPreload = File::Spec->catfile( $WEBGUI_ROOT, 'sbin', 'preload.custom');
-    if (-e $customPreload) {
-        open my $PRELOAD, '<', $customPreload or
-            croak "Unload to open $customPreload: $!\n";
-        LINE: while (my $line = <$PRELOAD>) {
-            $line =~ s/#.*//;
-            $line =~ s/^\s+//;
-            $line =~ s/\s+$//;
-            next LINE if !$line;
-            unshift @INC, $line;
-        }
-        close $PRELOAD;
+##Handle custom loaded library paths
+my $customPreload = File::Spec->catfile( $WEBGUI_ROOT, 'sbin', 'preload.custom');
+if (-e $customPreload) {
+    open my $PRELOAD, '<', $customPreload or
+        croak "Unload to open $customPreload: $!\n";
+    LINE: while (my $line = <$PRELOAD>) {
+        $line =~ s/#.*//;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next LINE if !$line;
+        unshift @INC, $line;
     }
+    close $PRELOAD;
 }
 
-use WebGUI::Session;
+}
+
 use WebGUI::PseudoRequest;
 
 our @EXPORT = qw(cleanupGuard addToCleanup);
-our @EXPORT_OK = qw(session config);
+our @EXPORT_OK = qw(session config collateral);
 
 my $CLASS = __PACKAGE__;
 
@@ -86,6 +98,11 @@ sub import {
         unless -r _;
 
     $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, File::Spec->catdir($CLASS->root, 'etc'));
+
+    goto &{ $_[0]->can('SUPER::import') };
+}
+
+sub _initSession {
     my $session = our $SESSION = $CLASS->newSession(1);
 
     my $originalSetting = clone $session->setting->get;
@@ -134,8 +151,6 @@ sub import {
             }
         });
     }
-
-    goto &{ $_[0]->can('SUPER::import') };
 }
 
 END {
@@ -155,8 +170,11 @@ If true, the session won't be registered for automatic deletion.
 =cut
 
 sub newSession {
+    shift
+        if eval { $_[0]->isa($CLASS) };
     my $noCleanup = shift;
     my $pseudoRequest = WebGUI::PseudoRequest->new;
+    require WebGUI::Session;
     my $session = WebGUI::Session->open( $CLASS->root, $CLASS->file );
     $session->{_request} = $pseudoRequest;
     if ( ! $noCleanup ) {
@@ -324,9 +342,13 @@ Returns the config object from the session.
 
 =cut
 
+my $config;
 sub config {
-    return undef unless defined $CLASS->session;
-    return $CLASS->session->config;
+    return $config
+        if $config;
+    require WebGUI::Config;
+    $config = WebGUI::Config->new(our $CONFIG_FILE);
+    return $config;
 }
 
 #----------------------------------------------------------------------------
@@ -426,8 +448,12 @@ Optionally adds a filename to the end.
 
 sub getTestCollateralPath {
     my $class           = shift;
-    my $filename        = shift;
-    return File::Spec->catfile(our $WEBGUI_TEST_COLLATERAL, $filename);
+    my @path            = @_;
+    return File::Spec->catfile(our $WEBGUI_TEST_COLLATERAL, @path);
+}
+
+sub collateral {
+    return $CLASS->getTestCollateralPath(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -470,7 +496,11 @@ disabled.
 =cut
 
 sub session {
-    return our $SESSION;
+    our $SESSION;
+    if (! $SESSION) {
+        _initSession();
+    }
+    return $SESSION;
 }
 
 #----------------------------------------------------------------------------
@@ -710,6 +740,10 @@ Example call:
         '' => sub {
             my ($class, $ident) = @_;
             return $class->new($CLASS->session, $ident);
+        },
+        'WebGUI::Asset' => sub {
+            my ($class, $ident) = @_;
+            return WebGUI::Asset->newPending($CLASS->session, $ident);
         },
         'WebGUI::Storage' => sub {
             my ($class, $ident) = @_;
