@@ -49,6 +49,8 @@ my $yesterday = $now-24*3600;
 my $newFolder = $archive->getFolder($yesterday);
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
+$versionTag->commit;
+WebGUI::Test->addToCleanup($versionTag);
 
 my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", keywords => 'andy,norton'});
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
@@ -70,6 +72,7 @@ STORY: foreach my $name (@characters) {
 
 $storyHandler->{bogs}->update({subtitle => 'drinking his food through a straw'});
 
+my $topicTag = WebGUI::VersionTag->getWorking($session);
 my $topic = WebGUI::Asset->getDefault($session)->addChild({
     className   => 'WebGUI::Asset::Wobject::StoryTopic',
     title       => 'Popular inmates in Shawshank Prison',
@@ -83,8 +86,8 @@ $topic->update({
     storiesShort => 3,
 });
 
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
+$topicTag->commit;
+WebGUI::Test->addToCleanup($topicTag);
 
 $topic = $topic->cloneFromDb;
 
