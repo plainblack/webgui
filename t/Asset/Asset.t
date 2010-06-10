@@ -372,10 +372,6 @@ is($importNode->fixUrl('1234'.'_'x235 . 'abcdefghij'), '1234'.'_'x235 . 'abcdefg
 is($importNode->fixUrl('1234'.'_'x250 . 'abcdefghij'), '1234'.'_'x216, 'fixUrl truncates long URLs over 250 characters to 220 characters');
 is $importNode->fixUrl('---'), '-', '... 3 dashes are collapsed down to a single dash';
 
-WebGUI::Test->originalConfig('extrasURL');
-WebGUI::Test->originalConfig('uploadsURL');
-WebGUI::Test->originalConfig('assets');
-
 $session->config->set('extrasURL',    '/extras');
 $session->config->set('uploadsURL',   '/uploads');
 
