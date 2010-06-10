@@ -62,7 +62,7 @@ $creationDateSth->execute([$weekAgo, $weekStory->getId]);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $workflow  = WebGUI::Workflow->create($session,
     {
@@ -71,7 +71,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
-addToCleanup($workflow);
+WebGUI::Test->addToCleanup($workflow);
 
 my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ArchiveOldStories');
 
@@ -99,6 +99,7 @@ my $archivedAssets = $home->getLineage(
 
 cmp_bag( $archivedAssets, [ ], 'Nothing archived.');
 
+$archive2 = $archive2->cloneFromDb;
 $archive2->update({ archiveAfter => 5*24*3600, });
 
 my $instance2 = WebGUI::Workflow::Instance->create($session,
@@ -120,5 +121,5 @@ $archivedAssets = $home->getLineage(
     },
 );
 
-cmp_bag( $archivedAssets, [ $weekStory->getId, $weekFolder->getId ], 'Nothing archived.');
+cmp_bag( $archivedAssets, [ $weekStory->getId, $weekFolder->getId ], 'archived two folders');
 $creationDateSth->finish;
