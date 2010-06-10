@@ -523,57 +523,6 @@ sub getSmokeLDAPProps {
 
 #----------------------------------------------------------------------------
 
-=head2 prepareMailServer ( )
-
-Prepare a Net::SMTP::Server to use for testing mail.
-
-=cut
-
-my $smtpdPid;
-my $smtpdStream;
-my $smtpdSelect;
-
-sub prepareMailServer {
-    eval {
-        require Net::SMTP::Server;
-        require Net::SMTP::Server::Client;
-    };
-    croak "Cannot load Net::SMTP::Server: $@" if $@;
-
-    my $SMTP_HOST        = 'localhost';
-    my $SMTP_PORT        = '54921';
-    my $smtpd    = File::Spec->catfile( $CLASS->root, 't', 'smtpd.pl' );
-    $smtpdPid = open $smtpdStream, '-|', $^X, $smtpd, $SMTP_HOST, $SMTP_PORT
-        or die "Could not open pipe to SMTPD: $!";
-
-    $smtpdSelect = IO::Select->new;
-    $smtpdSelect->add($smtpdStream);
-
-    $CLASS->session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
-
-    $CLASS->originalConfig('emailToLog');
-    $CLASS->session->config->set( 'emailToLog', 0 );
-
-    # Let it start up yo
-    sleep 2;
-
-    $CLASS->addToCleanup(sub {
-        # Close SMTPD
-        if ($smtpdPid) {
-            kill INT => $smtpdPid;
-        }
-        if ($smtpdStream) {
-            # we killed it, so there will be an error.  Prevent that from setting the exit value.
-            local $?;
-            close $smtpdStream;
-        }
-    });
-
-    return;
-}
-
-#----------------------------------------------------------------------------
-
 =head2 originalConfig ( $param )
 
 Stores the original data from the config file, to be restored
@@ -602,63 +551,6 @@ sub originalConfig {
         });
     }
     $originalConfig{$param} = $safeValue;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 getMail ( )
-
-Read a sent mail from the prepared mail server (L<prepareMailServer>)
-
-=cut
-
-sub getMail {
-    my $json;
-
-    if ( !$smtpdSelect ) {
-        return from_json ' { "error": "mail server not prepared" }';
-    }
-
-    if ($smtpdSelect->can_read(5)) {
-        $json = <$smtpdStream>;
-    }
-    else {
-        $json = ' { "error": "mail not sent" } ';
-    }
-
-    if (!$json) {
-        $json = ' { "error": "error in getting mail" } ';
-    }
-
-    return from_json( $json );
-}
-
-#----------------------------------------------------------------------------
-
-=head2 getMailFromQueue ( )
-
-Send the first mail in the queue and then retrieve it from the smtpd. Returns
-false if there is no mail in the queue.
-
-Will prepare the server if necessary
-
-=cut
-
-sub getMailFromQueue {
-    my $class   = shift;
-    if ( !$smtpdSelect ) {
-        $class->prepareMailServer;
-    }
-
-    my $messageId = $CLASS->session->db->quickScalar( "SELECT messageId FROM mailQueue" );
-    warn $messageId;
-    return unless $messageId; 
-
-    require WebGUI::Mail::Send;
-    my $mail    = WebGUI::Mail::Send->retrieve( $CLASS->session, $messageId );
-    $mail->send;
-
-    return $class->getMail;
 }
 
 #----------------------------------------------------------------------------

@@ -17,16 +17,14 @@ use lib "$FindBin::Bin/../lib";
 use JSON qw( from_json to_json );
 use Test::More;
 use Test::Deep;
-use Data::Dumper;
 use MIME::Parser;
 use Encode qw/decode encode/;
+use Try::Tiny;
 
 use WebGUI::Test;
 use WebGUI::Paths;
 
 use WebGUI::Mail::Send;
-
-$| = 1;
 
 #----------------------------------------------------------------------------
 # Init
@@ -34,11 +32,6 @@ my $session         = WebGUI::Test->session;
 
 my $mail;       # The WebGUI::Mail::Send object
 my $mime;       # for getMimeEntity
-
-# See if we have an SMTP server to use
-my $hasServer   = 0;
-eval { WebGUI::Test->prepareMailServer; $hasServer = 1 };
-if ( $@ ) { diag( "Can't prepare mail server: $@" ) }
 
 #----------------------------------------------------------------------------
 # Tests
@@ -127,139 +120,119 @@ my $dbMail = WebGUI::Mail::Send->retrieve($session, $messageId);
 is($dbMail->getMimeEntity->head->get('List-ID'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", 'addHeaderField: handles utf-8 correctly');
 
 # TODO: Test that addHtml creates a body with the right content type
-my $smtpServerOk = 0;
+
+my $smtpServerOk;
 
 #----------------------------------------------------------------------------
 # Test emailOverride
 SKIP: {
-    my $numtests        = 2; # Number of tests in this block
-
-    # Must be able to write the config, or we'll die
-    if ( !-w File::Spec->catfile( WebGUI::Paths->configBase, WebGUI::Test->file ) ) {
-        skip "Cannot test emailOverride: Can't write new configuration value", $numtests;
+    try {
+        require WebGUI::Test::MailServer;
+        $smtpServerOk = 1;
     }
+    catch {
+        skip "Cannot run live SMTP tests: $_", 6;
+    };
 
-    # Must have an SMTP server, or it's pointless
-    if ( !$hasServer ) {
-        skip "Cannot test emailOverride: Module Net::SMTP::Server not loaded!", $numtests;
-    }
+    WebGUI::Test::MailServer::test_smtp($session, sub {
+        my $cb = shift;
 
-    sleep 1;
-    $smtpServerOk = 1;
+        # Override the emailOverride
+        $session->config->set( 'emailOverride', 'dufresne@localhost' );
 
-    # Override the emailOverride
-    my $oldEmailOverride   = $session->config->get('emailOverride');
-    $session->config->set( 'emailOverride', 'dufresne@localhost' );
+        # Send the mail
+        my $mail
+            = WebGUI::Mail::Send->create( $session, { 
+                to      => 'norton@localhost',
+            } );
+        $mail->addText( 'His judgement cometh and that right soon.' );
 
-    # Send the mail
-    my $mail
-        = WebGUI::Mail::Send->create( $session, { 
-            to      => 'norton@localhost',
-        } );
-    $mail->addText( 'His judgement cometh and that right soon.' );
+        $mail->send;
+        my $received = $cb->();
 
-    $mail->send;
-    my $received = WebGUI::Test->getMail;
+        # Test the mail
+        like( $received->{to}->[0], qr/dufresne\@localhost/,
+            "Email TO: address is overridden",
+        );
 
-    if (!$received) {
-        skip "Cannot test emailOverride: No response received from smtpd", $numtests;
-    }
+        my $parser         = MIME::Parser->new();
+        $parser->output_to_core(1);
+        my $parsed_message = $parser->parse_data($received->{contents});
+        my $head           = $parsed_message->head;
+        my $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+        like ($messageId, qr/^<WebGUI-([a-zA-Z0-9\-_]){22}@\w+\.\w{2,4}>$/, 'Message-Id is valid');
 
-    # Test the mail
-    like( $received->{to}->[0], qr/dufresne\@localhost/,
-        "Email TO: address is overridden",
-    );
+        $session->config->delete( 'emailOverride' );
 
-    my $parser         = MIME::Parser->new();
-    $parser->output_to_core(1);
-    my $parsed_message = $parser->parse_data($received->{contents});
-    my $head           = $parsed_message->head;
-    my $messageId      = decode('MIME-Header', $head->get('Message-Id'));
-    like ($messageId, qr/^<WebGUI-([a-zA-Z0-9\-_]){22}@\w+\.\w{2,4}>$/, 'Message-Id is valid');
+        # Send the mail
+        $mail
+            = WebGUI::Mail::Send->create( $session, { 
+                to        => 'norton@localhost',
+            } );
+        $mail->addText( "I understand you're a man who knows how to get things." );
 
-    # Restore the emailOverride
-    $session->config->set( 'emailOverride', $oldEmailOverride );
-}
+        $mail->send;
+        $received = $cb->();
 
-SKIP: {
-    my $numtests        = 4; # Number of tests in this block
+        # Test the mail
+        my $parsed_message = $received->{parsed};
+        my $head           = $parsed_message->head;
+        my $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+        chomp $messageId;
+        like ($messageId, qr/^<WebGUI-([a-zA-Z0-9\-_]){22}@\w+\.\w{2,4}>$/, 'generated Message-Id is valid');
 
-    skip "Cannot test message ids", $numtests unless $smtpServerOk;
+        # Send the mail
+        $mail
+            = WebGUI::Mail::Send->create( $session, { 
+                to        => 'norton@localhost',
+                messageId => '<leadingAngleOnly@localhost.localdomain',
+            } );
+        $mail->addText( "What say you there, fuzzy-britches? Feel like talking?" );
 
-    # Send the mail
-    my $mail
-        = WebGUI::Mail::Send->create( $session, { 
-            to        => 'norton@localhost',
-        } );
-    $mail->addText( "I understand you're a man who knows how to get things." );
+        $mail->send;
+        $received = $cb->();
 
-    $mail->send;
-    my $received = WebGUI::Test->getMail;
+        $parsed_message = $received->{parsed};
+        $head           = $parsed_message->head;
+        $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+        chomp $messageId;
+        is($messageId, '<leadingAngleOnly@localhost.localdomain>', 'bad messageId corrected (added ending angle)');
 
-    if (!$received) {
-        skip "Cannot test messageIds: No response received from smtpd", $numtests;
-    }
+        # Send the mail
+        $mail
+            = WebGUI::Mail::Send->create( $session, { 
+                to        => 'norton@localhost',
+                messageId => 'endingAngleOnly@localhost.localdomain>',
+            } );
+        $mail->addText( "Dear Warden, You were right. Salvation lies within." );
 
-    # Test the mail
-    my $parser         = MIME::Parser->new();
-    $parser->output_to_core(1);
-    my $parsed_message = $parser->parse_data($received->{contents});
-    my $head           = $parsed_message->head;
-    my $messageId      = decode('MIME-Header', $head->get('Message-Id'));
-    chomp $messageId;
-    like ($messageId, qr/^<WebGUI-([a-zA-Z0-9\-_]){22}@\w+\.\w{2,4}>$/, 'generated Message-Id is valid');
+        $mail->send;
+        $received = $cb->();
 
-    # Send the mail
-    $mail
-        = WebGUI::Mail::Send->create( $session, { 
-            to        => 'norton@localhost',
-            messageId => '<leadingAngleOnly@localhost.localdomain',
-        } );
-    $mail->addText( "What say you there, fuzzy-britches? Feel like talking?" );
+        $parsed_message = $received->{parsed};
+        $parsed_message = $parser->parse_data($received->{contents});
+        $head           = $parsed_message->head;
+        $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+        chomp $messageId;
+        is($messageId, '<endingAngleOnly@localhost.localdomain>', 'bad messageId corrected (added starting angle)');
 
-    $mail->send;
-    $received = WebGUI::Test->getMail;
+        # Send the mail
+        $mail
+            = WebGUI::Mail::Send->create( $session, { 
+                to        => 'red@localhost',
+                messageId => 'noAngles@localhost.localdomain',
+            } );
+        $mail->addText( "Neither are they. You have to be human first. They don't qualify." );
 
-    $parsed_message = $parser->parse_data($received->{contents});
-    $head           = $parsed_message->head;
-    $messageId      = decode('MIME-Header', $head->get('Message-Id'));
-    chomp $messageId;
-    is($messageId, '<leadingAngleOnly@localhost.localdomain>', 'bad messageId corrected (added ending angle)');
+        $mail->send;
+        $received = $cb->();
 
-    # Send the mail
-    $mail
-        = WebGUI::Mail::Send->create( $session, { 
-            to        => 'norton@localhost',
-            messageId => 'endingAngleOnly@localhost.localdomain>',
-        } );
-    $mail->addText( "Dear Warden, You were right. Salvation lies within." );
-
-    $mail->send;
-    $received = WebGUI::Test->getMail;
-
-    $parsed_message = $parser->parse_data($received->{contents});
-    $head           = $parsed_message->head;
-    $messageId      = decode('MIME-Header', $head->get('Message-Id'));
-    chomp $messageId;
-    is($messageId, '<endingAngleOnly@localhost.localdomain>', 'bad messageId corrected (added starting angle)');
-
-    # Send the mail
-    $mail
-        = WebGUI::Mail::Send->create( $session, { 
-            to        => 'red@localhost',
-            messageId => 'noAngles@localhost.localdomain',
-        } );
-    $mail->addText( "Neither are they. You have to be human first. They don't qualify." );
-
-    $mail->send;
-    $received = WebGUI::Test->getMail;
-
-    $parsed_message = $parser->parse_data($received->{contents});
-    $head           = $parsed_message->head;
-    $messageId      = decode('MIME-Header', $head->get('Message-Id'));
-    chomp $messageId;
-    is($messageId, '<noAngles@localhost.localdomain>', 'bad messageId corrected (added both angles)');
-
+        $parsed_message = $received->{parsed};
+        $head           = $parsed_message->head;
+        $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+        chomp $messageId;
+        is($messageId, '<noAngles@localhost.localdomain>', 'bad messageId corrected (added both angles)');
+    });
 }
 
 #----------------------------------------------------------------------------
@@ -292,24 +265,24 @@ WebGUI::Test->addToCleanup($inboxGroup);
 $inboxGroup->addUsers([$emailUser->userId, $inboxUser->userId, $lonelyUser->userId]);
 
 SKIP: {
-    my $numtests        = 1; # Number of tests in this block
+    skip "Cannot test email notifications", 1 unless $smtpServerOk;
 
-    # Must be able to write the config, or we'll die
-    skip "Cannot test email notifications", $numtests unless $smtpServerOk;
+    WebGUI::Test::MailServer::test_smtp($session, sub {
+        my $cb = shift;
+        # Send the mail
+        $mail = WebGUI::Mail::Send->create( $session, { 
+                toUser  => $inboxUser->userId,
+                },
+                'fromInbox',
+        );
+        $mail->addText( 'sent via email' );
 
-    # Send the mail
-    $mail = WebGUI::Mail::Send->create( $session, { 
-            toUser  => $inboxUser->userId,
-            },
-            'fromInbox',
-    );
-    $mail->addText( 'sent via email' );
+        $mail->send;
+        my $received = $cb->();
 
-    $mail->send;
-    my $received = WebGUI::Test->getMail;
-
-    # Test the mail
-    is($received->{to}->[0], '<ellis_boyd_redding@shawshank.gov>', 'send, toUser with email address');
+        # Test the mail
+        is($received->{to}->[0], '<ellis_boyd_redding@shawshank.gov>', 'send, toUser with email address');
+    });
 }
 
 #----------------------------------------------------------------------------
