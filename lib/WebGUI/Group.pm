@@ -1595,7 +1595,7 @@ sub resetGroupFields {
 
     ##Note, I did assets in SQL instead of using the API because you would have to
     ##instanciate every version of the asset that used the group.  This should be much quicker
-    ASSET: foreach my $asset (keys %{ $assets }) {
+    ASSET: foreach my $asset ( $db->quickArray('SELECT DISTINCT className FROM asset') ) {
         my $definition = WebGUI::Pluggable::instanciate($asset, 'definition', [$session]);
         SUBDEF: foreach my $subdef (@{ $definition }) {
             next SUBDEF if exists $tableCache->{$subdef->{tableName}}; 
