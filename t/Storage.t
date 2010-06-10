@@ -15,7 +15,6 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Storage;
-use WebGUI::PseudoRequest;
 
 use File::Spec;
 use File::Temp qw/tempdir/;

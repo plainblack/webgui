@@ -315,6 +315,3 @@ TODO: {
 	local $TODO = "Methods that need to be tested";
 	ok(0, 'resize');
 }
-
-END {
-}

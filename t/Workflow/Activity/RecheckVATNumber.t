@@ -110,6 +110,4 @@ sub createInstance {
     return $instance;
 };
 
-
-
 #vim:ft=perl

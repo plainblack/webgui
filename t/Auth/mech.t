@@ -276,7 +276,3 @@ $mech->submit_form_ok(
 );
 $mech->base_is( $assetUrl, "We don't get redirected" );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-}

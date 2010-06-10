@@ -239,5 +239,3 @@ TODO: {
     ok(0, 'output from fatal when there is a db handler and request present');
 }
 
-END {
-}
