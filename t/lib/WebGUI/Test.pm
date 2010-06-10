@@ -139,6 +139,8 @@ If true, the session won't be registered for automatic deletion.
 =cut
 
 sub newSession {
+    shift
+        if eval { $_[0]->isa($CLASS) };
     my $noCleanup = shift;
     my $pseudoRequest = WebGUI::PseudoRequest->new;
     require WebGUI::Session;
@@ -885,7 +887,7 @@ This is a class method.
 my @guarded;
 sub addToCleanup {
     shift
-        if try { $_[0]->isa($CLASS) };
+        if eval { $_[0]->isa($CLASS) };
     push @guarded, cleanupGuard(@_);
 }
 
