@@ -693,6 +693,25 @@ sub assetsToPurge {
 
 #----------------------------------------------------------------------------
 
+=head2 cleanupAdminInbox ( )
+
+Push a list of Asset objects onto the stack of assets to be automatically purged
+at the end of the test.  This will also clean-up all version tags associated
+with the Asset.
+
+This is a class method.
+
+=cut
+
+sub cleanupAdminInbox {
+    my $class = shift;
+    my $admin = WebGUI::User->new($class->session, '3');
+    my $inbox = WebGUI::Inbox->new($class->session);
+    $inbox->deleteMessagesForUser($admin);
+}
+
+#----------------------------------------------------------------------------
+
 =head2 groupsToDelete ( $group, [$group ] )
 
 Push a list of group objects onto the stack of groups to be automatically deleted

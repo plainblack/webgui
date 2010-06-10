@@ -146,10 +146,11 @@ sub deleteMessagesForUser {
 	my $self    = shift;
     my $user    = shift;
 
-    my $db      = $self->session->db;
+    my $messages = $self->getMessagesForUser($user, 1e10);
     my $userId  = $user->userId;
-    $db->write("DELETE FROM inbox_messageState WHERE userId=?",[$userId]);
-    $db->write("DELETE FROM inbox WHERE userId=? AND (groupId IS NULL OR groupId='')",[$userId]);
+    foreach my $message (@{ $messages }) {
+        $message->delete($userId);
+    }
 }
 
 #-------------------------------------------------------------------
