@@ -63,9 +63,9 @@ my $storyHandler = {};
 
 STORY: foreach my $name (@characters) {
     my $namedStory = $nowFolder->addChild({ className => 'WebGUI::Asset::Story', title => $name, keywords => $name, } );
-    $storyHandler->{$name} = $namedStory;
     $creationDateSth->execute([$now, $namedStory->getId]);
     $namedStory->requestAutoCommit;
+    $storyHandler->{$name} = $namedStory->cloneFromDb;
 }
 
 $storyHandler->{bogs}->update({subtitle => 'drinking his food through a straw'});
@@ -84,7 +84,9 @@ $topic->update({
 });
 
 $versionTag->commit;
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
+
+$topic = $topic->cloneFromDb;
 
 ################################################################
 #
