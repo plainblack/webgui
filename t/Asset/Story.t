@@ -119,18 +119,18 @@ $story = $archive->addChild({
 });
 
 isa_ok($story, 'WebGUI::Asset::Story', 'Created a Story asset');
-is($story->get('photo'),   '[]', 'by default, photos is an empty JSON array');
-is($story->get('isHidden'), 1, 'by default, stories are hidden');
+is($story->photo,   '[]', 'by default, photos is an empty JSON array');
+is($story->isHidden, 1, 'by default, stories are hidden');
 $story->update({isHidden => 0});
-is($story->get('isHidden'), 1, 'stories cannot be set to not be hidden');
-is($story->get('state'),    'published', 'Story is published');
+is($story->isHidden, 1, 'stories cannot be set to not be hidden');
+is($story->state,    'published', 'Story is published');
 $story->requestAutoCommit;
 
 {
     ##Version control does not alter the current object's status, fetch an updated copy from the
     ##db.
-    my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
-    is($storyDB->get('status'),   'approved',  'Story is approved');
+    my $storyDB = $story->cloneFromDb;
+    is($storyDB->status,   'approved',  'Story is approved');
 }
 
 
@@ -179,7 +179,7 @@ $story->setPhotoData([
     },
 ]);
 
-is($story->get('photo'), q|[{"caption":"Shawshank Prison","byLine":"Andrew Dufresne"}]|, 'setPhotoData: set JSON in the photo property');
+is($story->photo, q|[{"caption":"Shawshank Prison","byLine":"Andrew Dufresne"}]|, 'setPhotoData: set JSON in the photo property');
 
 $photoData = $story->getPhotoData();
 $photoData->[0]->{caption}="My cell";
@@ -273,7 +273,7 @@ cmp_deeply(
         description => 'WebGUI was originally called Web Done Right.',
         'link'      => re('story-1$'),
         author      => 'JT Smith',
-        date        => $story->get('lastModified'),
+        date        => $story->lastModified,
     },
     'getRssData: returns correct data'
 );
@@ -292,7 +292,7 @@ $story->update({
     highlights => "one\ntwo\nthree",
     keywords   => "foxtrot,tango,whiskey",
 });
-is($story->get('highlights'), "one\ntwo\nthree", 'highlights set correctly for template var check');
+is($story->highlights, "one\ntwo\nthree", 'highlights set correctly for template var check');
 
 $storage1->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
 $storage2->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
@@ -342,7 +342,7 @@ cmp_bag(
     'viewTemplateVariables: keywords_loop is okay'
 );
 
-is ($viewVariables->{updatedTimeEpoch}, $story->get('revisionDate'), 'viewTemplateVariables: updatedTimeEpoch');
+is ($viewVariables->{updatedTimeEpoch}, $story->revisionDate, 'viewTemplateVariables: updatedTimeEpoch');
 
 cmp_deeply(
     $viewVariables->{photo_loop},
