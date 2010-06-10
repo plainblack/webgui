@@ -315,7 +315,7 @@ sub _build_assetKeywords {
     my $self = shift;
     my $session = $self->session;
     my $keywords = WebGUI::Keyword->new($session);
-    return $keywords->getKeywordsForAsset({asset => $self, asArrayRef => 1 });
+    return $keywords->getKeywordsForAsset({asset => $self, });
 }
 
 around BUILDARGS => sub {

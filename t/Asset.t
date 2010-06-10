@@ -363,16 +363,16 @@ my $session = WebGUI::Test->session;
     });
     WebGUI::Test->addToCleanup($asset);
     can_ok($asset, 'keywords');
-    $asset->keywords('chess set');
-    is ($asset->keywords, 'chess set', 'set and get of keywords via direct accessor');
-    is ($asset->get('keywords'), 'chess set', 'via get method');
+    $asset->keywords('chess set, checkers board');
+    is ($asset->keywords, 'chess set, checkers board', 'set and get of keywords via direct accessor');
+    is ($asset->get('keywords'), 'chess set, checkers board', 'via get method');
     my $keygate = WebGUI::Keyword->new($session);
     is $keygate->getKeywordsForAsset({assetId => $asset->getId}), '', 'not persisted to the db';
     $asset->write;
-    is $keygate->getKeywordsForAsset({assetId => $asset->assetId}), 'chess set', 'written to the db';
+    is $keygate->getKeywordsForAsset({assetId => $asset->assetId}), 'checkers board, chess set', 'written to the db';
 
     my $asset_copy = $asset->cloneFromDb;
-    is $asset->keywords, 'chess set', 'refreshed from db';
+    is $asset->keywords, 'chess set, checkers board', 'refreshed from db';
 
     my $asset2 = $default->addChild({
         className => 'WebGUI::Asset::Snippet',
