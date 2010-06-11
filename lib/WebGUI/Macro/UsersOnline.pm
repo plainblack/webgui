@@ -19,9 +19,8 @@ package WebGUI::Macro::UsersOnline;
 =cut
 
 use strict;
-use Apache2::ServerRec;
 use Net::DNS;
-use WebGUI::Asset::Template;
+use WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::Session::DateTime;
 use WebGUI::SQL;
@@ -118,7 +117,15 @@ sub process {
 	$var{'lastActivity_label'} = $i18n->get("Last Activity");
 	
 	# Process Template
-	return WebGUI::Asset::Template->newById($session,$templateId)->process(\%var);
+    my $template = eval { WebGUI::Asset->newById($session,$templateId); };
+    if (Exception::Class->caught) {
+        #Rethrow with the correct error
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $templateId,
+        );
+    }
+	return $template->process(\%var);
 }
 
 #-------------------------------------------------------------------
