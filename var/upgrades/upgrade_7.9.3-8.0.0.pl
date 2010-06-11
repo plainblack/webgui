@@ -28,6 +28,7 @@ my $session = start(); # this line required
 moveMaintenance($session);
 migrateToNewCache($session);
 moveFileLocations($session);
+addMaintenancePageToConfig($session);
 
 finish($session); # this line required
 
@@ -63,6 +64,14 @@ sub moveMaintenance {
     my $session = shift;
     print "\tMoving maintenance file " unless $quiet;
     unlink '../../docs/maintenance.html';
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addMaintenancePageToConfig {
+    my $session = shift;
+    print "\tAdd maintenance page entry to the config file " unless $quiet;
+    $session->config->set('maintenancePage', '/data/WebGUI/var/www/maintenance.html');
     print "DONE!\n" unless $quiet;
 }
 

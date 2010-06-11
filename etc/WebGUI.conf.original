@@ -1091,6 +1091,9 @@
 #Admin settings, then the mobile style will be used for these browsers.
    "siteIndex" : {
       "showHiddenPages" : 0
-   }
+   },
+
+#The complete path to the maintenance page.
+   "maintenancePage" : "/data/WebGUI/www/maintenance.html"
 
 }
