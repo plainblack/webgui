@@ -1187,7 +1187,7 @@ sub resetGroupFields {
 
     ##Note, I did assets in SQL instead of using the API because you would have to
     ##instanciate every version of the asset that used the group.  This should be much quicker
-    ASSET: foreach my $assetClass (keys %{ $assets }) {
+    ASSET: foreach my $assetClass ($db->quickArray('SELECT DISTINCT className FROM asset')) {
         my $className  = eval { WebGUI::Asset->loadModule($assetClass); };
         if (my $e = Exception::Class->caught) {
             warn $e->cause;
