@@ -25,7 +25,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
 my $startTime = time();
-my $wgBday = 997966800;
+my $wgBday = WebGUI::Test->webguiBirthday;
 
 #----------------------------------------------------------------------------
 # Init
@@ -280,6 +280,11 @@ $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('ShawshankRe
 my $snippetTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($snippetTag);
 $snippetTag->commit;
+
+
+foreach my $asset ($snippet, $fileAsset) {
+    $asset = $asset->cloneFromDb;
+}
 
 my $guts;
 $guts = $bundle->fetchAsset(URI->new('asset://filePumpSnippet'));
