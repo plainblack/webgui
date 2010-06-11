@@ -241,12 +241,12 @@ sub _listViewPageInterval_builder {
 }
 
 property icalFeeds    => (
+            noFormPost      => 1,
             fieldType       => "textarea",
             default         => sub { return []; },
-            serialize       => 1,
-            noFormPost      => 1,
-            autoGenerate    => 0,
-            tab             => "display",
+            traits          => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
+            isa             => 'WebGUI::Type::JSONArray',
+            coerce          => 1,
         );
 
 property icalInterval    => (
