@@ -19,21 +19,17 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 2;
-plan tests => $tests + 1;
+plan tests => 3;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey');
+use_ok('WebGUI::Asset::Wobject::Survey');
 my ($survey);
 
 # Returns the contents of the Survey_tempReport table
 sub getAll { $session->db->buildArrayRefOfHashRefs('select * from Survey_tempReport where assetId = ?', [$survey->getId]) }
 
-SKIP: {
-
-skip $tests, "Unable to load Survey" unless $usedOk;
 my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->addToCleanup($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
@@ -42,7 +38,7 @@ my $import_node = WebGUI::Asset->getImportNode($session);
 $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
-my $sJSON = $survey->surveyJSON;
+my $sJSON = $survey->getSurveyJSON;
 
 # Load bare-bones survey, containing a single section (S0)
 $sJSON->update([0], { variable => 'S0' });
@@ -127,8 +123,6 @@ superhashof({
     isCorrect => 1,
     value => 20, # e.g. score
 })]);
-
-}
 
 
 #----------------------------------------------------------------------------
