@@ -290,7 +290,7 @@ is($gcAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)->
 
 # now let's get tricky and test different file extensions
 my $storage = WebGUI::Storage->create($session);
-WebGUI::Test->addToCleanup($storage->getId);
+WebGUI::Test->addToCleanup('WebGUI::Storage' => $storage->getId);
 my $filename = 'somePerlFile_pl.txt';
 $storage->addFileFromScalar($filename, $filename);
 $session->user({userId=>3});
