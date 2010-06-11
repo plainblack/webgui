@@ -46,6 +46,8 @@ create table jsonCollateralDummy (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 EOSQL
 
+WebGUI::Test->addToCleanup(SQL => 'drop table jsonCollateralDummy');
+
 plan tests => 40;
 
 my $asset = WebGUI::Asset->getDefault($session)->addChild({
@@ -54,6 +56,7 @@ my $asset = WebGUI::Asset->getDefault($session)->addChild({
 });
 
 my $tag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($tag);
 $tag->commit;
 
 ################################################################
@@ -97,7 +100,7 @@ cmp_deeply(
 #
 ################################################################
 
-my $assetClone = WebGUI::Asset->new($session, $asset->getId, 'WebGUI::Asset::JSONCollateralDummy');
+my $assetClone = $asset->cloneFromDb;
 
 cmp_deeply(
     $assetClone->get('jsonField'),
@@ -343,14 +346,4 @@ cmp_deeply(
     ],
     '...collateral was removed'
 );
-
-note $asset->getId;
-
-
-$tag->rollback;
-$asset->purge;
-
-$session->db->write(<<EOSQL);
-drop table jsonCollateralDummy
-EOSQL
 

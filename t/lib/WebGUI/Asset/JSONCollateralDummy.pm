@@ -19,6 +19,26 @@ use Tie::IxHash;
 use Class::C3;
 use base qw/WebGUI::JSONCollateral WebGUI::Asset/;
 
+use strict;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+define assetName => 'JSON Collateral Dummy';
+define tableName => 'jsonCollateralDummy';
+define icon      => 'assets.gif';
+
+property jsonField => (
+            fieldType    => 'textarea',
+            noFormPost   => 1,
+            default      => sub { [] },
+            traits       => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
+            isa          => 'WebGUI::Type::JSONArray',
+            coerce       => 1,
+         );
+
+with 'WebGUI::Role::Asset::JSONCollateral';
+
 =head1 NAME
 
 Package WebGUI::Asset::JSONCollateral
@@ -40,39 +60,7 @@ These methods are available from this class:
 
 =cut
 
-#-------------------------------------------------------------------
 
-=head2 definition ( )
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift || [];
-    my %properties;
-    tie %properties, 'Tie::IxHash';
-    %properties = (
-        jsonField => {
-            label        => 'jsonField',
-            hoverHelp    => 'Not really needed, it is for internal data in this test case',
-            fieldType    => 'textarea',
-            serialize    => 1,
-            defaultValue => [],
-            noFormPost   => 1,
-        },
-    );
-    push(@{$definition}, {
-        assetName=>'JSON Collateral Dummy',
-        tableName=>'jsonCollateralDummy',
-        autoGenerateForms=>1,
-        className=>'WebGUI::Asset::JSONCollateralDummy',
-        icon=>'assets.gif',
-        properties=>\%properties
-        }
-    );
-    return $class->next::method($session, $definition);
-}
 
 1;
 
