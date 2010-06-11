@@ -412,7 +412,10 @@ cmp_deeply(
 isnt($newPhotoData->[0]->{storageId}, $photoData->[0]->{storageId}, '... and storage 0 is duplicated');
 isnt($newPhotoData->[1]->{storageId}, $photoData->[1]->{storageId}, '... and storage 1 is duplicated');
 
-WebGUI::Test->addToCleanup( map { 'WebGUI::Storage' => $_->{storageId} } @{ $newPhotoData } );
+{
+    my %hash = map { ('WebGUI::Storage' => $_->{storageId}) } @{ $newPhotoData };
+    WebGUI::Test->addToCleanup(%hash);
+}
 
 ############################################################
 #
