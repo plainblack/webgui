@@ -368,25 +368,25 @@ sub appendTemplateVarsSearchForm {
     $var->{ searchForm_basicSearch }
         = WebGUI::Form::text( $session, {
             name        => "basicSearch",
-            value       => $form->get("basicSearch"),
+            value       => scalar $form->get("basicSearch"),
         });
 
     $var->{ searchForm_title    }
         = WebGUI::Form::text( $session, {
             name        => "title",
-            value       => $form->get("title"),
+            value       => scalar $form->get("title"),
         });
 
     $var->{ searchForm_description }
         = WebGUI::Form::text( $session, {
             name        => "description",
-            value       => $form->get("description"),
+            value       => scalar $form->get("description"),
         });
 
     $var->{ searchForm_keywords }
         = WebGUI::Form::text( $session, {
             name        => "keywords",
-            value       => $form->get("keywords"),
+            value       => scalar $form->get("keywords"),
         });
 
     # Search classes
@@ -407,12 +407,12 @@ sub appendTemplateVarsSearchForm {
     $var->{ searchForm_creationDate_after }
         = WebGUI::Form::dateTime( $session, {
             name        => "creationDate_after",
-            value       => $form->get("creationDate_after",  "dateTime", $oneYearAgo),
+            value       => scalar $form->get("creationDate_after",  "dateTime", $oneYearAgo),
         });
     $var->{ searchForm_creationDate_before }
         = WebGUI::Form::dateTime( $session, {
             name        => "creationDate_before",
-            value       => $form->get("creationDate_before", "dateTime", time()),
+            value       => scalar $form->get("creationDate_before", "dateTime", time()),
         });
 
     # Buttons
