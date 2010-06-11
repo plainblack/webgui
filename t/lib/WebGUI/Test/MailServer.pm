@@ -20,6 +20,32 @@ Package WebGUI::Test::MailServer
 
 Routines for testing mail sending in WebGUI
 
+=head1 SUBROUTINES
+
+=head2 test_smtp ( $session, $testSub )
+
+Sets up a SMTP server and runs a test sub against it.  The test sub will be called with a callback sub as a parameter.  Calling that callback will return a hash ref with four keys.
+
+=over 8
+
+=item to
+
+Contains an array of addresses the message was sent to.
+
+=item from
+
+Contains the address the message was sent from.
+
+=item contents
+
+Contains the raw contents of the mail message.
+
+=item parsed
+
+Contains the mail message as a L<MIME::Entity> object.
+
+=back
+
 =cut
 
 use strict;
@@ -38,6 +64,7 @@ use MIME::Parser;
 my $smtpdPid;
 my $smtpdStream;
 my $smtpdSelect;
+
 
 sub test_smtp {
     my $session = shift;
@@ -71,7 +98,7 @@ sub _setup_server {
     my $lib_path = catdir( dirname(__FILE__), (updir) x 2 );
     my @command_line = (
         $^X, "-I$lib_path", '-M' . __PACKAGE__,
-        '-e' . __PACKAGE__ . '::run_server(@ARGV)', $host, $port,
+        '-e' . __PACKAGE__ . '::_run_server(@ARGV)', $host, $port,
     );
 
     $smtpdPid = open $smtpdStream, '-|', @command_line
@@ -102,22 +129,7 @@ sub _shutdown_server {
     }
 }
 
-=head2 getMail ( )
-
-Read a sent mail from the prepared mail server (L<prepareMailServer>)
-
-=cut
-
-sub getMail {
-    my $json;
-
-    if ($smtpdSelect->can_read(5)) {
-        $json = <$smtpdStream>;
-    }
-    return from_json( $json );
-}
-
-sub run_server {
+sub _run_server {
     my ($host, $port) = @_;
     my $server  = Net::SMTP::Server->new( $host, $port );
     local $| = 1;

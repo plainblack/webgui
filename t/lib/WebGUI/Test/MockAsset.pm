@@ -18,7 +18,33 @@ Package WebGUI::Test::MockAsset
 
 =head1 DESCRIPTION
 
-Utility module for making testing in WebGUI easier.
+Creates fake WebGUI::Asset objects and sets them up to be returned by WebGUI::Asset's normal constructors.
+
+=head1 METHODS
+
+=head2 new ( [ $class ], [ $id ] )
+
+Creates a new mock asset.  If not specified, the class will default to L<WebGUI::Asset>.  In addition to the methods listed, it will also include all of the methods from L<Test::MockObject>.  The object will automatically be cleaned up and will no longer be returned once it goes out of scope.
+
+=head2 mock_id ( $assetId, [ $asset_or_sub ] )
+
+As an object method, sets the asset ID for the object, and also sets the asset to be returned for that ID.
+
+As a class method, also accepts a second parameter.  If the second parameter is a sub, it will be called when the given asset ID is requested.  For any other type, the given object will be returned.
+
+=head2 unmock_id ( [ $assetId ] )
+
+As an object method, the mocking set up for the object by mock_id will be removed.
+
+As a class method, mocking will be removed for the given asset ID.
+
+=head2 mock_url ( $assetUrl, [ $asset_or_sub ] )
+
+Works the same as mock_id, except for asset URLs instead of IDs.
+
+=head2 unmock_url ( [ $assetUrl ] )
+
+Works the same as unmock_id, except for asset URLs instead of IDs.
 
 =cut
 
