@@ -22,6 +22,7 @@ use WebGUI::User;
 use WebGUI::Macro::UsersOnline;
 
 use Test::More; # increment this value for each test you create
+use Test::Exception;
 
 my $session = WebGUI::Test->session;
 
@@ -34,8 +35,7 @@ plan tests => 30;
 # Basic testing -----------------------------------------------------------
 
 # Check for default template
-my $defTemplate = WebGUI::Asset->new($session, 'h_T2xtOxGRQ9QJOR6ebLpQ');
-ok(defined $defTemplate, 'default template is present');
+lives_ok { WebGUI::Asset->newById($session, 'h_T2xtOxGRQ9QJOR6ebLpQ'); }, 'default template is present';
 
 # Call with default values
 my $html = WebGUI::Macro::UsersOnline::process($session);
