@@ -28,10 +28,6 @@ my ( $s, $t1 );
 my $tp = use_ok('TAP::Parser');
 my $tpa = use_ok('TAP::Parser::Aggregator');
 
-SKIP: {
-
-skip "Unable to load TAP::Parser and TAP::Parser::Aggregator", 88 unless $tp && $tpa;
-
 #----------------------------------------------------------------------------
 # put your tests here
 use_ok('WebGUI::Asset::Wobject::Survey::Test');
@@ -46,7 +42,12 @@ $session->config->set('enableSurveyExpressionEngine', 1);
 $s = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 isa_ok( $s, 'WebGUI::Asset::Wobject::Survey' );
 
-my $sJSON = $s->surveyJSON;
+my $tag = WebGUI::VersionTag->getWorking($session);
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+$s = $s->cloneFromDb;
+
+my $sJSON = $s->getSurveyJSON;
 
 # N.B. Survey starts off with a single empty section (S0)
 
@@ -724,7 +725,6 @@ Hashes differ on element: a
    got : '1'
 expect : '2'
 END_CMP
-}
 
 #----------------------------------------------------------------------------
 # Cleanup
