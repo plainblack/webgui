@@ -516,7 +516,7 @@ Example call:
                 ( $sql, @params ) = @$sql;
             }
             return sub {
-                $db->do( $sql, {}, @params );
+                $db->write( $sql, {}, @params );
             }
         },
     );
