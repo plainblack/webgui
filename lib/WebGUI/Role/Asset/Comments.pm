@@ -20,7 +20,7 @@ use WebGUI::Types;
 define tableName           => 'assetAspectComments';
 property comments => (
             noFormPost      => 1,
-            fieldType       => "hidden",
+            fieldType       => "textarea",
             default         => sub { [] },
             traits          => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
             isa             => 'WebGUI::Type::JSONArray',
