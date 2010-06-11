@@ -16,6 +16,7 @@ use WebGUI::AdminConsole;
 use WebGUI::TabForm;
 use WebGUI::International;
 use WebGUI::SQL;
+require WebGUI::Asset::RichEdit;
 
 =head1 NAME
 
