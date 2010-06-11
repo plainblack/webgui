@@ -148,6 +148,7 @@ checkModule("DateTime::Event::ICal",        "0.10"       );
 checkModule( "CHI",                                      );
 checkModule( "Cache::FastMmap",                          );
 checkModule('IO::Socket::SSL',                           );
+checkModule('Package::Stash',                            );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
