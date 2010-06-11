@@ -298,7 +298,7 @@ Creates a new session using the same WebGUI root, config file, and user.
 sub duplicate {
     my $self = shift;
     my $newSession = WebGUI::Session->open(
-        $self->config->getFilename,
+        $self->config,
         undef,
         undef,
         $self->getId,
