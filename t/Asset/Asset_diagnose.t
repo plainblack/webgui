@@ -43,9 +43,8 @@ SKIP: {
 }
 
 foreach my $asset ( @assets ) {
-    eval "use $asset";
-    my $def = $asset->definition($session);
-    my $tableName = $def->[0]->{tableName};
+    my $className = WebGUI::Asset->loadModule($asset);
+    my $tableName = $className->meta->tableName;
     my $classIds 
         = $session->db->buildArrayRef(
             q{
