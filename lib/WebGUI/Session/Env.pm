@@ -99,21 +99,6 @@ sub clientIsSpider {
 
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-	undef $self;
-}
-
-
 #-------------------------------------------------------------------
 
 =head2 get( varName ) 
@@ -127,9 +112,9 @@ The name of the variable.
 =cut
 
 sub get {
-	my $self = shift;
-	my $var = shift;
-	return $self->{_env}{$var};
+    my $self = shift;
+    my $var = shift;
+    return $$self->{$var};
 }
 
 
@@ -137,16 +122,13 @@ sub get {
 
 =head2 getIp ( )
 
-Returns the user's real IP address. Normally this is REMOTE_ADDR, but if they go through a proxy server it might be in HTTP_X_FORWARDED_FOR. This method attempts to figure out what the most likely IP is for the user. Note that it's possible to spoof this and therefore shouldn't be used as your only security mechanism for validating a user.
+Returns the user's IP address.
 
 =cut
 
 sub getIp {
-	my $self = shift;
-	if ($self->get("HTTP_X_FORWARDED_FOR") =~ m/(\d+\.\d+\.\d+\.\d+)/) {
-		return $1;
-	} 
-	return $self->get("REMOTE_ADDR");
+    my $self = shift;
+    return $self->get('REMOTE_ADDR');
 }
 
 
@@ -159,8 +141,16 @@ Constructor. Returns an env object.
 =cut
 
 sub new {
-	my $class = shift;
-	bless {_env=>\%ENV}, $class;
+    my $class = shift;
+    my $session = shift;
+    my $env;
+    if ($session->request) {
+        $env = $session->request->env;
+    }
+    else {
+        $env = {};
+    }
+    return bless \$env, $class;
 }
 
 #-------------------------------------------------------------------
@@ -195,12 +185,7 @@ was made via SSL.
 
 sub sslRequest {
     my $self = shift;
-    return (
-           $self->get('HTTPS') eq 'on'
-        || $self->get('SSLPROXY')
-        || $self->get('HTTP_SSLPROXY')
-        || $self->get('HTTP_X_FORWARDED_PROTO') eq 'https'
-    );
+    return $self->get('psgi.url_scheme') eq 'https';
 }
 
 

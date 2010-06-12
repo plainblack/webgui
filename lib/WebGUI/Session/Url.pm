@@ -20,6 +20,7 @@ use URI;
 use URI::Escape;
 use WebGUI::International;
 use WebGUI::Utility;
+use Scalar::Util qw(weaken);
 
 
 =head1 NAME
@@ -95,20 +96,6 @@ sub append {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 escape ( string )
 
 Encodes a string to make it safe to pass in a URL.
@@ -144,7 +131,7 @@ consecutive slashes in the path part of the URL will be replaced with a single s
 sub extras {
     my $self   = shift;
     my $path   = shift;
-    my $url    = $self->session->config->get("extrasURL");
+    my $url    = $self->session->url->make_urlmap_work($self->session->config->get("extrasURL"));
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} and $cdnCfg->{'extrasCdn'} ) {
         unless ( $path and grep $path =~ m/$_/, @{ $cdnCfg->{'extrasExclude'} } ) {
@@ -190,7 +177,7 @@ sub gateway {
 	my $pageUrl = shift;
 	my $pairs = shift;
 	my $skipPreventProxyCache = shift;
-        my $url = $self->session->config->get("gateway").'/'.$pageUrl;
+        my $url = $self->make_urlmap_work($self->session->config->get("gateway")).'/'.$pageUrl;
 	$url =~ s/\/+/\//g;
         if ($self->session->setting->get("preventProxyCache") == 1 and !$skipPreventProxyCache) {
                 $url = $self->append($url,"noCache=".randint(0,1000).':'.time());
@@ -198,7 +185,23 @@ sub gateway {
 	if ($pairs) {
 		$url = $self->append($url,$pairs);
 	}
+
+   return $url;
+}
+
+# Temporary hack
+sub make_urlmap_work {
+    my $self = shift;
+    my $url = shift;
+    if (! $self->session->request) {
         return $url;
+    }
+    if (URI->new($url, 'http')->host) {
+        return $url;
+    }
+    my $uri = $self->session->request->base;
+    $uri->path($uri->path . $url);
+    return $uri->path;
 }
 
 #-------------------------------------------------------------------
@@ -322,7 +325,7 @@ sub getRequestedUrl {
 	my $self = shift;
 	return undef unless ($self->session->request);
 	unless ($self->{_requestedUrl}) {
-		$self->{_requestedUrl} = $self->session->request->uri;
+		$self->{_requestedUrl} = $self->session->request->path_info; # TODO - is path_info right?
 		my $gateway = $self->session->config->get("gateway");
 		$self->{_requestedUrl} =~ s/^$gateway([^?]*)\??.*$/$1/;
 	}
@@ -419,7 +422,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------

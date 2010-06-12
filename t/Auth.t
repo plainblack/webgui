@@ -38,51 +38,39 @@ plan tests => 3;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # Test createAccountSave and returnUrl together
 # Set up request
-$oldRequest  = $session->request;
-$request     = WebGUI::PseudoRequest->new;
-$request->setup_param({
+my $createAccountSession = WebGUI::Test->newSession(0, {
     returnUrl       => 'REDIRECT_URL',
 });
-$session->{_request} = $request;
 
-$auth           = WebGUI::Auth->new( $session, $AUTH_METHOD );
-my $username    = $session->id->generate;
+$auth           = WebGUI::Auth->new( $createAccountSession, $AUTH_METHOD );
+my $username    = $createAccountSession->id->generate;
 push @cleanupUsernames, $username;
-$output         = $auth->createAccountSave( $username, { }, "PASSWORD" ); 
+$output         = $auth->createAccountSave( $username, { }, "PASSWORD" );
 
 is(
-    $session->http->getRedirectLocation, 'REDIRECT_URL',
+    $createAccountSession->http->getRedirectLocation, 'REDIRECT_URL',
     "returnUrl field is used to set redirect after createAccountSave",
 );
-
-# Session Cleanup
-$session->{_request} = $oldRequest;
 
 #----------------------------------------------------------------------------
 # Test login and returnUrl together
 # Set up request
-$oldRequest  = $session->request;
-$request     = WebGUI::PseudoRequest->new;
-$request->setup_param({
+
+my $loginSession = WebGUI::Test->newSession(0, {
     returnUrl       => 'REDIRECT_LOGIN_URL',
 });
-$session->{_request} = $request;
 
-$auth           = WebGUI::Auth->new( $session, $AUTH_METHOD, 3 );
-my $username    = $session->id->generate;
+$auth           = WebGUI::Auth->new( $loginSession, $AUTH_METHOD, 3 );
+my $username    = $loginSession->id->generate;
 push @cleanupUsernames, $username;
 $session->setting->set('showMessageOnLogin', 0);
-$output         = $auth->login; 
+$output         = $auth->login;
 
 is(
-    $session->http->getRedirectLocation, 'REDIRECT_LOGIN_URL',
+    $loginSession->http->getRedirectLocation, 'REDIRECT_LOGIN_URL',
     "returnUrl field is used to set redirect after login",
 );
 is $output, undef, 'login returns undef when showMessageOnLogin is false';
-
-# Session Cleanup
-$session->{_request} = $oldRequest;
-
 
 #----------------------------------------------------------------------------
 # Cleanup

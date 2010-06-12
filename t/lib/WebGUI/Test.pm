@@ -136,7 +136,7 @@ END {
 
 #----------------------------------------------------------------------------
 
-=head2 newSession ( $noCleanup )
+=head2 newSession ( $noCleanup, [ $request ] )
 
 Builds a WebGUI session object for testing.
 
@@ -144,20 +144,58 @@ Builds a WebGUI session object for testing.
 
 If true, the session won't be registered for automatic deletion.
 
+=head3 $request
+
+Either a HTTP::Request object to use for this session, or a hash ref of form parameters.
+
 =cut
 
 sub newSession {
     shift
         if eval { $_[0]->isa($CLASS) };
     my $noCleanup = shift;
-    my $pseudoRequest = WebGUI::PseudoRequest->new;
+    my $request = shift;
     require WebGUI::Session;
-    my $session = WebGUI::Session->open( $CLASS->config );
-    $session->{_request} = $pseudoRequest;
+    my $session = WebGUI::Session->open( $CLASS->config, newEnv( $request ) );
     if ( ! $noCleanup ) {
         $CLASS->addToCleanup($session);
     }
     return $session;
+}
+
+sub newEnv {
+    shift
+        if eval { $_[0]->isa($CLASS) };
+    my $form = shift;
+
+    require HTTP::Message::PSGI;
+    require HTTP::Request::Common;
+    my $config = $CLASS->config;
+    my $request;
+    if ( try { $form->isa('HTTP::Request') } ) {
+        $request = $form;
+    }
+    else {
+        my $url = 'http://' . $config->get('sitename')->[0];
+        $request = $form
+            ? HTTP::Request::Common::POST( $url, [ %$form ] )
+            : HTTP::Request::Common::GET( $url )
+            ;
+    }
+    return $request->to_psgi;
+}
+
+sub clientTest (&) {
+    my $client = shift;
+    local $ENV{WEBGUI_CONFIG} = $CLASS->file;
+    my $test_psgi = Plack::Util::load_psgi(
+        $CLASS->config->get('psgiFile')
+        || WebGUI::Paths->defaultPSGI,
+    );
+    Plack::Test::test_psgi(
+        app => $test_psgi,
+        client => $client,
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -265,6 +303,9 @@ below.
 
 =cut
 
+
+# I think that getPage should be entirely replaced with calles to Plack::Test::test_psgi
+# - testing with the callback is better and it means we can run on any backend
 sub getPage {
     my $class       = shift;
     my $actor       = shift;    # The actor to work on
@@ -288,9 +329,10 @@ sub getPage {
 
     # Create a new request object
     my $oldRequest  = $session->request;
-    my $request     = WebGUI::PseudoRequest->new;
-    $request->setup_param($optionsRef->{formParams});
+    my $request     = WebGUI::Session::Request->new(newEnv($optionsRef->{formParams}));
+    # $request->setup_param($optionsRef->{formParams});
     local $session->{_request} = $request;
+    local $session->{_response} = $request->new_response( 200 );
     local $session->output->{_handle};
 
     # Fill the buffer
@@ -315,7 +357,7 @@ sub getPage {
     $session->user({ user => $oldUser });
 
     # Return the page's output
-    return $request->get_output;
+    return join '', @{$session->response->body};
 }
 
 #----------------------------------------------------------------------------
@@ -516,7 +558,7 @@ Example call:
                 ( $sql, @params ) = @$sql;
             }
             return sub {
-                $db->write( $sql, {}, @params );
+                $db->do( $sql, {}, @params );
             }
         },
     );

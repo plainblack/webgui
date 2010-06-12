@@ -106,19 +106,6 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 displayImpression ( dontCount )
 
 Finds out what the next ad is to display, increments it's impression counter, and returns the HTML to display it.

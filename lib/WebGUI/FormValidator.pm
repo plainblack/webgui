@@ -17,6 +17,7 @@ package WebGUI::FormValidator;
 use strict qw(vars subs);
 use WebGUI::HTML;
 use WebGUI::Pluggable;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -79,20 +80,8 @@ sub AUTOLOAD {
 	return $control->getValue(@args);
 }
 
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
+# so it doesn't get autoloaded
+sub DESTROY {}
 
 #-------------------------------------------------------------------
 
@@ -120,9 +109,11 @@ A reference to the current session.
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $class = shift;
+    my $session = shift;
+    my $self = bless {_session=>$session}, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 

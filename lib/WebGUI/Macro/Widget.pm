@@ -33,7 +33,7 @@ sub process {
 
     # Get location for CSS and JS files
     my $conf            = $session->config;
-    my $extras          = $conf->get("extrasURL");
+    my $extras          = $session->url->make_urlmap_work($conf->get("extrasURL"));
 
     # add CSS and JS to the page
     my $style           = $session->style;

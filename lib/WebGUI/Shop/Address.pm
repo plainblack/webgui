@@ -91,7 +91,6 @@ Removes this address from the book.
 sub delete {
     my $self = shift;
     $self->addressBook->session->db->deleteRow("address","addressId",$self->getId);
-    undef $self;
     return undef;
 }
 

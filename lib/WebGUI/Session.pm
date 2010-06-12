@@ -29,9 +29,9 @@ use WebGUI::Session::Form;
 use WebGUI::Session::Http;
 use WebGUI::Session::Icon;
 use WebGUI::Session::Id;
-use WebGUI::Session::Os;
 use WebGUI::Session::Output;
 use WebGUI::Session::Privilege;
+use WebGUI::Session::Request;
 use WebGUI::Session::Scratch;
 use WebGUI::Session::Setting;
 use WebGUI::Session::Stow;
@@ -70,11 +70,10 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->icon
  $session->id
  $session->output
- $session->os
  $session->privilege
  $session->request
+ $session->response
  $session->scratch
- $session->server
  $session->setting
  $session->stow
  $session->style
@@ -169,7 +168,7 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler/) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
 		delete $self->{$key};
 	}
 }
@@ -318,7 +317,7 @@ Returns a WebGUI::Session::Env object.
 sub env {
 	my $self = shift;
 	unless (exists $self->{_env}) {
-		$self->{_env} = WebGUI::Session::Env->new;
+		$self->{_env} = WebGUI::Session::Env->new($self);
 	}
 	return $self->{_env};
 }
@@ -448,7 +447,7 @@ sub log {
 
 #-------------------------------------------------------------------
 
-=head2 open ( webguiRoot, configFile [, requestObject, serverObject, sessionId, noFuss ] )
+=head2 open ( webguiRoot, configFile [, env, sessionId, noFuss ] )
 
 Constructor. Opens a closed ( or new ) WebGUI session.
 
@@ -458,19 +457,16 @@ The path to the WebGUI files.
 
 =head3 configFile
 
-The filename of the config file that WebGUI should operate from.
+The filename of the config file that WebGUI should operate from, or a WebGUI::Config object
 
-=head3 requestObject
+=head3 env
 
-The Apache request object (aka $r). If this session is being instanciated from the web, this is required.
-
-=head3 serverObject
-
-The Apache server object (Apache2::ServerUtil). If this session is being instanciated from the web, this is required.
+The L<PSGI> env hash. If this session is being instanciated from the web, this is required.
 
 =head3 sessionId
 
 Optionally retrieve a specific session id. Normally this is set by a cookie in the user's browser.
+If you have a L<PSGI> env hash, you might find the sessionId at: $env->{'psgix.session'}->id
 
 =head3 noFuss
 
@@ -479,23 +475,26 @@ Uses simple session vars. See WebGUI::Session::Var::new() for more details.
 =cut
 
 sub open {
-	my $class = shift;
-	my $configFile = shift;
-	my $request = shift;
-	my $server = shift;
-    my $config;
-    if (eval { $configFile->isa('WebGUI::Config') } ) {
-        $config = $configFile;
+    my ($class, $c, $env, $sessionId, $noFuss) = @_;
+    my $config = ref $c ? $c : WebGUI::Config->new($c);
+    my $self = { _config => $config };
+    bless $self, $class;
+
+    if ($env) {
+        my $request = WebGUI::Session::Request->new($env);
+        $self->{_request} = $request;
+        $self->{_response} = $request->new_response( 200 );
+        
+        # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
+        # wasn't given explicitly
+        $sessionId ||= $request->cookies->{$config->getCookieName};
     }
-    else {
-        $config = WebGUI::Config->new($configFile);
+    
+    # If the sessionId is still unset or is invalid, generate a new one
+    if (!$sessionId || !$self->id->valid($sessionId)) {
+        $sessionId = $self->id->generate;
     }
-	my $self = {_config=>$config, _server=>$server};
-	bless $self , $class;
-	$self->{_request} = $request if (defined $request);
-	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
-	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
-	my $noFuss = shift;
+	
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);
 	return $self;
 }
@@ -514,23 +513,6 @@ sub output {
 		$self->{_output} = WebGUI::Session::Output->new($self);
 	}
 	return $self->{_output};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 os ( ) 
-
-Returns a WebGUI::Session::Os object.
-
-=cut
-
-sub os {
-	my $self = shift;
-	unless (exists $self->{_os}) {
-		$self->{_os} = WebGUI::Session::Os->new();
-	}
-	return $self->{_os};
 }
 
 
@@ -576,13 +558,26 @@ sub quick {
 
 =head2 request ( )
 
-Returns the Apache request (aka $r) object, or undef if it doesn't exist.
+Returns the L<Plack::Request> object, or undef if it doesn't exist.
 
 =cut
 
 sub request {
 	my $self = shift;
 	return $self->{_request};
+}
+
+#-------------------------------------------------------------------
+
+=head2 response ( )
+
+Returns the L<Plack::Response> object, or undef if it doesn't exist.
+
+=cut
+
+sub response {
+	my $self = shift;
+	return $self->{_response};
 }
 
 #-------------------------------------------------------------------
@@ -605,13 +600,13 @@ sub scratch {
 
 =head2 server ( )
 
-Returns the Apache server object (Apache2::ServerUtil), or undef if it doesn't exist.
+DEPRECATED (used to return the Apache2::ServerUtil object)
 
 =cut
 
 sub server {
 	my $self = shift;
-	return $self->{_server};
+	$self->log->fatal('WebGUI::Session::server is deprecated');
 }
 
 #-------------------------------------------------------------------

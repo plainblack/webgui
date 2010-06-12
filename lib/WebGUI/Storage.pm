@@ -365,8 +365,6 @@ sub addFileFromFormPost {
     my $session = $self->session;
     return ""
         if ($self->session->http->getStatus eq '413');
-    require Apache2::Request;
-    require Apache2::Upload;
     my $filename;
     my $attachmentCount = 1;
     foreach my $upload ($session->request->upload($formVariableName)) {
@@ -1278,7 +1276,7 @@ If specified, we'll return a URL to the file rather than the storage location.
 sub getUrl {
     my $self   = shift;
     my $file   = shift;
-    my $url    = $self->session->config->get("uploadsURL") . '/' . $self->getPathFrag;
+    my $url    = $self->session->url->make_urlmap_work($self->session->config->get("uploadsURL")) . '/' . $self->getPathFrag;
     my $cdnCfg = $self->session->config->get('cdn');
     if (    $cdnCfg
         and $cdnCfg->{'enabled'}

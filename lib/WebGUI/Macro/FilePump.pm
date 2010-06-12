@@ -92,8 +92,8 @@ sub process {
     
     my $uploadsDir = Path::Class::Dir->new($session->config->get('uploadsPath'));
     my $extrasDir  = Path::Class::Dir->new($session->config->get('extrasPath'));
-    my $uploadsUrl = Path::Class::Dir->new($session->config->get('uploadsURL'));
-    my $extrasUrl  = Path::Class::Dir->new($session->config->get('extrasURL'));
+    my $uploadsUrl = Path::Class::Dir->new($session->url->make_urlmap_work($session->config->get('uploadsURL')));
+    my $extrasUrl  = Path::Class::Dir->new($session->url->make_urlmap_work($session->config->get('extrasURL')));
 
     ##Normal mode
     if (! $session->var->isAdminOn) {

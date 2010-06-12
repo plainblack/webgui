@@ -16,7 +16,15 @@ package WebGUI::Session::Http;
 
 
 use strict;
-use WebGUI::Utility;
+use Scalar::Util qw(weaken);
+use WebGUI::Utility qw(isIn);
+use HTTP::Date ();
+
+sub _deprecated {
+    my $alt = shift;
+    my $method = (caller(1))[3];
+    Carp::carp("$method is deprecated. Use 'WebGUI::$alt' instead.");
+}
 
 =head1 NAME
 
@@ -55,21 +63,6 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-
-#-------------------------------------------------------------------
-
 =head2 getCacheControl  ( ) 
 
 Returns the cache control setting from this object.
@@ -91,16 +84,8 @@ Retrieves the cookies from the HTTP header and returns a hash reference containi
 
 sub getCookies {
 	my $self = shift;
-	if ($self->session->request) {
-		# Have to require this instead of using it otherwise it causes problems for command-line scripts on some platforms (namely Windows)
-		require APR::Request::Apache2;
-		my $jarHashRef = APR::Request::Apache2->handle($self->session->request)->jar();
-		return $jarHashRef if $jarHashRef;
-		return {};
-	}
-	else {
-		return {};
-	}
+	_deprecated('Request::cookies');
+	return $self->session->request->cookies;
 }
 
 
@@ -224,10 +209,9 @@ sub ifModifiedSince {
     my $self            = shift;
     my $epoch           = shift;
     my $maxCacheTimeout = shift;
-    require APR::Date;
-    my $modified = $self->session->request->headers_in->{'If-Modified-Since'};
+    my $modified = $self->session->request->header('If-Modified-Since');
     return 1 if ($modified eq "");
-    $modified = APR::Date::parse_http($modified);
+    $modified = HTTP::Date::str2time($modified);
     ##Implement a step function that increments the epoch time in integer multiples of
     ##the maximum cache time.  Used to handle the case where layouts containing macros
     ##(like assetproxied Navigations) can be periodically updated.
@@ -248,7 +232,8 @@ Returns a boolean value indicating whether the current page will redirect to som
 
 sub isRedirect {
 	my $self = shift;
-	return isIn($self->getStatus(), qw(302 301));
+	my $status = $self->getStatus;
+	return $status == 302 || $status == 301;
 }
 
 
@@ -267,7 +252,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 
@@ -284,61 +271,60 @@ sub sendHeader {
 	return undef if ($self->{_http}{noHeader});
 	return $self->_sendMinimalHeader unless defined $self->session->db(1);
 
-	my ($request, $datetime, $config, $var) = $self->session->quick(qw(request datetime config var));
+	my ($request, $response, $config, $var) = $self->session->quick(qw(request response config var));
 	return undef unless $request;
 	my $userId = $var->get("userId");
 	
 	# send webgui session cookie
 	my $cookieName = $config->getCookieName;
-	$self->setCookie($cookieName,$var->getId, $config->getCookieTTL, $config->get("cookieDomain")) unless $var->getId eq $self->getCookies->{$cookieName};
+	$self->setCookie($cookieName,$var->getId, $config->getCookieTTL, $config->get("cookieDomain")) unless $var->getId eq $request->cookies->{$cookieName};
 
 	$self->setNoHeader(1);
 	my %params;
 	if ($self->isRedirect()) {
-		$request->headers_out->set(Location => $self->getRedirectLocation);
-		$request->status($self->getStatus);
+		$response->header(Location => $self->getRedirectLocation);
+		$response->status($self->getStatus);
 	} else {
-		$request->content_type($self->getMimeType);
+		$response->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
-		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
+		my $date = ($userId eq "1") ? HTTP::Date::time2str($self->getLastModified) : HTTP::Date::time2str();
 		# under these circumstances, don't allow caching
 		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
-			$request->headers_out->set("Cache-Control" => "private, max-age=1");
-			$request->no_cache(1);
+			$response->header("Cache-Control" => "private, max-age=1");
+#			$response->no_cache(1); # TODO - re-enable this?
 		} 
 		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
 		else {
             if ( $cacheControl eq "none" ) {
-                $request->headers_out->set("Cache-Control" => "private, max-age=1");
-                $request->no_cache(1);
+                $response->header("Cache-Control" => "private, max-age=1");
             }
             else {
-                $request->headers_out->set('Last-Modified' => $date);
-                $request->headers_out->set('Cache-Control' => "must-revalidate, max-age=" . $cacheControl);
+                $response->header('Last-Modified' => $date);
+                $response->header('Cache-Control' => "must-revalidate, max-age=" . $cacheControl);
             }
 			# do an extra incantation if the HTTP protocol is really old
 			if ($request->protocol =~ /(\d\.\d)/ && $1 < 1.1) {
-				my $date = $datetime->epochToHttp(time() + $cacheControl);
-  				$request->headers_out->set('Expires' => $date);
+				my $date = HTTP::Date::time2str(time() + $cacheControl);
+  				$response->header( 'Expires' => $date );
 			}
   		}
 		if ($self->getFilename) {
-                        $request->headers_out->set('Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
+            $response->headers( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
 		}
-		$request->status($self->getStatus());
-		$request->status_line($self->getStatus().' '.$self->getStatusDescription());
+		$response->status($self->getStatus());
+#		$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	}
 	return undef;
 }
 
 sub _sendMinimalHeader {
 	my $self = shift;
-	my $request = $self->session->request;
-	$request->content_type('text/html; charset=UTF-8');
-	$request->headers_out->set('Cache-Control' => 'private');
-	$request->no_cache(1);
-	$request->status($self->getStatus());
-	$request->status_line($self->getStatus().' '.$self->getStatusDescription());
+	my $response = $self->session->response;
+	$response->content_type('text/html; charset=UTF-8');
+	$response->header('Cache-Control' => 'private');
+#	$response->no_cache(1); # TODO - re-enable this?
+	$response->status($self->getStatus());
+#	$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	return undef;
 }
 
@@ -407,18 +393,12 @@ sub setCookie {
 	my $domain = shift;
 	$ttl = (defined $ttl ? $ttl : '+10y');
 
-	if ($self->session->request) {
-		require Apache2::Cookie;
-		my $cookie = Apache2::Cookie->new($self->session->request,
-			-name=>$name,
-			-value=>$value,
-			-path=>'/'
-		);
-
-		$cookie->expires($ttl) if $ttl ne 'session';
-		$cookie->domain($domain) if ($domain);
-		$cookie->bake($self->session->request);
-	}
+	$self->session->response->cookies->{$name} = {
+        value   => $value,
+        path    => '/',
+        expires => $ttl ne 'session' ? $ttl : undef,
+        domain  => $domain,
+    };
 }
 
 

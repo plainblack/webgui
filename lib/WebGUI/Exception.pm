@@ -15,50 +15,6 @@ package WebGUI::Exception;
 =cut
 
 use strict;
-use Exception::Class (
-
-    'WebGUI::Error' => {
-        description     => "A general error occured.",
-        },
-    'WebGUI::Error::OverrideMe' => {
-        isa             => 'WebGUI::Error',
-        description     => 'This method should be overridden by subclasses.',
-        },
-    'WebGUI::Error::MethodNotFound' => {
-        isa             => 'WebGUI::Error',
-        description     => q|Called a method that doesn't exist.|,
-        fields          => 'method'
-        },
-    'WebGUI::Error::InvalidObject' => {
-        isa             => 'WebGUI::Error::InvalidParam',
-        description     => "Expected to get a reference to an object type that wasn't gotten.",
-        fields          => ["expected","got"],
-        },
-    'WebGUI::Error::InvalidParam' => {
-        isa             => 'WebGUI::Error',
-        description     => "Expected to get a param we didn't get.",
-        fields          => ["param"],
-        },
-    'WebGUI::Error::ObjectNotFound' => {
-        isa             => 'WebGUI::Error',
-        description     => "The object you were trying to retrieve does not exist.",
-        fields          => ["id"],
-        },
-    'WebGUI::Error::ObjectNotFound::Template' => {
-        isa             => 'WebGUI::Error',
-        description     => "The template an asset was trying to retrieve does not exist.",
-        fields          => [qw/templateId assetId/],
-        },
-    'WebGUI::Error::InvalidFile' => {
-        isa             => 'WebGUI::Error',
-        description     => "The file you have provided has errors.",
-        fields          => [qw{ brokenFile brokenLine }],
-        },
-    'WebGUI::Error::Template' => {
-        isa             => 'WebGUI::Error',
-        description     => "A template has errors that prevent it from being processed.",
-        },
-);
 
 sub WebGUI::Error::full_message {
     my $self = shift;
@@ -319,6 +275,15 @@ use Exception::Class (
         fields          => [qw{ resource }],
         },
 
+    'WebGUI::Error::Fatal' => {
+        isa             => 'WebGUI::Error',
+        description     => "Fatal error that should be shown to all site visitors.",
+    },
+
+    'WebGUI::Error::Database' => {
+        isa             => 'WebGUI::Error',
+        description     => 'A database error',
+    },
 );
 
 

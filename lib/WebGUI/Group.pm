@@ -271,7 +271,6 @@ sub delete {
     $self->session->db->write("delete from groups where groupId=?", [$self->getId]);
     $self->session->db->write("delete from groupings where groupId=?", [$self->getId]);
     $self->session->db->write("delete from groupGroupings where inGroup=? or groupId=?", [$self->getId, $self->getId]);
-    undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -363,21 +362,6 @@ sub description {
         }
         return $self->get("description");
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY
-
-Desconstructor
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 

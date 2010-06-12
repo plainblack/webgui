@@ -169,22 +169,7 @@ sub delete {
 	my $sth = $self->session->db->prepare("delete from WorkflowActivityData where activityId=?");
 	$sth->execute([$self->getId]);
 	$self->session->db->deleteRow("WorkflowActivity","activityId",$self->getId);
-	undef $self;
 }
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 

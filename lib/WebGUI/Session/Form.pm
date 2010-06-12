@@ -15,7 +15,6 @@ package WebGUI::Session::Form;
 =cut
 
 use strict qw(vars subs);
-use WebGUI::HTML;
 use Encode ();
 use Tie::IxHash;
 use base 'WebGUI::FormValidator';
@@ -64,6 +63,7 @@ sub AUTOLOAD {
 	my @args = @_;
 	our $AUTOLOAD;
 	my $method = "SUPER::".(split /::/, $AUTOLOAD)[-1];
+	return if $method eq 'SUPER::DESTROY';
 	return $self->$method(@args);
 }
 
@@ -78,10 +78,7 @@ Returns true if the param is part of the submitted form data, or a URL param.
 sub hasParam {
 	my $self = shift;
     my $param = shift;
-    return undef unless $param;
-    return undef unless $self->session->request;
-    my $hashRef = $self->session->request->param();
-    return exists $hashRef->{$param};
+    return $param && $self->session->request && exists $self->session->request->parameters->{$param};
 }
 
 

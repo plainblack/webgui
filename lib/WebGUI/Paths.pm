@@ -107,6 +107,7 @@ BEGIN {
         defaultUploads     => catdir($root, 'www', 'uploads'),
         defaultCreateSQL   => catdir($root, 'docs', 'create.sql'),
         var                => catdir($root, 'var'),
+        defaultPSGI        => catdir($root, 'var', 'site.psgi'),
     );
     my $meta = Class::MOP::Class->initialize(__PACKAGE__);
     for my $sub (keys %paths) {

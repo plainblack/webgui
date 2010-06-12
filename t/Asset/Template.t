@@ -49,7 +49,7 @@ ok($output =~ m/true/, "process() - conditionals");
 ok($output =~ m/\b(?:XY){5}\b/, "process() - loops");
 
 # See if template listens the Accept header
-$session->request->headers_in->{Accept} = 'application/json';
+$session->request->header('Accept' => 'application/json');
 
 my $json = $template->process(\%var);
 my $andNowItsAPerlHashRef = eval { from_json( $json ) };

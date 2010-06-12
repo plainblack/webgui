@@ -74,7 +74,6 @@ Removes this item from the transaction.
 sub delete {
     my $self = shift;
     $self->transaction->session->db->deleteRow("transactionItem","itemId",$self->getId);
-    undef $self;
     return undef;
 }
 

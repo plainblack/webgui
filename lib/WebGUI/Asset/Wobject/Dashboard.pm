@@ -313,7 +313,6 @@ sub view {
 
 	my @found;
 	my $newStuff;
-	my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
 	foreach my $position (@positions) {
 		my @assets = split(",",$position);
 		foreach my $asset (@assets) {

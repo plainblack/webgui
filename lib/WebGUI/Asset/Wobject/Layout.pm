@@ -327,7 +327,7 @@ Show performance indicators for the Layout and all children if enabled.
 sub view {
     my $self = shift;
     my $session = $self->session;
-    my $showPerformance = $session->errorHandler->canShowPerformanceIndicators;
+    my $perfLog = $session->log->performanceLogger;
     my @parts = split $self->{_viewSplitter},
     $self->processTemplate($self->{_viewVars}, undef, $self->{_viewTemplate});
     my $output = "";
@@ -342,9 +342,10 @@ sub view {
         my ($assetId, $outputPart) = split '~~', $part, 2;
         my $asset = $self->{_viewPlaceholder}{$assetId};
         if (defined $asset) {
-            my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
+            my $t = $perfLog ? [Time::HiRes::gettimeofday()] : undef;
             my $assetOutput = $asset->view;
-            $assetOutput .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
+            $perfLog->({ asset => $asset, 'time' => Time::HiRes::tv_interval($t), type => 'Layout' })
+                if $perfLog;
             if ($self->{_viewPrintOverride}) {
                 $session->output->print($assetOutput);
             } else {

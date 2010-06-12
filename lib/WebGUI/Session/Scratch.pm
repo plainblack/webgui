@@ -16,6 +16,7 @@ package WebGUI::Session::Scratch;
 
 use strict;
 use WebGUI::International;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -138,21 +139,6 @@ sub deleteNameByValue {
 	$session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
 #-------------------------------------------------------------------
 
 =head2 get( varName ) 
@@ -198,11 +184,14 @@ The current session.
 
 sub new {
     my ($class, $session) = @_;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
     my $scratch = $session->cache->get("sessionscratch_".$session->getId);
     unless (ref $scratch eq "HASH") {
 	    $scratch = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId], {noOrder => 1});
     }
-	bless {_session=>$session, _data=>$scratch}, $class;
+    $self->{_data} = $scratch;
+    return $self;
 }
 
 #-------------------------------------------------------------------

@@ -26,7 +26,7 @@ use Pod::Usage;
 use Cwd ();
 
 
-my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help, $noprompt);
+my ($prereq, $dbi, $dbDrivers, $simpleReport, $help, $noprompt);
 
 GetOptions(
     'noprompt' => \$noprompt,
@@ -108,7 +108,10 @@ checkModule("Finance::Quote",               1.15         );
 checkModule("POE",                          1.005        );
 checkModule("POE::Component::IKC::Server",  0.2001       );
 checkModule("POE::Component::Client::HTTP", 0.88         );
-checkModule("Apache2::Request",             2.08         );
+checkModule("Plack::Request");
+checkModule("Plack::Response");
+checkModule("Plack::Middleware::Status");
+checkModule("Plack::Middleware::Debug");
 checkModule("URI::Escape",                  "3.29"       );
 checkModule("POSIX"                                      );
 checkModule("List::Util"                                 );
@@ -139,6 +142,7 @@ checkModule("JavaScript::Minifier::XS",     "0.05"       );
 checkModule("Readonly",                     "1.03"       );
 checkModule("Moose",                        "0.93"       );
 checkModule("MooseX::Storage",              "0.23"       );
+checkModule("MooseX::NonMoose",             '0.07'       );
 checkModule("MooseX::Storage::Format::JSON","0.27"       );
 checkModule("namespace::autoclean",         "0.09"       );
 checkModule("Business::PayPal::API",        "0.62"       );

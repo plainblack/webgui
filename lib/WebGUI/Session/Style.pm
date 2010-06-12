@@ -16,12 +16,12 @@ package WebGUI::Session::Style;
 
 
 use strict;
-use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Macro;
 require WebGUI::Asset;
 BEGIN { eval { require WebGUI; WebGUI->import } }
 use HTML::Entities ();
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -53,19 +53,6 @@ This package contains utility methods for WebGUI's style system.
 These methods are available from this class:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
 
 #-------------------------------------------------------------------
 
@@ -181,7 +168,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session}, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------

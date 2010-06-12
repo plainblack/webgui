@@ -15,6 +15,7 @@ package WebGUI::Session::Stow;
 =cut
 
 use strict;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -74,20 +75,6 @@ Deletes all stow variables for this session.
 sub deleteAll {
 	my $self = shift;
 	delete $self->{_data};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
 }
 
 
@@ -155,7 +142,9 @@ A reference to the session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 

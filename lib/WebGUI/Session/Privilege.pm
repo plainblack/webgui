@@ -17,6 +17,7 @@ package WebGUI::Session::Privilege;
 use strict;
 use WebGUI::International;
 use WebGUI::Operation::Auth;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -63,21 +64,6 @@ sub adminOnly {
 	$output .= $i18n->get(36);
 	return $self->session->style->userStyle($output);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -145,7 +131,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 

@@ -20,7 +20,6 @@ use WebGUI::International;
 use WebGUI::Storage;
 use WebGUI::Asset::Wobject::HttpProxy::Parse;
 use WebGUI::Macro;
-use Apache2::Upload;
 use Tie::IxHash;
 
 use Moose;
@@ -443,7 +442,7 @@ sub view {
 				}
 				my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($self->session, $proxiedUrl, $var{content}, $self->getId,$self->rewriteUrls,$self->getUrl,$self->urlPatternFilter);
 				$var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
-				$p->DESTROY;
+				undef $p;
 		
 				if ($var{content} =~ /<frame/gis) {
 					$var{header} = "text/html";
