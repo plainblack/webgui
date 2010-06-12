@@ -306,7 +306,7 @@ my $properties = {
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Export Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $asset = $importNode->addChild($properties, $properties->{id});
 $asset->update({
@@ -458,7 +458,7 @@ is(scalar $grandChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWri
 
 # test different extensions
 $guidPath->rmtree;
-$asset = WebGUI::Asset->new($session, 'ExportTest000000000001');
+$asset = WebGUI::Asset->newById($session, 'ExportTest000000000001');
 $session->http->setNoHeader(1);
 eval { $asset->exportWriteFile() };
 is($@, '', 'exportWriteFile for perl file works');
@@ -466,7 +466,7 @@ is($@, '', 'exportWriteFile for perl file works');
 ok(-e $asset->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the perl file");
 
 $guidPath->rmtree;
-$asset = WebGUI::Asset->new($session, 'ExportTest000000000002');
+$asset = WebGUI::Asset->newById($session, 'ExportTest000000000002');
 eval { $asset->exportWriteFile() };
 is($@, '', 'exportWriteFile for plain file works');
 
@@ -634,9 +634,9 @@ unlink $symlinkedRoot->stringify;
 # exportGetDescendants()
 
 # clear these out now so that they don't interfere with the lineage tests
-$asset = WebGUI::Asset->new($session, 'ExportTest000000000001');
+$asset = WebGUI::Asset->newById($session, 'ExportTest000000000001');
 $asset->purge;
-$asset = WebGUI::Asset->new($session, 'ExportTest000000000002');
+$asset = WebGUI::Asset->newById($session, 'ExportTest000000000002');
 $asset->purge;
 
 $session->user( { userId => 1 } );
