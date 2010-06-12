@@ -847,6 +847,7 @@ sub submitObjectEdit {
         $survey = $self->addRevision;
         
         $newVersionTag->commit();
+        $survey = $survey->cloneFromDb;
         
         #Restore the old one, if it exists
         $oldVersionTag->setWorking() if $oldVersionTag;

@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 47;
+plan tests => 48;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -210,7 +210,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision unchanged');
 
     # Push revisionDate into the past because we can't have 2 revision dates with the same epoch (this is very hacky)
-    $revisionDate--;
+    $revisionDate -= 5;
     $session->stow->deleteAll();
     $session->cache->clear;
     $session->db->write('update Survey set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
@@ -220,6 +220,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     $survey = WebGUI::Asset->newById($session, $surveyId);
     isa_ok($survey, 'WebGUI::Asset::Wobject::Survey', 'Got back survey after monkeying with revisionDate');
     is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision date pushed back');
+    is($survey->revisionDate, $revisionDate, '... and in the object, too');
 
     # Create new response
     my $responseId = $survey->responseId;
