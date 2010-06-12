@@ -524,10 +524,7 @@ sub getTemplateVars {
     $var->{ fileUrl             } = $self->getFileUrl;
     $var->{ thumbnailUrl        } = $self->getThumbnailUrl;
 
-    # Set a flag for pending files
-    if ( $self->status eq "pending" ) {
-        $var->{ 'isPending' } = 1;
-    }
+    $var->{ isPending } = $self->status eq "pending";
 
     # Fix 'undef' vars since HTML::Template does inheritence on them
     for my $key ( qw( synopsis ) ) {

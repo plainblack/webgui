@@ -73,7 +73,7 @@ my $nextPhoto
         skipAutoCommitWorkflows => 1,
     });
 $versionTag->commit;
-foreach my $asset ($gallery, $album) {
+foreach my $asset ($gallery, $album, $photo) {
     $asset = $asset->cloneFromDb;
 }
 WebGUI::Test->addToCleanup($versionTag);
@@ -110,7 +110,7 @@ my $testTemplateVars    = {
     thumbnailUrl        => $photo->getThumbnailUrl,
     numberOfComments    => scalar @{ $photo->getCommentIds },
     exifLoop            => ignore(), # Tested elsewhere
-    isPending           => ( $photo->get("status") eq "pending" ),
+    isPending           => ( $photo->status eq "pending" ),
     firstFile_url       => $previousPhoto->getUrl,
     firstFile_thumbnailUrl 
         => $previousPhoto->getThumbnailUrl,
