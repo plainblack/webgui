@@ -28,7 +28,7 @@ my $session = WebGUI::Test->session;
 my $output = WebGUI::Content::SiteIndex::handler($session);
 is $output, undef, 'no content returned unless sitemap.xml is requested';
 
-$session->request->uri('/sitemap.xml');
+$session->request->env->{PATH_INFO} = '/sitemap.xml';
 $output = WebGUI::Content::SiteIndex::handler($session);
 my $xmlData = XMLin($output,
     KeepRoot   => 1,

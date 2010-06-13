@@ -56,7 +56,7 @@ cmp_deeply(
 );
 
 # - serviceSubnets
-$ENV{REMOTE_ADDR} = '2.2.2.2';
+$session->request->env->{REMOTE_ADDR} = '2.2.2.2';
 $session->config->set('serviceSubnets',['1.1.1.1/32']);
 $session->user({ userId => 3 });
 $session->request->setup_body({
@@ -196,7 +196,7 @@ cmp_deeply(
 );
 
 # - serviceSubnets
-$ENV{REMOTE_ADDR} = '2.2.2.2';
+$session->request->env->{REMOTE_ADDR} = '2.2.2.2';
 $session->config->set('serviceSubnets',['1.1.1.1/32']);
 $session->user({ userId => 3 });
 $session->request->setup_body({
@@ -336,7 +336,7 @@ cmp_deeply(
 );
 
 # - serviceSubnets
-$ENV{REMOTE_ADDR} = '2.2.2.2';
+$session->request->env->{REMOTE_ADDR} = '2.2.2.2';
 $session->config->set('serviceSubnets',['1.1.1.1/32']);
 $session->user({ userId => 3 });
 $session->request->setup_body({

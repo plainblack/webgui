@@ -37,9 +37,8 @@ my $id = $session->var->getId;
 my ($count) = $session->db->quickArray("select count(*) from userSession where sessionId=?",[$id]);
 is($count, 1, "created an user session entry in the database");
 
-my %newEnvHash = ( REMOTE_ADDR => '192.168.0.34');
-my $origEnv = $session->env->{_env};
-$session->env->{_env} = \%newEnvHash;
+my $env = $session->request->env;
+$env->{REMOTE_ADDR} = '192.168.0.34';
 
 my $var = WebGUI::Session::Var->new($session);
 my $varTime = time();
@@ -66,7 +65,7 @@ isa_ok($var->session, 'WebGUI::Session', 'session method returns a Session objec
 is($var->session->getId, $session->getId, 'session method returns our Session object');
 
 sleep(2);
-$newEnvHash{REMOTE_ADDR} = '10.0.5.5';
+$env->{REMOTE_ADDR} = '10.0.5.5';
 
 #Grab a more recent version of our user session object
 $varTime = time();
@@ -157,7 +156,7 @@ $varExpiring->{_var}{expires} = $varExpiring->get('lastPageView')-1;
 
 sleep 1;
 
-$newEnvHash{REMOTE_ADDR} = '127.0.0.1';
+$env->{REMOTE_ADDR} = '127.0.0.1';
 
 ##Test a valid fetch
 my $varTest = WebGUI::Session::Var->new($session, $var4->getId, 1);
@@ -209,8 +208,6 @@ $varTest->start("", $varTest->getId);
 is($varTest->get('userId'), 1, 'calling start with null userId returns default user (visitor)');
 
 END {
-
-	$session->env->{_env} = $origEnv;
 
 	foreach my $varObj ($var, $var2, $var3, $var4, $varExpiring, $varTest) {
 		if (defined $varObj and ref $varObj eq 'WebGUI::Session::Var') {

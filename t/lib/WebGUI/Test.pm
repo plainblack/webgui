@@ -154,9 +154,26 @@ sub newSession {
     shift
         if eval { $_[0]->isa($CLASS) };
     my $noCleanup = shift;
-    my $request = shift;
+    my $http_request = shift;
     require WebGUI::Session;
-    my $session = WebGUI::Session->open( $CLASS->config, newEnv( $request ) );
+    my $session = WebGUI::Session->open( $CLASS->config, newEnv( $http_request ) );
+    my $request = Test::MockObject::Extends->new( $session->request );
+    $request->mock('setup_body', sub {
+        my $self = shift;
+        my $params = shift;
+        delete $self->env->{$_} for grep { /^plack\./ } keys %{ $self->env };
+        my $body_params = $self->body_parameters;
+        $body_params->clear;
+        $body_params->add( $_ => $params->{$_} ) for keys %$params;
+    });
+    $request->mock('setup_param', sub {
+        my $self = shift;
+        my $params = shift;
+        delete $self->env->{$_} for grep { /^plack\./ } keys %{ $self->env };
+        my $query_params = $self->query_parameters;
+        $query_params->clear;
+        $query_params->add( $_ => $params->{$_} ) for keys %$params;
+    });
     if ( ! $noCleanup ) {
         $CLASS->addToCleanup($session);
     }

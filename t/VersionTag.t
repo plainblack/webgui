@@ -208,7 +208,7 @@ $tag->clearWorking();
 
 my $gotTag = ok(defined ($userTag = getWorking(1)), 'versionTagMode singlePerUser: reclaim version tag after clearWorking');
 SKIP: {
-    skip 1, 'userTag not set' unless $gotTag;
+    skip 'userTag not set', 1 unless $gotTag;
     is ($userTag->getId(), $userTagId, q{versionTagMode singlePerUser:  reclaimed version tag has same id});
     $userTag->clearWorking();
 }

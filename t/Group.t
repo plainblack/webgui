@@ -580,12 +580,13 @@ cmp_bag(
 my @tcps =  ();
 
 foreach my $idx (0..$#ipTests) {
-	##Set the ip to be used by the session for this user
 	my $ip = $ipTests[$idx]->{ip};
-	$ENV{REMOTE_ADDR} = $ip;
 
 	##Create a new session
-	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->file);
+	$sessionBank[$idx] = WebGUI::Test->newSession;
+
+	##Set the ip to be used by the session for this user
+	$sessionBank[$idx]->request->env->{REMOTE_ADDR} = $ip;
 
 	##Create a new user and make this session's default user that user
 	$tcps[$idx] = WebGUI::User->new($sessionBank[$idx], "new");
@@ -598,7 +599,6 @@ foreach my $idx (0..$#ipTests) {
 	$ipTests[$idx]->{user} = $tcps[$idx];
 }
 WebGUI::Test->addToCleanup(@tcps);
-WebGUI::Test->addToCleanup(@sessionBank);
 
 my $gI = WebGUI::Group->new($session, "new");
 WebGUI::Test->addToCleanup($gI);

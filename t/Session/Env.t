@@ -15,26 +15,14 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 3; # increment this value for each test you create
-use Test::MockObject::Extends;
+use Test::More tests => 2; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
 
-cmp_ok($session->env->get("PATH"), 'ne', "", "get() one valid entry");
-
-#Replace the ENV hash so that we can test getIp.
+cmp_ok($session->env->get("REMOTE_ADDR"), 'ne', "", "get() one valid entry");
 
 my $env = $session->env;
-$env    = Test::MockObject::Extends->new($env);
+$session->request->env->{REMOTE_ADDR} = '192.168.0.2';
+is ($env->getIp, '192.168.0.2', 'getIp');
 
-my %mockEnv = (
-    REMOTE_ADDR          => '192.168.0.2',
-);
-
-$env->mock('get', sub { return $mockEnv{$_[1]}});
-
-is ($env->getIp(), $mockEnv{'REMOTE_ADDR'}, 'getIp');
-
-$mockEnv{HTTP_X_FORWARDED_FOR} = '10.0.2.5',
-is ($env->getIp(), $mockEnv{'HTTP_X_FORWARDED_FOR'}, 'getIp with HTTP forwarding');

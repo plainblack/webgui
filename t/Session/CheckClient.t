@@ -184,17 +184,10 @@ sub testCount {
 
 plan tests => testCount() ;
 
-my $output;
 foreach my $testSet (@testArray) {
-    $output = FAKE_ENV->new( $testSet->{agent},
-		             $testSet->{address} || '69.42.78.32')
-		   ->requestNotViewed();
+    $session->request->env->{HTTP_USER_AGENT} = $testSet->{agent};
+    $session->request->env->{REMOTE_ADDR} = $testSet->{address} || '69.42.78.32';
+    my $output = $session->env->requestNotViewed;
     is($output, $testSet->{output}, $testSet->{comment});
-}
-
-{ # this is a local fake of the session, used for testing only
-package FAKE_ENV;
-use base 'WebGUI::Session::Env';
-sub new { shift; return bless { _env => { HTTP_USER_AGENT => $_[0], REMOTE_ADDR => $_[1] } }, __PACKAGE__; }
 }
 

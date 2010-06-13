@@ -25,10 +25,10 @@ plan tests => $numTests;
 my $session = WebGUI::Test->session;
 
 ##Setup for security method test
-my %newEnv = ( REMOTE_ADDR => '192.168.0.6' );
-$session->env->{_env} = \%newEnv;
+my $env = $session->request->env;
+$env->{REMOTE_ADDR} = '192.168.0.6';
 
-my ($eh) = $session->quick('errorHandler');
+my $eh = $session->errorHandler;
 
 ####################################################
 #
@@ -165,13 +165,13 @@ delete $eh->{_canShowDebug};
 ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is empty string');
 
 $session->setting->set('debugIp', '10.0.0.5/32, 192.168.0.4/30');
-$newEnv{REMOTE_ADDR} = '172.17.0.5';
+$env->{REMOTE_ADDR} ='172.17.0.5';
 delete $eh->{_canShowDebug};
 ok(! $eh->canShowDebug, 'canShowDebug: returns 0 if debugIp is set and IP address is out of filter');
-$newEnv{REMOTE_ADDR} = '10.0.0.5';
+$env->{REMOTE_ADDR} = '10.0.0.5';
 delete $eh->{_canShowDebug};
 ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
-$newEnv{REMOTE_ADDR} = '192.168.0.5';
+$env->{REMOTE_ADDR} = '192.168.0.5';
 delete $eh->{_canShowDebug};
 ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
 
@@ -189,11 +189,11 @@ $session->setting->set('debugIp', '');
 is($eh->canShowPerformanceIndicators, 1, 'canShowPerformanceIndicators: returns 1 if debugIp is blank');
 
 $session->setting->set('debugIp', '10.0.0.5/32, 192.168.0.4/30');
-$newEnv{REMOTE_ADDR} = '172.17.0.5';
+$env->{REMOTE_ADDR} = '172.17.0.5';
 is($eh->canShowPerformanceIndicators, 0, 'canShowPerformanceIndicators: returns 0 if debugIp is set and IP address does not match');
-$newEnv{REMOTE_ADDR} = '10.0.0.5';
+$env->{REMOTE_ADDR} = '10.0.0.5';
 is($eh->canShowPerformanceIndicators, 1, 'canShowPerformanceIndicators: returns 0 if debugIp is set and IP address matches exactly');
-$newEnv{REMOTE_ADDR} = '192.168.0.5';
+$env->{REMOTE_ADDR} = '192.168.0.5';
 is($eh->canShowPerformanceIndicators, 1, 'canShowPerformanceIndicators: returns 0 if debugIp is set and IP address matches subnet');
 
 ####################################################

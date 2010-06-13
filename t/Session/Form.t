@@ -22,16 +22,16 @@ plan tests => 4;
 my $session = WebGUI::Test->session;
 my $token = $session->scratch->get('webguiCsrfToken');
 
-$session->request->method('POST');
+$session->request->env->{'REQUEST_METHOD'} = 'POST';
 $session->request->setup_param({ webguiCsrfToken => $token, });
 ok($session->form->validToken, 'validToken: right method and form value');
 
-$session->request->method('GET');
+$session->request->env->{'REQUEST_METHOD'} = 'GET';
 ok(! $session->form->validToken, '... wrong method, right form value');
 
-$session->request->method('POST');
+$session->request->env->{'REQUEST_METHOD'} = 'POST';
 $session->request->setup_param({ webguiCsrfToken => 'bad token', });
 ok(! $session->form->validToken, 'validToken: right method and wrong form value');
 
-$session->request->method('GET');
+$session->request->env->{'REQUEST_METHOD'} = 'GET';
 ok(! $session->form->validToken, 'validToken: wrong method and form value');

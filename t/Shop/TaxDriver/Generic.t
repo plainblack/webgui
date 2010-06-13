@@ -68,7 +68,7 @@ is($session->getId, $taxer->session->getId, 'session method returns OUR session 
 
 my $taxIterator = $taxer->getItems;
 
-isa_ok($taxIterator, 'WebGUI::SQL::ResultSet');
+isa_ok($taxIterator, 'WebGUI::SQL::st');
 
 is($taxIterator->rows, 0, 'WebGUI ships with no predefined tax data');
 

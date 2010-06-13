@@ -1,15 +1,16 @@
 # Test what happens when the WebGUI PSGI app throws exceptions
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../lib";
+use lib "$FindBin::Bin/../lib";
 use WebGUI;
+use WebGUI::Test;
 use Plack::Test;
 use Plack::Builder;
 use HTTP::Request::Common;
 use Test::More tests => 9;
 use HTTP::Exception;
 
-my $wg = WebGUI->new;
+my $wg = WebGUI->new(site => WebGUI::Test->file);
 
 my $regular_app = builder {
     enable '+WebGUI::Middleware::Session', config => $wg->config;

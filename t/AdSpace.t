@@ -38,8 +38,8 @@ my $session = WebGUI::Test->session;
 my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, $villianClone, $defaultAdSpace );
 my ($jokerAd, $penguinAd, $twoFaceAd);
 
-    local $ENV{REMOTE_ADDR} = '10.0.0.1';
-    local $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
+    $session->request->env->{REMOTE_ADDR} = '10.0.0.1';
+    $session->request->env->{HTTP_USER_AGENT} = 'Mozilla/5.0';
 
 	$adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
 

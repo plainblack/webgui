@@ -18,6 +18,7 @@ use JSON;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use WebGUI::Asset::Wobject::GalleryAlbum;
 
 #----------------------------------------------------------------------------
 # Init
@@ -87,11 +88,7 @@ my $result;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 19;
-
-#----------------------------------------------------------------------------
-# Test module compiles okay
-use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
+plan tests => 18;
 
 #----------------------------------------------------------------------------
 # Test calling without arguments
@@ -251,7 +248,7 @@ sub callAjaxService {
     my $args = shift;
 
     # Setup the mock request object
-    $session->request->method('POST');
+    $session->request->env->{'REQUEST_METHOD'} = 'POST';
     $session->request->setup_body({ args => encode_json($args) });
     
     # Call ajax service function and decode reply

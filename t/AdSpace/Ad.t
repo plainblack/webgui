@@ -50,8 +50,8 @@ my $imageStorage = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($imageStorage);
 $imageStorage->addFileFromScalar('foo.bmp', 'This is not really an image');
 
-    local $ENV{REMOTE_ADDR} = '10.0.0.1';
-    local $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
+    $session->request->env->{REMOTE_ADDR} = '10.0.0.1';
+    $session->request->env->{HTTP_USER_AGENT} = 'Mozilla/5.0';
 
     $adSpace = WebGUI::AdSpace->create($session, {name=>"Tim Robbins"});
     $ad=WebGUI::AdSpace::Ad->create($session, $adSpace->getId, {"type" => "text"});

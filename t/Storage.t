@@ -608,7 +608,7 @@ is ($cdnStorage->getUrl, $locUrl, 'CDN: getUrl: URL for directory');
 my $fileUrl = $locUrl . '/' . 'cdn-file';
 is ($cdnStorage->getUrl('cdn-file'), $fileUrl, 'CDN: getUrl: URL for file');
 # SSL
-my %mockEnv = %ENV;
+my %mockEnv = %{ $session->request->env };
 my $env = Test::MockObject::Extends->new($session->env);
 $env->mock('get', sub { return $mockEnv{$_[1]} } );
 $mockEnv{HTTPS} = 'on';

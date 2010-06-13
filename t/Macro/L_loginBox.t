@@ -29,12 +29,9 @@ $session->user({userId=>1});
 ##Replace the original ENV hash with one that will return a
 ##known user agent.  Since it usually contains a reference to %ENV,
 ##you can't just modify that hash since it's protected
-my $origEnv = $session->{_env};
-my %newEnvHash = (
-    'HTTP_USER_AGENT'   => 'mozilla',
-    'QUERY_STRING'      => 'func=search',
-);
-$session->{_env}->{_env} = \%newEnvHash;
+my $env = $session->request->env;
+$env->{'HTTP_USER_AGENT'} = 'mozilla';
+$env->{'QUERY_STRING'}    = 'func=search';
 
 my $i18n = WebGUI::International->new($session,'Macro_L_loginBox');
 
@@ -122,7 +119,7 @@ like($vars{'username.form'}, qr/size="16"/, 'boxSize set in username.form');
 like($vars{'password.form'}, qr/size="16"/, 'boxSize set in password.form');
 
 ##Change browser to be MSIE like and watch boxSize change
-$newEnvHash{'HTTP_USER_AGENT'} = "msie";
+$env->{'HTTP_USER_AGENT'} = 'msie';
 
 $output = WebGUI::Macro::L_loginBox::process($session,24,'Log In',$template->getId);
 %vars = simpleTextParser($output);

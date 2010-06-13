@@ -25,7 +25,7 @@ my $session = WebGUI::Test->session;
 ##can be retrieved via the macro.  There are also tests for null, undef,
 ##and non-existant keys.
 
-my %env = %{ $session->env->{_env} };
+my %env = %{ $session->request->env };
 my @keys = keys %env;
 
 my $numTests = 3 + scalar keys %env;

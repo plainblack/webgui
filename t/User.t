@@ -478,9 +478,8 @@ ok($dude->canUseAdminMode, 'canUseAdminMode: with no subnets set, user canUseAdm
 $dude->deleteFromGroups([12]);
 
 ##Spoof the IP address to test subnet level access control to adminMode
-my $origEnvHash = $session->env->{_env};
-my %newEnv = ( REMOTE_ADDR => '194.168.0.2' );
-$session->env->{_env} = \%newEnv;
+my $env = $session->request->env;
+$env->{REMOTE_ADDR} = '194.168.0.2';
 $session->config->set('adminModeSubnets', ['194.168.0.0/24']);
 
 ok(!$dude->isInGroup(12), 'user is not in group 12');
@@ -490,7 +489,7 @@ $dude->addToGroups([12]);
 
 ok($dude->canUseAdminMode, 'canUseAdminMode: with no subnets set, user canUseAdminMode');
 
-$newEnv{REMOTE_ADDR} = '10.0.0.2';
+$env->{REMOTE_ADDR} = '10.0.0.2';
 
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permission, user must be in subnet if subnet is set');
 
@@ -498,11 +497,10 @@ ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permissi
 $session->config->set('adminModeSubnets', ['10.0.0.0/24', '192.168.0.0/24', ]);
 ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, first IP range');
 
-$newEnv{REMOTE_ADDR} = '192.168.0.127';
+$env->{REMOTE_ADDR} = '192.168.0.127';
 ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, second IP range');
 
 ##restore the original session variables
-$session->env->{_env} = $origEnvHash;
 $session->config->delete('adminModeSubnets');
 
 ################################################################
