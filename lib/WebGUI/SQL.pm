@@ -622,7 +622,8 @@ sub quickArray {
     my $self = shift;
     my $sql = shift;
     my $params = shift || [];
-    return $self->selectrow_array($sql, {}, @{ $params });
+    my @result = $self->selectrow_array($sql, {}, @{ $params });
+    return @result;
 }
 
 
@@ -686,7 +687,7 @@ sub quickHash {
     my $sql = shift;
     my $params = shift;
     my $row = $self->selectrow_hashref($sql, {}, @$params);
-    return %{$row};
+    return $row ? %{$row} : ();
 }
 
 #-------------------------------------------------------------------
@@ -709,7 +710,7 @@ sub quickHashRef {
     my $self = shift;
     my $sql = shift;
     my $params = shift;
-    return $self->selectrow_hashref($sql, {}, @$params);
+    return $self->selectrow_hashref($sql, {}, @$params) || {};
 }
 
 #-------------------------------------------------------------------
