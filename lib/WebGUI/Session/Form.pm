@@ -122,15 +122,14 @@ sub param {
     return undef unless $self->session->request;
 	my $field = shift;
 	if ($field) {
-        my @data = $self->session->request->param($field);
+        my @data = $self->session->request->parameters->get_all($field);
         foreach my $value (@data) {
             $value = Encode::decode_utf8($value);
         }
         return wantarray ? @data : $data[0];
 	}
     else {
-        my $paramRef = $self->session->request->param;
-        return keys %{ $paramRef };
+        return $self->session->request->parameters->keys;
 	}
 }
 
