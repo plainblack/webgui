@@ -8,7 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-#use lib 'tests';
-
-use Test::Class::Load qw{tests};
+use File::Spec::Functions qw( catdir rel2abs );
+use File::Basename qw( dirname );
+use Test::Class::Load rel2abs( catdir ( dirname( __FILE__ ), 'tests' ) );
 Test::Class->runtests;
