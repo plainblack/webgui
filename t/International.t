@@ -50,6 +50,11 @@ is($i18n->get('topicName'), 'Assets', 'get: get English label for topicName in A
 is($i18n->get('topicName', 'WebGUI'), 'WebGUI', 'get: test manual namespace override');
 
 installPigLatin();
+WebGUI::Test->addToCleanup(sub {
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
+	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
+});
 
 #tests for sub new
 my $i18nNew1 = WebGUI::International->new($session);
@@ -131,8 +136,5 @@ my $newi18n = WebGUI::International->new($session);
                 $newi18n->get('104', 'WebGUI', 'English'),
                 'Language check after SetLanguage contentHandler : key from missing file return English key'
 );
-END {
-	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
-	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
-	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
-}
+
+#vim:ft=perl

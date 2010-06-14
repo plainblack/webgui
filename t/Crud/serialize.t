@@ -34,6 +34,9 @@ plan tests => 10;        # Increment this number for each test you create
 use_ok('WebGUI::Serialize');
 
 WebGUI::Serialize->crud_createTable($session);
+WebGUI::Test->addToCleanup(sub {
+    WebGUI::Serialize->crud_dropTable($session);
+})
 
 my $cereal = WebGUI::Serialize->create($session);
 isa_ok($cereal, 'WebGUI::Serialize');
@@ -112,11 +115,4 @@ cmp_deeply(
     'get: returns safe references'
 );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-	
-WebGUI::Serialize->crud_dropTable($session);
-
-}
 #vim:ft=perl

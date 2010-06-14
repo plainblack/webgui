@@ -31,6 +31,9 @@ my $session = WebGUI::Test->session;
 plan tests => 4;
 
 installCollateral();
+WebGUI::Test->addToCleanup(sub {
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI Help HelpTest.pm/);
+});
 
 my $allHelp = WebGUI::Operation::Help::_load($session, 'HelpTest');
 
@@ -173,7 +176,4 @@ sub installCollateral {
 	);
 }
 
-END {
-	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI Help HelpTest.pm/);
-}
-
+#vim:ft=perl
