@@ -176,6 +176,7 @@ is($macroOutput, 1, 'generateAdditionalHeadTags: process a macro');
 ####################################################
 
 my ($versionTag, $templates, $article, $snippet) = setup_assets($session);
+WebGUI::Test->addToCleanup($versionTag);
 
 $style->sent(0);
 is($style->sent, 0, 'process: setup sent to 0');
@@ -556,10 +557,4 @@ sub setup_assets {
 	my $snippet = $daddySnippet->addChild($properties, $properties->{id});
 	$versionTag->commit;
 	return ($versionTag, $templates, $asset, $snippet);
-}
-
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
 }

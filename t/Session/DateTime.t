@@ -20,6 +20,7 @@ use WebGUI::Session;
 use Test::More tests => 90; # increment this value for each test you create
 
 installBadLocale();
+WebGUI::Test->addToCleanup(sub { unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/); });
  
 my $session = WebGUI::Test->session;
 
@@ -305,6 +306,4 @@ sub installBadLocale {
 	);
 }
 
-END {
-	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/);
-}
+#vim:ft=perl

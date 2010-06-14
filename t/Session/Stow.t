@@ -99,6 +99,4 @@ is( $session->stow->get( 'possibilities', { noclone => 1 } ), $arr,
     "With noclone returns same reference"
 );
 
-END {
-	$session->config->set('disableCache',$disableCache);
-}
+#vim:ft=perl
