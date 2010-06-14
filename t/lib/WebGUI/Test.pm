@@ -224,16 +224,28 @@ mock the isDebug flag so that debug output is always generated.
 
 =cut
 
+my $origLogger;
 sub interceptLogging {
-    my $logger = $CLASS->session->log->getLogger;
-    $logger = Test::MockObject::Extends->new( $logger );
+    my $log = $CLASS->session->log;
+    $origLogger ||= $log->{_logger};
+    $log->{_logger} = sub {
+        my $info = shift;
+        my $level = $info->{level};
+        my $message = $info->{message};
 
-    $logger->mock( 'warn',     sub { our $logger_warns = $_[1]} );
-    $logger->mock( 'debug',    sub { our $logger_debug = $_[1]} );
-    $logger->mock( 'info',     sub { our $logger_info  = $_[1]} );
-    $logger->mock( 'error',    sub { our $logger_error = $_[1]} );
-    $logger->mock( 'isDebug',  sub { return 1 } );
-    $logger->mock( 'is_debug', sub { return 1 } );
+        if ($level eq 'warn') {
+            our $logger_warns = $message;
+        }
+        elsif ($level eq 'debug') {
+            our $logger_debug = $message;
+        }
+        elsif ($level eq 'info') {
+            our $logger_info = $message;
+        }
+        elsif ($level eq 'error') {
+            our $logger_error = $message;
+        }
+    };
 }
 
 #----------------------------------------------------------------------------
@@ -245,14 +257,9 @@ Restores's the logging object to its original state.
 =cut
 
 sub restoreLogging {
-    my $logger = $CLASS->session->log->getLogger;
-
-    $logger->unmock( 'warn'     )
-           ->unmock( 'debug'    )
-           ->unmock( 'info'     )
-           ->unmock( 'error'    )
-           ->unmock( 'isDebug'  )
-           ->unmock( 'is_debug' );
+    my $log = $CLASS->session->log;
+    $log->{_logger} = $origLogger;
+    undef $origLogger;
 }
 
 #----------------------------------------------------------------------------
