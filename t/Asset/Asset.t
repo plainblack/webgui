@@ -222,15 +222,8 @@ is($importNode->getName,    $i18n->get('assetName', 'Asset_Folder'),  'getName: 
 
 is($importNode->addEditLabel, $i18n->get('edit').' '.$importNode->getName, 'addEditLabel, default mode is edit mode');
 
-my $origRequest = $session->{_request};
-my $newRequest = Test::MockObject->new();
-my $func;
-$newRequest->set_bound('body', \$func);
-$newRequest->set_bound('param', \$func);
-$session->{_request} = $newRequest;
-$func = 'add';
+$session->request->setup_param({ func => 'add' });
 is($importNode->addEditLabel, $i18n->get('add').' '.$importNode->getName, 'addEditLabel, use add mode');
-$session->{_request} = $origRequest;
 
 ################################################################
 #
