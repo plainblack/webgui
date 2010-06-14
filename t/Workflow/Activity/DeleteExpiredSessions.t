@@ -53,9 +53,6 @@ my $origSessionTimeout = $session->setting->get('sessionTimeout');
 my $sessionCount = $session->db->quickScalar('select count(*) from userSession');
 my $scratchCount = $session->db->quickScalar('select count(*) from userSessionScratch');
 
-note $sessionCount;
-note $scratchCount;
-
 my @sessions;
 
 foreach (1..2) {

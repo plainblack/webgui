@@ -27,6 +27,7 @@ plan tests => 2 + $num_tests;
 my $session = WebGUI::Test->session;
  
 # put your tests here
+WebGUI::Test->originalConfig('templateParsers');
 
 my $module = use_ok('HTML::Template::Expr');
 my $plugin = use_ok('WebGUI::Asset::Template::HTMLTemplateExpr');

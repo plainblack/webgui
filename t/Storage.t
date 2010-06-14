@@ -91,6 +91,7 @@ is($guidStorage->getDirectoryId, $newGuid, '... getDirectoryId');
 #
 ####################################################
 
+WebGUI::Test->originalConfig('cdn');
 $session->config->delete('cdn');
 # Note: the CDN configuration will be reverted after CDN tests below
 

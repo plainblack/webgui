@@ -87,7 +87,7 @@ sub execute {
             $self->session->errorHandler->warn("More than 1 old userLoginLog rows found, removing offending rows");
             $self->session->db->write("delete from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$sessionId] );
         }
-		my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename, undef, undef, $sessionId, 1);
+		my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilePath, undef, undef, $sessionId, 1);
 		if (defined $session) {
 			$session->var->end;
 			$session->close;

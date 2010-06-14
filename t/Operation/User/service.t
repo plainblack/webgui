@@ -29,6 +29,7 @@ use Data::Dumper;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+WebGUI::Test->originalConfig( "serviceSubnets" );
 $session->config->delete('serviceSubnets');
 
 my ( $response, $responseObj, $auth, $userAndy, $userRed );

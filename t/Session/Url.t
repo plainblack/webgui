@@ -85,6 +85,7 @@ is( $url2, $url.'?a=b;c=d', 'append second pair');
 #
 #######################################
 
+WebGUI::Test->originalConfig('gateway');
 $session->config->set('gateway', '/');
 
 is( $session->config->get('gateway'), '/', 'Set gateway for downstream tests');
@@ -130,6 +131,7 @@ my $setting_hostToUse = $session->setting->get('hostToUse');
 $session->setting->set('hostToUse', 'HTTP_HOST');
 my $sitename = $session->config->get('sitename')->[0];
 is( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config as http_host');
+WebGUI::Test->originalConfig('webServerPort');
 
 $session->url->setSiteURL('http://webgui.org');
 is( $session->url->getSiteURL, 'http://webgui.org', 'override config setting with setSiteURL');
@@ -149,6 +151,7 @@ $mockEnv{HTTP_HOST} = "devsite.com";
 $session->url->setSiteURL(undef);
 is( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL where requested host is not a configured site');
 
+WebGUI::Test->originalConfig('sitename');
 $session->config->addToArray('sitename', 'devsite.com');
 $session->url->setSiteURL(undef);
 is( $session->url->getSiteURL, 'http://devsite.com', 'getSiteURL where requested host is not the first configured site');
@@ -268,8 +271,9 @@ is($session->url->makeAbsolute('page1'), '/page1', 'makeAbsolute: default baseUr
 #
 #######################################
 
-my $extras  = $session->config->get('extrasURL');
+my $extras  = WebGUI::Test->originalConfig('extrasURL');
 
+WebGUI::Test->originalConfig('cdn');
 $session->config->delete('cdn');
 
 is($session->url->extras, $extras.'/', 'extras method returns URL to extras with a trailing slash');
@@ -425,6 +429,8 @@ is(
 # forceSecureConnection
 #
 #######################################
+
+WebGUI::Test->originalConfig('sslEnabled');
 
 ##Test all the false cases, first
 

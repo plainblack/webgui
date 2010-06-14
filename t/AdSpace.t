@@ -14,7 +14,6 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::AdSpace::Ad;
-use WebGUI::AdSpace;
 
 use Test::More;
 use Test::Deep;
@@ -31,8 +30,11 @@ my $newAdSpaceSettings = {
 
 my $numTests = 35; # increment this value for each test you create
 $numTests += 2 * scalar keys %{ $newAdSpaceSettings };
+++$numTests; ##For conditional testing on module load
 
 plan tests => $numTests;
+
+my $loaded = use_ok('WebGUI::AdSpace');
 
 my $session = WebGUI::Test->session;
 my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, );

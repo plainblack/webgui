@@ -34,6 +34,8 @@ plan tests => 3;        # Increment this number for each test you create
 # put your tests here
 
 use_ok( 'WebGUI::Cache::CHI' );
+WebGUI::Test->originalConfig('cacheType');
+WebGUI::Test->originalConfig('cache');
 $session->config->set('cacheType', 'WebGUI::Cache::CHI');
 $session->config->set('cache', { driver => 'FastMmap', });
 

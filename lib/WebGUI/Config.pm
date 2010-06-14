@@ -17,6 +17,7 @@ package WebGUI::Config;
 use strict;
 use Class::InsideOut qw(readonly id register);
 use Cwd ();
+use File::Spec;
 use base 'Config::JSON';
 
 my %config = ();
@@ -169,8 +170,10 @@ sub new {
 	my $class = shift;
 	my $webguiPath = Cwd::realpath(shift);
 	my $filename = shift;
-	my $noCache = shift;
-    my $fullPath = Cwd::realpath($webguiPath.'/etc/'.$filename);
+	my $noCache  = shift;
+    my $fullPath = File::Spec->file_name_is_absolute($filename)
+                 ? $filename
+                 : Cwd::realpath($webguiPath.'/etc/'.$filename);
 	if ($config{$fullPath}) {
 		return $config{$fullPath};
 	} else {

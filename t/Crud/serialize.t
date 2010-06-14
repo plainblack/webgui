@@ -36,7 +36,7 @@ use_ok('WebGUI::Serialize');
 WebGUI::Serialize->crud_createTable($session);
 WebGUI::Test->addToCleanup(sub {
     WebGUI::Serialize->crud_dropTable($session);
-})
+});
 
 my $cereal = WebGUI::Serialize->create($session);
 isa_ok($cereal, 'WebGUI::Serialize');
