@@ -62,7 +62,14 @@ has site    => (
     },
 );
 
-# Each web request results in a call to this sub
+=head2 call( $env )
+
+Every web requests results in a call to this subroutine.
+
+=head3 $env
+
+=cut
+
 sub call {
     my $self = shift;
     my $env = shift;
