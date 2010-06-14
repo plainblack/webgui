@@ -108,7 +108,7 @@ sub import {
             unless -f _;
         die "WEBGUI_CONFIG path '$config' is not readable by effective uid '$>'.\n"
             unless -r _;
-        $original_config_file = $config;
+        $original_config_file = abs2rel( $config, catdir( $CLASS->root, 'etc') );
     }
     goto &{ $_[0]->can('SUPER::import') };
 }
@@ -382,8 +382,7 @@ sub file {
         OPEN => 0,
         TMPDIR => 1,
     );
-    File::Copy::copy($original_config_file, $config_copy_abs)
-        or die "Error creating temp config file: $!";
+    File::Copy::copy($original_config_file, $config_copy_abs);
     $CLASS->addToCleanup(sub {
         unlink $config_copy_abs;
         undef $config_copy;
