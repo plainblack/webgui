@@ -131,7 +131,7 @@ consecutive slashes in the path part of the URL will be replaced with a single s
 sub extras {
     my $self   = shift;
     my $path   = shift;
-    my $url    = $self->session->url->make_urlmap_work($self->session->config->get("extrasURL"));
+    my $url    = $self->make_urlmap_work($self->session->config->get("extrasURL"));
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} and $cdnCfg->{'extrasCdn'} ) {
         unless ( $path and grep $path =~ m/$_/, @{ $cdnCfg->{'extrasExclude'} } ) {
