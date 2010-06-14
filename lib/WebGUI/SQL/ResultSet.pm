@@ -42,6 +42,7 @@ This class provides methods for working with SQL result sets. If you're used to 
 These methods are available from this package:
 
 =cut
+
 #-------------------------------------------------------------------
 
 =head2 prepare ( sql, db ) 
