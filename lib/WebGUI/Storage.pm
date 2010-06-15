@@ -390,7 +390,7 @@ sub addFileFromFormPost {
         $filename = $session->url->makeCompliant($clientFilename);
         my $filePath = $self->getPath($filename);
         $attachmentCount++;
-        if ($upload->link($filePath)) {
+        if (File::Copy::move($upload->path, $filePath)) {
             $self->_changeOwner($filePath);
             $self->session->errorHandler->info("Got ".$upload->filename);
         }

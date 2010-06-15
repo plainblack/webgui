@@ -469,19 +469,26 @@ my $formStore = WebGUI::Storage->create($session);
 addToCleanup($formStore);
 is($formStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns empty string when asking for a form variable with no files attached');
 
-$session->request->uploadFiles(
-    'oneFile',
-    [ WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin/WebGUI.pm') ],
-);
-is($formStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', '... returns the name of the uploaded file');
-cmp_bag($formStore->getFiles, [ qw/WebGUI.pm/ ], '... adds the file to the storage location');
+use HTTP::Request;
+use HTTP::Request::Common;
 
-$session->request->uploadFiles(
-    'thumbFile',
-    [ WebGUI::Test->getTestCollateralPath('thumb-thumb.gif') ],
-);
-is($formStore->addFileFromFormPost('thumbFile'), 'thumb.gif', '... strips thumb- prefix from files');
-cmp_bag($formStore->getFiles, [ qw/WebGUI.pm thumb.gif/ ], '... adds the file to the storage location');
+{
+    my $req = POST '/', Content_Type => 'form-data', Content => [
+        oneFile => [ WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin/WebGUI.pm') ],
+    ];
+    local $session->{_request} = Plack::Request->new($req->to_psgi);
+    is($formStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', '... returns the name of the uploaded file');
+    cmp_bag($formStore->getFiles, [ qw/WebGUI.pm/ ], '... adds the file to the storage location');
+}
+
+{
+    my $req = POST '/', Content_Type => 'form-data', Content => [
+        thumbFile => [ WebGUI::Test->getTestCollateralPath('thumb-thumb.gif') ],
+    ];
+    local $session->{_request} = Plack::Request->new($req->to_psgi);
+    is($formStore->addFileFromFormPost('thumbFile'), 'thumb.gif', '... strips thumb- prefix from files');
+    cmp_bag($formStore->getFiles, [ qw/WebGUI.pm thumb.gif/ ], '... adds the file to the storage location');
+}
 
 ####################################################
 #
@@ -608,10 +615,9 @@ is ($cdnStorage->getUrl, $locUrl, 'CDN: getUrl: URL for directory');
 my $fileUrl = $locUrl . '/' . 'cdn-file';
 is ($cdnStorage->getUrl('cdn-file'), $fileUrl, 'CDN: getUrl: URL for file');
 # SSL
-my %mockEnv = %{ $session->request->env };
-my $env = Test::MockObject::Extends->new($session->env);
-$env->mock('get', sub { return $mockEnv{$_[1]} } );
-$mockEnv{HTTPS} = 'on';
+my $env = $session->request->env;
+$env->{HTTPS} = 'on';
+$env->{'psgi.url_scheme'} = 'https';
 $cdnCfg->{'sslAlt'} = 1;
 $session->config->set('cdn', $cdnCfg);
 is ($cdnStorage->getUrl, $initUrl, 'CDN: getUrl: URL with sslAlt flag');
@@ -619,7 +625,8 @@ $cdnCfg->{'sslUrl'} = 'https://ssl.example.com';
 $session->config->set('cdn', $cdnCfg);
 my $sslUrl = $cdnCfg->{'sslUrl'} . '/' . $session->id->toHex($cdnStorage->getId);
 is ($cdnStorage->getUrl, $sslUrl, 'CDN: getUrl: sslUrl');
-$mockEnv{HTTPS} = undef;
+$env->{HTTPS} = undef;
+$env->{'psgi.url_scheme'} = 'http';
 is ($cdnStorage->getUrl, $locUrl, 'CDN: getUrl: cleartext request to not use sslUrl');
 # Copy
 my $cdnCopy = $cdnStorage->copy;
