@@ -60,23 +60,8 @@ $session->asset($snippet);
 my $macroOutput = WebGUI::Macro::PageTitle::process($session);
 is($macroOutput, $snippet->get('title'), "testing title returned from localy created asset with known title");
 
-my $origSessionRequest = $session->{_request};
-
-my ($operation, $function) = (0,0);
-
-my $request = Test::MockObject->new;
-$request->mock('body',
-	sub {
-		my ($self, $value) = @_;
-		return 1 if $operation and ($value eq "op");
-		return 1 if $function and ($value eq "func");
-		return 0;
-	}
-);
-$request->mock('param', sub {shift->body(@_)});
-
-$session->{_request} = $request;
-
+my $request = $session->request;
+$request->setup_param({op => 0, func => 0});
 $output = WebGUI::Macro::PageTitle::process($session);
 is($output, $session->asset->get('title'), 'fetching title for session asset, no func or op');
 
@@ -84,17 +69,14 @@ my $urlizedTitle = sprintf q!<a href="%s">%s</a>!,
 	$session->asset->getUrl,
 	$session->asset->get('title');
 
-$operation = 1;
-$function = 0;
+$request->setup_param({op => 1, func => 0});
 $output = WebGUI::Macro::PageTitle::process($session);
 is($output, $urlizedTitle, 'fetching urlized title via an operation');
 
-$operation = 0;
-$function = 1;
+$request->setup_param({op => 0, func => 1});
 $output = WebGUI::Macro::PageTitle::process($session);
 is($output, $urlizedTitle, 'fetching urlized title via a function');
 
-$operation = 1;
-$function = 1;
+$request->setup_param({op => 1, func => 1});
 $output = WebGUI::Macro::PageTitle::process($session);
 is($output, $urlizedTitle, 'fetching urlized title via an operation and function');
