@@ -1,3 +1,5 @@
+7.9.8
+
 7.9.7
  - added #11571: Allow return from photo edit view to gallery edit view
  - fixed: Reject form submissions without image selected for upload in edit view of Photo asset 
