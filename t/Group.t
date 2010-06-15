@@ -98,6 +98,7 @@ plan tests => (168 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # incremen
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
+WebGUI::Test->addToCleanup(sub { $testCache->flush; });
 
 foreach my $gid ('new', '') {
 	my $g = WebGUI::Group->new($session, $gid);
@@ -468,6 +469,7 @@ cmp_ok($expirationDate-time(), '>', 50, 'checking expire offset override on addU
 ################################################################
 
 $session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
+WebGUI::Test->addToCleanup(SQL => 'DROP TABLE IF EXISTS myUserTable');
 $session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
 
 my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
@@ -831,7 +833,4 @@ ok(  WebGUI::Group->vitalGroup(3), '... 3');
 ok(  WebGUI::Group->vitalGroup('pbgroup000000000000015'), '... pbgroup000000000000015');
 ok(! WebGUI::Group->vitalGroup('27'), '... 27 is not vital');
 
-END {
-	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
-	$testCache->flush;
-}
+#vim:ft=perl

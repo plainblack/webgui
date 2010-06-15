@@ -722,7 +722,4 @@ Hashes differ on element: a
 expect : '2'
 END_CMP
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-}
+#vim:ft=perl

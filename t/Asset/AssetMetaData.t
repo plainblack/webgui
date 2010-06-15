@@ -56,6 +56,12 @@ my $snippet = $folder->addChild({
 
 $versionTag->commit;
 
+WebGUI::Test->addToCleanup(sub {
+    foreach my $metaDataFieldId (keys %{ $snippet->getMetaDataFields }) {
+        $snippet->deleteMetaDataField($metaDataFieldId);
+    }
+});
+
 ##Note that there is no MetaData field master class.  New fields can be added
 ##from _ANY_ asset, and be available to all assets.
 
@@ -226,8 +232,4 @@ sub buildNameIndex {
     return $nameStruct;
 }
 
-END {
-    foreach my $metaDataFieldId (keys %{ $snippet->getMetaDataFields }) {
-        $snippet->deleteMetaDataField($metaDataFieldId);
-    }
-}
+#vim:ft=perl
