@@ -2,6 +2,7 @@
  - fixed #11619: Trash Expired Events not trashing events
  - fixed #11623: Navigation CSS-id
  - fixed #11622: Archived CSS entries displayable.
+ - fixed #11560: Email footer hidden from Outlook users
 
 7.8.21
  - fixed #11597: manageTrash and newlines
