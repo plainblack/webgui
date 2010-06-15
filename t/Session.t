@@ -53,5 +53,5 @@ my $slaveHash2 = {
 $session->config->set('dbslave2', $slaveHash2);
 
 my $slave2 = $session->dbSlave;
-isa_ok($slave2, 'WebGUI::SQL');
+isa_ok($slave2, 'WebGUI::SQL::db');
 
