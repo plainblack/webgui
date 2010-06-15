@@ -34,6 +34,7 @@ plan tests => 55;        # Increment this number for each test you create
 
 # check table structure
 WebGUI::Crud->crud_createTable($session);
+WebGUI::Test->addToCleanup(sub { WebGUI::Crud->crud_dropTable($session); });
 my $sth = $session->db->read("describe unnamed_crud_table");
 my ($col, $type) = $sth->array();
 is($col, 'id', "structure: id name");
@@ -139,11 +140,4 @@ is(WebGUI::Crud->crud_getTableKey($session), 'id', 'default key is id');
 is(WebGUI::Crud->crud_getTableName($session), 'unnamed_crud_table', 'default table is unnamed_crud_table');
 is(WebGUI::Crud->crud_getSequenceKey($session), '', 'default sequence key is blank');
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-	
-WebGUI::Crud->crud_dropTable($session);
-
-}
 #vim:ft=perl

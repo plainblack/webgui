@@ -23,14 +23,8 @@ my $session = WebGUI::Test->session;
 # Tests
 plan tests => 94;
 
-my ( $s, $t1 );
-
 my $tp = use_ok('TAP::Parser');
 my $tpa = use_ok('TAP::Parser::Aggregator');
-
-SKIP: {
-
-skip "Unable to load TAP::Parser and TAP::Parser::Aggregator", 88 unless $tp && $tpa;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -44,8 +38,9 @@ WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
 $session->config->set('enableSurveyExpressionEngine', 1);
 
 # Create a Survey
-$s = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+my $s = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 isa_ok( $s, 'WebGUI::Asset::Wobject::Survey' );
+WebGUI::Test->addToCleanup($s);
 
 my $sJSON = $s->surveyJSON;
 
@@ -155,7 +150,8 @@ cmp_deeply(
     'surveyOrderIndex correct'
 );
 
-$t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );
+my $t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );
+WebGUI::Test->addToCleanup(sub {$t1->delete();});
 my $spec;
 
 # No tests
@@ -725,11 +721,8 @@ Hashes differ on element: a
    got : '1'
 expect : '2'
 END_CMP
-}
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $s->purge() if $s;
-    $t1->delete() if $t1;
 }
