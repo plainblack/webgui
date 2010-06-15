@@ -2477,6 +2477,7 @@ sub write {
     $self->setSize();
     WebGUI::Keyword->new($self->session)->setKeywordsForAsset({ asset => $self, keywords => $self->keywords });
 
+    $self->purgeCache;
 }
 
 #-------------------------------------------------------------------
