@@ -41,10 +41,9 @@ my $session = WebGUI::Test->session;
 my $origToolbar = $session->user->profileField('toolbar');
 my $toolbars = $session->url->extras('toolbar/');
 
-my $newRequest = Test::MockObject->new;
+my $request = $session->request;
 my $requestedUrl = '/home/depot';
-$newRequest->set_bound('uri', \$requestedUrl);
-$session->{_request} = $newRequest;
+$request->env->{PATH_INFO} = $requestedUrl;
 
 my $i18n = WebGUI::International->new($session, 'Icon');
 
