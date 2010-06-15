@@ -213,7 +213,7 @@ around exportAssetCollateral => sub {
         my $exportSession = $self->session->duplicate;
 
         # open another session as the user doing the exporting...
-        my $selfdupe = WebGUI::Asset->newById( $exportSession, $self->getId );
+        my $selfdupe = WebGUI::Asset->newById( $exportSession, $self->assetId, $self->revisionDate );
 
         # next, get the contents, open the file, and write the contents to the file.
         my $fh = eval { $dest->open('>:utf8') };
