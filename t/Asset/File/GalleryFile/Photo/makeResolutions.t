@@ -29,6 +29,7 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test"});
+WebGUI::Test->addToCleanup($versionTags[-1]);
 
 my ($gallery, $album, $photo);
 $gallery
@@ -86,6 +87,7 @@ TODO: {
 # Array of resolutions passed to makeResolutions overrides defaults from 
 # parent asset
 push @versionTags, WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -139,6 +141,7 @@ TODO: {
 # makeResolutions allows API to specify resolutions to make as array reference
 # argument
 push @versionTags, WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $photo
     = $node->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
@@ -176,6 +179,7 @@ TODO: {
 #----------------------------------------------------------------------------
 # makeResolutions throws a warning on an invalid resolution but keeps going
 push @versionTags, WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $photo
     = $node->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
@@ -221,12 +225,4 @@ $photo->update({ filename => 'page_title.jpg' });
     );
 }
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    foreach my $versionTag (@versionTags) {
-        $versionTag->rollback;
-    }
-}
-
-
+#vim:ft=perl

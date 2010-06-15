@@ -23,6 +23,7 @@ my $session = WebGUI::Test->session;
 
 # get a user so we can test retrieving messages for a specific user
 my $admin = WebGUI::User->new($session, 3);
+WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox; });
 
 # Begin tests by getting an inbox object
 my $inbox = WebGUI::Inbox->new($session); 
@@ -133,9 +134,4 @@ note $messages->[0]->getStatus;
 note $messages->[0]->isRead;
 is($inbox->getUnreadMessageCount($admin->userId), 3, '... really tracks unread messages');
 
-END {
-    foreach my $message (@{ $inbox->getMessagesForUser($admin, 1000) } ) {
-        $message->setDeleted(3);
-        $message->delete(3);
-    }
-}
+#vim:ft=perl

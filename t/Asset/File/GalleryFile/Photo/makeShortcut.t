@@ -29,6 +29,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
+WebGUI::Test->addToCleanup($versionTag);
 my $maker           = WebGUI::Test::Maker::HTML->new;
 my $otherParent
     = $node->addChild({
@@ -119,10 +120,4 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # www_makeShortcut
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
-
-
+#vim:ft=perl
