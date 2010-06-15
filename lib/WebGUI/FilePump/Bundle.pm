@@ -6,6 +6,7 @@ use WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::Exception;
 use WebGUI::Utility;
+use WebGUI::Macro;
 use URI;
 use Path::Class;
 use File::Basename;
@@ -518,7 +519,8 @@ sub fetchAsset {
         content      => '',
     };
     if ($asset->isa('WebGUI::Asset::Snippet')) {
-        $guts->{content} = $asset->view(1);
+        $guts->{content} = $asset->snippet;
+        WebGUI::Macro::process($self->session, \( $guts->{content} ) );
     }
     elsif ($asset->isa('WebGUI::Asset::File')) {
         $guts->{content} = $asset->getStorageLocation->getFileContentsAsScalar($asset->get('filename'));
