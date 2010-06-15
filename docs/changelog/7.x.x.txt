@@ -16,6 +16,7 @@
  - fixed #11616: No access to /root
  - fixed #11619: Trash Expired Events not trashing events
  - fixed #11623: Navigation CSS-id
+ - fixed #11629: WebGUI Collateral Manager = Error
 
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
