@@ -25,6 +25,7 @@ use WebGUI::Asset::File::Image;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"Image Test"});
 my $image
     = $node->addChild({
@@ -54,9 +55,4 @@ ok(
     "Thumbnail file exists on the filesystem",
 );
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+#vim:ft=perl

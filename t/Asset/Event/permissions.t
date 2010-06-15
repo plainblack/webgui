@@ -31,6 +31,7 @@ $session->user({ userId => 3 });
 my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
+WebGUI::Test->addToCleanup($versionTags[-1]);
 
 my $registeredUser  = WebGUI::User->new( $session, "new" );
 WebGUI::Test->addToCleanup($registeredUser);
@@ -59,6 +60,7 @@ plan tests => 12;        # Increment this number for each test you create
 # Test permissions of an event added by the Admin
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $event  = $calendar->addChild({
     className       => 'WebGUI::Asset::Event',
     ownerUserId     => 3,
@@ -77,10 +79,4 @@ $maker->prepare( {
     fail        => [ '1', $registeredUser, ],
 } )->run;
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    for my $tag ( @versionTags ) {
-        $tag->rollback;
-    }
-}
+#vim:ft=perl

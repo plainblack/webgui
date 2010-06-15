@@ -25,6 +25,7 @@ use WebGUI::Asset::File::GalleryFile::Photo;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"Photo Test"});
 my $gallery
     = $node->addChild({
@@ -70,10 +71,4 @@ ok(
     "Generated resolution file exists on the filesystem",
 );
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
-
+#vim:ft=perl

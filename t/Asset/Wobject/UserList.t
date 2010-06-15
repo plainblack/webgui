@@ -27,6 +27,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"UserList Test"});
+WebGUI::Test->addToCleanup($versionTag);
 my $userList = $node->addChild({className=>'WebGUI::Asset::Wobject::UserList'});
 
 # Test for a sane object type
@@ -45,8 +46,4 @@ foreach my $newSetting (keys %{$newUserListSettings}) {
 	is ($userList->get($newSetting), $newUserListSettings->{$newSetting}, "updated $newSetting is ".$newUserListSettings->{$newSetting});
 }
 
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-}
-
+#vim:ft=perl
