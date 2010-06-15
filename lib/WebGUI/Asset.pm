@@ -771,7 +771,8 @@ sub fixUrl {
             $parts[0] .= "2";
         }
         $url = join(".",@parts);
-        $url = $self->fixUrl($url);
+        @_ = ($self, $url);
+        goto $self->can('fixUrl');
     }
     return $url;
 }
