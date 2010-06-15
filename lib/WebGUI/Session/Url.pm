@@ -200,8 +200,8 @@ sub make_urlmap_work {
         return $url;
     }
     my $uri = $self->session->request->base;
-    $uri->path($uri->path . $url);
-    return $uri->path;
+    $uri = URI->new($url)->abs($uri->path);
+    return $uri->canonical->path;
 }
 
 #-------------------------------------------------------------------
