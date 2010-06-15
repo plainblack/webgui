@@ -42,8 +42,8 @@ my $root = WebGUI::Asset->getRoot($session);
 
 $session->user({userId => 3});
 
-{ 
-
+{
+    my $toBeCopied = $home->getLineage( ['self', 'descendants'] );
     $output = WebGUI::AssetHelper::Copy::WithChildren->process($home);
     cmp_deeply(
         $output, 
@@ -54,7 +54,7 @@ $session->user({userId => 3});
     );
 
     my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
-    is @{ $clippies }, 10, '... only copied the asset to the clipboard with children';
+    is @{ $clippies }, @$toBeCopied, '... only copied the asset to the clipboard with children';
     addToCleanup(@{ $clippies });
 }
 
