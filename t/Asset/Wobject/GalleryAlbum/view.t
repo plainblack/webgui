@@ -27,6 +27,7 @@ my $maker           = WebGUI::Test::Maker::HTML->new;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"Album Test"});
 my $gallery
     = $node->addChild({
@@ -150,8 +151,5 @@ SKIP: {
     });
     $maker->run;
 }
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+
+#vim:ft=perl
