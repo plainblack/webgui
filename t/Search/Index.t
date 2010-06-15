@@ -56,7 +56,7 @@ cmp_deeply (
     {
         assetId         => $article->getId,
         title           => $article->get('title'),
-        synopsis        => $row->{keywords}, # synopsis defaults to value for keywords
+        synopsis        => '' . $article->get('synopsis'),
         url             => $article->get('url'),
         revisionDate    => $article->get('revisionDate'),
         creationDate    => $article->get('creationDate'),
