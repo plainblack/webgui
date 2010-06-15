@@ -22,6 +22,7 @@ use Net::SMTP;
 use WebGUI::Group;
 use WebGUI::Macro;
 use WebGUI::User;
+use WebGUI::HTML;
 use Encode qw(encode);
 
 =head1 NAME
@@ -84,15 +85,57 @@ sub addAttachment {
 
 =head2 addFooter ( )
 
-Adds the mail footer as set by the site admin to the end of this message.
+Adds the mail footer as set by the site admin to the end of the first
+part of this message.  If the first part of the message has an HTML MIME-type,
+then it will translate the footer to HTML.
+
+If the message is empty, it will create a MIME entity part to hold it.
+
+Macros in the footer will be evaluated.
 
 =cut
 
 sub addFooter {
 	my $self = shift;
+    return if $self->{_footerAdded};
 	my $text = "\n\n".$self->session->setting->get("mailFooter");
 	WebGUI::Macro::process($self->session, \$text);
-	$self->addText($text);
+    $self->{_footerAdded} = 1;
+    my @parts = $self->getMimeEntity->parts();
+    ##No parts yet, add one with the footer content.
+    if (! $parts[0]) {
+        $self->addText($text);
+        return;
+    }
+    ##Get the content of the first part, drop it from the set of parts
+    my $mime_body    = $parts[0]->bodyhandle;
+    my $body_content = join '', $mime_body->as_lines;
+    my $mime_type;
+    if ($parts[0]->effective_type eq 'text/plain') {
+        $body_content .= $text;
+        my $new_part = MIME::Entity->build(
+            Charset     => "UTF-8",
+            Encoding    => "quoted-printable",
+            Type        => 'text/plain',
+            Data        => encode('utf8', $body_content),
+        );
+        shift @parts;
+        unshift @parts, $new_part;
+        $self->getMimeEntity->parts(\@parts);
+    }
+    elsif ($parts[0]->effective_type eq 'text/html') {
+        $text = WebGUI::HTML::format($text, 'mixed');
+        $body_content =~ s{(?=</body>)}{$text};
+        my $new_part = MIME::Entity->build(
+            Charset     => "UTF-8",
+            Encoding    => "quoted-printable",
+            Type        => 'text/html',
+            Data        => encode('utf8', $body_content),
+        );
+        shift @parts;
+        unshift @parts, $new_part;
+        $self->getMimeEntity->parts(\@parts);
+    }
 }
 
 #-------------------------------------------------------------------
@@ -339,7 +382,13 @@ sub create {
 		delete $headers->{toGroup};
 		$message->attach(Data=>"This message was intended for ".$to." but was overridden in the config file.\n\n");
 	}
-	bless {_message=>$message,  _session=>$session, _toGroup=>$headers->{toGroup}, _isInbox => $isInbox }, $class;
+    return bless {
+        _message     => $message,
+        _session     => $session,
+        _toGroup     => $headers->{toGroup},
+        _isInbox     => $isInbox,
+        _footerAdded => 0,
+    }, $class;
 }
 
 #-------------------------------------------------------------------
@@ -462,6 +511,10 @@ sub send {
     my $smtpServer = $session->setting->get("smtpServer"); 
     my $status     = 1;
     
+    if ($mail->parts <= 1) {
+        warn "making singlepart";
+        $mail->make_singlepart;
+    }
     if ($mail->head->get("To")) {
         if ($session->config->get("emailToLog")){
             my $message = $mail->stringify;

@@ -18,6 +18,7 @@
  - fixed #11623: Navigation CSS-id
  - fixed #11629: WebGUI Collateral Manager = Error
  - fixed #11622: Archived CSS entries displayable.
+ - fixed #11560: Email footer hidden from Outlook users
 
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
