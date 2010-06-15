@@ -180,8 +180,9 @@ sub www_view {
                 'WebGUI::Asset::WikiPage',
                 'WebGUI::Asset::Post::Thread',
             ],
-            whereClause   => "asset.createdBy = '$userId' or assetData.ownerUserId = '$userId'",
-            orderByClause => "$sortBy $sortDir"
+            statusToInclude => [ qw/approved archived/ ],
+            whereClause     => "asset.createdBy = '$userId' or assetData.ownerUserId = '$userId'",
+            orderByClause   => "$sortBy $sortDir"
         }
     );
 
