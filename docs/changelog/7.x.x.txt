@@ -3,6 +3,7 @@
  - fixed #11623: Navigation CSS-id
  - fixed #11622: Archived CSS entries displayable.
  - fixed #11560: Email footer hidden from Outlook users
+ - fixed #11643: Account/Contributions: does not show archived content
 
 7.8.21
  - fixed #11597: manageTrash and newlines
