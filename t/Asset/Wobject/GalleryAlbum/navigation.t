@@ -76,7 +76,7 @@ use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
 #----------------------------------------------------------------------------
 # Test getPreviousFileId
 
-diag('getPreviousFileId');
+note 'getPreviousFileId';
 is( $album->getPreviousFileId($photo[2]->getId), $photo[1]->getId, 'Id of photo previous of photo no. 3 equals id of photo no. 2' );
 is( $album->getPreviousFileId($photo[1]->getId), $photo[0]->getId, 'Id of photo previous of photo no. 2 equals id of photo no. 1' );
 is( $album->getPreviousFileId($photo[0]->getId), undef, 'Id of photo previous of photo no. 3 is undef' );
@@ -89,7 +89,7 @@ is( $album->getPreviousFileId($album->getId), undef, 'Return undef if non-child 
 #----------------------------------------------------------------------------
 # Test getNextFileId
 
-diag('getNextFileId');
+note 'getNextFileId';
 is( $album->getNextFileId($photo[2]->getId), $photo[3]->getId, 'Id of photo next of photo no. 3 equals id of photo no. 4' );
 is( $album->getNextFileId($photo[3]->getId), $photo[4]->getId, 'Id of photo next of photo no. 4 equals id of photo no. 5' );
 is( $album->getNextFileId($photo[4]->getId), undef, 'Id of photo next of photo no. 5 is undef' );
