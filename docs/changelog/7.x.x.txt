@@ -1,6 +1,7 @@
 7.8.22
  - fixed #11619: Trash Expired Events not trashing events
  - fixed #11623: Navigation CSS-id
+ - fixed #11622: Archived CSS entries displayable.
 
 7.8.21
  - fixed #11597: manageTrash and newlines
