@@ -96,21 +96,22 @@ sub _initSession {
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         ##Offset Sessions, and Scratch by 1 because 1 will exist at the start
         my @checkCount = (
-            Sessions            => 'userSession',
-            Scratch             => 'userSessionScratch',
-            Users               => 'users',
-            Groups              => 'groups',
-            mailQ               => 'mailQueue',
-            Tags                => 'assetVersionTag',
-            Assets              => 'assetData',
-            Workflows           => 'Workflow',
-            Carts               => 'cart',
-            Transactions        => 'transaction',
-            'Transaction Items' => 'transactionItem',
-            'Ship Drivers'      => 'shipper',
-            'Payment Drivers'   => 'paymentGateway',
-            'Database Links'    => 'databaseLink',
-            'LDAP Links'        => 'ldapLink',
+            Sessions             => 'userSession',
+            Scratch              => 'userSessionScratch',
+            Users                => 'users',
+            Groups               => 'groups',
+            mailQ                => 'mailQueue',
+            Tags                 => 'assetVersionTag',
+            Assets               => 'assetData',
+            Workflows            => 'Workflow',
+            'Workflow Instances' => 'WorkflowInstance',
+            Carts                => 'cart',
+            Transactions         => 'transaction',
+            'Transaction Items'  => 'transactionItem',
+            'Ship Drivers'       => 'shipper',
+            'Payment Drivers'    => 'paymentGateway',
+            'Database Links'     => 'databaseLink',
+            'LDAP Links'         => 'ldapLink',
         );
         my %initCounts;
         for ( my $i = 0; $i < @checkCount; $i += 2) {
@@ -123,7 +124,7 @@ sub _initSession {
                 my $quant = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
                 my $delta = $quant - $initCounts{$table};
                 if ($delta) {
-                    $CLASS->builder->diag(sprintf '%-10s: %4d (delta %+d)', $label, $quant, $delta);
+                    $CLASS->builder->diag(sprintf '%-24s: %4d (delta %+d)', $label, $quant, $delta);
                 }
             }
         });
