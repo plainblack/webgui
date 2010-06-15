@@ -895,8 +895,10 @@ sub setRow {
         my %data = %$data;
         delete $data{$keyColumn};
 
-        my $fields = join ', ', map { $self->quote_identifier($_). '=?' } keys %data;
-        $self->do("UPDATE $table SET $fields WHERE $key = ?", {}, values %data, $id);
+        if ( keys %data ) {
+            my $fields = join ', ', map { $self->quote_identifier($_). '=?' } keys %data;
+            $self->do("UPDATE $table SET $fields WHERE $key = ?", {}, values %data, $id);
+        }
     };
 
     return $id;
