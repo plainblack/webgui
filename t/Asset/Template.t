@@ -57,7 +57,7 @@ ok( !$@, 'Accept = json, JSON is returned' );
 cmp_deeply( \%var, $andNowItsAPerlHashRef, 'Accept = json, The correct JSON is returned' );
 
 # Done, so remove the json Accept header.
-delete $session->request->headers_in->{Accept};
+$session->request->headers->remove_header('Accept');
 
 
 my $newList = WebGUI::Asset::Template->getList($session, 'WebGUI Test Template');
