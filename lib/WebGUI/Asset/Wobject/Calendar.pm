@@ -1675,7 +1675,7 @@ sub www_edit {
 
 
     return $self->getAdminConsole->render(
-            $self->getEditForm->print,
+            $self->getEditForm->toHtml,
             $i18n->get("assetName")
         );
 }

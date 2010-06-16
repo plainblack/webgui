@@ -24,4 +24,9 @@ sub parent_list {
     return ['WebGUI::Asset::Wobject::StoryArchive'];
 }
 
+sub t_11_getEditForm : Tests {
+    # Override because getEditForm returns straight HTML
+    ok(1);
+}
+
 1;

@@ -20,6 +20,7 @@ define assetName         => ['assetName', 'Asset_DataTable'];
 define icon              => 'DataTable.gif';
 define tableName         => 'DataTable';
 property data => (
+            tab          => "data",
             fieldType    => 'DataTable',
             default      => undef,
             label        => '',
@@ -116,50 +117,6 @@ sub getDataTemplateVars {
 
     return $dt;
 } ## end sub getDataTemplateVars
-
-#----------------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-Add the data table to the edit form.
-
-=cut
-
-# TODO Get the DataSource's edit form
-override getEditForm => sub {
-    my $self    = shift;
-    my $tabform = super();
-
-    $tabform->getTab("data")->raw(
-        q{<tr><td>}
-      . WebGUI::Form::DataTable->new(
-            $self->session, {
-                name         => "data",
-                value        => $self->data,
-                defaultValue => undef,
-                showEdit     => 1,
-            }
-            )->toHtml
-      . q{</td></tr>}
-    );
-
-    return $tabform;
-}; ## end sub getEditForm
-
-#----------------------------------------------------------------------------
-
-=head2 getEditTabs ( )
-
-Add a tab for the data table.
-
-override getEditTabs => sub {
-    my $self = shift;
-    my $i18n = WebGUI::International->new( $self->session, "Asset_DataTable" );
-
-    return ( super(), [ "data" => $i18n->get("tab label data") ], );
-};
-
-=cut
 
 #----------------------------------------------------------------------------
 

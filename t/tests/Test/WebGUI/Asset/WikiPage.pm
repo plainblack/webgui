@@ -24,4 +24,9 @@ sub parent_list {
     return ['WebGUI::Asset::Wobject::WikiMaster'];
 }
 
+sub t_11_getEditForm : Tests {
+    ok(1);
+    # Override, getEditForm returns HTML
+}
+
 1;

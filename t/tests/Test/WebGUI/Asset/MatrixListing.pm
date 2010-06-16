@@ -24,4 +24,9 @@ sub parent_list {
     return ['WebGUI::Asset::Wobject::Matrix'];
 }
 
+sub t_11_getEditForm : Tests {
+    ok(1);   # TODO: Test MatrixListing getEditForm
+    # Do not extend other test
+}
+
 1;

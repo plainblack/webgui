@@ -136,51 +136,38 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 override getEditForm => sub {
     my $self = shift;
-    my $tabform = super();
-
-# Add the fields defined locally and apply any overrides from the config file
+    my $f = super();
     my $i18n = WebGUI::International->new($self->session,"Asset_Image");
 
-    tie my %extraFields, "Tie::IxHash";
+    # Fix templateId to use correct namespace and default
+    my $template = $f->getTab('display')->getField('templateId');
+    $template->set( hoverHelp => $i18n->get('image template description') );
+    $template->set( namespace => 'ImageAsset' );
+    $template->set( defaultValue => 'PBtmpl0000000000000088' );
 
-    $extraFields{thumbnailSize} = {
-        fieldType => "integer",
-        name      => "thumbnailSize",
-        label     => $i18n->get('thumbnail size'),
-        hoverHelp => $i18n->get('Thumbnail size description'),
-        value     => $self->thumbnailSize,
-    };
-    $extraFields{parameters} = {
-        fieldType => "textarea",
-        name      => "parameters",
-        label     => $i18n->get('parameters'),
-        hoverHelp => $i18n->get('Parameters description'),
-        value     => $self->parameters,
-    };
+
+    # Add the fields defined locally and apply any overrides from the config file
+    my $overrides = $self->session->config->get("assets/".$self->className);
 
     if ($self->filename ne "") {
           my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->filename);
 
-          $extraFields{thumbnail} = {
-              fieldType => "readOnly",
+          $f->getTab('properties')->addField( "ReadOnly", 
+              name      => 'thumbnail',
               label     => $i18n->get('thumbnail'),
               hoverHelp => $i18n->get('Thumbnail description'),
-              value     => '<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>'
-          };
-          $extraFields{imageSize} = {
-              fieldType => "readOnly",
+              value     => '<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>',
+              ( $overrides->{thumbnail} ? %{$overrides->{thumbnail}} : () ),
+          );
+          $f->getTab('properties')->addField( "ReadOnly", 
+              name      => 'imageSize',
               label     => $i18n->get('image size'),
               value     => $x.' x '.$y,
-          };
+              ( $overrides->{imageSize} ? %{$overrides->{imageSize}} : () ),
+          );
     }
 
-    my $overrides = $self->session->config->get("assets/".$self->className);
-
-    foreach my $fieldName (keys %extraFields) {
-        $self->setupFormField($tabform, $fieldName, \%extraFields, $overrides);
-    }
-
-    return $tabform;
+    return $f;
 };
 
 #-------------------------------------------------------------------
@@ -284,6 +271,7 @@ sub www_edit {
     my $i18n = WebGUI::International->new($session, 'Asset_Image');
     if ($self->filename) {
         my $ac   = $self->getAdminConsole;
+        # These are asset helpers now, not functions
         $ac->addSubmenuItem($self->getUrl('func=resize'),   $i18n->get("resize image"));
         $ac->addSubmenuItem($self->getUrl('func=rotate'),   $i18n->get("rotate image"));
         $ac->addSubmenuItem($self->getUrl('func=crop'),     $i18n->get("crop image"));
@@ -291,13 +279,7 @@ sub www_edit {
         $ac->addSubmenuItem($self->getUrl('func=undo'),     $i18n->get("undo image"));
     }
     my $tabform = $self->getEditForm;
-    $tabform->getTab("display")->template(
-        -value        => $self->templateId,
-        -namespace    => "ImageAsset",
-        -hoverHelp    => $i18n->get('image template description'),
-        -defaultValue => "PBtmpl0000000000000088",
-    );
-    return $self->getAdminConsole->render($tabform->print,$i18n->get("edit image"));
+    return $self->getAdminConsole->render($tabform->toHtml,$i18n->get("edit image"));
 }
 
 #-------------------------------------------------------------------

@@ -21,4 +21,19 @@ sub list_of_tables {
      return [qw/assetData FileAsset ImageAsset/];
 }
 
+sub t_11_getEditForm : Tests( 2 ) {
+    my $test    = shift;
+    $test->SUPER::getEditForm( @_ );
+    my $session = $test->session;
+    my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
+
+    # Test extra fields
+    my $f   = $asset->getEditForm;
+    isa_ok( $f->getTab("properties")->getField("thumbnail"), "WebGUI::Form::ReadOnly" );
+    isa_ok( $f->getTab("properties")->getField("imageSize"), "WebGUI::Form::ReadOnly" );
+
+    # TODO: Test overrides for extra fields
+
+}
+
 1;

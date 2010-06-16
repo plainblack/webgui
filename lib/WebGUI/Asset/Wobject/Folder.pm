@@ -119,30 +119,6 @@ sub getContentLastModified {
     return $mtime;
 }
 
-#-------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-Returns the TabForm object that will be used in generating the edit page for this asset.
-
-=cut
-
-override getEditForm => sub {
-	my $self = shift;
-	my $tabform = super();
-	my $i18n = WebGUI::International->new($self->session,"Asset_Folder");
-	if ($self->assetId eq "new") {
-               	$tabform->getTab("properties")->whatNext(
-                       	-options=>{
-                               	view=>$i18n->get(823),
-                      	 	"viewParent"=>$i18n->get(847)
-                              	},
-			-value=>"view"
-			);
-	}
-	return $tabform;
-};
-
 #----------------------------------------------------------------------------
 
 =head2 getTemplateVars ( )

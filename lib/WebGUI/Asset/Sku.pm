@@ -194,22 +194,22 @@ override getEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
 
-    my $tabform = super();
+    my $form = super();
 
     my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
     my $definition  = $taxDriver->skuFormDefinition;
     my $config      = $self->getTaxConfiguration( $taxDriver->className );
-    my $shop        = $tabform->getTab( 'shop' );
+    my $shop        = $form->getTab( 'shop' );
 
     foreach my $fieldName ( keys %{ $definition } ) {
-        $shop->dynamicField(
+        $shop->addField( "DynamicField",
             %{ $definition->{ $fieldName } },
             name    => $fieldName,
             value   => $config->{ $fieldName },
         );
     }
 
-    return $tabform;
+    return $form;
 };
 
 #-------------------------------------------------------------------

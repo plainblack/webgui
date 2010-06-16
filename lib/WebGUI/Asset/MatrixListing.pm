@@ -198,7 +198,7 @@ sub getAutoCommitWorkflowId {
 
 =head2 getEditForm ( )
 
-Returns the TabForm object that will be used in generating the edit page for this asset.
+Returns the FormBuilder object that will be used in generating the edit page for this asset.
 
 =cut
 
@@ -210,16 +210,17 @@ sub getEditForm {
     my $i18n        = WebGUI::International->new($session, 'Asset_MatrixListing');
     my $func        = $session->form->process("func");
 
+    # TODO: Change to FormBuilder
     my $form = WebGUI::HTMLForm->new($session);
     
     if ($func eq "add" || ( $func eq "editSave" && $session->form->process("assetId") eq "new")) {
         $form->hidden(
-            -name           =>'assetId',
-            -value          =>'new',
+            -name           => 'assetId',
+            -value          => 'new',
         );
         $form->hidden(
-            -name           =>'class',
-            -value          =>'WebGUI::Asset::MatrixListing',
+            -name           => 'class',
+            -value          => 'WebGUI::Asset::MatrixListing',
         );
     }
     $form->hidden(
@@ -232,7 +233,8 @@ sub getEditForm {
         -label          =>$i18n->get("product name label"),
         -hoverHelp      =>$i18n->get('product name description'),
         -value          =>$self->title,
-        );
+        :help grep
+
     $form->image(
         -name           =>'screenshots',
         -defaultValue   =>undef,
@@ -269,7 +271,7 @@ sub getEditForm {
             -value          =>$userId,
         );
     }
-    $form->text(        
+    $form->text(
         -name           =>'version',
         -defaultValue   =>undef,
         -label          =>$i18n->get("version label"),
@@ -835,6 +837,7 @@ sub www_edit {
 
     my $var         = $self->get;
     my $matrix      = $self->getParent;
+    # TODO: Change to FormBuilder
     $var->{form}    = $self->getEditForm->print;
         
     return $matrix->processStyle($self->processTemplate($var,$matrix->get("editListingTemplateId")));
@@ -929,7 +932,7 @@ sub www_getScreenshots {
             <thumb_source>".$storage->getUrl($thumb)."</thumb_source>
             <width>".$width."</width>
             <height>".$height."</height>
-        </slide>            
+        </slide>
             ";
             }
         }

@@ -516,7 +516,7 @@ sub www_edit {
 		</style>
 						   |);	
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	return $self->processStyle('<h1>'.$i18n->get('ems badge').'</h1>'.$self->getEditForm->print);
+	return $self->processStyle('<h1>'.$i18n->get('ems badge').'</h1>'.$self->getEditForm->toHtml);
 }
 
 __PACKAGE__->meta->make_immutable;

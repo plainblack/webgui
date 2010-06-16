@@ -1012,7 +1012,7 @@ sub setupFormField {
     }
 
     $tab ||= 'properties';
-    return $tabform->getTab($tab)->dynamicField(%params);
+    return $tabform->getTab($tab)->addField( delete $params{fieldType}, %params);
 } ## end sub setupFormField
 
 #-------------------------------------------------------------------

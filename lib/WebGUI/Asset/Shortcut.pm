@@ -288,74 +288,69 @@ Extend the base class to handle hand drawing the query build and other pieces.
 
 override getEditForm => sub {
 	my $self = shift;
-	my $tabform = super();
+	my $f = super();
 	my $originalTemplate;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my $shortcut = $self->getShortcut;
 	if (defined $shortcut) {
-		$tabform->getTab("properties")->readOnly(
-			-label=>$i18n->get(1),
-			-hoverHelp=>$i18n->get('1 description'),
-			-value=>'<a href="'.$shortcut->getUrl.'">'.$shortcut->get('title').'</a> ('.$shortcut->getId.')'
+		$f->getTab("properties")->addField( "ReadOnly",
+			label=>$i18n->get(1),
+			hoverHelp=>$i18n->get('1 description'),
+			value=>'<a href="'.$shortcut->getUrl.'">'.$shortcut->get('title').'</a> ('.$shortcut->getId.')'
 			);
 	} else {
-		$tabform->getTab("properties")->readOnly(
+		$f->getTab("properties")->addField( "ReadOnly",
 			value=>'<a href="'.$self->getUrl("func=delete").'"><span style="font-weight: bold; color: red;">'.$self->notLinked.'</span></a>'
 			);
 	}
-	$tabform->getTab("display")->template(
-		-value=>$self->templateId,
-		-label=>$i18n->get('shortcut template title'),
-		-hoverHelp=>$i18n->get('shortcut template title description'),
-		-namespace=>"Shortcut"
-	);
+
 	if($self->session->setting->get("metaDataEnabled")) {
-		$tabform->getTab("properties")->yesNo(
-			-name     => "shortcutByCriteria",
-			-value    => $self->getValue("shortcutByCriteria"),
-			-label    => $i18n->get("Shortcut by alternate criteria"),
-			-hoverHelp=> $i18n->get("Shortcut by alternate criteria description"),
-			-extras   => q|onchange="wgCriteriaDisable(this.form, this.form.shortcutByCriteria[0].checked)"|,
+		$f->getTab("properties")->addField( "YesNo",
+			name     => "shortcutByCriteria",
+			value    => $self->getValue("shortcutByCriteria"),
+			label    => $i18n->get("Shortcut by alternate criteria"),
+			hoverHelp=> $i18n->get("Shortcut by alternate criteria description"),
+			extras   => q|onchange="wgCriteriaDisable(this.form, this.form.shortcutByCriteria[0].checked)"|,
         );
-		$tabform->getTab("properties")->yesNo(
-			-name=>"disableContentLock",
-			-value=>$self->getValue("disableContentLock"),
-			-label=>$i18n->get("disable content lock"),
-			-hoverHelp=>$i18n->get("disable content lock description")
+		$f->getTab("properties")->addField( "YesNo",
+			name=>"disableContentLock",
+			value=>$self->getValue("disableContentLock"),
+			label=>$i18n->get("disable content lock"),
+			hoverHelp=>$i18n->get("disable content lock description"),
 			);
 		if ($self->getValue("shortcutByCriteria") == 0) {
 			$self->{_disabled} = 'disabled=true';
 		}
-		$tabform->getTab("properties")->selectBox(
-			-name=>"resolveMultiples",
-			-value=>[ $self->getValue("resolveMultiples") ],
-			-label=>$i18n->get("Resolve Multiples"),
-			-hoverHelp=>$i18n->get("Resolve Multiples description"),
-			-options=>{
+		$f->getTab("properties")->addField( "SelectBox",
+			name=>"resolveMultiples",
+			value=>[ $self->getValue("resolveMultiples") ],
+			label=>$i18n->get("Resolve Multiples"),
+			hoverHelp=>$i18n->get("Resolve Multiples description"),
+			options=>{
 				mostRecent=>$i18n->get("Most Recent"),
 				random=>$i18n->get("Random"),
 			},
-			-extras=>$self->{_disabled}
+			extras=>$self->{_disabled},
 		);
-		$tabform->getTab("properties")->readOnly(
-			-value=>$self->_drawQueryBuilder(),
-			-label=>$i18n->get("Criteria"),
-			-hoverHelp=>$i18n->get("Criteria description")
+		$f->getTab("properties")->addField( "ReadOnly",
+			value=>$self->_drawQueryBuilder(),
+			label=>$i18n->get("Criteria"),
+			hoverHelp=>$i18n->get("Criteria description"),
 		);
 	}
-	$tabform->addTab('overrides',$i18n->get('Overrides'));
-	$tabform->getTab('overrides')->raw('<tr><td>' . $self->getOverridesList . '</td></tr>');
+	$f->addTab( name => 'overrides', label => $i18n->get('Overrides') );
+	$f->getTab('overrides')->addField( "ReadOnly", value => $self->getOverridesList );
 	if ($self->isDashlet) {
-		$tabform->addTab('preferences',$i18n->get('Preferences'), 9);
-		$tabform->getTab('preferences')->raw($self->getFieldsList);
-		$tabform->getTab("properties")->yesNo(
-			-value=>$self->getValue("showReloadIcon"),
-			-name=>"showReloadIcon",
-			-label=>$i18n->get("show reload icon"),
-			-hoverHelp=>$i18n->get("show reload icon description")
+		$f->addTab('preferences',$i18n->get('Preferences'), 9);
+		$f->getTab('preferences')->addField( "ReadOnly", value => $self->getFieldsList );
+		$f->getTab("properties")->addField( "YesNo",
+			value=>$self->getValue("showReloadIcon"),
+			name=>"showReloadIcon",
+			label=>$i18n->get("show reload icon"),
+			hoverHelp=>$i18n->get("show reload icon description"),
 		);
 	}
-	return $tabform;
+	return $f;
 };
 
 
@@ -948,7 +943,7 @@ sub www_edit {
 	return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));
-	return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get(2));
+	return $self->getAdminConsole->render($self->getEditForm->toHtml,$i18n->get(2));
 }
 
 #-------------------------------------------------------------------

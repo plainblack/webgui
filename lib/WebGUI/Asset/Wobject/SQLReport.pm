@@ -51,144 +51,169 @@ property dbQuery1 => (
             default     => undef,
             label       => [4, 'Asset_SQLReport', 1],
 			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+            rowClass    => 'query1',
         );
 property prequeryStatements1 => (
             fieldType   => "codearea",
             default     => undef,
             label       => ['Prequery statements %s', 'Asset_SQLReport', 1],
+            rowClass    => 'query1',
         );
 property preprocessMacros1 => (
             fieldType   => "yesNo",
             default     => 0,
             label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 1],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query1',
         );
 property placeholderParams1 => (
             fieldType   => "textarea",
             default     => undef,
             label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 1],
 			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+            rowClass    => 'query1',
         );
 property databaseLinkId1 => (
             fieldType   => "databaseLink",
             default     => 0,
             label       => ['Database Link %s', 'Asset_SQLReport', 1],
+            rowClass    => 'query1',
         );
 property dbQuery2 => (
             fieldType   => "codearea",
             default     => undef,
             label       => [4, 'Asset_SQLReport', 2],
 			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+            rowClass    => 'query2',
         );
 property prequeryStatements2 => (
             fieldType   => "codearea",
             default     => undef,
             label       => ['Prequery statements %s', 'Asset_SQLReport', 2],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query2',
         );
 property preprocessMacros2 => (
             fieldType   => "yesNo",
             default     => 0,
             label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 2],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query2',
         );
 property placeholderParams2 => (
             fieldType   => "textarea",
             default     => undef,
             label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 2],
 			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+            rowClass    => 'query2',
         );
 property databaseLinkId2 => (
             fieldType   => "databaseLink",
             default     => 0,
             label       => ['Database Link %s', 'Asset_SQLReport', 2],
+            rowClass    => 'query2',
         );
 property dbQuery3 => (
             fieldType   => "codearea",
             default     => undef,
             label       => [4, 'Asset_SQLReport', 3],
 			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+            rowClass    => 'query3',
         );
 property prequeryStatements3 => (
             fieldType   => "codearea",
             default     => undef,
             label       => ['Prequery statements %s', 'Asset_SQLReport', 3],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query3',
         );
 property preprocessMacros3 => (
             fieldType   => "yesNo",
             default     => 0,
             label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 3],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query3',
         );
 property placeholderParams3 => (
             fieldType   => "textarea",
             default     => undef,
             label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 3],
 			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+            rowClass    => 'query3',
         );
 property databaseLinkId3 => (
             fieldType   => "databaseLink",
             default     => 0,
             label       => ['Database Link %s', 'Asset_SQLReport', 3],
+            rowClass    => 'query3',
         );
 property dbQuery4 => (
             fieldType   => "codearea",
             default     => undef,
             label       => [4, 'Asset_SQLReport', 4],
 			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+            rowClass    => 'query4',
         );
 property prequeryStatements4 => (
             fieldType   => "codearea",
             default     => undef,
             label       => ['Prequery statements %s', 'Asset_SQLReport', 4],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query4',
         );
 property preprocessMacros4 => (
             fieldType   => "yesNo",
             default     => 0,
             label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 4],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query4',
         );
 property placeholderParams4 => (
             fieldType   => "textarea",
             default     => undef,
             label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 4],
 			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+            rowClass    => 'query4',
         );
 property databaseLinkId4 => (
             fieldType   => "databaseLink",
             default     => 0,
             label       => ['Database Link %s', 'Asset_SQLReport', 4],
+            rowClass    => 'query4',
         );
 property dbQuery5 => (
             fieldType   => "codearea",
             default     => undef,
             label       => [4, 'Asset_SQLReport', 5],
 			hoverHelp   => ['4 description', 'Asset_RichEdit'],
+            rowClass    => 'query5',
         );
 property prequeryStatements5 => (
             fieldType   => "codearea",
             default     => undef,
             label       => ['Prequery statements %s', 'Asset_SQLReport', 5],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query5',
         );
 property preprocessMacros5 => (
             fieldType   => "yesNo",
             default     => 0,
             label       => ['Preprocess macros on query %s?', 'Asset_SQLReport', 5],
 			hoverHelp   => ['15 description', 'Asset_RichEdit'],
+            rowClass    => 'query5',
         );
 property placeholderParams5 => (
             fieldType   => "textarea",
             default     => undef,
             label       => ['Placeholder Parameters %s', 'Asset_SQLReport', 5],
 			hoverHelp   => ['Placeholder Parameters description', 'Asset_RichEdit'],
+            rowClass    => 'query5',
         );
 property databaseLinkId5 => (
             fieldType   => "databaseLink",
             default     => 0,
             label       => ['Database Link %s', 'Asset_SQLReport', 5],
+            rowClass    => 'query5',
         );
 property debugMode => (
             fieldType   => "yesNo",
@@ -289,183 +314,17 @@ Manually make the edit form due to javascript for adding more queries.
 =cut
 
 override getEditForm => sub {
-	my $self = shift;
-	my $tabform = super();
-	my $i18n = WebGUI::International->new($self->session,"Asset_SQLReport");
-   	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
-                -label=>$i18n->get(72),
-                -hoverHelp=>$i18n->get('72 description'),
-      		-namespace=>"SQLReport"
-   		);
-        $tabform->getTab("properties")->yesNo(
-                -name=>"debugMode",
-                -label=>$i18n->get(16),
-                -hoverHelp=>$i18n->get('16 description'),
-                -value=>$self->getValue("debugMode")
-                );
-        $tabform->getTab("display")->interval(
-                -name=>"cacheTimeout",
-                -label=>$i18n->get('cache timeout'),
-                -hoverHelp=>$i18n->get('cache timeout description'),
-		-uiLevel => 8,
-                -value=>$self->getValue("cacheTimeout")
-                );
-	
-	
-	### Download
-	# Download Type
-	my %downloadTypes;
-	tie %downloadTypes, 'Tie::IxHash', 
-		"none" 		=> $i18n->get("No Download"),
-		"csv"		=> $i18n->get("CSV"),
-		"template"	=> $i18n->get("Template"),
-		;
-		
-	$tabform->getTab("properties")->radioList(
-		-name=>"downloadType",		# ID is downloadType_formId
-		-label=>$i18n->get("download type"),
-		-hoverHelp=>$i18n->get("download type description"),
-		-vertical=>1,
-		-options=> \%downloadTypes,
-		-defaultValue=>"none",
-		-value=>$self->getValue("downloadType"),
-		-extras=> "onclick='changeDownloadType(this)'"
-		);
-	
-	# Download Filename
-	$tabform->getTab("properties")->text(
-		-name=>"downloadFilename",		# ID is downloadFilename_formId
-		-label=>$i18n->get("download filename"),
-		-hoverHelp=>$i18n->get("download filename description"),
-		-value=>$self->getValue("downloadFilename"),
-		);
-	
-	# Download template (if necessary)
-	$tabform->getTab("properties")->template(
-		-name=>"downloadTemplateId",	# ID is downloadTemplateId_formId
-		-label=>$i18n->get("download template"),
-		-hoverHelp=>$i18n->get("download template description"),
-		-value=>$self->getValue("downloadTemplateId"),
-		-namespace=>"SQLReport/Download",
-		);
-	
-	# Download mimeType (if necessary)
+    my $self    = shift;
+    my $session = $self->session;
+    my ( $style, $url ) = $session->quick( qw( style url ) );
 
-	$tabform->getTab("properties")->selectBox(
-		-name=>"downloadMimeType",
-		-label=>$i18n->get("download mimetype"),
-		-hoverHelp=>$i18n->get("download mimetype description"),
-		#-options=> \%downloadMimeType,
-		-value=>$self->getValue("downloadMimeType"),
-		-defaultValue=>"application/octet-stream",
-		);
-	
-	# Download UserGroup
-	$tabform->getTab("security")->group(
-		-name=>"downloadUserGroup",
-		-label=>$i18n->get("download usergroup"),
-		-hoverHelp=>$i18n->get("download usergroup description"),
-		-value=>$self->getValue("downloadUserGroup"),
-		-defaultValue=>$self->getValue("groupIdView"),
-		);
-	
-	# javascript
-	$self->session->style->setScript($self->session->url->extras("wobject/SQLReport/editFormDownload.js"));
-	
-	### /DOWNLOAD
-	
-	
-	# Add toggleQuery javascript
-	$tabform->getTab("properties")->raw(qq|
-		<script type="text/javascript">
-		function toggleQuery(Id) {
-			queryClass = "query" + Id;
-			var tr = document.getElementsByTagName("tr");
-			if (tr == null) return undef;
-			for (i=0; i < tr.length; i++) {
-			   if(tr[i].className == queryClass) {
-				if(tr[i].style.display == 'none') {
-				   tr[i].style.display = '';
-				} else {
-				   tr[i].style.display = 'none';
-				}
-			   } 
-			}
-		}
-		</script>	
-		|);
+    # Add javascript
+    $style->setScript( $url->extras("wobject/SQLReport/editFormDownload.js"), { type => 'text/javascript', } );
+    $style->setScript( $url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"), { type => 'text/javascript' } );
 
-	for my $nr (1..5) {
-		# Set TR class for this query properties
-		$tabform->getTab("properties")->trClass("query".$nr);
+    # TODO: Add query toggling back
 
-		$tabform->getTab("properties")->readOnly(
-			-value=>"<hr>",
-			-label=>join '', "<b>", $i18n->get('4'), $nr,":</b>",
-		); 
-		$tabform->getTab("properties")->yesNo(
-			-name=>"preprocessMacros".$nr,
-			-label=>$i18n->get(15),
-			-hoverHelp=>$i18n->get('15 description'),
-			-value=>$self->getValue("preprocessMacros".$nr)
-		);
-		$tabform->getTab("properties")->textarea(
-			-name=>"placeholderParams".$nr,
-			-label=>$i18n->get('Placeholder Parameters'),
-			-hoverHelp=>$i18n->get('Placeholder Parameters description'),
-			-value=>$self->getValue("placeholderParams".$nr)
-		);
-		$tabform->getTab("properties")->codearea(
-			-name	=> "prequeryStatements".$nr,
-			-label	=> $i18n->get('Prequery statements'),
-			-hoverHelp => $i18n->get('Prequery statements description'),
-            -syntax => "sql",
-			-value	=> $self->getValue("prequeryStatements".$nr),
-		);
-		$tabform->getTab("properties")->codearea(
-			-name=>"dbQuery".$nr,
-			-label=>$i18n->get(4),
-			-hoverHelp=>$i18n->get('4 description'),
-            -syntax => "sql",
-			-value=>$self->getValue("dbQuery".$nr)
-		);
-		$tabform->getTab("properties")->databaseLink(
-			-name=>"databaseLinkId".$nr,
-			-value=>$self->getValue("databaseLinkId".$nr)
-		);
-
-		# Add a "Add another query" button
-		if ($nr < 5 and ($self->get("dbQuery".($nr+1)) eq "" || ($self->get("dbQuery".($nr)) eq "" and $self->get("dbQuery".($nr+1)) ne ""))) {
-			$tabform->getTab("properties")->button(
-				-value=>$i18n->get('Add another query'),
-				-extras=>'onclick="toggleQuery(\''.($nr+1).'\'); this.style.display=\'none\';"',
-				-noWait=>1
-			);
-		}
-
-		# Make empty query blocks invisible
-		if ($nr > 1 && ($self->get("dbQuery".$nr) eq "" || $self->get("dbQuery".($nr-1)) eq "")) {
-			$tabform->getTab("properties")->raw(qq|
-				<script type="text/javascript">
-					toggleQuery('$nr');
-				</script>
-			|);
-		}
-
-	}
-	
-	# Undefine TR class
-	$tabform->getTab("properties")->trClass();
-
-	$tabform->getTab("display")->integer(
-		-name=>"paginateAfter",
-		-label=>$i18n->get(14),
-		-hoverHelp=>$i18n->get('14 description'),
-		-value=>$self->getValue("paginateAfter")
-	);
-	
-	return $tabform;
+    return super();
 };
 
 

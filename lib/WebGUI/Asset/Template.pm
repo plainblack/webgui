@@ -237,49 +237,27 @@ override getEditForm => sub {
 	my $self = shift;
 	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
-	$tabform->hidden({
+	$tabform->addField( "hidden",
 		name=>"returnUrl",
 		value=>$self->session->form->get("returnUrl")
-		});
+		);
 	if ($self->namespace eq "") {
 		my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
-		$tabform->getTab("properties")->combo(
-			-name=>"namespace",
-			-options=>$namespaces,
-			-label=>$i18n->get('namespace'),
-			-hoverHelp=>$i18n->get('namespace description'),
-			-value=>[$self->session->form->get("namespace")] 
+		$tabform->getTab("properties")->addField( "combo",
+			name=>"namespace",
+			options=>$namespaces,
+			label=>$i18n->get('namespace'),
+			hoverHelp=>$i18n->get('namespace description'),
+			value=>[$self->session->form->get("namespace")] 
 			);
 	} else {
-		$tabform->getTab("meta")->readOnly(
-			-label=>$i18n->get('namespace'),
-			-hoverHelp=>$i18n->get('namespace description'),
-			-value=>$self->namespace
-			);	
-		$tabform->getTab("meta")->hidden(
-			-name=>"namespace",
-			-value=>$self->namespace
+		$tabform->getTab("meta")->addField( "ReadOnly",
+			name=>"namespace",
+			label=>$i18n->get('namespace'),
+			hoverHelp=>$i18n->get('namespace description'),
+			value=>$self->namespace
 			);
 	}
-	$tabform->getTab("display")->yesNo(
-		-name=>"showInForms",
-		-value=>$self->showInForms,
-		-label=>$i18n->get('show in forms'),
-		-hoverHelp=>$i18n->get('show in forms description'),
-		);
-	$tabform->getTab("properties")->codearea(
-		-name=>"template",
-		-label=>$i18n->get('assetName'),
-		-hoverHelp=>$i18n->get('template description'),
-		-syntax => "html",
-		-value=>$self->template
-		);
-    $tabform->getTab('properties')->yesNo(
-        name        => "usePacked",
-        label       => $i18n->get('usePacked label'),
-        hoverHelp   => $i18n->get('usePacked description'),
-        value       => $self->usePacked,
-    );
 	if($self->session->config->get("templateParsers")){
 		my @temparray = @{$self->session->config->get("templateParsers")};
 		tie my %parsers, 'Tie::IxHash';
@@ -288,12 +266,12 @@ override getEditForm => sub {
 		}
 		my $value = [$self->getValue("parser")];
 		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->parser);
-		$tabform->getTab("properties")->selectBox(
-			-name=>"parser",
-			-options=>\%parsers,
-			-value=>$value,
-			-label=>$i18n->get('parser'),
-			-hoverHelp=>$i18n->get('parser description'),
+		$tabform->getTab("properties")->addField( "SelectBox",
+			name=>"parser",
+			options=>\%parsers,
+			value=>$value,
+			label=>$i18n->get('parser'),
+			hoverHelp=>$i18n->get('parser description'),
 			);
 	}
 
@@ -688,7 +666,7 @@ ENDHTML
                 ;
     }
     
-    $output .= $self->getEditForm->print;
+    $output .= $self->getEditForm->toHtml;
 
     $self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
     return $self->getAdminConsole->render( $output, $i18n->get('edit template') );

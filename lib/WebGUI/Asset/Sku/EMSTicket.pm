@@ -250,15 +250,15 @@ Extended to support event metadata.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $form = $self->SUPER::getEditForm(@_);
+	my $form = super();
 	my $metadata = $self->getEventMetaData;
     my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
     my $date = WebGUI::DateTime->new($self->session, time());
 
 	foreach my $field (@{$self->getParent->getEventMetaFields}) {
-		$form->getTab("meta")->DynamicField(
+		$form->getTab("meta")->addField( "DynamicField",
 			name			=> "eventmeta ".$field->{label},
 			value			=> $metadata->{$field->{label}},
 			defaultValue	=> $field->{defaultValues},
@@ -267,7 +267,7 @@ sub getEditForm {
 			label			=> $field->{label},
 			);
 	}
-    $form->getTab("properties")->DateTime(
+    $form->getTab("properties")->addField( "DateTime",
             name            => "startDate", 
             label           => $i18n->get("add/edit event start date"),
             hoverHelp       => $i18n->get("add/edit event start date help"),
@@ -572,8 +572,8 @@ sub www_edit {
 						   |);	
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 	my $form = $self->getEditForm;
-	$form->hidden({name=>'proceed', value=>'viewAll'});
-	return $self->processStyle('<h1>'.$i18n->get('ems ticket').'</h1>'.$form->print);
+	$form->addField( "hidden", name=>'proceed', value=>'viewAll');
+	return $self->processStyle('<h1>'.$i18n->get('ems ticket').'</h1>'.$form->toHtml);
 }
 
 #-------------------------------------------------------------------

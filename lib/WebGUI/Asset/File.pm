@@ -212,48 +212,25 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 override getEditForm => sub {
     my $self        = shift;
-    my $tabform     = super();
+    my $f           = super();
     my $i18n        = WebGUI::International->new($self->session, 'Asset_File');
 
-    $tabform->getTab("properties")->raw( 
-        '<tr><td>'.$i18n->get('new file').'<td colspan="2">'
-        . $self->getEditFormUploadControl 
-        . '</td></tr>'
-    );
-
-    return $tabform;
-};
-
-#----------------------------------------------------------------------------
-
-=head2 getEditFormUploadControl
-
-Returns the HTML to display the current photo, if it has one, and a file chooser
-to either upload one, or replace the current one.
-
-=cut
-
-sub getEditFormUploadControl {
-    my $self        = shift;
-    my $session     = $self->session;
-    my $i18n        = WebGUI::International->new($session, 'Asset_File');
-    my $html        = '';
-
+    # Add field to upload file
     if ($self->filename ne "") {
-        $html .= WebGUI::Form::readOnly( $session, {
-            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->filename.'" style="border-style:none;vertical-align:middle;" /> '.$self->filename.'</a></p>'
+        $f->getTab("properties")->addField( "ReadOnly", {
+            name        => "viewFile",
+            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->filename.'" style="border-style:none;vertical-align:middle;" /> '.$self->filename.'</a></p>',
         });
     }
 
-    # Control to upload a new file
-    $html .= WebGUI::Form::file( $session, {
+    $f->getTab( "properties" )->addField( "File", 
         name        => 'newFile',
         label       => $i18n->get('new file'),
         hoverHelp   => $i18n->get('new file description'),
-    });
+    );
 
-    return $html;
-}
+    return $f;
+};
 
 #-------------------------------------------------------------------
 
@@ -615,13 +592,8 @@ sub www_edit {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my $i18n = WebGUI::International->new($self->session);
-	my $tabform = $self->getEditForm;
-	$tabform->getTab("display")->template(
-		-value=>$self->templateId,
-		-hoverHelp=>$i18n->get('file template description','Asset_File'),
-		-namespace=>"FileAsset"
-	);
-	return $self->getAdminConsole->render($tabform->print,$self->addEditLabel);
+	my $f = $self->getEditForm;
+	return $self->getAdminConsole->render($f->print,$self->addEditLabel);
 }
 
 #-------------------------------------------------------------------

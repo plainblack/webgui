@@ -596,25 +596,6 @@ sub view {
     #return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page.  Unless the method needs
-special handling or formatting, it does not need to be included in
-the module.
-
-=cut
-
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new( $session, 'Asset_EMSSubmission' );
-    return $self->getAdminConsole->render( $self->getEditForm->print, $i18n->get('edit asset') );
-}
-
 1;
 
 #vim:ft=perl

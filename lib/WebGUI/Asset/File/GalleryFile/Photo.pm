@@ -210,8 +210,7 @@ sub getDownloadFileUrl {
 =head2 getEditFormUploadControl
 
 Returns the HTML to display the current photo, if it has one, and a file chooser
-to either upload one, or replace the current one.  Subclasses the master class
-to change i18n labels.
+to either upload one, or replace the current one. 
 
 =cut
 

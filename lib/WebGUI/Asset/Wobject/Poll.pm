@@ -256,7 +256,7 @@ Extend the base class to handle the answers and graphing plugins.
 
 override getEditForm => sub {
 	my $self = shift;
-	my $tabform = super(); 
+	my $fb = super(); 
 	my $i18n = WebGUI::International->new($self->session,"Asset_Poll");
     my ($i, $answers);
     for ($i=1; $i<=20; $i++) {
@@ -264,34 +264,35 @@ override getEditForm => sub {
             $answers .= $self->get("a".$i)."\n";
         }
     }
-    $tabform->getTab("properties")->textarea(
-		-name=>"answers",
-		-label=>$i18n->get(7),
-		-hoverHelp=>$i18n->get('7 description'),
-		-subtext=>('<span class="formSubtext"><br />'.$i18n->get(8).'</span>'),
-		-value=>$answers
+    $fb->getTab("properties")->addField( "textarea", 
+		name=>"answers",
+		label=>$i18n->get(7),
+		hoverHelp=>$i18n->get('7 description'),
+		subtext=>('<span class="formSubtext"><br />'.$i18n->get(8).'</span>'),
+		value=>$answers
     );
-	$tabform->getTab("properties")->yesNo(
-		-name=>"resetVotes",
-		-label=>$i18n->get(10),
-		-hoverHelp=>$i18n->get('10 description')
+	$fb->getTab("properties")->addField( "YesNo", 
+		name=>"resetVotes",
+		label=>$i18n->get(10),
+		hoverHelp=>$i18n->get('10 description')
 		) if $self->session->form->process("func") ne 'add';
 
 
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
 		my $config = $self->getGraphConfig;
 
-		$tabform->addTab('graph', $i18n->get('Graphing','Image_Graph'));
-		$tabform->getTab('graph')->yesNo(
-			-name		=> 'generateGraph',
-			-label		=> $i18n->get('generate graph'),
-			-hoverHelp	=> $i18n->get('generate graph description'),
-			-value		=> $self->generateGraph,
+		$fb->addTab('graph', $i18n->get('Graphing','Image_Graph'));
+		$fb->getTab('graph')->addField( "yesNo", 
+			name		=> 'generateGraph',
+			label		=> $i18n->get('generate graph'),
+			hoverHelp	=> $i18n->get('generate graph description'),
+			value		=> $self->generateGraph,
 		);
-		$tabform->getTab('graph')->raw(WebGUI::Image::Graph->getGraphingTab($self->session, $config));
+                # TODO: Fix graphing plugins to use FormBuilder API
+		$fb->getTab('graph')->raw(WebGUI::Image::Graph->getGraphingTab($self->session, $config));
 	}
 
-	return $tabform;
+	return $fb;
 };
 
 #----------------------------------------------------------------------------

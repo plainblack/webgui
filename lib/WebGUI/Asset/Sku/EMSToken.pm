@@ -263,8 +263,8 @@ sub www_edit {
 						   |);	
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 	my $form = $self->getEditForm;
-	$form->hidden({name=>'proceed', value=>'viewAll'});
-	return $self->processStyle('<h1>'.$i18n->get('ems token').'</h1>'.$form->print);
+	$form->addField( "hidden", name=>'proceed', value=>'viewAll');
+	return $self->processStyle('<h1>'.$i18n->get('ems token').'</h1>'.$form->toHtml);
 }
 
 #-------------------------------------------------------------------
