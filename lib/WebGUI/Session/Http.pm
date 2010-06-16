@@ -289,8 +289,11 @@ sub sendHeader {
 		my $date = ($userId eq "1") ? HTTP::Date::time2str($self->getLastModified) : HTTP::Date::time2str();
 		# under these circumstances, don't allow caching
 		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
-			$response->header("Cache-Control" => "private, max-age=1");
-#			$response->no_cache(1); # TODO - re-enable this?
+			$response->header(
+                "Cache-Control" => "private, max-age=1", 
+                "Pragma"        => "no-cache",
+                "Cache-Control" => "no-cache",
+            );
 		} 
 		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
 		else {
@@ -298,8 +301,10 @@ sub sendHeader {
                 $response->header("Cache-Control" => "private, max-age=1");
             }
             else {
-                $response->header('Last-Modified' => $date);
-                $response->header('Cache-Control' => "must-revalidate, max-age=" . $cacheControl);
+                $response->header(
+                    'Last-Modified' => $date,
+                    'Cache-Control' => "must-revalidate, max-age=" . $cacheControl,
+                );
             }
 			# do an extra incantation if the HTTP protocol is really old
 			if ($request->protocol =~ /(\d\.\d)/ && $1 < 1.1) {
@@ -320,8 +325,11 @@ sub _sendMinimalHeader {
 	my $self = shift;
 	my $response = $self->session->response;
 	$response->content_type('text/html; charset=UTF-8');
-	$response->header('Cache-Control' => 'private');
-#	$response->no_cache(1); # TODO - re-enable this?
+	$response->header(
+        'Cache-Control' => 'private',
+        "Pragma"        => "no-cache",
+        "Cache-Control" => "no-cache",
+    );
 	$response->status($self->getStatus());
 #	$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	return undef;
