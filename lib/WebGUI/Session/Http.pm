@@ -42,7 +42,6 @@ This package allows the manipulation of HTTP protocol information.
 
  $http->sendHeader();
 
- $cookies = $http->getCookies();
  $mimetype = $http->getMimeType();
  $code = $http->getStatus();
  ($code, $description) = $http->getStatus();
