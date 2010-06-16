@@ -171,9 +171,7 @@ sub _visitors {
 	my $ip_clause;
 
 	# Check whether instance of Apache2::ServerRec is available
-	if($session->server) {
-		# Query hostname of server
-		my $hostname = $session->server->server_hostname();
+	if(my $hostname = $session->request->uri->host) {
 
 		# Look up server IP addresses
 		my $res = Net::DNS::Resolver->new();
