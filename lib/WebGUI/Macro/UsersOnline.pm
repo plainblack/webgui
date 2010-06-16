@@ -186,14 +186,13 @@ sub _visitors {
  	# increase the count artificially. Note, that the number determined here
 	# may deviate from the number of items returned in the visitor loop.
 	$var->{'visitors'} = $db->quickScalar("SELECT COUNT(DISTINCT lastIp) FROM " . 
-		"userSession WHERE (lastPageView > $epoch) AND (userId = 1) AND " .
-		"lastIp NOT LIKE '127.%.%.%'" . $ip_clause);
+		"userSession WHERE (lastPageView > ?) AND (userId = 1) AND " .
+		"lastIp NOT LIKE '127.%.%.%'" . $ip_clause, [$epoch]);
 	  
 	# Query session IDs and IPs of visitors
-	my $query = $db->prepare("SELECT sessionId, lastIp, lastPageView FROM " .
-		"userSession WHERE (lastPageView > $epoch) AND (userId = 1) AND " .
-		"lastIp NOT LIKE '127.%.%.%' " . $ip_clause . "LIMIT $maxVisitors");
-	$query->execute;
+	my $query = $db->read("SELECT sessionId, lastIp, lastPageView FROM " .
+		"userSession WHERE (lastPageView > ?) AND (userId = 1) AND " .
+		"lastIp NOT LIKE '127.%.%.%' " . $ip_clause . "LIMIT ?", [$epoch, $maxVisitors]);
 
 	# Iterate through rows
 	while (my %row = $query->hash) {
@@ -250,15 +249,14 @@ sub _members {
 	# Determine the number of registered users that are online. The Admin 
 	# account is excluded from the list.
 	$var->{'members'} = $db->quickScalar("SELECT COUNT(DISTINCT userId) FROM " . 
-		"userSession where (lastPageView > $epoch) and (userId != '1') and " . 
-		"(userId != '3')");
+		"userSession where (lastPageView > ?) and (userId != '1') and " . 
+		"(userId != '3')", [$epoch]);
 
 	# Query the names of registered users that are online. The showOnline flag
 	# in the user profile is respected.
-	my $query = $db->prepare("SELECT userId, sessionId, lastIp, lastPageView " . 
-		"FROM userSession WHERE (lastPageView > $epoch) AND (userId != '1') " .
-		"AND (userId != '3') LIMIT $maxMembers");
-	$query->execute;
+	my $query = $db->read("SELECT userId, sessionId, lastIp, lastPageView " . 
+		"FROM userSession WHERE (lastPageView > ?) AND (userId != '1') " .
+		"AND (userId != '3') LIMIT ?", [$epoch, $maxMembers]);
 
 	# Iterate through rows
 	while (my %row = $query->hash) {
