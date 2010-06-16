@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::ProfileField;
 
 
 my $toVersion = '7.9.8';
@@ -31,6 +32,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+changeFirstDayOfWeekDefault($session);
 
 finish($session); # this line required
 
@@ -44,6 +46,18 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub changeFirstDayOfWeekDefault {
+    my $session = shift;
+    print "\tMake the default for firstDayOfWeek a number instead of a string... " unless $quiet;
+    my $profileField = WebGUI::ProfileField->new($session, 'firstDayOfWeek');
+    my $properties = $profileField->get();
+    $properties->{dataDefault} = 0;
+    $profileField->set($properties);
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
