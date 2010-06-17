@@ -109,11 +109,6 @@ my @tmplVarTable = (
 		id   => 'MultiSearchTmpl0000001',
 		var  => [ qw(controls) ],
 	},
-	###Navigation
-	{
-		id   => 'PBtmpl0000000000000048',
-		var  => [ qw(controls) ],
-	},
 	###Poll
 	{
 		id   => 'PBtmpl0000000000000055',
@@ -166,7 +161,7 @@ foreach my $tmpl (@tmplVarTable) {
 
 plan tests => $numTests;
 
-#diag("planning on $numTests tests");
+#note("planning on $numTests tests");
 
 foreach my $tmpl ( @tmplVarTable ) {
 	my $tmplId = $tmpl->{id};

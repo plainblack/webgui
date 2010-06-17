@@ -50,6 +50,14 @@ sub addRevision {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canAdd ($session)
+
+This functions as a class or an object method.  It sets the subclassGroupId to 7
+instead of the default of 12.
+
+=cut
+
 sub canAdd {
     my $class = shift;
     my $session = shift;
@@ -57,6 +65,15 @@ sub canAdd {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canEdit 
+
+Returns true if the current user can administer the wiki containing this WikiPage, or
+if the current user can edit wiki pages and is trying to add or edit pages, or the page
+is not protected.
+
+=cut
+
 sub canEdit {
 	my $self = shift;
     my $wiki = $self->getWiki;
@@ -121,6 +138,16 @@ sub definition {
 
 
 #-------------------------------------------------------------------
+
+=head2 getAutoCommitWorkflowId 
+
+Overrides the master class to handle spam prevention.  If the content matches any of
+the spamStopWords, then the commit is canceled and the content is rolled back to the
+previous version.  Otherwise, it returns the autoCommitWorkflowId for the regular asset
+commit flow to handle.
+
+=cut
+
 sub getAutoCommitWorkflowId {
 	my $self = shift;
     my $wiki = $self->getWiki;
@@ -149,6 +176,13 @@ sub getAutoCommitWorkflowId {
 
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm 
+
+Renders a templated edit form for adding or editing a wiki page.
+
+=cut
+
 sub getEditForm {
 	my $self = shift;
 	my $session = $self->session;
@@ -201,6 +235,14 @@ sub getEditForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getWiki 
+
+Returns an object referring to the wiki that contains this page.  If it is not a WikiMaster,
+or the parent is undefined, it returns undef.
+
+=cut
+
 sub getWiki {
 	my $self = shift;
 	my $parent = $self->getParent;
@@ -209,6 +251,13 @@ sub getWiki {
 }
 
 #-------------------------------------------------------------------
+
+=head2 indexContent 
+
+Extends the master class to handle indexing the wiki content.
+
+=cut
+
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->next::method;
@@ -217,12 +266,27 @@ sub indexContent {
 }
 
 #-------------------------------------------------------------------
+
+=head2 isProtected 
+
+Returns a boolean indicating whether or not this WikiPage is protected.
+
+=cut
+
 sub isProtected {
 	my $self = shift;
 	return $self->get("isProtected");
 }
 
 #-------------------------------------------------------------------
+
+=head2 preparePageTemplate 
+
+This is essentially prepareView, but is smart and will only do the template
+preparation once.  Returns the preparted page template.
+
+=cut
+
 sub preparePageTemplate {
 	my $self = shift;
 	return $self->{_pageTemplate} if $self->{_pageTemplate};
@@ -233,6 +297,13 @@ sub preparePageTemplate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView 
+
+Extends the master class to handle preparing the main view template for the page.
+
+=cut
+
 sub prepareView {
 	my $self = shift;
 	$self->next::method;
@@ -241,6 +312,13 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost 
+
+Extends the master method to handle properties and attachments.
+
+=cut
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->next::method(@_);
@@ -351,6 +429,13 @@ sub validParent {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Renders this asset.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
@@ -384,6 +469,7 @@ sub view {
         allowsAttachments   => $self->getWiki->get("allowAttachments"),
 		comments			=> $self->getFormattedComments(),
         canEdit             => $self->canEdit,
+		isProtected         => $self->isProtected,
 		content             => $self->getWiki->autolinkHtml(
             $self->scrubContent,
             {skipTitles => [$self->get('title')]},
@@ -393,6 +479,14 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_delete 
+
+Overrides the master method so that privileges are checked on the parent wiki instead
+of the page.  Returns the user to viewing the wiki.
+
+=cut
+
 sub www_delete {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->getWiki->canAdminister;
@@ -402,6 +496,13 @@ sub www_delete {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_edit 
+
+Overrides the master class to render the edit form in the parent wiki's style.
+
+=cut
+
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
@@ -410,6 +511,13 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_getHistory 
+
+Returns the version history of this wiki page.  The output is templated.
+
+=cut
+
 sub www_getHistory {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
@@ -432,6 +540,12 @@ sub www_getHistory {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_restoreWikiPage 
+
+Publishes a wiki page that has been put into the trash or the clipboard.
+
+=cut
 
 sub www_restoreWikiPage {
 	my $self = shift;
@@ -456,6 +570,14 @@ sub www_showConfirmation {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_view 
+
+Override the master method to count the number of times this page has been viewed,
+and to render it with the parent's style.
+
+=cut
+
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess unless $self->canView;

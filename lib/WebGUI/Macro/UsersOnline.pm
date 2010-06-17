@@ -100,7 +100,7 @@ sub process {
 	# Calculate the total number of active users
 	$var{'total'} = $var{'members'} + $var{'visitors'};
 	# Set some flags
-   	$var{'isVisitor'} = 1 if ($session->user->userId == 1);
+   	$var{'isVisitor'}  = 1 if ($session->user->isVisitor);
 	$var{'hasMembers'} = 1 if $var{'member_loop'};
 
 	# Assign labels
@@ -185,7 +185,7 @@ sub _visitors {
 	# that crawlers tend to open multiple sessions(e.g. googlebot) and thereby
  	# increase the count artificially. Note, that the number determined here
 	# may deviate from the number of items returned in the visitor loop.
-	$$var{'visitors'} = $db->quickScalar("SELECT COUNT(DISTINCT lastIp) FROM " . 
+	$var->{'visitors'} = $db->quickScalar("SELECT COUNT(DISTINCT lastIp) FROM " . 
 		"userSession WHERE (lastPageView > $epoch) AND (userId = 1) AND " .
 		"lastIp NOT LIKE '127.%.%.%'" . $ip_clause);
 	  
@@ -198,7 +198,7 @@ sub _visitors {
 	# Iterate through rows
 	while (my %row = $query->hash) {
 	    # Add item to visitor template loop
-	    push(@{$$var{'visitor_loop'}}, {
+	    push(@{$var->{'visitor_loop'}}, {
 			sessionId => $row{'sessionId'},
 			ip => $row{'lastIp'},
 			lastActivity => $dt->epochToHuman($row{'lastPageView'}, $time_format)
@@ -249,15 +249,15 @@ sub _members {
 
 	# Determine the number of registered users that are online. The Admin 
 	# account is excluded from the list.
-	$$var{'members'} = $db->quickScalar("SELECT COUNT(DISTINCT userId) FROM " . 
-		"userSession where (lastPageView > $epoch) and (userId != 1) and " . 
-		"(userId != 3)");
+	$var->{'members'} = $db->quickScalar("SELECT COUNT(DISTINCT userId) FROM " . 
+		"userSession where (lastPageView > $epoch) and (userId != '1') and " . 
+		"(userId != '3')");
 
 	# Query the names of registered users that are online. The showOnline flag
 	# in the user profile is respected.
 	my $query = $db->prepare("SELECT userId, sessionId, lastIp, lastPageView " . 
-		"FROM userSession WHERE (lastPageView > $epoch) AND (userId != 1) " .
-		"AND (userId != 3) LIMIT $maxMembers");
+		"FROM userSession WHERE (lastPageView > $epoch) AND (userId != '1') " .
+		"AND (userId != '3') LIMIT $maxMembers");
 	$query->execute;
 
 	# Iterate through rows
@@ -279,7 +279,7 @@ sub _members {
 			}
 		
 			# Add item to member template loop
-			push(@{$$var{'member_loop'}}, {
+			push(@{$var->{'member_loop'}}, {
 		    		username => $user->username(),
 		    		firstName => $user->profileField("firstName"),
 		    		middleName => $user->profileField("middleName"),

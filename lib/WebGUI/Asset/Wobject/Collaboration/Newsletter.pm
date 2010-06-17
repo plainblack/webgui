@@ -98,22 +98,17 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 duplicate ( )
+=head2 getUserSubscriptions ( [ $userId ])
 
-duplicates a Newsletter.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-wobject instances, you will need to duplicate them here.
+Returns an array of subscriptions for a user.
+
+=head3 $userId
+
+Looks up subscriptions for the user given by $userId.  If no userId is passed,
+it will use the current user's userId.
 
 =cut
 
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
-	return $newAsset;
-}
-
-
-#-------------------------------------------------------------------
 sub getUserSubscriptions {
     my $self = shift;
     my $userId = shift || $self->session->user->userId;
@@ -123,6 +118,12 @@ sub getUserSubscriptions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getViewTemplateVars 
+
+Extends the base method to add custom template variables for the Newsletter.
+
+=cut
 
 sub getViewTemplateVars {
     my $self = shift;
@@ -134,6 +135,13 @@ sub getViewTemplateVars {
 
 
 #-------------------------------------------------------------------
+
+=head2 purge 
+
+Extend the base method to handle deleting information from the Newsletter_subscriptions table.
+
+=cut
+
 sub purge {
     my $self = shift;
     $self->session->db->write("delete from Newsletter_subscriptions where assetId=?", [$self->getId]);
@@ -142,6 +150,23 @@ sub purge {
 
 
 #-------------------------------------------------------------------
+
+=head2 setUserSubscriptions ($subscriptions, $userId)
+
+Store subscription information for a user into the database.
+
+=head3 $subscriptions
+
+A string containing newline separated subscriptions for a user.  A "subscription" is the
+fieldId of an asset metadata field joined with the metadata value with a tilde "~".
+
+=head3 $userId
+
+Sets subscriptions for the user given by $userId.  If no userId is passed,
+it will use the current user's userId.
+
+=cut
+
 sub setUserSubscriptions {
     my $self = shift;
     my $subscriptions = shift;
@@ -174,23 +199,13 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit ( )
+=head2 www_mySubscriptions 
 
-Web facing method which is the default edit page.  This method is entirely
-optional.  Take it out unless you specifically want to set a submenu in your
-adminConsole views.
+Build a form to display to the user their current subscriptions, and allow them to
+alter them.
 
 =cut
 
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new($self->session, "Asset_Newsletter");
-    return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit title"));
-}
-
-#-------------------------------------------------------------------
 sub www_mySubscriptions {
     my $self = shift;
     return $self->session->privilege->insufficient unless ($self->canView && $self->session->user->isRegistered);
@@ -231,6 +246,13 @@ sub www_mySubscriptions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_mySubscriptionsSave 
+
+Process the mySubscriptions form.
+
+=cut
+
 sub www_mySubscriptionsSave {
     my $self = shift;
     return $self->session->privilege->insufficient unless ($self->canView && $self->session->user->isRegistered);

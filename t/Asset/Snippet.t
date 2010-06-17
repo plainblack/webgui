@@ -16,13 +16,14 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 16; # increment this value for each test you create
 use WebGUI::Asset::Snippet;
 
 my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Snippet Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 my $snippet = $node->addChild({className=>'WebGUI::Asset::Snippet'});
 
 # Test for a sane object type
@@ -77,24 +78,15 @@ $snippet->update({
     snippet => q|^SQL(select value from settings where name="<tmpl_var title>");|
 });
 
-my $sqlMacroAdded = exists $session->config->get('macros')->{'SQL'};
-if (! $sqlMacroAdded) {
-    $session->config->addToHash('macros', 'SQL', 'SQL');
-}
+WebGUI::Test->originalConfig('macros');
+$session->config->addToHash('macros', 'SQL', 'SQL');
 
 is($snippet->view(), 'WebGUI', 'Interpolating macros in works with template in the correct order');
 
-if (! $sqlMacroAdded) {
-    $session->config->deleteFromHash('macros', 'SQL');
-}
+my $empty = $node->addChild( { className => 'WebGUI::Asset::Snippet', } );
+is($empty->www_view, 'empty', 'www_view: snippet with no content returns "empty"');
 
 TODO: {
-        local $TODO = "Tests to make later";
-	ok(0, 'Test indexContent method');
+    local $TODO = "Tests to make later";
+    ok(0, 'Test indexContent method');
 }
-
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-}
-

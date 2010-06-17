@@ -1561,4 +1561,24 @@ sub userGroupExpireDate {
 	}
 }	
 
+#-------------------------------------------------------------------
+
+=head2 vitalGroup ( $groupId )
+
+Class method to check to see if a group is a reserved WebGUI group.  Returns
+true or false.  Placed in here because I found two different lists in two
+different areas.
+
+=head3 $groupId
+
+A GUID of the group to check.
+
+=cut
+
+sub vitalGroup {
+	my $class   = shift;
+	my $groupId = shift;
+    return isIn ( $groupId, (1..17), qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 / );
+}	
+
 1;

@@ -812,7 +812,8 @@ sub new {
 
 =head2 secondsToInterval ( seconds )
 
-Returns an interval and internationalized units derived the number of seconds.
+Returns an interval and internationalized units derived the number
+of seconds, rounding to the closest unit smaller than the interval.
 
 =head3 seconds
 
@@ -854,6 +855,38 @@ sub secondsToInterval {
         $units = $i18n->get("704");
 	}
 	return ($interval, $units);
+}
+
+#-------------------------------------------------------------------
+
+=head2 secondsToExactInterval ( seconds )
+
+Returns an interval and internationalized units derived the number of seconds.
+
+=head3 seconds
+
+The number of seconds in the interval. 
+
+=cut
+
+sub secondsToExactInterval {
+    my $self = shift;
+    my $seconds = shift;
+    my $i18n = WebGUI::International->new($self->session, 'WebGUI');
+    my %units = (
+        31536000    => "703", # years
+        2592000     => "702", # months
+        604800      => "701", # weeks
+        86400       => "700", # days
+        3600        => "706", # hours
+        60          => "705", # minutes
+    );
+    for my $unit (sort { $b <=> $a } keys %units) {
+        if ($seconds % $unit == 0) {
+            return ($seconds / $unit, $i18n->get($units{$unit}));
+        }
+    }
+    return ($seconds, $i18n->get("704")); # seconds
 }
 
 #-------------------------------------------------------------------

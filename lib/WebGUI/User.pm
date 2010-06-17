@@ -409,6 +409,7 @@ sub delete {
     $db->write("DELETE FROM userSession WHERE userId=?",[$userId]);
 
     # remove inbox entries
+    $db->write("DELETE FROM inbox_messageState WHERE userId=?",[$userId]);
     $db->write("DELETE FROM inbox WHERE userId=? AND (groupId IS NULL OR groupId='')",[$userId]);
     
     # remove flux user data
@@ -710,30 +711,57 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getInboxAddresses ( )
+=head2 getInboxNotificationAddresses ( )
 
 Return a string with addresses that the user wants to receive Inbox
 notifications.  If the user does not want Inbox notifications, then
 the string will be empty.
 
+This is called by L<WebGUI::Mail::Send>, and has the effect that if
+the site C<sendInboxNotificationsOnly> setting is on and the user
+has turned off C<receiveInboxEmailNotifications>, no email at all is
+sent.
+
 =cut
 
-sub getInboxAddresses {
+sub getInboxNotificationAddresses {
     my $self   = shift;
     my $emails = '';
     if ( $self->profileField('receiveInboxEmailNotifications')
       && $self->profileField('email')) {
         $emails = $self->profileField('email');
     }
-    if ( $self->profileField('receiveInboxSmsNotifications')
-      && $self->profileField('cellPhone')
-      && $self->session->setting->get('smsGateway')) {
-        $emails .= ',' if $emails;
-        my $phoneNumber = $self->profileField('cellPhone');
-        $phoneNumber =~ tr/0-9//dc;  ##remove nonnumbers
-        $emails = join '', $emails, $phoneNumber, '@', $self->session->setting->get('smsGateway');
-    }
     return $emails;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getInboxSmsNotificationAddress ( )
+
+Return the email address that SMS notifications will be sent to for
+this user, constructed as:
+
+ cellPhone@smsGateway
+
+Non digits, such as area code separators, are removed from the cell phone information.
+
+=cut
+
+sub getInboxSmsNotificationAddress {
+    my $self   = shift;
+    
+    return unless $self->profileField('receiveInboxSmsNotifications');
+    
+    my $smsGateway = $self->session->setting->get('smsGateway');
+    return unless $smsGateway;
+    
+    my $cellPhone = $self->profileField('cellPhone');
+    return unless $cellPhone;
+    
+    # Remove non-numbers from cellPhone
+    $cellPhone =~ tr/0-9//dc;
+    
+    return join q{}, $cellPhone, '@', $smsGateway;
 }   
 
 #-------------------------------------------------------------------
@@ -792,7 +820,7 @@ sub getProfileUrl {
 
     my $identifier = $session->config->get("profileModuleIdentifier");
 
-    return qq{$page?op=account;module=$identifier;do=view;uid=}.$self->userId;
+    return $session->url->append($page,qq{op=account;module=$identifier;do=view;uid=}.$self->userId);
 
 }   
 
@@ -1185,6 +1213,7 @@ sub profileIsViewable {
     my $userId   = $user->userId;
 
     return 0 if ($self->isVisitor);  #Can't view visitor's profile
+    return 0 if ($user->isVisitor);  #User is not allowed to see anyone's profile, either
     return 1 if ($self->userId eq $userId);  #Users can always view their own profile
 
     my $profileSetting = $self->profileField('publicProfile');

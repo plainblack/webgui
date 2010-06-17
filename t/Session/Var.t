@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Session::Var;
 
-use Test::More tests => 40; # increment this value for each test you create
+use Test::More tests => 44; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -29,9 +29,13 @@ is($session->var->isAdminOn, 1, "switchAdminOn()");
 $session->var->switchAdminOff;
 is($session->var->isAdminOn, 0, "switchAdminOff()");
 
+my $token = $session->scratch->get('webguiCsrfToken');
+ok( $token, 'CSRF token set');
+ok( $session->id->valid($token), '...is a valid GUID');
+
 my $id = $session->var->getId;
 my ($count) = $session->db->quickArray("select count(*) from userSession where sessionId=?",[$id]);
-is($count, 1,"created an user session entry in the database");
+is($count, 1, "created an user session entry in the database");
 
 my %newEnvHash = ( REMOTE_ADDR => '192.168.0.34');
 my $origEnv = $session->env->{_env};
@@ -41,6 +45,8 @@ my $var = WebGUI::Session::Var->new($session);
 my $varTime = time();
 my $varExpires = $varTime + $session->setting->get('sessionTimeout');
 isa_ok($var, 'WebGUI::Session::Var', 'new returns Var object');
+isnt($session->scratch->get('webguiCsrfToken'), $token, '... calling new without sessionId creates a new token');
+$token = $session->scratch->get('webguiCsrfToken');
 
 cmp_ok(abs($var->get('lastPageView') - $varTime), '<=', 1, 'lastPageView set correctly');
 cmp_ok(abs($var->get('expires') - $varExpires), '<=', 1, 'expires set correctly');
@@ -66,6 +72,7 @@ $newEnvHash{REMOTE_ADDR} = '10.0.5.5';
 $varTime = time();
 my $var2 = WebGUI::Session::Var->new($session, $session->getId);
 $varExpires = $varTime + $session->setting->get('sessionTimeout');
+is($var2->session->scratch->get('webguiCsrfToken'), $token, 'opening a new user session did not change the CSRF token');
 
 cmp_deeply(
 	$var2,

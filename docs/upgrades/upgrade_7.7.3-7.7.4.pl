@@ -282,7 +282,7 @@ sub addPackage {
     $storage->addFileFromFilesystem( $file );
 
     # Import the package into the import node
-    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage, { overwriteLatest => 1 } );
 
     # Turn off the package flag, and set the default flag for templates added
     my $assetIds = $package->getLineage( ['self','descendants'] );

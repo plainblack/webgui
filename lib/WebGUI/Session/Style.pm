@@ -210,22 +210,23 @@ $session->asset's ancestors.
 =cut
 
 sub process {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 	my %var;
 	$var{'body.content'} = shift;
 	my $templateId = shift;
 	if ($self->{_makePrintable} && $self->session->asset) {
-		$templateId = $self->{_printableStyleId} || $self->session->asset->get("printableStyleTemplateId");
-		my $currAsset = $self->session->asset;
-		my $rootAssetId = WebGUI::Asset->getRoot($self->session)->getId;
+		$templateId = $self->{_printableStyleId} || $session->asset->get("printableStyleTemplateId");
+		my $currAsset = $session->asset;
+		my $rootAssetId = WebGUI::Asset->getRoot($session)->getId;
 		TEMPLATE: until ($templateId) {
 			# some assets don't have this property.  But at least one ancestor should....
-			$currAsset = $currAsset->getParent;
+			$currAsset  = $currAsset->getParent;
 			$templateId = $currAsset->get("printableStyleTemplateId");
 			last TEMPLATE if $currAsset->getId eq $rootAssetId;
 		}
-	} elsif ($self->session->scratch->get("personalStyleId") ne "") {
-		$templateId = $self->session->scratch->get("personalStyleId");
+	} elsif ($session->scratch->get("personalStyleId") ne "") {
+		$templateId = $session->scratch->get("personalStyleId");
 	} elsif ($self->{_useEmptyStyle}) {
 		$templateId = 'PBtmpl0000000000000132';
 	}
@@ -237,8 +238,9 @@ $var{'head.tags'} = '
 <script type="text/javascript">
 function getWebguiProperty (propName) {
 var props = new Array();
-props["extrasURL"] = "'.$self->session->url->extras().'";
-props["pageURL"] = "'.$self->session->url->page(undef, undef, 1).'";
+props["extrasURL"] = "'     . $session->url->extras().'";
+props["pageURL"] = "'       . $session->url->page(undef, undef, 1).'";
+props["firstDayOfWeek"] = "'. $session->user->get('firstDayOfWeek').'";
 return props[propName];
 }
 </script>

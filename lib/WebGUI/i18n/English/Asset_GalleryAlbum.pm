@@ -597,6 +597,36 @@ our $I18N = {
         context     => 'Label for URL to add an album Description.',
     },
 
+    'Uploading archive' => {
+        message     => 'Uploading archive',
+        lastUpdated => 1237403498,
+        context     => 'label for progress bar in addArchive',
+    },
+
+    'Extracting archive' => {
+        message     => 'Extracting archive',
+        lastUpdated => 1237403498,
+        context     => 'label for progress bar in addArchive',
+    },
+
+    'Found file: %s' => {
+        message     => 'Found file %s',
+        lastUpdated => 1237403498,
+        context     => 'label for progress bar in addArchive',
+    },
+
+    'Adding %s to album' => {
+        message     => 'Adding %s to album',
+        lastUpdated => 1237403498,
+        context     => 'label for progress bar in addArchive',
+    },
+
+    'Requesting commit for version tag' => {
+        message     => 'Requesting commit for version tag',
+        lastUpdated => 1237403498,
+        context     => 'label for progress bar in addArchive',
+    },
+
 };
 
 1;

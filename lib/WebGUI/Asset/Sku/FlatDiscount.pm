@@ -63,8 +63,6 @@ sub addToCart {
 
 =head2 definition
 
-Adds templateId, thankYouMessage, and defaultPrice fields.
-
 =cut
 
 sub definition {

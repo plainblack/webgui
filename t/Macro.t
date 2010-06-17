@@ -44,7 +44,7 @@ foreach my $macro (qw/
 }
 $session->config->addToHash('macros', "Ex'tras", "Extras");
 
-plan tests => 39;
+plan tests => 48;
 
 my $macroText = "CompanyName: ^c;";
 my $companyName = $session->setting->get('companyName');
@@ -119,6 +119,38 @@ is(
     $macroText,
     q{Extras(): /extras/},
     "Extras macro with parens but no args",
+);
+
+my $macroText = q{Extras("(test"): ^Extras("\(test");};
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    q{Extras("(test"): /extras/(test},
+    "Extras macro with escaped unbalanced opening parenthesis."
+);
+
+my $macroText = q{Extras("(test"): ^Extras("prefix \(test");};
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    q{Extras("(test"): /extras/prefix (test},
+    "Extras macro with escaped unbalanced opening parenthesis in the middle."
+);
+
+my $macroText = q{Extras("test)"): ^Extras("test\)");};
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    q{Extras("test)"): /extras/test)},
+    "Extras macro with escaped unbalanced closing parenthesis."
+);
+
+my $macroText = q{Extras("test)"): ^Extras("test\) suffix");};
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    q{Extras("test)"): /extras/test) suffix},
+    "Extras macro with escaped unbalanced closing parenthesis in the middle."
 );
 
 my $macroText = <<'EOF'
@@ -236,6 +268,13 @@ tie my %quotingEdges, 'Tie::IxHash';
         => '@MacroCall[`@MacroCall[`something`.`something else`]:`.`more still`]:',
     q{^VisualMacro("^VisualMacro('something', 'something else');", "more still");}
         => '@MacroCall[`@MacroCall[`something`.`something else`]:`.`more still`]:',
+    '^VisualMacro(,,);'                             => '@MacroCall[``.``]:',
+    '^VisualMacro("","",);'                         => '@MacroCall[``.``]:',
+    '^VisualMacro(,,"");'                           => '@MacroCall[``.``.``]:',
+    '^ReverseParams(^VisualMacro("something","else"););'
+        => '"else");^VisualMacro("something"',
+    '^ReverseParams("^VisualMacro(first word,second word);");'
+        => '@MacroCall[`first word`.`second word`]:',
 );
 while (my ($inText, $outText) = each %quotingEdges) {
     my $procText = $inText;
@@ -281,6 +320,7 @@ is(
     '',
     "Macro can return undef",
 );
+
 
 
 END {

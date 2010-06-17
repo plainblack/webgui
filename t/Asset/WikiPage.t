@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 14; # increment this value for each test you create
+use Test::More tests => 18; # increment this value for each test you create
 use WebGUI::Asset::Wobject::WikiMaster;
 use WebGUI::Asset::WikiPage;
 
@@ -25,6 +25,7 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 
 my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster'});
 $versionTag->commit;
@@ -32,6 +33,7 @@ my $wikipage = $wiki->addChild({className=>'WebGUI::Asset::WikiPage'});
 
 # Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
 my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
+WebGUI::Test->tagsToRollback($secondVersionTag );
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');
@@ -45,7 +47,37 @@ is($article, undef, "Can't add an Article wobject as a child to a Wiki Page.");
 my $wikiPageCopy = $wikipage->duplicate();
 isa_ok($wikiPageCopy, 'WebGUI::Asset::WikiPage');
 my $thirdVersionTag = WebGUI::VersionTag->new($session,$wikiPageCopy->get("tagId"));
+WebGUI::Test->tagsToRollback($thirdVersionTag);
 
+## isProtected
+
+$wikiPageCopy->update({isProtected => 1});
+ok($wikiPageCopy->isProtected, 'isProtected: copied page returns true');
+ok(! $wikipage->isProtected,   '... original page is not');
+
+## wiki page template variables
+
+my $templateId = 'WIKI_PAGE_TEMPLATE____';
+
+my $templateMock = Test::MockObject->new({});
+$templateMock->set_isa('WebGUI::Asset::Template');
+$templateMock->set_always('getId', $templateId);
+my $templateVars;
+$templateMock->mock('process', sub { $templateVars = $_[1]; } );
+
+$wiki->update({ pageTemplateId => $templateId });
+
+{
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $wikipage->view();
+    ok( ! $templateVars->{isProtected}, 'view template variables: isProtected is false on wiki page 1');
+}
+
+{
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $wikiPageCopy->view();
+    ok( $templateVars->{isProtected}, '... isProtected is true on wiki page 2');
+}
 
 ##################
 # This section tests the Comments aspect
@@ -77,12 +109,5 @@ is($wikipage->get('averageCommentRating'), 1, 'average rating is adjusted after 
 TODO: {
     local $TODO = "Tests to make later";
     ok(0, 'Lots and lots to do');
-}
-
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-	$secondVersionTag->rollback();
-	$thirdVersionTag->rollback();
 }
 

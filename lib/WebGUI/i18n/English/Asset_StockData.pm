@@ -146,8 +146,8 @@ our $I18N = {
 	},
 
 	'isVisitor' => {
-		message => q|Whether or not the current user is a visitor.  This returns true if the users is authenticated against the system|,
-		lastUpdated => 1149565312,
+		message => q|Whether or not the current user is a visitor.  This returns true if the user is not authenticated against the system|,
+		lastUpdated => 1252351439,
 	},
 
 	'stock.display.url' => {

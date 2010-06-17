@@ -126,7 +126,7 @@ sub addRevision {
 		# get the default values of each property
 		foreach my $property (keys %{$definition->{properties}}) {
 			$defaults{$property} = $definition->{properties}{$property}{defaultValue};
-            if (ref($defaults{$property}) eq 'ARRAY') {
+            if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{properties}{$property}{serialize}) {
                 $defaults{$property} = $defaults{$property}->[0];
             }
 		}
@@ -375,6 +375,41 @@ sub purgeRevision {
 
 #-------------------------------------------------------------------
 
+=head2 moveAssetToVersionTag ( tag )
+
+=head3 moveToTag
+
+Migrate the current asset to the designated version tag
+
+=cut
+
+sub moveAssetToVersionTag {
+    my ( $self, $moveToTag ) = @_;
+
+    # Determine if we were passed a version tagId or a VersionTag Class and act appropriately
+    #
+    my $moveToTagId = $moveToTag;
+    if ( ref($moveToTag) eq "WebGUI::VersionTag" ) {
+        $moveToTagId = $moveToTag->get('tagId');
+    }
+    else {
+        $moveToTag = WebGUI::VersionTag->new( $self->session, $moveToTagId );
+    }
+
+    my $tag = WebGUI::VersionTag->new( $self->session, $self->get('tagId') );
+
+    $self->setVersionTag($moveToTagId);
+
+    my $versionTag = $self->session->db->quickScalar("SELECT tagId FROM assetData WHERE assetId=? AND revisionDate=?",[$self->getId,$self->get('revisionDate')]);
+    
+    # If no revisions remain, delete the version tag
+    if ( $tag->getRevisionCount <= 0 ) {
+        $tag->rollback;
+    }
+} ## end sub moveAssetToVersionTag
+
+#-------------------------------------------------------------------
+
 =head2 requestAutoCommit ( )
 
 Requests an autocommit tag be commited. See also getAutoCommitWorkflowId() and setAutoCommitTag().
@@ -382,13 +417,29 @@ Requests an autocommit tag be commited. See also getAutoCommitWorkflowId() and s
 =cut
 
 sub requestAutoCommit {
-	my $self = shift;
-	my $tag = $self->{_autoCommitTag};
-	if (defined $tag) {
-		$tag->requestCommit;
-		delete $self->{_autoCommitTag};
-	}
-}
+    my $self = shift;
+
+    my $parentAsset;
+    if ( not defined( $parentAsset = $self->getParent ) ) {
+        $parentAsset = WebGUI::Asset->newPending( $self->session, $self->get('parentId') );
+    }
+    unless ( $parentAsset->hasBeenCommitted ) {
+        my $tagId = $parentAsset->get('tagId');
+
+        if ($tagId) {
+            if ( $tagId ne $self->get('tagId') ) {
+                $self->moveAssetToVersionTag($tagId);
+                return;
+            }
+        }
+    }
+
+    my $tag = $self->{_autoCommitTag};
+    if ( defined $tag ) {
+        $tag->requestCommit;
+        delete $self->{_autoCommitTag};
+    }
+} ## end sub requestAutoCommit
 
 
 #-------------------------------------------------------------------
@@ -485,7 +536,7 @@ Sets the versioning lock to "off" so that this piece of content may be edited on
 
 sub unsetVersionLock {
     my $self = shift;
-    $self->session->db->write("update asset set isLockedBy=NULL where assetId=".$self->session->db->quote($self->getId));
+    $self->session->db->write("update asset set isLockedBy=NULL where assetId=?",[$self->getId]);
     $self->{_properties}{isLockedBy} = undef;
     $self->updateHistory("unlocked");
     $self->purgeCache;

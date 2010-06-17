@@ -52,94 +52,66 @@ sub _fetchDepartments {
 
 #-------------------------------------------------------------------
 sub definition {
-	my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_InOutBoard");
-        push(@{$definition}, {
-                tableName=>'InOutBoard',
-                className=>'WebGUI::Asset::Wobject::InOutBoard',
-                assetName=>$i18n->get('assetName'),
-		icon=>'iob.gif',
-                properties=>{
-			statusList => {
-				defaultValue => $i18n->get(10)."\n"
-						.$i18n->get(11)."\n",
-				fieldType=>"textarea"
-				},
-			reportViewerGroup => {
-				defaultValue => 3,
-				fieldType => "group"
-				},
-		    inOutGroup => {
-				defaultValue => 2,
-				fieldType => "group"
-				},
-			inOutTemplateId => {
-				fieldType=>"template",
-			        defaultValue => 'IOB0000000000000000001'
-			        },
-			reportTemplateId => {
-				fieldType=>"template",
-			        defaultValue => 'IOB0000000000000000002'
-			        },
-			paginateAfter => {
-				fieldType=>"integer",
-				defaultValue => 50
-				},
-  			}
-                });
-        return $class->SUPER::definition($session, $definition);
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my $i18n = WebGUI::International->new($session,"Asset_InOutBoard");
+    push(@{$definition}, {
+        tableName => 'InOutBoard',
+        className => 'WebGUI::Asset::Wobject::InOutBoard',
+        assetName => $i18n->get('assetName'),
+        icon      => 'iob.gif',
+        autoGenerateForms => 1,
+        properties   => {
+            statusList => {
+                tab          => 'properties',
+                defaultValue => $i18n->get(10)."\n".$i18n->get(11)."\n",
+                fieldType    => "textarea",
+                label        => $i18n->get(1),
+                hoverHelp    => $i18n->get('1 description'),
+                subtext      => $i18n->get(2),
+            },
+            reportViewerGroup => {
+                tab          => 'security',
+                defaultValue => 3,
+                fieldType    => "group",
+                label        => $i18n->get(3),
+                hoverHelp    => $i18n->get("3 description"),
+            },
+            inOutGroup => {
+                tab          => 'security',
+                defaultValue => 2,
+                fieldType    => "group",
+                label        => $i18n->get('inOutGroup'),
+                hoverHelp    => $i18n->get('inOutGroup description'),
+            },
+            inOutTemplateId => {
+                tab          => 'display',
+                fieldType    => "template",
+                namespace    => "InOutBoard",
+                label        => $i18n->get("In Out Template"),
+                hoverHelp    => $i18n->get("In Out Template description"),
+                defaultValue => 'IOB0000000000000000001',
+            },
+            reportTemplateId => {
+                tab          => 'display',
+                fieldType    => "template",
+                defaultValue => 'IOB0000000000000000002',
+                label        => $i18n->get(13),
+                hoverHelp    => $i18n->get("13 description"),
+                namespace    => "InOutBoard/Report"
+            },
+            paginateAfter => {
+                tab          => 'display',
+                fieldType    => "integer",
+                defaultValue => 50,
+                label        => $i18n->get(12),
+                hoverHelp    => $i18n->get('12 description'),
+            },
+        }
+    });
+    return $class->SUPER::definition($session, $definition);
 }
-
-
-#-------------------------------------------------------------------
-sub getEditForm {
-        my $self = shift;
-        my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
-	$tabform->getTab("properties")->textarea(
-		-name=>"statusList",
-		-label=>$i18n->get(1),
-		-hoverHelp=>$i18n->get('1 description'),
-		-value=>$self->getValue("statusList"),
-		-subtext=>$i18n->get(2),
-		);
-	$tabform->getTab("display")->integer(
-		-name=>"paginateAfter",
-		-label=>$i18n->get(12),
-		-hoverHelp=>$i18n->get('12 description'),
-		-value=>$self->getValue("paginateAfter"),
-		);
-	$tabform->getTab("display")->template (
-	    -name => "inOutTemplateId",
-	    -value => $self->getValue("inOutTemplateId"),
-	    -label => $i18n->get("In Out Template"),
-	    -hoverHelp => $i18n->get("In Out Template description"),
-	    -namespace => "InOutBoard"
-	    );
-	$tabform->getTab("display")->template (
-	    -name => "reportTemplateId",
-	    -value => $self->getValue("reportTemplateId"),
-	    -label => $i18n->get(13),
-	    -hoverHelp => $i18n->get("13 description"),
-	    -namespace => "InOutBoard/Report"
-	    );
-	$tabform->getTab("security")->group(
-		-name=>"reportViewerGroup",
-		-value=>[$self->getValue("reportViewerGroup")],
-		-label=>$i18n->get(3),
-		-hoverHelp=>$i18n->get("3 description"),
-		);
-   $tabform->getTab("security")->group(
-		-name=>"inOutGroup",
-		-value=>[$self->getValue("inOutGroup")],
-		-label=>$i18n->get('inOutGroup'),
-		-hoverHelp=>$i18n->get('inOutGroup description'),
-		);
-    return $tabform;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -166,18 +138,46 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 purge ( )
+
+Extend the base method to cleanup the status and statusLog tables.
+
+=cut
+
+sub purge {
+    my $self    = shift;
+    my $session = $self->session;
+    $session->db->write('delete from InOutBoard_status    where assetId=?', [$self->getId]);
+    $session->db->write('delete from InOutBoard_statusLog where assetId=?', [$self->getId]);
+    $self->SUPER::purge(@_);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 view 
+
+Render the viewing screen, which displays In/Out status and a form to change
+status.
+
+=cut
+
 sub view {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 	my %var;
 	my $url = $self->getUrl('func=view');
 	
 	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
-	if ($self->session->user->isInGroup($self->getValue("reportViewerGroup"))) {
-	  $var{'viewReportURL'} = $self->getUrl("func=viewReport");
-	  $var{'viewReportLabel'} = $i18n->get('view report label');
-	  $var{canViewReport} = 1;
+	if ($session->user->isInGroup($self->getValue("reportViewerGroup"))) {
+        $var{'viewReportURL'}   = $self->getUrl("func=viewReport");
+        $var{'viewReportLabel'} = $i18n->get('view report label');
+        $var{canViewReport}     = 1;
 	}
-	else { $var{canViewReport} = 0; }
+	else {
+        $var{canViewReport} = 0;
+    }
 	
 	my $statusUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
 	my $statusListString = $self->getValue("statusList");
@@ -191,13 +191,19 @@ sub view {
 		$statusListHashRef->{$status} = $status;
 	}
 
-	#$self->session->errorHandler->warn("VIEW: userId: ".$statusUserId."\n" );
-	my ($status) = $self->session->db->quickArray("select status from InOutBoard_status where userId=".$self->session->db->quote($statusUserId)." and assetId=".$self->session->db->quote($self->getId));
+	#$self->session->log->warn("VIEW: userId: ".$statusUserId."\n" );
+	my ($status) = $session->db->quickArray(
+        "select status from InOutBoard_status where userId=? and assetId=?",
+        [ $statusUserId, $self->getId]
+    );
 
 	##Find all the users for which I am a delegate
-	my @users = $self->session->db->buildArray("select userId from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and delegateUserId=".$self->session->db->quote($self->session->user->userId));
+	my @users = $session->db->buildArray(
+        "select userId from InOutBoard_delegates where assetId=? and delegateUserId=?",
+        [ $self->getId, $session->user->userId ]
+    );
 
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	my $f = WebGUI::HTMLForm->new($session,-action=>$self->getUrl);
 	if (@users) {
 		my %nameHash;
 		tie %nameHash, "Tie::IxHash";
@@ -208,7 +214,7 @@ sub view {
 		$f->selectBox(
 			-name=>"delegate",
 			-options=>\%nameHash,
-			-value=>[ $self->session->scratch->get("userId") ],
+			-value=>[ $session->scratch->get("userId") ],
 			-label=>$i18n->get('delegate'),
 			-hoverHelp=>$i18n->get('delegate description'),
 			-extras=>q|onchange="this.form.submit();"|,
@@ -232,18 +238,23 @@ sub view {
 		);
 	$f->submit;
 	
-	my ($isInGroup) = $self->session->db->quickArray("select count(*) from groupings where userId=".$self->session->db->quote($self->session->user->userId)." and groupId=".$self->session->db->quote($self->get("inOutGroup")));
+	my ($isInGroup) = $session->db->quickArray(
+        "select count(*) from groupings where userId=? and groupId=?",
+        [ $session->user->userId, $self->get("inOutGroup") ]
+    );
 	if ($isInGroup) {
-	  $var{displayForm} = 1;
-	  $var{'form'} = $f->print;
-	  $var{'selectDelegatesURL'} = $self->getUrl("func=selectDelegates");
-	  $var{'selectDelegatesLabel'} = $i18n->get('select delegates label');
+	    $var{displayForm} = 1;
+	    $var{'form'} = $f->print;
+	    $var{'selectDelegatesURL'} = $self->getUrl("func=selectDelegates");
+	    $var{'selectDelegatesLabel'} = $i18n->get('select delegates label');
 	}
-	else { $var{displayForm} = 0; }
+	else {
+        $var{displayForm} = 0;
+    }
 	
 	my $lastDepartment = "_nothing_";
 	
-	my $p = WebGUI::Paginator->new($self->session,$url, $self->getValue("paginateAfter"));
+	my $p = WebGUI::Paginator->new($session, $url, $self->getValue("paginateAfter"));
 	
 	my $sql = "select users.username, 
 users.userId, 
@@ -258,12 +269,12 @@ from users
 left join groupings on  groupings.userId=users.userId
 left join InOutBoard on groupings.groupId=InOutBoard.inOutGroup
 left join userProfileData on users.userId=userProfileData.userId
-left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=".$self->session->db->quote($self->getId())."
-where users.userId<>'1' and InOutBoard.inOutGroup=".$self->session->db->quote($self->get("inOutGroup"))."
+left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=?
+where users.userId<>'1' and InOutBoard.inOutGroup=?
 group by userId
 order by department, lastName, firstName";
 
-	$p->setDataByQuery($sql);
+	$p->setDataByQuery($sql, undef, 0, [ $self->getId, $self->get('inOutGroup') ], );
 	my $rowdata = $p->getPageData();
 	my @rows;
 	foreach my $data (@$rowdata) {
@@ -296,14 +307,14 @@ order by department, lastName, firstName";
 }
 
 #-------------------------------------------------------------------
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
-}
 
-#-------------------------------------------------------------------
+=head2 www_selectDelegates 
+
+Form where a user can select delegates, other users who are allowed to change
+their status.
+
+=cut
+
 sub www_selectDelegates {
 	my $self = shift;
 	my %userNames = ();
@@ -356,44 +367,76 @@ sub www_selectDelegates {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_selectDelegatesEditSave 
+
+Process the selectDeletages form.
+
+=cut
+
 sub www_selectDelegatesEditSave {
-	my $self = shift;
-	my @delegates = $self->session->form->selectList("delegates");
-	$self->session->db->write("delete from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($self->session->user->userId));
+	my $self      = shift;
+    my $session   = $self->session;
+    my $db        = $session->db;
+	my @delegates = $session->form->selectList("delegates");
+	$db->write(
+        "delete from InOutBoard_delegates where assetId=? and userId=?",
+        [ $self->getId, $session->user->userId ]
+    );
 
 	foreach my $delegate (@delegates) {
-		$self->session->db->write("insert into InOutBoard_delegates
-		(userId,delegateUserId,assetId) values
-		(".$self->session->db->quote($self->session->user->userId).",".$self->session->db->quote($delegate).",".$self->session->db->quote($self->getId).")");
+		$db->write(
+            "insert into InOutBoard_delegates (userId,delegateUserId,assetId) values (?,?,?)",
+            [$session->user->userId, $delegate, $self->getId ],
+        );
 	}
 	return "";
 }
 #-------------------------------------------------------------------
+
+=head2 www_setStatus 
+
+Process the form from the view method to set status for a user.
+
+=cut
+
 sub www_setStatus {
-	my $self = shift;
-	#$self->session->errorHandler->warn("delegateId: ". $self->session->form->process("delegate")."\n" );
-	#$self->session->errorHandler->warn("userId: ".$self->session->scratch->get("userId") ."\n" );
-	if ($self->session->form->process("delegate") eq $self->session->scratch->get("userId")) {
-		#$self->session->errorHandler->warn("Wrote data and removed scratch\n");
-		my $sessionUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
-		#$self->session->errorHandler->warn("user Id: ".$sessionUserId."\n");
-		$self->session->scratch->delete("userId");
-		$self->session->db->write("delete from InOutBoard_status where userId=".$self->session->db->quote($sessionUserId)." and  assetId=".$self->session->db->quote($self->getId));
-		$self->session->db->write("insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).","
-			.$self->session->db->quote($self->session->form->process("status")).",".$self->session->datetime->time().",".$self->session->db->quote($self->session->form->process("message")).")");
-		$self->session->db->write("insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).",".$self->session->db->quote($self->session->user->userId).","
-			.$self->session->db->quote($self->session->form->process("status")).",".$self->session->datetime->time().",".$self->session->db->quote($self->session->form->process("message")).")");
+	my $self     = shift;
+    my $session  = $self->session;
+    my $db       = $session->db;
+    my $delegate = $session->form->process('delegate');
+	if ($delegate eq $self->session->scratch->get("userId")) {
+		my $sessionUserId = $session->scratch->get("userId") || $session->user->userId;
+        my $status  = $session->form->process('status');
+        return $self->www_view if $status eq '';
+		$session->scratch->delete("userId");
+        my $message = $session->form->process('message');
+		$db->write("delete from InOutBoard_status where userId=? and assetId=?", [ $sessionUserId, $self->getId ]);
+		$db->write(
+            "insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (?,?,?,?,?)",
+            [$self->getId, $sessionUserId, $status, $session->datetime->time(), $message ], 
+        );
+		$db->write(
+            "insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
+            [$self->getId, $sessionUserId, $session->user->userId, $status, $session->datetime->time(), $message ], 
+        );
 	}
 	else {
-		#$self->session->errorHandler->warn("Set scratch, redisplay\n");
-		#$self->session->errorHandler->warn(sprintf "Delegate is %s\n", $self->session->form->process("delegate"));
-		$self->session->scratch->set("userId",$self->session->form->process("delegate"));
+		$session->scratch->set("userId",$delegate);
 	}
 	return $self->www_view;
 }
 
 
 #-------------------------------------------------------------------
+
+=head2 www_viewReport 
+
+Builds a templated form for doing drill-down reports, along with displaying results from
+the report.
+
+=cut
+
 sub www_viewReport {
 	my $self = shift;
 	return "" unless ($self->session->user->isInGroup($self->getValue("reportViewerGroup")));
@@ -424,14 +467,18 @@ sub www_viewReport {
 		-hoverHelp=>$i18n->get('17 description'),
 		-value=>$endDate
 		);
+    ##Make a list of available departments.  Map empty departments to the No departments label, and
+    ##handle the SQL clause for searching.
 	my %depHash;
-	%depHash = map { $_ => $_ } ($self->_fetchDepartments(),
-				     $i18n->get('all departments'));
-	my $defaultDepartment =  $self->session->form->process("selectDepartment")
-	                      || $i18n->get('all departments');
-	my $departmentSQLclause = ($defaultDepartment eq $i18n->get('all departments'))
+	%depHash = map { $_ => $_ } 
+               ($self->_fetchDepartments(), $i18n->get('all departments'));
+    $depHash{''} = $i18n->get('7');
+	my $defaultDepartment   =  $self->session->form->process("selectDepartment");
+	my $departmentSQLclause = $defaultDepartment eq $i18n->get('all departments')
 	                        ? ''
-				: 'and c.fieldData='.$self->session->db->quote($defaultDepartment);
+                            : $defaultDepartment eq ''
+                            ? 'and userProfileData.department IS NULL'
+                            : 'and userProfileData.department='.$self->session->db->quote($defaultDepartment);
 	$f->selectBox(
 		-name=>"selectDepartment",
 		-options=>\%depHash,
@@ -450,10 +497,10 @@ sub www_viewReport {
 		-label=>$i18n->get(14),
 		-hoverHelp=>$i18n->get('14 description'),
 	);
-	$f->submit(-value=>"Search");
+	$f->submit(-value=>$i18n->get('search','Asset'));
 	$var{'reportTitleLabel'} = $i18n->get('report title');
-	$var{'form'} = $f->print;
-	my $url = $self->getUrl("func=viewReport;selectDepartment=".$self->session->form->process("selectDepartment").";reportPagination=".$self->session->form->process("reportPagination").";startDate=".$self->session->form->process("startDate").";endDate=".$self->session->form->process("endDate").";doit=1");
+	$var{'form'}             = $f->print;
+	my $url = $self->getUrl("func=viewReport;selectDepartment=".$defaultDepartment.";reportPagination=".$pageReportAfter.";startDate=".$self->session->form->process("startDate").";endDate=".$endDate.";doit=1");
 	if ($self->session->form->process("doit")) {
 	  $var{showReport} = 1;
 	  $endDate = $self->session->datetime->addToTime($endDate,24,0,0);
@@ -482,7 +529,7 @@ where users.userId<>'1' and
  $departmentSQLclause
 group by InOutBoard_statusLog.dateStamp
 order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
-	  #$self->session->errorHandler->warn("QUERY: $sql\n");
+	  $self->session->log->warn("QUERY: $sql\n");
 	  $p->setDataByQuery($sql);
 	  my $rowdata = $p->getPageData();
 	  my @rows;
@@ -518,7 +565,9 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 	  $var{'updatedBy.label'} = $i18n->get('updatedBy label');
 	  $p->appendTemplateVars(\%var);
 	}
-	else { $var{showReport} = 0; }
+	else {
+        $var{showReport} = 0;
+    }
 	
 	return $self->processStyle($self->processTemplate(\%var, $self->getValue("reportTemplateId")));
 }

@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
-use Test::More tests => 60; # increment this value for each test you create
+use Test::More tests => 68; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -216,6 +216,7 @@ is($siteWideTag->getId(), $siteWideTagId, 'versionTagMode siteWide: reclaim site
 ## Through in a new session as different user
 my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
 $admin_session->user({'userId' => 3});
+WebGUI::Test->sessionsToDelete($admin_session);
 
 setUserVersionTagMode($admin_session->user(), q{singlePerUser});
 
@@ -242,11 +243,137 @@ ok($adminSiteWideTag->getId() eq $siteWideTagId, 'versionTagMode siteWide + admi
 $admin_session->var()->end();
 $admin_session->close();
 
+# Check if get returns a safe copy
 
+my $name        = $userTag->get( 'name' );
+my $safeCopy    = $userTag->get;
+$safeCopy->{ name   } = 'NotSoSafeAfterAll!';
+
+is(
+    $userTag->get( 'name' ),
+    $name,
+    'get returns a safe copy of the internal data hash'
+);
+
+my $otherSafeCopy = $userTag->get;
+
+isnt(
+    $safeCopy,
+    $otherSafeCopy,
+    'get returns unique safe copies on each invocation'
+);
 
 $userTag->rollback();
 $siteWideTag->rollback();
 $adminUserTag->rollback();
+
+## Additional VersionTagMode to make sure that auto commit happens only when user is tag creator and tag is not site wide.
+## See bug #10689 (Version Tag Modes)
+{
+    my $test_prefix = q{versionTagMode B10689>};
+
+    setUserVersionTagMode($user, q{singlePerUser});
+    my $tag = WebGUI::VersionTag->create($session, {});
+    $tag->setWorking;
+    my $asset = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+    is($tag->getAssetCount, 1, qq{$test_prefix [singlePerUser] tag with 1 asset});
+
+    # create admin session
+    my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+    WebGUI::Test->sessionsToDelete($admin_session);
+    $admin_session->user({'userId' => 3});
+
+    setUserVersionTagMode($admin_session->user(), q{autoCommit});
+
+    # Take over version tag
+    my $adminUserTag = WebGUI::VersionTag->new($admin_session, $tag->getId());
+
+    $adminUserTag->setWorking();
+
+    my $adminCommitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        override        => 0,
+        allowComments   => 0,
+        returnUrl       => q{},
+    });
+
+    is(
+        $adminCommitStatus,
+        undef,
+        qq{$test_prefix [singlePerUser] Admin cannot auto commit working tag of other user},
+    );
+
+    $adminUserTag->rollback();
+
+    # Change user mode to autoCommit
+    setUserVersionTagMode($user, q{autoCommit});
+
+    my $userCommitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        override        => 0,
+        allowComments   => 0,
+        returnUrl       => q{},
+    });
+
+    is(
+        $userCommitStatus,
+        q{commit},
+        qq{$test_prefix [singlePerUser] User can auto commit},
+    );
+
+    $tag->rollback();
+
+
+    # Now test site wide tag
+
+    setUserVersionTagMode($user, q{siteWide});
+    $tag = WebGUI::VersionTag->create($session, {});
+    $tag->setWorking;
+    $asset = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+    is($tag->getAssetCount, 1, qq{$test_prefix [siteWide] tag with 1 asset});
+
+    # create admin session
+    $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+    WebGUI::Test->sessionsToDelete($admin_session);
+    $admin_session->user({'userId' => 3});
+
+    setUserVersionTagMode($admin_session->user(), q{autoCommit});
+
+    # Take over version tag
+    $adminUserTag = WebGUI::VersionTag->new($admin_session, $tag->getId());
+
+    $adminUserTag->setWorking();
+
+    $adminCommitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        override        => 0,
+        allowComments   => 0,
+        returnUrl       => q{},
+    });
+
+    is(
+        $adminCommitStatus,
+        undef,
+        qq{$test_prefix [siteWide] Admin cannot auto commit sitewide working tag},
+    );
+
+    $adminUserTag->rollback();
+
+    # Change user mode to autoCommit
+    setUserVersionTagMode($user, q{autoCommit});
+
+    $userCommitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        override        => 0,
+        allowComments   => 0,
+        returnUrl       => q{},
+    });
+
+    is(
+        $userCommitStatus,
+        q{commit},
+        qq{$test_prefix [siteWide] User CANNOT auto commit sitewide working tag},
+    );
+
+    $tag->rollback();
+
+}
 
 #reset (just in case other tests depends on this setting)
 setSiteVersionTagMode($session, q{multiPerUser});

@@ -22,7 +22,7 @@ use WebGUI::User;
 use WebGUI::ProfileField;
 use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 224; # increment this value for each test you create
+use Test::More tests => 226; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -93,7 +93,7 @@ ok(
 );
 
 ok(
-    !$session->db->quickScalar("SELECT COUNT(*) FROM userSessionScratch WHERE sessionId=?",[$session->getId]),
+    !$session->db->quickScalar("SELECT COUNT(*) FROM userSessionScratch WHERE sessionId=?",[$newSession->getId]),
     "Deactivating user deletes all user session scratch",
 );
 
@@ -833,6 +833,7 @@ isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 # getProfileUrl
 #
 ################################################################
+$session->setting->set('preventProxyCache', 0);
 
 WebGUI::Test->originalConfig('profileModuleIdentifier');
 my $profileModuleId = $session->config->get('profileModuleIdentifier');
@@ -845,7 +846,7 @@ $session->config->set('profileModuleIdentifier', 'someOtherThing');
 is(
     $newFish->getProfileUrl('cellblock'),
     "cellblock?op=account;module=someOtherThing;do=view;uid=".$newFish->userId,
-    'getProfileUrl: uses profileModuleIdentifier to pick the right Account module'
+    '... uses profileModuleIdentifier to pick the right Account module'
 );
 $session->config->set('profileModuleIdentifier', $profileModuleId);
 
@@ -853,8 +854,19 @@ $session->asset(WebGUI::Asset->getDefault($session));
 is(
     $newFish->getProfileUrl(),
     "/home?op=account;module=$profileModuleId;do=view;uid=".$newFish->userId,
-    'getProfileUrl: uses session->url->page if no URL is passed in'
+    '... uses session->url->page if no URL is passed in'
 );
+
+$session->setting->set('preventProxyCache', 1);
+my $newFishId = $newFish->userId;
+
+like(
+    $newFish->getProfileUrl(),
+    qr{/home\?noCache=\d+:\d+;op=account;module=$profileModuleId;do=view;uid=$newFishId},
+    '... handles preventProxyCache correctly'
+);
+
+$session->setting->set('preventProxyCache', 0);
 
 ################################################################
 #
@@ -905,7 +917,7 @@ ok(! $neighbor->profileIsViewable($friend), '... visitor permission follows publ
 ok(! $neighbor->profileIsViewable($admin), '... visitor permission follows publicProfile=none, even admin');
 $neighbor->profileField('publicProfile', 'all');
 ok(  $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=all');
-ok(  $neighbor->profileIsViewable($visitor), '... visitor permission follows publicProfile=all, even visitor');
+ok(! $neighbor->profileIsViewable($visitor), '... visitor may not see profiles, regardless of privacy setting');
 $neighbor->profileField('publicProfile', 'friends');
 ok(! $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=friend, not a friend');
 $friend->addToGroups([$neighbor->friends->getId]);
@@ -970,11 +982,10 @@ $friend->deleteFromGroups([$neighbor->friends->getId]);
 
 ################################################################
 #
-# getInboxAddresses
+# getInboxNotificationAddresses
 #
 ################################################################
 
-my $origSmsGateway = $session->setting->get('smsGateway');
 $session->setting->set('smsGateway', '');
 my $inmate = WebGUI::User->create($session);
 WebGUI::Test->usersToDelete($inmate);
@@ -982,32 +993,44 @@ $inmate->profileField('email',     '');
 $inmate->profileField('cellPhone', '');
 $inmate->profileField('receiveInboxEmailNotifications', 0);
 $inmate->profileField('receiveInboxSmsNotifications',   0);
-is ($inmate->getInboxAddresses, '', 'getInboxAddresses: with no profile info, returns blank');
+is ($inmate->getInboxNotificationAddresses, '', 'getInboxNotificationAddresses: with no profile info, returns blank');
 
 $inmate->profileField('receiveInboxEmailNotifications', 1);
-is ($inmate->getInboxAddresses, '', 'getInboxAddresses: with receiveInboxEmailNotifications=1, but not email address, returns blank');
+is ($inmate->getInboxNotificationAddresses, '', '... with receiveInboxEmailNotifications=1, but not email address, returns blank');
 
 $inmate->profileField('email', 'andy@shawshank.com');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: email address only');
+is ($inmate->getInboxNotificationAddresses, 'andy@shawshank.com', '... email address only');
 
 $inmate->profileField('receiveInboxSmsNotifications',   1);
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 but no other profile info');
+is ($inmate->getInboxNotificationAddresses, 'andy@shawshank.com', '... receive only email address, with receiveInboSMSNotifications=1 but no other profile info');
 
 $inmate->profileField('cellPhone', '37927');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and cell phone but no gateway');
+is ($inmate->getInboxNotificationAddresses, 'andy@shawshank.com', '... receive only email address, with receiveInboSMSNotifications=1 and cell phone but no gateway');
 
 $inmate->profileField('cellPhone', '');
 $session->setting->set('smsGateway', 'textme.com');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
+is ($inmate->getInboxNotificationAddresses, 'andy@shawshank.com', '... receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
 
+################################################################
+#
+# getInboxSmsNotificationAddress
+#
+################################################################
+$inmate->profileField('receiveInboxSmsNotifications',   0);
+$inmate->profileField('cellPhone', '');
+$session->setting->set('smsGateway', '');
+
+is($inmate->getInboxSmsNotificationAddress, undef, 'getInboxSmsNotificationAddress: returns undef with notifications off, no cell phone and no SMS gateway');
+
+$session->setting->set('smsGateway', 'textme.com');
 $inmate->profileField('cellPhone', '37927');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com,37927@textme.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
+is($inmate->getInboxSmsNotificationAddress, undef, '... returns undef with notifications off, but cell phone and gateway set');
 
-$inmate->profileField('receiveInboxEmailNotifications', 0);
-is ($inmate->getInboxAddresses, '37927@textme.com', 'getInboxAddresses: can get SMS and no email, even with email info present');
+$inmate->profileField('receiveInboxSmsNotifications',   1);
+is($inmate->getInboxSmsNotificationAddress, '37927@textme.com', '... returns cellphone@gateway');
 
-$inmate->profileField('receiveInboxSmsNotifications', 0);
-is ($inmate->getInboxAddresses, '', 'getInboxAddresses: can get no SMS and no email, even with profile info present');
+$inmate->profileField('cellPhone', '(555)-555.5555');
+is($inmate->getInboxSmsNotificationAddress, '5555555555@textme.com', '... strips non digits from cellphone');
 
 ################################################################
 #
@@ -1027,7 +1050,6 @@ $shopUser->delete;
 undef $book;
 eval { $book = WebGUI::Shop::AddressBook->new($session, $bookId); };
 my $e = Exception::Class->caught();
-diag ref $e;
 isa_ok($e, 'WebGUI::Error::ObjectNotFound', '... cleans up the address book');
 
 END {

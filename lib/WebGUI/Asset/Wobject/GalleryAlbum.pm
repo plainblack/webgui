@@ -20,6 +20,8 @@ use File::Temp qw{ tempdir };
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
+use WebGUI::HTML;
+use WebGUI::ProgressBar;
 
 use Archive::Any;
 
@@ -83,7 +85,7 @@ sub definition {
 
 #----------------------------------------------------------------------------
 
-=head2 addArchive ( filename, properties )
+=head2 addArchive ( filename, properties, [$outputSub] )
 
 Add an archive of Files to this Album. C<filename> is the full path of the 
 archive. C<properties> is a hash reference of properties to assign to the
@@ -94,12 +96,27 @@ a directory outside of the storage location.
 
 Will only handle file types handled by the parent Gallery.
 
+=head3 filename
+
+The name of the file archive to import.
+
+=head3 properties
+
+A base set of properties to add to each file in the archive.
+
+=head3 $outputSub
+
+A callback to use for outputting data, most likely to a progress bar.  It expects the
+callback to accept an i18n key for use in sprintf, and then any extra fields to stuff
+into the translated key.
+
 =cut
 
 sub addArchive {
     my $self        = shift;
     my $filename    = shift;
     my $properties  = shift;
+    my $outputSub   = shift || sub {};
     my $gallery     = $self->getParent;
     
     my $archive     = Archive::Any->new( $filename );
@@ -108,11 +125,12 @@ sub addArchive {
         if $archive->is_naughty;
 
     my $tempdirName = tempdir( "WebGUI-Gallery-XXXXXXXX", TMPDIR => 1, CLEANUP => 1);
+    $outputSub->('Extracting archive');
     $archive->extract( $tempdirName );
 
     # Get all the files in the archive
     my @files;
-    my $wanted      = sub { push @files, $File::Find::name };
+    my $wanted      = sub { push @files, $File::Find::name; $outputSub->('Found file: %s', $File::Find::name); };
     find( {
         wanted      => $wanted,
     }, $tempdirName );
@@ -126,7 +144,8 @@ sub addArchive {
         next unless $class; # class is undef for those files the Gallery can't handle
 
         $self->session->errorHandler->info( "Adding $filename to album!" );
-        # Remove the file extention
+        $outputSub->('Adding %s to album', $filename);
+        # Remove the file extension
         $filename   =~ s{\.[^.]+}{};
 
         $properties->{ className        } = $class;
@@ -142,6 +161,7 @@ sub addArchive {
     $versionTag->set({ 
         "workflowId" => $self->getParent->get("workflowIdCommit"),
     });
+    $outputSub->('Requesting commit for version tag');
     $versionTag->requestCommit;
 
     return undef;
@@ -917,7 +937,7 @@ sub www_addArchive {
 
     my $i18n = WebGUI::International->new($session);
 
-    $var->{ error           } = $params->{ error };
+    $var->{ error           } = $params->{ error } || $form->get('error');
 
     $var->{ form_start      } 
         = WebGUI::Form::formHeader( $session, {
@@ -972,32 +992,27 @@ sub www_addArchiveSave {
     my $session     = $self->session;
     my $form        = $self->session->form;
     my $i18n        = WebGUI::International->new( $session, 'Asset_GalleryAlbum' );
+    my $pb          = WebGUI::ProgressBar->new($session);
     my $properties  = {
         keywords        => $form->get("keywords"),
         friendsOnly     => $form->get("friendsOnly"),
     };
     
+    $pb->start($i18n->get('Uploading archive'), $session->url->extras('adminConsole/assets.gif'));
     my $storageId   = $form->get("archive", "File");
     my $storage     = WebGUI::Storage->get( $session, $storageId );
     if (!$storage) {
-        return $self->www_addArchive({
-            error       => sprintf $i18n->get('addArchive error too big'),
-        });
+        return $pb->finish($self->getUrl('func=addArchive;error='.$i18n->get('addArchive error too big')));
     }
     my $filename    = $storage->getPath( $storage->getFiles->[0] );
 
-    eval { $self->addArchive( $filename, $properties ) };
+    eval { $self->addArchive( $filename, $properties, sub{ $pb->update(sprintf $i18n->get(shift), @_); }); };
+    $storage->delete;
     if ( my $error = $@ ) {
-        return $self->www_addArchive({
-            error       => sprintf( $i18n->get('addArchive error generic'), $error ),
-        });
+        return $pb->finish($self->getUrl('func=addArchive;error='.sprintf $i18n->get('addArchive error generic'), $error ));
     }
 
-    $storage->delete;
-
-    return $self->processStyle(
-        sprintf $i18n->get('addArchive message'), $self->getUrl,
-    );
+    return $pb->finish($self->getUrl);
 }
 
 #----------------------------------------------------------------------------
@@ -1069,7 +1084,7 @@ sub www_addFileService {
 #    my $filePath = $storage->getPath( $storage->getFiles->[0] );
  #   $self->setFile( $filePath );
   #  $storage->delete;
-    $session->log->warn('XX:'. $filename);
+    #$session->log->warn('XX:'. $filename);
     
     $file->requestAutoCommit;
     
@@ -1413,10 +1428,15 @@ sub www_viewRss {
 
     my $var         = $self->getTemplateVars;
     $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
-    
+
     # Fix URLs to be full URLs
     for my $key ( qw( url url_viewRss ) ) {
         $var->{ $key } = $self->session->url->getSiteURL . $var->{ $key };
+    }
+
+    # Encode XML entities
+    for my $key ( qw( title description synopsis gallery_title gallery_menuTitle ) ) {
+        $var->{ $key } = WebGUI::HTML::filter($var->{$key}, 'xml');
     }
 
     # Process the file loop to add additional params
@@ -1424,6 +1444,10 @@ sub www_viewRss {
         # Fix URLs to be full URLs
         for my $key ( qw( url ) ) { 
             $file->{ $key }  = $self->session->url->getSiteURL . $file->{$key}; 
+        }
+        # Encode XML entities
+        for my $key ( qw( title description synopsis ) ) {
+            $file->{ $key } = WebGUI::HTML::filter($file->{$key}, 'xml');
         }
 
         $file->{ rssDate } 

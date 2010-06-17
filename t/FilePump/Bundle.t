@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  54;         # Increment this number for each test you create
+my  $tests =  62;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -88,14 +88,37 @@ is(
     '... okay to add a duplicate to another type'
 );
 
+ok($bundle->addFile('JS', 'http://mysite.com/helloworld.js'), 'added a second http uri');
+
 cmp_deeply(
     [ $bundle->addFile('JS', 'http://mysite.com/script.js') ],
     [ 0, 'Duplicate URI' ],
     '... checking error message for duplicate URI'
 );
 
-$bundle->addFile('JS', 'http://mysite.com/helloworld.js');
-$bundle->addFile('JS', 'file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js');
+cmp_deeply(
+    [ $bundle->addFile('JS', 'file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js') ],
+    [ 0, q{File uri must begin with file:uploads/.. or file:extras/..} ],
+    '... checking error message for file outside of uploads'
+);
+
+cmp_deeply(
+    [ $bundle->addFile('JS', 'file:extras/graviticEnergyDrive.js') ],
+    [ 0, q{File not found} ],
+    '... checking error message for missing file'
+);
+
+cmp_deeply(
+    [ $bundle->addFile('JS', 'file:extras/../../etc/log.conf') ],
+    [ 0, q{Directory traversal not permitted} ],
+    '... checking error message for directory traversal'
+);
+
+cmp_deeply(
+    $bundle->addFile('JS', 'file:extras/hoverhelp.js'),
+    1,
+    'added a valid file uri'
+);
 
 my @fileUris = map { $_->{uri} } @{ $bundle->get('jsFiles') };
 cmp_deeply(
@@ -103,9 +126,22 @@ cmp_deeply(
     [qw{
         http://mysite.com/script.js
         http://mysite.com/helloworld.js
-        file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js
+        file:extras/hoverhelp.js
     }],
     '... checking actual jsFiles data structure contents'
+);
+
+cmp_deeply(
+    $bundle->addFile('OTHER', 'file:extras/adminConsole'),
+    1,
+    'added a valid file folder'
+);
+
+my @fileUris = map { $_->{uri} } @{ $bundle->get('otherFiles') };
+cmp_deeply(
+    [ @fileUris ],
+    [ 'file:extras/adminConsole' ],
+    '... checking actual otherFiles data structure contents'
 );
 
 ###################################################################
@@ -160,7 +196,7 @@ cmp_deeply(
     [qw{
         http://mysite.com/helloworld.js
         http://mysite.com/script.js
-        file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js
+        file:extras/hoverhelp.js
     }],
     '... checking the actual order of js files'
 );
@@ -173,7 +209,7 @@ cmp_deeply(
     [ @fileUris ],
     [qw{
         http://mysite.com/helloworld.js
-        file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js
+        file:extras/hoverhelp.js
         http://mysite.com/script.js
     }],
     '... checking the actual order of js files'
@@ -270,9 +306,11 @@ cmp_deeply(
     'fetchAsset: retrieved a file asset'
 );
 
-my $path = $fileAsset->getStorageLocation->getPath($fileAsset->get('filename'));
-my $urilet = URI->new('file:'.$path);
-
+# Turn fileAsset into file:uploads/path/to/fileAsset (bc file uris must begin with either file:uploads/ or file:extras/)
+my $path = Path::Class::File->new($fileAsset->getStorageLocation->getPath($fileAsset->get('filename')));
+my $uploadsDir = Path::Class::Dir->new($session->config->get('uploadsPath'));
+$path = $path->relative($uploadsDir);
+my $urilet = URI->new('file:uploads/'.$path);
 $guts = $bundle->fetchFile($urilet);
 cmp_deeply(
     $guts,
@@ -284,7 +322,9 @@ cmp_deeply(
     'fetchFile: retrieved a file from the filesystem'
 );
 
-my $uriDir = URI->new('file:'.$storage->getPath);
+my $storageRelPath = 'uploads/' . Path::Class::Dir->new($storage->getPath)->relative($uploadsDir);
+
+my $uriDir = URI->new("file:$storageRelPath");
 $guts = $bundle->fetchDir($uriDir);
 cmp_deeply(
     $guts,
@@ -331,9 +371,11 @@ cmp_deeply(
 
 $bundle->deleteFiles('JS');
 $bundle->deleteFiles('CSS');
+$bundle->deleteFiles('OTHER');
 
 cmp_deeply($bundle->get('jsFiles'),  [], ' deleteFiles deleted all JS URIs');
 cmp_deeply($bundle->get('cssFiles'), [], ' ... deleted all CSS URIs');
+cmp_deeply($bundle->get('otherFiles'), [], ' ... deleted all OTHER URIs');
 
 ###################################################################
 #
@@ -355,8 +397,8 @@ $fileAsset->update({filename => 'pumpfile.css'});
 
 $bundle->addFile('JS',  'asset://filePumpSnippet');
 $bundle->addFile('CSS', 'asset://filePumpFileAsset');
-$bundle->addFile('OTHER', 'file:'.WebGUI::Test->getTestCollateralPath('gooey.jpg'));
-$bundle->addFile('OTHER', 'file:'.$storage->getPath);
+$bundle->addFile('OTHER', 'file:extras/plainblack.gif');
+$bundle->addFile('OTHER', "file:$storageRelPath");
 my ($buildFlag, $error) = $bundle->build();
 ok($buildFlag, 'build returns true when there are no errors');
 diag $error unless $buildFlag;
@@ -368,15 +410,16 @@ ok(-e $buildDir->stringify     &&  -d _, '... new build directory created');
 ok(!-e $oldBuildDir->stringify && !-d _, '... old build directory deleted');
 my $jsFile    = $buildDir->file($bundle->bundleUrl . '.js');
 my $cssFile   = $buildDir->file($bundle->bundleUrl . '.css');
-my $otherFile = $buildDir->file('gooey.jpg');
+my $otherFile = $buildDir->file('plainblack.gif');
 my $otherDir  = $buildDir->subdir($storage->getHexId);
 ok(-e $jsFile->stringify    && -f _ && -s _, '... minified JS file built, not empty');
 ok(-e $cssFile->stringify   && -f _ && -s _, '... minified CSS file built, not empty');
 ok(-e $otherFile->stringify && -f _ && -s _, '... other file copied over, not empty');
 ok(-e $otherDir->stringify  && -d _ ,        '... other directory copied over');
 
+my @sortedChildren = sort { lc $a cmp lc $b } map { $_->basename } $otherDir->children;
 cmp_deeply(
-    [ map { $_->basename } $otherDir->children ],
+    \@sortedChildren,
     [ qw/addendum ShawshankRedemptionMoviePoster.jpg/ ],
     '... File copied over to new directory'
 );

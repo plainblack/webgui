@@ -477,15 +477,13 @@ from working.|,
 	},
 
 	'form.header' => {
-		message => q|If the user is in the group to add projects, then this variable will contain HTML form code
-to make on the fly editing of tasks work.|,
-		lastUpdated => 1149824991,
+		message => q|HTML code to start the form for making on the fly editing of tasks work.  If the user is not in the group to add projects, it will be blank.|,
+		lastUpdated => 1252352849,
 	},
 
 	'form.footer' => {
-		message => q|If the user is in the group to add projects, then this variable will contain HTML form code
-to make on the fly editing of tasks work.|,
-		lastUpdated => 1149824991,
+		message => q|HTML code to end the form for making on the fly editing of tasks work.  If the user is not in the group to add projects, it will be blank.|,
+		lastUpdated => 1252352847,
 	},
 
 	'project.canEdit' => {
@@ -558,7 +556,7 @@ to make on the fly editing of tasks work.|,
 		lastUpdated => 1149824991,
 	},
 
-	'form.start.error' => {
+	'form.end.error' => {
 		message => q|An internationalized error message for not entering an end date.|,
 		lastUpdated => 1149824991,
 	},
@@ -940,8 +938,8 @@ Otherwise, just the duration will be displayed as text.|,
 	},
 
 	'project.endDate.data' => {
-		message => q|The project's starting date in YYYY-MM-DD format.  If no start date has been set, then it will have a short internationalized message.|,
-		lastUpdated => 1168969193,
+		message => q|The project's ending date in YYYY-MM-DD format.  If no end date has been set, then it will have a short internationalized message.|,
+		lastUpdated => 1252361540,
 	},
 
 	'project.cost.data.int' => {
@@ -955,13 +953,13 @@ Otherwise, just the duration will be displayed as text.|,
 	},
 
 	'project.complete.data.int' => {
-		message => q|Pecentage completion for the project, as an integer.|,
-		lastUpdated => 1168969193,
+		message => q|Percentage completion for the project, as an integer.|,
+		lastUpdated => 1252361508,
 	},
 
 	'project.complete.data.float' => {
-		message => q|Pecentage completion for the project, as a floating number with two decimal places of accuracy.|,
-		lastUpdated => 1168969193,
+		message => q|Percentage completion for the project, as a floating number with two decimal places of accuracy.|,
+		lastUpdated => 1252361512,
 	},
 
 	'project.edit.url' => {
@@ -1206,8 +1204,8 @@ Otherwise, just the duration will be displayed as text.|,
 	},
 
 	'form.addUser.text' => {
-		message => q|A unique identifier for the link that creates the add group pop-up.|,
-		lastUpdated => 1169764123,
+		message => q|A unique identifier for the link that creates the add user pop-up.|,
+		lastUpdated => 1252351938,
 	},
 
 	'form.addGroup.id' => {

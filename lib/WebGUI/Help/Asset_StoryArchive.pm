@@ -78,7 +78,7 @@ our $HELP = {
 
 
     'keyword list template' => {
-        title => 'view template',
+        title => 'keyword list template',
         body  => '',
         isa   => [
             {   namespace => "Asset_Template",

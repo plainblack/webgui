@@ -63,6 +63,13 @@ sub _visitorCacheOk {
 }
 
 #-------------------------------------------------------------------
+
+=head2 addChild 
+
+Extend the base method to allow only Threads as children.
+
+=cut
+
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
@@ -76,6 +83,22 @@ sub addChild {
 
 
 #-------------------------------------------------------------------
+
+=head2 appendPostListTemplateVars ($var, $p)
+
+Takes a WebGUI::Paginator object that should be full of Posts, and appends template
+variables to the hash reference.
+
+=head3 $var
+
+A hash reference.  Template variables will be added to it.
+
+=head3 $p
+
+A reference to a WebGUI::Paginator object.
+
+=cut
+
 sub appendPostListTemplateVars {
 	my $self = shift;
 	my $var = shift;
@@ -159,6 +182,17 @@ sub appendPostListTemplateVars {
 }
 
 #-------------------------------------------------------------------
+
+=head2 appendTemplateLabels ($var)
+
+Appends a whole mess of internationalized labels for use in a template.
+
+=head3 $var
+
+A hash reference.  Template labels will be appended to it.
+
+=cut
+
 sub appendTemplateLabels {
 	my $self = shift;
 	my $var = shift;
@@ -237,6 +271,18 @@ sub appendTemplateLabels {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canEdit ( [ $userId ] )
+
+Extends the base method to include adding Threads to this CS.
+
+=head3 $userId
+
+A userId to check for edit permissions. If $userId is false, then it checks
+the current session user.
+
+=cut
+
 sub canEdit {
         my $self    = shift;
         my $userId  = shift     || $self->session->user->userId;
@@ -257,13 +303,38 @@ sub canEdit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canModerate  ( [ $userId ] )
+
+Returns true if the user can edit this Collaboration System.
+
+=head3 $userId
+
+A userId to check for permission. If $userId is false, then it checks
+the current session user.
+
+=cut
+
 sub canModerate {
     my $self    = shift;
     my $userId  = shift     || $self->session->user->userId;
-    return $self->WebGUI::Asset::Wobject::canEdit( $userId );
+    return $self->WebGUI::Asset::canEdit( $userId );
 }
 
 #-------------------------------------------------------------------
+
+=head2 canPost ( [ $userId ] )
+
+Returns true if the user can post to the CS.  Checks that the CS is committed,
+that the user is in the group to post, or that the user can edit this CS.
+
+=head3 $userId
+
+A userId to check for edit permissions. If $userId is false, then it checks
+the current session user.
+
+=cut
+
 sub canPost {
     my $self    = shift;
     my $userId  = shift;
@@ -283,12 +354,25 @@ sub canPost {
     }
     # Users who can edit the collab can post
     else {
-        return $self->WebGUI::Asset::Wobject::canEdit( $userId );
+        return $self->WebGUI::Asset::canEdit( $userId );
     }
 }
 
 
 #-------------------------------------------------------------------
+
+=head2 canSubscribe  ( [ $userId ] )
+
+Returns true if the user can subscribe to the CS.  Checks that the user is registered
+and that they canView the Post.
+
+=head3 $userId
+
+A userId to check for edit permissions. If $userId is false, then it checks
+the current session user.
+
+=cut
+
 sub canSubscribe {
     my $self    = shift;
     my $userId  = shift;
@@ -301,6 +385,19 @@ sub canSubscribe {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canStartThread   ( [ $userId ] )
+
+Returns true if the user can start a thread in the CS.  Checks that the user is in the
+canStartThreadGroup or that they canEdit the CS.
+
+=head3 $userId
+
+A userId to check for edit permissions. If $userId is false, then it checks
+the current session user.
+
+=cut
+
 sub canStartThread {
     my $self    = shift;
     my $userId  = shift;
@@ -311,12 +408,24 @@ sub canStartThread {
                 ;
     return (
         $user->isInGroup($self->get("canStartThreadGroupId")) 
-        || $self->WebGUI::Asset::Wobject::canEdit( $userId )
+        || $self->WebGUI::Asset::canEdit( $userId )
     );
 }
 
 
 #-------------------------------------------------------------------
+
+=head2 canView ( [ $userId ] )
+
+Extends the base method to also allow users who canPost to the CS.
+
+=head3 $userId
+
+A userId to check for edit permissions. If $userId is false, then it checks
+the current session user.
+
+=cut
+
 sub canView {
 	my $self = shift;
         my $userId  = shift     || $self->session->user->userId;
@@ -325,6 +434,15 @@ sub canView {
 }
 
 #-------------------------------------------------------------------
+
+=head2 commit 
+
+Extend the base method to handle making a cron job for fetching mail for the CS.  The
+cron job is created even if the CS does not have email enabled.  The cron is disabled
+in that case.
+
+=cut
+
 sub commit {
     my $self = shift;
     $self->next::method;
@@ -352,6 +470,13 @@ sub commit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 createSubscriptionGroup 
+
+Creates a group to hold users who want to receive posts to this CS by email.
+
+=cut
+
 sub createSubscriptionGroup {
 	my $self = shift;
 	my $group = WebGUI::Group->new($self->session, "new");
@@ -807,6 +932,13 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 duplicate 
+
+Extend the base method to handle making a subscription group for the new CS.
+
+=cut
+
 sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->next::method(@_);
@@ -842,6 +974,13 @@ sub getNewThreadUrl {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getRssFeedItems 
+
+Returns an array ref of Posts for use in making the feeds for this CS.
+
+=cut
+
 sub getRssFeedItems {
 	my $self = shift;
 
@@ -1071,6 +1210,14 @@ sub getUnsubscribeUrl {
 
 
 #-------------------------------------------------------------------
+
+=head2 getViewTemplateVars 
+
+Returns a hash reference full of template variables that are used in
+several CS templates.
+
+=cut
+
 sub getViewTemplateVars {
 	my $self = shift;
 	my %var;
@@ -1198,6 +1345,15 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost 
+
+Extend the base method to handle creating subscription groups, propagating
+group privileges to all descendants and clearing scratch variables for sort key
+and direction.
+
+=cut
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
         my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->get("groupIdView") || $self->session->form->process("groupIdEdit") ne $self->get("groupIdEdit"));
@@ -1219,6 +1375,13 @@ sub processPropertiesFromFormPost {
 
 
 #-------------------------------------------------------------------
+
+=head2 purge 
+
+Extend the base method to delete the subscription group and cron job for emails.
+
+=cut
+
 sub purge {
 	my $self = shift;
 	my $group = WebGUI::Group->new($self->session, $self->get("subscriptionGroupId"));
@@ -1236,7 +1399,7 @@ sub purge {
 
 =head2 purgeCache ( )
 
-See WebGUI::Asset::purgeCache() for details.
+Extend the base method to delete view and visitor caches.
 
 =cut
 
@@ -1378,6 +1541,13 @@ sub unsubscribe {
 
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Render the CS, and handle local caching.
+
+=cut
+
 sub view {
 	my $self = shift;
 	if ($self->_visitorCacheOk) {
@@ -1473,6 +1643,13 @@ sub www_unsubscribe {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_view 
+
+Extend the base method to handle the visitor cache timeout.
+
+=cut
+
 sub www_view {
 	my $self = shift;
 	my $disableCache = ($self->session->form->process("sortBy") ne "");

@@ -477,10 +477,11 @@ sub getRichEditor {
     my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
     my @toolbarButtons = map{ @{$_} } @toolbarRows;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
+    my $ask = $self->getValue("askAboutRichEdit");
 	my %config = (
-		mode => "exact",
+		mode     => $ask ? "none" : "exact",
 		elements => $nameId,
-		theme => "advanced",
+		theme    => "advanced",
 		relative_urls => JSON::false(),
 		remove_script_host => JSON::true(),
 		auto_reset_designmode => JSON::true(),
@@ -489,7 +490,8 @@ sub getRichEditor {
 		theme_advanced_resizing => JSON::true(),
 		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
 		       (0..$#toolbarRows)),
-		ask => $self->getValue("askAboutRichEdit") ? JSON::true() : JSON::false(),
+		#ask => $self->getValue("askAboutRichEdit") ? JSON::true() : JSON::false(),
+		ask => JSON::false(),
 		preformatted => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
 		force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
 		force_p_newlines => $self->getValue("useBr") ? JSON::false() : JSON::true(),
@@ -502,6 +504,9 @@ sub getRichEditor {
 		valid_elements => $self->getValue("validElements"),
 		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
 		);
+#    if ($ask) {
+#        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
+#    }
 	foreach my $button (@toolbarButtons) {
 		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
             push(@plugins,"-wgspellchecker");
@@ -567,14 +572,36 @@ sub getRichEditor {
 	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
 	$config{plugins} = join(",",@plugins);
 
-    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
-    my $out = "<script type=\"text/javascript\">\n";
+    my $out = '';
+    if ($ask) {
+        $out = q|<a style="display: block;" href="javascript:toggleEditor('|.$nameId.q|')">|.$i18n->get('Toggle editor').q|</a>|;
+    }
+    $out .= qq|<script type="text/javascript">\n|;
+    if ($ask) {
+        $out .= <<"EOHTML1";
+function toggleEditor(id) {
+    if (!tinyMCE.get(id))
+        tinyMCE.execCommand('mceAddControl', false, id);
+    else
+        tinyMCE.execCommand('mceRemoveControl', false, id);
+}
+EOHTML1
+#function turnOffTinyMCE_$nameId () {
+#    if (tinyMCE.get('$nameId')) {
+#        tinyMCE.execCommand( 'mceRemoveControl', false, '$nameId');
+#    }
+#}
+#YAHOO.util.Event.onDOMReady(turnOffTinyMCE_$nameId);
+    }
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
     }
-    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " )\n"
-            . "</script>";
+    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " );\n";
+    $out    .= "</script>";
 }
 
 

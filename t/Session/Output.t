@@ -17,7 +17,7 @@ use WebGUI::Session;
 
 use Test::More; # increment this value for each test you create
 
-my $skip_tests = 7;
+my $skip_tests = 8;
 my $num_tests = 1 + $skip_tests;
 
 plan tests => $num_tests;
@@ -56,6 +56,11 @@ SKIP: {
 	$output->print('^#;', 1);
 	like($request->get_output, qr/\^#;\Z/, 'print: macro processing skipped');
 
+    $session->http->setMimeType('application/json');
+	$output->print('^#;');
+	like($request->get_output, qr/\^#;\Z/, 'print: macro processing skipped');
+
+    $session->http->setMimeType('');
 	$output->setHandle($otherHandle);
 	$output->print('New content');
 	is($otherHandleBuffer, 'New content', 'print: set to explicit handle');

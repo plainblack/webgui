@@ -68,17 +68,23 @@ STOP
 }
 
 if ($shutdown) {
-	my $remote = create_ikc_client(
-	        port=>$config->get("port"),
-	        ip=>$config->get("ip"),
-	        name=>rand(100000),
-        	timeout=>10
-        	);
-	die $POE::Component::IKC::ClientLite::error unless $remote;
-	my $result = $remote->post('admin/shutdown');
-	die $POE::Component::IKC::ClientLite::error unless defined $result;
-	$remote->disconnect;
-	undef $remote;
+    local $/;
+    my $pidFileName = $config->get('pidFile');
+    if (! $pidFileName) {
+        warn "No pidFile specified in spectre.conf;  please add one.  Trying /var/run/spectre.pid instead.\n";
+        $pidFileName = '/var/run/spectre.pid';
+    }
+    open my $pidFile, '<', $pidFileName or
+        die "Unable to open pidFile ($pidFileName) for reading: $!\n";
+    my $spectrePid = <$pidFile>;
+    close $pidFile or
+        die "Unable to close pidFile ($pidFileName) after reading: $!\n";
+    chomp $spectrePid;
+    kill 15, $spectrePid;
+    sleep 1;
+    kill 9, $spectrePid;
+    unlink $pidFileName or
+        die "Unable to remove PID file\n";
 }
 elsif ($ping) {
 	my $res = ping();
@@ -95,18 +101,32 @@ elsif ($run) {
 	Spectre::Admin->new($config, $debug);
 }
 elsif ($daemon) {
+    my $pidFileName = $config->get('pidFile');
+    ##Write the PID file
+    if (! $pidFileName) {
+        warn "No pidFile specified in spectre.conf;  please add one.  Trying /var/run/spectre.pid instead.\n";
+        $pidFileName = '/var/run/spectre.pid';
+    }
     if (!ping()) {
         die "Spectre is already running.\n";
+    }
+    elsif (-e $pidFileName){
+        die "pidFile $pidFileName already exists\n";
     }
     #fork and exit(sleep(1) and print((ping())?"Spectre failed to start!\n":"Spectre started successfully!\n"));  #Can't have right now.
     require POSIX;
     fork and exit;
     POSIX::setsid();
+    open my $pidFile, '>', $pidFileName or
+        die "Unable to open pidFile ($pidFileName) for writing: $!\n";
     chdir "/";
     open STDIN, "+>", File::Spec->devnull;
     open STDOUT, "+>&STDIN";
     open STDERR, "+>&STDIN";
     fork and exit;
+    print $pidFile $$."\n";
+    close $pidFile or
+        die "Unable to close pidFile ($pidFileName) after writing: $!\n";
     Spectre::Admin->new($config, $debug);
 }
 

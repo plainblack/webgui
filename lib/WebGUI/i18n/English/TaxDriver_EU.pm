@@ -51,20 +51,20 @@ our $I18N = {
     },
 
     'auto vies approval help' => {
-        message => q|If you set this to yes, VAT numbers that are validated through the VIES service are directly usable by your customers. If set to no, only VAT numbers that have been expicitly approved by you are usable.|,
-        lastUpdated => 0,
+        message => q|If you set this to yes, VAT numbers that are validated through the VIES service are directly usable by your customers. If set to no, only VAT numbers that have been explicitly approved by you are usable.|,
+        lastUpdated => 1250796443,
         context => 'Hover help in the admin screen',
     },
 
     'accept when vies unavailable' => {
-        message => q|Accept unvalidated VAT numbers when VIES is unavailable?|,
-        lastUpdated => 0,
+        message => q|Accept non-validated VAT numbers when VIES is unavailable?|,
+        lastUpdated => 1250796458,
         context => 'Form label in admin screen',
     },
 
     'accept when vies unavailable help' => {
-        message => q|If one of the VIES member states' databases is temporarily unavailable or the connection to VIES failed VAT numbers cannot be checked through this service. Normally this is a temporray problem. If you set this option to yes VAT numbers that could not be checked because of such an event are usable anyway. Note that the format of VAT numbers is always checked, regardless of the availability of VIES.|,
-        lastUpdated => 0,
+        message => q|If one of the VIES member states' databases is temporarily unavailable or the connection to VIES failed VAT numbers cannot be checked through this service. Normally this is a temporary problem. If you set this option to yes VAT numbers that could not be checked because of such an event are usable anyway. Note that the format of VAT numbers is always checked, regardless of the availability of VIES.|,
+        lastUpdated => 1248190913,
         context => 'Hover help in the admin screen',
     },
 

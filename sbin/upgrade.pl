@@ -200,16 +200,20 @@ print "\nREADY TO BEGIN UPGRADES\n" unless ($quiet);
 my $notRun = 1;
 
 
-my $currentPath = Cwd::getcwd();
+my $currentPath  = Cwd::getcwd();
+my $totalConfigs = scalar keys %config;
+my $configCounter = 0;
 foreach my $filename (keys %config) {
     chdir($upgradesPath);
 	my $clicmd = $config{$filename}{mysqlCLI} || $mysql;
 	my $dumpcmd = $config{$filename}{mysqlDump} || $mysqldump;
 	my $backupTo = $config{$filename}{backupPath} || $backupDir;
 	mkdir($backupTo);
+    ++$configCounter;
 	while ($upgrade{$config{$filename}{version}}{sql} ne "" || $upgrade{$config{$filename}{version}}{pl} ne "") {
 		my $upgrade = $upgrade{$config{$filename}{version}}{from};
 		print "\n".$config{$filename}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
+        print "Processing $configCounter out of $totalConfigs configs\n" unless ($quiet);
 		unless ($skipBackup) {
 			print "\tBacking up $config{$filename}{db} ($upgrade{$upgrade}{from})..." unless ($quiet);
 			my $cmd = qq!$dumpcmd -u"$config{$filename}{dbuser}" -p"$config{$filename}{dbpass}"!;

@@ -1,32 +1,30 @@
 package WebGUI::Shop::PayDriver::PayPal::PayPalStd;
 
 =head1 LEGAL
- -------------------------------------------------------------------
- PayPal Standard payment driver for WebGUI.
- Copyright (C) 2009  Invicta Services, LLC.
- -------------------------------------------------------------------
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- as published by the Free Software Foundation; either version 2
- of the License, or (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
  -------------------------------------------------------------------
 
 =cut
 
 use strict;
-use LWP::UserAgent;
-use Crypt::SSLeay;
+use warnings;
 
 use base qw/WebGUI::Shop::PayDriver::PayPal/;
+
+use URI;
+use URI::Escape;
+use LWP::UserAgent;
+use Readonly;
+
+Readonly my $I18N => 'PayDriver_PayPalStd'; 
 
 =head1 NAME
 
@@ -36,6 +34,11 @@ PayPal Website payments standard
 
 A PayPal Website payments standard handler for WebGUI. Provides an interface to PayPal with cart contents
 and transaction information on return.
+
+=head2 IMPORTANT NOTE
+
+In order to use this module, Auto Return and PDT must be enabled in your
+paypal seller account.  If they are not, everything will break!
 
 =head1 SYNOPSIS
 
@@ -56,27 +59,7 @@ Tells the commerce system that this payment plugin can handle recurring payments
 
 =cut
 
-sub handlesRecurring {
-    return 0;
-}
-
-#-------------------------------------------------------------------
-
-=head2 canCheckOutCart ( )
-
-Returns whether the cart can be checked out by this plugin.
-
-=cut
-
-sub canCheckoutCart {
-    my $self = shift;
-    my $cart = $self->getCart;
-
-    return 0 unless $cart->readyForCheckout;
-    return 0 if $cart->requiresRecurringPayment;
-
-    return 1;
-}
+sub handlesRecurring { 0 }
 
 #-------------------------------------------------------------------
 
@@ -90,7 +73,7 @@ sub definition {
         unless ref $session eq 'WebGUI::Session';
     my $definition = shift;
 
-    my $i18n = WebGUI::International->new( $session, 'PayDriver_PayPalStd' );
+    my $i18n = WebGUI::International->new( $session, $I18N );
 
     tie my %fields, 'Tie::IxHash';
     %fields = (
@@ -103,6 +86,11 @@ sub definition {
             fieldType => 'textarea',
             label     => $i18n->get('signature'),
             hoverHelp => $i18n->get('signature help'),
+        },
+        identityToken => {
+            fieldType => 'text',
+            label     => $i18n->get('identity token'),
+            hoverHelp => $i18n->get('identity token help'),
         },
         currency => {
             fieldType    => 'selectBox',
@@ -117,16 +105,23 @@ sub definition {
             hoverHelp    => $i18n->get('use sandbox help'),
             defaultValue => 1,
         },
+        sandboxUrl => {
+            fieldType    => 'text',
+            label        => $i18n->get('sandbox url'),
+            hoverHelp    => $i18n->get('sandbox url help'),
+            defaultValue => 'https://www.sandbox.paypal.com/cgi-bin/webscr',
+        },
+        liveUrl => {
+            fieldType    => 'text',
+            label        => $i18n->get('live url'),
+            hoverHelp    => $i18n->get('live url help'),
+            defaultValue => 'https://www.paypal.com/cgi-bin/webscr',
+        },
         buttonImage => {
             fieldType    => 'text',
             label        => $i18n->get('button image'),
             hoverHelp    => $i18n->get('button image help'),
             defaultValue => '',
-        },
-        emailMessage => {
-            fieldType => 'textarea',
-            label     => $i18n->get('emailMessage'),
-            hoverHelp => $i18n->get('emailMessage help'),
         },
     );
 
@@ -140,307 +135,198 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getButton 
+
+Extends the base class to add a user configurable button image.
+
+=cut
+
 sub getButton {
     my $self    = shift;
     my $session = $self->session;
+    
+    my $header = WebGUI::Form::formHeader(
+        $session, {
+            action => $self->payPalUrl, 
+            method => 'POST',
+        }
+    );
+
+    # All the API stuff is done in paymentVariables; we'll just turn it into
+    # hidden form fields here
+    my $v      = $self->paymentVariables;
+    my $fields = join "\n", map {
+        WebGUI::Form::hidden( $session, { name => $_, value => $v->{$_} } )
+    } (keys %$v);
+
+    # Customized buttons are allowed; If they didn't give us one, we'll just
+    # do a submit button with i18n'd paypal text.  If they did, we'll use an
+    # image submit.
+    my $button;
     my $i18n    = WebGUI::International->new( $session, 'PayDriver_PayPalStd' );
-
-    my $payForm = WebGUI::Form::formHeader($session) . $self->getDoFormTags('pay');
-
+    my $text = $i18n->get('PayPal');
     if ( $self->get('buttonImage') ) {
-        my $button = $self->get('buttonImage');
-        WebGUI::Macro::process( $session, \$button );
-        $payForm
-            .= '<input type="image" src="' 
-            . $button
-            . '" border="0" name="submit" alt="'
-            . $i18n->get('PayPal') . '"> ';
+        my $raw = $self->get('buttonImage');
+        WebGUI::Macro::process( $session, \$raw );
+        $button = qq{
+            <input type='image' 
+                   src='$raw' 
+                   border='0' 
+                   name='submit'
+                   alt='$text'>
+        };
     }
     else {
-        $payForm .= WebGUI::Form::submit( $session, { value => $i18n->get('PayPal') } );
+        $button = WebGUI::Form::submit( $session, { value => $text } );
     }
 
-    $payForm .= WebGUI::Form::formFooter($session);
-
-    return $payForm;
+    my $footer = WebGUI::Form::formFooter($session);
+    return join "\n", $header, $fields, $button, $footer;
 }
 
 #-------------------------------------------------------------------
 
-=head2 processTransaction ( [ paymentAddress ] )
+=head2 paymentVariables
 
-This method is responsible for handling success or failure from the payment processor, completing or denying the transaction, and sending out notification and receipt emails. Returns a WebGUI::Shop::Transaction object.
-This method is overridden from the parent class to allow asynchronous completion / denial of PayPal payments.
-
-=head3 paymentAddress
-
-A reference to a WebGUI::Shop::Address object that should be attached as payment information. Not required.
+Returns a hashref of the payment variables to be used as hidden form fields
+when clicking the getButton button.
 
 =cut
 
-sub processTransaction {
-    my ( $self, $paymentAddress ) = @_;
-
+sub paymentVariables {
+    my $self = shift;
+    my $url  = $self->session->url;
+    my $base = $url->getSiteURL . $url->page;
     my $cart = $self->getCart;
 
-    # Setup tranasction properties
-    my $transactionProperties;
-    $transactionProperties->{paymentMethod}  = $self;
-    $transactionProperties->{cart}           = $cart;
-    $transactionProperties->{paymentAddress} = $paymentAddress if defined $paymentAddress;
-    $transactionProperties->{isRecurring}    = $cart->requiresRecurringPayment;
-
-    # Create a transaction...
-    my $transaction = WebGUI::Shop::Transaction->create( $self->session, $transactionProperties );
-
-    # And handle the payment for it
-    my $session = $self->session;
-    my $config  = $session->config;
-
-    my $f = WebGUI::HTMLForm->new(
-        $session,
-        action => ( $self->get('useSandbox') ? $self->getPayPalSandboxUrl() : $self->getPayPalUrl() ),
-        extras => 'name="paypal_form"'
+    my $return = URI->new($base);
+    $return->query_form( {
+            shop             => 'pay',
+            method           => 'do',
+            do               => 'completeTransaction',
+            paymentGatewayId => $self->getId,
+        }
     );
 
-    $f->hidden( name => 'business',  value => $self->get('vendorId') );
-    $f->hidden( name => 'cmd',       value => '_cart' );
-    $f->hidden( name => 'site_url',  value => $session->setting->get("companyURL") );
-    $f->hidden( name => 'image_url', value => '' );
-    $f->hidden(
-        name => 'return',
-        value =>
-            $session->url->page( "shop=pay;method=do;do=completeTransaction;paymentGatewayId=" . $self->getId, 1 )
-    );    ## PayPal says OK for now
-    $f->hidden(
-        name => 'cancel_return',
-        value =>
-            $session->url->page( "shop=pay;method=do;do=cancelTransaction;paymentGatewayId=" . $self->getId, 1 )
-    );    ## Error / user cancel
+    my $cancel = URI->new($base);
+    $cancel->query_form({ shop => 'cart' });
 
-# $f->hidden(name=>'notify_url', value=>$session->url->page("shop=pay;method=do;do=IPNnotifyTransaction;paymentGatewayId=".$self->getId, 1));
-    $f->hidden( name => 'notify_url', value => '' );     ##no IPN for now, get OK from PDT auto-return
-    $f->hidden( name => 'rm',         value => '2' );    ## use POST
-    $f->hidden( name => 'currency_code', value => $self->get('currency') );
-    $f->hidden( name => 'lc',            value => 'US' );
-    $f->hidden( name => 'bn',            value => 'toolkit-perl' );
-    $f->hidden( name => 'cbt',           value => 'Continue >>' );
+    my %params = (
+        cmd           => '_cart',
+        upload        => 1,
+        business      => $self->get('vendorId'),
+        currency_code => $self->get('currency'),
+        no_shipping   => 1,
 
-    # <!-- Payment Page Information -->
-    $f->hidden( name => 'no_shipping', value => '1' );          # do not display shipping addr
-    $f->hidden( name => 'no_note',     value => '0' );
-    $f->hidden( name => 'cn',          value => 'Comments' );
-    $f->hidden( name => 'cs',          value => '' );
+        return        => $return->as_string,
+        cancel_return => $cancel->as_string,
 
-    # <!-- Cart Information -->
-    # does not get used for uploaded carts
-    $f->hidden( name => 'item_name', value => 'WebGUI cart' );
-    $f->hidden(
-        name  => 'amount',
-        value => $transaction->get('amount') - $transaction->get('taxes') - $transaction->get('shippingPrice')
+        shipping             => $cart->calculateShipping,
+        tax_cart             => $cart->calculateTaxes,
+        discount_amount_cart => -($cart->calculateShopCreditDeduction),
+
+        # When we verify that we have a valid transaction ID later on in
+        # processPayment, we'll make sure it's the cart we think it is.
+        custom => $cart->getId,
     );
-
-    # <!-- Product Information for each item in our cart -->
-    $f->hidden( name => 'upload', value => '1' );
-    my $itemList = $transaction->getItems;
-    my $itemNum  = 0;
-    foreach my $item ( @{$itemList} ) {
-
-        # items numbered 1++
-        $itemNum++;
-
-        # glue item number to WebGUI itemId
-        $f->hidden( name => 'item_number_' . $itemNum, value => $item->get('itemId') );
-        $f->hidden( name => 'item_name_' . $itemNum,   value => $item->get('configuredTitle') );
-        $f->hidden( name => 'quantity_' . $itemNum,    value => $item->get('quantity') );
-        $f->hidden( name => 'amount_' . $itemNum,      value => $item->get('price') );
+    
+    my $counter = 0;
+    foreach my $item (@{ $cart->getItems}) {
+        my $n = ++$counter;
+        $params{"amount_$n"}      = $item->getSku->getPrice;
+        $params{"quantity_$n"}    = $item->get('quantity');
+        $params{"item_name_$n"}   = $item->get('configuredTitle');
+        $params{"item_number_$n"} = $item->get('itemId');
     }
 
-    # <!-- Shipping and Misc Information -->
-    $f->hidden( name => 'shipping',      value => $transaction->get('shippingPrice') );
-    $f->hidden( name => 'shipping2',     value => '' );                                   # no individual shipping
-    $f->hidden( name => 'handling_cart', value => '0.00' );                               # no separate handling
-    $f->hidden( name => 'tax_cart',      value => $transaction->get('taxes') );           # no separate taxes
-    $f->hidden( name => 'custom',        value => '' );
-    $f->hidden( name => 'invoice',       value => $transaction->getId )
-        ;    # need to identify OUR TX so we can update it later
-
-    # <!-- Customer Information -->
-    $f->hidden( name => 'address_override', value => 1 );
-
-    $f->hidden(
-        name  => 'first_name',
-        value => substr(
-            $transaction->get('shippingAddressName'), 0,
-            rindex( $transaction->get('shippingAddressName'), ' ' )
-        )
-    );
-    $f->hidden(
-        name  => 'last_name',
-        value => substr(
-            $transaction->get('shippingAddressName'),
-            rindex( $transaction->get('shippingAddressName'), ' ' ) + 1
-        )
-    );
-
-    $f->hidden( name => 'address1', value => $transaction->get('shippingAddress1') );
-    $f->hidden( name => 'address2', value => $transaction->get('shippingAddress2') );
-    $f->hidden( name => 'city',     value => $transaction->get('shippingCity') );
-    $f->hidden( name => 'state',    value => $transaction->get('shippingState') );
-    $f->hidden( name => 'zip',      value => $transaction->get('shippingCode') );
-    $f->hidden( name => 'country',  value => $self->getPaypalCountry( $transaction->get('shippingCountry') ) );
-
-    if ( $session->user->profileField('email') ) {
-        $f->hidden( name => 'email', value => $session->user->profileField('email') );
-    }
-    $f->hidden( name => 'night_phone_a', value => $transaction->get('shippingPhoneNumber') );
-    $f->hidden( name => 'night_phone_b', value => '' );
-    $f->hidden( name => 'night_phone_c', value => '' );
-
-    return
-          $f->print
-        . '<center><font face="Verdana, Arial, Helvetica, sans-serif" size="2">Processing Transaction . . . </font></center>'
-        . '<script>document.paypal_form.submit();</script>';
-
-}
-
-#-------------------------------------------------------------------
-sub www_cancelTransaction {
-    my $self    = shift;
-    my $session = $self->session;
-
-    my %pdt;
-    my $retstr = '';
-    foreach my $input_name ( $self->session->request->param ) {
-        $pdt{$input_name} = $self->session->request->param($input_name);
-        $retstr .= $input_name . ":" . $self->session->request->param($input_name) . "<br />";
-    }
-
-    my $transaction = eval { WebGUI::Shop::Transaction->newByGatewayId( $session, $pdt{invoice}, $self->getId ) };
-
-    # First check whether the original transaction actualy exists
-    if ( WebGUI::Error->caught || !( defined $transaction ) ) {
-        $session->errorHandler->warn("PayPal Standard: No transaction ID: $pdt{invoice}");
-        return;
-    }
-    $transaction->denyPurchase( $pdt{invoice}, 0, $pdt{payment_status} );
-    return $self->displayPaymentError($transaction);
-}
-
-#-------------------------------------------------------------------
-sub www_completeTransaction {
-    my $self    = shift;
-    my $session = $self->session;
-
-    my $paypal_url;
-
-    my %paypal;    ## return variables from PDT
-
-## find TX key from PayPal PDT
-    my $tx = $self->session->form->get("tx");
-
-    if ($tx) {
-
-        # found a tx, re-present it for all the TX details
-        $paypal_url = $self->get('useSandbox') ? $self->getPayPalSandboxUrl() : $self->getPayPalUrl();
-
-        my $query      = join( "&", "cmd=_notify-synch", "tx=" . $tx, "at=" . $self->get('signature') );
-        my $user_agent = new LWP::UserAgent;
-        my $request    = new HTTP::Request( "POST", $paypal_url );
-
-        $request->content_type("application/x-www-form-urlencoded");
-        $request->content($query);
-
-        # Make the request
-        my $result = $user_agent->request($request);
-
-        if ( $result->is_error ) {
-            $session->errorHandler->warn("PayPal Standard: PayPal server seems offline.");
-            return;
-        }
-
-        # Decode the response into individual lines and unescape any HTML escapes
-        my @response = split( "\n", $self->session->url->unescape( $result->content ) );
-
-        # The status is always the first line of the response.
-        my $status = shift @response;
-
-        foreach my $response_line (@response) {
-            my ( $key, $value ) = split "=", $response_line;
-            $paypal{$key} = $value;
-        }
-
-        my $transaction = eval { WebGUI::Shop::Transaction->new( $session, $paypal{invoice} ) };
-
-        # First check whether the original transaction actualy exists
-        if ( WebGUI::Error->caught || !( defined $transaction ) ) {
-            $session->errorHandler->warn(
-                "PayPal Standard: No WebGUI transaction ID: $paypal{invoice}," . $self->getId );
-            return;
-        }
-
-        if ( $status eq "SUCCESS" ) {
-            $transaction->completePurchase( $paypal{invoice}, 1, $paypal{payment_status} );
-            my $cart = $self->getCart;
-            $cart->onCompletePurchase;
-            $self->sendNotifications($transaction);
-        }
-        elsif ( $status eq "FAIL" ) {
-            $transaction->denyPurchase( $paypal{invoice}, 0, $paypal{payment_status} );
-        }
-
-        if ( $transaction->get('isSuccessful') ) {
-            return $transaction->thankYou();
-        }
-        else {
-            return $self->displayPaymentError($transaction);
-        }
-    }
-    else {    ## no tx from paypal
-        $session->errorHandler->warn("PayPal Standard: No transaction ID");
-    }
+    return \%params;
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_edit ( )
+=head2 payPalUrl
 
-Generates an edit form.
+Returns the url of the paypal gateway, taking into account useSandbox.
 
 =cut
 
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    my $admin   = WebGUI::Shop::Admin->new($session);
-    my $i18n    = WebGUI::International->new( $session, 'PayDriver_PayPalStd' );
-
-    return $session->privilege->insufficient() unless $admin->canManage;
-
-    my $form = $self->getEditForm;
-
-    $form->submit;
-
-    # adds instructions for IPN etc.
-    my $output = '<br />';
-    $output
-        .= $i18n->get('extra info')
-        . '<br /><br />'
-        . '<b>https://'
-        . $session->config->get("sitename")->[0]
-        . '/?shop=pay;method=do;do=completeTransaction;paymentGatewayId='
-        . $self->getId . '</b>';
-
-    return $admin->getAdminConsole->render( $form->print . $output, $i18n->get( 'payment methods', 'PayDriver' ) );
+sub payPalUrl {
+    my $self  = shift;
+    my $field = $self->get('useSandbox') ? 'sandboxUrl' : 'liveUrl';
+    return $self->get($field);
 }
 
 #-------------------------------------------------------------------
-sub www_pay {
-    my $self    = shift;
+
+=head2 processPayment ( transaction )
+
+Implements the interface defined in WebGUI::Shop::PayDriver.  Notably, in case
+of an error, the error is rendered as an html table of the params that paypal
+passed to us.
+
+=cut
+
+sub processPayment {
+    my ( $self, $transaction ) = @_;
     my $session = $self->session;
 
-    # Payment time!
-    return $self->processTransaction();
+    # To prevent a spoofed post to this url, we'll get the info from paypal
+    # instead of relying on what was passed to us.
+    my $tx = $session->form->process('tx');
+
+    my %form = (
+        cmd => '_notify-synch',
+        tx  => $tx,
+        at  => $self->get('identityToken'),
+    );
+    my $response = LWP::UserAgent->new->post($self->payPalUrl, \%form);
+    my ($status, @lines) = split("\n", uri_unescape($response->content));
+    my %params = map { split /=/ } @lines;
+
+    if ($status =~ /FAIL/) {
+        my $message = '<table><tr><th>Field</th><th>Value</th></tr>';
+        foreach my $key ( keys %params ) {
+            $message .= "<tr><td>$key</td><td>$params{$key}</td></tr>";
+        }
+        $message .= '</table>';
+        return ( 0, $tx, $status, $message );
+    }
+
+    # Make sure the transaction is for this cart to prevent spoofing
+    my $cartId = $self->getCart->getId;
+    if ($params{custom} ne $cartId) {
+        my $user = $session->user;
+        my $name = $user->username;
+        my $id   = $user->userId;
+        $session->log->warn("SECURITY WARNING: $name (id: $id) tried to " .
+            "checkout cart $cartId with PayPal transaction $tx, which " .
+            "did not match the cart we passed ($params{custom})");
+
+        my $i18n = WebGUI::International->new( $session, $I18N );
+        return ( 0, $tx, 'FAIL', $i18n->get('cart transaction mismatch') );
+    }
+
+    $status = $params{payment_status};
+    return ( 1, $tx, $status, $status, $status );
+} ## end sub processPayment
+
+#-------------------------------------------------------------------
+
+=head2 www_completeTransaction 
+
+Where paypal comes back to when a transaction has been completed.
+
+=cut
+
+sub www_completeTransaction {
+    my $self = shift;
+
+    my $transaction = $self->processTransaction;
+
+    return $transaction->get('isSuccessful')
+        ? $transaction->thankYou
+        : $self->displayPaymentError($transaction);
 }
 
 1;

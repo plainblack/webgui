@@ -28,6 +28,21 @@ use Spectre::Workflow;
 
 #-------------------------------------------------------------------
 
+=head2 _safe_shutdown ( )
+
+Stops the kernel when TERM signal is received
+
+=cut
+
+sub _safe_shutdown {
+    my ($obj) = $_[ OBJECT ];
+    $obj->error('Spectre shut down');
+    POE::Kernel->stop;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 _start ( )
 
 Initializes the admin interface.
@@ -41,22 +56,9 @@ sub _start {
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
 	$kernel->delay_set("loadSiteData",3);
+    $kernel->sig( TERM => '_safe_shutdown' );
 }
 
-#-------------------------------------------------------------------
-
-=head2 _stop ( )
-
-Gracefully shuts down the admin interface.
-
-=cut
-
-sub _stop {
-	my ($kernel, $self) = @_[KERNEL, OBJECT];
-	$self->debug("Stopping Spectre administrative manager.");
-	undef $self;
-	$kernel->stop;
-}
 
 #-------------------------------------------------------------------
 
@@ -204,8 +206,8 @@ sub new {
        	 	name => 'Spectre'
         	);
 	POE::Session->create(
-		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop", "ping"=>"ping", "loadSiteData"=>"loadSiteData"} ],
-		args=>[["shutdown","ping"]]
+		object_states => [ $self => {_start=>"_start", "ping"=>"ping", "loadSiteData"=>"loadSiteData", "_safe_shutdown" => "_safe_shutdown"} ],
+		args=>[["ping"]]
         	);
 	Spectre::Workflow->new($config, $logger, $debug);
 	Spectre::Cron->new($config, $logger, $debug);

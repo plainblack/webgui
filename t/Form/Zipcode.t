@@ -55,7 +55,7 @@ my $testBlock = [
 	{
 		key => 'Zip5',
 		testValue => 'abcde',
-		expected  => undef,
+		expected  => 'ABCDE',
 		comment   => 'lower case',
 	},
 ];
@@ -84,11 +84,11 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is(scalar @forms, 1, '1 form was parsed');
 
 my @inputs = $forms[0]->inputs;
-is(scalar @inputs, 1, 'The form has 1 input');
+is(scalar @inputs, 2, 'The form has 2 inputs');
 
 #Basic tests
 
-my $input = $inputs[0];
+my $input = $inputs[1];
 is($input->name, 'TestZip', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, '97123-ORST', 'Checking default value');
@@ -107,7 +107,7 @@ $html = join "\n",
 
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 @inputs = $forms[0]->inputs;
-$input = $inputs[0];
+$input = $inputs[1];
 is($input->name, 'TestZip2', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, '97229-MXIM', 'Checking default value');
@@ -124,13 +124,13 @@ is($cntl->getValue('ABCDE'), 'ABCDE', 'alpha');
 is($cntl->getValue('02468'), '02468', 'numeric');
 is($cntl->getValue('NO WHERE'), 'NO WHERE', 'alpha space');
 is($cntl->getValue('-'), '-', 'bare dash');
-is($cntl->getValue('abcde'), undef, 'lower case');
+is($cntl->getValue('abcde'), 'ABCDE', 'lower case is uppercased');
 
 is($session->form->zipcode(undef,'ABCDE'), 'ABCDE', 'alpha');
 is($session->form->zipcode(undef,'02468'), '02468', 'numeric');
 is($session->form->zipcode(undef,'NO WHERE'), 'NO WHERE', 'alpha space');
 is($session->form->zipcode(undef,'-'), '-', 'bare dash');
-is($session->form->zipcode(undef,'abcde'), undef, 'lower case');
+is($session->form->zipcode(undef,'abcde'), 'ABCDE', 'lower case uppercased');
 
 
 __END__

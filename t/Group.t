@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (148 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (152 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -674,6 +674,17 @@ SKIP: {
 # getUserList
 #
 ################################################################
+
+################################################################
+#
+# vitalGroup
+#
+################################################################
+
+ok(  WebGUI::Group->vitalGroup(7), 'vitalGroup: 7');
+ok(  WebGUI::Group->vitalGroup(3), '... 3');
+ok(  WebGUI::Group->vitalGroup('pbgroup000000000000015'), '... pbgroup000000000000015');
+ok(! WebGUI::Group->vitalGroup('27'), '... 27 is not vital');
 
 END {
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');

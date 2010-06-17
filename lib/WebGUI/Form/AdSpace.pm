@@ -15,9 +15,8 @@ package WebGUI::Form::AdSpace;
 =cut
 
 use strict;
-use base 'WebGUI::Form::SelectList';
+use base 'WebGUI::Form::SelectBox';
 use WebGUI::International;
-use WebGUI::SQL;
 
 =head1 NAME
 

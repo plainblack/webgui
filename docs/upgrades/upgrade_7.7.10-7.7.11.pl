@@ -127,7 +127,14 @@ sub addPackage {
     $storage->addFileFromFilesystem( $file );
 
     # Import the package into the import node
-    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+    my $package = eval { WebGUI::Asset->getImportNode($session)->importPackage( $storage, { overwriteLatest => 1 } ); };
+
+    if ($package eq 'corrupt') {
+        die "Corrupt package found in $file.  Stopping upgrade.\n";
+    }
+    if ($@ || !defined $package) {
+        die "Error during package import on $file: $@\nStopping upgrade\n.";
+    }
 
     # Turn off the package flag, and set the default flag for templates added
     my $assetIds = $package->getLineage( ['self','descendants'] );
@@ -144,7 +151,7 @@ sub addPackage {
         $asset->update( $properties );
     }
 
-    return;
+    return 1;
 }
 
 #-------------------------------------------------

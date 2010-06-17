@@ -39,7 +39,7 @@ plan tests => 1 + $tests;
 
 my $e;
 
-diag('Testing existence');
+note('Testing existence');
 my $loaded = use_ok('WebGUI::Shop::PayDriver::Ogone');
 
 SKIP: {
@@ -52,7 +52,7 @@ skip 'Unable to load module WebGUI::Shop::PayDriver::Ogone', $tests unless $load
 #
 #######################################################################
 
-diag('Testing definition');
+note('Testing definition');
 my $definition;
 
 eval { $definition = WebGUI::Shop::PayDriver::Ogone->definition(); };
@@ -326,7 +326,7 @@ cmp_deeply  (
     'getName requires a session object passed to it',
 );
 
-is          (WebGUI::Shop::PayDriver->getName($session), 'Payment Driver', 'getName returns the human readable name of this driver');
+is (WebGUI::Shop::PayDriver::Ogone->getName($session), 'Ogone', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
@@ -372,7 +372,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 19, 'getEditForm: the form has 19 controls');
+is          (scalar @inputs, 20, 'getEditForm: the form has 20 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -384,6 +384,10 @@ foreach my $input (@inputs) {
 cmp_deeply(
     \@interestingFeatures,
     [
+        {
+            name    => 'webguiCsrfToken',
+            type    => 'hidden',
+        },
         {
             name    => undef,
             type    => 'submit',
@@ -555,6 +559,14 @@ cmp_deeply(
 #
 #######################################################################
 
+my $newOptions = {
+    label           => 'Yet another label',
+    enabled         => 1,
+    group           => 4,
+    receiptMessage  => 'Dropjes!',
+};
+
+$driver->update($newOptions);
 $session->user({userId => 3});
 ok($driver->canUse, 'canUse: session->user is used if no argument is passed');
 ok(!$driver->canUse({userId => 1}), 'canUse: userId explicit works, visitor cannot use this driver');

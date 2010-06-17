@@ -257,7 +257,7 @@ sub getFormattedComments {
 		if ($canEdit) {
 			$out .= q{ <a href="}.$self->getUrl("func=deleteComment;commentId=".$comment->{id}).q{">[X]</a> };
 		}
-		$out .= q{<b>}.$comment->{alias}.q{:</b> "}.WebGUI::HTML::format($comment->{comment},'html').q{"</div>};
+		$out .= q{<b>}.$comment->{alias}.q{:</b> "}.WebGUI::HTML::format($comment->{comment},'text').q{"</div>};
 	}
 	if ($self->canComment) {
 		$out .= '<div class="assetAspectCommentForm">';

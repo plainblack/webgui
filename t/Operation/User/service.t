@@ -170,7 +170,7 @@ cmp_deeply(
         }),
     },
     "Success response contains new users information",
-) or diag( Dumper $responseObj );
+) or diag explain $responseObj;
 $userRed    = WebGUI::User->new( $session, $responseObj->{user}->{userId} );
 is( $userRed->get("username"), "EBRedding", "User exists and username is correct" );
 $auth   = WebGUI::Operation::Auth::getInstance( $session, 'WebGUI', $userRed->getId );
@@ -311,7 +311,7 @@ cmp_deeply(
         }),
     },
     "Success response contains new users information",
-) or diag( Dumper $responseObj );
+) or diag explain $responseObj;
 $userRed    = WebGUI::User->new( $session, $responseObj->{user}->{userId} );
 is( $userRed->get("username"), "EBRedding", "User exists and username is correct" );
 $auth   = WebGUI::Operation::Auth::getInstance( $session, 'WebGUI', $userRed->getId );

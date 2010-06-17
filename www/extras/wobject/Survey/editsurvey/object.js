@@ -141,7 +141,8 @@ Survey.ObjectTemplate = (function(){
                 width: "600px",
                 context: [document.body, 'tr', 'tr'],
                 visible: false,
-                buttons: btns
+                buttons: btns,
+                constrainToViewport: true
             });
 
             dialog.callback = Survey.Comm.callback;
@@ -168,11 +169,6 @@ Survey.ObjectTemplate = (function(){
             
             var textareaId = type + 'Text';
             var textarea = YAHOO.util.Dom.get(textareaId);
-            
-            var height = YAHOO.util.Dom.getStyle(textarea, 'height');
-            if (!height) {
-                height = '300px';
-            }
 
             dialog.show();
             initHoverHelp(type);

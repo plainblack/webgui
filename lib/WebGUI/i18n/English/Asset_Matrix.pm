@@ -864,10 +864,47 @@ selectBox.</p>|
     },
 
     'too few message' => {
-        lastUpdated => 0,
-        message => q|You tried to compare only one listing. If you want to view just one listing, click on its name.|,
+        lastUpdated => 1250141046,
+        message => q|To compare, at least two listing must be selected. If you want to view just one listing, click on its name.|,
         context => q|A message shown to the user when they have selected only one listing to compare.|,
-    }
+    },
+
+    'Sort by name' => {
+        lastUpdated => 1250146133,
+        message => q|Sort by name|,
+        context => q|To order a list of items by name|,
+    },
+
+    'Sort by views' => {
+        lastUpdated => 1250146133,
+        message => q|Sort by views|,
+        context => q|To order a list of items by the number of times it has been viewed|,
+    },
+
+    'Sort by compares' => {
+        lastUpdated => 1250146133,
+        message => q|Sort by compares|,
+        context => q|To order a list of items by the number of times it has been compared|,
+    },
+
+    'Sort by clicks' => {
+        lastUpdated => 1250146133,
+        message => q|Sort by clicks|,
+        context => q|To order a list of items by the number of times it has been clicked|,
+    },
+
+    'Sort by updated' => {
+        lastUpdated => 1250146133,
+        message => q|Sort by updated|,
+        context => q|To order a list of items by the number of times it was last updated|,
+    },
+
+    'Return to Matrix' => {
+        lastUpdated => 1250146133,
+        message => q|Return to Matrix|,
+        context => q|To go back to the Matrix main screen.|,
+    },
+
 };
 
 1;

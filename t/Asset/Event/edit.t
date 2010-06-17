@@ -22,6 +22,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI::Session;
+plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 
 #----------------------------------------------------------------------------
 # Init
@@ -73,6 +74,9 @@ $mech->get( $baseUrl );
 if ( !$mech->success ) {
     plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
 }
+
+plan skip_all => 'set WEBGUI_LIVE to enable this test'
+    unless $ENV{WEBGUI_LIVE};
 
 plan tests => 8;        # Increment this number for each test you create
 

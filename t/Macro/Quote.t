@@ -34,6 +34,22 @@ my @testSets = (
 		input => q!!,
 		output => q!''!,
 	},
+	{
+		input => q!\(Awesome opening unbalanced parenthesis!,
+		output => q!'\\\\(Awesome opening unbalanced parenthesis'!,
+	},
+	{
+		input => q!Prefixed \(Awesome opening unbalanced parenthesis!,
+		output => q!'Prefixed \\\\(Awesome opening unbalanced parenthesis'!,
+	},
+	{
+		input => q!cool closing unbalanced parenthesis\)!,
+		output => q!'cool closing unbalanced parenthesis\\\\)'!,
+	},
+	{
+		input => q!cool closing unbalanced parenthesis\) with suffix!,
+		output => q!'cool closing unbalanced parenthesis\\\\) with suffix'!,
+	},
 );
 
 my $numTests = scalar @testSets;

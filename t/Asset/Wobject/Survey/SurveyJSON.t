@@ -1980,7 +1980,7 @@ cmp_deeply(
     $address = $s->newObject([0]);
     is(scalar @{$s->questions}, 1, '..now 1 question');
     is(scalar @{$s->questions([0])}, 1, '..in the first section');
-    is($s->questions([2]), undef, '..and none in the second section (which doesnt even exist)');
+    cmp_deeply($s->questions([2]), [], '..and none in the second section (which doesnt even exist)');
 
     # Add a question to second section 
     $address = $s->newObject([1]);

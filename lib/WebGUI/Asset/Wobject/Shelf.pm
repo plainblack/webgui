@@ -288,8 +288,9 @@ sub view {
 	
 	# get other shelves
 	my @childShelves = ();
-	foreach my $child (@{$self->getLineage(['children'],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
-		my $properties = $child->get;
+	SHELF: foreach my $child (@{$self->getLineage(['children'],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
+        next SHELF unless $child->canView;
+		my $properties  = $child->get;
 		$child->{url}   = $child->getUrl;
 		$child->{title} = $child->getTitle;
 		push @childShelves, $child;
@@ -305,30 +306,37 @@ sub view {
 		isa					=> 'WebGUI::Asset::Sku',
 		});
 
+    ##Prescreen to only paginate viewable products
+	my @productIds = List::MoreUtils::uniq(@childSkus, @{$keywordBasedAssetIds});
+    my @products = ();
+    PRODUCT: foreach my $id (@productIds) {
+		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        if (!defined $asset) {
+			$session->errorHandler->error(q|Couldn't instanciate SKU with assetId |.$id.q| on shelf with assetId |.$self->getId);
+            next PRODUCT;
+        }
+        push @products, $asset if $asset->canView;
+    }
+
 	# create paginator
-	my @products = List::MoreUtils::uniq(@childSkus, @{$keywordBasedAssetIds});
 	my $p = WebGUI::Paginator->new($session, $self->getUrl('func=view'));
 	$p->setDataByArrayRef(\@products);
 
 	# generate template variables
-	my @skus = ();
-	foreach my $id (@{$p->getPageData}) {
-		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
-		if (defined $asset) {
-			my $sku               = $asset->get;
-			$sku->{url}           = $asset->getUrl;
-            $sku->{thumbnailUrl}  = $asset->getThumbnailUrl;
-            $sku->{price}         = sprintf("%.2f", $asset->getPrice);
-            $sku->{addToCartForm} = $asset->getAddToCartForm;
-			push @skus, $sku;
-		}
-		else {
-			$session->errorHandler->error(q|Couldn't instanciate SKU with assetId |.$id.q| on shelf with assetId |.$self->getId);
-		}
-	}
+    my @skus = ();
+    foreach my $asset (@{$p->getPageData}) {
+        my $sku               = $asset->get;
+        $sku->{url}           = $asset->getUrl;
+        $sku->{thumbnailUrl}  = $asset->getThumbnailUrl;
+        $sku->{price}         = sprintf("%.2f", $asset->getPrice);
+        $sku->{addToCartForm} = $asset->getAddToCartForm;
+        push @skus, $sku;
+    }
 	my %var = (
-		shelves		=> \@childShelves,
-		products	=> \@skus,
+		shelves		    => \@childShelves,
+		products	    => \@skus,
+        noViewableSkus  => scalar(@skus)       ? 0 : 1,
+        emptyShelf      => scalar(@productIds) ? 0 : 1,
 		);
 	$p->appendTemplateVars(\%var);
 	

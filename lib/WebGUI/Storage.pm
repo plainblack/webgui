@@ -23,6 +23,7 @@ use File::Find ();
 use File::Path ();
 use File::Spec;
 use Image::Magick;
+use Path::Class::Dir;
 use Storable ();
 use WebGUI::Utility qw(isIn);
 
@@ -120,7 +121,7 @@ sub _cdnAdd {
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
         if ( $cdnCfg->{'queuePath'} ) {
-            my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getDirectoryId;
             my $dest;
             if ( open $dest, '>', $cdnFile ) {
                 close $dest;    # created empty file
@@ -160,7 +161,7 @@ sub _cdnDel {
             unlink $cdnFile;
         }
         if ( $cdnCfg->{'queuePath'} ) {
-            $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getDirectoryId;
             my $dest;
             if ( open $dest, '>', $cdnFile ) {
                 print $dest "deleted\n";
@@ -204,11 +205,15 @@ sub _makePath {
 
 #-------------------------------------------------------------------
 
-=head2 _changeOwner ( )
+=head2 _changeOwner ( $file )
 
-Changes the owner to be the same as that of the uploads directory
+Changes the permissions of $file to be the same as that of the uploads directory
 
 NOTE: This is a private method and should never be called except internally to this package.
+
+=head3 $file
+
+A file or directory.  It will have its permissions changed.
 
 =cut
 
@@ -496,16 +501,30 @@ sub adjustMaxImageSize {
 
 =head2 clear ( )
 
-Clears a storage locations of all files except the .wgaccess file
-If configured for CDN, add deletion of this location's files, to CDN queue.
+Clears a storage location of all files.  If configured for CDN, add
+deletion of this location's files, to CDN queue.
 
 =cut
 
 sub clear {
 	my $self = shift;
-	my $filelist = $self->getFiles(1);
-	foreach my $file (@{$filelist}) {
-       $self->deleteFile($file);
+    my $dir  = $self->getPathClassDir;
+    my $errors;
+    CHILD: while (my $child = $dir->next()) {
+        my $rel = $child->relative($dir);
+        next CHILD if $rel->stringify eq '.'
+                   || $rel->stringify eq '..';
+        if ($child->is_dir) {
+            my $errors;
+            $child->rmtree({ error => \$errors});
+            foreach my $error (@{ $errors }){
+                $self->_addError($error);
+            }
+        }
+        else {
+            $child->remove;
+            next CHILD;
+        }
     }
     $self->_cdnDel(1);
 }
@@ -531,15 +550,24 @@ Optionally pass in the list of filenames to copy from the specified storage loca
 sub copy {
     my $self = shift;
     my $newStorage = shift || WebGUI::Storage->create($self->session);
-    my $filelist = shift || $self->getFiles(1);
-    foreach my $file (@{$filelist}) {
-        next if  $file eq '.cdn';
-        open my $source, '<:raw', $self->getPath($file) or next;
-        open my $dest, '>:raw', $newStorage->getPath($file) or next;
-        File::Copy::copy($source, $dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
-        close $dest;
-        close $source;
-        $newStorage->_changeOwner($newStorage->getPath($file));
+    my $filelist   = shift || $self->getFiles('all');
+    FILE: foreach my $file (@{$filelist}) {
+        next if isIn($file, '.cdn', '.');
+        my $origFile = $self->getPath($file);
+        my $copyFile = $newStorage->getPath($file);
+        if (-d $origFile) {
+            mkdir($copyFile) or
+                $self->_addError("Couldn't copy directory: $copyFile: $!");
+                next FILE;
+        }
+        else {
+            open my $source, '<:raw', $origFile or next FILE;
+            open my $dest,   '>:raw', $copyFile or next FILE;
+            File::Copy::copy($source, $dest) or $self->_addError("Couldn't copy file ".$origFile." to ".$copyFile." because ".$!);
+            close $dest;
+            close $source;
+        }
+        $newStorage->_changeOwner($copyFile);
     }
     $newStorage->_cdnAdd;
     return $newStorage;
@@ -617,7 +645,7 @@ sub createTemp {
 	my $path    = $session->id->toHex($id);
 
 	$path =~ m/^(.{2})/;
-	my $self = {_session=>$session, _id => $id, _Hexid => $path, _pathParts => ['temp', $1, $path], _errors => []};
+	my $self = {_session=>$session, _id => $id, _hexId => $path, _pathParts => ['temp', $1, $path], _errors => []};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
 	return $self;
@@ -636,8 +664,7 @@ sub delete {
 	my $self = shift;
 
     my $path = $self->getPath || return undef;
-    File::Path::rmtree($path)
-        if (-d $path);
+    File::Path::rmtree($path) if (-d $path);
     foreach my $subDir (join('/', @{$self->{_pathParts}}[0,1]), $self->{_pathParts}[0]) {
         my $fullPath = $self->session->config->get('uploadsPath') . '/' . $subDir;
 
@@ -654,7 +681,8 @@ sub delete {
 
 =head2 deleteFile ( filename )
 
-Deletes a file from its storage location.
+Deletes a file from its storage location, and any thumbnails that might have been made
+with it.
 
 =head3 filename
 
@@ -690,7 +718,7 @@ sub deleteFromCdn {
         and $cdnCfg->{'enabled'}
         and $cdnCfg->{'syncProgram'} )
     {
-        my $id = $self->getHexId;
+        my $id = $self->getDirectoryId;
         my $cmd = sprintf( $cdnCfg->{'deleteProgram'}, $id );
         if ( $cmd =~ /$id/ ) {    # sanity check, no rm -rf /
             system($cmd);
@@ -698,7 +726,7 @@ sub deleteFromCdn {
                 $self->_addError("Error running CDN deleteProgram: $?");
             }
             if ( $cdnCfg->{'queuePath'} ) {
-                unlink $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+                unlink $cdnCfg->{'queuePath'} . '/' . $id;
             }
         }
         else {                    # Presume configuration error, missing %s
@@ -827,7 +855,14 @@ sub getCdnFileIterator {
                 my $sub = sub {
                     my $id = shift @ids;
                     return if !$id;
-                    return $class->get( $session, $session->id->fromHex($id) );
+                    my $storageId;
+                    if (length($id) > 22) {
+                        # convert from hex
+                        $storageId = $session->id->fromHex($id);
+                    } else {
+                        $storageId = $id;
+                    }
+                    return $class->get( $session, $storageId );
                 };
                 return $sub;
             }
@@ -1010,24 +1045,29 @@ Returns an array reference of the files in this storage location.
 
 =head3 showAll
 
-Whether or not to return all files, including ones with initial periods.
+Whether or not to return all files, including ones with initial periods and WebGUI created thumbnail
+files (files that start with "thumb-").
 
 =cut
 
 sub getFiles {
-    my $self = shift;
+    my $self    = shift;
     my $showAll = shift;
+    my $dir     = $self->getPathClassDir;
+    my $dirStr  = $dir->stringify;
     my @list;
-    if ( opendir my $dir, $self->getPath ) {
-        @list = readdir $dir;
-        closedir $dir;
-        if (!$showAll) {
-            # if not showing all, filter out files beginning with a period
-            @list = grep { $_ !~ /^\./ } @list;
-            # filter out thumbnails
-            @list = grep { $_ !~ /^thumb-/ } @list;
+    $dir->recurse(
+        callback => sub {
+            my $obj = shift;
+            my $rel = $obj->relative($dir);
+            my $str = $rel->stringify;
+            if (! $showAll ) {
+                return if $str =~ /^thumb-/;
+                return if $str =~ /^\./;
+            }
+            push @list, $str;
         }
-    }
+    );
     return \@list;
 }
 
@@ -1113,6 +1153,28 @@ sub getPath {
         return join('/', $path, $file);
     }
     return $path;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getPathClassDir (  )
+
+Returns a Path::Class::Dir object for this storage location.  If the uploadsPath is not
+configured, or the path parts don't exist, then it returns undef.
+
+=cut
+
+sub getPathClassDir {
+	my $self = shift;
+	my $file = shift;
+
+    unless ($self->session->config->get("uploadsPath") && $self->{_pathParts} && @{ $self->{_pathParts} }) {
+		$self->_addError("storage object malformed");
+		return undef;
+    }
+    my $dir = Path::Class::Dir->new($self->session->config->get("uploadsPath"), @{ $self->{_pathParts} });
+    return $dir;
 }
 
 
@@ -1211,19 +1273,15 @@ sub getUrl {
         and -e $self->getPath . '/.cdn' )
     {
         my $sep = '/';    # separator, if not already present trailing
-        if ($cdnCfg->{'sslAlt'}
-            and (  $self->session->env->get('HTTPS') eq 'on'
-                or $self->session->env->get('SSLPROXY') )
-            )
-        {
+        if ($cdnCfg->{'sslAlt'} && $self->session->env->sslRequest) {
             if ( $cdnCfg->{'sslUrl'} ) {
                 substr( $cdnCfg->{'sslUrl'}, -1 ) eq '/' and $sep = '';
-                $url = $cdnCfg->{'sslUrl'} . $sep . $self->getHexId;
+                $url = $cdnCfg->{'sslUrl'} . $sep . $self->getDirectoryId;
             }             # else do NOT override $url with CDN URL  ($url = $sslUrl || $url)
         }
         else {
             substr( $cdnCfg->{'url'}, -1 ) eq '/' and $sep = '';
-            $url = $cdnCfg->{'url'} . $sep . $self->getHexId;
+            $url = $cdnCfg->{'url'} . $sep . $self->getDirectoryId;
         }
     } ## end if ( $cdnCfg and $cdnCfg...
     if ( defined $file ) {
@@ -1350,7 +1408,7 @@ sub crop {
 
 #-------------------------------------------------------------------
 
-=head2 annotate ( filename [ text ] )
+=head2 annotate ( filename, $asset, $form )
 
 Adds annotation text to the image.
 
@@ -1358,9 +1416,13 @@ Adds annotation text to the image.
 
 The name of the file to annotate.
 
-=head3 text
+=head3 asset
 
-Text to add.
+The WebGUI Asset containing this image.
+
+=head3 $form
+
+A Session::Form object, used to fetch form data.
 
 =cut
 
@@ -1477,7 +1539,7 @@ sub rotate {
 
 =head2 resize ( filename [, width, height ] )
 
-Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaleed proportionately to the non-omitted one.
+Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaled proportionately to the non-omitted one.
 
 =head3 filename
 
@@ -1596,13 +1658,23 @@ sub setPrivileges {
 	my $owner = shift;
 	my $viewGroup = shift;
 	my $editGroup = shift;
-	
-    if ($owner eq '1' || $viewGroup eq '1' || $viewGroup eq '7' || $editGroup eq '1' || $editGroup eq '7') {
-        $self->deleteFile('.wgaccess');
-    }
-    else {
-        $self->addFileFromScalar(".wgaccess",$owner."\n".$viewGroup."\n".$editGroup);
-    }
+
+    my $dirObj = $self->getPathClassDir();
+    $dirObj->recurse(
+        callback => sub {
+            my $obj = shift;
+            return unless $obj->is_dir;
+            my $rel = $obj->relative($dirObj);
+
+            if ($owner eq '1' || $viewGroup eq '1' || $viewGroup eq '7' || $editGroup eq '1' || $editGroup eq '7') {
+                $self->deleteFile($rel->file('.wgaccess')->stringify);
+            }
+            else {
+                $self->addFileFromScalar($rel->file('.wgaccess')->stringify,$owner."\n".$viewGroup."\n".$editGroup);
+            }
+        }
+    );
+
 }
 
 
@@ -1627,13 +1699,13 @@ sub syncToCdn {
         my $originalDir = Cwd::cwd();
         my $locDir = join '/', $self->session->config->get('uploadsPath'), @{ $self->{_pathParts} }[ 0 .. 1 ];
         chdir $locDir or croak 'Unable to chdir to ' . $locDir . " : $!";
-        my $cmd = sprintf( $cdnCfg->{'syncProgram'}, $self->getHexId );
+        my $cmd = sprintf( $cdnCfg->{'syncProgram'}, $self->getDirectoryId );
         system($cmd);
         if ($?) {
             $self->_addError("Error running CDN syncProgram: $?");
         }
         elsif ( $cdnCfg->{'queuePath'} ) {
-            unlink $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            unlink $cdnCfg->{'queuePath'} . '/' . $self->getDirectoryId;
         }
         chdir $originalDir;
         my $dest;
@@ -1713,6 +1785,20 @@ sub untar {
 
     chdir $originalDir;
     return $temp;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDirectoryId (  )
+
+Returns the id in base64 or hex depending on how it's stored in
+the uploads path.
+
+=cut
+
+sub getDirectoryId {
+    my $self = shift;
+    return $self->{_pathParts}[2];
 }
 
 1;

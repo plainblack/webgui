@@ -358,7 +358,7 @@ sub importTaxData {
 
 =head2 skuFormDefinition ( )
 
-Returns a hash ref containing the form defintion for the per sku options for this tax driver.
+Returns a hash ref containing the form definition for the per sku options for this tax driver.
 
 =cut
 

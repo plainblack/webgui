@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use Carp qw( croak );
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -91,6 +92,35 @@ sub addChild {
 	return $newAsset;
 }
 
+#-------------------------------------------------------------------
+
+=head2 cacheChild ( [first|last], asset? )
+
+A cache is kept of the first and last child assets in several cases.  In order
+to avoid memory leaks, these references must be weak, and the child assets
+must have a _parent reference to avoid early collection.  cacheChild maintains
+this delicate state, and so should be called instead of setting this cache
+directly.
+
+If called without an asset argument, the cached child is simply returned.
+
+=cut
+
+sub cacheChild {
+	my ($self, $which, $child) = @_;
+	my $slot = "_${which}Child";
+
+	if ($child) {
+		$self->{$slot} = $child;
+		$child->{_parent} = $self;
+		weaken($self->{$slot});
+	}
+	else {
+		$child = $self->{$slot};
+	}
+
+	return $child;
+}
 
 #-------------------------------------------------------------------
 
@@ -229,7 +259,8 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 
 sub getFirstChild {
 	my $self = shift;
-	unless (exists $self->{_firstChild}) {
+	my $child = $self->cacheChild('first');
+	unless ($child) {
 		my $assetLineage = $self->session->stow->get("assetLineage");
 		my $lineage = $assetLineage->{firstChild}{$self->getId};
 		unless ($lineage) {
@@ -239,9 +270,10 @@ sub getFirstChild {
 				$self->session->stow->set("assetLineage", $assetLineage);
 			}
 		}
-		$self->{_firstChild} = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$self->cacheChild(first => $child);
 	}
-	return $self->{_firstChild};
+	return $child;
 }
 
 
@@ -255,7 +287,8 @@ Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
 
 sub getLastChild {
 	my $self = shift;
-	unless (exists $self->{_lastChild}) {
+	my $child = $self->cacheChild('last');
+	unless ($child) {
 		my $assetLineage = $self->session->stow->get("assetLineage");
 		my $lineage = $assetLineage->{lastChild}{$self->getId};
 		unless ($lineage) {
@@ -263,9 +296,10 @@ sub getLastChild {
 			$assetLineage->{lastChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
-		$self->{_lastChild} = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
+		$self->cacheChild(last => $child);
 	}
-	return $self->{_lastChild};
+	return $child;
 }
 
 #-------------------------------------------------------------------
@@ -383,11 +417,14 @@ sub getLineage {
 		}
 		# since we have the relatives info now, why not cache it
 		if ($rules->{returnObjects}) {
-			my $parent = $relativeCache{$parentId};
 			$relativeCache{$id} = $asset;
-			$asset->{_parent} = $parent if exists $relativeCache{$parentId};
-			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
-			$parent->{_lastChild} = $asset;
+			if (my $parent = $relativeCache{$parentId}) {
+				$asset->{_parent} = $parent; 
+				unless ($parent->cacheChild('first')) {
+					$parent->cacheChild(first => $asset);
+				}
+				$parent->cacheChild(last => $asset);
+			}
 		}
 		push(@lineage,$asset);
 	}
@@ -748,9 +785,9 @@ Returns 1 or the count of Assets with the same parentId as current Asset's asset
 sub hasChildren {
 	my $self = shift;
 	unless (exists $self->{_hasChildren}) {
-		if (exists $self->{_firstChild}) {
+		if ($self->cacheChild('first')) {
 			$self->{_hasChildren} = 1;
-		} elsif (exists $self->{_lastChild}) {
+		} elsif ($self->cacheChild('last')) {
 			$self->{_hasChildren} = 1;
 		} else {
 			$self->{_hasChildren} = $self->getChildCount;
@@ -1014,6 +1051,45 @@ sub www_setRank {
 	$self->session->asset($self->getParent);
 	return $self->getParent->www_manageAssets();
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_setRanks ( )
+
+Utility method for the AssetManager.  Reorders 1 pagefull of assets via rank.
+AssetIds are passed in via the C<assetId> form variable.
+
+If the current user cannot edit the current asset, or if a valid CSRF token
+is not submitted with the form, it returns the insufficient privileges page.
+
+Returns the user to the manage assets screen.
+
+=cut
+
+sub www_setRanks {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $session->asset->canEdit && $session->form->validToken;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $form    = $session->form;
+
+    $pb->start($i18n->get('Set Rank'), $session->url->extras('adminConsole/assets.gif'));
+    my @assetIds    = $form->get( 'assetId' );
+    ASSET: for my $assetId ( @assetIds ) {
+        my $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        next ASSET unless $asset;
+        my $rank   = $form->get( $assetId . '_rank' );
+        next ASSET unless $rank; # There's no such thing as zero
+
+        $asset->setRank( $rank, sub { $pb->update(sprintf $i18n->get(shift), shift); } );
+    }
+
+    $pb->finish($session->asset->getManagerUrl);
+    return "redirect";
+    #return $www_manageAssets();
+}
+
 
 
 1;

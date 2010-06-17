@@ -42,7 +42,7 @@ if ( $@ ) { diag( "Can't prepare mail server: $@" ) }
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 18;        # Increment this number for each test you create
+plan tests => 16;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test create
@@ -274,7 +274,6 @@ $emailUser->profileField('email', 'heywood@shawshank.gov');
 my $lonelyUser = WebGUI::User->create($session);
 WebGUI::Test->usersToDelete($lonelyUser);
 $lonelyUser->profileField('receiveInboxEmailNotifications', 0);
-$lonelyUser->profileField('receiveInboxSmsNotifications',   0);
 $lonelyUser->profileField('email',   'jake@shawshank.gov');
 
 my $inboxGroup = WebGUI::Group->new($session, 'new');
@@ -282,7 +281,7 @@ WebGUI::Test->groupsToDelete($inboxGroup);
 $inboxGroup->addUsers([$emailUser->userId, $inboxUser->userId, $lonelyUser->userId]);
 
 SKIP: {
-    my $numtests        = 3; # Number of tests in this block
+    my $numtests        = 1; # Number of tests in this block
 
     # Must be able to write the config, or we'll die
     skip "Cannot test email notifications", $numtests unless $smtpServerOk;
@@ -300,45 +299,6 @@ SKIP: {
 
     # Test the mail
     is($received->{to}->[0], '<ellis_boyd_redding@shawshank.gov>', 'send, toUser with email address');
-
-    $inboxUser->profileField('receiveInboxEmailNotifications', 0);
-    $inboxUser->profileField('receiveInboxSmsNotifications',   1);
-
-    # Send the mail
-    $mail = WebGUI::Mail::Send->create( $session, { 
-            toUser  => $inboxUser->userId,
-            },
-            'fromInbox',
-    );
-    $mail->addText( 'sent via SMS' );
-
-    $mail->send;
-    my $received = WebGUI::Test->getMail;
-
-    # Test the mail
-    is($received->{to}->[0], '<55555@textme.com>', 'send, toUser with SMS address');
-
-    $inboxUser->profileField('receiveInboxEmailNotifications', 1);
-    $inboxUser->profileField('receiveInboxSmsNotifications',   1);
-
-    # Send the mail
-    $mail = WebGUI::Mail::Send->create( $session, { 
-            toUser  => $inboxUser->userId,
-            },
-            'fromInbox',
-    );
-    $mail->addText( 'sent via SMS' );
-
-    $mail->send;
-    my $received = WebGUI::Test->getMail;
-
-    # Test the mail
-    cmp_bag(
-        $received->{to},
-        ['<55555@textme.com>', '<ellis_boyd_redding@shawshank.gov>',],
-        'send, toUser with SMS and email addresses'
-    );
-
 }
 
 #----------------------------------------------------------------------------
@@ -377,7 +337,7 @@ cmp_bag(
     \@emailAddresses,
     [
         'heywood@shawshank.gov'."\n",
-        'ellis_boyd_redding@shawshank.gov,55555@textme.com'."\n",
+        'ellis_boyd_redding@shawshank.gov'."\n",
     ],
     'send: when the original is sent, new messages are created for each user in the group, following their user profile settings'
 );

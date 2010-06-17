@@ -395,8 +395,8 @@ sub getObject {
         push @params, $self->session;
     }
     push @params, $self->get("parameters");
-    WebGUI::Pluggable::load($class);
-    return $self->{_object} = $class->$method(@params);
+    my $object = WebGUI::Pluggable::instanciate( $class, $method, \@params );
+    return $self->{_object} = $object;
 }
 
 #-------------------------------------------------------------------

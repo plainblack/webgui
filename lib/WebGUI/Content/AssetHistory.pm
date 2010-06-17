@@ -149,8 +149,10 @@ sub www_view {
     
     $output .= q|
   <div class="yui-skin-sam">  
-    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="|.$i18n->get(364, 'WebGUI').q|" /></form></div>
-    <div id="dynamicdata"></div>
+    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="|.$i18n->get(364, 'WebGUI').q|" /><input type="submit" value="|.$i18n->get('Clear', 'WebGUI').q|" onclick="this.form.keywords.value='';"/></form></div>
+    <div id="paginationTop"></div>
+    <div id="historyData"></div>
+    <div id="paginationBot"></div>
   </div>
 <script type="text/javascript">
     YAHOO.util.Event.onDOMReady( WebGUI.AssetHistory.initManager );

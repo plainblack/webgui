@@ -123,6 +123,11 @@ A hash reference of options to change how the import works
 Forces the all assets in the package to inherit ownerUserId, groupIdView and groupIdEdit
 from the asset where it is deployed.
 
+=head4 overwriteLatest
+
+Forces the package to ignore the revisionDate inside it.  This makes the imported package the
+latest revision of an asset.
+
 =cut
 
 sub importAssetData {
@@ -132,7 +137,7 @@ sub importAssetData {
     my $error       = $self->session->errorHandler;
     my $id          = $data->{properties}{assetId};
     my $class       = $data->{properties}{className};
-    my $version     = $data->{properties}{revisionDate};
+    my $version     = $options->{overwriteLatest} ? 0 : $data->{properties}{revisionDate};
 
     # Load the class
     WebGUI::Asset->loadModule( $self->session, $class );

@@ -85,7 +85,9 @@ Deletes this address book and all addresses contained in it.
 
 sub delete {
     my ($self) = @_;
+    my $myId   = id $self;
     foreach my $address (@{$self->getAddresses}) {
+        delete $addressCache{$myId}{$address->getId};
         $address->delete;
     } 
     $self->session->db->write("delete from addressBook where addressBookId=?",[$self->getId]);
@@ -204,7 +206,7 @@ sub getDefaultAddress {
 
 =head2 getId ()
 
-Returns the unique id for this cart.
+Returns the unique id for this addressBook.
 
 =cut
 
@@ -217,7 +219,7 @@ sub getId {
 
 =head2 new ( session, addressBookId )
 
-Constructor.  Instanciates a cart based upon a addressBookId.
+Constructor.  Instanciates an addressBook based upon a addressBookId.
 
 =head3 session
 

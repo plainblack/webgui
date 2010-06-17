@@ -22,13 +22,14 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
-plan tests => 6;
+plan tests => 12;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 my $root = WebGUI::Asset->getRoot($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Clipboard test"});
+WebGUI::Test->tagsToRollback($versionTag);
 
 my $snippet = $root->addChild({
     url => 'testSnippet',
@@ -40,6 +41,32 @@ my $snippet = $root->addChild({
 
 my $snippetAssetId      = $snippet->getId;
 my $snippetRevisionDate = $snippet->get("revisionDate");
+my $topFolder = $root->addChild({
+    url   => 'TopFolder',
+    title => 'TopFolder',
+    menuTitle   => 'topFolderMenuTitle',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
+});
+my $folder1a = $topFolder->addChild({
+    url   => 'folder_1a',
+    title => 'folder1a',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
+});
+my $folder1b = $topFolder->addChild({
+    url   => 'folder_1b',
+    title => 'folder1b',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
+});
+my $folder1a2 = $folder1a->addChild({
+    url   => 'folder_1a2',
+    title => 'folder1a2',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
+});
+
 
 $versionTag->commit;
 
@@ -61,11 +88,17 @@ is($duplicatedSnippet->getParent->getId, $root->getId, 'duplicated snippet is al
 
 my $newVersionTag = WebGUI::VersionTag->getWorking($session);
 $newVersionTag->commit;
+WebGUI::Test->tagsToRollback($newVersionTag);
 
-END {
-    foreach my $tag($versionTag, $newVersionTag) {
-        if (defined $tag and ref $tag eq 'WebGUI::VersionTag') {
-            $tag->rollback;
-        }
-    }
-}
+####################################################
+#
+# cut
+#
+####################################################
+
+is( $topFolder->cut, 1, 'cut: returns 1 if successful' );
+is($topFolder->get('state'),              'clipboard', '... state set to trash on the trashed asset object');
+is($topFolder->cloneFromDb->get('state'), 'clipboard', '... state set to trash in db on object');
+is($folder1a->cloneFromDb->get('state'),  'clipboard-limbo', '... state set to clipboard-limbo on child #1');
+is($folder1b->cloneFromDb->get('state'),  'clipboard-limbo', '... state set to clipboard-limbo on child #2');
+is($folder1a2->cloneFromDb->get('state'), 'clipboard-limbo', '... state set to clipboard-limbo on grandchild #1-1');

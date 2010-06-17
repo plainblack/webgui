@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  6;
+my  $tests =  11;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -54,36 +54,43 @@ my $snippet =  $root->addChild({
 my $fileAsset = $root->addChild({
     className => 'WebGUI::Asset::File',
     url       => 'filePumpFileAsset',
-    filename  => 'pumpfile',
+    filename  => 'pumpfile.css',
 }); 
 
 $fileAsset->getStorageLocation->addFileFromScalar('pumpfile.css', qq|   body {\npadding:   0px;}\n\n|);
+is($fileAsset->getStorageLocation->getFileContentsAsScalar($fileAsset->get('filename')), qq|   body {\npadding:   0px;}\n\n|, 'Sanity check - got back expected file contents');
 
 my $snippetTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($snippetTag);
 $snippetTag->commit;
 
-$bundle->addFile('JS',  'asset://filePumpSnippet');
-$bundle->addFile('CSS', 'asset://filePumpFileAsset');
+ok($bundle->addFile('JS',  'asset://filePumpSnippet'), 'Added filePumpSnippet');
+ok($bundle->addFile('CSS', 'asset://filePumpFileAsset'), 'Added filePumpAsset');
 
 my $storedFile = WebGUI::Storage->create($session);
 WebGUI::Test->storagesToDelete($storedFile);
 $storedFile->addFileFromScalar('storedJS.js', qq|function helloWorld() { alert("Hellow world");}|, );
-$bundle->addFile('JS', 'file:'. $storedFile->getPath('storedJS.js'));
+# Turn into file:uploads/path/to/fileAsset (bc file uris must begin with either file:uploads/ or file:extras/)
+my $path = Path::Class::File->new($storedFile->getPath($storedFile->get('filename')));
+my $uploadsDir = Path::Class::Dir->new($session->config->get('uploadsPath'));
+$path = $path->relative($uploadsDir);
+ok($bundle->addFile('JS', "file:uploads/$path/storedJS.js"), 'Added storedJS.js');
 
 my $uploadsURL = $session->config->get('uploadsURL');
 
-$bundle->build();
+my ($code, $error) = $bundle->build;
+ok($code, '... bundle built ok') or diag("Failed to fetch URI: $error");
+
 is(
     WebGUI::Macro::FilePump::process($session, 'test bundle', 'JS'),
-    sprintf(qq|<script type="text/javascript" src="%s">\n|,
+    sprintf(qq|<script type="text/javascript" src="%s" ></script>\n|,
         join('/', $uploadsURL, 'filepump', $bundle->bundleUrl . '.'. $bundle->get('lastBuild'), $bundle->bundleUrl.'.js'),
     ),
     '... check JS file, normal mode'
 );
 is(
     WebGUI::Macro::FilePump::process($session, 'test bundle', 'CSS'),
-    sprintf(qq|<link rel="stylesheet" type="text/css" href="%s">\n|,
+    sprintf(qq|<link rel="stylesheet" type="text/css" href="%s" >\n|,
         join('/', $uploadsURL, 'filepump', $bundle->bundleUrl . '.'. $bundle->get('lastBuild'), $bundle->bundleUrl.'.css'),
     ),
     '... check CSS file, normal mode'
@@ -97,14 +104,14 @@ is(
 $session->var->switchAdminOn();
 is(
     WebGUI::Macro::FilePump::process($session, 'test bundle', 'JS'),
-    sprintf(qq|<script type="text/javascript" src="%s">\n<script type="text/javascript" src="%s">\n|,
+    sprintf(qq|<script type="text/javascript" src="%s" ></script>\n<script type="text/javascript" src="%s" ></script>\n|,
         '/filePumpSnippet', $storedFile->getUrl('storedJS.js')
     ),
     '... check JS file, normal mode'
 );
 is(
     WebGUI::Macro::FilePump::process($session, 'test bundle', 'CSS'),
-    sprintf(qq|<link rel="stylesheet" type="text/css" href="/filePumpFileAsset">\n|, $fileAsset->getUrl),
+    sprintf(qq|<link rel="stylesheet" type="text/css" href="/filePumpFileAsset" >\n|, $fileAsset->getUrl),
     '... check CSS file, normal mode'
 );
 is(

@@ -91,6 +91,11 @@ our $I18N =
                 lastUpdated => 1165790228,
         },
 
+        'locked' => {
+                message => q|Locked|,
+                lastUpdated => 1253139992,
+        },
+
         'add/edit title' => {
                 message => q|Wiki Page, Add/Edit Template|,
                 lastUpdated => 1165790228,

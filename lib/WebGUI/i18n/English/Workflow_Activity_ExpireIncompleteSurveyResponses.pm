@@ -3,7 +3,7 @@ use strict;
 
 our $I18N = {
     'name' => {
-        message => q|ExpireIncompleteSurveyResponses|,
+        message => q|Expire Incomplete Survey Responses|,
         lastUpdated => 0,
     },
 	'Delete expired survey responses' => {
@@ -12,7 +12,7 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 	'delete expired' => {
-		message => q|When ran, every survey response which is expired will be completely removed from the database.|,
+		message => q|When run, every survey response which is expired will be completely removed from the database.|,
 		context => q|the hover help for the delete responses field|,
 		lastUpdated => 0,
 	},

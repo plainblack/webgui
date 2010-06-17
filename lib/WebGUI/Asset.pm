@@ -327,7 +327,13 @@ sub canView {
 
 =head2 checkView ( )
 
-Returns error messages if a user can't view due to publishing problems, otherwise it sets the cookie and returns undef. This is sort of a hack until we find something better.
+Returns error messages if a user can't view due to publishing problems,
+otherwise it sets the cookie and returns undef. This is sort of a hack
+until we find something better.
+
+If SSL in enabled in the config file, and the asset has encryptPage set, and
+HTTPS is set and SSLPROXY is not set in the ENV, then this page is redirected
+to SSL.
 
 =cut
 
@@ -335,19 +341,27 @@ sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
 	my ($conf, $env, $var, $http) = $self->session->quick(qw(config env var http));
-    if ($conf->get("sslEnabled") && $self->get("encryptPage") && $env->get("HTTPS") ne "on" && !$env->get("SSLPROXY")) {
+    if ($conf->get("sslEnabled") && $self->get("encryptPage") && ! $env->sslRequest) {
         # getUrl already changes url to https if 'encryptPage'
         $http->setRedirect($self->getUrl);
         $http->sendHeader;
         return "chunked";
 	}
     elsif ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
-		$http->setRedirect($self->getUrl("func=manageTrash"));
+        my $queryFrag = "func=manageTrash";
+        if ($self->session->form->process('revision')) {
+            $queryFrag .= ";revision=".$self->session->form->process('revision');
+        }
+		$http->setRedirect($self->getUrl($queryFrag));
         $http->sendHeader;
 		return "chunked";
 	} 
     elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
-		$http->setRedirect($self->getUrl("func=manageClipboard"));
+        my $queryFrag = "func=manageTrash";
+        if ($self->session->form->process('revision')) {
+            $queryFrag .= ";revision=".$self->session->form->process('revision');
+        }
+		$http->setRedirect($self->getUrl($queryFrag));
         $http->sendHeader;
 		return "chunked";
 	} 
@@ -359,6 +373,26 @@ sub checkView {
 	}
 	$self->logView();
 	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 cloneFromDb ( )
+
+Fetches a new fresh clone of this object from the database.  Often used after
+calling commit on version tags.
+
+Returns the new Asset object.
+
+=cut
+
+sub cloneFromDb {
+	my $self = shift;
+    return WebGUI::Asset->new($self->session,
+        $self->getId,
+        $self->get('className'),
+        $self->get('revisionDate')
+    );
 }
 
 #-------------------------------------------------------------------
@@ -605,11 +639,12 @@ Completely remove an asset from existence.
 
 sub DESTROY {
 	my $self = shift;
-	# something bad happens when the following is enabled, not sure why
-	# must check this out later
-	#$self->{_parent}->DESTROY if (exists $self->{_parent});
-	$self->{_firstChild}->DESTROY if (exists $self->{_firstChild});
-	$self->{_lastChild}->DESTROY if (exists $self->{_lastChild});
+
+	# Let the parent be garbage collected if no one else is referencing
+	# him.  firstChild and lastChild are weak references, so no need to
+	# worry about them here.
+	delete $self->{_parent};
+
 	$self = undef;
 }
 
@@ -698,12 +733,12 @@ sub fixUrl {
 		$url =~ s/(.*)\..*/$1/;
 		$url .= '/'.$self->getValue("menuTitle");
 	}
-	$url = $self->session->url->urlize($url);
 
     # if we're inheriting the URL from our parent, set that appropriately
     if($self->get('inheritUrlFromParent')) {
        $url = $self->fixUrlFromParent($url); 
     }
+	$url = $self->session->url->urlize($url);
 
 	# fix urls used by uploads and extras
 	# and those beginning with http
@@ -738,7 +773,6 @@ sub fixUrl {
 	# add automatic extension if we're supposed to
 	if ($self->session->setting->get("urlExtension") ne "" #don't add an extension if one isn't set
 	&&  !($url =~ /\./)                           # don't add an extension of the url already contains a dot
-    &&  !$self->get("url")                        # Only add it if this is a new asset.
     &&  $url ne lc($self->getId)                  # but don't assign it the original time
 	) {
 		$url .= ".".$self->session->setting->get("urlExtension");
@@ -786,15 +820,10 @@ sub fixUrlFromParent {
     my @parts = split(m{/}, $url);
 
     # don't do anything unless we need to
-    if("/$url" ne $self->getParent->getUrl . '/' . $parts[-1]) {
-        $url = $self->getParent->getUrl . '/' . $parts[-1];
+    if($url ne $self->getParent->get('url') . '/' . $parts[-1]) {
+        $url = $self->getParent->get('url') . '/' . $parts[-1];
     }
 
-    ##Note we do not need to call fixUrl on the url argument.  Here's the reasoning why.
-    ##If a URL has not been set to updated at the same time that inheritUrlFromParent is
-    ##called, then it has already been "fixed".
-    ##On the other hand, if it has, the sideEffect nature of this method guarantees that
-    ##the URL was "fixed" before it was called.
     return $url;
 }
 
@@ -1225,7 +1254,7 @@ sub getImportNode {
 
 #-------------------------------------------------------------------
 
-=head2 getIsa ( $session )
+=head2 getIsa ( $session, [ $offset ] )
 
 A class method to return an iterator for getting all Assets by class (and all sub-classes)
 as Asset objects, one at a time.  When the end of the assets is reached, then the iterator
@@ -1237,6 +1266,15 @@ my $productIterator = WebGUI::Asset::Product->getIsa($session);
 while (my $product = $productIterator->()) {
   ##Do something useful with $product
 }
+
+=head3 $session
+
+A reference to a WebGUI::Session object.
+
+=head3 $offset
+
+An offset, from the beginning of the results returned from the query, to really begin
+returning results.  This allows very large sets of results to be handled in chunks.
 
 =cut
 
@@ -1706,10 +1744,10 @@ Loads an asset module if it's not already in memory. This is a class method. Ret
 
 sub loadModule {
     my ($class, $session, $className) = @_;
-    if ($className !~ /^WebGUI::Asset(?:$|::)/ ) {
+    if ($className !~ /^WebGUI::Asset(?:::\w+)*$/ ) {
         return undef;
     }
-    (my $module = $className . '.pm') =~ s{::|'}{/}g;
+    (my $module = $className . '.pm') =~ s{::}{/}g;
     if (eval { require $module; 1 }) {
         return $className;
     }
@@ -1808,6 +1846,13 @@ sub new {
     if (defined $properties) {
         my $object = { _session=>$session, _properties => $properties };
         bless $object, $class;
+        foreach my $definition (@{ $object->definition($session) }) {
+            foreach my $property (keys %{ $definition->{properties} }) {
+                if ($definition->{properties}->{$property}->{serialize} && $object->{_properties}->{$property} ne '') {
+                    $object->{_properties}->{$property} = JSON->new->canonical->decode($object->{_properties}->{$property});
+                }
+            }
+        }
         return $object;
     }	
     $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
@@ -2533,8 +2578,13 @@ sub update {
             }
 
             # set the property
+            if ($propertyDefinition->{serialize}) {
+                $setPairs{$property} = JSON->new->canonical->encode($value);
+            }
+            else {
+                $setPairs{$property} = $value;
+            }
 			$self->{_properties}{$property} = $value;
-			$setPairs{$property} = $value;
 		}
 
         # if there's anything to update, then do so
@@ -2762,19 +2812,20 @@ sub www_edit {
 
 =head2 www_editSave ( )
 
-Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().  Will return an insufficient Privilege if canEdit returns False.
+Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().  Will return an insufficient Privilege if canEdit returns False, or if the submitted form does not pass the C<$session->form->validToken> check.
 
 NOTE: Don't try to override or overload this method. It won't work. What you are looking for is processPropertiesFromFormPost().
 
 =cut
 
 sub www_editSave {
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
 
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
-    my $isNewAsset = $self->session->form->process("assetId") eq "new" ? 1 : 0;
-    return $self->session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
-    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
+    return $session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
+    return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
     if ($self->session->config("maximumAssets")) {
         my ($count) = $self->session->db->quickArray("select count(*) from asset");
         my $i18n = WebGUI::International->new($self->session, "Asset");
@@ -2782,7 +2833,7 @@ sub www_editSave {
     }
     my $object;
     if ($isNewAsset) {
-        $object = $self->addChild({className=>$self->session->form->process("class","className")});	
+        $object = $self->addChild({className=>$session->form->process("class","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
         $object->{_properties}{url} = undef;
@@ -2792,15 +2843,15 @@ sub www_editSave {
             $object = $self->addRevision;
         } 
         else {
-            return $self->session->asset($self->getContainer)->www_view;
+            return $session->asset($self->getContainer)->www_view;
         }
     }
 
     # Process properties from form post
     my $errors = $object->processPropertiesFromFormPost;
     if (ref $errors eq 'ARRAY') {
-        $self->session->stow->set('editFormErrors', $errors);
-        if ($self->session->form->process('assetId') eq 'new') {
+        $session->stow->set('editFormErrors', $errors);
+        if ($session->form->process('assetId') eq 'new') {
             $object->purge;
             return $self->www_add();
         } else {
@@ -2812,45 +2863,55 @@ sub www_editSave {
     $object->updateHistory("edited");
 
     # we handle auto commit assets here in case they didn't handle it themselves
-    if ($object->getAutoCommitWorkflowId && $self->hasBeenCommitted) {
+    if ($object->getAutoCommitWorkflowId) {
         $object->requestAutoCommit;
+        #Since the version tag makes new objects, fetch a fresh one here.
+        $object = $object->cloneFromDb;
     }
     # else, try to to auto commit
-    elsif(WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
-        override        => scalar $self->session->form->process('saveAndCommit'),
-        allowComments   => 1,
-        returnUrl       => $self->getUrl,
-    }) eq 'redirect') {
-        return undef;
+    else {
+        my $commitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+            override        => scalar $session->form->process('saveAndCommit'),
+            allowComments   => 1,
+            returnUrl       => $self->getUrl,
+        });
+        if ($commitStatus eq 'redirect') {
+            ##Redirect set by tag.  Return nothing to send the user over to the redirect.
+            return undef;
+        }
+        elsif ($commitStatus eq 'commit') {
+            ##Commit was successful.  Update the local object cache so that it will no longer
+            ##register as locked.
+            $object = $object->cloneFromDb;
+        }
     }
-
     # Handle "saveAndReturn" button
-    if ( $self->session->form->process( "saveAndReturn" ) ne "" ) {
+    if ( $session->form->process( "saveAndReturn" ) ne "" ) {
         return $object->www_edit;
     }
 
     # Handle "proceed" form parameter
-    my $proceed = $self->session->form->process('proceed');
+    my $proceed = $session->form->process('proceed');
     if ($proceed eq "manageAssets") {
-        $self->session->asset($object->getParent);
-        return $self->session->asset->www_manageAssets;
+        $session->asset($object->getParent);
+        return $session->asset->www_manageAssets;
     }
     elsif ($proceed eq "viewParent") {
-        $self->session->asset($object->getParent);
-        return $self->session->asset->www_view;
+        $session->asset($object->getParent);
+        return $session->asset->www_view;
     }
-    elsif ($proceed eq "goBackToPage" && $self->session->form->process('returnUrl')) {
-        $self->session->http->setRedirect($self->session->form->process("returnUrl"));
+    elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
+        $session->http->setRedirect($session->form->process("returnUrl"));
         return undef;
     }
     elsif ($proceed ne "") {
-        my $method = "www_".$self->session->form->process("proceed");
-        $self->session->asset($object);
-        return $self->session->asset->$method();
+        my $method = "www_".$session->form->process("proceed");
+        $session->asset($object);
+        return $session->asset->$method();
     }
 
-    $self->session->asset($object->getContainer);
-    return $self->session->asset->www_view;
+    $session->asset($object->getContainer);
+    return $session->asset->www_view;
 }
 
 

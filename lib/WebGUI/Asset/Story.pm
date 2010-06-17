@@ -78,7 +78,7 @@ sub addRevision {
 
     my $newPhotoData = $newSelf->duplicatePhotoData;
     $newSelf->setPhotoData($newPhotoData);
-    $newSelf->requestAutoCommit;
+    #$newSelf->requestAutoCommit;
 
     return $newSelf;
 }
@@ -163,7 +163,7 @@ sub definition {
             defaultValue => '',
         },
         photo => {
-            fieldType    => 'text',
+            fieldType    => 'textarea',
             defaultValue => '[]',
             noFormPost   => 1,
         },
@@ -311,6 +311,15 @@ sub getAutoCommitWorkflowId {
     return undef;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getContainer (  )
+
+Returns the archive for this story, instead of the folder.
+
+=cut
+
+BEGIN { *getContainer = *getArchive }
 
 #-------------------------------------------------------------------
 
@@ -426,9 +435,18 @@ sub getEditForm {
     my $photoData      = $self->getPhotoData;
     my $numberOfPhotos = scalar @{ $photoData };
     foreach my $photoIndex (1..$numberOfPhotos) {
-        my $photo = $photoData->[$photoIndex-1];
+        my $photo   = $photoData->[$photoIndex-1];
+        my $storage = WebGUI::Storage->get($session, $photo->{storageId});
+        my $filename = $storage->getFiles->[0];
         push @{ $var->{ photo_form_loop } }, {
-            imgUploadForm  => $self->getPhotoUploadForm($photoIndex, $photo->{storageId}),
+            hasPhoto       => $filename ? 1                                    : 0, 
+            imgThumb       => $filename ? $storage->getThumbnailUrl($filename) : '', 
+            imgUrl         => $filename ? $storage->getUrl($filename)          : '', 
+            imgFilename    => $filename ? $filename                            : '',
+            newUploadForm  => WebGUI::Form::file($session, {
+                                name => 'newPhoto' . $photoIndex,
+                                maxAttachments => 1,
+                              }),
             imgCaptionForm => WebGUI::Form::text($session, {
                                  name  => 'imgCaption'.$photoIndex,
                                  value => $photo->{caption},
@@ -456,7 +474,7 @@ sub getEditForm {
         };
     }
     push @{ $var->{ photo_form_loop } }, {
-        imgUploadForm  => WebGUI::Form::image($session, {
+        newUploadForm  => WebGUI::Form::image($session, {
                              name           => 'newPhoto',
                              maxAttachments => 1,
                           }),
@@ -507,48 +525,6 @@ sub getPhotoData {
 
 #-------------------------------------------------------------------
 
-=head2 getPhotoUploadForm ( $index, $storageId )
-
-Render a simple file form control that displays the current image if it is
-uploaded.
-
-=head3 $index
-
-The index of a piece of Photo collateral.  An upload form for that index
-will be generated.
-
-=head3 $storageId
-
-The storage location for that piece of Photo collateral, to display an
-existing image if it exists.
-
-=cut
-
-sub getPhotoUploadForm {
-	my $self      = shift;
-    my $session   = $self->session;
-    my $index     = shift;
-    my $storageId = shift;
-
-    my $html      = '';
-    my $storage   = WebGUI::Storage->get($session, $storageId);
-    my $filename  = $storage->getFiles->[0];
-
-    if ($filename) {
-        $html .= WebGUI::Form::readOnly($session, {
-            value => '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($filename).'"><img src="'.$storage->getThumbnailUrl($filename).'" alt="'.$filename.'" style="border-style:none;vertical-align:middle;" /> '.$filename.'</a></p>',
-        })
-    }
-
-    $html .= WebGUI::Form::file($session, {
-        name => 'newPhoto' . $index,
-        maxAttachments => 1,
-    });
-    return $html;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getRssData (  )
 
 Returns RSS data for this Story.  The date of the RSS item is the lastModified
@@ -566,6 +542,20 @@ sub getRssData {
         date        => $self->get('lastModified'),
     };
 	return $data;
+}
+
+#-------------------------------------------------------------------
+
+=head2 indexContent (  )
+
+Extend the base class to index Story properties like headline, byline, etc.
+
+=cut
+
+sub indexContent {
+	my $self    = shift;
+    my $indexer = $self->next::method();
+    $indexer->addKeywords($self->get('headline'), $self->get('subtitle'), $self->get('location'), $self->get('highlights'), $self->get('byline'), $self->get('story'), );
 }
 
 #-------------------------------------------------------------------
@@ -606,6 +596,9 @@ sub processPropertiesFromFormPost {
     my $self = shift;
     my $session = $self->session;
     $self->next::method;
+    my $archive = delete $self->{_parent};  ##Force a new lookup.
+    #$session->log->warn($self->getParent->get('className'));
+    #$session->log->warn($self->getParent->getParent->get('className'));
     my $form    = $session->form;
     ##Handle old data first, to avoid iterating across a newly added photo.
     my $photoData      = $self->getPhotoData;
@@ -620,14 +613,17 @@ sub processPropertiesFromFormPost {
             splice @{ $photoData }, $photoIndex-1, 1;
             next PHOTO;
         }
-        ##Process new uploads
+        ##Process uploads that replace existing photos
         if (my $uploadId = $form->process('newPhoto'.$photoIndex,'File')) {
             my $upload   = WebGUI::Storage->get($session, $uploadId);
             my $storage  = WebGUI::Storage->get($session, $storageId);
             $storage->clear;
             my $filename = $upload->getFiles->[0];
             $storage->addFileFromFilesystem($upload->getPath($filename));
-            $storage->generateThumbnail($filename);
+            my ($width, $height) = $storage->getSizeInPixels($filename);
+            if ($width > $self->getArchive->get('photoWidth')) {
+                $storage->resize($filename, $self->getArchive->get('photoWidth'));
+            }
             $upload->delete;
         }
         my $newPhoto = {
@@ -658,6 +654,7 @@ sub processPropertiesFromFormPost {
         };
     }
     $self->setPhotoData($photoData);
+    $self->{_parent} = $archive;  ##Restore archive, for URL and other calculations
 }
 
 
@@ -817,6 +814,7 @@ Extend the superclass to make sure that the asset always stays hidden from navig
 sub update {
     my $self   = shift;
     my $properties = shift;
+    #$self->session->log->warn('story update');
     return $self->next::method({%$properties, isHidden => 1});
 }
 
@@ -833,7 +831,10 @@ This is a class method.
 sub validParent {
     my $class   = shift;
     my $session = shift;
-    return $session->asset && $session->asset->isa('WebGUI::Asset::Wobject::StoryArchive');
+    return $session->asset
+        && (   $session->asset->isa('WebGUI::Asset::Wobject::StoryArchive')
+           || ($session->asset->isa('WebGUI::Asset::Wobject::Folder') && $session->asset->getParent->isa('WebGUI::Asset::Wobject::StoryArchive') )
+           );
 }
 
 #-------------------------------------------------------------------
@@ -855,7 +856,7 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 viewTemplateVars ( $var )
+=head2 viewTemplateVariables ( $var )
 
 Add template variables to the existing template variables.  This includes asset level variables.
 
@@ -884,7 +885,7 @@ sub viewTemplateVariables {
     foreach my $keyword (@{ $keywords }) {
         push @{ $var->{keyword_loop} }, {
             keyword => $keyword,
-            url     => $archive->getUrl("func=view;keywords=".$session->url->escape($keyword)),
+            url     => $archive->getUrl("func=view;keyword=".$session->url->escape($keyword)),
         };
     }
     $var->{updatedTime}      = $self->formatDuration();
@@ -913,6 +914,7 @@ sub viewTemplateVariables {
     $var->{hasPhotos}   = $photoCounter;
     $var->{singlePhoto} = $photoCounter == 1;
     $var->{canEdit}     = $self->canEdit;
+    $var->{photoWidth}  = $archive->get('photoWidth');
     return $var;
 }
 

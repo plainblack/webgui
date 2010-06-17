@@ -1,6 +1,6 @@
 package WebGUI::FilePump::Bundle;
 
-use base qw/WebGUI::Crud/;
+use base qw/WebGUI::Crud WebGUI::JSONCollateral/;
 use strict;
 use WebGUI::International;
 use WebGUI::Utility;
@@ -40,9 +40,14 @@ sub addFile {
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
     my $files     = $self->get($collateralType);
-    my $uriExists = $self->getCollateralDataIndex($files, 'uri', $uri) != -1 ? 1 : 0;
+    my $uriExists = $self->getJSONCollateralDataIndex($files, 'uri', $uri) != -1 ? 1 : 0;
     return 0, 'Duplicate URI' if $uriExists;
-    $self->setCollateral(
+    
+    if (my $msg = $self->validate($uri)) {
+        return 0, $msg;
+    }
+    
+    $self->setJSONCollateral(
         $collateralType,
         'fileId',
         'new',
@@ -54,6 +59,7 @@ sub addFile {
     $self->update({lastModified => time()});
     return 1;
 }
+    
 
 #-------------------------------------------------------------------
 
@@ -388,39 +394,6 @@ sub deleteBuild {
 
 #-------------------------------------------------------------------
 
-=head2 deleteCollateral ( tableName, keyName, keyValue )
-
-Deletes a row of collateral data.
-
-=head3 tableName
-
-The name of the table you wish to delete the data from.
-
-=head3 keyName
-
-The name of a key in the collateral hash.  Typically a unique identifier for a given
-"row" of collateral data.
-
-=head3 keyValue
-
-Along with keyName, determines which "row" of collateral data to delete.
-
-=cut
-
-sub deleteCollateral {
-    my $self      = shift;
-    my $tableName = shift;
-    my $keyName   = shift;
-    my $keyValue  = shift;
-    my $table = $self->get($tableName);
-    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
-    return if $index == -1;
-    splice @{ $table }, $index, 1;
-    $self->update({ $tableName => $table });
-}
-
-#-------------------------------------------------------------------
-
 =head2 deleteFiles ( $type )
 
 Deletes all files of the requested type.
@@ -468,7 +441,7 @@ sub deleteFile {
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
-    $self->deleteCollateral(
+    $self->deleteJSONCollateral(
         $collateralType,
         'fileId',
         $fileId,
@@ -552,7 +525,7 @@ sub fetchAsset {
 
 #-------------------------------------------------------------------
 
-=head2 fetchDirectory ( $uri )
+=head2 fetchDir ( $uri )
 
 Fetches all files from a filesystem directory.  Returns a hashref
 with the date that the directory was last updated, a contents entry
@@ -569,7 +542,7 @@ A URI object.
 
 sub fetchDir {
     my ($self, $uri ) = @_;
-    my $filepath = $uri->path;
+    my $filepath = $self->resolveFilePath($uri->path);
     return {} unless (-e $filepath && -r _ && -d _);
     my @stats = stat(_);
     my $dir   = Path::Class::Dir->new($filepath);
@@ -601,7 +574,7 @@ A URI object.
 
 sub fetchFile {
     my ($self, $uri ) = @_;
-    my $filepath = $uri->path;
+    my $filepath = $self->resolveFilePath($uri->path);
     return {} unless (-e $filepath && -r _);
     return $self->fetchDir($uri) if -d _;
     my @stats = stat(_); # recycle stat data from file tests.
@@ -667,81 +640,6 @@ sub bundleUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getCollateral ( tableName, keyName, keyValue )
-
-Returns a hash reference containing one row of collateral data from a particular
-table.
-
-=head3 tableName
-
-The name of the table you wish to retrieve the data from.
-
-=head3 keyName
-
-The name of a key in the collateral hash.  Typically a unique identifier for a given
-"row" of collateral data.
-
-=head3 keyValue
-
-Along with keyName, determines which "row" of collateral data to get.
-If this is equal to "new", then an empty hashRef will be returned to avoid
-strict errors in the caller.  If the requested data does not exist in the
-collateral array, it also returns an empty hashRef.
-
-=cut
-
-sub getCollateral {
-    my $self      = shift;
-    my $tableName = shift;
-    my $keyName   = shift;
-    my $keyValue  = shift;
-    if ($keyValue eq "new" || $keyValue eq "") {
-        return {};
-    }
-    my $table = $self->get($tableName);
-    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
-    return {} if $index == -1;
-    my %copy = %{ $table->[$index] };
-    return \%copy;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getCollateralDataIndex ( table, keyName, keyValue )
-
-Returns the index in a set of collateral where an element of the
-data (keyName) has a certain value (keyValue).  If the criteria
-are not found, returns -1.
-
-=head3 table
-
-The collateral data to search
-
-=head3 keyName
-
-The name of a key in the collateral hash.
-
-=head3 keyValue
-
-The value that keyName should have to meet the criteria.
-
-=cut
-
-sub getCollateralDataIndex {
-    my $self     = shift;
-    my $table    = shift;
-    my $keyName  = shift;
-    my $keyValue = shift;
-    for (my $index=0; $index <= $#{ $table }; $index++) {
-        return $index
-            if (exists($table->[$index]->{$keyName}) && ($table->[$index]->{$keyName} eq $keyValue ));
-    }
-    return -1;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getPathClassDir ( $otherBuild )
 
 Returns a Path::Class::Dir object to the last build directory
@@ -792,84 +690,6 @@ sub getOutOfDateBundles {
 
 #-------------------------------------------------------------------
 
-=head2 moveCollateralDown ( tableName, keyName, keyValue )
-
-Moves a collateral data item down one position.  If called on the last element of the
-collateral array then it does nothing.  Returns 1 if the move is successful.  Returns
-undef or the empty array otherwise.
-
-=head3 tableName
-
-A string indicating the table that contains the collateral data.
-
-=head3 keyName
-
-The name of a key in the collateral hash.  Typically a unique identifier for a given
-"row" of collateral data.
-
-=head3 keyValue
-
-Along with keyName, determines which "row" of collateral data to move.
-
-=cut
-
-sub moveCollateralDown {
-    my $self      = shift;
-    my $tableName = shift;
-    my $keyName   = shift;
-    my $keyValue  = shift;
-
-    my $table = $self->get($tableName);
-    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
-    return if $index == -1;
-    return unless (abs($index) < $#{$table});
-    @{ $table }[$index,$index+1] = @{ $table }[$index+1,$index];
-    $self->update({ $tableName => $table });
-    return 1;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 moveCollateralUp ( tableName, keyName, keyValue )
-
-Moves a collateral data item up one position.  If called on the first element of the
-collateral array then it does nothing.  Returns 1 if the move is successful.  Returns
-undef or the empty array otherwise.
-
-
-=head3 tableName
-
-A string indicating the table that contains the collateral data.
-
-=head3 keyName
-
-The name of a key in the collateral hash.  Typically a unique identifier for a given
-"row" of collateral data.
-
-=head3 keyValue
-
-Along with keyName, determines which "row" of collateral data to move.
-
-=cut
-
-sub moveCollateralUp {
-    my $self      = shift;
-    my $tableName = shift;
-    my $keyName   = shift;
-    my $keyValue  = shift;
-
-    my $table = $self->get($tableName);
-    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
-    return if $index == -1;
-    return unless $index && (abs($index) <= $#{$table});
-    @{ $table }[$index-1,$index] = @{ $table }[$index,$index-1];
-    $self->update({ $tableName => $table });
-    return 1;
-}
-
-#-------------------------------------------------------------------
-
 =head2 moveFileDown ( $type, $fileId )
 
 Moves the requested file down in the ordered collateral.
@@ -893,7 +713,7 @@ sub moveFileDown {
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
-    $self->moveCollateralDown(
+    $self->moveJSONCollateralDown(
         $collateralType,
         'fileId',
         $fileId,
@@ -927,7 +747,7 @@ sub moveFileUp {
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
-    $self->moveCollateralUp(
+    $self->moveJSONCollateralUp(
         $collateralType,
         'fileId',
         $fileId,
@@ -936,63 +756,86 @@ sub moveFileUp {
     return 1;
 }
 
+#-------------------------------------------------------------------
 
-#-----------------------------------------------------------------
+=head2 validate ( $uri )
 
-=head2 setCollateral ( tableName, keyName, keyValue, properties )
+Check a uri for validation errors. Returns a validation error message (if problems found).
 
-Performs and insert/update of collateral data for any wobject's collateral data.
-Returns the id of the data that was set, even if a new row was added to the
-data.
+=head3 $uri
 
-=head3 tableName
-
-The name of the table to insert the data.
-
-=head3 keyName
-
-The name of a key in the collateral hash.  Typically a unique identifier for a given
-"row" of collateral data.
-
-=head3 keyValue
-
-Along with keyName, determines which "row" of collateral data to set.
-The index of the collateral data to set.  If the keyValue = "new", then a
-new entry will be appended to the end of the collateral array.  Otherwise,
-the appropriate entry will be overwritten with the new data.
-
-=head3 properties
-
-A hash reference containing the name/value pairs to be inserted into the collateral, using
-the criteria mentioned above.
+The URI to validate
 
 =cut
 
-sub setCollateral {
-    my $self       = shift;
-    my $tableName  = shift;
-    my $keyName    = shift;
-    my $keyValue   = shift;
-    my $properties = shift;
-    ##Note, since this returns a reference, it is actually updating
-    ##the object cache directly.
-    my $table = $self->get($tableName);
-    if ($keyValue eq 'new' || $keyValue eq '') {
-        if (! exists $properties->{$keyName}
-           or $properties->{$keyName} eq 'new'
-           or $properties->{$keyName} eq '') {
-            $properties->{$keyName} = $self->session->id->generate;
+sub validate {
+    my $self = shift;
+    my $uri = shift;
+    
+    my $urio   = URI->new($uri) or return "Invalid URI: $uri";
+    my $scheme = $urio->scheme;
+    my $path = $urio->path;
+    
+    # File validation
+    if ($scheme eq 'file') {
+        if ($path !~ m{^uploads/|^extras/}) {
+            return q{File uri must begin with file:uploads/.. or file:extras/..};
         }
-        push @{ $table }, $properties;
-        $self->update({$tableName => $table});
-        return $properties->{$keyName};
+        
+        # N.B. Once we have Path::Class >= 0.17 we can use resolve() for a better solution to this canonicalisation problem
+        if ($path =~ m{\.\./}) {
+            return q{Directory traversal not permitted};
+        }
+        
+        my $uploadsDir = Path::Class::Dir->new($self->session->config->get('uploadsPath'));
+        my $extrasDir  = Path::Class::Dir->new($self->session->config->get('extrasPath'));
+        
+        my $file = $self->resolveFilePath($path);
+        
+        return q{File not found} unless -e $file;
+        
+        if (!$uploadsDir->contains($file) && !$extrasDir->contains($file)) {
+            return q{File uri must correspond to files inside your uploads dir or your extras dir};
+        }
     }
-    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
-    return if $index == -1;
-    $table->[$index] = $properties;
-    $self->update({ $tableName => $table });
-    return $keyValue;
+    
+    return;
 }
 
+#-------------------------------------------------------------------
+
+=head2 resolveFilePath ( $path )
+
+Resolves a relative path into a L<Path::Class::File> object. The path,
+which must being with either C<uploads> or C<extras>, is resolved into
+an absolute path with C<uploads> or C<extras> replaced with the value
+of C<uploadsPath> or c<extrasPath> from the site config file.
+
+For example, the following path
+
+ file:extras/path/to/my/file
+
+Resolves to something like:
+
+ /data/WebGUI/www/extras/path/to/my/file
+
+=head3 $path
+
+A relative file path that must begine with either C<uploads> or C<extras>.
+
+=cut
+
+sub resolveFilePath {
+    my $self = shift;
+    my $path = shift;
+    
+    if ($path =~ s{^uploads/}{}) {
+        my $uploadsDir = Path::Class::Dir->new($self->session->config->get('uploadsPath'));
+        return Path::Class::File->new($uploadsDir, $path);
+    } elsif ($path =~ s{^extras/}{}) {
+        my $extrasDir  = Path::Class::Dir->new($self->session->config->get('extrasPath'));
+        return Path::Class::File->new($extrasDir, $path);
+    }
+}
 
 1;

@@ -223,7 +223,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 9, 'getEditForm: the form has 9 controls');
+is (scalar @inputs, 10, 'getEditForm: the form has 10 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -235,6 +235,10 @@ foreach my $input (@inputs) {
 cmp_deeply(
     \@interestingFeatures,
     [
+        {
+            name => 'webguiCsrfToken',
+            type => 'hidden',
+        },
         {
             name => undef,
             type => 'submit',
@@ -353,8 +357,7 @@ cmp_deeply(
 
 isa_ok( $driver->get(), 'HASH', 'get returns a hashref if called with no param');
 
-use Data::Dumper;
-diag Dumper $driver->get();
+note explain $driver->get();
 
 is($driver->get('groupToUse'), 7, '... default group is 7');
 

@@ -34,8 +34,8 @@ instances of this class to the database (one per distinct user response).
 
 Data stored in this object include the order in which questions and answers are
 presented to the user (L<"surveyOrder">), a snapshot of all completed questions   
-from the user (L<"responses">), the most recently answered question (L<"lastResponse">), the 
-number of questions answered (L<"questionsAnswered">) and the Survey start time (L<"startTime">).
+from the user (L<"responses">), the most recently answered question (L<"lastResponse">) and the 
+number of questions answered (L<"questionsAnswered">).
 
 This package is not intended to be used by any other Asset in WebGUI.
 
@@ -64,7 +64,7 @@ survey.
 =head3 $json
 
 A JSON string used to construct a new Perl object. The string should represent 
-a JSON hash made up of L<"startTime">, L<"surveyOrder">, L<"responses">, L<"lastResponse">
+a JSON hash made up of L<"surveyOrder">, L<"responses">, L<"lastResponse">
 and L<"questionsAnswered"> keys, with appropriate values.
 
 =cut
@@ -108,7 +108,6 @@ sub reset {
         responses => {},
         lastResponse => -1,
         questionsAnswered => 0,
-        startTime => time(),
         surveyOrder => undef,
         tags => {},
     };
@@ -225,29 +224,10 @@ sub freeze {
     my $self = shift;
     
     # These are the only properties of the response hash that we serialize:
-    my @props = qw(responses lastResponse questionsAnswered startTime tags);
+    my @props = qw(responses lastResponse questionsAnswered tags);
     my %serialize;
     @serialize{@props} = @{$self->response}{@props};
     return to_json(\%serialize);
-}
-
-#-------------------------------------------------------------------
-
-=head2 hasTimedOut ( $limit )
-
-Checks to see whether this survey has timed out, based on the internally stored starting
-time, and the suppied $limit value.
-
-=head3 $limit
-
-How long the user has to take the survey, in minutes.
-
-=cut
-
-sub hasTimedOut{
-    my $self = shift;
-    my ($limit) = validate_pos(@_, {type => SCALAR});
-    return $limit > 0 && $self->startTime + $limit * 60 < time;
 }
 
 #-------------------------------------------------------------------
@@ -269,7 +249,7 @@ If defined, lastResponse is set to $responseIndex.
 
 sub lastResponse {
     my $self = shift;
-    my ($responseIndex) = validate_pos(@_, {type => SCALAR, optional => 1});
+    my $responseIndex = shift;
     
     if ( defined $responseIndex ) {
         $self->response->{lastResponse} = $responseIndex;
@@ -293,37 +273,13 @@ If defined, increments the number of questions by $questionsAnswered
 
 sub questionsAnswered {
     my $self = shift;
-    my ($questionsAnswered) = validate_pos(@_, {type => SCALAR, optional => 1});
+    my $questionsAnswered = shift;
     
     if ( defined $questionsAnswered ) {
         $self->response->{questionsAnswered} += $questionsAnswered;
     }
     
     return $self->response->{questionsAnswered};
-}
-
-#-------------------------------------------------------------------
-
-=head2 startTime ([ $startTime ])
-
-Mutator for the time the user began the survey. 
-Returns (and optionally sets) the value of startTime.
-
-=head3 $startTime (optional)
-
-If defined, sets the starting time to $startTime.
-
-=cut
-
-sub startTime {
-    my $self     = shift;
-    my ($startTime) = validate_pos(@_, {type => SCALAR, optional => 1});
-
-    if ( defined $startTime ) {
-        $self->response->{startTime} = $startTime;
-    }
-
-    return $self->response->{startTime};
 }
 
 #-------------------------------------------------------------------
@@ -340,8 +296,8 @@ If defined, sets $tags to the supplied hashref.
 =cut
 
 sub tags {
-    my $self     = shift;
-    my ($tags) = validate_pos(@_, {type => HASHREF, optional => 1});
+    my $self = shift;
+    my $tags = shift;
 
     if ( $tags ) {
         $self->response->{tags} = $tags;
@@ -435,7 +391,7 @@ If defined, nextResponse is set to $responseIndex.
 
 sub nextResponse {
     my $self = shift;
-    my ($responseIndex) = validate_pos(@_, {type => SCALAR, optional => 1});
+    my $responseIndex = shift;
     
     if ( defined $responseIndex ) {
         $self->lastResponse($responseIndex - 1);
@@ -787,7 +743,7 @@ A variable name to match against all section and question variable names.
 
 sub processGoto {
     my $self = shift;
-    my ($goto) = validate_pos(@_, {type => SCALAR|UNDEF});
+    my $goto = shift;
     
     return if !$goto;
     
@@ -837,13 +793,13 @@ The expression. See  L<WebGUI::Asset::Wobject::Survey::ExpressionEngine> for mor
     
 sub processExpression {
     my $self = shift;
-    my ($expression) = validate_pos(@_, {type => SCALAR|UNDEF});
+    my $expression = shift;
     
     return if !$expression;
     
     # Prepare the ingredients..
-    my $values = $self->responseValuesByVariableName;
-    my $scores = $self->responseScoresByVariableName;
+    my $values = $self->responseValues( indexBy => 'variable' );
+    my $scores = $self->responseScores( indexBy => 'variable' );
     my $tags   = $self->tags;
     my %validTargets = map { $_ => 1 } @{$self->survey->getGotoTargets};
     
@@ -911,34 +867,35 @@ sub recordedResponses{
     return $responses;
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 responseValuesByVariableName ( $options )
+=head2 responseValues ( $opts )
 
-Returns a lookup table to question variable names and recorded response values.
+Returns a lookup table of recorded response values, keyed by either question variable
+or question address. Values come from the L<responses> hash.
 
-Only questions with a defined variable name set are included. Values come from
-the L<responses> hash.
+Accepts the following options:
 
-=head3 options
-
-The following options are supported:
-
-=over 3
+=over 4
 
 =item * useText
 
 For multiple choice questions, use the answer text instead of the recorded value
 (useful for doing [[var]] text substitution
 
+=item * indexBy
+
+The property to index responses by. Valid values are C<variable> (default) and C<address>.
+
+When using C<variable>, only questions with a defined variable name are included in the set.
+
 =back
 
 =cut
 
-sub responseValuesByVariableName {
+sub responseValues {
     my $self = shift;
-    my %options = validate(@_, { useText => 0 });
+    my %opts = validate(@_, { useText => 0, indexBy => { default => 'variable' } });
     
     my %lookup;
     
@@ -958,13 +915,16 @@ sub responseValuesByVariableName {
         # Grab the corresponding question
         my $question = $self->survey->question([@address]);
 
-        # Filter out questions without defined variable names
-        next if !$question || !defined $question->{variable};
+        # Find out what we're indexing responses by
+        my $identifier 
+            = $opts{indexBy} eq 'variable' ? $question && $question->{variable} 
+                                           : $self->questionId($address);
+        next unless $identifier;
         
         my $answer = $self->survey->answer([@address]);
         
         my $value = $response->{value};
-        if ($options{useText}) {
+        if ($opts{useText}) {
             # Test if question is a multiple choice type so we can use the answer text instead
             if($self->survey->getMultiChoiceBundle($question->{questionType})){
                 my $answerText = $answer->{text};
@@ -977,16 +937,16 @@ sub responseValuesByVariableName {
             }
         }
         
-        # Add variable => value to our hash
+        # Add identifier => value to our hash
         if (!$question->{maxAnswers} || $question->{maxAnswers} > 1) {
-            push @{$lookup{$question->{variable}}}, $value;
+            push @{$lookup{$identifier}}, $value;
         } else {
-            $lookup{$question->{variable}} = $value;
+            $lookup{$identifier} = $value;
         }
         
-        # For verbatims, also add verbatim value to lookup as variable + _verbatim
+        # For verbatims, also add verbatim value to lookup as identifier_verbatim
         if ($answer->{verbatim}) {
-            my $verbatimKey = $question->{variable} . "_verbatim";
+            my $verbatimKey = "${identifier}_verbatim";
             my $verbatimValue = $response->{verbatim};
             if (!$question->{maxAnswers} || $question->{maxAnswers} > 1) {
                 push @{$lookup{$verbatimKey}}, $verbatimValue;
@@ -1000,21 +960,32 @@ sub responseValuesByVariableName {
 
 #-------------------------------------------------------------------
 
-=head2 responseScoresByVariableName
+=head2 responseScores ( $opts )
 
-Returns a lookup table to question variable names and recorded response values.
+Returns a lookup table of recorded response scores, keyed by either question variable
+or question address. Values come from the L<responses> hash.
 
-Only questions with a defined variable name set are included. Scores come from
-the L<responses> hash.
+Accepts the following options:
+
+=over 4
+
+=item * indexBy
+
+The property to index responses by. Valid values are C<variable> (default) and C<address>.
+
+When using C<variable>, only questions with a defined variable name are included in the set.
+
+=back
 
 =cut
 
-sub responseScoresByVariableName {
+sub responseScores {
     my $self = shift;
+    my %opts = validate(@_, { indexBy => { default => 'variable' } });
     
     my %lookup;
     my $responses = $self->responses;
-    # Process responses in id order, just to be consistent with responseValuesByVariableName
+    # Process responses in id order, just to be consistent with L<responseValues>
     for my $address (sort keys %$responses) {
         next if !$address;
         my $response = $responses->{$address};
@@ -1029,8 +1000,11 @@ sub responseScoresByVariableName {
         # Grab the corresponding question
         my $question = $self->survey->question([@address]);
         
-        # Filter out questions without defined variable names
-        next if !$question || !defined $question->{variable};
+        # Find out what we're indexing responses by
+        my $identifier 
+            = $opts{indexBy} eq 'variable' ? $question && $question->{variable} 
+                                           : $self->questionId($address);
+        next unless $identifier;
         
         # Grab the corresponding answer
         my $answer = $self->survey->answer([@address]);
@@ -1039,17 +1013,19 @@ sub responseScoresByVariableName {
         my $score = (exists $answer->{value} && length $answer->{value} > 0) ? $answer->{value} : $question->{value};
         
         # Add variable => score to our hash (or add to existing score for multi-answer questions, e.g. maxAnswers != 1)
-        $lookup{$question->{variable}} += $score;
+        $lookup{$identifier} += $score;
     }
     
-    # Add section score totals
-    for my $s ( @{ $self->survey->sections } ) {
-        my $sVar = $s->{variable};
-        next unless $sVar;
-        
-        # N.B. Using map and grep here proved to be about twice as fast as looping over $s->{questions}
-        map { $lookup{$sVar} += $lookup{ $_->{variable} } }
-            grep { $_->{variable} and exists $lookup{ $_->{variable} } } @{ $s->{questions} };
+    # Add section score totals (currently only implemented when index is 'variable'
+    if ($opts{indexBy} eq 'variable') {
+        for my $s ( @{ $self->survey->sections } ) {
+            my $sVar = $s->{variable};
+            next unless $sVar;
+            
+            # N.B. Using map and grep here proved to be about twice as fast as looping over $s->{questions}
+            map { $lookup{$sVar} += $lookup{ $_->{variable} } }
+                grep { $_->{variable} and exists $lookup{ $_->{variable} } } @{ $s->{questions} };
+        }
     }
     
     return \%lookup;
@@ -1136,11 +1112,11 @@ sub nextQuestions {
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
     
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
-    my $responseValuesByVariableName = $self->responseValuesByVariableName( { useText => 1 } );
+    my $responseValues = $self->responseValues( { useText => 1, indexBy => 'variable' } );
     my $tags = $self->tags;
     
     # Merge values and tags hashes for processing [[var]] templated text
-    my %templateValues = (%$responseValuesByVariableName, %$tags);
+    my %templateValues = (%$responseValues, %$tags);
 
     # Do text replacement
     $section->{text} = $self->getTemplatedText($section->{text}, \%templateValues);
@@ -1251,7 +1227,7 @@ A Section Id is identical to a Section index. This method is only present for co
 
 sub sectionId {
     my $self = shift;
-    my ($sIndex) = validate_pos(@_, { type => SCALAR | UNDEF } );
+    my $sIndex = shift;
     
     return if !defined $sIndex;
     
@@ -1268,7 +1244,7 @@ The id is constructed by hyphenating the Section index and Question index.
 
 sub questionId {
     my $self = shift;
-    my ($sIndex, $qIndex) = validate_pos(@_, { type => SCALAR | UNDEF }, { type => SCALAR | UNDEF } );
+    my ($sIndex, $qIndex) = @_;
     
     return if !defined $sIndex || !defined $qIndex;
      
@@ -1285,7 +1261,7 @@ The id is constructed by hyphenating all three indices.
 
 sub answerId {
     my $self = shift;
-    my ($sIndex, $qIndex, $aIndex) = validate_pos(@_, { type => SCALAR | UNDEF  }, { type => SCALAR | UNDEF  }, { type => SCALAR | UNDEF  } );
+    my ($sIndex, $qIndex, $aIndex) = @_;
     
     return if !defined $sIndex || !defined $qIndex || !defined $aIndex;
     
@@ -1318,10 +1294,7 @@ This method is identical to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/sIndex>
 
 =cut
 
-sub sIndex {
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
-    return $address->[0];
-}
+sub sIndex { $_[0][0] }
 
 #-------------------------------------------------------------------
 
@@ -1333,10 +1306,7 @@ This method is identical to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/qIndex>
 
 =cut
 
-sub qIndex {
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
-    return $address->[1];
-}
+sub qIndex { $_[0][1] }
 
 #-------------------------------------------------------------------
 
@@ -1350,7 +1320,7 @@ This is because the third element of the L<"surveyOrder"> address array ref in i
 =cut
 
 sub aIndexes {
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    my $address = shift;
     
     if (my $indexes = $address->[2]) {
         return @{ $indexes };
@@ -1461,64 +1431,57 @@ sub _loadSectionIntoSummary{
 }
 #-------------------------------------------------------------------
 
-=head2 returnResponseForReporting
+=head2 responseReport
 
-Used to extract JSON responses for use in reporting results.
+Returns an array ref containing the current responses to the survey in a
+format that can be written to the temporary report table (see 
+L<WebGUI::Asset::Wobject::Survey::loadTempReportTable>.
 
-Returns an array ref containing the current responses to the survey.  The array ref contains a list of hashes with the section, question,
-sectionName, questionName, questionComment, and an answer array ref.  The answer array ref contains a list of hashes, with isCorrect (1 true, 0 false),
+The array ref contains a list of hashes with the section, question,
+sectionName, questionName, questionComment, and an answer array ref. 
+The answer array ref contains a list of hashes, with isCorrect (1 true, 0 false),
 recorded value, and the id of the answer. 
 
 =cut
 
-# TODO: This sub should make use of responseValuesByVariableName
+sub responseReport {
+    my $self = shift;
 
-sub returnResponseForReporting {
-    my $self      = shift;
-    my @report = ();
+    my @report;
     for my $address ( @{ $self->surveyOrder } ) {
-        my ($sIndex, $qIndex) = (sIndex($address), qIndex($address));
-        my $section = $self->survey->section( $address );
-        my $question = $self->survey->question( [ $sIndex, $qIndex ] );
-        my $questionId = $self->questionId($sIndex, $qIndex);
+        my ( $sIndex, $qIndex ) = ( sIndex($address), qIndex($address) );
+        my $section    = $self->survey->section($address);
+        my $question   = $self->survey->question( [ $sIndex, $qIndex ] );
+        my $questionId = $self->questionId( $sIndex, $qIndex );
 
         # Skip if this is a Section without a Question
-        if ( !defined $qIndex ) {
-            next;
-        }
-        
-        my @responses;
-        for my $aIndex (aIndexes($address)) {
-            my $answerId = $self->answerId($sIndex, $qIndex, $aIndex);
+        next unless defined $qIndex;
 
-            if ( $self->responses->{$answerId} ) {
+        # Multi-choice answers can have multiple responses per-question,
+        # so make sure we look over all answers
+        my @answer_responses;
+        for my $aIndex ( aIndexes($address) ) {
+            my $answerId = $self->answerId( $sIndex, $qIndex, $aIndex );
+            my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
 
-                # Make a safe copy of the response
-                my %response = %{$self->responses->{$answerId}};
-                $response{id} = $aIndex;
-
-                my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
-                if ( $answer->{isCorrect} ) {
-                    $response{value}
-                        = $answer->{value} =~ /\w/ ? $answer->{value}
-                                                   : $question->{value}
-                        ;
-                    $response{isCorrect} = 1;
-                }
-                else {
-                    $response{isCorrect} = 0;
-                }
-                push @responses, \%response;
+            # Massage each answer response and push it onto the list
+            if ( my $response = clone $self->responses->{$answerId} ) {
+                $response->{isCorrect} = $answer->{isCorrect} ? 1 : 0;
+                $response->{id} = $aIndex;
+                $response->{score} = $answer->{value};    # N.B. answer score is consistently misnamed 'value'
+                push @answer_responses, $response;
             }
         }
-        push @report, {
-                    section         => $sIndex,
-                    question        => $qIndex,
-                    sectionName     => $section->{variable},
-                    questionName    => $question->{variable},
-                    questionComment => $self->responses->{$questionId}->{comment},
-                    answers         => \@responses
-                };
+
+        push @report,
+            {
+            section         => $sIndex,
+            question        => $qIndex,
+            sectionName     => $section->{variable},
+            questionName    => $question->{variable},
+            questionComment => $self->responses->{$questionId}->{comment},
+            answers         => \@answer_responses
+            };
     }
     return \@report;
 }

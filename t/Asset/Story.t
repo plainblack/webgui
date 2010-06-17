@@ -81,7 +81,7 @@ WebGUI::Test->storagesToDelete($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 42;
+my $tests = 45;
 plan tests => 1
             + $tests
             + $canEditMaker->plan
@@ -103,8 +103,13 @@ skip "Unable to load module $class", $tests unless $loaded;
 ok(! WebGUI::Asset::Story->validParent($session), 'validParent: no session asset');
 $session->asset($defaultNode);
 ok(! WebGUI::Asset::Story->validParent($session), 'validParent: wrong type of asset');
+$session->asset(WebGUI::Asset->getRoot($session));
+ok(! WebGUI::Asset::Story->validParent($session), 'validParent: Any old folder is not valid');
 $session->asset($archive);
 ok(  WebGUI::Asset::Story->validParent($session), 'validParent: StoryArchive is valid');
+my $todayFolder = $archive->getFolder();
+$session->asset($todayFolder);
+ok(  WebGUI::Asset::Story->validParent($session), 'validParent: Folder below story archive is valid');
 
 ############################################################
 #
@@ -125,6 +130,7 @@ is($story->get('isHidden'), 1, 'by default, stories are hidden');
 $story->update({isHidden => 0});
 is($story->get('isHidden'), 1, 'stories cannot be set to not be hidden');
 is($story->get('state'),    'published', 'Story is published');
+$story->requestAutoCommit;
 
 {
     ##Version control does not alter the current object's status, fetch an updated copy from the
@@ -141,6 +147,14 @@ is($story->get('state'),    'published', 'Story is published');
 ############################################################
 
 is($story->getArchive->getId, $archive->getId, 'getArchive gets the parent archive for the Story');
+
+############################################################
+#
+# getContainer
+#
+############################################################
+
+is($story->getContainer->getId, $archive->getId, 'getContainer gets the parent archive for the Story');
 
 ############################################################
 #
@@ -310,7 +324,7 @@ $story->setPhotoData([
 
 
 my $viewVariables = $story->viewTemplateVariables;
-#diag Dumper $viewVariables;
+#note explain $viewVariables;
 cmp_deeply(
     $viewVariables->{highlights_loop},
     [
@@ -327,9 +341,9 @@ is($viewVariables->{headline}, 'WebGUI, Web Done Right', '... headline is okay')
 cmp_bag(
     $viewVariables->{keyword_loop},
     [
-        { keyword => "foxtrot", url => '/home/test-archive?func=view;keywords=foxtrot', },
-        { keyword => "tango",   url => '/home/test-archive?func=view;keywords=tango', },
-        { keyword => "whiskey", url => '/home/test-archive?func=view;keywords=whiskey', },
+        { keyword => "foxtrot", url => '/home/test-archive?func=view;keyword=foxtrot', },
+        { keyword => "tango",   url => '/home/test-archive?func=view;keyword=tango', },
+        { keyword => "whiskey", url => '/home/test-archive?func=view;keyword=whiskey', },
     ],
     'viewTemplateVariables: keywords_loop is okay'
 );

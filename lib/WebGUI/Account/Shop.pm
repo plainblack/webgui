@@ -120,8 +120,8 @@ sub editSettingsForm {
         name        => 'shopMySalesTemplateId',
         value       => $self->session->setting->get('shopMySalesTemplateId'),
         namespace   => 'Shop/MySales',
-        label       => $shopi18n->echo('my sales template'),
-        hoverHelp   => $shopi18n->echo('my sales template help'),
+        label       => $i18n->get('my sales template'),
+        hoverHelp   => $i18n->get('my sales template help'),
     );
 
     return $f->printRowsOnly;
@@ -179,7 +179,7 @@ sub getStyleTemplateId {
 
 =head2 www_managePurchases ( )
 
-The main view page for editing the user's profile.
+Provides a list of all the users transactions, with links to view more details for each one.
 
 =cut
 
@@ -197,8 +197,8 @@ sub www_managePurchases {
         push @{$var->{transactions}}, {
             %{$transaction->get},
             viewDetailUrl   => $self->getUrl('op=account;module=shop;do=viewTransaction;transactionId='.$id),
-            amount          => sprintf("%.2f", $transaction->get('amount')),
-            amountMinusTax  => sprintf( '%.2f', $transaction->get('amount') - $transaction->get('taxes') ),
+            amount          => sprintf( '%.2f', $transaction->get('amount') - $transaction->get('shopCreditDeduction') ),
+            amountMinusTax  => sprintf( '%.2f', $transaction->get('amount') - $transaction->get('shopCreditDeduction') - $transaction->get('taxes') ),
         };
     }
 
@@ -208,6 +208,14 @@ sub www_managePurchases {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manageTaxData ( )
+
+A wrapper for TaxDriver->getUserScreen, allowing the user to enter configuration
+data for himself.
+
+=cut
+
 sub www_manageTaxData {
     my $self    = shift;
     my $session = $self->session;

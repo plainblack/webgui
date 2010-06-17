@@ -127,7 +127,8 @@ sub getName {
 
 =head2 getValue ( )
 
-See WebGUI::Form::File::getValue() for details. Generates a thumbnail.
+See WebGUI::Form::File::getValue() for details. Generates a thumbnail.  If forceImageOnly is
+set, removes all images from the storage location that are not images, according Storage.pm.
 
 =cut
 

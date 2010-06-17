@@ -63,7 +63,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 45
+my $tests = 50
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -79,14 +79,22 @@ my $storage;
 my $versionTag;
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
+my @skipAutoCommit  = (undef, undef, { skipAutoCommitWorkflows => 1 });
 
 SKIP: {
 
 skip "Unable to load module $class", $tests unless $loaded;
+my $home = WebGUI::Asset->getDefault($session);
 
-$archive    = WebGUI::Asset->getDefault($session)->addChild({className => $class, title => 'My Stories', url => '/home/mystories'});
+$archive    = $home->addChild({
+                className => $class,
+                title => 'My Stories',
+                url => '/home/mystories',
+                styleTemplateId => $home->get('styleTemplateId'),
+              });
 $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
+WebGUI::Test->tagsToRollback($versionTag);
 
 isa_ok($archive, 'WebGUI::Asset::Wobject::StoryArchive', 'created StoryArchive');
 
@@ -118,16 +126,17 @@ $canPostMaker->run();
 my $now = time();
 my $todayFolder = $archive->getFolder($now);
 isa_ok($todayFolder, 'WebGUI::Asset::Wobject::Folder', 'getFolder created a Folder');
-is($archive->getChildCount, 1, 'getFolder created a child');
+is($archive->getChildCount, 1, '... created a child');
 my $dt = DateTime->from_epoch(epoch => $now, time_zone => $session->datetime->getTimeZone);
 my $folderName = $dt->strftime('%B_%d_%Y');
 $folderName =~ s/^(\w+_)0/$1/;
-is($todayFolder->getTitle, $folderName, 'getFolder: folder has the right name');
+is($todayFolder->getTitle, $folderName, '... folder has the right name');
 my $folderUrl = join '/', $archive->getUrl, lc $folderName;
-is($todayFolder->getUrl, $folderUrl, 'getFolder: folder has the right URL');
-is($todayFolder->getParent->getId, $archive->getId, 'getFolder: created folder has the right parent');
-is($todayFolder->get('state'),  'published', 'getFolder: created folder is published');
-is($todayFolder->get('status'), 'approved',  'getFolder: created folder is approved');
+is($todayFolder->getUrl, $folderUrl, '... folder has the right URL');
+is($todayFolder->getParent->getId, $archive->getId, '... created folder has the right parent');
+is($todayFolder->get('state'),  'published', '... created folder is published');
+is($todayFolder->get('status'), 'approved',  '... created folder is approved');
+is($todayFolder->get('styleTemplateId'), $archive->get('styleTemplateId'),  '... created folder has correct styleTemplateId');
 
 my $sameFolder = $archive->getFolder($now);
 is($sameFolder->getId, $todayFolder->getId, 'call with same time returns the same folder');
@@ -152,12 +161,23 @@ is($archive->getChildCount, 0, 'leaving with an empty archive');
 my $child = $archive->addChild({className => 'WebGUI::Asset::Wobject::StoryTopic'});
 is($child, undef, 'addChild: Will only add Stories');
 
-$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'});
+$child = $archive->addChild({className => 'WebGUI::Asset::Snippet'});
+is($child, undef, '... will not add snippets');
+
+$child = $archive->addChild({className => 'WebGUI::Asset::Wobject::Folder'});
+isa_ok($child, 'WebGUI::Asset::Wobject::Folder', '... will add folders, so importing a package works');
+
+$child->purge;
+
+$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'}, @skipAutoCommit);
+my $tag1 = WebGUI::VersionTag->getWorking($session);
+$tag1->commit;
+WebGUI::Test->tagsToRollback($tag1);
 isa_ok($child, 'WebGUI::Asset::Story', 'addChild added and returned a Story');
-is($archive->getChildCount, 1, 'addChild: added it to the archive');
+is($archive->getChildCount, 1, '... added it to the archive');
 my $folder = $archive->getFirstChild();
-isa_ok($folder, 'WebGUI::Asset::Wobject::Folder', 'Folder was added to Archive');
-is($folder->getChildCount, 1, 'The folder has 1 child...');
+isa_ok($folder, 'WebGUI::Asset::Wobject::Folder', '... Folder was added to Archive');
+is($folder->getChildCount, 1, '... The folder has 1 child...');
 is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct child');
 
 ################################################################
@@ -186,16 +206,22 @@ my $newFolder = $archive->getFolder($yesterday);
 my ($wgBdayMorn,undef)    = $session->datetime->dayStartEnd($wgBday);
 my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
-my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo'});
+my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo,all'}, @skipAutoCommit);
 $creationDateSth->execute([$wgBday, $story->getId]);
+my $tag2 = WebGUI::VersionTag->getWorking($session);
+$tag2->commit;
+WebGUI::Test->tagsToRollback($tag2);
 
 {
     my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
     is ($storyDB->get('status'), 'approved', 'addRevision always calls for an autocommit');
 }
 
-my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" });
+my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" }, @skipAutoCommit);
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
+my $tag3 = WebGUI::VersionTag->getWorking($session);
+$tag3->commit;
+WebGUI::Test->tagsToRollback($tag3);
 
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
@@ -262,13 +288,16 @@ cmp_deeply(
     'viewTemplateVariables: returns expected template variables with 3 stories in different folders, user is cannot edit stories'
 );
 
-my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot"});
-my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo"});
-my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo"});
+my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot,all"}, @skipAutoCommit);
+my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo,all"},  @skipAutoCommit);
+my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo,all"},    @skipAutoCommit);
 foreach my $storilet ($story2, $story3, $story4) {
     $session->db->write("update asset set creationDate=$now where assetId=?",[$storilet->getId]);
 }
 $archive->update({storiesPerPage => 3});
+my $tag4 = WebGUI::VersionTag->getWorking($session);
+$tag4->commit;
+WebGUI::Test->tagsToRollback($tag4);
 
 ##Don't assume that Admin and Visitor have the same timezone.
 $session->user({userId => 3});
@@ -372,6 +401,10 @@ cmp_deeply(
 );
 
 $archive->update({storiesPerPage => 3});
+$session->request->setup_body({ keyword => 'all' } );
+$templateVars = $archive->viewTemplateVariables('keyword');
+ok($templateVars->{'pagination.pageCount.isMultiple'}, 'keyword search with multiple pages');
+is($templateVars->{'pagination.lastPageUrl'}, '/home/mystories?func=view;keyword=all;pn=2', '... pagination variable has correct URL');
 
 $session->request->setup_body({ } );
 
@@ -469,7 +502,7 @@ $session->scratch->delete('isExporting');
 $templateVars = $archive->viewTemplateVariables();
 my @anchors = simpleHrefParser($templateVars->{keywordCloud});
 my @expectedAnchors = ();
-foreach my $keyword(qw/echo foxtrot roger/) {
+foreach my $keyword(qw/echo foxtrot roger all/) {
     push @expectedAnchors, [ $keyword, '/home/mystories?func=view;keyword='.$keyword ];
 }
 cmp_bag(
@@ -489,7 +522,7 @@ $session->scratch->set('isExporting', 1);
 $templateVars = $archive->viewTemplateVariables();
 @anchors = simpleHrefParser($templateVars->{keywordCloud});
 @expectedAnchors = ();
-foreach my $keyword(qw/echo foxtrot roger/) {
+foreach my $keyword(qw/echo foxtrot roger all/) {
     push @expectedAnchors, [ $keyword, '/home/mystories/keyword_'.$keyword.'.html' ];
 }
 cmp_bag(
@@ -558,11 +591,13 @@ $archive->exportAssetCollateral($assetFile, {}, $session);
 my $exportedFiles = $exportStorage->getFiles();
 cmp_bag(
     $exportedFiles,
-    [qw/
-        mystories.rss        mystories
-        mystories.atom
-        mystories.rdf
-    /],
+    [qw{
+        mystories.rss                mystories
+        mystories.atom               mystories.rdf
+        mystories/index.html         mystories/keyword_echo.html
+        mystories/keyword_roger.html mystories/keyword_foxtrot.html
+        mystories/keyword_all.html
+    }],
     'exportAssetCollateral: feed files exported'
 );
 
@@ -572,6 +607,7 @@ cmp_bag(
         keyword_echo.html
         keyword_roger.html
         keyword_foxtrot.html
+        keyword_all.html
         index.html
     /],
     'exportAssetCollateral: keyword files exported into correct dir (below the asset)'
@@ -630,12 +666,6 @@ $archive->update({ url => '/home/mystories' });
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    if (defined $archive and ref $archive eq $class) {
-        $archive->purge;
-    }
-    if ($versionTag) {
-        $versionTag->rollback;
-    }
     $creationDateSth->finish;
 }
 

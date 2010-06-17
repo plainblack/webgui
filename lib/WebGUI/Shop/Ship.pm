@@ -265,6 +265,7 @@ sub www_manage {
         .WebGUI::Form::selectBox($session, {name=>"className", options=>$self->getDrivers})
         .WebGUI::Form::submit($session, {value=>$i18n->get("add shipper")})
         .WebGUI::Form::formFooter($session);
+    my $hasShipper = 0;
     foreach my $shipper (@{$self->getShippers}) {
         $output .= '<div style="clear: both;">'
 			.WebGUI::Form::formHeader($session, {extras=>'style="float: left;"'})
@@ -283,8 +284,13 @@ sub www_manage {
             .' '
             .$shipper->get("label")
 			.'</div>';        
+        $hasShipper = 1;
     }
     my $console = $admin->getAdminConsole;
+    if (! $hasShipper) {
+        my $noShipper = $i18n->get('No shippers');
+        $output = qq|<div class="error">$noShipper</div>\n| . $output;
+    }
     return $console->render($output, $i18n->get("shipping methods"));
 }
 

@@ -169,7 +169,10 @@ sub create {
 	# add defaults
 	my $properties = $class->crud_getProperties($session);
 	foreach my $property (keys %{$properties}) {
-		$data->{$property} ||= $properties->{$property}{defaultValue};
+	    # set a default value if it's empty or undef (as per L<update>)
+        if ($data->{$property} eq "") {
+            $data->{$property} = $properties->{$property}{defaultValue};
+        }
 	}
 
 	# determine sequence
@@ -188,6 +191,26 @@ sub create {
 	my $self = $class->new($someObject, $id);
 	$self->update($data);
 	return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 crud_createOrUpdateTable ( session )
+
+A detection class method used to affirm creation or update of the database table using the crud_definition(). Returns 1 on successful completion.
+
+=head3 session
+
+A reference to a WebGUI::Session.
+
+=cut
+
+sub crud_createOrUpdateTable {
+    my ( $class, $session ) = @_;
+    my $tableName   = $class->crud_getTableName($session);
+    my $tableExists = $session->db->dbh->do("show tables like '$tableName'");
+
+    return ( $tableExists ne '0E0' ? $class->crud_updateTable($session) : $class->crud_createTable($session) );
 }
 
 #-------------------------------------------------------------------

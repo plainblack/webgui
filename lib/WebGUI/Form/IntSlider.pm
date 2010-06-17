@@ -87,9 +87,10 @@ Returns the form element used for manual input.
 sub getInputElement {
 	my $self = shift;
 
+    $self->session->log->warn("int slider value: ". $self->getSliderValue);
 	return WebGUI::Form::Integer($self->session, {
 		name	=> $self->get('name'),
-		value	=> $self->getValue(),
+		value	=> $self->getSliderValue(),
 		size	=> $self->get('size'),
 		id	=> 'view-'.$self->get('id'),
 	});

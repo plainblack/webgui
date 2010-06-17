@@ -12,6 +12,26 @@ our $I18N = {
         message     => q{Group to manage friends, to assign people to one another and to view the interface for managing friends.},
         lastUpdated => 0,
     },
+    
+    'style template label' => {
+        message     => q|Style Template|,
+        lastUpdated => 0
+	},
+
+    'style template hoverHelp' => {
+        message     => q|Select a style template from the list to enclose the Friend Manager tab in.|,
+        lastUpdated => 0
+	},
+
+    'layout template label' => {
+        message     => q|Layout Template|,
+        lastUpdated => 0
+	},
+
+    'layout template hoverHelp' => {
+        message     => q{Choose a layout template in which to enclose the content from the various methods within the Friend Manager tab},
+        lastUpdated => 0
+    },
 
     'view template label' => {
         message     => q{View Template},
@@ -109,8 +129,8 @@ our $I18N = {
     },
 
     'manageUrl' => {
-        message     => q{The GUID of the user whose friends you are managing.},
-        lastUpdated => 0,
+        message     => q{The URL back to the Friend Manager main screen},
+        lastUpdated => 1248798355,
     },
 
     'back to friend manager' => {

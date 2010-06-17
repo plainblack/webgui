@@ -30,6 +30,7 @@ $session->user({ userId => 3 });
 my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
+WebGUI::Test->tagsToRollback(@versionTags);
 
 # Add a new user to the test user's friends list
 my $friend  = WebGUI::User->new($session, "new");
@@ -130,10 +131,3 @@ $photo->update({ friendsOnly => 0, });
 
 #----------------------------------------------------------------------------
 # Cleanup
-END {
-    for my $versionTag ( @versionTags ) {
-        $versionTag->rollback;
-    }
-    $session->user({userId => 3});
-    $session->user->friends->delete();
-}

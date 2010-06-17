@@ -41,6 +41,9 @@ sub addChild {
     my $self = shift;
     my ($properties) = @_;
     ##Allow subclassing
+    if ($properties->{className} eq 'WebGUI::Asset::Wobject::Folder') {
+        return $self->SUPER::addChild(@_);
+    }
     return undef unless $properties->{className} =~ /^WebGUI::Asset::Story/;
     my $todayFolder = $self->getFolder;
     return undef unless $todayFolder;
@@ -322,11 +325,12 @@ sub getFolder {
 
     ##Call SUPER because my addChild calls getFolder
     $folder = $self->SUPER::addChild({
-        className => 'WebGUI::Asset::Wobject::Folder',
-        title     => $folderName,
-        menuTitle => $folderName,
-        url       => $folderUrl,
-        isHidden  => 1,
+        className       => 'WebGUI::Asset::Wobject::Folder',
+        title           => $folderName,
+        menuTitle       => $folderName,
+        url             => $folderUrl,
+        isHidden        => 1,
+        styleTemplateId => $self->get('styleTemplateId'),
     });
     $newVersionTag->commit();
     ##Restore the old one, if it exists
@@ -460,7 +464,7 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 viewTemplateVars ( $mode )
+=head2 viewTemplateVariables ( $mode )
 
 Make template variables for the view template.
 
@@ -508,6 +512,7 @@ sub viewTemplateVariables {
             usePaginator => 1,
             rowsPerPage  => $self->get('storiesPerPage'),
         });
+        $p->setBaseUrl($self->getUrl("func=view;keyword=".$keywords));
     }
     elsif ($mode eq 'search') {
         $var->{mode} = 'search';

@@ -52,6 +52,9 @@ my $origSessionTimeout = $session->setting->get('sessionTimeout');
 my $sessionCount = $session->db->quickScalar('select count(*) from userSession');
 my $scratchCount = $session->db->quickScalar('select count(*) from userSessionScratch');
 
+note $sessionCount;
+note $scratchCount;
+
 my @sessions;
 
 foreach (1..2) {
@@ -67,14 +70,11 @@ foreach (1..2) {
 
 $session->setting->set('sessionTimeout', $origSessionTimeout );
 
-$sessions[1]->scratch->set('scratch1', 1);
-$sessions[3]->scratch->set('scratch3', 3);
-
 my $newSessionCount = $session->db->quickScalar('select count(*) from userSession');
 my $newScratchCount = $session->db->quickScalar('select count(*) from userSessionScratch');
 
 is ($newSessionCount, $sessionCount+4, 'all new sessions created correctly');
-is ($newScratchCount, $scratchCount+2, 'two of the new sessions have scratch entries');
+is ($newScratchCount, $scratchCount+4, 'all new user sessions created correctly');
 
 my $instance2 = WebGUI::Workflow::Instance->create($session,
     {
@@ -95,7 +95,7 @@ $newSessionCount = $session->db->quickScalar('select count(*) from userSession')
 $newScratchCount = $session->db->quickScalar('select count(*) from userSessionScratch');
 
 is ($newSessionCount, $sessionCount+2, 'two of the sessions were deleted');
-is ($newScratchCount, $scratchCount+1, 'one of the new sessions have scratch entries were deleted');
+is ($newScratchCount, $scratchCount+2, 'scratch from both sessions cleaned up');
 
 foreach my $testSession (@sessions) {
     $testSession->var->end;

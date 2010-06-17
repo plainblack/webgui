@@ -154,7 +154,7 @@ sub www_approveVersionTag {
     my $tag         = WebGUI::VersionTag->new( $session, $session->form->param("tagId") );
 
     return $session->privilege->insufficient 
-        unless canApproveVersionTag( $session, $tag );
+        unless canApproveVersionTag( $session, $tag ) && $session->form->validToken;
     
     my $instance    = $tag->getWorkflowInstance;
     my $activity    = $instance->getNextActivity;
@@ -271,7 +271,7 @@ A reference to the current session.
 
 sub www_editVersionTagSave {
 	my $session = shift;
-        return $session->session->privilege->insufficient() unless canView($session);
+    return $session->session->privilege->insufficient() unless canView($session) && $session->form->validToken;
 	if ($session->form->param("tagId") eq "new") {
 		my $tag = WebGUI::VersionTag->create($session, {
 			name=>$session->form->process("name","text", "Untitled"),
@@ -419,7 +419,7 @@ sub www_commitVersionTagConfirm {
 	my $tagId = $session->form->param("tagId");
 	if ($tagId) {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
+		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse")) && $session->form->validToken) {
 			my $i18n = WebGUI::International->new($session, "VersionTag");
 			
             my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
@@ -651,10 +651,12 @@ sub www_manageRevisionsInTag {
     $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
     $ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
     $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
+    $ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
 
     # Process any actions
-    my $action = lc $session->form->get('action');
-    if ( $action eq "purge" ) {
+    my $action     = lc $session->form->get('action');
+    my $validToken = $session->form->validToken;
+    if ( $action eq "purge" && $validToken) {
         # Purge these revisions
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
@@ -669,7 +671,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $action eq "move to:" ) {
+    elsif ( $action eq "move to:" && $validToken) {
         # Get the new version tag
         my $moveToTagId = $session->form->get('moveToTagId');
         my $moveToTag;
@@ -697,7 +699,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $action eq "update version tag" ) {
+    elsif ( $action eq "update version tag" && $validToken) {
         my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
         my $endTime   = WebGUI::DateTime->new($session,$session->form->process("endTime","dateTime"))->toDatabase;
         
@@ -850,14 +852,16 @@ sub www_rollbackVersionTag {
 	return $session->privilege->adminOnly() unless canView($session);
 	my $tagId = $session->form->process("tagId");
 	return $session->privilege->vitalComponent() if ($tagId eq "pbversion0000000000001");
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $i18n    = WebGUI::International->new($session, 'VersionTag');
+    $pb->start($i18n->get('rollback version tag'), $session->url->extras('adminConsole/versionTags.gif'));
 	if ($tagId) {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		$tag->rollback if defined $tag;
+		$tag->rollback({ outputSub => sub { $pb->update(@_) }, }) if defined $tag;
 	}
-	if ($session->form->process("proceed") eq "manageCommittedVersions") {
-		return www_manageCommittedVersions($session);
-	}
-	return www_manageVersions($session);
+	my $method = $session->form->process("proceed");
+    $method    = $method eq "manageCommittedVersions" ? $method : 'manageVersions';
+    $pb->finish(WebGUI::Asset->getDefault($session)->getUrl('op='.$method));
 }
 
 

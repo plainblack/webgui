@@ -81,6 +81,12 @@ our $HELP = {
             { 'name' => 'question_count' },
             {   'name'      => 'response_loop',
                 'variables' => [
+                    { 'name' => 'response_feedback_url' },
+                    { 'name' => 'response_id' },
+                    { 'name' => 'response_userId' },
+                    { 'name' => 'response_ip' },
+                    { 'name' => 'response_startDate' },
+                    { 'name' => 'response_endDate' },
                     { 'name' => 'response_user_name' },
                     { 'name' => 'response_count_correct' },
                     { 'name' => 'response_percent' }
@@ -409,10 +415,11 @@ our $HELP = {
         fields    => [],
         variables => [
             { name => 'complete', description => 'response complete help' },
-            { name => 'restart', description => 'response complete help' },
+            { name => 'restart', description => 'response restart help' },
             { name => 'timeout', description => 'response timeout help' },
             { name => 'timeoutRestart', description => 'response timeout restart help' },
             { name => 'endDate', description => 'response endDate help' },
+            { name => 'responseId', description => 'responseId help' },
         ],
          related => [
             {   tag       => 'survey template',

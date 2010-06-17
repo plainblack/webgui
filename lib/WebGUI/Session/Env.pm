@@ -43,7 +43,7 @@ These methods are available from this package:
 
 =head2 callerIsSearchSite ( )
 
-returns true if the remote address matches a site which is a known indexer or spider.
+Returns true if the remote address matches a site which is a known indexer or spider.
 
 =cut
 
@@ -65,7 +65,8 @@ sub callerIsSearchSite {
 
 =head2 clientIsSpider ( )
 
-returns true is the client/agent is a spider/indexer or some other non-human interface
+Returns true is the client/agent is a spider/indexer or some other non-human interface, determined
+by checking the user agent against a list of known spiders.
 
 =cut
 
@@ -166,7 +167,7 @@ sub new {
 
 =head2 requestNotViewed ( )
 
-returns true is the client/agent is a spider/indexer or some other non-human interface
+Returns true is the client/agent is a spider/indexer or some other non-human interface
 
 =cut
 
@@ -179,6 +180,24 @@ sub requestNotViewed {
                                             # IPv6 addresses.  it may be useful in the 
                                             # future though
 
+}
+
+#-------------------------------------------------------------------
+
+=head2 sslRequest ( )
+
+Returns true if a https request was made.
+
+=cut
+
+sub sslRequest {
+    my $self = shift;
+    return (
+           $self->get('HTTPS') eq 'on'
+        || $self->get('SSLPROXY')
+        || $self->get('HTTP_SSLPROXY')
+        || $self->get('HTTP_X_FORWARDED_PROTO') eq 'https'
+    );
 }
 
 

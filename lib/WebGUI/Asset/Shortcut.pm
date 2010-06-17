@@ -140,6 +140,14 @@ sub _submenu {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canEdit 
+
+Extend the base method to handle dashlets.  If this Shortcut is a dashlet, then if you
+can manage the parent you can edit this Shortcut.
+
+=cut
+
 sub canEdit {
 	my $self = shift;
 return 1 if ($self->SUPER::canEdit || ($self->isDashlet && $self->getParent->canManage));
@@ -147,6 +155,13 @@ return 1 if ($self->SUPER::canEdit || ($self->isDashlet && $self->getParent->can
 }
 
 #-------------------------------------------------------------------
+
+=head2 canManage 
+
+An alias for canEdit.
+
+=cut
+
 sub canManage {
 	my $self = shift;
 	return $self->canEdit;
@@ -207,6 +222,14 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 discernUserId 
+
+This utility method is used to determine if the user should be shown the view of the
+Shortcut that the Visitor would see, or their own.
+
+=cut
+
 sub discernUserId {
 	my $self = shift;
 	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->userId;
@@ -217,8 +240,6 @@ sub discernUserId {
 =head2 duplicate
 
 Extend the base method to duplicate shortcut overrides.
-
-See also Asset::duplicate.
 
 =cut
 
@@ -235,14 +256,35 @@ END_SQL
 }
 
 #-------------------------------------------------------------------
+
+=head2 getContentLastModified 
+
+Extend the base method to consider the revisionDate of the Asset being shortcutted.
+Return the largest of either the asset revision date, or the shortcut revision date.
+
+=cut
+
 sub getContentLastModified {
     my $self = shift;
     my $assetRev = $self->get('revisionDate');
-    my $shortcuttedRev = $self->getShortcut->get('revisionDate');
-    return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
+    my $shortcut = $self->getShortcut;
+    my $shortcuttedRev;
+    if (defined $shortcut) {
+        $shortcuttedRev = $shortcut->get('revisionDate');
+        return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
+    } else {
+        return 0;
+    }
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm 
+
+Extend the base class to handle hand drawing the query build and other pieces.
+
+=cut
+
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
@@ -324,6 +366,14 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 getFieldsList 
+
+Return a form with a list of profile fields to show to the user, and a list of fields
+to import as variables for use in overrides.
+
+=cut
+
 sub getFieldsList {
 	my $self    = shift;
     my $session = $self->session;
@@ -331,7 +381,6 @@ sub getFieldsList {
 	my $output  = '<a href="'.$self->getUrl('op=editProfileSettings').'" class="formLink">'.$i18n->get('Manage Profile Fields').'</a><br /><br />';
 	my %fieldNames;
 	tie %fieldNames, 'Tie::IxHash';
-    use Data::Dumper;
 	foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
 		my $fieldId = $field->getId;
 		next if $fieldId =~ /contentPositions/;
@@ -340,7 +389,6 @@ sub getFieldsList {
 	}
 	$output .= '<table cellspacing="0" cellpadding="3" border="1"><tr><td><table cellspacing="0" cellpadding="3" border="0">';
 	my @prefFieldsToShow = $self->getPrefFieldsToShow;
-    $session->log->warn('fieldsToShow: '.Dumper \@prefFieldsToShow);
 	my $list = WebGUI::Form::CheckList->new($session,
 		-name=>"prefFieldsToShow",
 		-value=>\@prefFieldsToShow,
@@ -496,6 +544,14 @@ sub getOverrides {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getShortcut 
+
+Return a copy of the Asset that this Shortcut points to.  Overrides are
+processed if set.
+
+=cut
+
 sub getShortcut {
 	my $self = shift;
 	unless ($self->{_shortcut}) {
@@ -629,12 +685,27 @@ sub getShortcutByCriteria {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getShortcutDefault 
+
+Return the asset that this Shortcut points to.
+
+=cut
+
 sub getShortcutDefault {
 	my $self = shift;
 	return WebGUI::Asset->newByDynamicClass($self->session, $self->get("shortcutToAssetId"));
 }
 
 #-------------------------------------------------------------------
+
+=head2 getShortcutOriginal 
+
+If shortcutByCriteria is set, return the Shortcut that matches the criteria.  Otherwise,
+just return the asset the shortcut points to.
+
+=cut
+
 sub getShortcutOriginal {
 	my $self = shift;
 	if ($self->get("shortcutByCriteria")) {
@@ -645,12 +716,27 @@ sub getShortcutOriginal {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getPrefFieldsToShow 
+
+Returns an array of profile fields to show to the user as preferences.
+
+=cut
+
 sub getPrefFieldsToShow {
 	my $self = shift;
 	return split("\n",$self->getValue("prefFieldsToShow"));
 }
 
 #-------------------------------------------------------------------
+
+=head2 getPrefFieldsToImport 
+
+Returns an array of profile fields to import from the user's profile as variables
+for overrides.
+
+=cut
+
 sub getPrefFieldsToImport {
 	my $self = shift;
 	return split("\n",$self->getValue("prefFieldsToImport"));
@@ -678,6 +764,13 @@ sub getTemplateVars {
 }
 
 #-------------------------------------------------------------------
+
+=head2 isDashlet 
+
+Returns true if this Shortcut is a Dashlet.  Dashlets are chilren of Dashboards.
+
+=cut
+
 sub isDashlet {
 	my $self = shift;
 	return 1 if ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard';
@@ -685,6 +778,12 @@ sub isDashlet {
 }
 
 #-------------------------------------------------------------------
+
+=head2 notLinked 
+
+Returns an I18n'ed error message that the Asset that this Shortcut points to no longer exists.
+
+=cut
 
 sub notLinked {
 	my $self = shift;
@@ -777,12 +876,26 @@ END_SQL
 }
 
 #-------------------------------------------------------------------
+
+=head2 uncacheOverrides 
+
+Delete any cached overrides.
+
+=cut
+
 sub uncacheOverrides {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,$self->_overridesCacheTag)->delete;
 }
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Render the Shortcut.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my $content;
@@ -824,6 +937,13 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_edit 
+
+Override the base class to handle adding a menu entry for Manage Overrides.
+
+=cut
+
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -834,6 +954,14 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_getUserPrefsForm 
+
+Returns a form displaying all user profile fields to show to the user, that they
+are allowed to edit.
+
+=cut
+
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self    = shift;
@@ -881,6 +1009,14 @@ sub www_getUserPrefsForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manageOverrides 
+
+Web facing method for getOverridesList.  Returns insufficient unless the current
+user canEdit this Shortcut.
+
+=cut
+
 sub www_manageOverrides {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -889,6 +1025,14 @@ sub www_manageOverrides {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_purgeOverrideCache 
+
+Web facing method for purgeOverrideCache.  Returns insufficient unless the current
+user canEdit this Shortcut.  Returns the user to the manageOverrides screen.
+
+=cut
+
 sub www_purgeOverrideCache {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -897,6 +1041,14 @@ sub www_purgeOverrideCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteOverride 
+
+Delete an override by fieldName, as set by the form variable C<fieldName>.  Then it
+uncaches the overrides and returns the user to the manageOverrides screen.
+
+=cut
+
 sub www_deleteOverride {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -943,6 +1095,14 @@ sub www_saveUserPrefs {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_getNewTitle 
+
+Returns the title of the shortcut, with overrides applied.  If the user cannot
+personalize the Dashboard, returns ''.
+
+=cut
+
 sub www_getNewTitle {
 	my $self = shift;
 	return '' unless $self->getParent->canPersonalize;
@@ -951,6 +1111,14 @@ sub www_getNewTitle {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editOverride 
+
+Renders a form for overrides to be entered.  The override to be edited is
+set by the form variable C<fieldName>.
+
+=cut
+
 sub www_editOverride {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -1023,6 +1191,13 @@ sub www_editOverride {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_saveOverride 
+
+Process the editOverride form.
+
+=cut
+
 sub www_saveOverride {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -1044,6 +1219,13 @@ sub www_saveOverride {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_view 
+
+Render the shortcut in standalone mode.
+
+=cut
+
 sub www_view {
         my $self = shift;
         my $check = $self->checkView;
@@ -1106,6 +1288,8 @@ sub getShortcutsForAssetId {
 
     $properties->{ joinClass            } = 'WebGUI::Asset::Shortcut';
     $properties->{ whereClause          } = 'Shortcut.shortcutToAssetId = ' . $db->quote($assetId);
+    $properties->{ statesToInclude      } = ['published', 'trash', 'clipboard', 'clipboard-limbo', 'trash-limbo'];
+    $properties->{ statusToInclude      } = ['approved', 'pending', 'archived'];
 
     return WebGUI::Asset->getRoot($session)->getLineage(['descendants'], $properties); 
 }

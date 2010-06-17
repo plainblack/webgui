@@ -58,19 +58,30 @@ specified by the session variable.
 
 sub apply {
 	my $self    = shift;
-	my $userId  = shift || $self->session->user->userId;
+    my $session = $self->session;
+	my $userId  = shift || $session->user->userId;
 	my $groupId = $self->get('subscriptionGroup');
 
 	# Make user part of the right group and adjust the expiration date
-	my $group   = WebGUI::Group->new($self->session,$groupId);
-	$group->addUsers( [$userId], $self->getExpirationOffset );
+	my $group   = WebGUI::Group->new($session, $groupId);
+    my $user    = WebGUI::User->new($session, $userId);
+    if ($user->isInGroup($group->getId) && ! $self->isRecurring) {
+        my $expireDate = $group->userGroupExpireDate($userId);
+        $expireDate   += $self->getExpirationOffset;
+        $group->userGroupExpireDate($userId, $expireDate);
+    }
+    else {
+        $group->addUsers( [$userId], $self->getExpirationOffset );
+    }
 
 	# Add karma to the user's account
-	WebGUI::User->new($self->session,$userId)->karma($self->get('karma'), 'Subscription', 'Added for purchasing subscription '.$self->get('title'));
+    if ($session->setting->get('userKarma')) {
+        WebGUI::User->new($session,$userId)->karma($self->get('karma'), 'Subscription', 'Added for purchasing subscription '.$self->get('title'));
+    }
 
 	# Process the executeOnPurchase field
 	my $command = $self->get('executeOnSubscription');
-	WebGUI::Macro::process($self->session,\$command);
+	WebGUI::Macro::process($session,\$command);
 	system($command) if ($self->get('executeOnSubscription') ne "");
 }
 
@@ -78,8 +89,6 @@ sub apply {
 #-------------------------------------------------------------------
 
 =head2 definition
-
-Adds templateId, thankYouMessage, and defaultPrice fields.
 
 =cut
 
@@ -526,7 +535,7 @@ sub redeemCode {
 
 =head2 view
 
-Displays the donation form.
+Displays the subscription form.
 
 =cut
 

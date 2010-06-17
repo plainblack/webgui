@@ -46,7 +46,7 @@ our $I18N = {
 	},
 
 	'feedDescription hoverHelp' => {
-		message => q|An optional description for the feed. If not specified the asset's synopsis will be used instead.|,
+		message => q|An optional description for the feed. If not specified the asset's summary will be used instead.|,
 		lastUpdated => 1236820473,
 		context => q|The hoverhelp of the feedDescription field.|
 	},
@@ -95,18 +95,27 @@ our $I18N = {
 
     'feedHeaderLinks' => {
         message => q|HTML Header Feed Links|,
+		lastUpdated => 1236820473,
     },
+
     'feedHeaderLinks hoverHelp' => {
         message => q|Select which feed types to include in the HTML headers, which many browsers will offer as options to users.|,
+		lastUpdated => 1236820473,
     },
+
     'rssLinkOption' => {
         message => q|RSS 2.0|,
+		lastUpdated => 1236820473,
     },
+
     'atomLinkOption' => {
         message => 'Atom',
+		lastUpdated => 1236820473,
     },
+
     'rdfLinkOption' => {
         message => 'RDF/RSS 1.0',
+		lastUpdated => 1236820473,
     },
 };
 

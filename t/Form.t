@@ -54,6 +54,7 @@ my $testDefaults = all(
     re( q{action=} ),
     re( q{enctype="multipart/form-data"} ),
     re( q{method="post"} ),
+    re( q{type="hidden" name="webguiCsrfToken"} ),
 );
 
 cmp_deeply( 
@@ -85,6 +86,7 @@ my $testHiddenElements = all(
     re( q{<input type="hidden" name="func" value="edit"} ),
     re( q{<input type="hidden" name="a" value="1"} ),
     re( q{<input type="hidden" name="b" value="2"} ),
+    re( q{<input type="hidden" name="webguiCsrfToken" value=".{22}"} ),
 );
 
 cmp_deeply(

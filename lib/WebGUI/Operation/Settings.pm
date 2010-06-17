@@ -305,11 +305,19 @@ sub definition {
 		});
 	push(@fields, {
 		tab          => 'messaging',
-		fieldType    => 'email',
+		fieldType    => 'text',
 		name         => 'smsGateway',
 		label        => $i18n->get('sms gateway'),
 		hoverHelp    => $i18n->get('sms gateway help'),
 		defaultValue => $setting->get('smsGateway'),
+        });
+    push(@fields, {
+		tab          => 'messaging',
+		fieldType    => 'text',
+		name         => 'smsGatewaySubject',
+		label        => $i18n->get('sms gateway subject'),
+		hoverHelp    => $i18n->get('sms gateway subject help'),
+		defaultValue => $setting->get('smsGatewaySubject'),
 		});
 	# misc
 	push(@fields, {
@@ -671,7 +679,7 @@ is in group Admin (3).  Returns the user to the Edit Settings screen, www_editSe
 
 sub www_saveSettings {
     my $session     = shift;
-    return $session->privilege->adminOnly() unless ($session->user->isAdmin);
+    return $session->privilege->adminOnly() unless ($session->user->isAdmin && $session->form->validToken);
     my $i18n        = WebGUI::International->new($session, "WebGUI");
     my $setting     = $session->setting;
     my $form        = $session->form;

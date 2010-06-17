@@ -23,14 +23,28 @@ use WebGUI::Utility;
 our @ISA = qw(WebGUI::Asset::Post);
 
 #-------------------------------------------------------------------
+
+=head2 addRevision 
+
+Extend the base method to handle creating a subscription group for this Thread.
+
+=cut
+
 sub addRevision {
-        my $self = shift;
-        my $newSelf = $self->SUPER::addRevision(@_);
-	$newSelf->createSubscriptionGroup;
-        return $newSelf;
+    my $self = shift;
+    my $newSelf = $self->SUPER::addRevision(@_);
+    $newSelf->createSubscriptionGroup;
+    return $newSelf;
 }
 
 #-------------------------------------------------------------------
+
+=head2 archive 
+
+Archives all posts under this thread.
+
+=cut
+
 sub archive {
 	my $self = shift;
 	foreach my $post (@{$self->getPosts}) {
@@ -39,6 +53,14 @@ sub archive {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canAdd ($session)
+
+A class method.  Returns true if the current user in in the group canStartThreadGroupId
+in the default asset, which better be a Collaboration System.
+
+=cut
+
 sub canAdd {
     my $class   = shift;
     my $session = shift;
@@ -46,6 +68,18 @@ sub canAdd {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canReply ( [$userId ] )
+
+Determines if a user can reply to a post.  True if the thread is not locked, the parent CS allows replies, and the user canPost according to the parent CS.
+
+=head3 $userId
+
+The ID of the user to check for permissions.  If left out, then the current session
+user is checked instead.
+
+=cut
+
 sub canReply {
     my $self        = shift;
     my $userId      = shift || $self->session->user->userId;
@@ -56,6 +90,19 @@ sub canReply {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canSubscribe  ( [$userId ] )
+
+Determines if a user can subscribe to this Thread.  Returns true if the user is
+not visitor, and the user can view this Thread.
+
+=head3 $userId
+
+The ID of the user to check for permissions.  If left out, then the current session
+user is checked instead.
+
+=cut
+
 sub canSubscribe {
     my $self    = shift;
     my $userId  = shift || $self->session->user->userId;
@@ -63,6 +110,12 @@ sub canSubscribe {
 }
 
 #-------------------------------------------------------------------
+
+=head2 commit 
+
+Extends the base method to increment the number of threads in the parent CS.
+
+=cut
 
 sub commit {
 	my $self = shift;
@@ -75,6 +128,13 @@ sub commit {
 #-------------------------------------------------------------------
 # Override duplicateBranch here so that new posts get their threadId set correctly.
 # Buggo: should this be part of the addRevision override instead?
+
+=head2 duplicateBranch 
+
+Extends the base method to handle updating the threadId of the newly copied posts, and
+to update the Thread with the lastPost information.
+
+=cut
 
 sub duplicateBranch {
 	my $self = shift;
@@ -89,6 +149,14 @@ sub duplicateBranch {
 }
 
 #-------------------------------------------------------------------
+
+=head2 createSubscriptionGroup 
+
+Creates a group to hold subscribers to this thread, if the Thread does not
+already have one.
+
+=cut
+
 sub createSubscriptionGroup {
 	my $self = shift;
 	return undef if ($self->get("subscriptionGroupId"));
@@ -170,6 +238,13 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 DESTROY 
+
+Extends the base DESTROY method to handle deleting the cached previous
+and next threads, and to delete the parent CS.
+
+=cut
+
 sub DESTROY {
 	my $self = shift;
 	return undef unless defined $self;
@@ -249,12 +324,26 @@ sub getArchiveUrl {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getAutoCommitWorkflowId 
+
+Override the base method to fetch the threadApprovalWorkflow from the parent CS.
+
+=cut
+
 sub getAutoCommitWorkflowId {
 	my $self = shift;
 	return $self->getThread->getParent->get("threadApprovalWorkflow");
 }
 
 #-------------------------------------------------------------------
+
+=head2 getLastPost 
+
+Fetches the last post in this thread, otherwise, returns itself.
+
+=cut
+
 sub getLastPost {
 	my $self = shift;
 	my $lastPostId = $self->get("lastPostId");
@@ -383,6 +472,13 @@ sub getSubscribeUrl {
 
 
 #-------------------------------------------------------------------
+
+=head2 getThread 
+
+Overrides the base method to return itself, since it's a thread.
+
+=cut
+
 sub getThread {
 	return shift;
 }
@@ -578,6 +674,13 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 postProcess 
+
+Extend the base method from Post to process the karmaScale.
+
+=cut
+
 sub postProcess {
 	my $self = shift;
 	if ($self->getParent->canEdit) {
@@ -589,6 +692,13 @@ sub postProcess {
 }
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost 
+
+Extend the base method to do captcha processing.
+
+=cut
+
 sub processPropertiesFromFormPost {
     my $self = shift;
 
@@ -675,6 +785,13 @@ sub setLastPost {
 }
 
 #-------------------------------------------------------------------
+
+=head2 normalizeLastPost 
+
+Looks up the last postId and date from the db and sets it.
+
+=cut
+
 sub normalizeLastPost {
 	my $self = shift;
 	# Hmm.  Is this right?
@@ -897,6 +1014,13 @@ sub validParent {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Render this thread and its posts.
+
+=cut
+
 sub view {
     my $self = shift;
 	my $currentPost = shift || $self;
@@ -1032,7 +1156,7 @@ sub www_archive {
 
 #-------------------------------------------------------------------
 
-=head2 www_lock (  )
+=head2 www_lockThread (  )
 
 The web method to lock a thread.
 
@@ -1152,7 +1276,7 @@ sub www_unarchive {
 
 #-------------------------------------------------------------------
 
-=head2 www_unlock ( )
+=head2 www_unlockThread ( )
 
 The web method to unlock a thread.
 
@@ -1180,7 +1304,7 @@ sub www_unstick {
 
 #-------------------------------------------------------------------
 
-=head2 www_threadUnsubscribe ( )
+=head2 www_unsubscribe ( )
 
 The web method to unsubscribe from a thread.
 

@@ -31,7 +31,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 46;
+my $tests = 54;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -286,7 +286,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 13, 'getEditForm: the form has 13 controls');
+is          (scalar @inputs, 14, 'getEditForm: the form has 14 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -298,6 +298,10 @@ foreach my $input (@inputs) {
 cmp_deeply(
     \@interestingFeatures,
     [
+        {
+            name    => 'webguiCsrfToken',
+            type    => 'hidden',
+        },
         {
             name    => undef,
             type    => 'submit',
@@ -411,7 +415,7 @@ TODO: {
 
 #######################################################################
 #
-# update
+# update, get
 #
 #######################################################################
 
@@ -434,26 +438,46 @@ my $newOptions = {
 };
 
 $driver->update($newOptions);
-my $storedOptions = $session->db->quickScalar('select options from paymentGateway where paymentGatewayId=?', [
+my $storedJson = $session->db->quickScalar('select options from paymentGateway where paymentGatewayId=?', [
     $driver->getId,
 ]);
 cmp_deeply(
     $newOptions,
-    from_json($storedOptions),
+    from_json($storedJson),
     ,
     'update() actually stores data',
 );
 
+is( $driver->get('receiptMessage'), 'Dropjes!', '... updates object, receiptMessage');
+is( $driver->get('group'),          4,          '... updates object, group');
+is( $driver->get('enabled'),        0,          '... updates object, enabled');
+is( $driver->get('label'),          'Yet another label', '... updates object, label');
+
+$newOptions->{label} = 'Safe reference';
+is( $driver->get('label'),          'Yet another label', '... safe reference check');
+
+my $storedOptions = $driver->get();
+$storedOptions->{label} = 'Safe reference';
+is( $driver->get('label'),          'Yet another label', 'get: safe reference check');
 
 #######################################################################
 #
 # canUse
 #
 #######################################################################
+$options = $driver->get();
+$options->{enabled} = 1;
+$driver->update($options);
 
 $session->user({userId => 3});
-ok($driver->canUse, 'canUse: session->user is used if no argument is passed');
+ok( $driver->canUse, 'canUse: session->user is used if no argument is passed');
 ok(!$driver->canUse({userId => 1}), 'canUse: userId explicit works, visitor cannot use this driver');
+
+$options = $driver->get();
+$options->{enabled} = 0;
+$driver->update($options);
+ok( !$driver->get('enabled'), 'driver is disabled');
+ok( !$driver->canUse({userId => 3}), '... driver cannot be used');
 
 TODO: {
     local $TODO = 'tests for canUse';

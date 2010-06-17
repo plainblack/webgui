@@ -58,8 +58,8 @@ our $I18N = {
 	},
 
 	'image help' => {
-		message => q|The image file that will be displayed on each ad impression.|,
-		lastUpdated => 0,
+		message => q|The image file that will be displayed on each ad impression.  To replace an existing image, simply upload a new one.|,
+		lastUpdated => 1251431251,
 		context => q|help for a form property in the ad editor|
 	},
 

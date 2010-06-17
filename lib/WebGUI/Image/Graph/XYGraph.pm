@@ -492,7 +492,7 @@ sub setChartOffset {
 
 #-------------------------------------------------------------------
 
-=head2 setChartHeight ( width )
+=head2 setChartWidth ( width )
 
 Sets the width of the chart to the specified value.
 

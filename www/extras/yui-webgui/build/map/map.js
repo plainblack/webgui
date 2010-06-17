@@ -51,8 +51,15 @@ WebGUI.Map.editPoint
 
     // Callback should open the window with the form
     var callback    = function (text, code) {
-        marker.openInfoWindowHtml( text );
-
+        marker.infoWin.innerHTML = text;
+        var button = marker.infoWin.getElementsByTagName( "form" )[0].elements["save"];
+        marker.openInfoWindow( marker.infoWin );
+        YAHOO.util.Event.addListener( button, "click", function (e) {
+            // Closing the info window triggers infowindowbeforeclose
+            marker.closeInfoWindow();
+            YAHOO.util.Event.stopEvent(e);
+            return false;
+        } );
         GEvent.addListener( marker, "infowindowbeforeclose", function () {
             WebGUI.Map.editPointSave( map, mgr, mapUrl, marker );
         });
@@ -86,9 +93,11 @@ WebGUI.Map.editPointSave
             GEvent.clearListeners( marker, "click" );
             GEvent.clearListeners( marker, "infowindowbeforeclose" );
 
-            // Set the marker's title
-            marker.kh.title = point.title;
-            // I hate the google maps API.
+            // Decode HTML entities because JSON is being returned as text/html
+            // See WebGUI::Asset::Wobject::Map www_ajaxEditPointSave
+            var decoder = document.createElement( "textarea" );
+            decoder.innerHTML       = point.content;
+            point.content           = decoder.value;
 
             var infoWin = document.createElement( "div" );
             infoWin.innerHTML       = point.content;
@@ -136,6 +145,7 @@ WebGUI.Map.editPointSave
 WebGUI.Map.focusOn
 = function ( assetId ) {
     var marker  = WebGUI.Map.markers[assetId];
+    if ( !marker ) return;
     var map     = marker.map;
     var infoWin = marker.infoWin;
     if ( map.getZoom() < 5 ) {

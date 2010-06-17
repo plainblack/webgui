@@ -143,10 +143,11 @@ is($newDriver->get('label'), 'Cold, stone hard cash', 'label passed correctly to
 my $drivers = $pay->getDrivers();
 
 my $defaultPayDrivers = {
-    'WebGUI::Shop::PayDriver::Cash'              => 'Cash',
-    'WebGUI::Shop::PayDriver::ITransact'         => 'Credit Card (ITransact)',
-    'WebGUI::Shop::PayDriver::PayPal::PayPalStd' => 'PayPal',
-    'WebGUI::Shop::PayDriver::Ogone'             => 'Ogone',
+    'WebGUI::Shop::PayDriver::Cash'          => 'Cash',
+    'WebGUI::Shop::PayDriver::ITransact'     => 'Credit Card (ITransact)',
+    'WebGUI::Shop::PayDriver::Ogone'         => 'Ogone',
+    'WebGUI::Shop::PayDriver::PayPal::PayPalStd'       => 'PayPal',
+    'WebGUI::Shop::PayDriver::PayPal::ExpressCheckout' => 'PayPal Express Checkout',
 };
 
 cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers');

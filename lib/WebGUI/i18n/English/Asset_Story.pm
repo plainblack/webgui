@@ -255,8 +255,8 @@ our $I18N = {
     },
 
     'crumb_url' => {
-        message => q|The title of a page in the crumb trail.|,
-        lastUpdated => 0,
+        message => q|The url of a page in the crumb trail.|,
+        lastUpdated => 1248191458,
     },
 
     'updatedTime' => {
@@ -274,19 +274,9 @@ our $I18N = {
         lastUpdated => 0,
     },
 
-    'storageId tmplvar' => {
-        message => q|The photo JSON blob from the Story asset.|,
-        lastUpdated => 0,
-    },
-
     'ago' => {
         message => q|ago|,
         context => q|As in the phrase, Last updated 3 hours ago.|,
-        lastUpdated => 0,
-    },
-
-    'storageId tmplvar' => {
-        message => q|The photo JSON blob from the Story asset.|,
         lastUpdated => 0,
     },
 
@@ -302,7 +292,7 @@ our $I18N = {
         lastUpdated => 0,
     },
 
-    'imgUploadForm' => {
+    'newUploadForm' => {
         message => q|A form field to upload an image.|,
         context => q|Template variable for edit form.|,
         lastUpdated => 0,
@@ -375,9 +365,9 @@ our $I18N = {
     },
 
     'photo delete' => {
-        message => q|Delete Photo|,
+        message => q|Delete Photo and Metadata|,
         context => q|Label in the edit story form.  Request that the photo be deleted, and all information with it.|,
-        lastUpdated => 0,
+        lastUpdated => 1250195747,
     },
 
     'photo_loop' => {
@@ -428,6 +418,36 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'photoWidth' => {
+        message => q|The width of photos, set in the Story Archive for this Story.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'hasPhoto' => {
+        message => q|This template variable will be true if the a photo in the photo_loop has an image in it.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imgThumb' => {
+        message => q|The URL to the thumbnail of the image, if this photo has an image.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imgUrl' => {
+        message => q|The URL to the image, if this photo has an image.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imgFilename' => {
+        message => q|The URL to the image, if this photo has an image.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
     'singlePhoto' => {
         message => q|This template variable will be true if the Story has just 1 photo uploaded to it.|,
         context => q|Template variable|,
@@ -448,6 +468,11 @@ our $I18N = {
 
     'canEdit' => {
         message => q|A boolean which will be true if the current user can edit this story.|,
+        lastUpdated => 0,
+    },
+
+    'Replace image with new image' => {
+        message => q|Replace image with new image|,
         lastUpdated => 0,
     },
 

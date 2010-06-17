@@ -685,6 +685,16 @@ be useful, others may not.|,
         lastUpdated => 1204668000,
     },
 
+    'The event end date must be after the event start date.' => {
+        message     => q{The event end date must be after the event start date.},
+        lastUpdated => 1246549332,
+    },
+
+    'The event end time must be after the event start time.' => {
+        message     => q{The event end time must be after the event start time.},
+        lastUpdated => 1204668000,
+    },
+
 };
 
 1;

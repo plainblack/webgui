@@ -65,6 +65,11 @@ A url that will get a filename appended to it and then links to delete the files
 
 Though not all browsers support it, this will attempt to set the size (or width) of the browse for file field.
 
+=head4 persist
+
+The default behavior of File is to delete empty storage location.  However, this causes problems with Assets, which
+expect them to stick around.  Setting persist => 1 will prevent the deletion.
+
 =cut
 
 sub definition {
@@ -83,6 +88,9 @@ sub definition {
 			},
         size=>{
             defaultValue=>40
+            },
+        persist=>{
+            defaultValue=>0,
             },
 		});
         return $class->SUPER::definition($session, $definition);
@@ -173,7 +181,7 @@ deleting the file if it was specified.
 
 sub getValue {
 	my $self = shift;
-	my $value = $self->get("value");
+	my $value = $self->getOriginalValue;
 	my $storage = WebGUI::Storage->get($self->session,$value);
 	if (defined $storage) {
 		foreach my $file (@{$storage->getFiles}) {
@@ -195,7 +203,7 @@ sub getValue {
 		}
 		$storage->addFileFromFormPost($self->get("name")."_file",1000);
 		my @files = @{ $storage->getFiles };
-		if (scalar(@files) < 1) {
+		if (scalar(@files) < 1 && !$self->get('persist')) {
 			$storage->delete;
 			return undef;
 		}

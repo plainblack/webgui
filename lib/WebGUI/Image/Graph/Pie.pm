@@ -55,6 +55,29 @@ sub _mod2pi {
 }
 
 #-------------------------------------------------------------------
+
+=head2 addSlice ( $properties )
+
+Add 1 slice to the pie graph.
+
+=head3 $properties
+
+Properties that define the slice.
+
+=head4 percentage
+
+The percentage of the pie this slice should occupy.
+
+=head4 label
+
+A label for the slice.
+
+=head4 color
+
+The color to use to draw the slice.
+
+=cut
+
 sub addSlice {
 	my (%slice, $leftMost, $rightMost, $center, $overallStartCorner, $overallEndCorner, 
 		$fillColor, $strokeColor, $sideColor);
@@ -65,7 +88,7 @@ sub addSlice {
 
 	# Work around a bug in imagemagick where an A path with the same start and end point will segfault.
 	if ($percentage == 1) { 
-		$percentage = 0.999999999;
+		$percentage = 0.99999;
 	}
 
 	my $label = $properties->{label};
@@ -779,9 +802,9 @@ sub drawSide {
 
 #-------------------------------------------------------------------
 
-=head2 drawBottom ( slice )
+=head2 drawTop ( slice )
 
-Draws the bottom of the given pie slice.
+Draws the top of the given pie slice.
 
 =head3 slice
 

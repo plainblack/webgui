@@ -135,6 +135,12 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 duplicate 
+
+Extend the master method to duplicate the storage location.
+
+=cut
+
 sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(@_);
@@ -160,6 +166,12 @@ sub exportAssetData {
 }
 
 #-------------------------------------------------------------------
+
+=head2 exportWriteFile 
+
+Places a copy of the file from storage into the right location during an export.
+
+=cut
 
 sub exportWriteFile {
     my $self = shift;
@@ -244,6 +256,13 @@ sub getEditFormUploadControl {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getFileUrl 
+
+Returns the URL for the file stored in the storage location.
+
+=cut
+
 sub getFileUrl {
 	my $self = shift;
 	#return $self->get("url");
@@ -251,15 +270,35 @@ sub getFileUrl {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getFileIconUrl 
+
+Returns the icon for the file stored in the storage location.  If there's no
+file, then it returns undef.
+
+=cut
+
 sub getFileIconUrl {
-	my $self = shift;
-        return undef unless $self->get("filename"); ## Why do I have to do this when creating new Files?
-	return $self->getStorageLocation->getFileIconUrl($self->get("filename"));
+    my $self = shift;
+    return undef unless $self->get("filename"); ## Why do I have to do this when creating new Files?
+    return $self->getStorageLocation->getFileIconUrl($self->get("filename"));
 }
 
 
 
 #-------------------------------------------------------------------
+
+=head2 getIcon ($small)
+
+Return an icon indicating what type of file this is.  If the $small flag is set,
+then the icon returned is a file type icon, rather than an asset icon.
+
+=head3 $small
+
+Indicates that a small icon should be returned.
+
+=cut
+
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
@@ -303,6 +342,13 @@ sub getStorageFromPost {
 
 #-------------------------------------------------------------------
 
+=head2 getStorageLocation 
+
+Returns the storage location for this asset.  If one does not exist, then it
+is created.
+
+=cut
+
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
@@ -345,6 +391,13 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost 
+
+Extend the master method to handle file uploads and applying constraints.
+
+=cut
+
 sub processPropertiesFromFormPost {
     my $self    = shift;
     my $session = $self->session;
@@ -369,6 +422,12 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
+=head2 purge 
+
+Extends the master method to delete all storage locations associated with this asset.
+
+=cut
+
 sub purge {
 	my $self = shift;
 	my $sth = $self->session->db->read("select storageId from FileAsset where assetId=".$self->session->db->quote($self->getId));
@@ -383,7 +442,7 @@ sub purge {
 
 =head2 purgeCache ( )
 
-See WebGUI::Asset::purgeCache() for details.
+Extends the master method to clear the view cache.
 
 =cut
 
@@ -394,6 +453,12 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purgeRevision 
+
+Extends the master method to delete the storage location for this asset.
+
+=cut
 
 sub purgeRevision {
 	my $self = shift;
@@ -456,6 +521,19 @@ sub setSize {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setStorageLocation ($storage)
+
+Updates the locally cached storage location.  If this asset does not have a
+storage location, then one is created.  Otherwise, the storage location's storageId
+is fetched from the db and used to create a storage location which is then placed
+in the local object cache.
+
+=head3 $storage
+
+If defined, the locally cached storage location is set to this object.
+
+=cut
 
 sub setStorageLocation {
     my $self    = shift;
@@ -520,6 +598,13 @@ sub updatePropertiesFromStorage {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Generate the view method for the Asset, and handle caching.
+
+=cut
+
 sub view {
 	my $self = shift;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
@@ -540,6 +625,14 @@ sub view {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_edit 
+
+Display the edit form to the user.  Manually handles the template for displaying
+the inline view of the asset.
+
+=cut
+
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -556,21 +649,27 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
+=head2 www_view 
+
+When viewed directly, stream the stored file to the user.
+
+=cut
 
 sub www_view {
-	my $self = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
+	my $self    = shift;
+    my $session = $self->session;
+	return $session->privilege->noAccess() unless $self->canView;
 
 	# Check to make sure it's not in the trash or some other weird place
 	if ($self->get("state") ne "published") {
-		my $i18n = WebGUI::International->new($self->session,'Asset_File');
-		$self->session->http->setStatus("404");
+		my $i18n = WebGUI::International->new($session,'Asset_File');
+		$session->http->setStatus("404");
 		return sprintf($i18n->get("file not found"), $self->getUrl());
 	}
 
-    $self->session->http->setRedirect($self->getFileUrl);
-    $self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
-    $self->session->http->sendHeader;
+    $session->http->setRedirect($self->getFileUrl) unless $session->config->get('enableStreamingUploads');
+    $session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
+    $session->http->sendHeader;
     return 'chunked';
 }
 

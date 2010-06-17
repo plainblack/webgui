@@ -459,7 +459,7 @@ sub setLastModified {
 
 =head2 setMimeType ( mimetype )
 
-Override mime type for the document, which is defaultly "text/html". Also see setFilename().
+Override mime type for the document, which is defaultly "text/html; charset=UTF-8". Also see setFilename().
 
 B<NOTE:> By setting the mime type to something other than "text/html" WebGUI will automatically not process the normal page contents. Instead it will return only the content of your Wobject function or Operation.
 

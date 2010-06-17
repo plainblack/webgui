@@ -30,6 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+removeDanglingOldRssAssets( $session );
 addOgoneToConfig( $session );
 addUseEmailAsUsernameToSettings( $session );
 alterVATNumberTable( $session );
@@ -46,6 +47,26 @@ addMatrixMaxGroup($session);
 addUserControlWorkflows($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub removeDanglingOldRssAssets {
+    my $session = shift;
+    print "\tChecking for uses of RSSCapable...\n" unless $quiet;
+    my $peek = $session->db->dbh->table_info(undef, undef, 'RSSCapable');
+    if ($peek->fetchrow_hashref()) {
+        my @rssCapableClasses = $session->db->buildArray('SELECT className FROM RSSCapable INNER JOIN asset ON RSSCapable.assetId=asset.assetId GROUP BY className');
+        if (@rssCapableClasses) {
+            warn "\t\tThis site is using the assets\n\t\t\t" . join(', ', @rssCapableClasses) . "\n\t\twhich use the RSSCapable class!  Support RSSCapable has been dropped and it will no longer be maintained.\n";
+        }
+        else {
+            print "\t\tNot used, removing leftover assets, if any.\n" unless $quiet;
+            $session->db->write(q|DELETE FROM assetData WHERE assetId IN (SELECT assetId FROM asset WHERE className="WebGUI::Asset::RssFromParent")|);
+            $session->db->write(q|DELETE FROM asset WHERE className = "WebGUI::Asset::RssFromParent"|);
+        }
+    }
+    print "\tDone.\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 sub addMatrixMaxGroup {
@@ -286,7 +307,7 @@ sub addPackage {
     $storage->addFileFromFilesystem( $file );
 
     # Import the package into the import node
-    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage, { overwriteLatest => 1 } );
 
     # Turn off the package flag, and set the default flag for templates added
     my $assetIds = $package->getLineage( ['self','descendants'] );

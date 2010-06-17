@@ -33,26 +33,6 @@ These methods are available from this class:
 
 =cut
 
-=head2 getPayPaySandboxUrl
-
-Returns the URL for the PayPal sandbox
-
-=cut
-
-sub getPayPalSandboxUrl {
-    return ('https://www.sandbox.paypal.com/cgi-bin/webscr');
-}
-
-=head2 getPayPalUrl
-
-Returns the URL for PayPal.
-
-=cut
-
-sub getPayPalUrl {
-    return ('https://www.paypal.com/cgi-bin/webscr');
-}
-
 =head2 getPaymentCurrencies
 
 Returns a hash reference of currency codes and their full names.

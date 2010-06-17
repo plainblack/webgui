@@ -18,6 +18,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
 use XML::Simple;
+use WebGUI::HTML;
 
 =head1 NAME
 
@@ -1212,7 +1213,12 @@ sub www_listAlbumsRss {
         for my $key ( qw( url ) ) {
             $assetVar->{ $key } = $self->session->url->getSiteURL . $assetVar->{ $key };
         }
-        
+
+        # Encode XML entities
+        for my $key ( qw( title description synopsis gallery_title gallery_menuTitle ) ) {
+            $assetVar->{ $key } = WebGUI::HTML::filter($assetVar->{$key}, 'xml');
+        }
+
         # Additional vars for RSS
         $assetVar->{ rssDate  } 
             = $session->datetime->epochToMail( $assetVar->{ creationDate } );

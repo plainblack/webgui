@@ -100,7 +100,7 @@ sub definition {
 
 =head2 getEditForm ( )
 
-Returns the TabForm object that will be used in generating the edit page for this asset.
+Extends the base method to  handle the optional mobileTemplateId and assetsToHide.
 
 =cut
 
@@ -179,6 +179,13 @@ sub getEditForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView 
+
+Extends the base class to handle the optional mobile style template, to handle asset dragging
+and to put children in their places.
+
+=cut
 
 sub prepareView {
     my $self = shift;
@@ -300,6 +307,15 @@ sub prepareView {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Render all the children.
+
+Show performance indicators for the Layout and all children if enabled.
+
+=cut
+
 sub view {
     my $self = shift;
     my $session = $self->session;
@@ -337,6 +353,14 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_setContentPositions 
+
+Method called via iFrame to handle reordering content positions.  This action creates
+a new asset revision.
+
+=cut
+
 sub www_setContentPositions {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -348,6 +372,14 @@ sub www_setContentPositions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getContentLastModified 
+
+Extend the base class to include looking at the last modified times of all children
+of the page, by lineage.
+
+=cut
+
 sub getContentLastModified {
     # Buggo: this is a little too conservative.  Children that are hidden maybe shouldn't count.  Hm.
     my $self = shift;
@@ -360,6 +392,13 @@ sub getContentLastModified {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_view 
+
+Extend the base method to handle caching and ad rotation.
+
+=cut
+
 sub www_view {
     my $self = shift;
     my $session = $self->session;
@@ -370,7 +409,11 @@ sub www_view {
     ) {
         my $check = $self->checkView;
         return $check if (defined $check);
-        my $cache = WebGUI::Cache->new($session, "view_".$self->getId);
+        my $cacheKey = "view_".$self->getId;
+        if ($session->env->sslRequest) {
+            $cacheKey .= '_ssl';
+        }
+        my $cache = WebGUI::Cache->new($session, $cacheKey);
         my $out = $cache->get if defined $cache;
         unless ($out) {
             $self->prepareView;

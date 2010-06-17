@@ -18,24 +18,23 @@ Package WebGUI::Macro::If
 
 =head1 DESCRIPTION
 
-Macro for displaying text based on whether or not the value entered it empty.
+Macro for displaying text based on whether or not the value entered is true.
 
-=head2 process ( value, textIfValue, textIfNotValule )
-
-Either the textIfValue or textIfNotValue fields can be empty
+=head2 process ( value, textIfTrue, textIfFalse )
 
 =head3 value
 
-The value to test to see if it's empty.
+The value to test to see if it's true or not.  False values are the empty string, 0 and
+any string which is only whitespace.
 
-=head3 textIfValue
+=head3 textIfTrue
 
-The text to be displayed if the value is not empty.  Use %s to represent the value itself.
+The text to be displayed if the value is not false.  Use %s to represent the value itself.
 
-ex: ^HasValueText(test,<li>%s</li>,);
+ex: ^If(test,<li>%s</li>,);
 returns: <li>test</li>
 
-=head3 textIfNoValue
+=head3 textIfFalse
 
 Text to be displayed if the value is empty.
 
@@ -44,13 +43,13 @@ Text to be displayed if the value is empty.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	my ($value, $valueText, $noValueText ) = @_;
+	my ($value, $trueText, $falseText ) = @_;
     $value =~ s/^\s//;
     $value =~ s/\s$//;
-    if ($value eq "") {
-		return $noValueText;
+    if (!$value) {
+		return $falseText;
 	}
-    return sprintf($valueText,$value);
+    return sprintf($trueText,$value);
 }
 
 

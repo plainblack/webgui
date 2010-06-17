@@ -90,8 +90,8 @@ our $I18N = {
 	},
 
 	'7' => {
-		message => q|LDAP Identity Name|,
-		lastUpdated => 1031514049
+		message => q|Username Label|,
+		lastUpdated => 1249690147,
 	},
 
 	'2' => {
@@ -130,8 +130,8 @@ our $I18N = {
 	},
 
 	'6' => {
-		message => q|LDAP Identity (default)|,
-		lastUpdated => 1031514049
+		message => q|Username Attribute|,
+		lastUpdated => 1249689883,
 	},
 
 	'3' => {
@@ -150,13 +150,18 @@ our $I18N = {
 	},
 
 	'8' => {
-		message => q|LDAP Password Name|,
-		lastUpdated => 1031514049
+		message => q|Password Label|,
+		lastUpdated => 1249690167,
 	},
 
 	'4' => {
-		message => q|Connect DN|,
-		lastUpdated => 1031514049
+		message => q|LDAP Proxy User DN|,
+		lastUpdated => 1031514049,
+	},
+
+	'connect_dn_help' => {
+		message => q|The distinguished name used to make an LDAP connection.  Used to be called Connect DN.|,
+		lastUpdated => 1249688660,
 	},
 
 	'account.form.karma' => {
@@ -510,10 +515,10 @@ our $I18N = {
 		lastUpdated => 1116151382
 	},
 
-#	'LDAPLink_990' => {
-#		message => q|Edit LDAP Connection|,
-#		lastUpdated => 1056151382
-#	},
+	'LDAPLink_990' => {
+		message => q|Edit LDAP Connection|,
+		lastUpdated => 1056151382
+	},
 
 	'LDAPLink_991' => {
 		message => q|LDAP Connection ID|,
@@ -531,13 +536,13 @@ our $I18N = {
 	},
 
 	'LDAPLink_994' => {
-		message => q|Connect DN|,
-		lastUpdated => 1056151382
+		message => q|LDAP Proxy User DN|,
+		lastUpdated => 1249689834,
 	},
 
 	'LDAPLink_995' => {
-		message => q|Identifier|,
-		lastUpdated => 1056151382
+		message => q|LDAP Proxy Password|,
+		lastUpdated => 1249689837,
 	},
 
         'LDAPLink_992 description' => {
@@ -553,40 +558,39 @@ our $I18N = {
         },
 
         'LDAPLink_994 description' => {
-                message => q|<p>DN = Distinguished Name. A DN is a unique path to a particular object within an LDAP
-directory. In this case, the "Connect DN" is the DN that points to the user account
+                message => q|<p>The LDAP Proxy User DN is the DN (Distinguished Name) that points to the user account
 record for authenticating against this LDAP server at a permission level that has full read and write access to all of the users and groups on your LDAP server.
 Usually that will look something like:</p>
 <p>cn=Joe Shmoe,ou=people,dc=example,dc=com</p>|,
-                lastUpdated => 1146630168,
+                lastUpdated => 1249917626,
         },
 
         'LDAPLink_995 description' => {
-                message => q|The password for the account entered in the "Connect DN" field|,
-                lastUpdated => 1120164594,
+                message => q|The password for the account entered in the "LDAP Proxy User DN" field|,
+                lastUpdated => 1250099704,
         },
 
         '9 description' => {
                 message => q|<p>Enter the attribute that should be used for each record in LDAP to uniquely identify a user.
 This field is used for auto creating user accounts for users already in your LDAP repository when they attempt to log in and
-for finding users who sign up for the site via the anonymous registration feature if it is enabled. In almost all cases this attrubute is 'dn'
+for finding users who sign up for the site via the anonymous registration feature if it is enabled. In almost all cases this attribute is 'dn'
 and should be entered as such.</p>|,
-                lastUpdated => 1146630220,
+                lastUpdated => 1250099631,
         },
 
         '6 description' => {
-                message => q|The LDAP Identity is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>shortname</b>, which takes the form of first initial + last name. Example: jdoe. Therefore, if you specify the LDAP identity to be <i>shortname</i> then Jon Doe would enter <i>jdoe</i> during the registration process.|,
-                lastUpdated => 1165512076,
+                message => q|The Username Attribute is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>cn</b>, <b>uid</b>, or <b>shortname</b>. Example: jdoe. Therefore, if you specify the LDAP Username Attribute to be <b>shortname</b> then Jon Doe would enter <i>jdoe</i> during the registration process.|,
+                lastUpdated => 1250264355,
         },
 
         '7 description' => {
-                message => q|The label used to describe the LDAP Identity to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP identity is known as their <i>Web Username</i>. So you could enter that label here for consistency.|,
-                lastUpdated => 1120164594,
+                message => q|The label used to describe the LDAP Authentication Attribute to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP Authentication Attribute is known as their <i>Web Username</i>. So you could enter that label here for consistency.  Used to be called LDAP Identity Label.|,
+                lastUpdated => 1250264194,
         },
 
         '8 description' => {
-                message => q|Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use this label as you would LDAP Identity Name.|,
-                lastUpdated => 1120164594,
+                message => q|The label used to describe the field where the user will enter a password for authentication.  Used to be called LDAP Password Name.|,
+                lastUpdated => 1249690272,
         },
 
         '868 description' => {

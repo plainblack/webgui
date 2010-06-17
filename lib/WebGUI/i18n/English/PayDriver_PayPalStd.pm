@@ -24,6 +24,11 @@ package WebGUI::i18n::English::PayDriver_PayPalStd;
 use strict;
 
 our $I18N = {
+    'cart transaction mismatch' => {
+        message => 'Cart mismatch detected.  This incident will be logged.',
+        context => 'Message displayed when a transaction spoof is detected.',
+        lastUpdated => 1248289540,
+    },
     'error occurred message' => {
         message     => q|The following errors occurred:|,
         lastUpdated => 0,
@@ -38,6 +43,16 @@ our $I18N = {
         message     => q|PayPal|,
         lastUpdated => 0,
         context     => q|Default PayPal payment gateway label|
+    },
+
+    'identity token' => {
+        message => 'PDT Identity Token',
+        lastUpdated => 1248297326,
+    },
+
+    'identity token help' => {
+        message => q{The identity token listed under the Payment Data Transfer radio button in your website payment preference on PayPal},
+        lastUpdated => 1248297326,
     },
 
     'vendorId' => {
@@ -106,6 +121,25 @@ our $I18N = {
         lastUpdated => 0,
         context     => q|Form label in the configuration form of the PayPal module.|
     },
+
+    'live url' => {
+        message     => 'Live URL',
+        lastUpdated => 0,
+    },
+    'live url help' => {
+        message     => 'URL to post to when live (not using sandbox)',
+        lastUpdated => 0,
+    },
+
+    'sandbox url' => {
+        message     => 'Sandbox URL',
+        lastUpdated => 0,
+    },
+    'sandbox url help' => {
+        message => 'URL to post to when testing (using sandbox)',
+        lastUpdated => 0,
+    },
+
     'button image' => {
         message     => q|PayPal Button image URL|,
         lastUpdated => 1241986933,

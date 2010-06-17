@@ -1,5 +1,19 @@
 package WebGUI::Shop::Pay;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 use strict;
 
 use Class::InsideOut qw{ :std };
@@ -74,8 +88,13 @@ This subroutine returns a hash reference of available shipping driver classes as
 sub getDrivers {
     my $self      = shift;
     my %drivers = ();
-    foreach my $class (@{$self->session->config->get('paymentDrivers')}) {
-        $drivers{$class} = eval { WebGUI::Pluggable::instanciate($class, 'getName', [ $self->session ])};
+    CLASS: foreach my $class (@{$self->session->config->get('paymentDrivers')}) {
+        my $driverName   = eval { WebGUI::Pluggable::instanciate($class, 'getName', [ $self->session ])};
+        if ($@) {
+            $self->session->log->warn("Error loading $class: $@");
+        }
+        next CLASS unless $driverName;
+        $drivers{$class} = $driverName;
     }
     return \%drivers;
 }

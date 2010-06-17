@@ -47,7 +47,7 @@ sub addRevision {
     my $newSelf = $self->SUPER::addRevision(@_);
     if ($newSelf->getRevisionCount > 1) {
         foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
-            if ($self->get($field) && $self->get($field) ne $newSelf->get($field)) {
+            if ($self->get($field)) {
                 my $newStorage = WebGUI::Storage->get($self->session,$self->get($field))->copy;
                 $newSelf->update({$field=>$newStorage->getId});
             }
@@ -94,7 +94,8 @@ sub definition {
             defaultValue=>undef,
             maxAttachments=>1,
             label=>$i18n->get(7),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename=")
+            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename="),
+            persist => 1,
         },
         image2=>{
             tab => "properties",
@@ -102,7 +103,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(8),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image2;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         image3=>{
             tab => "properties",
@@ -110,7 +112,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(9),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image3;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         brochure=>{
             tab => "properties",
@@ -118,7 +121,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(13),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=brochure;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         manual=>{
             tab => "properties",
@@ -126,7 +130,8 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(14),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         isShippingRequired => {
             tab          => "shop",
@@ -141,37 +146,44 @@ sub definition {
             maxAttachments=>1,
             label=>$i18n->get(15),
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
-            defaultValue=>undef
+            defaultValue=>undef,
+            persist => 1,
         },
         variantsJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
+            fieldType=>"textarea",
         },
         accessoryJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
+            fieldType=>"textarea",
         },
         relatedJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
+            fieldType=>"textarea",
         },
         specificationJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
+            fieldType=>"textarea",
         },
         featureJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
+            fieldType=>"textarea",
         },
         benefitJSON => {
             ##Collateral data is stored as JSON in here
             autoGenerate => 0,
             defaultValue => '[]',
+            fieldType=>"textarea",
         },
     );
     push(@{$definition}, {
@@ -255,7 +267,8 @@ sub getAddToCartForm {
     my $i18n = WebGUI::International->new($session, 'Asset_Product');
     my %variants = ();
     tie %variants, 'Tie::IxHash';
-    foreach my $collateral ( @{ $self->getAllCollateral('variantsJSON')} ) {
+    COLLATERAL: foreach my $collateral ( @{ $self->getAllCollateral('variantsJSON')} ) {
+        next COLLATERAL unless $collateral->{quantity} > 0;
         $variants{$collateral->{variantId}} = join ", ", $collateral->{shortdesc}, sprintf('%.2f',$collateral->{price});
     }
     return
@@ -393,6 +406,17 @@ sub getConfiguredTitle {
 
 
 #-------------------------------------------------------------------
+
+=head2 getFileIconUrl ( $store )
+
+Return a file icon URL for file collateral.
+
+=head3 $store
+
+A WebGUI::Storage object.  The returned icon will be for the first file in the storage object.
+
+=cut
+
 sub getFileIconUrl {
     my $self = shift;
     my $store = $_[0];
@@ -400,6 +424,17 @@ sub getFileIconUrl {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getFilename ( $store )
+
+Return a filename from a WebGUI::Storage object.
+
+=head3 $store
+
+The WebGUI::Storage object to look up the file.
+
+=cut
+
 sub getFilename {
     my $self = shift;
     my $store = $_[0];
@@ -413,6 +448,17 @@ sub getFilename {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getFileUrl ( $store )
+
+Return a URL for file collateral.
+
+=head3 $store
+
+A WebGUI::Storage object.  The returned URL will be for the first file in the storage object.
+
+=cut
+
 sub getFileUrl {
     my $self = shift;
     my $store = $_[0];
@@ -713,12 +759,19 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 purge 
+
+Extend the base class to handle all file collateral.
+
+=cut
+
 sub purge {
     my $self = shift;
-    my $sth = $self->session->db->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=".$self->session->db->quote($self->getId));
+    my $sth = $self->session->db->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=?", [$self->getId]);
     while (my @array = $sth->array) {
-        foreach my $id (@array){
-            next if ($id eq "");
+        ID: foreach my $id (@array){
+            next ID if ($id eq "");
             WebGUI::Storage->get($self->session,$id)->delete; 
         }
     }
@@ -730,7 +783,7 @@ sub purge {
 
 =head2 purgeCache ( )
 
-See WebGUI::Asset::purgeCache() for details.
+Extends the base class to handle cleaning up the cache for this asset.
 
 =cut
 
@@ -744,7 +797,7 @@ sub purgeCache {
 
 =head2 purgeRevision ( )
 
-See WebGUI::Asset::purgeRevision() for details.
+Extend the base method to handle deleting file collateral.
 
 =cut
 
@@ -837,6 +890,14 @@ sub setCollateral {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addAccessory 
+
+Builds a form that lists other Products that could be accessories for this one, and allows
+the user to select them.
+
+=cut
+
 sub www_addAccessory {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -884,6 +945,13 @@ sub www_addAccessory {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addAccessorySave 
+
+Process the addAccessory form.
+
+=cut
+
 sub www_addAccessorySave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -903,6 +971,13 @@ sub www_addAccessorySave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addRelated 
+
+Provides a form for the user to pick Products related to this one.
+
+=cut
+
 sub www_addRelated {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -951,6 +1026,13 @@ sub www_addRelated {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addRelatedSave 
+
+Process the addRelated form.
+
+=cut
+
 sub www_addRelatedSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1005,6 +1087,13 @@ sub www_deleteAccessoryConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteBenefitConfirm 
+
+Delete a benefit from the Product, given the form variable C<bid>.
+
+=cut
+
 sub www_deleteBenefitConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1013,6 +1102,13 @@ sub www_deleteBenefitConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteFeatureConfirm 
+
+Delete a feature from the Product, given the form variable C<fid>.
+
+=cut
+
 sub www_deleteFeatureConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1021,6 +1117,13 @@ sub www_deleteFeatureConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteFileConfirm 
+
+Delete a piece of file collateral, as given by the form variable C<file>.
+
+=cut
+
 sub www_deleteFileConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1034,6 +1137,13 @@ sub www_deleteFileConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteRelatedConfirm 
+
+Remove a Product from the list of related products, as given by the form variable C<rid>.
+
+=cut
+
 sub www_deleteRelatedConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1042,6 +1152,13 @@ sub www_deleteRelatedConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteVariantConfirm 
+
+Remove a variant from this Product, as given by the form variable C<vid>.
+
+=cut
+
 sub www_deleteVariantConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1050,6 +1167,13 @@ sub www_deleteVariantConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteSpecificationConfirm 
+
+Remove a specification from this Product, as given by the form variable C<sid>.
+
+=cut
+
 sub www_deleteSpecificationConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1059,6 +1183,13 @@ sub www_deleteSpecificationConfirm {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_editBenefit 
+
+Form to edit, or add benefits to this Product.
+
+=cut
+
 sub www_editBenefit {
     my $self = shift;
     my $bid = shift || $self->session->form->process('bid');
@@ -1090,6 +1221,13 @@ sub www_editBenefit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editBenefitSave 
+
+Process the editBenefit form.
+
+=cut
+
 sub www_editBenefitSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1108,6 +1246,13 @@ sub www_editBenefitSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editFeature 
+
+Form to add or edit features to thie Product.
+
+=cut
+
 sub www_editFeature {
     my $self = shift;
     my $fid = shift || $self->session->form->process('fid');
@@ -1139,6 +1284,13 @@ sub www_editFeature {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editFeatureSave 
+
+Process the editFeature form.
+
+=cut
+
 sub www_editFeatureSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1157,6 +1309,13 @@ sub www_editFeatureSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editSpecification 
+
+Form to add or edit a specification.
+
+=cut
+
 sub www_editSpecification {
     my $self = shift;
     my $sid = shift || $self->session->form->process('sid');
@@ -1202,6 +1361,13 @@ sub www_editSpecification {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editSpecificationSave 
+
+Process the editSpecification form.
+
+=cut
+
 sub www_editSpecificationSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1223,6 +1389,13 @@ sub www_editSpecificationSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editVariant 
+
+Form to add or edit a variant.
+
+=cut
+
 sub www_editVariant {
     my $self = shift;
     my $vid  = shift || $self->session->form->process("vid");
@@ -1279,6 +1452,13 @@ sub www_editVariant {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editVariantSave 
+
+Process the editVariant form.
+
+=cut
+
 sub www_editVariantSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1302,6 +1482,13 @@ sub www_editVariantSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveAccessoryDown 
+
+Move an accessory, given by C<aid>, down one place.
+
+=cut
+
 sub www_moveAccessoryDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1310,6 +1497,13 @@ sub www_moveAccessoryDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveAccessoryUp 
+
+Move an accessory, given by C<aid>, up one place.
+
+=cut
+
 sub www_moveAccessoryUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1318,6 +1512,13 @@ sub www_moveAccessoryUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveBenefitDown 
+
+Move an benefit, given by C<bid>, down one place.
+
+=cut
+
 sub www_moveBenefitDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1326,6 +1527,13 @@ sub www_moveBenefitDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveBenefitUp 
+
+Move an benefit, given by C<bid>, up one place.
+
+=cut
+
 sub www_moveBenefitUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1334,6 +1542,13 @@ sub www_moveBenefitUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveFeatureDown 
+
+Move an feature, given by C<fid>, down one place.
+
+=cut
+
 sub www_moveFeatureDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1342,6 +1557,13 @@ sub www_moveFeatureDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveFeatureUp 
+
+Move an feature, given by C<fid>, up one place.
+
+=cut
+
 sub www_moveFeatureUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1350,6 +1572,13 @@ sub www_moveFeatureUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveRelatedDown 
+
+Move a related asset, given by C<rid>, down one place.
+
+=cut
+
 sub www_moveRelatedDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1358,6 +1587,13 @@ sub www_moveRelatedDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveRelatedUp 
+
+Move a related asset, given by C<rid>, up one place.
+
+=cut
+
 sub www_moveRelatedUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1366,6 +1602,13 @@ sub www_moveRelatedUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveSpecificationDown 
+
+Move an specification, given by C<sid>, down one place.
+
+=cut
+
 sub www_moveSpecificationDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1374,6 +1617,13 @@ sub www_moveSpecificationDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveSpecificationUp 
+
+Move an specification, given by C<sid>, up one place.
+
+=cut
+
 sub www_moveSpecificationUp {
     my $self = shift;   
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1382,6 +1632,13 @@ sub www_moveSpecificationUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveVariantDown 
+
+Move an variant, given by C<vid>, down one place.
+
+=cut
+
 sub www_moveVariantDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1390,6 +1647,13 @@ sub www_moveVariantDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveVariantUp 
+
+Move an variant, given by C<vid>, up one place.
+
+=cut
+
 sub www_moveVariantUp {
     my $self = shift;   
     return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -1398,6 +1662,14 @@ sub www_moveVariantUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+Render the view screen for the Product, with variants, specification, related products,
+file collateral, and everything else.
+
+=cut
+
 sub view {
     my $self = shift;
     my $error = shift;
@@ -1420,23 +1692,29 @@ sub view {
     my $i18n = WebGUI::International->new($session,'Asset_Product');
     if ($brochure) {
         my $file = WebGUI::Storage->get($session,$brochure);
-        $var{"brochure_icon"}  = $self->getFileIconUrl($file);
-        $var{"brochure_label"} = $i18n->get(13);
-        $var{"brochure_URL"}   = $self->getFileUrl($file);
+        if ($self->getFilename($file)) {
+            $var{"brochure_icon"}  = $self->getFileIconUrl($file);
+            $var{"brochure_label"} = $i18n->get(13);
+            $var{"brochure_URL"}   = $self->getFileUrl($file);
+        }
     }
     #---manual
     if ($manual) {
         my $file = WebGUI::Storage->get($session,$manual);
-        $var{"manual_icon"}  = $self->getFileIconUrl($file);
-        $var{"manual_label"} = $i18n->get(14);
-        $var{"manual_URL"}   = $self->getFileUrl($file);
+        if ($self->getFilename($file)) {
+            $var{"manual_icon"}  = $self->getFileIconUrl($file);
+            $var{"manual_label"} = $i18n->get(14);
+            $var{"manual_URL"}   = $self->getFileUrl($file);
+        }
     }
     #---warranty
     if ($warranty) {
         my $file = WebGUI::Storage->get($session,$warranty);
-        $var{"warranty_icon"}  = $self->getFileIconUrl($file);
-        $var{"warranty_label"} = $i18n->get(15);
-        $var{"warranty_URL"}   = $self->getFileUrl($file);
+        if ($self->getFilename($file)) {
+            $var{"warranty_icon"}  = $self->getFileIconUrl($file);
+            $var{"warranty_label"} = $i18n->get(15);
+            $var{"warranty_URL"}   = $self->getFileUrl($file);
+        }
     }
     #---image1
     if ($image1) {
@@ -1609,7 +1887,7 @@ sub view {
 
 =head2 www_view ( )
 
-See WebGUI::Asset::Sku::www_view() for details.
+Extend the base method to handle caching.
 
 =cut
 

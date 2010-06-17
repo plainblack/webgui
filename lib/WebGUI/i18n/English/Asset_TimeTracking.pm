@@ -355,8 +355,8 @@ our $I18N = {
 		},
 
 		'time.save.label' => {
-			lastUpdated => 0,
-			message => q|The phrase "Add Row", internationalized.|
+			lastUpdated => 1251518492,
+			message => q|The word "Save", internationalized.|
 		},
 
 		'time.report.complete.label' => {

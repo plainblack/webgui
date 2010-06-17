@@ -19,6 +19,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI::Session;
+plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 
 #----------------------------------------------------------------------------
 # Init

@@ -214,40 +214,44 @@ Renders a date picker control.
 =cut
 
 sub toHtml {
-        my $self = shift;
-	my $value;
+    my $self    = shift;
+    my $session = $self->session;
+    my $value;
     # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
+    if (!$self->get("defaultValue") 
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
-		# Epoch format
-		$value	= $self->session->datetime->epochToSet($self->getOriginalValue,1);
-	} else {
-		# MySQL format
-		$value	= $self->getOriginalValue;
-		# Fix time zone
-		$value 	= WebGUI::DateTime->new($self->session, mysql => $value)
+        # Epoch format
+        $value	= $session->datetime->epochToSet($self->getOriginalValue,1);
+    } else {
+        # MySQL format
+        $value	= $self->getOriginalValue;
+        # Fix time zone
+        $value 	= WebGUI::DateTime->new($session, mysql => $value)
                 ->set_time_zone($self->get("timeZone"))
                 ->strftime("%Y-%m-%d %H:%M:%S");
-	}
-        $self->session->style->setLink($self->session->url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
-        $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
-        $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
-        $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{ type=>'text/javascript' });
-        $self->session->style->setScript($self->session->url->extras('yui/build/calendar/calendar-min.js'),{ type=>'text/javascript' });
-        my $firstDow = $self->session->user->profileField("firstDayOfWeek");
-        $self->session->style->setRawHeadTags("<script type=\"text/javascript\">window.webguiFirstDayOfWeek = $firstDow</script>");
-        $self->session->style->setScript($self->session->url->extras('yui-webgui/build/datepicker/datepicker.js'),{ type=>'text/javascript' });
+    }
+    my $style   = $session->style;
+    my $url     = $session->url;
+    $style->setLink($url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'),        { type => 'text/javascript' });
+    $style->setScript($url->extras('yui/build/json/json-min.js'),               { type => 'text/javascript' });
+    $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),             { type => 'text/javascript' });
+    $style->setScript($url->extras('yui/build/dom/dom-min.js'),                 { type => 'text/javascript' });
+    $style->setScript($url->extras('yui/build/event/event-min.js'),             { type => 'text/javascript' });
+    $style->setScript($url->extras('yui/build/calendar/calendar-min.js'),       { type => 'text/javascript' });
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js' ),           { type => 'text/javascript' });
+    $style->setScript($url->extras('yui-webgui/build/datepicker/datepicker.js'),{ type => 'text/javascript' });
 
-        return WebGUI::Form::Text->new($self->session,
-                name=>$self->get("name"),
-                value=>$value,
-                size=>$self->get("size"),
-                extras=>$self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this, true);"',
-                id=>$self->get('id'),
-                maxlength=>$self->get("maxlength")
-                )->toHtml;
+    return WebGUI::Form::Text->new($self->session,
+            name=>$self->get("name"),
+            value=>$value,
+            size=>$self->get("size"),
+            extras=>$self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this, true);"',
+            id=>$self->get('id'),
+            maxlength=>$self->get("maxlength")
+            )->toHtml;
 }
 
 #-------------------------------------------------------------------

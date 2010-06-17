@@ -95,7 +95,7 @@ sub formFooter {
 
 =head2 formHeader ( session, options )
 
-Returns a form header.
+Returns a form header.  Also generates a CSRF token for use with the form.
 
 =head3 session
 
@@ -141,7 +141,7 @@ sub formHeader {
     my $enctype     = (exists $params->{enctype} && $params->{enctype} ne "") ? $params->{enctype} : "multipart/form-data";
 
     # Fix a query string in the action URL
-    my $hidden;
+    my $hidden = csrfToken($session);
     if ($action =~ /\?/) {
         ($action, my $query) = split /\?/, $action, 2;
         my @params = split /[&;]/, $query;

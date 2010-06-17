@@ -473,13 +473,13 @@ sub deleteThingData {
 
     return undef unless $self->canEditThingData($thingId, $thingDataId);;
 
-    $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
-
     my ($onDeleteWorkflowId) = $db->quickArray("select onDeleteWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
     if ($onDeleteWorkflowId){
-        $self->triggerWorkflow($onDeleteWorkflowId);
+        $self->triggerWorkflow($onDeleteWorkflowId, $thingId,$thingDataId);
     }
+
+    $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
 
     return undef;
 }
@@ -598,13 +598,13 @@ sub editThingDataSave {
         my ($onAddWorkflowId) = $session->db->quickArray("select onAddWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
         if ($onAddWorkflowId){
-            $self->triggerWorkflow($onAddWorkflowId);
+            $self->triggerWorkflow($onAddWorkflowId,$thingId,$newThingDataId);
         }
     }else{
         my ($onEditWorkflowId) = $session->db->quickArray("select onEditWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
         if ($onEditWorkflowId){
-            $self->triggerWorkflow($onEditWorkflowId);
+            $self->triggerWorkflow($onEditWorkflowId,$thingId,$newThingDataId);
         }
     }
 
@@ -948,7 +948,7 @@ sub getFormElement {
 
 Returns an instanciated WebGUI::Form::* plugin.
 
-=head3 proeprties
+=head3 properties
 
 The properties to configure the form plugin with. The fieldType key should contain the type of the form plugin.
 
@@ -965,9 +965,9 @@ sub getFormPlugin {
 
     my %param;
     my $session = $self->session;
-    my $db = $session->db;
-    my $dbh = $db->dbh;
-    my $i18n = WebGUI::International->new($session,"Asset_Thingy");
+    my $db      = $session->db;
+    my $dbh     = $db->dbh;
+    my $i18n    = WebGUI::International->new($session,"Asset_Thingy");
 
     $param{name} = "field_".$data->{fieldId};
     my $name = $param{name};
@@ -989,7 +989,7 @@ sub getFormPlugin {
 
     if ( WebGUI::Utility::isIn( $data->{fieldType}, qw(SelectList CheckList SelectBox Attachments) ) ) {
         my @values;
-        if ( $useFormPostData && $self->session->form->param($name) ) {
+        if ( $useFormPostData && $session->form->param($name) ) {
             $param{ value } = [ $session->form->process( $name, $data->{fieldType} ) ];
         }
         elsif ( $data->{ value } ) {
@@ -1000,7 +1000,7 @@ sub getFormPlugin {
             $param{value} = \@values;
         }
     }
-    elsif ( $useFormPostData && $self->session->form->param($name) ) {
+    elsif ( $useFormPostData && $session->form->param($name) ) {
         $param{value} = $session->form->process( $name, $data->{fieldType} );
     }
 
@@ -1045,10 +1045,16 @@ sub getFormPlugin {
         my $errorMessage = $self->badOtherThing($tableName, $fieldName);
         return $errorMessage if $errorMessage;
 
-        $options = $db->buildHashRef('select thingDataId, '
+        my $sth = $session->db->read('select thingDataId, '
             .$dbh->quote_identifier($fieldName)
             .' from '.$dbh->quote_identifier($tableName));
     
+        while (my $result = $sth->hashRef){
+            if ($self->canViewThingData($otherThingId,$result->{thingDataId})){
+                $options->{$result->{thingDataId}} = $result->{$fieldName}
+            }
+        }
+ 
         my $value = $data->{value} || $data->{defaultValue};
         ($param{value}) = $db->quickArray('select '
             .$dbh->quote_identifier($fieldName)
@@ -1390,7 +1396,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 triggerWorkflow ( workflowId )
+=head2 triggerWorkflow ( workflowId, thingId, thingDataId )
 
 Runs the specified workflow when this Thingy changes.
 
@@ -1404,12 +1410,17 @@ sub triggerWorkflow {
 
     my $self = shift;
     my $workflowId = shift;
-    WebGUI::Workflow::Instance->create($self->session, {
+    my $thingId = shift ;
+    my $thingDataId = shift ;
+    my $workflowInstance = WebGUI::Workflow::Instance->create($self->session, {
         workflowId=>$workflowId,
         className=>"WebGUI::Asset::Wobject::Thingy",
         methodName=>"new",
         parameters=>$self->getId
-        })->start;
+        });
+    $workflowInstance->setScratch("thingId", $thingId);
+    $workflowInstance->setScratch("thingDataId",$thingDataId);
+    $workflowInstance->start;
     return undef;
 }
 
@@ -1922,7 +1933,7 @@ sub www_editThing {
     );
 
     # create the options hash for the 'Who can edit' and 'Who can view' selectBoxes.
-    %editViewOptions = ('owner'=>'owner',$session->db->buildHash(
+    %editViewOptions = ('owner'=>$i18n->get('owner'),$session->db->buildHash(
         "select groupId,groupName from groups where showInForms=1 order by groupName"
     ));
 
@@ -2420,10 +2431,6 @@ sub editThingData {
 
     return $session->privilege->insufficient() unless $canEditThingData;
 
-    if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
-        return $i18n->get("has entered max per user message");
-    }
-
     my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
@@ -2505,6 +2512,14 @@ sub editThingData {
     $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value => $thingProperties->{saveButtonLabel}});
     $var->{"form_end"} = WebGUI::Form::formFooter($self->session);
     $self->appendThingsVars($var, $thingId);
+
+    if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
+        delete $var->{form_start};
+        delete $var->{form_end};
+        delete $var->{form_submit};
+        delete $var->{field_loop};
+        $var->{editInstructions} = $i18n->get("has entered max per user message");
+    }
     return $self->processTemplate($var,$thingProperties->{editTemplateId});
 }
 

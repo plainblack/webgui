@@ -171,6 +171,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'keyword list template' => {
+        message => q|Story Archive, Keyword List Template|,
+        context => q|Title of a help page.|,
+        lastUpdated => 0,
+    },
+
     'view template' => {
         message => q|Story Archive, View Template|,
         context => q|Title of a help page.|,
@@ -214,15 +220,15 @@ our $I18N = {
     },
 
     'deleteIcon' => {
-        message => q|An icon to delete this story.  If the user is not allowed to delete the icon, or their UI level is set too low, this variable will be empty.|,
+        message => q|An icon to delete this story.  If the user is not allowed to delete the story, or their UI level is set too low, this variable will be empty.|,
         context => q|Template variable.|,
-        lastUpdated => 0,
+        lastUpdated => 1247068423,
     },
 
     'editIcon' => {
-        message => q|An icon to edit this story.  If the user is not allowed to edit the icon, or their UI level is set too low, this variable will be empty.|,
+        message => q|An icon to edit this story.  If the user is not allowed to edit the story, or their UI level is set too low, this variable will be empty.|,
         context => q|Template variable.|,
-        lastUpdated => 0,
+        lastUpdated => 1247068422,
     },
 
     'add a story' => {
@@ -298,9 +304,9 @@ our $I18N = {
     },
 
     'asset url' => {
-        message => q|The title of this url.|,
+        message => q|The URL of this asset.|,
         context => q|Template variable.|,
-        lastUpdated => 0,
+        lastUpdated => 1250263822,
     },
 
     'keyword' => {

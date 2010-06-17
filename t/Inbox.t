@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Inbox;
 use WebGUI::User;
 
-use Test::More tests => 13; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -39,7 +39,7 @@ my $new_message = {
     userId  => 1,
 };
 
-my $message = $inbox->addMessage($new_message,{ testing => 1, });
+my $message = $inbox->addMessage($new_message,{ no_email => 1, });
 isa_ok($message, 'WebGUI::Inbox::Message');
 
 ok(defined($message), 'addMessage returned a response');
@@ -88,32 +88,36 @@ $inbox->addMessage({
     message => "First message",
     userId  => 3,
     sentBy  => $senders[0]->userId,
+    status  => 'unread',
 },{
-    testing => 1,
+    no_email => 1,
 });
 
 $inbox->addMessage({
     message => "Second message",
     userId  => 3,
     sentBy  => $senders[1]->userId,
+    status  => 'unread',
 },{
-    testing => 1,
+    no_email => 1,
 });
 
 $inbox->addMessage({
     message => "Third message",
     userId  => 3,
     sentBy  => $senders[2]->userId,
+    status  => 'unread',
 },{
-    testing => 1,
+    no_email => 1,
 });
 
 $inbox->addMessage({
     message => "Fourth message",
     userId  => 3,
     sentBy  => $senders[2]->userId,
+    status  => 'unread',
 },{
-    testing => 1,
+    no_email => 1,
 });
 
 is(scalar @{ $inbox->getMessagesForUser($admin) }, 4, 'Added 3 messages by various users');
@@ -121,6 +125,12 @@ is(scalar @{ $inbox->getMessagesForUser($admin, '', '', '', 'sentBy='.$session->
 is(scalar @{ $inbox->getMessagesForUser($admin, '', '', '', 'sentBy='.$session->db->quote($senders[1]->userId)) }, 1, '1 message by sender[1]');
 is(scalar @{ $inbox->getMessagesForUser($admin, '', '', '', 'sentBy='.$session->db->quote($senders[2]->userId)) }, 2, '2 messages by sender[2]');
 
+is($inbox->getUnreadMessageCount($admin->userId), 4, 'getUnreadMessageCount');
+my $messages = $inbox->getMessagesForUser($admin);
+$messages->[0]->setRead($admin->userId);
+note $messages->[0]->getStatus;
+note $messages->[0]->isRead;
+is($inbox->getUnreadMessageCount($admin->userId), 3, '... really tracks unread messages');
 
 END {
     $session->db->write('delete from inbox where messageId = ?', [$message->getId]);

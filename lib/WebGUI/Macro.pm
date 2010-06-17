@@ -46,7 +46,9 @@ my $parenthesis;
 $parenthesis = qr{
     \(                      # Start with '(',
     (?:                     # Followed by
-        (?>[^()]+)              # Non-parenthesis
+        (?>\\[()])              # Escaped parenthesis
+    |                       # or
+        (?>[^()])               # Non-parenthesis
     |                       # or
         (??{ $parenthesis })    # a balanced parenthesis block
     )*                      # zero or more times
@@ -162,7 +164,7 @@ sub _processMacro {
     $parameters =~ s/\)$//;
 
     my @params;
-    while ($parameters =~ /
+    while ($parameters =~ m{
         (?<!\z)                             # don't try to match if we are at the end of the string
         (?:                                 # either
             \s* "                               # white space followed by a double quote
@@ -188,9 +190,9 @@ sub _processMacro {
         |                                   # or
             ,                                   # a comma
         )
-    /xg) {
+    }xg) {
         # three matches, only one will exist per run
-        push @params, defined $1 ? $1 : defined $2 ? $2 : $3;
+        push @params, $+;
     }
 
     for my $param (@params) {

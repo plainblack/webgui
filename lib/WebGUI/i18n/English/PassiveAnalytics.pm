@@ -69,9 +69,9 @@ $ = end of url<br />
 + = 1 or more<br />
 ? = 0 or 1<br />
 Meta characters should be backslash-escaped if you want to match them as ordinary text, e.g.<br />
-home\?func=match, or<br />
+home\?func=match<br />
 |,
-		lastUpdated => 0,
+		lastUpdated => 1248191303,
 		context => q||
 	},
 
@@ -106,8 +106,8 @@ home\?func=match, or<br />
 	},
 
 	'User help' => {
-		message => q|The user who will recieve an email when bucket processing is done.|,
-		lastUpdated => 0,
+		message => q|The user who will receive an email when bucket processing is done.|,
+		lastUpdated => 1248191382,
 		context => q||
 	},
 

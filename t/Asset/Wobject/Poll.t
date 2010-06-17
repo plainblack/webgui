@@ -106,7 +106,7 @@ my $uploadsPath = Path::Class::Dir->new($session->config->get('uploadsPath'));
 my $uploadsUrl  = Path::Class::Dir->new($session->config->get('uploadsURL'));
 my $graphRelative = $graphUrl->relative($uploadsUrl);
 my $graphFile     = $uploadsPath->file($graphRelative);
-diag $graphFile->stringify;
+note $graphFile->stringify;
 
 ok(-e $graphFile->stringify, 'graph exists');
 

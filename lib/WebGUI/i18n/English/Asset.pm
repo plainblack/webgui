@@ -837,8 +837,8 @@ case of the check box list, then enter one per line.  The total amount of data i
                    message => q|Hide from navigation?|
                  },
         '43' => {
-                  lastUpdated => 1149960436,
-                  message => q|Are you certain that you wish to delete this content? Note that this change is not versioned and will take place immediately.|
+                  message => q|Are you certain that you wish to delete this content, and all content below it? Note that this change is not versioned and will take place immediately.|,
+                  lastUpdated => 1250091423,
                 },
         '940' => {
                    lastUpdated => 1050438829,
@@ -1296,6 +1296,78 @@ Couldn't open %-s because %-s <br />
         message     => q{Use the packed version of the head tags for faster downloads},
         lastUpdated => 0,
         context     => q{Description of asset property},
+    },
+
+    'Error getting asset with assetId %s' => {
+        message     => q{Error getting asset with assetId %s},
+        lastUpdated => 0,
+        context     => q{Generic error when an asset cannot be looked up by assetId},
+    },
+
+    'You cannot edit the asset %s, skipping' => {
+        message     => q{You cannot edit the asset %s, skipping},
+        lastUpdated => 0,
+        context     => q{Generic error when an asset cannot be edited},
+    },
+
+    'Purging %s' => {
+        message     => q{Purging %s},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Trying to delete system page %s.  Aborting' => {
+        message     => q{Trying to delete system page %s.  Aborting},
+        lastUpdated => 1251071942,
+        context     => q{},
+    },
+
+    'Undefined child' => {
+        message     => q{Undefined child.},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Purging shortcuts' => {
+        message     => q{Purging shortcuts},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Deleting exported files' => {
+        message     => q{Deleting exported files},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Deleting keywords' => {
+        message     => q{Deleting keywords},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Clearing search index' => {
+        message     => q{Clearing search index},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Clearing cache' => {
+        message     => q{Clearing cache},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Clearing asset tables' => {
+        message     => q{Clearing asset tables},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Delete Assets' => {
+        message     => q{Delete Assets},
+        lastUpdated => 0,
+        context     => q{},
     },
 
 };

@@ -16,6 +16,7 @@ package WebGUI::Form::Codearea;
 
 use strict;
 use base 'WebGUI::Form::Textarea';
+use HTML::Entities qw(encode_entities decode_entities);
 use WebGUI::International;
 
 =head1 NAME
@@ -114,6 +115,20 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getValue ( [value] )
+
+Return the value, HTML decoded
+
+=cut
+
+sub getValue {
+    my ( $self, @args ) = @_;
+    my $value = $self->SUPER::getValue( @args );
+    return decode_entities( $value );
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -133,40 +148,44 @@ Renders a code area field.
 =cut
 
 sub toHtml {
-	my $self    = shift;
-	my $output  = "";
-    
-    # Do our superclass's job
-    my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
-	my $width = $self->get('width') || 400;
-	my $height = $self->get('height') || 150;
-	my ($style, $url) = $self->session->quick(qw(style url));
-	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
-    $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
-	$output = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '.$self->get("extras").' rows="#" cols="#" style="width: '.$width.'px; height: '.$height.'px;">'.$value.'</textarea>';
+    my $self = shift;
+    my ($style, $url, $stow) = $self->session->quick(qw(style url stow));
 
-    # Vars for JS below
-    my $id              = $self->get( "id" );
-    my $syntax          = $self->get( "syntax" );
-    my $editareaPath    = $self->session->url->extras( 'editarea' );
+    my $value = encode_entities( $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue))) );
+    my $width = $self->get('width') || 400;
+    my $height = $self->get('height') || 150;
+    my $id = $self->get('id');
+    my $name = $self->get('name');
+    my $extras = $self->get('extras');
+    my $syntax = $self->get('syntax');
+    my $styleAttr = $self->get('style');
 
-	$self->session->style->setScript($editareaPath . '/edit_area/edit_area_full.js',{type=>"text/javascript"});
-    $output .= qq~
-        <script type="text/javascript">
-            editAreaLoader.init({
-                id              : "$id",
-                syntax          : "$syntax",
-                start_highlight : true,
-                show_line_colors: true,
-                display         : "later",
-                toolbar         : "search, go_to_line, |, undo, redo, |, syntax_selection, highlight, reset_highlight, |, help"
-            });
-        </script>
-    ~;
-
-    return $output;
+    $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
+    $style->setLink($url->extras("yui/build/assets/skins/sam/skin.css"), {type=>"text/css", rel=>"stylesheet"});
+    $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/utilities/utilities.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/container/container_core-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/menu/menu-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/button/button-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/element/element-beta-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/resize/resize-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/editor/editor-min.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"),{type=>"text/javascript"});
+    my $codeCss = $url->extras("yui-webgui/build/code-editor/code.css");
+    my $out = <<"END_HTML";
+<textarea id="$id" name="$name" $extras rows="10" cols="60" style="font-family: monospace; $styleAttr; height: 100%; width: 100%; resize: none;">$value</textarea>
+<script type="text/javascript">
+(function(){
+    YAHOO.util.Event.onDOMReady( function () {
+        var myeditor = new YAHOO.widget.CodeEditor('${id}', { handleSubmit: true, css_url: '${codeCss}', height: '${height}px', width: '${width}px', status: true, resize: true });
+        myeditor.render();
+    } );
+}());
+</script>
+END_HTML
+    return $out;
 }
-
 
 1;
 

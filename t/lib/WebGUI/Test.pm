@@ -1,9 +1,5 @@
 package WebGUI::Test;
 
-use strict;
-use warnings;
-use Clone qw/clone/;
-
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -25,6 +21,12 @@ Package WebGUI::Test
 Utility module for making testing in WebGUI easier.
 
 =cut
+
+
+use strict;
+use warnings;
+use Clone qw/clone/;
+use Test::MockObject;
 
 our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL );
 
@@ -55,6 +57,7 @@ our $logger_error;
 my %originalConfig;
 my $originalSetting;
 
+my @assetsToPurge;
 my @groupsToDelete;
 my @usersToDelete;
 my @sessionsToDelete;
@@ -66,7 +69,45 @@ my $smtpdPid;
 my $smtpdStream;
 my $smtpdSelect;
 
+my $mocker;
+
 BEGIN {
+
+#----------------------------------------------------------------------------
+
+=head2 sessionsToDelete ( $session, [$session, ...] )
+
+Push a list of session objects onto the stack of groups to be automatically deleted
+at the end of the test.  Note, this will be the last group of objects to be
+cleaned up.
+
+This is a class method.
+
+=cut
+
+sub sessionsToDelete {
+    my $class = shift;
+    push @sessionsToDelete, @_;
+}
+
+
+sub newSession {
+    my $pseudoRequest = WebGUI::PseudoRequest->new;
+    my $session = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
+    $session->{_request} = $pseudoRequest;
+    WebGUI::Test->sessionsToDelete($session);
+    return $session;
+}
+
+}
+
+BEGIN {
+
+    $mocker = Test::MockObject->fake_module(
+        'APR::Request::Apache2',
+        handle => sub { return bless {}, 'APR::Request::Apache2'; }, 
+        jar    => sub { return { }; },
+    );
 
     STDERR->autoflush(1);
 
@@ -115,44 +156,53 @@ BEGIN {
 
     push (@INC,$WEBGUI_LIB);
 
+    ##Handle custom loaded library paths
+    my $customPreload = File::Spec->catdir( $WEBGUI_ROOT, 'sbin', 'preload.custom');
+    if (-e $customPreload) {
+        open my $PRELOAD, '<', $customPreload or
+            croak "Unload to open $customPreload: $!\n";
+        LINE: while (my $line = <$PRELOAD>) {
+            $line =~ s/#.*//;
+            $line =~ s/^\s+//;
+            $line =~ s/\s+$//;
+            next LINE if !$line;
+            unshift @INC, $line;
+        }
+        close $PRELOAD;
+    }
+
     # http://thread.gmane.org/gmane.comp.apache.apreq/3378
     # http://article.gmane.org/gmane.comp.apache.apreq/3388
     if ( $^O eq 'darwin' && $Config::Config{osvers} lt '8.0.0' ) {
-
-        require Class::Null;
-        require IO::File;
-
         unshift @INC, sub {
             return undef unless $_[1] =~ m/^Apache2|APR/;
-            return IO::File->new( $INC{'Class/Null.pm'}, &IO::File::O_RDONLY );
+            my $buffer = '1';
+            open my $fh, '<', \$buffer;
+            return $fh;
         };
 
-        no strict 'refs';
-
+        no warnings 'redefine';
         *Apache2::Const::OK        = sub {   0 };
         *Apache2::Const::DECLINED  = sub {  -1 };
         *Apache2::Const::NOT_FOUND = sub { 404 };
     }
 
-    unless ( eval "require WebGUI::Session;" ) {
+    unless ( eval { require WebGUI::Session; } ) {
         warn qq/Failed to require package 'WebGUI::Session'. Reason: '$@'.\n/;
         exit(1);
     }
 
-    my $pseudoRequest = WebGUI::PseudoRequest->new;
-    #$SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE, $pseudoRequest );
-    $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
-    $SESSION->{_request} = $pseudoRequest;
+
+    $SESSION = WebGUI::Test->newSession;
 
     $originalSetting = clone $SESSION->setting->get;
-
 }
 
 END {
     my $Test = Test::Builder->new;
     GROUP: foreach my $group (@groupsToDelete) {
         my $groupId = $group->getId;
-        next GROUP if any { $groupId eq $_ } qw/1 2 3 4 6 7 8 11 12 13 14 pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 /;
+        next GROUP if WebGUI::Group->vitalGroup($groupId);
         my $newGroup = WebGUI::Group->new($SESSION, $groupId);
         $newGroup->delete if $newGroup;
     }
@@ -162,7 +212,7 @@ END {
         my $newUser = WebGUI::User->new($SESSION, $userId);
         $newUser->delete if $newUser;
     }
-    foreach my $stor (@storagesToDelete) {
+    STORAGE: foreach my $stor (@storagesToDelete) {
         if ($SESSION->id->valid($stor)) {
             my $storage = WebGUI::Storage->get($SESSION, $stor);
             $storage->delete if $storage;
@@ -171,9 +221,8 @@ END {
             $stor->delete;
         }
     }
-    SESSION: foreach my $session (@sessionsToDelete) {
-        $session->var->end;
-        $session->close;
+    ASSET: foreach my $asset (@assetsToPurge) {
+        $asset->purge;
     }
     TAG: foreach my $tag (@tagsToRollback) {
         $tag->rollback;
@@ -218,8 +267,10 @@ END {
     while (my ($param, $value) = each %{ $originalSetting }) {
         $SESSION->setting->set($param, $value);
     }
-    $SESSION->var->end;
-    $SESSION->close if defined $SESSION;
+    SESSION: foreach my $session (@sessionsToDelete) {
+        $session->var->end;
+        $session->close;
+    }
 
     # Close SMTPD
     if ($smtpdPid) {
@@ -230,6 +281,106 @@ END {
         # we killed it, so there will be an error.  Prevent that from setting the exit value.
         $? = 0;
     }
+}
+
+=head2 newSession ( )
+
+Builds a WebGUI session object for testing.
+
+=cut
+
+=head2 mockAssetId ( $assetId, $object )
+
+Causes WebGUI::Asset->new* initializers to return the specified
+object instead of retreiving it from the database for the given
+asset ID.
+
+=cut
+
+my %mockedAssetIds;
+sub mockAssetId {
+    my ($class, $assetId, $object) = @_;
+    _mockAssetInits();
+    $mockedAssetIds{$assetId} = $object;
+}
+
+=head2 unmockAssetId ( $assetId )
+
+Removes a given asset ID from being mocked.
+
+=cut
+
+sub unmockAssetId {
+    my ($class, $assetId) = @_;
+    delete $mockedAssetIds{$assetId};
+}
+
+=head2 mockAssetUrl ( $url, $object )
+
+Causes WebGUI::Asset->newByUrl to return the specified object instead
+of retreiving it from the database for the given URL.
+
+=cut
+
+my %mockedAssetUrls;
+sub mockAssetUrl {
+    my ($url, $object) = @_;
+    _mockAssetInits();
+    $mockedAssetUrls{$url} = $object;
+}
+
+=head2 unmockAssetUrl ( $url )
+
+Removes a given asset URL from being mocked.
+
+=cut
+
+sub unmockAssetUrl {
+    my ($class, $url) = @_;
+    delete $mockedAssetUrls{$url};
+}
+
+my $mockedNew;
+sub _mockAssetInits {
+    no warnings 'redefine';
+
+    return
+        if $mockedNew;
+    require WebGUI::Asset;
+    my $original_new = \&WebGUI::Asset::new;
+    *WebGUI::Asset::new = sub {
+        my ($class, $session, $assetId, $className, $revisionDate) = @_;
+        if ($mockedAssetIds{$assetId}) {
+            return $mockedAssetIds{$assetId};
+        }
+        goto $original_new;
+    };
+    my $original_newByDynamicClass = \&WebGUI::Asset::newByDynamicClass;
+    *WebGUI::Asset::newByDynamicClass = sub {
+        my ($class, $session, $assetId, $revisionDate) = @_;
+        if ($mockedAssetIds{$assetId}) {
+            return $mockedAssetIds{$assetId};
+        }
+        goto $original_newByDynamicClass;
+    };
+    my $original_newPending = \&WebGUI::Asset::newPending;
+    *WebGUI::Asset::newPending = sub {
+        my ($class, $session, $assetId, $revisionDate) = @_;
+        if ($mockedAssetIds{$assetId}) {
+            return $mockedAssetIds{$assetId};
+        }
+        goto $original_newPending;
+    };
+    my $original_newByUrl = \&WebGUI::Asset::newByUrl;
+    *WebGUI::Asset::newByUrl = sub {
+        my ($class, $session, $url, $revisionDate) = @_;
+        if ($mockedAssetUrls{$url}) {
+            return $mockedAssetUrls{$url};
+        }
+        goto $original_newByUrl;
+    };
+
+    $mockedNew = 1;
 }
 
 #----------------------------------------------------------------------------
@@ -251,6 +402,25 @@ sub interceptLogging {
     $logger->mock( 'error',    sub { $WebGUI::Test::logger_error = $_[1]} );
     $logger->mock( 'isDebug',  sub { return 1 } );
     $logger->mock( 'is_debug', sub { return 1 } );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 restoreLogging
+
+Restores's the logging object to its original state.
+
+=cut
+
+sub restoreLogging {
+    my $logger = $SESSION->log->getLogger;
+
+    $logger->unmock( 'warn'     )
+           ->unmock( 'debug'    )
+           ->unmock( 'info'     )
+           ->unmock( 'error'    )
+           ->unmock( 'isDebug'  )
+           ->unmock( 'is_debug' );
 }
 
 #----------------------------------------------------------------------------
@@ -492,6 +662,23 @@ sub originalConfig {
 
 #----------------------------------------------------------------------------
 
+=head2 assetsToPurge ( $asset, [$asset ] )
+
+Push a list of Asset objects onto the stack of assets to be automatically purged
+at the end of the test.  This will also clean-up all version tags associated
+with the Asset.
+
+This is a class method.
+
+=cut
+
+sub assetsToPurge {
+    my $class = shift;
+    push @assetsToPurge, @_;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 groupsToDelete ( $group, [$group ] )
 
 Push a list of group objects onto the stack of groups to be automatically deleted
@@ -576,23 +763,6 @@ This is a class method.
 sub storagesToDelete {
     my $class = shift;
     push @storagesToDelete, @_;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 sessionsToDelete ( $session, [$session, ...] )
-
-Push a list of session objects onto the stack of groups to be automatically deleted
-at the end of the test.  Note, this will be the last group of objects to be
-cleaned up.
-
-This is a class method.
-
-=cut
-
-sub sessionsToDelete {
-    my $class = shift;
-    push @sessionsToDelete, @_;
 }
 
 #----------------------------------------------------------------------------

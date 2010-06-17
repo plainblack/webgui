@@ -7,6 +7,202 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.21
+--------------------------------------------------------------------
+
+    * The EventManagementSystem schedule template was accidently given
+    the same namespace as the main EMS template.  This allowed the
+    wrong template to be chosen for the main EMS template and the
+    schedule template.  The upgrade from 7.8.0 to 7.8.1 will attempt
+    to fix this when default templates have been used.
+
+7.7.19
+--------------------------------------------------------------------
+    * The search indexer was not properly indexing non-ASCII content
+      entered via TinyMCE.  The behaviour has been corrected.  If your
+      site has content in languages other than English, you should
+      re-index the site.  This can be done with the search.pl utility
+      script by running
+        perl search.pl --configFile=www.mysite.com.conf --indexsite
+      or, to index all of the sites on the server:
+        perl search.pl --indexall
+
+    * For searching content with ideograms, ft_min_word_len must be
+      set to 2 in the Mysql config file.  WebGUI will safely pad the
+      characters so that it does not need to be set to 1.  The WRE
+      has ft_min_word_len set to 2 by default.
+
+    * If upgrading from WebGUI 7.6, you must first upgrade to 7.6.35,
+      then you can upgrade to WebGUI 7.7.19 and beyond.
+
+7.7.18
+--------------------------------------------------------------------
+    * The search indexer was not properly indexing non-ASCII content.  The
+      behaviour has been corrected.  If your site has content in languages
+      other than English, you should re-index the site.  This can be done
+      with the search.pl utility script by running
+        perl search.pl --configFile=www.mysite.com.conf --indexsite
+      or, to index all of the sites on the server:
+        perl search.pl --indexall
+
+7.7.17
+--------------------------------------------------------------------
+    * It was found that the combination of
+        DBI: 1.52
+        DBD-mysql: 3.002
+      will cause an error during the 7.6.32 upgrade.  Later versions
+      of these modules should work.
+
+    * Spectre now works like many other programs and uses a PID
+      file.  By default, it will use /var/run/spectre.pid, but you
+      can change that in your spectre.conf file:
+
+# The location of the file that keeps track of the master spectre
+# processId.
+"pidFile" : "/var/run/spectre.pid", ##Or some other location
+
+      After installing this version, you should manually kill spectre and
+      then modify the spectre.conf file to add the pidFile directive.
+
+    * The Default Gallery Album View Thumbnails template has been reworked
+      to get rid of intermittent rendering bugs with IE7.  The thumbnail
+      pop-up is now completely CSS.  The thumbnails.js file is still available,
+      but is now considered deprecated.
+
+7.7.16
+--------------------------------------------------------------------
+    * There was some confusion about the state of 
+      WebGUI::Shop::PayDriver::PayPal::PayPalStd.  While it was in fact
+      dysfunctional, it was using the Paypal Website Standard API, while
+      the new Paypal module was using Express Checkout.  Express checkout
+      is only available in the US, UK, and Canada.  PayPalStd has
+      been repaired, and the newly written Express Checkout module is
+      available at WebGUI::Shop::PayDriver::PayPal::ExpressCheckout.
+
+7.7.15
+--------------------------------------------------------------------
+    * WebGUI::Shop::PayDriver::PayPal::PayPalStd has been replaced by
+      WebGUI::Shop::PayDriver::PayPal.  The old module by that name (a base
+      class for PayPalStd) has been removed.  If you had the PayPalStd working,
+      the new module very likely will not work (the old one did some very
+      un-Shop things, which is why it was replaced).  Please test the new one
+      with your setup.
+
+    * 29 templates have been replaced with new ones. These are the templates
+      for the Article, File, Folder, Image, Navigation, Layout, Poll, Search
+      and Syndicated Content assets. 13 templates have been deleted (Article,
+      Navigation and Layout templates). These were deleted because of deprecated
+      code, redundancy and because we are want to reduce the number of
+      templates. This will make the whole set of templates more comprehensible.
+
+      Changes for all these templates:
+      - extra divs, classes and IDs have been added;
+      - consistent markup for recurring code, like titles, descriptions, attachments and pagination;
+      - inline styles and deprecated code removed.
+
+      Article
+      - All Article templates:
+          - Removed pagination. This will be re-added later, when the pagination macro bug has been fixed (bug #10619)
+      - Default Article:
+          - Added attachment loop (RFE #4152)
+          - Removed code for image, since there now is a dedicated Article with Image template
+      - Center Image:
+          - Deleted: align="center" is deprecated
+      - Left align image:
+          - Changed name to Article with Image
+          - Removed tables and added styles for img positioning
+      - Linked Image with Caption
+          - Removed tables and added styles for img positioning
+      - Item:
+          - Added attachment loop
+      - Item w/ popup links:
+          - Deleted: pop-up links are bad practice and this doesn't need to be a default
+      - Article with files:
+          - Deleted: attachment loop now added to Default Article
+      - article.css added
+
+      File
+      - Default File:
+          - The linktext is title instead of the filename (RFE #10173)
+      - Flash File:
+          - Template now uses swfobject code
+          - Absolute width and height attributes are set in the html to replace the percentage value and inline style
+
+      Folder
+      - File Folder:
+          - The linktext is title instead of the filename (like in the Default File template)
+          - Tables have not been removed, since they are semantically correct here
+
+      Image
+      - Image:
+          - Only added extra div with ID and class
+      - Annotate Image:
+          - No changes
+
+      Changes for Navigation
+      - crumbTrail:
+          - No specific changes
+      - verticalMenu:
+          - Deleted: best practice is using "Bulleted List" for vertical navs
+      - horizontalMenu:
+          - Based on unordered list
+          - Added styles
+      - DropMenu:
+          - Javascript cleaned up
+          - Noscript alternative added
+      - Tabs:
+          - Based on unordered list
+          - Added styles
+      - Tree Navigation:
+          - Javascript cleaned up
+      - Hierarchical top nav:
+          - Javascript cleaned up
+      - Synopsis:
+          - HTML based on definition list
+      - Bulleted list:
+          - Now always generates validating html (closing ul and li tags)
+      - Indent Nav:
+          - No specific changes
+      - navigation.css added
+
+      Layout
+      - All table layouts:
+          - Deleted: using tables for positioning is bad practice
+      - All non table layouts:
+          - Removed unnecessary divs ("layoutColumnPadding" and "content")
+          - Styles for positioning added
+      - One Over Two:
+          - Newly added
+          - Replaces News, but has one less content position
+      - News, Three Over One, Left column:
+          - Deleted: we want to reduce the number of templates and only kept the basic/most used page layouts
+      - layout.css added
+
+      Poll
+      - Default Poll:
+          - General cleanup, added extra classes and IDs
+      - poll.css added
+
+      Search
+      - Default Search:
+          - Results in a definitions list
+          - Form post back to the current page instead of to the asset in wobject focus,
+            this prevents possible "breaking" of the style
+
+      Syndicated Content
+      - Default Syndicated Content:
+          - General cleanup, added extra tags, classes and IDs
+      - Syndicated Articles:
+          - General cleanup, added extra tags, classes and IDs
+          - Removed inline style
+
+7.7.13
+--------------------------------------------------------------------
+   * WebGUI has allowed metadata possible values to be processed differently
+     by Posts than from other Assets.  This causes problems when metadata is
+     shared between Posts and other Assets.  To rememdy this, all metadata
+     possible values are being moved into the standard "pipe format", and
+     the Post will no longer process data in the other format.
 
 7.7.8
 --------------------------------------------------------------------
@@ -21,7 +217,7 @@ save you many hours of grief.
 --------------------------------------------------------------------
    * WebGUI now requires Digest::SHA.
    
-   * WebGUI now requires JavsScript::Minifier::XS 0.05
+   * WebGUI now requires JavaScript::Minifier::XS 0.05
    
    * WebGUI now requires CSS::Minifier::XS 0.03
 
@@ -74,6 +270,11 @@ save you many hours of grief.
      RssFeed AssetAspect.  If not used by custom assets, the tables
      used by them will be removed from the database.
 
+     This will change the URLs for your RSS Feeds from "myAsset.rss" to
+     "myAsset?func=viewRss".  You will need to update all Syndicated Content
+     assets and other content aggregators that had the old URLs.  Alternately,
+     you can use Redirect assets to forward the old URL to the new one.
+
 7.7.1
 --------------------------------------------------------------------
    * Keywords are now comma separated rather than space separated.  Quotes are
@@ -120,7 +321,9 @@ save you many hours of grief.
      Tags field.  Extra Head Tags are now added for all templates and
      assets included on a page, except for Style templates, which do
      not have Extra Head Tags.  Existing Extra Head Tags for Style
-     templates have been removed.
+     templates will be lost.  If your current Style template uses
+     the Head Block please put any content from there directly into your
+     style template inside the <head></head> tags.
 
    * Web Services Client is no longer part of the official distribution of
      WebGUI, but is still available to be maintained by third-parties. However,

@@ -4,13 +4,14 @@ use strict;
 
 use Test::MockObject;
 
-my $mocker = Test::MockObject->new();
-$mocker->fake_module(
-    'Apache2::Cookie', 
-    new     => sub { return bless {}, 'Apache2::Cookie'; },
-    expires => sub { 1; },
-    domain  => sub { 1; },
-    bake    => sub { 1; },
+Test::MockObject->fake_module(
+    'Apache2::Cookie',
+    new => sub {
+        my $class = shift;
+        my $self = Test::MockObject->new;
+        $self->set_isa($class);
+        $self->set_true(qw(expires domain bake));
+    }
 );
 
 =head1 LEGAL
@@ -213,7 +214,7 @@ sub new {
 	my $this = shift;
 	my $class = ref($this) || $this;
 	my $headers = WebGUI::PseudoRequest::Headers->new();
-	my $self = {headers_out => $headers};
+	my $self = { headers_out => $headers, headers_in => {} };
 	bless $self, $class;
 	return $self;
 }
@@ -288,6 +289,19 @@ sub content_type {
 		$self->{content_type} = $value;
 	}
 	return $self->{content_type};
+}
+
+#----------------------------------------------------------------------------
+
+=head2 headers_in ( )
+
+Mimics the behavior of Apache2::Request->headers_in.
+
+=cut
+
+sub headers_in {
+       my $self = shift;
+       return $self->{headers_in};
 }
 
 #----------------------------------------------------------------------------
@@ -374,6 +388,23 @@ C<print> method.  Returns it as a scalar.
 sub get_output {
     my $self = shift;
     return $self->{output};
+}
+
+#----------------------------------------------------------------------------
+
+=head2 method ( [ $method ] )
+
+Getter/setter for the HTTP request method.
+
+=cut
+
+sub method {
+    my ($self, $newMethod) = @_;
+    my $method = $self->{method};
+    if (defined $newMethod) {
+        $self->{method} = $newMethod;
+    }
+    return $method;
 }
 
 #----------------------------------------------------------------------------

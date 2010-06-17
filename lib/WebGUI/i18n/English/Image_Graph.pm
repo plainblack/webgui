@@ -86,6 +86,13 @@ want to use.|,
 		message => q|No graphing plugins are enabled in the config file.|,
 		lastUpdated => 1163746146,
 	},
+
+	'Graphing' => {
+		message => q|Graphing|,
+		lastUpdated => 1251312907,
+        context => q|Name of the tab that contains the form for graph configuration.|,
+	},
+
 };
 
 1;

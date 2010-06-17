@@ -106,6 +106,13 @@ sub canView {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addColorToPalette 
+
+Build a form for the user to add a color to this palette.
+
+=cut
+
 sub www_addColorToPalette {
 	my ($f);
 	my $session = shift;
@@ -132,6 +139,13 @@ sub www_addColorToPalette {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addColorToPaletteSave 
+
+Process the addColorToPalette form.
+
+=cut
+
 sub www_addColorToPaletteSave {
 	my $session = shift;
 
@@ -153,6 +167,13 @@ my	$palette = WebGUI::Image::Palette->new($session, $session->form->process('pid
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteFont 
+
+Deletes a font specified by the form variable C<fid>.  Returns the user to listFonts.
+
+=cut
+
 sub www_deleteFont {
 	my $session = shift;
 
@@ -165,6 +186,13 @@ sub www_deleteFont {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deletePalette 
+
+Deletes a palette specified by the form variable C<pid>.  Returns the user to listPalettes.
+
+=cut
+
 sub www_deletePalette {
 	my $session = shift;
 
@@ -177,6 +205,13 @@ sub www_deletePalette {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editColor 
+
+Allows the user to add or edit a color.
+
+=cut
+
 sub www_editColor {
 	my ($f);
 	my $session = shift;
@@ -206,6 +241,13 @@ sub www_editColor {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editColorSave 
+
+Processes the editColor screen.  Returns the user to editPalette.
+
+=cut
+
 sub www_editColorSave {
 	my $session = shift;
 	
@@ -226,6 +268,13 @@ sub www_editColorSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editFont 
+
+Show the user a form to add a new font or edit an existing one.
+
+=cut
+
 sub www_editFont {
 	my ($f, $fontName);
 	my $session = shift;
@@ -265,6 +314,13 @@ sub www_editFont {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editFontSave 
+
+Process the editFont form.  Returns the user to listFonts.
+
+=cut
+
 sub www_editFontSave {
 	my $session = shift;
 
@@ -288,6 +344,19 @@ sub www_editFontSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editPalette ($palette, $output)
+
+Add or edit a palette.
+
+=head3 $palette
+
+The ID of a palette to edit.  If blank, it will use the form variable C<pid>.
+
+=head3 $output
+
+=cut
+
 sub www_editPalette {
 	my ($name, $palette, $output);
 	my $session = shift;
@@ -345,6 +414,13 @@ sub www_editPalette {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editPaletteSave 
+
+Process the editPalette screen.  Returns the user to editPalette.
+
+=cut
+
 sub www_editPaletteSave {
 	my $session = shift;
 
@@ -357,6 +433,13 @@ sub www_editPaletteSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_listGraphicsOptions 
+
+Provides a screen where the user can list palettes or fonts.
+
+=cut
+
 sub www_listGraphicsOptions {
 	my ($output);
 	my $session = shift;
@@ -372,6 +455,13 @@ sub www_listGraphicsOptions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_listPalettes 
+
+Lists all palettes in the system, along with controls to delete, edit or add palettes.
+
+=cut
+
 sub www_listPalettes {
 	my ($output);
 	my $session = shift;
@@ -401,6 +491,13 @@ sub www_listPalettes {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveColorDown 
+
+Move the color given by the form variable C<pid> down one position.
+
+=cut
+
 sub www_moveColorDown {
 	my ($palette, $index);
 	my $session = shift;
@@ -416,6 +513,13 @@ sub www_moveColorDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveColorUp 
+
+Move the color given by the form variable C<pid>, up one position.
+
+=cut
+
 sub www_moveColorUp {
 	my ($palette, $index);
 	my $session = shift;
@@ -431,6 +535,13 @@ sub www_moveColorUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_listFonts 
+
+Lists all fonts in the system, with controls to delete them or add new ones.
+
+=cut
+
 sub www_listFonts {
 	my ($output);
 	my $session = shift;
@@ -460,6 +571,14 @@ sub www_listFonts {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_removeColorFromPalette 
+
+Removes the color given by the form variable C<index> from palette described by the
+form variable C<pid>.
+
+=cut
+
 sub www_removeColorFromPalette {
 	my $session = shift;
 

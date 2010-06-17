@@ -1,5 +1,19 @@
 package WebGUI::Shop::PayDriver;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 use strict;
 
 use Class::InsideOut qw{ :std };
@@ -13,6 +27,7 @@ use WebGUI::Macro;
 use WebGUI::User;
 use WebGUI::Shop::Cart;
 use JSON;
+use Clone qw/clone/;
 use Scalar::Util qw/blessed/;
 
 =head1 NAME
@@ -87,7 +102,9 @@ sub cancelRecurringPayment {
 
 =head2 canUse ( user )
 
-Checks to see if the user can use this Payment Driver.
+Checks to see if the user can use this Payment Driver.  Ability to use
+is based on whether or not this user has the correct privileges, and if
+the driver is enabled or not.
 
 =head3 user
 
@@ -107,6 +124,7 @@ A user object that will be used directly.
 
 sub canUse {
     my $self = shift;
+    return 0 unless $self->get('enabled');
     my $user = shift;
     my $userObject;
     if (!defined $user or ref($user) ne 'HASH') {
@@ -304,7 +322,7 @@ sub get {
         return $options->{ $param };
     }
     else {
-        return { %$options };
+        return { %{ $options } };
     }
 }
 
@@ -729,6 +747,8 @@ sub update {
         $jsonOptions,
         $self->paymentGatewayId
     ]);
+    my $storedProperties = clone $properties;
+    $options{ id $self } = $storedProperties;
 
     return;
 }

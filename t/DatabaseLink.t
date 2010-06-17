@@ -24,107 +24,145 @@ my $session = WebGUI::Test->session;
 
 #DSNs for parsing tests, particularly the database name
 my $DSNs = [
-	{
-		dsn     => 'DBI:mysql:colonSeparated:myHost:8008',
-		dbName  => 'colonSeparated',
+    {
+        dsn     => 'DBI:mysql:colonSeparated:myHost:8008',
+        dbName  => 'colonSeparated',
         comment => 'explicit',
-	},
-	{
-		dsn     => 'DBI:mysql:database=myDatabase',
-		dbName  => 'myDatabase',
+    },
+    {
+        dsn     => 'DBI:mysql:database=myDatabase',
+        dbName  => 'myDatabase',
         comment => 'database=',
-	},
-	{
-		dsn     => 'DBI:mysql:dbName=myDbName',
-		dbName  => undef,
+    },
+    {
+        dsn     => 'DBI:mysql:dbName=myDbName',
+        dbName  => undef,
         comment => 'dbName=, bad capitalization',
-	},
-	{
-		dsn     => 'DBI:mysql:dbname=mydbname',
-		dbName  => 'mydbname',
+    },
+    {
+        dsn     => 'DBI:mysql:dbname=mydbname',
+        dbName  => 'mydbname',
         comment => 'dbname=',
-	},
-	{
-		dsn     => 'DBI:mysql:dbnane=myDbName',
-		dbName  => undef,
+    },
+    {
+        dsn     => 'DBI:mysql:dbnane=myDbName',
+        dbName  => undef,
         comment => 'dbnane=, misspelling',
-	},
-	{
-		dsn     => 'DBI:mysql:db=myDb',
-		dbName  => 'myDb',
+    },
+    {
+        dsn     => 'DBI:mysql:db=myDb',
+        dbName  => 'myDb',
         comment => 'db=',
-	},
+    },
 ];
 
 #Grants for parsing tests, particularly the database name
 my $grants = [
-	{
-		dsn        => 'DBI:mysql:myDb:myHost:8008',
-		privileges => [qw/ALTER CREATE INSERT DELETE/],
+    {
+        dsn        => 'DBI:mysql:myDb:myHost:8008',
+        privileges => [qw/ALTER CREATE INSERT DELETE/],
         grants     => [
             'GRANT ALTER, CREATE, INSERT, DELETE ON *.* to user@localhost',
         ],
         privileged => 1,
         comment    => 'ACID on *.*, privileged',
-	},
-	{
-		dsn        => 'DBI:mysql:myDb:myHost:8008',
-		privileges => [qw/ALTER CREATE INSERT DELETE/],
+    },
+    {
+        dsn        => 'DBI:mysql:myDb:myHost:8008',
+        privileges => [qw/ALTER CREATE INSERT DELETE/],
         grants     => [
             'GRANT ALL PRIVILEGES ON *.* to user@localhost',
         ],
         privileged => 1,
         comment    => 'ALL PRIVILEGES on *.*, privileged',
-	},
-	{
-		dsn        => 'DBI:mysql:myDb:myHost:8008',
-		privileges => [qw/ALTER CREATE INSERT DELETE/],
+    },
+    {
+        dsn        => 'DBI:mysql:myDb:myHost:8008',
+        privileges => [qw/ALTER CREATE INSERT DELETE/],
         grants     => [
             'GRANT ALTER, CREATE, INSERT ON *.* to user@localhost',
         ],
         privileged => 0,
         comment    => 'Missing DELETE on *.*, unprivileged',
-	},
-	{
-		dsn        => 'DBI:mysql:myDb:myHost:8008',
-		privileges => [qw/ALTER CREATE INSERT DELETE/],
+    },
+    {
+        dsn        => 'DBI:mysql:myDb:myHost:8008',
+        privileges => [qw/ALTER CREATE INSERT DELETE/],
         grants     => [
             'GRANT ALL PRIVILEGES ON myDb.* to user@localhost',
         ],
         privileged => 1,
         comment    => 'ALL PRIVILEGES on explicit db name, privileged',
-	},
-	{
-		dsn        => 'DBI:mysql:myDb:myHost:8008',
-		privileges => [qw/ALTER CREATE INSERT DELETE/],
+    },
+    {
+        dsn        => 'DBI:mysql:myDb:myHost:8008',
+        privileges => [qw/ALTER CREATE INSERT DELETE/],
         grants     => [
             'GRANT ALL PRIVILEGES ON `myDb`.* to user@localhost',
         ],
         privileged => 1,
         comment    => 'ALL PRIVILEGES on quoted, explicit db name, privileged',
-	},
-	{
-		dsn        => 'DBI:mysql:myDb:myHost:8008',
-		privileges => [qw/ALTER CREATE INSERT DELETE/],
+    },
+    {
+        dsn        => 'DBI:mysql:myDb:myHost:8008',
+        privileges => [qw/ALTER CREATE INSERT DELETE/],
         grants     => [
             'GRANT ALL PRIVILEGES ON `my%`.* to user@localhost',
         ],
         privileged => 1,
         comment    => 'ALL PRIVILEGES on quoted, wildcard name, privileged',
-	},
-	{
-		dsn        => 'DBI:mysql:yourDb:myHost:8008',
-		privileges => [qw/ALTER CREATE INSERT DELETE/],
+    },
+    {
+        dsn        => 'DBI:mysql:yourDb:myHost:8008',
+        privileges => [qw/ALTER CREATE INSERT DELETE/],
         grants     => [
             'GRANT ALL PRIVILEGES ON `my%`.* to user@localhost',
         ],
         privileged => 0,
         comment    => 'ALL PRIVILEGES on wrong db, unprivileged',
-	},
+    },
 ];
 
 
-plan tests => 14 + scalar @{ $DSNs } + scalar @{ $grants };
+#Queries to run through our schlocky query validator.
+my $queries = [
+    {
+        query   => 'SELECT * from users',
+        expect  => 1,
+        comment => '... select',
+    },
+    {
+        query   => 'select * from users',
+        expect  => 1,
+        comment => '... case check',
+    },
+    {
+        query   => '   select * from users',
+        expect  => 1,
+        comment => '... initial whitespace',
+    },
+    {
+        query   => 'delete from users',
+        expect  => 0,
+        comment => '... delete',
+    },
+    {
+        query   => '   delete from users',
+        expect  => 0,
+        comment => '... delete with initial whitespace',
+    },
+    {
+        query   => '(select * from users)',
+        expect  => 1,
+        comment => '... parenthesized',
+    },
+];
+
+plan tests => 14
+            + scalar @{ $DSNs    }
+            + scalar @{ $grants  }
+            + scalar @{ $queries }
+            ;
 
 ####################################################
 #
@@ -180,12 +218,6 @@ ok($session->id->valid($dbLink->getId), 'create made a valid GUID instead of tha
 
 ####################################################
 #
-# queryIsValid
-#
-####################################################
-
-####################################################
-#
 # new
 #
 ####################################################
@@ -201,10 +233,14 @@ is(WebGUI::DatabaseLink->new($session,'foobar'), undef, 'new returns undef with 
 
 ####################################################
 #
-# delete
+# queryIsValid
 #
 ####################################################
 
+note 'queryIsValid';
+foreach my $query (@{ $queries }) {
+    is($dbLink->queryIsAllowed($query->{query}), $query->{expect}, $query->{comment});
+}
 
 
 ####################################################
@@ -217,7 +253,7 @@ my $dbs = WebGUI::DatabaseLink->getList($session);
 
 foreach my $dsn (@{ $DSNs }) {
     my $dbl = WebGUI::DatabaseLink->create($session, { DSN => $dsn->{dsn} });
-	is( $dbl->databaseName(), $dsn->{dbName}, $dsn->{comment} );
+    is( $dbl->databaseName(), $dsn->{dbName}, $dsn->{comment} );
     $dbl->delete;
 }
 
@@ -229,7 +265,7 @@ foreach my $dsn (@{ $DSNs }) {
 
 foreach my $grant (@{ $grants }) {
     my $dbl = WebGUI::DatabaseLink->create($session, { DSN => $grant->{dsn} });
-	is(
+    is(
         $dbl->checkPrivileges($grant->{privileges}, $grant->{grants}),
         $grant->{privileged},
         $grant->{comment}
@@ -241,8 +277,14 @@ my $dbsAfter = WebGUI::DatabaseLink->getList($session);
 
 cmp_deeply($dbs, $dbsAfter, 'delete cleaned up all temporarily created DatabaseLinks');
 
+####################################################
+#
+# delete
+#
+####################################################
+
 END {
-	foreach my $link ($dbLink, $wgDbLink) {
-		$link->delete if (defined $link and ref $link eq 'WebGUI::DatabaseLink');
-	}
+    foreach my $link ($dbLink, $wgDbLink) {
+        $link->delete if (defined $link and ref $link eq 'WebGUI::DatabaseLink');
+    }
 }

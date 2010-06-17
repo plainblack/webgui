@@ -3058,9 +3058,9 @@ or are under your current version tag.</p>
         },
 
 	'help' => {
-		message => q|Help|,
+		message => q|Template Help|,
 		lastUpdated =>1092930637,
-                context => q|Title of the help index for the admin console.|
+        context => q|Title of the help index for the admin console.|
         },
 
 	'content filters' => {
@@ -3132,6 +3132,141 @@ or are under your current version tag.</p>
 		message => q|Admin Console Template|,
 		lastUpdated =>1118453709,
         },
+
+	'admin console template variables' => {
+		message => q|Admin Console Template Variables|,
+		lastUpdated =>1247528069,
+    },
+
+	'formHeader' => {
+		message => q|HTML code to start a form.|,
+		lastUpdated =>1247529885,
+    },
+
+	'formFooter' => {
+		message => q|HTML code to end a form.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application_loop' => {
+		message => q|A loop containing all admin applications.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.workarea' => {
+		message => q|The rendered application screen.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.title' => {
+		message => q|The title of the application.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.icon' => {
+		message => q|The URL to this application's icon.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.icon.small' => {
+		message => q|The URL to this application's icon, the small version.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.canUse' => {
+		message => q|A boolean that will be true if the current user can use this application, based on group privileges and uiLevel.|,
+		lastUpdated =>1247529885,
+    },
+
+	'application.url' => {
+		message => q|The URL to this screen.|,
+		lastUpdated =>1247529885,
+    },
+
+	'backtosite.label' => {
+		message => q|An internationalized label for the link that returns the user back to the website from the Admin Console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'backtosite.url' => {
+		message => q|The URL for the link to take the user back to the website, from the Admin Console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'toggle.on.label' => {
+		message => q|An internationalized label for the link that displays the Admin console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'toggle.off.label' => {
+		message => q|An internationalized label for the link that hides the Admin console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'submenu_loop' => {
+		message => q|A loop contains a set of links for the submenu panel.|,
+		lastUpdated =>1247529885,
+    },
+
+	'submenu.label' => {
+		message => q|A label for the link.|,
+		lastUpdated =>1247529885,
+    },
+
+	'submenu.url' => {
+		message => q|The URL for the link.|,
+		lastUpdated =>1247529885,
+    },
+
+	'submenu.extras' => {
+		message => q|Any extra parameters for the link, like javascript for a confirmation.|,
+		lastUpdated =>1247529885,
+    },
+
+	'console.title' => {
+		message => q|The admin console's title.|,
+		lastUpdated =>1247529885,
+    },
+
+	'console.icon' => {
+		message => q|The admin console's icon.|,
+		lastUpdated =>1247529885,
+    },
+
+	'console.canUse' => {
+		message => q|A boolean that will be true if the current user can use the admin console, based on group privileges and uiLevel.|,
+		lastUpdated =>1247529885,
+    },
+
+	'console.url' => {
+		message => q|The URL to the admin console.|,
+		lastUpdated =>1247529885,
+    },
+
+	'help.url' => {
+		message => q|The URL to view the help associated with this application, if any.|,
+		lastUpdated =>1247529885,
+    },
+
+	'versionTags' => {
+		message => q|A loop containing information about open version tags.|,
+		lastUpdated =>1247529885,
+    },
+
+	'versionTags.title' => {
+		message => q|The title of this version tag.|,
+		lastUpdated =>1247529885,
+    },
+
+	'versionTags.url' => {
+		message => q|If this version tag is the current tag for the user, then this link will be to commit the tag.  Otherwise, it will be to make this tag the current tag for the user.|,
+		lastUpdated =>1247529885,
+    },
+
+	'versionTags.icon' => {
+		message => q|If this tag is the current tag for the user, this will contain the URL to a small version of the version tags admin console icon.|,
+		lastUpdated =>1248190349,
+    },
 
 	'settings' => {
 		message => q|Settings|,
@@ -3357,8 +3492,8 @@ a user.|,
 	},
 
 	'help index' => {
-		message => q|Index|,
-		lastUpdated => 1128552837
+		message => q|Help Index|,
+		lastUpdated => 1252424721
 	},
 
 	'help toc' => {
@@ -4123,12 +4258,6 @@ LongTruncOk=1</p>
         context     => q{General purpose, similar to submit.},
     },
 
-    'save' => {
-        message     => q{Save},
-        lastUpdated => 0,
-        context     => q{General purpose, similar to submit.},
-    },
-
     'company information' => {
         message     => q{Company Information},
         lastUpdated => 0,
@@ -4420,7 +4549,7 @@ Users may override this setting in their profile.
     },
 
  	'sms gateway' => {
- 		message => q|SMS gateway|,
+ 		message => q|SMS Gateway|,
  		context => q|email to SMS/text email address for this site.|,
  		lastUpdated => 1235685248,
  	},
@@ -4428,6 +4557,17 @@ Users may override this setting in their profile.
  	'sms gateway help' => {
  		message => q|The email address that this site would use to send an SMS message.|,
  		lastUpdated => 1235695517,
+ 	},
+ 	
+ 	'sms gateway subject' => {
+ 		message => q|SMS Gateway Subject|,
+ 		context => q|Subject to use for the SMS Gateway for this site.|,
+ 		lastUpdated => 0,
+ 	},
+
+ 	'sms gateway subject help' => {
+ 		message => q|The email subject to pass to the SMS Gateway (typically used for SMS Gateway authorization).|,
+ 		lastUpdated => 0,
  	},
  
     'Select One' => {
@@ -4472,6 +4612,23 @@ Users may override this setting in their profile.
 
     'Working...' => {
         message => 'Working...',
+        lastUpdated => 0,
+    },
+
+    'csrfToken' => {
+        message => 'CSRF Token',
+        lastUpdated => 0,
+        context => 'CSRF = Cross Site Request Forgery, token is a piece of identification',
+    },
+
+    'Clear' => {
+        message => 'Clear',
+        lastUpdated => 0,
+        context => 'To empty or wipe-out, similar to erase.',
+    },
+
+    'Comments' => {
+        message => 'Comments',
         lastUpdated => 0,
     },
 

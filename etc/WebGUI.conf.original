@@ -80,8 +80,11 @@
 
 "richEditorsUseAssetUrls" : 1,
 
+# Used to generate user facing URLs.
 # If you are not running your web server on the standard
-# port (80) then use this setting to specify that.
+# port (80) then use this setting to specify that.  If you
+# are running WebGUI behind a proxy, then webServerPort should
+# be set to which ever port the proxy is listening to.
 
 #"webServerPort" : 80,
 
@@ -178,6 +181,7 @@
     "WebGUI::Shop::PayDriver::Cash",
     "WebGUI::Shop::PayDriver::ITransact",
     "WebGUI::Shop::PayDriver::PayPal::PayPalStd",
+    "WebGUI::Shop::PayDriver::PayPal::ExpressCheckout",
     "WebGUI::Shop::PayDriver::Ogone"
     ],
 
@@ -461,7 +465,7 @@
 # about categories. Each listing has a key of class name, and then
 # has several properties, which are:
 #
-#   category    - The category the asset should appear in.
+#   category    - The category the asset should appear in.  Can also be an array of categories.
 #   isContainer - Whether or not the assets main purpose to display the data from other assets.
 #   addGroup    - The group the user must be in to add this asset.
 #   uiLevel     - The minimum UI level the user must have to add the asset.
@@ -784,6 +788,7 @@
     "BackToSite"       : "BackToSite",
     "CanEditText"      : "CanEditText", 
     "CartItemCount"    : "CartItemCount",
+    "ConvertToUTC"     : "ConvertToUTC",
     "c"                : "c_companyName", 
     "D"                : "D_date", 
     "DeactivateAccount": "DeactivateAccount",
@@ -1020,17 +1025,17 @@
 # Content Delivery Network - for use with WebGUI::Storage
 # required for CDN: enabled, url, queuePath, syncProgram, deleteProgram
 # optional for CDN: sslAlt, sslUrl, extrasCdn, extrasSsl, extrasExclude
-"cdn" : { "enabled" : 0,
-          "url" : "http://content.example.com",
-          "sslAlt" : 0,
-          "sslUrl" : "https://ssl.example.com",
-          "queuePath" : "/data/cdnqueue",
-          "syncProgram" : "/usr/bin/rsync -av --chmod=u+rwx -- '%s' user@content.example.com:/path",
-          "deleteProgram" : "/usr/bin/ssh user@content.example.com 'rm -Rf -- %s'",
-          "extrasCdn" : "http://content.example.com/extras",
-          "extrasSsl" : "https://content.example.com/extras",
-          "extrasExclude": ["tinymce", "^blah$"]
-        },
+#"cdn" : { "enabled" : 0,
+#          "url" : "http://content.example.com",
+#          "sslAlt" : 0,
+#          "sslUrl" : "https://ssl.example.com",
+#          "queuePath" : "/data/cdnqueue",
+#          "syncProgram" : "/usr/bin/rsync -av --chmod=u+rwx -- '%s' user@content.example.com:/path",
+#          "deleteProgram" : "/usr/bin/ssh user@content.example.com 'rm -Rf -- %s'",
+#          "extrasCdn" : "http://content.example.com/extras",
+#          "extrasSsl" : "https://content.example.com/extras",
+#          "extrasExclude": ["tinymce", "^blah$"]
+#        },
 
 #A list of UserAgents of recognized mobile platforms.  If useMobileStyle is set in the
 #Admin settings, then the mobile style will be used for these browsers.

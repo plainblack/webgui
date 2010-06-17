@@ -20,6 +20,7 @@ use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
 use XML::Simple;
+plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 
 #----------------------------------------------------------------------------
 # Init
@@ -27,6 +28,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Album Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -40,13 +42,16 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-        description         => "An RSS Description",
+        description         => "An RSS Description with an extra &nbsp;space",
+        title               => "Title with extra&nbsp; dash",
     },
     undef,
     undef,
     {
         skipAutoCommitWorkflows => 1,
     });
+note $album->get('title');
+note $album->get('description');
 my @photos;
 for my $i ( 0 .. 5 ) {
     $photos[ $i ] 
@@ -114,9 +119,3 @@ cmp_deeply(
     },
     "RSS Datastructure is complete and correct",
 );
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}

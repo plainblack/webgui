@@ -71,12 +71,6 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Tabitha Zipperer / Plain Black
                                      Henry Tang / Long Term Results B.V.
 
-
-Invicta Services made the PayPal payment gateway in WebGUI and also offers
-additional PayPal related services for WebGUI. You can find out more at:
-    http://webgui.invictaservices.net
-
-
 The following are people/companies who didn't directly contribute
 to WebGUI, but whose work has made WebGUI possible:
 

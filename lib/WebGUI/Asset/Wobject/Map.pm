@@ -16,6 +16,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
+use HTML::Entities qw(encode_entities);
 use base 'WebGUI::Asset::Wobject';
 
 # To get an installer for your wobject, add the Installable AssetAspect
@@ -123,7 +124,7 @@ sub definition {
     );
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),
-        icon              => 'Map.gif',
+        icon              => 'maps.png',
         autoGenerateForms => 1,
         tableName         => 'Map',
         className         => 'WebGUI::Asset::Wobject::Map',
@@ -520,6 +521,8 @@ sub www_ajaxEditPointSave {
     my $form        = $self->session->form;
     my $i18n        = WebGUI::International->new( $session, 'Asset_Map' );
 
+    # We're returning as HTML because application/json causes download pop-up
+    # and text/plain causes <pre>...</pre> in firefox
     $session->http->setMimeType("text/html"); 
     $session->log->preventDebugOutput;
 
@@ -547,7 +550,8 @@ sub www_ajaxEditPointSave {
         $asset->requestAutoCommit;
     }
 
-    return JSON->new->encode($asset->getMapInfo);
+    # Encode entities because we're returning as HTML
+    return encode_entities( JSON->new->encode($asset->getMapInfo) );
 }
 
 #-------------------------------------------------------------------

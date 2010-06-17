@@ -326,7 +326,7 @@ sub www_listDatabaseLinks {
         }
         else {
             $output .= $i18n->get('ok');
-            $connection->disconnect;
+            $connection->disconnect unless $id eq '0';
         }
         $output .='</td></tr>';
     }

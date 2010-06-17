@@ -17,6 +17,7 @@ use WebGUI::Cache;
 use WebGUI::Paginator;
 use WebGUI::Asset::Wobject;
 use WebGUI::Storage;
+use WebGUI::HTML;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -125,6 +126,7 @@ sub definition {
 				fieldType=>"image",
 				deleteFileUrl=>$session->url->page("func=deleteFile;filename="),
 				maxAttachments=>2,
+                persist => 1,
 				defaultValue=>undef,
 				label=>$i18n->get("attachments"),
 				hoverHelp=>$i18n->get("attachments help")
@@ -404,7 +406,7 @@ sub view {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);
 	} else {
-		my @pages = split(/\^\-\;/,$var{description});
+		my @pages = WebGUI::HTML::splitSeparator($var{description});
 		$p->setDataByArrayRef(\@pages);
 		$var{description} = $p->getPage;
 	}

@@ -123,6 +123,14 @@ END_SCRIPT
     return $output;
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_searchAsJSON 
+
+Returns search results in the form variable C<search> as JSON.
+
+=cut
+
 sub www_searchAsJSON {
     my $session = shift;
     my $search = $session->form->param('search');
@@ -134,15 +142,39 @@ sub www_searchAsJSON {
     return JSON::to_json({keywords => $keywords});
 }
 
+#-------------------------------------------------------------------
+
+=head2 getDefaultValue 
+
+Extends the base method to return keywords in a comma delimited string.
+
+=cut
+
 sub getDefaultValue {
     my $self = shift;
     return _formatKeywordsAsWanted($self->SUPER::getDefaultValue(@_));
 }
 
+#-------------------------------------------------------------------
+
+=head2 getOriginalValue 
+
+Extends the base method to return keywords in a comma delimited string.
+
+=cut
+
 sub getOriginalValue {
     my $self = shift;
     return _formatKeywordsAsWanted($self->SUPER::getOriginalValue(@_));
 }
+
+#-------------------------------------------------------------------
+
+=head2 getValue 
+
+Extends the base method to return keywords in a comma delimited string.
+
+=cut
 
 sub getValue {
     my $self = shift;

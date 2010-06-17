@@ -119,15 +119,22 @@ A hash refernece containing options that change the behavior of this method.
 
 A boolean that, if true, will skip dealing with exported files.
 
+=head4 outputSub
+
+A subroutine used to report the status of the purge, most likely used by WebGUI::ProgressBar->update.
+
 =cut
 
 sub purge {
-	my $self = shift;
-	my $options = shift;
-    my $session = $self->session;
+	my $self      = shift;
+	my $options   = shift;
+    my $session   = $self->session;
+    my $outputSub = $options->{outputSub} || sub {};
+    my $i18n      = WebGUI::International->new($session, 'Asset');
 
     # can't delete if it's one of these things
 	if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage") || $self->get("isSystem")) {
+        $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
         $session->errorHandler->security("delete a system protected page (".$self->getId.")");
         return 0;
     }
@@ -142,44 +149,53 @@ sub purge {
 		# Technically get lineage should never return an undefined object from getLineage when called like this, but it did so this saves the world from destruction.
         if (defined $kid) {
             unless ($kid->purge) {
-                $self->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
+                $session->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
+                $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
                 return 0;
             }
         }
         else {
+            $outputSub->($i18n->get('Undefined child'));
 			$session->errorHandler->error("getLineage returned an undefined object in the AssetTrash->purge method.  Unable to purge asset.");
         }
 	}
 
     # Delete shortcuts to this asset
-    # Also publish any shortcuts to this asset that are in the trash
+    # Also purge any shortcuts to this asset that are in the trash
+    $outputSub->($i18n->get('Purging shortcuts'));
     my $shortcuts 
         = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { 
             returnObjects   => 1,
         });
     for my $shortcut ( @$shortcuts ) {
-        $shortcut->purge;
+        $shortcut->purge({ outputSub => $outputSub, });
     }
 
     # gotta delete stuff we've exported
 	unless ($options->{skipExported}) {
-		$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('purgeWorkflow'), 1);
+        $outputSub->($i18n->get('Deleting exported files'));
+		$self->_invokeWorkflowOnExportedFiles($session->setting->get('purgeWorkflow'), 1);
 	}
 
     # gonna need this at the end
+    my $tags  = $session->db->buildArrayRef('select tagId from assetData where assetId=?',[$self->getId]);
     my $tagId = $self->get("tagId");
 
     # clean up keywords
+    $outputSub->($i18n->get('Deleting keywords'));
     WebGUI::Keyword->new($session)->deleteKeywordsForAsset($self);
 
     # clean up search engine
+    $outputSub->($i18n->get('Clearing search index'));
     WebGUI::Search::Index->new($self)->delete;
 
     # clean up cache
+    $outputSub->($i18n->get('Clearing cache'));
 	WebGUI::Cache->new($session)->deleteChunk(["asset",$self->getId]);
 	$self->purgeCache;
 
     # delete stuff out of the asset tables
+    $outputSub->($i18n->get('Clearing asset tables'));
 	$session->db->beginTransaction;
 	$session->db->write("delete from metaData_values where assetId = ?",[$self->getId]);
 	foreach my $definition (@{$self->definition($session)}) {
@@ -193,52 +209,92 @@ sub purge {
 	$self = undef;
 
     # clean up version tag if empty
-    my $versionTag = WebGUI::VersionTag->new($session, $tagId);
-    if ($versionTag && $versionTag->getAssetCount == 0) {
-        $versionTag->rollback;
+    foreach my $tagId (@{ $tags }) {
+        my $versionTag = WebGUI::VersionTag->new($session, $tagId);
+        if ($versionTag && $versionTag->getAssetCount == 0) {
+            $versionTag->rollback;
+        }
     }
+
     return 1;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 trash ( )
+=head2 restore
+
+Publishes assets from the trash.
+
+=cut
+
+sub restore {
+   my $self = shift;
+   $self->publish;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 trash ( $options )
 
 Removes asset from lineage, places it in trash state. The "gap" in the 
-lineage is changed in state to trash-limbo.
+lineage is changed in state to trash-limbo.  Returns 1 if the trash
+was successful, otherwise it return undef.
+
+=head3 $options
+
+An optional hashref of options
+
+=head4 outputSub
+
+A subroutine used to report the status of the purge, most likely used by WebGUI::ProgressBar->update.
 
 =cut
 
 sub trash {
-    my $self = shift;
-    return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get('isSystem'));
+    my $self      = shift;
+	my $options   = shift;
+    my $session   = $self->session;
+    my $outputSub = $options->{outputSub} || sub {};
+    my $i18n      = WebGUI::International->new($session, 'Asset');
+
+    if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage") || $self->get('isSystem')) {
+        $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
+        $session->errorHandler->security("delete a system protected page (".$self->getId.")");
+        return undef;
+    }
+
     foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
-        $asset->_invokeWorkflowOnExportedFiles($self->session->setting->get('trashWorkflow'), 1);
+        $outputSub->($i18n->get('Clearing search index'));
+        my $index = WebGUI::Search::Index->new($asset);
+        $index->delete;
+        $outputSub->($i18n->get('Deleting exported files'));
+        $asset->_invokeWorkflowOnExportedFiles($session->setting->get('trashWorkflow'), 1);
+        $outputSub->($i18n->get('Purging the cache'));
+        $asset->purgeCache;
+        $asset->updateHistory("trashed");
     }
 
     # Trash any shortcuts to this asset
     my $shortcuts 
-        = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { returnObjects => 1});
+        = WebGUI::Asset::Shortcut->getShortcutsForAssetId($session, $self->getId, { returnObjects => 1});
+    $outputSub->($i18n->get('Purging shortcuts'));
     for my $shortcut ( @$shortcuts ) {
-        $shortcut->trash;
+        $shortcut->trash({ outputSub => $outputSub, });
     }
 
     # Raw database work is more efficient than $asset->update
-    my $db = $self->session->db;
+    my $db = $session->db;
     $db->beginTransaction;
-    my $sth = $db->read("select assetId from asset where lineage like ?",[$self->get("lineage").'%']);
-    while (my ($id) = $sth->array) {
-        $db->write("delete from assetIndex where assetId=?",[$id]);
-    }
+    $outputSub->($i18n->get('Clearing asset tables'));
     $db->write("update asset set state='trash-limbo' where lineage like ?",[$self->get("lineage").'%']);
-    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$self->session->user->userId, $self->session->datetime->time(), $self->getId]);
+    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$session->user->userId, $session->datetime->time(), $self->getId]);
     $db->commit;
 
     # Update ourselves since we didn't use update()
     $self->{_properties}{state} = "trash";
-    $self->updateHistory("trashed");
-    $self->purgeCache;
+    return 1;
 }
 
 require WebGUI::Workflow::Activity::DeleteExportedFiles;
@@ -265,7 +321,8 @@ sub _invokeWorkflowOnExportedFiles {
 
 =head2 www_delete
 
-Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
+Moves self to trash, returns www_view() method of Container or Parent if canEdit.
+Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -275,31 +332,50 @@ sub www_delete {
 	return $self->session->privilege->vitalComponent() if $self->get('isSystem');
 	return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
 	$self->trash;
-	$self->session->asset($self->getParent);
-	return $self->getParent->www_view;
+    my $asset = $self->getContainer;
+    if ($self->getId eq $asset->getId) {
+        $asset = $self->getParent;
+    }
+	$self->session->asset($asset);
+	return $asset->www_view;
 }
 
 #-------------------------------------------------------------------
 
 =head2 www_deleteList
 
-Moves list of assets to trash, returns www_manageAssets() method of self if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
+Checks to see if a valid CSRF token was received.  If not, then it returns insufficient privilege.
+
+Moves list of assets to trash, checking each to see if the user canEdit,
+and canEditIfLocked.  Returns the user to manageTrash, or to the screen set
+by the form variable C<proceeed>.
 
 =cut
 
 sub www_deleteList {
-	my $self = shift;
-	foreach my $assetId ($self->session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newPending($self->session,$assetId);
-		if ($asset->canEdit && $asset->canEditIfLocked) {
-			$asset->trash;
-		}
-	}
-	if ($self->session->form->process("proceed") ne "") {
-                my $method = "www_".$self->session->form->process("proceed");
-                return $self->$method();
+	my $self     = shift;
+    my $session  = $self->session;
+    my $pb       = WebGUI::ProgressBar->new($session);
+    my $i18n     = WebGUI::International->new($session, 'Asset');
+    my $form     = $session->form;
+    my @assetIds = $form->param('assetId');
+    $pb->start($i18n->get('Delete Assets'), $session->url->extras('adminConsole/assets.gif'));
+	return $self->session->privilege->insufficient() unless $session->form->validToken;
+	ASSETID: foreach my $assetId (@assetIds) {
+        my $asset = eval { WebGUI::Asset->newPending($session,$assetId); };
+        if ($@) {
+            $pb->update(sprintf $i18n->get('Error getting asset with assetId %s'), $assetId);
+            next ASSETID;
         }
-	return $self->www_manageAssets();
+		if (! ($asset->canEdit && $asset->canEditIfLocked) ) {
+            $pb->update(sprintf $i18n->get('You cannot edit the asset %s, skipping'), $asset->getTitle);
+		}
+        else {
+			$asset->trash({outputSub => sub { $pb->update(@_); } });
+        }
+	}
+    my $method = ($session->form->process("proceed")) ? $session->form->process('proceed') : 'manageTrash';
+    $pb->finish($self->getUrl('func='.$method));
 }
 
 
@@ -356,6 +432,7 @@ sub www_manageTrash {
 	$output .= '
             assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
             assetManager.AddButton("'.$i18n->get("purge").'","purgeList","manageTrash");
+            assetManager.AddFormHidden({ name:"webguiCsrfToken", value:"'.$self->session->scratch->get('webguiCsrfToken').'"});
             assetManager.Write();        
             var assetListSelectAllToggle = false;
             function toggleAssetListSelectAll(form) {
@@ -379,19 +456,33 @@ sub www_manageTrash {
 
 Purges a piece of content, including all it's revisions, from the system permanently.
 
+Returns insufficient privileges unless the submitted form passes the validToken check.
+
 =cut
 
 sub www_purgeList {
-        my $self = shift;
-        foreach my $id ($self->session->form->param("assetId")) {
-                my $asset = WebGUI::Asset->newPending($self->session,$id);
-                $asset->purge if $asset->canEdit;
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $session->form->validToken;
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    $pb->start($i18n->get('purge'), $session->url->extras('adminConsole/assets.gif'));
+
+    ASSETID: foreach my $id ($session->form->param("assetId")) {
+        my $asset = eval { WebGUI::Asset->newPending($session,$id); };
+        if ($@) {
+            $pb->update(sprintf $i18n->get('Error getting asset with assetId %s'), $id);
+            next ASSETID;
         }
-        if ($self->session->form->process("proceed") ne "") {
-                my $method = "www_".$self->session->form->process("proceed");
-                return $self->$method();
+        if (! $asset->canEdit) {
+            $pb->update(sprintf $i18n->get('You cannot edit the asset %s, skipping'), $asset->getTitle);
         }
-        return $self->www_manageTrash();
+        else {
+            $asset->purge({outputSub => sub { $pb->update(@_); } });
+        }
+    }
+    my $method = ($session->form->process("proceed")) ? $session->form->process('proceed') : 'manageTrash';
+    $pb->finish($self->getUrl('func='.$method));
 }
 
 #-------------------------------------------------------------------
@@ -405,8 +496,8 @@ Restores a piece of content from the trash back to it's original location.
 sub www_restoreList {
         my $self = shift;
         foreach my $id ($self->session->form->param("assetId")) {
-                my $asset = WebGUI::Asset->newByDynamicClass($self->session,$id);
-                $asset->publish if $asset->canEdit;
+                my $asset = eval { WebGUI::Asset->newPending($self->session,$id); };
+                $asset->restore if $asset->canEdit;
         }
         if ($self->session->form->process("proceed") ne "") {
                 my $method = "www_".$self->session->form->process("proceed");

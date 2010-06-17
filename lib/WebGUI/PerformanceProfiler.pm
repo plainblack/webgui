@@ -116,6 +116,13 @@ sub addProfilerCode {
 	return Apache2::Const::DECLINED;
 }
 
+
+=head2 output 
+
+Handler that adds the results to the body of the outgoing page.
+
+=cut
+
 sub output {
 	my $f = shift;
 	return Apache2::Const::DECLINED unless($f->r->content_type =~ 'text/html');
@@ -515,6 +522,17 @@ sub is_constant {
 	}
 	return $is_const;
 }
+
+
+=head2 sum ($arrRef)
+
+Calculates and returns the sum of the elements in the array reference.
+
+=head3 $arrRef
+
+An array reference.
+
+=cut
 
 sub sum {
 	my $sum = 0;

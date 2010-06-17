@@ -125,9 +125,9 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'questions on section page description' => {
-        message => q|Are question displayed on the initial page of this section or on the next page.|,
+        message => q|Whether questions are displayed on the initial page of this section or on the next page.|,
         context => q|Description of the 'questions on section page' field, used as hoverhelp in the edit section dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1249057316
     },
 
 	'section name' => {
@@ -608,12 +608,12 @@ the time limit for completing the survey. This message is in the 'take survey' t
         lastUpdated => 0,
     },
 
-    'Grabebook Report Template' => {
-        message     => q|Grabebook Report Template|,
-        lastUpdated => 0,
+    'Gradebook Report Template' => {
+        message     => q|Gradebook Report Template|,
+        lastUpdated => 1249056084,
     },
 
-    'Grabebook Report Template help' => {
+    'Gradebook Report Template help' => {
         message     => q|The template used to display the Gradebook Report|,
         lastUpdated => 0,
     },
@@ -923,6 +923,42 @@ directly inside the answer_loop for other types of questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1149654771,
     },
+    
+    response_feedback_url => {
+        message => q|The URL of the individual response feedback page.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_id  => {
+        message => q|The unique ID of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_userId => {
+        message => q|The userId of the user that completed the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_ip => {
+        message => q|The IP Address of the user that completed the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_startDate => {
+        message => q|The Start Date of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    response_endDate => {
+        message => q|The End Date of the response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
 
     'survey template common vars title' => {
         message => q|Survey Template Common Vars|,
@@ -943,6 +979,11 @@ directly inside the answer_loop for other types of questions.|,
 
     'response complete help' => {
         message => q|A boolean flag indicating whether the Survey Response completed|,
+        lastUpdated => 1242180657,
+    },
+    
+    'responseId help' => {
+        message => q|The unique GUID for the response|,
         lastUpdated => 1242180657,
     },
 
@@ -1452,9 +1493,9 @@ section/answer.|,
     },
 
     'recordedAnswer' => {
-        message => q|Determines what gets recorded as the response value if this answer is selected. Allows you to 'recode' recorded responses, e.g. 'Yes' could be recorded as '1' and 'No' as '0'. Relevant only for Multiple Choice questions (other question types record the input actually entered by the user: free text, selected date, etc..).|,
+        message => q|The answer that gets recorded for this answer in the database.  This is relevant only for Multiple Choice questions, where the answer that is recorded may be different from what is what is displayed, e.g. 'Yes' could be recorded as '1' and 'No' as '0'.|,
         context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+        lastUpdated => 1249057018,
     },
 
     'textCols' => {
@@ -1492,9 +1533,9 @@ section/answer.|,
     },
 
     'showProgress' => {
-        message => q|A boolean that is true if the asset has been configured to show how much progess the user has made in completing this Survey.|,
+        message => q|A boolean that is true if the asset has been configured to show how much progress the user has made in completing this Survey.|,
         context => q|Template variable doc.|,
-        lastUpdated => 0,
+        lastUpdated => 1249057498,
     },
 
     'min' => {
@@ -1636,6 +1677,16 @@ section/answer.|,
     
     'tests failed' => {
         message => q{Tests Failed},
+        lastUpdated => 0,
+    },
+    
+    'start date' => {
+        message => q{Start Date},
+        lastUpdated => 0,
+    },
+    
+    'end date' => {
+        message => q{End Date},
         lastUpdated => 0,
     },
 

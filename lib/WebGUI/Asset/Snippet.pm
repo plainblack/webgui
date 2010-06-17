@@ -294,7 +294,7 @@ sub view {
     unless ($noCache) {
 		WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
 	}
-       	return $output;
+    return $output;
 }
 
 #-------------------------------------------------------------------
@@ -311,7 +311,11 @@ sub www_view {
     my $mimeType=$self->getValue('mimeType');
     $self->session->http->setMimeType($mimeType || 'text/html');
     $self->session->http->setCacheControl($self->get("cacheTimeout"));
-    return $self->view(1);
+    my $output = $self->view(1);
+    if (!defined $output) {
+        $output = 'empty';
+    }
+    return $output;
 }
 
 

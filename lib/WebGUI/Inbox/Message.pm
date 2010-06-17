@@ -97,14 +97,37 @@ Email message to use rather than inbox message contents.
 
 Email subject to use rather than inbox message subject.
 
+=head4 smsMessage
+
+SMS notification message to send to C<smsAddress>
+
+=head4 smsSubject
+
+SMS notification subject (typically used for SMS Gateway authentication)
+
+=head4 smsAddress
+
+Email address that SMS notification is sent to (typically the user's C<cellPhone> C<@> C<smsGateway>)
+
 =head3 options
 
 A hash reference containing options for handling the message. 
 
-=head4 testing
+=head4 no_email 
 
-If testing is true, then no email will be made or sent.  Only
+If no_email is true, then no email will be made or sent.  Only
 the inbox message will be made.
+
+=head4 no_sms
+
+If no_sms is true, then no attempt to sms notifications will be sent.
+
+=head4 overridePerUserDelivery
+
+If true, then the C<isInbox> flag will not be passed to L<WebGUI::Mail::Send::Create>, and thus the
+per-user settings for email delivery will not be used. Useful if you want to force this message to
+be sent as an Email rather than allowing the user's C<receiveInboxEmailNotifications> setting to
+take effect.
 
 =cut
 
@@ -127,6 +150,9 @@ sub create {
              $self->{_properties}{userId} = $session->user->userId;
          }
     my $status = $self->{_properties}{status};
+    my $smsMessage = $properties->{smsMessage};
+    my $smsSubject = $properties->{smsSubject};
+    my $smsAddress = $properties->{smsAddress};
     
 	if ($status eq "completed") {
 		$self->{_properties}{completedBy} = $session->user->userId;
@@ -158,16 +184,15 @@ sub create {
             );
         }
     }
-
-	my $subject = (defined $properties->{emailSubject}) ? $properties->{emailSubject} : $self->{_properties}{subject};
-	my $mail = $options->{testing}
-             ? undef
-             : WebGUI::Mail::Send->create($session, {
+    unless ( $options->{ no_email } ) {
+        my $subject = (defined $properties->{emailSubject}) ? $properties->{emailSubject} : $self->{_properties}{subject};
+        my $mail = WebGUI::Mail::Send->create($session, {
                    toUser=>$self->{_properties}{userId},
                    toGroup=>$self->{_properties}{groupId},
                    subject=>$subject,
-               });
-	if (defined $mail) {
+               }, 
+               $options->{overridePerUserDelivery} ? undef : 'isInbox',
+        );
         my $preface = "";
         my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
         #Don't append prefaces to the visitor users or messages that don't specify a user (default case)
@@ -179,7 +204,24 @@ sub create {
         $mail->addHtml($msg);
         $mail->addFooter;
 		$mail->queue;
-	}
+    }
+    
+    unless ( $options->{ no_sms } ) {
+        # If smsAddress provided, send smsMessage too
+        if ( $smsAddress && $smsMessage) {
+            my $sms = WebGUI::Mail::Send->create(
+                $session,
+                {   to      => $smsAddress,
+                    subject => $smsSubject,
+                }
+            );
+            if ($sms) {
+                $sms->addText($smsMessage);
+                $sms->queue;
+            }
+        }
+    }
+	
 	$self->{_session} = $session;
 	bless $self, $class;
 }

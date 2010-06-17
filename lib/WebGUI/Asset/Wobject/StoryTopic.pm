@@ -157,7 +157,7 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 viewTemplateVars ( )
+=head2 viewTemplateVariables ( )
 
 Make template variables for the view template.
 

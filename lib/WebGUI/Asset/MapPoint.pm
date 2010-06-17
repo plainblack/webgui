@@ -296,6 +296,10 @@ sub getTemplateVarsEditForm {
         ;
     $var->{ form_footer } = WebGUI::Form::formFooter( $session );
 
+    $var->{ form_save } = WebGUI::Form::submit( $session, {
+        name        => "save",
+    } );
+
     # Stuff from this class's definition
     my $definition  = __PACKAGE__->definition($session)->[0]->{properties};
     for my $key ( keys %{$definition} ) {

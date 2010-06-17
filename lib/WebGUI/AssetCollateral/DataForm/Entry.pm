@@ -1,5 +1,38 @@
 package WebGUI::AssetCollateral::DataForm::Entry;
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 use strict;
+
+=head1 NAME
+
+Package WebGUI::AssetCollateral::DataForm::Entry
+
+=head1 DESCRIPTION
+
+Package to manipulate user entries for WebGUI::Asset::Wobject::DataForm.
+
+There should be a list of data that this module uses and a description of how
+they relate and function.
+
+=head1 METHODS
+
+This packages is a subclass of L<WebGUI::Crud>.  Please refer to that module
+for a list of base methods that are available.
+
+=cut
 
 our $VERSION = '0.0.1';
 
@@ -18,6 +51,13 @@ public      ipAddress       => my %ipAddress;
 public      submissionDate  => my %submissionDate;
 
 #-------------------------------------------------------------------
+
+=head2 delete 
+
+Deletes this entry from the database. Returns true.
+
+=cut
+
 sub delete {
     my $self = shift;
     $self->session->db->deleteRow('DataForm_entry', 'DataForm_entryId', $self->getId);
@@ -26,6 +66,14 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+
+=head2 deleteField 
+
+Deletes a field from this entry.  Throws an InvalidParam exception if the field
+does not exist.  Otherwise, returns the entry for this field after deleting it.
+
+=cut
+
 sub deleteField {
     my $self = shift;
     my ($field) = @_;
@@ -37,6 +85,22 @@ sub deleteField {
 }
 
 #-------------------------------------------------------------------
+
+=head2 field ( $fieldName, [ $fieldValue ] )
+
+Getter and setter for field data.  Returns the value of the field after
+the set has been done.
+
+=head3 $fieldName
+
+The name of the field to work on.
+
+=head3 $fieldValue
+
+If passed in, this value will be stored in the field.
+
+=cut
+
 sub field {
     my $self = shift;
     my $fieldName = shift;
@@ -49,6 +113,18 @@ sub field {
 }
 
 #-------------------------------------------------------------------
+
+=head2 fields ( [ $newData ] )
+
+Getter and setter for all fields.  Returns a hash of all fields in
+this entry.
+
+=head3 $newData
+
+A hash reference of new data to store in this entry.
+
+=cut
+
 sub fields {
     my $self = shift;
     my $entryData = $entryData{ id $self };
@@ -95,6 +171,17 @@ sub getHash {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getCount ($asset)
+
+Returns the number of entries for a dataform.
+
+=head3 $asset
+
+A reference to a Dataform object.
+
+=cut
+
 sub getCount {
     my $class = shift;
     my $asset = shift;
@@ -106,12 +193,30 @@ sub getCount {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getId 
+
+Returns the GUID for this entry.
+
+=cut
+
 sub getId {
     my $self = shift;
     return $entryId{ id $self };
 }
 
 #-------------------------------------------------------------------
+
+=head2 iterateAll ( $asset )
+
+This class method returns an iterator set to iterate over all entries for a Dataform.
+
+=head3 $asset
+
+A reference to a Dataform object.
+
+=cut
+
 sub iterateAll {
     my $class = shift;
     my $asset = shift;
@@ -216,6 +321,17 @@ sub newFromHash {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purgeAssetEntries ( $asset )
+
+Delete all entries for a Dataform.
+
+=head3 $asset
+
+A reference to a Dataform object.
+
+=cut
+
 sub purgeAssetEntries {
     my $class = shift;
     my $asset = shift;
@@ -224,6 +340,22 @@ sub purgeAssetEntries {
 }
 
 #-------------------------------------------------------------------
+
+=head2 renameField ($oldField, $newField)
+
+Renames a field inside this entry.  Throws an InvalidParam exception if the old field
+does not exist, or if the new field already exists.
+
+=head3 $oldField
+
+The name of the field to rename.
+
+=head3 $newField
+
+The new name of the field.
+
+=cut
+
 sub renameField {
     my $self = shift;
     my ($oldField, $newField) = @_;
@@ -234,11 +366,18 @@ sub renameField {
     elsif ( exists $entryData{ $newField } ) {
         WebGUI::Error::InvalidParam->throw(error=>'cannot rename field over existing field');
     }
-    $entryData->{$newField} = delete $entryData{$newField};
+    $entryData->{$newField} = delete $entryData{$oldField};
     return $newField;
 }
 
 #-------------------------------------------------------------------
+
+=head2 save 
+
+Persists data from this entry into the db.
+
+=cut
+
 sub save {
     my $self = shift;
     my $id = id $self;
@@ -259,6 +398,42 @@ sub save {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setFromHash ( $properties )
+
+Sets all properties for this entry.  Returns true.
+
+=head3 $properties
+
+A hashref of data to set for this entry.  Only keys from the properties hash ref
+will be set.  No old data missing from $properties will be lost.
+
+=head4 DataForm_entryId
+
+GUID that the DataForm uses to refer to this entry.
+
+=head4 userId
+
+GUID of the user who submitted this entry.
+
+=head4 username
+
+The user's username.
+
+=head4 ipAddress
+
+The IP address the user submitted it from.
+
+=head4 submissionDate
+
+The epoch date the entry was submitted.
+
+=head4 entryData
+
+Data, either as JSON or a perl data structure.
+
+=cut
+
 sub setFromHash {
     my $self = shift;
     my $id = id $self;
@@ -288,6 +463,18 @@ sub setFromHash {
 }
 
 #-------------------------------------------------------------------
+
+=head2 user ( [ $user ] )
+
+Returns the userId of the user who submitted this entry.
+
+=head3 $user
+
+An optional WebGUI::User object.  If passed, the userId and username will be
+set from it for this entry.
+
+=cut
+
 sub user {
     my $self = shift;
     my $id = id $self;
@@ -303,6 +490,18 @@ sub user {
 }
 
 #-------------------------------------------------------------------
+
+=head2 userId ( [ $user ] )
+
+Returns the userId of the user who submitted this entry.
+
+=head3 $user
+
+An optional WebGUI::User object.  If passed, the userId and username will be
+set from it for this entry.
+
+=cut
+
 sub userId {
     my $self = shift;
     my $id = id $self;

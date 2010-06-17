@@ -138,8 +138,7 @@ sub _isValidLDAPUser {
 This method checks a given username and password for the following:
 
 1) Is there a WebGUI user account for the user and is it active
-2) Does the user account have the properties set necessary to authenticate using
-   LDAP.
+2) Does the user account have the properties set necessary to authenticate using LDAP.
 3) Can we bind to the LDAP server using their account information
 
 Returns 1 on success.
@@ -203,6 +202,13 @@ sub authenticate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 connectToLDAP ( ) 
+
+Create a new WebGUI::LDAPLink connection, if possible.
+
+=cut
+
 sub connectToLDAP {
 
     # This method needs to do some excpetion handling when we try to create an LDAPLink object
@@ -224,6 +230,13 @@ sub connectToLDAP {
 }
 
 #-------------------------------------------------------------------
+
+=head2 createAccount ( message, confirm ) 
+
+Show the form to create a new LDAP account relationship
+
+=cut
+
 sub createAccount {
     my $self = shift;
 	my $message = shift;
@@ -274,6 +287,13 @@ sub createAccount {
 }
 
 #-------------------------------------------------------------------
+
+=head2 createAccountSave (  )
+
+Process the form to create a new LDAP account relationship
+
+=cut
+
 sub createAccountSave {
     my $self = shift;
     my $username = $self->session->form->process('authLDAP_ldapId');
@@ -334,6 +354,13 @@ sub createAccountSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 deactivateAccount ( )
+
+Show the confirmation form to deactivate the user's account
+
+=cut
+
 sub deactivateAccount {
     my $self = shift;
     return $self->displayLogin if($self->userId eq '1');
@@ -341,6 +368,13 @@ sub deactivateAccount {
 }
 
 #-------------------------------------------------------------------
+
+=head2 deactivateAccountConfirm ( )
+
+Confirm the user is deactivating their account.
+
+=cut
+
 sub deactivateAccountConfirm {
    my $self = shift;
    return $self->displayLogin unless ($self->session->setting->get("selfDeactivation"));
@@ -348,6 +382,13 @@ sub deactivateAccountConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 displayAccount ( message ) 
+
+Display the account details.
+
+=cut
+
 sub displayAccount {
     my $self = shift;
     my $vars;
@@ -375,6 +416,13 @@ sub displayAccount {
 }
 
 #-------------------------------------------------------------------
+
+=head2 displayLogin ( message )
+
+Web-facing method to display the login form.
+
+=cut
+
 sub displayLogin {
    my $self = shift;
    my $vars;
@@ -485,6 +533,13 @@ sub editUserSettingsForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 editUserSettingsFormSave ( )
+
+Process the editUserSettingsForm
+
+=cut
+
 sub editUserSettingsFormSave {
    my $self = shift;
    my $f = $self->session->form;
@@ -493,6 +548,13 @@ sub editUserSettingsFormSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getAccountTemplateId ( )
+
+Get the templateId of the template to show the user's account details
+
+=cut
+
 sub getAccountTemplateId {
     my $self = shift;
     my $ldapConnect = $self->getLDAPConnection;
@@ -501,12 +563,26 @@ sub getAccountTemplateId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getConnectDN ( )
+
+Get the Distinguished Name used to connect to the LDAP server.
+
+=cut
+
 sub getConnectDN {
    my $self = shift;
    return $self->{_connectDN};
 }
 
 #-------------------------------------------------------------------
+
+=head2 getCreateAccountTemplateId ( )
+
+Get the templateId to create a new LDAP account relationship
+
+=cut
+
 sub getCreateAccountTemplateId {
     my $self = shift;
     my $ldapConnect = $self->getLDAPConnection;
@@ -515,6 +591,13 @@ sub getCreateAccountTemplateId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getLDAPConnection ( )
+
+Get the properties of the LDAP connection we're using for Auth.
+
+=cut
+
 sub getLDAPConnection {
    my $self = shift;
 
@@ -523,6 +606,13 @@ sub getLDAPConnection {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getLDAPLink ( )
+
+Get the WebGUI::LDAPLink for this auth connection
+
+=cut
+
 sub getLDAPLink {
    my $self = shift;
    
@@ -530,6 +620,13 @@ sub getLDAPLink {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getLoginTemplateId ( )
+
+Get the template ID for the login form.
+
+=cut
+
 sub getLoginTemplateId {
     my $self = shift;
     my $ldapConnect = $self->getLDAPConnection;
@@ -538,6 +635,13 @@ sub getLoginTemplateId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 login ( )
+
+Process the login form. Create a new account if auto registration is enabled.
+
+=cut
+
 sub login {
     my $self = shift;
     my $i18n = WebGUI::International->new($self->session);
@@ -585,6 +689,14 @@ sub login {
 }
 
 #-------------------------------------------------------------------
+
+=head2 new ( session, authMethod, userId )
+
+Create a new Auth instance. C<authMethod> is the name of this auth method ("ldap").
+C<userId> is the ID of the user to be authenticated.
+
+=cut
+
 sub new {
    my $class = shift;
 	my $session = shift;
@@ -604,12 +716,26 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+
+=head2 ldapStatusCode ( code )
+
+Get the friendly i18n message for the given LDAP status code.
+
+=cut
+
 sub ldapStatusCode {
    my ($self, $code) = @_;
    return $self->{_statusCode}->{$code};
 }
 
 #-------------------------------------------------------------------
+
+=head2 setConnectDN ( connectDn ) 
+
+Set a distinguished name to connect with
+
+=cut
+
 sub setConnectDN {
    my $self = shift;
    $self->{_connectDN} = $_[0];

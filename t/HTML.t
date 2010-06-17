@@ -81,6 +81,18 @@ my @filterSets = (
 		type => 'all',
 		comment => 'all, specific iframe test case',
 	},
+	{
+		inputText => q!&nbsp;!,
+		output => q!&#x26;nbsp;!,
+		type => 'xml',
+		comment => 'xml, &nbsp;',
+	},
+	{
+		inputText => q!> < "!,
+		output => q!&#x3E; &#x3C; &#x22;!,
+		type => 'xml',
+		comment => 'xml, other characters',
+	},
 );
 
 my @macroParamSets = (

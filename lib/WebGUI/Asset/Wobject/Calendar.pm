@@ -20,11 +20,13 @@ use WebGUI::Search;
 use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::DateTime;
+use Class::C3;
 
-use base 'WebGUI::Asset::Wobject';
+use base qw/WebGUI::Asset::Wobject WebGUI::JSONCollateral/;
 
 use DateTime;
 use JSON;
+use Text::Wrap;
 
 =head1 NAME
 
@@ -254,6 +256,15 @@ sub definition {
             unitsAvailable  => [ qw( days weeks months years ) ],
         },
 
+        icalFeeds    => {
+            fieldType       => "textarea",
+            defaultValue    => [],
+            serialize       => 1,
+            noFormPost      => 1,
+            autoGenerate    => 0,
+            tab             => "display",
+        },
+
         icalInterval    => {
             fieldType       => "interval",
             defaultValue    => $session->datetime->intervalToSeconds( 3, 'months' ),
@@ -262,7 +273,7 @@ sub definition {
             hoverHelp       => $i18n->get('editForm icalInterval description'),
             unitsAvailable  => [ qw( days weeks months years ) ],
         },
- 
+
         workflowIdCommit => {
             fieldType       => "workflow",
             defaultValue    => $session->setting->get('defaultVersionTagWorkflow'),
@@ -304,6 +315,45 @@ sub addChild {
     }
 
     return $self->SUPER::addChild($properties, @other);
+}
+
+#----------------------------------------------------------------------------
+
+=head2 addFeed ( $feedParams )
+
+Adds a new Feed to this calendar.  This is a wrapper around WebGUI::JSONCollateral's setJSONCollateral
+method.
+
+=head3 $feedParams
+
+A hashref of parameters that describe the feed.
+
+=head4 feedId
+
+GUID for this feed.
+
+=head4 url
+
+URL for this feed.
+
+=head4 lastUpdated
+
+The date this feed was added, or edited last.
+
+=head4 lastResult
+
+The results of what happened the last time this feed was accessed to pull iCal.
+
+=head4 feedType
+
+What kind of feed this is.
+
+=cut
+
+sub addFeed {
+    my $self        = shift;
+    my $feedParams  = shift;
+    return $self->setJSONCollateral('icalFeeds', 'feedId', 'new', $feedParams);
 }
 
 #----------------------------------------------------------------------------
@@ -455,6 +505,25 @@ sub createSubscriptionGroup {
     });
 
     return undef;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 deleteFeed ( $feedId )
+
+Deletes a Feed from this calendar.  This is a wrapper around WebGUI::JSONCollateral's deleteJSONCollateral
+method.
+
+=head3 $feedId
+
+GUID of the feed to delete.
+
+=cut
+
+sub deleteFeed {
+    my $self    = shift;
+    my $feedId  = shift;
+    return $self->deleteJSONCollateral('icalFeeds', 'feedId', $feedId);
 }
 
 #----------------------------------------------------------------------------
@@ -612,9 +681,9 @@ ENDHTML
     # Add the existing feeds
     my $feeds    = $self->getFeeds();
     $tab->raw('<script type="text/javascript">'."\n");
-    for my $feedId (keys %$feeds) {
-        my %row = %{ $feeds->{ $feedId } };
-        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".JSON->new->encode( \%row ).");\n");
+    for my $feed (@{ $feeds }) {
+        my $feedId = $feed->{feedId};
+        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".JSON->new->encode( $feed ).");\n");
     }
     $tab->raw('</script>');
 
@@ -671,11 +740,22 @@ TODO: Allow WebGUI::DateTime objects to be passed as the parameters.
 
 This is the main API method to get events from a calendar, so it must be flexible.
 
-C<options> is a hash reference with the following keys:
+=head3 startDate
 
- order                  - The order to return the events. Will default to the
-                        sortEventsBy asset property. Valid values are:
-                        'time', 'sequenceNumber'
+A date, with optional time, in UTC, in MySQL format.
+
+=head3 endDate
+
+A date, with optional time, in UTC, in MySQL format.
+
+=head3 options
+
+A hash reference with any the following keys and values:
+
+=head4 order
+
+The order to return the events. Will default to the sortEventsBy asset property.
+Valid values are: 'time', 'sequenceNumber'
 
 =cut
 
@@ -688,8 +768,6 @@ sub getEventsIn {
     $params->{order} = '' if $params->{order} !~ /^(?:time|sequencenumber)/i;
     my $order_by_type = $params->{order} ? lc($params->{order}) : $self->get('sortEventsBy');
 
-    my $tz      = $self->session->datetime->getTimeZone;
-    
     # Warn and return undef if no startDate or endDate
     unless ($start && $end) {
         $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEventsIn() called with not enough arguments at ".join('::',(caller)[1,2]));
@@ -698,35 +776,28 @@ sub getEventsIn {
     
     # Create objects and adjust for timezone
     
-    my ($startDate,$startTime)    = split / /, $start;
-    my ($endDate,$endTime)        = split / /, $end;
-    
-    #use Data::Dumper;
-    #$self->session->errorHandler->warn( Dumper [caller(1), caller(2), caller(3)] );
-    my $startTz  = WebGUI::DateTime->new($self->session, mysql => $start, time_zone => $tz)
-                    ->set_time_zone("UTC")->toMysql;
-    my $endTz    = WebGUI::DateTime->new($self->session, mysql => $end, time_zone => $tz)
-                    ->set_time_zone("UTC")->toMysql;
-    
+    my ($startDate)    = split / /, $start;
+    my ($endDate)      = split / /, $end;
+
     my $where    
         = qq{ 
                 ( 
-                    Event.startTime IS NULL 
-                    && Event.endTime IS NULL 
+                       Event.startTime IS NULL 
+                    && Event.endTime   IS NULL 
                     && 
                         !(
                             Event.startDate >= '$endDate' 
-                         || Event.endDate   <  '$startDate'
+                         || Event.endDate   <= '$startDate'
                         )
                 ) 
-                || ( 
-                    CONCAT(Event.startDate,' ',Event.startTime) >= '$startTz' 
-                    && CONCAT(Event.startDate,' ',Event.startTime) < '$endTz'
+                || !( 
+                       CONCAT(Event.startDate,' ',Event.startTime) >= '$end' 
+                    || CONCAT(Event.endDate,  ' ',Event.endTime  ) <= '$start'
                 )
         };
 
     my @order_priority 
-       = ( 'Event.startDate', 
+       = (  'Event.startDate', 
             'Event.startTime', 
             'Event.endDate', 
             'Event.endTime', 
@@ -739,7 +810,6 @@ sub getEventsIn {
 
     my $orderby = join ',', @order_priority;
 
-    
     my $events 
         = $self->getLineage(["descendants"], {
             returnObjects       => 1,
@@ -748,9 +818,9 @@ sub getEventsIn {
             orderByClause       => $orderby,
             whereClause         => $where,
         });
-    
+
     #? Perhaps use Stow to cache Events ?#
-    
+
     return @{$events};
 }
 
@@ -777,9 +847,28 @@ sub getEventVars {
 
 #----------------------------------------------------------------------------
 
+=head2 getFeed ( $feedId )
+
+Gets the data structure for one particular feed from this Calendar.  This is a wrapper
+for getJSONCollateral.
+
+=head3 $feedId
+
+The GUID of the feed to fetch.
+
+=cut
+
+sub getFeed {
+    my $self       = shift;
+    my $feedId     = shift;
+    return $self->getJSONCollateral('icalFeeds', 'feedId', $feedId);
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getFeeds ( )
 
-Gets a hashref of hashrefs of all the feeds attached to this calendar.
+Gets an arrayref of hashrefs of all the feeds attached to this calendar.
 
 TODO: Format lastUpdated into the user's time zone
 
@@ -787,12 +876,7 @@ TODO: Format lastUpdated into the user's time zone
 
 sub getFeeds {
     my $self    = shift;
-    
-    return $self->session->db->buildHashRefOfHashRefs(
-        "select * from Calendar_feeds where assetId=?",
-        [$self->get("assetId")],
-        "feedId"
-        );
+    return $self->get('icalFeeds');
 }
 
 #----------------------------------------------------------------------------
@@ -948,30 +1032,23 @@ sub processPropertiesFromFormPost {
         $feeds{$feedId}++;
     }
     my @feedsFromForm = keys %feeds;
-    
+
     # Delete old feeds that are not in @feeds
-    my @oldFeeds 
-        = $session->db->buildArray(
-            "select feedId from Calendar_feeds where assetId=?",
-            [$self->get("assetId")]
-        );
+    my @oldFeeds = map { $_->{feedId} } @{ $self->getFeeds };
 
     for my $feedId (@oldFeeds) {
-        if (!grep /^$feedId$/, @feedsFromForm) {
-            $session->db->write(
-                "delete from Calendar_feeds where feedId=? and assetId=?",
-                [$feedId,$self->get("assetId")]
-            );
+        if (!isIn($feedId, @feedsFromForm)) {
+            $self->deleteFeed($feedId);
         }
     }
-    
+
     # Create new feeds
     for my $feedId (grep /^new(\d+)/, @feedsFromForm) {
-        $session->db->setRow("Calendar_feeds","feedId",{
-            feedId      => "new",
-            assetId     => $self->get("assetId"),
+        $self->addFeed({
             url         => $form->param("feeds-".$feedId),
             feedType    => "ical",
+            lastUpdated => 'never',
+            lastResult  => '',
         });
     }
 
@@ -981,18 +1058,26 @@ sub processPropertiesFromFormPost {
 
 #----------------------------------------------------------------------------
 
-=head2 purge ( )
+=head2 setFeed ( $feedId, $feedParams )
 
-Handle Asset specific purge tasks.
+Adds a new Feed to this calendar.  This is a wrapper around WebGUI::JSONCollateral's setJSONCollateral
+method.
 
-Delete iCal feeds for this Calendar.
+=head3 $feedId
+
+The GUID of the feed to update.
+
+=head3 $feedParams
+
+See L<addFeed> for a list of parameters.
 
 =cut
 
-sub purge {
-    my $self = shift;
-    $self->session->db->write('delete from Calendar_feeds where assetId=?',[$self->get('assetId')]);
-    $self->SUPER::purge;
+sub setFeed {
+    my $self       = shift;
+    my $feedId     = shift;
+    my $feedParams = shift;
+    return $self->setJSONCollateral('icalFeeds', 'feedId', $feedId, $feedParams);
 }
 
 #----------------------------------------------------------------------------
@@ -1113,19 +1198,21 @@ The day to look at.
 =cut
 
 sub viewDay {
-    my $self        = shift;
-    my $session     = $self->session;
-    my $params      = shift;
-    my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
-    my $var         = $self->getTemplateVars;
-    
+    my $self     = shift;
+    my $session  = $self->session;
+    my $params   = shift;
+    my $i18n     = WebGUI::International->new($session,"Asset_Calendar");
+    my $var      = $self->getTemplateVars;
+    my $tz       = $session->datetime->getTimeZone;
+
     ### Get all the events in this time period
     # Get the range of the epoch of this day
-    my $dt        = WebGUI::DateTime->new($session, $params->{start});
+    my $dt       = WebGUI::DateTime->new($session, $params->{start});
+    $dt->set_time_zone($tz);
     $dt->truncate( to => "day");
-    
+
     my @events    = $self->getEventsIn($dt->toMysql,$dt->clone->add(days => 1)->toMysql);
-    
+
     #### Create the template parameters
     # The events
     my $pos        = -1;
@@ -1134,7 +1221,7 @@ sub viewDay {
         next EVENT unless $event->canView();
         my $dt      = $event->getDateTimeStart;
         my $hour    = $dt->clone->truncate(to=>"hour")->hour;
-        
+
         # Update position if necessary
         unless ($hour == $last_hour) {
             $pos++;
@@ -1146,7 +1233,7 @@ sub viewDay {
                 "hourM"     => ( $hour < 12 ? "am" : "pm"),
                 };
         }
-        
+
         my $eventVar    = $event->get;
         my %eventDates  = $event->getTemplateVars;
         push @{$var->{hours}->[$pos]->{events}}, {
@@ -1155,8 +1242,8 @@ sub viewDay {
             (map { "event".ucfirst($_) => $eventDates{$_} } keys %eventDates),
             };
     }
-    
-    
+
+
     # Make the navigation bars
     $var->{"pageNextStart"}     = $dt->clone->add(days=>1)->toMysql;
     $var->{"pageNextUrl"}       = $self->getUrl("type=day;start=".$var->{"pageNextStart"});
@@ -1174,8 +1261,8 @@ sub viewDay {
     $var->{"mdy"}               = $dt->mdy;
     $var->{"dmy"}               = $dt->dmy;
     $var->{"epoch"}             = $dt->epoch;
-    
-    
+
+
     # Return the template parameters
     return $var;
 }
@@ -1290,6 +1377,7 @@ sub viewMonth {
     #### Get all the events in this time period
     # Get the range of the epoch of this month
     my $dt          = WebGUI::DateTime->new($self->session, $params->{start});
+    $dt->set_time_zone($tz);
     $dt->truncate( to => "month");
     my $start = $dt->toMysql;
     my $dtEnd = $dt->clone->add(months => 1);
@@ -1336,7 +1424,7 @@ sub viewMonth {
         next EVENT unless $event->canView();
         # Get the WebGUI::DateTime objects
         my $dt_event_start  = $event->getDateTimeStart;
-        my $dt_event_end    = $event->getDateTimeEnd;
+        my $dt_event_end    = $event->getDateTimeEndNI;
         
         # Prepare the template variables
         my %eventTemplateVariables = $self->getEventVars($event);
@@ -1431,6 +1519,7 @@ sub viewWeek {
     #### Get all the events in this time period
     # Get the range of the epoch of this week
     my $dt      = WebGUI::DateTime->new($self->session, $params->{start});
+    $dt->set_time_zone($tz);
     $dt->truncate( to => "day");
     
     # Apply First Day of Week settings
@@ -1469,7 +1558,7 @@ sub viewWeek {
            # Get the week this event is in, and add it to that week in
            # the template variables
            my $dt_event_start = $event->getDateTimeStart;
-           my $dt_event_end   = $event->getDateTimeEnd;
+           my $dt_event_end   = $event->getDateTimeEndNI;
            
            #Handle events that start before this week or end after this week.
            if ($dt_event_start < $dt) {
@@ -1481,7 +1570,7 @@ sub viewWeek {
            }
            
            my $start_dow = ($dt_event_start->day_of_week - $first_dow) % 7;
-           my $end_dow = ($dt_event_end->day_of_week - $first_dow) % 7;
+           my $end_dow   = ($dt_event_end->day_of_week   - $first_dow) % 7;
 
            my $sequence_number = $session->db->dbh->selectcol_arrayref(
                "SELECT sequenceNumber FROM Event WHERE assetId = ? ORDER BY revisionDate desc LIMIT 1",
@@ -1635,26 +1724,26 @@ sub viewWeek {
         # Get the week this event is in, and add it to that week in
         # the template variables
         my $dt_event_start = $event->getDateTimeStart;
-        my $dt_event_end   = $event->getDateTimeEnd;
+        my $dt_event_end   = $event->getDateTimeEndNI;
 
         #Handle events that start before this week or end after this week.
         if ($dt_event_start < $dt) {
-            $dt_event_start = $dt;
+            $dt_event_start = $dt->clone;
         }
 
         if ($dt_event_end > $dtEnd) {
-            $dt_event_end = $dtEnd;
+            $dt_event_end = $dtEnd->clone;
         }
 
         my $start_dow = ($dt_event_start->day_of_week - $first_dow) % 7;
-        my $end_dow = ($dt_event_end->day_of_week - $first_dow) % 7;
+        my $end_dow   = ($dt_event_end->day_of_week  - $first_dow) % 7;
 
         my %eventTemplateVariables = $self->getEventVars($event);
 
         foreach my $weekDay ($start_dow .. $end_dow) {
             my $eventAssetId = $event->get( 'assetId' );
 
-           my %hash = %eventTemplateVariables;
+            my %hash = %eventTemplateVariables;
 
             if ($sort_by_sequence && $can_edit_order) {
                if (1) {
@@ -1732,14 +1821,16 @@ that ; , \ and newlines should be escaped by prepending them with a \.
 sub wrapIcal {
     my $self    = shift;
     my $text    = shift;
-    
-    return $text unless length $text >= 75;
-    
+
     $text       =~ s/([,;\\])/\\$1/g;
     $text       =~ s/\n/\\n/g;
-    
-    my @text    = ($text =~ m/.{0,75}/g);
-    return join "\r\n ",@text;
+
+    {
+        local $Text::Wrap::separator = "\r\n";
+        local $Text::Wrap::columns   = 74;
+        $text = Text::Wrap::wrap('', ' ', $text);
+    }
+    return $text;
 }
 
 #----------------------------------------------------------------------------

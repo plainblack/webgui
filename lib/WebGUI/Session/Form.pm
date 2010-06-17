@@ -174,5 +174,24 @@ sub process {
 	});
 }
 
+#-------------------------------------------------------------------
+
+=head2 validToken ( )
+
+Checks that the current form has a method=POST, and that it has a CSRF token matching
+the one in this user's current session.
+
+=cut
+
+sub validToken {
+	my ($self)  = @_;
+    my $session = $self->session;
+    $session->log->warn('method: '. $session->request->method);
+    $session->log->warn('token: '. $session->scratch->get('webguiCsrfToken'));
+    return 0 unless $session->request->method eq 'POST';
+    return 0 unless $self->param('webguiCsrfToken') eq $session->scratch->get('webguiCsrfToken');
+    return 1;
+}
+
 1;
 

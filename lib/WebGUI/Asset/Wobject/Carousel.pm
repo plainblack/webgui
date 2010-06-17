@@ -47,6 +47,13 @@ sub definition {
 			hoverHelp       =>$i18n->get('carousel template description'),
 			label           =>$i18n->get('carousel template label'),
 		},
+		slideWidth =>{
+			fieldType       => "integer",  
+			defaultValue    => 0,
+			tab             => "display",
+			hoverHelp       => $i18n->get('carousel slideWidth description'),
+			label           => $i18n->get('carousel slideWidth label'),
+		},
         items =>{
             noFormPost      =>1,
             fieldType       =>'text',
@@ -273,24 +280,6 @@ sub view {
 	
 	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page.  This method is entirely
-optional.  Take it out unless you specifically want to set a submenu in your
-adminConsole views.
-
-=cut
-
-#sub www_edit {
-#   my $self = shift;
-#   return $self->session->privilege->insufficient() unless $self->canEdit;
-#   return $self->session->privilege->locked() unless $self->canEditIfLocked;
-#   my $i18n = WebGUI::International->new($self->session, "Asset_Carousel");
-#   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit title"));
-#}
 
 1;
 #vim:ft=perl

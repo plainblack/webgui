@@ -80,15 +80,16 @@ The content to output.
 
 =head3 skipMacros
 
-A boolean indicating whether to skip macro processing on this content.
+A boolean indicating whether to skip macro processing on this content.  If the mime type
+has been set to a non-text type, macros will automatically be skipped.
 
 =cut
 
 sub print {
-	my $self = shift;
-	my $content = shift;
-	my $skipMacros = shift;
-	WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
+    my $self       = shift;
+    my $content    = shift;
+    my $skipMacros = shift || !($self->session->http->getMimeType =~ /^text/);
+    WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
     my $handle = $self->{_handle};
     if (defined $handle) {
         print $handle $content;

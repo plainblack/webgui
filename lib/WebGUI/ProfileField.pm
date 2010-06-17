@@ -67,7 +67,50 @@ Return true iff fieldName is reserved and therefore not usable as a profile fiel
 sub isReservedFieldName {
     my $class = shift;
     my $fieldName = shift;
-    return isIn($fieldName, ('func', 'op', 'wg_privacySettings'));
+    return isIn($fieldName, qw/userId shop specialState func op wg_privacySettings username authMethod dateCreated lastUpdated karma status referringAffiliate friendsGroup/);
+}
+
+#-------------------------------------------------------------------
+
+=head2 fixDataColumnTypes ( session )
+
+Checks the column types of userProfileData against the form fields that they use.  If they
+differ then they are updated to match for the form field.  This is to account for bugs in
+this module, and changes in Form types.
+
+This is a class method.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub fixDataColumnTypes {
+    my $class       = shift;
+    my $session     = shift;
+    
+    my $dbh         = $session->db->dbh;
+
+    my $fields = WebGUI::ProfileField->getFields($session);
+    foreach my $field ( @{ $fields } ) {
+        my $columnInfo = $dbh->column_info(undef, undef, 'userProfileData', $field->getId)->fetchrow_hashref();
+        my $formField  = $field->formField(undef, undef, undef, undef, undef, 'returnObject');
+        my $columnType = $formField->getDatabaseFieldType();
+        $columnType =~ s/\s+\w+$//;
+        if ($columnType eq 'BOOLEAN') {
+            $columnType = 'TINYINT';  ##Alias for INT(1)
+        }
+        my $actualType = $columnInfo->{TYPE_NAME};
+        if ($columnType =~ m/\(\d+\)/) {
+            $actualType = sprintf('%s(%s)', $actualType, $columnInfo->{COLUMN_SIZE});
+        }
+        if ($actualType ne $columnType) {
+            $session->log->warn("Updating ".$field->getId." from $actualType to $columnType");
+            $session->db->write('ALTER TABLE userProfileData MODIFY COLUMN '.$dbh->quote_identifier($field->getId).' '.$columnType);
+        }
+    }
+
 }
 
 #-------------------------------------------------------------------
@@ -105,17 +148,22 @@ sub create {
 
     ### Check data
     # Check if the field already exists
+    $properties->{fieldType} ||= "ReadOnly";
     return undef if $class->exists($session,$fieldName);
     return undef if $class->isReservedFieldName($fieldName);
 
     ### Data okay, create the field
     # Add the record
-    my $id 
-        = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},$fieldName);
+    my $id = $session->db->setRow("userProfileField","fieldName",
+                {
+                    fieldName=>"new",
+                    fieldType => $properties->{fieldType},
+                },
+                $fieldName
+    );
     my $self = $class->new($session,$id);
     
     # Get the field's data type
-    $properties->{fieldType} ||= "ReadOnly";
     my $formClass   = $self->getFormControlClass;
     eval { WebGUI::Pluggable::load($formClass) };
     my $dbDataType = $formClass->getDatabaseFieldType;
@@ -215,7 +263,7 @@ sub _formProperties { my $self = shift; return $self->formProperties(@_); }
 
 #-------------------------------------------------------------------
 
-=head2 formField ( [ formProperties, withWrapper, userObject ] )
+=head2 formField ( [ formProperties, withWrapper, userObject, skipDefault, assignedValue ] )
 
 Returns an HTMLified form field element.
 
@@ -240,6 +288,10 @@ If true, this causes the default value set up for the form field to be ignored.
 If assignedValue is defined, it will be used to override the default value set up for the
 form.
 
+=head3 returnObject
+
+If true, it returns a WebGUI::Form object, instead of returning HTML.
+
 =cut
 
 # FIXME This would be better if it returned an OBJECT not the HTML
@@ -254,6 +306,7 @@ sub formField {
     my $u             = shift || $session->user;
     my $skipDefault   = shift;
     my $assignedValue = shift;
+    my $returnObject  = shift;
     
     if ($skipDefault) {
         $properties->{value} = undef;
@@ -273,12 +326,14 @@ sub formField {
             $properties->{value} = WebGUI::Operation::Shared::secureEval($session,$properties->{dataDefault});
         }
     }
+    my $form = WebGUI::Form::DynamicField->new($session,%{$properties});
+    return $form if $returnObject;
     if ($withWrapper == 1) {
-        return WebGUI::Form::DynamicField->new($session,%{$properties})->toHtmlWithWrapper;
+        return $form->toHtmlWithWrapper;
     } elsif ($withWrapper == 2) {
-        return WebGUI::Form::DynamicField->new($session,%{$properties})->getValueAsHtml;
+        return $form->getValueAsHtml;
     } else {
-        return WebGUI::Form::DynamicField->new($session,%{$properties})->toHtml;
+        return $form->toHtml;
     }
 }
 
@@ -432,7 +487,7 @@ sub getEditableFields {
 
 =head2 getFields ( session )
 
-Returns an array reference of WebGUI::ProfileField objects. This is a class method.
+Returns an array reference of all WebGUI::ProfileField objects. This is a class method.
 
 =cut
 
@@ -503,6 +558,8 @@ sub getRegistrationFields {
     my $session = shift;
     return $class->_listFieldsWhere($session, "f.showAtRegistration = 1");
 }
+
+#-------------------------------------------------------------------
 
 =head2 getPasswordRecoveryFields ( session )
 
@@ -820,13 +877,15 @@ sub set {
     my $db          = $session->db;
 
     # Set the defaults
-    $properties->{visible} = 0 unless ($properties->{visible} == 1);
-    $properties->{editable} = 0 unless ($properties->{editable} == 1);
-    $properties->{protected} = 0 unless ($properties->{protected} == 1);
-    $properties->{required} = 0 unless ($properties->{required} == 1);
-    $properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
-    $properties->{fieldType} = 'text' unless ($properties->{fieldType});
-    $properties->{extras} = '' unless ($properties->{extras});
+    $properties->{visible}   = 0           unless ($properties->{visible}   == 1);
+    $properties->{protected} = 0           unless ($properties->{protected} == 1);
+    $properties->{required}  = 0           unless ($properties->{required}  == 1);
+    $properties->{editable}  = $properties->{required} == 1 ? 1
+                             : $properties->{editable} == 1 ? 1
+                             : 0;
+    $properties->{label}     = 'Undefined' if     ($properties->{label} =~ /^[\"\']*$/);
+    $properties->{fieldType} = 'text'      unless ($properties->{fieldType});
+    $properties->{extras}    = ''          unless ($properties->{extras});
     if ($properties->{dataDefault} && $properties->{fieldType}=~/List$/) {
         unless ($properties->{dataDefault} =~ /^\[/) {
             $properties->{dataDefault} = "[".$properties->{dataDefault};
@@ -887,7 +946,7 @@ sub setCategory {
 
     return undef if ($categoryId eq $currentCategoryId);
 
-    my ($sequenceNumber) = $self->session->db->quickArray("select max(sequenceNumber) from userProfileField where profileCategoryId=".$self->session->db->quote($categoryId));
+    my ($sequenceNumber) = $self->session->db->quickArray("select max(sequenceNumber) from userProfileField where profileCategoryId=?",  [$categoryId]);
     $self->session->db->setRow("userProfileField","fieldName",{fieldName=>$self->getId, profileCategoryId=>$categoryId, sequenceNumber=>$sequenceNumber+1});
     $self->{_property}{profileCategoryId} = $categoryId;
     $self->{_property}{sequenceNumber} = $sequenceNumber+1;

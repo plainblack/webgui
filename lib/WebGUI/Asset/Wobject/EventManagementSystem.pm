@@ -33,7 +33,7 @@ use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Workflow::Instance;
 use Tie::IxHash;
-
+use Data::Dumper;
 
 
 #-------------------------------------------------------------------
@@ -66,7 +66,7 @@ sub definition {
 			tab			=> 'display',
 			label			=> $i18n->get('schedule template'),
 			hoverHelp		=> $i18n->get('schedule template help'),
-			namespace		=> 'EMS',
+			namespace		=> 'EMS/Schedule',
 		},
 		scheduleColumnsPerPage => {
 			fieldType 		=> 'Integer',
@@ -1156,28 +1156,30 @@ returns the JSON data for a page of the schedule table
 sub www_getScheduleDataJSON {
     my $self = shift;
     my $session = $self->session;
+    my $emptyRecord = JSON->new->encode( {
+        records         => [ ],   totalRecords        => 0,     recordsReturned    => 0,
+        startIndex      => 0,     currentLocationPage => 0,     totalLocationPages => 0,
+        currentDatePage => 0,     totalDatePages      => 0,     dateRecords        => [ ],
+        sort            => undef, dir                 => 'asc', pageSize           => 0,
+    });
+    return $emptyRecord unless $self->canView;
     # the following two are expected to be configurable...
-    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
+    my $locationsPerPage   = $self->get('scheduleColumnsPerPage');
 
-    my ($db, $form) = $session->quick(qw(db form));
+    my ($db, $form)        = $session->quick(qw(db form));
     my $locationPageNumber = $form->get('locationPage') || 1;
-    my $datePageNumber = $form->get('datePage') || 1;
+    my $datePageNumber     = $form->get('datePage')     || 1;
     my @dateRecords;
     my @ticketLocations = $self->getLocations( \@dateRecords );
     # the total number of pages is the number of locations divided by the number of locations per page
     my $numberOfLocationPages = int( .9 + scalar(@ticketLocations) / $locationsPerPage );
         # skip everything else if there are no locations/pages
-    return JSON->new->encode( {
-        records => [ ],  totalRecords => 0, recordsReturned => 0, startIndex => 0,
-        currentLocationPage => 0, totalLocationPages => 0,
-        currentDatePage => 0, totalDatePages => 0, dateRecords => [ ],
-        sort => undef,  dir => 'asc', pageSize => 0,
-    })  if $numberOfLocationPages == 0;
+    return $emptyRecord if $numberOfLocationPages == 0;
     # now we pick out the locations to be displayed on this page
     my $indexFirstLocation = ($locationPageNumber-1)*$locationsPerPage;
-    my $indexLastLocation = $locationPageNumber*$locationsPerPage - 1;
-    my $currentDate = $dateRecords[$datePageNumber-1];
-    @ticketLocations = @ticketLocations[$indexFirstLocation..$indexLastLocation];
+    my $indexLastLocation  = $locationPageNumber*$locationsPerPage - 1;
+    my $currentDate        = $dateRecords[$datePageNumber-1];
+    @ticketLocations       = @ticketLocations[$indexFirstLocation..$indexLastLocation];
 	my $tickets = $db->read( q{
              select assetData.assetId, sku.description, assetData.title, EMSTicket.startDate, EMSTicket.location
                from EMSTicket
@@ -1261,11 +1263,13 @@ sub www_getTicketsAsJson {
     my ($self) = @_;
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
-    my ($db, $form) = $session->quick(qw(db form));
-    my $startIndex = $form->get('startIndex') || 0;
-    my $numberOfResults = $form->get('results') || 25;
+    my ($db, $form)     = $session->quick(qw(db form));
+    my $startIndex      = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results')    || 25;
+    my $sortDir         = $form->get('sortDir')    || 'ASC';
+    my $sortKey         = $form->get('sortKey')    || 'eventNumber';
     my %results = ();
-	my @ids = ();
+	my @ids     = ();
 	my $keywords = $form->get('keywords');
 	
 	# looking for specific events
@@ -1287,7 +1291,7 @@ sub www_getTicketsAsJson {
 	# just get all tickets
 	else {
 		@ids = $db->buildArray("select assetId from asset left join EMSTicket using (assetId) where parentId=? and
-className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by eventNumber", [$self->getId]);
+className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by $sortKey $sortDir", [$self->getId]);
 	}
 	
 	# get badge's badge groups
@@ -1552,7 +1556,7 @@ $|=1;
 	my $first = 1;
 	if (open my $file, "<", $storage->getPath($filename)) {
 		$out->print("Processing file...\n",1);
-		while (my $line = <$file>) {
+		ROW: while (my $line = <$file>) {
 			if ($first) {
 				$first = 0;
 				if ($ignoreFirst) {
@@ -1581,11 +1585,20 @@ $|=1;
 					next unless isIn($field->{name}, @import);
             		$out->print("\tAdding field ".$field->{label}."\n",1);
 					my $type = $field->{type};
+                    ##Force the use of Form::DateTime and MySQL Format
+                    if ($field->{name} eq 'startDate') {
+                        $type = 'dateTime';
+                        $field->{defaultValue} = '1999-05-24 17:30:00';
+                    }
 					my $value = $validate->$type({
 							name			=> $field->{name},
 							defaultValue	=> $field->{defaultValue},
 							options			=> $field->{options},
 							},$row[$i]);
+                    if ($field->{name} eq 'startDate' && !$value) {
+                        $out->print('Skipping event on line '.$line.' due to bad date format');
+                        next ROW;
+                    }
 					if ($field->{isMeta}) {
 						$metadata->{$field->{label}} = $value;
 					}
@@ -1962,7 +1975,8 @@ sub www_printTicket {
 	my $registrant = $self->getRegistrant($form->get('badgeId'));
 	my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $form->get('ticketAssetId'));
 	$registrant->{ticketTitle} = $ticket->getTitle;
-	$registrant->{ticketStart} = $ticket->get('startDate');
+        my $startTime = WebGUI::DateTime->new($ticket->get('startDate'))->set_time_zone($self->get('timezone'));
+	$registrant->{ticketStart} = $startTime->strftime('%F %R');
 	$registrant->{ticketDuration} = $ticket->get('duration');
 	$registrant->{ticketLocation} = $ticket->get('location');
 	$registrant->{ticketEventNumber} = $ticket->get('eventNumber');
@@ -2041,18 +2055,19 @@ sub www_toggleRegistrantCheckedIn {
 
 =head2 www_viewSchedule ()
 
-view the schedule table
+View the schedule table.
 
 =cut
 
 sub www_viewSchedule {
-	my $self = shift;
-	my $db = $self->session->db;
-    my $rowsPerPage = 25;
+	my $self             = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+	my $db               = $self->session->db;
+    my $rowsPerPage      = 25;
     my $locationsPerPage = $self->get('scheduleColumnsPerPage');
 
     my @columnNames = map { "'col" . $_ . "'" } ( 1..$locationsPerPage );
-    my $fieldList = join ',', @columnNames;
+    my $fieldList   = join ',', @columnNames;
     my $dataColumns = join ",\n",  map {
 	    '{key:' . $_ . ',sortable:false,label:"",formatter:formatViewScheduleItem}'
                      }  @columnNames;
@@ -2063,7 +2078,7 @@ sub www_viewSchedule {
                       rowsPerPage => $rowsPerPage,
                       dataColumns => $dataColumns,
                       fieldList => $fieldList,
-		      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
+                      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
                   },$self->get('scheduleTemplateId')));
 
 }

@@ -68,11 +68,11 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is(scalar @forms, 1, '1 form was parsed');
 
 my @inputs = $forms[0]->inputs;
-is(scalar @inputs, 1, 'The form has 1 input');
+is(scalar @inputs, 2, 'The form has 2 input');
 
 #Basic tests
 
-my $input = $inputs[0];
+my $input = $inputs[1];
 is($input->name, 'CBox1', 'Checking input name');
 is($input->type, 'checkbox', 'Checking input type');
 is($input->value, 'Checkme', 'Checking default value');

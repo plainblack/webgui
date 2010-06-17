@@ -42,7 +42,7 @@ These methods are available from this class:
 
 =head2 definition ( session, definition )
 
-See WebGUI::Workflow::Activity::defintion() for details.
+See WebGUI::Workflow::Activity::definition() for details.
 
 =cut 
 
@@ -84,7 +84,6 @@ sub execute {
     my $self            = shift;
     my $thingy          = shift;
     my $inbox           = WebGUI::Inbox->new($self->session);
-    my $messageTemplate = $self->get('messageTemplate');
     my $properties      = {
         status  => 'completed',
         subject => 'Thingy at URL ' . $thingy->getUrl . ' changed.',

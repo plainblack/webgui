@@ -173,7 +173,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 13, 'getEditForm: the form has 13 controls');
+is (scalar @inputs, 14, 'getEditForm: the form has 14 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -185,6 +185,10 @@ foreach my $input (@inputs) {
 cmp_deeply(
     \@interestingFeatures,
     [
+        {
+            name => 'webguiCsrfToken',
+            type => 'hidden',
+        },
         {
             name => undef,
             type => 'submit',

@@ -142,57 +142,50 @@ sub toHtml {
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
-	my ($style, $url) = $self->session->quick(qw(style url));
-	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
-    $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
-	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '
-            . ( $self->get("maxlength") ? 'maxlength="' . $self->get( "maxlength" ) . '" ' : '' )
-            . $self->get("extras") . ' rows="#" cols="#" style="width: '.$width.'px; height: '.$height.'px;">'.$value.'</textarea>'
-            ;
+	my ($style, $url, $stow) = $self->session->quick(qw(style url stow));
+    my $sizeStyle =  ' width: ' . $width . 'px; height: ' . $height . 'px;';
+    my $out
+        = '<textarea id="' . $self->get('id') . '"'
+        . ' name="' . $self->get("name") . '"'
+        . ( $self->get("maxlength") ? ' maxlength="' . $self->get( "maxlength" ) . '"' : '' )
+        . ' ' . $self->get("extras")
+        . ' rows="5" cols="60"'
+        . ' style="' . $self->get('style')
+        . ( $self->get("resizable") ? ' height: 100%; width: 100%; resize: none;' : $sizeStyle ) . '"'
+        . '>' . $value . '</textarea>';
 
-    # Add the maxlength script
-    $style->setScript( 
-        $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ), 
-        { type => 'text/javascript' },
-    );
-    $style->setScript( 
-        $url->extras( 'yui-webgui/build/form/textarea.js' ), 
-        { type => 'text/javascript' }, 
-    );
-
-    unless ( $self->session->stow->get( 'texareaHeadTagsLoaded' ) ) {
-        $style->setRawHeadTags( q|
-            <script type="text/javascript">
-                YAHOO.util.Event.onDOMReady( function () { WebGUI.Form.Textarea.setMaxLength() } );
-            </script>
-        | );
-
-        $self->session->stow->set( 'texareaHeadTagsLoaded', 1 )
-    }
-
-	if ($self->get("resizable")) {
-        $style->setLink($url->extras("resize.css"), {type=>"text/css", rel=>"stylesheet"});
-        $style->setLink($url->extras("resize-skin.css"), {type=>"text/css", rel=>"stylesheet"});
+    if ($self->get("resizable")) {
+        $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
         $style->setScript($url->extras("yui/build/utilities/utilities.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/resize/resize.js"), {type=>"text/javascript"});
-        $out = qq|
-            <div id="resize_| . $self->get('id'). qq|" style="width: | . ($width + 6) . qq|px; height: | . ($height + 6) . qq|px; overflow: hidden">
-            $out
-            </div>
-
-            <script type="text/javascript">
-            YAHOO.util.Event.onContentReady('| . $self->get('id') . qq|', function() {
-                var Dom = YAHOO.util.Dom;
-                var resize = new YAHOO.util.Resize('resize_| . $self->get('id'). qq|');
-                resize.on('resize', function(ev) {
-                    Dom.setStyle('| . $self->get('id') . qq|', 'width', (ev.width - 6) + "px");
-                    Dom.setStyle('| . $self->get('id') . qq|', 'height', (ev.height - 6) + "px");
-                });
-            });
-            </script>
-        |;
-	}
-	return $out;
+        $style->setScript($url->extras("yui/build/resize/resize-min.js"), {type=>"text/javascript"});
+        $out = sprintf <<'END_HTML', $self->get('id'), $out, $sizeStyle;
+<div id="%1$s_resizewrapper" style="padding-right: 6px; padding-bottom: 6px; %3$s">%2$s</div>
+<script type="text/javascript">
+(function() {
+    var resize = new YAHOO.util.Resize('%1$s_resizewrapper');
+    resize.on('resize', function(e) {
+        YAHOO.util.Dom.setStyle('%1$s', 'width', resize.getStyle('width'));
+        YAHOO.util.Dom.setStyle('%1$s', 'height', resize.getStyle('height'));
+    });
+    resize.reset();
+})();
+</script>
+END_HTML
+    }
+    elsif ($self->get('maxlength')) {
+        $style->setScript(
+            $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ),
+            { type => 'text/javascript' },
+        );
+    }
+    if ($self->get('maxlength')) {
+        # Add the maxlength script
+        $style->setScript(
+            $url->extras( 'yui-webgui/build/form/textarea.js' ),
+            { type => 'text/javascript' },
+        );
+    }
+    return $out;
 }
 
 #-------------------------------------------------------------------

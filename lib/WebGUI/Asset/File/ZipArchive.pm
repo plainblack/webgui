@@ -22,6 +22,8 @@ use WebGUI::Utility;
 
 use Archive::Tar;
 use Archive::Zip;
+use Cwd ();
+use Scope::Guard ();
 
 
 
@@ -67,7 +69,9 @@ sub unzip {
 	my $filename = shift;
    
 	my $filepath = $storage->getPath();
-	chdir $filepath;
+    my $cwd = Cwd::cwd();
+    chdir $filepath;
+    my $dir_guard = Scope::Guard->new(sub { chdir $cwd });
    
 	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
 	if ($filename =~ m/\.zip/i) {

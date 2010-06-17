@@ -75,6 +75,18 @@ our $I18N = {
         lastUpdated => 0,
         context     => "Description of asset property",
     },
+
+    'fieldPrice label' => {
+        message     => "Field Add-on Price",
+        lastUpdated => 0,
+        context     => "Label for asset property",
+    },
+
+    'fieldPrice description' => {
+        message     => "Add to the base price if a user decides to fill-in this field.",
+        lastUpdated => 0,
+        context     => "Description of asset property",
+    },
 };
 
 1;

@@ -457,6 +457,12 @@ option is set to Yes, then all whitespace entered into the form will be preserve
         lastUpdated => 1206653834,
     },
 
+    'Toggle editor' => {
+        message     => q{Toggle editor},
+        lastUpdated => 0,
+        context     => q{Toggle, to switch between on and off},
+    },
+
     'editForm allowMedia label' => {
         message     => q{Allow Media},
         lastUpdated => 0,

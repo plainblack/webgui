@@ -428,7 +428,8 @@ is($@, '', "exportWriteFile works for grandchild");
 ok(-e $grandChild->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the grandchild file");
 
 # finally, check its contents
-eval { $content = WebGUI::Test->getPage($grandChild, 'exportHtml_view', { user => WebGUI::User->new($session, 1) }) };
+$session->style->sent(0);
+eval { $content = WebGUI::Test->getPage($grandChild, 'exportHtml_view') };
 is(scalar $grandChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWriteFile puts correct content in exported grandchild");
 
 # test different extensions

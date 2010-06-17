@@ -148,11 +148,7 @@ sub extras {
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} and $cdnCfg->{'extrasCdn'} ) {
         unless ( $path and grep $path =~ m/$_/, @{ $cdnCfg->{'extrasExclude'} } ) {
-            if ($cdnCfg->{'extrasSsl'}
-                and (  $self->session->env->get('HTTPS') eq 'on'
-                    or $self->session->env->get('SSLPROXY') )
-                )
-            {
+            if ($cdnCfg->{'extrasSsl'} && $self->session->env->sslRequest) {
                 $url = $cdnCfg->{'extrasSsl'};
             }
             else {
@@ -291,7 +287,7 @@ sub forceSecureConnection {
     my $url = shift;
     my ($conf, $env, $http) = $self->session->quick(qw(config env http));
    
-    if ($conf->get("sslEnabled") && $env->get("HTTPS") ne "on" && !$env->get("SSLPROXY")){
+    if ($conf->get("sslEnabled") && !$env->sslRequest){
    
         $url = $self->session->url->page if(! $url);
         $url = $env->get('QUERY_STRING') if(! $url);
@@ -354,7 +350,7 @@ sub getSiteURL {
                 $site = $sitenames->[0];
         }
         my $proto = "http://";
-        if ($self->session->env->get("HTTPS") eq "on") {
+        if ($self->session->env->sslRequest) {
                 $proto = "https://";
         }
 		my $port = "";

@@ -15,6 +15,7 @@ package WebGUI::Search::Index;
 =cut
 
 use strict;
+use HTML::Entities;
 
 =head1 NAME
 
@@ -82,14 +83,7 @@ sub addKeywords {
 	my $self = shift;
 	my $text = join(" ", @_);
 
-	$text = WebGUI::HTML::filter($text, "all");
-	#-------------------- added by zxp for chinese word segment
-	my @segs = split /([A-z|\d]+|\S)/, $text;
-	$text = join " ",@segs;
-	$text =~ s/\s{2,}/ /g;
-	$text =~ s/(^\s|\s$)//g;
-	$text =~ s/\s/\'\'/g;
-	#-------------------- added by zxp end
+    $text = $self->_filterKeywords($text);
 	my ($keywords) = $self->session->db->quickArray("select keywords from assetIndex where assetId=?",[$self->getId]);
 	$self->session->db->write("update assetIndex set keywords =? where assetId=?", [$keywords.' '.$text, $self->getId]);
 }
@@ -122,24 +116,16 @@ sub create {
 	my $asset = shift;
 	my $self = $class->new($asset);
 	$self->delete;
+
 	my $url = $asset->get("url");
 	$url =~ s/\/|\-|\_/ /g;
+
 	my $description = WebGUI::HTML::filter($asset->get('description'), "all");
     my $keywords = join(" ",$asset->get("title"), $asset->get("menuTitle"), $asset->get("synopsis"), $url,
-        $description);
-    $keywords .= WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$asset});
-	$keywords = WebGUI::HTML::filter($keywords, "all");
+        $description, WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$asset}));
+    $keywords = $self->_filterKeywords($keywords);
+
 	my $synopsis = $asset->get("synopsis") || substr($description,0,255) || substr($keywords,0,255);
-
-#-------------------- added by zxp for chinese word segment
-	utf8::decode($keywords);
-	my @segs = split /([A-z|\d]+|\S)/, $keywords;
-	$keywords = join " ",@segs;
-	$keywords =~ s/\s{2,}/ /g;
-	$keywords =~ s/(^\s|\s$)//g;
-	$keywords =~ s/\s/\'\'/g;
-#-------------------- added by zxp end
-
 	my $add = $self->session->db->prepare("insert into assetIndex (assetId, title, url, creationDate, revisionDate, 
 		ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
 	$add->execute([$asset->getId, $asset->get("title"), $asset->get("url"), $asset->get("creationDate"),
@@ -178,6 +164,45 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 _filterKeywords ( $keywords )
+
+Perform filtering and cleaning up of the keywords before submitting them.  Ideographic characters are padded
+so that they are still searchable.  HTML entities are decoded.
+
+=head3 $keywords
+
+A string containing keywords.
+
+=cut
+
+sub _filterKeywords {
+    my $self     = shift;
+    my $keywords = shift;
+
+    $keywords = WebGUI::HTML::filter($keywords, "all");
+    $keywords = HTML::Entities::decode_entities($keywords);
+    utf8::upgrade($keywords);
+
+    # split into 'words'.  Ideographic characters (such as Chinese) are
+    # treated as distinct words.  Everything else is space delimited.
+    my @words = grep { $_ ne '' } split /\s+|(\p{Ideographic})/, $keywords;
+
+    # remove punctuation characters at the start and end of each word.
+    for my $word ( @words ) {
+        $word =~ s/\A\p{isPunct}+//;
+        $word =~ s/\p{isPunct}+\z//;
+        # we add padding to ideographic characters to avoid minimum word length limits on indexing
+        if ($word =~ /\p{Ideographic}/) {
+            $word = q{''}.$word.q{''};
+        }
+    }
+
+    $keywords = join q{ }, @words;
+    return $keywords;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the ID used to create this object.
@@ -201,7 +226,7 @@ sub setIsPublic {
 	my $self = shift;
 	my $boolean = shift;
 	my $set = $self->session->db->prepare("update assetIndex set isPublic=? where assetId=?");
-	$set->execute($boolean, $self->getId);
+	$set->execute([$boolean, $self->getId]);
 }
 
 #-------------------------------------------------------------------

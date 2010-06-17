@@ -11,8 +11,6 @@ if ( typeof WebGUI.AssetManager == "undefined" ) {
     WebGUI.AssetManager = {};
 }
 
-// The extras folder
-WebGUI.AssetManager.extrasUrl   = '/extras/';
 // Keep track of the open more menus
 WebGUI.AssetManager.MoreMenusDisplayed = {};
 // Append something to a url:
@@ -150,7 +148,7 @@ WebGUI.AssetManager.formatClassName = function ( elCell, oRecord, oColumn, order
     Format the asset class name
 */
 WebGUI.AssetManager.formatLockedBy = function ( elCell, oRecord, oColumn, orderNumber ) {
-    var extras  = WebGUI.AssetManager.extrasUrl;
+    var extras  = getWebguiProperty('extrasURL');
     elCell.innerHTML 
         = oRecord.getData( 'lockedBy' )
         ? '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'

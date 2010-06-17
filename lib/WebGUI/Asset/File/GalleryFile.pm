@@ -241,7 +241,7 @@ sub canView {
     my $album       = $self->getParent;
     return 0 unless $album->canView($userId);
 
-    if ($self->isFriendsOnly && $userId != $self->get("ownerUserId") ) {
+    if ($self->isFriendsOnly && $userId ne $self->get("ownerUserId") ) {
         my $owner       = WebGUI::User->new( $self->session, $self->get("ownerUserId") );
         return 0
             unless WebGUI::Friends->new($self->session, $owner)->isFriend($userId);

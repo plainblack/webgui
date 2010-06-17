@@ -16,19 +16,27 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::PseudoRequest;
-use Test::More tests => 17; # increment this value for each test you create
+use Test::More tests => 26; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
+use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
+my $templateId = 'THING_EDIT_TEMPLATE___';
+my $templateMock = Test::MockObject->new({});
+$templateMock->set_isa('WebGUI::Asset::Template');
+$templateMock->set_always('getId', $templateId);
+my $templateVars;
+$templateMock->mock('process', sub { $templateVars = $_[1]; } );
+
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Thingy Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 my $thingy = $node->addChild({className=>'WebGUI::Asset::Wobject::Thingy'});
 
 # Test for a sane object type
@@ -198,15 +206,16 @@ my $copyThingId = $thingy->duplicateThing($thingId);
 
 $isValidId = $session->id->valid($copyThingId);
 
-is($isValidId,1,"duplicating a Thing: duplicateThing returned a valid id: ".$copyThingId);
+ok($isValidId, "duplicating a Thing: duplicateThing returned a valid id: ".$copyThingId);
 
 # Test adding, editing, getting and deleting thing data
 
 my ($newThingDataId,$errors) = $thingy->editThingDataSave($thingId,'new',{"field_".$fieldId => 'test value'});
+ok( ! $thingy->hasEnteredMaxPerUser($thingId), 'hasEnteredMaxPerUser: returns false when maxEntriesPerUser=0 and 1 entry added');
 
 my $isValidThingDataId = $session->id->valid($newThingDataId);
 
-is($isValidId,1,"Adding thing data: editFieldSave returned a valid id: ".$newThingDataId);
+ok($isValidThingDataId, "Adding thing data: editFieldSave returned a valid id: ".$newThingDataId);
 
 my $viewThingVars = $thingy->getViewThingVars($thingId,$newThingDataId);
 
@@ -289,9 +298,103 @@ cmp_deeply(
         'Getting thing data as JSON after deleting: www_viewThingDataViaAjax returns correct message.'
     );
 
+($newThingDataId,$errors) = $thingy->editThingDataSave($thingId,'new',{"field_".$fieldId => 'second test value'});
 
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
+#################################################################
+#
+# maxEntriesPerUser
+#
+#################################################################
+
+my %otherThingProperties = %thingProperties;
+$otherThingProperties{maxEntriesPerUser} = 1;
+$otherThingProperties{editTemplateId   } = $templateId;
+my $otherThingId = $thingy->addThing(\%otherThingProperties, 0); 
+my %otherFieldProperties = %fieldProperties;
+$otherFieldProperties{thingId} = $otherThingId;
+my $otherFieldId = $thingy->addField(\%otherFieldProperties, 0);
+ok( ! $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser: returns false with no data entered');
+
+my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
+
+{
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $thingy->editThingData($otherThingId);
+    my %miniVars;
+    @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
+    cmp_deeply(
+        \%miniVars,
+        {
+            form_start  => ignore,
+            form_end    => ignore,
+            form_submit => ignore,
+            field_loop  => ignore,
+        },
+        'thing edit form variables exist, because max entries not reached yet'
+    );
 }
 
+$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'other test value'} );
+ok( $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser returns true with one row entered, and maxEntriesPerUser=1');
+
+{
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $thingy->editThingData($otherThingId);
+    my %miniVars;
+    @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
+    my $existance = 0;
+    foreach my $tmplVar (@edit_thing_form_fields) {
+        $existance ||= exists $templateVars->{$tmplVar}
+    }
+    ok(
+        ! $existance,
+        'thing edit form variables do not exist, because max entries was reached'
+    );
+}
+
+#################################################################
+#
+# deleteThing
+#
+#################################################################
+
+$thingy->deleteThing($otherThingId);
+my $count;
+$count = $session->db->quickScalar('select count(*) from Thingy_things where thingId=?',[$otherThingId]);
+is($count, 0, 'deleteThing: clears thing from Thingy_things');
+$count = $session->db->quickScalar('select count(*) from Thingy_fields where thingId=?',[$otherThingId]);
+is($count, 0, '... clears thing from Thingy_fields');
+my $table = $session->db->dbh->table_info(undef, undef, 'Thingy_'.$otherThingId)->fetchrow_hashref();
+is($table, undef, '... drops thing specific table');
+
+#################################################################
+#
+# thing data permissions, getFormPlugin
+#
+#################################################################
+
+%otherThingProperties                = %thingProperties;
+$otherThingProperties{'groupIdView'} = 3;
+$otherThingId                        = $thingy->addThing(\%otherThingProperties, 0); 
+%otherFieldProperties                = %fieldProperties;
+$otherFieldProperties{thingId}       = $otherThingId;
+$otherFieldId                        = $thingy->addField(\%otherFieldProperties, 0);
+$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 1'} );
+$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 2'} );
+$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'value 3'} );
+
+my $andy = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($andy);
+$session->user({userId => $andy->userId});
+
+my $form = $thingy->getFormPlugin({
+    name                => 'fakeFormForTesting',
+    fieldType           => 'otherThing_'.$otherThingId,
+    fieldInOtherThingId => $otherFieldId,
+});
+
+cmp_deeply(
+    $form->get('options'),
+    {},
+    'getFormPlugin: form has no data since the user does not have viewing privileges'
+);

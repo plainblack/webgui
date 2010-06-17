@@ -31,19 +31,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 23;
-plan tests => 1 + $tests;
+plan tests => 24;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::AddressBook');
-
 my $storage;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::AddressBook', $tests unless $loaded;
 my $e;
 my $book;
 
@@ -155,9 +148,9 @@ my $address2 = $book->addAddress({ label => q{Norton's office} });
 
 my @addresses = @{ $book->getAddresses() };
 
-cmp_deeply(
-    \@addresses,
-    [$address1, $address2],
+cmp_bag(
+    [ map { $_->getId } @addresses ],
+    [$address1->getId, $address2->getId],
     'getAddresses returns all address objects for this book'
 );
 
@@ -204,11 +197,36 @@ $bookClone->delete();
 $bookCount = $session->db->quickScalar('select count(*) from addressBook');
 my $addrCount = $session->db->quickScalar('select count(*) from address');
 
-is($bookCount, 0, 'delete: book deleted');
-is($addrCount, 0, 'delete: also deletes addresses in the book');
+is($bookCount, 0, '... book deleted');
+is($addrCount, 0, '... also deletes addresses in the book');
 undef $book;
 
-}
+#######################################################################
+#
+# newBySession
+#
+#######################################################################
+
+
+my $otherSession = WebGUI::Test->newSession;
+my $mergeUser    = WebGUI::User->create($otherSession);
+WebGUI::Test->usersToDelete($mergeUser);
+$otherSession->user({user => $mergeUser});
+my $adminBook   = WebGUI::Shop::AddressBook->create($otherSession);
+my $goodAddress = $adminBook->addAddress({label => 'first'});
+
+my $session2 = WebGUI::Test->newSession;
+$session2->user({user => $mergeUser});
+my $bookAdmin = WebGUI::Shop::AddressBook->newBySession($session2);
+
+cmp_bag(
+    [ map { $_->getId } @{ $bookAdmin->getAddresses } ],
+    [ $goodAddress->getId, ],
+    'newBySession merges address books by userId'
+);
+
+$adminBook->delete;
+$bookAdmin->delete;
 
 END {
     $session->db->write('delete from addressBook');

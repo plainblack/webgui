@@ -91,11 +91,11 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is(scalar @forms, 1, '1 form was parsed');
 
 my @inputs = $forms[0]->inputs;
-is(scalar @inputs, 1, 'The form has 1 input');
+is(scalar @inputs, 2, 'The form has 2 input');
 
 #Basic tests
 
-my $input = $inputs[0];
+my $input = $inputs[1];
 is($input->name, 'TestClass', 'Checking input name');
 is($input->type, 'hidden', 'Checking input type');
 is($input->value, 'WebGUI::Asset::File', 'Checking default value');
@@ -112,13 +112,13 @@ my $html = join "\n",
 
 @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 @inputs = $forms[0]->inputs;
-my $input = $inputs[0];
+my $input = $inputs[1];
 is($input->name, 'StorageClass', 'Checking input name');
 is($input->value, 'WebGUI::Storage', 'Checking default value');
 
 ##Test Form Output parsing
 
-#diag $formType;
+#note $formType;
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
 #

@@ -36,4 +36,5 @@ WebGUI.Form.Textarea.setMaxLength
     }
 }
 
+YAHOO.util.Event.onDOMReady( function () { WebGUI.Form.Textarea.setMaxLength() } );
 

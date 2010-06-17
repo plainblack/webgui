@@ -60,6 +60,60 @@ our $I18N = {
         context     => q{Label for the manage tax tab},
     },
 
+    'my sales template' => {
+        message     => q{My Sales Template},
+        lastUpdated => 0,
+        context     => q{Template for displaying My Sales},
+    },
+
+    'my sales template help' => {
+        message     => q{Template to render the screen where vendor sales are displayed.},
+        lastUpdated => 0,
+        context     => q{hoverhelp for settings},
+    },
+
+    'Payout Totals' => {
+        message     => q{Payout Totals},
+        lastUpdated => 0,
+        context     => q{Similar to Total amount paid.},
+    },
+
+    'Paid' => {
+        message     => q{Paid},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Scheduled for payment' => {
+        message     => q{Scheduled for payment},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Not yet scheduled' => {
+        message     => q{Not yet scheduled},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Product' => {
+        message     => q{Product},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Products' => {
+        message     => q{Products},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
+    'Payout' => {
+        message     => q{Payout},
+        lastUpdated => 0,
+        context     => q{},
+    },
+
 };
 
 1;

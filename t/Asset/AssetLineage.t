@@ -30,6 +30,7 @@ is($asset->formatRank(76), "000076", "formatRank()");
 is($asset->getLineageLength(), (length($asset->get("lineage")) / 6), "getLineageLength()");
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($versionTag);
 $versionTag->set({name=>"AssetLineage Test"});
 
 my $root = WebGUI::Asset->getRoot($session);
@@ -183,12 +184,12 @@ is(
 #
 ####################################################
 
-#diag $snippets[0]->get('lineage');
-#diag $snippet2->get('lineage');
+#note $snippets[0]->get('lineage');
+#note $snippet2->get('lineage');
 ##Uncomment me to crash the test
 #$snippet2->cascadeLineage($snippets[0]->get('lineage'));
-#diag $snippets[0]->get('lineage');
-#diag $snippet2->get('lineage');
+#note $snippets[0]->get('lineage');
+#note $snippet2->get('lineage');
 
 ####################################################
 #
@@ -501,6 +502,7 @@ cmp_bag(
 
 my $vTag2 = WebGUI::VersionTag->getWorking($session);
 $vTag2->set({name=>"deep addChild test"});
+WebGUI::Test->tagsToRollback($vTag2);
 
 WebGUI::Test->interceptLogging();
 
@@ -525,11 +527,4 @@ TODO: {
     local $TODO = "Tests to make later";
     ok(0, 'addChild');
     ok(0, 'getLineage coverage tests');
-}
-
-
-END {
-    foreach my $tag ($versionTag, $vTag2) {
-        $tag->rollback;
-    }
 }

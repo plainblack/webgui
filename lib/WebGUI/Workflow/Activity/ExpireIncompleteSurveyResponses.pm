@@ -20,6 +20,7 @@ use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset;
 use WebGUI::DateTime;
 use DateTime::Duration;
+use WebGUI::Mail::Send;
 
 =head1 NAME
 
@@ -44,7 +45,7 @@ These methods are available from this class:
 
 =head2 definition ( session, definition )
 
-See WebGUI::Workflow::Activity::defintion() for details.
+See WebGUI::Workflow::Activity::definition() for details.
 
 =cut 
 
@@ -106,20 +107,19 @@ sub execute {
 	my $self = shift;
     my $session = $self->session;
 
-    my $sql = "select r.Survey_responseId, r.username, r.userId, upd.email,upd.firstName,upd.lastName, r.startDate, s.timeLimit, ad.title, ad.url  
-                from Survey s, Survey_response r, assetData ad, userProfileData upd
-                where r.isComplete = 0 and s.timeLimit > 0 and (unix_timestamp() - r.startDate) > (s.timeLimit * 60) 
-                    and r.assetId = s.assetId and s.revisionDate = (select max(revisionDate) from Survey where assetId = s.assetId)
-                    and ad.assetId = s.assetId and ad.revisionDate = s.revisionDate and upd.userId = r.userId"; 
-    my $refs = $self->session->db->buildArrayRefOfHashRefs($sql);
+    my $refs = $self->session->db->buildArrayRefOfHashRefs( $self->getSql );
     for my $ref (@{$refs}) {
-        if($self->get("deleteExpired") == 1){
+        if($self->get("deleteExpired")){
+            $session->log->debug("deleting response: $ref->{Survey_responseId} ");
             $self->session->db->write("delete from Survey_response where Survey_responseId = ?",[$ref->{Survey_responseId}]);
-        }else{#else sent to expired but not deleted
-            $self->session->db->write("update Survey_response set isComplete = 99 where Survey_responseId = ?",[$ref->{Survey_responseId}]);
+        }else{
+            # Mark response as expired (with appropriate completeCode)
+            my $completeCode = $ref->{doAfterTimeLimit} eq 'restartSurvey' ? 4 : 3;
+            $self->session->db->write("update Survey_response set isComplete = ?, endDate = ? where Survey_responseId = ?",
+                [$completeCode, scalar time, $ref->{Survey_responseId}]
+            );
         }
         if($self->get("emailUsers") == 1 && $ref->{email} =~ /\@/){
-
             my $var = { 
                     to  =>  $ref->{email},
                     from => $self->get("from"),
@@ -130,6 +130,8 @@ sub execute {
                     responseId => $ref->{Survey_responseId},
                     deleted => $self->get("deleteExpired"),
                     companyName => $self->session->setting->get("companyName"),
+                    username => $ref->{username},
+                    userId => $ref->{userId},
                 };
             my $template = WebGUI::Asset->newByDynamicClass($self->session,$self->get('emailTemplateId')); 
             my $message = $template->processTemplate($var, $self->get("emailTemplateId"));
@@ -147,6 +149,35 @@ sub execute {
 	return $self->COMPLETE;
 }
 
+=head2 getSql
+
+Returns the SQL used to look up incomplete survey responses.
+
+Factored out into a separate subroutine for the sake of testability.
+
+=cut
+
+sub getSql {
+
+    return <<END_SQL;
+select  
+    r.Survey_responseId, r.username, r.userId, r.startDate, 
+    upd.email, upd.firstName, upd.lastName, 
+    s.timeLimit, s.doAfterTimeLimit, 
+    ad.title, ad.url  
+from 
+    Survey_response r, Survey s, assetData ad, userProfileData upd
+where 
+    r.isComplete = 0 
+    and s.timeLimit > 0 
+    and ( unix_timestamp() - r.startDate ) > ( s.timeLimit * 60 ) 
+    and r.assetId = s.assetId 
+    and ad.assetId = s.assetId 
+    and ad.revisionDate = s.revisionDate 
+    and s.revisionDate = r.revisionDate
+    and upd.userId = r.userId
+END_SQL
+
+}
+
 1;
-
-

@@ -88,8 +88,8 @@ our $I18N = {
 	},
 
 	'property click discounts help' => {
-		message => q|Enter discounts one per line at the start of the line.  Extra text is ignored so you can add comments to the discounts.  Each discount consists of two numbers seperated by '@' with no spaces.  The first number is the percent discount(no decimal point) the second number is the number of items purchased.  So 5@1000 indicates a 5% discount for 1000 or more clicks purchased.|,
-		lastUpdated => 0,
+		message => q|Enter discounts one per line at the start of the line.  Extra text is ignored so you can add comments to the discounts.  Each discount consists of two numbers separated by '@' with no spaces.  The first number is the percent discount(no decimal point) the second number is the number of items purchased.  So 5@1000 indicates a 5% discount for 1000 or more clicks purchased.|,
+		lastUpdated => 1251410363,
 		context => q|Help text for the click discounts field.|
 	},
 
@@ -100,9 +100,9 @@ our $I18N = {
 	},
 
 	'property impression discounts help' => {
-		message => q|Enter discounts one per line at the start of the line.  Extra text is ignored so you can add comments to the discounts.  Each discount consists of two numbers seperated by '@' with no spaces.  The first number is the percent discount(no decimal point) the second number is the number of items purchased. So 5@1000 indicates a 5% discount for 1000 or more impressions purchased.|,
-		lastUpdated => 0,
-		context => q|Help text for the impresison discounts field.|
+		message => q|Enter discounts one per line at the start of the line.  Extra text is ignored so you can add comments to the discounts.  Each discount consists of two numbers separated by '@' with no spaces.  The first number is the percent discount(no decimal point) the second number is the number of items purchased. So 5@1000 indicates a 5% discount for 1000 or more impressions purchased.|,
+		lastUpdated => 1251410361,
+		context => q|Help text for the impression discounts field.|
 	},
 
 	'property adsku karma' => {
@@ -127,6 +127,18 @@ our $I18N = {
 		message => q|@ %f per impression|,
 		lastUpdated => 0,
 		context => q|%f is the price charged for each impression of the ad.|
+	},
+
+	'minimum impressions' => {
+		message => q|Must buy at least %d impressions|,
+		lastUpdated => 0,
+		context => q|%d is the number of impressions that must be bought.|
+	},
+
+	'minimum clicks' => {
+		message => q|Must buy at least %d clicks|,
+		lastUpdated => 0,
+		context => q|%d is the number of clicks that must be bought.|
 	},
 
 	'form manage title' => {
@@ -253,6 +265,174 @@ our $I18N = {
 		message => q|You must purchase at least %d impressions for this adSpace.|,
 		lastUpdated => 0,
 		context => q|Remind the user to that they must purchase a minimum number of impressions, use '%d' to indicate the minimum number of impressions.|
+	},
+
+	'view template title' => {
+		message => q|Ad Sales View Template.|,
+		lastUpdated => 0,
+		context => q|Help topic title.|
+	},
+
+	'formHeader' => {
+		message => q|HTML code to start the form to buy an Ad.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'formFooter' => {
+		message => q|HTML code to end the form to buy an Ad.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'formSubmit' => {
+		message => q|A button with internationalized label to submit the form.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'error_msg' => {
+		message => q|Any errors from submitting the form.  Multiple errors will be joined by break tags.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'hasAddedToCart' => {
+		message => q|A boolean which is true when the user has just bought an Ad.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'continueShoppingUrl' => {
+		message => q|The URL back to the normal view screen of the Ad Sales asset.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'manageLink' => {
+		message => q|The URL to the screen that lists all Ads bought by the current user.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'adSkuTitle' => {
+		message => q|The title of this Asset.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'adSkuDescription' => {
+		message => q|The description of this Asset.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'formTitle' => {
+		message => q|Form for the user to input the title of the Ad.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'formLink' => {
+		message => q|Form for the user to input the URL the Ad will link to.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'formImage' => {
+		message => q|Form for the user to upload an image for the Ad.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'formClicks' => {
+		message => q|Form for the user to enter the number of clicks they want to buy.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'formImpressions' => {
+		message => q|Form for the user to enter the number of impressions they want to buy.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'formAdId' => {
+		message => q|Hidden form element containing the unique identifier for the Ad.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'clickPrice' => {
+		message => q|The price for each click.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'impressionPrice' => {
+		message => q|The price for each impression.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'clickDiscount' => {
+		message => q|Shows what discounts are available for buying lots of clicks.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'impressionDiscount' => {
+		message => q|Shows what discounts are available for buying lots of impressions.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'minimumClicks' => {
+		message => q|Shows the minimum number of clicks that must be bought.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'minimumImpressions' => {
+		message => q|Shows the minimum number of impressions that must be bought.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'manage template title' => {
+		message => q|Ad Sales Manage Template.|,
+		lastUpdated => 0,
+		context => q|Help topic title.|
+	},
+
+	'myAds' => {
+		message => q|A loop containing information about all ads bought by the current user.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'rowTitle' => {
+		message => q|The title of an Ad.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'rowClicks' => {
+		message => q|The number of clicks bought for this Ad, and the number of clicks used so far.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'rowImpressions' => {
+		message => q|The number of impressions bought for this Ad, and the number of impressions used so far.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
+	},
+
+	'rowRenewLink' => {
+		message => q|A link to take the user to a screen where they can purchase additional clicks, impressions and edit their Ad.|,
+		lastUpdated => 0,
+		context => q|Template variable.|
 	},
 
 #	'TODO' => {

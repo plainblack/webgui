@@ -185,19 +185,14 @@ sub getEditForm {
 	return $tabform;
 }
 
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------
 
-=head2 getStorageClass
+=head2 getThumbnailUrl 
 
-Returns the class name of the WebGUI::Storage we should use for this asset.
+Returns the URL to the thumbnail of the image stored in the Asset.
 
 =cut
 
-sub getStorageClass {
-    return 'WebGUI::Storage';
-}
-
-#-------------------------------------------------------------------
 sub getThumbnailUrl {
 	my $self = shift;
 	return $self->getStorageLocation->getThumbnailUrl($self->get("filename"));
@@ -219,21 +214,12 @@ sub getToolbar {
 
 #-------------------------------------------------------------------
 
-=head2 prepareView ( )
+=head2 view 
 
-See WebGUI::Asset::prepareView() for details.
+Renders this asset.
 
 =cut
 
-sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
-}
-
-#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
@@ -282,6 +268,14 @@ sub setFile {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_edit 
+
+Override the master class to add image editing controls to the edit screen.
+Also adds the Image template form variable.
+
+=cut
+
 sub www_edit {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -303,6 +297,14 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_undo 
+
+Rolls back the last revision of this asset, undoing any work that may
+have been done to it.
+
+=cut
+
 sub www_undo {
     my $self = shift;
     my $previous = (@{$self->getRevisions()})[1];
@@ -331,6 +333,12 @@ sub www_undo {
 # The revision system doesn't support the blobs, it seems.
 # All of the image operations will have to be updated to support annotations.
 #
+
+=head2 www_annotate 
+
+Allow the user to place some text on their image.  This is done via JS and tooltips
+
+=cut
 
 sub www_annotate {
     my $self = shift;
@@ -421,6 +429,19 @@ sub www_annotate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 annotate_js ($opts)
+
+Returns some javascript and other supporting text.
+
+=head3 $opts
+
+A hash reference of options
+
+=head4 just_image
+
+=cut
+
 sub annotate_js {
     my $self = shift;
     my $opts = shift;
@@ -494,7 +515,6 @@ sub annotate_js {
 
         # next if 3 == $i;
 
-        warn('next');
         $domMe .= qq(
                 <style type="text/css">
                     div#tooltip$i { position: absolute; border:1px solid; }
@@ -532,11 +552,20 @@ sub annotate_js {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_rotate 
+
+Displays a form to the user to rotate their image.  If the C<Rotate> form variable
+is true, does the rotation as well.
+
+Returns the user to the roate form.
+
+=cut
+
 sub www_rotate {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    # warn(sprintf("Rotate_formId: %s", $self->session->form->process("Rotate")));
 	if (defined $self->session->form->process("Rotate")) {
 		my $newSelf = $self->addRevision();
 		delete $newSelf->{_storageLocation};
@@ -580,6 +609,16 @@ sub www_rotate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_resize 
+
+Displays a form for the user to resize this image.  If either of the C<newWidth> or
+C<newHeight> form variables are true, also does the resizing.
+
+Returns the user to the resize form.
+
+=cut
+
 sub www_resize {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -673,16 +712,27 @@ sub www_resize {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_crop 
+
+Display a form that allows the user to Crop their images.  Also does the
+cropping if any of the C<Width>, C<Height>, C<Top> or C<Left> form
+variables are true.
+
+Returns the user to the cropping form.
+
+=cut
+
 sub www_crop {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
 
-	if ($self->session->form->process("Width") || $self->session->form->process("Height") 
+    if ($self->session->form->process("Width") || $self->session->form->process("Height") 
         || $self->session->form->process("Top") || $self->session->form->process("Left")) {
-            my $newSelf = $self->addRevision();
-            delete $newSelf->{_storageLocation};
-            $newSelf->getStorageLocation->crop(
+        my $newSelf = $self->addRevision();
+        delete $newSelf->{_storageLocation};
+        $newSelf->getStorageLocation->crop(
             $newSelf->get("filename"),
             $newSelf->session->form->process("Width"),
             $newSelf->session->form->process("Height"),
@@ -691,7 +741,7 @@ sub www_crop {
         );
 		$self = $newSelf;
 		$self->generateThumbnail;
-	}
+    }
 
 	my $filename = $self->get("filename");
 
@@ -778,21 +828,4 @@ sub www_crop {
     return $self->getAdminConsole->render($f->print.$image,$i18n->get("crop image"));
 }
 
-#-------------------------------------------------------------------
-# Use superclass method for now.
-sub www_view {
-	my $self = shift;
-	return($self->SUPER::www_view);
-}
-
-#sub www_view {
-#	my $self = shift;
-#	my $storage = $self->getStorageLocation;
-#	$self->session->http->setRedirect($storage->getUrl($self->get("filename")));
-#	$self->session->http->setStreamedFile($storage->getPath($self->get("filename")));
-#	return "1";
-#}
-
-
 1;
-
