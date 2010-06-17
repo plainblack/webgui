@@ -25,6 +25,7 @@ use MooseX::NonMoose;
 use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Paths;
+use WebGUI::Types;
 use Try::Tiny;
 
 extends 'Plack::Component';
@@ -48,18 +49,10 @@ These subroutines are available from this package:
 =cut
 
 has config  => (
-    is => 'rw',
-    isa => 'WebGUI::Config',
-);
-has site    => (
     is => 'ro',
-    isa => 'Str',
     required => 1,
-    trigger => sub {
-        my ($self, $site) = @_;
-        my $config = WebGUI::Config->new( $site );
-        $self->config($config);
-    },
+    isa => 'WebGUI::Type::Config',
+    coerce => 1,
 );
 
 =head2 call( $env )

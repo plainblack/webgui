@@ -45,6 +45,17 @@ Similarly, if an undef value is applied, it is coerced into an empty arrayref.
 
 =cut
 
+subtype 'WebGUI::Type::Config'
+    => as class_type('WebGUI::Config');
+
+coerce 'WebGUI::Type::Config'
+    => from Str
+    => via {
+        require WebGUI::Config;
+        WebGUI::Config->new($_)
+    }
+;
+
 subtype 'WebGUI::Type::JSONArray'
     => as 'ArrayRef'
 ;
