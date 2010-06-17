@@ -422,14 +422,14 @@ Subclass the method to remove the subscription group.
 
 =cut
 
-override purge => sub {
+around purge => sub {
+    my $orig    = shift;
     my $self    = shift;
     my $options = shift;
 
     my $group   = $self->getSubscriptionGroup();
     $group->delete if $group;
-
-    return super();
+    return $self->$orig($options, @_);
 };
 
 #----------------------------------------------------------------------------
