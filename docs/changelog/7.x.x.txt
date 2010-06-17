@@ -5,6 +5,7 @@
  - fixed #11560: Email footer hidden from Outlook users
  - fixed #11643: Account/Contributions: does not show archived content
  - fixed #11651: First Day of Week is a string...
+ - fixed #11656: Thingy: Select list fields are not sorted properly
 
 7.8.21
  - fixed #11597: manageTrash and newlines

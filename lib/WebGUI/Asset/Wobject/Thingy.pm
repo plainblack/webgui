@@ -1049,20 +1049,8 @@ sub getFormPlugin {
     eval { WebGUI::Pluggable::load($class) };
     if ($class->isa('WebGUI::Form::List')) {
         delete $param{size};
-
         my $values = WebGUI::Operation::Shared::secureEval($session,$data->{possibleValues});
-        if (ref $values eq 'HASH') {
-            $param{options} = $values;
-        }
-        else{
-            my %options;
-            tie %options, 'Tie::IxHash';
-            foreach (split(/\n/x, $data->{possibleValues})) {
-                s/\s+$//x; # remove trailing spaces
-                    $options{$_} = $_;
-            }
-            $param{options} = \%options;
-        }
+        $param{options} = $values;
     }
 
     if ($data->{fieldType} eq "YesNo") {
