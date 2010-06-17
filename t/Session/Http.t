@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
- 
+
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
@@ -24,7 +24,7 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 
 plan tests => 57;
- 
+
 my $session = WebGUI::Test->session;
 
 my $http = $session->http;
@@ -155,10 +155,6 @@ $http->setCacheControl(undef);
 #
 ####################################################
 
-##Let's make a "request object" :)
-my $request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
-
 $session->request->uri('/here/later');
 
 $http->setRedirect('/here/now');
@@ -177,7 +173,7 @@ my $expectedMetas = [
 ];
 cmp_bag(\@metas, $expectedMetas, 'setRedirect:sets meta tags in the style object');
 
-$request->uri('/here/now');
+$session->request->uri('/here/now');
 $session->url->{_requestedUrl} = '';
 my $sessionAsset = $session->asset;
 $session->{_asset} = WebGUI::Asset->getDefault($session);
@@ -185,7 +181,7 @@ my $defaultAssetUrl = $session->asset->getUrl;
 
 is($http->setRedirect($defaultAssetUrl), undef, 'setRedirect: returns undef if returning to self and no params');
 
-$request->setup_body({ param1 => 'value1' });
+$session->request->setup_body({ param1 => 'value1' });
 isnt($http->setRedirect('/here/now'), undef, 'setRedirect: does not return undef if returning to self but there are params');
 
 $session->{_asset} = $sessionAsset;
@@ -216,14 +212,22 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
 #
 ####################################################
 
-##Clear request object to run a new set of requests
-$request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
+{
+    ##A new, clean session
+    my $session = WebGUI::Test->newSession('nocleanup');
+    my $guard   = WebGUI::Test->cleanupGuard($session);
 
-$http->setRedirect('/here/there');
-$http->sendHeader;
-is($request->status, 302, 'sendHeader as redirect: status set to 301');
-is_deeply($request->headers_out->fetch, {'Location' => '/here/there'}, 'sendHeader as redirect: location set');
+    $session->http->setRedirect('/here/there');
+    $session->http->sendHeader;
+    is($session->response->status, 302, 'sendHeader as redirect: status set to 301');
+    cmp_deeply(
+        headers_out($session->response->headers),
+        {
+            'Location' => '/here/there',
+        },
+        '... location set'
+    );
+}
 
 ####################################################
 #
@@ -231,24 +235,40 @@ is_deeply($request->headers_out->fetch, {'Location' => '/here/there'}, 'sendHead
 #
 ####################################################
 
-##Clear request object to run a new set of requests
-$request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
-$http->setStatus(200, 'Just spiffy');
-$http->setMimeType('');
-$http->setLastModified(1200);
-$http->setNoHeader(0);
+{
 
-$http->sendHeader();
-is($request->status, 200, 'sendHeader: status set');
-is($request->status_line, '200 Just spiffy', 'sendHeader: status_line set');
-is($request->content_type, 'text/html; charset=UTF-8', 'sendHeader: default mimetype');
-is($request->no_cache, undef, 'sendHeader: no_cache undefined');
-my $expected_headers = {
-    'Last-Modified' => $session->datetime->epochToHttp(1200),
-    'Cache-Control' => 'must-revalidate, max-age=1',
-};
-cmp_deeply($request->headers_out->fetch, $expected_headers, 'sendHeader: normal headers');
+    ##A new, clean session
+    my $session  = WebGUI::Test->newSession('nocleanup');
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    my $http     = $session->http;
+    my $response = $session->response;
+    $http->setStatus(200, 'Just spiffy');
+    $http->setMimeType('');
+    $session->request->protocol('');
+    $http->setLastModified(1200);
+
+    $http->sendHeader();
+    is($response->status, 200, 'sendHeader: status set');
+    my $can_status_line = ok($response->can('status_line'), 'response can set a status line');
+    SKIP: {
+        skip 'no status_line method in Plack::Response', 1 unless $can_status_line;
+        is($response->status_line, '200 Just spiffy', '... status_line set');
+    }
+    cmp_deeply(
+        [ $response->content_type ],
+        [ 'text/html', 'charset=UTF-8']
+        , '... default mimetype'
+    );
+    cmp_deeply(
+        headers_out($response->headers),
+        {
+           'Last-Modified' => $session->datetime->epochToHttp(1200),
+           'Cache-Control' => 'must-revalidate, max-age=1',
+           'Content-Type'  => 'text/html; charset=UTF-8',
+        },
+        '... normal headers'
+    );
+}
 
 ####################################################
 #
@@ -256,74 +276,91 @@ cmp_deeply($request->headers_out->fetch, $expected_headers, 'sendHeader: normal 
 #
 ####################################################
 
-$http->setNoHeader(0);
-$http->setFilename('image.png');
-$http->setMimeType('image/png');
-$request->protocol('HTTP 1.1');
-$http->sendHeader();
-is($request->content_type, 'image/png', 'sendHeader: mimetype');
-is_deeply(
-	$request->headers_out->fetch,
-	{
-		'Last-Modified' => $session->datetime->epochToHttp(1200),
-		'Content-Disposition' => q!attachment; filename="image.png"!,
-        'Cache-Control' => 'must-revalidate, max-age=1',
-	},
-	'sendHeader: normal headers'
-);
-
+{
+    ##A new, clean session
+    my $session  = WebGUI::Test->newSession('nocleanup', { SERVER_PROTOCOL => 'HTTP 1.1', });
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    my $http     = $session->http;
+    my $response = $session->response;
+    $http->setFilename('image.png');
+    $http->setMimeType('image/png');
+    $http->sendHeader();
+    is($response->headers->content_type, 'image/png', 'sendHeader: mimetype');
+    cmp_deeply(
+        headers_out($response->headers),
+        {
+            'Last-Modified'       => $session->datetime->epochToHttp(time()),
+            'Content-Disposition' => q!attachment; filename="image.png"!,
+            'Content-Type'        => 'image/png',
+            'Cache-Control'       => 'must-revalidate, max-age=1'
+        },
+        '... normal headers'
+    );
+}
 ####################################################
 #
 # sendHeader, old HTTP protocol
 #
 ####################################################
-$request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
+{
+    ##A new, clean session
+    my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
+    $http_request->protocol('HTTP/1.0');
+    my $session  = WebGUI::Test->newSession('nocleanup', $http_request);
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    my $http     = $session->http;
+    my $response = $session->response;
+    my $time = $session->datetime->epochToHttp(time());
+    $http->sendHeader();
+    my $headers       = headers_out($response->headers);
+    my $expire_header = $headers->{Expires};
+    my $delta = deltaHttpTimes($session->datetime->epochToHttp(), $expire_header);
+    cmp_ok($delta->seconds, '<=', 1, 'sendHeader, old HTTP protocol: adds extra cache header field');
+    cmp_deeply(
+        $headers,
+        {
+            'Last-Modified' => ignore(),
+            'Cache-Control' => 'must-revalidate, max-age=1',
+            'Content-Type'  => 'text/html; charset=UTF-8',
+            'Expires'       => ignore(),
+        },
+        '... checking headers'
+    );
 
-$http->setNoHeader(0);
-$http->setFilename('');
-$request->protocol('HTTP 1.0');
-$http->sendHeader();
-my $headers_out = $request->headers_out->fetch;
-my $expire_header = delete $headers_out->{Expires};
-my $delta = deltaHttpTimes($session->datetime->epochToHttp(), $expire_header);
-cmp_ok($delta->seconds, '<=', 1, 'sendHeader, old HTTP protocol: adds extra cache header field');
-is_deeply(
-	$request->headers_out->fetch,
-	{
-		'Last-Modified' => $session->datetime->epochToHttp(1200),
-        'Cache-Control' => 'must-revalidate, max-age=1',
-	},
-	'sendHeader: normal headers'
-);
+}
 
 ####################################################
 #
 # sendHeader, old HTTP protocol, cacheControl set to 500
 #
 ####################################################
-$request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
 
-$http->setNoHeader(0);
-$http->setFilename('');
-$request->protocol('HTTP 1.0');
-$http->setCacheControl(500);
-$http->sendHeader();
-$headers_out = $request->headers_out->fetch;
-$expire_header = delete $headers_out->{Expires};
-$delta = deltaHttpTimes($session->datetime->epochToHttp(time+500), $expire_header);
-cmp_ok($delta->seconds, '<=', 2, 'sendHeader, old HTTP protocol, cacheControl=500: adds extra cache header field');
-is_deeply(
-	$request->headers_out->fetch,
-	{
-		'Last-Modified' => $session->datetime->epochToHttp(1200),
-        'Cache-Control' => 'must-revalidate, max-age=500',
-	},
-	'sendHeader: normal headers'
-);
+{
+    ##A new, clean session
+    my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
+    $http_request->protocol('HTTP/1.0');
+    my $session  = WebGUI::Test->newSession('nocleanup', $http_request);
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    my $http     = $session->http;
+    my $response = $session->response;
+    $http->setCacheControl(500);
+    $http->sendHeader();
+    my $headers       = headers_out($response->headers);
+    my $expire_header = $headers->{Expires};
+    my $delta = deltaHttpTimes($session->datetime->epochToHttp(time+500), $expire_header);
+    cmp_ok($delta->seconds, '<=', 2, 'sendHeader, old HTTP protocol, cacheControl=500: adds extra cache header field');
+    cmp_deeply(
+        $headers,
+        {
+            'Last-Modified' => ignore(),
+            'Cache-Control' => 'must-revalidate, max-age=500',
+            'Content-Type'  => 'text/html; charset=UTF-8',
+            'Expires'       => ignore(),
+        },
+        '... checking headers'
+    );
 
-
+}
 
 ####################################################
 #
@@ -332,24 +369,28 @@ is_deeply(
 ####################################################
 
 ##Clear request object to run a new set of requests
-$request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
-$http->setFilename('');
-$http->setNoHeader(0);
+{
+    ##A new, clean session
+    my $session  = WebGUI::Test->newSession('nocleanup');
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    my $http     = $session->http;
+    my $response = $session->response;
 
-$session->setting->set('preventProxyCache', 1);
+    $session->setting->set('preventProxyCache', 1);
 
-$http->sendHeader();
-is($request->no_cache, 1, 'sendHeader: no_cache set when preventProxyCache set');
-is_deeply(
-	$request->headers_out->fetch,
-	{
-        'Cache-Control' => 'private, max-age=1',
-	},
-	'sendHeader: Cache-Control setting when preventProxyCache set'
-);
+    $http->sendHeader();
+    cmp_deeply(
+        headers_out($response->headers),
+        {
+            'Content-Type'  => 'text/html; charset=UTF-8',
+            'Cache-Control' => 'private, max-age=1, no-cache',
+            'Pragma'        => 'no-cache',
+        },
+        'sendHeader: Cache-Control setting when preventProxyCache set'
+    );
 
-$session->setting->set('preventProxyCache', 0);
+    $session->setting->set('preventProxyCache', 0);
+}
 
 ####################################################
 #
@@ -357,22 +398,24 @@ $session->setting->set('preventProxyCache', 0);
 #
 ####################################################
 
-##Clear request object to run a new set of requests
-$request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
-$http->setFilename('');
-$http->setNoHeader(0);
-$http->setCacheControl('none');
-
-$http->sendHeader();
-is($request->no_cache, 1, 'sendHeader: no_cache set when preventProxyCache set');
-is_deeply(
-	$request->headers_out->fetch,
-	{
-        'Cache-Control' => 'private, max-age=1',
-	},
-	'sendHeader: Cache-Control setting when preventProxyCache set'
-);
+{
+    ##A new, clean session
+    my $session  = WebGUI::Test->newSession('nocleanup');
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    my $http     = $session->http;
+    my $response = $session->response;
+    $http->setCacheControl('none');
+    $http->sendHeader();
+    cmp_deeply(
+        headers_out($response->headers),
+        {
+            'Cache-Control' => 'private, max-age=1, no-cache',
+            'Content-Type'  => 'text/html; charset=UTF-8',
+            'Pragma'        => 'no-cache',
+        },
+        'sendHeader: Cache-Control setting when cacheControl="none"'
+    );
+}
 
 ####################################################
 #
@@ -380,24 +423,26 @@ is_deeply(
 #
 ####################################################
 
-##Clear request object to run a new set of requests
-$request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
-$http->setFilename('');
-$http->setNoHeader(0);
-$session->user({userId => 3});
+{
+    ##A new, clean session
+    my $session  = WebGUI::Test->newSession('nocleanup');
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    my $http     = $session->http;
+    my $response = $session->response;
+    $session->user({userId => 3});
 
-$http->sendHeader();
-is($request->no_cache, 1, 'sendHeader: no_cache set when preventProxyCache set');
-is_deeply(
-	$request->headers_out->fetch,
-	{
-        'Cache-Control' => 'private, max-age=1',
-	},
-	'sendHeader: Cache-Control setting when preventProxyCache set'
-);
+    $http->sendHeader();
+    cmp_deeply(
+        headers_out($response->headers),
+        {
+            'Cache-Control' => 'private, max-age=1, no-cache',
+            'Content-Type'  => 'text/html; charset=UTF-8',
+            'Pragma'        => 'no-cache',
+        },
+        'sendHeader: Cache-Control setting when user is not Visitor'
+    );
 
-$session->user({userId => 1});
+}
 
 ####################################################
 #
@@ -405,21 +450,39 @@ $session->user({userId => 1});
 #
 ####################################################
 ##Clear request object to run a new set of requests
-$request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
-$request->headers_in->{'If-Modified-Since'} = '';
-ok $session->http->ifModifiedSince(0), 'ifModifiedSince: empty header always returns true';
 
-$request->headers_in->{'If-Modified-Since'} = $session->datetime->epochToHttp(WebGUI::Test->webguiBirthday);
-ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday + 5), '... epoch check, true';
-ok !$session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5), '... epoch check, false';
-ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5, 3600), '... epoch check, made true by maxCacheTimeout';
+{
+    ##A new, clean session
+    my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
+    $http_request->header('If-Modified-Since' => '');
+    my $session  = WebGUI::Test->newSession('nocleanup', $http_request);
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    ok $session->http->ifModifiedSince(0), 'ifModifiedSince: empty header always returns true';
+
+}
+
+{
+    my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
+    $http_request->header('If-Modified-Since' => $session->datetime->epochToHttp(WebGUI::Test->webguiBirthday));
+    my $session  = WebGUI::Test->newSession('nocleanup', $http_request);
+    my $guard    = WebGUI::Test->cleanupGuard($session);
+    ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday + 5), '... epoch check, true';
+    ok !$session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5), '... epoch check, false';
+    ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5, 3600), '... epoch check, made true by maxCacheTimeout';
+}
 
 ####################################################
 #
 # Utility functions
 #
 ####################################################
+
+=head2 fetchMultipleMetas ($text)
+
+Parse a piece of text as HTML, and extract out all the meta tags from it.  Returns the meta
+tags as a list.
+
+=cut
 
 sub fetchMultipleMetas {
 	my ($text) = @_;
@@ -435,10 +498,32 @@ sub fetchMultipleMetas {
 	return @metas;
 }
 
+=head2 deltaHttpTimes ($http1, $http2)
+
+Takes two dates in HTTP format, and returns $http1 - $http2
+
+=cut
+
 sub deltaHttpTimes {
 	my ($http1, $http2) = @_;
 	my $httpParser = DateTime::Format::Strptime->new(pattern =>'%a, %d %b %Y %H:%M:%S', time_zone => 'GMT');
 	my $dt1 = $httpParser->parse_datetime($http1);
 	my $dt2 = $httpParser->parse_datetime($http2);
 	my $delta_time = $dt1-$dt2;
+}
+
+=head2 headers_out ($header_object)
+
+Returns an array reference of HTTP headers, as hashrefs, from a HTTP::Headers object, to make comparison with
+Test::Deep easier.
+
+=cut
+
+sub headers_out {
+	my ($head_obj) = @_;
+    my $headers = {};
+    foreach my $field_name ($head_obj->header_field_names) {
+        $headers->{$field_name} = $head_obj->header($field_name);
+    }
+    return $headers;
 }

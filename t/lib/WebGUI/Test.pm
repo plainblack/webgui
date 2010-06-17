@@ -181,6 +181,16 @@ sub newSession {
     return $session;
 }
 
+=head2 newEnv
+
+This method works either as a object method, or as a standalone subroutine.
+
+=head3 form
+
+Something that could be a HTTP::Request object.
+
+=cut
+
 sub newEnv {
     shift
         if eval { $_[0]->isa($CLASS) };
