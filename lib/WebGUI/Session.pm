@@ -299,7 +299,6 @@ sub duplicate {
     my $newSession = WebGUI::Session->open(
         $self->config,
         undef,
-        undef,
         $self->getId,
     );
     return $newSession;
