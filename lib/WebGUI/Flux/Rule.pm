@@ -844,8 +844,8 @@ sub _updateDataAndTriggerWorkflows {
                 $self->session,
                 {   workflowId => $workflowId,
                     methodName => "new",
-                    className  => "WebGUI::User",
-                    parameters => $user_id,
+                    className  => "WebGUI::Workflow::Instance::GenericObject",
+                    parameters => { userId => $user_id, fluxRuleId => $self->getId() },
                 }
                 )->start( !$ENV{FLUX_REALTIME_WORKFLOWS} );
 
