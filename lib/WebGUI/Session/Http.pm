@@ -313,7 +313,7 @@ sub sendHeader {
 			}
   		}
 		if ($self->getFilename) {
-            $response->headers( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
+            $response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
 		}
 		$response->status($self->getStatus());
 #		$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
