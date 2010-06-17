@@ -584,14 +584,12 @@ you wish to appear, one per line. <br />
 <br />If you want a different label for a value, the possible values list has to be
 formatted as follows:
 <pre>
-&#123;
-   "key1"=>"value1",
-   "key2"=>"value2",
-   "key3"=>"value3"
+   key1|value1
+   key2|value2
+   key3|value3
    ...
-&#125;
 </pre>
-Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/value pairs},
+Simply replace "key1"/"value1" with your own name/value pairs},
         lastUpdated => 1223372150,
     },
 
