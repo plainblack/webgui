@@ -19,7 +19,7 @@ use WebGUI::User;
 
 use Test::More;
 
-plan tests => 4; # increment this value for each test you create
+plan tests => 5; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -35,6 +35,11 @@ is($userId, $user->userId, 'changing session user changes sessionId inside userS
 $session->user({userId => 3});
 is($session->user->userId,  3, 'Set session user to Admin, check userId==3');
 is($session->user->profileField('uiLevel'), 9, 'Set session user to Admin, check uiLevel==9');
+
+my $dupe = $session->duplicate;
+WebGUI::Test->addToCleanup($dupe);
+
+is $session->getId, $dupe->getId, 'duplicated session has the same sessionId';
 
 ################################################################
 #
