@@ -28,8 +28,6 @@ my $session = WebGUI::Test->session;
 
 my $style = $session->style;
 
-my $crappyPerl = $^V lt v5.8;
-
 isa_ok($style, 'WebGUI::Session::Style', 'session has correct object type');
 
 ####################################################
@@ -451,16 +449,10 @@ sub fetchMultipleMetas {
 sub sendImmediate {
 	my ($style, $action, $output, $comment) = @_;
 
-	SKIP: {
-		skip "You have an old perl", 1 if $crappyPerl;
-        my $request = $style->session->request;
-        $request->clear_output;
-		$style->sent(1);
-		$style->$action($output);
-		like($request->get_output, qr/$output/, $comment);
-		$style->sent(0);
-	}
-
+    $style->sent(1);
+    $style->$action($output);
+    like($style->session->response->body->[-1], qr/$output/, $comment);
+    $style->sent(0);
 }
 
 #like($buffer, qr/$output/, );
@@ -555,11 +547,6 @@ sub setup_assets {
 	};
 	my $snippet = $daddySnippet->addChild($properties, $properties->{id});
 	$versionTag->commit;
+    WebGUI::Test->addToCleanup($versionTag);
 	return ($versionTag, $templates, $asset, $snippet);
-}
-
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
 }
