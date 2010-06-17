@@ -45,7 +45,7 @@ my $fatal_app = builder {
 test_psgi $regular_app, sub {
     my $cb  = shift;
     my $res = $cb->( GET "/" );
-    like $res->content, qr/My Company/;
+    like $res->content, qr/My Company/, 'testing regular app';
 };
 
 # N.B. The die() is caught thanks to WebGUI::Middleware::HTTPExceptions, 
@@ -53,24 +53,24 @@ test_psgi $regular_app, sub {
 test_psgi $generic_dead_app, sub {
     my $cb  = shift;
     my $res = $cb->( GET "/" );
-    is $res->code, 500;
-    is $res->content, 'Internal Server Error';
+    is $res->code, 500, 'generic dead app, status code';
+    is $res->content, 'Internal Server Error', '... status description';
 };
 
 test_psgi $specific_dead_app, sub {
     my $cb  = shift;
     my $res = $cb->( GET "/" );
-    is $res->code, 501;
-    is $res->content, 'Not Implemented'; # how apt
+    is $res->code, 501, 'specific dead app, status code';
+    is $res->content, 'Not Implemented', '... status description'; # how apt
 };
 
 test_psgi $fatal_app, sub {
     my $cb  = shift;
     my $res = $cb->( GET "/" );
-    is $res->code, 500;
+    is $res->code, 500, 'fatal app, status code';
     
     # WebGUI doesn't know who you are, so it displays the generic error page
-    like $res->content, qr/Problem With Request/;
+    like $res->content, qr/Problem With Request/, '... status description';
 };
 
 test_psgi $fatal_app, sub {
@@ -78,9 +78,9 @@ test_psgi $fatal_app, sub {
     
     local *WebGUI::Session::ErrorHandler::canShowDebug = sub {1};
     my $res = $cb->( GET "/" );
-    is $res->code, 500;
+    is $res->code, 500, 'generic dead app, debug, status code';
     
     # We canShowDebug, so WebGUI gives us more info
-    like $res->content, qr/Fatally yours/;
+    like $res->content, qr/Fatally yours/, '... status description';
 };
 
