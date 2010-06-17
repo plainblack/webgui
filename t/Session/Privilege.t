@@ -23,46 +23,40 @@ my @simpleTests = (
 	{
 		method => 'adminOnly',
 		status => 401,
-		description => 'Admin Only',
 		titleCode => 35,
 	},
 	{
 		method => 'insufficient',
 		status => 401,
-		description => 'Insufficient Privileges',
 		titleCode => 37,
 	},
 	{
 		method => 'locked',
 		status => 401,
-		description => 'Insufficient Privileges',
 		titleCode => 37,
 	},
 	{
 		method => 'notMember',
 		status => 400,
-		description => 'Not A Member',
 		titleCode => 345,
 	},
 	{
 		method => 'vitalComponent',
 		status => 403,
-		description => 'Vital Component',
 		titleCode => 40,
 	},
 	{
 		method => 'noAccess',
 		status => 401,
-		description => 'No Access',
 		titleCode => 37,
 	},
 
 );
 
 my $num_tests = 1;
-$num_tests += 4 * scalar @simpleTests; ##For each simple privilege validation
-$num_tests += 3; ##For noAccess as Visitor tests
-$num_tests += 4; ##For insufficient with noStyle=1
+$num_tests += 3 * scalar @simpleTests; ##For each simple privilege validation
+$num_tests += 2; ##For noAccess as Visitor tests
+$num_tests += 3; ##For insufficient with noStyle=1
 
 plan tests => $num_tests;
  
@@ -91,7 +85,6 @@ foreach my $test (@simpleTests) {
 	my $method = $test->{method};
 	my $output = $privilege->$method;
 	is($session->http->getStatus(), $test->{status}, "$method: status code");
-	is($session->http->getStatusDescription(), $test->{description}, "$method: description");
 	my $title = $i18n->get($test->{titleCode});
 	like($output, qr{<h1>$title</h1>}, "$method: correct title");
 	like($output, qr{^USERSTYLE}, "$method: renders in WebGUI User Style");
@@ -106,7 +99,6 @@ foreach my $test (@simpleTests) {
 
 my $output = $privilege->insufficient(1);
 is($session->http->getStatus(), '401', 'insufficient: status code with Visitor');
-is($session->http->getStatusDescription(), 'Insufficient Privileges', 'insufficient: description with Visitor');
 my $title = $i18n->get(37);
 unlike($output, qr{^USERSTYLE}, "insufficient: when noStyle is true the user style is not used");
 like($output, qr{<h1>$title</h1>}, "insufficient: when noStyle is true the title is still okay");
@@ -121,7 +113,6 @@ $session->user({userId=>1});
 
 my $output = $privilege->noAccess;
 is($session->http->getStatus(), '401', 'noAccess: status code with Visitor');
-is($session->http->getStatusDescription(), 'No Access', 'noAccess: description with Visitor');
 ##Is the auth screen returned, not validating the auth screen
 is($output, WebGUI::Operation::Auth::www_auth($session, "init"), 'noAccess: visitor sees auth screen');
 
