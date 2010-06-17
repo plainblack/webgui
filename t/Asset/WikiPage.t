@@ -26,20 +26,23 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster', title => 'Wiki Test', url => 'wikitest'});
 my @autoCommitCoda = (undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 $versionTag->commit;
+my $wiki = $wiki->cloneFromDb;
 my $wikipage = $wiki->addChild(
-    {className=>'WebGUI::Asset::WikiPage'},
+    {className=>'WebGUI::Asset::WikiPage',
+     title    =>'wikipage'},
     @autoCommitCoda,
 );
 
 # Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
 my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
 $secondVersionTag->commit;
-addToCleanup($secondVersionTag );
+WebGUI::Test->addToCleanup($secondVersionTag );
+my $wikipage = $wikipage->cloneFromDb;
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');
@@ -51,6 +54,8 @@ is($article, undef, "Can't add an Article wobject as a child to a Wiki Page.");
 
 # See if the duplicate method works
 my $wikiPageCopy = $wikipage->duplicate();
+$wikiPageCopy    = $wikiPageCopy->cloneFromDb;
+$wikiPageCopy->update({ title => 'wikipage copy', });
 isa_ok($wikiPageCopy, 'WebGUI::Asset::WikiPage');
 my $thirdVersionTag = WebGUI::VersionTag->new($session,$wikiPageCopy->get("tagId"));
 WebGUI::Test->addToCleanup($thirdVersionTag);
@@ -143,3 +148,5 @@ cmp_deeply
     $templateVars->{keyword_page_loop},
     [ ],
     'empty keyword_page_loop, self is not put into the loop';
+
+#vim:ft=perl
