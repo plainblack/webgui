@@ -38,8 +38,6 @@ is($stow->get("Test1"), undef, "delete()");
 $stow->deleteAll;
 is($stow->get("Test2"), undef, "deleteAll()");
 
-WebGUI::Test->interceptLogging();
-
 is($session->stow->set('', 'null string'), undef, 'set returns undef when name is empty string');
 is($session->stow->set(0, 'zero'), undef, 'set returns undef when name is zero');
 

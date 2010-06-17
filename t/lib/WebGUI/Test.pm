@@ -235,42 +235,19 @@ mock the isDebug flag so that debug output is always generated.
 
 =cut
 
-my $origLogger;
-sub interceptLogging {
-    my $log = $CLASS->session->log;
-    $origLogger ||= $log->{_logger};
-    $log->{_logger} = sub {
-        my $info = shift;
-        my $level = $info->{level};
-        my $message = $info->{message};
-
-        if ($level eq 'warn') {
-            our $logger_warns = $message;
-        }
-        elsif ($level eq 'debug') {
-            our $logger_debug = $message;
-        }
-        elsif ($level eq 'info') {
-            our $logger_info = $message;
-        }
-        elsif ($level eq 'error') {
-            our $logger_error = $message;
-        }
+sub interceptLogging (&) {
+    shift
+        if eval { $_[0]->isa($CLASS) };
+    my $sub = shift;
+    my @logged;
+    my $last_logged = {};
+    local $CLASS->session->log->{'_logger'} = sub {
+        my $to_log = shift;
+        push @logged, $to_log;
+        $last_logged->{$to_log->{level}} = $to_log->{message};
     };
-}
-
-#----------------------------------------------------------------------------
-
-=head2 restoreLogging
-
-Restores's the logging object to its original state.
-
-=cut
-
-sub restoreLogging {
-    my $log = $CLASS->session->log;
-    $log->{_logger} = $origLogger;
-    undef $origLogger;
+    $sub->($last_logged);
+    return \@logged;
 }
 
 #----------------------------------------------------------------------------

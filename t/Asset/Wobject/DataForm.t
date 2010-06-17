@@ -54,17 +54,19 @@ plan tests => 4;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # _createForm
 
-WebGUI::Test->interceptLogging;
+WebGUI::Test->interceptLogging( sub {
+    my $log_data = shift;
 
-$df->_createForm(
-    {
-        name => 'test field',
-        type => 'MASSIVE FORM FAILURE',
-    },
-    'some value'
-);
+    $df->_createForm(
+        {
+            name => 'test field',
+            type => 'MASSIVE FORM FAILURE',
+        },
+        'some value'
+    );
 
-is($WebGUI::Test::logger_error, "Unable to load form control - MASSIVE FORM FAILURE", '_createForm logs when it cannot load a form type');
+    is($log_data->{error}, "Unable to load form control - MASSIVE FORM FAILURE", '_createForm logs when it cannot load a form type');
+});
 
 #----------------------------------------------------------------------------
 # getContentLastModified

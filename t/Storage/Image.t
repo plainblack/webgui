@@ -116,7 +116,8 @@ foreach my $extTest ( @{ $extensionTests } ) {
 #
 ####################################################
 
-WebGUI::Test->interceptLogging();
+WebGUI::Test->interceptLogging(sub {
+    my $log_data = shift;
 
 my $thumbStore = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($thumbStore);
@@ -124,9 +125,9 @@ my $square = WebGUI::Image->new($session, 500, 500);
 $square->setBackgroundColor('#FF0000');
 $square->saveToStorageLocation($thumbStore, 'square.png');
 is($thumbStore->generateThumbnail(), 0, 'generateThumbnail returns 0 if no filename is supplied');
-is($WebGUI::Test::logger_error, q/Can't generate a thumbnail when you haven't specified a file./, 'generateThumbnail logs an error message for not sending a filename');
+is($log_data->{error}, q/Can't generate a thumbnail when you haven't specified a file./, 'generateThumbnail logs an error message for not sending a filename');
 is($thumbStore->generateThumbnail('file.txt'), 0, 'generateThumbnail returns 0 if you try to thumbnail a non-image file');
-is($WebGUI::Test::logger_warns, q/Can't generate a thumbnail for something that's not an image./, 'generateThumbnail logs a warning message for thumbnailing a non-image file.');
+is($log_data->{warn}, q/Can't generate a thumbnail for something that's not an image./, 'generateThumbnail logs a warning message for thumbnailing a non-image file.');
 chmod 0, $thumbStore->getPath('square.png');
 
 SKIP: {
@@ -135,7 +136,7 @@ SKIP: {
     ok(! -r $thumbStore->getPath('square.png'), 'Made square.png not readable');
     is($thumbStore->generateThumbnail('square.png'), 0,
        'generateThumbnail returns 0 if there are errors reading the file');
-    like($WebGUI::Test::logger_error, qr/^Couldn't read image for thumbnail creation: (.+)$/,
+    like($log_data->{error}, qr/^Couldn't read image for thumbnail creation: (.+)$/,
          'generateThumbnail when it cannot read the file for thumbnailing');
     chmod oct(644), $thumbStore->getPath('square.png');
 }
@@ -155,13 +156,13 @@ cmp_bag([$thumbStore->getSizeInPixels('square.png')],       [500,500], 'getSizeI
 cmp_bag([$thumbStore->getSizeInPixels('thumb-square.png')], [50,50],   'getSizeInPixels on thumb');
 
 is($thumbStore->getSizeInPixels(), 0, 'getSizeInPixels returns only a zero if no file is sent');
-is($WebGUI::Test::logger_error, q/Can't check the size when you haven't specified a file./, 'getSizeInPixels logs an error message for not sending a filename');
+is($log_data->{error}, q/Can't check the size when you haven't specified a file./, 'getSizeInPixels logs an error message for not sending a filename');
 
 is($thumbStore->getSizeInPixels('noImage.txt'), 0, 'getSizeInPixels returns only a zero if sent a non-image file');
-is($WebGUI::Test::logger_error, q/Can't check the size of something that's not an image./, 'getSizeInPixels logs an error message for sending a non-image filename');
+is($log_data->{error}, q/Can't check the size of something that's not an image./, 'getSizeInPixels logs an error message for sending a non-image filename');
 
 is($thumbStore->getSizeInPixels('noImage.gif'), 0, 'getSizeInPixels returns only a zero if sent a file that does not exist');
-like($WebGUI::Test::logger_error, qr/^Couldn't read image to check the size of it./, 'getSizeInPixels logs an error message for reading a file that does not exist');
+like($log_data->{error}, qr/^Couldn't read image to check the size of it./, 'getSizeInPixels logs an error message for reading a file that does not exist');
 
 ####################################################
 #
@@ -203,10 +204,10 @@ is($imageCopy->deleteFile('../../'), undef, 'deleteFile in Storage::Image also r
 ####################################################
 
 is($thumbStore->getThumbnailUrl(), '', 'getThumbnailUrl returns undef if no file is sent');
-is($WebGUI::Test::logger_error, q/Can't find a thumbnail url without a filename./, 'getThumbnailUrl logs an error message for not sending a filename');
+is($log_data->{error}, q/Can't find a thumbnail url without a filename./, 'getThumbnailUrl logs an error message for not sending a filename');
 
 is($thumbStore->getThumbnailUrl('round.png'), '', 'getThumbnailUrl returns undef if the requested file is not in the storage location');
-is($WebGUI::Test::logger_error, q/Can't find a thumbnail for a file named 'round.png' that is not in my storage location./, 'getThumbnailUrl logs an error message for not sending a filename');
+is($log_data->{error}, q/Can't find a thumbnail for a file named 'round.png' that is not in my storage location./, 'getThumbnailUrl logs an error message for not sending a filename');
 
 is($thumbStore->getThumbnailUrl('square.png'), $thumbStore->getUrl('thumb-square.png'), 'getThumbnailUrl returns the correct url');
 
@@ -215,8 +216,6 @@ is($thumbStore->getThumbnailUrl('square.png'), $thumbStore->getUrl('thumb-square
 # adjustMaxImageSize
 #
 ####################################################
-
-my $origMaxImageSize = $session->setting->get('maxImageSize');
 
 my $sizeTest = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($sizeTest);
@@ -275,7 +274,7 @@ foreach my $testImage (@testImages) {
     );
 }
 
-$session->setting->set('maxImageSize', $origMaxImageSize );
+});
 
 TODO: {
 	local $TODO = "Methods that need to be tested";

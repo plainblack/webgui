@@ -87,13 +87,14 @@ cmp_ok(abs ($instance->get('lastUpdate')-$dateUpdated), '<=', 3, 'Date updated f
 my $otherInstance = WebGUI::Workflow::Instance->create($session, $properties);
 is ($otherInstance, undef, 'create: only allows one instance of a singleton to be created');
 
-WebGUI::Test->interceptLogging;
-
-$instance->set({ 'parameters' => {session => 1}, });
-$otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 1,} });
-is($otherInstance, undef, 'create: another singleton instance can not be created if it the same parameters as a currently existing instance');
-my $expectedId = $wf->getId;
-like($WebGUI::Test::logger_info, qr/An instance of singleton workflow $expectedId already exists/, 'create: Warning logged for trying to make another singleton');
+WebGUI::Test->interceptLogging( sub {
+    my $log_data = shift;
+    $instance->set({ 'parameters' => {session => 1}, });
+    $otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 1,} });
+    is($otherInstance, undef, 'create: another singleton instance can not be created if it the same parameters as a currently existing instance');
+    my $expectedId = $wf->getId;
+    like($log_data->{info}, qr/An instance of singleton workflow $expectedId already exists/, 'create: Warning logged for trying to make another singleton');
+} );
 
 $otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 2,}});
 isnt ($otherInstance, undef, 'create: another singleton instance can be created if it has different parameters');

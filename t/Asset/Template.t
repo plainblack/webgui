@@ -166,17 +166,17 @@ my $brokenTemplate = $importNode->addChild({
     template  => q|<tmpl_if unclosedIf>If clause with no ending tag|,
 });
 
-WebGUI::Test->interceptLogging;
-my $brokenOutput = $brokenTemplate->process({});
-my $logError = $WebGUI::Test::logger_error;
-my $brokenUrl = $brokenTemplate->getUrl;
-my $brokenId  = $brokenTemplate->getId;
-like($brokenOutput, qr/^There is a syntax error in this template/, 'process: returned error output contains boilerplate');
-like($brokenOutput, qr/$brokenUrl/, '... and the template url');
-like($brokenOutput, qr/$brokenId/, '... and the template id');
-like($logError, qr/$brokenUrl/, 'process: logged error has the url');
-like($logError, qr/$brokenId/, '... and the template id');
-WebGUI::Test->restoreLogging;
+WebGUI::Test->interceptLogging( sub {
+    my $log_data = shift;
+    my $brokenOutput = $brokenTemplate->process({});
+    my $brokenUrl = $brokenTemplate->getUrl;
+    my $brokenId  = $brokenTemplate->getId;
+    like($brokenOutput, qr/^There is a syntax error in this template/, 'process: returned error output contains boilerplate');
+    like($brokenOutput, qr/$brokenUrl/, '... and the template url');
+    like($brokenOutput, qr/$brokenId/, '... and the template id');
+    like($log_data->{error}, qr/$brokenUrl/, 'process: logged error has the url');
+    like($log_data->{error}, qr/$brokenId/, '... and the template id');
+});
 
 WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
 
