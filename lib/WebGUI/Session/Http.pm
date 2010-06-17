@@ -44,8 +44,6 @@ This package allows the manipulation of HTTP protocol information.
 
  $mimetype = $http->getMimeType();
  $code = $http->getStatus();
- ($code, $description) = $http->getStatus();
- $description = $http->getStatusDescription();
  $boolean = $http->isRedirect();
  
  $http->setCookie($name,$value);
@@ -152,24 +150,8 @@ the code returned will be 200.
 
 sub getStatus {
 	my $self = shift;
-	$self->{_http}{statusDescription} = $self->{_http}{statusDescription} || "OK";
 	my $status = $self->{_http}{status} || "200";
 	return $status;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getStatusDescription ( ) {
-
-Returns the current HTTP status description.  If no description has
-been set, "OK" will be returned.
-
-=cut
-
-sub getStatusDescription {
-	my $self = shift;
-	return $self->{_http}{statusDescription} || "OK";
 }
 
 
@@ -316,7 +298,6 @@ sub sendHeader {
             $response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
 		}
 		$response->status($self->getStatus());
-#		$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	}
 	return undef;
 }
@@ -331,7 +312,6 @@ sub _sendMinimalHeader {
         "Cache-Control" => "no-cache",
     );
 	$response->status($self->getStatus());
-#	$response->status_line($self->getStatus().' '.$self->getStatusDescription()); # TODO - re-enable
 	return undef;
 }
 
@@ -527,7 +507,7 @@ sub setRedirect {
 	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
 	$self->session->errorHandler->info("Redirecting to $url");
 	$self->setRedirectLocation($url);
-	$self->setStatus($type, "Redirect");
+	$self->setStatus($type);
 	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});
 }
 
@@ -547,7 +527,7 @@ sub setRedirectLocation {
 
 #-------------------------------------------------------------------
 
-=head2 setStatus ( code, description )
+=head2 setStatus ( code )
 
 Sets the HTTP status code.
 
@@ -555,16 +535,11 @@ Sets the HTTP status code.
 
 An HTTP status code. It is a 3 digit status number.
 
-=head3 description
-
-An HTTP status code description. It is a little one line of text that describes the status code.
-
 =cut
 
 sub setStatus {
-	my $self = shift;
-	$self->{_http}{status} = shift;
-	$self->{_http}{statusDescription} = shift;
+    my $self = shift;
+    $self->{_http}{status} = shift;
 }
 
 #-------------------------------------------------------------------

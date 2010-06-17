@@ -614,7 +614,7 @@ sub checkView {
 		return "chunked";
 	} 
     elsif ($self->get("state") ne "published") { # tell em it doesn't exist anymore
-		$http->setStatus("410");
+		$http->setStatus(410);
 		my $notFound = WebGUI::Asset->getNotFound($self->session);
 		$self->session->asset($notFound);
 		return $notFound->www_view;

@@ -134,7 +134,7 @@ sub _httpBasicLogin {
     $self->session->request->headers_out->set(
         'WWW-Authenticate' => 'Basic realm="'.$self->session->setting->get('companyName').'"'
     );
-    $self->session->http->setStatus(401,'Unauthorized');
+    $self->session->http->setStatus(401);
     $self->session->http->sendHeader;
     return '';
 }

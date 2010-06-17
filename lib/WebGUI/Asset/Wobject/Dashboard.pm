@@ -423,7 +423,7 @@ sub www_view {
                         $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
                         return undef;
                 } else { # tell em it doesn't exist anymore
-                        $self->session->http->setStatus("410");
+                        $self->session->http->setStatus(410);
                         return WebGUI::Asset->getNotFound($self->session)->www_view;
                 }
         }

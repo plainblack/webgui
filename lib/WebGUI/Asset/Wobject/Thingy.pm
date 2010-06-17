@@ -1635,7 +1635,7 @@ sub www_deleteThingDataViaAjax {
     $session->http->setMimeType("application/json");
 
     unless ($thingId && $thingDataId) {
-        $session->http->setStatus("400", "Bad Request");
+        $session->http->setStatus(400);
         return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
@@ -1650,7 +1650,7 @@ sub www_deleteThingDataViaAjax {
         return JSON->new->encode({message => "Data with thingDataId $thingDataId was deleted."});
     }
     else {
-        $session->http->setStatus("404", "Not Found");
+        $session->http->setStatus(404);
         return JSON->new->encode({message => "The thingId you specified can not be found."});
     }
 }
@@ -2594,7 +2594,7 @@ sub www_editThingDataSaveViaAjax {
     my $i18n        = WebGUI::International->new($self->session, "Asset_Thingy");
 
     unless ($thingId && $thingDataId) {
-        $session->http->setStatus("400", "Bad Request");
+        $session->http->setStatus(400);
         return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
@@ -2606,19 +2606,19 @@ sub www_editThingDataSaveViaAjax {
             ,$thingProperties);
 
         if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
-            $session->http->setStatus("400", "Bad Request");
+            $session->http->setStatus(400);
             return JSON->new->encode({message => $i18n->get("has entered max per user message")});
         }
 
     	my ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
     	if ($errors){
-	    $session->http->setStatus("400", "Bad Request");
+	    $session->http->setStatus(400);
             return JSON->new->encode($errors);
     	}
     }
     else {
-        $session->http->setStatus("404", "Not Found");
+        $session->http->setStatus(404);
         return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
@@ -2707,7 +2707,7 @@ sub www_getThingViaAjax {
     $session->http->setMimeType("application/json");
 
     unless ($thingId) {
-        $session->http->setStatus("400", "Bad Request");
+        $session->http->setStatus(400);
         return JSON->new->encode({message => "Can't return thing properties without a thingId."});
     }
 
@@ -2729,7 +2729,7 @@ sub www_getThingViaAjax {
         return JSON->new->encode($thingProperties);
     }
     else {
-        $session->http->setStatus("404", "Not Found");
+        $session->http->setStatus(404);
         return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
@@ -2763,7 +2763,7 @@ sub www_getThingsViaAjax {
         return JSON->new->encode(\@visibleThings);
     }
     else {
-        $session->http->setStatus("404", "Not Found");
+        $session->http->setStatus(404);
         return JSON->new->encode({message => "No visible Things were found in this Thingy."});
     }
 }
@@ -3123,7 +3123,7 @@ sub www_searchViaAjax {
     my $i18n            = WebGUI::International->new($self->session,"Asset_Thingy");
 
     unless ($thingId) {
-        $session->http->setStatus("400", "Bad Request");
+        $session->http->setStatus(400);
         return JSON->new->encode({message => "Can't perform search without a thingId."});
     }
 
@@ -3138,7 +3138,7 @@ sub www_searchViaAjax {
         return JSON->new->encode($var);
     }
     else {
-        $session->http->setStatus("404", "Not Found");
+        $session->http->setStatus(404);
         return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
@@ -3549,7 +3549,7 @@ sub www_viewThingDataViaAjax {
     $session->http->setMimeType("application/json");
 
     unless ($thingId && $thingDataId) {
-        $session->http->setStatus("400", "Bad Request");
+        $session->http->setStatus(400);
         return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
@@ -3564,12 +3564,12 @@ sub www_viewThingDataViaAjax {
             return JSON->new->encode($output);
         }
         else{
-            $session->http->setStatus("404", "Not Found");
+            $session->http->setStatus(404);
             return JSON->new->encode({message => "The thingDataId you requested can not be found."});
         }
     }
     else {
-        $session->http->setStatus("404", "Not Found");
+        $session->http->setStatus(404);
         return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }

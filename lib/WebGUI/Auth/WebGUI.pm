@@ -775,7 +775,7 @@ sub hashPassword {
 sub login {
    my $self = shift;
    if(!$self->authenticate($self->session->form->process("username"),$self->session->form->process("identifier"))){
-      $self->session->http->setStatus("401","Incorrect Credentials");
+      $self->session->http->setStatus(401);
       $self->session->errorHandler->security("login to account ".$self->session->form->process("username")." with invalid information.");
 	my $i18n = WebGUI::International->new($self->session);
 	  return $self->displayLogin("<h1>".$i18n->get(70)."</h1>".$self->error);

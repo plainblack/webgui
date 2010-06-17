@@ -96,7 +96,7 @@ sub handler {
         if ($var->get("userId") eq "1"
          && defined $asset
          && !$http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
-            $http->setStatus("304","Content Not Modified");
+            $http->setStatus(304);
             $http->sendHeader;
             return "chunked";
         } 

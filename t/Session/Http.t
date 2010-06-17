@@ -23,7 +23,7 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-plan tests => 57;
+plan tests => 48;
 
 my $session = WebGUI::Test->session;
 
@@ -43,23 +43,19 @@ isa_ok($http, 'WebGUI::Session::Http', 'session has correct object type');
 
 ####################################################
 #
-# setStatus, getStatus, getStatusDescription
+# setStatus, getStatus
 #
 ####################################################
 
 $http->setStatus('123');
 
 is($http->getStatus, '123', 'getStatus: returns correct code');
-is($http->getStatusDescription, 'OK', 'getStatusDescription: returns default description via getStatus');
 
 $http->setStatus('');
 
-is($http->getStatusDescription, 'OK', 'getStatusDescription: returns default description via itself');
 is($http->getStatus, '200', 'getStatus: returns default code');
 
 $http->setStatus('', 'packets are great');
-
-is($http->getStatusDescription, 'packets are great', 'getStatusDescription: returns correct description');
 
 ####################################################
 #
@@ -71,10 +67,10 @@ $http->setStatus('200');
 ok(!$http->isRedirect, 'isRedirect: 200 is not');
 
 $http->setStatus('301');
-ok($http->isRedirect, 'isRedirect: 301 is');
+ok($http->isRedirect, '... 301 is');
 
 $http->setStatus('302');
-ok($http->isRedirect, 'isRedirect: 302 is too');
+ok($http->isRedirect, '... 302 is too');
 $http->setStatus('200');
 
 ####################################################
@@ -159,7 +155,6 @@ $session->request->uri('/here/later');
 
 $http->setRedirect('/here/now');
 is($http->getStatus, 302, 'setRedirect: sets HTTP status');
-is($http->getStatusDescription, 'Redirect', 'setRedirect: sets HTTP status description');
 is($http->getRedirectLocation, '/here/now', 'setRedirect: redirect location');
 
 $session->style->useEmptyStyle(1);
@@ -214,14 +209,14 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
 
 {
     ##A new, clean session
-    my $session = WebGUI::Test->newSession('nocleanup');
-    my $guard   = WebGUI::Test->cleanupGuard($session);
+    my $session1 = WebGUI::Test->newSession('noCleanup');
+    my $guard   = WebGUI::Test->cleanupGuard($session1);
 
-    $session->http->setRedirect('/here/there');
-    $session->http->sendHeader;
-    is($session->response->status, 302, 'sendHeader as redirect: status set to 301');
+    $session1->http->setRedirect('/here/there');
+    $session1->http->sendHeader;
+    is($session1->response->status, 302, 'sendHeader as redirect: status set to 301');
     cmp_deeply(
-        headers_out($session->response->headers),
+        headers_out($session1->response->headers),
         {
             'Location' => '/here/there',
         },
@@ -249,11 +244,6 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
 
     $http->sendHeader();
     is($response->status, 200, 'sendHeader: status set');
-    my $can_status_line = ok($response->can('status_line'), 'response can set a status line');
-    SKIP: {
-        skip 'no status_line method in Plack::Response', 1 unless $can_status_line;
-        is($response->status_line, '200 Just spiffy', '... status_line set');
-    }
     cmp_deeply(
         [ $response->content_type ],
         [ 'text/html', 'charset=UTF-8']
@@ -456,7 +446,7 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
     my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
     $http_request->header('If-Modified-Since' => '');
     my $session  = WebGUI::Test->newSession('nocleanup', $http_request);
-    my $guard    = WebGUI::Test->cleanupGuard($session);
+    my $guard    = WebGUI::Test->addToCleanup($session);
     ok $session->http->ifModifiedSince(0), 'ifModifiedSince: empty header always returns true';
 
 }

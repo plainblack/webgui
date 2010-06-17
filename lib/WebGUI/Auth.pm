@@ -366,7 +366,7 @@ sub createAccountSave {
         return undef;
     } 
     else {
-        $self->session->http->setStatus(201,"Account Registration Successful");
+        $self->session->http->setStatus(201);
     }
 
 	return undef;

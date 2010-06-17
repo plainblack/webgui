@@ -639,7 +639,7 @@ sub www_view {
 	# Check to make sure it's not in the trash or some other weird place
 	if ($self->state ne "published") {
 		my $i18n = WebGUI::International->new($session,'Asset_File');
-		$session->http->setStatus("404");
+		$session->http->setStatus(404);
 		return sprintf($i18n->get("file not found"), $self->getUrl());
 	}
 

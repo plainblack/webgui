@@ -354,7 +354,7 @@ sub www_ajaxCreateUser {
     # Verify access
     if ( !canAdd($session) || !canUseService($session) ) {
         # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
+        $session->http->setStatus(401);
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::Unauthorized",
             message     => "",
@@ -441,7 +441,7 @@ sub www_ajaxDeleteUser {
     # Verify access
     if ( !canEdit($session) || !canUseService($session) ) {
         # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
+        $session->http->setStatus(401);
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::Unauthorized",
             message     => "",
@@ -458,7 +458,7 @@ sub www_ajaxDeleteUser {
         } );
     }
     elsif ( $userId eq "1" || $userId eq "3" ) {
-        $session->http->setStatus(403,"Forbidden");
+        $session->http->setStatus(403);
         return createServiceResponse( $outputFormat, {
             error       => 'WebGUI::Error::InvalidParam',
             param       => 'userId',
@@ -508,7 +508,7 @@ sub www_ajaxUpdateUser {
     # Verify access
     if ( !canEdit($session) || !canUseService($session) ) {
         # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
+        $session->http->setStatus(401);
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::Unauthorized",
             message     => "",

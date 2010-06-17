@@ -93,7 +93,7 @@ sub addChild {
 	my $temp = WebGUI::Asset->newByPropertyHashRef($session, $properties) || croak "Couldn't create a new $properties->{className} asset!";
 	my $newAsset = $temp->addRevision($properties, $now, $options); 
 	$self->updateHistory("added child ".$id);
-	$session->http->setStatus(201,"Asset Creation Successful");
+	$session->http->setStatus(201);
 	return $newAsset;
 }
 
