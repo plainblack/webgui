@@ -128,8 +128,6 @@ save you many hours of grief.
       prefix from the filename.
 
 
-
->>>>>>> master
 7.8.0
 --------------------------------------------------------------------
 
