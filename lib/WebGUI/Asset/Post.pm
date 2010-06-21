@@ -1230,12 +1230,18 @@ sub postProcess {
 
 #-------------------------------------------------------------------
 
-#sub publish {
-#	my $self = shift;
-#	$self->SUPER::publish(@_);
-#
-#	$self->getThread->sumReplies;
-#}
+=head2 publish 
+
+Extend the base method to handle updating last post information in the parent Thread
+and CS.
+
+=cut
+
+sub publish {
+	my $self = shift;
+	$self->SUPER::publish(@_);
+    $self->qualifyAsLastPost;
+}
 
 #-------------------------------------------------------------------
 
@@ -1448,7 +1454,8 @@ sub setStatusUnarchived {
 
 =head2 trash ( )
 
-Moves post to the trash, updates reply counter on thread and recalculates the thread rating.
+Moves post to the trash, updates reply counter on thread, recalculates the thread rating,
+and updates any lastPost information in the parent Thread, and CS.
 
 =cut
 
@@ -1457,20 +1464,7 @@ sub trash {
     $self->SUPER::trash;
     $self->getThread->sumReplies if ($self->isReply);
     $self->getThread->updateThreadRating;
-    if ($self->getThread->get("lastPostId") eq $self->getId) {
-        my $threadLineage = $self->getThread->get("lineage");
-        my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
-            lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
-            order by creationDate desc",[$threadLineage.'%', $self->getId]);
-        $self->getThread->update({lastPostId=>$id, lastPostDate=>$date});
-    }
-    if ($self->getThread->getParent->get("lastPostId") eq $self->getId) {
-        my $forumLineage = $self->getThread->getParent->get("lineage");
-        my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
-            lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
-            order by creationDate desc",[$forumLineage.'%', $self->getId]);
-        $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
-    }
+    $self->disqualifyAsLastPost;
 }
 
 #-------------------------------------------------------------------
