@@ -28,7 +28,6 @@ use WebGUI::Asset::Wobject::Collaboration;
 my $toVersion = '7.8.10';
 my $quiet; # this line required
 
-
 my $session = start(); # this line required
 
 # upgrade functions go here
