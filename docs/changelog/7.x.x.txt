@@ -2,6 +2,7 @@
  - fixed #11651: First Day of Week is a string...
  - fixed #11656: Thingy: Select list fields are not sorted properly
  - fixed #11662: yahooapis.com sourced links
+ - fixed #11658: tmpl var message missing in template help for the cart
 
 7.9.7
  - added #11571: Allow return from photo edit view to gallery edit view
