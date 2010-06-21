@@ -372,9 +372,6 @@ sub www_manage {
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
 
     $session->style->setRawHeadTags( <<ENDHTML );
-    <link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.6.0/build/logger/assets/skins/sam/logger.css">
-    <script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/logger/logger-min.js"></script> 
-
     <script type="text/javascript">
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
