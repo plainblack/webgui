@@ -129,6 +129,11 @@ our $HELP = {
 				],
 			},
 			{
+				name		=> "message",
+				description	=> "message help",
+				required	=> 1,
+			},
+			{
 				name		=> "error",
 				description	=> "error help",
 				required	=> 1,

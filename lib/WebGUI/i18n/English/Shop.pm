@@ -189,6 +189,12 @@ our $I18N = {
 		context		=> q|a help description|,
 	},
 
+	'message help' => {
+		message 	=> q|If the cart is empty, this internationalized message should be displayed to the user.|,
+		lastUpdated	=> 0,
+		context		=> q|a help description|,
+	},
+
 	'formHeader help' => {
 		message 	=> q|The top of the form.|,
 		lastUpdated	=> 0,
