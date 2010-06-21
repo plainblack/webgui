@@ -22,17 +22,19 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Collaboration;
+use WebGUI::Asset::Post::Thread;
 use WebGUI::ProfileField;
-
 
 my $toVersion = '7.9.8';
 my $quiet; # this line required
-
 
 my $session = start(); # this line required
 
 # upgrade functions go here
 changeFirstDayOfWeekDefault($session);
+updateLastPostCS($session);
+updateLastPostThread($session);
 
 finish($session); # this line required
 
@@ -51,11 +53,47 @@ finish($session); # this line required
 sub changeFirstDayOfWeekDefault {
     my $session = shift;
     print "\tMake the default for firstDayOfWeek a number instead of a string... " unless $quiet;
+    # and here's our code
     my $profileField = WebGUI::ProfileField->new($session, 'firstDayOfWeek');
     my $properties = $profileField->get();
     $properties->{dataDefault} = 0;
     $profileField->set($properties);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub updateLastPostCS {
+    my $session = shift;
+    print "\tUpdating last post information in every Collaboration System.  This could take a very long time... " unless $quiet;
     # and here's our code
+    my $getCs = WebGUI::Asset::Wobject::Collaboration->getIsa($session);
+    CS: while (my $cs = eval { $getCs->() } ) {
+       next CS if Exception::Class->caught();
+       last CS if ! $cs;
+       next CS unless $cs->get('lastPostId');
+       my $lastPost = WebGUI::Asset->newByDynamicClass($session, $cs->get('lastPostId'));
+       next CS unless $lastPost && $lastPost->get('status') eq 'archived';
+       $lastPost->disqualifyAsLastPost;
+   }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub updateLastPostThread {
+    my $session = shift;
+    print "\tUpdating last post information in every Thread.  This could also take a very long time... " unless $quiet;
+    # and here's our code
+    my $getThread = WebGUI::Asset::Wobject::Collaboration->getIsa($session);
+    THREAD: while (my $thread = eval { $getThread->() } ) {
+       next THREAD if Exception::Class->caught();
+       last THREAD if ! $thread;
+       next THREAD unless $thread->get('lastPostId');
+       my $lastPost = WebGUI::Asset->newByDynamicClass($session, $thread->get('lastPostId'));
+       next THREAD unless $lastPost && $lastPost->get('status') eq 'archived';
+       $lastPost->disqualifyAsLastPost;
+   }
     print "DONE!\n" unless $quiet;
 }
 

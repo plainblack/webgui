@@ -62,6 +62,7 @@ sub _fixReplyCount {
     my $lastPostId = $asset->getLineage( [ qw{ self descendants } ], {
         isa             => 'WebGUI::Asset::Post',
         orderByClause   => 'assetData.revisionDate desc',
+        limit           => 1,
     } )->[0];
 
     if (my $lastPost = WebGUI::Asset->newByDynamicClass( $self->session, $lastPostId ) ) {
@@ -352,6 +353,53 @@ sub definition {
     return $class->next::method($session,$definition);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 disqualifyAsLastPost ( )
+
+This method should be called whenever something happens to the Post or Thread that would disqualify
+it as being the last post in a Thread, or Collaboration System.  Good examples are cutting to the
+clipboard, trashing, or archiving.
+
+If the Post was the last post, it will find the second to last post for each kind of parent asset,
+and update that asset with that Post's information.
+
+=cut
+
+sub disqualifyAsLastPost {
+	my $self = shift;
+    my $thread = $self->getThread;
+    if ($thread->get('lastPostId') eq $self->getId) {
+        my $secondary_post = $thread->getLineage(['descendants'], {
+            returnObjects       => 1,
+            includeOnlyClasses  => ["WebGUI::Asset::Post", ],
+            limit               => 1,
+            orderByClause       => 'revisionDate,lineage DESC',
+        })->[0];
+        if ($secondary_post) {  ##Handle edge case for no other
+            $thread->update({ lastPostId => $secondary_post->getId, lastPostDate => $secondary_post->get('creationDate'), });
+        }
+        else {
+            $thread->update({ lastPostId => '', lastPostDate => '', });
+        }
+    }
+    my $cs = $thread->getParent;
+    if ($cs->get('lastPostId') eq $self->getId) {
+        my $secondary_post = $cs->getLineage(['descendants'], {
+            returnObjects       => 1,
+            includeOnlyClasses  => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
+            limit               => 1,
+            orderByClause       => 'revisionDate DESC',
+        })->[0];
+        if ($secondary_post) {  ##Handle edge case for no other
+            $cs->update({ lastPostId => $secondary_post->getId, lastPostDate => $secondary_post->get('creationDate'), });
+        }
+        else {
+            $cs->update({ lastPostId => '', lastPostDate => '', });
+        }
+    }
+}
 
 #-------------------------------------------------------------------
 
@@ -1190,6 +1238,31 @@ sub purgeRevision {
 
 #-------------------------------------------------------------------
 
+=head2 qualifyAsLastPost ( )
+
+This method should be called whenever something happens to the Post or Thread that would qualify
+it as being the last post in a Thread, or Collaboration System.  Good examples are pasting from
+the clipboard, restoring from the trash, or changing the state from archiving.
+
+It checks the parent Thread and CS to see if it is now the last Post, and updates that asset with
+its information.
+
+=cut
+
+sub qualifyAsLastPost {
+    my ($self) = @_;
+    my $thread = $self->getThread();
+    if ($self->get('creationDate') > $thread->get('lastPostDate')) {
+        $thread->update({ lastPostId => $self->getId, lastPostDate => $self->get('creationDate'), });
+    }
+    my $cs = $thread->getParent;
+    if ($self->get('creationDate') > $cs->get('lastPostDate')) {
+        $cs->update({ lastPostId => $self->getId, lastPostDate => $self->get('creationDate'), });
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 rate ( rating )
 
 Stores a rating against this post.
@@ -1292,14 +1365,16 @@ sub setParent {
 
 =head2 setStatusArchived ( )
 
-Sets the status of this post to archived.
+Sets the status of this post to archived.  Updates the parent thread and CS to remove
+the lastPost, if this post is the last post.
 
 =cut
 
 
 sub setStatusArchived {
-        my ($self) = @_;
-        $self->update({status=>'archived'});
+    my ($self) = @_;
+    $self->update({status=>'archived'});
+    $self->disqualifyAsLastPost;
 }
 
 
@@ -1308,13 +1383,15 @@ sub setStatusArchived {
 =head2 setStatusUnarchived ( )
 
 Sets the status of this post to approved, but does so without any of the normal notifications and other stuff.
+Updates the last post information in the parent Thread and CS if applicable.
 
 =cut
 
 
 sub setStatusUnarchived {
-        my ($self) = @_;
-        $self->update({status=>'approved'}) if ($self->get("status") eq "archived");
+    my ($self) = @_;
+    $self->update({status=>'approved'}) if ($self->get("status") eq "archived");
+    $self->qualifyAsLastPost;
 }
 
 #-------------------------------------------------------------------
