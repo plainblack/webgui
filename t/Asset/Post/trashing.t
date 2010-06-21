@@ -8,7 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-## Test that archiving a post works, and checking side effects like updating
+## Test that trashing a post works, and checking side effects like updating
 ## lastPost information in the Thread, and CS.
 
 use FindBin;
@@ -94,8 +94,8 @@ is $collab->getChildCount, 2, 'collab has correct number of children';
 is $collab->get('lastPostId'),   $t2p2->getId, 'lastPostId set in collab';
 is $collab->get('lastPostDate'), $t2p2->get('creationDate'), 'lastPostDate, too';
 
-$t2p2->setStatusArchived;
-is $t2p2->get('status'), 'archived', 'setStatusArchived set the post to be archived';
+$t2p2->trash;
+is $t2p2->get('state'), 'trash', 'cut set the post to be in the clipboard';
 
 $second_thread = $second_thread->cloneFromDb;
 is $second_thread->get('lastPostId'),   $t2p1->getId, '.. updated lastPostId in the thread';
@@ -105,8 +105,8 @@ $collab = $collab->cloneFromDb;
 is $collab->get('lastPostId'),   $t2p1->getId, '.. updated lastPostId in the CS';
 is $collab->get('lastPostDate'), $t2p1->get('creationDate'), '... lastPostDate, too';
 
-$t2p2->setStatusUnarchived;
-is $t2p2->get('status'), 'approved', 'setStatusUnarchived sets the post back to approved';
+$t2p2->restore;
+is $t2p2->get('state'), 'published', 'publish sets the post normal';
 
 $second_thread = $second_thread->cloneFromDb;
 is $second_thread->get('lastPostId'),   $t2p2->getId, '.. updated lastPostId in the thread';

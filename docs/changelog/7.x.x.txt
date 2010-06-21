@@ -4,6 +4,7 @@
  - fixed #11662: yahooapis.com sourced links
  - fixed #11658: tmpl var message missing in template help for the cart
  - fixed #11628: Message Board: Last Post doesn't show up in CS Thread List
+ - fixed #11646: Post and Thread Last Post
 
 7.9.7
  - added #11571: Allow return from photo edit view to gallery edit view
