@@ -414,10 +414,6 @@ An array reference containing a list of asset classes to remove from the result 
 
 A boolean indicating that we should return objects rather than asset ids.
 
-=head4 returnSQL
-
-A boolean indicating that we should return the sql statement rather than asset ids.
-
 =head4 invertTree
 
 A boolean indicating whether the resulting asset tree should be returned in reverse order.
