@@ -27,6 +27,7 @@ our $HELP = {
             { 'name' => 'reply.synopsis' },
             { 'name' => 'reply.content' },
             { 'name' => 'reply.userDefinedN' },
+            { 'name' => 'isSubscribedToCs' },
             { 'name' => 'subscribe.form' },
             { 'name' => 'isNewThread' },
             { 'name' => 'archive.form' },
