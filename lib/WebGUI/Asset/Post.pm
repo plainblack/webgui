@@ -1673,6 +1673,7 @@ sub www_edit {
     $var{'archive.form'} = WebGUI::Form::yesNo($session, {
         name=>"archive"
     });
+    $var{'isSubscribedToCs'} = $self->getThread->getParent->isSubscribed;
 	$var{'form.header'} .= WebGUI::Form::hidden($session, {
         name=>"proceed", 
         value=>"showConfirmation"
