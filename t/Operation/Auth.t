@@ -52,7 +52,7 @@ package main;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 6;        # Increment this number for each test you create
+plan tests => 7;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the getInstance method
@@ -78,8 +78,17 @@ isa_ok(
     'AuthType in config file, so return instance of authType',
 );
 
+$session->user({ userId => 3 });
+isa_ok(
+    WebGUI::Operation::Auth::getInstance( $session ),
+    'WebGUI::Auth::WebGUI',
+    'AuthType is defined by the logged-in user',
+);
+
+#----------------------------------------------------------------------------
 # Test the web method for auth operation
 # First a clean session, without an authenticated user
+$session->user({ userId => 1 });
 my $output = WebGUI::Operation::Auth::www_auth($session);
 like(
     $output,
