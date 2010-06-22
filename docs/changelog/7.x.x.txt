@@ -6,6 +6,7 @@
  - fixed #11628: Message Board: Last Post doesn't show up in CS Thread List
  - fixed #11646: Post and Thread Last Post
  - fixed #11626: Duplicate messages from Collab Systems
+ - fixed #11667: Shop: unable to remove item from Cart
 
 7.9.7
  - added #11571: Allow return from photo edit view to gallery edit view
