@@ -14,6 +14,7 @@ package WebGUI::Operation::Auth;
 # logic that defines how Authentication should happen
 
 use strict qw(vars subs);
+use List::MoreUtils qw( any );
 use URI;
 use WebGUI::Operation::Shared;
 use WebGUI::Pluggable;
@@ -33,9 +34,16 @@ Get the instance of this object or create a new instance if none exists
 sub getInstance {
 	my $session = shift;
 	#Get Auth Settings
-	my $authMethod = $session->user->authMethod || $session->setting->get("authMethod");
-	$authMethod = $session->setting->get("authMethod") if($session->user->isVisitor);
-	$authMethod = $_[0] if($_[0] && isIn($_[0], @{$session->config->get("authMethods")}));
+	my $authMethod  = $_[0]
+                        || ( !$session->user->isVisitor && $session->user->authMethod ) # Visitor has no authType
+                        || $session->form->get('authType') 
+                        || $session->setting->get("authMethod")
+                        ;
+        # Verify is in auth method list
+        if ( !any { $_ eq $authMethod } @{$session->config->get('authMethods')} ) {
+            $authMethod = $session->setting->get('authMethod');
+        }
+
 	my $userId = $_[1];
 	#Create Auth Object
     my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod, $userId ] ) };
@@ -72,7 +80,11 @@ sub www_auth {
 		my $i18n = WebGUI::International->new($session);
 		return $i18n->get(1077);
 	}
-    my $out = $authMethod->$methodCall;
+
+        # Determine if we have a www_ method
+        my $method  = $authMethod->can( 'www_' . $methodCall )
+                    || $authMethod->can( $methodCall );
+    my $out = $method->( $authMethod );
     if (substr($session->http->getMimeType(),0,9) eq "text/html") {
 	    return $session->style->userStyle($out);
     }
