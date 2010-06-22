@@ -579,6 +579,7 @@ An integer describing how many levels of ancestry from the start point that shou
 =head4 excludeClasses
 
 An array reference containing a list of asset classes to remove from the result set. The opposite of the includOnlyClasses rule.
+Each class is internally appended with a SQL wildcard, so any subclass will also be excluded.
 
 =head4 invertTree
 
