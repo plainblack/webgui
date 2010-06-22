@@ -27,26 +27,26 @@ my $session         = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Test package for method dispatch
-BEGIN {
-    package WebGUI::Auth::TestAuth;
+BEGIN { $INC{'WebGUI/Auth/TestAuth.pm'} = __FILE__; }
 
-    use base 'WebGUI::Auth';
+package WebGUI::Auth::TestAuth;
 
-    sub new {
-        my $self    = $_[0]->SUPER::new(@_);
-        $self->setCallable( ['callable'] );
-        return bless $self, 'WebGUI::Auth::TestAuth'; # Auth requires rebless
-    }
+use base 'WebGUI::Auth';
 
-    sub callable {
-        return "callable";
-    }
-
-    sub www_verify {
-        return "verify";
-    }
+sub new {
+    my $self    = shift->SUPER::new(@_);
+    $self->setCallable( ['callable'] );
+    return bless $self, 'WebGUI::Auth::TestAuth'; # Auth requires rebless
 }
-$INC{'WebGUI/Auth/TestAuth.pm'} = __FILE__;
+
+sub callable {
+    return "callable";
+}
+
+sub www_verify {
+    return "verify";
+}
+
 package main;
 
 #----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ isa_ok(
 $session->config->addToArray( 'authMethods', 'TestAuth' );
 isa_ok( 
     WebGUI::Operation::Auth::getInstance( $session ),
-    'WebGUI::Auth::' . $session->setting->get('authMethod'),
+    'WebGUI::Auth::TestAuth',
     'AuthType in config file, so return instance of authType',
 );
 
