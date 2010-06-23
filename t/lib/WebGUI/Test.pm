@@ -343,7 +343,7 @@ sub config {
     return $config
         if $config;
     require WebGUI::Config;
-    $config = WebGUI::Config->new(our $CONFIG_FILE);
+    $config = WebGUI::Config->new($CLASS->root, $CLASS->file, 1);
     return $config;
 }
 
