@@ -11,6 +11,7 @@
  - fixed #11628: Message Board: Last Post doesn't show up in CS Thread List
  - fixed #11646: Post and Thread Last Post
  - fixed #11626: Duplicate messages from Collab Systems
+ - fixed #11550: Pending assets in the clipboard or trash are not visible from the approval screen
 
 7.8.21
  - fixed #11597: manageTrash and newlines

@@ -173,6 +173,7 @@ sub getAssetsInClipboard {
        {
            statesToInclude => ["clipboard"],
            returnObjects   => 1,
+           statusToInclude => [qw/approved pending archived/],
            whereClause     => $limit,
        }
     );
