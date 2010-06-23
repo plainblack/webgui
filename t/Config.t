@@ -16,6 +16,7 @@ use WebGUI::Test;
 use Test::More tests => 15; # increment this value for each test you create
 use Test::Deep;
 use File::Basename qw(basename);
+use Cwd;
 
 my $config     = WebGUI::Test->config;
 my $configFile = WebGUI::Test->file;
@@ -27,7 +28,7 @@ is( ref $config->get("macros"), "HASH", "get() macros hash" );
 is( ref $config->get("assets"), "HASH", "get() assets hash" );
 is( ref $config->get("shippingDrivers"), "ARRAY", "get() shippingDrivers array" );
 is( $config->getFilename, basename($configFile), "getFilename()" );
-is( $config->getWebguiRoot, $webguiRoot, "getWebguiRoot()" );
+is( $config->getWebguiRoot, Cwd::realpath($webguiRoot), "getWebguiRoot()" );
 ok( defined WebGUI::Config->readAllConfigs($webguiRoot), "readAllConfigs" );
 $config->addToArray("shippingDrivers","TEST");
 my $found = 0;
