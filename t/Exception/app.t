@@ -7,18 +7,20 @@ use WebGUI::Test;
 use Plack::Test;
 use Plack::Builder;
 use HTTP::Request::Common;
-use Test::More tests => 9;
+use Test::More;
 use HTTP::Exception;
 
 my $wg = WebGUI->new(config => WebGUI::Test->config);
 
 my $regular_app = builder {
     enable '+WebGUI::Middleware::Session', config => $wg->config;
+    enable '+WebGUI::Middleware::HTTPExceptions';
     $wg;
 };
 
 my $generic_dead_app = builder {
     enable '+WebGUI::Middleware::Session', config => $wg->config;
+    enable '+WebGUI::Middleware::HTTPExceptions';
     
     # Pretend that WebGUI dies during request handling
     sub { die 'WebGUI died' }
@@ -26,13 +28,15 @@ my $generic_dead_app = builder {
 
 my $specific_dead_app = builder {
     enable '+WebGUI::Middleware::Session', config => $wg->config;
+    enable '+WebGUI::Middleware::HTTPExceptions';
     
     # Pretend that WebGUI throws a '501 - Not Implemented' HTTP error
-    sub { HTTP::Exception::501->throw }
+    sub { HTTP::Exception->throw(501) }
 };
 
 my $fatal_app = builder {
     enable '+WebGUI::Middleware::Session', config => $wg->config;
+    enable '+WebGUI::Middleware::HTTPExceptions';
     
     # Pretend that WebGUI calls $session->log->fatal during request handling
     sub { 
@@ -42,9 +46,17 @@ my $fatal_app = builder {
     }
 };
 
+my $not_found_app = builder {
+    enable '+WebGUI::Middleware::Session', config => $wg->config;
+    enable '+WebGUI::Middleware::HTTPExceptions';
+    
+    sub { HTTP::Exception->throw(404) }
+};
+
 test_psgi $regular_app, sub {
     my $cb  = shift;
     my $res = $cb->( GET "/" );
+    is $res->code, 200, 'regular app, status code';
     like $res->content, qr/My Company/, 'testing regular app';
 };
 
@@ -64,13 +76,20 @@ test_psgi $specific_dead_app, sub {
     is $res->content, 'Not Implemented', '... status description'; # how apt
 };
 
+test_psgi $not_found_app, sub {
+    my $cb  = shift;
+    my $res = $cb->( GET "/" );
+    is $res->code, 404, 'not found app, status code';
+    is $res->content, 'Not Found', '... status description'; # how apt
+};
+
 test_psgi $fatal_app, sub {
     my $cb  = shift;
     my $res = $cb->( GET "/" );
     is $res->code, 500, 'fatal app, status code';
     
     # WebGUI doesn't know who you are, so it displays the generic error page
-    like $res->content, qr/Problem With Request/, '... status description';
+    like $res->content, qr/Fatally yours/, '... status description is $@ stringified from the logged fatal';
 };
 
 test_psgi $fatal_app, sub {
@@ -84,3 +103,4 @@ test_psgi $fatal_app, sub {
     like $res->content, qr/Fatally yours/, '... status description';
 };
 
+done_testing;
