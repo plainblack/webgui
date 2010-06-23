@@ -63,7 +63,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 50
+my $tests = 51
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -95,6 +95,7 @@ $archive    = $home->addChild({
 $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
 WebGUI::Test->addToCleanup($versionTag);
+$archive = $archive->cloneFromDb;
 
 isa_ok($archive, 'WebGUI::Asset::Wobject::StoryArchive', 'created StoryArchive');
 
@@ -151,6 +152,17 @@ is($sameFolder->getId, $todayFolder->getId, 'call within same day(end) returns t
 undef $sameFolder;
 $todayFolder->purge;
 is($archive->getChildCount, 0, 'leaving with an empty archive');
+
+{
+    my $archive2    = $home->addChild({
+                    className => 'WebGUI::Asset::Wobject::StoryArchive',
+                    title => 'Uncommitted',
+                    url => 'uncommitted_archive',
+                  });
+    my $guard = WebGUI::Test->cleanupGuard($archive2);
+    my $new_folder = $archive2->getFolder;
+    is $archive2->get('tagId'), $new_folder->get('tagId'), 'folder added to uncommitted archive uses the same version tag';
+}
 
 ################################################################
 #
