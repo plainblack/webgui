@@ -34,6 +34,7 @@ $registeredUser->username('TimBob');
 WebGUI::Test->addToCleanup($registeredUser);
 $session->user({user => $registeredUser});
 
+WebGUI::Test->originalConfig('macros');
 ##Overwrite any local configuration so that we know how to call it.
 foreach my $macro (qw/
     GroupText LoginToggle PageTitle MacroStart MacroEnd MacroNest

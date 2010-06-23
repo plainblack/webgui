@@ -40,6 +40,7 @@ my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->addToCleanup($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
 
+WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
 $session->config->set('enableSurveyExpressionEngine', 1);
 
 # Create a Survey

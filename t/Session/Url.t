@@ -413,7 +413,6 @@ TODO: {
 }
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup( $versionTag );
 my $statefulAsset = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
 $versionTag->commit;
 $session->asset( $statefulAsset );
@@ -491,3 +490,24 @@ is($session->http->getRedirectLocation, $secureUrl, '... and redirect status cod
 
 $session->config->set('sslEnabled', $origSSLEnabled);
 
+END {  ##Always clean-up
+	$session->asset($sessionAsset);
+	$versionTag->rollback if defined $versionTag;
+
+	$session->config->set('sitename',           \@config_sitename);
+    $session->config->set('gateway',            $gateway);
+    $session->config->set('extrasURL',          $origExtras);
+    $session->config->set('sslEnabled',         $origSSLEnabled) if defined $origSSLEnabled;
+
+	if ($config_port) {
+		$session->config->set($config_port);
+	}
+	else {
+		$session->config->delete('webServerPort');
+	}
+	if ($savecdn) {
+	   $session->config->set('cdn', $savecdn);
+	} else {
+	   $session->config->delete('cdn');
+	}
+}

@@ -31,6 +31,8 @@ use WebGUI::Asset::RssAspectDummy;
 # Init
 my $session         = WebGUI::Test->session;
 
+WebGUI::Test->originalConfig('exportPath');
+
 #----------------------------------------------------------------------------
 # Tests
 

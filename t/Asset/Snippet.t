@@ -79,6 +79,7 @@ $snippet->update({
     snippet => q|^SQL(select value from settings where name="<tmpl_var title>");|
 });
 
+WebGUI::Test->originalConfig('macros');
 $session->config->addToHash('macros', 'SQL', 'SQL');
 
 is($snippet->view(), 'WebGUI', 'Interpolating macros in works with template in the correct order');

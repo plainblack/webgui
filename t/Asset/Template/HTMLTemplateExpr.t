@@ -28,6 +28,7 @@ my $session = WebGUI::Test->session;
  
 # put your tests here
 my ($versionTag, $template);
+my $originalParsers = $session->config->get('templateParsers');
 
 my $module = use_ok('HTML::Template::Expr');
 SKIP: {
@@ -39,7 +40,6 @@ SKIP: {
 
         $session->config->set('templateParsers', ['WebGUI::Asset::Template::HTMLTemplate', 'WebGUI::Asset::Template::HTMLTemplateExpr',] );
         ($versionTag, $template) = setup_assets($session);
-        WebGUI::Test->addToCleanup($versionTag);
         my $templateOutput = $template->process({ "foo.bar" => "baz", "number.value" => 2 });
         my $companyName = $session->config->get('companyName');
         like($templateOutput, qr/NAME=$companyName/, "session variable with underscores");
@@ -68,3 +68,9 @@ sub setup_assets {
 	return ($versionTag, $template);
 }
 
+END {
+	$session->config->set('templateParsers', $originalParsers);
+	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
+		$versionTag->rollback;
+	}
+}
