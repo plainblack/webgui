@@ -436,7 +436,8 @@ A string containing as asset class to join in. There is no real reason to use a 
 
 =head4 whereClause
 
-A string containing extra where clause information for the query.
+A string containing extra WHERE clause information for the query.  The AND conjunction will be added internally, so the clause
+should not start with AND.
 
 =head4 orderByClause 
 
