@@ -336,7 +336,7 @@ sub view {
         my $sku               = $asset->get;
         $sku->{url}           = $asset->getUrl;
         $sku->{thumbnailUrl}  = $asset->getThumbnailUrl;
-        $sku->{price}         = sprintf("%.2f", $asset->getPrice);
+        $sku->{price}         = sprintf("%.2f", $asset->getPrice ? $asset->getPrice : 0);
         $sku->{addToCartForm} = $asset->getAddToCartForm;
         push @skus, $sku;
     }
