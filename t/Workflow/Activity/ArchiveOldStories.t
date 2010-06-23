@@ -62,7 +62,10 @@ $creationDateSth->execute([$weekAgo, $weekStory->getId]);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
+foreach my $asset ($archive1, $archive2) {
+    $asset = $asset->cloneFromDb;
+}
 
 my $workflow  = WebGUI::Workflow->create($session,
     {

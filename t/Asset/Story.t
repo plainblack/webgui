@@ -70,6 +70,9 @@ my $topic       = $defaultNode->addChild({
 my $archiveTag  = WebGUI::VersionTag->getWorking($session);
 $archiveTag->commit;
 WebGUI::Test->addToCleanup($archiveTag);
+foreach my $asset ($archive, $topic) {
+    $asset = $asset->cloneFromDb;
+}
 
 my $storage1 = WebGUI::Storage->create($session);
 my $storage2 = WebGUI::Storage->create($session);

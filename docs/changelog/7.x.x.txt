@@ -8,6 +8,8 @@
  - fixed #11626: Duplicate messages from Collab Systems
  - fixed #11667: Shop: unable to remove item from Cart
  - fixed #11550: Pending assets in the clipboard or trash are not visible from the approval screen
+ - fixed #11678: Story Archive leaks version tags
+
 
 7.9.7
  - added #11571: Allow return from photo edit view to gallery edit view
