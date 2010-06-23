@@ -97,7 +97,8 @@ sub import {
     die "WEBGUI_CONFIG path '$CONFIG_FILE' is not readable by effective uid '$>'.\n"
         unless -r _;
 
-    $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, File::Spec->catdir($CLASS->root, 'etc'));
+    my $etcDir = Cwd::realpath(File::Spec->catdir($CLASS->root, 'etc'));
+    $CONFIG_FILE = File::Spec->abs2rel($CONFIG_FILE, $etcDir);
 
     goto &{ $_[0]->can('SUPER::import') };
 }
