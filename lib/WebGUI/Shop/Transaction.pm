@@ -367,7 +367,7 @@ Returns a reference to the payment gateway attached to this transaction.
 
 sub getPaymentGateway {
     my ($self) = @_;
-    my $pay = WebGUI::Shop::Pay->new($self->session);
+    my $pay = WebGUI::Shop::Pay->new(session => $self->session);
     return $pay->getPaymentGateway($self->get('paymentDriverId'));
 }
 

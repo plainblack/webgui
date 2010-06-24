@@ -77,7 +77,7 @@ property duration => (
          );
 sub _duration_options {
     my $session = shift->session;
-    return WebGUI::Shop::Pay->new( $session )->getRecurringPeriodValues,
+    return WebGUI::Shop::Pay->new( session => $session )->getRecurringPeriodValues,
 }
 property executeOnSubscription => (
             fieldType       => 'text',

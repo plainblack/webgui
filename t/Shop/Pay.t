@@ -18,7 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
-#use Test::Exception;
+use Test::Exception;
 use JSON;
 use HTML::Form;
 
@@ -31,12 +31,6 @@ use WebGUI::TestException;
 my $session         = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
-# Tests
-
-my $tests = 18;
-plan tests => 1 + $tests;
-
-#----------------------------------------------------------------------------
 # put your tests here
 
 my $loaded = use_ok('WebGUI::Shop::Pay');
@@ -45,31 +39,19 @@ my $storage;
 my $newDriver;
 my $anotherDriver;
 
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::Pay', $tests unless $loaded;
-
 #######################################################################
 #
 # new
 #
 #######################################################################
 
-my $e;
 my $pay;
 
+dies_ok { $pay = WebGUI::Shop::Pay->new(); } 
+    'new takes an exception to not giving it a session variable';
 
-throws_deeply ( sub { $pay = WebGUI::Shop::Pay->new(); }, 
-    'WebGUI::Error::InvalidObject', 
-    {
-        error       => 'Must provide a session variable',
-        got         => '',
-        expected    => 'WebGUI::Session',
-    },
-    'new takes an exception to not giving it a session variable'
-);
-
-$pay = WebGUI::Shop::Pay->new($session);
+lives_ok { $pay = WebGUI::Shop::Pay->new(session => $session); } 'new called with hash arguments';
+lives_ok { $pay = WebGUI::Shop::Pay->new($session); } 'new called only with session';
 isa_ok($pay, 'WebGUI::Shop::Pay', 'new returned the right kind of object');
 
 #######################################################################
@@ -232,14 +214,11 @@ cmp_bag(
 #
 #######################################################################
 
-
-}
+done_testing();
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
     defined $newDriver and $newDriver->delete;
     defined $newDriver and $anotherDriver->delete;
-    my $count = $session->db->quickScalar('select count(*) from paymentGateway');
-    is($count, 2, 'WebGUI ships with two drivers by default');
 }

@@ -16,7 +16,8 @@ package WebGUI::Shop::Pay;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+#use Class::InsideOut qw{ :std };
+use Moose;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
@@ -24,6 +25,7 @@ use WebGUI::Shop::Admin;
 #use WebGUI::Shop::PayDriver;
 use WebGUI::Utility;
 use Tie::IxHash;
+use Scalar::Util;
 
 =head1 NAME
 
@@ -43,8 +45,34 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
+#-------------------------------------------------------------------
 
+=head2 session () 
+
+Returns a reference to the current session.
+
+=cut
+
+
+has session => (
+    is              => 'ro',
+    required        => 1,
+);
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    if (ref $_[0] eq 'HASH') {
+        return $className->$orig(@_);
+    }
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession);
+    }
+    return $className->$orig(@_);
+};
 
 #-------------------------------------------------------------------
 
@@ -214,36 +242,6 @@ sub getRecurringPeriodValues {
 	return \%periods;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 new ( $session )
-
-Constructor.
-
-=head3 $session
-
-A WebGUI::Session object.
-
-=cut
-
-sub new {
-    my $class     = shift;
-    my $session   = shift;
-    WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error => q{Must provide a session variable}) unless ref $session eq 'WebGUI::Session';
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
-=head2 session () 
-
-Returns a reference to the current session.
-
-=cut
 
 #-------------------------------------------------------------------
 

@@ -177,7 +177,7 @@ sub www_pay {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $pay = WebGUI::Shop::Pay->new($session);
+    my $pay = WebGUI::Shop::Pay->new(session => $session);
     if ($method ne "www_" && $pay->can($method)) {
         $output = $pay->$method();
     }
