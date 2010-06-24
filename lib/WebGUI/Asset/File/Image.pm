@@ -235,8 +235,8 @@ sub view {
 
         $style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
         $style->setLink($url->extras('yui/container/assets/container.css'), {rel=>'stylesheet', type=>'text/css'});
-        $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-        $style->setScript($url->extras('yui/build/container/container-min.js'), {type=>'text/javascript'});
+        $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+        $style->setScript($url->extras('yui/build/container/container-min.js'));
     }
 
     $var{controls}    = $self->getToolbar;
@@ -354,11 +354,11 @@ sub www_annotate {
 	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
 	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
 
-	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+	$style->setScript($url->extras('yui/build/element/element-min.js'));
+	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
+	$style->setScript($url->extras('yui/build/resize/resize-min.js'));
+	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'));
 
 	my @pieces = split(/\n/, $self->annotations);
 	
@@ -633,11 +633,11 @@ sub www_resize {
 
 	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
 	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/animation/animation-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+	$style->setScript($url->extras('yui/build/element/element-min.js'));
+	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
+	$style->setScript($url->extras('yui/build/resize/resize-min.js'));
+	$style->setScript($url->extras('yui/build/animation/animation-min.js'));
 
 	my $resize_js = qq(
 		<script>
@@ -774,11 +774,11 @@ sub www_crop {
 	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
 	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
 	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+	$style->setScript($url->extras('yui/build/element/element-min.js'));
+	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
+	$style->setScript($url->extras('yui/build/resize/resize-min.js'));
+	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'));
 
 	my $i18n = WebGUI::International->new($session,"Asset_Image");
 

@@ -555,12 +555,12 @@ sub getConfigurationScreen {
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
     $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type => 'text/CSS'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
     ##YUI Datatable
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
     ##Default CSS
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search, #export form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');

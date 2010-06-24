@@ -446,26 +446,11 @@ Override the master method to stuff in some javascript.
 
 sub getEditForm {
     my $self = shift;
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/utilities/utilities.js'),
-        { type => 'text/javascript', },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
-        { type => 'text/javascript', },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/json/json-min.js'),
-        { type => 'text/javascript', },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui-webgui/build/i18n/i18n.js'),
-        { type => 'text/javascript', },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui-webgui/build/ShipDriver/UPS.js'),
-        { type => 'text/javascript', },
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/utilities/utilities.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui/build/json/json-min.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui-webgui/build/i18n/i18n.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui-webgui/build/ShipDriver/UPS.js'));
     $self->session->style->setRawHeadTags(<<EOL);
 <script type="text/javascript">
     YAHOO.util.Event.onDOMReady( WebGUI.ShipDriver.UPS.initI18n );

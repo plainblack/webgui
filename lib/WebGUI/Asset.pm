@@ -1581,10 +1581,10 @@ sub getToolbar {
 
     $self->session->style->setLink($self->session->url->extras('assetToolbar/assetToolbar.css'), {rel=>"stylesheet",type=>"text/css"});
     $self->session->style->setLink($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>"stylesheet",type=>"text/css"});
-    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>"text/javascript"});
-    $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'), {type=>"text/javascript"});
-    $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
-    $self->session->style->setScript($self->session->url->extras('assetToolbar/assetToolbar.js'), {type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'));
+    $self->session->style->setScript($self->session->url->extras('assetToolbar/assetToolbar.js'));
     my $output
         = '<div class="yui-skin-sam wg-toolbar">'
         . '<img src="' . $self->getIcon(1) . '" title="' . $self->getName . '" alt="' . $self->getName . '" class="wg-toolbar-icon" />'

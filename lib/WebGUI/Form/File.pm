@@ -278,8 +278,8 @@ sub toHtml {
 	my @files = @{ $storage->getFiles } if (defined $storage);
 	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
 	if ($maxFiles > 0) {
-        $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'),{type=>"text/javascript"});
-        $self->session->style->setScript($self->session->url->extras('fileIcons.js'),{type=>"text/javascript"});
+        $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'));
+        $self->session->style->setScript($self->session->url->extras('fileIcons.js'));
         $uploadControl = '<script type="text/javascript">'
             . sprintf(q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow();!
                 , $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles, $self->get("size"))

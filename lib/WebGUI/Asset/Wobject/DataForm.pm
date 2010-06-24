@@ -1234,7 +1234,7 @@ Prepare the template for the form mode of the template.
 sub prepareViewForm {
     my $self = shift;
     $self->session->style->setLink($self->session->url->extras('tabs/tabs.css'), {"type"=>"text/css"});
-    $self->session->style->setScript($self->session->url->extras('tabs/tabs.js'), {"type"=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('tabs/tabs.js'));
     my $templateId = $self->templateId;
     my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     if (!$template) {

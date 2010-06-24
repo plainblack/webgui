@@ -100,9 +100,7 @@ sub getSelectAllButton {
     my $formName    = $self->get('name');
     my $i18n        = WebGUI::International->new($self->session, "Form_CheckList");
 
-    $self->session->style->setScript(
-        $self->session->url->extras("yui-webgui/build/form/form.js")
-    );
+    $self->session->style->setScript( $self->session->url->extras("yui-webgui/build/form/form.js"));
 
     return WebGUI::Form::Button->new($self->session, {
         name        => $self->privateName('selectAllButton'),

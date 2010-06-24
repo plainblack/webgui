@@ -270,11 +270,11 @@ sub print {
     my $url = $self->session->url;
     $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'));
+    $style->setScript($url->extras('/yui/build/dom/dom-min.js'));
+    $style->setScript($url->extras('/yui/build/event/event-min.js'));
+    $style->setScript($url->extras('/yui/build/container/container-min.js'));
+    $style->setScript($url->extras('/hoverhelp.js'));
         return $self->{_header}.$self->{_data}.$self->{_footer};
 }
 

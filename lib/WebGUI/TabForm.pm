@@ -235,10 +235,10 @@ sub print {
 	$style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'),{type=>"text/css", rel=>"stylesheet"});
     $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('/yui/build/container/container-min.js'));
+    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'));
+    $style->setScript($url->extras('/hoverhelp.js'));
 	my $i = 1;
 	my $tabs = '<ul class="yui-nav">';
 	my $form = '<div class="yui-content">';

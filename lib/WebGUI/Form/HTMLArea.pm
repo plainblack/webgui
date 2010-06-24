@@ -171,7 +171,7 @@ sub toHtml {
 	my $i18n = WebGUI::International->new($self->session);
 	my $richEdit = eval { WebGUI::Asset::RichEdit->newById($self->session, $self->get("richEditId")); };
 	if (! Exception::Class->caught() ) {
-       $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
+       $self->session->style->setScript($self->session->url->extras('textFix.js'));
 	   $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
 	   $self->set("resizable", 0);
 	   return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));

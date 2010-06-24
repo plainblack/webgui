@@ -214,10 +214,8 @@ sub www_show {
         @assetIds = $session->form->param("attachments");
     }
 	$session->http->setCacheControl("none");
-    $style->setScript($url->extras("/AttachmentsControl/AttachmentsControl.js"),
-        {type=>"text/javascript"});
-    $style->setLink($url->extras("/AttachmentsControl/AttachmentsControl.css"),
-        {type=>"text/css", rel=>"stylesheet"});
+    $style->setScript($url->extras("/AttachmentsControl/AttachmentsControl.js"));
+    $style->setLink($url->extras("/AttachmentsControl/AttachmentsControl.css"), {type=>"text/css", rel=>"stylesheet"});
     my $uploadControl = '';
 	my $i18n = WebGUI::International->new($session);
 	my $maxFiles = $form->param('maxAttachments') - scalar(@assetIds) ;

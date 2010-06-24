@@ -90,9 +90,9 @@ sub toHtml {
     my $url = $session->url;
 
     $style->setLink($url->extras("yui/build/autocomplete/assets/skins/sam/autocomplete.css"), {rel=>"stylesheet", type=>"text/css"});
-    $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"), {type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/datasource/datasource-min.js"), {type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/autocomplete/autocomplete-min.js"), {type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"));
+    $style->setScript($url->extras("yui/build/datasource/datasource-min.js"));
+    $style->setScript($url->extras("yui/build/autocomplete/autocomplete-min.js"));
     $style->setRawHeadTags('<style type="text/css">.yui-skin-sam.webgui-keywords-autocomplete .yui-ac-input { position: static; width: auto }</style>');
 
     my $name = $self->generateIdParameter($self->get('name'));

@@ -481,6 +481,7 @@ The URL to your script.
 =head3 params
 
 A hash reference containing the additional parameters to include in the script tag, such as "type" and "language".
+Defaults to { type => 'text/javascript' } if omitted.
 
 =head3 inBody
 
@@ -492,7 +493,10 @@ body_attachments variable instead of to head_attachments.
 sub setScript {
 	my $self = shift;
 	my $url = shift;
-	my $params = shift;
+	my $params = shift || { type => 'text/javascript', };
+    if (! exists $params->{type}) {
+        $params->{type} = 'text/javascript';
+    }
 	my $inBody = shift;
 	return undef if ($self->{_javascript}{$url});
 	my $tag = '<script src="'.$url.'"';

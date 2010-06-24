@@ -620,16 +620,11 @@ sub view {
         $var->{productUrl_click}        .= ';revision='.$revisionDate;
     }
 
-    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'),
-        {type => 'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),
-        {type => 'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'),
-        {type =>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
-        {type =>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'),
-        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'));
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         {type =>'text/css', rel=>'stylesheet'});
 

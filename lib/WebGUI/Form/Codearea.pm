@@ -162,16 +162,16 @@ sub toHtml {
 
     $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
     $style->setLink($url->extras("yui/build/assets/skins/sam/skin.css"), {type=>"text/css", rel=>"stylesheet"});
-    $style->setScript($url->extras("yui/build/utilities/utilities.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/container/container_core-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/menu/menu-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/button/button-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/resize/resize-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/editor/editor-min.js"),{type=>"text/javascript"});
-    $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras("yui/build/utilities/utilities.js"));
+    $style->setScript($url->extras("yui/build/container/container_core-min.js"));
+    $style->setScript($url->extras("yui/build/menu/menu-min.js"));
+    $style->setScript($url->extras("yui/build/button/button-min.js"));
+    $style->setScript($url->extras("yui/build/resize/resize-min.js"));
+    $style->setScript($url->extras("yui/build/editor/editor-min.js"));
+    $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"));
     #$style->setLink($url->extras("yui/build/logger/assets/logger.css"), {type=>"text/css", rel=>"stylesheet"});
     #$style->setLink($url->extras("yui/build/logger/assets/skins/sam/logger.css"), {type=>"text/css", rel=>"stylesheet"});
-    #$style->setScript($url->extras("yui/build/logger/logger.js"),{type=>"text/javascript"});
+    #$style->setScript($url->extras("yui/build/logger/logger.js"));
     my $codeCss = $url->extras("yui-webgui/build/code-editor/code.css");
     my $out = <<"END_HTML";
 <textarea id="$id" name="$name" $extras rows="10" cols="60" style="font-family: monospace; $styleAttr; height: 100%; width: 100%; resize: none;">$value</textarea>

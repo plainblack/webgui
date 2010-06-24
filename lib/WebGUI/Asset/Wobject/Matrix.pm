@@ -588,11 +588,11 @@ sub view {
     $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
         {type =>'text/css', rel=>'stylesheet'});
 
-    $style->setScript($url->extras('yui/build/utilities/utilities.js'),       {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'),             {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),   {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'),         {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
     
     my ($varStatistics,$varStatisticsEncoded);
 	my $var = $self->get;
@@ -826,24 +826,15 @@ sub www_compare {
         @listingIds = $self->session->form->checkList("listingId");
     }
 
-    $style->setScript($url->extras('yui/build/utilities/utilities.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),
-        {type =>'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'),
-        {type =>'text/javascript'});
-    $style->setScript($url->extras('yui/build/container/container-min.js'),
-        {type =>'text/javascript'});
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
-        {type =>'text/css', rel=>'stylesheet'});
-    $style->setScript($url->extras('hoverhelp.js'),
-        {type => 'text/javascript'});
-    $style->setLink($url->extras('hoverhelp.css'),
-        {type =>'text/css', rel=>'stylesheet'});
+    $style->setScript($url->extras('yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setScript($url->extras('yui/build/container/container-min.js'));
+    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type =>'text/css', rel=>'stylesheet'});
+    $style->setScript($url->extras('hoverhelp.js'));
+    $style->setLink($url->extras('hoverhelp.css'), {type =>'text/css', rel=>'stylesheet'});
 
     my $maxComparisons;
     if($self->session->user->isVisitor){
@@ -1356,18 +1347,12 @@ sub www_search {
     my $style   = $session->style;
     
     $var->{compareForm}     = $self->getCompareForm;
-    $style->setScript($url->extras('yui/build/utilities/utilities.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'),
-        {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),
-        {type =>'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'),
-        {type =>'text/javascript'});
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
-        {type =>'text/css', rel=>'stylesheet'});
+    $style->setScript($url->extras('yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type =>'text/css', rel=>'stylesheet'});
 
     foreach my $category (keys %{$self->getCategories}) {
         my $attributes;

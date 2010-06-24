@@ -876,11 +876,11 @@ sub www_manage {
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/paginator/paginator-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datasource/datasource-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datatable/datatable-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('/yui/build/json/json-min.js'));
+    $style->setScript($url->extras('/yui/build/paginator/paginator-min.js'));
+    $style->setScript($url->extras('/yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('/yui/build/datatable/datatable-min.js'));
 
     # draw the html markup that's needed
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');

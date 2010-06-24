@@ -37,8 +37,8 @@ sub process {
 	return undef unless $session->var->isAdminOn;
 	my $i18n = WebGUI::International->new($session,'Macro_AdminBar');
 	my ($url, $style, $asset, $user, $config) = $session->quick(qw(url style asset user config));
-	$style->setScript($url->extras('yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('accordion/accordion.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/utilities/utilities.js'));
+	$style->setScript($url->extras('accordion/accordion.js'));
 	$style->setLink($url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
 
 	my $out = q{<dl class="accordion-menu">};

@@ -491,16 +491,16 @@ sub www_managePayouts {
     $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type=>'text/css', rel=>'stylesheet'});
     $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       {type=>'text/css', rel=>'stylesheet'});
 
-    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/element/element-min.js'),             {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/connection/connection-min.js'),       {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'),         {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'),       {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),         {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'),               {type=>'text/javascript'});
-    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),                {type=>'text/javascript'});
-    $style->setScript($url->extras('VendorPayout/vendorPayout.js'),                 {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/element/element-min.js'));
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'));
+    $style->setScript($url->extras('VendorPayout/vendorPayout.js'));
 
     # Add css for scheduled payout highlighting
     $style->setRawHeadTags(<<CSS);

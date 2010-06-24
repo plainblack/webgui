@@ -221,17 +221,17 @@ sub handler {
         my $style = $session->style;
         $style->setLink($url->extras('/yui/build/container/assets/skins/sam/container.css'),{ type=>'text/css', rel=>"stylesheet" });
         $style->setLink($url->extras('/yui/build/colorpicker/assets/skins/sam/colorpicker.css'),{ type=>'text/css', rel=>"stylesheet" });
-        $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
-        $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
-        $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
-        $style->setScript($url->extras('/yui/build/dragdrop/dragdrop-min.js'),{ type=>'text/javascript' });
-        $style->setScript($url->extras('/yui/build/utilities/utilities.js'),{ type=>'text/javascript' });
-        $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-        $style->setScript($url->extras('/yui/build/slider/slider-min.js'),{ type=>'text/javascript' });
-        $style->setScript($url->extras('/yui/build/colorpicker/colorpicker-min.js'),{ type=>'text/javascript' });
+        $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'));
+        $style->setScript($url->extras('/yui/build/event/event-min.js'));
+        $style->setScript($url->extras('/yui/build/dom/dom-min.js'));
+        $style->setScript($url->extras('/yui/build/dragdrop/dragdrop-min.js'));
+        $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+        $style->setScript($url->extras('/yui/build/container/container-min.js'));
+        $style->setScript($url->extras('/yui/build/slider/slider-min.js'));
+        $style->setScript($url->extras('/yui/build/colorpicker/colorpicker-min.js'));
         $style->setLink($url->extras('/colorpicker/colorpicker.css'),{ type=>'text/css', rel=>"stylesheet" });
-        $style->setScript($url->extras('/colorpicker/colorpicker.js'),{ type=>'text/javascript' });
-        $style->setScript($url->extras("/styleDesigner/styleDesigner.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras('/colorpicker/colorpicker.js'));
+        $style->setScript($url->extras("/styleDesigner/styleDesigner.js"));
         $style->setLink($url->extras("/styleDesigner/styleDesigner.css"), {rel=>"stylesheet", type=>"text/css"});
         $legend = $i18n->get("style designer");
         $output .= '

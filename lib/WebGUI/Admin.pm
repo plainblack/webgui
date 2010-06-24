@@ -295,18 +295,18 @@ sub www_view {
     $style->setLink( $url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $style->setLink( $url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
     $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
-    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('accordion/accordion.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('admin/admin.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/element/element-min.js'), {type=>"text/javascript"});
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('accordion/accordion.js'));
+    $style->setScript($url->extras('admin/admin.js'));
+    $style->setScript($url->extras('yui/build/element/element-min.js'));
     $style->setScript( $url->extras( 'yui/build/paginator/paginator-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/datasource/datasource-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/datatable/datatable-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/container/container-min.js' ) );
-    $style->setScript($url->extras('yui/build/tabview/tabview-min.js'), {type=>"text/javascript"});
-    $style->setScript($url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
-    $style->setScript($url->extras('yui/build/button/button-min.js'), {type=>"text/javascript"});
+    $style->setScript($url->extras('yui/build/tabview/tabview-min.js'));
+    $style->setScript($url->extras('yui/build/menu/menu-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
 
     $style->setScript( $url->extras( 'yui/build/json/json-min.js' ) );
     $style->setScript( $url->extras( 'yui-webgui/build/i18n/i18n.js' ) );

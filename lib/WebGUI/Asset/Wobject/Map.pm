@@ -298,21 +298,21 @@ sub loadMapApiTags {
 
     $style->setLink($url->extras('yui/build/container/assets/skins/sam/container.css'),{type=>'text/css',rel=>'stylesheet'});
     $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),{type=>'text/css',rel=>'stylesheet'});
-    $style->setScript("http://www.google.com/jsapi?key=" . $self->mapApiKey,{type=>"text/javascript"});
+    $style->setScript("http://www.google.com/jsapi?key=" . $self->mapApiKey);
     $style->setRawHeadTags(<<'ENDHTML');
 <script type="text/javascript">
     google.load("maps", "2", { "other_params" : "sensor=false" });
 </script>
 ENDHTML
-    $style->setScript('http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js', {type=>"text/javascript"});
-    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/connection/connection-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/element/element-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/container/container-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui-webgui/build/map/map.js'),{type=>'text/javascript'});
+    $style->setScript('http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js');
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'));
+    $style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
+    $style->setScript($url->extras('yui/build/element/element-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setScript($url->extras('yui/build/container/container-min.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui-webgui/build/map/map.js'));
 
     return;
 }

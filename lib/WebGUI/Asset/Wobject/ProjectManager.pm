@@ -1737,59 +1737,28 @@ sub www_viewProject {
     );
 	
     #Set page scripts
-	$style->setScript($assetExtras."/cMenu.js",{ 
-                          type=>"text/javascript",
-                      }
-    );
+	$style->setScript($assetExtras."/cMenu.js");
     
-	$style->setScript($extras."/contextMenu/contextMenu.js",{ 
-                          type=>"text/javascript" 
-                     }
-    );
+	$style->setScript($extras."/contextMenu/contextMenu.js");
 	
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/yahoo/yahoo-min.js'));
     
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/event/event-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/event/event-min.js'));
     
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/dom/dom-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/dom/dom-min.js'));
    
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/connection/connection-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/connection/connection-min.js'));
     
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/container/container-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/container/container-min.js'));
     
-    $style->setScript($assetExtras."/modal.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-    
+    $style->setScript($assetExtras."/modal.js"); 
     #$self->session->style->setScript(
     #  $self->session->url->extras('yui-webgui/build/datepicker/datepicker.js'),
     #  { type=>'text/javascript' }
     #);
 
-	$style->setScript($assetExtras."/projectDisplay.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-	$style->setScript($assetExtras."/taskEdit.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
+	$style->setScript($assetExtras."/projectDisplay.js");
+	$style->setScript($assetExtras."/taskEdit.js");
 	
 	#Get Project Data
     my $sql          = q|select * from PM_project where projectId=?|;   

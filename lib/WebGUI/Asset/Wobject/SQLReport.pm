@@ -371,7 +371,7 @@ override getEditForm => sub {
 		);
 	
 	# javascript
-	$self->session->style->setScript($self->session->url->extras("wobject/SQLReport/editFormDownload.js"), {type => 'text/javascript',});
+	$self->session->style->setScript($self->session->url->extras("wobject/SQLReport/editFormDownload.js"));
 	
 	### /DOWNLOAD
 	

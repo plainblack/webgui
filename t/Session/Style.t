@@ -19,8 +19,9 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 58; # increment this value for each test you create
+use Test::More;
 use Test::Deep;
+use Data::Dumper;
  
 my $session = WebGUI::Test->session;
  
@@ -137,19 +138,22 @@ is($url, '-', 'setScript: called with no params or script url');
 $style->setScript('http://www.plainblack.com/stuff.js');
 is($style->setScript('http://www.plainblack.com/stuff.js'), undef, 'setScript: called with duplicate url returns undef');
 my $scriptOutput = $style->generateAdditionalHeadTags;
-($url) = simpleLinkParser('script', $scriptOutput);
-is($url, 'http://www.plainblack.com/stuff.js', 'setScript: called with script url');
+diag $scriptOutput;
+($url, $params) = simpleLinkParser('script', $scriptOutput);
+is($url, 'http://www.plainblack.com/stuff.js', '... called with script url');
+diag Dumper $params;
+is_deeply($params, { type => 'text/javascript', }, '... defaults to text/javascript');
 
-my $setParams = { type => 'text/javascript' };
+my $setParams = { type => 'textual/mongoscript' };
 my $setUrl = 'http://www.webguidev.org/sorting.js';
 $style->setScript($setUrl, $setParams);
 my $scriptOutput = $style->generateAdditionalHeadTags;
 ($url, $params) = simpleLinkParser('script', $scriptOutput);
-is($url, $setUrl, 'setScript: called with new script url');
-is_deeply($params, $setParams, 'setScript: params set properly');
+is($url, $setUrl, '... called with new script url');
+is_deeply($params, $setParams, '... params set properly');
 
 sendImmediate($style, 'setScript', 'http://dev.setscript.com/script.js',
-	'setScript, sent: data automatically sent out via Session->Output');
+	'... sent: data automatically sent out via Session->Output');
 
 TODO: {
 	local $TODO = "more setScript tests";
@@ -405,6 +409,8 @@ $session->asset($snippet);
 is($style->process('test output'), 
 	"WebGUI was unable to instantiate your style template with the id: .test output",
 	'process:  no valid printableStyleTemplateFound in asset branch returns error');
+
+done_testing();
 
 ####################################################
 #

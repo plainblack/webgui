@@ -407,7 +407,7 @@ sub www_manageTrash {
         $ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), $i18n->get(964));
     }
   	$self->session->style->setLink($self->session->url->extras('assetManager/assetManager.css'), {rel=>"stylesheet",type=>"text/css"});
-        $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'), {type=>"text/javascript"});
+        $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'));
 	my $output = "
    <script type=\"text/javascript\">
    //<![CDATA[

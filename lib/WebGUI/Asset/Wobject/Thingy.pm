@@ -1722,16 +1722,11 @@ sub www_editThing {
     
     $tabForm->addTab('fields', $i18n->get('fields tab label'));
 
-    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'), {type => 
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=> 
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('wobject/Thingy/thingy.js'), {type=>
-    'text/javascript'});
-    $self->session->style->setLink($self->session->url->extras('wobject/Thingy/thingy.css'), {type
-    =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'));
+    $self->session->style->setScript($self->session->url->extras('wobject/Thingy/thingy.js'));
+    $self->session->style->setLink($self->session->url->extras('wobject/Thingy/thingy.css'), {type =>'text/css', rel=>'stylesheet'});
 
     $tab = $tabForm->getTab('fields');
     foreach my $fieldType ( keys %{ WebGUI::Form::FieldType->new($session)->getTypes }) {

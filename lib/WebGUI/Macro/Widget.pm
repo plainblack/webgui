@@ -44,18 +44,9 @@ sub process {
     );
     
     # and the JS
-    $style->setScript($extras."/wgwidget.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-    $style->setScript($extras."/yui/build/yahoo-dom-event/yahoo-dom-event.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-    $style->setScript($extras."/yui/build/container/container-min.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
+    $style->setScript($extras."/wgwidget.js");
+    $style->setScript($extras."/yui/build/yahoo-dom-event/yahoo-dom-event.js");
+    $style->setScript($extras."/yui/build/container/container-min.js");
 
     # construct the absolute URL and get the asset ID
     my $asset           = eval { WebGUI::Asset->newByUrl($session, $url); };

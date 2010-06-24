@@ -351,13 +351,13 @@ sub getConfigurationScreen {
     $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('/yui/build/container/container-min.js'));
+    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'));
+    $style->setScript($url->extras('/hoverhelp.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
    
     my $generalLabel    = $i18n->get('general configuration');
     my $groupsLabel     = $i18n->get('vat groups');

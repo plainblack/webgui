@@ -385,12 +385,12 @@ override getEditForm => sub {
 	);
 
 	my ($style, $url) = $self->session->quick(qw(style url));
-	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),           {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/json/json-min.js'),             {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/dom/dom-min.js'),               {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/event/event-min.js'),           {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
-	$style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),          {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
+	$style->setScript($url->extras('yui/build/json/json-min.js'));
+	$style->setScript($url->extras('yui/build/dom/dom-min.js'));
+	$style->setScript($url->extras('yui/build/event/event-min.js'));
+	$style->setScript($url->extras('yui/build/connection/connection-min.js'));
+	$style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'));
 
 	pop(@headers);
 	my $scriptUrl = $url->extras('templateAttachments.js');

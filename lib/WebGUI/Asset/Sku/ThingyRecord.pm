@@ -207,22 +207,10 @@ Add the javascript needed for the edit form
 
 override getEditForm => sub {
     my ($self) = @_;
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
-        { type => "text/javascript" },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/connection/connection-min.js'),
-        { type => "text/javascript" },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/json/json-min.js'),
-        { type => "text/javascript" },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui-webgui/build/thingyRecord/thingyRecord.js'),
-        { type => "text/javascript" },
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui/build/connection/connection-min.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui/build/json/json-min.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui-webgui/build/thingyRecord/thingyRecord.js'));
     $self->session->style->setRawHeadTags(<<EOSCRIPT);
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady( function () { var thingForm = YAHOO.util.Dom.get('thingId_formId'); WebGUI.ThingyRecord.getThingFields(thingForm.options[thingForm.selectedIndex].value,'thingFields_formId')} );

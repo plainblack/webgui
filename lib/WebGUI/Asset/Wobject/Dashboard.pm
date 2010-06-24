@@ -283,10 +283,7 @@ sub view {
 	my $self = shift;
 	my %vars = %{$self->get()};
 	
-	$self->session->style->setScript(
-      $self->session->url->extras('yui/build/utilities/utilities.js'),
-      { type=>'text/javascript' }
-    );
+	$self->session->style->setScript( $self->session->url->extras('yui/build/utilities/utilities.js'));
 	
 	my $templateId = $self->templateId;
 	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });

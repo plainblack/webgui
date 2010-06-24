@@ -92,7 +92,7 @@ Renders a phone number field.
 
 sub toHtml {
         my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->url->extras('inputCheck.js'));
         $self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'x.0123456789-()+ \')" ');
 	return $self->SUPER::toHtml;
 }
