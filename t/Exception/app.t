@@ -19,7 +19,6 @@ my $regular_app = builder {
 };
 
 my $generic_dead_app = builder {
-    enable '+WebGUI::Middleware::Session', config => $wg->config;
     enable '+WebGUI::Middleware::HTTPExceptions';
     
     # Pretend that WebGUI dies during request handling
@@ -27,11 +26,10 @@ my $generic_dead_app = builder {
 };
 
 my $specific_dead_app = builder {
-    enable '+WebGUI::Middleware::Session', config => $wg->config;
     enable '+WebGUI::Middleware::HTTPExceptions';
     
     # Pretend that WebGUI throws a '501 - Not Implemented' HTTP error
-    sub { HTTP::Exception->throw(501) }
+    sub { HTTP::Exception->throw(501) };
 };
 
 my $fatal_app = builder {
@@ -42,6 +40,7 @@ my $fatal_app = builder {
     sub { 
         my $env = shift;
         
+        WebGUI::Test->addToCleanup($env->{'webgui.session'});
         $env->{'webgui.session'}->log->fatal('Fatally yours');
     }
 };
@@ -50,7 +49,11 @@ my $not_found_app = builder {
     enable '+WebGUI::Middleware::Session', config => $wg->config;
     enable '+WebGUI::Middleware::HTTPExceptions';
     
-    sub { HTTP::Exception->throw(404) }
+    sub {
+        my $env = shift;
+        WebGUI::Test->addToCleanup($env->{'webgui.session'});
+        HTTP::Exception->throw(404)
+    };
 };
 
 test_psgi $regular_app, sub {
