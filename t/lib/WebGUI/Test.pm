@@ -123,7 +123,7 @@ sub _initSession {
                 my ($label, $table) = @checkCount[$i, $i+1];
                 my $quant = $session->db->quickScalar('SELECT COUNT(*) FROM ' . $table);
                 my $delta = $quant - $initCounts{$table};
-                if ($delta) {
+                if ($delta || $ENV{WEBGUI_TEST_DEBUG} eq 2) {
                     $CLASS->builder->diag(sprintf '%-24s: %4d (delta %+d)', $label, $quant, $delta);
                 }
             }
