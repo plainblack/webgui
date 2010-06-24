@@ -21,3 +21,4 @@
     enable 'Plack::Middleware::Static',
         path => sub { s{^$uploadsURL/}{} }, 
         root => "$uploadsPath/";
+
