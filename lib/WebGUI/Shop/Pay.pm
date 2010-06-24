@@ -64,9 +64,6 @@ around BUILDARGS => sub {
     my $className  = shift;
 
     ##Original arguments start here.
-    if (ref $_[0] eq 'HASH') {
-        return $className->$orig(@_);
-    }
     my $protoSession = $_[0];
     if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
         return $className->$orig(session => $protoSession);
