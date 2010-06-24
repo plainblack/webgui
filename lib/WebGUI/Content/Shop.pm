@@ -199,7 +199,7 @@ sub www_ship {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $ship = WebGUI::Shop::Ship->new($session);
+    my $ship = WebGUI::Shop::Ship->new(session => $session);
     if ($method ne "www_" && $ship->can($method)) {
         $output = $ship->$method($session);
     }

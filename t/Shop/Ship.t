@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use JSON;
 use HTML::Form;
 use Data::Dumper;
@@ -33,9 +34,6 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 22;
-plan tests => 1 + $tests;
-
 #----------------------------------------------------------------------------
 # put your tests here
 
@@ -46,32 +44,16 @@ my $driver;
 my $driver2;
 my $ship;
 
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::Ship', $tests unless $loaded;
-
 #######################################################################
 #
 # new
 #
 #######################################################################
 
-my $e;
+dies_ok { $ship = WebGUI::Shop::Ship->new(); } 'new takes an exception to not giving it a session variable';
 
-eval { $ship = WebGUI::Shop::Ship->new(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-        got   => '',
-        expected => 'WebGUI::Session',
-    ),
-    'new: requires a session variable',
-);
-
-$ship = WebGUI::Shop::Ship->new($session);
+lives_ok { $ship = WebGUI::Shop::Ship->new(session => $session); } 'new takes hash arguments';
+lives_ok { $ship = WebGUI::Shop::Ship->new($session); } 'new takes a bare session object';
 isa_ok($ship, 'WebGUI::Shop::Ship', 'new returned the right kind of object');
 
 isa_ok($ship->session, 'WebGUI::Session', 'session method returns a session object');
@@ -106,6 +88,8 @@ cmp_bag(
 #######################################################################
 
 my $shipper;
+
+my $e;
 
 eval { $shipper = $ship->addShipper(); };
 $e = Exception::Class->caught();
@@ -216,12 +200,11 @@ cmp_deeply(
 
 $cart->delete;
 
-}
+done_testing();
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
     $driver->delete;
     $driver2->delete;
-    is(scalar @{$ship->getShippers()}, 1, 'getShippers: deleted all test shippers');
 }

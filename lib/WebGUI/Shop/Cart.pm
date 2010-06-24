@@ -369,7 +369,7 @@ Returns the WebGUI::Shop::ShipDriver object that is attached to this cart for sh
 
 sub getShipper {
     my $self = shift;
-    return WebGUI::Shop::Ship->new($self->session)->getShipper($self->get("shipperId"));
+    return WebGUI::Shop::Ship->new(session => $self->session)->getShipper($self->get("shipperId"));
 }
 
 #-------------------------------------------------------------------
@@ -845,7 +845,7 @@ sub www_view {
     else {
         $var{hasShippingAddress} = 1;
         $var{shippingAddress} = $address->getHtmlFormatted;
-        my $ship = WebGUI::Shop::Ship->new($self->session);
+        my $ship = WebGUI::Shop::Ship->new(session => $self->session);
         my $options = $ship->getOptions($self);
         my $numberOfOptions = scalar keys %{ $options };
         if ($numberOfOptions < 1) {
