@@ -103,6 +103,14 @@ sub editUserSettingsForm {
         hoverHelp   => $i18n->get('consumer secret help'),
     );
 
+    $f->template(
+        name        => 'twitterTemplateIdChooseUsername',
+        value       => $setting->get( 'twitterTemplateIdChooseUsername' ),
+        label       => $i18n->get('choose username template'),
+        hoverHelp   => $i18n->get('choose username template help'),
+        namespace   => 'Auth/Twitter/ChooseUsername',
+    );
+
     return $f->printRowsOnly;
 }
 
@@ -119,12 +127,29 @@ sub editUserSettingsFormSave {
     my $session = $self->session;
     my ( $form, $setting ) = $session->quick(qw( form setting ));
 
-    my @fields  = qw( twitterEnabled twitterConsumerKey twitterConsumerSecret );
+    my @fields  = qw( 
+        twitterEnabled twitterConsumerKey twitterConsumerSecret 
+        twitterTemplateIdChooseUsername 
+    );
     for my $field ( @fields ) {
         $setting->set( $field, $form->get( $field ) );
     }
 
     return;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getTemplateChooseUsername ( )
+
+Get the template to choose a username
+
+=cut
+
+sub getTemplateChooseUsername {
+    my ( $self ) = @_;
+    my $templateId  = $self->session->setting->get('twitterTemplateIdChooseUsername');
+    return WebGUI::Asset::Template->new( $self->session, $templateId );
 }
 
 #----------------------------------------------------------------------------
@@ -208,16 +233,12 @@ sub www_callback {
 
     # Otherwise ask them for a new username to use
     $scratch->set( "AuthTwitterUserId", $twitterUserId );
-    my $output  = '<h1>^International("choose username title","Auth_Twitter");</h1>'
-                . '<p>^International("twitter screen name taken","Auth_Twitter","<tmpl_var username>");</p>'
-                . '<form><input type="hidden" name="op" value="auth" />'
-                . '<input type="hidden" name="authType" value="Twitter" />'
-                . '<input type="hidden" name="method" value="setUsername" />'
-                . '<input type="text" name="newUsername" value="" />'
-                . '<input type="submit" />'
-                . '</form>'
-                ;
-    return $output;
+    my $tmpl    = $self->getTemplateChooseUsername;
+    my $var     = {
+        message     => sprintf( $i18n->get("twitter screen name taken"), $twitterScreenName ),
+    };
+
+    return $tmpl->process( $var );
 }
 
 #----------------------------------------------------------------------------
@@ -243,16 +264,12 @@ sub www_setUsername {
     }
 
     # Username is again taken! Noooooo!
-    my $output  = '<h1>^International("choose username title","Auth_Twitter");</h1>'
-                . '<p>^International("webgui username taken","Auth_Twitter","<tmpl_var username>");</p>'
-                . '<form><input type="hidden" name="op" value="auth" />'
-                . '<input type="hidden" name="authType" value="Twitter" />'
-                . '<input type="hidden" name="method" value="setUsername" />'
-                . '<input type="text" name="newUsername" value="" />'
-                . '<input type="submit" />'
-                . '</form>'
-                ;
-    return $output;
+    my $tmpl    = $self->getTemplateChooseUsername;
+    my $var     = {
+        message     => sprintf( $i18n->get("webgui username taken"), $username ),
+    };
+
+    return $tmpl->process( $var );
 }
 
 1;
