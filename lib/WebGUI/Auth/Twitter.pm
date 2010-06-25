@@ -28,9 +28,24 @@ sub editUserSettingsForm {
 
     $f->yesNo( 
         name        => 'twitterEnabled',
-        value       => $settings->get( 'twitterEnabled' ),
+        value       => $setting->get( 'twitterEnabled' ),
         label       => 'Enabled?',
         hoverHelp   => 'Enabled Twitter-based login',
+    );
+
+    $f->text(
+        name        => 'twitterConsumerKey',
+        value       => $setting->get( 'twitterConsumerKey' ),
+        label       => 'Twitter Consumer Key',
+        hoverHelp   => 'The Consumer Key from your application settings',
+        subtext     => 'Get a Twitter API key from http://example.com',
+    );
+
+    $f->text( 
+        name        => 'twitterConsumerSecret',
+        value       => $setting->get( 'twitterConsumerSecret' ),
+        label       => 'Twitter Consumer Secret',
+        hoverHelp   => 'The Consumer Secret from your application settings',
     );
 
     return $f->printRowsOnly;
@@ -41,7 +56,7 @@ sub editUserSettingsFormSave {
     my $session = $self->session;
     my ( $form, $setting ) = $session->quick(qw( form setting ));
 
-    my @fields  = qw( twitterEnabled );
+    my @fields  = qw( twitterEnabled twitterConsumerKey twitterConsumerSecret );
     for my $field ( @fields ) {
         $setting->set( $field, $form->get( $field ) );
     }
@@ -52,12 +67,12 @@ sub editUserSettingsFormSave {
 sub www_login {
     my ( $self ) = @_;
     my $session = $self->session;
-    my ( $url, $scratch ) = $session->quick( qw( url scratch ) );
+    my ( $url, $scratch, $setting ) = $session->quick( qw( url scratch setting ) );
 
     my $nt = Net::Twitter->new(
         traits          => [qw/API::REST OAuth/],
-        consumer_key    => '3hvJpBr73pa4FycNrqw',
-        consumer_secret => 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A',
+        consumer_key    => $setting->get( 'twitterConsumerKey' ),       # Test: '3hvJpBr73pa4FycNrqw',
+        consumer_secret => $setting->get( 'twitterConsumerSecret' ),    # Test: 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A',
     );
 
     my $url = $nt->get_authorization_url(
@@ -74,14 +89,14 @@ sub www_login {
 sub www_callback {
     my ( $self ) = @_;
     my $session = $self->session;
-    my ( $form, $scratch, $db ) = $session->quick(qw( form scratch db ));
+    my ( $form, $scratch, $db, $setting ) = $session->quick(qw( form scratch db setting ));
 
     my $verifier = $form->get('oauth_verifier');
 
     my $nt = Net::Twitter->new(
         traits => [qw/API::REST OAuth/],
-        consumer_key    => '3hvJpBr73pa4FycNrqw',
-        consumer_secret => 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A',
+        consumer_key    => $setting->get( 'twitterConsumerKey' ),       # Test: '3hvJpBr73pa4FycNrqw',
+        consumer_secret => $setting->get( 'twitterConsumerSecret' ),    # Test: 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A',
     );
     $nt->request_token( $scratch->get('AuthTwitterToken') );
     $nt->request_token_secret( $scratch->get('AuthTwitterTokenSecret') );
