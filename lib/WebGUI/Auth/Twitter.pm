@@ -77,29 +77,30 @@ sub editUserSettingsForm {
     my $self = shift;
     my $session = $self->session;
     my ( $setting ) = $session->quick(qw( setting ));
+    my $i18n = WebGUI::International->new( $session, 'Auth_Twitter' );
 
     my $f = WebGUI::HTMLForm->new( $session );
 
     $f->yesNo( 
         name        => 'twitterEnabled',
         value       => $setting->get( 'twitterEnabled' ),
-        label       => 'Enabled?',
-        hoverHelp   => 'Enabled Twitter-based login',
+        label       => $i18n->get('enabled'),
+        hoverHelp   => $i18n->get('enabled help'),
     );
 
     $f->text(
         name        => 'twitterConsumerKey',
         value       => $setting->get( 'twitterConsumerKey' ),
-        label       => 'Twitter Consumer Key',
-        hoverHelp   => 'The Consumer Key from your application settings',
-        subtext     => 'Get a Twitter API key from http://example.com',
+        label       => $i18n->get('consumer key'),
+        hoverHelp   => $i18n->get('consumer key help'),
+        subtext     => sprintf( $i18n->get('get key'), ($keyUrl) x 2 ),
     );
 
     $f->text( 
         name        => 'twitterConsumerSecret',
         value       => $setting->get( 'twitterConsumerSecret' ),
-        label       => 'Twitter Consumer Secret',
-        hoverHelp   => 'The Consumer Secret from your application settings',
+        label       => $i18n->get('consumer secret'),
+        hoverHelp   => $i18n->get('consumer secret help'),
     );
 
     return $f->printRowsOnly;
@@ -207,8 +208,8 @@ sub www_callback {
 
     # Otherwise ask them for a new username to use
     $scratch->set( "AuthTwitterUserId", $twitterUserId );
-    my $output  = '<h1>Choose a Username</h1>'
-                . sprintf( '<p>Your twitter screen name "%s" is already taken. Please choose a new username.</p>', $twitterScreenName )
+    my $output  = '<h1>^International("choose username title","Auth_Twitter");</h1>'
+                . '<p>^International("twitter screen name taken","Auth_Twitter","<tmpl_var username>");</p>'
                 . '<form><input type="hidden" name="op" value="auth" />'
                 . '<input type="hidden" name="authType" value="Twitter" />'
                 . '<input type="hidden" name="method" value="setUsername" />'
@@ -242,8 +243,8 @@ sub www_setUsername {
     }
 
     # Username is again taken! Noooooo!
-    my $output  = '<h1>Choose a Username</h1>'
-                . sprintf( '<p>The username "%s" is already taken. Please choose a new username.</p>', $username )
+    my $output  = '<h1>^International("choose username title","Auth_Twitter");</h1>'
+                . '<p>^International("webgui username taken","Auth_Twitter","<tmpl_var username>");</p>'
                 . '<form><input type="hidden" name="op" value="auth" />'
                 . '<input type="hidden" name="authType" value="Twitter" />'
                 . '<input type="hidden" name="method" value="setUsername" />'
