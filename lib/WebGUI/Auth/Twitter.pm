@@ -56,9 +56,9 @@ Create a new Auth::Twitter user with the given twitter userId and screen name.
 =cut
 
 sub createTwitterUser {
-    my ( $self, $twitterUserId, $twitterScreenName ) = @_;
+    my ( $self, $twitterUserId, $username ) = @_;
     my $user    = WebGUI::User->create( $self->session );
-    $user->username( $twitterScreenName );
+    $user->username( $username );
     $self->saveParams( $user->userId, $self->authMethod, { 
         "twitterUserId" => $twitterUserId,
     } );
@@ -83,7 +83,7 @@ sub editUserSettingsForm {
 
     my $f = WebGUI::HTMLForm->new( $session );
 
-    $f->yesNo( 
+    $f->yesNo(
         name        => 'twitterEnabled',
         value       => $setting->get( 'twitterEnabled' ),
         label       => $i18n->get('enabled'),
@@ -98,7 +98,7 @@ sub editUserSettingsForm {
         subtext     => sprintf( $i18n->get('get key'), ($keyUrl) x 2 ),
     );
 
-    $f->text( 
+    $f->text(
         name        => 'twitterConsumerSecret',
         value       => $setting->get( 'twitterConsumerSecret' ),
         label       => $i18n->get('consumer secret'),
