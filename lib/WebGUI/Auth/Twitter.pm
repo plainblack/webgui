@@ -79,6 +79,8 @@ sub editUserSettingsForm {
     my ( $setting ) = $session->quick(qw( setting ));
     my $i18n = WebGUI::International->new( $session, 'Auth_Twitter' );
 
+    my $keyUrl  = 'http://dev.twitter.com/apps/new';
+
     my $f = WebGUI::HTMLForm->new( $session );
 
     $f->yesNo( 
@@ -232,6 +234,7 @@ sub www_callback {
     }
 
     # Otherwise ask them for a new username to use
+    my $i18n = WebGUI::International->new( $session, 'Auth_Twitter' );
     $scratch->set( "AuthTwitterUserId", $twitterUserId );
     my $tmpl    = $self->getTemplateChooseUsername;
     my $var     = {
@@ -254,6 +257,7 @@ sub www_setUsername {
     my ( $self ) = @_;
     my $session = $self->session;
     my ( $form, $scratch, $db ) = $session->quick(qw( form scratch db ));
+    my $i18n = WebGUI::International->new( $session, 'Auth_Twitter' );
 
     my $username    = $form->get('newUsername');
     if ( !WebGUI::User->newByUsername( $session, $username ) ) {
