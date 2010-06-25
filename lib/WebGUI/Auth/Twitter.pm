@@ -19,6 +19,36 @@ sub createTwitterUser {
     return $user;
 }
 
+sub editUserSettingsForm {
+    my $self = shift;
+    my $session = $self->session;
+    my ( $setting ) = $session->quick(qw( setting ));
+
+    my $f = WebGUI::HTMLForm->new( $session );
+
+    $f->yesNo( 
+        name        => 'twitterEnabled',
+        value       => $settings->get( 'twitterEnabled' ),
+        label       => 'Enabled?',
+        hoverHelp   => 'Enabled Twitter-based login',
+    );
+
+    return $f->printRowsOnly;
+}
+
+sub editUserSettingsFormSave {
+    my $self    = shift;
+    my $session = $self->session;
+    my ( $form, $setting ) = $session->quick(qw( form setting ));
+
+    my @fields  = qw( twitterEnabled );
+    for my $field ( @fields ) {
+        $setting->set( $field, $form->get( $field ) );
+    }
+
+    return;
+}
+
 sub www_login {
     my ( $self ) = @_;
     my $session = $self->session;

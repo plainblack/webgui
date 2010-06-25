@@ -59,6 +59,7 @@ sub addTwitterAuth {
 
     $session->config->addToArray( 'authMethods', 'Twitter' );
     $session->config->addToHash( 'macros', "TwitterLogin" => "TwitterLogin" );
+    $session->setting->set( 'twitterEnabled', 0 );
 
     print "DONE!\n" unless $quiet;
 }

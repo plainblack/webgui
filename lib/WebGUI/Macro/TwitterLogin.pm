@@ -40,6 +40,7 @@ sub process {
 
     return "" unless any { $_ eq 'Twitter' } @{ $session->config->get( 'authMethods' ) };
     return "" unless $session->user->isVisitor;
+    return "" unless $session->setting->get('twitterEnabled'); # Don't allow if twitter login is disabled
 
     my $loginUrl    = $session->url->page('op=auth;authType=Twitter;method=login');
     my $imgUrl      = shift || $session->url->extras( 'twitter_login.png' );
