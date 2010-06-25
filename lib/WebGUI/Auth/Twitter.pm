@@ -1,13 +1,59 @@
 package WebGUI::Auth::Twitter;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 use strict;
 use base 'WebGUI::Auth';
 use Net::Twitter;
+
+=head1 NAME
+
+WebGUI::Auth::Twitter -- Twitter auth for WebGUI
+
+=head1 DESCRIPTION
+
+Allow WebGUI to authenticate to WebGUI
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+#----------------------------------------------------------------------------
+
+=head2 new ( ... )
+
+Create a new object
+
+=cut
 
 sub new {
     my $self    = shift->SUPER::new(@_);
     return bless $self, __PACKAGE__; # Auth requires rebless
 }
+
+#----------------------------------------------------------------------------
+
+=head2 createTwitterUser ( twitterUserId, username )
+
+    my $user    = $self->createTwitterUser( $twitterUserId, $username );
+
+Create a new Auth::Twitter user with the given twitter userId and screen name.
+
+=cut
 
 sub createTwitterUser {
     my ( $self, $twitterUserId, $twitterScreenName ) = @_;
@@ -18,6 +64,14 @@ sub createTwitterUser {
     } );
     return $user;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 editUserSettingsForm ( )
+
+Return the form to edit the settings of this Auth module
+
+=cut
 
 sub editUserSettingsForm {
     my $self = shift;
@@ -51,6 +105,14 @@ sub editUserSettingsForm {
     return $f->printRowsOnly;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 editUserSettingsFormSave ( )
+
+Process the form for this Auth module's settings
+
+=cut
+
 sub editUserSettingsFormSave {
     my $self    = shift;
     my $session = $self->session;
@@ -63,6 +125,14 @@ sub editUserSettingsFormSave {
 
     return;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_login ( )
+
+Begin the login procedure
+
+=cut
 
 sub www_login {
     my ( $self ) = @_;
@@ -85,6 +155,17 @@ sub www_login {
     $session->http->setRedirect($url);
     return "redirect";
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_callback ( )
+
+Callback from the Twitter authentication. Try to log the user in, creating a 
+new user account if necessary. 
+
+If the username is taken, allow the user to choose a new one.
+
+=cut
 
 sub www_callback {
     my ( $self ) = @_;
@@ -137,6 +218,15 @@ sub www_callback {
                 ;
     return $output;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 www_setUsername ( )
+
+Set the username for a twitter user. Only used as part of the initial twitter
+registration.
+
+=cut
 
 sub www_setUsername {
     my ( $self ) = @_;
