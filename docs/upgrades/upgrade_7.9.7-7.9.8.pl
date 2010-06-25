@@ -35,6 +35,7 @@ my $session = start(); # this line required
 changeFirstDayOfWeekDefault($session);
 updateLastPostCS($session);
 updateLastPostThread($session);
+addTwitterAuth( $session );
 
 finish($session); # this line required
 
@@ -47,6 +48,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add twitter auth and macro
+sub addTwitterAuth {
+    my $session = shift;
+    print "\tAdding twitter auth method... " unless $quiet;
+
+    $session->config->addToArray( 'authMethods', 'Twitter' );
+    $session->config->addToHash( 'macros', "TwitterLogin" => "TwitterLogin" );
+    $session->setting->set( 'twitterEnabled', 0 );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

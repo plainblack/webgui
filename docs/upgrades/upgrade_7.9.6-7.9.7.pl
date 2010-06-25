@@ -52,19 +52,6 @@ finish($session); # this line required
 #}
 
 #----------------------------------------------------------------------------
-# Add twitter auth and macro
-sub addTwitterAuth {
-    my $session = shift;
-    print "\tAdding twitter auth method... " unless $quiet;
-
-    $session->config->addToArray( 'authMethods', 'Twitter' );
-    $session->config->addToHash( 'macros', "TwitterLogin" => "TwitterLogin" );
-    $session->setting->set( 'twitterEnabled', 0 );
-
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
 # Describe what our function does
 sub cleanup_inbox_messageStateTable {
     my $session = shift;
