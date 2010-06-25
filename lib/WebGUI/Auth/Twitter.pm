@@ -173,7 +173,7 @@ sub www_login {
         consumer_secret => $setting->get( 'twitterConsumerSecret' ),    # Test: 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A',
     );
 
-    my $url = $nt->get_authorization_url(
+    my $url = $nt->get_authentication_url(
                     callback => $url->getSiteURL . $url->page('op=auth&authType=Twitter&method=callback'),
                 );
 
