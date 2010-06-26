@@ -42,7 +42,6 @@ sub getAnchoredAsset {
         $a = $a->cloneFromDb;
     }
     WebGUI::Test->addToCleanup($tag);
-    warn "returning data";
     return ($tag, $asset, @parents);
 }
 
@@ -273,7 +272,6 @@ sub t_05_cut_paste : Test(5) {
     my $test    = shift;
     my $session = $test->session;
     my ($tag, $asset, @parents) = $test->getAnchoredAsset();
-    ok $asset->cut, 'cut returns true if it was cut';
     ok $asset->cut, 'cut returns true if it was cut';
     is $asset->state, 'clipboard', 'asset state updated';
     my $session_asset = $session->asset();

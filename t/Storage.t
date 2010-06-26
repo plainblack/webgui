@@ -68,8 +68,8 @@ is( $storage1->getLastError, undef, "No errors during path creation");
 #
 ####################################################
 
-is( $storage1->getPathFrag,    '7e/8a/7e8a1b6ab', 'pathFrag returns correct value');
-is( $storage1->getDirectoryId, '7e8a1b6ab',       'getDirectoryId returns the last path element');
+is( $storage1->getPathFrag,    '7e/8a/7e8a1b6a', 'pathFrag returns correct value');
+is( $storage1->getDirectoryId, '7e8a1b6a',       'getDirectoryId returns the last path element');
 
 ##Build an old-style GUID storage location
 my $uploadsBase = Path::Class::Dir->new($uploadDir);
@@ -94,12 +94,12 @@ is($guidStorage->getDirectoryId, $newGuid, '... getDirectoryId');
 $session->config->delete('cdn');
 # Note: the CDN configuration will be reverted after CDN tests below
 
-my $storageDir1 = join '/', $uploadDir, '7e', '8a', '7e8a1b6ab';
+my $storageDir1 = join '/', $uploadDir, '7e', '8a', '7e8a1b6a';
 is ($storage1->getPath, $storageDir1, 'getPath: path calculated correctly for directory');
 my $storageFile1 = join '/', $storageDir1, 'baz';
 is ($storage1->getPath('baz'), $storageFile1, 'getPath: path calculated correctly for file');
 
-my $storageUrl1 = join '/', $uploadUrl, '7e', '8a', '7e8a1b6ab';
+my $storageUrl1 = join '/', $uploadUrl, '7e', '8a', '7e8a1b6a';
 is ($storage1->getUrl, $storageUrl1, 'getUrl: url calculated correctly for directory');
 my $storageUrl2 = join '/', $storageUrl1, 'bar';
 is ($storage1->getUrl('bar'), $storageUrl2, 'getUrl: url calculated correctly for file');
