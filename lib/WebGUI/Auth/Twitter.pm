@@ -156,6 +156,28 @@ sub getTemplateChooseUsername {
 
 #----------------------------------------------------------------------------
 
+=head2 getTwitter ( )
+
+Get the Net::Twitter object with the appropriate keys
+
+=cut
+
+sub getTwitter {
+    my ( $self ) = @_;
+    if ( !$self->{_twitter} ) {
+        my $nt = Net::Twitter->new(
+            traits          => [qw/API::REST OAuth/],
+            consumer_key    => $setting->get( 'twitterConsumerKey' ),       # Test: '3hvJpBr73pa4FycNrqw',
+            consumer_secret => $setting->get( 'twitterConsumerSecret' ),    # Test: 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A',
+        );
+
+        $self->{_twitter} = $nt;
+    }
+    return $self->{_twitter};
+}
+
+#----------------------------------------------------------------------------
+
 =head2 www_login ( )
 
 Begin the login procedure
@@ -167,11 +189,7 @@ sub www_login {
     my $session = $self->session;
     my ( $url, $scratch, $setting ) = $session->quick( qw( url scratch setting ) );
 
-    my $nt = Net::Twitter->new(
-        traits          => [qw/API::REST OAuth/],
-        consumer_key    => $setting->get( 'twitterConsumerKey' ),       # Test: '3hvJpBr73pa4FycNrqw',
-        consumer_secret => $setting->get( 'twitterConsumerSecret' ),    # Test: 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A',
-    );
+    my $nt  = $self->getTwitter;
 
     my $url = $nt->get_authentication_url(
                     callback => $url->getSiteURL . $url->page('op=auth&authType=Twitter&method=callback'),
@@ -202,11 +220,7 @@ sub www_callback {
 
     my $verifier = $form->get('oauth_verifier');
 
-    my $nt = Net::Twitter->new(
-        traits => [qw/API::REST OAuth/],
-        consumer_key    => $setting->get( 'twitterConsumerKey' ),       # Test: '3hvJpBr73pa4FycNrqw',
-        consumer_secret => $setting->get( 'twitterConsumerSecret' ),    # Test: 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A',
-    );
+    my $nt      = $self->getTwitter;
     $nt->request_token( $scratch->get('AuthTwitterToken') );
     $nt->request_token_secret( $scratch->get('AuthTwitterTokenSecret') );
 
