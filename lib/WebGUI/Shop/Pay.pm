@@ -130,9 +130,9 @@ sub getDrivers {
 =head2 getOptions ( $cart )
 
 Returns a set of options for the user to pay to.  It is a hash of
-hashrefs, with the key of the primary hash being the paymentGatewayId
-of the driver, and sub keys of label and button.  The hash will only
-contain payment gateways that this user is allowed to use.
+gatewayIds and labels.
+
+The hash will only contain payment gateways that this user is allowed to use.
 
 =head3 $cart
 
@@ -146,17 +146,13 @@ sub getOptions {
 
     WebGUI::Error::InvalidParam->throw(error => q{Need a cart.}) unless defined $cart and $cart->isa("WebGUI::Shop::Cart");
 
-    my $session = $cart->session; 
     my $recurringRequired = $cart->requiresRecurringPayment;
     my %options = ();
 
     foreach my $gateway (@{ $self->getPaymentGateways() }) {
         next unless $gateway->canUse;
         if (!$recurringRequired || $gateway->handlesRecurring) {
-            $options{$gateway->getId} = {
-                label   => $gateway->get("label"),
-                button  => $gateway->getButton( $cart ),
-            };    
+            $options{$gateway->getId} = $gateway->get("label");
         }
     }
     return \%options;
@@ -364,70 +360,6 @@ sub www_manage {
     # Wrap in admin console
     my $console = $admin->getAdminConsole;
     return $console->render($output, $i18n->get("payment methods"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_selectPaymentGateway ( )
-
-The screen in which a customer chooses a payment gateway.
-
-TODO: Template this screen.
-
-=cut
-
-sub www_selectPaymentGateway {
-    my $self    = shift;
-    my $session = $self->session;
-  
-    my $cart    = WebGUI::Shop::Cart->newBySession( $session );
-    my $i18n    = WebGUI::International->new( $session, 'Shop' );
-
-    # Make sure the user is logged in.
-    if ($session->user->isVisitor) {
-        $session->scratch->set( 'redirectAfterLogin', $session->url->page('shop=pay;method=selectPaymentGateway') );
-
-        # We cannot use WebGUI::Operation::execute( $session, 'auth'); because the method form param used by the
-        # Shop contenthandler overrides the method param used by WG::Op::Auth
-        $session->http->setRedirect( $session->url->page('op=auth;method=init') );
-
-        # If the redirect fails make sure people can still go to the login screen by giving them a link
-        return $session->style->userStyle(
-            sprintf $i18n->get('login message'), $session->url->page('op=auth;method=init')
-        );
-    }
-
-    # Check if the cart is ready for checkout
-    unless ($cart->readyForCheckout) {
-        $session->http->setRedirect( $session->url->page('shop=cart;method=view') );
-        return '';
-    }
-    
-    # Complete Transaction if it's a $0 transaction.
-    my $total = $cart->calculateTotal;
-    if (sprintf('%.2f', $total + $cart->calculateShopCreditDeduction($total)) eq '0.00') {
-        my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $cart});
-        $transaction->completePurchase('zero', 'success', 'success');
-        $cart->onCompletePurchase;
-        $transaction->sendNotifications();
-        return $transaction->thankYou();
-    }
-
-    # All the output stuff below is just a placeholder until it's templated.
-    my $payOptions  = $self->getOptions( $cart );
-
-    # TODO: If only one payOption exists, just send us there
-    # In order to do this, the PayDriver must give us a direct URL to go to
-
-    my $var;
-    my @paymentGateways;
-    foreach my $payOption ( values %{$payOptions} ) {
-        push @paymentGateways, $payOption;
-    }
-    $var->{ paymentGateways     }   = \@paymentGateways;
-    $var->{ choose              }   = $i18n->get('choose payment gateway message');
-    my $template = WebGUI::Asset::Template->newById($session, $session->setting->get("selectGatewayTemplateId"));
-    return $session->style->userStyle($template->process($var));
 }
 
 1;

@@ -48,7 +48,10 @@ throws_deeply ( sub { my $cart = WebGUI::Shop::Cart->newBySession(); },
     'newBySession takes an exception to not giving it a session variable'
 );
 
+$session->user({userId => 3});
+
 my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart);
 
 isa_ok($cart, "WebGUI::Shop::Cart");
 isa_ok($cart->session, "WebGUI::Session");
@@ -62,6 +65,7 @@ my $product = $root->addChild({
     className=>"WebGUI::Asset::Sku::Donation",
     title=>"Test Product",
     });
+WebGUI::Test->addToCleanup($product);
 $product->applyOptions({price=>50.25});
 my $item = $cart->addItem($product);
 isa_ok($item, "WebGUI::Shop::CartItem");
@@ -100,16 +104,33 @@ isa_ok($cart->getAddressBook, "WebGUI::Shop::AddressBook", "can get an address b
 #
 
 # Setup a checkout'able cart and verify that it is
-my $address = $cart->getAddressBook->addAddress( { firstName => 'C.D.', lastName => 'Murray'} );
+my $address = $cart->getAddressBook->addAddress( {
+    label     => 'cell block',
+    firstName => 'C.D.',           lastName => 'Murray',
+    address1  => 'cell block #5',
+    city      => 'Shawshank',      state     => 'MN',
+    code      => '55555',          country   => 'United States of America',
+    phoneNumber => '555.555.5555', email     => 'newFish@shawshank.gov',
+} );
 my $ship    = WebGUI::Shop::Ship->new( $session );
 my $shipper = $ship->addShipper( 'WebGUI::Shop::ShipDriver::FlatRate', {flatFee => 1 } );
+WebGUI::Test->addToCleanup($shipper);
 $cart->update( {
     shippingAddressId   => $address->getId,
 } );
 ok(! $cart->readyForCheckout, 'readyForCheckout:  returns false due to no shipperId');
 
-$cart->update( { shipperId           => $shipper->getId, } );
-ok($cart->readyForCheckout, '... returns true when it has shipperId, and shipping address');
+my $pay     = WebGUI::Shop::Pay->new($session);
+my $gateway = $pay->getPaymentGateways()->[0];
+
+$cart->error('');
+$cart->update( {
+    shipperId           => $shipper->getId,
+    billingAddressId    => $address->getId,
+    gatewayId           => $gateway->getId,
+} );
+ok($cart->readyForCheckout, '... returns true when it has shipperId, shipping and billing addresses and a gatewayId')
+    || diag $cart->error;
 
 # Check shipping address constraint
 $cart->update( {shippingAddressId   => 'Does Not Exist'} );
@@ -137,6 +158,7 @@ my $session2 = WebGUI::Session->open(WebGUI::Test->file);
 addToCleanup($session2);
 $session2->user({userId => 3});
 my $cart2 = WebGUI::Shop::Cart->newBySession($session2);
+WebGUI::Test->addToCleanup($cart2);
 isnt(
     refaddr $cart->getAddressBook,
     refaddr $cart2->getAddressBook,
@@ -145,6 +167,7 @@ isnt(
 $cart2->delete;
 
 my $cart3 = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart3);
 isnt(
     refaddr $cart->getAddressBook,
     refaddr $cart3->getAddressBook,
@@ -158,10 +181,3 @@ is($cart->delete, undef, "Can destroy cart.");
 
 $product->purge;
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    if ($shipper) {
-        $shipper->delete;
-    }
-}

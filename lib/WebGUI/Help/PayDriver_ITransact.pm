@@ -8,7 +8,11 @@ our $HELP = {
 	'edit credentials template' => {	
 		title 		=> 'edit credentials template', 
 		body 		=> 'edit credentials template help',	
-		isa 		=> [],
+		isa 		=> [
+            {   namespace => "PayDriver",
+                tag       => "cart summary variables"
+            },
+        ],
 		fields 		=> [],
 		variables 	=> [
 			{
@@ -34,46 +38,6 @@ our $HELP = {
                 namespace   => 'Shop',
 			},
 			{
-				name		=> "addressField",
-				description	=> "addressField help",
-				required	=> 1,
-			},
-			{
-				name		=> "cityField",
-				description	=> "cityField help",
-				required	=> 1,
-                namespace   => 'Shop',
-			},
-			{
-				name		=> "stateField",
-				description	=> "stateField help",
-				required	=> 1,
-                namespace   => 'Shop',
-			},
-			{
-				name		=> "countryField",
-				description	=> "countryField help",
-				required	=> 1,
-                namespace   => 'Shop',
-			},
-			{
-				name		=> "codeField",
-				description	=> "codeField help",
-				required	=> 1,
-                namespace   => 'Shop',
-			},
-			{
-				name		=> "phoneField",
-				description	=> "phoneNumberField help",
-				required	=> 1,
-                namespace   => 'Shop',
-			},
-			{
-				name		=> "emailField",
-				description	=> "emailField help",
-				required	=> 1,
-			},
-			{
 				name		=> "cardNumberField",
 				description	=> "cardNumberField help",
 				required	=> 1,
@@ -92,7 +56,6 @@ our $HELP = {
 				name		=> "checkoutButton",
 				description	=> "checkoutButton help",
 				required	=> 1,
-                namespace   => 'Shop',
 			},
 		],
 		related 	=> [  

@@ -97,6 +97,12 @@ property usePacked => (
              hoverHelp       => ['usePacked description', 'Asset_Template'],
          );
 
+property storageIdExample => (
+             fieldType       => 'image',
+             label           => ['field storageIdExample', 'Asset_Template'],
+             hoverHelp       => ['field storageIdExample description', 'Asset_Template'],
+         );
+
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
@@ -202,6 +208,10 @@ override duplicate => sub {
     my $newTemplate = super();
     $newTemplate->update({isDefault => 0});
     $newTemplate->addAttachments($self->getAttachments);
+    if ( my $storageId = $self->get('storageIdExample') ) {
+        my $newStorage  = WebGUI::Storage->get( $self->session, $storageId )->copy;
+        $newTemplate->update({ storageIdExample => $newStorage->getId });
+    }
     return $newTemplate;
 };
 
@@ -217,6 +227,9 @@ override exportAssetData => sub {
     my ( $self ) = @_;
     my $data    = super();
     $data->{template_attachments} = $self->getAttachments;
+    if ( $self->get('storageIdExample') ) {
+        push @{$data->{storage}}, $self->get('storageIdExample');
+    }
     return $data;
 };
 
@@ -399,9 +412,32 @@ override getEditForm => sub {
 	$label = $i18n->get('attachment add field label');
 	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
 
+        $properties->image( 
+            name        => 'storageIdExample',
+            value       => $self->getValue('storageIdExample'),
+            label       => $i18n->get('field storageIdExample'),
+            hoverHelp   => $i18n->get('field storageIdExample description'),
+        );
+
 	return $tabform;
 };
 
+#-------------------------------------------------------------------
+
+=head2 getExampleImageUrl ( )
+
+Get the URL to the example image of this template, if any
+
+=cut
+
+sub getExampleImageUrl {
+    my ( $self ) = @_;
+    if ( my $storageId = $self->get('storageIdExample') ) {
+        my $storage = WebGUI::Storage->get( $self->session, $storageId );
+        return $storage->getUrl( $storage->getFiles->[0] );
+    }
+    return;
+}
 
 #-------------------------------------------------------------------
 

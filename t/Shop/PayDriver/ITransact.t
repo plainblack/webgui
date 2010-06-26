@@ -23,6 +23,7 @@ use WebGUI::Session;
 use WebGUI::Shop::Cart;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Transaction;
+use WebGUI::Shop::PayDriver::ITransact;
 use JSON;
 use HTML::Form;
 use WebGUI::Shop::PayDriver::ITransact;
@@ -30,6 +31,7 @@ use WebGUI::Shop::PayDriver::ITransact;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+$session->user({userId => 3});
 
 
 #----------------------------------------------------------------------------
@@ -41,6 +43,25 @@ plan tests => 28;
 # figure out if the test can actually run
 
 my $e;
+my $ship = WebGUI::Shop::Ship->new($session);
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart);
+my $shipper = $ship->getShipper('defaultfreeshipping000');
+my $address = $cart->getAddressBook->addAddress( {
+    label     => 'red',
+    firstName => 'Ellis Boyd', lastName => 'Redding',
+    address1  => 'cell block #5',
+    city      => 'Shawshank',      state     => 'MN',
+    code      => '55555',          country   => 'United States of America',
+    phoneNumber => '555.555.5555', email     => 'red@shawshank.gov',
+} );
+$cart->update({
+    billingAddressId  => $address->getId,
+    shippingAddressId => $address->getId,
+    shipperId         => $shipper->getId,
+});
+my $transaction;
+
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 my $home = WebGUI::Asset->getDefault($session);
@@ -81,9 +102,6 @@ $cart->update({
     shippingAddressId => $address->getId,
     shipperId         => $shipper->getId,
 });
-
-
-my $hammerItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 
 #######################################################################
 #
@@ -254,21 +272,8 @@ $driver->{_cardData} = {
     cvv2     => '1234',
 };
 
-$driver->{_billingAddress} = {
-    firstName   => 'Ellis Boyd',
-    lastName    => 'Redding',
-    address1    => '#2 Row 30265',
-    city        => 'Shawshank',
-    state       => 'Maine',
-    code        => '97025',
-    country     => 'USA',
-    phoneNumber => '555.555.5555',
-    email       => '30265@shawshank.gov',
-};
-
-
-my $transaction = WebGUI::Shop::Transaction->create($session, {
-    paymentMethod => $driver,
+$cart->update({gatewayId => $driver->getId,});
+$transaction = WebGUI::Shop::Transaction->create($session, {
     cart          => $cart,
     isRecurring   => $cart->requiresRecurringPayment,
 });

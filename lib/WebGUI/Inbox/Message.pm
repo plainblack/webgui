@@ -129,6 +129,11 @@ per-user settings for email delivery will not be used. Useful if you want to for
 be sent as an Email rather than allowing the user's C<receiveInboxEmailNotifications> setting to
 take effect.
 
+=head4 extraHeaders
+
+A hash ref containing extra header information to send to WebGUI::Message::create valid headers include:
+cc, bcc, replyTo, returnPath, contentType, messageId, and inReplyTo.  See WebGUI::Message::create for more details.
+
 =cut
 
 sub create {
@@ -186,13 +191,21 @@ sub create {
     }
     unless ( $options->{ no_email } ) {
         my $subject = (defined $properties->{emailSubject}) ? $properties->{emailSubject} : $self->{_properties}{subject};
-        my $mail = WebGUI::Mail::Send->create($session, {
-                   toUser=>$self->{_properties}{userId},
-                   toGroup=>$self->{_properties}{groupId},
-                   subject=>$subject,
-               }, 
-               $options->{overridePerUserDelivery} ? undef : 'isInbox',
-        );
+        #Set default mail headers
+        my $mailHeaders = {
+           toUser=>$self->{_properties}{userId},
+           toGroup=>$self->{_properties}{groupId},
+           subject=>$subject,
+        };
+        #Add extraHeaders if they are passsed in as options
+        if($options->{ extraHeaders } && ref $options->{ extraHeaders } eq 'HASH') {
+           %{$mailHeaders} = (%{$mailHeaders},%{$options->{ extraHeaders }});
+        }
+        #Get inbox override flag
+        my $overridePerUserDelivery = $options->{overridePerUserDelivery} ? undef : 'isInbox';
+        #Create the mail message
+        my $mail = WebGUI::Mail::Send->create($session,$mailHeaders,$overridePerUserDelivery);
+
         my $preface = "";
         my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
         #Don't append prefaces to the visitor users or messages that don't specify a user (default case)

@@ -537,7 +537,7 @@ listing of pages that are related to a specific keyword?| },
     },
 
     'keywords_loop' => {
-        message     => q{A loop containing all the top level keywords, links to their keyword pages, and all sub pages below them.},
+        message     => q{A loop containing all the top level keywords for this page, links to their keyword pages, and all sub pages below them.},
         lastUpdated => 0,
         context     => q{Help for template variable},
     },
@@ -560,6 +560,12 @@ listing of pages that are related to a specific keyword?| },
         context     => q{Help for template variable},
     },
 
+    'keyword descendants' => {
+        message     => q{The number of wiki pages that are tagged with this keyword, and all sub-keywords of this keyword.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
     'indent_loop' => {
         message     => q{A loop that runs 1 time for each level.},
         lastUpdated => 0,
@@ -570,6 +576,84 @@ listing of pages that are related to a specific keyword?| },
         message     => q{The loop iterator for the indent_loop.},
         lastUpdated => 0,
         context     => q{Help for template variable},
+    },
+
+    'by keyword template title' => {
+        message     => q{Wiki By Keyword Template Variables},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword keyword' => {
+        message     => q{The keyword that was requested.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword pagesLoop' => {
+        message     => q{A loop of pages that contain the requested keyword.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword title' => {
+        message     => q{The title of this page in the loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword url' => {
+        message     => q{The url of this page in the loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword synopsis' => {
+        message     => q{The synopsis of this page in the loop.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword formHeader' => {
+        message     => q{HTML code to start the form for entering in sub-keywords.  This will be empty unless the current user can administer this wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword formFooter' => {
+        message     => q{HTML code to end the form for entering in sub-keywords.  This will be empty unless the current user can administer this wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword keywordForm' => {
+        message     => q{HTML code for the field for entering in sub-keywords.  This will be empty unless the current user can administer this wiki},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'by keyword submitForm' => {
+        message     => q{A button to submit the sub-keywords form.},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'Related Pages' => {
+        message     => q{Related Pages},
+        lastUpdated => 0,
+        context     => q{template label},
+    },
+
+    'keyword page variables' => {
+        message     => q{Keyword Page Variables},
+        lastUpdated => 0,
+        context     => q{template variable help},
+    },
+
+    'keyword isTopLevel' => {
+        message     => q{Whether or not the keyword is one of the keywords for the page that was called.  For the Wiki Front Page, it will only include top level keywords.  For a keyword page, it would be true for any sub-keywords of this page.},
+        lastUpdated => 0,
+        context     => q{template variable help},
     },
 
 };

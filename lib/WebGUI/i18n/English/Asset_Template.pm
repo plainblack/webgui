@@ -390,6 +390,16 @@ Any scratch variables will be available in the template with this syntax:<br/>
         lastUpdated => 0,
     },
 
+    'field storageIdExample' => {
+        message     => 'Example Image',
+        lastUpdated => 0,
+    },
+
+    'field storageIdExample description' => {
+        message     => 'An example image to show what the template looks like before the user selects it',
+        lastUpdated => 0,
+    },
+
 };
 
 1;

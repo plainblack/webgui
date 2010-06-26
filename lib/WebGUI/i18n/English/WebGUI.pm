@@ -4304,7 +4304,7 @@ LongTruncOk=1</p>
     },
 
     'Contact Us' => {
-        message     => q{All Contact Us},
+        message     => q{Contact Us},
         lastUpdated => 0,
         context     => q{Template label for automatically created Page layouts during Site Setup.},
     },
@@ -4316,7 +4316,7 @@ LongTruncOk=1</p>
     },
 
     'Forums' => {
-        message     => q{Initial Pages},
+        message     => q{Forums},
         lastUpdated => 0,
         context     => q{Label for the Site Setup screen},
     },

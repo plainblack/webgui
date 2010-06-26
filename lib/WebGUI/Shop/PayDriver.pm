@@ -82,6 +82,33 @@ sub _buildObj {
 
 #-------------------------------------------------------------------
 
+=head2 appendCartVariables ( $var )
+
+Append the subtotal, shipping, tax, and shop credeductions to a set of template
+variables.
+
+=cut
+
+sub appendCartVariables {
+    my ($self, $var) = @_;
+    $var      ||= {};
+    my $cart    = $self->getCart;
+    $var->{shippableItemsInCart} = $cart->requiresShipping;
+    $var->{subtotal} = $cart->calculateSubtotal;
+    $var->{shipping} = $cart->calculateShipping;
+    $var->{taxes}    = $cart->calculateTaxes;
+    my $totalPrice   = $var->{subtotal} + $var->{shipping} + $var->{taxes};
+    my $session = $self->session;
+    my $credit = WebGUI::Shop::Credit->new($session, $cart->getPosUser->userId);
+    $var->{inShopCreditAvailable} = $credit->getSum;
+    $var->{inShopCreditDeduction} = $credit->calculateDeduction($var->{totalPrice});
+    $var->{totalPrice           } = $cart->formatCurrency($totalPrice + $var->{inShopCreditDeduction});
+    return $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 cancelRecurringPayment ( transaction )
 
 Cancels a recurring transaction. Returns an array containing ( isSuccess, gatewayStatus, gatewayError). Needs to be overridden by subclasses capable of dealing with recurring payments.
@@ -340,12 +367,13 @@ sub getAddress {
 
 =head2 getButton ( )
 
-Returns the form that will take the user to check out.
+Used for the generic, vanilla checkout form.  Must be overridden by any methods that
+use the default www_getCredentials.
 
 =cut
 
 sub getButton {
-    my $self = shift;
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -358,9 +386,7 @@ Returns the WebGUI::Shop::Cart object for the current session.
 
 sub getCart {
     my $self = shift;
-
     my $cart = WebGUI::Shop::Cart->newBySession( $self->session );
-
     return $cart;
 }
 
@@ -463,51 +489,6 @@ sub getName {
 
 #-------------------------------------------------------------------
 
-=head2 getSelectAddressButton ( returnMethod, [ buttonLabel ] )
-
-Generates a button for selecting an address.
-
-=head3 returnMethod
-
-The name of the www_ method the selected addressId should be returned to. Without the 'www_' part.
-
-=head3 buttonLabel
-
-The label for the button, defaults to the internationalized version of 'Choose billing address'.
-
-=cut
-
-sub getSelectAddressButton {
-    my $self            = shift;
-    my $returnMethod    = shift;
-    my $buttonLabel     = shift || 'Choose billing address';
-    my $session         = $self->session;
-
-    # Generate the json string that defines where the address book posts the selected address
-    my $callbackParams = {
-        url     => $session->url->page,
-        params  => [
-            { name => 'shop',               value => 'pay'          },
-            { name => 'method',             value => 'do'           },
-            { name => 'do',                 value => $returnMethod  },
-            { name => 'paymentGatewayId',   value => $self->getId   },
-        ],
-    };
-    my $callbackJson = JSON::to_json( $callbackParams );
-
-    # Generate 'Choose billing address' button
-    my $addressButton = WebGUI::Form::formHeader( $session )
-        . WebGUI::Form::hidden( $session, { name => 'shop',     value => 'address'      } )
-        . WebGUI::Form::hidden( $session, { name => 'method',   value => 'view'         } )
-        . WebGUI::Form::hidden( $session, { name => 'callback', value => $callbackJson  } )
-        . WebGUI::Form::submit( $session, { value => $buttonLabel                       } )
-        . WebGUI::Form::formFooter( $session );
-
-    return $addressButton;
-}
-
-#-------------------------------------------------------------------
-
 =head2 handlesRecurring ()
 
 Returns 0. Should be overridden to return 1 by any subclasses that can handle recurring payments.
@@ -581,6 +562,35 @@ sub processPayment {
 
 =head2 processPropertiesFromFormPost ( )
 
+Updates pay driver with data from Form.
+
+=cut
+
+sub processTemplate {
+    my $self       = shift;
+    my $session    = $self->session;
+    my $templateId = shift;
+    my $var        = shift;
+    my $i18n       = WebGUI::International->new($session, 'PayDriver');
+
+    my $template = eval { WebGUI::Asset->newById($session, $templateId); };
+    my $output;
+    if (!Exception::Class->caught) {
+        $template->prepare;
+        $output = $template->process($var);
+    }
+    else {
+        $output = $i18n->get('template gone');
+    }
+    return $output;
+
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
 Updates ship driver with data from Form.
 
 =cut
@@ -637,7 +647,6 @@ sub processTransaction {
         my $transactionProperties;
         $transactionProperties->{ paymentMethod     } = $self;
         $transactionProperties->{ cart              } = $cart;
-        $transactionProperties->{ paymentAddress    } = $paymentAddress if defined $paymentAddress;
         $transactionProperties->{ isRecurring       } = $cart->requiresRecurringPayment;
     
         # Create a transaction...
@@ -705,6 +714,31 @@ Accessor for the unique identifier for this PayDriver.  The paymentGatewayId is
 a GUID.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 www_getCredentials ( )
+
+Displays a summary of the cart, and a button to checkout.  Plugins that need to get additional
+information, or perform additional checks, should override this method.  Uses the getButton
+method to create the checkout button.
+
+=cut
+
+sub www_getCredentials {
+    my ($self)    = @_;
+    my $session = $self->session;
+
+    # Generate 'Proceed' button
+    my $i18n = WebGUI::International->new($session, 'PayDriver_Cash');
+    my $var = {
+        proceedButton => $self->getButton,
+    };
+    $self->appendCartVariables($var);
+
+    my $output   = $self->processTemplate($self->get("summaryTemplateId"), $var);
+    return $session->style->userStyle($output);
+}
 
 #-------------------------------------------------------------------
 

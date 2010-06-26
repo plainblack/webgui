@@ -95,6 +95,41 @@ our $I18N = {
         message     => q{Username from Paypal credentials},
         lastUpdated => 1247254128,
     },
+
+    'summary template' => {
+        message => q|Summary Template|,
+        lastUpdated => 0,
+        context => q|Form label in the configuration form of the Cash module.|
+    },
+    'summary template help' => {
+        message => q|Pick a template to display the screen where the user confirms the cart summary info and agrees to pay.|,
+        lastUpdated => 0,
+        context => q|Hover help for the summary template field in the configuration form of the Cash module.|
+    },
+ 
+	'password' => {
+		message => q|Password|,
+		lastUpdated => 0,
+		context => q|Form label in the configuration form of the iTransact module.|
+	},
+	'password help' => {
+		message => q|The password for your ITransact account.|,
+		lastUpdated => 0,
+		context => q|Hover help for the password field in the configuration form of the iTransact module.|
+	},
+
+	'Pay' => {
+		message => q|Pay|,
+		lastUpdated => 0,
+		context => q|Button label|
+	},
+
+	'cart summary template' => {
+		message => q|PayPal Express Checkout Cart Summary Template|,
+		lastUpdated => 0,
+		context => q||
+	},
+
 };
 
 1;

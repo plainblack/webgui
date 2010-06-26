@@ -102,6 +102,13 @@ sub definition {
             hoverHelp       => $i18n->get('use test mode help'),
             defaultValue    => 1,
         },
+        summaryTemplateId  => {
+            fieldType    => 'template',
+            label        => $i18n->get('summary template'),
+            hoverHelp    => $i18n->get('summary template help'),
+            namespace    => 'Shop/Credentials',
+            defaultValue => 'jysVZeUR0Bx2NfrKs5sulg',
+        },
     );
 
     push @{ $definition }, {
@@ -110,28 +117,6 @@ sub definition {
     };
 
     return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getButton ( )
-
-Returns the HTML for a form containing a button that, when clicked, will take the user to the checkout screen of
-this plugin.
-
-=cut
-
-sub getButton {
-    my $self    = shift;
-    my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_Ogone');
-
-    my $payForm = WebGUI::Form::formHeader($session)
-        . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $i18n->get('Ogone') })
-        . WebGUI::Form::formFooter($session);
-
-    return $payForm;
 }
 
 #-------------------------------------------------------------------
@@ -269,80 +254,6 @@ sub ogoneCheckoutButton {
         . WebGUI::Form::formFooter( $session );
 
 	return $form;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_getCredentials ( [ addressId ] )
-
-Displays the checkout form for this plugin.
-
-=head3 addressId
-
-Optionally supply this variable which will set the payment address to this addressId.
-
-=cut
-
-sub www_getCredentials {
-    my ($self, $addressId)    = @_;
-    my $session = $self->session;
-    my $i18n    = WebGUI::International->new( $session, 'PayDriver_Ogone' );
-
-    # Process address from address book if passed
-    $addressId   = $session->form->process( 'addressId' );
-    my $address;
-    if ( $addressId ) {
-        $address    = eval{ $self->getAddress( $addressId ) };
-    }
-    else { 
-        $address    = $self->getCart->getShippingAddress;
-    }
-    my $billingAddressHtml = $address->getHtmlFormatted;
-
-    # Fetch transaction
-    my $transactionId = $session->form->process('transactionId');
-    my $transaction;
-    if ($transactionId) {
-        $transaction = WebGUI::Shop::Transaction->new( $session, $transactionId );
-    }
-
-    # Or generate a new one
-    unless ($transaction) {
-        $transaction = $self->processTransaction( $address );
-    }
-
-    # Set the billing address
-    $transaction->update( {
-        paymentAddress  => $address,
-    } );
-
-    # Generate the json string that defines where the address book posts the selected address
-    my $callbackParams = {
-        url     => $session->url->page,
-        params  => [
-            { name => 'shop',               value => 'pay' },
-            { name => 'method',             value => 'do' },
-            { name => 'do',                 value => 'getCredentials' },
-            { name => 'paymentGatewayId',   value => $self->getId },
-        ],
-    };
-    my $callbackJson = JSON::to_json( $callbackParams );
-
-    # Generate 'Choose billing address' button
-    my $addressButton = WebGUI::Form::formHeader( $session )
-        . WebGUI::Form::hidden( $session, { name => 'shop',     value => 'address' } )
-        . WebGUI::Form::hidden( $session, { name => 'method',   value => 'view' } )
-        . WebGUI::Form::hidden( $session, { name => 'callback', value => $callbackJson } )
-        . WebGUI::Form::submit( $session, { value => $i18n->get('choose billing address') } )
-        . WebGUI::Form::formFooter( $session);
-
-
-    # Generate 'Proceed' button
-    my $proceedButton = $address 
-                      ? $self->ogoneCheckoutButton( $transaction, $address ) 
-                      : $i18n->get('please choose a billing address')
-                      ;
-    return $session->style->userStyle($addressButton.'<br />'.$billingAddressHtml.'<br />'.$proceedButton);
 }
 
 #-------------------------------------------------------------------
@@ -543,6 +454,40 @@ sub www_edit {
     $output .= sprintf $i18n->get('ogone setup'), $processUrl, $processUrl;
         
     return $admin->getAdminConsole->render($form->print.$output, $i18n->get('payment methods','PayDriver'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getCredentials ( )
+
+Displays the checkout form for this plugin.
+
+=cut
+
+sub www_getCredentials {
+    my ($self)    = @_;
+    my $session = $self->session;
+
+    # Fetch transaction
+    my $transactionId = $session->form->process('transactionId');
+    my $transaction;
+    if ($transactionId) {
+        $transaction = WebGUI::Shop::Transaction->new( $session, $transactionId );
+    }
+
+    # Or generate a new one
+    unless ($transaction) {
+        $transaction = $self->processTransaction( );
+    }
+
+    # Generate 'Proceed' button
+    my $var = {
+        proceedButton => $self->ogoneCheckoutButton,
+    };
+    $self->appendCartVariables($var);
+
+    my $output = $self->processTemplate($self->get("summaryTemplateId"), $var);
+    return $session->style->userStyle($output);
 }
 
 #-------------------------------------------------------------------

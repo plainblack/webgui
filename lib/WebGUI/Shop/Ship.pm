@@ -100,7 +100,14 @@ sub getDrivers {
 =head2 getOptions ( $cart )
 
 Returns a list of options for the user to ship, along with the cost of using each one.  It is a hash of hashrefs,
-with the key of the primary hash being the shipperId of the driver, and sub keys of label and price.
+with the key of the primary hash being the shipperId of the driver, and sub keys of label, price, and whether the
+price actually exists, to tell the difference between 0 and unknown.
+
+    {
+        label    => 'ShipDriver label',
+        price    => \d+,
+        hasPrice => 1 || 0,
+    }
 
 =head3 $cart
 
@@ -115,15 +122,24 @@ sub getOptions {
     my %options = ();
     SHIPPER: foreach my $shipper (@{$self->getShippers()}) {
         next SHIPPER unless $shipper->get('enabled');
-        my $price = eval { $shipper->calculate($cart) };
-        if (my $e = WebGUI::Error->caught()) {
-            $self->session->log->warn($e->error);
-            next SHIPPER;
-        }
         next SHIPPER unless $shipper->canUse;
+        my ($price, $hasPrice);
+        if ($cart->get('shippingAddressId')) {
+            $price = eval { $shipper->calculate($cart) };
+            if (my $e = WebGUI::Error->caught()) {
+                $self->session->log->warn($e->error);
+                next SHIPPER;
+            }
+            $hasPrice = 1;
+        }
+        else {
+            $price    = 0;
+            $hasPrice = 0;
+        }
         $options{$shipper->getId} = {
-            label => $shipper->get("label"),
-            price => $price,
+            label    => $shipper->get("label"),
+            price    => $price,
+            hasPrice => $hasPrice,
         };
     }
     return \%options;

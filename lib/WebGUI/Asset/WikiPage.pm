@@ -54,6 +54,7 @@ property isFeatured => (
 with 'WebGUI::Role::Asset::AlwaysHidden';
 with 'WebGUI::Role::Asset::Subscribable';
 with 'WebGUI::Role::Asset::Comments';
+with 'WebGUI::Role::Asset::AutoSynopsis';
 
 use WebGUI::International;
 
@@ -274,35 +275,11 @@ sub getTemplateVars {
             $self->scrubContent,
             {skipTitles => [$self->title]},
         ),	
-        isKeywordPage       => $self->isKeywordPage,
         isSubscribed        => $self->isSubscribed,
         subscribeUrl        => $self->getSubscribeUrl,
         unsubscribeUrl      => $self->getUnsubscribeUrl,
         owner               => $owner->get('alias'),
     };
-    my @keyword_pages = ();
-    if ($var->{isKeywordPage}) {
-        my $paginator = $keyObj->getMatchingAssets({
-            startAsset   => $self->getWiki,
-            keyword      => $self->get('title'),
-            usePaginator => 1,
-        });
-        PAGE: foreach my $assetId (@{ $paginator->getPageData }) {
-            next PAGE if $assetId->{assetId} eq $self->getId;
-            my $asset = eval { WebGUI::Asset->newById($session, $assetId->{assetId}); };
-            next PAGE if Exception::Class->caught();
-            push @keyword_pages, {
-                title => $asset->getTitle,
-                url   => $asset->getUrl,
-            };
-        }
-        $paginator->appendTemplateVars($var);
-        @keyword_pages = map { $_->[1] }
-                         sort
-                         map { [ lc $_->{title}, $_ ] }
-                         @keyword_pages;
-    }
-    $var->{keyword_page_loop} = \@keyword_pages;
     return $var;
 }
 
@@ -337,24 +314,6 @@ around indexContent => sub {
 	$indexer->addKeywords($self->content);
 	return $indexer;
 };
-
-#-------------------------------------------------------------------
-
-=head2 isKeywordPage
-
-Returns a boolean indicating whether or not the name of this WikiPage matches any keyword in the Wiki that
-contains it.
-
-=cut
-
-sub isKeywordPage {
-    my $self  = shift;
-    my $keywords = WebGUI::Keyword->new($self->session)->getMatchingAssets({
-        asset   => $self->getWiki,
-        keyword => $self->get('title'),
-    });
-    return scalar @{ $keywords };
-}
 
 #-------------------------------------------------------------------
 
@@ -415,6 +374,8 @@ sub processPropertiesFromFormPost {
         $properties->{isFeatured}  = $session->form->get("isFeatured");
     }
 
+    ($properties->{synopsis}) = $self->getSynopsisAndContent(undef, $self->get('content'));
+
 	$self->update($properties);
 
     # deal with attachments from the attachments form control
@@ -468,7 +429,8 @@ sub scrubContent {
         my $self = shift;
         my $content = shift || $self->content;
 
-        my $scrubbedContent = WebGUI::HTML::filter($content, $self->getWiki->filterCode);
+        $content =~ s/\^-\;//g;
+        my $scrubbedContent = WebGUI::HTML::filter($content, $self->getWiki->get("filterCode"));
 
         if ($self->getWiki->useContentFilter) {
                 $scrubbedContent = WebGUI::HTML::processReplacements($self->session, $scrubbedContent);

@@ -27,6 +27,7 @@ use WebGUI::Session;
 use WebGUI::Text;
 use WebGUI::Shop::Cart;
 use WebGUI::Shop::AddressBook;
+use WebGUI::Shop::TaxDriver::EU;
 
 #----------------------------------------------------------------------------
 # Init
@@ -36,6 +37,7 @@ my $session         = WebGUI::Test->session;
 my $taxUser     = WebGUI::User->new( $session, 'new' );
 $taxUser->username( 'Tex Evasion' );
 WebGUI::Test->addToCleanup($taxUser);
+$session->user({userId => $taxUser->getId});
 
 # Test VAT numbers
 my $testVAT_NL  = 'NL123456789B12';
@@ -58,8 +60,10 @@ my $sku  = WebGUI::Asset->getRoot($session)->addChild( {
     title     => 'Taxable donation',
     defaultPrice => 100.00,
 } );
+WebGUI::Test->addToCleanup($sku);
 
 my $book = WebGUI::Shop::AddressBook->create($session);
+WebGUI::Test->addToCleanup($book);
 
 # setup address in EU but not in residential country of merchant
 my $beAddress = $book->addAddress({
@@ -82,22 +86,15 @@ my $usAddress = $book->addAddress({
     country => 'US',
 });
 
-my $cart;
-
 #----------------------------------------------------------------------------
 # Tests
 
 my $tests = 342;
-plan tests => 1 + $tests;
+plan tests => $tests;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::TaxDriver::EU');
-
-SKIP: {
-
-    skip 'Unable to load module WebGUI::Shop::TaxDriver::EU', $tests unless $loaded;
 
 #######################################################################
 #
@@ -474,7 +471,8 @@ SKIP: {
     ), 'appendCartItemVars returns correct error for missing CartItem' );
     
 
-    $cart = WebGUI::Shop::Cart->newBySession( $session );
+    my $cart = WebGUI::Shop::Cart->newBySession( $session );
+    WebGUI::Test->addToCleanup($cart);
 
     my $item = $cart->addItem( $sku );
     $item->setQuantity( 2 );
@@ -554,8 +552,6 @@ SKIP: {
 }
 
 
-} #SKIP BLOCK
-
 #----------------------------------------------------------------------------
 sub setupTestNumbers {
     my $taxer = WebGUI::Shop::TaxDriver::EU->new($session);
@@ -574,11 +570,8 @@ sub setupTestNumbers {
 # Cleanup
 END {
     $session->db->write('delete from tax_eu_vatNumbers');
-    $cart->delete;
-    $session->db->write('delete from cart');
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
     $session->db->write('delete from taxDriver where className=?', [ 'WebGUI::Shop::TaxDriver::EU' ]);
  
-    $sku->purge;
 }

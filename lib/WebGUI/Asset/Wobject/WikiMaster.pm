@@ -181,6 +181,14 @@ property filterCode => (
             label     => ['filter code', 'Asset_WikiMaster'],
             hoverHelp => ['filter code description', 'Asset_WikiMaster'],
          );
+property topLevelKeywords => (
+            fieldType => "keywords",
+            default   => '',
+            tab       => 'properties',
+            label     => ['top level keywords', 'Asset_WikiMaster'],
+            hoverHelp => ['top level keywords description', 'Asset_WikiMaster'],
+         );
+
 with 'WebGUI::Role::Asset::Subscribable';
 with 'WebGUI::Role::Asset::RssFeed';
 
@@ -213,13 +221,12 @@ sub appendFeaturedPageVars {
 
 =head2 appendKeywordPageVars ( var )
 
-Append the template variables to C<var> for keyword (catagory) pages.
+Append the template variables to C<var> for keyword (category) pages.
 
 =cut
 
 sub appendKeywordPageVars {
     my ( $self, $var ) = @_;
-    my $session        = $self->session;
     my $topKeywords    = $self->getTopLevelKeywordsList;
     my $keywordHierarchy  = $self->getKeywordHierarchy( $topKeywords, );
     $var->{keywords_loop} = $self->getKeywordVariables( $keywordHierarchy );
@@ -227,6 +234,7 @@ sub appendKeywordPageVars {
 }
 
 #-------------------------------------------------------------------
+
 
 =head2 appendMostPopular ($var, [ $limit ])
 
@@ -242,10 +250,10 @@ If passed in, this will override the mostPopularCount set in the object.
 =cut
 
 sub appendMostPopular {
-	my $self = shift;
-	my $var = shift;
-	my $limit = shift || $self->mostPopularCount;
-	foreach my $asset (@{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"]})}) { 
+    my $self  = shift;
+    my $var   = shift;
+    my $limit = shift || $self->get("mostPopularCount");
+	foreach my $asset (@{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"], joinClass => 'WebGUI::Asset::WikiPage', orderByClause => 'WikiPage.views DESC'})}) { 
 		if (defined $asset) {
 			push(@{$var->{mostPopular}}, {
 				title=>$asset->getTitle,
@@ -461,177 +469,20 @@ sub canEditPages {
 }
 
 #-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_WikiMaster');
 
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties =
-	    (
-	     groupToEditPages => { fieldType => 'group',
-				   defaultValue => ['2'],
-				   tab => 'security',
-				   hoverHelp => $i18n->get('groupToEditPages hoverHelp'),
-				   label => $i18n->get('groupToEditPages label') },
+=head2 deleteSubKeywords ( $keyword )
 
-	     groupToAdminister => { fieldType => 'group',
-				    defaultValue => ['3'],
-				    tab => 'security',
-				    hoverHelp => $i18n->get('groupToAdminister hoverHelp'),
-				    label => $i18n->get('groupToAdminister label') },
+Delete all keywords that are associated with a particular keyword for this wiki.
 
-	     richEditor => { fieldType => 'selectRichEditor',
-			     defaultValue => 'PBrichedit000000000001',
-			     tab => 'display',
-			     hoverHelp => $i18n->get('richEditor hoverHelp'),
-			     label => $i18n->get('richEditor label') },
+=head3 $keyword
 
-	     frontPageTemplateId => { fieldType => 'template',
-				   namespace => 'WikiMaster_front',
-				      defaultValue => 'WikiFrontTmpl000000001',
-				      tab => 'display',
-				      hoverHelp => $i18n->get('frontPageTemplateId hoverHelp'),
-				      label => $i18n->get('frontPageTemplateId label') },
+The main keyword to key off of.
 
-	     pageTemplateId => { fieldType => 'template',
-				 namespace => 'WikiPage',
-				 defaultValue => 'WikiPageTmpl0000000001',
-				 tab => 'display',
-				 hoverHelp => $i18n->get('pageTemplateId hoverHelp'),
-				 label => $i18n->get('pageTemplateId label') },
+=cut
 
-	     pageHistoryTemplateId => { fieldType => 'template',
-					namespace => 'WikiPage_pageHistory',
-					defaultValue => 'WikiPHTmpl000000000001',
-					tab => 'display',
-					hoverHelp => $i18n->get('pageHistoryTemplateId hoverHelp'),
-					label => $i18n->get('pageHistoryTemplateId label') },
-
-	     mostPopularTemplateId => { fieldType => 'template',
-					  namespace => 'WikiMaster_mostPopular',
-					  defaultValue => 'WikiMPTmpl000000000001',
-					  tab => 'display',
-					  hoverHelp => $i18n->get('mostPopularTemplateId hoverHelp'),
-					  label => $i18n->get('mostPopularTemplateId label') },
-
-	     recentChangesTemplateId => { fieldType => 'template',
-					  namespace => 'WikiMaster_recentChanges',
-					  defaultValue => 'WikiRCTmpl000000000001',
-					  tab => 'display',
-					  hoverHelp => $i18n->get('recentChangesTemplateId hoverHelp'),
-					  label => $i18n->get('recentChangesTemplateId label') },
-
-	     byKeywordTemplateId => { fieldType => 'template',
-					  namespace => 'WikiMaster_byKeyword',
-					  defaultValue => 'WikiKeyword00000000001',
-					  tab => 'display',
-					  hoverHelp => $i18n->get('byKeywordTemplateId hoverHelp'),
-					  label => $i18n->get('byKeywordTemplateId label') },
-
-	     searchTemplateId => { fieldType => 'template',
-				   namespace => 'WikiMaster_search',
-				   defaultValue => 'WikiSearchTmpl00000001',
-				   tab => 'display',
-				   hoverHelp => $i18n->get('searchTemplateId hoverHelp'),
-				   label => $i18n->get('searchTemplateId label') },
-
-	     pageEditTemplateId => { fieldType => 'template',
-				   namespace => 'WikiPage_edit',
-				   defaultValue => 'WikiPageEditTmpl000001',
-				   tab => 'display',
-				   hoverHelp => $i18n->get('pageEditTemplateId hoverHelp'),
-				   label => $i18n->get('pageEditTemplateId label') },
-
-	     recentChangesCount => { fieldType => 'integer',
-				     defaultValue => 50,
-				     tab => 'display',
-				     hoverHelp => $i18n->get('recentChangesCount hoverHelp'),
-				     label => $i18n->get('recentChangesCount label') },
-
-	     recentChangesCountFront => { fieldType => 'integer',
-					  defaultValue => 10,
-					  tab => 'display',
-					  hoverHelp => $i18n->get('recentChangesCountFront hoverHelp'),
-					  label => $i18n->get('recentChangesCountFront label') },
-
-	     mostPopularCount => { fieldType => 'integer',
-				     defaultValue => 50,
-				     tab => 'display',
-				     hoverHelp => $i18n->get('mostPopularCount hoverHelp'),
-				     label => $i18n->get('mostPopularCount label') },
-
-	     mostPopularCountFront => { fieldType => 'integer',
-					  defaultValue => 10,
-					  tab => 'display',
-					  hoverHelp => $i18n->get('mostPopularCountFront hoverHelp'),
-					  label => $i18n->get('mostPopularCountFront label') },
-                approvalWorkflow =>{
-                        fieldType=>"workflow",
-                        defaultValue=>"pbworkflow000000000003",
-                        type=>'WebGUI::VersionTag',
-                        tab=>'security',
-                        label=>$i18n->get('approval workflow'),
-                        hoverHelp=>$i18n->get('approval workflow description'),
-                        },    
-		thumbnailSize => {
-			fieldType => "integer",
-			defaultValue => 0,
-			tab => "display",
-			label => $i18n->get("thumbnail size"),
-			hoverHelp => $i18n->get("thumbnail size help")
-			},
-		maxImageSize => {
-			fieldType => "integer",
-			defaultValue => 0,
-			tab => "display",
-			label => $i18n->get("max image size"),
-			hoverHelp => $i18n->get("max image size help")
-			},
-        allowAttachments => {
-            fieldType       => "integer",
-            defaultValue    => 0,
-            tab             => "security",
-            label           => $i18n->get("allow attachments"),
-            hoverHelp       => $i18n->get("allow attachments help"),
-            },
-		useContentFilter =>{
-                        fieldType=>"yesNo",
-                        defaultValue=>1,
-                        tab=>'display',
-                        label=>$i18n->get('content filter'),
-                        hoverHelp=>$i18n->get('content filter description'),
-                        },
-                filterCode =>{
-                        fieldType=>"filterContent",
-                        defaultValue=>'javascript',
-                        tab=>'security',
-                        label=>$i18n->get('filter code'),
-                        hoverHelp=>$i18n->get('filter code description'),
-                        },
-                topLevelKeywords =>{
-                        fieldType    => "keywords",
-                        defaultValue => '',
-                        tab          => 'properties',
-                        label        => $i18n->get('top level keywords'),
-                        hoverHelp    => $i18n->get('top level keywords description'),
-                },
-		);
-
-	push @$definition,
-	     {
-	      assetName => $i18n->get('assetName'),
-	      icon => 'wikiMaster.gif',
-	      autoGenerateForms => 1,
-	      tableName => 'WikiMaster',
-	      className => 'WebGUI::Asset::Wobject::WikiMaster',
-	      properties => \%properties,
-	     };
-
-        return $class->next::method($session, $definition);
->>>>>>> 808a866c8b2a426e4958d38c34e8753a8555fc90
+sub deleteSubKeywords {
+    my ( $self, $keyword ) = @_;
+    return $self->session->db->write('delete from WikiMasterKeywords where assetId=? and keyword=?', [$self->getId, $keyword]);
 }
 
 #-------------------------------------------------------------------
@@ -664,14 +515,15 @@ The hierarchy data structure that looks like this:
 
     [
         {
-            title => 'title', # same as the keyword, since this is a keyword (category) page
-            url   => 'url',   # url from the keyword page, via getUrl so it contains the gateway URL
-                              # If a keyword page does not exist for the keyword, this key/value pair will not be present.
-            children => [     # Array reference of sub-categories referenced by this category
-                {             # If there are no children, this key/value pair will not be present
+            keyword => 'keyword', # same as the keyword, since this is a keyword (category) page
+            url     => 'url',     # url from the keyword page, via getUrl so it contains the gateway URL
+            children => [         # Array reference of sub-categories referenced by this category
+                {                 # If there are no children, this key/value pair will not be present
                     ...
                 }
-            ]
+            ],
+            descendants => 25,    # The total number of wiki pages that this keyword, and any other sub-keywords
+                                  # of this keyword, refer to.
         }
     ]
 
@@ -693,31 +545,47 @@ sub getKeywordHierarchy {
     my $hierarchy   = [];
     $keywords     ||= $self->getTopLevelKeywordsList;
     $seen         ||= {};
+    my $assetKeyword = WebGUI::Keyword->new($session);
     KEYWORD: foreach my $keyword (sort @{ $keywords }) {
-        my $page = $self->getLineage(['children'], {
-            returnObjects => 1,
-            whereClause   => 'assetData.title = '.$session->db->quote($keyword),
-            limit         => 1,
-            includeOnlyClasses => [qw/WebGUI::Asset::WikiPage/],
-        })->[0];
-        if (! $page) {
-            push @{ $hierarchy }, { title => $keyword, url => '', };
-            next KEYWORD;
-        }
         my $datum = {
-            title => $keyword,  ##Note, same as keyword
-            url   => $page->getUrl,
+            title       => $keyword,  ##Note, same as keyword
+            url         => $self->getUrl('func=byKeyword;keyword='.$keyword),
+            descendants => scalar @{ $assetKeyword->getMatchingAssets( { startAsset => $self, keyword => $keyword, }) },
         };
         ##Prevent recursion if seen again
         if (! $seen->{$keyword}++) {
-            my $children =  $self->getKeywordHierarchy(WebGUI::Keyword::string2list($page->get('keywords')), $seen, );
+            ##Replace this with a call to getSubKeywords.
+            my $children =  $self->getKeywordHierarchy($self->getSubKeywords($keyword), $seen, );
             if (@{ $children } ) {
+                foreach my $child (@{ $children }) {
+                    $datum->{descendants} += $child->{descendants};
+                }
                 $datum->{children} = $children;
             }
         }
         push @{ $hierarchy }, $datum;
     }
     return $hierarchy;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSubKeywords ( $keyword )
+
+Return all keywords that are associated with a particular keyword for this wiki.
+
+=head3 $keyword
+
+The main keyword to key off of.
+
+=cut
+
+sub getSubKeywords {
+    my ( $self, $keyword ) = @_;
+    return $self->session->db->buildArrayRef(
+        'select subKeyword from WikiMasterKeywords where assetId=? and keyword=?',
+        [$self->getId, $keyword]
+    );
 }
 
 #-------------------------------------------------------------------
@@ -745,6 +613,7 @@ sub getKeywordVariables {
     KEYWORD: foreach my $member (@{ $hierarchy }) {
         my $varBlock             = clone $member;
         $varBlock->{level}       = $level;
+        $varBlock->{isTopLevel}  = $level == 0;
         $varBlock->{indent_loop} = [ map { { indent => $_ } } 1..$level ];
         delete $varBlock->{children};
         push @{$variables}, $varBlock;
@@ -877,6 +746,48 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
+=head2 purge 
+
+Extend the master method to delete all keyword entries.
+
+=cut
+
+sub purge {
+	my $self = shift;
+    $self->session->db->write('delete from WikiMasterKeywords where assetId=?',[$self->getId]);
+    return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setSubKeywords ( $keyword, @keywords )
+
+Store the set of keywords for this WikiMaster in the db.  Returns true.
+
+=head3 $keyword
+
+The keyword that gets the new keywords.
+
+=head3 @keywords
+
+The new set of keywords.
+
+=cut
+
+sub setSubKeywords {
+    my ( $self, $keyword, @subKeywords ) = @_;
+    $self->deleteSubKeywords($keyword);
+    my $stuffIt = $self->session->db->prepare('insert into WikiMasterKeywords (assetId, keyword, subKeyword) values (?,?,?)');
+    KEYWORD: foreach my $subKeyword (@subKeywords) {
+        next unless $keyword;
+        $stuffIt->execute([$self->getId, $keyword, $subKeyword]);
+    }
+    $stuffIt->finish;
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 shouldSkipNotification ( )
 
 WikiMasters do not send notification
@@ -933,30 +844,55 @@ Return search results that match the keyword from the form variable C<keyword>.
 =cut
 
 sub www_byKeyword {
-    my $self = shift;
-    my $keyword = $self->session->form->process("keyword");
-    my @pages = ();
-    my $p = WebGUI::Keyword->new($self->session)->getMatchingAssets({
+    my $self    = shift;
+    my $session = $self->session;
+    my $keyword = $session->form->process("keyword");
+
+    my $p = WebGUI::Keyword->new($session)->getMatchingAssets({
         startAsset      => $self,
         keyword         => $keyword,   
         usePaginator    => 1,
-        });
+    });
     $p->setBaseUrl($self->getUrl("func=byKeyword;keyword=".$keyword));
+
+    my @pages  = ();
     foreach my $assetData (@{$p->getPageData}) {
         my $asset = WebGUI::Asset->newById($self->session, $assetData->{assetId});
         next unless defined $asset;
         push(@pages, {
-            title   => $asset->getTitle,
-            url     => $asset->getUrl,
+            title    => $asset->getTitle,
+            url      => $asset->getUrl,
+            synopsis => $asset->get('synopsis'),
             });
     }
     @pages = sort { lc($a->{title}) cmp lc($b->{title}) } @pages;
     my $var = {
-        keyword => $keyword,
-        pagesLoop => \@pages,
-        };
+        keyword          => $keyword,
+        pagesLoop        => \@pages,
+        canAdminister    => $self->canAdminister,
+		recentChangesUrl => $self->getUrl("func=recentChanges"),
+		mostPopularUrl   => $self->getUrl("func=mostPopular"),
+		wikiHomeUrl      => $self->getUrl,
+    };
     $p->appendTemplateVars($var);
-	return $self->processStyle($self->processTemplate($var, $self->byKeywordTemplateId));
+
+    my $subKeywords       = $self->getSubKeywords($keyword);
+    my $keywordHierarchy  = $self->getKeywordHierarchy($subKeywords);
+    $var->{keywords_loop} = $self->getKeywordVariables($keywordHierarchy);
+
+    if ($var->{canAdminister}) {
+        $var->{formHeader}  = WebGUI::Form::formHeader($session, {action => $self->getUrl})
+                            . WebGUI::Form::hidden($session, { name => 'func',    value => 'subKeywordSave',})
+                            . WebGUI::Form::hidden($session, { name => 'keyword', value => $keyword,});
+        my $subKeywords = join ', ', @{ $self->getSubKeywords($keyword) };
+        $var->{keywordForm} = WebGUI::Form::keywords($session, {
+                                                       name  => 'subKeywords',
+                                                       value => $session->form->get('subKeywords') || $subKeywords,
+                                                       });
+        $var->{submitForm} = WebGUI::Form::submit($session, {});
+        $var->{formFooter} = WebGUI::Form::formFooter($session);
+    }
+	return $self->processStyle($self->processTemplate($var, $self->get('byKeywordTemplateId')));
 }
 
 
@@ -1059,6 +995,26 @@ sub www_search {
 		$var->{'performSearch'} = 1;
 	}
 	return $self->processStyle($self->processTemplate($var, $self->searchTemplateId));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_subKeywordSave 
+
+Process the form from www_byKeyword and update the subkeywords for a keyword in this wiki.
+
+=cut
+
+sub www_subKeywordSave {
+	my $self = shift;
+    my $form = $self->session->form;
+
+    my $subKeywords = $form->process('subKeywords', 'keywords');
+    my $keyword     = $form->process('keyword');
+    my @subKeywords = @{ WebGUI::Keyword::string2list($subKeywords) };
+    $self->setSubKeywords($keyword, @subKeywords);
+
+	return $self->www_byKeyword;
 }
 
 __PACKAGE__->meta->make_immutable;

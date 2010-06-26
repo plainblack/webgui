@@ -95,11 +95,9 @@ sub _karma_noFormPost {
 use WebGUI::Asset::Template;
 use WebGUI::Form;
 use WebGUI::Storage;
-use WebGUI::Shop::Pay;
 use WebGUI::AssetCollateral::Sku::Ad::Ad;
 use WebGUI::AdSpace;
 use WebGUI::AdSpace::Ad;
-use Data::Dumper;
 
 =head1 NAME
 

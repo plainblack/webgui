@@ -383,7 +383,7 @@ sub view {
                         ;
 	
     # instanciate address
-    my $address = WebGUI::Shop::AddressBook->newBySession($self->session)->getAddress($form->get("addressId")) if ($form->get("addressId"));
+    my $address = WebGUI::Shop::AddressBook->newByUserId($self->session)->getAddress($form->get("addressId")) if ($form->get("addressId"));
 
     # build the form that the user needs to fill out with badge holder information
     $vars{formHeader} = WebGUI::Form::formHeader($session, {action => $self->getUrl})

@@ -42,6 +42,10 @@ sub process {
     if (! defined $time) {
         $time = time();
     }
+    else {
+        $time =~ s/^\s+//;
+        $time =~ s/\s+$//;
+    }
     my $temp = $session->datetime->epochToHuman($time, $_[0]);
     return $temp;
 }

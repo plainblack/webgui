@@ -300,6 +300,50 @@ our $HELP = {
         ],
     },
 
+    'cart summary variables' => {    
+        title        => 'cart summary variables', 
+        body         => 'cart summary variables help',    
+        isa          => [],
+        fields       => [],
+        private      => 1,
+        variables    => [
+            {
+                name        => 'shippableItemsInCart',
+                namespace   => 'Shop',
+            },
+            {
+                name        => 'subtotal',
+                description => 'subtotalPrice help',
+                namespace   => 'Shop',
+            },
+            {
+                name        => 'shipping',
+                description => 'shippingPrice help',
+                namespace   => 'Shop',
+            },
+            {
+                name        => 'taxes',
+                description => 'taxes help',
+                namespace   => 'Shop',
+            },
+            {
+                name        => 'inShopCreditAvailable',
+                description => 'inShopCreditAvailable help',
+                namespace   => 'Shop',
+            },
+            {
+                name        => 'inShopCreditDeduction',
+                description => 'inShopCreditDeduction help',
+                namespace   => 'Shop',
+            },
+            {
+                name        => 'totalPrice',
+                description => 'totalPrice help',
+                namespace   => 'Shop',
+            },
+        ],
+    },
+
 };
 
 1;  

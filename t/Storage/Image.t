@@ -283,7 +283,7 @@ foreach my $testImage (@testImages) {
 ####################################################
 
 my $rotateTest = WebGUI::Storage->create( $session );
-WebGUI::Test->storagesToDelete($rotateTest);
+WebGUI::Test->addToCleanup($rotateTest);
 
 # Add test image to the storage
 ok( $rotateTest->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath("rotation_test.png")), "Can add test image to storage" );

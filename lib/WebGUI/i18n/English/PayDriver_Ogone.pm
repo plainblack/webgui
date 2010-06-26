@@ -80,6 +80,17 @@ our $I18N = {
         context => q|Hover help of a setting in the ogone config screen.|,
     },
 
+    'summary template' => {
+        message => q|Summary Template|,
+        lastUpdated => 0,
+        context => q|Form label in the configuration form of the Cash module.|
+    },
+    'summary template help' => {
+        message => q|Pick a template to display the screen where the user confirms the cart summary info and agrees to pay.|,
+        lastUpdated => 0,
+        context => q|Hover help for the summary template field in the configuration form of the Cash module.|
+    },
+
     'pay' => {
         message => q|Pay|,
         lastUpdated => 0,
@@ -129,6 +140,13 @@ our $I18N = {
         lastUpdated => 0,
         context => q|Text that describes the required Ogone settings.|,
     },
+
+    'cart summary template' => {
+        message => q|Ogone Payment Gateway Summary Template.|,
+        lastUpdated => 0,
+        context => q|Status message|,
+    },
+
 };
 
 1;

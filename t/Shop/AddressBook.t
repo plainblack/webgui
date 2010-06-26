@@ -32,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 24;
+plan tests => 26;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -104,7 +104,18 @@ cmp_deeply(
 );
 
 $session->user({userId => 1});
+eval { $book = WebGUI::Shop::AddressBook->create($session); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to making an address book for Visitor');
+cmp_deeply(
+    $e,
+    methods(
+        error    => 'Visitor cannot have an address book.',
+    ),
+    '... correct error message',
+);
 
+$session->user({userId => 3});
 $book = WebGUI::Shop::AddressBook->create($session);
 isa_ok($book, 'WebGUI::Shop::AddressBook', 'create returns the right kind of object');
 
@@ -114,7 +125,7 @@ is($session->getId, $book->session->getId, 'session method returns OUR session o
 
 ok($session->id->valid($book->getId), 'create makes a valid GUID style addressBookId');
 
-is($book->get('userId'), 1, 'create uses $session->user to get the userid for this book');
+is($book->get('userId'), 3, 'create uses $session->user to get the userid for this book');
 
 my $bookCount = $session->db->quickScalar('select count(*) from addressBook');
 is($bookCount, 1, 'only 1 address book was created');
@@ -167,7 +178,6 @@ cmp_deeply(
     $book->get(),
     {
         userId     => ignore(),
-        sessionId  => ignore(),
         addressBookId  => ignore(),
         defaultAddressId => ignore(),
     },
@@ -204,7 +214,7 @@ undef $book;
 
 #######################################################################
 #
-# newBySession
+# newByUserId
 #
 #######################################################################
 
@@ -214,22 +224,15 @@ my $mergeUser    = WebGUI::User->create($otherSession);
 WebGUI::Test->addToCleanup($mergeUser);
 $otherSession->user({user => $mergeUser});
 my $adminBook   = WebGUI::Shop::AddressBook->create($otherSession);
+WebGUI::Test->addToCleanup($adminBook);
 my $goodAddress = $adminBook->addAddress({label => 'first'});
 
 my $session2 = WebGUI::Test->newSession;
 $session2->user({user => $mergeUser});
-my $bookAdmin = WebGUI::Shop::AddressBook->newBySession($session2);
+my $bookAdmin = WebGUI::Shop::AddressBook->newByUserId($session2);
 
 cmp_bag(
     [ map { $_->getId } @{ $bookAdmin->getAddresses } ],
     [ $goodAddress->getId, ],
-    'newBySession merges address books by userId'
+    'newByUserId works'
 );
-
-$adminBook->delete;
-$bookAdmin->delete;
-
-END {
-    $session->db->write('delete from addressBook');
-    $session->db->write('delete from address');
-}

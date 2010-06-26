@@ -14,6 +14,7 @@ package WebGUI::Role::Asset::Subscribable;
 
 =cut
 
+use strict;
 
 use Moose::Role;
 use WebGUI::Definition::Asset;
@@ -39,6 +40,7 @@ sub _subscriptionTemplateId_namespace {
     return $self->getSubscriptionTemplateNamespace($self->session);
 }
 
+use WebGUI::International;
 use WebGUI::Mail::Send;
 
 =head1 NAME

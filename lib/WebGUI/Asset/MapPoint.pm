@@ -54,10 +54,10 @@ property address2 => (
 property city => (
             tab         => "properties",
             fieldType   => "text",
-            label       => $i18n->get("city label"),
-            hoverHelp   => $i18n->get("city description"),
-        },
-property region => {
+            label       => ["city label", 'Asset_MapPoint'],
+            hoverHelp   => ["city description", 'Asset_MapPoint'],
+         );
+property region => (
             tab         => "properties",
             fieldType   => "text",
             label       => ["state label", 'Asset_MapPoint'],

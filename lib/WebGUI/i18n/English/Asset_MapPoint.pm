@@ -243,7 +243,7 @@ our $I18N = {
     },
 
     'form_fax' => {
-        message     => "A text field for entering in a phone number.",
+        message     => "A text field for entering in a fax number.",
         lastUpdated => 0,
         context     => "template variable help",
     },

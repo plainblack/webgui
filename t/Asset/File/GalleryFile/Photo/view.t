@@ -128,6 +128,9 @@ my $testTemplateVars    = {
     lastFile_thumbnailUrl 
         => $nextPhoto->getThumbnailUrl,    
     lastFile_title      => $nextPhoto->get("title"),
+    ownerAlias          => 'Admin',
+    ownerId             => '3',
+    ownerProfileUrl     => '/?op=account;module=profile;do=view;uid=3',
 };
 
 # Ignore all EXIF tags, they're tested in exif.t

@@ -17,6 +17,28 @@ save you many hours of grief.
     - Moose
     - CHI
 
+7.9.4
+--------------------------------------------------------------------
+     * Shop and Cart changes
+
+     This release contains a rework of the shopping cart to make it faster to checkout.  Please
+     review the following list of changes;
+
+     * If no shipping address is entered for an item, it will not display the cart's shipping address.
+
+     * Visitors no longer have address books.  To have an address book, users must log in.
+
+     * Users are still, at this point, required to login before they can checkout.  The point where
+     the user must be logged in has been moved back in the checkout process.  Before a user is allowed
+     to enter in any address information, they must be logged in.
+
+     * There are only two cart screens now.  The main cart, where address information is entered, and
+     second screen where the summary of all charges (taxes, shipping, etc.) are summarized before the
+     user pays.   Both screens are templatable.
+
+     * The Cart will now work without javascript.  Javascript is used to make parts of the cart easier,
+     and to automatically update the user's cart so they don't have to manually update it.
+
 7.9.3
 --------------------------------------------------------------------
      * Test:Deep, which had been an optional dependency for testing, has been used

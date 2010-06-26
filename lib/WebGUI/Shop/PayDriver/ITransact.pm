@@ -61,7 +61,7 @@ sub _generatePaymentRequestXML {
     my $self            = shift;
     my $transaction     = shift;
     my $session         = $self->session;
-    my $paymentAddress  = $self->{ _billingAddress };
+    my $paymentAddress  = $self->getCart->getBillingAddress->get();
     my $cardData        = $self->{ _cardData };
 
     # Set up the XML.
@@ -472,27 +472,6 @@ sub doXmlRequest {
 
 #-------------------------------------------------------------------
 
-=head2 getButton 
-
-Return a form to select this payment driver and to accept credentials from those
-who wish to use it.
-
-=cut
-
-sub getButton {
-    my $self    = shift;
-    my $session = $self->session;
-
-    my $payForm = WebGUI::Form::formHeader($session)
-        . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $self->get('label') })
-        . WebGUI::Form::formFooter($session);
-
-    return $payForm;
-}
-
-#-------------------------------------------------------------------
-
 =head2 handlesRecurring
 
 Tells the commerce system that this payment plugin can handle recurring payments.
@@ -519,19 +498,6 @@ sub processCredentials {
 	my $i18n    = WebGUI::International->new($session,'PayDriver_ITransact');
     my @error;
 
-    # Check address data
-	push @error, $i18n->get( 'invalid firstName'    ) unless $form->process( 'firstName' );
-	push @error, $i18n->get( 'invalid lastName'     ) unless $form->process( 'lastName'  );
-	push @error, $i18n->get( 'invalid address'      ) unless $form->process( 'address'   );
-	push @error, $i18n->get( 'invalid city'         ) unless $form->process( 'city'      );
-	push @error, $i18n->get( 'invalid email'        ) unless $form->email  ( 'email'     );
-	push @error, $i18n->get( 'invalid zip'          ) 
-        if ( !$form->zipcode( 'zipcode' ) && $form->process( 'country' ) eq 'United States' );
-	
-    # Check credit card data
-	push @error, $i18n->get( 'invalid card number'  ) unless $form->integer('cardNumber');	
-	push @error, $i18n->get( 'invalid cvv2'         ) if ($self->get('useCVV2') && !$form->integer('cvv2'));
-
 	# Check if expDate and expYear have sane values
 	my ($currentYear, $currentMonth) = $self->session->datetime->localtime;
     my $expires = $form->integer( 'expYear' ) . sprintf '%02d', $form->integer( 'expMonth' );
@@ -549,62 +515,7 @@ sub processCredentials {
         cvv2		=> $form->integer( 'cvv2'       ),
     };	
     
-    $self->{ _billingAddress } = {
-        address1	=> $form->process( 'address'    ),
-        code	    => $form->zipcode( 'zipcode'    ),
-        city		=> $form->process( 'city'       ),
-        firstName	=> $form->process( 'firstName'  ),
-        lastName	=> $form->process( 'lastName'   ),
-        email		=> $form->email  ( 'email'      ),
-        state		=> $form->process( 'state'      ),
-        country		=> $form->process( 'country'    ),
-        phoneNumber => $form->process( 'phone'      ),
-    };
-
     return;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getBillingAddress ( $addressId )
-
-The billing address is not handled by WebGUI::Shop::Address, it comes from
-www_getCredentials.  However, WebGUI::Shop::Transaction requires an
-WebGUI::Shop::Address object.  The billing address is seeded with information
-from the shipping address.  If this address info is different, then create
-a new address to hand to Transaction.
-
-=head3 $addressId
-
-The id of a WebGUI::Shop::Address.  If not present, then use the shipping
-address instead.
-
-=cut
-
-sub getBillingAddress {
-    my ($self, $addressId) = @_;
-
-    my $address     = $addressId
-                    ? $self->getAddress( $addressId )
-                    : $self->getCart->getShippingAddress
-                    ;
-    
-    ##If the user made any changes to the default address, create a new billing address
-    ##and use it instead
-    if( $address->get('firstName'   ) ne $self->{_billingAddress}->{ 'firstName'    }
-     || $address->get('lastName'    ) ne $self->{_billingAddress}->{ 'lastName'     }
-     || $address->get('address1'    ) ne $self->{_billingAddress}->{ 'address1'     }
-     || $address->get('city'        ) ne $self->{_billingAddress}->{ 'city'         }
-     || $address->get('state'       ) ne $self->{_billingAddress}->{ 'state'        }
-     || $address->get('code'        ) ne $self->{_billingAddress}->{ 'code'         }
-     || $address->get('country'     ) ne $self->{_billingAddress}->{ 'country'      }
-     || $address->get('phoneNumber' ) ne $self->{_billingAddress}->{ 'phoneNumber'  }
-     || $address->get('email'       ) ne $self->{_billingAddress}->{ 'email'        }
-    ) {
-        my $billingAddress = $self->getCart->getAddressBook->addAddress( $self->{_billingAddress} );
-        return $billingAddress;
-    }
-    return $address;
 }
 
 #-------------------------------------------------------------------
@@ -725,18 +636,7 @@ sub www_getCredentials {
     my $session     = $self->session;
     my $form        = $session->form;
     my $i18n        = WebGUI::International->new($self->session, 'PayDriver_ITransact');
-	my $u           = WebGUI::User->new($self->session,$self->session->user->userId);
 
-    # Process address from address book if passed
-    my $addressId   = $session->form->process( 'addressId' );
-    my $addressData;
-    if ( $addressId ) {
-        $addressData    = eval{ $self->getAddress( $addressId )->get() } || {};
-    }
-    else { 
-        $addressData    = $self->getCart->getShippingAddress->get;
-    }
-                   
     my $var = {};
 
     # Process form errors
@@ -748,55 +648,11 @@ sub www_getCredentials {
         }
     }
     
-    $var->{getSelectAddressButton} = $self->getSelectAddressButton( 'getCredentials' );
-
     $var->{formHeader} = WebGUI::Form::formHeader($session)
                        . $self->getDoFormTags('pay');
 
-    if ($var->{formHeader}) {
-        $var->{formHeader} .= WebGUI::Form::hidden($session, {name => 'addressId', value => $addressId});
-    }
-
     $var->{formFooter} = WebGUI::Form::formFooter();
    
-    # Address data form
-    $var->{firstNameField} = WebGUI::Form::text($session, {
-        name  => 'firstName',
-        value => $form->process("firstName") || $addressData->{ "firstName" } || $u->profileField('firstName'),
-    });
-    $var->{lastNameField} = WebGUI::Form::text($session, {
-        name  => 'lastName',
-        value => $form->process("lastName") || $addressData->{ "lastName" } || $u->profileField('lastName'),
-    });
-    $var->{addressField} = WebGUI::Form::text($session, {
-        name  => 'address',
-        value => $form->process("address") || $addressData->{ address1 } || $u->profileField('homeAddress'),
-    });
-    $var->{cityField} = WebGUI::Form::text($session, {
-        name  => 'city',
-        value => $form->process("city") || $addressData->{ city } || $u->profileField('homeCity'),
-    });
-    $var->{stateField} = WebGUI::Form::text($session, {
-        name  => 'state',
-        value => $form->process("state") || $addressData->{ state } || $u->profileField('homeState'),
-    });
-    $var->{codeField} = WebGUI::Form::zipcode($session, {
-        name  => 'zipcode',
-        value => $form->process("zipcode") || $addressData->{ code } || $u->profileField('homeZip'),
-    });
-    $var->{countryField} = WebGUI::Form::country($session, {
-        name  => 'country',
-        value => ($form->process("country",'country', '') || $addressData->{ country } || $u->profileField("homeCountry") || 'United States of A'),
-    });
-    $var->{phoneField} = WebGUI::Form::phone($session, {
-        name  => 'phone',
-        value => $form->process("phone",'phone') || $addressData->{ phoneNumber } || $u->profileField("homePhone"),
-    });
-    $var->{emailField} = WebGUI::Form::email($session, {
-        name  => 'email',
-        value => $form->process('email', 'email') || $addressData->{ email } || $u->profileField('email'),
-    });
-
     # Credit card information
     $var->{cardNumberField} = WebGUI::Form::text($session, {
         name  => 'cardNumber',
@@ -814,17 +670,9 @@ sub www_getCredentials {
         value => $i18n->get('checkout button', 'Shop'),
         extras => 'onclick="this.disabled=true;this.form.submit(); return false;"',
     });
+    $self->appendCartVariables($var);
 
-    my $template = eval { WebGUI::Asset::Template->newById($session, $self->get("credentialsTemplateId")); };
-    my $output;
-    if (! Exception::Class->caught()) {
-        $template->prepare;
-        $output = $template->process($var);
-    }
-    else {
-        $output = $i18n->get('template gone');
-    }
-
+    my $output   = $self->processTemplate($self->get("credentialsTemplateId"), $var);
     return $session->style->userStyle($output);
 }
 
@@ -847,16 +695,8 @@ sub www_pay {
     # Go back to checkout form if credentials are not ok
     return $self->www_getCredentials( $credentialsErrors ) if $credentialsErrors;
 
-    my $addressId      = $session->form->process( 'addressId' );
-    my $billingAddress = $self->getBillingAddress($addressId);
-
     # Payment time!
-    my $transaction = $self->processTransaction( $billingAddress );
-    ## The billing address object is temporary, just to send to the transaction.
-    ## Delete it if we don't need it.
-    if ($billingAddress->getId ne $addressId) {
-        $billingAddress->delete;
-    }
+    my $transaction = $self->processTransaction( );
 	if ($transaction->get('isSuccessful')) {
 	    return $transaction->thankYou();
 	}

@@ -22,6 +22,7 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
+$session->user({userId => 3});
 
 plan tests => 4;
 

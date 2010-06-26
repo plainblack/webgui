@@ -22,6 +22,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use JSON;
 use HTML::Form;
+use WebGUI::Shop::PayDriver::Ogone;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,20 +32,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 45;
-plan tests => 1 + $tests;
+plan tests => 45;
 
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
 
 my $e;
-
-note('Testing existence');
-my $loaded = use_ok('WebGUI::Shop::PayDriver::Ogone');
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::PayDriver::Ogone', $tests unless $loaded;
 
 #######################################################################
 #
@@ -109,6 +102,13 @@ my $expectDefinition =  {
             label           => ignore(),
             hoverHelp       => ignore(),
             defaultValue    => 1,
+        },
+        summaryTemplateId => {
+            fieldType       => 'template',
+            label           => ignore(),
+            hoverHelp       => ignore(),
+            defaultValue    => ignore(),
+            namespace       => 'Shop/Credentials',
         },
     },
 };
@@ -355,6 +355,7 @@ isnt(
 my $cart = $driver->getCart;
 WebGUI::Test->addToCleanup($cart);
 isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGUI::Shop::Cart object');
+WebGUI::Test->addToCleanup($cart);
 
 #######################################################################
 #
@@ -373,7 +374,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 17, 'getEditForm: the form has 17 controls');
+is          (scalar @inputs, 18, 'getEditForm: the form has 18 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -452,6 +453,10 @@ cmp_deeply(
         {
             name    => 'useTestMode',
             type    => 'radio',
+        },
+        {
+            name    => 'summaryTemplateId',
+            type    => 'option',
         },
     ],
     'getEditForm made the correct form with all the elements'
@@ -577,5 +582,4 @@ is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
-}
 #vim:ft=perl

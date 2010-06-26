@@ -123,6 +123,13 @@ sub definition {
             hoverHelp    => $i18n->get('button image help'),
             defaultValue => '',
         },
+        summaryTemplateId  => {
+            fieldType    => 'template',
+            label        => $i18n->get('summary template'),
+            hoverHelp    => $i18n->get('summary template help'),
+            namespace    => 'Shop/Credentials',
+            defaultValue => '',
+        },
     );
 
     push @{$definition},
@@ -164,7 +171,7 @@ sub getButton {
     # do a submit button with i18n'd paypal text.  If they did, we'll use an
     # image submit.
     my $button;
-    my $i18n    = WebGUI::International->new( $session, 'PayDriver_PayPalStd' );
+    my $i18n = WebGUI::International->new( $session, 'PayDriver_PayPalStd' );
     my $text = $i18n->get('PayPal');
     if ( $self->get('buttonImage') ) {
         my $raw = $self->get('buttonImage');
@@ -329,5 +336,5 @@ sub www_completeTransaction {
         : $self->displayPaymentError($transaction);
 }
 
-1;
 
+1;

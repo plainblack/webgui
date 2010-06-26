@@ -339,4 +339,3 @@ sub getPaypalCountry {
 }
 
 1;
-

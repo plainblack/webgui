@@ -42,6 +42,7 @@ sub getAnchoredAsset {
         $a = $a->cloneFromDb;
     }
     WebGUI::Test->addToCleanup($tag);
+    warn "returning data";
     return ($tag, $asset, @parents);
 }
 
@@ -267,27 +268,12 @@ sub t_01_write_update : Test(8) {
     $session->db->write("delete from assetData where assetId=?", [$testId]);
 }
 
-sub t_03_addRevision : Test(5) {
-    note "cut";
-    my $test    = shift;
-    my $session = $test->session;
-    my ($tag, $asset, @parents) = $test->getAnchoredAsset();
-    ok $asset->cut, 'cut returns true if it was cut';
-    is $asset->state, 'clipboard', 'asset state updated';
-    my $session_asset = $session->asset();
-    $session->asset($parents[-1]);
-    ok $asset->canPaste, 'canPaste: allowed to paste here';
-    ok $parents[-1]->paste($asset->assetId), 'paste returns true when it pastes';
-    $asset_prime = $asset->cloneFromDb;
-    is $asset_prime->state, 'published', 'asset state updated';
-    $session->asset($session_asset);
-}
-
 sub t_05_cut_paste : Test(5) {
     note "cut";
     my $test    = shift;
     my $session = $test->session;
     my ($tag, $asset, @parents) = $test->getAnchoredAsset();
+    ok $asset->cut, 'cut returns true if it was cut';
     ok $asset->cut, 'cut returns true if it was cut';
     is $asset->state, 'clipboard', 'asset state updated';
     my $session_asset = $session->asset();

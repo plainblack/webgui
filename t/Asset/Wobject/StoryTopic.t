@@ -297,6 +297,8 @@ cmp_deeply(
             'link'      => ignore(),
             date        => ignore(),
             author      => ignore(),
+            pubDate     => ignore(),
+            guid        => ignore(),
         },
         {
             title => 'red',
@@ -304,6 +306,8 @@ cmp_deeply(
             'link'      => ignore(),
             date        => ignore(),
             author      => ignore(),
+            pubDate     => ignore(),
+            guid        => ignore(),
         },
         {
             title => 'brooks',
@@ -311,6 +315,8 @@ cmp_deeply(
             'link'      => ignore(),
             date        => ignore(),
             author      => ignore(),
+            pubDate     => ignore(),
+            guid        => ignore(),
         },
     ],
     'rssFeedItems'

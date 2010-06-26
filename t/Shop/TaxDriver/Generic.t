@@ -31,13 +31,14 @@ use WebGUI::Shop::TaxDriver::Generic;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+$session->user({userId => 3});
 
 #----------------------------------------------------------------------------
 # Tests
 
 my $addExceptions = getAddExceptions($session);
 
-plan tests => 78
+plan tests => 79
             +  2*scalar(@{$addExceptions});
 
 #----------------------------------------------------------------------------
@@ -471,6 +472,7 @@ $taxer->importTaxData(
     WebGUI::Test->getTestCollateralPath('taxTables/largeTaxTable.csv')
 ),
 my $book = WebGUI::Shop::AddressBook->create($session);
+WebGUI::Test->addToCleanup($book);
 my $taxingAddress = $book->addAddress({
     label => 'taxing',
     city  => 'Madison',
@@ -579,12 +581,11 @@ $tag2->commit;
 WebGUI::Test->addToCleanup($tag2);
 $taxFreeDonation = $taxFreeDonation->cloneFromDb;
 
-$taxFreeDonation->setTaxConfiguration( 'WebGUI::Shop::TaxDriver::Generic', {
-    overrideTaxRate => 1,
-    taxRateOverride => 0,
-});
+my $tax = $taxer->getTaxRate( $taxableDonation, $taxingAddress );
+is($tax, 5.5, 'calculate: simple tax calculation on 1 item in the cart');
 
-is($taxer->getTaxRate( $taxFreeDonation, $taxingAddress), 0, 'getTaxRate: tax rate override should override tax derived from address');
+$cart->update({ shippingAddressId => $taxFreeAddress->getId});
+is($taxer->getTaxRate( $taxableDonation, $taxFreeAddress ), 0, 'calculate: simple tax calculation on 1 item in the cart, tax free location');
 
 #######################################################################
 #

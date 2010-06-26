@@ -201,12 +201,6 @@ our $I18N = {
 		context		=> q|a help description|,
 	},
 
-	'checkoutButton help' => {
-		message 	=> q|The button the user pushes to choose a payment method.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-
 	'continueShoppingButton help' => {
 		message 	=> q|Clicking this button will take the user back to the site.|,
 		lastUpdated	=> 0,
@@ -215,18 +209,6 @@ our $I18N = {
 
 	'updateButton help' => {
 		message 	=> q|Clicking this button will apply the changes you made to the cart and recalculate all the prices.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-
-	'chooseShippingButton help' => {
-		message 	=> q|Clicking this button will let the user pick a shipping address from the address book.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-
-	'shipToButton help' => {
-		message 	=> q|Does the same as the chooseShippingButton.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
@@ -974,6 +956,12 @@ our $I18N = {
 		message => q|Ship To|,
 		lastUpdated => 0,
 		context => q|a button the user clicks on to set shipping information|
+	},
+
+	'Special shipping' => { 
+		message => q|Special shipping|,
+		lastUpdated => 0,
+		context => q|a button the user clicks on to set shipping information on an item|
 	},
 
 	'shipping address' => { 
@@ -1741,6 +1729,48 @@ our $I18N = {
 		message => q|Failure|,
 		lastUpdated => 0,
 		context => q|commerce setting help|
+	},
+
+	'Billing Address' => { 
+		message => q|Billing Address|,
+		lastUpdated => 0,
+		context => q|template label for the cart|
+	},
+
+	'Shipping Address' => { 
+		message => q|Shipping Address|,
+		lastUpdated => 0,
+		context => q|template label for the cart|
+	},
+
+	'use same shipping as billing' => { 
+		message => q|Use the same shipping address as billing address.|,
+		lastUpdated => 0,
+		context => q|template label for the cart|
+	},
+
+	'Add new address' => { 
+		message => q|Add new address|,
+		lastUpdated => 0,
+		context => q|form label for the cart.  Allows user to build a new address.|
+	},
+
+	'Update this address' => { 
+		message => q|Update this address|,
+		lastUpdated => 0,
+		context => q|form label for the cart.  Allows user to build a new address.|
+	},
+
+	'Choose a payment method' => { 
+		message => q|Choose a payment method|,
+		lastUpdated => 0,
+		context => q|form label for the cart.  Allows user to choose a payment method.  Bart Jol for Minister in 2012!|
+	},
+
+	'shippableItemsInCart' => { 
+		message => q|A boolean which will be true if any item in the cart requires shipping.|,
+		lastUpdated => 0,
+		context => q|form label for the cart.  Allows user to choose a payment method.  Bart Jol for Minister in 2012!|
 	},
 
 };

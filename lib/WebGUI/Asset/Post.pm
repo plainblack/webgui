@@ -77,6 +77,8 @@ with 'WebGUI::Role::Asset::AlwaysHidden';
 
 with 'WebGUI::Role::Asset::SetStoragePermissions';
 
+with 'WebGUI::Role::Asset::AutoSynopsis';
+
 use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -170,7 +172,7 @@ Extend the master class to make the default group 7.
 sub canAdd {
 	my $class = shift;
 	my $session = shift;
-	$class->SUPER::canAdd($session, undef, '7');
+	$class->next::method($session, undef, '7');
 }
 
 #-------------------------------------------------------------------
@@ -613,49 +615,6 @@ sub getStorageLocation {
 		}
 	}
 	return $self->{_storageLocation};
-}
-
-#-------------------------------------------------------------------
-
-=head2 getSynopsisAndContent ($synopsis, $body)
-
-Returns a synopsis taken from the body of the Post, based on either the separator
-macro, the first html paragraph, or the first physical line of text as defined by
-newlines.
-
-Returns both the synopsis, and the original body content.
-
-=head3 $synopsis
-
-If passed in, it returns that instead of the calculated synopsis.
-
-=head3 $body
-
-Body of the Post to use a source for the synopsis.
-
-=cut
-
-sub getSynopsisAndContent {
-	my $self = shift;
-	my $synopsis = shift;
-	my $body = shift;
-	unless ($synopsis) {
-           my @content;
-           if( $body =~ /\^\-\;/ ) {
-               my @pieces = WebGUI::HTML::splitSeparator($body);
-               $content[0] = shift @pieces;
-               $content[1] = join '', @pieces;
-           }
-           elsif( $body =~ /<p>/ ) {
-               @content = WebGUI::HTML::splitTag($body);
-           }
-           else {
-       	       @content = split("\n",$body);
-           }
-           shift @content if $content[0] =~ /^\s*$/;
-           $synopsis = WebGUI::HTML::filter($content[0],"all");
-	}
-	return ($synopsis,$body);
 }
 
 #-------------------------------------------------------------------
@@ -1352,6 +1311,7 @@ override trash => sub {
     }
 };
 
+
 #-------------------------------------------------------------------
 
 =head2 prepareView 
@@ -1362,7 +1322,7 @@ Extend the base method to also prepare the Thread containing this Post.
 
 sub prepareView {
 	my $self = shift;
-	$self->SUPER::prepareView;
+	$self->next::method;
 	unless ($self->getThread->getId eq $self->getId) {
 		# Need the unless to avoid infinite recursion.
 		$self->getThread->prepareView;

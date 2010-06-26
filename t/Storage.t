@@ -18,11 +18,11 @@ use WebGUI::Storage;
 
 use File::Spec;
 use File::Temp qw/tempdir/;
+use Image::Magick;
 use Test::More;
 use Test::Deep;
 use Test::MockObject;
 use Cwd;
-use Data::Dumper;
 use Path::Class::Dir;
 
 my $session = WebGUI::Test->session;
@@ -31,7 +31,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 136; # increment this value for each test you create
+my $numTests = 140; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -68,8 +68,8 @@ is( $storage1->getLastError, undef, "No errors during path creation");
 #
 ####################################################
 
-is( $storage1->getPathFrag,    '7e/8a/7e8a1b6a', 'pathFrag returns correct value');
-is( $storage1->getDirectoryId, '7e8a1b6a',       'getDirectoryId returns the last path element');
+is( $storage1->getPathFrag,    '7e/8a/7e8a1b6ab', 'pathFrag returns correct value');
+is( $storage1->getDirectoryId, '7e8a1b6ab',       'getDirectoryId returns the last path element');
 
 ##Build an old-style GUID storage location
 my $uploadsBase = Path::Class::Dir->new($uploadDir);
@@ -94,12 +94,12 @@ is($guidStorage->getDirectoryId, $newGuid, '... getDirectoryId');
 $session->config->delete('cdn');
 # Note: the CDN configuration will be reverted after CDN tests below
 
-my $storageDir1 = join '/', $uploadDir, '7e', '8a', '7e8a1b6a';
+my $storageDir1 = join '/', $uploadDir, '7e', '8a', '7e8a1b6ab';
 is ($storage1->getPath, $storageDir1, 'getPath: path calculated correctly for directory');
 my $storageFile1 = join '/', $storageDir1, 'baz';
 is ($storage1->getPath('baz'), $storageFile1, 'getPath: path calculated correctly for file');
 
-my $storageUrl1 = join '/', $uploadUrl, '7e', '8a', '7e8a1b6a';
+my $storageUrl1 = join '/', $uploadUrl, '7e', '8a', '7e8a1b6ab';
 is ($storage1->getUrl, $storageUrl1, 'getUrl: url calculated correctly for directory');
 my $storageUrl2 = join '/', $storageUrl1, 'bar';
 is ($storage1->getUrl('bar'), $storageUrl2, 'getUrl: url calculated correctly for file');
@@ -544,6 +544,39 @@ is ($privs, '{"assets":[],"groups":["3","3"],"users":["3"]}', '... correct group
     is ($privs, '{"assets":["' . $asset->getId . '"],"groups":[],"users":[]}', '... correct asset contents');
 }
 
+####################################################
+#
+# rotate
+#
+####################################################
+
+# Create new storage for test of 'rotate' method
+my $rotateTestStorage = WebGUI::Storage->create($session);
+addToCleanup($rotateTestStorage);
+
+# Add test image from file system
+my $file = "rotation_test.png";
+$rotateTestStorage->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath($file) );
+
+# Rotate image by 90° CW
+$rotateTestStorage->rotate( $file, 90 );
+
+# Test based on dimensions
+cmp_deeply( [ $rotateTestStorage->getSizeInPixels($file) ], [ 3, 2 ], "rotate: check if image was rotated by 90° CW (based on dimensions)" );
+# Test based on single pixel
+my $image = new Image::Magick;
+$image->Read( $rotateTestStorage->getPath( $file ) );
+is( $image->GetPixel( x=>3, y=>1 ), 1, "rotate: check if image was rotated by 90° CW (based on pixels)");
+
+# Rotate image by 90° CCW
+$rotateTestStorage->rotate( $file, -90 );
+
+# Test based on dimensions
+cmp_deeply( [ $rotateTestStorage->getSizeInPixels($file) ], [ 2, 3 ], "rotate: check if image was rotated by 90° CCW (based on dimensions)" );
+# Test based on single pixel
+my $image = new Image::Magick;
+$image->Read( $rotateTestStorage->getPath( $file ) );
+is( $image->GetPixel( x=>1, y=>1 ), 1, "rotate: check if image was rotated by 90° CCW (based on pixels)");
 
 ####################################################
 #
