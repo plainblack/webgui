@@ -367,6 +367,29 @@ override processPropertiesFromFormPost => sub {
     return undef;
 };
 
+
+#----------------------------------------------------------------------------
+
+=head2 rotate ( angle )
+
+Rotate the photo clockwise by the specified C<angle> (in degrees) including the
+thumbnail and all resolutions.
+
+=cut
+
+sub rotate {
+    my $self    = shift;
+    my $angle   = shift;
+    my $storage = $self->getStorageLocation;
+    
+    # Rotate all files in the storage
+    foreach my $file (@{$storage->getFiles}) {
+        $storage->rotate($file, $angle);
+    }
+    # Re-create thumbnail
+    $self->generateThumbnail;
+}
+
 #----------------------------------------------------------------------------
 
 =head2 setFile ( filename )

@@ -188,6 +188,8 @@ use WebGUI::International;
 use HTML::Parser;
 use URI::Escape;
 use WebGUI::Utility qw/isIn/;
+use WebGUI::Form;
+use Clone qw/clone/;
 
 #-------------------------------------------------------------------
 
@@ -209,12 +211,29 @@ sub appendFeaturedPageVars {
 
 #-------------------------------------------------------------------
 
+=head2 appendKeywordPageVars ( var )
+
+Append the template variables to C<var> for keyword (catagory) pages.
+
+=cut
+
+sub appendKeywordPageVars {
+    my ( $self, $var ) = @_;
+    my $session        = $self->session;
+    my $topKeywords    = $self->getTopLevelKeywordsList;
+    my $keywordHierarchy  = $self->getKeywordHierarchy( $topKeywords, );
+    $var->{keywords_loop} = $self->getKeywordVariables( $keywordHierarchy );
+    return $var;
+}
+
+#-------------------------------------------------------------------
+
 =head2 appendMostPopular ($var, [ $limit ])
 
 =head3 $var
 
 A hash reference of template variables.  An array reference containing the most popular wiki pages
-in order of popularity.
+in order of popularity will be appended to it.
 
 =head3 $limit
 
@@ -442,6 +461,180 @@ sub canEditPages {
 }
 
 #-------------------------------------------------------------------
+sub definition {
+	my $class = shift;
+	my $session = shift;
+	my $definition = shift;
+	my $i18n = WebGUI::International->new($session, 'Asset_WikiMaster');
+
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties =
+	    (
+	     groupToEditPages => { fieldType => 'group',
+				   defaultValue => ['2'],
+				   tab => 'security',
+				   hoverHelp => $i18n->get('groupToEditPages hoverHelp'),
+				   label => $i18n->get('groupToEditPages label') },
+
+	     groupToAdminister => { fieldType => 'group',
+				    defaultValue => ['3'],
+				    tab => 'security',
+				    hoverHelp => $i18n->get('groupToAdminister hoverHelp'),
+				    label => $i18n->get('groupToAdminister label') },
+
+	     richEditor => { fieldType => 'selectRichEditor',
+			     defaultValue => 'PBrichedit000000000001',
+			     tab => 'display',
+			     hoverHelp => $i18n->get('richEditor hoverHelp'),
+			     label => $i18n->get('richEditor label') },
+
+	     frontPageTemplateId => { fieldType => 'template',
+				   namespace => 'WikiMaster_front',
+				      defaultValue => 'WikiFrontTmpl000000001',
+				      tab => 'display',
+				      hoverHelp => $i18n->get('frontPageTemplateId hoverHelp'),
+				      label => $i18n->get('frontPageTemplateId label') },
+
+	     pageTemplateId => { fieldType => 'template',
+				 namespace => 'WikiPage',
+				 defaultValue => 'WikiPageTmpl0000000001',
+				 tab => 'display',
+				 hoverHelp => $i18n->get('pageTemplateId hoverHelp'),
+				 label => $i18n->get('pageTemplateId label') },
+
+	     pageHistoryTemplateId => { fieldType => 'template',
+					namespace => 'WikiPage_pageHistory',
+					defaultValue => 'WikiPHTmpl000000000001',
+					tab => 'display',
+					hoverHelp => $i18n->get('pageHistoryTemplateId hoverHelp'),
+					label => $i18n->get('pageHistoryTemplateId label') },
+
+	     mostPopularTemplateId => { fieldType => 'template',
+					  namespace => 'WikiMaster_mostPopular',
+					  defaultValue => 'WikiMPTmpl000000000001',
+					  tab => 'display',
+					  hoverHelp => $i18n->get('mostPopularTemplateId hoverHelp'),
+					  label => $i18n->get('mostPopularTemplateId label') },
+
+	     recentChangesTemplateId => { fieldType => 'template',
+					  namespace => 'WikiMaster_recentChanges',
+					  defaultValue => 'WikiRCTmpl000000000001',
+					  tab => 'display',
+					  hoverHelp => $i18n->get('recentChangesTemplateId hoverHelp'),
+					  label => $i18n->get('recentChangesTemplateId label') },
+
+	     byKeywordTemplateId => { fieldType => 'template',
+					  namespace => 'WikiMaster_byKeyword',
+					  defaultValue => 'WikiKeyword00000000001',
+					  tab => 'display',
+					  hoverHelp => $i18n->get('byKeywordTemplateId hoverHelp'),
+					  label => $i18n->get('byKeywordTemplateId label') },
+
+	     searchTemplateId => { fieldType => 'template',
+				   namespace => 'WikiMaster_search',
+				   defaultValue => 'WikiSearchTmpl00000001',
+				   tab => 'display',
+				   hoverHelp => $i18n->get('searchTemplateId hoverHelp'),
+				   label => $i18n->get('searchTemplateId label') },
+
+	     pageEditTemplateId => { fieldType => 'template',
+				   namespace => 'WikiPage_edit',
+				   defaultValue => 'WikiPageEditTmpl000001',
+				   tab => 'display',
+				   hoverHelp => $i18n->get('pageEditTemplateId hoverHelp'),
+				   label => $i18n->get('pageEditTemplateId label') },
+
+	     recentChangesCount => { fieldType => 'integer',
+				     defaultValue => 50,
+				     tab => 'display',
+				     hoverHelp => $i18n->get('recentChangesCount hoverHelp'),
+				     label => $i18n->get('recentChangesCount label') },
+
+	     recentChangesCountFront => { fieldType => 'integer',
+					  defaultValue => 10,
+					  tab => 'display',
+					  hoverHelp => $i18n->get('recentChangesCountFront hoverHelp'),
+					  label => $i18n->get('recentChangesCountFront label') },
+
+	     mostPopularCount => { fieldType => 'integer',
+				     defaultValue => 50,
+				     tab => 'display',
+				     hoverHelp => $i18n->get('mostPopularCount hoverHelp'),
+				     label => $i18n->get('mostPopularCount label') },
+
+	     mostPopularCountFront => { fieldType => 'integer',
+					  defaultValue => 10,
+					  tab => 'display',
+					  hoverHelp => $i18n->get('mostPopularCountFront hoverHelp'),
+					  label => $i18n->get('mostPopularCountFront label') },
+                approvalWorkflow =>{
+                        fieldType=>"workflow",
+                        defaultValue=>"pbworkflow000000000003",
+                        type=>'WebGUI::VersionTag',
+                        tab=>'security',
+                        label=>$i18n->get('approval workflow'),
+                        hoverHelp=>$i18n->get('approval workflow description'),
+                        },    
+		thumbnailSize => {
+			fieldType => "integer",
+			defaultValue => 0,
+			tab => "display",
+			label => $i18n->get("thumbnail size"),
+			hoverHelp => $i18n->get("thumbnail size help")
+			},
+		maxImageSize => {
+			fieldType => "integer",
+			defaultValue => 0,
+			tab => "display",
+			label => $i18n->get("max image size"),
+			hoverHelp => $i18n->get("max image size help")
+			},
+        allowAttachments => {
+            fieldType       => "integer",
+            defaultValue    => 0,
+            tab             => "security",
+            label           => $i18n->get("allow attachments"),
+            hoverHelp       => $i18n->get("allow attachments help"),
+            },
+		useContentFilter =>{
+                        fieldType=>"yesNo",
+                        defaultValue=>1,
+                        tab=>'display',
+                        label=>$i18n->get('content filter'),
+                        hoverHelp=>$i18n->get('content filter description'),
+                        },
+                filterCode =>{
+                        fieldType=>"filterContent",
+                        defaultValue=>'javascript',
+                        tab=>'security',
+                        label=>$i18n->get('filter code'),
+                        hoverHelp=>$i18n->get('filter code description'),
+                        },
+                topLevelKeywords =>{
+                        fieldType    => "keywords",
+                        defaultValue => '',
+                        tab          => 'properties',
+                        label        => $i18n->get('top level keywords'),
+                        hoverHelp    => $i18n->get('top level keywords description'),
+                },
+		);
+
+	push @$definition,
+	     {
+	      assetName => $i18n->get('assetName'),
+	      icon => 'wikiMaster.gif',
+	      autoGenerateForms => 1,
+	      tableName => 'WikiMaster',
+	      className => 'WebGUI::Asset::Wobject::WikiMaster',
+	      properties => \%properties,
+	     };
+
+        return $class->next::method($session, $definition);
+>>>>>>> 808a866c8b2a426e4958d38c34e8753a8555fc90
+}
+
+#-------------------------------------------------------------------
 
 =head2 getFeaturedPageIds ( )
 
@@ -458,6 +651,108 @@ sub getFeaturedPageIds {
     } );
     
     return $assetIds;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getKeywordHierarchy ( $keywords, $seen )
+
+Starting with the top level keywords, return the hierarchy of keywords as a recursive arrayref of hashrefs.
+The traversal is left-most, depth first.
+
+The hierarchy data structure that looks like this:
+
+    [
+        {
+            title => 'title', # same as the keyword, since this is a keyword (category) page
+            url   => 'url',   # url from the keyword page, via getUrl so it contains the gateway URL
+                              # If a keyword page does not exist for the keyword, this key/value pair will not be present.
+            children => [     # Array reference of sub-categories referenced by this category
+                {             # If there are no children, this key/value pair will not be present
+                    ...
+                }
+            ]
+        }
+    ]
+
+=head3 $keywords
+
+An array reference of keywords.  If this is blank, then it will use the top level keywords from
+itself as a default.
+
+=head3 $seen
+
+A hash reference that keeps track of which keywords have already been seen.  This prevents
+infinite loops from happening during the traversal.
+
+=cut
+
+sub getKeywordHierarchy {
+    my ( $self, $keywords, $seen ) = @_;
+    my $session     = $self->session;
+    my $hierarchy   = [];
+    $keywords     ||= $self->getTopLevelKeywordsList;
+    $seen         ||= {};
+    KEYWORD: foreach my $keyword (sort @{ $keywords }) {
+        my $page = $self->getLineage(['children'], {
+            returnObjects => 1,
+            whereClause   => 'assetData.title = '.$session->db->quote($keyword),
+            limit         => 1,
+            includeOnlyClasses => [qw/WebGUI::Asset::WikiPage/],
+        })->[0];
+        if (! $page) {
+            push @{ $hierarchy }, { title => $keyword, url => '', };
+            next KEYWORD;
+        }
+        my $datum = {
+            title => $keyword,  ##Note, same as keyword
+            url   => $page->getUrl,
+        };
+        ##Prevent recursion if seen again
+        if (! $seen->{$keyword}++) {
+            my $children =  $self->getKeywordHierarchy(WebGUI::Keyword::string2list($page->get('keywords')), $seen, );
+            if (@{ $children } ) {
+                $datum->{children} = $children;
+            }
+        }
+        push @{ $hierarchy }, $datum;
+    }
+    return $hierarchy;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getKeywordVariables ( $hierarchy, $level )
+
+Take a data structure representing a hierarchy of keywords, and append template variables
+to them similar to a Navigation so you can build useful things with them.
+
+=head3 $hierarchy
+
+A data structure similar to that produced by getKeywordHierarchy
+
+=head3 $level
+
+The current level in any part of the hierarchy.
+
+=cut
+
+sub getKeywordVariables {
+    my ( $self, $hierarchy, $level ) = @_;
+    $level ||= 0;
+    my $variables = [];
+
+    KEYWORD: foreach my $member (@{ $hierarchy }) {
+        my $varBlock             = clone $member;
+        $varBlock->{level}       = $level;
+        $varBlock->{indent_loop} = [ map { { indent => $_ } } 1..$level ];
+        delete $varBlock->{children};
+        push @{$variables}, $varBlock;
+        if ( exists $member->{children} ) {
+            push @{$variables}, @{ $self->getKeywordVariables($member->{children}, $level+1) };
+        }
+    }
+    return $variables;
 }
 
 #-------------------------------------------------------------------
@@ -519,6 +814,19 @@ sub getTemplateVars {
     };
     
     return $var;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getTopLevelKeywordsList ( )
+
+Return the top level keywords as an array reference.
+
+=cut
+
+sub getTopLevelKeywordsList {
+    my ( $self ) = @_;
+    return WebGUI::Keyword::string2list($self->get('topLevelKeywords'));
 }
 
 #-------------------------------------------------------------------
@@ -611,6 +919,7 @@ sub view {
 	$self->appendSearchBoxVars($var);
 	$self->appendRecentChanges($var, $self->recentChangesCountFront);
 	$self->appendMostPopular($var, $self->mostPopularCountFront);
+	$self->appendKeywordPageVars($var);
 	return $self->processTemplate($var, undef, $template);
 }
 

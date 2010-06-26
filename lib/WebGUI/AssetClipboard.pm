@@ -100,9 +100,12 @@ sub duplicate {
     my $newAsset    
         = $parent->addChild( $self->get, undef, $self->get("revisionDate"), { skipAutoCommitWorkflows => $options->{skipAutoCommitWorkflows} } );
 
-    $session->log->error(
-        sprintf "Unable to add child %s (%s) to %s (%s)", $self->getTitle, $self->getId, $parent->getTitle, $parent->getId
-    );
+    if (! $newAsset) {
+        $self->session->log->error(
+            sprintf "Unable to add child %s (%s) to %s (%s)", $self->getTitle, $self->getId, $parent->getTitle, $parent->getId
+        );
+        return undef;
+    }
     # Duplicate metadata fields
     my $sth = $session->db->read(
         "select * from metaData_values where assetId = ?", 

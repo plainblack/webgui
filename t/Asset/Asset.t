@@ -448,11 +448,24 @@ is($fixTitleAsset->getUiLevel, 8, 'getUiLevel: Snippet has a configured uiLevel 
 
 ################################################################
 #
-# isValidRssItem
+# assetExists
 #
 ################################################################
 
-#is($canViewAsset->isValidRssItem, 1, 'isValidRssItem: By default, all Assets are valid RSS items');
+{
+
+    my $id    = $canViewAsset->getId;
+    my $class = 'WebGUI::Asset';
+    my $date  = $canViewAsset->get('revisionDate');
+
+    ok ( WebGUI::Asset->assetExists($session, $id, $class, $date), 'assetExists with proper class, id and revisionDate');
+    ok (!WebGUI::Asset->assetExists($session, $id, 'WebGUI::Asset::Snippet', $date), 'assetExists with wrong class does not exist');
+    my $id2 = $id;
+    ++$id2;
+    ok (!WebGUI::Asset->assetExists($session, $id2, $class, $date), 'assetExists with wrong id does not exist');
+    ok (!WebGUI::Asset->assetExists($session, $id,  $class, $date+1), 'assetExists with wrong revisionDate does not exist');
+
+}
 
 ################################################################
 #

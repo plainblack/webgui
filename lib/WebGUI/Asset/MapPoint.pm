@@ -54,10 +54,10 @@ property address2 => (
 property city => (
             tab         => "properties",
             fieldType   => "text",
-            label       => ["city label", 'Asset_MapPoint'],
-            hoverHelp   => ["city description", 'Asset_MapPoint'],
-         );
-property state => (
+            label       => $i18n->get("city label"),
+            hoverHelp   => $i18n->get("city description"),
+        },
+property region => {
             tab         => "properties",
             fieldType   => "text",
             label       => ["state label", 'Asset_MapPoint'],
@@ -276,6 +276,8 @@ sub getTemplateVarsEditForm {
     my $definition  = __PACKAGE__->definition($session)->[0]->{properties};
     for my $key ( keys %{$definition} ) {
         next if $definition->{$key}->{noFormPost};
+        next if $key eq 'latitude' 
+             || $key eq 'longitude';
         $definition->{$key}->{name}     = $key;
         $definition->{$key}->{value}    = $self->$key;
         $var->{ "form_$key" } 

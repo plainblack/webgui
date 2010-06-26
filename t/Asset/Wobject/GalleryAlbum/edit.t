@@ -9,9 +9,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-# Test editing a GalleryAlbum from the web interface
-# 
-#
+# Test editing a GalleryAlbum from the web interface. Currently, it 
+# is tested whether...
+# - users can add albums.
+# - photos can be rotated.
 
 use FindBin;
 use strict;
@@ -73,7 +74,7 @@ if ( !$mech->success ) {
     plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
 }
 
-plan tests => 6;        # Increment this number for each test you create
+plan tests => 11;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Visitor user cannot add albums 
@@ -111,6 +112,65 @@ $mech->content_contains(
 # Creates the album with the appropriate properties
 my $album   = WebGUI::Asset->newById( $session, $gallery->getAlbumIds->[0] );
 cmp_deeply( $properties, subhashof( $album->get ), "Properties from edit form are set correctly" );
+
+#----------------------------------------------------------------------------
+# Photos can be rotated using the respective form buttons
+
+# Use album from previous test
+my $album = $gallery->getFirstChild;
+
+# Add single photo to this album. No need to commit since auto-commit was
+# enabled for the Gallery asset.
+my $photo
+    = $album->addChild({
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
+    });
+my $photoId = $photo->getId;
+
+# Attach image file to photo asset (setFile also makes download versions)
+$photo->setFile( WebGUI::Test->getTestCollateralPath("rotation_test.png") );
+my $storage = $photo->getStorageLocation;
+
+# Save dimensions of images
+my @oldDims;
+foreach my $file ( @{$storage->getFiles('showAll') } ) {    
+    push ( @oldDims, [ $storage->getSizeInPixels($file) ] ) unless $file eq '.';
+}
+
+# Rotate photo (i.e. all attached images) by 90° CW
+$mech->get_ok( $baseUrl . $album->getUrl('func=edit'), 'Request GalleryAlbum edit screen' );
+# Select the proper form
+$mech->form_name( 'galleryAlbumEdit' );
+# Try to click the "rotate right" button
+$mech->submit_form_ok( {
+    button     => 'rotateRight-' . $photoId,
+}, 'Request rotation of photo by 90° CW' );
+
+# Save new dimensions of images in reverse order
+my @newDims;
+foreach my $file ( @{$storage->getFiles('showAll') } ) {
+    push ( @newDims, [ reverse($storage->getSizeInPixels($file)) ] ) unless $file eq '.';
+}
+
+# Compare dimensions
+cmp_deeply( \@oldDims, \@newDims, "Check if all files were rotated by 90° CW" );
+
+# Rotate photo (i.e. all attached images) by 90° CCW. No need to request the edit view since
+# an updated view was returned after the last form submittal.
+$mech->form_name( 'galleryAlbumEdit' );
+# Try to click the "rotate left" button
+$mech->submit_form_ok( {
+    button     => 'rotateLeft-' . $photoId,
+}, 'Request rotation of photo by 90° CCW' );
+
+# Save new dimensions of images in original order
+my @newerDims;
+foreach my $file ( @{$storage->getFiles('showAll') } ) {
+    push ( @newerDims, [ $storage->getSizeInPixels($file) ] ) unless $file eq '.';
+}
+
+# Compare dimensions
+cmp_deeply( \@oldDims, \@newerDims, "Check if all files were rotated by 90° CCW" );
 
 #----------------------------------------------------------------------------
 # getMechLogin( baseUrl, WebGUI::User, "identifier" )

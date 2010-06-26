@@ -266,10 +266,6 @@ is(scalar @{ $windowCal->getLineage(['children'])}, 13, 'added events to the win
 
 my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
 
-#note $startDt->toDatabase;
-#note join "\n", map { join ' ', $_->get('title'), $_->get('startDate'), $_->get('startTime')} @window;
-#note $endDt->toDatabase;
-
 cmp_bag(
     [ map { $_->get('title') } @window ],
     [ map { $_->get('title') }
@@ -498,9 +494,6 @@ my $listCal = $node->addChild({
 
 $allDayDt     = $bday->cloneToUserTimeZone->truncate( to => 'day' );
 my $prevDayDt = $bday->cloneToUserTimeZone->truncate( to => 'day' )->subtract(days => 1)->add(hours => 19);
-
-note $allDayDt->toDatabase;
-note $prevDayDt->toDatabase;
 
 $allDay = $listCal->addChild({
     className   => 'WebGUI::Asset::Event',

@@ -332,6 +332,14 @@ our $HELP = {
                         description => 'helpvar form_demote',
                     },
                     {
+                        name        => 'form_rotateLeft',
+                        description => 'helpvar form_rotateLeft',
+                    },
+                    {
+                        name        => 'form_rotateRight',
+                        description => 'helpvar form_rotateRight',
+                    },                                                            
+                    {
                         name        => 'form_synopsis',
                         description => 'helpvar form_synopsis',
                     },

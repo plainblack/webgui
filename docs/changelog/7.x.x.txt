@@ -1,3 +1,5 @@
+7.9.4
+
 7.9.3
  - added #11477: No synopsis in asset now means no synopsis in search index
  - added #11007: Added drag'n'drop sorting in Gallery Album Edit View (Bernd Kalbfuß-Zimmermann)
@@ -5,6 +7,16 @@
  - fixed #11520: Wiki Locked
  - fixed Missing Template variables for the Wiki Page view template.
  - added #10944: Wiki Keyword Page
+ - added #10946: Wiki - Hierarchical Keyword Report
+ - added #10945: Wiki - Top-level keyword list
+ - fixed #11444: Strange spectre problem
+ - fixed #10189: pbworkflow000000000007 Hanging
+ - fixed #11526: Wrong log error in file AssetClipboard.pm
+ - fixed #11525: Paste assets inside CS
+ - added #620: Add buttons to the GalleryAlbum edit view so users can rotate photos by 90 deg (Bernd Kalbfuß-Zimmermann)
+ - fixed #11530: account deactivation not working (United Knowledge)
+ - fixed #11531: MapPoint property conflict
+ - fixed #11532: MapPoint, no i18n
 
 7.9.2
  - added: Workflow to extend recurring Calendar events 2 years from the
