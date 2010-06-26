@@ -199,6 +199,26 @@ our $HELP = {
         related => [ ],
     },
 
+    'collaboration unsubscribe template' => {
+        title     => 'collaboration unsubscribe template title',
+        body      => '',
+        fields    => [],
+        isa       => [],
+        variables => [
+            { name => 'formHeader',
+              description => 'unsubscribe formHeader', },
+            { name => 'formSubmit',
+              description => 'unsubscribe formSubmit', },
+            { name => 'formEmail',
+              description => 'unsubscribe formEmail', },
+            { name => 'formFooter',
+              description => 'unsubscribe formFooter', },
+            { name => 'formMessage',
+              description => 'unsubscribe formMessage', },
+        ],
+        related => [ ],
+    },
+
 };
 
 1;

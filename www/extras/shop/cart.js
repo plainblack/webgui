@@ -242,7 +242,7 @@
 
             var self   = this,
                 e      = args.elements,
-                f      = document.forms[0],
+                f      = document.getElementById('wgCartId'),
                 checks = f.sameShippingAsBilling,
                 sameChange;
 

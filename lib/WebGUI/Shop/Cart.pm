@@ -287,15 +287,39 @@ sub getBillingAddress {
 
 #-------------------------------------------------------------------
 
-=head2 getPaymentGateway ()
+=head2 getI18nError ()
 
-Returns the WebGUI::Shop::PayDriver object that is attached to this cart for payment.
+Returns an internationalized version of the current error, if it exists.
 
 =cut
 
-sub getPaymentGateway {
-    my $self = shift;
-    return WebGUI::Shop::Pay->new($self->session)->getPaymentGateway($self->get("gatewayId"));
+sub getI18nError {
+    my ($self) = @_;
+    my $error  = $self->error;
+    my $i18n   = WebGUI::International->new($self->session, 'Shop');
+    return $error eq 'no billing address'     ? $i18n->get('no billing address')
+         : $error eq 'no shipping address'    ? $i18n->get('no shipping address')
+         : $error eq 'billing label'          ? $i18n->get('billing label')
+         : $error eq 'billing firstName'      ? $i18n->get('billing firstName')
+         : $error eq 'billing lastName'       ? $i18n->get('billing lastName')
+         : $error eq 'billing address1'       ? $i18n->get('billing address1')
+         : $error eq 'billing city'           ? $i18n->get('billing city')
+         : $error eq 'billing code'           ? $i18n->get('billing code')
+         : $error eq 'billing state'          ? $i18n->get('billing state')
+         : $error eq 'billing country'        ? $i18n->get('billing country')
+         : $error eq 'billing phoneNumber'    ? $i18n->get('billing phoneNumber')
+         : $error eq 'shipping label'         ? $i18n->get('shipping label')
+         : $error eq 'shipping firstName'     ? $i18n->get('shipping firstName')
+         : $error eq 'shipping lastName'      ? $i18n->get('shipping lastName')
+         : $error eq 'shipping address1'      ? $i18n->get('shipping address1')
+         : $error eq 'shipping city'          ? $i18n->get('shipping city')
+         : $error eq 'shipping code'          ? $i18n->get('shipping code')
+         : $error eq 'shipping state'         ? $i18n->get('shipping state')
+         : $error eq 'shipping country'       ? $i18n->get('shipping country')
+         : $error eq 'shipping phoneNumber'   ? $i18n->get('shipping phoneNumber')
+         : $error eq 'no shipping method set' ? $i18n->get('Choose a shipping method and update the cart to checkout')
+         : $error eq 'no payment gateway set' ? $i18n->get('Choose a payment gateway and update the cart to checkout')
+         : $error ;
 }
 
 #-------------------------------------------------------------------
@@ -373,6 +397,19 @@ sub getItemsByAssetId {
         push(@itemsObjects, $self->getItem($itemId));
     }
     return \@itemsObjects;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getPaymentGateway ()
+
+Returns the WebGUI::Shop::PayDriver object that is attached to this cart for payment.
+
+=cut
+
+sub getPaymentGateway {
+    my $self = shift;
+    return WebGUI::Shop::Pay->new($self->session)->getPaymentGateway($self->get("gatewayId"));
 }
 
 #-------------------------------------------------------------------
@@ -542,7 +579,7 @@ sub readyForCheckout {
     }
 
     if (my @missingFields = $book->missingFields($address->get)) {
-        $self->error($missingFields[0]);
+        $self->error('billing '.$missingFields[0]);
         return 0;
     }
 
@@ -554,7 +591,7 @@ sub readyForCheckout {
     }
 
     if (my @missingFields = $book->missingFields($shipAddress->get)) {
-        $self->error($missingFields[0]);
+        $self->error('shipping '.$missingFields[0]);
         return 0;
     }
 
@@ -702,8 +739,9 @@ Updates the cart totals, the address fields and the shipping and billing options
 =cut
 
 sub updateFromForm {
-    my $self = shift;
-    my $form = $self->session->form;
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
     foreach my $item (@{$self->getItems}) {
         if ($form->get("quantity-".$item->getId) ne "") {
             eval { $item->setQuantity($form->get("quantity-".$item->getId)) };
@@ -740,12 +778,12 @@ sub updateFromForm {
         my $address = $self->getBillingAddress();
         $address->update(\%billingData);
     }
-    elsif ($billingAddressId ne 'new_address' && $billingAddressId) {
+    elsif ($billingAddressId ne 'new_address' && $billingAddressId ne 'update_address' && $billingAddressId) {
         ##User changed the address selector to another address field
         $cartProperties->{billingAddressId} = $billingAddressId;
     }
     elsif (@missingBillingFields) {
-        $self->error('missing billing '.$missingBillingFields[0]);
+        $self->error('billing '.$missingBillingFields[0]);
     }
     else {
         $self->session->log->warn('billing address: something else: ');
@@ -763,7 +801,7 @@ sub updateFromForm {
             my $shippingAddressId = $form->process('shippingAddressId');
             ##No missing shipping fields, if we set to the same as the billing fields
             if (@missingShippingFields) {
-                $self->error('missing shipping '.$missingShippingFields[0]);
+                $self->error('shipping '.$missingShippingFields[0]);
             }
             if ($shippingAddressId eq 'new_address' && ! @missingShippingFields) {
                 ##Add a new address
@@ -775,7 +813,7 @@ sub updateFromForm {
                 my $address = $self->getBillingAddress();
                 $address->update(\%shippingData);
             }
-            elsif ($shippingAddressId ne 'new_address' && $shippingAddressId) {
+            elsif ($shippingAddressId ne 'new_address' && $shippingAddressId ne 'update_address' && $shippingAddressId) {
                 $cartProperties->{shippingAddressId} = $shippingAddressId;
             }
             else {
@@ -921,7 +959,7 @@ sub www_update {
             ##Handle rounding errors, and checkout immediately if the amount is 0 since
             ##at least the ITransact driver won't accept $0 checkout.
             if (sprintf('%.2f', $total + $self->calculateShopCreditDeduction($total)) eq '0.00') {
-                my $transaction = WebGUI::Shop::Transaction->create($session, {self => $self});
+                my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $self});
                 $transaction->completePurchase('zero', 'success', 'success');
                 $self->onCompletePurchase;
                 $transaction->sendNotifications();
@@ -968,7 +1006,7 @@ sub www_view {
 
     my %var = (
         %{$self->get},
-        formHeader              => WebGUI::Form::formHeader($session)
+        formHeader              => WebGUI::Form::formHeader($session, { extras => q|id="wgCartId"|, })
                                 .  WebGUI::Form::hidden($session, {name=>"shop",   value=>"cart"})
                                 .  WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
                                 .  WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
@@ -1117,7 +1155,7 @@ sub www_view {
 
         my $billingAddressId = $self->get('billingAddressId');
         if ($billingAddressId) {
-            $billingAddressOptions{'update_address'} = $i18n->get('Update this address');
+            $billingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getBillingAddress->get('label');
         }
 
         %billingAddressOptions = (%billingAddressOptions, %addressOptions);
@@ -1133,7 +1171,7 @@ sub www_view {
 
         my $shippingAddressId = $self->get('shippingAddressId');
         if ($shippingAddressId) {
-            $shippingAddressOptions{'update_address'} = $i18n->get('Update this address');
+            $shippingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getShippingAddress->get('label');
         }
         %shippingAddressOptions = (%shippingAddressOptions, %addressOptions);
 
@@ -1183,12 +1221,12 @@ sub www_view {
     $var{totalPrice}              = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
     my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
     $var{ inShopCreditAvailable } = $credit->getSum;
-    $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
+    $var{ inShopCreditDeduction } = $self->calculateShopCreditDeduction($var{totalPrice});
     $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
     foreach my $field (qw/subtotalPrice inShopCreditAvailable inShopCreditDeduction totalPrice shippingPrice tax/) {
         $var{$field} = sprintf q|<span id="%sWrap">%s</span>|, $field, $var{$field};
     }
-    $var{ error                 } = $self->error; 
+    $var{ error } = $self->getI18nError; 
 
     # render the cart
     my $template = WebGUI::Asset->newById($session, $session->setting->get("shopCartTemplateId"));

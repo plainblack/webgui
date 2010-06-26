@@ -43,16 +43,22 @@ for my $i ( 1 .. 5 ) {
 with 'WebGUI::Role::Asset::AlwaysHidden';
 with 'WebGUI::Role::Asset::RssFeed';
 
+use strict;
 use Carp qw( croak );
 use File::Find;
 use File::Spec;
 use File::Temp qw{ tempdir };
 use JSON qw();
+use Image::ExifTool qw( :Public );
+use JSON;
+use Tie::IxHash;
+
 use WebGUI::International;
 use WebGUI::HTML;
 use WebGUI::ProgressBar;
 use WebGUI::Storage;
 
+# Do not move this instruction!
 use Archive::Any;
 
 =head1 NAME
@@ -88,6 +94,12 @@ The name of the file archive to import.
 
 A base set of properties to add to each file in the archive.
 
+=head3 sortBy
+
+Order in which files should be added to the gallery album. Legal values are 
+'name', 'date' and 'fileOrder'. If missing or invalid, files will be added as 
+ordered in the archive (default; corresponding to 'fileOrder').
+
 =head3 $outputSub
 
 A callback to use for outputting data, most likely to a progress bar.  It expects the
@@ -100,6 +112,7 @@ sub addArchive {
     my $self        = shift;
     my $filename    = shift;
     my $properties  = shift;
+    my $sortBy      = shift;
     my $outputSub   = shift || sub {};
     my $gallery     = $self->getParent;
     my $session     = $self->session;
@@ -119,6 +132,33 @@ sub addArchive {
     find( {
         wanted      => $wanted,
     }, $tempdirName );
+    
+    # Sort files by date
+    if ($sortBy eq 'date') {              
+        # Hash for storing last modified timestamps
+        my %mtimes;        
+    
+        my $exifTool = Image::ExifTool->new;
+        # Make ExifTool return epoch timestamps
+        $exifTool->Options('DateFormat', '%s');
+
+        # Iterate through all files
+        foreach my $file (@files) {            
+            # Extract exif data from image
+            $exifTool->ExtractInfo( $file );
+            # Get last modified timestamp from exif data
+            $mtimes{$file} = $exifTool->GetValue('ModifyDate');
+            # Use last modified date of file as fallback
+            $mtimes{$file} = (stat($file))[9] unless $mtimes{$file};
+        }
+        
+        # Sort files based on last modified timestamps
+        @files = sort { $mtimes{$a} <=> $mtimes{$b} } @files;
+    } 
+    # Sort files by name
+    elsif ($sortBy eq 'name') {
+        @files = sort @files;
+    }
 
     for my $filePath (@files) {
         my ($volume, $directory, $filename) = File::Spec->splitpath( $filePath );
@@ -955,11 +995,28 @@ sub www_addArchive {
             name            => "keywords",
             value           => ( $form->get("keywords") ),
         });
+        
+    $var->{ form_location   }
+        = WebGUI::Form::Text( $session, {
+            name            => "location",
+            value           => ( $form->get("location") ),
+        });        
 
     $var->{ form_friendsOnly }
         = WebGUI::Form::yesNo( $session, {
             name            => "friendsOnly",
             value           => ( $form->get("friendsOnly") ),
+        });
+        
+    $var->{ form_sortBy     }
+        = WebGUI::Form::RadioList( $session, {
+            name            => "sortBy",
+            value           => [ "name" ],
+            options         => {
+                name            => $i18n->get("addArchive sortBy name", 'Asset_GalleryAlbum'),                
+                date            => $i18n->get("addArchive sortBy date", 'Asset_GalleryAlbum'),
+                fileOrder       => $i18n->get("addArchive sortBy fileOrder", 'Asset_GalleryAlbum'),
+            },
         });
 
     return $self->processStyle(
@@ -978,26 +1035,39 @@ Process the form for adding an archive.
 sub www_addArchiveSave {
     my $self        = shift;
 
+    # Return error message if the user viewing does not have permission to add files
     return $self->session->privilege->insufficient unless $self->canAddFile;
 
     my $session     = $self->session;
     my $form        = $self->session->form;
     my $i18n        = WebGUI::International->new( $session, 'Asset_GalleryAlbum' );
     my $pb          = WebGUI::ProgressBar->new($session);
+
+    # Retrieve properties and sort order from form variables
     my $properties  = {
         keywords        => $form->get("keywords"),
+        location        => $form->get("location"),
         friendsOnly     => $form->get("friendsOnly"),
     };
+    my $sortBy = $form->get("sortBy");
     
+    # Create progress bar to keep the connection alive
     $pb->start($i18n->get('Uploading archive'), $session->url->extras('adminConsole/assets.gif'));
+    
+    # Retrieve storage containing the uploaded archive
     my $storageId   = $form->get("archive", "File");
     my $storage     = WebGUI::Storage->get( $session, $storageId );
     if (!$storage) {
         return $pb->finish($self->getUrl('func=addArchive;error='.$i18n->get('addArchive error too big')));
     }
-    my $filename    = $storage->getPath( $storage->getFiles->[0] );
 
-    eval { $self->addArchive( $filename, $properties, sub{ $pb->update(sprintf $i18n->get(shift), @_); }); };
+    # Get the full path to the archive
+    my $filename    = $storage->getPath( $storage->getFiles->[0] );
+    
+    # Try to add files in archive as photos
+    eval { $self->addArchive( $filename, $properties, $sortBy, sub{ $pb->update(sprintf $i18n->get(shift), @_); }); };
+    
+    # Delete storage containing archive
     $storage->delete;
     if ( my $error = $@ ) {
         return $pb->finish($self->getUrl('func=addArchive;error='.sprintf $i18n->get('addArchive error generic'), $error ));

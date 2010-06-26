@@ -294,7 +294,8 @@ sub getJsonStatus {
     my %output;
     if ($sitename) { #must have entry for each queue
         %output = %queues;
-        foreach my $instance ($self->getInstances) {
+        INSTANCE: foreach my $instance ($self->getInstances) {
+            next INSTANCE unless $instance->{sitename} eq $sitename;
             my $queue = ucfirst($instance->{status});
             push @{$output{$queue}}, [$instance->{workingPriority}, $instance->{instanceId}, $instance];
         }

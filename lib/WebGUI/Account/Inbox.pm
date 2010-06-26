@@ -238,6 +238,12 @@ sub editSettingsForm {
         hoverHelp    => $i18n->get('send inbox notifications only help'),
         defaultValue => $setting->get('sendInboxNotificationsOnly'),
     );
+    $f->yesNo(
+        name         => 'sendRejectNotice',
+        label        => $i18n->get('send reject notice'),
+        hoverHelp    => $i18n->get('send reject notice help'),
+        defaultValue => $setting->get('sendRejectNotice'),
+    );
     $f->text(
         name         => 'inboxNotificationsSubject',
         label        => $i18n->get('inbox notifications subject'),
@@ -306,6 +312,7 @@ sub editSettingsFormSave {
     $setting->set("inboxNotificationsSubject",         $form->process("inboxNotificationsSubject", "text"));
     $setting->set("inboxNotificationTemplateId",       $form->process("inboxNotificationTemplateId","template"));
     $setting->set("inboxSmsNotificationTemplateId",    $form->process("inboxSmsNotificationTemplateId","template"));
+    $setting->set("sendRejectNotice",                  $form->process("sendRejectNotice","yesNo"));
 }
 
 
@@ -605,7 +612,7 @@ sub www_approveDenyInvitations {
         next unless ($invite->{inviterId}); #Not sure how this could ever happen, but check for it
         next unless ($session->user->userId eq $invite->{friendId});  #Protect against malicious stuff
         if($deny) {
-            $friends->rejectAddRequest($inviteId);
+            $friends->rejectAddRequest($inviteId,$session->setting->get("sendRejectNotice"));
         }
         elsif($approve) {
             $friends->approveAddRequest($inviteId);
@@ -954,7 +961,7 @@ sub www_inviteUserSave {
         );
 
         ## No sneaky attack paths...
-        $var->{'message'} = WebGUI::HTML::html2text( WebGUI::HTML::filter($message) );
+        $var->{'message'} = WebGUI::HTML::format(WebGUI::HTML::filter($message));
 
         my $emailBody = $self->processTemplate( $var, $self->getInviteUserMessageTemplateId );
 

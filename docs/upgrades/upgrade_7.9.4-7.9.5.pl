@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Workflow::Instance;
 
 
 my $toVersion = '7.9.5';
@@ -31,9 +32,13 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+modifySortItems( $session );
+fixRequestForApprovalScratch($session);
+addRejectNoticeSetting($session);
+updateGroupGroupingsTable($session);
+installNewCSUnsubscribeTemplate($session);
 
 finish($session); # this line required
-
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -44,6 +49,85 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Adds setting which allows users to set whether or not to send reject notices
+sub addRejectNoticeSetting {
+    my $session = shift;
+    print "\tAdding reject notice setting... " unless $quiet;
+    $session->setting->add('sendRejectNotice',1);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub installNewCSUnsubscribeTemplate {
+    my $session = shift;
+    print "\tAdding new unsubscribe template to the CS... " unless $quiet;
+    $session->db->write(q|ALTER TABLE Collaboration ADD COLUMN unsubscribeTemplateId CHAR(22) NOT NULL|);
+    $session->db->write(q|UPDATE Collaboration set unsubscribeTemplateId='default_CS_unsubscribe'|);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add keys and indicies to groupGroupings to help speed up group queries
+sub updateGroupGroupingsTable {
+    my $session = shift;
+    print "\tAdding primary key and indicies to groupGroupings table... " unless $quiet;
+    my $sth = $session->db->read('show create table groupGroupings');
+    my ($field,$stmt) = $sth->array;
+    $sth->finish;
+    unless ($stmt =~ m/PRIMARY KEY/i) {
+        $session->db->write("alter table groupGroupings add primary key (groupId,inGroup)");
+    }
+    unless ($stmt =~ m/KEY `inGroup`/i) {
+        $session->db->write("alter table groupGroupings add index inGroup (inGroup)");
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixRequestForApprovalScratch {
+    my $session = shift;
+    print "\tCorrect RequestApprovalForVersionTag workflow instance data with leading commas... " unless $quiet;
+    # and here's our code
+    my $instances = WebGUI::Workflow::Instance->getAllInstances($session);
+    INSTANCE: foreach my $instance (@{ $instances }) {
+        my $messageId = $instance->getScratch('messageId');
+        next INSTANCE unless $messageId;
+        $messageId =~ s/^,//;
+        $instance->setScratch('messageId', $messageId);
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Changes sortItems to a SelectBox
+sub modifySortItems {
+    my $session = shift;
+    print "\tUpdating SyndicatedContent...\n" unless $quiet;
+
+    require WebGUI::Form::SelectBox;
+
+    print "\t\tModifying table...\n" unless $quiet;
+    my $type = WebGUI::Form::SelectBox->getDatabaseFieldType;
+    $session->db->write("ALTER TABLE SyndicatedContent MODIFY sortItems $type");
+
+    print "\t\tConverting old values..." unless $quiet;
+    $session->db->write(q{
+        UPDATE SyndicatedContent
+        SET    sortItems = 'none'
+        WHERE  sortItems <> '1'
+    });
+    $session->db->write(q{
+        UPDATE SyndicatedContent
+        SET    sortItems = 'pubDate_des'
+        WHERE  sortItems = '1'
+    });
+
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

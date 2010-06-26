@@ -972,19 +972,13 @@ sub www_search {
 		wikiHomeUrl=>$self->getUrl,
 		addPageUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage;title=".$queryString),
 		};
-    if (defined $queryString) {
-        $self->session->scratch->set('wikiSearchQueryString', $queryString);
-    }
-    else {
-        $queryString = $self->session->scratch->get('wikiSearchQueryString');
-    }
 	$self->appendSearchBoxVars($var, $queryString);
 	if (length $queryString) {
 		my $search = WebGUI::Search->new($self->session);
 		$search->search({ keywords => $queryString,
 				  lineage => [$self->lineage],
 				  classes => ['WebGUI::Asset::WikiPage'] });
-		my $rs = $search->getPaginatorResultSet($self->getUrl("func=search"));
+		my $rs = $search->getPaginatorResultSet($self->getUrl("func=search;query=".$queryString));
 		$rs->appendTemplateVars($var);
 		my @results = ();
 		foreach my $row (@{$rs->getPageData}) {

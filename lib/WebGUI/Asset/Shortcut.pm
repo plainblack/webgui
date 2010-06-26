@@ -904,9 +904,13 @@ sub view {
 		}
 	}
 	
-	if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
-		$content = $i18n->get("Displaying this shortcut would cause a feedback loop");
-	} else {
+    if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
+        $content = $i18n->get("Displaying this shortcut would cause a feedback loop");
+    }
+    elsif (! $shortcut->canView) {
+        $content = '';
+    }
+    else {
         # Make sure the www_view method won't be skipped b/c the asset is cached.
         $shortcut->purgeCache();
 
@@ -1214,10 +1218,12 @@ Render the shortcut in standalone mode.
 =cut
 
 sub www_view {
-        my $self = shift;
-        my $check = $self->checkView;
+        my $self    = shift;
+        my $session = $self->session;
+        my $check   = $self->checkView;
         return $check if defined $check;
         my $shortcut = $self->getShortcut;
+        return $session->privilege->noAccess() unless $shortcut->canView;
         $self->prepareView;
 
         # Make sure the www_view method won't be skipped b/c the asset is cached.

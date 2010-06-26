@@ -233,7 +233,7 @@ sub createAccount {
             $formField   = $field->formField($properties, undef, undef, undef, $defaultValue);
         }
         else {
-            $formField   = $field->formField($properties, undef, undef, undef, undef, undef, 'useFormDefault');
+            $formField   = $field->formField($properties);
         }
        
 

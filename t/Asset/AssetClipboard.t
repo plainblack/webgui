@@ -22,7 +22,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
-plan tests => 12;
+plan tests => 27;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -95,9 +95,66 @@ WebGUI::Test->addToCleanup($newVersionTag);
 ####################################################
 
 note "cut";
-is($topFolder->cut, 1, 'returns 1 if successful' );
-is($topFolder->state,              'clipboard', '... state set to trash on the trashed asset object');
-is($topFolder->cloneFromDb->state, 'clipboard', '... state set to trash in db on object');
-is($folder1a->cloneFromDb->state,  'clipboard-limbo', '... state set to clipboard-limbo on child #1');
-is($folder1b->cloneFromDb->state,  'clipboard-limbo', '... state set to clipboard-limbo on child #2');
-is($folder1a2->cloneFromDb->state, 'clipboard-limbo', '... state set to clipboard-limbo on grandchild #1-1');
+
+is( $topFolder->cut, 1, 'cut: returns 1 if successful' );
+is($topFolder->get('state'),              'clipboard', '... state set to trash on the trashed asset object');
+is($topFolder->cloneFromDb->get('state'), 'clipboard', '... state set to trash in db on object');
+is($folder1a->cloneFromDb->get('state'),  'clipboard-limbo', '... state set to clipboard-limbo on child #1');
+is($folder1b->cloneFromDb->get('state'),  'clipboard-limbo', '... state set to clipboard-limbo on child #2');
+is($folder1a2->cloneFromDb->get('state'), 'clipboard-limbo', '... state set to clipboard-limbo on grandchild #1-1');
+
+sub is_tree_of_folders {
+    my ($asset, $depth, $pfx) = @_;
+    my $recursive; $recursive = sub {
+        my ($asset, $depth) = @_;
+        my $pfx = "    $pfx $depth";
+        return 0 unless isa_ok($asset, 'WebGUI::Asset::Wobject::Folder',
+            "$pfx: this object");
+
+        my $children = $asset->getLineage(
+            ['children'], {
+                statesToInclude => ['clipboard', 'clipboard-limbo' ],
+                returnObjects   => 1,
+            }
+        );
+
+        return $depth < 2
+            ? is(@$children, 0, "$pfx: leaf childless")
+            : is(@$children, 1, "$pfx: has child")
+              && $recursive->($children->[0], $depth - 1);
+    };
+
+    my $pass = $recursive->($asset, $depth);
+    undef $recursive;
+    my $message = "$pfx is tree of folders";
+    return $pass ? pass $message : fail $message;
+}
+
+# test www_copy
+my $tag = WebGUI::VersionTag->create($session);
+$tag->setWorking;
+WebGUI::Test->addToCleanup($tag);
+
+my $tempspace  = WebGUI::Asset->getTempspace($session);
+my $folder     = {className => 'WebGUI::Asset::Wobject::Folder'};
+my $root       = $tempspace->addChild($folder);
+my $child      = $root->addChild($folder);
+my $grandchild = $child->addChild($folder);
+
+sub copied {
+    for my $a (@{$tempspace->getAssetsInClipboard}) {
+        if ($a->getParent->getId eq $tempspace->getId) {
+            return $a;
+        }
+    }
+    return undef;
+}
+
+my @methods = qw(Single Children Descendants);
+for my $i (0..2) {
+    my $meth = "_wwwCopy$methods[$i]";
+    $root->$meth();
+    my $clip = copied();
+    is_tree_of_folders($clip, $i+1, $meth);
+    $clip->purge;
+}

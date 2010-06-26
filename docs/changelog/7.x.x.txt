@@ -1,4 +1,29 @@
 7.9.5
+ - Asset->www_copy now has a progress bar
+ - fixed #11556: New cart doesn't work with other forms on the same page
+ - fixed #11557: Shop credit deduction calculated incorrectly
+ - fixed #11561: PayDriver_Cash - password help
+ - fixed #11541: running workflows screen
+ - fixed #11544: VersionTag Workflows with missing Version Tags run forever
+ - fixed #11555: Wiki subcategories entry field is not labeled
+ - fixed: UserList asset has SQL injection bug
+ - fixed #11558: wiki results for visitors 
+ - fixed #11533: Saving entered data at registration
+ - fixed #11564: Shop: Cart does not require a state field in the address
+ - fixed #11562: Missing perl modules in gotcha
+ - fixed #11565: Can't clear cache on plainblack.com
+ - fixed #11540: Pending version tags are not completed on approval under certain conditions
+ - fixed #11566: Group API: group membership cannot be checked without consideration of expiration dates.
+ - fixed #11567: EMS: Build badge page, ticket tab, pagination
+ - added: a new inbox setting which supresses friend rejection notices
+ - fixed #11552: Visitors (and others) can bypass group-by-IP restrictions
+ - fixed #11572: visitors can enter editProfile
+ - fixed #11563: Syndicated Content - descriptionFirstParagraph cuts off
+ - fixed #11538: User invite mail: whitespace in message lost
+ - fixed #11549: Shortcut Asset cannot override Page Layout
+ - added #11502: Gallery: Allow specification of location when uploading ZIP archives
+ - added #11517: Gallery: Sorting of files uploaded in zip archives
+ - fixed #11559: Unsubscribe Link in Emails
 
 7.9.4
  - We're shipping underscore.js now for its suite of extremely handy utility

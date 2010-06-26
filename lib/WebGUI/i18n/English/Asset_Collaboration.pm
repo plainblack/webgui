@@ -597,6 +597,12 @@ our $I18N = {
 		lastUpdated => 1109696029,
 	},
 
+	'Unsubscribe from %s' => {
+		message => q|Unsubscribe from %s|,
+		lastUpdated => 1274216526,
+        context     => q|Label for the unsubscribe form.  %s will be filled in with the title of the CS.|,
+	},
+
 	'url' => {
 		message => q|URL|,
 		lastUpdated => 1109696029,
@@ -1580,15 +1586,35 @@ the Collaboration Asset, the user will be notified.|,
 		message => q|The assetId of this Collaboration System.  Unlike the variable assetId, this one will not be overridden by the assetIds inside of Threads or Posts.|,
 		lastUpdated => 1170543345,
 	},
-    
+
     'subscription group label' => {
         message => q|Subscription Group|,
         lastUpdated => 1170543345,
     },
-    
+
     'subscription group hoverHelp' => {
         message => q|Manage the users in the subscription group for this Collaboration System|,
         lastUpdated => 1170543345,
+    },
+
+    'unsubscribe template' => {
+        message => q|Unsubscribe Template|,
+        lastUpdated => 1274208100,
+    },
+
+    'unsubscribe template hoverHelp' => {
+        message => q|Choose a template to help a user, who is not logged in, unsubscribe from either the CS or from a Thread within it.|,
+        lastUpdated => 1274208493,
+    },
+
+    'unsubscribe instructions' => {
+        message => q|Please enter in the email address of the user who wants to unsubscribe|,
+        lastUpdated => 1274208493,
+    },
+
+    'no user email error message' => {
+        message => q|No user with that email can be found.|,
+        lastUpdated => 1274208493,
     },
 
     'group to edit label' => {
@@ -1599,7 +1625,7 @@ the Collaboration Asset, the user will be notified.|,
         message => q|A group that is allowed to edit posts after they have been submitted.|,
         lastUpdated => 1269283819,
     },
-    
+
     'use captcha label' => {
         message => q|Use Post Captcha|,
         lastUpdated => 1170543345,
@@ -1609,7 +1635,7 @@ the Collaboration Asset, the user will be notified.|,
         message => q|Choose whether or not to make users verify their humnanity before being able to post to this collaboration system|,
         lastUpdated => 1170543345,
     },
-    
+
     'captcha label' => {
         message => q|Verify your humanity|,
         lastUpdated => 1170543345,
@@ -1631,7 +1657,7 @@ the Collaboration Asset, the user will be notified.|,
         message => q|Keywords|,
         lastUpdated => 1170543345,
     },
-    
+
     'asset not committed' => {
 		message => q{<h1>Error!</h1><p>You need to commit this collaboration system before you can create a new thread</p>},
         lastUpdated => 1166848379,
@@ -1680,6 +1706,48 @@ the Collaboration Asset, the user will be notified.|,
     'unarchive confirm' => {
         message     => q{Are you sure? Any threads past the 'Archive After' interval will be re-archived.},
         context     => q{Text for pop-up dialog to confirm unarchive all threads},
+        lastUpdated => 0,
+    },
+
+    'unsubscribe formHeader' => {
+        message     => q{HTML code to start the unsubscribe form.},
+        context     => q{Template variable help},
+        lastUpdated => 0,
+    },
+
+    'unsubscribe formFooter' => {
+        message     => q{HTML code to end the unsubscribe form.},
+        context     => q{Template variable help},
+        lastUpdated => 0,
+    },
+
+    'unsubscribe formSubmit' => {
+        message     => q{A button to submit the form.},
+        context     => q{Template variable help},
+        lastUpdated => 0,
+    },
+
+    'unsubscribe formEmail' => {
+        message     => q{A text form with email completion.},
+        context     => q{Template variable help},
+        lastUpdated => 0,
+    },
+
+    'unsubscribe formMessage' => {
+        message     => q{Internationalized messages to tell the user about errors and successes.},
+        context     => q{Template variable help},
+        lastUpdated => 0,
+    },
+
+    'You have been unsubscribed' => {
+        message     => q{You have been unsubscribed.},
+        context     => q{status message},
+        lastUpdated => 0,
+    },
+
+    'collaboration unsubscribe template title' => {
+        message     => q{Collaboration System Unsubscribe Template},
+        context     => q{status message},
         lastUpdated => 0,
     },
 

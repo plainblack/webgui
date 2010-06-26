@@ -1896,7 +1896,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 
         # gotta get to the page we're working with
         $counter++;
-        next unless ($counter >= ($startIndex * $numberOfResults));
+        next unless ($counter >= $startIndex+1);
 		
 		# publish the data for this ticket
         my $description = $ticket->description;

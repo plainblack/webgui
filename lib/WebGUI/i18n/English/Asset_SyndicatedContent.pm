@@ -245,11 +245,33 @@ our $I18N = {
 	},
 
     'sortItemsLabel' => {
-        message => q{Sort feed items by date?},
+        message => q{Sort items by},
     },
 
     'sortItemsLabel description' => {
-        message => q{If enabled, items will be sorted by date.  If disabled, items will be left in the order they appear in the original feed.},
+        message => q{No order: items will be in semi-random order<br />
+Publication Date: sort by item pubDate<br />
+Feed Order: Items will be in the order they appeared in the feed}
+    },
+
+    'no order' => {
+        message => 'No Order',
+        context => 'name for the sortItems value that indicates that no sorting should be done '
+	},
+
+    'feed order' => {
+        message => 'Feed Order',
+        context => 'name for the sortItems value that indicates items should be in the order they appeared in the feed'
+    },
+
+    'publication date ascending' => {
+        message => 'Publication Date (oldest first)',
+        context => 'name for the sortItems value that indicates items should be sorted by publication date from oldest to newest'
+    },
+
+    'publication date descending' => {
+        message => 'Publication Date (newest first)',
+        context => 'name for the sortItems value that indicates items should be sorted by publication date from newest to oldest'
     },
 
 	'syndicated content asset template variables title' => {

@@ -895,7 +895,7 @@ sub isEnabled {
 
 #-------------------------------------------------------------------
 
-=head2 isInGroup ( [ groupId ] )
+=head2 isInGroup ( [groupId ] )
 
 Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins.
 
@@ -906,38 +906,47 @@ The group that you wish to verify against the user. Defaults to group with Id 3 
 =cut
 
 sub isInGroup {
-   my ($self, $gid) = @_;
-   $gid = 3 unless $gid;
-   my $uid = $self->userId;
-   ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
-   #my $eh = $self->session->errorHandler;
-   #$eh->warn("Group Id is: $gid for ".$tgroup->name);
-   return 1 if ($gid eq '7');		# everyone is in the everyone group
-   return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
-   return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
-   ### Get data for auxillary checks.
-   my $isInGroup = $self->session->stow->get("isInGroup", { noclone => 1 });
-   ### Look to see if we've already looked up this group. 
-   return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
-   ### Lookup the actual groupings.
-   my $group = WebGUI::Group->new($self->session,$gid);
-   if ( !$group ) {
-       $group = WebGUI::Group->new($self->session,3);
-   }
-   ### Check for groups of groups.
-   my $users = $group->getAllUsers();
-   foreach my $user (@{$users}) {
-      $isInGroup->{$user}{$gid} = 1;
-	  if ($uid eq $user) {
-	     $self->session->stow->set("isInGroup",$isInGroup);
-		 return 1;
-	  }
-   }
-   $isInGroup->{$uid}{$gid} = 0;
-   $self->session->stow->set("isInGroup",$isInGroup);
-   return 0;
-}
+    my ($self, $gid) = @_;
+    my $session   = $self->session;
+    my $uid       = $self->userId;
+    $gid          = 3 unless $gid;
 
+	### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal.
+    return 1 if ($gid eq '7');      # everyone is in the everyone group
+    return 1 if ($gid eq '1' && $uid eq '1');   # visitors are in the visitors group
+    return 1 if ($gid eq '2' && $uid ne '1');   # if you're not a visitor, then you're a registered user
+
+	### Check stow before we check the cache.  Stow is in memory and much faster
+	my $stow          = $session->stow->get("isInGroup", { noclone => 1 }) || {};
+	return $stow->{$uid}->{$gid} if (exists $stow->{$uid}->{$gid});
+	
+	### Don't bother checking File Cache if we already have a stow for this group.
+	### We can find what we need there and save ourselves a bunch of time
+	my $cache        = undef;
+	my $groupMembers = undef;
+	unless ($stow->{$uid}->{$gid}) {
+		$groupMembers  = $session->cache->get("groupMembers".$gid) || {};
+		#If we have this user's membership cached, return what we have stored
+		if (exists $groupMembers->{$uid}) {
+			return $groupMembers->{$uid}->{isMember} if (!$self->isVisitor);
+			return $groupMembers->{$uid}->{$session->getId}->{isMember} #Include the session check for visitors
+		}
+	}
+	
+ 	### Instantiate the group
+    my $group = WebGUI::Group->new($session,$gid);
+	if ( !$group ) {
+        #Group is not valid, check the admin group
+        $group = WebGUI::Group->new($session,3);
+    }
+
+	#Check the group for membership
+	my $isInGroup = $group->hasUser($self);
+	
+	#Write what we found to file cache
+	$group->cacheGroupings( $self, $isInGroup, $groupMembers );
+	return $isInGroup;
+}
 
 #-------------------------------------------------------------------
 

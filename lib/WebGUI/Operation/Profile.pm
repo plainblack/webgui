@@ -184,6 +184,7 @@ A reference to the current session.
 
 sub www_editProfile {
 	my $session  = shift;
+    return $session->privilege->insufficient if $session->user->isVisitor;
     my $instance = WebGUI::Content::Account->createInstance($session,"profile");
     return $instance->displayContent($instance->callMethod("edit"));
 }

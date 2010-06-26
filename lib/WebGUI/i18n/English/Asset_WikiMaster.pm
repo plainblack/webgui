@@ -656,6 +656,12 @@ listing of pages that are related to a specific keyword?| },
         context     => q{template variable help},
     },
 
+    'Sub-keywords' => {
+        message     => q{Sub-keywords},
+        lastUpdated => 0,
+        context     => q{template label},
+    },
+
 };
 
 1;

@@ -4237,14 +4237,14 @@ LongTruncOk=1</p>
             context     => q{Description for site setting},
         },
 
-    'site starter title' => {
-        message     => q{Site Starter},
+    'page builder title' => {
+        message     => q{Page Builder},
         lastUpdated => 0,
-        context     => q{Title for the site starter screen.},
+        context     => q{Title for the page builder screen.},
     },
 
-    'site starter body' => {
-        message     => q{Do you wish to use the WebGUI Site Starter, which will lead you through options to create a custom look and feel for your site, and set up some basic content areas?},
+    'page builder body' => {
+        message     => q{Would you like to use the Page Builder to select a default set of pages to include on your site, such as an About Us page or discussion forum.},
         lastUpdated => 0,
         context     => q{Body for the site starter screen.},
     },
@@ -4684,6 +4684,18 @@ Users may override this setting in their profile.
         message => 'Go',
         lastUpdated => 0,
         context => 'Label for buttons that take you someplace else'
+    },
+
+    'pick style' => {
+        message     => 'Choose a Design',
+        lastUpdated => 0,
+        context     => 'Header for the pick style template page',
+    },
+
+    'pick style description' => {
+        message     => 'Select a design to apply to your site. All designs are created from templates that you will have access to from your site, so modifications can be made later.',
+        lastUpdate  => 0,
+        context     => 'Description for pick style template page',
     },
 
 };

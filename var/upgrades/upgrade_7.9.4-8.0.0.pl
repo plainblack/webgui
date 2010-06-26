@@ -71,7 +71,7 @@ sub moveMaintenance {
 sub addMaintenancePageToConfig {
     my $session = shift;
     print "\tAdd maintenance page entry to the config file " unless $quiet;
-    $session->config->set('maintenancePage', '/data/WebGUI/var/www/maintenance.html');
+    $session->config->set('maintenancePage', '/data/WebGUI/www/maintenance.html');
     print "DONE!\n" unless $quiet;
 }
 
@@ -79,9 +79,9 @@ sub moveFileLocations {
     my $session = shift;
     print "\tMoving preload files " unless $quiet;
     unlink '../../sbin/preload.custom.example';
-    rename '../../sbin/preload.custom', File::Spec->catfile(WebGUI::Paths->etc, 'preload.custom');
+    rename '../../sbin/preload.custom', File::Spec->catfile(WebGUI::Paths->configBase, 'preload.custom');
     unlink '../../sbin/preload.exclude.example';
-    rename '../../sbin/preload.exclude', File::Spec->catfile(WebGUI::Paths->etc, 'preload.exclude');
+    rename '../../sbin/preload.exclude', File::Spec->catfile(WebGUI::Paths->configBase, 'preload.exclude');
     unlink '../../lib/default.ttf';
     print "Done.\n" unless $quiet;
 }

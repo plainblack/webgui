@@ -247,7 +247,7 @@ $session->user({userId => 1});
 cmp_deeply(
     $templateVars,
     {
-        canPostStories => 0,
+        canPostStories => bool(0),
         mode           => 'view',
         addStoryUrl    => '',
         date_loop      => [
@@ -410,9 +410,6 @@ $session->request->setup_body({ query => 'echo' } );
 $archive->update({storiesPerPage => 25});
 $templateVars = $archive->viewTemplateVariables('search');
 is($templateVars->{mode}, 'search', 'viewTemplateVariables mode == search');
-
-use Data::Dumper;
-diag Dumper $templateVars->{date_loop};
 
 cmp_bag(
     $templateVars->{date_loop},

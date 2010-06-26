@@ -71,11 +71,23 @@ property hasTerms => (
          );
 property sortItems => (
                 tab             => 'properties',
-                fieldType       => 'yesNo',
-                default         => 1,
+                fieldType       => 'selectBox',
+                default         => 'none',
                 label           => ['sortItemsLabel', 'Asset_SyndicatedContent'],
                 hoverHelp       => ['sortItemsLabel description', 'Asset_SyndicatedContent'],
+                options         => \&_sortItems_options,
          );
+sub _sortItems_options {
+    my $session = shift->session;
+	my $i18n    = WebGUI::International->new($session,'Asset_SyndicatedContent');
+    tie my %o, 'Tie::IxHash', (
+        none        => $i18n->get('no order'),
+        feed        => $i18n->get('feed order'),
+        pubDate_asc => $i18n->get('publication date ascending'),
+        pubDate_des => $i18n->get('publication date descending'),
+    );
+    return \%o;
+}
 has '+uiLevel' => (
     default => 6,
 );
@@ -114,11 +126,15 @@ Combines all feeds into a single XML::FeedPP object.
 =cut
 
 sub generateFeed {
-	my $self = shift;
-    my $limit = shift || $self->maxHeadlines;
+	my $self    = shift;
+    my $limit   = shift || $self->maxHeadlines;
     my $session = $self->session;
-    my ( $log, $cache ) = $session->quick(qw( log cache ));
-	my $feed = XML::FeedPP::Atom->new();
+	my $log     = $session->log;
+	my $cache   = $session->cache;
+	my $sort    = $self->sortItems;
+
+	my %opt   = (use_ixhash => 1) if $sort eq 'feed';
+	my $feed  = XML::FeedPP::Atom->new(%opt);
 
 	# build one feed out of many
     my $newlyCached = 0;
@@ -151,7 +167,7 @@ sub generateFeed {
         # care of any encoding specified in the XML prolog
         utf8::downgrade($value, 1);
         eval {
-            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string');
+            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string', %opt);
             $feed->merge_channel($singleFeed);
             $feed->merge_item($singleFeed);
         };
@@ -183,8 +199,13 @@ sub generateFeed {
     }
 
 	# sort them by date and remove any duplicate from the OR based term matching above
-    if ($self->sortItems) {
+    if ($sort =~ /^pubDate/) {
         $feed->sort_item();
+    }
+    if ($sort =~ /_asc$/) {
+        my @items = $feed->get_item;
+        $feed->clear_item;
+        $feed->add_item($_) for (reverse @items);
     }
 
 	# limit the feed to the maximum number of headlines (or the feed generator limit).
@@ -270,10 +291,19 @@ sub getTemplateVariables {
         $item{descriptionFirst25words} =~ s/(((\S+)\s+){25}).*/$1/s;
         $item{descriptionFirst10words} = $item{descriptionFirst25words};
         $item{descriptionFirst10words} =~ s/(((\S+)\s+){10}).*/$1/s;
-        $item{descriptionFirst2paragraphs} = $item{description};
-        $item{descriptionFirst2paragraphs} =~ s/^((.*?\n){2}).*/$1/s;
-        $item{descriptionFirstParagraph} = $item{descriptionFirst2paragraphs};
-        $item{descriptionFirstParagraph} =~ s/^(.*?\n).*/$1/s;
+        if ($description =~ /<p>/) {
+            my $html = $description;
+            $html =~ tr/\n/ /s;
+            my @paragraphs = map { "<p>".$_."</p>" } WebGUI::HTML::splitTag($html,3);
+            $item{descriptionFirstParagraph}   = $paragraphs[0];
+            $item{descriptionFirst2paragraphs} = join '', @paragraphs[0..1];
+        }
+        else {
+            $item{descriptionFirst2paragraphs} = $item{description};
+            $item{descriptionFirst2paragraphs} =~ s/^((.*?\n){2}).*/$1/s;
+            $item{descriptionFirstParagraph} = $item{descriptionFirst2paragraphs};
+            $item{descriptionFirstParagraph} =~ s/^(.*?\n).*/$1/s;
+        }
         $item{descriptionFirst4sentences} = $item{description};
         $item{descriptionFirst4sentences} =~ s/^((.*?\.){4}).*/$1/s;
         $item{descriptionFirst3sentences} = $item{descriptionFirst4sentences};

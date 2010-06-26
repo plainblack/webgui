@@ -208,7 +208,9 @@ sub execute {
     # Tag is approved
     elsif ( $instance->getScratch("status") eq "approved" ) {
         # Clean up after ourselves
-        $self->setMessageCompleted( $instance );
+        if (! $self->setMessageCompleted( $instance ) ) {
+            return $self->ERROR;
+        }
         $instance->deleteScratch( "status" );
         
         # We're done here
@@ -278,7 +280,7 @@ sub sendMessage {
                 groupId => $groupId,
                 status  => 'pending',
             });
-        $messageIds = join ",", $messageIds, $message->getId;
+        $messageIds = $messageIds ? join(",", $messageIds, $message->getId) : $message->getId;
     }
 
     # Keep track of message Ids so we can complete them 
@@ -335,23 +337,32 @@ workflow instance we're part of.
 =cut
 
 sub setMessageCompleted {
-    my $self        = shift;
-    my $instance    = shift;
-    my $inbox       = WebGUI::Inbox->new( $self->session );
+    my $self     = shift;
+    my $instance = shift;
+    my $inbox    = WebGUI::Inbox->new( $self->session );
 
     # Set all messages to completed
-    for my $messageId ( split /,/, $instance->getScratch("messageId") ) { 
-        if($messageId){
-            my $message = $inbox->getMessage( $messageId );
-            $message->setCompleted if $message;
+    for my $messageId ( split /,/, $instance->getScratch("messageId") ) {
+        if ($messageId) {
+            my $message = $inbox->getMessage($messageId);
+            if ($message) {
+                $message->setCompleted;
+            }
+            else {
+                $self->session->log->error("Could not get inbox message for messageId: $messageId");
+                return 0;
+            }
         }
-    }
+        else {
+            $self->session->log->error("Malformed workflow instance scratch variable messageId for instance: ". $instance->getId);
+            return 0;
+        }
+    } ## end for my $messageId ( split...)
 
-    $instance->deleteScratch( "messageId" );
+    $instance->deleteScratch("messageId");
 
-    return;
-}
-
+    return 1;
+} ## end sub setMessageCompleted
 
 1;
 

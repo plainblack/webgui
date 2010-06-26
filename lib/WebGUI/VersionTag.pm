@@ -686,11 +686,15 @@ sub rollback {
         my $revision = WebGUI::Asset->newById($session, $id, $revisionDate);
         next REVISION unless $revision;
         $outputSub->(sprintf $i18n->get('Rolling back %s'), $revision->getTitle);
-        $revision->purgeRevision;
+		$revision->purgeRevision;
+	}
+    my $instance = $self->getWorkflowInstance;
+    if ($instance) {
+        $instance->delete;
     }
-    $session->db->write("delete from assetVersionTag where tagId=?", [$tagId]);
-    $self->clearWorking;
-    return 1;
+	$session->db->write("delete from assetVersionTag where tagId=?", [$tagId]);
+	$self->clearWorking;
+	return 1;
 }
 
 #-------------------------------------------------------------------
