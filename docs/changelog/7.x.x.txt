@@ -15,6 +15,7 @@
  - fixed #11626: Duplicate messages from Collab Systems
  - fixed #11550: Pending assets in the clipboard or trash are not visible from the approval screen
  - fixed #11678: Story Archive leaks version tags
+ - fixed #11671: Approving version tags takes up 1 to hour to take affect.
 
 
 7.8.21
