@@ -164,6 +164,7 @@ Get the Net::Twitter object with the appropriate keys
 
 sub getTwitter {
     my ( $self ) = @_;
+    my $setting     = $self->session->setting;
     if ( !$self->{_twitter} ) {
         my $nt = Net::Twitter->new(
             traits          => [qw/API::REST OAuth/],
@@ -191,14 +192,14 @@ sub www_login {
 
     my $nt  = $self->getTwitter;
 
-    my $url = $nt->get_authentication_url(
+    my $auth_url = $nt->get_authentication_url(
                     callback => $url->getSiteURL . $url->page('op=auth&authType=Twitter&method=callback'),
                 );
 
     $scratch->set( 'AuthTwitterToken', $nt->request_token );
     $scratch->set( 'AuthTwitterTokenSecret', $nt->request_token_secret );
 
-    $session->http->setRedirect($url);
+    $session->http->setRedirect($auth_url);
     return "redirect";
 }
 
@@ -272,6 +273,9 @@ sub www_setUsername {
     my $session = $self->session;
     my ( $form, $scratch, $db ) = $session->quick(qw( form scratch db ));
     my $i18n = WebGUI::International->new( $session, 'Auth_Twitter' );
+
+    # Don't allow just anybody to set a username
+    return unless $scratch->get('AuthTwitterUserId');
 
     my $username    = $form->get('newUsername');
     if ( !WebGUI::User->newByUsername( $session, $username ) ) {
