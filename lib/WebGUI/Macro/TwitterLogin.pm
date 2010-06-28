@@ -29,6 +29,10 @@ Display a twitter login button
 
 A session variable
 
+=item *
+
+A URL to an image to log in via Twitter
+
 =back
 
 =cut
