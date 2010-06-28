@@ -1,3 +1,24 @@
+7.9.6
+ - new checkbox in the asset manager for clearing the package flag on import
+ - fixed #11597: manageTrash and newlines
+ - fixed #11577: Gallery Album: "Sort by" radio list missing in "Add Archive" view
+ - fixed #11576: Default WebGUI config has a bad macro
+ - fixed #11578: Collaboration System: add edit stamp uses wrong user
+ - added #9774: More owner information in the gallery
+ - fixed #11581: Calendar problems
+ - fixed #11583: EMS: Tokens do not follow their permissions
+ - fixed #11584: Errors on checkout when payment problems occur
+ - fixed #11582: Registering with a .mobi email address
+ - fixed #11580: Date not populated for Story Archive RSS feed
+ - fixed #11587: Thingy, no fields and undefined statement handles
+ - fixed #11589: Syndicated Content: Return raw text for sentence and word template variables
+ - fixed #11573: user has no way of knowing what they are currently using
+ - fixed #11603: Shelf, template variables for sub shelves
+ - added #11504: Allow search by location in the gallery
+ - migrate to getLineageIterator to save memory
+ - add findBrokenAssets.pl to find and fix/delete broken assets
+ - change to use weaken() to save memory
+
 7.9.5
  - Asset->www_copy now has a progress bar
  - fixed #11556: New cart doesn't work with other forms on the same page

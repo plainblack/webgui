@@ -329,7 +329,15 @@ sub getThingOptions {
     tie my %options, 'Tie::IxHash', ( "" => "" );
     my $thingyIter = WebGUI::Asset->getRoot($session)
         ->getLineageIterator( ['descendants'], { includeOnlyClasses => ['WebGUI::Asset::Wobject::Thingy'], } );
-    while ( my $thingy = $thingyIter->() ) {
+    while ( 1 ) {
+        my $thingy;
+        eval { $thingy = $thingyIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $thingy;
+
         tie my %things, 'Tie::IxHash', (
             $session->db->buildHash( "SELECT thingId, label FROM Thingy_things WHERE assetId=?", [ $thingy->getId ] ) );
         $options{ $thingy->title } = \%things;

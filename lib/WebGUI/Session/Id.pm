@@ -17,6 +17,7 @@ package WebGUI::Session::Id;
 
 use strict;
 use Digest::MD5 ();
+use Scalar::Util qw( weaken );
 use Time::HiRes qw( gettimeofday usleep );
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Scalar::Util qw(weaken);

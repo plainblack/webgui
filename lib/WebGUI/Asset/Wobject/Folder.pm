@@ -104,7 +104,15 @@ Overridden to check the revision dates of children as well
 sub getContentLastModified {
     my $self = shift;
     my $mtime = $self->revisionDate;
-    foreach my $child (@{ $self->getLineage(["children"],{returnObjects=>1}) }) {
+    my $childIter = $self->getLineageIterator(["children"]);
+    while ( 1 ) {
+        my $child;
+        eval { $child = $childIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $child;
         my $child_mtime = $child->getContentLastModified;
         $mtime = $child_mtime if ($child_mtime > $mtime);
     }
@@ -216,17 +224,24 @@ sub view {
 	my $vars    = $self->getTemplateVars;
     # TODO: Getting the children template vars should be a seperate method.
 	
-    my %rules   = ( returnObjects => 1);
+    my %rules   = ( );
     if ( $self->sortAlphabetically ) {
-        $rules{ orderByClause   } = "assetData.title " . $self->sortOrder;
+        $rules{ orderByClause   } = "assetData.title " . $self->get( "sortOrder" );
     }
     else {
         $rules{ orderByClause   } = "asset.lineage " . $self->sortOrder;
     }
 
-	my $children    = $self->getLineage( ["children"], \%rules);
-	foreach my $child ( @{ $children } ) {
-        # TODO: Instead of this it should be using $child->getTemplateVars || $child->get
+	my $childIter    = $self->getLineageIterator( ["children"], \%rules);
+        while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $self->session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
+            # TODO: Instead of this it should be using $child->getTemplateVars || $child->get
 		if ( $child->isa("WebGUI::Asset::Wobject::Folder") ) {
 			push @{ $vars->{ "subfolder_loop" } }, {
 				id           => $child->getId,

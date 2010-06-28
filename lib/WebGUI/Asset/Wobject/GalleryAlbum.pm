@@ -1438,9 +1438,9 @@ sub www_edit {
     elsif ( grep { $_ =~ /^rotateLeft-(.{22})$/ } $form->param ) {
         my $assetId     = ( grep { $_ =~ /^rotateLeft-(.{22})$/ } $form->param )[0];
         $assetId        =~ s/^rotateLeft-//;              
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = eval { WebGUI::Asset->newById( $session, $assetId ); };
         
-        if ( $asset ) {
+        if ( ! Exception::Class->caught() ) {
             # Add revision and create a new version tag by doing so
             my $newRevision = $asset->addRevision;
             # Rotate photo (i.e. all attached image files) by 90° CCW
@@ -1456,9 +1456,9 @@ sub www_edit {
     elsif ( grep { $_ =~ /^rotateRight-(.{22})$/ } $form->param ) {
         my $assetId     = ( grep { $_ =~ /^rotateRight-(.{22})$/ } $form->param )[0];
         $assetId        =~ s/^rotateRight-//;                
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset->newById( $session, $assetId );
 
-        if ( $asset ) {
+        if ( Exception::Class->caught() ) {
             # Add revision and create a new version tag by doing so
             my $newRevision = $asset->addRevision;
             # Rotate photo (i.e. all attached image files) by 90° CW

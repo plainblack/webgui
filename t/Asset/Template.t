@@ -75,7 +75,7 @@ my $template3 = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'headBlock test',
     template  => "this is a template",
-});
+}, undef, time()-5);
 
 my @atts = (
     {type => 'headScript', sequence => 1, url => 'bar'},
@@ -97,7 +97,7 @@ ok(exists $session->style->{_javascript}->{$_}, "$_ in style") for qw(foo bar bo
 # revision-ness of attachments
 
 # sleep so the revisiondate isn't duplicated
-sleep 1;
+#sleep 1;
 
 my $template3dup = $template3->duplicate;
 my @atts3dup = map { delete @{ $_ }{qw/attachId templateId revisionDate/}; $_; } @{ $template3dup->getAttachments };

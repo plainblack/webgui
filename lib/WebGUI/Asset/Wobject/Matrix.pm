@@ -300,11 +300,17 @@ sub deleteAttribute {
         [$attributeId,$self->getId]);
 
     # recalculate scores for MatrixListings
-    my @listings = @{ $self->getLineage(['descendants'], {
+    my $listingIter = $self->getLineageIterator(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
-            returnObjects       => 1,
-        }) };
-    foreach my $listing (@listings){
+        });
+    while ( 1 ) {
+        my $listing;
+        eval { $listing = $listingIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $listing;
         $listing->updateScore;
     }
 
@@ -618,17 +624,23 @@ sub view {
    
     if ($self->canEdit){
         # Get all the MatrixListings that are still pending.
-        my @pendingListings = @{ $self->getLineage(['descendants'], {
+        my $pendingIter = $self->getLineageIterator(['descendants'], {
                 includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
                 orderByClause       => "revisionDate asc",
-                returnObjects       => 1,
                 statusToInclude     => ['pending'],
-            }) };
-        foreach my $pendingListing (@pendingListings){
+            });
+        while ( 1 ) {
+            my $pending;
+            eval { $pending = $pendingIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $pending;
             push (@{ $var->{pending_loop} }, {
-                            url     => $pendingListing->getUrl
-                                       ."?func=view;revision=".$pendingListing->revisionDate,
-                            name    => $pendingListing->title,
+                            url     => $pending->getUrl
+                                       ."?func=view;revision=".$pending->revisionDate,
+                            name    => $pending->title,
                         });
         }
     } 
@@ -705,18 +717,23 @@ sub view {
 
         # Get the 5 MatrixListings that were last updated as objects using getLineage.
 
-        my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
+        my $lastUpdatedIter = $self->getLineageIterator(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
             joinClass           => "WebGUI::Asset::MatrixListing",
             orderByClause       => "lastUpdated desc",
-            limit               => 5,
-            returnObjects       => 1,
-        }) };
-        foreach my $lastUpdatedListing (@lastUpdatedListings){
+        });
+        for ( 1..5 ) {
+            my $lastUpdated;
+            eval { $lastUpdated = $lastUpdatedIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $lastUpdated;
             push (@{ $varStatistics->{last_updated_loop} }, {
-                        url         => $lastUpdatedListing->getUrl,
-                        name        => $lastUpdatedListing->title,
-                        lastUpdated => $session->datetime->epochToHuman($lastUpdatedListing->lastUpdated,"%z")
+                        url         => $lastUpdated->getUrl,
+                        name        => $lastUpdated->title,
+                        lastUpdated => $session->datetime->epochToHuman($lastUpdated->lastUpdated,"%z")
                     });
         }
         $varStatistics->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>"

@@ -15,6 +15,7 @@ package WebGUI::Session::Privilege;
 =cut
 
 use strict;
+use Scalar::Util qw( weaken );
 use WebGUI::International;
 use WebGUI::Operation::Auth;
 use Scalar::Util qw(weaken);

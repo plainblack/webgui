@@ -19,6 +19,7 @@ use 5.010;
 
 use CHI;
 use File::Temp qw( tempdir );
+use Scalar::Util qw( weaken );
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;

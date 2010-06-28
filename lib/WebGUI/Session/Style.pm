@@ -16,6 +16,8 @@ package WebGUI::Session::Style;
 
 
 use strict;
+use Tie::CPHash;
+use Scalar::Util qw( weaken );
 use WebGUI::International;
 use WebGUI::Macro;
 require WebGUI::Asset;

@@ -23,7 +23,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::MockObject;
-plan tests => 14;
+plan tests => 16;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -126,6 +126,30 @@ cmp_ok( $updatedSnippet->get('revisionDate'), '>', $snippetRev->get('revisionDat
 
 my $lastTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($lastTag);
+
+{
+    # Test clearPackageFlag
+    my $flagTag = WebGUI::VersionTag->create($session);
+    WebGUI::Test->addToCleanup($flagTag);
+    $flagTag->setWorking;
+    my $tempspace = WebGUI::Asset->getTempspace($session);
+    my $snippet = $tempspace->addChild(
+        {   url       => 'pflagt',
+            title     => 'package flag test',
+            menuTitle => 'package flag test',
+            className => 'WebGUI::Asset::Snippet',
+            snippet   => 'This is a test asset',
+            isPackage => 1,
+        }
+    );
+    my $storage = $snippet->exportPackage;
+    WebGUI::Test->addToCleanup($storage);
+    my $without = $tempspace->importPackage($storage);
+    ok $without->get('isPackage'), 'has flag with no option';
+    my $with = $tempspace->importPackage($storage, { clearPackageFlag => 1 });
+    ok !$with->get('isPackage'), 'no flag with option';
+}
+
 
 TODO: {
     local $TODO = "Tests to make later";

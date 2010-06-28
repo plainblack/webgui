@@ -17,6 +17,12 @@ save you many hours of grief.
     - Moose
     - CHI
 
+
+7.9.6
+--------------------------------------------------------------------
+     * The javascript check for email addresses has been removed.
+
+
 7.9.5
 --------------------------------------------------------------------
      * Starting in WebGUI 7.9.4, the CHI and Cache::FastMmap modules are required.

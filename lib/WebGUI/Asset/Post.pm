@@ -115,14 +115,12 @@ sub _fixReplyCount {
     my $self    = shift;
     my $asset   = shift;
 
-    my $lastPost = $asset->getLineage( [ qw{ self descendants } ], {
-        returnObjects   => 1,
+    my $lastPostId = $asset->getLineage( [ qw{ self descendants } ], {
         isa             => 'WebGUI::Asset::Post',
         orderByClause   => 'assetData.revisionDate desc',
-        limit           => 1,
     } )->[0];
 
-    if ($lastPost) {
+    if (my $lastPost = WebGUI::Asset->newById( $self->session, $lastPostId ) ) {
         $asset->incrementReplies( $lastPost->revisionDate, $lastPost->getId );
     }
     else {
@@ -690,23 +688,25 @@ sub getTemplateVars {
 	unless ($self->storageId eq "") {
 		my $storage = $self->getStorageLocation;
 		foreach my $filename (@{$storage->getFiles}) {
-			if (!$gotImage && $storage->isImage($filename)) {
-				$var{"image.url"} = $storage->getUrl($filename);
+			my $isImage = $storage->isImage($filename);
+			my $fileUrl = $storage->getUrl($filename);
+			if (!$gotImage && $isImage) {
+				$var{"image.url"} = $fileUrl;
 				$var{"image.thumbnail"} = $storage->getThumbnailUrl($filename);
 				$gotImage = 1;
 			}
-			if (!$gotAttachment && !$storage->isImage($filename)) {
-				$var{"attachment.url"} = $storage->getUrl($filename);
+			if (!$gotAttachment && !$isImage) {
+				$var{"attachment.url"} = $fileUrl;
 				$var{"attachment.icon"} = $storage->getFileIconUrl($filename);
 				$var{"attachment.name"} = $filename;
 				$gotAttachment = 1;
        			}	
 			push(@{$var{"attachment_loop"}}, {
-				url=>$storage->getUrl($filename),
-				icon=>$storage->getFileIconUrl($filename),
-				filename=>$filename,
-				thumbnail=>$storage->getThumbnailUrl($filename),
-				isImage=>$storage->isImage($filename)
+				url       =>$fileUrl,
+				icon      =>$var{"attachment.icon"},
+				filename  =>$filename,
+				thumbnail =>$var{"image.thumbnail"},
+				isImage   =>$isImage
 				});
 		}
 	}
@@ -983,10 +983,7 @@ override paste => sub {
     super();
 
     # First, figure out what Thread we're under
-    my $thread = $self->getLineage( [ qw{ self ancestors } ], {
-        returnObjects   => 1,
-        isa             => 'WebGUI::Asset::Post::Thread',
-    } )->[0];
+    my $thread = $self->getThread;
 
     # If the pasted asset is not a thread we'll have to update the threadId of it and all posts below it.
     if ( $self->threadId ne $self->getId ) {
@@ -1083,10 +1080,9 @@ sub postProcess {
             $self->trash;
         }
     }
-	my $user = WebGUI::User->new($self->session, $self->ownerUserId);
 	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
-	if ($self->getThread->getParent->addEditStampToPosts) {
-		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$user->profileField("alias").") --- \n</p>";
+	if ($self->getThread->getParent->get("addEditStampToPosts")) {
+		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$self->session->user->profileField("alias").") --- \n</p>";
 	}
 	$data{url} = $self->fixUrl($self->getThread->url."/1") if ($self->isReply && $self->isNew);
 	$data{groupIdView} = $self->getThread->getParent->groupIdView;

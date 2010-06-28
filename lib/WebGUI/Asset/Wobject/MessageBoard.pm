@@ -96,8 +96,15 @@ sub view {
 	my $first;
 	my @forum_loop;
 	my $i18n = WebGUI::International->new($self->session,"Asset_MessageBoard");
-	my $children = $self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Wobject::Collaboration"],returnObjects=>1});
-	foreach my $child (@{$children}) {
+	my $childIter = $self->getLineageIterator(["children"],{includeOnlyClasses=>["WebGUI::Asset::Wobject::Collaboration"]});
+        while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $self->session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
 		$count++;
 		next unless ($child->canView);
 		if ($count == 1) {

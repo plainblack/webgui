@@ -615,10 +615,10 @@ returns true if the EMS has subission forms attached
 sub hasSubmissionForms {
    my $self = shift;
 		   # are there ~any~ forms attached to this ems?
-   my $res = $self->getLineage(['children'],{ limit => 1,
+   my $count = $self->getDescendantCount({
 	 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
      } );
-   return scalar(@$res);
+   return $count;
 }
 
 #-------------------------------------------------------------------
@@ -1046,12 +1046,12 @@ then call www_editSubmission on it
 sub www_editSubmission {
 	my $self             = shift;
         my $submissionId = $self->session->form->get('submissionId');
-        my $asset = $self->getLineage(['descendants'], { returnObjects => 1,
+        my $asset = $self->getLineageIterator(['descendants'], {
 		    joinClass          => "WebGUI::Asset::EMSSubmission",
 		    whereClause        => 'submissionId = ' . int($submissionId),
 		    includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
            } );
-        return $asset->[0]->www_editSubmission;
+        return $asset->()->www_editSubmission;
 }
 
 
@@ -1397,6 +1397,7 @@ sub www_getBadgesAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
     $results{records} = [];
+        # TODO: Use getLineageIterator here instead
 	BADGE: foreach my $badge (@{$self->getBadges}) {
         next BADGE unless $badge->canView;
 		push(@{$results{records}}, {
@@ -1965,7 +1966,8 @@ sub www_getTokensAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
     $results{records} = [];  ##Initialize to an empty array
-	foreach my $token (@{$self->getTokens}) {
+	TOKEN: foreach my $token (@{$self->getTokens}) {
+        next TOKEN unless $token->canView;
 		push(@{$results{records}}, {
 			title 				=> $token->getTitle,
 			description			=> $token->description,

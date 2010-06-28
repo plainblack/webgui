@@ -64,7 +64,15 @@ Turns this package into a package file and returns the storage location object o
 sub exportPackage {
 	my $self = shift;
 	my $storage = WebGUI::Storage->createTemp($self->session);
-	foreach my $asset (@{$self->getLineage(["self","descendants"],{returnObjects=>1, statusToInclude=>['approved', 'archived']})}) {
+        my $assetIter = $self->getLineageIterator(["self","descendants"],{statusToInclude=>['approved', 'archived']});
+        while ( 1 ) {
+            my $asset;
+            eval { $asset = $assetIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $self->session->log->error($x->full_message);
+                next;
+            }
+            last unless $asset;
 		my $data = $asset->exportAssetData;
 		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON->new->utf8->pretty->encode($data));
 		foreach my $storageId (@{$data->{storage}}) {
@@ -348,10 +356,12 @@ sub www_exportPackage {
 =cut
 
 sub www_importPackage {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
-	my $storage = WebGUI::Storage->createTemp($self->session);
-    my $inheritPermissions = $self->session->form->process('inheritPermissions');
+	my $self    = shift;
+	my $session = $self->session;
+	return $session->privilege->insufficient() unless ($self->canEdit && $session->user->isInGroup(4));
+
+	my $form    = $session->form;
+	my $storage = WebGUI::Storage->createTemp($session);
 
 	##This is a hack.  It should use the WebGUI::Form::File API to insulate
 	##us from future form name changes.
@@ -359,19 +369,25 @@ sub www_importPackage {
 
 	my $error = "";
 	if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg") {
-		$error = $self->importPackage($storage, {inheritPermissions => $inheritPermissions});
+		$error = $self->importPackage(
+			$storage, {
+				inheritPermissions => $form->get('inheritPermissions'),
+				clearPackageFlag   => $form->get('clearPackageFlag'),
+			}
+		);
 	}
 	if (!blessed $error) {
-		my $i18n = WebGUI::International->new($self->session, "Asset");
-        if ($error eq 'corrupt') {
-            return $self->session->style->userStyle($i18n->get("package corrupt"));
-        }
-        else {
-            return $self->session->style->userStyle($i18n->get("package extract error"));
-        }
+		my $i18n  = WebGUI::International->new($session, "Asset");
+		my $style = $session->style;
+		if ($error eq 'corrupt') {
+			return $style->userStyle($i18n->get("package corrupt"));
+		}
+		else {
+			return $style->userStyle($i18n->get("package extract error"));
+		}
 	}
     # Handle autocommit workflows
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,
     }) eq 'redirect') {

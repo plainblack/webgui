@@ -280,17 +280,19 @@ sub getTemplateVariables {
         $item{guid} = WebGUI::HTML::filter(scalar $object->guid, 'javascript');
         $item{link} = WebGUI::HTML::filter(scalar $object->link, 'javascript');
         my $description = WebGUI::HTML::filter(scalar($object->description), 'javascript');
+        my $raw_description = WebGUI::HTML::filter($description, 'all');
+        $raw_description =~ s/^\s+//s;
         $item{description} = defined $description ? $description : '';
-        $item{descriptionFirst100words} = $item{description};
-        $item{descriptionFirst100words} =~ s/(((\S+)\s+){100}).*/$1/s;
+        $item{descriptionFirst100words} = $raw_description;
+        $item{descriptionFirst100words} =~ s/(((\S+)\s+){1,100}).*/$1/ms;
         $item{descriptionFirst75words} = $item{descriptionFirst100words};
-        $item{descriptionFirst75words} =~ s/(((\S+)\s+){75}).*/$1/s;
+        $item{descriptionFirst75words} =~ s/(((\S+)\s+){1,75}).*/$1/ms;
         $item{descriptionFirst50words} = $item{descriptionFirst75words};
-        $item{descriptionFirst50words} =~ s/(((\S+)\s+){50}).*/$1/s;
+        $item{descriptionFirst50words} =~ s/(((\S+)\s+){1,50}).*/$1/ms;
         $item{descriptionFirst25words} = $item{descriptionFirst50words};
-        $item{descriptionFirst25words} =~ s/(((\S+)\s+){25}).*/$1/s;
+        $item{descriptionFirst25words} =~ s/(((\S+)\s+){1,25}).*/$1/ms;
         $item{descriptionFirst10words} = $item{descriptionFirst25words};
-        $item{descriptionFirst10words} =~ s/(((\S+)\s+){10}).*/$1/s;
+        $item{descriptionFirst10words} =~ s/(((\S+)\s+){1,10}).*/$1/ms;
         if ($description =~ /<p>/) {
             my $html = $description;
             $html =~ tr/\n/ /s;
@@ -304,12 +306,12 @@ sub getTemplateVariables {
             $item{descriptionFirstParagraph} = $item{descriptionFirst2paragraphs};
             $item{descriptionFirstParagraph} =~ s/^(.*?\n).*/$1/s;
         }
-        $item{descriptionFirst4sentences} = $item{description};
-        $item{descriptionFirst4sentences} =~ s/^((.*?\.){4}).*/$1/s;
+        $item{descriptionFirst4sentences} = $raw_description;
+        $item{descriptionFirst4sentences} =~ s/^((.*?\.){1,4}).*/$1/s;
         $item{descriptionFirst3sentences} = $item{descriptionFirst4sentences};
-        $item{descriptionFirst3sentences} =~ s/^((.*?\.){3}).*/$1/s;
+        $item{descriptionFirst3sentences} =~ s/^((.*?\.){1,3}).*/$1/s;
         $item{descriptionFirst2sentences} = $item{descriptionFirst3sentences};
-        $item{descriptionFirst2sentences} =~ s/^((.*?\.){2}).*/$1/s;
+        $item{descriptionFirst2sentences} =~ s/^((.*?\.){1,2}).*/$1/s;
         $item{descriptionFirstSentence} = $item{descriptionFirst2sentences};
         $item{descriptionFirstSentence} =~ s/^(.*?\.).*/$1/s;
 		push @{$var{item_loop}}, \%item;

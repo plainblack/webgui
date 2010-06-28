@@ -68,7 +68,15 @@ sub cut {
 	$session->db->write("update asset set state='clipboard', stateChangedBy=?, stateChanged=? where assetId=?", [$session->user->userId, time(), $self->getId]);
 	$session->db->commit;
 	$self->state("clipboard");
-    foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
+    my $assetIter = $self->getLineageIterator(['descendants']);
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $asset;
         $asset->purgeCache;
         $asset->updateHistory('cut');
     }
@@ -215,11 +223,18 @@ sub paste {
         
         # Update lineage in search index.
         $self->purgeCache;
-        my $updateAssets = $pastedAsset->getLineage(['self', 'descendants'], {returnObjects => 1});
+        my $assetIter = $pastedAsset->getLineageIterator(['self', 'descendants']);
+        while ( 1 ) {
+            my $asset;
+            eval { $asset = $assetIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $asset;
  
-        foreach (@{$updateAssets}) {
             $outputSub->(sprintf $i18n->get('indexing %s'), $pastedAsset->getTitle) if defined $outputSub;
-            $_->indexContent();
+            $asset->indexContent();
         }
 
 		return 1;
@@ -489,7 +504,7 @@ sub www_duplicateList {
 	foreach my $assetId ($session->form->param("assetId")) {
 		my $asset = WebGUI::Asset->newById($session,$assetId);
 		if ($asset->canEdit) {
-			my $newAsset = $asset->duplicate;
+			my $newAsset = $asset->duplicate({skipAutoCommitWorkflows => 1, });
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
 		}
 	}

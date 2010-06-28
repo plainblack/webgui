@@ -369,14 +369,21 @@ for generating an RSS and Atom feeds.
 
 sub getRssFeedItems {
     my $self    = shift;
-    my $stories = $self->getLineageIterator(['descendants'],{
+    my $storyIter = $self->getLineageIterator(['descendants'],{
         excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
         orderByClause  => 'creationDate desc, lineage',
         returnObjects  => 1,
         limit          => $self->itemsPerFeed,
     });
     my $storyData = [];
-    while (my $story = $stories->()) {
+    while ( 1 ) {
+        my $story;
+        eval { $story = $storyIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $story;
         push @{ $storyData }, $story->getRssData;
     }
     return $storyData;

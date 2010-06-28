@@ -44,20 +44,25 @@ This macro takes a templateId to show the links
 sub process {
 	my $session 	= shift;
 	my $templateId 	= shift || "_aE16Rr1-bXBf8SIaLZjCg";
-	my $template 	= eval { WebGUI::Asset::Template->newById($session, $templateId); };
+	my $template 	= eval { WebGUI::Asset->newById($session, $templateId); };
     if (Exception::Class->caught()) {
         return "Could not instanciate template with id [$templateId]" unless $template;
     }
 	my $i18n 	= WebGUI::International->new($session);
 	my $languages 	= $i18n->getLanguages();
+    my $currentLanguage = $session->scratch->get('language')
+                        ? $session->scratch->get('language')
+                        : $session->user->profileField('language');
 	my @lang_loop 	= ();
 	foreach my $language ( keys %$languages ) {
+        my $isCurrentLanguage = $currentLanguage eq $language ? 1 : 0;
 		push @lang_loop, {
 			language_url 		=> '?op=setLanguage;language=' . $language, 
 			language_lang		=> $i18n->getLanguage($language , 'label'),
 			language_langAbbr 	=> $i18n->getLanguage($language, 'languageAbbreviation'),
 			language_langAbbrLoc 	=> $i18n->getLanguage($language, 'locale'),
 			language_langEng 	=> $language,
+            language_isCurrent  => $isCurrentLanguage,
 		};
 	}
 	my %vars = (

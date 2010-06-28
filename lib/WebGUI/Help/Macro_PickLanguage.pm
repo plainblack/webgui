@@ -24,6 +24,9 @@ our $HELP = {
 					{
 					name => "language_langEng",
 					},
+					{
+					name => "language_isCurrent",
+					},
 				],
 			},
 			{

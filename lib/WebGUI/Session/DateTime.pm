@@ -19,6 +19,7 @@ use DateTime;
 use DateTime::Format::Strptime;
 use DateTime::Format::Mail;
 use DateTime::TimeZone;
+use Scalar::Util qw( weaken );
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility qw(round isIn);

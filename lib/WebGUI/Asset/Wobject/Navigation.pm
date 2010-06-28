@@ -369,44 +369,49 @@ sub view {
 	# we've got to determine what our start point is based upon user conditions
 	my $start;
 	$self->session->asset(WebGUI::Asset->newByUrl($self->session)) unless ($self->session->asset);
-	my $current = $self->session->asset;
 
+	my $var = {'page_loop' => []};
+
+	my $current = $self->session->asset;
     # no current asset is set
     unless (defined $current) {
         $current = WebGUI::Asset->getDefault($self->session);
     }
 
+	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
+    # Add properties from current asset
+    foreach my $property (@interestingProperties) {
+		$var->{'currentPage.'.$property} = $current->$property;
+	}
+    $var->{'currentPage.menuTitle'} = $current->getMenuTitle;
+    $var->{'currentPage.title'}     = $current->getTitle;
+    $var->{'currentPage.isHome'} = ($current->getId eq $self->session->setting->get("defaultPage"));
+    $var->{'currentPage.url'} = $current->getUrl;
+    $var->{'currentPage.hasChild'} = $current->hasChildren;
+    $var->{'currentPage.rank'} = $current->getRank;
+    $var->{'currentPage.rankIs'.$current->getRank} = 1;
+
+    # Build the asset tree
 	if ($self->startType eq "specificUrl") {
 		$start = WebGUI::Asset->newByUrl($self->session,$self->startPoint);
-	} elsif ($self->startType eq "relativeToRoot") {
+	}
+    elsif ($self->startType eq "relativeToRoot") {
 		unless (($self->startPoint+1) >= $current->getLineageLength) {
 			$start = WebGUI::Asset->newByLineage($self->session,substr($current->lineage,0, ($self->startPoint + 1) * 6));
 		}
-	} elsif ($self->startType eq "relativeToCurrentUrl") {
+	}
+    elsif ($self->startType eq "relativeToCurrentUrl") {
 		$start = WebGUI::Asset->newByLineage($self->session,substr($current->lineage,0, ($current->getLineageLength + $self->startPoint) * 6));
 	}
 	$start = $current unless (defined $start); # if none of the above results in a start point, then the current page must be it
 	my @includedRelationships = split("\n",$self->assetsToInclude);
 
 	my %rules;
-	$rules{returnObjects} = 1;
 	$rules{endingLineageLength} = $start->getLineageLength+$self->descendantEndPoint;
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
 	$rules{ancestorLimit} = $self->ancestorEndPoint;
 	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->reversePageLoop);
-	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
-	my $var = {'page_loop' => []};
-    foreach my $property (@interestingProperties) {
-		$var->{'currentPage.'.$property} = $current->$property;
-	}
-	$var->{'currentPage.menuTitle'} = $current->getMenuTitle;
-	$var->{'currentPage.title'}     = $current->getTitle;
-	$var->{'currentPage.isHome'} = ($current->getId eq $self->session->setting->get("defaultPage"));
-	$var->{'currentPage.url'} = $current->getUrl;
-    	$var->{'currentPage.hasChild'} = $current->hasChildren;
-    	$var->{'currentPage.rank'} = $current->getRank;
-    	$var->{'currentPage.rankIs'.$current->getRank} = 1;
 	my $currentLineage = $current->lineage;
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
@@ -414,8 +419,7 @@ sub view {
 	my %lastChildren;
 	my $previousPageData = undef;
 	my $eh = $self->session->errorHandler;
-	foreach my $asset (@{$assets}) {
-
+        while ( my $asset = $assets->() ) {
 		# skip pages we shouldn't see
 		my $pageLineage = $asset->lineage;
 		next if ($pageLineage =~ m/^$lineageToSkip/);

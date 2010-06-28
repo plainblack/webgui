@@ -24,6 +24,7 @@ use WebGUI::Exception;
 use Scalar::Util ();
 use Try::Tiny;
 use namespace::clean;
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 

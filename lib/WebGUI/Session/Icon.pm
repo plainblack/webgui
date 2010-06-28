@@ -19,7 +19,6 @@ use WebGUI::International;
 use Tie::IxHash;
 use Scalar::Util qw(weaken);
 
-
 =head1 NAME
 
 Package WebGUI::Session::Icon

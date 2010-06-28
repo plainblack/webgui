@@ -22,6 +22,7 @@ use WebGUI::Pluggable;
 require WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::DatabaseLink;
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -1504,6 +1505,7 @@ sub new {
     
     my $class           = shift;
     $self->{_session}   = shift;
+    weaken( $self->{_session} );
 	$self->{_groupId}   = shift;
 	my $override        = shift;
     my $noAdmin         = shift;

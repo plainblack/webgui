@@ -49,11 +49,12 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
           $templateVars,
               {
                       lang_loop => [
-                      {       'language_url' => '?op=setLanguage;language=English',
-                              'language_lang' => 'English',
+                      {       'language_url'      => '?op=setLanguage;language=English',
+                              'language_lang'     => 'English',
                               'language_langAbbr' => 'en',
                               'language_langAbbrLoc' => 'US',
-                              'language_langEng' => 'English',
+                              'language_langEng'     => 'English',
+                              'language_isCurrent'   => 1,
                       },
               ],
 		delete_url 	=> '?op=setLanguage;language=delete;',
@@ -82,6 +83,7 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
                               'language_langAbbr' => 'en',
                               'language_langAbbrLoc' => 'US',
                               'language_langEng' => 'English',
+                              'language_isCurrent'   => 1,
                       },
               ],
 			delete_url => '?op=setLanguage;language=delete;',

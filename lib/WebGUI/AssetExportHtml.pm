@@ -308,20 +308,22 @@ sub exportBranch {
     my $indexFileName       = $options->{indexFileName};
     my $extrasUploadAction  = $options->{extrasUploadAction};
     my $rootUrlAction       = $options->{rootUrlAction};
+    my $exportedCount = 0;
 
     my $i18n;
     if ( $reportSession ) {
         $i18n = WebGUI::International->new($self->session, 'Asset');
     }
 
-    my $exportedCount = 0;
-    my $assetIds = $self->exportGetDescendants(undef, $depth);
-    foreach my $assetId ( @{$assetIds} ) {
+
+    my $exportAsset = sub {
+        my ( $assetId ) = @_;
         # Must be created once for each asset, since session is supposed to only handle
         # one main asset
         my $outputSession = $self->session->duplicate;
         my $osGuard = Scope::Guard->new(sub {
             $outputSession->close;
+            $outputSession = undef;
         });
 
         my $asset       = WebGUI::Asset->newById($outputSession, $assetId);
@@ -376,6 +378,16 @@ sub exportBranch {
         if ( $reportSession ) {
             $reportSession->output->print($i18n->get('done'));
         }
+
+        #use Devel::Cycle;
+        #warn "CHECKING on " . ref( $asset ) . ' ID: ' . $asset->getId . "\n";
+        #find_cycle( $asset );
+    };
+
+
+    my $assetIds = $self->exportGetDescendants(undef, $depth);
+    foreach my $assetId ( @{$assetIds} ) {
+        $exportAsset->( $assetId );
     }
 
     # handle symlinking
@@ -435,13 +447,23 @@ boolean indicating whether or not this asset is exportable.
 sub exportCheckExportable {
     my $self = shift;
 
+    # We have ourself already, check it first
+    return 0 unless $self->get('isExportable');
+
     # get this asset's ancestors. return objects as a shortcut since we'd be
     # instantiating them all anyway.
-    my $assets = $self->getLineage( ['ancestors'], { returnObjects => 1 } );
+    my $assetIter = $self->getLineageIterator( ['self','ancestors'] );
 
     # process each one. return false if any of the assets in the lineage, or
     # this asset itself, isn't exportable.
-    foreach my $asset ( @{$assets}, $self ) {
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $asset;
         return 0 unless $asset->get('isExportable');
     }
 
@@ -522,6 +544,9 @@ sub exportGetDescendants {
         endingLineageLength => $asset->getLineageLength + $depth,
         orderByClause       => 'assetData.url DESC',
     } );
+
+    #use Data::Dumper;
+    #warn "Assets: " . scalar( @$assetIds );
 
     return $assetIds;
 }

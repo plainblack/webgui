@@ -447,13 +447,10 @@ sub search {
                 if ( ! eval { WebGUI::Pluggable::load($className) } ) {
                     $self->session->errorHandler->fatal($@);
                 }
-                foreach my $definition (@{$className->definition($self->session)}) {
-                    unless ($definition->{tableName} eq "asset") {
-                        my $tableName = $definition->{tableName};
-                        push @$join, 
-                            "left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
-                    }
-                    last;
+                TABLE: foreach my $tableName ($className->meta->get_tables) {
+                    next TABLE if $tableName eq 'assetData';
+                    push @{ $join },
+                        "left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
                 }
             }
             # Get only the latest revision

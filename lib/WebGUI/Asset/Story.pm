@@ -506,8 +506,10 @@ sub getRssData {
         title       => $self->headline || $self->getTitle,
         description => $self->story,
         'link'      => $self->getUrl,
+        guid        => $self->getUrl,
         author      => $self->byline,
         date        => $self->lastModified,
+        pubDate     => $self->session->datetime->epochToMail($self->creationDate),
     };
 	return $data;
 }

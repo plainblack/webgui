@@ -1271,6 +1271,12 @@ Couldn't open %-s because %-s <br />
         context     => q{Error message in Asset.pm},
     },
 
+    'clear package flag' => {
+        message     => q{Clear package flag},
+        lastUpdate  => 1275419384,
+        context     => q{Package import option in admin console},
+    },
+
     'need a userId parameter' => {
         message     => q{need a userId parameter},
         lastUpdated => 0,

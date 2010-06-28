@@ -208,13 +208,27 @@ JS
     my $output = '<div class="nav">';
     my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
     my @crumb;
-    my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
-    foreach my $ancestor (@{$ancestors}) {
+    my $ancestorIter = $base->getLineageIterator(["self","ancestors"]);
+    while ( 1 ) {
+        my $ancestor;
+        eval { $ancestor = $ancestorIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $ancestor;
         push(@crumb,'<a href="'.$ancestor->getUrl("op=formHelper;class=HTMLArea;sub=pageTree").'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
     }
     $output .= '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div>\n<ul>";
-    my $children = $base->getLineage(["children"],{returnObjects=>1});
-    foreach my $child (@{$children}) {
+    my $childIter = $base->getLineageIterator(["children"]);
+    while ( 1 ) {
+        my $child;
+        eval { $child = $childIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $child;
         next unless $child->canView;
         $output .= '<li><a href="#" class="selectLink" onclick="selectLink(\'' . $child->get('url') . '\'); return false;">['
             . $i18n->get("select") . ']</a> <a href="' . $child->getUrl("op=formHelper;class=HTMLArea;sub=pageTree")
@@ -253,8 +267,15 @@ JS
 
     my @crumb;
     my $media;
-    my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
-    foreach my $ancestor (@{$ancestors}) {
+    my $ancestorIter = $base->getLineageIterator(["self","ancestors"]);
+    while ( 1 ) {
+        my $ancestor;
+        eval { $ancestor = $ancestorIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $ancestor;
         push(@crumb,'<a href="'.$ancestor->getUrl("op=formHelper;class=HTMLArea;sub=imageTree").'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
         if ($ancestor->get('assetId') eq 'PBasset000000000000003') {
             $media = $ancestor;
@@ -276,8 +297,8 @@ JS
     $output .= '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div>\n<ul>";
 
     my $useAssetUrls = $session->config->get("richEditorsUseAssetUrls");
-    my $children = $base->getLineage(["children"],{returnObjects=>1});
-    foreach my $child (@{$children}) {
+    my $children = $base->getLineage(["children"]);
+    while ( my $child = $children->() ) {
         next unless $child->canView;
         $output .= '<li>';
         if ($child->isa('WebGUI::Asset::File::Image')) {

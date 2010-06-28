@@ -175,6 +175,45 @@ sub getContentPositionsDefault {
 
 #-------------------------------------------------------------------
 
+=head2 getEditForm 
+
+Extend the base method to display lists of assets to hide or show.
+
+=cut
+
+sub getEditForm {
+	my $self = shift;
+	my $tabform = $self->SUPER::getEditForm;
+	my $i18n = WebGUI::International->new($self->session, "Asset_Dashboard");
+	if ($self->session->form->process("func") ne "add") {
+		my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
+		my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
+		my %childIds;
+                while ( 1 ) {
+                    my $child;
+                    eval { $child = $childIter->() };
+                    if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                        $self->session->log->error($x->full_message);
+                        next;
+                    }
+                    last unless $child;
+			$childIds{$child->getId} = $child->getTitle.' ['.ref($child).']';	
+		}
+		$tabform->getTab("display")->checkList(
+			-name=>"assetsToHide",
+			-value=>\@assetsToHide,
+			-options=>\%childIds,
+			-label=>$i18n->get('assets to hide'),
+			-hoverHelp=>$i18n->get('assets to hide description'),
+			-vertical=>1,
+			-uiLevel=>9
+		);
+	}
+	return $tabform;
+}
+
+#-------------------------------------------------------------------
+
 =head2 initialize 
 
 Add the unique profile field that holds content positions for this dashboard.
@@ -218,18 +257,25 @@ their templates.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView;
-	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
+	super();
 	my @hidden = split("\n",$self->assetsToHide);
-	foreach my $child (@{$children}) {
+	my $childIter = $self->getLineageIterator( ["children"], {excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
+        while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $self->session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
 		unless (isIn($child->getId, @hidden) || !($child->canView)) {
 			$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 			$child->prepareView;
 		}
 	}
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -286,8 +332,9 @@ sub view {
 	$self->session->style->setScript( $self->session->url->extras('yui/build/utilities/utilities.js'));
 	
 	my $templateId = $self->templateId;
-	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
+    # XXX Not using getLineageIterator because we loop over the children three times...
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
+	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
 	my @positions = split(/\./,$self->getContentPositions);
 	my @hidden = split("\n",$self->assetsToHide);
 	foreach my $child (@{$children}) {

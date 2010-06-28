@@ -99,20 +99,4 @@ sub isDynamicCompatible {
     return 1;
 }
 
-#-------------------------------------------------------------------
-
-=head2 toHtml ( )
-
-Renders an email address field.
-
-=cut
-
-sub toHtml {
-        my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('emailCheck.js'));
-	$self->{_params}{extras} .= ' onchange="emailCheck(this.value)" ';
-	return $self->SUPER::toHtml;
-}
-
 1;
-

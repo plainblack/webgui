@@ -160,9 +160,16 @@ override getEditForm => sub {
     }
     else {
         my @assetsToHide = split("\n",$self->assetsToHide);
-        my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
+        my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
         my %childIds;
-        foreach my $child (@{$children}) {
+        while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $self->session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
             $childIds{$child->getId} = $child->getTitle;    
         }
         $extraFields{assetsToHide} = {
@@ -236,11 +243,18 @@ sub prepareView {
 
     my %placeHolder;
     my @children;
-
-    for my $child ( @{ $self->getLineage( ["children"], {
-        returnObjects   => 1,
+    
+    my $childIter = $self->getLineageIterator( ["children"], {
         excludeClasses  => ["WebGUI::Asset::Wobject::Layout"],
-    } ) } ) {
+    } ); 
+    while ( 1 ) {
+        my $child;
+        eval { $child = $childIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $child;
         my $assetId = $child->getId;
         next
             if ($hidden{$assetId} || ! $child->canView);
@@ -393,7 +407,15 @@ override getContentLastModified => sub {
     # Buggo: this is a little too conservative.  Children that are hidden maybe shouldn't count.  Hm.
     my $self = shift;
     my $mtime = super();
-    foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1, excludeClasses=>['WebGUI::Asset::Wobject::Layout']})}) {
+    my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>['WebGUI::Asset::Wobject::Layout']});
+    while ( 1 ) {
+        my $child;
+        eval { $child = $childIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $child;
         my $child_mtime = $child->getContentLastModified;
         $mtime = $child_mtime if ($child_mtime > $mtime);
     }

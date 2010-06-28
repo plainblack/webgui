@@ -78,8 +78,9 @@ sub execute {
     my $limit   = 2_500;
     my $timeLimit = 60;
 
-    my $list = $root->getLineage( ['descendants'], { returnObjects => 1,
+    my $list = $root->getLineage( ['descendants'], {
                  includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+                 returnObjects      => 1,
              } );
     
     for my $emsForm ( @$list ) {
@@ -88,6 +89,7 @@ sub execute {
 	     joinClass => 'WebGUI::Asset::EMSSubmission',
 	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
 	     whereClause => $whereClause,
+             returnObjects      => 1,
 	 } );
         for my $submission ( @$res ) {
 	    my $properties = { className => 'WebGUI::Asset::Sku::EMSTicket' };

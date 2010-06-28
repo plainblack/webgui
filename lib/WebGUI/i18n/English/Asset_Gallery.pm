@@ -419,6 +419,11 @@ our $I18N = {
         message     => 'Search by keyword.',
         lastUpdated => 0,
     },
+    
+    'helpvar searchForm_location' => {
+        message     => 'Search by location.',
+        lastUpdated => 0,
+    },    
 
     'helpvar searchForm_className' => {
         message     => 'Search by class name.',
@@ -615,6 +620,12 @@ our $I18N = {
         message     => "Tags",
         lastUpdated => 0,
         context     => "Label for the 'Keywords' input for the search form. 'Tags' is used because Keywords may be confused with the generic, all-inclusive search box.",
+    },
+    
+    'template search field location' => {
+        message     => "Location",
+        lastUpdated => 0,
+        context     => "Label for the 'Location' input for the search form.",
     },
 
     'template search field className' => {

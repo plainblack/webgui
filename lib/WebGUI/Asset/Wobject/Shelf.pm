@@ -266,12 +266,20 @@ sub view {
 	
 	# get other shelves
 	my @childShelves = ();
-	SHELF: foreach my $child (@{$self->getLineage(['children'],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
+        my $childIter = $self->getLineageIterator(['children'],{includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']});
+        SHELF: while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
         next SHELF unless $child->canView;
 		my $properties  = $child->get;
-		$child->{url}   = $child->getUrl;
-		$child->{title} = $child->getTitle;
-		push @childShelves, $child;
+		$properties->{url}   = $child->getUrl;
+		$properties->{title} = $child->getTitle;
+		push @childShelves, $properties;
 	}
 	
 	# get other child skus

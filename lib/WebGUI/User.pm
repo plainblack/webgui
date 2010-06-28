@@ -21,6 +21,7 @@ use WebGUI::Workflow::Instance;
 use JSON ();
 use WebGUI::ProfileField;
 use Tie::CPHash;
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -1070,6 +1071,7 @@ sub new {
     my $self        = $session->cache->get("user_" . $userId) || {};
     bless $self, $class;
     $self->{_session} = $session;
+    weaken( $self->{_session} );
     unless ($self->{_userId} && $self->{_user}{username}) {
         my %user;
         tie %user, 'Tie::CPHash';

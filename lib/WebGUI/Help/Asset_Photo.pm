@@ -63,6 +63,18 @@ our $HELP = {
                 description => 'helpvar ownerUsername',
             },
             {
+                name        => 'ownerAlias',
+                description => 'helpvar ownerAlias',
+            },
+            {
+                name        => 'ownerId',
+                description => 'helpvar ownerId',
+            },
+            {
+                name        => 'ownerProfileUrl',
+                description => 'helpvar ownerProfileUrl',
+            },            
+            {
                 name        => 'thumbnailUrl',
                 description => 'helpvar thumbnailUrl',
             },

@@ -203,7 +203,7 @@ foreach my $idx (0..$#ldapTests) {
     });
 }
 
-WebGUI::Test->usersToDelete(@shawshank);
+WebGUI::Test->addToCleanup(@shawshank);
 
 my $lGroup = WebGUI::Group->new($session, 'new');
 
@@ -504,8 +504,7 @@ cmp_bag(
 $session->db->write('delete from myUserTable where userId=?',[$mob[0]->getId]);
 my $inDb = $session->db->quickScalar("select count(*) from myUserTable where userId=?",[$mob[0]->getId]);
 ok ( !$inDb, 'mob[0] no longer in myUserTable');
-WebGUI::Cache->new($session, ["groupMembers",$gY->getId])->delete;  #Delete cache so we get a good test
-$session->stow->delete("isInGroup");                                #Delete stow so we get a good test
+$session->cache->remove("isInGroup");                                #Delete stow so we get a good test
 
 is_deeply(
 	[ (map { $gY->hasDatabaseUser($_->getId) }  @mob) ],
@@ -637,8 +636,7 @@ foreach my $scratchTest (@scratchTests) {
 	is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
 }
 
-WebGUI::Cache->new($session, $gS->getId)->delete();  ##Delete cached key for testing
-$session->stow->delete("isInGroup");
+$session->cache->remove("isInGroup");
 
 #hasScratchUser test
 foreach my $scratchTest (@scratchTests) {

@@ -125,8 +125,18 @@ the available Rich Text Editor assets.
 
 sub getOptions {
     my $self = shift;
-    my $editors = WebGUI::Asset->getRoot($self->session)->getLineage(['descendants'], {includeOnlyClasses => ['WebGUI::Asset::RichEdit'], returnObjects => 1});
-    my %options = map { $_->getId => $_->getTitle } @$editors;
+    my $editorIter = WebGUI::Asset->getRoot($self->session)->getLineageIterator( ['descendants'], {includeOnlyClasses => ['WebGUI::Asset::RichEdit']});
+    my %options;
+    while ( 1 ) {
+        my $editor;
+        eval { $editor = $editorIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $editor;
+        $options{ $editor->getId } = $editor->getTitle;
+    }
     return \%options;
 }
 

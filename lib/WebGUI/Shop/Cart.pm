@@ -905,6 +905,38 @@ sub www_ajaxSetCartItemShippingId {
 
 #-------------------------------------------------------------------
 
+=head2 www_checkout ( )
+
+All checks and work for checking out are contained in here.
+
+=cut
+
+sub www_checkout {
+    my $self    = shift;
+    my $session = $self->session;
+    ##Setting a shipping address greatly simplifies the Transaction
+    if (! $self->requiresShipping && ! $self->get('shippingAddressId')) {
+        $self->update({shippingAddressId => $self->get('billingAddressId')});
+    }
+    if ($self->readyForCheckout()) {
+        my $total = $self->calculateTotal;
+        ##Handle rounding errors, and checkout immediately if the amount is 0 since
+        ##at least the ITransact driver won't accept $0 checkout.
+        if (sprintf('%.2f', $total + $self->calculateShopCreditDeduction($total)) eq '0.00') {
+            my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $self});
+            $transaction->completePurchase('zero', 'success', 'success');
+            $self->onCompletePurchase;
+            $transaction->sendNotifications();
+            return $transaction->thankYou();
+        }
+        my $gateway = $self->getPaymentGateway;
+        return $gateway->www_getCredentials;
+    }
+    return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_lookupPosUser ( )
 
 Adds a Point of Sale user to the cart.
@@ -950,24 +982,8 @@ sub www_update {
         return undef;
     }
     elsif ($session->form->get('checkout')) {
-        ##Setting a shipping address greatly simplifies the Transaction
-        if (! $self->requiresShipping && ! $self->get('shippingAddressId')) {
-            $self->update({shippingAddressId => $self->get('billingAddressId')});
-        }
-        if ($self->readyForCheckout()) {
-            my $total = $self->calculateTotal;
-            ##Handle rounding errors, and checkout immediately if the amount is 0 since
-            ##at least the ITransact driver won't accept $0 checkout.
-            if (sprintf('%.2f', $total + $self->calculateShopCreditDeduction($total)) eq '0.00') {
-                my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $self});
-                $transaction->completePurchase('zero', 'success', 'success');
-                $self->onCompletePurchase;
-                $transaction->sendNotifications();
-                return $transaction->thankYou();
-            }
-            my $gateway = $self->getPaymentGateway;
-            return $gateway->www_getCredentials;
-        }
+        ##Shortcut method for checkout, so that the cart form contents don't get lost.
+        return $self->www_checkout();
     }
     return $self->www_view;
 }

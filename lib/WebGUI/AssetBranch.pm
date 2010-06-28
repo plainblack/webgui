@@ -53,10 +53,19 @@ sub duplicateBranch {
     my $childrenOnly = shift;
 
     my $newAsset = $self->duplicate({skipAutoCommitWorkflows=>1,skipNotification=>1});
+    # Correctly handle positions for Layout assets
     my $contentPositions = $self->get("contentPositions");
     my $assetsToHide     = $self->get("assetsToHide");
 
-    foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
+    my $childIter = $self->getLineageIterator(["children"]);
+    while ( 1 ) {
+        my $child;
+        eval { $child = $childIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $child;
         my $newChild = $childrenOnly ? $child->duplicate({skipAutoCommitWorkflows=>1, skipNotification=>1}) : $child->duplicateBranch;
         $newChild->setParent($newAsset);
         my ($oldChildId, $newChildId) = ($child->getId, $newChild->getId);
@@ -355,11 +364,18 @@ sub www_editBranchSave {
         $urlBase   = $form->text("baseUrl");
         $endOfUrl  = $form->selectBox("endOfUrl");
     }
-    my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1});	
-    DESCENDANT: foreach my $descendant (@{$descendants}) {
+    my $descendantIter = $self->getLineageIterator(["self","descendants"]);
+    while ( 1 ) {
+        my $descendant;
+        eval { $descendant = $descendantIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $descendant;
         if ( !$descendant->canEdit ) {
             $pb->update(sprintf $i18n->get('skipping %s'), $descendant->getTitle);
-            next DESCENDANT;
+            next;
         }
         $pb->update(sprintf $i18n->get('editing %s'), $descendant->getTitle);
         my $url;

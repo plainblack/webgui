@@ -87,12 +87,17 @@ sub execute {
                 }
         } 
 	my $sth = $self->session->db->read("select groupId,deleteOffset,groupCacheTimeout from groups");
+    my $expireTime = time() + $self->getTTL();
         while (my $data = $sth->hashRef) {
         	if ($data->{groupCacheTimeout} > 0) {
         		# there is no need to wait deleteOffset days for expired external group cache data
                   	$self->session->db->write("delete from groupings where groupId=? and expireDate < ?", [$data->{groupId}, time()]);
                 } else {
                         $self->session->db->write("delete from groupings where groupId=? and expireDate < ?", [$data->{groupId}, time()-$data->{deleteOffset}]);
+                }
+                if (time() > $expireTime) {
+                    $sth->finish;
+                    return $self->WAITING(1);
                 }
         }
 	return $self->COMPLETE;

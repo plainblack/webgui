@@ -30,6 +30,10 @@ our $HELP = {
                 description => 'helpvar searchForm_keywords',
             },
             {
+                name        => 'searchForm_location',
+                description => 'helpvar searchForm_location',
+            },            
+            {
                 name        => 'searchForm_className',
                 description => 'helpvar searchForm_className',
             },

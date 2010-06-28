@@ -49,20 +49,25 @@ sub handler {
     # Only handle op=ajaxGetI18N
     return undef unless ( $session->form->get( "op" ) eq "ajaxGetI18N" );
 
-    my $json        = $session->form->get( "request" );
-    my $namespaces  = JSON->new->decode( $json );
-    my $i18n        = WebGUI::International->new( $session );
     my $response    = {};
+    my $json        = $session->form->get( "request" );
+    my $namespaces  = eval { JSON->new->decode( $json ) };
+    unless ($@) {
+        my $i18n        = WebGUI::International->new( $session );
 
-    for my $ns ( keys %{ $namespaces } ) {
-        for my $key ( @{ $namespaces->{ $ns } } ) {
-            $response->{ $ns }->{ $key }    = $i18n->get( $key, $ns );
+        for my $ns ( keys %{ $namespaces } ) {
+            for my $key ( @{ $namespaces->{ $ns } } ) {
+                $response->{ $ns }->{ $key }    = $i18n->get( $key, $ns );
+            }
         }
     }
-    
+    else {
+        $session->log->warn("User ".$session->user->username." tried to execute ajaxGetI18n but could not decode JSON string: $json");
+    }
     $session->http->setMimeType( "application/json" );
     return JSON->new->encode( $response );
 }
+
 
 1;
 

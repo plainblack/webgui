@@ -275,8 +275,10 @@ cmp_deeply(
         title       => 'Story 1',
         description => 'WebGUI was originally called Web Done Right.',
         'link'      => re('story-1$'),
+        guid        => re('story-1$'),
         author      => 'JT Smith',
         date        => $story->lastModified,
+        pubDate     => $session->datetime->epochToMail($story->creationDate),
     },
     'getRssData: returns correct data'
 );

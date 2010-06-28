@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use WebGUI::Utility qw(isIn formatBytes);
+use JSON;
 
 =head1 NAME
 
@@ -140,24 +141,23 @@ sub purge {
     }
 
     # assassinate the offspring
-	my $kids = $self->getLineage(["children"],{
-        returnObjects   => 1,
+	my $childIter = $self->getLineageIterator(["children"],{
         statesToInclude => [qw(published clipboard clipboard-limbo trash trash-limbo)],
         statusToInclude => [qw(approved archived pending)],
     });
-	foreach my $kid (@{$kids}) {
-		# Technically get lineage should never return an undefined object from getLineage when called like this, but it did so this saves the world from destruction.
-        if (defined $kid) {
-            unless ($kid->purge) {
+        while ( 1 ) {
+            my $child;
+            eval { $child = $childIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $child;
+            unless ($child->purge) {
                 $session->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
                 $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
                 return 0;
             }
-        }
-        else {
-            $outputSub->($i18n->get('Undefined child'));
-			$session->errorHandler->error("getLineage returned an undefined object in the AssetTrash->purge method.  Unable to purge asset.");
-        }
 	}
 
     # Delete shortcuts to this asset
@@ -265,7 +265,15 @@ sub trash {
         return undef;
     }
 
-    foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
+    my $assetIter = $self->getLineageIterator(['self','descendants']);
+    while ( 1 ) {
+        my $asset;
+        eval { $asset = $assetIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $session->log->error($x->full_message);
+            next;
+        }
+        last unless $asset;
         $outputSub->($i18n->get('Clearing search index'));
         my $index = WebGUI::Search::Index->new($asset);
         $index->delete;
@@ -418,21 +426,37 @@ sub www_manageTrash {
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          \n";
+
+    # To avoid string escaping issues
+    my $json = JSON->new;
+    my $amethod = sub {
+        my ($method, @args) = @_;
+        my $array = $json->encode(\@args);
+        $array =~ s/^\[//;
+        $array =~ s/\]$//;
+        $output .= "assetManager.$method($array);\n";
+    };
 	foreach my $child (@{$self->getAssetsInTrash($limit)}) {
-		my $title = $child->getTitle;
-                $title =~ s/\'/\\\'/g;
+    		my $title = $child->getTitle;
     		my $plus =$child->getChildCount({includeTrash => 1}) ? "+ " : "&nbsp;&nbsp;&nbsp;&nbsp;";
-         	$output .= "assetManager.AddLine('"
-			.WebGUI::Form::checkbox($self->session, {
-				name=>'assetId',
-				value=>$child->getId
-				})
-			."','" . $plus . "<a href=\"".$child->getUrl("op=assetManager")."\">" . $title
-			."</a>','<p style=\"display:inline;vertical-align:middle;\"><img src=\"".$child->getIcon(1)."\" style=\"vertical-align:middle;border-style:none;\" alt=\"".$child->getName."\" /></p> ".$child->getName
-			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
-			."','".formatBytes($child->get("assetSize"))."');\n";
-         	$output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
-			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";
+            $amethod->('AddLine',
+                WebGUI::Form::checkbox($self->session, {
+                    name=>'assetId',
+                    value=>$child->getId
+                }),
+                qq($plus<a href=").$child->getUrl("op=assetManager")
+                .qq(">$title</a>),
+			    '<p style="display:inline;vertical-align:middle;"><img src="'
+                .$child->getIcon(1)
+                .'" style="vertical-align:middle;border-style:none;" alt='
+                .$child->getName .'" /></p> ' . $child->getName,
+                $self->session->datetime->epochToHuman($child->get("revisionDate")),
+                formatBytes($child->get("assetSize"))
+            );
+            $amethod->('AddLineSortData',
+                '', $title, $child->getName,
+                $child->get('revisionDate'), $child->get('assetSize')
+            );
 	}
 	$output .= '
             assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");

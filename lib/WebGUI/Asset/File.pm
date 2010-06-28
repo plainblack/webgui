@@ -371,6 +371,7 @@ around indexContent => sub {
 	my $self = shift;
 	my $indexer = $self->$orig(@_);
 	$indexer->addFile($self->getStorageLocation->getPath($self->filename));
+    return $indexer;
 };
 
 

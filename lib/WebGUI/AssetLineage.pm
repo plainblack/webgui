@@ -223,36 +223,106 @@ Returns the number of children this asset has. This excludes assets in the trash
 
 =head3 opts
 
-A hashref of options.  Currently only one option is supported.
+A hashref of options.  
 
 =head4 includeTrash
 
 If this value of this hash key is true, then assets in any state will be counted.  Normally,
 only those that are published or achived are counted.
 
+=head4 includeOnlyClasses
+
+Only count these classes. Arrayref of class names
+
+=head4 statusToInclude
+
+Arrayref of status to include
+
 =cut
 
 sub getChildCount {
 	my $self = shift;
-    my $opts = shift || {};
-	my $stateWhere = $opts->{includeTrash} ? '' : "asset.state='published' and";
-	my ($count) = $self->session->db->quickArray("select count(distinct asset.assetId) from asset, assetData where asset.assetId=assetData.assetId and $stateWhere parentId=? and (assetData.status in ('approved', 'archived') or assetData.tagId=?)", [$self->getId, $self->session->scratch->get('versionTag')]);
+    my $opt = shift || {};
+    $opt->{ statusToInclude } ||= [ 'approved', 'archived' ];
+
+    my $db  = $self->session->db;
+    my $sql = "select count(distinct asset.assetId) 
+                from asset, assetData 
+                where asset.assetId=assetData.assetId 
+                    and parentId=? 
+                    and (assetData.status in (" . $db->quoteAndJoin( $opt->{statusToInclude} ) . ") 
+                        or assetData.tagId=?)";
+    my @params  = ( $self->getId, $self->session->scratch->get('versionTag') );
+
+    if ( !$opt->{ includeTrash } ) {
+        $sql .= ' AND asset.state=?';
+        push @params, "published";
+    }
+    # XXX This code is duplicated in getLineageSql and getDescendantCount. Merge the three ways?
+    if ( $opt->{ includeOnlyClasses } ) {
+        my @classes;
+        if ( !ref $opt->{includeOnlyClasses} eq 'ARRAY' ) {
+            @classes = $opt->{includeOnlyClasses};
+        }
+        else {
+            @classes = @{ $opt->{includeOnlyClasses} };
+        }
+        $sql .= "AND className IN (" . join( ',', ("?") x @classes ) . ")";
+        push @params, @classes;
+    }
+	my $count = $self->session->db->quickScalar($sql, \@params);
 	return $count;
 }
 
 #-------------------------------------------------------------------
 
-=head2 getDescendantCount ( )
+=head2 getDescendantCount ( opts )
 
 Returns the number of descendants this asset has. This includes only assets that are published, and not
 in the clipboard or trash.
+
+=head3 opts
+
+=head4 includeOnlyClasses
+
+Only count these classes. Arrayref of class names
+
+=head4 statusToInclude
+
+Arrayref of status to include
 
 =cut
 
 sub getDescendantCount {
 	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(distinct asset.assetId) from asset, assetData where asset.assetId=assetData.assetId and asset.state = 'published' and assetData.status in ('approved','archived') and asset.lineage like ?", [$self->get("lineage")."%"]);
-	$count--; # have to subtract self
+        my $opt = shift || {};
+        $opt->{ statusToInclude } ||= [ 'approved', 'archived' ];
+
+        my $db  = $self->session->db;
+
+        my $sql  = "select count(distinct asset.assetId) 
+                    from asset, assetData
+                    where asset.assetId = assetData.assetId 
+                        and asset.assetId != ?
+                        and asset.state = 'published' 
+                        and assetData.status in (" . $db->quoteAndJoin( $opt->{statusToInclude} ) . ") 
+                        and asset.lineage like ? ";
+        my @params = ( $self->getId, $self->get("lineage")."%" );
+
+        # XXX This code is duplicated in getLineageSql and getChildCount. Merge the three ways?
+        if ( $opt->{includeOnlyClasses} ) {
+            my @classes;
+            if ( !ref $opt->{includeOnlyClasses} eq 'ARRAY' ) {
+                @classes = $opt->{includeOnlyClasses};
+            }
+            else {
+                @classes = @{ $opt->{includeOnlyClasses} };
+            }
+            $sql .= "AND className IN (" . join( ',', ("?") x @classes ) . ")";
+            push @params, @classes;
+        }
+
+	my $count = $self->session->db->quickScalar($sql, \@params);
 	return $count;
 }
 
@@ -927,14 +997,21 @@ sub setRank {
 	my $parentLineage = $self->getParentLineage;
 
     my $reverse = ($newRank < $currentRank) ? 1 : 0;
-	my $siblings = $self->getLineage(["siblings"],{returnObjects=>1, invertTree=>$reverse});
 
 	my $temp = substr($self->session->id->generate(),0,6);
 	my $previous = $self->lineage;
 	$self->session->db->beginTransaction;
     $outputSub->('moving %s aside', $self->getTitle);
 	$self->cascadeLineage($temp);
-	foreach my $sibling (@{$siblings}) {
+	my $siblingIter = $self->getLineageIterator(["siblings"],{invertTree=>$reverse});
+        while ( 1 ) {
+            my $sibling;
+            eval { $sibling = $siblingIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $self->session->log->error($x->full_message);
+                next;
+            }
+            last unless $sibling;
 		if (isBetween($sibling->getRank, $newRank, $currentRank)) {
             $outputSub->('moving %s', $sibling->getTitle);
 			$sibling->cascadeLineage($previous);

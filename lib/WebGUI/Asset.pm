@@ -14,7 +14,7 @@ package WebGUI::Asset;
 
 =cut
 
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed weaken );
 use Clone qw(clone);
 use JSON;
 use HTML::Packer;

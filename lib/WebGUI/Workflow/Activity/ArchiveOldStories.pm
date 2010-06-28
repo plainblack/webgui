@@ -72,26 +72,39 @@ sub execute {
     my $self    = shift;
     my $session = $self->session;
     my $epoch   = time();
+    my $expireTime   = $epoch + $self->getTTL();
     my $getAnArchive = WebGUI::Asset::Wobject::StoryArchive->getIsa($session);
     ARCHIVE: while (my $archive = $getAnArchive->()) {
         next ARCHIVE unless $archive && $archive->get("archiveAfter");
         my $archiveDate = $epoch - $archive->get("archiveAfter");
-        my $folders = $archive->getLineage(
+        my $folderIter = $archive->getLineageIterator(
             ['children'],
             {
                 statusToInclude => ['approved'],
                 whereClause     => 'creationDate < '.$session->db->quote($archiveDate),
-                returnObjects   => 1,
             },
         );
-        FOLDER: foreach my $folder (@{ $folders }) {
-            next FOLDER unless $folder;
-            my $stories = $folder->getLineage(
-                ['children'], { returnObjects   => 1, },
-            );
-            STORY: foreach my $story (@{ $stories }) {
-                next STORY unless $story;
+        FOLDER: while ( 1 ) {
+            my $folder;
+            eval { $folder = $folderIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $folder;
+            my $storyIter = $folder->getLineageIterator( ['children'] );
+            STORY: while ( 1 ) {
+                my $story;
+                eval { $story = $storyIter->() };
+                if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                    $session->log->error($x->full_message);
+                    next;
+                }
+                last unless $story;
                 $story->update({ status => 'archived' });
+                if (time() > $expireTime) {
+                    return $self->WAITING(1);
+                }
             }
             $folder->update({ status => 'archived' });
         }

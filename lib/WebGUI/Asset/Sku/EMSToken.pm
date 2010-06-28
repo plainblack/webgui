@@ -208,7 +208,7 @@ Takes form variable badgeId and add the token to the cart.
 
 sub www_addToCart {
 	my ($self) = @_;
-	return $self->session->privilege->noAccess() unless $self->getParent->canView;
+	return $self->session->privilege->noAccess() unless $self->getParent->canView && $self->canView;
 	my $badgeId = $self->session->form->get('badgeId');
 	$self->addToCart({badgeId=>$badgeId});
 	return $self->getParent->www_buildBadge($badgeId);
