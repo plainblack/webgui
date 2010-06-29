@@ -58,6 +58,8 @@ my $tmpl    = $auth->getTemplateChooseUsername;
 isa_ok( $tmpl, 'WebGUI::Asset::Template' );
 is( $tmpl->getId, $session->setting->get('twitterTemplateIdChooseUsername'), "Template taken from settings" );
 
+$session->setting->set( 'twitterConsumerKey' => '3hvJpBr73pa4FycNrqw' );
+$session->setting->set( 'twitterConsumerSecret' => 'E4M5DJ66RAXiHgNCnJES96yTqglttsUes6OBcw9A' );
 my $nt      = $auth->getTwitter;
 isa_ok( $nt, 'Net::Twitter' );
 
