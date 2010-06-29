@@ -11,6 +11,7 @@
  - fixed #11550: Pending assets in the clipboard or trash are not visible from the approval screen
  - fixed #11678: Story Archive leaks version tags
  - fixed #11671: Approving version tags takes up 1 to hour to take affect.
+ - fixed #11663: More detail section of image gallery
 
 
 7.9.7
