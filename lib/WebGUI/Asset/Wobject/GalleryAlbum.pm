@@ -189,8 +189,9 @@ sub appendTemplateVarsFileLoop {
     my $assetIds    = shift;
     my $session     = $self->session;
 
-    for my $assetId (@$assetIds) {
+    ASSET: for my $assetId (@$assetIds) {
         my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        next ASSET unless $asset;
         # Set the parent
         $asset->{_parent} = $self;
         push @{$var->{file_loop}}, $asset->getTemplateVars;

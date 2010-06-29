@@ -17,7 +17,7 @@
  - fixed #11678: Story Archive leaks version tags
  - fixed #11671: Approving version tags takes up 1 to hour to take affect.
  - fixed #11663: More detail section of image gallery
-
+ - fixed #11681: Gallery album chokes on photo w/ missing properties
 
 7.8.21
  - fixed #11597: manageTrash and newlines
