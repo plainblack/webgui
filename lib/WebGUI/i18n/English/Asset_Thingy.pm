@@ -970,8 +970,14 @@ search has been done.|,
     },
 
     'searchFields_is__fieldType__' => {
-        message => q|A boolean indicating wether this field is of type __fieldType__. The first letter of __fieldType__ is always uppercase. Example: for a select box the value of &lt;tmpl_var searchFields_isSelectBox&gt; is true.|,
+        message => q|A boolean indicating whether this field is of type __fieldType__. The first letter of __fieldType__ is always uppercase. Example: for a select box the value of &lt;tmpl_var searchFields_isSelectBox&gt; is true.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
+    },
+
+    'searchFields_listType' => {
+        message => q|A boolean indicating whether this field is a List type field.|,
+        lastUpdated => 1277849256,
         context => q|Description of a tmpl_var for the template help.|,
     },
 

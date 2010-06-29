@@ -3284,7 +3284,7 @@ $self->session->form->process($_) eq "") {
 sequenceNumber');
     while (my $field = $fields->hashRef) {
         if ($field->{searchIn}){
-            my $searchForm = $self->getFormElement($field);
+            my $searchForm = $self->getFormPlugin($field, 1);
             my $searchTextForm = WebGUI::Form::Text($self->session, {
                 name=>"field_".$field->{fieldId},
                 size=>25,
@@ -3299,9 +3299,10 @@ sequenceNumber');
             push(@searchFields_loop, {
                 "searchFields_fieldId" => $field->{fieldId},
                 "searchFields_label" => $field->{label},
-                "searchFields_form" => $searchForm,
+                "searchFields_form" => $searchForm->toHtml,
                 "searchFields_textForm" => $searchTextForm,
                 "searchFields_is".$fieldType => 1,
+                "searchFields_listType" => $searchForm->isa('WebGUI::Form::List'),
             });
 
             my @searchValue = $session->form->process("field_".$field->{fieldId});
