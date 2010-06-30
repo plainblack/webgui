@@ -1749,6 +1749,30 @@ our $I18N = {
 		context => q|commerce setting help|
 	},
 
+    'item taxRate help' => { 
+        message => q|The tax rate for this item.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'item taxAmount help' => { 
+        message => q|The amount of tax for this item.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'item pricePlusTax help' => { 
+        message => q|The amount of tax plus the price for this item.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'item extendedPricePlusTax help' => { 
+        message => q|The amount of tax plus the price for this item, times the quantity of this item in the cart.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
 };
 
 1;

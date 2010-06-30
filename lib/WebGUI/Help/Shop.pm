@@ -126,6 +126,22 @@ our $HELP = {
 					{
 						name		=> "posUserId",
 					},
+					{
+						name		=> "taxRate",
+						description => "item taxRate help",
+					},
+					{
+						name		=> "taxAmount",
+						description => "item taxAmount help",
+					},
+					{
+						name		=> "pricePlusTax",
+						description => "item pricePlusTax help",
+					},
+					{
+						name		=> "extendedPricePlusTax",
+						description => "item extendedPricePlusTax help",
+					},
 				],
 			},
 			{

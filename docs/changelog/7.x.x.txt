@@ -1,4 +1,9 @@
 7.8.23
+ - fixed: missing per-item template variables for the cart.
+ - fixed #11671: Approving version tags takes up 1 to hour to take affect.
+ - fixed #11663: More detail section of image gallery
+ - fixed #11681: Gallery album chokes on photo w/ missing properties
+ - fixed #11612: Thingy: Search on "list" type fields does not work properly
 
 7.8.22
  - fixed #11619: Trash Expired Events not trashing events
@@ -15,10 +20,6 @@
  - fixed #11626: Duplicate messages from Collab Systems
  - fixed #11550: Pending assets in the clipboard or trash are not visible from the approval screen
  - fixed #11678: Story Archive leaks version tags
- - fixed #11671: Approving version tags takes up 1 to hour to take affect.
- - fixed #11663: More detail section of image gallery
- - fixed #11681: Gallery album chokes on photo w/ missing properties
- - fixed #11612: Thingy: Search on "list" type fields does not work properly
 
 7.8.21
  - fixed #11597: manageTrash and newlines
