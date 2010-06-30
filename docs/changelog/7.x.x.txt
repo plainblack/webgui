@@ -1,5 +1,6 @@
 7.9.9
  - fixed #11693: Shopping cart does not show for visitor user
+ - fixed: missing per-item template variables for the cart.
 
 7.9.8
  - fixed #11651: First Day of Week is a string...
