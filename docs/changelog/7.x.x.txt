@@ -1,3 +1,5 @@
+7.9.9
+
 7.9.8
  - fixed #11651: First Day of Week is a string...
  - fixed #11656: Thingy: Select list fields are not sorted properly
