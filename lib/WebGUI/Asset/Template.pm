@@ -112,36 +112,12 @@ sub definition {
             storageIdExample => {
                 fieldType       => 'image',
             },
+            attachmentsJson => {
+                fieldType       => 'JsonTable',
+            },
         },
     };
     return $class->SUPER::definition($session,$definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 addAttachments ( attachments )
-
-Adds attachments to this template.  Attachments is an arrayref of hashrefs,
-where each hashref should have at least url, type, and sequence as keys.
-
-=cut
-
-sub addAttachments {
-    my ($self, $attachments) = @_;
-
-    my $db = $self->session->db;
-
-    foreach my $a (@$attachments) {
-        my %params = (
-            templateId   => $self->getId, 
-            revisionDate => $self->get('revisionDate'),
-            url          => $a->{url},
-            type         => $a->{type},
-            sequence     => $a->{sequence},
-            attachId     => 'new',
-        );
-        $db->setRow('template_attachments', 'attachId', \%params);
-    }
 }
 
 #-------------------------------------------------------------------
@@ -156,7 +132,6 @@ sub addRevision {
     my ( $self, $properties, @args ) = @_;
     my $asset = $self->SUPER::addRevision($properties, @args);
     delete $properties->{templatePacked};
-    $asset->addAttachments($self->getAttachments);
     return $asset;
 }
 
@@ -192,7 +167,6 @@ sub duplicate {
 	my $self = shift;
 	my $newTemplate = $self->SUPER::duplicate;
     $newTemplate->update({isDefault => 0});
-    $newTemplate->addAttachments($self->getAttachments);
     if ( my $storageId = $self->get('storageIdExample') ) {
         my $newStorage  = WebGUI::Storage->get( $self->session, $storageId )->copy;
         $newTemplate->update({ storageIdExample => $newStorage->getId });
@@ -211,7 +185,6 @@ Override to add attachments to package data
 sub exportAssetData {
     my ( $self ) = @_;
     my $data    = $self->SUPER::exportAssetData;
-    $data->{template_attachments} = $self->getAttachments;
     if ( $self->get('storageIdExample') ) {
         push @{$data->{storage}}, $self->get('storageIdExample');
     }
@@ -234,27 +207,18 @@ If defined, will limit the attachments to this type; e.g., passing
 
 sub getAttachments {
 	my ( $self, $type ) = @_;
-	my @params = ($self->getId, $self->get('revisionDate'));
-	my $typeString;
+    if ( !$self->{_attachments} ) {
+        $self->{_attachments} = JSON->new->decode( $self->get('attachmentsJson') );
+    }
 
-	if ($type) {
-		$typeString = 'AND type = ?';
-		push(@params, $type);
-	}
+    my $output  = [];
+    for my $attach ( @{$self->{_attachments}} ) {
+        if ( $attach->{type} eq $type ) {
+            push @{$output}, $attach;
+        }
+    }
 
-	my $sql = qq{
-		SELECT 
-			* 
-		FROM 
-			template_attachments 
-		WHERE 
-			templateId = ?
-            AND revisionDate = ?
-			$typeString
-		ORDER BY
-			type, sequence ASC
-	};
-	return $self->session->db->buildArrayRefOfHashRefs($sql, \@params);
+    return $output;
 }
 
 #-------------------------------------------------------------------
@@ -329,73 +293,29 @@ sub getEditForm {
 			);
 	}
 
-    ### Template attachments
-	my $session = $self->session;
-	my @headers = map { '<th>' . $i18n->get("attachment header $_") . '</th>' } 
-                      qw(index type url remove);
-
-    tie my %attachmentTypeNames, 'Tie::IxHash' => (
-        stylesheet => $i18n->get('css label'),
-        headScript => $i18n->get('js head label'),
-        bodyScript => $i18n->get('js body label'),
+    $properties->jsonTable(
+        name        => 'attachmentsJson', 
+        value       => $self->get('attachmentsJson'),
+        label       => $i18n->get("attachments display label"),
+        fields      => [
+            {
+                type            => "text",
+                name            => "url",
+                label           => $i18n->get('attachment header url'),
+                size            => '48',
+            },
+            {
+                type            => "select",
+                name            => "type",
+                label           => $i18n->get('attachment header type'),
+                options         => [
+                    stylesheet => $i18n->get('css label'),
+                    headScript => $i18n->get('js head label'),
+                    bodyScript => $i18n->get('js body label'),
+                ],
+            },
+        ],
     );
-
-	my $table = '<table id="attachmentDisplay">';
-	$table .= "<thead><tr>@headers</tr></thead><tbody id='addAnchor'>";
-	foreach my $a ( @{ $self->getAttachments } ) {
-		my ($seq, $type, $url) = @{$a}{qw(sequence type url)};
-        # escape macros in the url so they don't get processed
-        $url =~ s/\^/&#94;/g;
-		my $del = WebGUI::Form::checkbox(
-			$session, { 
-				name   => 'removeAttachment',
-				value  => $url,
-				extras => 'class="id"',
-            }
-        );
-		my @data = (
-			"<td class='index'>$seq</td>", 
-			"<td class='type'>$type</td>", 
-			"<td class='url'>$url</td>", 
-			"<td>$del</td>",
-		);
-		$table .= "<tr class='existingAttachment'>@data</tr>";
-	}
-	$table .= '</tbody></table>';
-	my $properties = $tabform->getTab('properties');
-	my $label = $i18n->get('attachment display label');
-	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
-
-	my @data = map { "<td>$_</td>" } (
-		WebGUI::Form::integer(
-			$session, { size => '2', id => 'addBoxIndex' }
-		),
-		WebGUI::Form::selectBox(
-			$session, { options => \%attachmentTypeNames, id => 'addBoxType' }
-		),
-		WebGUI::Form::text($session, { id => 'addBoxUrl', size => 40 }),
-		WebGUI::Form::button(
-			$session, { 
-				value  => $i18n->get('attachment add button'), 
-				extras => 'onclick="addClick()"' 
-			}
-		),
-	);
-
-	my ($style, $url) = $self->session->quick(qw(style url));
-	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),           {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/json/json-min.js'),             {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/dom/dom-min.js'),               {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/event/event-min.js'),           {type => 'text/javascript'});
-	$style->setScript($url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
-	$style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),          {type => 'text/javascript'});
-
-	pop(@headers);
-	my $scriptUrl = $url->extras('templateAttachments.js');
-	$table = "<table id='addBox'><tr>@headers</tr><tr>@data</tr></table>";
-	$table .= qq(<script type="text/javascript" src="$scriptUrl"></script>);
-	$label = $i18n->get('attachment add field label');
-	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
 
         $properties->image( 
             name        => 'storageIdExample',
@@ -690,28 +610,7 @@ sub processPropertiesFromFormPost {
     }
 
     ### Template attachments
-    my $f    = $self->session->form;
-    my $p    = $f->paramsHashRef;
-    my @nums = grep {$_} map { my ($i) = /^attachmentUrl(\d+)$/; $i } keys %$p;
-    my @add;
-    
-    # Remove all attachments first, then re-add whatever's left in the form
-    $self->removeAttachments;
-
-    foreach my $n (@nums) {
-        my ($index, $type, $url) = 
-            map { $f->process('attachment' . $_ . $n) }
-            qw(Index Type Url);
-
-        push(
-            @add, {
-                sequence     => $index,
-                url          => $url,
-                type         => $type,
-            }
-        );
-    }
-    $self->addAttachments(\@add);
+    $self->update({ attachmentsJson => $f->process( 'attachmentsJson', 'JsonTable' ), });
 
     return;
 }
