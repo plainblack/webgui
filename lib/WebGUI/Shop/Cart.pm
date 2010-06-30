@@ -1099,15 +1099,15 @@ sub www_view {
                                                   options => \%specialAddressOptions,
                                                   extras  => q|class="itemAddressMenu"|,
                                               });
+            $taxDriver->appendCartItemVars( \%properties, $item );
         }
 
-        $taxDriver->appendCartItemVars( \%properties, $item );
 
         push(@items, \%properties);
     }
 
     $var{items}                = \@items;
-    if ($var{shippableItemsInCart}) {
+    if (! $var{userIsVisitor} && $var{shippableItemsInCart}) {
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
         my $numberOfOptions = scalar keys %{ $options };
