@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+migrateAttachmentsToJson( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,40 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Move Template attachments to JSON collateral
+sub migrateAttachmentsToJson {
+    my $session = shift;
+    print "\tMoving template attachments to JSON... " unless $quiet;
+    # and here's our code
+    $session->db->write(
+        "ALTER TABLE template ADD attachmentsJson LONGTEXT"
+    );
+
+    my $attach;     # hashref (template) of hashrefs (revisionDate)
+                    # of arrayrefs (attachments) of hashrefs (attachment)
+    my $sth = $session->db->read( "SELECT * FROM template_attachments" );
+    while ( my $row = $sth->hashRef ) {
+        push @{ $attach->{ $row->{templateId} }{ $row->{revisionDate} } }, {
+            url         => $row->{url},
+            type        => $row->{type},
+        };
+    }
+
+    for my $templateId ( keys %{ $attach } ) {
+        for my $revisionDate ( keys %{ $attach->{$templateId} } ) {
+            my $data    = $attach->{$templateId}{$revisionDate};
+            my $asset   = WebGUI::Asset->newByDynamicClass( $session, $templateId, $revisionDate );
+            $asset->update({ attachmentsJson => JSON->new->encode( $data ) });
+        }
+    }
+
+    $session->db->write(
+        "DROP TABLE template_attachments"
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

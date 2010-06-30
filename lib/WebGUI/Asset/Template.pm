@@ -207,12 +207,18 @@ If defined, will limit the attachments to this type; e.g., passing
 
 sub getAttachments {
 	my ( $self, $type ) = @_;
-    if ( !$self->{_attachments} ) {
-        $self->{_attachments} = JSON->new->decode( $self->get('attachmentsJson') );
+
+    return [] if !$self->get('attachmentsJson');
+
+    my $attachments = JSON->new->decode( $self->get('attachmentsJson') );
+
+    # We want it all and we want it now
+    if ( !$type ) {
+        return $attachments;
     }
 
     my $output  = [];
-    for my $attach ( @{$self->{_attachments}} ) {
+    for my $attach ( @{$attachments} ) {
         if ( $attach->{type} eq $type ) {
             push @{$output}, $attach;
         }
@@ -293,7 +299,7 @@ sub getEditForm {
 			);
 	}
 
-    $properties->jsonTable(
+    $tabform->getTab('properties')->jsonTable(
         name        => 'attachmentsJson', 
         value       => $self->get('attachmentsJson'),
         label       => $i18n->get("attachments display label"),
@@ -317,7 +323,7 @@ sub getEditForm {
         ],
     );
 
-        $properties->image( 
+        $tabform->getTab('properties')->image( 
             name        => 'storageIdExample',
             value       => $self->getValue('storageIdExample'),
             label       => $i18n->get('field storageIdExample'),
@@ -588,6 +594,7 @@ Extends the master class to handle template parsers, namespaces and template att
 
 sub processPropertiesFromFormPost {
 	my $self = shift;
+        my $session = $self->session;
 	$self->SUPER::processPropertiesFromFormPost;
     # TODO: Perhaps add a way to check template syntax before it blows stuff up?
     my %data;
@@ -610,7 +617,7 @@ sub processPropertiesFromFormPost {
     }
 
     ### Template attachments
-    $self->update({ attachmentsJson => $f->process( 'attachmentsJson', 'JsonTable' ), });
+    $self->update({ attachmentsJson => $session->form->process( 'attachmentsJson', 'JsonTable' ), });
 
     return;
 }
@@ -646,70 +653,6 @@ sub processRaw {
 	my $vars = shift;
 	my $parser = shift;
 	return $class->getParser($session,$parser)->process($template, $vars);
-}
-
-#-------------------------------------------------------------------
-
-=head2 purge ( )
-
-Extend the master to purge attachments in all revisions.
-
-=cut
-
-sub purge {
-    my $self = shift;
-    $self->session->db->write('delete from template_attachments where templateId=?', [$self->getId]);
-    return $self->SUPER::purge(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 purgeRevision ( )
-
-Extend the master purgeRevision to purge attachments
-
-=cut
-
-sub purgeRevision {
-    my $self = shift;
-    $self->removeAttachments;
-    return $self->SUPER::purgeRevision(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 removeAttachments ( urls )
-
-Removes attachments. C<urls> is an arrayref of URLs to remove. If C<urls>
-is not defined, will remove all attachments for this revision.
-
-=cut
-
-sub removeAttachments {
-    my ($self, $urls) = @_;
-
-    my $db    = $self->session->db;
-    my $dbh   = $db->dbh;
-    my $rmsql = qq{
-        DELETE FROM 
-            template_attachments
-        WHERE
-            templateId = ?
-            AND revisionDate = ?
-    };
-    
-    if ( $urls && @{$urls} ) {
-        my $in    = join(',', map { $dbh->quote($_) } @{$urls});
-        $rmsql .= qq{
-            AND url IN ($in)
-        };
-    }
-
-    my @params = (
-        $self->getId,
-        $self->get('revisionDate'),
-    );
-    $db->write($rmsql, \@params);
 }
 
 #-------------------------------------------------------------------
