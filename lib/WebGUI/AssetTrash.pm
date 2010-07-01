@@ -291,11 +291,16 @@ sub _invokeWorkflowOnExportedFiles {
     if ($workflowId) {
         my ($lastExportedAs) = $self->get("lastExportedAs");
         my $wfInstance = WebGUI::Workflow::Instance->create($self->session, { workflowId => $workflowId });
-        $wfInstance->setScratch(
-            WebGUI::Workflow::Activity::DeleteExportedFiles::DELETE_FILES_SCRATCH() =>
-            Storable::freeze([ defined($lastExportedAs) ? ($lastExportedAs) : () ])
-        );
-        $wfInstance->start(1);
+        if ($wfInstance) {
+            $wfInstance->setScratch(
+                WebGUI::Workflow::Activity::DeleteExportedFiles::DELETE_FILES_SCRATCH() =>
+                Storable::freeze([ defined($lastExportedAs) ? ($lastExportedAs) : () ])
+            );
+            $wfInstance->start(1);
+        }
+        else {
+            $self->session->log->warn('The Purge Workflow from the settings has been deleted and cannot be run.');
+        }
     }
 }
 
