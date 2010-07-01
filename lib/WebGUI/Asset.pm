@@ -2605,7 +2605,15 @@ sub update {
 
             # set the property
             if ($propertyDefinition->{serialize}) {
-                $setPairs{$property} = JSON->new->canonical->encode($value);
+                # Only serialize references
+                if ( ref $value ) {
+                    $setPairs{$property} = JSON->new->canonical->encode($value);
+                }
+                # Passing already serialized JSON string
+                elsif ( $value ) {
+                    $setPairs{$property} = $value;
+                    $value = JSON->new->decode( $value ); # for setting in _properties, below
+                }
             }
             else {
                 $setPairs{$property} = $value;

@@ -86,6 +86,23 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getOriginalValue ( )
+
+Get the original value, encoding to JSON if necessary
+
+=cut
+
+sub getOriginalValue {
+    my ( $self ) = @_;
+    my $value   = $self->SUPER::getOriginalValue;
+    if ( ref $value eq "ARRAY" ) {
+        return JSON->new->encode( $value );
+    }
+    return $value;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getValue ( value )
 
 Get the value of the field. Substitute id fields with GUIDs.
@@ -96,6 +113,7 @@ sub getValue {
     my ( $self, $value ) = @_;
     $value ||= $self->SUPER::getValue;
 
+    $self->session->log->info( "JsonTable Got $value from form" );
     $value  = JSON->new->decode( $value );
 
     for my $row ( @{$value} ) {
@@ -162,13 +180,14 @@ sub toHtml {
             $fieldHtml  .= '<input type="hidden" class="jsontable_id" name="' . $fieldName . '" value="new" />';
         }
         else {  # Readonly or unknown
-            $fieldHtml  = '';
+            $fieldHtml  = '&nbsp;';
         }
 
         $output .= '<td>' . $fieldHtml . '</td>';
     }
 
-    $output .= '</tr></tbody></table>';
+    $output .= '<td></td>'      # Extra cell for buttons
+            . '</tr></tbody></table>';
 
     # Build the existing rows
     $output .= '<input type="hidden" name="' . $self->get('name') . '" value="' . $value . '" />';
@@ -185,7 +204,8 @@ sub toHtml {
     $output .= sprintf '<script src="%s" type="text/javascript"></script>', 
                 $url->extras('yui-webgui/build/form/jsontable.js');
     $output .= '<script type="text/javascript">'
-            . q{new WebGUI.Form.JsonTable("} . $self->get('name') . q{","} . $self->get( 'id' ) . q{");}
+            . q{new WebGUI.Form.JsonTable("} . $self->get('name') . q{","} . $self->get( 'id' ) . q{", }
+            . JSON->new->encode( $self->get('fields') ) . q{ );}
             . '</script>';
 
     return $output;
