@@ -152,7 +152,27 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 127
+#### TestAsset class to test definition / update relationship
+BEGIN { $INC{ 'WebGUI/Asset/TestAsset.pm' } = __FILE__ }
+package WebGUI::Asset::TestAsset;
+
+our @ISA = ( 'WebGUI::Asset' );
+sub definition {
+    my ( $class, $session, $definition ) = @_;
+
+    # Alter assetData fields for testing purposes. Do not do 
+    # this in normal circumstances. Ever.
+    $definition = $class->SUPER::definition( $session, $definition );
+
+    # Make synopsis serialized
+    $definition->[0]->{properties}->{synopsis}->{serialize} = 1;
+
+    return $definition;
+}
+
+package main;
+
+plan tests => 132
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -256,6 +276,40 @@ my $tempNode = WebGUI::Asset->getTempspace($session);
 isa_ok($tempNode, 'WebGUI::Asset::Wobject::Folder');
 is($tempNode->getId, 'tempspace0000000000000', 'Tempspace Asset ID check');
 is($tempNode->getParent->getId, $rootAsset->getId, 'Tempspace parent is Root Asset');
+
+
+################################################################
+#
+# update
+#
+################################################################
+
+# Create a new TestAsset instance
+my $ta  = $importNode->addChild( { 
+                className       => 'WebGUI::Asset::TestAsset',
+} );
+addToCleanup( $ta );
+isa_ok( $ta, 'WebGUI::Asset::TestAsset', 'addChild returns correct object' );
+
+ok(
+    eval { $ta->update({ synopsis => [ "one", "two" ] }); 1; },
+    'update() succeeds with ref on serialized property',
+);
+cmp_deeply(
+    $ta->get('synopsis'),
+    [ "one", "two" ],
+    "serialized property returns deserialized ref",
+);
+
+ok(
+    eval { $ta->update({ synopsis => '[ "two", "three" ]', }); 1; },
+    'update() succeeds with serialized string on serialized property',
+);
+cmp_deeply(
+    $ta->get('synopsis'),
+    [ "two", "three" ],
+    "serialized property returns deserialized ref",
+);
 
 ################################################################
 #
@@ -1104,3 +1158,5 @@ sub getTitleTests {
     },
     );
 }
+
+
