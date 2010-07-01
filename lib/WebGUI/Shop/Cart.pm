@@ -762,6 +762,15 @@ sub updateFromForm {
         $error{id $self} = $i18n->get('mixed items warning');
     }
 
+    my @cartItemIds = $form->process('remove_item', 'checkList');
+    foreach my $cartItemId (@cartItemIds) {
+        my $item = eval { $self->getItem($cartItemId); };
+        $item->remove if ! Exception::Class->caught();
+    }
+
+    ##Visitor cannot have an address book, or set a payment gateway, so skip the rest of this.
+    return 1 if $session->user->isVisitor;
+
     my $book        = $self->getAddressBook;
 
     my $cartProperties = {};
@@ -825,12 +834,6 @@ sub updateFromForm {
     $cartProperties->{ shipperId } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
     $cartProperties->{ gatewayId } = $form->process( 'gatewayId' ) if $form->process( 'gatewayId' );
     $self->update( $cartProperties );
-
-    my @cartItemIds = $form->process('remove_item', 'checkList');
-    foreach my $cartItemId (@cartItemIds) {
-        my $item = eval { $self->getItem($cartItemId); };
-        $item->remove if ! Exception::Class->caught();
-    }
 }
 
 #-------------------------------------------------------------------

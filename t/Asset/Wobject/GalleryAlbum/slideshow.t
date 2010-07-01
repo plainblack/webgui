@@ -61,6 +61,7 @@ for my $i ( 0 .. 5 ) {
 }
 
 $versionTag->commit;
+WebGUI::Test->addToCleanup($versionTag);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -78,8 +79,4 @@ TODO: {
 # Test www_slideshow
 
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+#vim:ft=perl

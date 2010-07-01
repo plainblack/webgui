@@ -420,10 +420,6 @@ An array reference containing a list of asset classes to remove from the result 
 
 A boolean indicating that we should return objects rather than asset ids.
 
-=head4 returnSQL
-
-A boolean indicating that we should return the sql statement rather than asset ids.
-
 =head4 invertTree
 
 A boolean indicating whether the resulting asset tree should be returned in reverse order.
@@ -446,7 +442,8 @@ A string containing as asset class to join in. There is no real reason to use a 
 
 =head4 whereClause
 
-A string containing extra where clause information for the query.
+A string containing extra WHERE clause information for the query.  The AND conjunction will be added internally, so the clause
+should not start with AND.
 
 =head4 orderByClause 
 
@@ -591,6 +588,7 @@ An integer describing how many levels of ancestry from the start point that shou
 =head4 excludeClasses
 
 An array reference containing a list of asset classes to remove from the result set. The opposite of the includOnlyClasses rule.
+Each class is internally appended with a SQL wildcard, so any subclass will also be excluded.
 
 =head4 invertTree
 

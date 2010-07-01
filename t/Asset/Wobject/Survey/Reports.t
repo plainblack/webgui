@@ -25,18 +25,18 @@ plan tests => 3;
 # put your tests here
 
 use_ok('WebGUI::Asset::Wobject::Survey');
-my ($survey);
-
-# Returns the contents of the Survey_tempReport table
-sub getAll { $session->db->buildArrayRefOfHashRefs('select * from Survey_tempReport where assetId = ?', [$survey->getId]) }
 
 my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->addToCleanup($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey
-$survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+my $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+WebGUI::Test->addToCleanup($survey);
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
+
+# Returns the contents of the Survey_tempReport table
+sub getAll { $session->db->buildArrayRefOfHashRefs('select * from Survey_tempReport where assetId = ?', [$survey->getId]) }
 
 my $sJSON = $survey->getSurveyJSON;
 
@@ -124,12 +124,4 @@ superhashof({
     value => 20, # e.g. score
 })]);
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $survey->purge() if $survey;
-
-    my $versionTag = WebGUI::VersionTag->getWorking( $session, 1 );
-    $versionTag->rollback() if $versionTag;
-}
+#vim:ft=perl

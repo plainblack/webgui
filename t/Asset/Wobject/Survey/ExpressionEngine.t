@@ -261,3 +261,5 @@ cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 199} target}
     cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 199} target}, {userId => $user->userId} ),
         { jump => 'target', tags => {} }, 'first external tag lookups still works' );
 }
+
+#vim:ft=perl

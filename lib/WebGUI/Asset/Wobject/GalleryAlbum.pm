@@ -211,8 +211,9 @@ sub appendTemplateVarsFileLoop {
     my $assetIds    = shift;
     my $session     = $self->session;
 
-    for my $assetId (@$assetIds) {
-        my $asset = WebGUI::Asset->newById($session, $assetId);
+    ASSET: for my $assetId (@$assetIds) {
+        my $asset = eval { WebGUI::Asset->newById($session, $assetId); };
+        next ASSET if Exception::Class->caught();
         # Set the parent
         $asset->{_parent} = $self;
         push @{$var->{file_loop}}, $asset->getTemplateVars;

@@ -23,6 +23,7 @@ use Test::More;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 
 $versionTag->set({name=>"Album Test"});
 
@@ -99,8 +100,4 @@ is( $album->getNextFileId(''), undef, 'Return undef if empty string specified');
 is( $album->getNextFileId('123456'), undef, 'Return undef if non-existing id specified');
 is( $album->getNextFileId($album->getId), undef, 'Return undef if non-child id specified');
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+#vim:ft=perl

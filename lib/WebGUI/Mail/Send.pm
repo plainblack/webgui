@@ -512,7 +512,6 @@ sub send {
     my $status     = 1;
     
     if ($mail->parts <= 1) {
-        warn "making singlepart";
         $mail->make_singlepart;
     }
     if ($mail->head->get("To")) {

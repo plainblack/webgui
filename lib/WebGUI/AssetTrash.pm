@@ -57,39 +57,20 @@ sub getAssetsInTrash {
 	my $self = shift;
 	my $limitToUser = shift;
 	my $userId = shift || $self->session->user->userId;
-	my @assets;
 	my $limit;
 	if ($limitToUser) {
-		$limit = "and asset.stateChangedBy=".$self->session->db->quote($userId);
+		$limit = "asset.stateChangedBy=".$self->session->db->quote($userId);
 	}
-	my $sth = $self->session->db->read("
-        select 
-                asset.assetId, 
-                assetData.revisionDate
-        from 
-                asset                 
-        left join 
-                assetData on asset.assetId=assetData.assetId 
-        where 
-                asset.state='trash'
-                and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
-                $limit
-		group by
-			assetData.assetId
-                order by 
-                        assetData.title desc
-                        ");
-    while (my ($id, $date) = $sth->array) {
-		my $asset = WebGUI::Asset->newById($self->session, $id, $date);
-        if (!Exception::Class->caught()) {
-            push(@assets, $asset);
-        }
-        else {
-            $self->session->errorHandler->error("AssetTrash::getAssetsInTrash - failed to instanciate asset with assetId $id and revisionDate $date");
-        }
-    }
-	$sth->finish;
-	return \@assets;
+    my $root = WebGUI::Asset->getRoot($self->session);
+    return $root->getLineage(
+       ["descendants", ],
+       {
+           statesToInclude => ["trash"],
+           statusToInclude => [qw/approved pending archived/],
+           returnObjects   => 1,
+           whereClause     => $limit,
+       }
+    );
 }
 
 #----------------------------------------------------------------------------

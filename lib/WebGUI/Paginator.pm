@@ -17,6 +17,7 @@ package WebGUI::Paginator;
 use strict;
 use WebGUI::International;
 use WebGUI::Utility;
+use List::Util qw/min/;
 
 =head1 NAME
 
@@ -428,10 +429,10 @@ sub getPageData {
     }
 
     #Handle setByArrayRef or the old setDataByQuery method
-    my @pageRows = ();
-    my $rowsPerPage = $self->{_rpp};
+    my $rowsPerPage  = $self->{_rpp};
     my $pageStartRow = ($pageNumber*$rowsPerPage)-$rowsPerPage;
-    my $pageEndRow = $pageNumber*$rowsPerPage;
+    my $pageEndRow   = min($pageNumber*$rowsPerPage, $#{$allRows}+1);
+    my @pageRows     = ();
     for (my $i=$pageStartRow; $i<$pageEndRow; $i++) {
        $pageRows[$i-$pageStartRow] = $allRows->[$i] if ($i <= $#{$self->{_rowRef}});
     }

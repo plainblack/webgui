@@ -1,3 +1,20 @@
+7.9.8
+ - fixed #11651: First Day of Week is a string...
+ - fixed #11656: Thingy: Select list fields are not sorted properly
+ - fixed #11662: yahooapis.com sourced links
+ - fixed #11658: tmpl var message missing in template help for the cart
+ - fixed: many other template variables for the cart
+ - fixed #11628: Message Board: Last Post doesn't show up in CS Thread List
+ - fixed #11646: Post and Thread Last Post
+ - fixed #11626: Duplicate messages from Collab Systems
+ - fixed #11667: Shop: unable to remove item from Cart
+ - fixed #11550: Pending assets in the clipboard or trash are not visible from the approval screen
+ - fixed #11678: Story Archive leaks version tags
+ - fixed #11671: Approving version tags takes up 1 to hour to take affect.
+ - fixed #11663: More detail section of image gallery
+ - fixed #11681: Gallery album chokes on photo w/ missing properties
+ - fixed #11612: Thingy: Search on "list" type fields does not work properly
+
 7.9.7
  - added #11571: Allow return from photo edit view to gallery edit view
  - fixed: Reject form submissions without image selected for upload in edit view of Photo asset 

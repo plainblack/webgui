@@ -154,6 +154,7 @@ checkModule( "Cache::FastMmap",                          );
 checkModule('IO::Socket::SSL',                           );
 checkModule('Package::Stash',                            );
 checkModule('HTTP::Exception',                           );
+checkModule('Net::Twitter',                 "3.13006"    );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

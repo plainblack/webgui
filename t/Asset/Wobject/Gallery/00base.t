@@ -25,6 +25,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Gallery Test"});
+WebGUI::Test->addToCleanup($versionTag);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -65,3 +66,5 @@ $gallery->purge;
 
 eval { WebGUI::Asset->newById($session, $properties->{assetId}); };
 ok( Exception::Class->caught(), 'Gallery no longer able to be instanciated after purge');
+
+#vim:ft=perl

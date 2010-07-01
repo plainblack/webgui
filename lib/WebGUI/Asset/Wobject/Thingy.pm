@@ -996,20 +996,8 @@ sub getFormPlugin {
     eval { WebGUI::Pluggable::load($class) };
     if ($class->isa('WebGUI::Form::List')) {
         delete $param{size};
-
         my $values = WebGUI::Operation::Shared::secureEval($session,$data->{possibleValues});
-        if (ref $values eq 'HASH') {
-            $param{options} = $values;
-        }
-        else{
-            my %options;
-            tie %options, 'Tie::IxHash';
-            foreach (split(/\n/x, $data->{possibleValues})) {
-                s/\s+$//x; # remove trailing spaces
-                    $options{$_} = $_;
-            }
-            $param{options} = \%options;
-        }
+        $param{options} = $values;
     }
 
     if ($data->{fieldType} eq "YesNo") {
@@ -3238,7 +3226,7 @@ $self->session->form->process($_) eq "") {
 sequenceNumber');
     while (my $field = $fields->hashRef) {
         if ($field->{searchIn}){
-            my $searchForm = $self->getFormElement($field);
+            my $searchForm = $self->getFormPlugin($field, 1);
             my $searchTextForm = WebGUI::Form::Text($self->session, {
                 name=>"field_".$field->{fieldId},
                 size=>25,
@@ -3253,9 +3241,10 @@ sequenceNumber');
             push(@searchFields_loop, {
                 "searchFields_fieldId" => $field->{fieldId},
                 "searchFields_label" => $field->{label},
-                "searchFields_form" => $searchForm,
+                "searchFields_form" => $searchForm->toHtml,
                 "searchFields_textForm" => $searchTextForm,
                 "searchFields_is".$fieldType => 1,
+                "searchFields_listType" => $searchForm->isa('WebGUI::Form::List'),
             });
 
             my @searchValue = $session->form->process("field_".$field->{fieldId});
