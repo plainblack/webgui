@@ -120,20 +120,6 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getIp ( )
-
-Returns the user's IP address.
-
-=cut
-
-sub getIp {
-    my $self = shift;
-    return $self->get('REMOTE_ADDR');
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 new ( )
 
 Constructor. Returns an env object.

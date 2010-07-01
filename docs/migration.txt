@@ -6,7 +6,7 @@ The information contained herein documents the API changes that have occurred in
 
 
 WebGUI::Config
-=============
+==============
 WebGUI::Config->new has a new API.  Its WebGUI root parameter has been eliminated.  It now only accepts a config file as either an absolute path, or a path relative to WebGUI's etc directory.
 
 my $config = WebGUI::Config->new($filename);
@@ -14,10 +14,19 @@ my $config = WebGUI::Config->new($filename);
 
 
 WebGUI::Session
-=============
+===============
 WebGUI::Session->open has a new API.  Its WebGUI root parameter has been eliminated.  The config file it is given can be either an absolute path, or a path relative to WebGUI's etc directory.
 
-my $session = WebGUI::Session->open($configFile, $request, $server);
+my $session = WebGUI::Session->open($configFile);
+
+perldoc WebGUI::Session for more details about the arguments.
+
+
+WebGUI::Session::Env
+====================
+WebGUI::Session::Env has been moved into WebGUI::Session::Request.  A listing of replacements and equivalents follows:
+
+$session->env->getIp => $session->request->address
 
 
 

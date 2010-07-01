@@ -830,7 +830,7 @@ sub hasRated {
         return 1 if $self->isPoster;
 	my $flag = 0;
 	if ($self->session->user->isVisitor) {
-        	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and ipAddress=?",[$self->getId, $self->session->env->getIp]);
+        	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and ipAddress=?",[$self->getId, $self->session->request->address]);
 	} else {
         	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and userId=?",[$self->getId, $self->session->user->userId]);
 	}
@@ -895,7 +895,7 @@ sub insertUserPostRating {
 	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values (?,?,?,?,?)",
 		[$self->getId,
 		 $self->session->user->userId,
-		 $self->session->env->getIp,
+		 $self->session->request->address,
 		 time(),
 		 $rating,]
 	);

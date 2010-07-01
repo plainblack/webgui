@@ -299,7 +299,7 @@ sub canUseAdminMode {
 	my $pass = 1;
 	my $subnets = $self->session->config->get("adminModeSubnets") || [];
 	if (scalar(@$subnets)) {
-		$pass = WebGUI::Utility::isInSubnet($self->session->env->getIp, $subnets);
+		$pass = WebGUI::Utility::isInSubnet($self->session->request->address, $subnets);
 	}
 
 	return $pass && $self->isInGroup(12)

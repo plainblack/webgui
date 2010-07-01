@@ -565,7 +565,7 @@ sub editThingDataSave {
     if ($thingDataId eq "new"){
         $thingData{dateCreated} = time();
         $thingData{createdById} = $session->user->userId;
-        $thingData{ipAddress} = $session->env->getIp;
+        $thingData{ipAddress} = $session->request->address;
     }
     else {
         %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)

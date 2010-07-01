@@ -182,7 +182,7 @@ sub new {
             my $time = time();
             my $timeout = $session->setting->get("sessionTimeout");
 			$self->{_var}{lastPageView} = $time;
-			$self->{_var}{lastIP} = $session->env->getIp;
+			$self->{_var}{lastIP} = $session->request->address;
 			$self->{_var}{expires} = $time + $timeout;
             if ($self->{_var}{nextCacheFlush} > 0 && $self->{_var}{nextCacheFlush} < $time) {
                 delete $self->{_var}{nextCacheFlush};
@@ -247,7 +247,7 @@ sub start {
 	$self->{_var} = {
 		expires      => $time + $timeout,
 		lastPageView => $time,
-		lastIP       => $session->env->getIp,
+		lastIP       => $session->request->address,
 		adminOn      => 0,
 		userId       => $userId
 	};

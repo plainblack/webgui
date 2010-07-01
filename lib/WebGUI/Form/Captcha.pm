@@ -111,7 +111,7 @@ sub getValue {
         my $ua = LWP::UserAgent->new;
         my $res = $ua->post('http://api-verify.recaptcha.net/verify', {
             privatekey  => $privKey,
-            remoteip    => $self->session->env->getIp,
+            remoteip    => $self->session->request->env->{REMOTE_ADDR},
             challenge   => $challenge,
             response    => $response,
         });

@@ -100,7 +100,7 @@ sub _logLogin {
             $_[0],
             $_[1],
             time(),
-            $self->session->env->getIp,
+            $self->session->request->address,
             $self->session->env->get("HTTP_USER_AGENT"),
             $self->session->getId,
             time(),

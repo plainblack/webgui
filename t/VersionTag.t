@@ -289,6 +289,7 @@ ok($adminSiteWideTag->get(q{isSiteWide}), 'versionTagMode siteWide + admin inher
 ok($adminSiteWideTag->getId() eq $siteWideTagId, 'versionTagMode siteWide + admin inherited: empty has same ID as site wide');
 
 
+$adminUserTag->rollback();
 $admin_session->var()->end();
 $admin_session->close();
 
@@ -314,7 +315,6 @@ isnt(
 
 $userTag->rollback();
 $siteWideTag->rollback();
-$adminUserTag->rollback();
 
 ## Additional VersionTagMode to make sure that auto commit happens only when user is tag creator and tag is not site wide.
 ## See bug #10689 (Version Tag Modes)
@@ -329,7 +329,6 @@ $adminUserTag->rollback();
 
     # create admin session
     my $admin_session = WebGUI::Test->newSession;
-    WebGUI::Test->addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});

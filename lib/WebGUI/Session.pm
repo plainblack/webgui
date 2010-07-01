@@ -20,6 +20,8 @@ use 5.010;
 use CHI;
 use File::Temp qw( tempdir );
 use Scalar::Util qw( weaken );
+use HTTP::Message::PSGI;
+use HTTP::Request::Common;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
@@ -480,15 +482,20 @@ sub open {
     my $self = { _config => $config };
     bless $self, $class;
 
-    if ($env) {
-        my $request = WebGUI::Session::Request->new($env);
-        $self->{_request} = $request;
-        $self->{_response} = $request->new_response( 200 );
-        
-        # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
-        # wasn't given explicitly
-        $sessionId ||= $request->cookies->{$config->getCookieName};
+    ##No env was passed, so construct one
+    if (! $env) {
+        my $url = 'http://' . $config->get('sitename')->[0];
+        my $request = HTTP::Request::Common::GET($url);
+        $env = $request->to_psgi;
     }
+
+    my $request = WebGUI::Session::Request->new($env);
+    $self->{_request} = $request;
+    $self->{_response} = $request->new_response( 200 );
+    
+    # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
+    # wasn't given explicitly
+    $sessionId ||= $request->cookies->{$config->getCookieName};
     
     # If the sessionId is still unset or is invalid, generate a new one
     if (!$sessionId || !$self->id->valid($sessionId)) {
