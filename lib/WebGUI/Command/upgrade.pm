@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+package WebGUI::Command::upgrade;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
@@ -10,43 +10,37 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use WebGUI::Command -command;
 use strict;
 use warnings;
+
 use WebGUI::Paths -inc;
 use WebGUI::Upgrade;
-use Getopt::Long ();
-use Pod::Usage ();
 
-Getopt::Long::GetOptions(
-    'help'              => \( my $help ),
-    'history'           => \( my $history ),
-    'override'          => \( my $override ),
-    'quiet'             => \( my $quiet ),
-    'doit'              => \( my $doit ),
-    'skipDelete'        => \( my $skipDelete ),
-    'skipMaintenance'   => \( my $skipMaintenance ),
-    'skipbackup'        => \( my $skipBackup ),
-    'backupDir=s'       => \( my $backupDir ),
-    'mysql=s'           => \( my $mysql ),
-    'mysqldump=s'       => \( my $mysqldump ),
-) or Pod::Usage::pod2usage(2);
-
-if ($help) {
-    Pod::Usage::pod2usage(
-        -verbosity => 1,
-        -exitval => 1,
+sub opt_spec {
+    return (
+        [ 'history',    'Display upgrade history for a site' ],
+        [ 'override',   'Force upgrade to run even if not running as root' ],
+        [ 'quiet',      'Don\'t show progress reports' ],
+        [ 'doit',       'Run upgrade' ],
+        [ 'skipDelete', 'Don\'t clear cache' ],
+        [ 'skipMaintenance', 'Don\'t turn on maintenance mode for sites while upgrading' ],
+        [ 'skipBackup', 'Don\'t create database backups' ],
+        [ 'backupDir=s', 'Directory to store database backups' ],
+        [ 'mysql=s',    'mysql command line client to use' ],
+        [ 'mysqldump=s', 'mysqldump command line client to use' ],
     );
 }
-elsif ($history) {
-    for my $config (WebGUI::Paths->siteConfigs) {
-        print "$config:\n";
-        WebGUI::Upgrade->reportHistory($config);
-        print "\n";
+
+sub validate_args {
+    my $self = shift;
+    my $opt = shift;
+    my $args = shift;
+    if ($opt->{history}) {
+        return;
     }
-    exit;
-}
-elsif ( ! $doit ) {
-    my $message = <<'END_MESSAGE';
+    elsif (! $opt->{doit}) {
+        $self->usage_error(<<'END_MESSAGE');
 
 +--------------------------------------------------------------------+
 |                                                                    |
@@ -71,46 +65,66 @@ elsif ( ! $doit ) {
 +--------------------------------------------------------------------+
 
 END_MESSAGE
-    Pod::Usage::pod2usage($message);
+    }
+    elsif ( $^O ne 'MSWin32' && $> != 0 && !$opt->{override} ) {
+        $self->usage_error('You must be the super user to use this utility.');
+    }
 }
 
-if ( $^O ne 'MSWin32' && $> != 0 && !$override ) {
-    print "You must be the super user to use this utility.\n";
-    exit;
+sub run {
+    my ($self, $opt, $args) = @_;
+    if ($opt->{history}) {
+        $self->show_history($opt, $args);
+    }
+    else {
+        $self->run_upgrade($opt, $args);
+    }
 }
 
-## Globals
+sub run_upgrade {
+    my ($self, $opt, $args) = @_;
+    my $upgrade = WebGUI::Upgrade->new(
+        quiet               => $opt->{quiet},
+        clearCache          => ! $opt->{skipDelete},
+        createBackups       => ! $opt->{skipBackup},
+        useMaintenanceMode  => ! $opt->{skipMaintenance},
+        $opt->{mysql} ? (
+            mysql               => $opt->{mysql},
+        ) : (),
+        $opt->{mysqldump} ? (
+            mysqldump           => $opt->{mysqldump},
+        ) : (),
+        $opt->{backupDir} ? (
+            backupPath          => $opt->{backupDir},
+        ) : (),
+    );
+    $upgrade->upgradeSites;
 
-my $upgrade = WebGUI::Upgrade->new(
-    quiet               => $quiet,
-    clearCache          => ! $skipDelete,
-    createBackups       => ! $skipBackup,
-    useMaintenanceMode  => ! $skipMaintenance,
-    $mysql ? (
-        mysql               => $mysql,
-    ) : (),
-    $mysqldump ? (
-        mysqldump           => $mysqldump,
-    ) : (),
-    $backupDir ? (
-        backupPath          => $backupDir,
-    ) : (),
-);
+        print <<STOP;
 
-$upgrade->upgradeSites;
-
-print <<STOP;
-
-Upgrades complete.
-Please restart your web server and test your sites.
+        Upgrades complete.
+        Please restart your web server and test your sites.
 
 STOP
+
+}
+
+sub show_history {
+    my $self = shift;
+    for my $config (WebGUI::Paths->siteConfigs) {
+        print "$config:\n";
+        WebGUI::Upgrade->reportHistory($config);
+        print "\n";
+    }
+}
+
+1;
 
 __END__
 
 =head1 NAME
 
-upgrade - Upgrade WebGUI database to the latest revision.
+WebGUI::Command::upgrade - Upgrade WebGUI database to the latest revision.
 
 =head1 SYNOPSIS
 
@@ -220,3 +234,4 @@ Shows this documentation, then exits.
 Copyright 2001-2009 Plain Black Corporation.
 
 =cut
+
