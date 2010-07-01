@@ -505,6 +505,4 @@ $sub1->getFormattedComments;
 
 } [], 'no warnings from calling a bunch of functions';
 
-#done_testing();
-#print 'press return to complete test' ; <>;
 #vim:ft=perl

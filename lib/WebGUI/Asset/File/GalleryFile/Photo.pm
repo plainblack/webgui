@@ -108,8 +108,7 @@ override applyConstraints => sub {
     $storage->resize( $file, undef, undef, $gallery->imageDensity );
     $storage->adjustMaxImageSize($file, $maxImageSize);
 
-    $self->generateThumbnail;
-    $self->setSize;
+    $self->generateThumbnail;        
     $self->updateExifDataFromFile;
     super();
 };
@@ -229,10 +228,11 @@ sub getEditFormUploadControl {
     }
 
     # Control to upload a new file
-    $html .= WebGUI::Form::file( $session, {
-        name        => 'newFile',
-        label       => $i18n->get('new file'),
-        hoverHelp   => $i18n->get('new file description'),
+    $html .= WebGUI::Form::image( $session, {
+        name            => 'newFile',
+        label           => $i18n->get('new file'),
+        hoverHelp       => $i18n->get('new file description'),
+        forceImageOnly  => 1,
     });
 
     return $html;
@@ -378,10 +378,18 @@ contained in.
 sub makeResolutions {
     my $self        = shift;
     my $resolutions = shift;
+    my $session     = $self->session;
     my $error;
 
     croak "Photo->makeResolutions: resolutions must be an array reference"
         if $resolutions && ref $resolutions ne "ARRAY";
+    
+#    # Return immediately if no image is available
+#    if ( $self->get("filename") eq '' )
+#    {
+#        $session->log->error("makeResolutions skipped since no image available");
+#        return;
+#    }        
     
     # Get default if necessary
     $resolutions    ||= $self->getGallery->getImageResolutions;
@@ -413,13 +421,20 @@ Make the default title into the file name minus the extention.
 
 override processPropertiesFromFormPost => sub {
     my $self    = shift;
+    my $i18n    = WebGUI::International->new( $self->session,'Asset_Photo' );
     my $form    = $self->session->form;
     my $errors  = super() || [];
+
+    # Make sure there is an image file attached to this asset.
+    if ( !$self->get('filename') ) {
+        push @{ $errors }, $i18n->get('error no image');
+    }
 
     # Return if errors
     return $errors if @$errors;
     
     ### Passes all checks
+    
     # If no title was given, make it the file name
     if ( !$form->get('title') ) {
         my $title   = $self->filename;
@@ -586,6 +601,7 @@ sub www_edit {
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
                 action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),
+                extras      => 'name="photoAdd"',
             })
             . WebGUI::Form::hidden( $session, {
                 name        => 'ownerUserId',
@@ -597,6 +613,7 @@ sub www_edit {
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
                 action      => $self->getUrl('func=editSave'),
+                extras      => 'name="photoEdit"',
             })
             . WebGUI::Form::hidden( $session, {
                 name        => 'ownerUserId',
@@ -607,7 +624,7 @@ sub www_edit {
     $var->{ form_start } 
         .= WebGUI::Form::hidden( $session, {
             name        => "proceed",
-            value       => "showConfirmation",
+            value       => $form->get('proceed') || "showConfirmation",
         });
 
     $var->{ form_end } = WebGUI::Form::formFooter( $session );

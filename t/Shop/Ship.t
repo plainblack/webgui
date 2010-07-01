@@ -40,7 +40,6 @@ my $session         = WebGUI::Test->session;
 my $loaded = use_ok('WebGUI::Shop::Ship');
 
 my $storage;
-my $driver;
 my $driver2;
 my $ship;
 
@@ -136,7 +135,8 @@ cmp_deeply(
     'addShipper croaks without options to build a object with',
 );
 
-$driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}, groupToUse=>7});
+my $driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}, groupToUse=>7});
+WebGUI::Test->addToCleanup($driver);
 isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured FlatRate driver');
 
 #######################################################################
@@ -146,7 +146,8 @@ isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured F
 #######################################################################
 
 my $shippers;
-$driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>0, label=>q{Tommy's cut-rate shipping}, groupToUse=>7});
+my $driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>0, label=>q{Tommy's cut-rate shipping}, groupToUse=>7});
+WebGUI::Test->addToCleanup($driver2);
 
 $shippers = $ship->getShippers();
 
@@ -204,9 +205,4 @@ $cart->delete;
 
 done_testing();
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $driver->delete;
-    $driver2->delete;
-}
+#vim:ft=perl

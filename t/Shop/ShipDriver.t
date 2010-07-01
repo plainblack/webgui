@@ -43,10 +43,6 @@ my $loaded = use_ok('WebGUI::Shop::ShipDriver');
 
 my $storage;
 
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::ShipDriver', $tests unless $loaded;
-
 #######################################################################
 #
 # definition
@@ -163,6 +159,7 @@ my $options = {
               };
 
 $driver = WebGUI::Shop::ShipDriver->create( $session, $options );
+WebGUI::Test->addToCleanup($driver);
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
 
@@ -399,5 +396,3 @@ is($count, 0, 'delete deleted the object');
 
 undef $driver;
 
-
-}

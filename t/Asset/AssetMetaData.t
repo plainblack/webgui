@@ -30,6 +30,7 @@ $session->user({userId => 3});
 my $root = WebGUI::Asset->getRoot($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Package test"});
+WebGUI::Test->addToCleanup($versionTag);
 
 ####################################################
 #
@@ -229,11 +230,4 @@ END {
     foreach my $metaDataFieldId (keys %{ $snippet->getMetaDataFields }) {
         $snippet->deleteMetaDataField($metaDataFieldId);
     }
-
-    foreach my $tag($versionTag) {
-        if (defined $tag and ref $tag eq 'WebGUI::VersionTag') {
-            $tag->rollback;
-        }
-    }
-
 }

@@ -178,6 +178,7 @@ is($macroOutput, 1, 'generateAdditionalHeadTags: process a macro');
 ####################################################
 
 my ($versionTag, $templates, $article, $snippet) = setup_assets($session);
+WebGUI::Test->addToCleanup($versionTag);
 
 $style->sent(0);
 is($style->sent, 0, 'process: setup sent to 0');

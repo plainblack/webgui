@@ -54,4 +54,3 @@ unlike(
     qr/<input type="hidden" name="method" value="login" /, 
     "Hidden form elements for login NOT displayed to valid user",
 );
-

@@ -40,6 +40,7 @@ my $sku = $root->addChild({
         title=>"Test Donation",
         defaultPrice => 50.00,
         });
+WebGUI::Test->addToCleanup($sku);
 isa_ok($sku, "WebGUI::Asset::Sku::Donation");
 
 is($sku->getPrice, 50.00, "Price should be 50.00");

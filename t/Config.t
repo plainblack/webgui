@@ -16,6 +16,7 @@ use WebGUI::Test;
 use Test::More tests => 14; # increment this value for each test you create
 use Test::Deep;
 use File::Basename qw(basename);
+use Cwd;
 
 my $config     = WebGUI::Test->config;
 my $configFile = WebGUI::Test->file;
@@ -83,5 +84,7 @@ if ($cookieName eq "") {
 }
 
 $config->set('privateArray', ['a', 'b', 'c']);
+WebGUI::Test->addToCleanup(sub { $config->delete('privateArray')});
 cmp_bag($config->get('privateArray'), ['a', 'b', 'c'], 'set: array, not scalar');
 
+#vim:ft=perl

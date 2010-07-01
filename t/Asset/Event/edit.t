@@ -62,6 +62,7 @@ my $calendar    = $node->addChild( {
 my $eventUrl;
 
 $versionTags[-1]->commit;
+WebGUI::Test->addToCleanup($versionTags[-1]);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -168,15 +169,6 @@ $properties = {
 cmp_deeply( $event->get, superhashof( $properties ), 'Events properties saved correctly' );
 
 #----------------------------------------------------------------------------
-# Cleanup
-END {
-    for my $tag ( @versionTags ) {
-        $tag->rollback;
-    }
-
-}
-
-#----------------------------------------------------------------------------
 # getMechLogin( baseUrl, WebGUI::User, "identifier" )
 # Returns a Test::WWW::Mechanize session after logging in the given user using
 # the given identifier (password)
@@ -197,3 +189,5 @@ sub getMechLogin {
 
     return $mech;
 }
+
+#vim:ft=perl

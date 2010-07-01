@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 94; # increment this value for each test you create
+use Test::More tests => 96; # increment this value for each test you create
 use Test::Deep;
 use Test::Exception;
 use Data::Dumper;
@@ -85,8 +85,15 @@ my $snippet2 = $folder2->addChild( {
 });
 
 $versionTag->commit;
-my @snipIds;
-my $lineageIds;
+
+####################################################
+#
+# getLineageSql
+#
+####################################################
+
+note "getLineageSql";
+ok $root->getLineageSql(['ancestors']), 'valid SQL returned in an error condition';
 
 ####################################################
 #
@@ -94,12 +101,8 @@ my $lineageIds;
 #
 ####################################################
 
-my $ids = $folder->getLineage(['self']);
-cmp_deeply(
-    [$folder->getId],
-    $ids,
-    'getLineage: get self'
-);
+my @snipIds;
+my $lineageIds;
 
 @snipIds = map { $_->getId } @snippets;
 $lineageIds = $folder->getLineage(['descendants']);
@@ -107,7 +110,7 @@ $lineageIds = $folder->getLineage(['descendants']);
 cmp_deeply($lineageIds, \@snipIds, 'default order returned by getLineage is lineage order');
 
 @snipIds = map { $_->getId } @snippets;
-$ids = $folder->getLineage(['descendants']);
+my $ids = $folder->getLineage(['descendants']);
 cmp_bag(
     \@snipIds,
     $ids,
@@ -141,6 +144,13 @@ cmp_bag(
     [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
     $ids,
     '... descendants of topFolder',
+);
+
+my $empty = getListFromIterator($root->getLineageIterator(['ancestors']));
+cmp_bag(
+    $empty,
+    [],
+    '... getting ancestors of root returns empty array'
 );
 
 ####################################################
@@ -193,6 +203,14 @@ cmp_bag(
     $ids,
     'getLineageIterator: descendants of topFolder',
 );
+
+my $empty = getListFromIterator($root->getLineageIterator(['ancestors']));
+cmp_bag(
+    $empty,
+    [],
+    '... getting ancestors of root returns empty array'
+);
+
 
 ####################################################
 #

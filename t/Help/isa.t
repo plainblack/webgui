@@ -167,3 +167,4 @@ cmp_deeply(
     'isa imports variables with nested loops'
 );
 
+#vim:ft=perl

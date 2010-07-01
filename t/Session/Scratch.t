@@ -55,6 +55,7 @@ for (my $count = 1; $count <= $maxCount; $count++){
 
 ##Creating a new session with the previous session's Id should clone the scratch data
 my $newSession = WebGUI::Session->open(WebGUI::Test->file, undef, $session->getId);
+WebGUI::Test->addToCleanup($newSession);
 
 is($newSession->getId, $session->getId, "Successful session duplication");
 
@@ -82,6 +83,8 @@ is($scratch->set('','value'), undef, 'set returns undef unless it gets a name ev
 ############################################
 
 my @sessionBank = map { WebGUI::Session->open(WebGUI::Test->file) } 0..3;
+
+WebGUI::Test->addToCleanup(@sessionBank);
 
 ##Set variables to be deleted by name
 foreach my $i (0..3) {
@@ -127,14 +130,4 @@ $scratch->setLanguageOverride('English');
 $scratch->setLanguageOverride();
 is($scratch->getLanguageOverride, 'English', 'A empty string is falsely recognised as a language');
 
-END {
-	$session->scratch->deleteAll;
-	foreach my $wgSess ($newSession, @sessionBank) {
-		if (defined $wgSess and ref $wgSess eq 'WebGUI::Session') {
-            note "Closing session";
-			$wgSess->scratch->deleteAll;
-            $wgSess->var->end;
-			$wgSess->close;
-		}
-	}
-}
+#vim:ft=perl

@@ -92,7 +92,7 @@ my @ldapTests = (
 );
 
 
-plan tests => (164 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (168 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 $session->cache->remove('myTestKey');
@@ -187,7 +187,7 @@ my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
 $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
 my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
 is($ldap->getValue("ldapLinkId"),$ldapProps->{ldapLinkId},'ldap link created properly');
-addToCleanup($ldap);
+WebGUI::Test->addToCleanup($ldap);
 
 my @shawshank;
 
@@ -738,8 +738,8 @@ foreach my $ipTest (@ipTests) {
 
     note "Checking for user Visitor session leak";
 
-    $ENV{REMOTE_ADDR} = '191.168.1.1';
     my $remoteSession = WebGUI::Test->newSession;
+    $remoteSession->request->env->{REMOTE_ADDR} = '191.168.1.1';
     $remoteSession->user({userId => 1});
 
     my $localIpGroup = WebGUI::Group->new($session, 'new');
@@ -748,8 +748,8 @@ foreach my $ipTest (@ipTests) {
 
     ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remote Visitor fails to be in the group';
 
-    $ENV{REMOTE_ADDR} = '192.168.33.1';
     my $localSession = WebGUI::Test->newSession;
+    $localSession->request->env->{REMOTE_ADDR} = '192.168.33.1';
     WebGUI::Test->addToCleanup($localIpGroup, $remoteSession, $localSession);
     $localSession->user({userId => 1});
     $localIpGroup->clearCaches;
@@ -773,11 +773,15 @@ $gY->addUsers([$cacheDude->userId]);
 
 ok( $cacheDude->isInGroup($gY->getId), "Cache dude added to group Y");
 ok( $cacheDude->isInGroup($gZ->getId), "Cache dude is a member of group Z by group membership");
+ok((grep $_ eq $gY->getId, @{ $cacheDude->getGroupIdsRecursive } ), 'Cache dude in Y by getGroupIdsRecursive');
 
-$gY->deleteUsers([$cacheDude->userId]);
+ok(eval { $gY->deleteUsers([$cacheDude->userId]); 1; }, "Y deleteUsers on Cache dude");
 
-ok( !$cacheDude->isInGroup($gY->getId), "Cache dude removed from group Y");
-ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude removed from group Z too");
+ok((! grep $_ eq $gY->getId, @{ $cacheDude->getGroupIdsRecursive } ), 'Cache dude not in Y getGroupIdsRecursive');
+ok((! grep $_ eq $cacheDude->userId, @{ $gY->getAllUsers() } ), 'Cache dude not in Y getAllUsers');
+
+ok( !$cacheDude->isInGroup($gY->getId), "Cache dude removed from group Y by isInGroup");
+ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude removed from group Z too by isInGroup");
 
 my $gCache = WebGUI::Group->new($session, "new");
 WebGUI::Test->addToCleanup($gCache);

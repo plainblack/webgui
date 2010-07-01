@@ -32,6 +32,9 @@ use Log::Log4perl;  # load early to ensure proper order of END blocks
 use Clone               qw(clone);
 use File::Basename      qw(dirname fileparse);
 use File::Spec::Functions qw(abs2rel rel2abs catdir catfile updir);
+use IO::Handle          ();
+use IO::Select          ();
+use Cwd                 ();
 use Scalar::Util        qw( blessed );
 use Carp                qw( carp croak );
 use List::MoreUtils qw(any);
@@ -106,6 +109,9 @@ sub _initSession {
             Workflows            => 'Workflow',
             'Workflow Instances' => 'WorkflowInstance',
             Carts                => 'cart',
+            AdSpaces             => 'adSpace',
+            Ads                  => 'advertisement',
+            Inbox                => 'inbox',
             Transactions         => 'transaction',
             'Transaction Items'  => 'transactionItem',
             'Address Books'      => 'addressBook',
@@ -516,6 +522,25 @@ sub originalConfig {
 
 #----------------------------------------------------------------------------
 
+=head2 cleanupAdminInbox ( )
+
+Push a list of Asset objects onto the stack of assets to be automatically purged
+at the end of the test.  This will also clean-up all version tags associated
+with the Asset.
+
+This is a class method.
+
+=cut
+
+sub cleanupAdminInbox {
+    my $class = shift;
+    my $admin = WebGUI::User->new($class->session, '3');
+    my $inbox = WebGUI::Inbox->new($class->session);
+    $inbox->deleteMessagesForUser($admin);
+}
+
+#----------------------------------------------------------------------------
+
 =head2 cleanupGuard ( $object, $class => $ident )
 
 Pass in a list of objects or pairs of classes and identifiers, and
@@ -524,6 +549,7 @@ object goes out of scope, it will automatically clean up all of the
 passed in objects.  Objects will be destroyed in the order they
 were passed in.  Currently able to destroy:
 
+    WebGUI::AdSpace
     WebGUI::Asset
     WebGUI::Group
     WebGUI::Session
@@ -535,9 +561,11 @@ were passed in.  Currently able to destroy:
     WebGUI::Shop::ShipDriver
     WebGUI::Shop::PayDriver
     WebGUI::Shop::Transaction
+    WebGUI::Shop::Vendor
     WebGUI::Shop::AddressBook
     WebGUI::DatabaseLink
     WebGUI::LDAPLink
+    WebGUI::Inbox::Message
 
 Example call:
 
@@ -637,9 +665,13 @@ Example call:
         'WebGUI::Shop::Transaction'  => 'delete',
         'WebGUI::Shop::ShipDriver'   => 'delete',
         'WebGUI::Shop::PayDriver'    => 'delete',
+        'WebGUI::Shop::Vendor'       => 'delete',
+        'WebGUI::Inbox::Message'     => 'purge',
+        'WebGUI::AdSpace'            => 'delete',
+        'WebGUI::FilePump::Bundle'   => 'delete',
         'WebGUI::Shop::Cart'         => sub {
             my $cart        = shift;
-            my $addressBook = $cart->getAddressBook();
+            my $addressBook = eval { $cart->getAddressBook(); };
             $addressBook->delete if $addressBook;  ##Should we call cleanupGuard instead???
             $cart->delete;
         },

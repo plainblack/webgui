@@ -74,6 +74,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
+WebGUI::Test->addToCleanup($workflow);
 my $icalFetch = $workflow->addActivity('WebGUI::Workflow::Activity::CalendarUpdateFeeds');
 
 my $instance1 = WebGUI::Workflow::Instance->create($session,
@@ -127,8 +128,4 @@ is(scalar @{ $newEvents }, 1, 'reimport does not create new children');
 $anniversary = pop @{ $newEvents };
 is($anniversary->get('description'),   $party->get('description'), '... description, checks for line unwrapping');
 
-END {
-    $instance1 && $instance1->delete('skipNotify');
-    $instance2 && $instance2->delete('skipNotify');
-    $workflow  && $workflow->delete;
-}
+#vim:ft=perl

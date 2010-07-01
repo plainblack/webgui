@@ -301,3 +301,4 @@ $session->user({user => $dude});
 is($dt->epochToHuman($wgbday), '8/16/2001  9:00 pm', 'epochToHuman: constructs a default locale if the language does not provide one.');
 $session->user({userId => 1});
 
+#vim:ft=perl

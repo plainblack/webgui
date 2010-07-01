@@ -267,6 +267,7 @@ $templateMock->mock('process', sub { push @templateVars, clone $_[1]; } );
 $session->setting->set('shopReceiptEmailTemplateId', $templateId);
 
 {
+    WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox(); });
     $trans->sendNotifications;
     is(@templateVars, 2, '... called template->process twice');
     my $inbox = WebGUI::Inbox->new($session);

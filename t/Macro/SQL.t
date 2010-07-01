@@ -32,6 +32,7 @@ my $WebGUIdbLink = WebGUI::DatabaseLink->new($session, '0');
 my $originalMacroAccessValue = $WebGUIdbLink->macroAccessIsAllowed();
 
 $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
+WebGUI::Test->addToCleanup(SQL => 'DROP TABLE testTable');
 $session->db->dbh->do('CREATE TABLE testTable (zero int(8), one int(8), two int(8), three int(8), four int(8), five int(8), six int(8), seven int(8), eight int(8), nine int(8), ten int(8), eleven int(8) ) TYPE=InnoDB');
 $session->db->dbh->do('INSERT INTO testTable (zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven ) VALUES(0,1,2,3,4,5,6,7,8,9,10,11)');
 $session->db->dbh->do('INSERT INTO testTable (zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven ) VALUES(100,101,102,103,104,105,106,107,108,109,110,111)');
@@ -154,6 +155,4 @@ my $output = WebGUI::Macro::SQL::process(
 );
 is($output, 'zero', 'alternate linkId works');
 
-END {
-	$session->db->dbh->do('DROP TABLE testTable');
-}
+#vim:ft=perl

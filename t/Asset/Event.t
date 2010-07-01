@@ -129,6 +129,7 @@ sleep 2;
 my $event6a = $event6->addRevision({ title => 'Event with storage', }, undef, { skipAutoCommitWorkflows => 1, });
 ok($session->id->valid($event6a->get('storageId')), 'addRevision gives the new revision a valid storageId');
 isnt($event6a->get('storageId'), $event6->get('storageId'), '... and it is different from the previous revision');
+
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag2);
 $versionTag2->commit;

@@ -23,8 +23,6 @@ my $session = WebGUI::Test->session;
 # Tests
 plan tests => 94;
 
-my ( $s, $t1 );
-
 my $tp = use_ok('TAP::Parser');
 my $tpa = use_ok('TAP::Parser::Aggregator');
 
@@ -39,8 +37,9 @@ my $import_node = WebGUI::Asset->getImportNode($session);
 $session->config->set('enableSurveyExpressionEngine', 1);
 
 # Create a Survey
-$s = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+my $s = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 isa_ok( $s, 'WebGUI::Asset::Wobject::Survey' );
+WebGUI::Test->addToCleanup($s);
 
 my $tag = WebGUI::VersionTag->getWorking($session);
 $tag->commit;
@@ -155,7 +154,8 @@ cmp_deeply(
     'surveyOrderIndex correct'
 );
 
-$t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );
+my $t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );
+WebGUI::Test->addToCleanup(sub {$t1->delete();});
 my $spec;
 
 # No tests
@@ -729,6 +729,4 @@ END_CMP
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $s->purge() if $s;
-    $t1->delete() if $t1;
 }

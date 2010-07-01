@@ -135,3 +135,4 @@ is($dumper->Dump, q|$VAR1 = {
     );
 };
 
+#vim:ft=perl

@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
-use Test::More tests => 81; # increment this value for each test you create
+use Test::More tests => 85; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -184,15 +184,39 @@ is($tag3->getRevisionCount, 5, 'original tag still with five revisions');
 $tag4->clearWorking;
 $tag3->rollback;
 $tag4->rollback;
-($asset1, $asset2, $asset3, $tag3, $tag4) = ();
 
+#Test commitAsUser
+my $tag5   = WebGUI::VersionTag->create($session, {});
+$tag5->setWorking;
+my $asset5 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+is($tag5->get("createdBy"),1,'tag created by visitor');
+$tag5->commitAsUser(3);
+$tag5      = WebGUI::VersionTag->new($session, $tag5->getId); #Get the tag again - properties have changed
+is($tag5->get("committedBy"),3,'tag committed by admin');
+$tag5->clearWorking;
+$tag5->rollback;
+
+#Test commitAsUser with options
+my $tag6   = WebGUI::VersionTag->create($session, {});
+$tag6->setWorking;
+my $asset6 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+$tag6->commitAsUser(3, { commitNow => "yes" });
+$tag6      = WebGUI::VersionTag->new($session, $tag6->getId); #Get the tag again - properties have changed
+is($tag6->get("committedBy"),3,'tag committed by admin again');
+$asset6    = WebGUI::Asset->newById($session,$asset6->getId); #Get the asset again - properties have changed
+is($asset6->get("status"),"approved","asset status approved");
+$tag6->clearWorking;
+$tag6->rollback;
+
+($asset1, $asset2, $asset3, $asset5, $asset6, $tag3, $tag4, $tag5, $tag6) = ();
 #additional tests for versionTagMode
 # 
 
 setSiteVersionTagMode($session, q{singlePerUser});
 setUserVersionTagMode($user, q{inherited});
 
-ok(!defined getWorking(1), 'versionTagMode singlePerUser: no working tag initially present');
+ok(!defined getWorking(1), 'versionTagMode singlePerUser: no working tag initially present')
+    or diag(getWorking(1)->getId);
 
 $tag = WebGUI::VersionTag->create($session, {});
 isa_ok($tag, 'WebGUI::VersionTag', 'versionTagMode singlePerUser: empty tag');
@@ -304,8 +328,8 @@ $adminUserTag->rollback();
     is($tag->getAssetCount, 1, qq{$test_prefix [singlePerUser] tag with 1 asset});
 
     # create admin session
-    my $admin_session = WebGUI::Session->open(WebGUI::Test->file);
-    addToCleanup($session);
+    my $admin_session = WebGUI::Test->newSession;
+    WebGUI::Test->addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -356,7 +380,8 @@ $adminUserTag->rollback();
     is($tag->getAssetCount, 1, qq{$test_prefix [siteWide] tag with 1 asset});
 
     # create admin session
-    $admin_session = WebGUI::Session->open(WebGUI::Test->file);
+    $admin_session = WebGUI::Test->newSession;
+    WebGUI::Test->addToCleanup($admin_session);
     addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 

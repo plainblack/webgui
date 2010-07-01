@@ -27,26 +27,22 @@ plan tests => 2 + $num_tests;
 my $session = WebGUI::Test->session;
  
 # put your tests here
-my ($versionTag, $template);
-my $originalParsers = $session->config->get('templateParsers');
+WebGUI::Test->originalConfig('templateParsers');
 
 my $module = use_ok('HTML::Template::Expr');
+my $plugin = use_ok('WebGUI::Asset::Template::HTMLTemplateExpr');
+
 SKIP: {
-	skip "HTML::Template::Expr or plugin not loaded", $num_tests+1 unless $module;
-    my $plugin = use_ok('WebGUI::Asset::Template::HTMLTemplateExpr');
+    skip "HTML::Template::Expr or plugin not loaded", $num_tests unless $plugin;
 
-    SKIP: {
-        skip "HTML::Template::Expr or plugin not loaded", $num_tests unless $plugin;
-
-        $session->config->set('templateParsers', ['WebGUI::Asset::Template::HTMLTemplate', 'WebGUI::Asset::Template::HTMLTemplateExpr',] );
-        ($versionTag, $template) = setup_assets($session);
-        my $templateOutput = $template->process({ "foo.bar" => "baz", "number.value" => 2 });
-        my $companyName = $session->config->get('companyName');
-        like($templateOutput, qr/NAME=$companyName/, "session variable with underscores");
-        like($templateOutput, qr/FOOBAR=baz/, "explicit variable with dots");
-        like($templateOutput, qr/EQN=4/, "explicit variable with dots in expr");
-    }
-
+    $session->config->set('templateParsers', ['WebGUI::Asset::Template::HTMLTemplate', 'WebGUI::Asset::Template::HTMLTemplateExpr',] );
+    my ($versionTag, $template) = setup_assets($session);
+    WebGUI::Test->addToCleanup($versionTag);
+    my $templateOutput = $template->process({ "foo.bar" => "baz", "number.value" => 2 });
+    my $companyName = $session->config->get('companyName');
+    like($templateOutput, qr/NAME=$companyName/, "session variable with underscores");
+    like($templateOutput, qr/FOOBAR=baz/, "explicit variable with dots");
+    like($templateOutput, qr/EQN=4/, "explicit variable with dots in expr");
 }
 
 sub setup_assets {
@@ -68,8 +64,3 @@ sub setup_assets {
 	return ($versionTag, $template);
 }
 
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
-}

@@ -78,23 +78,23 @@ If true, this will limit the list of template to only include templates that are
 =cut
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session, 'Asset_Template');
-	push(@{$definition}, {
-		label=>{
-			defaultValue=>$i18n->get("assetName")
-			},
-		name=>{
-			defaultValue=>"templateId"
-			},
-		namespace=>{
-			defaultValue=>undef
-			},
-		onlyCommitted=>{
-			defaultValue=>''
-			},
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift || [];
+    my $i18n = WebGUI::International->new($session, 'Asset_Template');
+    push(@{$definition}, {
+        label=>{
+            defaultValue=>$i18n->get("assetName")
+            },
+        name=>{
+            defaultValue=>"templateId"
+            },
+        namespace=>{
+            defaultValue=>undef
+            },
+        onlyCommitted=>{
+            defaultValue=>''
+            },
         });
         return $class->SUPER::definition($session, $definition);
 }
@@ -138,6 +138,54 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
+=head2 getValueAsHtml ( )
+
+Returns the tempalte name of the selected template.
+
+=cut
+
+sub getValueAsHtml {
+    my $self    = shift;
+
+    $self->setOptions;
+
+    return $self->SUPER::getValueAsHtml;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setOptions
+
+Fills the options of the select list with the appropriate templates.
+
+=cut
+
+sub setOptions {
+    my $self    = shift;
+    my $session = $self->session;
+    my $userId  = $session->user->userId;
+
+    my $onlyCommitted   = $self->get( 'onlyCommitted' ) 
+                        ? q{assetData.status='approved'}
+                        : $self->get( 'onlyCommitted' )
+                        ;
+    my $templateList    = WebGUI::Asset::Template->getList( $session, $self->get( 'namespace' ), $onlyCommitted );
+
+    #Remove entries from template list that the user does not have permission to view.
+    for my $assetId ( keys %{$templateList} ) {
+        my $asset = eval { WebGUI::Asset->newById($session, $assetId); };
+        if (!Exception::Class->caught() && !$asset->canView($self->session->user->userId)) {
+            delete $templateList->{$assetId};
+        }
+    }
+
+    $self->set( 'options', $templateList );
+
+    return;
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders a template picker control.
@@ -145,18 +193,11 @@ Renders a template picker control.
 =cut
 
 sub toHtml {
-	my $self = shift;
-    my $onlyCommitted = $self->get('onlyCommitted') ? "assetData.status='approved'" : $self->get('onlyCommitted');
-    my $templateList = WebGUI::Asset::Template->getList($self->session, $self->get("namespace"), $onlyCommitted);
-    #Remove entries from template list that the user does not have permission to view.
-    for my $assetId ( keys %{$templateList} ) {
-        my $asset = WebGUI::Asset::Template->newById($self->session, $assetId);
-        if (!$asset->canView($self->session->user->userId)) {
-                delete $templateList->{$assetId};
-        }
-    }
-	$self->set("options", $templateList);
-	return $self->SUPER::toHtml();
+    my $self = shift;
+    
+    $self->setOptions;
+
+    return $self->SUPER::toHtml();
 }
 
 #-------------------------------------------------------------------

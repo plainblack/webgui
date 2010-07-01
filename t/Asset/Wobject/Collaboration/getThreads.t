@@ -25,6 +25,7 @@ use WebGUI::Session;
 # Init
 my $session         = WebGUI::Test->session;
 my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
+WebGUI::Test->addToCleanup($versionTags[-1]);
 my @addChildArgs    = ( {skipAutoCommitWorkflows=>1} );
 my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
     className       => 'WebGUI::Asset::Wobject::Collaboration',
@@ -205,12 +206,6 @@ or diag( "GOT: " . Dumper $page ), diag( "EXPECTED: " . Dumper $expect );
 $session->request->setup_param({});
 $session->scratch->delete($collab->getId.'_sortBy');
 $session->scratch->delete($collab->getId.'_sortDir');
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $_->rollback for @versionTags;
-}
 
 #----------------------------------------------------------------------------
 # sortThreads( \&sortSub, @threads )

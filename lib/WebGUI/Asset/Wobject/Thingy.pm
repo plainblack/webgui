@@ -2408,6 +2408,8 @@ sub editThingData {
     my $thingId         = shift || $session->form->process('thingId');
     my $thingDataId     = shift || $session->form->process('thingDataId') || "new";
     my $thingProperties = shift || $self->getThing($thingId);
+    my $errors          = shift;
+    my $resetForm       = shift;
     my $i18n            = WebGUI::International->new($self->session, "Asset_Thingy");
 
     my $canEditThingData = $self->canEditThingData($thingId, $thingDataId, $thingProperties);
@@ -2417,7 +2419,7 @@ sub editThingData {
     my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
-    my $errors = shift;
+    
     $var->{error_loop} = $errors if ($errors);
 
     $var->{canEditThings} = $self->canEdit;
@@ -2465,14 +2467,17 @@ sub editThingData {
         ,[$self->getId,$thingId]);
     while (my %field = $fields->hash) {
         my $fieldName = 'field_'.$field{fieldId};
-        if ($session->form->process("func") eq "editThingDataSave"){
-            $fieldValue = $session->form->process($fieldName,$field{fieldType},$field{defaultValue});
+        $fieldValue = undef;
+        unless ($resetForm) {
+            if ($session->form->process("func") eq "editThingDataSave"){
+                $fieldValue = $session->form->process($fieldName,$field{fieldType},$field{defaultValue});
+            }
+            else{
+                $fieldValue = $thingData{"field_".$field{fieldId}};
+            }
         }
-        else{
-            $fieldValue = $thingData{"field_".$field{fieldId}};
-        }
-        $field{value} = $fieldValue || $field{defaultValue};     
-        my $formElement .= $self->getFormElement(\%field);
+        $field{value} = $fieldValue || $field{defaultValue};
+        my $formElement .= $self->getFormPlugin(\%field,($resetForm eq ""))->toHtml;
         
         my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
         my $value = $field{value};
@@ -2546,7 +2551,7 @@ sub www_editThingDataSave {
         return $self->www_viewThingData($thingId,$newThingDataId);
     }
     elsif ($thingProperties->{afterSave} eq "addThing") {
-        return $self->www_editThingData($thingId,"new");
+        return $self->www_editThingData($thingId,"new",undef,undef,"resetForm");
     }
     elsif ($thingProperties->{afterSave} =~ m/^searchOther_/x){
         $otherThingId = $thingProperties->{afterSave};
@@ -2556,7 +2561,7 @@ sub www_editThingDataSave {
     elsif ($thingProperties->{afterSave} =~ m/^addOther_/x){
         $otherThingId = $thingProperties->{afterSave};
         $otherThingId =~ s/^addOther_//x;
-        return $self->www_editThingData($otherThingId,"new");
+        return $self->www_editThingData($otherThingId,"new",undef,undef,"resetForm");
     }
     # if afterSave is thingy default or in any other case return www_view()
     else {

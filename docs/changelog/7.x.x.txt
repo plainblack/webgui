@@ -1,3 +1,26 @@
+7.9.7
+ - added #11571: Allow return from photo edit view to gallery edit view
+ - fixed: Reject form submissions without image selected for upload in edit view of Photo asset 
+ - fixed #11596: Calendar: all day events leaking
+ - fixed #11604: scheduled workflows getting deleted
+ - fixed #11613: Thingy: If next action after add is to add more things, previous data remains
+ - added API method commitAsUser allowing developers to commit version tags as other users
+ - fixed: The template form plugin would return an empty string when getValueAsHtml was called. ( Martin Kamerbeek / Oqapi )
+ - fixed #11611: Thingy: The add field pop up box has multiple "Text" field types
+ - fixed #11610: Bad hover help for CS sortBy field
+ - fixed #11605: UserList refers to non-existent "publicEmail" user profiling field
+ - fixed #11595: Orphaned data in inbox_messageState
+ - fixed AddressBook feedback for missing fields.
+ - fixed #11606: Syndicated Content feed returns a relative link
+ - fixed #11614: Forums: Sort Fields
+ - fixed #11616: No access to /root
+ - fixed #11619: Trash Expired Events not trashing events
+ - fixed #11623: Navigation CSS-id
+ - fixed #11629: WebGUI Collateral Manager = Error
+ - fixed #11622: Archived CSS entries displayable.
+ - fixed #11560: Email footer hidden from Outlook users
+ - fixed #11643: Account/Contributions: does not show archived content
+
 7.9.6
  - new checkbox in the asset manager for clearing the package flag on import
  - fixed #11597: manageTrash and newlines

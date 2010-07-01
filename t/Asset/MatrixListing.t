@@ -26,6 +26,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 my ($matrix, $matrixListing);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"Matrix Listing Test"});
 
 $matrix = $node->addChild({className=>'WebGUI::Asset::Wobject::Matrix'});
@@ -34,6 +35,7 @@ $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'});
 
 # Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
 my $secondVersionTag = WebGUI::VersionTag->new($session,$matrixListing->get("tagId"));
+WebGUI::Test->addToCleanup($secondVersionTag);
 
 # Test for sane object types
 isa_ok($matrix, 'WebGUI::Asset::Wobject::Matrix');
@@ -53,11 +55,4 @@ isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');
 #    local $TODO = "Tests to make later";
 #    ok(0, 'Lots and lots to do');
 #}
-
-END {
-	# Clean up after thy self
-	$versionTag->rollback();
-	$secondVersionTag->rollback();
-	#$thirdVersionTag->rollback();
-}
-
+#vim:ft=perl

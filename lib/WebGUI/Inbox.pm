@@ -119,6 +119,29 @@ sub canRead {
 
 #-------------------------------------------------------------------
 
+=head2 deleteMessagesForUser ( $user ) 
+
+Deletes all messages for a user.
+
+=head3 $user
+
+A WebGUI::User object, representing the user who will have all their messages deleted.
+
+=cut
+
+sub deleteMessagesForUser {
+	my $self    = shift;
+    my $user    = shift;
+
+    my $messages = $self->getMessagesForUser($user, 1e10);
+    my $userId  = $user->userId;
+    foreach my $message (@{ $messages }) {
+        $message->delete($userId);
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 getMessage ( messageId [, userId] ) 
 
 Returns a WebGUI::Inbox::Message object.
@@ -448,7 +471,7 @@ sub getMessageSql {
     }
 
     if($whereClause) {
-        $whereClause = qq{WHERE $whereClause};
+        $whereClause = qq{AND $whereClause};
     }
 
     if($limit) {
@@ -473,14 +496,13 @@ SELECT
     my $sql = qq{
         SELECT
             $select
-        FROM (
-                ( SELECT messageId, subject, sentBy, dateStamp, status FROM inbox WHERE userId = '$userId' order by dateStamp desc limit $limitHalf)
-                UNION
-                ( SELECT messageId, subject, sentBy, dateStamp, status FROM inbox WHERE groupId IN ( $userGroups ) order by dateStamp desc limit $limitHalf )
-        ) AS ibox
-        JOIN inbox_messageState on inbox_messageState.messageId=ibox.messageId and inbox_messageState.userId='$userId' and inbox_messageState.deleted=0
-        LEFT JOIN users on users.userId=ibox.sentBy
-        LEFT JOIN userProfileData on userProfileData.userId=ibox.sentBy
+        FROM inbox_messageState
+        JOIN inbox ibox USING (messageId)
+        JOIN users on users.userId = ibox.sentBy
+        JOIN userProfileData on userProfileData.userId = ibox.sentBy
+        WHERE inbox_messageState.messageId = ibox.messageId 
+        AND   inbox_messageState.userId    = '$userId' 
+        AND   inbox_messageState.deleted   = 0
         $whereClause
         $sortBy
         $limit

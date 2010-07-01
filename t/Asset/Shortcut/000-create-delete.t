@@ -25,18 +25,13 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Shortcut Test"});
+WebGUI::Test->addToCleanup($versionTag);
 
 # Make a snippet to shortcut
 my $snippet 
     = $node->addChild({
         className       => "WebGUI::Asset::Snippet",
     });
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-	$versionTag->rollback();
-}
 
 #----------------------------------------------------------------------------
 # Tests

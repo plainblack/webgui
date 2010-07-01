@@ -17,6 +17,12 @@ save you many hours of grief.
     - Moose
     - CHI
 
+7.9.7
+--------------------------------------------------------------------
+     * Due to a bug introduced in 7.9.3, Scheduler tasks may have been deleted
+       from your site.  The 7.9.7 upgrade will restore all default tasks, and tasks
+       for handling email from Collaboration Systems, but you should check any Scheduler
+       tasks that you have created.
 
 7.9.6
 --------------------------------------------------------------------

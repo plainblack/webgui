@@ -23,11 +23,13 @@ use Test::More;
 use Test::Exception;
 use URI;
 
-plan tests => 20; # increment this value for each test you create
+plan tests => 19; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 my $admin = $session->user;
+WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox; });
+WebGUI::Test->addToCleanup(SQL =>  "delete from mailQueue  where message like '%Threshold=15%'");
 my $inbox = WebGUI::Inbox->new($session);
 
 my $import = WebGUI::Asset->getImportNode($session);
@@ -122,7 +124,7 @@ my $uri = URI->new($url);
 is($uri->path,  $posters->getUrl, 'Link in message has correct URL path');
 is($uri->query, 'func=editVariant;vid='.$marilynVarId, 'Link in message has function and variant id');
 
-wipeMessages($inbox, $admin);
+WebGUI::Test->cleanupAdminInbox;
 is(scalar @{$inbox->getMessagesForUser($admin)}, 0, 'All messages deleted');
 $instance1->delete;
 
@@ -148,6 +150,13 @@ $message = $inbox->getMessagesForUser($admin)->[0];
 note "Test that the workflow does not die when encountering bad assets";
 
 my $otherPosters = $posters->duplicate;
+WebGUI::Test->addToCleanup(sub {
+    $session->db->write("delete from asset      where assetId=?",[$otherPosters->getId]);
+    $session->db->write("delete from assetData  where assetId=?",[$otherPosters->getId]);
+    $session->db->write("delete from sku        where assetId=?",[$otherPosters->getId]);
+    $session->db->write("delete from Product    where assetId=?",[$otherPosters->getId]);
+    $session->db->write("delete from assetIndex where assetId=?",[$otherPosters->getId]);
+});
 my $movie_posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'movie_posters',
@@ -181,7 +190,7 @@ is($retVal, 'done', 'Workflow is done');
 
 $messages = $inbox->getMessagesForUser($admin);
 is(scalar @{$messages}, 1, 'Received one message');
-wipeMessages($inbox, $admin);
+WebGUI::Test->cleanupAdminInbox;
 
 my $instance4 = WebGUI::Workflow::Instance->create($session,
     {
@@ -200,24 +209,5 @@ is($retVal, 'done', 'Workflow is done');
 
 $messages = $inbox->getMessagesForUser($admin);
 is(scalar @{$messages}, 1, 'Still received one message');
-wipeMessages($inbox, $admin);
 
-END {
-    wipeMessages($inbox, $admin);
-    $messages = $inbox->getMessagesForUser($admin);
-    is(scalar @{$messages}, 0, 'Inbox cleaned up');
-    $session->db->write("delete from mailQueue  where message like '%Threshold=15%'");
-    $session->db->write("delete from asset      where assetId=?",[$otherPosters->getId]);
-    $session->db->write("delete from assetData  where assetId=?",[$otherPosters->getId]);
-    $session->db->write("delete from sku        where assetId=?",[$otherPosters->getId]);
-    $session->db->write("delete from Product    where assetId=?",[$otherPosters->getId]);
-    $session->db->write("delete from assetIndex where assetId=?",[$otherPosters->getId]);
-}
-
-sub wipeMessages {
-    my ($inbox, $user) = @_;
-    foreach my $message (@{ $inbox->getMessagesForUser($user) }) {
-        $message->delete;
-    }
-
-}
+#vim:ft=perl

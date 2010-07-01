@@ -120,10 +120,12 @@ cmp_deeply(
 
 my $tz   = $session->datetime->getTimeZone();
 my $bday = WebGUI::DateTime->new($session, WebGUI::Test->webguiBirthday);
-$dt   = $bday->clone->truncate(to => 'day');
 
-my $startDt = $dt->cloneToUserTimeZone->subtract(days => 1);
-my $endDt   = $dt->cloneToUserTimeZone->add(days => 1);
+##Simulate how windows are built in each view method
+my $startDt     = $bday->cloneToUserTimeZone->truncate(to => 'day')->subtract(days => 1);
+my $windowStart = $startDt->clone;
+my $endDt       = $startDt->clone->add(days => 2);
+my $windowEnd   = $endDt->clone->subtract(seconds => 1);
 
 my $inside = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
@@ -217,6 +219,38 @@ my $justAfterwt = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
+my $justBefore = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Just before the window.  Ending date coincident with window start',
+    startDate   => $startDt->clone->add(days => -1)->toDatabaseDate,
+    endDate     => $startDt->clone->add(days => -1)->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $justAfter = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Just after the window.  Start date coincident with window end',
+    startDate   => $endDt->clone->add(days => 1)->toDatabaseDate,
+    endDate     => $endDt->clone->add(days => 1)->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $starting = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Inside the window, same start date',
+    startDate   => $startDt->toDatabaseDate,
+    endDate     => $startDt->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
+my $ending = $windowCal->addChild({
+    className   => 'WebGUI::Asset::Event',
+    title       => 'Inside the window, same end date',
+    startDate   => $endDt->clone->add(days => -1)->toDatabaseDate,
+    endDate     => $endDt->clone->add(days => -1)->toDatabaseDate,
+    timeZone    => $tz,
+}, undef, undef, {skipAutoCommitWorkflows => 1});
+
 my $coincident = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
     title       => 'Coincident with the window start and window end',
@@ -241,6 +275,7 @@ my $coincidentHigh = $windowCal->addChild({
     timeZone    => $tz,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
+#    no suffix = all day event
 #    wt suffix = with times
 #                      inside
 #                      insidewt
@@ -252,7 +287,10 @@ my $coincidentHigh = $windowCal->addChild({
 #              |----------coincidentLow------------------|
 #    |--------------------coincidentHigh-------|
 # window:      |-------------------------------|
+#  starting--->|
+#                                             |<---ending
 #   justBeforewt                               justAfterwt
+#     justBefore                               justAfter
 #                                                 outside high
 # outside low
 #
@@ -262,16 +300,19 @@ my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
 addToCleanup($tag2);
 
-is(scalar @{ $windowCal->getLineage(['children'])}, 13, 'added events to the window calendar');
+is(scalar @{ $windowCal->getLineage(['children'])}, 17, 'added events to the window calendar');
 
-my @window = $windowCal->getEventsIn($startDt->toDatabase, $endDt->toDatabase);
+diag "startDate: ". $windowStart->toDatabase;
+diag "endDate: ". $windowEnd->toDatabase;
+my @window = $windowCal->getEventsIn($windowStart->toDatabase, $windowEnd->toDatabase);
 
 cmp_bag(
     [ map { $_->get('title') } @window ],
     [ map { $_->get('title') }
         ($inside,     $insidewt,
-         $straddle,   $straddleHighwt, $straddleLowwt, $straddlewt,
-         $coincident, $coincidentLow,  $coincidentHigh, )
+         $straddle,   $straddleHighwt, $straddleLowwt,  $straddlewt,
+         $coincident, $coincidentLow,  $coincidentHigh, $starting,
+         $ending, )
     ],
     '..returns correct set of events'
 );
@@ -368,7 +409,7 @@ my $monthCal = $node->addChild({
     title     => 'Calendar for doing event span testing, month',
 });
 
-$allDayDt    = $bday->cloneToUserTimeZone;
+$allDayDt       = $bday->cloneToUserTimeZone;
 my $nextMonthDt = $bday->cloneToUserTimeZone->add(months => 1)->truncate( to => 'month')->add(days => 29, hours => 19);
 
 $allDay = $monthCal->addChild({

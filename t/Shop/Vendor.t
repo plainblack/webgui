@@ -31,8 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 49;
-plan tests => 1 + $tests;
+plan tests => 49;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -46,10 +45,6 @@ $fenceUser->username('fence');
 my $guardUser = WebGUI::User->new($session, 'new');
 $guardUser->username('guard');
 WebGUI::Test->addToCleanup($fenceUser, $guardUser);
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::Vendor', $tests unless $loaded;
 
 $numberOfVendors = scalar @{ WebGUI::Shop::Vendor->getVendors($session) };
 
@@ -130,6 +125,7 @@ cmp_deeply(
 my $now = WebGUI::DateTime->new($session, time);
 
 eval { $fence = WebGUI::Shop::Vendor->create($session, { userId => $fenceUser->userId, }); };
+WebGUI::Test->addToCleanup($fence);
 $e = Exception::Class->caught();
 ok(!$e, 'No exception thrown by create');
 isa_ok($vendor, 'WebGUI::Shop::Vendor', 'create returns correct type of object');
@@ -251,6 +247,7 @@ my $defaultVendor = WebGUI::Shop::Vendor->newByUserId($session, 3);
 #######################################################################
 
 $guard = WebGUI::Shop::Vendor->create($session, { userId => $guardUser->userId, name => q|Warden Norton|});
+WebGUI::Test->addToCleanup($guard);
 my $vendorsList = WebGUI::Shop::Vendor->getVendors($session);
 cmp_deeply(
     $vendorsList,
@@ -307,11 +304,4 @@ foreach (keys %completeProps ) {
 
 undef $guard;
 
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $fence->delete;
-    is( scalar @{  WebGUI::Shop::Vendor->getVendors($session) }, $numberOfVendors, 'No vendors leaked');
-}
+#vim:ft=perl
