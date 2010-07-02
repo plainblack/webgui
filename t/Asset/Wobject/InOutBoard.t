@@ -144,6 +144,7 @@ cmp_bag(
             dateStamp      => ignore(),
             message        => 'work time',
             username       => 'red',
+            department     => 'No Department',
         },
         ignore(), ignore(), ignore(), ignore(),
     ],

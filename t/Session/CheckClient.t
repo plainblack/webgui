@@ -185,9 +185,9 @@ sub testCount {
 plan tests => testCount() ;
 
 foreach my $testSet (@testArray) {
-    $session->request->env->{HTTP_USER_AGENT} = $testSet->{agent};
+    $session->request->headers->user_agent($testSet->{agent});
     $session->request->env->{REMOTE_ADDR} = $testSet->{address} || '69.42.78.32';
-    my $output = $session->env->requestNotViewed;
+    my $output = $session->request->requestNotViewed;
     is($output, $testSet->{output}, $testSet->{comment});
 }
 

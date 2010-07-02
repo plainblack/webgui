@@ -1284,7 +1284,7 @@ sub getUrl {
         and -e $self->getPath . '/.cdn' )
     {
         my $sep = '/';    # separator, if not already present trailing
-        if ($cdnCfg->{'sslAlt'} && $self->session->env->sslRequest) {
+        if ($cdnCfg->{'sslAlt'} && $self->session->request->secure) {
             if ( $cdnCfg->{'sslUrl'} ) {
                 substr( $cdnCfg->{'sslUrl'}, -1 ) eq '/' and $sep = '';
                 $url = $cdnCfg->{'sslUrl'} . $sep . $self->getDirectoryId;

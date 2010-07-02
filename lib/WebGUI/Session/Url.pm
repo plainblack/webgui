@@ -136,7 +136,7 @@ sub extras {
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} and $cdnCfg->{'extrasCdn'} ) {
         unless ( $path and grep $path =~ m/$_/, @{ $cdnCfg->{'extrasExclude'} } ) {
-            if ($cdnCfg->{'extrasSsl'} && $self->session->env->sslRequest) {
+            if ($cdnCfg->{'extrasSsl'} && $self->session->request->secure) {
                 $url = $cdnCfg->{'extrasSsl'};
             }
             else {
@@ -258,7 +258,7 @@ Returns the URL of the page this request was refered from (no gateway, no query 
 
 sub getRefererUrl {
 	my $self = shift;
-	my $referer = $self->session->env->get("HTTP_REFERER");
+	my $referer = $self->session->request->referer;
 	return undef unless ($referer);
 	my $url = $referer;
 	my $gateway = $self->session->config->get("gateway");
@@ -289,20 +289,20 @@ is not passed in, it will attempt to get one from the L<page> method, or finally
 sub forceSecureConnection {
     my $self = shift;
     my $url = shift;
-    my ($conf, $env, $http) = $self->session->quick(qw(config env http));
+    my ($conf, $http) = $self->session->quick(qw(config http));
    
-    if ($conf->get("sslEnabled") && !$env->sslRequest){
+    if ($conf->get("sslEnabled") && ! $self->session->request->secure){
    
-        $url = $self->session->url->page if(! $url);
-        $url = $env->get('QUERY_STRING') if(! $url);
+        my $query_string = $self->session->request->env->{'QUERY_STRING'};
+        $url = $url || $self->page || $query_string;
 
         my $siteURL = $self->getSiteURL();
 
         if($url !~ /^$siteURL/i){
             $url = $siteURL . $url;
         }
-        if($env->get('QUERY_STRING')){ 
-            $url .= "?". $env->get('QUERY_STRING');
+        if($query_string){ 
+            $url .= "?". $query_string;
         }
         if($url =~ /^http/i) {
             $url =~ s/^https?/https/i;
@@ -347,14 +347,14 @@ sub getSiteURL {
     unless ($self->{_siteUrl}) {
         my $site = "";
         my $sitenames = $self->session->config->get("sitename");
-        my ($http_host,$currentPort) = split(':', $self->session->env->get("HTTP_HOST"));
+        my ($http_host,$currentPort) = split(':', $self->session->request->env->{"HTTP_HOST"});
         if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and isIn($http_host,@{$sitenames})) {
                 $site = $http_host;
         } else {
                 $site = $sitenames->[0];
         }
         my $proto = "http://";
-        if ($self->session->env->sslRequest) {
+        if ($self->session->request->secure) {
                 $proto = "https://";
         }
 		my $port = "";

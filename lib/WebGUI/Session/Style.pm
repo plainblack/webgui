@@ -131,7 +131,7 @@ sub useMobileStyle {
     if (! $session->setting->get('useMobileStyle')) {
         return $self->{_useMobileStyle} = 0;
     }
-    my $ua = $session->env->get('HTTP_USER_AGENT');
+    my $ua = $session->request->user_agent;
     for my $mobileUA (@{ $self->session->config->get('mobileUserAgents') }) {
         if ($ua =~ m/$mobileUA/) {
             return $self->{_useMobileStyle} = 1;

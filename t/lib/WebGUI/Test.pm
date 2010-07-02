@@ -216,6 +216,7 @@ sub newEnv {
             ? HTTP::Request::Common::POST( $url, [ %$form ] )
             : HTTP::Request::Common::GET( $url )
             ;
+        $request->headers->user_agent('WebGUI');
     }
     return $request->to_psgi;
 }

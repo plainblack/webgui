@@ -588,8 +588,8 @@ to SSL.
 sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	my ($conf, $env, $var, $http) = $self->session->quick(qw(config env var http));
-    if ($conf->get("sslEnabled") && $self->get("encryptPage") && ! $env->sslRequest) {
+	my ($conf, $var, $http) = $self->session->quick(qw(config var http));
+    if ($conf->get("sslEnabled") && $self->get("encryptPage") && ! $self->session->request->secure) {
         # getUrl already changes url to https if 'encryptPage'
         $http->setRedirect($self->getUrl);
         $http->sendHeader;
@@ -1726,7 +1726,7 @@ sub getWwwCacheKey {
     my $session  = $self->session;
     my $method   = shift;
     my $cacheKey = join '_', @_, $self->getId;
-    if ($session->env->sslRequest) {
+    if ($session->request->secure) {
         $cacheKey .= '_ssl';
     }
     return $cacheKey;

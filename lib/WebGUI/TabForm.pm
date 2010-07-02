@@ -206,7 +206,7 @@ sub new {
 	}
 	my $i18n = WebGUI::International->new($session);
     my $cancelJS  = 'history.go(-1);';
-    if (my $cancelURL = $session->env->get('HTTP_REFERER')) {
+    if (my $cancelURL = $session->request->referer) {
         $cancelJS = sprintf q{window.location.href='%s';}, $cancelURL;
     }
 	my $cancel = WebGUI::Form::button($session,{

@@ -26,7 +26,6 @@ use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Session::DateTime;
-use WebGUI::Session::Env;
 use WebGUI::Session::ErrorHandler;
 use WebGUI::Session::Form;
 use WebGUI::Session::Http;
@@ -66,7 +65,6 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->datetime
  $session->db
  $session->dbSlave
- $session->env
  $session->log
  $session->form
  $session->http
@@ -171,7 +169,7 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
 		delete $self->{$key};
 	}
 }
@@ -305,23 +303,6 @@ sub duplicate {
         $self->getId,
     );
     return $newSession;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 env ( )
-
-Returns a WebGUI::Session::Env object.
-
-=cut
-
-sub env {
-	my $self = shift;
-	unless (exists $self->{_env}) {
-		$self->{_env} = WebGUI::Session::Env->new($self);
-	}
-	return $self->{_env};
 }
 
 
@@ -486,6 +467,7 @@ sub open {
     if (! $env) {
         my $url = 'http://' . $config->get('sitename')->[0];
         my $request = HTTP::Request::Common::GET($url);
+        $request->headers->user_agent('WebGUI');
         $env = $request->to_psgi;
     }
 

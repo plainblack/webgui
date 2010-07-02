@@ -46,7 +46,7 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-    if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
+    if ($session->request->env->{"HTTP_X_MOZ"} eq "prefetch") { # browser prefetch is a bad thing
         $session->http->setStatus(403);
     }
     return undef;

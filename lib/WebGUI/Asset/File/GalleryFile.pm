@@ -697,7 +697,7 @@ sub processCommentEditForm {
                     ;
 
     my $visitorIp   = $session->user->isVisitor
-                    ? $session->env->get("REMOTE_ADDR")
+                    ? $session->request->remote_host
                     : undef
                     ;
 
