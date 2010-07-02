@@ -15,7 +15,13 @@ package WebGUI::Keyword;
 =cut
 
 use strict;
-use Class::InsideOut qw(public register id);
+use Moose;
+
+has session => (
+    is              => 'ro',
+    required        => 1,
+);
+
 use HTML::TagCloud;
 use WebGUI::Paginator;
 
@@ -40,6 +46,17 @@ These methods are available from this class:
 
 =cut
 
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession);
+    }
+    return $className->$orig(@_);
+};
 
 #-------------------------------------------------------------------
 
@@ -48,9 +65,6 @@ These methods are available from this class:
 Returns a reference to the current session.
 
 =cut
-
-public session => my %session;
-
 
 #-------------------------------------------------------------------
 
@@ -472,15 +486,6 @@ Constructor.
 A reference to the current session.
 
 =cut
-
-sub new {
-    my $class = shift;
-    my $session = shift;
-    my $self = bless \do {my $s}, $class;
-    register($self);
-    $session{id $self} = $session;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 
