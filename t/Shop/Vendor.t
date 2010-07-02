@@ -31,22 +31,20 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 49;
+plan tests => 50;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 my $loaded = use_ok('WebGUI::Shop::Vendor');
 
-my ($vendor, $guard, $numberOfVendors);
+my ($vendor);
 my ($fence, $fenceCopy);
 my $fenceUser = WebGUI::User->new($session, 'new');
 $fenceUser->username('fence');
 my $guardUser = WebGUI::User->new($session, 'new');
 $guardUser->username('guard');
 WebGUI::Test->addToCleanup($fenceUser, $guardUser);
-
-$numberOfVendors = scalar @{ WebGUI::Shop::Vendor->getVendors($session) };
 
 #######################################################################
 #
@@ -125,15 +123,17 @@ cmp_deeply(
 my $now = WebGUI::DateTime->new($session, time);
 
 eval { $fence = WebGUI::Shop::Vendor->create($session, { userId => $fenceUser->userId, }); };
-WebGUI::Test->addToCleanup($fence);
 $e = Exception::Class->caught();
-ok(!$e, 'No exception thrown by create');
+ok(!$e, 'No exception thrown by create') ||
+    diag $@;
 isa_ok($vendor, 'WebGUI::Shop::Vendor', 'create returns correct type of object');
+WebGUI::Test->addToCleanup($fence);
 
+$fence->write;
 ok($fence->get('dateCreated'), 'dateCreated is not null');
 my $dateCreated = WebGUI::DateTime->new($session, $fence->get('dateCreated'));
 my $deltaDC = $dateCreated - $now;
-cmp_ok( $deltaDC->seconds, '<=', 2, 'dateCreated is set properly');
+cmp_ok( $deltaDC->in_units('seconds'), '<=', 2, 'dateCreated is set properly');
 
 #######################################################################
 #
@@ -144,11 +144,14 @@ cmp_ok( $deltaDC->seconds, '<=', 2, 'dateCreated is set properly');
 ok($session->id->valid($fence->get('vendorId')),   'get: vendorId is a valid guid');
 is($fence->getId,         $fence->get('vendorId'), 'get: getId is an alias for get vendorId');
 is($fence->get('userId'), $fenceUser->userId,      'get: userId');
-is($fence->get('name'),   undef,                   'get: by default, no name is set');
+is($fence->get('name'),   '',                      'get: by default, no name is set');
 
 $fence->update({name =>  'Bogs Diamond'});
 is($fence->get('name'),  'Bogs Diamond',           'get: get name');
 is($fence->get('userId'), $fenceUser->userId,      'get: updating name did not affect userId');
+
+my $fence_fresh = WebGUI::Shop::Vendor->new($session, $fence->vendorId);
+is($fence->name,  'Bogs Diamond',           'update wrote to the db');
 
 my $newProps = {
     name => 'Warden Norton',
@@ -170,7 +173,6 @@ cmp_deeply(
         paymentInformation   => ignore(),
         vendorId             => ignore(),
         preferredPaymentType => ignore(),
-        paymentAddressId     => ignore(),
         dateCreated          => ignore(),
         url                  => 'http://www.shawshank.com',
         userId               => $fenceUser->userId,
@@ -246,10 +248,11 @@ my $defaultVendor = WebGUI::Shop::Vendor->newByUserId($session, 3);
 #
 #######################################################################
 
-$guard = WebGUI::Shop::Vendor->create($session, { userId => $guardUser->userId, name => q|Warden Norton|});
+my $guard = WebGUI::Shop::Vendor->create($session, { userId => $guardUser->userId, name => q|Warden Norton|});
+$guard->write;
 WebGUI::Test->addToCleanup($guard);
 my $vendorsList = WebGUI::Shop::Vendor->getVendors($session);
-cmp_deeply(
+cmp_bag(
     $vendorsList,
     [ $guard, $fence, $defaultVendor, ],
     'getVendors returns all 3 vendors as an array ref'
