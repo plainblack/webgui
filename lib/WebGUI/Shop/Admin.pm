@@ -1,7 +1,27 @@
 package WebGUI::Shop::Admin;
 
 use strict;
-use Class::InsideOut qw{ :std };
+
+use Moose;
+
+has session => (
+    is              => 'ro',
+    required        => 1,
+);
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession);
+    }
+    return $className->$orig(@_);
+};
+
+
 use WebGUI::AdminConsole;
 use WebGUI::Exception::Shop;
 use WebGUI::HTMLForm;
@@ -27,8 +47,6 @@ All the admin stuff that didn't fit elsewhere.
 These subroutines are available from this package:
 
 =cut
-
-readonly session => my %session;
 
 #-------------------------------------------------------------------
 
@@ -102,17 +120,6 @@ Constructor.
 A reference to the current session.
 
 =cut
-
-sub new {
-    my ($class, $session) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id } = $session;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 
