@@ -14,7 +14,7 @@ use WebGUI::Command -command;
 use strict;
 use warnings;
 
-use WebGUI::Paths -inc;
+use WebGUI::Paths;
 use WebGUI::Upgrade;
 
 sub opt_spec {

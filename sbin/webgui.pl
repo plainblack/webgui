@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use WebGUI::Paths -inc;
 use WebGUI::Command;
 WebGUI::Command->run;
 
