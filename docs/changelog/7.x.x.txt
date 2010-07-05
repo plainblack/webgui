@@ -5,6 +5,7 @@
  - fixed #11681: Gallery album chokes on photo w/ missing properties
  - fixed #11612: Thingy: Search on "list" type fields does not work properly
  - fixed #11698: Trash dies on missing or bad workflow
+ - fixed #11692: Dates not imported correctly into Thingy
 
 7.8.22
  - fixed #11619: Trash Expired Events not trashing events
