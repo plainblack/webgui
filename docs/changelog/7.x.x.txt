@@ -3,6 +3,7 @@
  - fixed: missing per-item template variables for the cart.
  - fixed #11696: WebGUI 7.9.8 gotcha
  - fixed #11698: Trash dies on missing or bad workflow
+ - fixed #11692: Dates not imported correctly into Thingy
 
 7.9.8
  - fixed #11651: First Day of Week is a string...
