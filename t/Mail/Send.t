@@ -42,7 +42,7 @@ if ( $@ ) { diag( "Can't prepare mail server: $@" ) }
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 34;        # Increment this number for each test you create
+plan tests => 38;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test create
@@ -173,6 +173,46 @@ is($dbMail->getMimeEntity->head->get('Subject'), "=?UTF-8?Q?H=C3=84ufige=20Frage
     $mail->addText('This is a textual email');
     my $result = $mail->getMimeEntity->is_multipart;
     ok(defined $result &&   $result, 'by default, we make multipart messages');
+}
+
+{
+    ##Disable the footer for easy processing
+    my $origFooter = $session->setting->get('mailFooter');
+    $session->setting->set('mailFooter', "");
+    my $textMail = WebGUI::Mail::Send->create( $session );
+    $textMail->addText("H\x{00C4}ufige Fragen");
+    $textMail->addFooter();
+    is $textMail->getMimeEntity->parts(0)->bodyhandle->as_string,
+       encode('utf-8', "H\x{00C4}ufige Fragen\n\n"),
+       'check that adding a footer does not double encode the body when it is text';
+    my $htmlMail = WebGUI::Mail::Send->create( $session );
+    $htmlMail->addHtml("__H\x{00C4}ufige Fragen__");
+    $htmlMail->addFooter();
+    my ($encoded_segment) = $htmlMail->getMimeEntity->parts(0)->bodyhandle->as_string =~ /__([^_]+)__/;
+    is $encoded_segment,
+       encode('utf-8', "H\x{00C4}ufige Fragen"),
+       '... similarly with an html body';
+    $session->setting->set('mailFooter', $origFooter);
+}
+
+{
+    ##Set the footer to contain UTF-8 characters
+    my $origFooter = $session->setting->get('mailFooter');
+    $session->setting->set('mailFooter', "Not beta: \x{00DF} ");
+    my $textMail = WebGUI::Mail::Send->create( $session );
+    $textMail->addText("");
+    $textMail->addFooter();
+    is $textMail->getMimeEntity->parts(0)->bodyhandle->as_string,
+       encode('utf-8', "\n\nNot beta: \x{00DF} "),
+       'check that footer is encoded as UTF-8 for a text body';
+    my $htmlMail = WebGUI::Mail::Send->create( $session );
+    $htmlMail->addHtml("");
+    $htmlMail->addFooter();
+    my ($encoded_segment) = $htmlMail->getMimeEntity->parts(0)->bodyhandle->as_string =~ /Not beta: (\S+)/;
+    is $encoded_segment,
+       encode('utf-8', "\x{00DF}"),
+       '... similarly with an html body';
+    $session->setting->set('mailFooter', $origFooter);
 }
 
 my $smtpServerOk = 0;

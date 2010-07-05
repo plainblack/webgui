@@ -98,8 +98,9 @@ Macros in the footer will be evaluated.
 sub addFooter {
 	my $self = shift;
     return if $self->{_footerAdded};
-	my $text = "\n\n".$self->session->setting->get("mailFooter");
-	WebGUI::Macro::process($self->session, \$text);
+	my $footer = "\n\n".$self->session->setting->get("mailFooter");
+	WebGUI::Macro::process($self->session, \$footer);
+    my $text = encode("utf8", $footer);
     $self->{_footerAdded} = 1;
     my @parts = $self->getMimeEntity->parts();
     ##No parts yet, add one with the footer content.
@@ -117,7 +118,7 @@ sub addFooter {
             Charset     => "UTF-8",
             Encoding    => "quoted-printable",
             Type        => 'text/plain',
-            Data        => encode('utf8', $body_content),
+            Data        => $body_content,
         );
         shift @parts;
         unshift @parts, $new_part;
@@ -130,7 +131,7 @@ sub addFooter {
             Charset     => "UTF-8",
             Encoding    => "quoted-printable",
             Type        => 'text/html',
-            Data        => encode('utf8', $body_content),
+            Data        => $body_content,
         );
         shift @parts;
         unshift @parts, $new_part;
