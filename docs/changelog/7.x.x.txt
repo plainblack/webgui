@@ -4,6 +4,7 @@
  - fixed #11696: WebGUI 7.9.8 gotcha
  - fixed #11698: Trash dies on missing or bad workflow
  - fixed #11692: Dates not imported correctly into Thingy
+ - fixed #11672: UTF-Error in message body (from DataForm)
 
 7.9.8
  - fixed #11651: First Day of Week is a string...
