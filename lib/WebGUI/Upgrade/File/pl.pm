@@ -19,6 +19,8 @@ WebGUI::Upgrade::File::pl - Upgrade class for Perl scripts
 package WebGUI::Upgrade::File::pl;
 use Moose;
 use Class::MOP::Class;
+use File::Spec::Functions qw(devnull);
+use Scope::Guard;
 use namespace::autoclean -also => qr/^_/;
 
 with 'WebGUI::Upgrade::File';
@@ -29,7 +31,15 @@ sub run {
 
     local $ENV{WEBGUI_CONFIG}           = $configFile;
     local $ENV{WEBGUI_UPGRADE_VERSION}  = $self->version;
-    local $ENV{WEBGUI_UPGRADE_QUIET}    = $self->quiet;
+    my $io_guard;
+    if ($self->quiet) {
+        open my $stdout_old, '>&=', \*STDOUT;
+        open \*STDOUT, '>', devnull;
+        $io_guard = Scope::Guard->new(sub {
+            close STDOUT;
+            open STDOUT, '>&=', $stdout_old;
+        });
+    }
     return _runScript($self->file);
 }
 

@@ -43,7 +43,6 @@ sub _build_exports {
         or die 'WEBGUI_CONFIG environment variable must be specified';
     my $version      = $ENV{WEBGUI_UPGRADE_VERSION}
         or die 'WEBGUI_UPGRADE_VERSION must be set';
-    my $quiet        = $ENV{WEBGUI_UPGRADE_QUIET};
     my $upgrade_file = $caller_upgrade_file;
     (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
     $shortname =~ s/\.[^.]*$//;
@@ -122,6 +121,9 @@ sub _build_exports {
     push @cleanups, $cleanup;
     weaken $cleanups[-1];
 
+    my $indent = 0;
+    my $just_started;
+
     my $subs = {
         # this closes over the guard, keeping it alive until the sub is either
         # run or deleted.  WebGUI::Upgrade::File::pl will end up deleting
@@ -134,16 +136,25 @@ sub _build_exports {
         version_tag => $version_tag_sub,
         dbh         => $dbh_sub,
         collateral  => $collateral_sub,
-        quiet => sub () {
-            return $quiet;
+        start_step  => sub (@) {
+            print "\n"
+                if $just_started;
+            print "\t" x $indent, @_, '... ';
+            $just_started = 1;
+            $indent++;
         },
         report => sub (@) {
-            print @_
-                unless $quiet;
+            print "\n"
+                if $just_started;
+            print "\t" x $indent, @_, "\n";
+            $just_started = 0;
         },
         done => sub () {
-            print "Done.\n"
-                unless $quiet;
+            $indent--;
+            print "\t" x $indent
+                unless $just_started;
+            print "Done.\n";
+            $just_started = 0;
         },
         sql => sub (@) {
             my $sql = shift;
@@ -273,7 +284,7 @@ They cannot be called directly.
 
 =head2 report ( $message )
 
-Outputs $message unless quiet mode has been enabled.
+Outputs $message.
 
 =head2 done
 

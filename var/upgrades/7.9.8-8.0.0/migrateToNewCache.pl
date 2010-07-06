@@ -1,7 +1,7 @@
 use WebGUI::Upgrade::Script;
 use Module::Find;
 
-report "\tMigrating to new cache ... ";
+start_step "Migrating to new cache";
 
 rm_lib
     findallmod('WebGUI::Cache'),
