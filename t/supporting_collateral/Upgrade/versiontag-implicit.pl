@@ -7,7 +7,7 @@ WebGUI::Asset->getRoot(session)->addChild({
 });
 my $vt = WebGUI::VersionTag->getWorking(session, 'nocreate');
 if ($vt) {
-    ::addToCleanup($vt);
+    ::addToCleanup('WebGUI::VersionTag', $vt->getId);
 }
 $vt;
 

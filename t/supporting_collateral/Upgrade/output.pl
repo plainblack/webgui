@@ -1,5 +1,5 @@
 use WebGUI::Upgrade::Script;
-report 'Simple Output';
+start_step 'Simple Output';
 
 done;
 

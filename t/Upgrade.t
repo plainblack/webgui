@@ -24,7 +24,7 @@ use Capture::Tiny qw(capture);
 local *WebGUI::Paths::siteConfigs;
 local *WebGUI::Paths::upgrades;
 
-our $configFile = WebGUI::Test->config->getFilename;
+our $configFile = WebGUI::Test->config->pathToFile;
 {
     no warnings 'redefine';
     *WebGUI::Paths::siteConfigs = sub { $configFile };

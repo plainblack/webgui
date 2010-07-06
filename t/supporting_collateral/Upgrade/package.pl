@@ -1,5 +1,5 @@
 use WebGUI::Upgrade::Script;
-::addToCleanup(version_tag);
+::addToCleanup('WebGUI::VersionTag', version_tag->getId);
 
 import_package('test-template.wgpkg');
 

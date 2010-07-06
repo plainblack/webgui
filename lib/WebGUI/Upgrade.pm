@@ -346,7 +346,7 @@ sub runUpgradeFile {
     my ($configFile, $version, $filename) = @_;
     my $has_run = $self->_files_run->{ Cwd::realpath($filename) } ++;
 
-    try {
+    return try {
         my $upgrade_class = $self->classForFile($filename);
         my $upgrade_file = $upgrade_class->new(
             version     => $version,
@@ -361,12 +361,12 @@ sub runUpgradeFile {
     catch {
         when (/^No upgrade package/) {
             warn $_;
+            return;
         }
         default {
             die $_;
         }
     };
-    return;
 }
 
 =head2 classForFile ( $file )
