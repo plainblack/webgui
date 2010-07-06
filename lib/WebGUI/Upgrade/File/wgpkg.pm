@@ -30,8 +30,9 @@ use namespace::clean;
 
 sub run {
     my $self = shift;
+    my $configFile = shift;
 
-    my $session = WebGUI::Session->open($self->configFile);
+    my $session = WebGUI::Session->open($configFile);
     $session->user({userId => 3});
 
     my $versionTag = WebGUI::VersionTag->getWorking($session);
