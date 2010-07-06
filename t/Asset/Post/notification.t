@@ -59,7 +59,7 @@ my $t1p1 = $first_thread->addChild(
     {
         className   => 'WebGUI::Asset::Post',
         title       => $title,
-        url         => lc $title,
+        url         => 'haufige fragen',
         content     => $content,
     },
     @addArgs
@@ -69,7 +69,7 @@ $versionTag->commit();
 WebGUI::Test->addToCleanup($versionTag);
 
 is $t1p1->get('title'), "H\x{00E4}ufige Fragen", "utf8 in title set correctly";
-is $t1p1->get('url'),   "h\x{00E4}ufige-fragen", "... in url";
+is $t1p1->get('url'),   "haufige-fragen", "... in url";
 is $t1p1->get('content'), "Ba\x{00DF}", "... in content";
 
 foreach my $asset ($collab, $first_thread, $t1p1, ) {
@@ -77,7 +77,7 @@ foreach my $asset ($collab, $first_thread, $t1p1, ) {
 }
 
 is $t1p1->get('title'), "H\x{00E4}ufige Fragen", "utf8 title pulled correctly from db";
-is $t1p1->get('url'),   "h\x{00E4}ufige-fragen", "... and url";
+is $t1p1->get('url'),   "haufige-fragen", "... and url";
 is $t1p1->get('content'), "Ba\x{00DF}", "... and content";
 
 $t1p1->notifySubscribers();
@@ -95,7 +95,7 @@ chomp $subject;
 is $subject, "H\x{00E4}ufige Fragen", 'subject has correct UTF8 phrase';
 my $body = $message1->getMimeEntity->parts(0)->bodyhandle->as_string;  ##comes out decoded for us
 my ($url, $content) = $body =~ /!!!url:([^!]+)!!!content:([^!]+)!!!/;
-my $expected_url = $session->url->getSiteURL . "/h\x{00E4}ufige-fragen";
+my $expected_url = $session->url->getSiteURL . "/haufige-fragen";
 utf8::encode($expected_url);
 is $url,
     $expected_url,
