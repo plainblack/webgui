@@ -65,7 +65,7 @@ sub checkContent {
 	my $content = shift;
 	my @content = @{$content};
 
-	my $podAllowed = 0;
+	my $podAllowed = 1;
 	my $lineNumber = 1;
 	foreach my $line (@content) {
 		chomp $line;
