@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 51;
+plan tests => 55;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -67,6 +67,19 @@ cmp_deeply(
     'new: requires a session variable',
 );
 
+eval { $vendor = WebGUI::Shop::Vendor->new({ userId => 3, }); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidObject', 'new via property hash takes an exception to not giving it a session variable');
+cmp_deeply(
+    $e,
+    methods(
+        error    => 'Need a session.',
+        got      => '',
+        expected => 'WebGUI::Session',
+    ),
+    '... requires a session variable',
+);
+
 eval { $vendor = WebGUI::Shop::Vendor->new($session); };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes an exception to not giving it a vendor id to instanciate');
@@ -89,6 +102,13 @@ cmp_deeply(
     ),
     'new: requires a valid vendorId',
 );
+
+my $test_vendor = eval { WebGUI::Shop::Vendor->new({ session => $session, }); };
+$e = Exception::Class->caught();
+ok(!$e, 'new via property hash with session');
+isa_ok($test_vendor, 'WebGUI::Shop::Vendor', '... returns correct type of object');
+WebGUI::Test->addToCleanup($test_vendor);
+$test_vendor->delete;
 
 eval { $vendor = WebGUI::Shop::Vendor->new($session, 'defaultvendor000000000'); };
 $e = Exception::Class->caught();

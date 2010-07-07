@@ -50,12 +50,12 @@ around BUILDARGS => sub {
         ##Need same db code as below here.
         ##Session check goes here?
         ##Build a new one
-        my $session = $_[0]->{session};
+        my $properties = $_[0];
+        my $session = $properties->{session};
         if (! (blessed $session && $session->isa('WebGUI::Session')) ) {
             WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
         }
         my ($vendorId, $dateCreated) = $class->_init($session);
-        my $properties = {};
         $properties->{vendorId}    = $vendorId;
         $properties->{dateCreated} = $dateCreated;
         return $class->$orig($properties);
