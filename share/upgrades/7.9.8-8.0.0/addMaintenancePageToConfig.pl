@@ -9,6 +9,6 @@ start_step "Moving preload files";
 
 my $webgui_root = realpath( catdir( dirname( $INC{'WebGUI/Upgrade/Script.pm'} ), (updir) x 3 ) );
 
-config->set('maintenancePage', catfile( $webgui_root, 'www', 'maintenance.html' );
+config->set('maintenancePage', catfile( $webgui_root, 'www', 'maintenance.html' ));
 
 done;
