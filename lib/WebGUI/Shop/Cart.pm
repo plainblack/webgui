@@ -7,36 +7,36 @@ use Moose;
 use WebGUI::Definition;
 
 property 'shippingAddressId' => (
-    is         => 'rw',
     noFormPost => 1,
     default    => '',
 );
 
 property 'billingAddressId' => (
-    is         => 'rw',
     noFormPost => 1,
     default    => '',
 );
 
 property 'shipperId' => (
-    is         => 'rw',
     noFormPost => 1,
     default    => '',
 );
 
 property 'gatewayId' => (
-    is         => 'rw',
     noFormPost => 1,
     default    => '',
 );
 
 property 'posUserId' => (
-    is         => 'rw',
     noFormPost => 1,
     default    => '',
 );
 
-has [ qw/cartId creationDate session/] => (
+property creationDate => (
+    required   => 1,
+    noFormPost => 1,
+    default    => '',
+);
+has [ qw/cartId session/] => (
     is => 'ro',
     required => 1,
 );
