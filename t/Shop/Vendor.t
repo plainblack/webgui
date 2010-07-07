@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 50;
+plan tests => 51;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -128,6 +128,7 @@ ok(!$e, 'No exception thrown by create') ||
     diag $@;
 isa_ok($vendor, 'WebGUI::Shop::Vendor', 'create returns correct type of object');
 WebGUI::Test->addToCleanup($fence);
+is $fence->userId, $fenceUser->userId, 'object made with create has properties initialized correctly';
 
 $fence->write;
 ok($fence->get('dateCreated'), 'dateCreated is not null');
