@@ -423,7 +423,7 @@ sub createBackup {
     my $self = shift;
     my $config = shift;
     if (! ref $config) {
-        $config = WebGUI::Config->new($config, 1);
+        $config = WebGUI::Config->new($config);
     }
 
     make_path($self->backupPath);
@@ -492,7 +492,7 @@ sub dbhForConfig {
     my $class = shift;
     my $config = shift;
     if (! ref $config) {
-        $config = WebGUI::Config->new($config, 1);
+        $config = WebGUI::Config->new($config);
     }
     return WebGUI::SQL->connect($config);
 }
@@ -509,7 +509,7 @@ sub mysqlCommandLine {
     my $class = shift;
     my $config = shift;
     if (! ref $config) {
-        $config = WebGUI::Config->new($config, 1);
+        $config = WebGUI::Config->new($config);
     }
 
     my $dsn = $config->get('dsn');

@@ -55,7 +55,7 @@ sub _build_exports {
     my $config_sub = sub () {
         state $config = do {
             require WebGUI::Config;
-            WebGUI::Config->new($configFile, 1);
+            WebGUI::Config->new($configFile);
         };
         return $config;
     };
