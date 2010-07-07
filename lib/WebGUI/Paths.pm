@@ -85,7 +85,7 @@ Returns the base directory of the default site uploads content.
 
 Returns the file path of the default site create.sql script.
 
-=head2 var
+=head2 share
 
 Returns the base directory for WebGUI auxiliary files.
 
@@ -102,12 +102,12 @@ BEGIN {
         spectreConfig      => catfile($root, 'etc', 'spectre.conf'),
         preloadCustom      => catfile($root, 'etc', 'preload.custom'),
         preloadExclusions  => catfile($root, 'etc', 'preload.exclude'),
-        upgrades           => catdir($root, 'var', 'upgrades'),
+        upgrades           => catdir($root, 'share', 'upgrades'),
         extras             => catdir($root, 'www', 'extras'),
         defaultUploads     => catdir($root, 'www', 'uploads'),
         defaultCreateSQL   => catdir($root, 'docs', 'create.sql'),
-        var                => catdir($root, 'var'),
-        defaultPSGI        => catdir($root, 'var', 'site.psgi'),
+        share              => catdir($root, 'share'),
+        defaultPSGI        => catdir($root, 'share', 'site.psgi'),
     );
     my $meta = Class::MOP::Class->initialize(__PACKAGE__);
     for my $sub (keys %paths) {

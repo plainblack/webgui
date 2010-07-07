@@ -73,7 +73,7 @@ sub getFile {
 	if ($self->getStorageId) {
 		return WebGUI::Storage->get($self->session, $self->getStorageId)->getPath($self->getFilename);
 	} else {
-		return WebGUI::Paths->var . '/default.ttf';
+		return WebGUI::Paths->share . '/default.ttf';
 	}
 }
 
