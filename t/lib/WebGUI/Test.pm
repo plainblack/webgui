@@ -310,6 +310,9 @@ sub interceptLogging {
     $logger->mock( 'error',    sub { our $logger_error = $_[1]} );
     $logger->mock( 'isDebug',  sub { return 1 } );
     $logger->mock( 'is_debug', sub { return 1 } );
+    $logger->mock( 'is_info',  sub { return 1 } );
+    $logger->mock( 'is_warn',  sub { return 1 } );
+    $logger->mock( 'is_error', sub { return 1 } );
 }
 
 #----------------------------------------------------------------------------
@@ -328,7 +331,10 @@ sub restoreLogging {
            ->unmock( 'info'     )
            ->unmock( 'error'    )
            ->unmock( 'isDebug'  )
-           ->unmock( 'is_debug' );
+           ->unmock( 'is_debug' )
+           ->unmock( 'is_info'  )
+           ->unmock( 'is_warn'  )
+           ->unmock( 'is_error' );
 }
 
 #----------------------------------------------------------------------------
