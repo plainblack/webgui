@@ -2,7 +2,58 @@ package WebGUI::Shop::Cart;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+use Scalar::Util qw/blessed/;
+use Moose;
+use WebGUI::Definition;
+
+property 'shippingAddressId' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'billingAddressId' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'shipperId' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'gatewayId' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'posUserId' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+has [ qw/cartId creationDate session/] => (
+    is => 'ro',
+    required => 1,
+);
+has sessionId => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_default_sessionId',
+);
+sub _default_sessionId {
+    my $self = shift;
+    return $self->session->getId;
+}
+has error => (
+    is       => 'rw',
+);
+
+
 use JSON;
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
@@ -38,10 +89,115 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
-private properties => my %properties;
-public error => my %error;
-private addressBookCache => my %addressBookCache;
+#readonly session => my %session;
+#private properties => my %properties;
+#public error => my %error;
+#private addressBookCache => my %addressBookCache;
+
+#-------------------------------------------------------------------
+
+=head2 new ( $session, $cartId )
+
+Constructor.  Instanciates a cart based upon a cartId.
+
+=head2 new ( $session )
+
+Constructor.  Builds a new, default cart object.
+
+=head2 new ( $properties )
+
+Constructor.  Builds a new, default cart object in Moose style with default properties set by $properties. This does not
+persist them to the database automatically.  This needs to be done via $self->write.
+
+=head3 $session
+
+A reference to the current session.
+
+=head3 $cartId
+
+The unique id of a cart to instanciate.
+
+=head3 $properties
+
+A hash reference that contains one or more of the following:
+
+=head4 shippingAddressId
+
+The unique id for a shipping address attached to this cart.
+
+=head4 billingAddressId
+
+The unique id for a billing address attached to this cart.
+
+=head4 shipperId
+
+The unique id of the configured shipping driver that will be used to ship these goods.
+
+=head4 posUserId
+
+The ID of a user being checked out, if they're being checked out by a cashier.
+
+=head4 creationDate
+
+The date the cart was created.
+
+=cut
+
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if (ref $_[0] eq 'HASH') {
+        my $properties = $_[0];
+        my $session = $properties->{session};
+        if (! (blessed $session && $session->isa('WebGUI::Session')) ) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+        }
+        my ($cartId, $creationDate) = $class->_init($session);
+        $properties->{cartId}       = $cartId;
+        $properties->{creationDate} = $creationDate;
+        return $class->$orig($properties);
+    }
+    my $session = shift;
+    if (! (blessed $session && $session->isa('WebGUI::Session'))) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    my $argument2 = shift;
+    if (!defined $argument2) {
+        my ($cartId, $creationDate) = $class->_init($session);
+        my $properties = {};
+        $properties->{session}      = $session;
+        $properties->{cartId}       = $cartId;
+        $properties->{creationDate} = $creationDate;
+        return $class->$orig($properties);
+    }
+    ##Look up one in the db
+    my $cart = $session->db->quickHashRef("select * from cart where cartId=?", [$argument2]);
+    if ($cart->{cartId} eq "") {
+        WebGUI::Error::ObjectNotFound->throw(error=>"No such cart.", id=>$argument2);
+    }
+    $cart->{session} = $session;
+    return $class->$orig($cart);
+};
+
+
+#-------------------------------------------------------------------
+
+=head2 _init ( session )
+
+Builds a stub of object information in the database, and returns the newly created
+cartId, and the creationDate fields so the object can be initialized correctly.
+
+=cut
+
+sub _init {
+    my $class        = shift;
+    my $session      = shift;
+    my $creationDate = WebGUI::DateTime->new($session)->epoch;
+    my $cartId       = $session->id->generate;
+    $session->db->write('insert into cart (cartId, sessionId, creationDate) values (?,?,?)', [$cartId, $session->getId, $creationDate]);
+    return ($cartId, $creationDate);
+}
 
 #-------------------------------------------------------------------
 
@@ -83,7 +239,7 @@ sub calculateShopCreditDeduction {
     }
     # cannot use in-shop credit on recurring items
     return $self->formatCurrency(0) if $self->requiresRecurringPayment;
-    return $self->formatCurrency(WebGUI::Shop::Credit->new($self->session, $self->get('posUserId'))->calculateDeduction($total));
+    return $self->formatCurrency(WebGUI::Shop::Credit->new($self->session, $self->posUserId)->calculateDeduction($total));
 }
 
 #-------------------------------------------------------------------
@@ -160,7 +316,7 @@ sub calculateTotal {
 
 =head2 create ( session )
 
-Constructor. Creates a new cart object if there’s not one already attached to the current session object. Otherwise just instanciates the existing one.  Returns a reference to the object.
+Deprecated, left as a stub for existing code.  Use L<new> instead.
 
 =head3 session
 
@@ -230,27 +386,6 @@ sub formatCurrency {
 
 #-------------------------------------------------------------------
 
-=head2 get ( [ property ] )
-
-Returns a duplicated hash reference of this object’s data.
-
-=head3 property
-
-Any field − returns the value of a field rather than the hash reference.
-
-=cut
-
-sub get {
-    my ($self, $name) = @_;
-    if (defined $name) {
-        return $properties{id $self}{$name};
-    }
-    my %copyOfHashRef = %{$properties{id $self}};
-    return \%copyOfHashRef;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getAddressBook ()
 
 Returns a reference to the address book for the user who's cart this is.
@@ -259,11 +394,10 @@ Returns a reference to the address book for the user who's cart this is.
 
 sub getAddressBook {
     my $self = shift;
-    my $id = id $self;
-    unless (exists $addressBookCache{$id}) {
-        $addressBookCache{$id} = WebGUI::Shop::AddressBook->newByUserId($self->session);
+    unless (exists $self->{_addressBook}) {
+        $self->{_addressBook} = WebGUI::Shop::AddressBook->newByUserId($self->session);
     }    
-    return $addressBookCache{$id};
+    return $self->{_addressBook};
 }
 
 #-------------------------------------------------------------------
@@ -277,7 +411,7 @@ Returns the WebGUI::Shop::Address object that is attached to this cart for billi
 sub getBillingAddress {
     my $self = shift;
     my $book = $self->getAddressBook;
-    if (my $addressId = $self->get("billingAddressId")) {
+    if (my $addressId = $self->billingAddressId) {
         return $book->getAddress($addressId);
     }
     my $address = $book->getDefaultAddress;
@@ -332,7 +466,7 @@ Returns the unique id for this cart.
 
 sub getId {
     my ($self) = @_;
-    return $self->get("cartId");
+    return $self->cartId;
 }
 
 #-------------------------------------------------------------------
@@ -409,7 +543,7 @@ Returns the WebGUI::Shop::PayDriver object that is attached to this cart for pay
 
 sub getPaymentGateway {
     my $self = shift;
-    return WebGUI::Shop::Pay->new($self->session)->getPaymentGateway($self->get("gatewayId"));
+    return WebGUI::Shop::Pay->new($self->session)->getPaymentGateway($self->gatewayId);
 }
 
 #-------------------------------------------------------------------
@@ -422,7 +556,7 @@ Returns the userId of the user making a purchase. If there is a cashier and the 
 
 sub getPosUser {
     my $self = shift;
-    if ($self->get('posUserId') ne "") {
+    if ($self->posUserId ne "") {
         return WebGUI::User->new($self->session, $self->get('posUserId'));
     }
     return $self->session->user;    
@@ -438,7 +572,7 @@ Returns the WebGUI::Shop::ShipDriver object that is attached to this cart for sh
 
 sub getShipper {
     my $self = shift;
-    return WebGUI::Shop::Ship->new(session => $self->session)->getShipper($self->get("shipperId"));
+    return WebGUI::Shop::Ship->new(session => $self->session)->getShipper($self->shipperId);
 }
 
 #-------------------------------------------------------------------
@@ -452,8 +586,8 @@ Returns the WebGUI::Shop::Address object that is attached to this cart for shipp
 sub getShippingAddress {
     my $self = shift;
     my $book = $self->getAddressBook;
-    if ($self->get("shippingAddressId")) {
-        return $book->getAddress($self->get("shippingAddressId"));
+    if ($self->shippingAddressId) {
+        return $book->getAddress($self->shippingAddressId);
     }
     my $address = $book->getDefaultAddress;
     $self->update({shippingAddressId=>$address->getId});
@@ -487,41 +621,6 @@ sub hasMixedItems {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, cartId )
-
-Constructor.  Instanciates a cart based upon a cartId.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 cartId
-
-The unique id of a cart to instanciate.
-
-=cut
-
-sub new {
-    my ($class, $session, $cartId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    unless (defined $cartId && $cartId =~ m/^[A-Za-z0-9_-]{22}$/) {
-        WebGUI::Error::InvalidParam->throw(error=>"Need a cartId.");
-    }
-    my $cart = $session->db->quickHashRef('select * from cart where cartId=?', [$cartId]);
-    if ($cart->{cartId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"No such cart.", id=>$cartId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    $properties{ $id } = $cart;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 newBySession ( session )
 
 Class method that figures out if the user has a cart in their session. If they do it returns it. If they don't it creates it and returns it.
@@ -538,8 +637,7 @@ sub newBySession {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
     my $cartId = $session->db->quickScalar("select cartId from cart where sessionId=?",[$session->getId]);
-    return $class->new($session, $cartId) if (defined $cartId and $cartId ne '');
-    return $class->create($session);
+    return $class->new($session, $cartId);  ##Falls back to creating a new cart if there's no 2nd argument
 }
 
 #-------------------------------------------------------------------
@@ -597,12 +695,12 @@ sub readyForCheckout {
 
     if ($self->requiresShipping) {
         ##Must have a configured shipping id.
-        if (! $self->get('shipperId')) {
+        if (! $self->shipperId) {
             $self->error('no shipping method set');
             return 0;
         }
 
-        my $shipper = eval { WebGUI::Shop::ShipDriver->new($session, $self->get('shipperId'))};
+        my $shipper = eval { WebGUI::Shop::ShipDriver->new($session, $self->shipperId)};
         if (my $e = WebGUI::Error->caught) {
             $self->error($e->error);
             return 0;
@@ -628,19 +726,19 @@ sub readyForCheckout {
     }
 
     ##Must have a configured payment method.
-    if (! $self->get('gatewayId')) {
+    if (! $self->gatewayId) {
         $self->error('no payment gateway set');
         return 0;
     }
 
-    my $gateway = eval { WebGUI::Shop::PayDriver->new($session, $self->get('gatewayId'))};
+    my $gateway = eval { WebGUI::Shop::PayDriver->new($session, $self->gatewayId)};
     if (my $e = WebGUI::Error->caught) {
         $self->error($e->error);
         return 0;
     }
 
     ##Check for any other logged errors
-    return 0 if $error{ id $self };
+    return 0 if $self->error;
 
     # All checks passed so return true
     return 1;
@@ -688,46 +786,17 @@ sub requiresShipping {
 
 #-------------------------------------------------------------------
 
-=head2 update ( properties )
+=head2 write ( )
 
-Sets properties in the cart.
-
-=head3 properties
-
-A hash reference that contains one of the following:
-
-=head4 shippingAddressId
-
-The unique id for a shipping address attached to this cart.
-
-=head4 billingAddressId
-
-The unique id for a billing address attached to this cart.
-
-=head4 shipperId
-
-The unique id of the configured shipping driver that will be used to ship these goods.
-
-=head4 posUserId
-
-The ID of a user being checked out, if they're being checked out by a cashier.
-
-=head4 creationDate
-
-The date the cart was created.
+Serialize the current set of cart properties to the database.
 
 =cut
 
-sub update {
-    my ($self, $newProperties) = @_;
-    unless (defined $newProperties && ref $newProperties eq 'HASH') {
-        WebGUI::Error::InvalidParam->throw(error=>"Need a properties hash ref.");
-    }
-    my $id = id $self;
-    foreach my $field (qw(billingAddressId shippingAddressId posUserId gatewayId shipperId creationDate)) {
-        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
-    }
-    $self->session->db->setRow("cart","cartId",$properties{$id});
+sub write {
+    my ($self)     = @_;
+    my $properties = $self->get();
+    delete $properties->{error};
+    $self->session->db->setRow("cart", "cartId", $properties);
 }
 
 #-------------------------------------------------------------------
@@ -747,10 +816,10 @@ sub updateFromForm {
             eval { $item->setQuantity($form->get("quantity-".$item->getId)) };
             if (WebGUI::Error->caught("WebGUI::Error::Shop::MaxOfItemInCartReached")) {
                 my $i18n = WebGUI::International->new($self->session, "Shop");
-                $error{id $self} = sprintf($i18n->get("too many of this item"), $item->get("configuredTitle"));
+                $self->error(sprintf($i18n->get("too many of this item"), $item->get("configuredTitle")));
             }
             elsif (my $e = WebGUI::Error->caught) {
-                $error{id $self} = "An unknown error has occured: ".$e->message;
+                $self->error("An unknown error has occured: ".$e->message);
             }
         }
         if (my $itemAddressId = $form->get("itemAddress_".$item->getId)) {
@@ -759,7 +828,7 @@ sub updateFromForm {
     }
     if ($self->hasMixedItems) {
          my $i18n = WebGUI::International->new($self->session, "Shop");
-        $error{id $self} = $i18n->get('mixed items warning');
+        $self->error($i18n->get('mixed items warning'));
     }
 
     my @cartItemIds = $form->process('remove_item', 'checkList');
@@ -782,7 +851,7 @@ sub updateFromForm {
         my $newAddress = $book->addAddress(\%billingData);
         $cartProperties->{billingAddressId} = $newAddress->get('addressId');
     }
-    elsif ($billingAddressId eq 'update_address' && $self->get('billingAddressId') && ! @missingBillingFields) {
+    elsif ($billingAddressId eq 'update_address' && $self->billingAddressId && ! @missingBillingFields) {
         ##User updated the current address
         my $address = $self->getBillingAddress();
         $address->update(\%billingData);
@@ -802,7 +871,7 @@ sub updateFromForm {
 
     if ($self->requiresShipping) {
         if ($form->process('sameShippingAsBilling', 'yesNo')) {
-            $cartProperties->{shippingAddressId} = $self->get('billingAddressId');
+            $cartProperties->{shippingAddressId} = $self->billingAddressId;
         }
         else {
             my %shippingData = $book->processAddressForm('shipping_');
@@ -817,7 +886,7 @@ sub updateFromForm {
                 my $newAddress = $book->addAddress(\%shippingData);
                 $cartProperties->{shippingAddressId} = $newAddress->get('addressId');
             }
-            elsif ($shippingAddressId eq 'update_address' && $self->get('shippingAddressId') && ! @missingShippingFields) {
+            elsif ($shippingAddressId eq 'update_address' && $self->shippingAddressId && ! @missingShippingFields) {
                 ##User changed the address selector
                 my $address = $self->getBillingAddress();
                 $address->update(\%shippingData);
@@ -918,8 +987,8 @@ sub www_checkout {
     my $self    = shift;
     my $session = $self->session;
     ##Setting a shipping address greatly simplifies the Transaction
-    if (! $self->requiresShipping && ! $self->get('shippingAddressId')) {
-        $self->update({shippingAddressId => $self->get('billingAddressId')});
+    if (! $self->requiresShipping && ! $self->shippingAddressId) {
+        $self->update({shippingAddressId => $self->billingAddressId});
     }
     if ($self->readyForCheckout()) {
         my $total = $self->calculateTotal;
@@ -1049,7 +1118,7 @@ sub www_view {
 
     # get the shipping address    
     my $address = eval { $self->getShippingAddress };
-    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound") && $self->get('shippingAddressId')) {
+    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound") && $self->shippingAddressId) {
         # choose another address cuz we've got a problem
         $self->update({shippingAddressId=>''});
     }
@@ -1125,7 +1194,7 @@ sub www_view {
                     $formOptions{$optionId} .= ' ('.$self->formatCurrency($options->{$optionId}{price}).')';
                 }
             }
-            my $shipperId = $self->get('shipperId');
+            my $shipperId = $self->shipperId;
             if (!$shipperId && $numberOfOptions == 1) {
                 my ($option) = keys %{ $options };
                 $self->update({shipperId => $option});
@@ -1172,7 +1241,7 @@ sub www_view {
         tie my %billingAddressOptions, 'Tie::IxHash';
         $billingAddressOptions{'new_address'} = $i18n->get('Add new address');
 
-        my $billingAddressId = $self->get('billingAddressId');
+        my $billingAddressId = $self->billingAddressId;
         if ($billingAddressId) {
             $billingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getBillingAddress->get('label');
         }
@@ -1188,7 +1257,7 @@ sub www_view {
         tie my %shippingAddressOptions, 'Tie::IxHash';
         $shippingAddressOptions{'new_address'} = $i18n->get('Add new address');
 
-        my $shippingAddressId = $self->get('shippingAddressId');
+        my $shippingAddressId = $self->shippingAddressId;
         if ($shippingAddressId) {
             $shippingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getShippingAddress->get('label');
         }
@@ -1200,15 +1269,15 @@ sub www_view {
             value   => $shippingAddressId ? $shippingAddressId : 'new_address',
         });
 
-        my $shippingAddressData = $self->get('shippingAddressId') ? $self->getShippingAddress->get() : {};
-        my $billingAddressData  = $self->get('billingAddressId')  ? $self->getBillingAddress->get()  : {};
+        my $shippingAddressData = $self->shippingAddressId ? $self->getShippingAddress->get() : {};
+        my $billingAddressData  = $self->billingAddressId  ? $self->getBillingAddress->get()  : {};
         my $addressBook = $self->getAddressBook;
         $addressBook->appendAddressFormVars(\%var, 'shipping_', $shippingAddressData);
         $addressBook->appendAddressFormVars(\%var, 'billing_',  $billingAddressData);
 
         $var{sameShippingAsBilling} = WebGUI::Form::yesNo($session, {
             name => 'sameShippingAsBilling',
-            value => $self->get('billingAddressId') && $self->get('billingAddressId') eq $self->get('shippingAddressId'),
+            value => $self->billingAddressId && $self->billingAddressId eq $self->shippingAddressId,
         });
     }
 
@@ -1223,7 +1292,7 @@ sub www_view {
     $var{paymentOptions} = WebGUI::Form::selectBox($session, {
         name    => 'gatewayId',
         options => \%paymentOptions,
-        value   => $self->get('gatewayId') || $form->get('gatewayId') || '',
+        value   => $self->gatewayId || $form->get('gatewayId') || '',
     });
 
     # POS variables
