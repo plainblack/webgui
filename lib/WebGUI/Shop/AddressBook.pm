@@ -2,7 +2,6 @@ package WebGUI::Shop::AddressBook;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
 use Moose;
 use WebGUI::Definition;
 
