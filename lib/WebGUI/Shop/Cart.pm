@@ -89,11 +89,6 @@ These subroutines are available from this package:
 
 =cut
 
-#readonly session => my %session;
-#private properties => my %properties;
-#public error => my %error;
-#private addressBookCache => my %addressBookCache;
-
 #-------------------------------------------------------------------
 
 =head2 new ( $session, $cartId )
@@ -326,12 +321,7 @@ A reference to the current session.
 
 sub create {
     my ($class, $session) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    my $cartId = $session->id->generate;
-    $session->db->write('insert into cart (cartId, sessionId, creationDate) values (?,?,UNIX_TIMESTAMP())', [$cartId, $session->getId]);
-    return $class->new($session, $cartId);
+    return $class->new($session);
 }
 
 #-------------------------------------------------------------------
