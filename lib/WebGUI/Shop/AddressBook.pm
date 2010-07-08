@@ -97,13 +97,20 @@ around BUILDARGS => sub {
         if (! (blessed $session && $session->isa('WebGUI::Session')) ) {
             WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
         }
+        if ($session->user->isVisitor) {
+            WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
+        }
         my ($addressBookId)          = $class->_init($session);
         $properties->{addressBookId} = $addressBookId;
+        $properties->{userId}        = $session->user->userId;
         return $class->$orig($properties);
     }
     my $session = shift;
     if (! (blessed $session && $session->isa('WebGUI::Session'))) {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    if ($session->user->isVisitor) {
+        WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
     }
     my $argument2 = shift;
     if (!defined $argument2) {
@@ -111,6 +118,7 @@ around BUILDARGS => sub {
         my $properties = {};
         $properties->{session}       = $session;
         $properties->{addressBookId} = $addressBookId;
+        $properties->{userId}        = $session->user->userId;
         return $class->$orig($properties);
     }
     ##Look up one in the db
@@ -135,7 +143,7 @@ sub _init {
     my $class          = shift;
     my $session        = shift;
     my $addressBookId  = $session->id->generate;
-    $session->db->write('insert into addressBook (addressBookId) values (?)', [$addressBookId]);
+    $session->db->write('insert into addressBook (addressBookId, userId) values (?,?)', [$addressBookId, $session->user->userId]);
     return ($addressBookId);
 }
 
@@ -219,32 +227,19 @@ sub appendAddressFormVars {
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, userId )
+=head2 create ( session )
 
-Constructor. Creates a new address book for this user.
+Deprecated, left as a stub for existing code.  Use L<new> instead.
 
 =head3 session
 
 A reference to the current session.
 
-=head3 userId
-
-The userId for the user.  Throws an exception if it is Visitor.  Defaults to the session
-user if omitted.
-
 =cut
 
 sub create {
-    my ($class, $session, $userId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    $userId ||= $session->user->userId;
-    if ($userId eq '1') {
-        WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
-    }
-    my $id = $session->db->setRow("addressBook", "addressBookId", {addressBookId=>"new", userId=>$userId}); 
-    return $class->new($session, $id);
+    my ($class, $session) = @_;
+    return $class->new($session);
 }
 
 #-------------------------------------------------------------------
@@ -257,7 +252,6 @@ Deletes this address book and all addresses contained in it.
 
 sub delete {
     my ($self) = @_;
-    my $myId   = id $self;
     foreach my $address (@{$self->getAddresses}) {
         $address->delete;
     } 
@@ -418,41 +412,6 @@ sub missingFields {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, addressBookId )
-
-Constructor.  Instanciates an addressBook based upon a addressBookId.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 addressBookId
-
-The unique id of an address book to instanciate.
-
-=cut
-
-sub new {
-    my ($class, $session, $addressBookId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    unless (defined $addressBookId) {
-        WebGUI::Error::InvalidParam->throw(error=>"Need an addressBookId.");
-    }
-    my $addressBook = $session->db->quickHashRef('select * from addressBook where addressBookId=?', [$addressBookId]);
-    if ($addressBook->{addressBookId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"No such address book.", id=>$addressBookId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    $properties{ $id } = $addressBook;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 newByUserId ( session, userId )
 
 Constructor. Creates a new address book for this user if they don't have one.  In any case returns a reference to the address book.
@@ -499,7 +458,7 @@ sub newByUserId {
     }
     else {
         # nope create one for the user
-        return $class->create($session);
+        return $class->new($session);
     }
 }
 
