@@ -51,9 +51,9 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 new ( $session, $cartId )
+=head2 new ( $session, $addressBookId )
 
-Constructor.  Instanciates an address book based upon a cartId.
+Constructor.  Instanciates an address book based upon an addressBookId.
 
 =head2 new ( $session )
 
@@ -134,7 +134,7 @@ around BUILDARGS => sub {
 =head2 _init ( session )
 
 Builds a stub of object information in the database, and returns the newly created
-cartId, and the creationDate fields so the object can be initialized correctly.
+addressBookId, and the creationDate fields so the object can be initialized correctly.
 
 =cut
 
