@@ -163,7 +163,8 @@ A hash reference containing address information.
 
 sub addAddress {
     my ($self, $address) = @_;
-    my $addressObj = WebGUI::Shop::Address->create( $self, $address);
+    my $addressObj = WebGUI::Shop::Address->create($self);
+    $addressObj->update($address);
     return $addressObj;
 }
 

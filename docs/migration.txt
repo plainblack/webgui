@@ -194,3 +194,8 @@ WebGUI::Shop::AddressBook
 Since create is now really new, there is no way to create an address book for an arbitrary userId.  To work around this,
 update the address book with the new userId after it has been created.
 
+WebGUI::Shop::Address
+=====================
+Object properties are no longer written to the database when an object is created from scratch.  The write method needs
+to be called.
+
