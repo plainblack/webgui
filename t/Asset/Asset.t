@@ -288,7 +288,6 @@ is($tempNode->getParent->getId, $rootAsset->getId, 'Tempspace parent is Root Ass
 my $ta  = $importNode->addChild( { 
                 className       => 'WebGUI::Asset::TestAsset',
 } );
-addToCleanup( $ta );
 isa_ok( $ta, 'WebGUI::Asset::TestAsset', 'addChild returns correct object' );
 
 ok(
@@ -310,6 +309,7 @@ cmp_deeply(
     [ "two", "three" ],
     "serialized property returns deserialized ref",
 );
+$ta->purge;
 
 ################################################################
 #
