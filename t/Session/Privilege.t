@@ -67,6 +67,7 @@ my $session = WebGUI::Test->session;
 my $privilege = $session->privilege;
 
 my ($versionTag, $userTemplate) = setup_assets($session);
+WebGUI::Test->addToCleanup($versionTag);
 
 isa_ok($privilege, 'WebGUI::Session::Privilege', 'session has correct object type');
 
@@ -135,9 +136,4 @@ sub setup_assets {
 	return ($versionTag, $userTemplate);
 }
 
-
-END {
-	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-		$versionTag->rollback;
-	}
-}
+#vim:ft=perl

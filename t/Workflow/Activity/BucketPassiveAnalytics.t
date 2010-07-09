@@ -17,6 +17,9 @@ plan tests => 1; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 
+WebGUI::Test->addToCleanup(SQL => 'delete from passiveLog');
+WebGUI::Test->addToCleanup(SQL => 'delete from analyticRule');
+
 my $workflow = WebGUI::Workflow->new($session, 'PassiveAnalytics000001');
 my $activities = $workflow->getActivities();
 ##Note, they're in order, and the order is known.
@@ -30,6 +33,7 @@ my $instance = WebGUI::Workflow::Instance->create($session,
         priority                => 1,
     }
 );
+WebGUI::Test->addToCleanup($instance);
 ##Rule label, url, and regexp
 my @ruleSets = (
     ['home',       '/home',               '^\/home'             ],
@@ -76,12 +80,6 @@ PAUSE: while (my $retval = $instance->run()) {
 
 ok(1, 'One test');
 
-END {
-    $session->db->write('delete from passiveLog');
-    $session->db->write('delete from analyticRule');
-    $instance->delete;
-}
-
 sub loadLogData {
     my ($session, @urls) = @_;
     $session->db->write('delete from passiveLog');
@@ -99,3 +97,5 @@ sub loadLogData {
         $startTime += int(rand(10))+1;
     }
 }
+
+#vim:ft=perl

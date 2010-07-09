@@ -84,3 +84,4 @@ ok(
     "getDownloadFileUrl croaks if resolution doesn't exist",
 );
 
+#vim:ft=perl

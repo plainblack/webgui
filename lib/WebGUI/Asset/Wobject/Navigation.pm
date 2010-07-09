@@ -411,7 +411,7 @@ sub view {
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
 	$rules{ancestorLimit} = $self->ancestorEndPoint;
 	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->reversePageLoop);
-	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
+	my $assetIter = $start->getLineageIterator(\@includedRelationships,\%rules);	
 	my $currentLineage = $current->lineage;
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
@@ -419,7 +419,15 @@ sub view {
 	my %lastChildren;
 	my $previousPageData = undef;
 	my $eh = $self->session->errorHandler;
-        while ( my $asset = $assets->() ) {
+        while ( 1 ) {
+            my $asset;
+            eval { $asset = $assetIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $self->session->log->error($x->full_message);
+                next;
+            }
+            last unless $asset;
+
 		# skip pages we shouldn't see
 		my $pageLineage = $asset->lineage;
 		next if ($pageLineage =~ m/^$lineageToSkip/);

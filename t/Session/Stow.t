@@ -80,3 +80,4 @@ is( $session->stow->get( 'possibilities', { noclone => 1 } ), $arr,
     "With noclone returns same reference"
 );
 
+#vim:ft=perl

@@ -23,6 +23,7 @@ my $session = WebGUI::Test->session;
 
 # get a user so we can test retrieving messages for a specific user
 my $admin = WebGUI::User->new($session, 3);
+WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox; });
 
 # Begin tests by getting an inbox object
 my $inbox = WebGUI::Inbox->new($session); 
@@ -40,6 +41,7 @@ my $new_message = {
 };
 
 my $message = $inbox->addMessage($new_message,{ no_email => 1, });
+WebGUI::Test->addToCleanup($message);
 isa_ok($message, 'WebGUI::Inbox::Message');
 
 ok(defined($message), 'addMessage returned a response');
@@ -51,8 +53,8 @@ ok($messageId, 'messageId retrieved');
 ####################################
 # get a message based on messageId #
 ####################################
-$message = $inbox->getMessage($messageId);
-ok($message->getId == $messageId, 'getMessage returns message object');
+my $messageCopy = $inbox->getMessage($messageId);
+ok($messageCopy->getId == $messageId, 'getMessage returns message object');
 
 #########################################################
 # get a list (arrayref) of messages for a specific user #
@@ -132,10 +134,4 @@ note $messages->[0]->getStatus;
 note $messages->[0]->isRead;
 is($inbox->getUnreadMessageCount($admin->userId), 3, '... really tracks unread messages');
 
-END {
-    $session->db->write('delete from inbox where messageId = ?', [$message->getId]);
-    foreach my $message (@{ $inbox->getMessagesForUser($admin, 1000) } ) {
-        $message->setDeleted(3);
-        $message->delete(3);
-    }
-}
+#vim:ft=perl

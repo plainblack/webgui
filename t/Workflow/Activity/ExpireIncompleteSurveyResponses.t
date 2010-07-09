@@ -158,7 +158,4 @@ is($session->db->quickScalar('select count(*) from Survey_response where Survey_
 # Afterwards, back to no incomplete responses
 is( scalar $session->db->buildArray($SQL), 0, 'Afterwards, back to no incomplete responses');
 
-END {
-    $session->db->write('delete from Survey_response where userId = ?', [$user->userId]) if $user;
-    $survey->purge if $survey;
-}
+#vim:ft=perl

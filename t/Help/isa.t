@@ -30,8 +30,10 @@ my $session = WebGUI::Test->session;
 
 plan tests => 4;
 
-local @INC = @INC;
-unshift @INC, File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'Help-isa', 'lib' );
+installCollateral();
+WebGUI::Test->addToCleanup(sub {
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI Help HelpTest.pm/);
+});
 
 my $allHelp = WebGUI::Operation::Help::_load($session, 'HelpTest');
 
@@ -167,3 +169,11 @@ cmp_deeply(
     'isa imports variables with nested loops'
 );
 
+sub installCollateral {
+	copy( 
+        File::Spec->catfile( WebGUI::Test->getTestCollateralPath, qw/Help HelpTest.pm/),
+		File::Spec->catfile( WebGUI::Test->lib, qw/WebGUI Help/)
+	);
+}
+
+#vim:ft=perl

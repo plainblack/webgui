@@ -353,7 +353,7 @@ sub view {
     my $url = $self->session->url;
 	my $i18n = WebGUI::International->new($self->session, "Asset_UserList");
 	my (%var, @users, @profileField_loop, @profileFields);
-	my ($defaultPublicProfile, $defaultPublicEmail, $user, $sth, $sql, $profileField);
+	my ($user, $sth, $sql, $profileField);
 
     my $currentUrlWithoutSort = $self->getUrl();
     foreach ($form->param) {
@@ -504,9 +504,6 @@ sub view {
     }
     $sortBy = join '.', map { $self->session->db->quoteIdentifier($_) } split /\./, $sortBy;
 	$sql .= " order by ".$sortBy." ".$sortOrder;
-
-	($defaultPublicProfile) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicProfile'");
-	($defaultPublicEmail) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicEmail'");
 
 	my $paginatePage = $form->param('pn') || 1;
 	my $currentUrl = $self->getUrl();

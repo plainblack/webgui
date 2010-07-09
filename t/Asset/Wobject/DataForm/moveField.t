@@ -35,6 +35,7 @@ my $df  = WebGUI::Asset->getImportNode( $session )
             mailData            => 0,
             fieldConfiguration  => '[]',
         } );
+WebGUI::Test->addToCleanup($df);
 
 # Add three fields to the DataForm
 $df->createField( "one", { label => "One" } );
@@ -98,10 +99,4 @@ cmp_deeply(
 );
 
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $df->purge;
-    WebGUI::VersionTag->getWorking( $session )->rollback;
-}
 #vim:ft=perl

@@ -92,7 +92,7 @@ my @ldapTests = (
 );
 
 
-plan tests => (164 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (168 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 $session->cache->remove('myTestKey');
@@ -466,6 +466,7 @@ cmp_ok($expirationDate-time(), '>', 50, 'checking expire offset override on addU
 ################################################################
 
 $session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
+WebGUI::Test->addToCleanup(SQL => 'DROP TABLE IF EXISTS myUserTable');
 $session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
 
 my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
@@ -706,6 +707,7 @@ foreach my $idx (0..$#ipTests) {
 	$ipTests[$idx]->{user} = $tcps[$idx];
 }
 WebGUI::Test->addToCleanup(@tcps);
+WebGUI::Test->addToCleanup(@sessionBank);
 
 my $gI = WebGUI::Group->new($session, "new");
 WebGUI::Test->addToCleanup($gI);
@@ -773,11 +775,15 @@ $gY->addUsers([$cacheDude->userId]);
 
 ok( $cacheDude->isInGroup($gY->getId), "Cache dude added to group Y");
 ok( $cacheDude->isInGroup($gZ->getId), "Cache dude is a member of group Z by group membership");
+ok((grep $_ eq $gY->getId, @{ $cacheDude->getGroupIdsRecursive } ), 'Cache dude in Y by getGroupIdsRecursive');
 
-$gY->deleteUsers([$cacheDude->userId]);
+ok(eval { $gY->deleteUsers([$cacheDude->userId]); 1; }, "Y deleteUsers on Cache dude");
 
-ok( !$cacheDude->isInGroup($gY->getId), "Cache dude removed from group Y");
-ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude removed from group Z too");
+ok((! grep $_ eq $gY->getId, @{ $cacheDude->getGroupIdsRecursive } ), 'Cache dude not in Y getGroupIdsRecursive');
+ok((! grep $_ eq $cacheDude->userId, @{ $gY->getAllUsers() } ), 'Cache dude not in Y getAllUsers');
+
+ok( !$cacheDude->isInGroup($gY->getId), "Cache dude removed from group Y by isInGroup");
+ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude removed from group Z too by isInGroup");
 
 my $gCache = WebGUI::Group->new($session, "new");
 WebGUI::Test->addToCleanup($gCache);
@@ -826,3 +832,4 @@ END {
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
     $session->cache->remove('myTestKey');
 }
+#vim:ft=perl

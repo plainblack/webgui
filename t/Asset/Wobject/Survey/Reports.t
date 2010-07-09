@@ -36,6 +36,7 @@ my $import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey
 $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+WebGUI::Test->addToCleanup($survey);
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
 my $sJSON = $survey->getSurveyJSON;
@@ -125,11 +126,4 @@ superhashof({
 })]);
 
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $survey->purge() if $survey;
-
-    my $versionTag = WebGUI::VersionTag->getWorking( $session, 1 );
-    $versionTag->rollback() if $versionTag;
-}
+#vim:ft=perl

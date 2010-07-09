@@ -25,6 +25,7 @@ use WebGUI::Asset::Wobject::GalleryAlbum;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 
 my %user;
 $user{'1'} = WebGUI::User->new( $session, "new" );

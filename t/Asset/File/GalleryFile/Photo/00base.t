@@ -93,3 +93,5 @@ my $properties  = $photo->get;
 $photo->purge;
 
 dies_ok { WebGUI::Asset->newById($session, $properties->{assetId}) } "Photo no longer able to be instanciated";
+
+#vim:ft=perl

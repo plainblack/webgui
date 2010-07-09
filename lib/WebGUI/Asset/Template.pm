@@ -134,29 +134,77 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addAttachments ( attachments )
+=head2 definition ( session, definition )
 
-Adds attachments to this template.  Attachments is an arrayref of hashrefs,
-where each hashref should have at least url, type, and sequence as keys.
+Defines the properties of this asset.
+
+=head3 session
+
+A reference to an existing session.
+
+=head3 definition
+
+A hash reference passed in from a subclass definition.
 
 =cut
 
-sub addAttachments {
-    my ($self, $attachments) = @_;
-
-    my $db = $self->session->db;
-
-    foreach my $a (@$attachments) {
-        my %params = (
-            templateId   => $self->getId,
-            revisionDate => $self->revisionDate,
-            url          => $a->{url},
-            type         => $a->{type},
-            sequence     => $a->{sequence},
-            attachId     => 'new',
-        );
-        $db->setRow('template_attachments', 'attachId', \%params);
-    }
+sub definition {
+    my $class       = shift;
+	my $session     = shift;
+    my $definition  = shift;
+	my $i18n        = WebGUI::International->new($session,"Asset_Template");
+    push @{$definition}, {
+		assetName   => $i18n->get('assetName'),
+		icon        => 'template.gif',
+        tableName   => 'template',
+        className   => 'WebGUI::Asset::Template',
+        properties  => {
+            template => {
+                fieldType       => 'codearea',
+                syntax          => "html",
+                defaultValue    => undef,
+                filter          => 'packTemplate',
+            },
+            isEditable => {
+                noFormPost      => 1,
+                fieldType       => 'hidden',
+                defaultValue    => 1,
+            },
+            isDefault => {
+                fieldType       => 'hidden',
+                defaultValue    => 0,
+            },
+            showInForms => {
+                fieldType       => 'yesNo',
+                defaultValue    => 1,
+            },
+            parser => {
+                noFormPost      => 1,
+                fieldType       => 'selectBox',
+                defaultValue    => [$session->config->get("defaultTemplateParser")],
+            },	
+            namespace => {
+                fieldType       => 'combo',
+                defaultValue    => undef,
+            },
+            templatePacked => {
+                fieldType       => 'hidden',
+                defaultValue    => undef,
+                noFormPost      => 1,
+            },
+            usePacked => {
+                fieldType       => 'yesNo',
+                defaultValue    => 0,
+            },
+            storageIdExample => {
+                fieldType       => 'image',
+            },
+            attachmentsJson => {
+                fieldType       => 'JsonTable',
+            },
+        },
+    };
+    return $class->SUPER::definition($session,$definition);
 }
 
 #-------------------------------------------------------------------
@@ -171,7 +219,6 @@ override addRevision => sub {
     my ( $self, $properties, @args ) = @_;
     my $asset = super();
     delete $properties->{templatePacked};
-    $asset->addAttachments($self->getAttachments);
     return $asset;
 };
 
@@ -207,7 +254,6 @@ override duplicate => sub {
     my $self = shift;
     my $newTemplate = super();
     $newTemplate->update({isDefault => 0});
-    $newTemplate->addAttachments($self->getAttachments);
     if ( my $storageId = $self->get('storageIdExample') ) {
         my $newStorage  = WebGUI::Storage->get( $self->session, $storageId )->copy;
         $newTemplate->update({ storageIdExample => $newStorage->getId });
@@ -225,8 +271,7 @@ Override to add attachments to package data
 
 override exportAssetData => sub {
     my ( $self ) = @_;
-    my $data    = super();
-    $data->{template_attachments} = $self->getAttachments;
+    my $data    = $self->SUPER::exportAssetData;
     if ( $self->get('storageIdExample') ) {
         push @{$data->{storage}}, $self->get('storageIdExample');
     }
@@ -249,27 +294,24 @@ If defined, will limit the attachments to this type; e.g., passing
 
 sub getAttachments {
 	my ( $self, $type ) = @_;
-	my @params = ($self->getId, $self->revisionDate);
-	my $typeString;
 
-	if ($type) {
-		$typeString = 'AND type = ?';
-		push(@params, $type);
-	}
+    return [] if !$self->get('attachmentsJson');
 
-	my $sql = qq{
-		SELECT 
-			* 
-		FROM 
-			template_attachments 
-		WHERE 
-			templateId = ?
-            AND revisionDate = ?
-			$typeString
-		ORDER BY
-			type, sequence ASC
-	};
-	return $self->session->db->buildArrayRefOfHashRefs($sql, \@params);
+    my $attachments = JSON->new->decode( $self->get('attachmentsJson') );
+
+    # We want it all and we want it now
+    if ( !$type ) {
+        return $attachments;
+    }
+
+    my $output  = [];
+    for my $attach ( @{$attachments} ) {
+        if ( $attach->{type} eq $type ) {
+            push @{$output}, $attach;
+        }
+    }
+
+    return $output;
 }
 
 #-------------------------------------------------------------------
@@ -344,75 +386,31 @@ override getEditForm => sub {
 			);
 	}
 
-    ### Template attachments
-	my $session = $self->session;
-	my @headers = map { '<th>' . $i18n->get("attachment header $_") . '</th>' } 
-                      qw(index type url remove);
-
-    tie my %attachmentTypeNames, 'Tie::IxHash' => (
-        stylesheet => $i18n->get('css label'),
-        headScript => $i18n->get('js head label'),
-        bodyScript => $i18n->get('js body label'),
+    $tabform->getTab('properties')->jsonTable(
+        name        => 'attachmentsJson', 
+        value       => $self->get('attachmentsJson'),
+        label       => $i18n->get("attachments display label"),
+        fields      => [
+            {
+                type            => "text",
+                name            => "url",
+                label           => $i18n->get('attachment header url'),
+                size            => '48',
+            },
+            {
+                type            => "select",
+                name            => "type",
+                label           => $i18n->get('attachment header type'),
+                options         => [
+                    stylesheet => $i18n->get('css label'),
+                    headScript => $i18n->get('js head label'),
+                    bodyScript => $i18n->get('js body label'),
+                ],
+            },
+        ],
     );
 
-	my $table = '<table id="attachmentDisplay">';
-	$table .= "<thead><tr>@headers</tr></thead><tbody id='addAnchor'>";
-	foreach my $a ( @{ $self->getAttachments } ) {
-		my ($seq, $type, $url) = @{$a}{qw(sequence type url)};
-        # escape macros in the url so they don't get processed
-        $url =~ s/\^/&#94;/g;
-		my $del = WebGUI::Form::checkbox(
-			$session, { 
-				name   => 'removeAttachment',
-				value  => $url,
-				extras => 'class="id"',
-            }
-        );
-		my @data = (
-			"<td class='index'>$seq</td>", 
-			"<td class='type'>$type</td>", 
-			"<td class='url'>$url</td>", 
-			"<td>$del</td>",
-		);
-		$table .= "<tr class='existingAttachment'>@data</tr>";
-	}
-	$table .= '</tbody></table>';
-	my $properties = $tabform->getTab('properties');
-	my $label = $i18n->get('attachment display label');
-	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
-
-	my @data = map { "<td>$_</td>" } (
-		WebGUI::Form::integer(
-			$session, { size => '2', id => 'addBoxIndex' }
-		),
-		WebGUI::Form::selectBox(
-			$session, { options => \%attachmentTypeNames, id => 'addBoxType' }
-		),
-		WebGUI::Form::text($session, { id => 'addBoxUrl', size => 40 }),
-		WebGUI::Form::button(
-			$session, { 
-				value  => $i18n->get('attachment add button'), 
-				extras => 'onclick="addClick()"' 
-			}
-		),
-	);
-
-	my ($style, $url) = $self->session->quick(qw(style url));
-	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
-	$style->setScript($url->extras('yui/build/json/json-min.js'));
-	$style->setScript($url->extras('yui/build/dom/dom-min.js'));
-	$style->setScript($url->extras('yui/build/event/event-min.js'));
-	$style->setScript($url->extras('yui/build/connection/connection-min.js'));
-	$style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'));
-
-	pop(@headers);
-	my $scriptUrl = $url->extras('templateAttachments.js');
-	$table = "<table id='addBox'><tr>@headers</tr><tr>@data</tr></table>";
-	$table .= qq(<script type="text/javascript" src="$scriptUrl"></script>);
-	$label = $i18n->get('attachment add field label');
-	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
-
-        $properties->image( 
+        $tabform->getTab('properties')->image( 
             name        => 'storageIdExample',
             value       => $self->getValue('storageIdExample'),
             label       => $i18n->get('field storageIdExample'),
@@ -667,6 +665,7 @@ Extends the master class to handle template parsers, namespaces and template att
 override processPropertiesFromFormPost => sub {
 	my $self = shift;
 	super();
+        my $session = $self->session;
     # TODO: Perhaps add a way to check template syntax before it blows stuff up?
     my %data;
     my $needsUpdate = 0;
@@ -688,28 +687,7 @@ override processPropertiesFromFormPost => sub {
     }
 
     ### Template attachments
-    my $f    = $self->session->form;
-    my $p    = $f->paramsHashRef;
-    my @nums = grep {$_} map { my ($i) = /^attachmentUrl(\d+)$/; $i } keys %$p;
-    my @add;
-    
-    # Remove all attachments first, then re-add whatever's left in the form
-    $self->removeAttachments;
-
-    foreach my $n (@nums) {
-        my ($index, $type, $url) = 
-            map { $f->process('attachment' . $_ . $n) }
-            qw(Index Type Url);
-
-        push(
-            @add, {
-                sequence     => $index,
-                url          => $url,
-                type         => $type,
-            }
-        );
-    }
-    $self->addAttachments(\@add);
+    $self->update({ attachmentsJson => $session->form->process( 'attachmentsJson', 'JsonTable' ), });
 
     return;
 };
@@ -749,66 +727,25 @@ sub processRaw {
 
 #-------------------------------------------------------------------
 
-=head2 purge ( )
+=head2 update
 
-Extend the master to purge attachments in all revisions.
+Override update from Asset.pm to handle backwards compatibility with the old
+packages that contain headBlocks. This will be removed in the future.  Don't plan
+on this being here.
 
 =cut
 
-sub purge {
+sub update {
     my $self = shift;
-    $self->session->db->write('delete from template_attachments where templateId=?', [$self->getId]);
-    return $self->SUPER::purge(@_);
-}
+    my $requestedProperties = shift;
+    my $properties = clone($requestedProperties);
 
-#-------------------------------------------------------------------
-
-=head2 purgeRevision ( )
-
-Extend the master purgeRevision to purge attachments
-
-=cut
-
-override purgeRevision => sub {
-    my $self = shift;
-    $self->removeAttachments;
-    return super();
-};
-
-#-------------------------------------------------------------------
-
-=head2 removeAttachments ( urls )
-
-Removes attachments. C<urls> is an arrayref of URLs to remove. If C<urls>
-is not defined, will remove all attachments for this revision.
-
-=cut
-
-sub removeAttachments {
-    my ($self, $urls) = @_;
-
-    my $db    = $self->session->db;
-    my $dbh   = $db->dbh;
-    my $rmsql = qq{
-        DELETE FROM 
-            template_attachments
-        WHERE
-            templateId = ?
-            AND revisionDate = ?
-    };
-    
-    if ( $urls && @{$urls} ) {
-        my $in    = join(',', map { $dbh->quote($_) } @{$urls});
-        $rmsql .= qq{
-            AND url IN ($in)
-        };
+    if (exists $properties->{headBlock}) {
+        $properties->{extraHeadTags} .= $properties->{headBlock};
+        delete $properties->{headBlock};
     }
 
-    my @params = (
-        $self->getId,
-        $self->get('revisionDate'),
-    );
-    $db->write($rmsql, \@params);
+    $self->SUPER::update($properties);
 }
 
 #-------------------------------------------------------------------

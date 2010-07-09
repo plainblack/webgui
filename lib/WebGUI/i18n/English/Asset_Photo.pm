@@ -759,6 +759,12 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Error when user is out of disk space.},
     },
+    
+    'error no image' => {
+        message     => q{You need to select an image to upload.},
+        lastUpdated => 0,
+        context     => q{Error when user tries to add photo without selecting image.},
+    },    
 
     'template comment add title' => {
         message     => q{Add comment},

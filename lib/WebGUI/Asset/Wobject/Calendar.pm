@@ -241,12 +241,36 @@ sub _listViewPageInterval_builder {
 }
 
 property icalFeeds    => (
-            noFormPost      => 1,
-            fieldType       => "textarea",
             default         => sub { return []; },
             traits          => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
             isa             => 'WebGUI::Type::JSONArray',
             coerce          => 1,
+            fieldType       => "JsonTable",
+            defaultValue    => [],
+            serialize       => 1,
+            tab             => "feeds",
+            fields          => [
+                {
+                    name        => 'feedId',
+                    type        => 'id',
+                },
+                {
+                    name        => 'url',
+                    type        => 'text',
+                    size        => '40',
+                    label       => $i18n->get('Feed URL'),
+                },
+                {
+                    name        => 'status',
+                    type        => 'readonly',
+                    label       => $i18n->get('434','WebGUI'),
+                },
+                {
+                    name        => 'lastUpdated',
+                    type        => 'readonly',
+                    label       => $i18n->get('454', 'WebGUI'),
+                },
+            ],
         );
 
 property icalInterval    => (
@@ -511,169 +535,17 @@ sub deleteFeed {
 
 #----------------------------------------------------------------------------
 
-=head2 getEditForm
+=head2 getEditTabs ( )
 
-Adds an additional tab for feeds. 
-
-TODO: Abstract the Javascript enough to export into extras/yui-webgui for use
-in other areas.
+Add the feeds tab to the edit form
 
 =cut
 
-override getEditForm => sub {
-    my $self    = shift;
-    my $session = $self->session;
-    my $form    = super();
-    my $i18n    = WebGUI::International->new($session,"Asset_Calendar");
-
-    my $tab     = $form->addTab("feeds",$i18n->get("feeds"), 6);
-    $tab->raw("<tr><td>");
-
-    $tab->raw(<<'ENDJS');
-    <script type="text/javascript">
-    var FeedsManager    = new Object();
-
-    FeedsManager.addFeed = function (table,rowId,params) {
-        // TODO: Verify that feed URL is valid
-
-        var table    = document.getElementById(table);
-
-        // If id is "new"
-        //  Add a number on the end.
-        if (rowId == "new")
-            rowId = "new" + Math.round(Math.random() * 10000000000000000);
-
-        // Create 5 cells
-        var cells    = new Array();
-        for (var i = 0; i < 5; i++)
-            cells[i]    = document.createElement("td");
-
-
-        /*** [0] - Delete button */
-        var button    = document.createElement("img");
-        button.setAttribute("src","/extras/wobject/Calendar/images/delete.gif");
-        button.setAttribute("border","0");
-
-        var deleteLink    = document.createElement("a");
-        deleteLink.setAttribute("href","#");
-        YAHOO.util.Event.addListener(deleteLink, "click", function (e, rowId) {
-            FeedsManager.deleteFeed('feeds',rowId);
-            YAHOO.util.Event.preventDefault(e);
-        }, rowId);
-        deleteLink.appendChild(button);
-
-        cells[0].appendChild(deleteLink);
-
-
-        /*** [1] - Feed link for teh clicking and form element for teh saving */
-        var feedLink    = document.createElement("a");
-        feedLink.setAttribute("href",params.url);
-        feedLink.setAttribute("target","_new"); // TODO: Use JS to open window. target="" is deprecated
-        feedLink.appendChild(document.createTextNode(params.url));
-
-        var formElement    = document.createElement("input");
-        formElement.setAttribute("type","hidden");
-        formElement.setAttribute("name","feeds-"+rowId);
-        formElement.setAttribute("value",params.url);
-
-        cells[1].appendChild(feedLink);
-        cells[1].appendChild(formElement);
-
-
-        /*** [2] - Result (new) */
-        if (params.lastResult == undefined)
-            params.lastResult = "new";
-        var lastResult    = document.createTextNode(params.lastResult);
-
-        cells[2].appendChild(lastResult);
-
-
-        /*** [3] - Last updated */
-        if (params.lastUpdated == undefined)
-            params.lastUpdated = "never";
-        var lastUpdated    = document.createTextNode(params.lastUpdated);
-
-        cells[3].appendChild(lastUpdated);
-
-
-        /*** [4] - Update now! */
-        /* TODO */
-
-
-        /* Add the row to the table */
-        var row        = document.createElement("tr");
-        row.setAttribute("id",rowId);
-        for (var i = 0; i < cells.length; i++)
-            row.appendChild(cells[i]);
-
-        var tbody = table.getElementsByTagName('tbody')[0];
-        if (tbody)
-            tbody.appendChild(row);
-        else
-            table.appendChild(row);
-        FeedsManager.updateFeed(table.getAttribute("id"),rowId);
-    }
-
-
-    FeedsManager.updateFeed = function (table,rowId) {
-        /* TODO */
-
-    }
-
-
-    FeedsManager.deleteFeed = function (table,rowId) {
-        row        = document.getElementById(rowId);
-
-        row.parentNode.removeChild(row);
-    }
-
-
-    FeedsManager.setFeed    = function (table,rowId,params) {
-
-
-
-    }
-
-    </script>
-ENDJS
-
-
-    my $addFeed = $i18n->get('Add a feed');
-    my $add     = $i18n->get('Add');
-    my $feedUrl = $i18n->get('Feed URL');
-    my $status  = $i18n->get('434', 'WebGUI');
-    my $lastUpdated  = $i18n->get('454', 'WebGUI');
-    $tab->raw(<<"ENDHTML");
-    <label for="addFeed">$addFeed</label>
-    <input type="text" size="60" id="addFeed" name="addFeed" value="" />
-    <input type="button" value="$add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
-
-    <table id="feeds" style="width: 100%;">
-    <thead>
-        <th style="width: 30px;">&nbsp;</th>
-        <th style="width: 50%;">$feedUrl</th>
-        <th>$status</th>
-        <th>$lastUpdated</th>
-        <th>&nbsp;</th>
-    </thead>
-    </table>
-ENDHTML
-
-
-
-    # Add the existing feeds
-    my $feeds    = $self->getFeeds();
-    $tab->raw('<script type="text/javascript">'."\n");
-    for my $feed (@{ $feeds }) {
-        my $feedId = $feed->{feedId};
-        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".JSON->new->encode( $feed ).");\n");
-    }
-    $tab->raw('</script>');
-
-
-    $tab->raw("</td></tr>");
-    return $form;
-};
+sub getEditTabs {
+    my ( $self ) = @_;
+    my $i18n    = WebGUI::International->new($self->session,"Asset_Calendar");
+    return $self->SUPER::getEditTabs, ["feeds",$i18n->get("feeds"), 6];
+}
 
 #----------------------------------------------------------------------------
 
@@ -769,7 +641,7 @@ sub getEventsIn {
                     && Event.endTime   IS NULL 
                     && 
                         !(
-                            Event.startDate > '$endDate' 
+                            Event.startDate > SUBDATE('$endDate', INTERVAL 1 DAY)
                          || Event.endDate   < '$startDate'
                         )
                 ) 
@@ -794,7 +666,7 @@ sub getEventsIn {
     my $orderby = join ',', @order_priority;
 
     my $events 
-        = $self->getLineage(["descendants"], {
+        = $self->getLineage(["children"], {
             returnObjects       => 1,
             includeOnlyClasses  => ['WebGUI::Asset::Event'],
             joinClass           => 'WebGUI::Asset::Event',
@@ -1002,37 +874,6 @@ override processPropertiesFromFormPost => sub {
 
     unless ($self->groupIdSubscribed) {
         $self->createSubscriptionGroup();
-    }
-
-    $self->session->errorHandler->info( "DEFAULT VIEW:" . $self->defaultView );
-
-    ### Get feeds from the form
-    # Workaround WebGUI::Session::Form->param bug that returns duplicate
-    # names.
-    my %feeds;
-    for my $feedId ( grep /^feeds-/, ($form->param()) ) {
-        $feedId =~ s/^feeds-//;
-        $feeds{$feedId}++;
-    }
-    my @feedsFromForm = keys %feeds;
-
-    # Delete old feeds that are not in @feeds
-    my @oldFeeds = map { $_->{feedId} } @{ $self->getFeeds };
-
-    for my $feedId (@oldFeeds) {
-        if (!isIn($feedId, @feedsFromForm)) {
-            $self->deleteFeed($feedId);
-        }
-    }
-
-    # Create new feeds
-    for my $feedId (grep /^new(\d+)/, @feedsFromForm) {
-        $self->addFeed({
-            url         => $form->param("feeds-".$feedId),
-            feedType    => "ical",
-            lastUpdated => 'never',
-            lastResult  => '',
-        });
     }
 
     return;

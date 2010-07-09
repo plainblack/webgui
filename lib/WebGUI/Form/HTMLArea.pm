@@ -297,7 +297,7 @@ JS
     $output .= '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div>\n<ul>";
 
     my $useAssetUrls = $session->config->get("richEditorsUseAssetUrls");
-    my $children = $base->getLineage(["children"]);
+    my $children = $base->getLineageIterator(["children"]);
     while ( my $child = $children->() ) {
         next unless $child->canView;
         $output .= '<li>';

@@ -36,7 +36,9 @@ my $mime;       # for getMimeEntity
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 17;        # Increment this number for each test you create
+plan tests => 33;        # Increment this number for each test you create
+
+WebGUI::Test->addToCleanup(SQL => 'delete from mailQueue');
 
 #----------------------------------------------------------------------------
 # Test create
@@ -70,6 +72,8 @@ is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
     "addText should add newlines after 78 characters",
 );
 
+is ( $mime->parts(0)->effective_type, 'text/plain', '... sets the correct MIME type' );
+
 #----------------------------------------------------------------------------
 # Test addHtml
 $mail   = WebGUI::Mail::Send->create( $session );
@@ -81,13 +85,13 @@ $mail->addHtml($text);
 $mime   = $mail->getMimeEntity;
 
 # TODO: Test that addHtml creates an HTML wrapper if no html or body tag exists
-# TODO: Test that addHtml creates a body with the right content type
 
 # addHtml should add newlines after 78 characters
 $newlines    = length $text / 78;
 is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
     "addHtml should add newlines after 78 characters",
 );
+is ( $mime->parts(0)->effective_type, 'text/html', '... sets the correct MIME type' );
 
 # TODO: Test that addHtml does not create an HTML wrapper if html or body tag exist
 
@@ -326,10 +330,58 @@ cmp_bag(
     'send: when the original is sent, new messages are created for each user in the group, following their user profile settings'
 );
 
-# TODO: Test the emailToLog config setting
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $session->db->write('delete from mailQueue');
+SKIP: {
+    my $numtests = 2; # Number of tests in this block
+
+    skip "Cannot test making emails single part", $numtests unless $smtpServerOk;
+
+    # Send the mail
+    my $mail
+        = WebGUI::Mail::Send->create( $session, { 
+            to        => 'norton@localhost',
+        } );
+    $mail->addText("They say it has no memory. That's where I want to live the rest of my life. A warm place with no memory.");
+
+    ok ($mail->getMimeEntity->is_multipart, 'starting with a multipart message');
+    $mail->send;
+    my $received = WebGUI::Test->getMail;
+
+    if (!$received) {
+        skip "Cannot making single part: No response received from smtpd", $numtests;
+    }
+
+    # Test the mail
+    my $parser         = MIME::Parser->new();
+    $parser->output_to_core(1);
+    my $parsed_message = $parser->parse_data($received->{contents});
+    ok (!$parsed_message->is_multipart, 'converted to singlepart since it only has 1 part.');
 }
 
+SKIP: {
+    my $numtests = 2; # Number of tests in this block
+
+    skip "Cannot test making emails single part", $numtests unless $smtpServerOk;
+
+    # Send the mail
+    my $mail
+        = WebGUI::Mail::Send->create( $session, { 
+            to        => 'norton@localhost',
+        } );
+    $mail->addText("You know what the Mexicans say about the Pacific?");
+    $mail->addText("They say it has no memory. That's where I want to live the rest of my life. A warm place with no memory.");
+
+    ok ($mail->getMimeEntity->is_multipart, 'starting with a multipart message');
+    $mail->send;
+    my $received = WebGUI::Test->getMail;
+
+    if (!$received) {
+        skip "Cannot making single part: No response received from smtpd", $numtests;
+    }
+
+    # Test the mail
+    my $parser         = MIME::Parser->new();
+    $parser->output_to_core(1);
+    my $parsed_message = $parser->parse_data($received->{contents});
+    ok ( $parsed_message->is_multipart, 'left as multipart since it has more than 1 part');
+}
+# TODO: Test the emailToLog config setting

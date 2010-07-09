@@ -149,11 +149,18 @@ checkModule("Business::PayPal::API",        "0.62"       );
 checkModule("Locales",                      "0.10"       );
 checkModule("Test::Harness",                "3.17"       );
 checkModule("DateTime::Event::ICal",        "0.10"       );
+<<<<<<< HEAD
 checkModule( "CHI",                                      );
 checkModule( "Cache::FastMmap",                          );
 checkModule('IO::Socket::SSL',                           );
 checkModule('Package::Stash',                            );
 checkModule('HTTP::Exception',                           );
+=======
+checkModule("Cache::FastMmap",              "1.35"       );
+checkModule("CHI",                          "0.34"       );
+checkModule('IO::Socket::SSL',                           );
+checkModule('Net::Twitter',                 "3.13006"    );
+>>>>>>> master
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

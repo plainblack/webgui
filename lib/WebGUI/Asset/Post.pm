@@ -118,6 +118,7 @@ sub _fixReplyCount {
     my $lastPostId = $asset->getLineage( [ qw{ self descendants } ], {
         isa             => 'WebGUI::Asset::Post',
         orderByClause   => 'assetData.revisionDate desc',
+        limit           => 1,
     } )->[0];
 
     if (my $lastPost = WebGUI::Asset->newById( $self->session, $lastPostId ) ) {
@@ -312,6 +313,53 @@ override cut => sub {
 
     return $result;
 };
+
+#-------------------------------------------------------------------
+
+=head2 disqualifyAsLastPost ( )
+
+This method should be called whenever something happens to the Post or Thread that would disqualify
+it as being the last post in a Thread, or Collaboration System.  Good examples are cutting to the
+clipboard, trashing, or archiving.
+
+If the Post was the last post, it will find the second to last post for each kind of parent asset,
+and update that asset with that Post's information.
+
+=cut
+
+sub disqualifyAsLastPost {
+	my $self = shift;
+    my $thread = $self->getThread;
+    if ($thread->get('lastPostId') eq $self->getId) {
+        my $secondary_post = $thread->getLineage(['descendants'], {
+            returnObjects       => 1,
+            includeOnlyClasses  => ["WebGUI::Asset::Post", ],
+            limit               => 1,
+            orderByClause       => 'revisionDate,lineage DESC',
+        })->[0];
+        if ($secondary_post) {  ##Handle edge case for no other
+            $thread->update({ lastPostId => $secondary_post->getId, lastPostDate => $secondary_post->get('creationDate'), });
+        }
+        else {
+            $thread->update({ lastPostId => '', lastPostDate => '', });
+        }
+    }
+    my $cs = $thread->getParent;
+    if ($cs->get('lastPostId') eq $self->getId) {
+        my $secondary_post = $cs->getLineage(['descendants'], {
+            returnObjects       => 1,
+            includeOnlyClasses  => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
+            limit               => 1,
+            orderByClause       => 'revisionDate DESC',
+        })->[0];
+        if ($secondary_post) {  ##Handle edge case for no other
+            $cs->update({ lastPostId => $secondary_post->getId, lastPostDate => $secondary_post->get('creationDate'), });
+        }
+        else {
+            $cs->update({ lastPostId => '', lastPostDate => '', });
+        }
+    }
+}
 
 #-------------------------------------------------------------------
 
@@ -1102,6 +1150,22 @@ sub postProcess {
 
 #-------------------------------------------------------------------
 
+=head2 publish 
+
+Extend the base method to handle updating last post information in the parent Thread
+and CS.
+
+=cut
+
+sub publish {
+    my $self = shift;
+    $self->next::method(@_);
+    $self->qualifyAsLastPost;
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 purge 
 
 Extend the base method to handle cleaning up storage locations.
@@ -1148,6 +1212,31 @@ override purgeRevision => sub {
 };
 
 
+
+#-------------------------------------------------------------------
+
+=head2 qualifyAsLastPost ( )
+
+This method should be called whenever something happens to the Post or Thread that would qualify
+it as being the last post in a Thread, or Collaboration System.  Good examples are pasting from
+the clipboard, restoring from the trash, or changing the state from archiving.
+
+It checks the parent Thread and CS to see if it is now the last Post, and updates that asset with
+its information.
+
+=cut
+
+sub qualifyAsLastPost {
+    my ($self) = @_;
+    my $thread = $self->getThread();
+    if ($self->get('creationDate') > $thread->get('lastPostDate')) {
+        $thread->update({ lastPostId => $self->getId, lastPostDate => $self->get('creationDate'), });
+    }
+    my $cs = $thread->getParent;
+    if ($self->get('creationDate') > $cs->get('lastPostDate')) {
+        $cs->update({ lastPostId => $self->getId, lastPostDate => $self->get('creationDate'), });
+    }
+}
 
 #-------------------------------------------------------------------
 
@@ -1253,14 +1342,16 @@ override setParent => sub {
 
 =head2 setStatusArchived ( )
 
-Sets the status of this post to archived.
+Sets the status of this post to archived.  Updates the parent thread and CS to remove
+the lastPost, if this post is the last post.
 
 =cut
 
 
 sub setStatusArchived {
-        my ($self) = @_;
-        $self->update({status=>'archived'});
+    my ($self) = @_;
+    $self->update({status=>'archived'});
+    $self->disqualifyAsLastPost;
 }
 
 
@@ -1269,20 +1360,23 @@ sub setStatusArchived {
 =head2 setStatusUnarchived ( )
 
 Sets the status of this post to approved, but does so without any of the normal notifications and other stuff.
+Updates the last post information in the parent Thread and CS if applicable.
 
 =cut
 
 
 sub setStatusUnarchived {
-        my ($self) = @_;
-        $self->update({status=>'approved'}) if ($self->status eq "archived");
+    my ($self) = @_;
+    $self->update({status=>'approved'}) if ($self->get("status") eq "archived");
+    $self->qualifyAsLastPost;
 }
 
 #-------------------------------------------------------------------
 
 =head2 trash ( )
 
-Moves post to the trash, updates reply counter on thread and recalculates the thread rating.
+Moves post to the trash, updates reply counter on thread, recalculates the thread rating,
+and updates any lastPost information in the parent Thread, and CS.
 
 =cut
 
@@ -1291,22 +1385,8 @@ override trash => sub {
     super();
     $self->getThread->sumReplies if ($self->isReply);
     $self->getThread->updateThreadRating;
-    if ($self->getThread->lastPostId eq $self->getId) {
-        my $threadLineage = $self->getThread->lineage;
-        my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
-            lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
-            order by creationDate desc",[$threadLineage.'%', $self->getId]);
-        $self->getThread->update({lastPostId=>$id, lastPostDate=>$date});
-    }
-    if ($self->getThread->getParent->lastPostId eq $self->getId) {
-        my $forumLineage = $self->getThread->getParent->lineage;
-        my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
-            lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
-            order by creationDate desc",[$forumLineage.'%', $self->getId]);
-        $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
-    }
-};
-
+    $self->disqualifyAsLastPost;
+}
 
 #-------------------------------------------------------------------
 
@@ -1506,6 +1586,7 @@ sub www_edit {
     $var{'archive.form'} = WebGUI::Form::yesNo($session, {
         name=>"archive"
     });
+    $var{'isSubscribedToCs'} = $self->getThread->getParent->isSubscribed;
 	$var{'form.header'} .= WebGUI::Form::hidden($session, {
         name=>"proceed", 
         value=>"showConfirmation"

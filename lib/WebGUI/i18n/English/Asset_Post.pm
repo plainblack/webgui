@@ -48,6 +48,12 @@ editing an existing Post.|,
 		lastUpdated => 1149829706,
 	},
 
+	'isSubscribedToCs' => {
+		message => q|A boolean which will be true if the current user is subscribed to the CS containing this Post.|,
+        context => q|Template variable description|,
+		lastUpdated => 1149829706,
+	},
+
 	'subscribe.form' => {
 		message => q|A yes/no button to allow the user to subscribe to the thread this post belongs to.|,
 		lastUpdated => 1149829706,

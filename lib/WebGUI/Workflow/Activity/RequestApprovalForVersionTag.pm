@@ -306,6 +306,7 @@ sub setApproved {
     my $self        = shift;
     my $instance    = shift;
     $instance->setScratch( "status", "approved" );
+    $instance->set({});  ##Bump spectre to get it to run right now.
 }	
 
 #----------------------------------------------------------------------------
@@ -325,7 +326,8 @@ sub setDenied {
     my $self        = shift;
     my $instance    = shift;
     $instance->setScratch( "status", "denied" );
-}	
+    $instance->set({});  ##Bump spectre to get it to run right now.
+}
 
 #----------------------------------------------------------------------------
 

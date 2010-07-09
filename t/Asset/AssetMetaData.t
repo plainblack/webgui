@@ -30,6 +30,7 @@ $session->user({userId => 3});
 my $root = WebGUI::Asset->getRoot($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Package test"});
+WebGUI::Test->addToCleanup($versionTag);
 
 ####################################################
 #
@@ -54,6 +55,12 @@ my $snippet = $folder->addChild({
 });
 
 $versionTag->commit;
+
+WebGUI::Test->addToCleanup(sub {
+    foreach my $metaDataFieldId (keys %{ $snippet->getMetaDataFields }) {
+        $snippet->deleteMetaDataField($metaDataFieldId);
+    }
+});
 
 ##Note that there is no MetaData field master class.  New fields can be added
 ##from _ANY_ asset, and be available to all assets.
@@ -225,15 +232,4 @@ sub buildNameIndex {
     return $nameStruct;
 }
 
-END {
-    foreach my $metaDataFieldId (keys %{ $snippet->getMetaDataFields }) {
-        $snippet->deleteMetaDataField($metaDataFieldId);
-    }
-
-    foreach my $tag($versionTag) {
-        if (defined $tag and ref $tag eq 'WebGUI::VersionTag') {
-            $tag->rollback;
-        }
-    }
-
-}
+#vim:ft=perl

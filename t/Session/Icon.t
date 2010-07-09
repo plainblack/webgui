@@ -39,6 +39,7 @@ my $session = WebGUI::Test->session;
 ####################################################
 
 my $origToolbar = $session->user->profileField('toolbar');
+WebGUI::Test->addToCleanup(sub { $session->user->profileField('toolbar', $origToolbar); },);
 my $toolbars = $session->url->extras('toolbar/');
 
 my $request = $session->request;
@@ -165,12 +166,6 @@ sub linkAndText {
 	my @parsedParams = map { $token->[1]{$_} || '-' } @params;
 
 	return @parsedParams;
-}
-
-my $icon = $session->icon->drag();
-
-END {
-	$session->user->profileField('toolbar', $origToolbar);
 }
 
 sub fetchTestSet {

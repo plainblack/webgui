@@ -28,6 +28,7 @@ $session->user({ userId => 3 });
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Album Test"});
+WebGUI::Test->addToCleanup($versionTag);
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -102,3 +103,4 @@ $maker->run;
 eval { WebGUI::Asset->newById( $session, $assetId ); };
 ok (Exception::Class->caught(), "GalleryAlbum cannot be instanciated after www_deleteConfirm");
 
+#vim:ft=perl

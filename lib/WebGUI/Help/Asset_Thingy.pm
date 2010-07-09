@@ -191,6 +191,7 @@ our $HELP = {
                     { 'name' => 'searchFields_textForm' },
                     { 'name' => 'searchFields_label' },
                     { 'name' => 'searchFields_is__fieldType__' },
+                    { 'name' => 'searchFields_listType' },
                 ],
             },
             {   'name'      => 'listOfThings',

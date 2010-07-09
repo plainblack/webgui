@@ -27,8 +27,6 @@ use WebGUI::Session;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode( $session );
 
-my $dt;
-
 #----------------------------------------------------------------------------
 # Tests
 
@@ -41,6 +39,7 @@ my $dt  = $node->addChild( {
     className   => 'WebGUI::Asset::Wobject::DataTable',
 } );
 isa_ok( $dt, 'WebGUI::Asset::Wobject::DataTable' );
+WebGUI::Test->addToCleanup($dt);
 
 #----------------------------------------------------------------------------
 # Value and variables
@@ -138,9 +137,4 @@ cmp_deeply(
     "getTemplateVars returns complete and correct data structure",
 );
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $dt->purge;
-}
 #vim:ft=perl

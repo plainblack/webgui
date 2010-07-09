@@ -26,6 +26,7 @@ use Image::ExifTool qw(:Public);
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"Photo Test"});
 WebGUI::Test->addToCleanup($versionTag);
 my $gallery
@@ -80,3 +81,5 @@ is_deeply(
     [ sort map { $_->{tag} } @{ $var->{exifLoop} } ],
     "getTemplateVars gets a loop over the tags",
 );
+
+#vim:ft=perl

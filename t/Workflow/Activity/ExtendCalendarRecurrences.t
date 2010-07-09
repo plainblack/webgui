@@ -30,7 +30,9 @@ my $calendar = $temp->addChild(
     {   className => 'WebGUI::Asset::Wobject::Calendar' }
 );
 
-my $one_year_ago = DateTime->today->subtract(years => 1)->ymd;
+my $eventStartDate = DateTime->today->truncate(to => 'month')->subtract(years => 1); 
+
+my $one_year_ago = $eventStartDate->ymd;
 
 my $event = $calendar->addChild(
     {   className => 'WebGUI::Asset::Event',
@@ -43,7 +45,7 @@ my $recurId = $event->setRecurrence(
     {   recurType => 'monthDay',
         every     => 2,
         startDate => $event->get('startDate'),
-        dayNumber => DateTime->today->day,
+        dayNumber => $eventStartDate->day,
     }
 );
 

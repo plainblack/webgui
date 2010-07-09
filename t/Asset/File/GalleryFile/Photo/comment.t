@@ -30,6 +30,7 @@ my $node            = WebGUI::Asset->getImportNode($session);
 
 my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTags[-1]);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
 WebGUI::Test->addToCleanup($versionTags[-1]);
 
@@ -327,3 +328,5 @@ TODO: {
     # TODO
     ok( 0, "Visitor has their IP logged in visitorIp field" );
 }
+
+#vim:ft=perl

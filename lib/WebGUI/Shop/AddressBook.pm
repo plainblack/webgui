@@ -684,7 +684,20 @@ sub www_editAddressSave {
     my %addressData = $self->processAddressForm();
     my @missingFields = $self->missingFields(\%addressData);
     if (@missingFields) {
-        return $self->www_editAddress(pop @missingFields);
+        my $i18n = WebGUI::International->new($self->session, "Shop");
+        my $missingField = pop @missingFields;
+        my $label = $missingField eq 'label'        ? $i18n->get('label')
+                  : $missingField eq 'firstName'    ? $i18n->get('firstName')
+                  : $missingField eq 'lastName'     ? $i18n->get('lastName')
+                  : $missingField eq 'address1'     ? $i18n->get('address')
+                  : $missingField eq 'city'         ? $i18n->get('city')
+                  : $missingField eq 'state'        ? $i18n->get('state')
+                  : $missingField eq 'country'      ? $i18n->get('country')
+                  : $missingField eq 'phoneNumber'  ? $i18n->get('phone number')
+                  : '' ;
+        if ($label) {
+            return $self->www_editAddress(sprintf($i18n->get('is a required field'), $label));
+        }
     }
     if ($form->get('addressId') eq '') {
         $self->addAddress(\%addressData);

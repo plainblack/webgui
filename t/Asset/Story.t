@@ -274,7 +274,7 @@ cmp_deeply(
     {
         title       => 'Story 1',
         description => 'WebGUI was originally called Web Done Right.',
-        'link'      => re('story-1$'),
+        'link'      => all(re('^'.$session->url->getSiteURL),re('story-1$')),
         guid        => re('story-1$'),
         author      => 'JT Smith',
         date        => $story->lastModified,
@@ -417,10 +417,7 @@ cmp_deeply(
 isnt($newPhotoData->[0]->{storageId}, $photoData->[0]->{storageId}, '... and storage 0 is duplicated');
 isnt($newPhotoData->[1]->{storageId}, $photoData->[1]->{storageId}, '... and storage 1 is duplicated');
 
-{
-    my %hash = map { ('WebGUI::Storage' => $_->{storageId}) } @{ $newPhotoData };
-    WebGUI::Test->addToCleanup(%hash);
-}
+WebGUI::Test->addToCleanup( map { ( 'WebGUI::Storage' => $_->{storageId} ) } @{ $newPhotoData } );
 
 ############################################################
 #
@@ -440,3 +437,4 @@ cmp_bag(
     '...asset package data has the storage locations in it'
 );
 
+#vim:ft=perl

@@ -184,4 +184,10 @@ cmp_bag(
     'exportAssetCollateral: feed files exported, shawshank.html file'
 );
 
+#####################################################
+#
+# exportAssetCollateral
+#
+#####################################################
+
 #vim:ft=perl

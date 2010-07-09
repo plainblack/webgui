@@ -996,20 +996,8 @@ sub getFormPlugin {
     eval { WebGUI::Pluggable::load($class) };
     if ($class->isa('WebGUI::Form::List')) {
         delete $param{size};
-
         my $values = WebGUI::Operation::Shared::secureEval($session,$data->{possibleValues});
-        if (ref $values eq 'HASH') {
-            $param{options} = $values;
-        }
-        else{
-            my %options;
-            tie %options, 'Tie::IxHash';
-            foreach (split(/\n/x, $data->{possibleValues})) {
-                s/\s+$//x; # remove trailing spaces
-                    $options{$_} = $_;
-            }
-            $param{options} = \%options;
-        }
+        $param{options} = $values;
     }
 
     if ($data->{fieldType} eq "YesNo") {
@@ -2408,6 +2396,8 @@ sub editThingData {
     my $thingId         = shift || $session->form->process('thingId');
     my $thingDataId     = shift || $session->form->process('thingDataId') || "new";
     my $thingProperties = shift || $self->getThing($thingId);
+    my $errors          = shift;
+    my $resetForm       = shift;
     my $i18n            = WebGUI::International->new($self->session, "Asset_Thingy");
 
     my $canEditThingData = $self->canEditThingData($thingId, $thingDataId, $thingProperties);
@@ -2417,7 +2407,7 @@ sub editThingData {
     my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
-    my $errors = shift;
+    
     $var->{error_loop} = $errors if ($errors);
 
     $var->{canEditThings} = $self->canEdit;
@@ -2465,14 +2455,17 @@ sub editThingData {
         ,[$self->getId,$thingId]);
     while (my %field = $fields->hash) {
         my $fieldName = 'field_'.$field{fieldId};
-        if ($session->form->process("func") eq "editThingDataSave"){
-            $fieldValue = $session->form->process($fieldName,$field{fieldType},$field{defaultValue});
+        $fieldValue = undef;
+        unless ($resetForm) {
+            if ($session->form->process("func") eq "editThingDataSave"){
+                $fieldValue = $session->form->process($fieldName,$field{fieldType},$field{defaultValue});
+            }
+            else{
+                $fieldValue = $thingData{"field_".$field{fieldId}};
+            }
         }
-        else{
-            $fieldValue = $thingData{"field_".$field{fieldId}};
-        }
-        $field{value} = $fieldValue || $field{defaultValue};     
-        my $formElement .= $self->getFormElement(\%field);
+        $field{value} = $fieldValue || $field{defaultValue};
+        my $formElement .= $self->getFormPlugin(\%field,($resetForm eq ""))->toHtml;
         
         my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
         my $value = $field{value};
@@ -2546,7 +2539,7 @@ sub www_editThingDataSave {
         return $self->www_viewThingData($thingId,$newThingDataId);
     }
     elsif ($thingProperties->{afterSave} eq "addThing") {
-        return $self->www_editThingData($thingId,"new");
+        return $self->www_editThingData($thingId,"new",undef,undef,"resetForm");
     }
     elsif ($thingProperties->{afterSave} =~ m/^searchOther_/x){
         $otherThingId = $thingProperties->{afterSave};
@@ -2556,7 +2549,7 @@ sub www_editThingDataSave {
     elsif ($thingProperties->{afterSave} =~ m/^addOther_/x){
         $otherThingId = $thingProperties->{afterSave};
         $otherThingId =~ s/^addOther_//x;
-        return $self->www_editThingData($otherThingId,"new");
+        return $self->www_editThingData($otherThingId,"new",undef,undef,"resetForm");
     }
     # if afterSave is thingy default or in any other case return www_view()
     else {
@@ -3233,7 +3226,7 @@ $self->session->form->process($_) eq "") {
 sequenceNumber');
     while (my $field = $fields->hashRef) {
         if ($field->{searchIn}){
-            my $searchForm = $self->getFormElement($field);
+            my $searchForm = $self->getFormPlugin($field, 1);
             my $searchTextForm = WebGUI::Form::Text($self->session, {
                 name=>"field_".$field->{fieldId},
                 size=>25,
@@ -3248,9 +3241,10 @@ sequenceNumber');
             push(@searchFields_loop, {
                 "searchFields_fieldId" => $field->{fieldId},
                 "searchFields_label" => $field->{label},
-                "searchFields_form" => $searchForm,
+                "searchFields_form" => $searchForm->toHtml,
                 "searchFields_textForm" => $searchTextForm,
                 "searchFields_is".$fieldType => 1,
+                "searchFields_listType" => $searchForm->isa('WebGUI::Form::List'),
             });
 
             my @searchValue = $session->form->process("field_".$field->{fieldId});

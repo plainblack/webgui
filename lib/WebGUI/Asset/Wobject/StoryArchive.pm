@@ -288,9 +288,14 @@ sub getFolder {
     ##For a fully automatic commit, save the current tag, create a new one
     ##with the commit without approval workflow, commit it, then restore
     ##the original if it exists
-    my $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'noCreate');
-    my $newVersionTag = WebGUI::VersionTag->create($session, { workflowId => 'pbworkflow00000000003', });
-    $newVersionTag->setWorking;
+    my ($oldVersionTag, $newVersionTag);
+    $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'noCreate');
+
+    if ($self->hasBeenCommitted) {
+        $newVersionTag = WebGUI::VersionTag->create($session, { workflowId => 'pbworkflow00000000003', });
+        $newVersionTag->setWorking;
+        $newVersionTag->set({ name => 'Adding folder '. $folderName. ' to archive '. $self->getUrl});
+    }
 
     ##Call SUPER because my addChild calls getFolder
     $folder = $self->addChild({
@@ -301,7 +306,7 @@ sub getFolder {
         isHidden        => 1,
         styleTemplateId => $self->styleTemplateId,
     });
-    $newVersionTag->commit();
+    $newVersionTag->commit() if $newVersionTag;
     ##Restore the old one, if it exists
     $oldVersionTag->setWorking() if $oldVersionTag;
 

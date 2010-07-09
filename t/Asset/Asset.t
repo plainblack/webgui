@@ -35,7 +35,144 @@ my $session = WebGUI::Test->session;
 
 my @getTitleTests = getTitleTests($session);
 
-plan tests => 121
+my $rootAsset = WebGUI::Asset->getRoot($session);
+
+##Test users.
+##All users in here will be deleted at the end of the test.  DO NOT PUT
+##Visitor or Admin in here!
+my %testUsers = ();
+##Just a regular user
+$testUsers{'regular user'} = WebGUI::User->new($session, 'new');
+$testUsers{'regular user'}->username('regular user');
+##Users in group 12 can add Assets
+$testUsers{'canAdd turnOnAdmin'} = WebGUI::User->new($session, 'new');
+$testUsers{'canAdd turnOnAdmin'}->addToGroups(['12']);
+$testUsers{'canAdd turnOnAdmin'}->username('Turn On Admin user');
+
+##Just a user for owning assets
+$testUsers{'owner'} = WebGUI::User->new($session, 'new');
+$testUsers{'owner'}->username('Asset Owner');
+
+##Test Groups
+##All groups in here will be deleted at the end of the test
+my %testGroups = ();
+##A group and user for groupIdEdit
+$testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
+$testUsers{'canEdit group user'} = WebGUI::User->new($session, 'new');
+$testUsers{'canEdit group user'}->addToGroups([$testGroups{'canEdit asset'}->getId]);
+$testUsers{'canEdit group user'}->username('Edit Group User');
+addToCleanup($testGroups{'canEdit asset'});
+
+##A group and user for groupIdEdit
+$testGroups{'canAdd asset'}     = WebGUI::Group->new($session, 'new');
+$testUsers{'canAdd group user'} = WebGUI::User->new($session, 'new');
+$testUsers{'canAdd group user'}->addToGroups([$testGroups{'canAdd asset'}->getId]);
+$testUsers{'canEdit group user'}->username('Can Add Group User');
+addToCleanup($testGroups{'canAdd asset'}, values %testUsers);
+
+my $canAddMaker = WebGUI::Test::Maker::Permission->new();
+$canAddMaker->prepare({
+    'className' => 'WebGUI::Asset',
+    'session'   => $session,
+    'method'    => 'canAdd',
+    #'pass'      => [3, $testUsers{'canAdd turnOnAdmin'}, $testUsers{'canAdd group user'} ],
+    'pass'      => [3, $testUsers{'canAdd group user'} ],
+    'fail'      => [1, $testUsers{'regular user'},                                       ],
+});
+
+my $canAddMaker2 = WebGUI::Test::Maker::Permission->new();
+$canAddMaker2->prepare({
+    'className' => 'WebGUI::Asset',
+    'session'   => $session,
+    'method'    => 'canAdd',
+    'fail'      => [$testUsers{'canAdd turnOnAdmin'},],
+});
+
+my $properties;
+$properties = {
+	#            '1234567890123456789012'
+	id          => 'canEditAsset0000000010',
+	title       => 'canEdit Asset Test',
+	url         => 'canEditAsset1',
+	className   => 'WebGUI::Asset',
+    ownerUserId => $testUsers{'owner'}->userId,
+    groupIdEdit => $testGroups{'canEdit asset'}->getId,
+    groupIdView => 7,
+};
+
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+addToCleanup($versionTag2);
+
+my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
+
+$versionTag2->commit;
+$properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
+
+my $canEditMaker = WebGUI::Test::Maker::Permission->new();
+$canEditMaker->prepare({
+    'object' => $canEditAsset,
+    'method' => 'canEdit',
+    'pass'   => [3, $testUsers{'owner'},        $testUsers{'canEdit group user'}, ],
+    'fail'   => [1, $testUsers{'regular user'},                                   ],
+});
+
+my $versionTag3 = WebGUI::VersionTag->getWorking($session);
+addToCleanup($versionTag3);
+$properties = {
+	#            '1234567890123456789012'
+	id          => 'canViewAsset0000000010',
+	title       => 'canView Asset Test',
+	url         => 'canViewAsset1',
+	className   => 'WebGUI::Asset',
+    ownerUserId => $testUsers{'owner'}->userId,
+    groupIdEdit => $testGroups{'canEdit asset'}->getId,
+    groupIdView => $testGroups{'canEdit asset'}->getId,
+};
+
+
+my $canViewAsset = $rootAsset->addChild($properties, $properties->{id});
+
+$versionTag3->commit;
+$properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
+
+my $canViewMaker = WebGUI::Test::Maker::Permission->new();
+$canViewMaker->prepare(
+    {
+        'object' => $canEditAsset,
+        'method' => 'canView',
+        'pass'   => [1, 3, $testUsers{'owner'}, $testUsers{'canEdit group user'}, $testUsers{'regular user'},],
+    },
+    {
+        'object' => $canViewAsset,
+        'method' => 'canView',
+        'pass'   => [3, $testUsers{'owner'},        $testUsers{'canEdit group user'}, ],
+        'fail'   => [1, $testUsers{'regular user'},                                   ],
+    },
+);
+
+#### TestAsset class to test definition / update relationship
+BEGIN { $INC{ 'WebGUI/Asset/TestAsset.pm' } = __FILE__ }
+package WebGUI::Asset::TestAsset;
+
+our @ISA = ( 'WebGUI::Asset' );
+sub definition {
+    my ( $class, $session, $definition ) = @_;
+
+    # Alter assetData fields for testing purposes. Do not do 
+    # this in normal circumstances. Ever.
+    $definition = $class->SUPER::definition( $session, $definition );
+
+    # Make synopsis serialized
+    $definition->[0]->{properties}->{synopsis}->{serialize} = 1;
+
+    return $definition;
+}
+
+package main;
+
+plan tests => 132
+            + scalar(@fixIdTests)
+            + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             ;
 
@@ -185,6 +322,40 @@ my $tempNode = WebGUI::Asset->getTempspace($session);
 isa_ok($tempNode, 'WebGUI::Asset::Wobject::Folder');
 is($tempNode->getId, 'tempspace0000000000000', 'Tempspace Asset ID check');
 is($tempNode->getParent->getId, $rootAsset->getId, 'Tempspace parent is Root Asset');
+
+
+################################################################
+#
+# update
+#
+################################################################
+
+# Create a new TestAsset instance
+my $ta  = $importNode->addChild( { 
+                className       => 'WebGUI::Asset::TestAsset',
+} );
+isa_ok( $ta, 'WebGUI::Asset::TestAsset', 'addChild returns correct object' );
+
+ok(
+    eval { $ta->update({ synopsis => [ "one", "two" ] }); 1; },
+    'update() succeeds with ref on serialized property',
+);
+cmp_deeply(
+    $ta->get('synopsis'),
+    [ "one", "two" ],
+    "serialized property returns deserialized ref",
+);
+
+ok(
+    eval { $ta->update({ synopsis => '[ "two", "three" ]', }); 1; },
+    'update() succeeds with serialized string on serialized property',
+);
+cmp_deeply(
+    $ta->get('synopsis'),
+    [ "two", "three" ],
+    "serialized property returns deserialized ref",
+);
+$ta->purge;
 
 ################################################################
 #
@@ -801,3 +972,5 @@ sub getTitleTests {
     },
     );
 }
+
+

@@ -49,8 +49,12 @@ is($i18n->getNamespace(), 'Asset', 'getNamespace: set namespace to Asset');
 is($i18n->get('topicName'), 'Assets', 'get: get English label for topicName in Asset: Assets');
 is($i18n->get('topicName', 'WebGUI'), 'WebGUI', 'get: test manual namespace override');
 
-local @INC = @INC;
-unshift @INC, File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'International', 'lib' );
+installPigLatin();
+WebGUI::Test->addToCleanup(sub {
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
+	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
+});
 
 #tests for sub new
 my $i18nNew1 = WebGUI::International->new($session);
@@ -119,5 +123,4 @@ is(
     'Language check after SetLanguage contentHandler : key from missing file return English key'
 );
 
-}
-
+#vim:ft=perl

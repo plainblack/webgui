@@ -165,18 +165,6 @@ our $I18N = {
 		context		=> q|a help description|,
 	},
 
-	'removeButton help' => {
-		message 	=> q|Clicking this button will remove the item from the cart.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-
-	'item shipToButton help' => {
-		message 	=> q|Clicking this button will set an alternate address as the destination of this item.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-
 	'shippingAddress help' => {
 		message 	=> q|The HTML formatted address to ship to.|,
 		lastUpdated	=> 0,
@@ -185,6 +173,12 @@ our $I18N = {
 
 	'error help' => {
 		message 	=> q|If there are any problems the error message will be displayed here.|,
+		lastUpdated	=> 0,
+		context		=> q|a help description|,
+	},
+
+	'message help' => {
+		message 	=> q|If the cart is empty, this internationalized message should be displayed to the user.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
@@ -239,6 +233,12 @@ our $I18N = {
 
 	'shippingOptions help' => {
 		message 	=> q|A select list containing all the configured shipping options for this order.|,
+		lastUpdated	=> 0,
+		context		=> q|a help description|,
+	},
+
+	'paymentOptions help' => {
+		message 	=> q|A select list containing all the configured payment options for this order.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
@@ -443,6 +443,12 @@ our $I18N = {
 
 	'phoneNumberField help' => {
 		message 	=> q|A field to contain the phone number for this address.|,
+		lastUpdated	=> 0,
+		context		=> q|a help description|,
+	},
+
+	'emailField help' => {
+		message 	=> q|A field to contain the email address for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
@@ -1782,7 +1788,7 @@ our $I18N = {
 	'shippableItemsInCart' => { 
 		message => q|A boolean which will be true if any item in the cart requires shipping.|,
 		lastUpdated => 0,
-		context => q|form label for the cart.  Allows user to choose a payment method.  Bart Jol for Minister in 2012!|
+		context => q|Template variable help.|
 	},
 
     'no billing address' => { 
@@ -1903,6 +1909,108 @@ our $I18N = {
         message => q|Please enter a phone number for the shipping address.|,
         lastUpdated => 0,
         context => q|Cart error message|
+    },
+
+    'minimumCartAmount help' => { 
+        message => q|The minimum cart amount, from the settings, formatted to two decimal places.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'userIsVisitor help' => { 
+        message => q|A boolean which will be true if the currrent user is Visitor|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'removeBox help' => { 
+        message => q|A checkbox that will allow this item to be removed from the cart.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'itemAddressChooser help' => { 
+        message => q|A dropdown for choosing an address to ship an individual item in the cart to, enabling per-item shipping.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'shippingAddressChooser help' => { 
+        message => q|A dropdown for choosing a default shipping address for all items in the cart.  Also contains actions for editing and adding new addresses.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'billingAddressChooser help' => { 
+        message => q|A dropdown for choosing a default billing address.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'sameShippingAsBilling help' => { 
+        message => q|A checkbox to tell the cart that the user wants to use the same shipping address, as their billing address.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'loginFormHeader help' => { 
+        message => q|The start of the form to help a user log in.  This variable will only be populated if the current user is Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'loginFormFooter help' => { 
+        message => q|The end of the form to help a user log in.  This variable will only be populated if the current user is Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'loginFormUsername help' => { 
+        message => q|A text box for the user to enter in their name.  This variable will only be populated if the current user is Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'loginFormPassword help' => { 
+        message => q|A text box for the user to enter in their password, obscured.  This variable will only be populated if the current user is Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'loginFormButton help' => { 
+        message => q|The end of the form to help a user log in.  This variable will only be populated if the current user is Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'registerLink help' => { 
+        message => q|A link for a user to register an account on this site, if they do not already have one.  This variable will only be populated if the current user is Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'item taxRate help' => { 
+        message => q|The tax rate for this item.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'item taxAmount help' => { 
+        message => q|The amount of tax for this item.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'item pricePlusTax help' => { 
+        message => q|The amount of tax plus the price for this item.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'item extendedPricePlusTax help' => { 
+        message => q|The amount of tax plus the price for this item, times the quantity of this item in the cart.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
     },
 
 };

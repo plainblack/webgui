@@ -18,6 +18,7 @@ use WebGUI::Asset::Template;
 use Exception::Class;
 use Test::More tests => 42; # increment this value for each test you create
 use Test::Deep;
+use Data::Dumper;
 use JSON qw{ from_json };
 
 my $session = WebGUI::Test->session;
@@ -78,13 +79,13 @@ my $template3 = $importNode->addChild({
 }, undef, time()-5);
 
 my @atts = (
-    {type => 'headScript', sequence => 1, url => 'bar'},
-    {type => 'headScript', sequence => 0, url => 'foo'},
-    {type => 'stylesheet', sequence => 0, url => 'style'},
-    {type => 'bodyScript', sequence => 0, url => 'body'},
+    {type => 'headScript', url => 'foo'},
+    {type => 'headScript', url => 'bar'},
+    {type => 'stylesheet', url => 'style'},
+    {type => 'bodyScript', url => 'body'},
 );
 
-$template3->addAttachments(\@atts);
+$template3->update({ attachmentsJson => JSON->new->encode( \@atts ) });
 my $att3 = $template3->getAttachments('headScript');
 is($att3->[0]->{url}, 'foo', 'has foo');
 is($att3->[1]->{url}, 'bar', 'has bar');
@@ -100,12 +101,12 @@ ok(exists $session->style->{_javascript}->{$_}, "$_ in style") for qw(foo bar bo
 #sleep 1;
 
 my $template3dup = $template3->duplicate;
-my @atts3dup = map { delete @{ $_ }{qw/attachId templateId revisionDate/}; $_; } @{ $template3dup->getAttachments };
+my @atts3dup = @{ $template3dup->getAttachments };
 cmp_bag(
     [@atts3dup],
     [@atts],
     'attachments are duplicated'
-);
+) or diag( Dumper \@atts3dup );
 
 my $template3rev = $template3->addRevision();
 my $att4 = $template3rev->getAttachments('headScript');
@@ -113,7 +114,9 @@ is($att4->[0]->{url}, 'foo', 'rev has foo');
 is($att4->[1]->{url}, 'bar', 'rev has bar');
 is(@$att4, 2, 'rev is proper size');
 
-$template3rev->addAttachments([{type => 'headScript', sequence => 2, url => 'baz'}]);
+$template3rev->update({ 
+    attachmentsJson => JSON->new->encode([ @atts, {type => 'headScript', url => 'baz'} ]),
+});
 $att4 = $template3rev->getAttachments('headScript');
 $att3 = $template3->getAttachments('headScript');
 is($att3->[0]->{url}, 'foo', 'original still has foo');
@@ -122,12 +125,8 @@ is(@$att3, 2, 'original does not have new thing');
 
 is($att4->[0]->{url}, 'foo', 'rev still has foo');
 is($att4->[1]->{url}, 'bar', 'rev still has bar');
-is($att4->[2]->{url}, 'baz', 'rev does have new thing');
+is($att4->[2]->{url}, 'baz', 'rev does have new thing') or diag( $template3rev->get('attachmentsJson') );
 is(@$att4, 3, 'rev is proper size');
-
-##This is a non-test.  Duplicate URLs will not cause the test to blow-up with
-##an untrappable error.
-$template3rev->addAttachments([{ type => 'headScript', sequence => 3, url => 'baz'}]);
 
 $template3rev->purgeRevision();
 

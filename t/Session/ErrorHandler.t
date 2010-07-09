@@ -115,4 +115,3 @@ WebGUI::Test->interceptLogging( sub {
     };
     is $log_data->{fatal}, 'Bad things are happenning', 'fatal: logger called correctly';
 });
-

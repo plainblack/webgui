@@ -148,7 +148,7 @@ cmp_bag(
         ignore(), ignore(), ignore(), ignore(),
     ],
     'view: returns one entry for each user, entry is correct for user with status'
-);
+) or diag(Dumper $templateVars->{rows_loop});
 
 ################################################################
 #

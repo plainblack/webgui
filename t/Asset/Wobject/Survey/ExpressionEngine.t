@@ -28,9 +28,11 @@ plan tests => $tests + 1;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $e = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
-use_ok($e);
+my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey::ExpressionEngine');
 
+my $e = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
+
+WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
 $session->config->set( 'enableSurveyExpressionEngine', 0 );
 is( $e->run( $session, 'jump { 1 } target' ),
     undef, "Nothing happens unless we turn on enableSurveyExpressionEngine in config" );
@@ -240,6 +242,7 @@ cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 199} target}
 {
     # Create a second test user
     my $survey2 = WebGUI::Asset::Wobject::Survey->new($session, $survey->getId);
+    WebGUI::Test->addToCleanup($survey2);
     my $user2 = WebGUI::User->new( $session, 'new' );
     WebGUI::Test->addToCleanup($user2);
     $session->user({userId => $user2->userId});
@@ -261,3 +264,5 @@ cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 199} target}
     cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 199} target}, {userId => $user->userId} ),
         { jump => 'target', tags => {} }, 'first external tag lookups still works' );
 }
+
+#vim:ft=perl

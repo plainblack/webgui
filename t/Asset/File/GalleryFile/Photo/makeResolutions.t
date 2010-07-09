@@ -29,6 +29,7 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test"});
+WebGUI::Test->addToCleanup($versionTags[-1]);
 
 my ($gallery, $album, $photo);
 $gallery
@@ -224,3 +225,5 @@ $photo->update({ filename => 'page_title.jpg' });
         "makeResolutions still makes valid resolutions when invalid resolutions given",
     );
 }
+
+#vim:ft=perl
