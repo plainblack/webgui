@@ -16,7 +16,6 @@ package WebGUI::Shop::Pay;
 
 use strict;
 
-#use Class::InsideOut qw{ :std };
 use Moose;
 use WebGUI::Exception;
 use WebGUI::International;
