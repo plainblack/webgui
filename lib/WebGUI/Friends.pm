@@ -15,7 +15,6 @@ package WebGUI::Friends;
 =cut
 
 use strict;
-use Class::InsideOut qw(id register public readonly);
 
 use Moose;
 
