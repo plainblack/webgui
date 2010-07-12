@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addIndexToUserSessionLog($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addIndexToUserSessionLog {
+    my $session = shift;
+    print "\tAdd index to UserSessionLogTable... " unless $quiet;
+    $session->db->write(q|alter table userLoginLog add index sessionId (sessionId)|);
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

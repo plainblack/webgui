@@ -7,6 +7,7 @@
  - fixed #11672: UTF-Error in message body (from DataForm)
  - fixed #11709: Shop - i18n error
  - fixed #11710: Weird license in json.js might be taken as non free
+ - fixed #11708: Activity DeleteExpiredSessions is too slow
 
 7.9.8
  - fixed #11651: First Day of Week is a string...
