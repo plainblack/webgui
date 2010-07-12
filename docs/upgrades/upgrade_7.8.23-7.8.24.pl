@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addIndexToUserSessionLog($session);
+addHeightToCarousel($session);
 
 finish($session); # this line required
 
@@ -51,6 +52,15 @@ sub addIndexToUserSessionLog {
     my $session = shift;
     print "\tAdd index to UserSessionLogTable... " unless $quiet;
     $session->db->write(q|alter table userLoginLog add index sessionId (sessionId)|);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addHeightToCarousel {
+    my $session = shift;
+    print "\tAdd slide height to Carousel... " unless $quiet;
+    $session->db->write(q|alter table Carousel add column slideHeight int(11)|);
     print "DONE!\n" unless $quiet;
 }
 
