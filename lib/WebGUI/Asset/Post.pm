@@ -1386,7 +1386,7 @@ override trash => sub {
     $self->getThread->sumReplies if ($self->isReply);
     $self->getThread->updateThreadRating;
     $self->disqualifyAsLastPost;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -1396,14 +1396,14 @@ Extend the base method to also prepare the Thread containing this Post.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->next::method;
+        super();
 	unless ($self->getThread->getId eq $self->getId) {
 		# Need the unless to avoid infinite recursion.
 		$self->getThread->prepareView;
 	}
-}
+};
 
 #-------------------------------------------------------------------
 

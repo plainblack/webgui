@@ -750,8 +750,8 @@ foreach my $ipTest (@ipTests) {
 
     ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remote Visitor fails to be in the group';
 
-    $ENV{REMOTE_ADDR} = '192.168.33.1';
     my $localSession = WebGUI::Test->newSession;
+    $localSession->request->env->{'REMOTE_ADDR'} = '192.168.33.1';
     WebGUI::Test->addToCleanup($localIpGroup, $remoteSession, $localSession);
     $localSession->user({userId => 1});
     $localIpGroup->clearCaches;

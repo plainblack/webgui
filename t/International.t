@@ -28,10 +28,6 @@ plan tests => $numTests;
 
 my $loaded = use_ok('WebGUI::International');
 
-SKIP: {
-
-skip 'Module was not loaded, skipping all tests', $numTests-1 unless $loaded;
-
 my $i18n = WebGUI::International->new($session, undef, 'English');
 
 isa_ok($i18n, 'WebGUI::International', 'object of correct type created');
@@ -122,5 +118,17 @@ is(
     $newi18n->get('104', 'WebGUI', 'English'),
     'Language check after SetLanguage contentHandler : key from missing file return English key'
 );
+
+sub installPigLatin {
+    mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');
+    copy( 
+        WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
+        File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/)
+    );
+    copy(
+        WebGUI::Test->getTestCollateralPath('PigLatin.pm'),
+        File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/)
+    );
+}
 
 #vim:ft=perl

@@ -249,6 +249,7 @@ property icalFeeds    => (
             defaultValue    => [],
             serialize       => 1,
             tab             => "feeds",
+            label           => ['feeds','Asset_Calendar'],
             fields          => [
                 {
                     name        => 'feedId',
@@ -258,17 +259,17 @@ property icalFeeds    => (
                     name        => 'url',
                     type        => 'text',
                     size        => '40',
-                    label       => $i18n->get('Feed URL'),
+                    label       => ['Feed URL','Asset_Calendar'],
                 },
                 {
                     name        => 'status',
                     type        => 'readonly',
-                    label       => $i18n->get('434','WebGUI'),
+                    label       => ['434','WebGUI'],
                 },
                 {
                     name        => 'lastUpdated',
                     type        => 'readonly',
-                    label       => $i18n->get('454', 'WebGUI'),
+                    label       => ['454', 'WebGUI'],
                 },
             ],
         );

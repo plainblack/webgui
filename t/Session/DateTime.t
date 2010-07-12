@@ -303,7 +303,7 @@ $session->user({userId => 1});
 
 sub installBadLocale {
 	copy(
-		WebGUI::Test->getTestCollateralPath('BadLocale.pm'),
+		WebGUI::Test->getTestCollateralPath(qw/ Session-DateTime lib WebGUI i18n BadLocale.pm /),
 		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/)
 	);
 }

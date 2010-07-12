@@ -103,6 +103,11 @@ property storageIdExample => (
              hoverHelp       => ['field storageIdExample description', 'Asset_Template'],
          );
 
+property attachmentsJson => (
+    fieldType       => 'image',
+    label           => [ "attachments display label", "Asset_Template" ],
+);
+
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
@@ -131,81 +136,6 @@ use WebGUI::Asset::Template;
 These methods are available from this class:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-Defines the properties of this asset.
-
-=head3 session
-
-A reference to an existing session.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-	my $session     = shift;
-    my $definition  = shift;
-	my $i18n        = WebGUI::International->new($session,"Asset_Template");
-    push @{$definition}, {
-		assetName   => $i18n->get('assetName'),
-		icon        => 'template.gif',
-        tableName   => 'template',
-        className   => 'WebGUI::Asset::Template',
-        properties  => {
-            template => {
-                fieldType       => 'codearea',
-                syntax          => "html",
-                defaultValue    => undef,
-                filter          => 'packTemplate',
-            },
-            isEditable => {
-                noFormPost      => 1,
-                fieldType       => 'hidden',
-                defaultValue    => 1,
-            },
-            isDefault => {
-                fieldType       => 'hidden',
-                defaultValue    => 0,
-            },
-            showInForms => {
-                fieldType       => 'yesNo',
-                defaultValue    => 1,
-            },
-            parser => {
-                noFormPost      => 1,
-                fieldType       => 'selectBox',
-                defaultValue    => [$session->config->get("defaultTemplateParser")],
-            },	
-            namespace => {
-                fieldType       => 'combo',
-                defaultValue    => undef,
-            },
-            templatePacked => {
-                fieldType       => 'hidden',
-                defaultValue    => undef,
-                noFormPost      => 1,
-            },
-            usePacked => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            storageIdExample => {
-                fieldType       => 'image',
-            },
-            attachmentsJson => {
-                fieldType       => 'JsonTable',
-            },
-        },
-    };
-    return $class->SUPER::definition($session,$definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -723,29 +653,6 @@ sub processRaw {
 	my $vars = shift;
 	my $parser = shift;
 	return $class->getParser($session,$parser)->process($template, $vars);
-}
-
-#-------------------------------------------------------------------
-
-=head2 update
-
-Override update from Asset.pm to handle backwards compatibility with the old
-packages that contain headBlocks. This will be removed in the future.  Don't plan
-on this being here.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $requestedProperties = shift;
-    my $properties = clone($requestedProperties);
-
-    if (exists $properties->{headBlock}) {
-        $properties->{extraHeadTags} .= $properties->{headBlock};
-        delete $properties->{headBlock};
-    }
-
-    $self->SUPER::update($properties);
 }
 
 #-------------------------------------------------------------------

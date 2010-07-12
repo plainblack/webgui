@@ -36,7 +36,7 @@ my $mime;       # for getMimeEntity
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 33;        # Increment this number for each test you create
+plan tests => 39;        # Increment this number for each test you create
 
 WebGUI::Test->addToCleanup(SQL => 'delete from mailQueue');
 
@@ -124,6 +124,103 @@ my $dbMail = WebGUI::Mail::Send->retrieve($session, $messageId);
 is($dbMail->getMimeEntity->head->get('List-ID'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", 'addHeaderField: handles utf-8 correctly');
 
 # TODO: Test that addHtml creates a body with the right content type
+use utf8;
+$mail = WebGUI::Mail::Send->create( $session, {
+    to      => 'norton@localhost',
+    subject => "H\x{00C4}ufige Fragen",
+});
+$mail->addHeaderField('List-ID', "H\x{00C4}ufige Fragen");
+my $messageId = $mail->queue;
+my $dbMail = WebGUI::Mail::Send->retrieve($session, $messageId);
+is($dbMail->getMimeEntity->head->get('List-ID'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", 'addHeaderField: handles utf-8 correctly in List-ID');
+is($dbMail->getMimeEntity->head->get('Subject'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", '... in Subject');
+
+{
+    my $mail = WebGUI::Mail::Send->create( $session );
+    ok ! $mail->{_footerAdded}, 'footerAdded flag set to false by default';
+    $mail->addFooter;
+    ok   $mail->{_footerAdded}, '... flag set after calling addFooter';
+    my $number_of_parts;
+    $number_of_parts = $mail->getMimeEntity->parts;
+    is $number_of_parts, 1, '... added 1 part for a footer';
+    $mail->addFooter;
+    ok   $mail->{_footerAdded}, '... flag still set after calling addFooter again';
+    $number_of_parts = $mail->getMimeEntity->parts;
+    is $number_of_parts, 1, '... 2nd footer not added';
+
+}
+
+{
+    my $mail = WebGUI::Mail::Send->create( $session );
+    $mail->addText('some text');
+    $mail->addFooter;
+    my $number_of_parts;
+    $number_of_parts = $mail->getMimeEntity->parts;
+    is $number_of_parts, 1, 'addFooter did not add any other parts';
+    my $body = $mail->getMimeEntity->parts(0)->as_string;
+    $body =~ s/\A.+?(?=some text)//s;
+    is $body, "some text\n\nMy Company\ninfo\@mycompany.com\nhttp://www.mycompany.com\n", '... footer appended to the first part as text';
+}
+
+{
+    my $mail = WebGUI::Mail::Send->create( $session );
+    $mail->addHtml('some <b>markup</b>');
+    $mail->addFooter;
+    my $number_of_parts;
+    $number_of_parts = $mail->getMimeEntity->parts;
+    is $number_of_parts, 1, 'addFooter did not add any other parts';
+    my $body = $mail->getMimeEntity->parts(0)->as_string;
+    $body =~ s/\A.+?<body>\n//sm;
+    $body =~ s!</body>.+\Z!!sm;
+    is $body, "some <b>markup</b>\n<br />\n<br />\nMy Company<br />\ninfo\@mycompany.com<br />\nhttp://www.mycompany.com<br />\n", '... footer appended to the first part as text';
+}
+
+{
+    my $mail = WebGUI::Mail::Send->create( $session );
+    $mail->addText('This is a textual email');
+    my $result = $mail->getMimeEntity->is_multipart;
+    ok(defined $result &&   $result, 'by default, we make multipart messages');
+}
+
+{
+    ##Disable the footer for easy processing
+    my $origFooter = $session->setting->get('mailFooter');
+    $session->setting->set('mailFooter', "");
+    my $textMail = WebGUI::Mail::Send->create( $session );
+    $textMail->addText("H\x{00C4}ufige Fragen");
+    $textMail->addFooter();
+    is $textMail->getMimeEntity->parts(0)->bodyhandle->as_string,
+       encode('utf8', "H\x{00C4}ufige Fragen\n\n"),
+       'check that adding a footer does not double encode the body when it is text';
+    my $htmlMail = WebGUI::Mail::Send->create( $session );
+    $htmlMail->addHtml("__H\x{00C4}ufige Fragen__");
+    $htmlMail->addFooter();
+    my ($encoded_segment) = $htmlMail->getMimeEntity->parts(0)->bodyhandle->as_string =~ /__([^_]+)__/;
+    is $encoded_segment,
+       encode('utf8', "H\x{00C4}ufige Fragen"),
+       '... similarly with an html body';
+    $session->setting->set('mailFooter', $origFooter);
+}
+
+{
+    ##Set the footer to contain UTF-8 characters
+    my $origFooter = $session->setting->get('mailFooter');
+    $session->setting->set('mailFooter', "Not beta: \x{00DF} ");
+    my $textMail = WebGUI::Mail::Send->create( $session );
+    $textMail->addText("");
+    $textMail->addFooter();
+    is $textMail->getMimeEntity->parts(0)->bodyhandle->as_string,
+       encode('utf-8', "\n\nNot beta: \x{00DF} "),
+       'check that footer is encoded as UTF-8 for a text body';
+    my $htmlMail = WebGUI::Mail::Send->create( $session );
+    $htmlMail->addHtml("");
+    $htmlMail->addFooter();
+    my ($encoded_segment) = $htmlMail->getMimeEntity->parts(0)->bodyhandle->as_string =~ /Not beta: (\S+)/;
+    is $encoded_segment,
+       encode('utf-8', "\x{00DF}"),
+       '... similarly with an html body';
+    $session->setting->set('mailFooter', $origFooter);
+}
 
 my $smtpServerOk;
 
@@ -330,11 +427,8 @@ cmp_bag(
     'send: when the original is sent, new messages are created for each user in the group, following their user profile settings'
 );
 
-SKIP: {
-    my $numtests = 2; # Number of tests in this block
-
-    skip "Cannot test making emails single part", $numtests unless $smtpServerOk;
-
+WebGUI::Test::MailServer::test_smtp($session, sub {
+    my $cb = shift;
     # Send the mail
     my $mail
         = WebGUI::Mail::Send->create( $session, { 
@@ -344,24 +438,16 @@ SKIP: {
 
     ok ($mail->getMimeEntity->is_multipart, 'starting with a multipart message');
     $mail->send;
-    my $received = WebGUI::Test->getMail;
+    my $received = $cb->();
 
-    if (!$received) {
-        skip "Cannot making single part: No response received from smtpd", $numtests;
-    }
-
-    # Test the mail
     my $parser         = MIME::Parser->new();
     $parser->output_to_core(1);
     my $parsed_message = $parser->parse_data($received->{contents});
     ok (!$parsed_message->is_multipart, 'converted to singlepart since it only has 1 part.');
-}
+});
 
-SKIP: {
-    my $numtests = 2; # Number of tests in this block
-
-    skip "Cannot test making emails single part", $numtests unless $smtpServerOk;
-
+WebGUI::Test::MailServer::test_smtp($session, sub {
+    my $cb = shift;
     # Send the mail
     my $mail
         = WebGUI::Mail::Send->create( $session, { 
@@ -372,16 +458,12 @@ SKIP: {
 
     ok ($mail->getMimeEntity->is_multipart, 'starting with a multipart message');
     $mail->send;
-    my $received = WebGUI::Test->getMail;
+    my $received = $cb->();
 
-    if (!$received) {
-        skip "Cannot making single part: No response received from smtpd", $numtests;
-    }
-
-    # Test the mail
     my $parser         = MIME::Parser->new();
     $parser->output_to_core(1);
     my $parsed_message = $parser->parse_data($received->{contents});
     ok ( $parsed_message->is_multipart, 'left as multipart since it has more than 1 part');
-}
+});
+
 # TODO: Test the emailToLog config setting

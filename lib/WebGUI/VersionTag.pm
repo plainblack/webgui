@@ -222,7 +222,7 @@ sub commitAsUser {
     return 0 unless (defined $userId);
 
     #Open a new session
-    my $new_session = WebGUI::Session->open( $config->getWebguiRoot, $config->getFilename );
+    my $new_session = WebGUI::Session->open( $config->getFilename );
     #Set the userId in the new session
     $new_session->user( { userId => $userId } );
 
