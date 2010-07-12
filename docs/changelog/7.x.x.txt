@@ -6,6 +6,7 @@
  - fixed #11692: Dates not imported correctly into Thingy
  - fixed #11672: UTF-Error in message body (from DataForm)
  - fixed #11709: Shop - i18n error
+ - fixed #11710: Weird license in json.js might be taken as non free
 
 7.9.8
  - fixed #11651: First Day of Week is a string...
