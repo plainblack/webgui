@@ -1978,7 +1978,7 @@ our $I18N = {
     },
 
     'loginFormButton help' => { 
-        message => q|The end of the form to help a user log in.  This variable will only be populated if the current user is Visitor.|,
+        message => q|A button to submit the login form.  This variable will only be populated if the current user is Visitor.|,
         lastUpdated => 0,
         context => q|Template variable help|
     },
