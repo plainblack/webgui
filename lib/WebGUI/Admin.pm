@@ -333,6 +333,28 @@ __DATA__
         </a>
         </TMPL_LOOP>
     </div></dd>
+    <!-- placeholder for version tags -->
+    <dt class="a-m-t">Version Tags (i18n)</dt>
+    <dd class="a-m-d"><div class="bd">
+    </div></dd>
+    <!-- placeholder for clipboard -->
+    <dt class="a-m-t">Clipboard (i18n)</dt>
+    <dd class="a-m-d"><div class="bd">
+    </div></dd>
+    <!-- placeholder for asset helpers -->
+    <dt class="a-m-t">Asset Helpers (i18n)</dt>
+    <dd class="a-m-d"><div class="bd">
+        <h1 id="helper_asset_name">Asset</h1>
+        <ul id="helper_list">
+        </ul>
+        <h2>^International("asset history label","Admin");</h2>
+        <ul id="history_list">
+        </ul>
+    </div></dd>
+    <!-- placeholder for new content menu -->
+    <dt class="a-m-t">New Content (i18n)</dt>
+    <dd class="a-m-d"><div class="bd">
+    </div></dd>
 </dl>
 
 <div id="wrapper" class="yui-skin-sam">
@@ -388,5 +410,7 @@ YAHOO.util.Event.onDOMReady( function() {
     window.admin = new WebGUI.Admin( {
         homeUrl : '<tmpl_var homeUrl>'
     } );
+    // Add all asset helpers to the admin instance
 } );
+
 </script>
