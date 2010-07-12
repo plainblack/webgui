@@ -1,5 +1,6 @@
 7.8.24
  - fixed #11710: Weird license in json.js might be taken as non free
+ - fixed #11708: Activity DeleteExpiredSessions is too slow
 
 7.8.23
  - fixed: missing per-item template variables for the cart.
