@@ -104,7 +104,7 @@ property storageIdExample => (
          );
 
 property attachmentsJson => (
-    fieldType       => 'image',
+    fieldType       => 'JsonTable',
     label           => [ "attachments display label", "Asset_Template" ],
 );
 
