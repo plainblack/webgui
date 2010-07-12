@@ -105,7 +105,7 @@ BEGIN {
         upgrades           => catdir($root, 'share', 'upgrades'),
         extras             => catdir($root, 'www', 'extras'),
         defaultUploads     => catdir($root, 'www', 'uploads'),
-        defaultCreateSQL   => catdir($root, 'docs', 'create.sql'),
+        defaultCreateSQL   => catdir($root, 'share', 'create.sql'),
         share              => catdir($root, 'share'),
         defaultPSGI        => catdir($root, 'share', 'site.psgi'),
     );
