@@ -53,6 +53,13 @@ sub definition {
 			hoverHelp       => $i18n->get('carousel slideWidth description'),
 			label           => $i18n->get('carousel slideWidth label'),
 		},
+		slideHeight =>{
+			fieldType       => "integer",  
+			defaultValue    => 0,
+			tab             => "display",
+			hoverHelp       => $i18n->get('carousel slideHeight description'),
+			label           => $i18n->get('carousel slideHeight label'),
+		},
         items =>{
             noFormPost      =>1,
             fieldType       =>'text',
