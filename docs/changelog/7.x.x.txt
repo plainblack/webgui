@@ -1,4 +1,5 @@
 7.8.24
+ - fixed #11710: Weird license in json.js might be taken as non free
 
 7.8.23
  - fixed: missing per-item template variables for the cart.
