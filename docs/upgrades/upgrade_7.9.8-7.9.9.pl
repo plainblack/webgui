@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::ProfileField;
 
 
 my $toVersion = '7.9.9';
@@ -33,6 +34,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addIndexToUserSessionLog($session);
 addHeightToCarousel($session);
+synchronizeUserProfileTables($session);
 
 finish($session); # this line required
 
@@ -64,6 +66,23 @@ sub addHeightToCarousel {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub synchronizeUserProfileTables {
+    my $session = shift;
+    print "\tMake sure that userProfileField, and userProfileData tables are aligned correctly... " unless $quiet;
+    my $dbh         = $session->db->dbh;
+    my $fields = WebGUI::ProfileField->getFields($session);
+    foreach my $field ( @{ $fields } ) {
+        my $columnInfo = $dbh->column_info(undef, undef, 'userProfileData', $field->getId)->fetchrow_hashref();
+        if (! $columnInfo) {
+            printf "\n\t\tDeleting broken field: %s", $field->getId;
+            $session->db->deleteRow('userProfileField', 'fieldName', $field->getId);
+        }
+    }
+
+    print "  ...DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
