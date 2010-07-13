@@ -248,7 +248,7 @@ SKIP: {
     use utf8;
 
     my $min_word_length = $session->db->quickHashRef("show variables like 'ft_min_word_len'");
-    skip 'MySQL minimum word length too long to support ideograms', 2
+    skip 'MySQL minimum word length too long to support ideograms', 1
         if $min_word_length->{Value} > 2;
 
     $article->update({
