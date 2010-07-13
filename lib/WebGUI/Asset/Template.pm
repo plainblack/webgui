@@ -436,8 +436,6 @@ Override to import attachments
 
 sub importAssetCollateralData {
     my ( $self, $data, @args ) = @_;
-    $self->removeAttachments;
-    $self->addAttachments( $data->{template_attachments} );
     return $self->SUPER::importAssetCollateralData( $data, @args );
 }
     
