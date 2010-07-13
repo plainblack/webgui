@@ -10,6 +10,7 @@
  - fixed #11708: Activity DeleteExpiredSessions is too slow
  - fixed #11621: Documentation Error: Methods that accept URLs should indicate whether or not to include Gateway
  - fixed #11457: Carousel broken
+ - fixed #11455: Wrong use of Extras macro?
 
 7.9.8
  - fixed #11651: First Day of Week is a string...
