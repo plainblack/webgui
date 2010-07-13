@@ -347,7 +347,7 @@ __DATA__
         <h1 id="helper_asset_name">Asset</h1>
         <ul id="helper_list">
         </ul>
-        <h2>^International("asset history label","Admin");</h2>
+        <h2>History (i18n)</h2>
         <ul id="history_list">
         </ul>
     </div></dd>
