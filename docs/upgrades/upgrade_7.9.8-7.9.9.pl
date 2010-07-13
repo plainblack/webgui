@@ -32,13 +32,10 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-<<<<<<< HEAD
 addIndexToUserSessionLog($session);
 addHeightToCarousel($session);
 synchronizeUserProfileTables($session);
-=======
 migrateAttachmentsToJson( $session );
->>>>>>> migrate to JsonTable to edit template attachments
 
 finish($session); # this line required
 
