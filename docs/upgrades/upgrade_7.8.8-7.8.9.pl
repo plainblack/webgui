@@ -55,7 +55,6 @@ sub addEuTaxRecheckWorkflow {
     print "Done\n" unless $quiet;
 }
 
-
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
 #----------------------------------------------------------------------------

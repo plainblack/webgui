@@ -170,7 +170,7 @@ sub create {
 
     # Add the column to the userProfileData table
     $db->write(
-        "ALTER TABLE userProfileData ADD " . $db->dbh->quote_identifier($fieldName)
+        "ALTER TABLE userProfileData ADD " . $db->dbh->quote_identifier($id)
         . $dbDataType
     );
     
