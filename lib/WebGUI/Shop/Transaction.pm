@@ -287,7 +287,7 @@ sub _mine_cart {
         $self->addItem({item=>$item});
     }
 
-    $self->chashierUserId($cart->getPosUser->userId);
+    $self->cashierUserId($cart->getPosUser->userId);
 
 }
 
