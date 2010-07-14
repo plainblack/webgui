@@ -35,7 +35,6 @@ my $session = start(); # this line required
 addIndexToUserSessionLog($session);
 addHeightToCarousel($session);
 synchronizeUserProfileTables($session);
-migrateAttachmentsToJson( $session );
 
 finish($session); # this line required
 
@@ -172,6 +171,7 @@ sub start {
 sub finish {
     my $session = shift;
     updateTemplates($session);
+    migrateAttachmentsToJson( $session );
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
     $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".time().")");
