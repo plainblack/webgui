@@ -199,3 +199,8 @@ WebGUI::Shop::Address
 Object properties are no longer written to the database when an object is created from scratch.  The write method needs
 to be called.
 
+WebGUI::Shop::Transaction
+=========================
+Object properties are no longer written to the database when an object is created from scratch.  The write method needs
+to be called.
+

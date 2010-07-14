@@ -645,12 +645,14 @@ sub processTransaction {
     # Setup dynamic transaction
     unless (defined $transaction) {     
         my $transactionProperties;
-        $transactionProperties->{ paymentMethod     } = $self;
-        $transactionProperties->{ cart              } = $cart;
-        $transactionProperties->{ isRecurring       } = $cart->requiresRecurringPayment;
+        $transactionProperties->{ paymentMethod } = $self;
+        $transactionProperties->{ cart          } = $cart;
+        $transactionProperties->{ isRecurring   } = $cart->requiresRecurringPayment;
+        $transactionProperties->{ session       } = $self->session;
     
         # Create a transaction...
-        $transaction = WebGUI::Shop::Transaction->create( $self->session, $transactionProperties );
+        $transaction = WebGUI::Shop::Transaction->new( $transactionProperties );
+        $transaction->write;
     }
 
     # And handle the payment for it

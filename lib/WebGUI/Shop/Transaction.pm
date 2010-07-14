@@ -2,8 +2,295 @@ package WebGUI::Shop::Transaction;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
 use JSON qw{ from_json };
+use Scalar::Util qw/blessed/;
+use Moose;
+use WebGUI::Definition;
+
+property isSuccessful => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property transactionCode => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property statusCode => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property statusMessage => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property amount => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 0
+);
+property shippingAddressId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingAddressName => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingAddress1 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingAddress2 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingAddress3 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingCity => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingState => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingCountry => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingCode => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingPhoneNumber => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingDriverId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingDriverLabel => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property notes => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingPrice => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 0
+);
+property paymentAddressId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentAddressName => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property originatingTransactionId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property isRecurring => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentAddress1 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentAddress2 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentAddress3 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentCity => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentState => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentCountry => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentCode => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentPhoneNumber => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentDriverId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentDriverLabel => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property taxes => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 0
+);
+property shopCreditDeduction => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 0
+);
+property userId => (
+    is => 'ro',
+    noFormPost => 1,
+    lazy => 1,
+    builder => '_userId_builder',
+);
+sub _userId_builder {
+    my $self = shift;
+    return $self->session->user->userId;
+}
+
+property username => (
+    is => 'ro',
+    noFormPost => 1,
+    lazy => 1,
+    builder => '_username_builder',
+);
+sub _username_builder {
+    my $self = shift;
+    return $self->session->user->username;
+}
+
+property cashierUserId => (
+    is => 'ro',
+    noFormPost => 1,
+    lazy => 1,
+    builder => '_cashierUserId_builder',
+);
+sub _cashierUserId_builder {
+    my $self = shift;
+    return $self->session->user->userId;
+}
+
+has [ qw/session transactionId dateOfPurchase orderNumber/ ] => (
+    is       => 'ro',
+    required => 1,
+);
+
+##These are really placeholders for objects that are mined for data to build a transaction
+
+has paymentMethod => (
+    is      => 'rw',
+    trigger => \&_mine_paymentMethod,
+);
+
+sub _mine_paymentMethod {
+    my ($self, $pay) = @_;
+    $self->paymentDriverId($pay->getId);
+    $self->paymentDriverLabel($pay->get('label'));
+}
+
+has cart => (
+    is      => 'rw',
+    trigger => \&_mine_cart,
+);
+
+sub _mine_cart {
+    my ($self, $cart) = @_;
+    $self->taxes($cart->calculateTaxes);
+
+    my $billingAddress        = $cart->getBillingAddress;
+    $self->paymentAddressId($billingAddress->getId);
+    $self->paymentAddressName($billingAddress->firstName . " " . $billingAddress->lastName);
+    $self->paymentAddress1($billingAddress->address1);
+    $self->paymentAddress2($billingAddress->address2);
+    $self->paymentAddress3($billingAddress->address3);
+    $self->paymentCity($billingAddress->city);
+    $self->paymentState($billingAddress->state);
+    $self->paymentCountry($billingAddress->country);
+    $self->paymentCode($billingAddress->code);
+    $self->paymentPhoneNumber($billingAddress->phoneNumber);
+
+    my $shippingAddress        = $cart->getShippingAddress;
+    $self->shippingAddressId($shippingAddress->getId);
+    $self->shippingAddressName($shippingAddress->firstName . " " . $shippingAddress->lastName);
+    $self->shippingAddress1($shippingAddress->address1);
+    $self->shippingAddress2($shippingAddress->address2);
+    $self->shippingAddress3($shippingAddress->address3);
+    $self->shippingCity($shippingAddress->city);
+    $self->shippingState($shippingAddress->state);
+    $self->shippingCountry($shippingAddress->country);
+    $self->shippingCode($shippingAddress->code);
+    $self->shippingPhoneNumber($shippingAddress->phoneNumber);
+    if ($cart->requiresShipping) {
+        my $shipper = $cart->getShipper;
+        $self->shippingDriverId($shipper->getId);
+        $self->shippingDriverLabel($shipper->get('label'));
+        $self->shippingPrice($shipper->calculate($cart));
+    }
+    else {
+        $self->shippingDriverLabel("NO SHIPPING");
+        $self->shippingPrice(0);
+    }
+
+    $self->shopCreditDeduction($cart->calculateShopCreditDeduction($self->amount));
+    $self->amount($self->amount + $self->shopCreditDeduction);
+
+    my $pay = $cart->getPaymentGateway;
+    $self->paymentDriverId($pay->getId);
+    $self->paymentDriverLabel($pay->get('label'));
+
+    foreach my $item (@{$cart->getItems}) {
+        $self->addItem({item=>$item});
+    }
+
+    $self->chashierUserId($cart->getPosUser->userId);
+
+}
+
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
@@ -33,6 +320,7 @@ This package keeps records of every puchase made.
  
  # typical transaction goes like this:
  my $transaction = WebGUI::Shop::Transaction->create({ cart=>$cart });
+ $transaction->write;
  my ($transactionNumber, $status, $message) = $paymentMethod->tryTransaction;
  if ($status eq "somekindofsuccess") {
     $transaction->completePurchase($cart, $transactionNumber, $status, $message);
@@ -48,8 +336,155 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
-private properties => my %properties;
+#-------------------------------------------------------------------
+
+=head2 new ( session, transactionId )
+
+Constructor.  Instanciates a transaction from the database based upon a transactionId.
+
+=head2 new ( properties )
+
+Constructor.  Builds a new transaction object.
+
+=head2 new ( session, properties )
+
+Constructor.  Builds a new transaction object.  This form of new is deprecated, and only exists for
+backwards compatibility with the old "create" method.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 transactionId
+
+The unique id of a transaction to instanciate.
+
+=head3 properties
+
+A hash reference that contains one of the following:
+
+=head4 cart
+
+A reference to a cart object. Will pull shipping method, shipping address, tax, items, and total from
+it. Alternatively you can set manually any of the following properties that are set by cart automatically:
+amount shippingAddressId shippingAddressName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity
+shippingState shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel shippingPrice
+taxes shopCreditDeduction cashierUserId
+
+You can also use the addItem() method to manually add items to the transaction rather than passing a cart full of items.
+
+=head4 paymentAddress
+
+A reference to a WebGUI::Shop::Address that contains the payment address. Alternatively you can set manually
+any of the properties that are set by payment address automatically: paymentAddressId paymentAddressName
+paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
+paymentPhoneNumber 
+
+=head4 paymentMethod
+
+A reference to a WebGUI::Shop::PayDriver subclass that is used to make payment. Alternatively you can set
+manually any of the properties that are set by payment method automatically: paymentDriverId paymentDriverLabel
+
+=head4 isSuccessful
+
+A boolean indicating whether the transaction was completed successfully.
+
+=head4 transactionCode
+
+The transaction id or code given by the payment gateway.
+
+=head4 statusCode
+
+The status code that came back from the payment gateway when trying to process the payment.
+
+=head4 statusMessage
+
+The extended status message that came back from the payment gateway when trying to process the payment.
+
+=head4 isRecurring
+
+A boolean indicating whether this is a recurring transaction or not. Defaults to 0.
+
+=head4 originatingTransactionId
+
+Most of the time this will be empty. But if this is a recurring transaction, then this will hold the id of the original transaction that started the recurrence.
+
+=head4 notes
+
+A text field containing notes about this transaction.
+
+=head4 userId
+
+The userId of the user who created the transaction.  If omitted, will use the current session->user.
+
+=head4 username
+
+The username of the user who created the transaction.  If omitted, will use the current session->user.
+
+=cut
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if (ref $_[0] eq 'HASH') {
+        my $properties = $_[0];
+        my $session = $properties->{session};
+        if (! (blessed $session && $session->isa('WebGUI::Session')) ) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+        }
+        my ($transactionId, $dateOfPurchase, $orderNumber) = $class->_init($session);
+        $properties->{transactionId}  = $transactionId;
+        $properties->{dateOfPurchase} = $dateOfPurchase;
+        $properties->{orderNumber}    = $orderNumber;
+        return $class->$orig($properties);
+    }
+    my $session = shift;
+    if (! (blessed $session && $session->isa('WebGUI::Session'))) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    my $argument2 = shift;
+    if (!defined $argument2) {
+        WebGUI::Error::InvalidParam->throw( param=>$argument2, error=>"Need a vendorId.");
+    }
+    if (ref $argument2 eq 'HASH') {
+        ##Build a new one
+        my ($transactionId, $dateOfPurchase, $orderNumber) = $class->_init($session);
+        my $properties                = $argument2;
+        $properties->{session}        = $session;
+        $properties->{transactionId}  = $transactionId;
+        $properties->{dateOfPurchase} = $dateOfPurchase;
+        $properties->{orderNumber}    = $orderNumber;
+        return $class->$orig($properties);
+    }
+    else {
+        ##Look up one in the db
+        my $transaction = $session->db->quickHashRef("select * from transaction where transactionId=?", [$argument2]);
+        if ($transaction->{transactionId} eq "") {
+            WebGUI::Error::ObjectNotFound->throw(error=>"No such transaction.", id=>$argument2);
+        }
+        $transaction->{session} = $session;
+        return $class->$orig($transaction);
+    }
+};
+
+#-------------------------------------------------------------------
+
+=head2 _init ( session )
+
+Builds a stub of object information in the database, and returns the newly created
+transactionId, and the dateOfPurchase fields so the object can be initialized correctly.
+
+=cut
+
+sub _init {
+    my $class          = shift;
+    my $session        = shift;
+    my $transactionId  = $session->id->generate;
+    my $dateOfPurchase = WebGUI::DateTime->new($session)->toDatabase;
+    $session->db->write("insert into transaction (transactionId, dateOfPurchase) values (?, ?)",[$transactionId, $dateOfPurchase]);
+    my $orderNumber    = $session->db->quickScalar('select orderNumber from transaction where transactionId=?', [$transactionId]);
+    return ($transactionId, $dateOfPurchase, $orderNumber);
+}
 
 #-------------------------------------------------------------------
 
@@ -135,41 +570,6 @@ sub completePurchase {
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, properties )
-
-Constructor. Creates a new transaction object. Returns a reference to the object.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 properties
-
-See update().
-
-=cut
-
-sub create {
-    my ($class, $session, $properties) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    my $transactionId = $session->id->generate;
-    my $cashier = $session->user;
-    my $posUser = $cashier;
-    my $cart = $properties->{cart};
-    if (defined $cart) {
-        $posUser = $cart->getPosUser;
-    }
-    $session->db->write('insert into transaction (transactionId, userId, username, cashierUserId, dateOfPurchase) values (?,?,?,?,now())',
-        [$transactionId, $posUser->userId, $posUser->username, $cashier->userId]);
-    my $self = $class->new($session, $transactionId);
-    $self->update($properties);
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 delete ()
 
 Deletes this transaction and all transactionItems contained in it.
@@ -243,6 +643,7 @@ sub duplicate {
         $newTransaction->addItem( $item->get );
     }
 
+    $newTransaction->write;
     return $newTransaction;
 }
 
@@ -286,27 +687,6 @@ The number to format.
 sub formatCurrency {
     my ($self, $amount) = @_;
     return sprintf("%.2f", $amount);
-}
-
-#-------------------------------------------------------------------
-
-=head2 get ( [ property ] )
-
-Returns a duplicated hash reference of this object's data.
-
-=head3 property
-
-Any field ? returns the value of a field rather than the hash reference.
-
-=cut
-
-sub get {
-    my ($self, $name) = @_;
-    if (defined $name) {
-        return $properties{id $self}{$name};
-    }
-    my %copyOfHashRef = %{$properties{id $self}};
-    return \%copyOfHashRef;
 }
 
 #-------------------------------------------------------------------
@@ -409,31 +789,31 @@ sub getTransactionVars {
         %{ $self->get },
         viewDetailUrl           => $url->page( 'shop=transaction;method=viewMy;transactionId='.$self->getId, 1 ),
         cancelRecurringUrl      => $url->page('shop=transaction;method=cancelRecurring;transactionId='.$self->getId),
-        amount                  => sprintf( "%.2f", $self->get('amount') ),
-        inShopCreditDeduction   => sprintf( "%.2f", $self->get('shopCreditDeduction') ),
-        taxes                   => sprintf( "%.2f", $self->get('taxes') ),
-        shippingPrice           => sprintf( "%.2f", $self->get('shippingPrice') ),
+        amount                  => sprintf( "%.2f", $self->amount ),
+        inShopCreditDeduction   => sprintf( "%.2f", $self->shopCreditDeduction ),
+        taxes                   => sprintf( "%.2f", $self->taxes ),
+        shippingPrice           => sprintf( "%.2f", $self->shippingPrice ),
         shippingAddress         => $self->formatAddress( {
-            name        => $self->get('shippingAddressName'),
-            address1    => $self->get('shippingAddress1'),
-            address2    => $self->get('shippingAddress2'),
-            address3    => $self->get('shippingAddress3'),
-            city        => $self->get('shippingCity'),
-            state       => $self->get('shippingState'),
-            code        => $self->get('shippingCode'),
-            country     => $self->get('shippingCountry'),
-            phoneNumber => $self->get('shippingPhoneNumber'),
+            name        => $self->shippingAddressName,
+            address1    => $self->shippingAddress1,
+            address2    => $self->shippingAddress2,
+            address3    => $self->shippingAddress3,
+            city        => $self->shippingCity,
+            state       => $self->shippingState,
+            code        => $self->shippingCode,
+            country     => $self->shippingCountry,
+            phoneNumber => $self->shippingPhoneNumber,
         } ),
         paymentAddress          =>  $self->formatAddress({
-            name        => $self->get('paymentAddressName'),
-            address1    => $self->get('paymentAddress1'),
-            address2    => $self->get('paymentAddress2'),
-            address3    => $self->get('paymentAddress3'),
-            city        => $self->get('paymentCity'),
-            state       => $self->get('paymentState'),
-            code        => $self->get('paymentCode'),
-            country     => $self->get('paymentCountry'),
-            phoneNumber => $self->get('paymentPhoneNumber'),
+            name        => $self->paymentAddressName,
+            address1    => $self->paymentAddress1,
+            address2    => $self->paymentAddress2,
+            address3    => $self->paymentAddress3,
+            city        => $self->paymentCity,
+            state       => $self->paymentState,
+            code        => $self->paymentCode,
+            country     => $self->paymentCountry,
+            phoneNumber => $self->paymentPhoneNumber,
         } ),
     };
     
@@ -441,7 +821,7 @@ sub getTransactionVars {
     my @items = ();
     foreach my $item (@{$self->getItems}) {
         my $address = '';
-        if ($self->get('shippingAddressId') ne $item->get('shippingAddressId')) {
+        if ($self->shippingAddressId ne $item->get('shippingAddressId')) {
             $address = $self->formatAddress({
                             name        => $item->get('shippingAddressName'),
                             address1    => $item->get('shippingAddress1'),
@@ -505,67 +885,6 @@ Returns 1 if this is the first of a set of recurring transactions.
 sub isFirst {
     my $self = shift;
 	return ($self->get('originatingTransactionId') eq '');
-}
-
-#-------------------------------------------------------------------
-
-=head2 isRecurring ( )
-
-Returns 1 if this is a recurring transaction.
-
-=cut
-
-sub isRecurring {
-    my $self = shift;
-	return $self->get('isRecurring');
-}
-
-#-------------------------------------------------------------------
-
-=head2 isSuccessful ( )
-
-Returns 1 if this transaction had a successful payment applied to it.
-
-=cut
-
-sub isSuccessful {
-    my $self = shift;
-	return $self->get('isSuccessful');
-}
-
-#-------------------------------------------------------------------
-
-=head2 new ( session, transactionId )
-
-Constructor.  Instanciates a transaction based upon a transactionId.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 transactionId
-
-The unique id of a transaction to instanciate.
-
-=cut
-
-sub new {
-    my ($class, $session, $transactionId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    unless (defined $transactionId) {
-        WebGUI::Error::InvalidParam->throw(error=>"Need a transactionId.");
-    }
-    my $transaction = $session->db->quickHashRef('select * from transaction where transactionId=?', [$transactionId]);
-    if ($transaction->{transactionId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"No such transaction.", id=>$transactionId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    $properties{ $id } = $transaction;
-    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -640,8 +959,8 @@ sub sendNotifications {
     # purchase receipt
     $inbox->addMessage( {
         message     => $receipt,
-        subject     => $i18n->get('receipt subject') . ' ' . $self->get('orderNumber'),
-        userId      => $self->get('userId'),
+        subject     => $i18n->get('receipt subject') . ' ' . $self->orderNumber,
+        userId      => $self->userId,
         status      => 'completed',
     } );
     
@@ -652,7 +971,7 @@ sub sendNotifications {
     WebGUI::Macro::process($session, \$notification);
     $inbox->addMessage( {
         message     => $notification,
-        subject     => $i18n->get('a sale has been made') . ' ' . $self->get('orderNumber'),
+        subject     => $i18n->get('a sale has been made') . ' ' . $self->orderNumber,
         groupId     => $session->setting->get('shopSaleNotificationGroupId'),
         status      => 'unread',
     } );
@@ -678,135 +997,17 @@ sub thankYou {
 
 #-------------------------------------------------------------------
 
-=head2 update ( properties )
+=head2 write ( properties )
 
 Sets properties in the transaction.
 
-=head3 properties
-
-A hash reference that contains one of the following:
-
-=head4 cart
-
-A reference to a cart object. Will pull shipping method, shipping address, tax, items, and total from
-it. Alternatively you can set manually any of the following properties that are set by cart automatically:
-amount shippingAddressId shippingAddressName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity
-shippingState shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel shippingPrice
-taxes shopCreditDeduction
-
-You can also use the addItem() method to manually add items to the transaction rather than passing a cart full of items.
-
-=head4 paymentAddress
-
-A reference to a WebGUI::Shop::Address that contains the payment address. Alternatively you can set manually
-any of the properties that are set by payment address automatically: paymentAddressId paymentAddressName
-paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
-paymentPhoneNumber 
-
-=head4 paymentMethod
-
-A reference to a WebGUI::Shop::PayDriver subclass that is used to make payment. Alternatively you can set
-manually any of the properties that are set by payment method automatically: paymentDriverId paymentDriverLabel
-
-=head4 isSuccessful
-
-A boolean indicating whether the transaction was completed successfully.
-
-=head4 transactionCode
-
-The transaction id or code given by the payment gateway.
-
-=head4 statusCode
-
-The status code that came back from the payment gateway when trying to process the payment.
-
-=head4 statusMessage
-
-The extended status message that came back from the payment gateway when trying to process the payment.
-
-=head4 isRecurring
-
-A boolean indicating whether this is a recurring transaction or not. Defaults to 0.
-
-=head4 originatingTransactionId
-
-Most of the time this will be empty. But if this is a recurring transaction, then this will hold the id of the original transaction that started the recurrence.
-
-=head4 notes
-
-A text field containing notes about this transaction.
-
 =cut
 
-sub update {
-    my ($self, $newProperties) = @_;
-    my $id = id $self;
-    if (exists $newProperties->{cart}) {
-        my $cart = $newProperties->{cart};
-        $newProperties->{taxes} = $cart->calculateTaxes;
-
-        my $billingAddress = $cart->getBillingAddress;
-        $newProperties->{paymentAddressId}   = $billingAddress->getId;
-        $newProperties->{paymentAddressName} = $billingAddress->get('firstName') . " " . $billingAddress->get('lastName');
-        $newProperties->{paymentAddress1}    = $billingAddress->get('address1');
-        $newProperties->{paymentAddress2}    = $billingAddress->get('address2');
-        $newProperties->{paymentAddress3}    = $billingAddress->get('address3');
-        $newProperties->{paymentCity}        = $billingAddress->get('city');
-        $newProperties->{paymentState}       = $billingAddress->get('state');
-        $newProperties->{paymentCountry}     = $billingAddress->get('country');
-        $newProperties->{paymentCode}        = $billingAddress->get('code');
-        $newProperties->{paymentPhoneNumber} = $billingAddress->get('phoneNumber');
-
-        my $shippingAddress = $cart->getShippingAddress;
-        $newProperties->{shippingAddressId}   = $shippingAddress->getId;
-        $newProperties->{shippingAddressName} = $shippingAddress->get('firstName') . " " . $shippingAddress->get('lastName');
-        $newProperties->{shippingAddress1}    = $shippingAddress->get('address1');
-        $newProperties->{shippingAddress2}    = $shippingAddress->get('address2');
-        $newProperties->{shippingAddress3}    = $shippingAddress->get('address3');
-        $newProperties->{shippingCity}        = $shippingAddress->get('city');
-        $newProperties->{shippingState}       = $shippingAddress->get('state');
-        $newProperties->{shippingCountry}     = $shippingAddress->get('country');
-        $newProperties->{shippingCode}        = $shippingAddress->get('code');
-        $newProperties->{shippingPhoneNumber} = $shippingAddress->get('phoneNumber');
-
-        if ($cart->requiresShipping) {
-            my $shipper = $cart->getShipper;
-            $newProperties->{shippingDriverId}    = $shipper->getId;
-            $newProperties->{shippingDriverLabel} = $shipper->get('label');
-            $newProperties->{shippingPrice}       = $shipper->calculate($cart);
-        }
-        else {
-            $newProperties->{shippingDriverLabel} = "NO SHIPPING";
-            $newProperties->{shippingPrice}       = 0;
-        }
-
-        $newProperties->{amount}              = $cart->calculateTotal + $newProperties->{shopCreditDeduction};
-        $newProperties->{shopCreditDeduction} = $cart->calculateShopCreditDeduction($newProperties->{amount});
-        $newProperties->{amount}             += $newProperties->{shopCreditDeduction};
-
-        my $pay = $cart->getPaymentGateway;
-        $newProperties->{paymentDriverId}    = $pay->getId;
-        $newProperties->{paymentDriverLabel} = $pay->get('label');
-
-        foreach my $item (@{$cart->getItems}) {
-            $self->addItem({item=>$item});
-        }
-    }
-    if (exists $newProperties->{paymentMethod}) {
-        my $pay = $newProperties->{paymentMethod};
-        $newProperties->{paymentDriverId}    = $pay->getId;
-        $newProperties->{paymentDriverLabel} = $pay->get('label');
-    }
-    my @fields = (qw( isSuccessful transactionCode statusCode statusMessage amount shippingAddressId
-        shippingAddressName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState
-        shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel notes
-        shippingPrice paymentAddressId paymentAddressName originatingTransactionId isRecurring
-        paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
-        paymentPhoneNumber paymentDriverId paymentDriverLabel taxes shopCreditDeduction));
-    foreach my $field (@fields) {
-        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
-    }
-    $self->session->db->setRow("transaction","transactionId",$properties{$id});
+sub write {
+    my $self = shift;
+    my %properties = %{ $self->get() };
+    delete @properties{qw/session cart paymentMethod/};
+    $self->session->db->setRow("transaction", "transactionId", \%properties);
 }
 
 #-------------------------------------------------------------------
@@ -820,7 +1021,7 @@ Cancels a recurring transaction.
 sub www_cancelRecurring {
     my ($class, $session) = @_;
     my $self = $class->new($session, $session->form->get("transactionId"));
-    return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage || $session->user->userId eq $self->get('userId'));
+    return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage || $session->user->userId eq $self->userId);
     my $error = $self->cancelRecurring;
 
     # TODO: Needs to be templated or included in www_view.
@@ -1293,9 +1494,8 @@ sub www_update {
     return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage);
     my $self = $class->new($session, $session->form->get("transactionId"));
     my $form = $session->form;
-    $self->update({
-        notes  => $form->get('notes'),
-        });
+    $self->notes($form->get('notes'));
+    $self->write;
     return $class->www_view($session);
 }
 
