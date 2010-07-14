@@ -241,13 +241,11 @@ sub _listViewPageInterval_builder {
 }
 
 property icalFeeds    => (
+            fieldType       => "JsonTable",
             default         => sub { return []; },
-            traits          => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
             isa             => 'WebGUI::Type::JSONArray',
             coerce          => 1,
-            fieldType       => "JsonTable",
-            defaultValue    => [],
-            serialize       => 1,
+            traits          => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
             tab             => "feeds",
             label           => ['feeds','Asset_Calendar'],
             fields          => [

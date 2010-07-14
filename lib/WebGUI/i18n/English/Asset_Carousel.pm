@@ -33,8 +33,26 @@ our $I18N = {
         context => q|Description of the carousel template field, used as hover help.|
     },
 
+	'carousel slideHeight label' => {
+		message => q|Carousel slide height|,
+		lastUpdated => 0,
+		context => q|Slide, one "frame" or "page" in the Carousel.|
+	},
+
+    'carousel slideHeight description' => {
+        message => q|Height in pixels.  The Carousel will not automatically resize itself for content of various widths.  Setting this width will help it render properly.  If left with the default, 0, then the width of the Carousel is set by the width of the first element.|,
+        lastUpdated => 0,
+        context => q|Description of the carousel template field, used as hover help.|
+    },
+
     'slideWidth' => {
         message => q|The width set for each slide in the Carousel|,
+        lastUpdated => 0,
+        context => q|Description of the carousel template field, used as hover help.|
+    },
+
+    'slideHeight' => {
+        message => q|The height set for each slide in the Carousel|,
         lastUpdated => 0,
         context => q|Description of the carousel template field, used as hover help.|
     },

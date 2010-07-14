@@ -555,7 +555,7 @@ sub exportGetDescendants {
 
 =head2 exportGetUrlAsPath ( index )
 
-Translates a URL into an appropriate path and filename for exporting. For
+Translates an asset's URL into an appropriate path and filename for exporting. For
 example, given C<'/foo/bar/baz'>, will return C<'/foo/bar/baz/index.html'>
 provided the value of indexFile as given to exportAsHtml was C<'index.html'>.
 

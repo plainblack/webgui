@@ -22,20 +22,15 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-use WebGUI::ProfileField;
 
 
-my $toVersion = '7.9.9';
+my $toVersion = '7.9.10';
 my $quiet; # this line required
 
 
 my $session = start(); # this line required
 
 # upgrade functions go here
-migrateAttachmentsToJson( $session );
-addIndexToUserSessionLog($session);
-addHeightToCarousel($session);
-synchronizeUserProfileTables($session);
 
 finish($session); # this line required
 
@@ -49,76 +44,6 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
-#----------------------------------------------------------------------------
-# Describe what our function does
-sub addIndexToUserSessionLog {
-    my $session = shift;
-    print "\tAdd index to UserSessionLogTable... " unless $quiet;
-    $session->db->write(q|alter table userLoginLog add index sessionId (sessionId)|);
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-# Describe what our function does
-sub addHeightToCarousel {
-    my $session = shift;
-    print "\tAdd slide height to Carousel... " unless $quiet;
-    $session->db->write(q|alter table Carousel add column slideHeight int(11)|);
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-# Describe what our function does
-sub synchronizeUserProfileTables {
-    my $session = shift;
-    print "\tMake sure that userProfileField, and userProfileData tables are aligned correctly... " unless $quiet;
-    my $dbh         = $session->db->dbh;
-    my $fields = WebGUI::ProfileField->getFields($session);
-    foreach my $field ( @{ $fields } ) {
-        my $columnInfo = $dbh->column_info(undef, undef, 'userProfileData', $field->getId)->fetchrow_hashref();
-        if (! $columnInfo) {
-            printf "\n\t\tDeleting broken field: %s", $field->getId;
-            $session->db->deleteRow('userProfileField', 'fieldName', $field->getId);
-        }
-    }
-
-    print "  ...DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-# Move Template attachments to JSON collateral
-sub migrateAttachmentsToJson {
-    my $session = shift;
-    print "\tMoving template attachments to JSON... " unless $quiet;
-    # and here's our code
-    $session->db->write(
-        "ALTER TABLE template ADD attachmentsJson LONGTEXT"
-    );
-
-    my $attach;     # hashref (template) of hashrefs (revisionDate)
-                    # of arrayrefs (attachments) of hashrefs (attachment)
-    my $sth = $session->db->read( "SELECT * FROM template_attachments" );
-    while ( my $row = $sth->hashRef ) {
-        push @{ $attach->{ $row->{templateId} }{ $row->{revisionDate} } }, {
-            url         => $row->{url},
-            type        => $row->{type},
-        };
-    }
-
-    for my $templateId ( keys %{ $attach } ) {
-        for my $revisionDate ( keys %{ $attach->{$templateId} } ) {
-            my $data    = $attach->{$templateId}{$revisionDate};
-            my $asset   = WebGUI::Asset->newByDynamicClass( $session, $templateId, $revisionDate );
-            $asset->update({ attachmentsJson => JSON->new->encode( $data ) });
-        }
-    }
-
-    $session->db->write(
-        "DROP TABLE template_attachments"
-    );
-
-    print "DONE!\n" unless $quiet;
-}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
@@ -172,7 +97,6 @@ sub start {
 sub finish {
     my $session = shift;
     updateTemplates($session);
-    migrateAttachmentsToJson( $session );
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
     $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".time().")");

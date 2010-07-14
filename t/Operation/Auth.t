@@ -75,6 +75,7 @@ isa_ok(
     'AuthType not in config file, so return default authType',
 );
 
+WebGUI::Test->originalConfig( 'authMethods' );
 $session->config->addToArray( 'authMethods', 'TestAuth' );
 isa_ok( 
     WebGUI::Operation::Auth::getInstance( $session ),

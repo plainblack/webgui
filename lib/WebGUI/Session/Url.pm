@@ -408,9 +408,8 @@ sub makeCompliant {
     $url =~ s{\s+$}{};          # remove trailing whitespace
     $url =~ s{^/+}{};           # remove leading slashes
     $url =~ s{/+$}{};           # remove trailing slashes
-    $url =~ s{[^\w/:._-]+}{-}g; # replace anything aside from word or other allowed characters with dashes
-    $url =~ s{//+}{/}g;         # remove double slashes
-    $url =~ s{--+}{-}g;         # remove double dashes
+    $url =~ s{[^\w/:.-]+}{-}g; # replace anything aside from word or other allowed characters with dashes
+    $url =~ tr{/-}{/-}s;        # replace multiple slashes and dashes with singles.
     return $url;
 }
 
@@ -533,16 +532,14 @@ The string to urlize.
 =cut
 
 sub urlize {
-    my $self = shift;
-    my ($value);
-    $value = lc(shift);		#lower cases whole string
+    my $self  = shift;
+    my $value = lc(shift);		#lower cases whole string
     $value = $self->makeCompliant($value);
 
     # remove /./ or /../
     $value =~ s{(^|/)(?:\.\.?/)*}{$1}g;
 
     # remove trailing slashes
-    $value =~ s/\/$//;
     return $value;
 }
 

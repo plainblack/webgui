@@ -1829,8 +1829,6 @@ properties in the database, but creates a WebGUI::Asset object.
 
 A hash reference of properties to assign to the object.
 
-=cut
-
 =head2 new ( session, assetId [,revisionDate ] )
 
 Instanciator. This does not create an asset in the database, but looks up the object's
@@ -2047,8 +2045,6 @@ The height of the iframe. Required for making widget-in-widget function properly
 
 The templateId for this widgetized asset to use. Required for making
 widget-in-widget function properly.
-
-=cut
 
 =head3 styleTemplateId
 
@@ -2486,7 +2482,23 @@ sub write {
 
 Returns the asset's url without any site specific prefixes. If you want a browser friendly url see the getUrl() method.
 
-=head3 value
+            # set the property
+            if ($propertyDefinition->{serialize}) {
+                # Only serialize references
+                if ( ref $value ) {
+                    $setPairs{$property} = JSON->new->canonical->encode($value);
+                }
+                # Passing already serialized JSON string
+                elsif ( $value ) {
+                    $setPairs{$property} = $value;
+                    $value = JSON->new->decode( $value ); # for setting in _properties, below
+                }
+            }
+            else {
+                $setPairs{$property} = $value;
+            }
+			$self->{_properties}{$property} = $value;
+		}
 
 The new value to set the URL to.
 

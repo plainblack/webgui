@@ -309,7 +309,8 @@ sub _getFeedUrl {
 
 =head2 _getStaticFeedUrl ($extension)
 
-Generic method for returning the static URL for a type of feed.
+Generic method for returning the static URL for a type of feed.  The returned URL will be complete,
+and absolute, containing the gateway URL for this site.
 
 =head3 $extension
 

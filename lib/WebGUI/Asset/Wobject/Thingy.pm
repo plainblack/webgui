@@ -2843,7 +2843,7 @@ sub www_import {
                 my $fieldType = $insertColumn->{fieldType};
                 my $fieldInOtherThingId = $insertColumn->{fieldInOtherThingId};
                 # TODO: process dates and otherThing field id's 
-                if ($fieldType eq "date" || $fieldType eq "dateTime"){
+                if (lc $fieldType eq "date" || lc $fieldType eq "datetime"){
                     $fieldValue =~ s/\//-/gx;
                     $fieldValue = $session->datetime->setToEpoch($fieldValue);                
                 }

@@ -20,6 +20,7 @@ our $HELP = {
                 ],
             },
             {   'name'      => 'slideWidth', },
+            {   'name'      => 'slideHeight', },
         ],
         related => [],
     },

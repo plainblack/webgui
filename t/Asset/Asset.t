@@ -301,6 +301,7 @@ isa_ok($tempNode, 'WebGUI::Asset::Wobject::Folder');
 is($tempNode->getId, 'tempspace0000000000000', 'Tempspace Asset ID check');
 is($tempNode->getParent->getId, $rootAsset->getId, 'Tempspace parent is Root Asset');
 
+
 ################################################################
 #
 # urlExists

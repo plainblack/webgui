@@ -15,6 +15,7 @@ $VERSION = "1.0.0";
 use strict;
 use JSON;
 use WebGUI::International;
+use WebGUI::Utility;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
@@ -36,6 +37,13 @@ property slideWidth => (
     tab       => "display",
     hoverHelp => [ 'carousel slideWidth description', 'Asset_Carousel' ],
     label     => [ 'carousel slideWidth label', 'Asset_Carousel' ],
+);
+property slideHeight => (
+    fieldType       => "integer",
+    default         => 0,
+    tab             => "display",
+    hoverHelp       => ['carousel slideHeight description', 'Asset_Carousel' ],
+    label           => ['carousel slideHeight label', 'Asset_Carousel' ],
 );
 property items => (
     noFormPost   => 1,

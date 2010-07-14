@@ -449,14 +449,15 @@ sub getParser {
 
 =head2 importAssetCollateralData ( data )
 
-Override to import attachments
+Override to import attachments from old versions of WebGUI
 
 =cut
 
 override importAssetCollateralData => sub {
     my ( $self, $data, @args ) = @_;
-    $self->removeAttachments;
-    $self->addAttachments( $data->{template_attachments} );
+    if ( $data->{template_attachments} ) {
+        $self->update( { attachmentsJson => $data->{template_attachments} } );
+    }
     return super();
 };
     

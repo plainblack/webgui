@@ -50,7 +50,8 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-plan tests => 83 + scalar(@getRefererUrlTests);
+use Test::MockObject::Extends;
+plan tests => 84 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 my $request = $session->request;
@@ -165,10 +166,25 @@ $session->url->setSiteURL('http://'.$sitename);
 is( $session->url->getSiteURL, 'http://'.$sitename, 'restore config setting');
 $session->setting->set('hostToUse', $setting_hostToUse);
 
+#######################################
+#
+# makeCompliant
+#
+#######################################
+
 $url  = 'level1 /level2/level3   ';
 $url2 = 'level1-/level2/level3';
-
-is( $session->url->makeCompliant($url), $url2, 'language specific URL compliance');
+is $session->url->makeCompliant($url), $url2, 'internal spaces encoded, trailing spaces removed';
+is $session->url->makeCompliant('home/'), 'home', '... trailing slashes removed';
+is $session->url->makeCompliant('home is where the heart is'), 'home-is-where-the-heart-is', '... makeCompliant translates spaces to dashes';
+is $session->url->makeCompliant('/home'), 'home', '... removes initial slash';
+is $session->url->makeCompliant('home -- here'),             'home-here', 'multiple dashes collapsed';
+is $session->url->makeCompliant('home!@#$%^&*here'),         'home-here', 'non-word characters collapsed to single dash';
+is $session->url->makeCompliant("home\x{2267}here"),         'home-here', 'non-word international characters removed';
+is $session->url->makeCompliant("home\x{1EE9}here"),         "home\x{1EE9}here", 'word international characters not removed';
+my $character = "\x{00C0}";
+utf8::upgrade($character);
+is( $session->url->makeCompliant($character), $character, 'utf8 allowed in URLs');
 
 
 #######################################
@@ -332,17 +348,10 @@ is($unEscapedString, '10% is enough;', 'unescape method');
 #######################################
 
 is($session->url->urlize('HOME/PATH1'), 'home/path1', 'urlize: urls are lower cased');
-is($session->url->urlize('home/'), 'home', '... trailing slashes removed');
-is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart-is', '... makeCompliant translates spaces to dashes');
-is($session->url->urlize('/home'), 'home', '... removes initial slash');
-is($session->url->urlize('home/../out-of-bounds'),    'home/out-of-bounds', '... removes ../');
-is($session->url->urlize('home/./here'),              'home/here', '... removes ./');
-is($session->url->urlize('home/../../out-of-bounds'), 'home/out-of-bounds', '... removes multiple ../');
-is($session->url->urlize('home/././here'),            'home/here', '... removes multiple ./');
-is($session->url->urlize('home -- here'),             'home-here', 'multiple dashes collapsed');
-is($session->url->urlize('home!@#$%^&*here'),         'home-here', 'non-word characters collapsed to single dash');
-is($session->url->urlize("home\x{2267}here"),         'home-here', 'non-word international characters removed');
-is($session->url->urlize("home\x{1EE9}here"),         "home\x{1EE9}here", 'word international characters not removed');
+is $session->url->urlize('home/../out-of-bounds'),    'home/out-of-bounds', '... removes ../';
+is $session->url->urlize('home/./here'),              'home/here', '... removes ./';
+is $session->url->urlize('home/../../out-of-bounds'), 'home/out-of-bounds', '... removes multiple ../';
+is $session->url->urlize('home/././here'),            'home/here', '... removes multiple ./';
 
 #######################################
 #

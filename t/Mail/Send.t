@@ -36,7 +36,7 @@ my $mime;       # for getMimeEntity
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 39;        # Increment this number for each test you create
+plan tests => 40;        # Increment this number for each test you create
 
 WebGUI::Test->addToCleanup(SQL => 'delete from mailQueue');
 
@@ -121,7 +121,8 @@ $mail = WebGUI::Mail::Send->create( $session, {
 $mail->addHeaderField('List-ID', "H\x{00C4}ufige Fragen");
 my $messageId = $mail->queue;
 my $dbMail = WebGUI::Mail::Send->retrieve($session, $messageId);
-is($dbMail->getMimeEntity->head->get('List-ID'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", 'addHeaderField: handles utf-8 correctly');
+is($dbMail->getMimeEntity->head->get('List-ID'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", 'addHeaderField: handles utf-8 correctly in List-ID');
+is($dbMail->getMimeEntity->head->get('Subject'), "=?UTF-8?Q?H=C3=84ufige=20Fragen?=\n", '... in Subject');
 
 # TODO: Test that addHtml creates a body with the right content type
 use utf8;
