@@ -15,6 +15,7 @@ package WebGUI::Content::Admin;
 =cut
 
 use strict;
+use WebGUI::Admin;
 
 
 =head1 NAME
