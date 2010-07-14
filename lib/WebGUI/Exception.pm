@@ -286,13 +286,12 @@ use Exception::Class (
     },
 );
 
-
-
-
-
-
-
-
+{
+    package WebGUI::Error;
+    use overload '~~' => sub {
+        return $_[0]->isa($_[1]);
+    };
+}
 
 1;
 

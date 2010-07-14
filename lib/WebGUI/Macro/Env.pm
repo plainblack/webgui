@@ -32,7 +32,8 @@ then undef will be returned.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	return $session->env->get(shift);
+    my $key     = shift;
+	return $session->request->env->{$key};
 }
 
 1;

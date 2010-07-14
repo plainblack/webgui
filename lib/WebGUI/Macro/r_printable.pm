@@ -54,7 +54,7 @@ sub process {
 	my $append = 'op=makePrintable';
 	$temp = $session->url->page($append);
         $temp =~ s/\/\//\//;
-        $temp = $session->url->append($temp,$session->env->get("QUERY_STRING"));
+        $temp = $session->url->append($temp,$session->request->env->{"QUERY_STRING"});
 	if ($param[1] ne "") {
 		$temp = $session->url->append($temp,'styleId='.$param[1]);
 	}

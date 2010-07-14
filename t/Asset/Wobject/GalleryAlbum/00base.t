@@ -70,3 +70,5 @@ $album->purge;
 
 eval { WebGUI::Asset->newById($session, $properties->{assetId}); };
 ok( Exception::Class->caught(), 'Album no longer able to be instanciated');
+
+#vim:ft=perl

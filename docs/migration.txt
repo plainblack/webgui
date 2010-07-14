@@ -6,7 +6,7 @@ The information contained herein documents the API changes that have occurred in
 
 
 WebGUI::Config
-=============
+==============
 WebGUI::Config->new has a new API.  Its WebGUI root parameter has been eliminated.  It now only accepts a config file as either an absolute path, or a path relative to WebGUI's etc directory.
 
 my $config = WebGUI::Config->new($filename);
@@ -14,10 +14,19 @@ my $config = WebGUI::Config->new($filename);
 
 
 WebGUI::Session
-=============
+===============
 WebGUI::Session->open has a new API.  Its WebGUI root parameter has been eliminated.  The config file it is given can be either an absolute path, or a path relative to WebGUI's etc directory.
 
-my $session = WebGUI::Session->open($configFile, $request, $server);
+my $session = WebGUI::Session->open($configFile);
+
+perldoc WebGUI::Session for more details about the arguments.
+
+
+WebGUI::Session::Env
+====================
+WebGUI::Session::Env has been moved into WebGUI::Session::Request.  A listing of replacements and equivalents follows:
+
+$session->env->getIp => $session->request->address
 
 
 
@@ -174,3 +183,19 @@ Asset API
 ----------
 ->get will still work, but will be slightly slower since inside it calls the direct Moose accessor.  Similarly,
 getId is slightly slower than ->assetId.
+
+WebGUI::Shop::Vendor
+====================
+Object properties are no longer written to the database when an object is created from scratch.  The write method needs
+to be called.
+
+WebGUI::Shop::AddressBook
+=========================
+Since create is now really new, there is no way to create an address book for an arbitrary userId.  To work around this,
+update the address book with the new userId after it has been created.
+
+WebGUI::Shop::Address
+=====================
+Object properties are no longer written to the database when an object is created from scratch.  The write method needs
+to be called.
+

@@ -96,6 +96,7 @@ plan tests => (168 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # incremen
 
 my $session = WebGUI::Test->session;
 $session->cache->remove('myTestKey');
+WebGUI::Test->addToCleanup(sub { $session->cache->remove('myTestKey'); });
 
 foreach my $gid ('new', '') {
 	my $g = WebGUI::Group->new($session, $gid);
@@ -187,7 +188,7 @@ my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
 $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
 my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
 is($ldap->getValue("ldapLinkId"),$ldapProps->{ldapLinkId},'ldap link created properly');
-addToCleanup($ldap);
+WebGUI::Test->addToCleanup($ldap);
 
 my @shawshank;
 
@@ -707,7 +708,6 @@ foreach my $idx (0..$#ipTests) {
 	$ipTests[$idx]->{user} = $tcps[$idx];
 }
 WebGUI::Test->addToCleanup(@tcps);
-WebGUI::Test->addToCleanup(@sessionBank);
 
 my $gI = WebGUI::Group->new($session, "new");
 WebGUI::Test->addToCleanup($gI);
@@ -740,8 +740,8 @@ foreach my $ipTest (@ipTests) {
 
     note "Checking for user Visitor session leak";
 
-    $ENV{REMOTE_ADDR} = '191.168.1.1';
     my $remoteSession = WebGUI::Test->newSession;
+    $remoteSession->request->env->{REMOTE_ADDR} = '191.168.1.1';
     $remoteSession->user({userId => 1});
 
     my $localIpGroup = WebGUI::Group->new($session, 'new');
@@ -751,7 +751,7 @@ foreach my $ipTest (@ipTests) {
     ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remote Visitor fails to be in the group';
 
     my $localSession = WebGUI::Test->newSession;
-    $localSession->request->env->{'REMOTE_ADDR'} = '192.168.33.1';
+    $localSession->request->env->{REMOTE_ADDR} = '192.168.33.1';
     WebGUI::Test->addToCleanup($localIpGroup, $remoteSession, $localSession);
     $localSession->user({userId => 1});
     $localIpGroup->clearCaches;
@@ -828,8 +828,4 @@ ok(  WebGUI::Group->vitalGroup(3), '... 3');
 ok(  WebGUI::Group->vitalGroup('pbgroup000000000000015'), '... pbgroup000000000000015');
 ok(! WebGUI::Group->vitalGroup('27'), '... 27 is not vital');
 
-END {
-	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
-    $session->cache->remove('myTestKey');
-}
 #vim:ft=perl

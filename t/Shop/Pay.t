@@ -31,9 +31,6 @@ use WebGUI::TestException;
 my $session         = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
-# Tests
-
-#----------------------------------------------------------------------------
 # put your tests here
 
 my $loaded = use_ok('WebGUI::Shop::Pay');
@@ -220,6 +217,7 @@ cmp_bag(
 #######################################################################
 
 done_testing();
+<<<<<<< HEAD
 
 #----------------------------------------------------------------------------
 # Cleanup
@@ -227,3 +225,5 @@ END {
     defined $newDriver and $newDriver->delete;
     defined $newDriver and $anotherDriver->delete;
 }
+=======
+>>>>>>> upstream/WebGUI8

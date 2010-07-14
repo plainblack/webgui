@@ -47,7 +47,7 @@ WebGUI::Test->interceptLogging( sub {
     is($log_data->{warn}, "Second warning", "warn: Log4perl called again");
     $eh->security('Shields up, red alert');
     my $security = sprintf '%s (%d) connecting from %s attempted to %s',
-        $session->user->username, $session->user->userId, $session->env->getIp, 'Shields up, red alert';
+        $session->user->username, $session->user->userId, $session->request->address, 'Shields up, red alert';
     is($log_data->{warn}, $security, 'security: calls warn with username, userId and IP address');
 });
 

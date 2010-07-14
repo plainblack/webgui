@@ -2,7 +2,25 @@ package WebGUI::Shop::AddressBook;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+use Moose;
+use WebGUI::Definition;
+
+property 'userId' => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'defaultAddressId' => (
+    noFormPost => 1,
+    default    => '',
+);
+
+has [ qw/addressBookId session/] => (
+    is => 'ro',
+    required => 1,
+);
+
+
 use JSON;
 require WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
@@ -31,9 +49,103 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
-private properties => my %properties;
-private addressCache => my %addressCache;
+#-------------------------------------------------------------------
+
+=head2 new ( $session, $addressBookId )
+
+Constructor.  Instanciates an address book based upon an addressBookId.
+
+=head2 new ( $session )
+
+Constructor.  Builds a new, default address book object.
+
+=head2 new ( $properties )
+
+Constructor.  Builds a new, default address book object in Moose style with default properties set by $properties. This does not
+persist them to the database automatically.  This needs to be done via $self->write.
+
+=head3 $session
+
+A reference to the current session.
+
+=head3 $addressBookId
+
+The unique id of a cart to instanciate.
+
+=head3 $properties
+
+A hash reference that contains one or more of the following:
+
+=head4 defaultAddressId
+
+The unique id for a address attached to this cart.
+
+=head4 userId
+
+The unique id for the user who owns this cart.
+
+=cut
+
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if (ref $_[0] eq 'HASH') {
+        my $properties = $_[0];
+        my $session = $properties->{session};
+        if (! (blessed $session && $session->isa('WebGUI::Session')) ) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+        }
+        if ($session->user->isVisitor) {
+            WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
+        }
+        my ($addressBookId)          = $class->_init($session);
+        $properties->{addressBookId} = $addressBookId;
+        $properties->{userId}        = $session->user->userId;
+        return $class->$orig($properties);
+    }
+    my $session = shift;
+    if (! (blessed $session && $session->isa('WebGUI::Session'))) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    if ($session->user->isVisitor) {
+        WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
+    }
+    my $argument2 = shift;
+    if (!defined $argument2) {
+        my ($addressBookId)          = $class->_init($session);
+        my $properties = {};
+        $properties->{session}       = $session;
+        $properties->{addressBookId} = $addressBookId;
+        $properties->{userId}        = $session->user->userId;
+        return $class->$orig($properties);
+    }
+    ##Look up one in the db
+    my $book = $session->db->quickHashRef("select * from addressBook where addressBookId=?", [$argument2]);
+    if ($book->{addressBookId} eq "") {
+        WebGUI::Error::ObjectNotFound->throw(error=>"No such address book.", id=>$argument2);
+    }
+    $book->{session} = $session;
+    return $class->$orig($book);
+};
+
+#-------------------------------------------------------------------
+
+=head2 _init ( session )
+
+Builds a stub of object information in the database, and returns the newly created
+addressBookId, and the creationDate fields so the object can be initialized correctly.
+
+=cut
+
+sub _init {
+    my $class          = shift;
+    my $session        = shift;
+    my $addressBookId  = $session->id->generate;
+    $session->db->write('insert into addressBook (addressBookId, userId) values (?,?)', [$addressBookId, $session->user->userId]);
+    return ($addressBookId);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -51,7 +163,8 @@ A hash reference containing address information.
 
 sub addAddress {
     my ($self, $address) = @_;
-    my $addressObj = WebGUI::Shop::Address->create( $self, $address);
+    my $addressObj = WebGUI::Shop::Address->create($self);
+    $addressObj->update($address);
     return $addressObj;
 }
 
@@ -114,32 +227,19 @@ sub appendAddressFormVars {
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, userId )
+=head2 create ( session )
 
-Constructor. Creates a new address book for this user.
+Deprecated, left as a stub for existing code.  Use L<new> instead.
 
 =head3 session
 
 A reference to the current session.
 
-=head3 userId
-
-The userId for the user.  Throws an exception if it is Visitor.  Defaults to the session
-user if omitted.
-
 =cut
 
 sub create {
-    my ($class, $session, $userId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    $userId ||= $session->user->userId;
-    if ($userId eq '1') {
-        WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
-    }
-    my $id = $session->db->setRow("addressBook", "addressBookId", {addressBookId=>"new", userId=>$userId}); 
-    return $class->new($session, $id);
+    my ($class, $session) = @_;
+    return $class->new($session);
 }
 
 #-------------------------------------------------------------------
@@ -152,9 +252,7 @@ Deletes this address book and all addresses contained in it.
 
 sub delete {
     my ($self) = @_;
-    my $myId   = id $self;
     foreach my $address (@{$self->getAddresses}) {
-        delete $addressCache{$myId}{$address->getId};
         $address->delete;
     } 
     $self->session->db->write("delete from addressBook where addressBookId=?",[$self->getId]);
@@ -181,28 +279,6 @@ sub formatCallbackForm {
 
 #-------------------------------------------------------------------
 
-=head2 get ( [ property ] )
-
-Returns a duplicated hash reference of this object’s data.
-
-=head3 property
-
-Any field − returns the value of a field rather than the hash reference.  See the 
-C<update> method.
-
-=cut
-
-sub get {
-    my ($self, $name) = @_;
-    if (defined $name) {
-        return $properties{id $self}{$name};
-    }
-    my %copyOfHashRef = %{$properties{id $self}};
-    return \%copyOfHashRef;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getAddress ( id )
 
 Returns an address object.
@@ -215,11 +291,10 @@ An address object's unique id.
 
 sub getAddress {
     my ($self, $addressId) = @_;
-    my $id = id $self;
-    unless (exists $addressCache{$id}{$addressId}) {
-        $addressCache{$id}{$addressId} = WebGUI::Shop::Address->new($self, $addressId);
+    unless (exists $self->{_addressCache}->{$addressId}) {
+        $self->{_addressCache}->{$addressId} = WebGUI::Shop::Address->new($self, $addressId);
     }
-    return $addressCache{$id}{$addressId};
+    return $self->{_addressCache}->{$addressId};
 }
 
 #-------------------------------------------------------------------
@@ -337,41 +412,6 @@ sub missingFields {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, addressBookId )
-
-Constructor.  Instanciates an addressBook based upon a addressBookId.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 addressBookId
-
-The unique id of an address book to instanciate.
-
-=cut
-
-sub new {
-    my ($class, $session, $addressBookId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    unless (defined $addressBookId) {
-        WebGUI::Error::InvalidParam->throw(error=>"Need an addressBookId.");
-    }
-    my $addressBook = $session->db->quickHashRef('select * from addressBook where addressBookId=?', [$addressBookId]);
-    if ($addressBook->{addressBookId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"No such address book.", id=>$addressBookId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    $properties{ $id } = $addressBook;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 newByUserId ( session, userId )
 
 Constructor. Creates a new address book for this user if they don't have one.  In any case returns a reference to the address book.
@@ -418,7 +458,7 @@ sub newByUserId {
     }
     else {
         # nope create one for the user
-        return $class->create($session);
+        return $class->new($session);
     }
 }
 
@@ -465,31 +505,15 @@ sub processAddressForm {
 
 #-------------------------------------------------------------------
 
-=head2 update ( properties )
+=head2 write ( )
 
-Sets properties in the addressBook
-
-=head3 properties
-
-A hash reference that contains one of the following:
-
-=head4 userId
-
-Assign the user that owns this address book.
-
-=head4 defaultAddressId
-
-The id of the address to be made the default for this address book.
+Writes the object properties to the database.
 
 =cut
 
-sub update {
+sub write {
     my ($self, $newProperties) = @_;
-    my $id = id $self;
-    foreach my $field (qw(userId defaultAddressId)) {
-        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
-    }
-    $self->session->db->setRow("addressBook","addressBookId",$properties{$id});
+    $self->session->db->setRow("addressBook","addressBookId",$self->get());
 }
 
 #-------------------------------------------------------------------

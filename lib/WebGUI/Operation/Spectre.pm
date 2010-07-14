@@ -59,7 +59,7 @@ sub www_spectreGetSiteData {
     if (!defined $subnets) {
         $subnets = [];
     }
-	if (!isInSubnet($session->env->getIp, $subnets)) {
+	if (!isInSubnet($session->request->address, $subnets)) {
 		$session->errorHandler->security("Tried to make a Spectre workflow data load request, but we're only allowed to accept requests from "
 			.join(",",@{$subnets}).".");
 	} 
@@ -181,7 +181,7 @@ sub www_spectreTest {
         $subnets = [];
     }
 
-    my $sessionIp = $session->env->getIp;
+    my $sessionIp = $session->request->address;
 	unless (isInSubnet($sessionIp, $subnets)) {
 		$session->errorHandler->security(
             sprintf "Tried to make a Spectre workflow runner request from %s, but we're only allowed to accept requests from %s",

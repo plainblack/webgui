@@ -79,18 +79,18 @@ sub process {
         # A hidden field with the current URL
         my $returnUrl   = $session->url->page;
         if ( !$session->form->get("op") eq "auth" ) {
-            $returnUrl  .= '?' . $session->env->get( "QUERY_STRING" );
+            $returnUrl  .= '?' . $session->request->env->{ "QUERY_STRING" };
         }
         $var{'form.returnUrl'} 
             = WebGUI::Form::hidden( $session, {
                 name        => 'returnUrl',
-                value       => $session->url->page($session->env->get("QUERY_STRING")),
+                value       => $session->url->page($session->request->env->{"QUERY_STRING"}),
             });
             
         # Fix box size
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
-        if (index(lc($session->env->get("HTTP_USER_AGENT")),"msie") < 0) {
+        if (index(lc($session->request->user_agent),"msie") < 0) {
         	$boxSize = int($boxSize=$boxSize*2/3);
         }
 

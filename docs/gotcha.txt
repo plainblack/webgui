@@ -7,7 +7,6 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
-<<<<<<< HEAD
 8.0.0
 --------------------------------------------------------------------
  * WebGUI 8 is not API compatible with WebGUI 7. If you have custom
@@ -17,11 +16,10 @@ save you many hours of grief.
  * WebGUI now requires the following modules
     - Moose
     - CHI
-=======
+
 7.9.8
 --------------------------------------------------------------------
      * Starting in WebGUI 7.9.4, the Net::Twitter module is required.
->>>>>>> master
 
 7.9.7
 --------------------------------------------------------------------

@@ -151,7 +151,7 @@ Get the template to choose a username
 sub getTemplateChooseUsername {
     my ( $self ) = @_;
     my $templateId  = $self->session->setting->get('twitterTemplateIdChooseUsername');
-    return WebGUI::Asset::Template->new( $self->session, $templateId );
+    return WebGUI::Asset->newById( $self->session, $templateId );
 }
 
 #----------------------------------------------------------------------------

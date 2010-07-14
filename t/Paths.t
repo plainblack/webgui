@@ -15,7 +15,7 @@ my @pathMethods = qw(
     extras
     defaultUploads
     defaultCreateSQL
-    var
+    share
 );
 can_ok 'WebGUI::Paths', @pathMethods;
 

@@ -35,8 +35,6 @@ This package parses the WebGUI config file.
 
  use WebGUI::Config;
 
- WebGUI::Config->loadAllConfigs($webguiRoot);
- 
  my $configs = WebGUI::Config->readAllConfigs;
 
  my $config = WebGUI::Config->new($configFileName);
@@ -62,24 +60,6 @@ Config::JSON
 These subroutines are available from this package:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 clearCache ( ) 
-
-Clear the cache of in-memory configuration files.  This is required by the upgrade script, which
-forks to run each upgrade.  When the child is reaped, the original is untouched, so that the
-next script in the line recieves an old, in-memory config, essentially undoing any config
-changes in the first upgrade script.
-
-This is a class method.
-
-=cut
-
-sub clearCache {
-	my $class = shift;
-    %config = ();
-}
 
 #-------------------------------------------------------------------
 
@@ -112,62 +92,22 @@ sub getCookieTTL {
 
 #-------------------------------------------------------------------
 
-=head2 loadAllConfigs ( webguiRoot )
-
-Reads all the config file data for all defined sites into an in-memory cache. This is a class method.
-
-=head3 webguiRoot
-
-The path to the WebGUI installation.
-
-=cut
-
-sub loadAllConfigs {
-	my $class = shift;
-	my $configs = $class->readAllConfigs;
-	foreach my $filename (keys %{$configs}) {
-		unless ($filename =~ /^demo\d/) {
-			print "\tLoading ".$filename."\n";	
-			$config{$filename} = $configs->{$filename};
-		}
-	}
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 new ( webguiRoot , configFile [ , noCache ] )
+=head2 new ( configFile )
 
 Returns a hash reference containing the configuration data. It tries to get the data out of the memory cache first, but reads the config file directly if necessary.
-
-=head3 webguiRoot
-
-The path to the WebGUI installation.
 
 =head3 configFile
 
 The filename of the config file to read.
 
-=head3 noCache
-
-A boolean value that when set to true tells the config system not to store the config in an in memory cache, in case it's loaded again later. This is mostly used when loading utility configs, like spectre.conf.
-
 =cut
 
-around new => sub {
+around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
     my $filename = shift;
-    my $noCache = shift;
     $filename = Cwd::realpath(File::Spec->rel2abs($filename, WebGUI::Paths->configBase));
-    if (exists $config{$filename}) {
-        return $config{$filename};
-    }
-    else {
-        my $self = $class->$orig($filename);
-        $config{$filename} = $self unless $noCache;
-        return $self;
-    }
+    return $class->$orig($filename);
 };
 
 #-------------------------------------------------------------------

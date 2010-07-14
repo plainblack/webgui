@@ -100,8 +100,8 @@ sub _logLogin {
             $_[0],
             $_[1],
             time(),
-            $self->session->env->getIp,
-            $self->session->env->get("HTTP_USER_AGENT"),
+            $self->session->request->address,
+            $self->session->request->user_agent,
             $self->session->getId,
             time(),
         ]
@@ -539,7 +539,7 @@ sub displayLogin {
         ) {
         my $returnUrl
             = $self->session->form->get('returnUrl')
-            || $self->session->url->page( $self->session->env->get('QUERY_STRING') )
+            || $self->session->url->page( $self->session->request->env->{'QUERY_STRING'} )
             ;
         $self->session->scratch->set("redirectAfterLogin", $returnUrl);
     }

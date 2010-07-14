@@ -57,15 +57,6 @@ my $uncommittedThread = $collab->addChild($props, @addArgs);
 # Test for a sane object type
 isa_ok($thread, 'WebGUI::Asset::Post::Thread');
 
-my $env = $session->env;
-$env    = Test::MockObject::Extends->new($env);
-
-my %mockEnv = (
-    REMOTE_ADDR          => '192.168.0.2',
-);
-
-$env->mock('get', sub { return $mockEnv{$_[1]}});
-
 $session->user({userId => 3});
 $thread->rate(1);
 $thread->trash;

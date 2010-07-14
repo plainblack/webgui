@@ -32,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 26;
+plan tests => 23;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -60,17 +60,7 @@ cmp_deeply(
     'new takes exception to not giving it a session object',
 );
 
-eval { $book = WebGUI::Shop::AddressBook->new($session); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a addressBookId');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Need an addressBookId.',
-    ),
-    'new takes exception to not giving it a addressBook Id',
-);
-
+$session->user({userId => 3});
 eval { $book = WebGUI::Shop::AddressBook->new($session, 'neverAGUID'); };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::ObjectNotFound', 'new takes exception to not giving it an existing addressBookId');
@@ -82,31 +72,12 @@ cmp_deeply(
     ),
     'new takes exception to not giving it a addressBook Id',
 );
-
-
-#######################################################################
-#
-# create
-#
-#######################################################################
-
-eval { $book = WebGUI::Shop::AddressBook->create(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a session object');
-cmp_deeply(
-    $e,
-    methods(
-        error    => 'Need a session.',
-        expected => 'WebGUI::Session',
-        got      => '',
-    ),
-    'create takes exception to not giving it a session object',
-);
-
 $session->user({userId => 1});
-eval { $book = WebGUI::Shop::AddressBook->create($session); };
+
+
+eval { $book = WebGUI::Shop::AddressBook->new($session); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to making an address book for Visitor');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to making an address book for Visitor');
 cmp_deeply(
     $e,
     methods(
@@ -116,22 +87,23 @@ cmp_deeply(
 );
 
 $session->user({userId => 3});
-$book = WebGUI::Shop::AddressBook->create($session);
-isa_ok($book, 'WebGUI::Shop::AddressBook', 'create returns the right kind of object');
+$book = WebGUI::Shop::AddressBook->new($session);
+isa_ok($book, 'WebGUI::Shop::AddressBook', 'new returns the right kind of object');
 
 isa_ok($book->session, 'WebGUI::Session', 'session method returns a session object');
 
 is($session->getId, $book->session->getId, 'session method returns OUR session object');
 
-ok($session->id->valid($book->getId), 'create makes a valid GUID style addressBookId');
+ok($session->id->valid($book->getId), 'new makes a valid GUID style addressBookId');
 
-is($book->get('userId'), 3, 'create uses $session->user to get the userid for this book');
+is($book->get('userId'), 3, 'new uses $session->user to get the userid for this book');
+is($book->userId, 3, '... testing direct accessor');
 
 my $bookCount = $session->db->quickScalar('select count(*) from addressBook');
 is($bookCount, 1, 'only 1 address book was created');
 
-my $alreadyHaveBook = WebGUI::Shop::AddressBook->create($session);
-isnt($book->getId, $alreadyHaveBook->getId, 'creating an addressbook as visitor, even when you already have one, always returns a new one');
+my $alreadyHaveBook = WebGUI::Shop::AddressBook->new($session);
+isnt($book->getId, $alreadyHaveBook->getId, 'creating an addressbook, even when you already have one, always returns a new one');
 
 #######################################################################
 #
@@ -177,15 +149,16 @@ $book->update({ lastShipId => $address1->getId, lastPayId => $address2->getId});
 cmp_deeply(
     $book->get(),
     {
-        userId     => ignore(),
-        addressBookId  => ignore(),
+        userId           => ignore(),
+        addressBookId    => ignore(),
         defaultAddressId => ignore(),
     },
-    'update updates the object properties cache'
+    'update does not add new properties to the object'
 );
 
 my $bookClone = WebGUI::Shop::AddressBook->new($session, $book->getId);
 
+delete $book->{_addressCache};
 cmp_deeply(
     $bookClone,
     $book,
@@ -223,13 +196,14 @@ my $otherSession = WebGUI::Test->newSession;
 my $mergeUser    = WebGUI::User->create($otherSession);
 WebGUI::Test->addToCleanup($mergeUser);
 $otherSession->user({user => $mergeUser});
-my $adminBook   = WebGUI::Shop::AddressBook->create($otherSession);
+my $adminBook   = WebGUI::Shop::AddressBook->new($otherSession);
 WebGUI::Test->addToCleanup($adminBook);
 my $goodAddress = $adminBook->addAddress({label => 'first'});
 
 my $session2 = WebGUI::Test->newSession;
 $session2->user({user => $mergeUser});
 my $bookAdmin = WebGUI::Shop::AddressBook->newByUserId($session2);
+WebGUI::Test->addToCleanup($bookAdmin);
 
 cmp_bag(
     [ map { $_->getId } @{ $bookAdmin->getAddresses } ],

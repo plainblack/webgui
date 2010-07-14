@@ -259,7 +259,7 @@ sub addFileFromCaptcha {
         $self->session->errorHandler->warn("Error adding noise: $error");
     }
     # AddNoise generates a different average color depending on library.  This is ugly, but the best I can see for now
-    $error = $image->Annotate(font=>WebGUI::Paths->var.'/default.ttf', pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
+    $error = $image->Annotate(font=>WebGUI::Paths->share.'/default.ttf', pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
 	if($error) {
         $self->session->errorHandler->warn("Error Annotating image: $error");
     }
@@ -1284,7 +1284,7 @@ sub getUrl {
         and -e $self->getPath . '/.cdn' )
     {
         my $sep = '/';    # separator, if not already present trailing
-        if ($cdnCfg->{'sslAlt'} && $self->session->env->sslRequest) {
+        if ($cdnCfg->{'sslAlt'} && $self->session->request->secure) {
             if ( $cdnCfg->{'sslUrl'} ) {
                 substr( $cdnCfg->{'sslUrl'}, -1 ) eq '/' and $sep = '';
                 $url = $cdnCfg->{'sslUrl'} . $sep . $self->getDirectoryId;

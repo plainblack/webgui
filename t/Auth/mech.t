@@ -70,6 +70,7 @@ my $asset
     });
 $versionTag->commit;
 my $assetUrl    = $baseUrl . $asset->get('url');
+WebGUI::Test->addToCleanup($versionTag);
 
 #----------------------------------------------------------------------------
 # Tests

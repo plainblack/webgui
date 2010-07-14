@@ -350,7 +350,7 @@ sub hasRated {
 
     my $hasRated = $self->session->db->quickScalar("select count(*) from MatrixListing_rating where
         ((userId=? and userId<>'1') or (userId='1' and ipAddress=?)) and listingId=?",
-        [$session->user->userId,$session->env->get("HTTP_X_FORWARDED_FOR"),$self->getId]);
+        [$session->user->userId,$session->request->env->{"HTTP_X_FORWARDED_FOR"}, $self->getId]);
     return $hasRated;
 
 }
@@ -372,7 +372,7 @@ sub incrementCounter {
     my $db      = $self->session->db;
     my $counter = shift;
     
-    my $currentIp = $self->session->env->get("HTTP_X_FORWARDED_FOR");
+    my $currentIp = $self->session->request->env->{"HTTP_X_FORWARDED_FOR"};
     
     unless ($self->get($counter."LastIp") && ($self->get($counter."LastIp") eq $currentIp)) {
         $self->update({ 
@@ -528,7 +528,7 @@ sub setRatings {
             $db->write("insert into MatrixListing_rating 
                 (userId, category, rating, timeStamp, listingId, ipAddress, assetId) values (?,?,?,?,?,?,?)",
                 [$session->user->userId,$category,$ratings->{$category},time(),$self->getId,
-                $session->env->get("HTTP_X_FORWARDED_FOR"),$matrixId]);
+                $session->request->env->{"HTTP_X_FORWARDED_FOR"}, $matrixId]);
         }
         my $sql     = "from MatrixListing_rating where listingId=? and category=?";
         my $sum     = $db->quickScalar("select sum(rating) $sql", [$self->getId,$category]);

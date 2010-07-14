@@ -668,10 +668,4 @@ sub getAddExceptions {
         },
     ];
 }
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $session->db->write('delete from tax_generic_rates');
-}
 #vim:ft=perl

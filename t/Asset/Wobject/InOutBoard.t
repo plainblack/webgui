@@ -144,11 +144,9 @@ cmp_bag(
             dateStamp      => ignore(),
             message        => 'work time',
             username       => 'red',
-        }),
-        superhashof({ username => 'Admin' }),
-        superhashof({ username => 'boggs' }),
-        superhashof({ username => 'andy' }),
-        superhashof({ username => 'hadley' }),
+            department     => 'No Department',
+        },
+        ignore(), ignore(), ignore(), ignore(),
     ],
     'view: returns one entry for each user, entry is correct for user with status'
 ) or diag(Dumper $templateVars->{rows_loop});

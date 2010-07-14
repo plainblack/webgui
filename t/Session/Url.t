@@ -50,8 +50,7 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-use Test::MockObject::Extends;
-plan tests => 84 + scalar(@getRefererUrlTests);
+plan tests => 82 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 my $request = $session->request;
@@ -258,12 +257,8 @@ $session->asset($sessionAsset);
 #
 #######################################
 
-$env->{'HTTP_REFERER'} = 'test';
-
-is($session->env->get('HTTP_REFERER'), 'test', 'testing overridden ENV');
-
 foreach my $test (@getRefererUrlTests) {
-	$env->{HTTP_REFERER} = $test->{input};
+    $session->request->referer($test->{input});
 	is($session->url->getRefererUrl, $test->{output}, $test->{comment});
 }
 

@@ -28,11 +28,9 @@ plan tests => $tests + 1;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey::ExpressionEngine');
-
 my $e = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
+use_ok($e);
 
-WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
 $session->config->set( 'enableSurveyExpressionEngine', 0 );
 is( $e->run( $session, 'jump { 1 } target' ),
     undef, "Nothing happens unless we turn on enableSurveyExpressionEngine in config" );

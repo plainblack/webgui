@@ -255,3 +255,5 @@ sub callAjaxService {
     # Call ajax service function and decode reply
     return decode_json( $album->www_ajax() );
 }
+
+#vim:ft=perl

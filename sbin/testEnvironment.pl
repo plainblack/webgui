@@ -71,6 +71,7 @@ checkModule("Test::Exception",              0.27,      2 );
 checkModule("Test::Class",                  0.31,      2 );
 checkModule("Pod::Coverage",                0.19,      2 );
 checkModule("Text::Balanced",               2.00,      2 );
+checkModule("Capture::Tiny",                0.08,      2 );
 checkModule("Digest::MD5",                  2.38         );
 checkModule("DBI",                          1.607        );
 checkModule("DBD::mysql",                   4.010        );

@@ -15,16 +15,26 @@ package WebGUI::Friends;
 =cut
 
 use strict;
-use Class::InsideOut qw(id register public readonly);
+
+use Moose;
+
+has 'session' => (
+    is              => 'ro',
+    required        => 1,
+    weak_ref        => 1,
+);
+
+has 'user' => (
+    is              => 'ro',
+    required        => 1,
+);
+
 use WebGUI::DateTime;
 use WebGUI::HTML;
 use WebGUI::Inbox;
 use WebGUI::International;
 use WebGUI::User;
 use WebGUI::Utility;
-
-readonly session    => my %session;
-readonly user       => my %user;
 
 =head1 NAME
 
@@ -44,6 +54,20 @@ A user relationship management system.
 =head1 METHODS
 
 =cut
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        my $protoUser = defined $_[1] ? $_[1] : $protoSession->user;
+        return $className->$orig(session => $protoSession, user => $protoUser,);
+    }
+    return $className->$orig(@_);
+};
+
 
 
 #-------------------------------------------------------------------
@@ -275,16 +299,6 @@ A reference to a WebGUI::User object that we're going to manage the friends of. 
 attached to the session.
 
 =cut
-
-sub new {
-    my $class       = shift;
-    my $session     = shift;
-    my $user        = shift || $session->user;
-    my $self        = register($class);
-    $session{id $self} = $session;
-    $user{id $self} = $user;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 

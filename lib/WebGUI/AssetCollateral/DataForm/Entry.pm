@@ -301,7 +301,7 @@ sub new {
     }
     else {
         $self->user($session->user);
-        $self->ipAddress($session->env->getIp);
+        $self->ipAddress($session->request->address);
         $self->submissionDate(WebGUI::DateTime->new($session, time));
         $entryData{id $self} = {};
     }

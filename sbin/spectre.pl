@@ -18,7 +18,7 @@ use File::Spec;
 use POE::Component::IKC::ClientLite;
 use Spectre::Admin;
 use WebGUI::Paths -inc;
-use WebGUI::Config;
+use Config::JSON;
 use JSON;
 
 $|=1; # disable output buffering
@@ -47,7 +47,7 @@ GetOptions(
 pod2usage( verbose => 2 ) if $help;
 pod2usage() unless ($ping||$shutdown||$daemon||$run||$test||$status);
 
-my $config = WebGUI::Config->new( WebGUI::Paths->spectreConfig, 1);
+my $config = Config::JSON->new( WebGUI::Paths->spectreConfig);
 unless (defined $config) {
 	print <<STOP;
 

@@ -850,7 +850,7 @@ sub www_inviteUser {
 
     $var->{'submit_button'    }  = WebGUI::Form::submit($session,{});
     $var->{'form_footer'      }  = WebGUI::Form::formFooter($session, {});
-    $var->{'back_url'         }  = $session->env->get("HTTP_REFERER") || $var->{'view_inbox_url'};
+    $var->{'back_url'         }  = $session->request->referer || $var->{'view_inbox_url'};
 
     #Add common template variable for displaying the inbox
     $self->appendCommonVars($var);
@@ -1099,7 +1099,7 @@ sub www_sendMessage {
     my $messageId = $form->get("messageId");
     my $userId    = $form->get("userId");
     my $pageUrl   = $session->url->page;
-    my $backUrl   = $session->env->get("HTTP_REFERER") || $var->{'view_inbox_url'};
+    my $backUrl   = $session->request->referer || $var->{'view_inbox_url'};
     my $errorMsg  = "";
 
     if($messageId) {

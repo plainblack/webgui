@@ -1,7 +1,15 @@
 package WebGUI::Shop::Credit;
 
 use strict;
-use Class::InsideOut qw{ :std };
+use Moose;
+use Scalar::Util qw/blessed/;
+
+has [ qw/session userId/ ] => (
+    is       => 'ro',
+    required => 1,
+);
+
+
 use WebGUI::Shop::Admin;
 use WebGUI::Exception::Shop;
 use WebGUI::International;
@@ -28,8 +36,18 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
-readonly userId => my %userId;
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession, userId => $_[1], );
+    }
+    return $className->$orig(@_);
+};
+
 
 #-------------------------------------------------------------------
 
@@ -136,21 +154,6 @@ A reference to the current session.
 A unique id for a user that you want to adjust the credit of. Defaults to the current user.
 
 =cut
-
-sub new {
-    my ($class, $session, $userId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    unless (defined $userId) {
-        $userId = $session->user->userId;
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id } = $session;
-    $userId{ $id } = $userId;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 

@@ -223,7 +223,7 @@ is($dbMail->getMimeEntity->head->get('Subject'), "=?UTF-8?Q?H=C3=84ufige=20Frage
     $session->setting->set('mailFooter', $origFooter);
 }
 
-my $smtpServerOk;
+my $smtpServerOk = 0;
 
 #----------------------------------------------------------------------------
 # Test emailOverride

@@ -120,8 +120,8 @@ sub _fixReplyCount {
         orderByClause   => 'assetData.revisionDate desc',
         limit           => 1,
     } )->[0];
-
-    if (my $lastPost = WebGUI::Asset->newById( $self->session, $lastPostId ) ) {
+    my $lastPost = eval { WebGUI::Asset->newById( $self->session, $lastPostId ); };
+    if ( ! Exception::Class->caught() ) {
         $asset->incrementReplies( $lastPost->revisionDate, $lastPost->getId );
     }
     else {
@@ -293,23 +293,30 @@ the parent thread.
 =cut
 
 override cut => sub {
+    warn "post's cut";
     my $self = shift;
 
     # Fetch the Thread and CS before cutting the asset.
     my $thread  = $self->getThread;
+    warn "got thread";
     my $cs      = $thread->getParent;
+    warn "got cs";
 
     # Cut the asset
     my $result = super();
+    warn "called super";
 
     # If a post is being cut update the thread reply count first
     if ($thread->getId ne $self->getId) {
+        warn "calling _fixReplyCount on thread";
         $self->_fixReplyCount( $thread );
     }
 
     # Update the CS reply count. This step is also necessary when a Post is cut since the Thread's incrementReplies
     # also calls the CS's incrementReplies, possibly with the wrong last post Id.
+    warn "calling _fixReplyCount on cs";
     $self->_fixReplyCount( $cs );
+    warn "all should be well...?";
 
     return $result;
 };
@@ -823,7 +830,7 @@ sub hasRated {
         return 1 if $self->isPoster;
 	my $flag = 0;
 	if ($self->session->user->isVisitor) {
-        	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and ipAddress=?",[$self->getId, $self->session->env->getIp]);
+        	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and ipAddress=?",[$self->getId, $self->session->request->address]);
 	} else {
         	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and userId=?",[$self->getId, $self->session->user->userId]);
 	}
@@ -888,7 +895,7 @@ sub insertUserPostRating {
 	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values (?,?,?,?,?)",
 		[$self->getId,
 		 $self->session->user->userId,
-		 $self->session->env->getIp,
+		 $self->session->request->address,
 		 time(),
 		 $rating,]
 	);
@@ -1367,7 +1374,7 @@ Updates the last post information in the parent Thread and CS if applicable.
 
 sub setStatusUnarchived {
     my ($self) = @_;
-    $self->update({status=>'approved'}) if ($self->get("status") eq "archived");
+    $self->update({status=>'approved'}) if ($self->status eq "archived");
     $self->qualifyAsLastPost;
 }
 

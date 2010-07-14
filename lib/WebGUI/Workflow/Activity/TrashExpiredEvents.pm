@@ -81,8 +81,8 @@ sub execute {
     my $date = WebGUI::DateTime->new($session, time() - $self->get("trashAfter") );
     my $sth  = $session->db->read( "select Event.assetId, revisionDate from Event join assetData using (assetId, revisionDate) where endDate < ? and revisionDate = (select max(revisionDate) from assetData where assetData.assetId=Event.assetId);", [ $date->toDatabaseDate ]);
     EVENT: while ( my ($id) = $sth->array ) {
-        my $asset = eval { WebGUI::Asset::Event->newById($self->session, $id); };
-        if (! Exception::Class->caught() ) {
+        my $asset = eval { WebGUI::Asset->newById($session, $id); };
+        if (! Exception::Class->caught()) {
             $asset->trash;
         }
         last EVENT if time() > $finishTime;

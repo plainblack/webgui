@@ -203,7 +203,7 @@ my $asset6 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::
 $tag6->commitAsUser(3, { commitNow => "yes" });
 $tag6      = WebGUI::VersionTag->new($session, $tag6->getId); #Get the tag again - properties have changed
 is($tag6->get("committedBy"),3,'tag committed by admin again');
-$asset6    = WebGUI::Asset->newByDynamicClass($session,$asset6->getId); #Get the asset again - properties have changed
+$asset6    = WebGUI::Asset->newById($session,$asset6->getId); #Get the asset again - properties have changed
 is($asset6->get("status"),"approved","asset status approved");
 $tag6->clearWorking;
 $tag6->rollback;
@@ -215,7 +215,8 @@ $tag6->rollback;
 setSiteVersionTagMode($session, q{singlePerUser});
 setUserVersionTagMode($user, q{inherited});
 
-ok(!defined getWorking(1), 'versionTagMode singlePerUser: no working tag initially present');
+ok(!defined getWorking(1), 'versionTagMode singlePerUser: no working tag initially present')
+    or diag(getWorking(1)->getId);
 
 $tag = WebGUI::VersionTag->create($session, {});
 isa_ok($tag, 'WebGUI::VersionTag', 'versionTagMode singlePerUser: empty tag');
@@ -288,6 +289,7 @@ ok($adminSiteWideTag->get(q{isSiteWide}), 'versionTagMode siteWide + admin inher
 ok($adminSiteWideTag->getId() eq $siteWideTagId, 'versionTagMode siteWide + admin inherited: empty has same ID as site wide');
 
 
+$adminUserTag->rollback();
 $admin_session->var()->end();
 $admin_session->close();
 
@@ -313,7 +315,6 @@ isnt(
 
 $userTag->rollback();
 $siteWideTag->rollback();
-$adminUserTag->rollback();
 
 ## Additional VersionTagMode to make sure that auto commit happens only when user is tag creator and tag is not site wide.
 ## See bug #10689 (Version Tag Modes)
@@ -327,8 +328,7 @@ $adminUserTag->rollback();
     is($tag->getAssetCount, 1, qq{$test_prefix [singlePerUser] tag with 1 asset});
 
     # create admin session
-    my $admin_session = WebGUI::Session->open(WebGUI::Test->file);
-    addToCleanup($session);
+    my $admin_session = WebGUI::Test->newSession;
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -379,7 +379,8 @@ $adminUserTag->rollback();
     is($tag->getAssetCount, 1, qq{$test_prefix [siteWide] tag with 1 asset});
 
     # create admin session
-    $admin_session = WebGUI::Session->open(WebGUI::Test->file);
+    $admin_session = WebGUI::Test->newSession;
+    WebGUI::Test->addToCleanup($admin_session);
     addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 

@@ -173,9 +173,9 @@ sub setOptions {
 
     #Remove entries from template list that the user does not have permission to view.
     for my $assetId ( keys %{$templateList} ) {
-        my $asset = WebGUI::Asset::Template->newById($self->session, $assetId);
-        if (!$asset->canView($self->session->user->userId)) {
-                delete $templateList->{$assetId};
+        my $asset = eval { WebGUI::Asset->newById($session, $assetId); };
+        if (!Exception::Class->caught() && !$asset->canView($self->session->user->userId)) {
+            delete $templateList->{$assetId};
         }
     }
 

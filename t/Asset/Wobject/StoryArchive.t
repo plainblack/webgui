@@ -63,12 +63,6 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 51
-          + $canPostMaker->plan
-          ;
-plan tests => 1
-            + $tests;
-
 #----------------------------------------------------------------------------
 # put your tests here
 

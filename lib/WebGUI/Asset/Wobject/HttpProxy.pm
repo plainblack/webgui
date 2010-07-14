@@ -310,7 +310,7 @@ sub view {
 	return $self->processTemplate({},$self->templateId) 
 		unless ($proxiedUrl ne "");
 	
-	my $requestMethod = $self->session->env->get("REQUEST_METHOD") || "GET";
+	my $requestMethod = $self->session->request->method || "GET";
 	
 	### Do we have cached content to get?
     my $cache = $self->session->cache;
@@ -328,7 +328,7 @@ sub view {
 		REDIRECT: for my $redirect (0..4) { # We follow max 5 redirects to prevent bouncing/flapping
 			
 			my $userAgent = new LWP::UserAgent;
-			$userAgent->agent($self->session->env->get("HTTP_USER_AGENT"));
+			$userAgent->agent($self->session->request->user_agent);
 			$userAgent->timeout($self->timeout);
 			$userAgent->env_proxy;
 			

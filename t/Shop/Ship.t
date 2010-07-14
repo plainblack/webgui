@@ -205,9 +205,4 @@ $cart->delete;
 
 done_testing();
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $driver->delete;
-    $driver2->delete;
-}
+#vim:ft=perl

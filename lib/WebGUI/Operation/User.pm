@@ -141,7 +141,7 @@ sub canUseService {
     my ( $session ) = @_;
     my $subnets = $session->config->get('serviceSubnets');
     return 1 if !$subnets || !@{$subnets};
-    return 1 if WebGUI::Utility::isInSubnet( $session->env->getIp, $subnets );
+    return 1 if WebGUI::Utility::isInSubnet( $session->request->address, $subnets );
     return 0; # Don't go away mad, just go away
 }
 

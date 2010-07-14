@@ -66,3 +66,5 @@ $gallery->purge;
 
 eval { WebGUI::Asset->newById($session, $properties->{assetId}); };
 ok( Exception::Class->caught(), 'Gallery no longer able to be instanciated after purge');
+
+#vim:ft=perl

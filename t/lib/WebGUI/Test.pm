@@ -26,6 +26,7 @@ use strict;
 use warnings;
 use base qw(Test::Builder::Module);
 
+use Log::Log4perl;
 use Test::MockObject;
 use Test::MockObject::Extends;
 use Log::Log4perl;  # load early to ensure proper order of END blocks
@@ -109,6 +110,9 @@ sub _initSession {
             Workflows            => 'Workflow',
             'Workflow Instances' => 'WorkflowInstance',
             Carts                => 'cart',
+            AdSpaces             => 'adSpace',
+            Ads                  => 'advertisement',
+            Inbox                => 'inbox',
             Transactions         => 'transaction',
             'Transaction Items'  => 'transactionItem',
             'Address Books'      => 'addressBook',
@@ -213,6 +217,7 @@ sub newEnv {
             ? HTTP::Request::Common::POST( $url, [ %$form ] )
             : HTTP::Request::Common::GET( $url )
             ;
+        $request->headers->user_agent('WebGUI');
     }
     return $request->to_psgi;
 }
@@ -267,7 +272,7 @@ sub config {
     return $config
         if $config;
     require WebGUI::Config;
-    $config = WebGUI::Config->new($CLASS->file, 1);
+    $config = WebGUI::Config->new($CLASS->file);
     return $config;
 }
 
@@ -699,6 +704,8 @@ Example call:
         my @cleanups;
         while (@_) {
             my $class = shift;
+            next
+                if !defined $class;
             my $construct;
             if ( ref $class ) {
                 my $object = $class;

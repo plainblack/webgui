@@ -20,11 +20,12 @@ use 5.010;
 use CHI;
 use File::Temp qw( tempdir );
 use Scalar::Util qw( weaken );
+use HTTP::Message::PSGI;
+use HTTP::Request::Common;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Session::DateTime;
-use WebGUI::Session::Env;
 use WebGUI::Session::ErrorHandler;
 use WebGUI::Session::Form;
 use WebGUI::Session::Http;
@@ -64,7 +65,6 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->datetime
  $session->db
  $session->dbSlave
- $session->env
  $session->log
  $session->form
  $session->http
@@ -169,9 +169,15 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
 		delete $self->{$key};
 	}
+    $self->{closed} = 1;
+}
+
+sub closed {
+    my $self = shift;
+    return $self->{closed};
 }
 
 #-------------------------------------------------------------------
@@ -303,23 +309,6 @@ sub duplicate {
         $self->getId,
     );
     return $newSession;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 env ( )
-
-Returns a WebGUI::Session::Env object.
-
-=cut
-
-sub env {
-	my $self = shift;
-	unless (exists $self->{_env}) {
-		$self->{_env} = WebGUI::Session::Env->new($self);
-	}
-	return $self->{_env};
 }
 
 
@@ -480,15 +469,21 @@ sub open {
     my $self = { _config => $config };
     bless $self, $class;
 
-    if ($env) {
-        my $request = WebGUI::Session::Request->new($env);
-        $self->{_request} = $request;
-        $self->{_response} = $request->new_response( 200 );
-        
-        # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
-        # wasn't given explicitly
-        $sessionId ||= $request->cookies->{$config->getCookieName};
+    ##No env was passed, so construct one
+    if (! $env) {
+        my $url = 'http://' . $config->get('sitename')->[0];
+        my $request = HTTP::Request::Common::GET($url);
+        $request->headers->user_agent('WebGUI');
+        $env = $request->to_psgi;
     }
+
+    my $request = WebGUI::Session::Request->new($env);
+    $self->{_request} = $request;
+    $self->{_response} = $request->new_response( 200 );
+    
+    # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
+    # wasn't given explicitly
+    $sessionId ||= $request->cookies->{$config->getCookieName};
     
     # If the sessionId is still unset or is invalid, generate a new one
     if (!$sessionId || !$self->id->valid($sessionId)) {

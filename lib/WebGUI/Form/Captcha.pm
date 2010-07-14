@@ -111,7 +111,7 @@ sub getValue {
         my $ua = LWP::UserAgent->new;
         my $res = $ua->post('http://api-verify.recaptcha.net/verify', {
             privatekey  => $privKey,
-            remoteip    => $self->session->env->getIp,
+            remoteip    => $self->session->request->env->{REMOTE_ADDR},
             challenge   => $challenge,
             response    => $response,
         });
@@ -158,10 +158,9 @@ sub toHtml {
     my $self = shift;
 
     if ($self->session->setting->get('useRecaptcha')) {
-        my $env = $self->session->env;
         my $pubKey = $self->session->setting->get('recaptchaPublicKey');
         my $server = "http://api.recaptcha.net";
-        if ($env->sslRequest) {
+        if ($self->session->request->secure) {
             $server = "https://api-secure.recaptcha.net";
         }
         return

@@ -2045,7 +2045,7 @@ sub responseId {
     my $ignoreRevisionDate = $opts{ignoreRevisionDate};
 
     my $user = WebGUI::User->new( $self->session, $userId );
-    my $ip = $self->session->env->getIp;
+    my $ip = $self->session->request->address;
 
     my $responseId = $self->{responseId};
     return $responseId if $responseId;
@@ -2178,7 +2178,7 @@ sub canTakeSurvey {
     }
 
     my $maxResponsesPerUser = $self->maxResponsesPerUser;
-    my $ip                  = $self->session->env->getIp;
+    my $ip                  = $self->session->request->address;
     my $userId              = $self->session->user->userId();
     my $takenCount          = 0;
 

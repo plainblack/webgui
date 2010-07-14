@@ -253,7 +253,7 @@ sub security {
     my $self = shift;
     my $message = shift;
     @_ = ($self, $self->session->user->username." (".$self->session->user->userId.") connecting from "
-        .$self->session->env->getIp." attempted to ".$message);
+        .$self->session->request->address." attempted to ".$message);
     goto $self->can('warn');
 }
 
