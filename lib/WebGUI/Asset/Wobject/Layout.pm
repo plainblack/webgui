@@ -55,6 +55,7 @@ property assetsToHide => (
              vertical  => 1,
              uiLevel   => 9,
              options        => sub {
+                my ( $self ) = @_;
                 my @assetsToHide = split("\n",$self->assetsToHide);
                 my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
                 my %childIds;
@@ -71,6 +72,8 @@ property assetOrder => (
              label        => ['asset order label', 'Asset_Layout'],
              hoverHelp    => ['asset order hoverHelp', 'Asset_Layout'],
              options      => sub {
+                 my ( $self ) = @_;
+                 my $i18n = WebGUI::International->new( $self->session, 'Asset_Layout' );
                  tie my %assetOrder, "Tie::IxHash", (
                     "asc"  => $i18n->get("asset order asc"),
                     "desc" => $i18n->get("asset order desc"),
