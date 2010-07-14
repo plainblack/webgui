@@ -297,19 +297,18 @@ sub www_view {
     $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $style->setScript($url->extras('yui/build/utilities/utilities.js'));
-    $style->setScript($url->extras('accordion/accordion.js'));
-    $style->setScript($url->extras('admin/admin.js'));
     $style->setScript($url->extras('yui/build/element/element-min.js'));
     $style->setScript( $url->extras( 'yui/build/paginator/paginator-min.js ' ) );
+    $style->setScript($url->extras('yui/build/animation/animation-min.js'));
     $style->setScript( $url->extras( 'yui/build/datasource/datasource-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/datatable/datatable-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/container/container-min.js' ) );
     $style->setScript($url->extras('yui/build/tabview/tabview-min.js'));
     $style->setScript($url->extras('yui/build/menu/menu-min.js'));
     $style->setScript($url->extras('yui/build/button/button-min.js'));
-
     $style->setScript( $url->extras( 'yui/build/json/json-min.js' ) );
     $style->setScript( $url->extras( 'yui-webgui/build/i18n/i18n.js' ) );
+    $style->setScript($url->extras('admin/admin.js'));
 
     # Use the template in our __DATA__ block
     my $tmpl    = WebGUI::Asset::Template::HTMLTemplate->new( $session );
@@ -323,8 +322,8 @@ sub www_view {
 1;
 
 __DATA__
-<dl class="accordion-menu">
-    <dt class="a-m-t">^International("admin console","AdminConsole");</dt>
+<dl id="adminBar" class="accordion-menu">
+    <dt id="adminConsole" class="a-m-t">^International("admin console","AdminConsole");</dt>
     <dd class="a-m-d"><div class="bd">
         <TMPL_LOOP adminPlugins>
         <a class="link" target="view" href="<tmpl_var url>">
@@ -334,15 +333,15 @@ __DATA__
         </TMPL_LOOP>
     </div></dd>
     <!-- placeholder for version tags -->
-    <dt class="a-m-t">Version Tags (i18n)</dt>
+    <dt id="versionTags" class="a-m-t">Version Tags (i18n)</dt>
     <dd class="a-m-d"><div class="bd">
     </div></dd>
     <!-- placeholder for clipboard -->
-    <dt class="a-m-t">Clipboard (i18n)</dt>
+    <dt id="clipboard" class="a-m-t">Clipboard (i18n)</dt>
     <dd class="a-m-d"><div class="bd">
     </div></dd>
     <!-- placeholder for asset helpers -->
-    <dt class="a-m-t">Asset Helpers (i18n)</dt>
+    <dt id="assetHelpers" class="a-m-t">Asset Helpers (i18n)</dt>
     <dd class="a-m-d"><div class="bd">
         <h1 id="helper_asset_name">Asset</h1>
         <ul id="helper_list">
@@ -352,22 +351,35 @@ __DATA__
         </ul>
     </div></dd>
     <!-- placeholder for new content menu -->
-    <dt class="a-m-t">New Content (i18n)</dt>
-    <dd class="a-m-d"><div class="bd">
+    <dt id="newContent" class="a-m-t">New Content (i18n)</dt>
+    <dd class="a-m-d"><div class="bd" style="margin: 0; padding: 0">
+        <dl id="newContentBar" class="accordion-menu" style="height: 500px">
+            <dt class="a-m-t" id="newOne">One</dt>
+            <dd class="a-m-d"><div class="bd">
+                <p>One</p>
+            </div></dd>
+            <dt class="a-m-t" id="newTwo">Two</dt>
+            <dd class="a-m-d"><div class="bd">
+                <p>Two</p>
+            </div></dd>
+        </dl>
     </div></dd>
 </dl>
 
 <div id="wrapper" class="yui-skin-sam">
 
-    <div id="versionTag" <TMPL_UNLESS tagName>style="display: none"</TMPL_UNLESS> >
-        <div style="float: right">Publish | Leave</div>
-        <a href="<tmpl_var tagEditUrl>" id="tagEditLink" target="view">
-            <img src="^Extras(icon/tag_blue.png);" class="icon"/>
-            <tmpl_var tagName>
-        </a>
+    <div id="versionTag" style="display: none">
+        <div style="float: right">
+            <span class="action" id="publishTag">Publish</span>
+            | <span class="action" id="leaveTag">Leave</span>
+        </div>
+        <a href="#" id="editTag" target="view" style="background-image: ^Extras(icon/tag_blue.png);;"></a>
     </div>
     <div id="user">
-        <div style="float: right">Back to Site | Log Out</div>
+        <div style="float: right">
+            <a href="<tmpl_var homeUrl>">Back to Site</a> 
+            | <a href="<tmpl_var logoutUrl>">Log Out</a>
+        </div>
         <a href="<tmpl_var userEditUrl>" target="view">
             <img src="^Extras(icon/user.png);" class="icon" />
             <tmpl_var userName>

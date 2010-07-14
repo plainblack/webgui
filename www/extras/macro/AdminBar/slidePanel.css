@@ -9,10 +9,12 @@ dl.accordion-menu dd.a-m-d div.ncmct {
 }
 
 dl.accordion-menu {
-        margin: 0;
-        padding: 0;
-        width: 160px;
-        background: #eeeeee;
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+}
+
+dl#adminBar {
     position:fixed; 
     _position:absolute; 
     top:0; 
@@ -21,6 +23,7 @@ dl.accordion-menu {
     _top:expression(eval((document.documentElement && document.documentElement.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop)); */
     left:0;
     z-index: 100;
+    width: 160px;
 }
 
 dl.accordion-menu dt.a-m-t {
@@ -155,7 +158,9 @@ html.accordion-menu-js dd.a-m-d-anim {
 }
 
 
-
+dl.accordion-menu dl.accordion-menu dt.a-m-t {
+    background: #aaa;
+}
 
 
 

@@ -21,11 +21,17 @@ WebGUI.Admin = function(cfg){
     if ( !this.cfg.tabBarId ) {
         this.cfg.tabBarId = "tabBar";
     }
+    if ( !this.cfg.adminBarId ) {
+        this.cfg.adminBarId = "adminBar";
+    }
 
     // Private methods
     var self = this;
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
+        self.adminBar       = new WebGUI.Admin.AdminBar( self.cfg.adminBarId );
+        YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
+        self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar" );
         self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId );
         self.tree           = new WebGUI.Admin.Tree();
         self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
@@ -928,6 +934,168 @@ WebGUI.Admin.Tree.prototype.toggleRow = function ( child ) {
             break;
         }
     }
+};
+
+/****************************************************************************
+ * WebGUI.Admin.AdminBar( id )
+ * Initialize an adminBar with the given ID.
+ */
+WebGUI.Admin.AdminBar
+= function ( id ) {
+    this.id     = id;
+    this.animDuration   = 0.25;
+    this.dl     = document.getElementById( id );
+    this.dt     = [];
+    this.dd     = [];
+
+    // Get all the DT and DD
+    //  -- Using childNodes so we can nest another accordion inside
+    for ( var i = 0; i < this.dl.childNodes.length; i++ ) {
+        var node = this.dl.childNodes[i];
+        if ( node.nodeName == "DT" ) {
+            this.dt.push( node );
+        }
+        else if ( node.nodeName == "DD" ) {
+            this.dd.push( node );
+        }
+    }
+
+    // Add click handlers to DT to open corresponding DD
+    this.dtById = {};
+    this.ddById = {};
+    for ( var i = 0; i < this.dt.length; i++ ) {
+        var dt = this.dt[i];
+        var dd = this.dd[i];
+
+        // Make sure dd is hidden
+        dd.style.display = "none";
+
+        // Save references by ID
+        this.dtById[ dt.id ] = dt;
+        this.ddById[ dt.id ] = dd;
+
+        this.addClickHandler( dt, dd );
+    }
+
+    // Precalculate dtHeight and maxHeight
+    this.dtHeight   = this.getRealHeight( this.dt[0] ) * this.dt.length;
+    this.maxHeight  = YAHOO.util.Dom.getViewportHeight() - this.dtHeight;
+};
+
+WebGUI.Admin.AdminBar.prototype.addClickHandler
+= function ( dt, dd ) {
+    var self = this;
+    YAHOO.util.Event.on( dt, "click", function(){ self.show.call( self, dt.id ) } );
+};
+
+/**
+ * getAnim( elem )
+ * Get an Animation object for the given element to use for the transition.
+ */
+WebGUI.Admin.AdminBar.prototype.getAnim
+= function ( elem ) {
+    var anim = new YAHOO.util.Anim( elem );
+    anim.duration  = this.animDuration;
+    anim.method    = YAHOO.util.Easing.easeOut;
+    return anim;
+};
+
+/**
+ * getExpandHeight( elem )
+ * Get the height to expand the element to.
+ */
+WebGUI.Admin.AdminBar.prototype.getExpandHeight
+= function ( elem ) {
+    var height  = this.getRealHeight( elem );
+
+    // Make sure not more than maxHeight
+    if ( height > this.maxHeight ) {
+        return this.maxHeight;
+    }
+    return height;
+};
+
+/**
+ * getRealHeight( elem ) 
+ * Get the real height of the given element. 
+ */
+WebGUI.Admin.AdminBar.prototype.getRealHeight
+= function ( elem ) {
+    var D = YAHOO.util.Dom;
+    var clipped = false;
+    // We don't want 0 height!
+    if ( parseInt( elem.style.height ) == 0 ) {
+        elem.style.display = "none";
+        elem.style.height = ""
+    }
+    if (elem.style.display == 'none') {
+        clipped = true;
+        var _pos = D.getStyle(elem, 'position');
+        var _vis = D.getStyle(elem, 'visiblity');
+        D.setStyle(elem, 'position', 'absolute');
+        D.setStyle(elem, 'visiblity', 'hidden');
+        D.setStyle(elem, 'display', 'block');
+    }
+    var height = elem.offsetHeight;
+    if (height == 'auto') {
+        //This is IE, let's fool it
+        D.setStyle(elem, 'zoom', '1');
+        height = elem.clientHeight;
+    }
+    if (clipped) {
+        D.setStyle(elem, 'display', 'none');
+        D.setStyle(elem, 'visiblity', _vis);
+        D.setStyle(elem, 'position', _pos);
+    }
+    //Strip the px from the style
+    return parseInt(height); 
+
+};
+
+/**
+ * show( id )
+ * Show the pane with the given ID. The ID is from the DT element.
+ */
+WebGUI.Admin.AdminBar.prototype.show
+= function ( id ) {
+    if ( this.currentId ) {
+        // Close the current
+        var old         = this.ddById[ this.currentId ];
+        var oldHeight   = this.getExpandHeight( old );
+        if ( !old.anim ) {
+            old.anim = this.getAnim(this.current);
+        }
+        var hideContent = function() {
+            // Hide old and restore height for next open
+            old.style.display = "none";
+            old.style.height  = oldHeight + 'px';
+            old.anim.onComplete.unsubscribe( hideContent );
+        };
+        old.anim.onComplete.subscribe( hideContent, this, true );
+        old.anim.attributes.height = { to : 0 };
+        old.anim.animate();
+
+        // Let user close by clicking again
+        if ( this.currentId == id ) {
+            this.currentId  = null;
+            return;
+        }
+    }
+
+    var dd  = this.ddById[ id ];
+
+    if ( !dd.anim ) {
+        dd.anim     = this.getAnim(dd);
+    }
+    dd.anim.attributes.height = { from: 0, to : this.getExpandHeight( dd ) };
+    dd.style.height  = "0px";
+    dd.style.display = "block";
+    dd.anim.animate();
+    this.currentId = id;
+
+    // TODO: If we're nested inside another accordion-menu, fix 
+    // the parent's height as we fix our own to avoid having to set
+    // explicit height on parent
 };
 
 
