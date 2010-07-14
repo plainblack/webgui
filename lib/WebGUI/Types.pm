@@ -70,4 +70,18 @@ coerce 'WebGUI::Type::JSONArray'
     => via  { return []; },
 ;
 
+subtype 'WebGUI::Type::JSONHash'
+    => as 'HashRef'
+;
+
+coerce 'WebGUI::Type::JSONHash'
+    => from Str
+    => via  { my $struct = eval { JSON::from_json($_); }; $struct ||= {}; return $struct; },
+;
+
+coerce 'WebGUI::Type::JSONHash'
+    => from Undef
+    => via  { return {}; },
+;
+
 1;
