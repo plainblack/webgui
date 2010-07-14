@@ -273,7 +273,7 @@ $driver->{_cardData} = {
 };
 
 $cart->update({gatewayId => $driver->getId,});
-$transaction = WebGUI::Shop::Transaction->create($session, {
+$transaction = WebGUI::Shop::Transaction->new($session, {
     cart          => $cart,
     isRecurring   => $cart->requiresRecurringPayment,
 });
