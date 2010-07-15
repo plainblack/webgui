@@ -88,20 +88,6 @@ sub getAdminPluginTemplateVars {
 
 #----------------------------------------------------------------------
 
-=head2 getClipboardTemplateVars
-
-=cut
-
-sub getClipboardTemplateVars {
-    my ( $self ) = @_;
-    my $session = $self->session;
-    my $vars    = [];
-    my $clipboardItems = $session->asset->getAssetsInClipboard(1);
-
-}
-
-#----------------------------------------------------------------------
-
 =head2 getNewContentTemplateVars 
 
 =cut
@@ -174,6 +160,34 @@ sub getVersionTagTemplateVars {
     }
 
     return $vars;
+}
+
+#----------------------------------------------------------------------
+
+=head2 www_getClipboard ( ) 
+
+Get the assets currently on the user's clipboard
+
+=cut
+
+sub www_getClipboard {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $user, $form ) = $session->quick(qw{ user form });
+
+    my $assets      = WebGUI::Asset->getRoot( $session )->getAssetsInClipboard(1);
+    my @assetInfo   = ();
+    for my $asset ( @{$assets} ) {
+        push @assetInfo, {
+            assetId         => $asset->getId,
+            url             => $asset->getUrl,
+            title           => $asset->menuTitle,
+            revisionDate    => $asset->revisionDate,
+            icon            => $asset->getIcon("small"),
+        };
+    }
+
+    return JSON->new->encode( \@assetInfo );
 }
 
 #----------------------------------------------------------------------
@@ -266,7 +280,6 @@ sub www_view {
     # Add vars for AdminBar
     $var->{adminPlugins} = $self->getAdminPluginTemplateVars;
     $var->{versionTags} = $self->getVersionTagTemplateVars;
-    #$var->{clipboardAssets} = $self->getClipboardTemplateVars;
     $var->{newContentTabs} = $self->getNewContentTemplateVars;
 
     # Add vars for current user
@@ -301,6 +314,7 @@ sub www_view {
     $style->setScript( $url->extras( 'yui/build/paginator/paginator-min.js ' ) );
     $style->setScript($url->extras('yui/build/animation/animation-min.js'));
     $style->setScript( $url->extras( 'yui/build/datasource/datasource-min.js ' ) );
+    $style->setScript( $url->extras( 'yui/build/connection/connection-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/datatable/datatable-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/container/container-min.js' ) );
     $style->setScript($url->extras('yui/build/tabview/tabview-min.js'));
@@ -339,6 +353,7 @@ __DATA__
     <!-- placeholder for clipboard -->
     <dt id="clipboard" class="a-m-t">Clipboard (i18n)</dt>
     <dd class="a-m-d"><div class="bd">
+        <div id="clipboardItems"></div>
     </div></dd>
     <!-- placeholder for asset helpers -->
     <dt id="assetHelpers" class="a-m-t">Asset Helpers (i18n)</dt>

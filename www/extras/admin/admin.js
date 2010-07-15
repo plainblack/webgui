@@ -200,13 +200,56 @@ WebGUI.Admin.prototype.updateAdminBar
 
     }
     else if ( id == "clipboard" ) {
-
+        admin.requestUpdateClipboard.call( admin );
     }
     else if ( id == "newContent" ) {
 
     }
     else if ( id == "versionTags" ) {
 
+    }
+};
+
+/**
+ * requestUpdateClipboard( )
+ * Request the new set of clipboard assets from the server
+ */
+WebGUI.Admin.prototype.requestUpdateClipboard
+= function ( ) {
+    var callback = {
+        success : function (o) {
+            var clipboard = YAHOO.lang.JSON.parse( o.responseText );
+            this.updateClipboard( clipboard );
+        },
+        failure : function (o) {
+
+        },
+        scope: this
+    };
+
+    var ajax = YAHOO.util.Connect.asyncRequest( 'GET', '?op=admin;method=getClipboard', callback );
+};
+
+/**
+ * updateClipboard( assets )
+ * Update the clipboard list with the given assets
+ */
+WebGUI.Admin.prototype.updateClipboard
+= function ( assets ) {
+    // Clear out the old clipboard
+    var div = document.getElementById( 'clipboardItems' );
+    while ( div.childNodes.length > 0 ) {
+        div.removeChild( div.childNodes[0] );
+    }
+
+    for ( var i = 0; i < assets.length; i++ ) {
+        var asset   = assets[i];
+        var a       = document.createElement('a');
+        var icon    = document.createElement('img');
+        icon.src    = asset.icon;
+        a.appendChild( icon );
+        a.appendChild( document.createTextNode( asset.title ) );
+        div.appendChild( a );
     }
 };
 
