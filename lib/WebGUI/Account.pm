@@ -2,7 +2,38 @@ package WebGUI::Account;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+#use Class::InsideOut qw{ :std };
+use Moose;
+
+has session => (
+    is       => 'ro',
+    required => 1,
+);
+
+has module => (
+    is       => 'ro',
+);
+
+has method => (
+    is       => 'rw',
+    default  => 'view',
+);
+
+has uid => (
+    is       => 'rw',
+    default  => 'view',
+);
+
+has bare => (
+    is       => 'rw',
+    default  => 0,
+);
+
+has store => (
+    is       => 'rw',
+    default  => sub { return {}; },
+);
+
 use WebGUI::Exception;
 use Carp qw(croak);
 use WebGUI::International;
@@ -36,8 +67,6 @@ Returns a reference to the current WebGUI::Session object.
 
 =cut
 
-readonly session => my %session;
-
 #-------------------------------------------------------------------
 
 =head2 module ()
@@ -46,8 +75,6 @@ Returns the string representation of the name of the last Account module called.
 
 =cut
 
-readonly module  => my %module;
-
 #-------------------------------------------------------------------
 
 =head2 method ()
@@ -55,8 +82,6 @@ readonly module  => my %module;
 Returns the string representation of the name of the last method called on the module().
 
 =cut
-
-public   method  => my %method;
 
 #-------------------------------------------------------------------
 
@@ -69,8 +94,6 @@ Returns the userId of the WebGUI::User who's account is being interacted with.
 Optionally set the userId. Normally this is never needed, but is provided for completeness.
 
 =cut
-
-public   uid     => my %uid;
 
 #-------------------------------------------------------------------
 
@@ -98,10 +121,6 @@ A hash reference of data to store.
 
 =cut
 
-public   store   => my %store;  #This is an all purpose hash to store stuff in: $self->store->{something} = "something"
-public   bare    => my %bare;   #This flag indicates that neither the layout nor style template should be applied
-                                #to the output of the method.  Think JSON/XML, etc.
-                                
 #-------------------------------------------------------------------
 
 =head2 appendCommonVars ( var )
@@ -418,31 +437,26 @@ The module being called
 
 =cut
 
-sub new {
-    my $class         = shift;
-    my $session       = shift;
-    my $module        = shift;
-
-    unless (ref $session eq 'WebGUI::Session') {
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my $properties;
+    if (ref $_[0] eq 'HASH') {
+        $properties = $_[0];
+    }
+    else {
+        $properties->{session} = shift;
+    }
+    if (!(blessed $properties->{session} && ref $properties->{session} eq 'WebGUI::Session')) {
         WebGUI::Error::InvalidObject->throw(
             expected =>"WebGUI::Session",
-            got      =>(ref $session),
+            got      =>(ref $properties->{session}),
             error    => q{Must provide a session variable}
         );
     }
 
-    my $self              = register $class;
-    my $id                = id $self;
-
-    $session { $id      } = $session;
-    $module  { $id      } = $module;
-    $store   { $id      } = {};
-    $method  { $id      } = "view";
-    $uid     { $id      } = undef;
-    $bare    { $id      } = 0;
-
-    return $self;
-}
+    return $class->$orig($properties);
+};
 
 #-------------------------------------------------------------------
 
@@ -530,26 +544,5 @@ sub showError {
     
     return $self->processTemplate($var,$templateId)
 }
-
-#-------------------------------------------------------------------
-
-=head2 store ( )
-
-This method returns an internal hash where you can store things for your Account Plugin.
-The store is private to your plugin, to each user's copy of the plugin, and only lasts as
-long as the session does.
-
-=cut
-
-#-------------------------------------------------------------------
-
-=head2 store ( )
-
-This method returns an internal hash where you can store things for your Account Plugin.
-The store is private to your plugin, to each user's copy of the plugin, and only lasts as
-long as the session does.
-
-=cut
-
 
 1;
