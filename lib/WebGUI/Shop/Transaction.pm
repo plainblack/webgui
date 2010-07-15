@@ -445,7 +445,7 @@ around BUILDARGS => sub {
     }
     my $argument2 = shift;
     if (!defined $argument2) {
-        WebGUI::Error::InvalidParam->throw( param=>$argument2, error=>"Need a vendorId.");
+        WebGUI::Error::InvalidParam->throw( param=>$argument2, error=>"Need a transactionId.");
     }
     if (ref $argument2 eq 'HASH') {
         ##Build a new one
