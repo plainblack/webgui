@@ -271,6 +271,11 @@ WebGUI.Admin.prototype.addPasteHandler
 = function ( elem, assetId ) {
     var self    = this;
     YAHOO.util.Event.on( elem, "click", function(){
+        var updateAfterPaste = function(){
+            this.requestUpdateClipboard();
+            this.afterNavigate.unsubscribe( updateAfterPaste );
+        };
+        self.afterNavigate.subscribe(updateAfterPaste, self );
         self.pasteAsset( assetId );
     }, self );
 };
