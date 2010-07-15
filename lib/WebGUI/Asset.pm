@@ -2567,12 +2567,17 @@ sub www_edit {
     $f->action( $self->getUrl );
 
     # TODO: Make this whole thing a template instead!
-    $self->session->style->setRawHeadTags( 
-        '<style type="text/css">
+    $self->session->style->setRawHeadTags(<<'ENDHTML'); 
+        <style type="text/css">
             label.formDescription { display: block; margin-top: 1em; font-weight: bold }
             .saveButtons { position: absolute; top: 3px; right: 5px; z-index: 9001; }
-        </style>'
-    );
+        </style>
+        <script type="text/javascript">
+            if ( window.parent && window.parent.admin ) {
+                window.parent.admin.adminBar.show("assetHelpers");
+            }
+        </script>
+ENDHTML
 
     return $self->session->style->process(
         '<div class="yui-skin-sam">' . $f->toHtml . '</div>',
