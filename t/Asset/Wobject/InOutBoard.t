@@ -145,7 +145,7 @@ cmp_bag(
             message        => 'work time',
             username       => 'red',
             department     => 'No Department',
-        },
+        }),
         ignore(), ignore(), ignore(), ignore(),
     ],
     'view: returns one entry for each user, entry is correct for user with status'
