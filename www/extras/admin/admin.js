@@ -269,6 +269,7 @@ WebGUI.Admin.prototype.addPasteHandler
 = function ( elem, assetId ) {
     var self    = this;
     YAHOO.util.Event.on( elem, "click", function(){
+        // Update clipboard after paste in case paste fails
         var updateAfterPaste = function(){
             this.requestUpdateClipboard();
             this.afterNavigate.unsubscribe( updateAfterPaste );
