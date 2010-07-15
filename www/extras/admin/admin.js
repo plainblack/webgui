@@ -29,7 +29,7 @@ WebGUI.Admin = function(cfg){
     var self = this;
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
-        self.adminBar       = new WebGUI.Admin.AdminBar( self.cfg.adminBarId );
+        self.adminBar       = new WebGUI.Admin.AdminBar( self.cfg.adminBarId, { expandMax : true } );
         self.adminBar.afterShow.subscribe( self.updateAdminBar, self );
         YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
         self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar" );
@@ -961,16 +961,20 @@ WebGUI.Admin.Tree.prototype.toggleRow = function ( child ) {
 };
 
 /****************************************************************************
- * WebGUI.Admin.AdminBar( id )
+ * WebGUI.Admin.AdminBar( id, cfg )
  * Initialize an adminBar with the given ID.
+ *
+ * Configuration:
+ *      expandMax:      If true, will always expand pane to maximum space
  *
  * Custom Events:
  *      afterShow:      Fired after a new pane is shown.
  *          args:       id  - The ID of the new pane shown
  */
 WebGUI.Admin.AdminBar
-= function ( id ) {
+= function ( id, cfg ) {
     this.id     = id;
+    this.cfg    = cfg || {};
     this.animDuration   = 0.25;
     this.dl     = document.getElementById( id );
     this.dt     = [];
@@ -1041,6 +1045,10 @@ WebGUI.Admin.AdminBar.prototype.getAnim
  */
 WebGUI.Admin.AdminBar.prototype.getExpandHeight
 = function ( elem ) {
+    if ( this.cfg.expandMax ) {
+        return this.maxHeight;
+    }
+
     var height  = this.getRealHeight( elem );
 
     // Make sure not more than maxHeight
