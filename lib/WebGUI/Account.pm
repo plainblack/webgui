@@ -2,7 +2,6 @@ package WebGUI::Account;
 
 use strict;
 
-#use Class::InsideOut qw{ :std };
 use Moose;
 
 has session => (
