@@ -76,6 +76,19 @@ sub updateGroupGroupingsTable {
     my ($field,$stmt) = $sth->array;
     $sth->finish;
     unless ($stmt =~ m/PRIMARY KEY/i) {
+        # clean up duplicates that would prevent applying a primary key
+        my $rs = $session->db->read(q{ 
+            select count(*) as num, groupId, inGroup
+            from groupGroupings
+            group by groupId, inGroup 
+            having num > 1
+        });
+        my $dupSth = $session->db->prepare("delete from groupGroupings where groupId = ? and inGroup = ? limit ?");
+        while (my ($num, $groupId, $inGroup) = $rs->array) {
+            $dupSth->execute([$groupId, $inGroup, $num-1]);
+        }
+        $dupSth->finish;
+        # add the primary key 
         $session->db->write("alter table groupGroupings add primary key (groupId,inGroup)");
     }
     unless ($stmt =~ m/KEY `inGroup`/i) {
