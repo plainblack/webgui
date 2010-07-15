@@ -982,6 +982,10 @@ WebGUI.Admin.AdminBar
     this.maxHeight  = YAHOO.util.Dom.getViewportHeight() - this.dtHeight;
 };
 
+/**
+ * addClickHandler( dt, dd )
+ * Add the correct click handler on the dt to show the dd. 
+ */
 WebGUI.Admin.AdminBar.prototype.addClickHandler
 = function ( dt, dd ) {
     var self = this;
