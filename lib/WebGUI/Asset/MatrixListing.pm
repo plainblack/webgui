@@ -233,7 +233,7 @@ sub getEditForm {
         -label          =>$i18n->get("product name label"),
         -hoverHelp      =>$i18n->get('product name description'),
         -value          =>$self->title,
-        :help grep
+    );
 
     $form->image(
         -name           =>'screenshots',
