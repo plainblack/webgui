@@ -122,7 +122,7 @@ Returns a CHI object, configured according to the settings in the config file.
 sub cache {
     my $self = shift;
     unless (exists $self->{_cache}) {
-        my $cacheConf    = $self->config->get('cache');
+        my $cacheConf    = $self->config->get('cache') || { driver => "Memory", global => 1 };
 
         # Default values
         my $resolveConf = sub {
