@@ -1,8 +1,178 @@
 package WebGUI::Shop::TransactionItem;
 
 use strict;
-use Class::InsideOut qw{ :std };
+
+use Scalar::Util qw/blessed/;
+use Moose;
+use WebGUI::Definition;
 use JSON qw{ to_json };
+
+property assetId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property configuredTitle => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property options => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+    default    => sub { return {}; },
+    traits     => ['Hash', 'WebGUI::Definition::Meta::Property::Serialize',],
+    isa        => 'WebGUI::Type::JSONHash',
+    coerce     => 1,
+);
+
+property quantity => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 1,
+);
+property price => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 0,
+);
+property vendorId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 'defaultvendor000000000',
+);
+property vendorPayoutAmount => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 0.00,
+);
+property vendorPayoutStatus => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 'NotPaid',
+);
+property shippingTrackingNumber => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property orderStatus => (
+    is => 'rw',
+    noFormPost => 1,
+    default => 'NotShipped',
+);
+property shippingAddressId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingName => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingAddress1 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingAddress2 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingAddress3 => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingCity => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingState => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingCountry => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingCode => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property shippingPhoneNumber => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property taxRate => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property taxConfiguration => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+
+property lastUpdated => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+
+has [ qw/transaction itemId/ ] => (
+    is       => 'ro',
+    required => 1,
+);
+
+has item => (
+    is      => 'rw',
+    trigger => \&_mine_item,
+);
+
+sub _mine_item {
+    my ($self, $item) = @_;
+    my $sku = $item->getSku;
+    $self->options($sku->getOptions);
+    $self->assetId($sku->getId);
+    $self->price($sku->getPrice);
+    $self->configuredTitle($item->get('configuredTitle'));
+    $self->quantity($item->get('quantity'));
+    $self->vendorId($sku->getVendorId);
+    $self->vendorPayoutAmount(sprintf '%.2f', $sku->getVendorPayout * $item->get('quantity'));
+
+    my $address = $item->getShippingAddress;
+    $self->shippingAddressId($address->getId);
+    $self->shippingName($address->name);
+    $self->shippingAddress1($address->address1);
+    $self->shippingAddress2($address->address2);
+    $self->shippingAddress3($address->address3);
+    $self->shippingCity($address->city);
+    $self->shippingState($address->state);
+    $self->shippingCountry($address->country);
+    $self->shippingCode($address->code);
+    $self->shippingPhoneNumber($address->phoneNumber);
+
+    # Store tax rate for product
+    my $transaction = $self->transaction;
+    my $taxDriver = WebGUI::Shop::Tax->getDriver( $transaction->session );
+    $self->taxRate($taxDriver->getTaxRate( $sku, $address ));
+    $self->taxConfiguration(to_json( $taxDriver->getTransactionTaxData( $sku, $address ) || '{}' ));
+
+    if (!$sku->isShippingRequired && $transaction->isSuccessful) {
+        $self->orderStatus('Shipped');
+    }
+}
+
 use WebGUI::DateTime;
 use WebGUI::Exception::Shop;
 use WebGUI::Shop::Transaction;
@@ -26,41 +196,113 @@ Each transaction item represents a sku that was purchased or attempted to be pur
 
 These subroutines are available from this package:
 
-=cut
-
-readonly transaction => my %transaction;
-private properties => my %properties;
-
-
 #-------------------------------------------------------------------
 
-=head2 create ( transaction, properties)
+=head2 new ( transaction, itemId )
 
-Constructor. Adds an item to the transaction. Returns a reference to the item.
+Constructor.  Instanciates a transaction item based upon itemId.
+
+=head2 new ( properties )
+
+Constructor.  Builds a new transaction item object.  The properties of the newly created object are not persisted
+to the database.  The write method must be called on the object to do that.
+
+=head2 new ( transaction, properties )
+
+Constructor.  Builds a new transaction item object.  This form of new is
+deprecated, and only exists for backwards compatibility with the old "create"
+method.  The properties of the newly created object are not persisted to
+the database.  The write method must be called on the object to do that.
 
 =head3 transaction
 
-A reference to WebGUI::Shop::Transaction object.
+A reference to the current transaction object.
+
+=head3 itemId
+
+The unique id of the item to instanciate.
 
 =head3 properties
 
-See update() for details.
+A hash reference that contains one of the following:
+
+=head4 item
+
+A reference to a WebGUI::Shop::CartItem. Alternatively you can manually pass in any of the following
+fields that would be created automatically by this object: assetId configuredTitle options shippingAddressId
+shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState shippingCountry
+shippingCode shippingPhoneNumber quantity price vendorId
+
+=head4 shippingTrackingNumber
+
+A tracking number that is used by the shipping method for this transaction.
+
+=head4 orderStatus
+
+The status of this item. The default is 'NotShipped'. Other statuses include: Cancelled, Backordered, Shipped
 
 =cut
 
-sub create {
-    my ($class, $transaction, $properties) = @_;
-    unless (defined $transaction && $transaction->isa("WebGUI::Shop::Transaction")) {
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if (ref $_[0] eq 'HASH') {
+        my $properties = $_[0];
+        my $transaction = $properties->{transaction};
+        if (! (blessed $transaction && $transaction->isa("WebGUI::Shop::Transaction"))) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Transaction", got=>(ref $transaction), error=>"Need a transaction.");
+        }
+        my ($itemId)                 = $class->_init($transaction);
+        $properties->{itemId}        = $itemId;
+        $properties->{transactionId} = $transaction->getId;
+        return $class->$orig($properties);
+    }
+    my $transaction = shift;
+    if (! (blessed $transaction && $transaction->isa("WebGUI::Shop::Transaction"))) {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Transaction", got=>(ref $transaction), error=>"Need a transaction.");
     }
-    unless (defined $properties && ref $properties eq "HASH") {
-        WebGUI::Error::InvalidParam->throw(param=>$properties, error=>"Need a properties hash reference.");
+    my $argument2 = shift;
+    if (!defined $argument2) {
+        WebGUI::Error::InvalidParam->throw( param=>$argument2, error=>"Need a itemId.");
     }
-    my $itemId = $transaction->session->id->generate;
-    $transaction->session->db->write('insert into transactionItem (itemId, transactionId) values (?,?)', [$itemId, $transaction->getId]);
-    my $self = $class->new($transaction, $itemId);
-    $self->update($properties);
-    return $self;
+    if (ref $argument2 eq 'HASH') {
+        ##Build a new one
+        my ($itemId) = $class->_init($transaction);
+        my $properties                = $argument2;
+        $properties->{transaction}    = $transaction;
+        $properties->{itemId}         = $itemId;
+        return $class->$orig($properties);
+    }
+    else {
+        ##Look up one in the db
+        my $item = $transaction->session->db->quickHashRef("select * from transactionItem where itemId=?", [$argument2]);
+        if ($item->{transactionId} eq "") {
+            WebGUI::Error::ObjectNotFound->throw(error=>"Item not found", id=>$argument2);
+        }
+        if ($item->{transactionId} ne $transaction->getId) {
+            WebGUI::Error::ObjectNotFound->throw(error=>"Item not in this transaction.", id=>$argument2);
+        }
+        $item->{transaction} = $transaction;
+        return $class->$orig($item);
+    }
+};
+
+#-------------------------------------------------------------------
+
+=head2 _init ( session )
+
+Builds a stub of object information in the database, and returns the newly created
+transactionId, and the dateOfPurchase fields so the object can be initialized correctly.
+
+=cut
+
+sub _init {
+    my $class       = shift;
+    my $transaction = shift;
+    my $session     = $transaction->session;
+    my $itemId      = $session->id->generate;
+    $session->db->write("insert into transactionItem (itemId, transactionId) values (?, ?)",[$itemId, $transaction->getId]);
+    return ($itemId);
 }
 
 #-------------------------------------------------------------------
@@ -73,38 +315,8 @@ Removes this item from the transaction.
 
 sub delete {
     my $self = shift;
-    $self->transaction->session->db->deleteRow("transactionItem","itemId",$self->getId);
+    $self->transaction->session->db->deleteRow("transactionItem", "itemId", $self->getId);
     return undef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 get ( [ property ] )
-
-Returns a duplicated hash reference of this object’s data.
-
-=head3 property
-
-Any field − returns the value of a field rather than the hash reference.
-
-=cut
-
-sub get {
-    my ($self, $name) = @_;
-    if (defined $name) {
-        if ($name eq "options") {
-            my $options = $properties{id $self}{$name};
-            if ($options eq "") {
-                return {};
-            }
-            else {
-                return JSON->new->decode($properties{id $self}{$name});
-            }
-        }
-        return $properties{id $self}{$name};
-    }
-    my %copyOfHashRef = %{$properties{id $self}};
-    return \%copyOfHashRef;
 }
 
 #-------------------------------------------------------------------
@@ -117,7 +329,7 @@ Returns the unique id of this item.
 
 sub getId {
     my $self = shift;
-    return $self->get("itemId");
+    return $self->itemId;
 }
 
 
@@ -131,12 +343,12 @@ Returns an instanciated WebGUI::Asset::Sku object for this item.
 
 sub getSku {
     my ($self) = @_;
-    my $asset = eval { WebGUI::Asset->newById($self->transaction->session, $self->get("assetId")); };
+    my $asset = eval { WebGUI::Asset->newById($self->transaction->session, $self->assetId); };
     if (Exception::Class->caught()) {
-        WebGUI::Error::ObjectNotFound->throw(error=>'SKU Asset '.$self->get('assetId').' could not be instanciated. Perhaps it no longer exists.', id=>$self->get('assetId'));
+        WebGUI::Error::ObjectNotFound->throw(error=>'SKU Asset '.$self->assetId.' could not be instanciated. Perhaps it no longer exists.', id=>$self->assetId);
         return undef;
     }
-    $asset->applyOptions($self->get("options"));
+    $asset->applyOptions($self->options);
     return $asset;
 }
 
@@ -150,48 +362,10 @@ Returns the money from this item to the user in the form of in-store credit.
 
 sub issueCredit {
     my $self = shift;
-    my $credit = WebGUI::Shop::Credit->new($self->transaction->session, $self->transaction->get('userId'));
-    $credit->adjust(($self->get('price') * $self->get('quantity')), "Issued credit on sku ".$self->get('assetId')." for transaction item ".$self->getId." on transaction ".$self->transaction->getId);
+    my $credit = WebGUI::Shop::Credit->new($self->transaction->session, $self->transaction->userId);
+    $credit->adjust(($self->price * $self->quantity), "Issued credit on sku ".$self->assetId." for transaction item ".$self->getId." on transaction ".$self->transaction->getId);
     $self->getSku->onRefund($self);
     $self->update({orderStatus=>'Cancelled'});
-}
-
-#-------------------------------------------------------------------
-
-=head2 new ( transaction, itemId )
-
-Constructor.  Instanciates a transaction item based upon itemId.
-
-=head3 transaction
-
-A reference to the current transaction
-
-=head3 itemId
-
-The unique id of the item to instanciate.
-
-=cut
-
-sub new {
-    my ($class, $transaction, $itemId) = @_;
-    unless (defined $transaction && $transaction->isa("WebGUI::Shop::Transaction")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Transaction", got=>(ref $transaction), error=>"Need a transaction.");
-    }
-    unless (defined $itemId) {
-        WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
-    }
-    my $item = $transaction->session->db->quickHashRef('select * from transactionItem where itemId=?', [$itemId]);
-    if ($item->{itemId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"Item not found.", id=>$itemId);
-    }
-    if ($item->{transactionId} ne $transaction->getId) {
-        WebGUI::Error::ObjectNotFound->throw(error=>"Item not in this transaction.", id=>$itemId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $transaction{ $id }   = $transaction;
-    $properties{ $id } = $item;
-    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -236,82 +410,21 @@ Returns a reference to the transaction object.
 
 #-------------------------------------------------------------------
 
-=head2 update ( properties )
+=head2 write ( )
 
-Sets properties of the transaction item.
-
-=head3 properties
-
-A hash reference that contains one of the following:
-
-=head4 item
-
-A reference to a WebGUI::Shop::CartItem. Alternatively you can manually pass in any of the following
-fields that would be created automatically by this object: assetId configuredTitle options shippingAddressId
-shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState shippingCountry
-shippingCode shippingPhoneNumber quantity price vendorId
-
-=head4 shippingTrackingNumber
-
-A tracking number that is used by the shipping method for this transaction.
-
-=head4 orderStatus
-
-The status of this item. The default is 'NotShipped'. Other statuses include: Cancelled, Backordered, Shipped
+Stores the object's properties to the database.
 
 =cut
 
-sub update {
-    my ($self, $newProperties) = @_;
-    my $id          = id $self;
+sub write {
+    my ($self) = @_;
     my $transaction = $self->transaction;
     my $session     = $transaction->session;
-    my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
-
-    if (exists $newProperties->{item}) {
-        my $item = $newProperties->{ item };
-        my $sku = $item->getSku;
-        $newProperties->{ options               } = $sku->getOptions;
-        $newProperties->{ assetId               } = $sku->getId;       
-        $newProperties->{ price                 } = $sku->getPrice;       
-        $newProperties->{ configuredTitle       } = $item->get('configuredTitle');
-        $newProperties->{ quantity              } = $item->get('quantity');
-        $newProperties->{ vendorId              } = $sku->getVendorId;
-        $newProperties->{ vendorPayoutAmount    } = sprintf '%.2f', $sku->getVendorPayout * $item->get('quantity');
-
-        my $address = $item->getShippingAddress;
-        $newProperties->{ shippingAddressId     } = $address->getId;
-        $newProperties->{ shippingAddressName   } = $address->get('name');
-        $newProperties->{ shippingAddress1      } = $address->get('address1');
-        $newProperties->{ shippingAddress2      } = $address->get('address2');
-        $newProperties->{ shippingAddress3      } = $address->get('address3');
-        $newProperties->{ shippingCity          } = $address->get('city');
-        $newProperties->{ shippingState         } = $address->get('state');
-        $newProperties->{ shippingCountry       } = $address->get('country');
-        $newProperties->{ shippingCode          } = $address->get('code');
-        $newProperties->{ shippingPhoneNumber   } = $address->get('phoneNumber');
-
-        # Store tax rate for product
-        $newProperties->{ taxRate               } = $taxDriver->getTaxRate( $sku, $address );
-        $newProperties->{ taxConfiguration      } = 
-            to_json( $taxDriver->getTransactionTaxData( $sku, $address ) || '{}' );
-
-        if (!$sku->isShippingRequired && $transaction->get('isSuccessful')) {
-            $newProperties->{orderStatus} = 'Shipped';
-        }
-    }
-    my @fields = (qw(assetId configuredTitle options shippingAddressId shippingTrackingNumber orderStatus
-        shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState
-        shippingCountry shippingCode shippingPhoneNumber quantity price vendorId 
-        vendorPayoutStatus vendorPayoutAmount taxRate taxConfiguration));
-    foreach my $field (@fields) {
-        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
-    }
-    if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
-        $properties{$id}{options} = JSON->new->encode($newProperties->{options});
-    }
-    $properties{$id}{lastUpdated} = WebGUI::DateTime->new($session,time())->toDatabase;
-    $self->transaction->session->db->setRow("transactionItem","itemId",$properties{$id});
+    $self->lastUpdated(WebGUI::DateTime->new($session,time())->toDatabase);
+    my %properties       = %{ $self->get() };
+    $properties{options} = JSON->new->encode($properties{options});
+    delete @properties{qw/transaction item/};
+    $session->db->setRow("transactionItem", "itemId", \%properties);
 }
 
 

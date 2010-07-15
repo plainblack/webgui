@@ -501,7 +501,8 @@ A reference to a subclass of WebGUI::Shop::CartItem.
 
 sub addItem {
     my ($self, $cartItem) = @_;
-    my $item = WebGUI::Shop::TransactionItem->create( $self, $cartItem);
+    my $item = WebGUI::Shop::TransactionItem->new( $self, $cartItem);
+    $item->write;
     return $item;
 }
 
