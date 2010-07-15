@@ -37,6 +37,7 @@ WebGUI.Admin = function(cfg){
         YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
         self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar" );
         self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId );
+        self.afterNavigate.subscribe( self.locationBar.afterNavigate, self.locationBar );
         self.tree           = new WebGUI.Admin.Tree();
         self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
         // Keep track of View and Tree tabs
@@ -170,21 +171,18 @@ WebGUI.Admin.prototype.makeGotoAsset
  */
 WebGUI.Admin.prototype.navigate
 = function ( assetDef ) {
-    // Don't do the same asset twice
-    if ( this.currentAssetDef && this.currentAssetDef.assetId == assetDef.assetId ) {
-        // But still fire the event
-        this.afterNavigate.fire( assetDef );
-        return;
-    }
-
     // Defer until the locationBar is created
     if ( !this.locationBar ) {
         var self = this; // Scope correction
         return setTimeout( function(){ self.navigate( assetDef ) }, 1000 );
     }
 
-    // Update the location bar
-    this.locationBar.navigate( assetDef );
+    // Don't do the same asset twice
+    if ( this.currentAssetDef && this.currentAssetDef.assetId == assetDef.assetId ) {
+        // But still fire the event
+        this.afterNavigate.fire( assetDef );
+        return;
+    }
 
     if ( !this.currentAssetDef || this.currentAssetDef.assetId != assetDef.assetId ) {
         this.currentAssetDef = assetDef;
@@ -474,18 +472,23 @@ WebGUI.Admin.LocationBar.prototype.inputFocus
 };
 
 /**
- * navigate( assetDef )
- * Tell the locationbar we've navigated to a new asset. 
+ * afterNavigate( type, args, me )
+ * Update our location if necessary
+ * Context is the WebGUI.Admin object.
+ * Args is array:
+ *      assetDef        - the new current asset
  */
-WebGUI.Admin.LocationBar.prototype.navigate
-= function ( assetDef ) {
+WebGUI.Admin.LocationBar.prototype.afterNavigate
+= function ( type, args, me ) {
+    var assetDef = args[0];
+
     // Always update location bar
-    this.setTitle( assetDef.title );
-    this.setUrl( assetDef.url );
+    me.setTitle( assetDef.title );
+    me.setUrl( assetDef.url );
 
     // Don't do the same asset twice
-    if ( this.currentAssetDef && this.currentAssetDef.assetId != assetDef.assetId ) {
-        this.addBackAsset( this.currentAssetDef );
+    if ( me.currentAssetDef && me.currentAssetDef.assetId != assetDef.assetId ) {
+        me.addBackAsset( me.currentAssetDef );
         // We navigated, so destroy the forward queue
         //this.forwardAssetDefs = [];
         //this.btnForward.getMenu().clearItems();
@@ -494,7 +497,7 @@ WebGUI.Admin.LocationBar.prototype.navigate
     }
 
     // Current asset is now...
-    this.currentAssetDef = assetDef;
+    me.currentAssetDef = assetDef;
 
     return;
 };
