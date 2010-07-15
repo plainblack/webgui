@@ -251,7 +251,30 @@ WebGUI.Admin.prototype.updateClipboard
         a.appendChild( icon );
         a.appendChild( document.createTextNode( asset.title ) );
         div.appendChild( a );
+        this.addPasteHandler( a, asset.assetId );
     }
+};
+
+/**
+ * addPasteHandler( elem, assetId )
+ * Add an onclick handler to paste an asset.
+ */
+WebGUI.Admin.prototype.addPasteHandler
+= function ( elem, assetId ) {
+    var self    = this;
+    YAHOO.util.Event.on( elem, "click", function(){
+        self.pasteAsset( assetId );
+    }, self );
+};
+
+/**
+ * pasteAsset( id )
+ * Paste an asset and update the clipboard
+ */
+WebGUI.Admin.prototype.pasteAsset
+= function ( id ) {
+    var url = appendToUrl( this.currentAssetDef.url, 'func=paste;assetId=' + id );
+    this.gotoAsset( url );
 };
 
 /****************************************************************************
