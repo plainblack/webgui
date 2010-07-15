@@ -452,14 +452,13 @@ sub addMissing {
 	my $self = shift;
 	my $assetUrl = shift;
 	return undef unless ($self->session->var->isAdminOn);
-	my $ac = $self->getAdminConsole;
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $output = $i18n->get("missing page query");
 	$output .= '<ul>
 			<li><a href="'.$self->getUrl("func=add;class=WebGUI::Asset::Wobject::Layout;url=".$assetUrl).'">'.$i18n->get("add the missing page").'</a></li>
 			<li><a href="'.$self->getUrl.'">'.$i18n->get("493","WebGUI").'</a></li>
 			</ul>';
-	return $ac->render($output);
+	return $output;
 }
 
 #-------------------------------------------------------------------
