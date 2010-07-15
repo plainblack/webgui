@@ -260,6 +260,8 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
             title       => $session->asset->getTitle,
             url         => $session->asset->getUrl,
             icon        => $session->asset->getIcon(1),
+            type        => $session->asset->assetName,
+            helpers     => $session->asset->getHelpers,
         };
         $var{'head.tags'} .= sprintf <<'ADMINJS', JSON->new->encode( $assetDef );
 if ( window.parent && window.parent.admin ) {

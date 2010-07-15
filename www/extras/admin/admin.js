@@ -187,6 +187,7 @@ WebGUI.Admin.prototype.navigate
     if ( !this.currentAssetDef || this.currentAssetDef.assetId != assetDef.assetId ) {
         this.currentAssetDef = assetDef;
         this.treeDirty = 1;
+        this.updateAssetHelpers( assetDef );
     }
 
     // Fire event
@@ -288,6 +289,48 @@ WebGUI.Admin.prototype.pasteAsset
     var url = appendToUrl( this.currentAssetDef.url, 'func=paste;assetId=' + id );
     this.gotoAsset( url );
 };
+
+/**
+ * updateAssetHelpers( assetDef )
+ * Update the asset helpers. assetDef must contain:
+ *      helper      - An arrayref of hashrefs of helper definitions
+ *      icon        - The icon of the current asset
+ *      type        - The type of the current asset
+ */
+WebGUI.Admin.prototype.updateAssetHelpers
+= function ( assetDef ) {
+    var typeEl  = document.getElementById( 'helper_asset_name' );
+    typeEl.style.backgroundImage = assetDef.icon;
+    typeEl.innerHTML = assetDef.type;
+
+    // Clear old helpers
+    var helperEl    = document.getElementById( 'helper_list' );
+    while ( helperEl.childNodes.length > 0 ) {
+        helperEl.removeChild( helperEl.childNodes[0] );
+    }
+
+    // Add new ones
+    for ( var i = 0; i < assetDef.helpers.length; i++ ) {
+        var helper  = assetDef.helpers[i];
+        var li      = document.createElement('li');
+        li.appendChild( document.createTextNode( helper.label ) );
+        this.addHelperHandler( li, helper );
+        helperEl.appendChild( li );
+    }
+};
+
+/**
+ * addHelperHandler( elem, helper )
+ * Add the click handler to activate the given helper
+ */
+WebGUI.Admin.prototype.addHelperHandler
+= function ( elem, helper ) {
+    var self = this;
+    if ( helper.url ) {
+        YAHOO.util.Event.on( elem, "click", function(){ self.gotoAsset( helper.url ) }, self, true );
+    }
+};
+
 
 /****************************************************************************
  *  WebGUI.Admin.LocationBar
