@@ -30,6 +30,7 @@ WebGUI.Admin = function(cfg){
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
         self.adminBar       = new WebGUI.Admin.AdminBar( self.cfg.adminBarId );
+        self.adminBar.afterShow.subscribe( self.updateAdminBar, self );
         YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
         self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar" );
         self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId );
@@ -183,6 +184,29 @@ WebGUI.Admin.prototype.navigate
     if ( !this.currentAssetDef || this.currentAssetDef.assetId != assetDef.assetId ) {
         this.currentAssetDef = assetDef;
         this.treeDirty = 1;
+    }
+};
+
+/**
+ * updateAdminBar( type, args, admin )
+ * Update the AdminBar. args is an array containing the id of the AdminBar 
+ * pane being shown.
+ */
+WebGUI.Admin.prototype.updateAdminBar
+= function ( type, args, admin ) {
+    // "this" is the AdminBar
+    var id  = args[0];
+    if ( id == "assetHelpers" ) {
+
+    }
+    else if ( id == "clipboard" ) {
+
+    }
+    else if ( id == "newContent" ) {
+
+    }
+    else if ( id == "versionTags" ) {
+
     }
 };
 
@@ -939,6 +963,10 @@ WebGUI.Admin.Tree.prototype.toggleRow = function ( child ) {
 /****************************************************************************
  * WebGUI.Admin.AdminBar( id )
  * Initialize an adminBar with the given ID.
+ *
+ * Custom Events:
+ *      afterShow:      Fired after a new pane is shown.
+ *          args:       id  - The ID of the new pane shown
  */
 WebGUI.Admin.AdminBar
 = function ( id ) {
@@ -980,6 +1008,9 @@ WebGUI.Admin.AdminBar
     // Precalculate dtHeight and maxHeight
     this.dtHeight   = this.getRealHeight( this.dt[0] ) * this.dt.length;
     this.maxHeight  = YAHOO.util.Dom.getViewportHeight() - this.dtHeight;
+
+    // Add custom event when showing an AdminBar pane
+    this.afterShow  = new YAHOO.util.CustomEvent("afterShow", this);
 };
 
 /**
@@ -1096,6 +1127,8 @@ WebGUI.Admin.AdminBar.prototype.show
     dd.style.display = "block";
     dd.anim.animate();
     this.currentId = id;
+
+    this.afterShow.fire( id );
 
     // TODO: If we're nested inside another accordion-menu, fix 
     // the parent's height as we fix our own to avoid having to set
