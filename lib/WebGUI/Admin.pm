@@ -175,7 +175,9 @@ sub www_getClipboard {
     my $session = $self->session;
     my ( $user, $form ) = $session->quick(qw{ user form });
 
-    my $assets      = WebGUI::Asset->getRoot( $session )->getAssetsInClipboard(1);
+    my $userOnly = !$form->get('all');
+
+    my $assets      = WebGUI::Asset->getRoot( $session )->getAssetsInClipboard( $userOnly );
     my @assetInfo   = ();
     for my $asset ( @{$assets} ) {
         push @assetInfo, {
@@ -353,6 +355,8 @@ __DATA__
     <!-- placeholder for clipboard -->
     <dt id="clipboard" class="a-m-t">Clipboard (i18n)</dt>
     <dd class="a-m-d"><div class="bd">
+        <input type="checkbox" id="clipboardShowAll" />
+        <label for="clipboardShowAll" id="clipboardShowAllLabel">Show All (i18n)</label>
         <div id="clipboardItems"></div>
     </div></dd>
     <!-- placeholder for asset helpers -->

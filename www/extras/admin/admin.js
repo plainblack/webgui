@@ -227,7 +227,8 @@ WebGUI.Admin.prototype.requestUpdateClipboard
         scope: this
     };
 
-    var ajax = YAHOO.util.Connect.asyncRequest( 'GET', '?op=admin;method=getClipboard', callback );
+    var showAll = document.getElementById( 'clipboardShowAll' ).checked ? ";all=1" : ";all=0";
+    var ajax = YAHOO.util.Connect.asyncRequest( 'GET', '?op=admin;method=getClipboard' + showAll, callback );
 };
 
 /**
