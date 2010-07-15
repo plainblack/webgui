@@ -217,13 +217,3 @@ cmp_bag(
 #######################################################################
 
 done_testing();
-<<<<<<< HEAD
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    defined $newDriver and $newDriver->delete;
-    defined $newDriver and $anotherDriver->delete;
-}
-=======
->>>>>>> upstream/WebGUI8
