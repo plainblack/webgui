@@ -25,6 +25,9 @@ WebGUI.Admin = function(cfg){
         this.cfg.adminBarId = "adminBar";
     }
 
+    // Custom events
+    this.afterNavigate = new YAHOO.util.CustomEvent( "afterNavigate", this );
+
     // Private methods
     var self = this;
     // Initialize these things AFTER the i18n is fetched
@@ -169,6 +172,8 @@ WebGUI.Admin.prototype.navigate
 = function ( assetDef ) {
     // Don't do the same asset twice
     if ( this.currentAssetDef && this.currentAssetDef.assetId == assetDef.assetId ) {
+        // But still fire the event
+        this.afterNavigate.fire( assetDef );
         return;
     }
 
@@ -185,6 +190,9 @@ WebGUI.Admin.prototype.navigate
         this.currentAssetDef = assetDef;
         this.treeDirty = 1;
     }
+
+    // Fire event
+    this.afterNavigate.fire( assetDef );
 };
 
 /**
