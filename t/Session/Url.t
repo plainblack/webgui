@@ -28,7 +28,7 @@ my @getRefererUrlTests = (
 		comment => 'getRefererUrl returns the url minus the gateway',
 	},
 	{
-		input => 'http://www.domain.com/myUrl.html?op=switchAdminOn',
+		input => 'http://www.domain.com/myUrl.html?op=admin',
 		output => 'myUrl.html',
 		comment => 'getRefererUrl returns the url minus the gateway',
 	},
@@ -50,7 +50,7 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-plan tests => 82 + scalar(@getRefererUrlTests);
+plan tests => 83 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 my $request = $session->request;
