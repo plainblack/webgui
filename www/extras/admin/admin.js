@@ -300,7 +300,7 @@ WebGUI.Admin.prototype.pasteAsset
 WebGUI.Admin.prototype.updateAssetHelpers
 = function ( assetDef ) {
     var typeEl  = document.getElementById( 'helper_asset_name' );
-    typeEl.style.backgroundImage = assetDef.icon;
+    typeEl.style.backgroundImage = 'url(' + assetDef.icon + ')';
     typeEl.innerHTML = assetDef.type;
 
     // Clear old helpers

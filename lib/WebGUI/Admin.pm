@@ -361,11 +361,11 @@ __DATA__
     </div></dd>
     <!-- placeholder for asset helpers -->
     <dt id="assetHelpers" class="a-m-t">Asset Helpers (i18n)</dt>
-    <dd class="a-m-d"><div class="bd">
+    <dd id="assetHelpers_pane" class="a-m-d"><div class="bd">
         <h1 id="helper_asset_name">Asset</h1>
         <ul id="helper_list">
         </ul>
-        <h2>History (i18n)</h2>
+        <h2 style="background-image: url(^Extras(icon/clock.png););">History (i18n)</h2>
         <ul id="history_list">
         </ul>
     </div></dd>

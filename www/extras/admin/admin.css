@@ -104,3 +104,19 @@ img.icon {
 a:link {
     text-decoration: none;
 }
+
+#helper_asset_name {
+    font-size:          14pt;
+    margin-left:        5px;
+    padding-left:       20px;
+    background-repeat:  no-repeat;
+    background-position: 0 50%;
+}
+
+#assetHelpers_pane h2 {
+    font-size:          14pt;
+    margin-left:        5px;
+    padding-left:       20px;
+    background-repeat:  no-repeat;
+    background-position: 0 50%;
+}
