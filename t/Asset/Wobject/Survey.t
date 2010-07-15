@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 48;
+plan tests => 47;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -268,50 +268,6 @@ like($storage->getFileContentsAsScalar($filename), qr{
 }xs, 'Generated graph looks roughly okay');
 
 }
-
-$survey->getAdminConsole();
-my $adminConsole = $survey->getAdminConsole();
-cmp_deeply(
-    $adminConsole->{_submenuItem},
-    [
-        {
-          'extras' => undef,
-          'url' => re('func=edit$'),
-          'label' => 'Edit'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=editSurvey$'),
-          'label' => 'Edit Survey'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=takeSurvey$'),
-          'label' => 'Take Survey'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=graph$'),
-          'label' => 'Visualize'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=editTestSuite$'),
-          'label' => 'Test Suite'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=runTests$'),
-          'label' => 'Run All Tests'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=runTests;format=tap$'),
-          'label' => 'Run All Tests (TAP)'
-        }
-    ],
-    "Admin console submenu",
-);
 
 ####################################################
 #

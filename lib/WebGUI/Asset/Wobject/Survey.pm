@@ -659,8 +659,7 @@ sub www_editSurvey {
 Extends the base class to add in survey controls like edit, view graph, run tests, and
 test suite.
 
-=cut
-
+# TODO: Convert to Asset Helper
 sub getAdminConsole {
     my $self = shift;
     my $ac = $self->SUPER::getAdminConsole;
