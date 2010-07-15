@@ -276,7 +276,7 @@ override getEditForm => sub {
             value           => $self->startDate,
     );
 	return $form;
-}
+};
 
 
 #-------------------------------------------------------------------
