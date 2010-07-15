@@ -344,7 +344,8 @@ Constructor.  Instanciates a transaction from the database based upon a transact
 
 =head2 new ( properties )
 
-Constructor.  Builds a new transaction object.
+Constructor.  Builds a new transaction object.  The properties of the newly created object are not persisted to
+the database.  The write method must be called on the object to do that.
 
 =head2 new ( session, properties )
 
