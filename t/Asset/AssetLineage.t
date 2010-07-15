@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 107; # increment this value for each test you create
+use Test::More tests => 109; # increment this value for each test you create
 use Test::Deep;
 use Test::Exception;
 use Data::Dumper;
