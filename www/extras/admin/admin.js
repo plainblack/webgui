@@ -38,6 +38,10 @@ WebGUI.Admin = function(cfg){
         self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar" );
         self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId );
         self.afterNavigate.subscribe( self.locationBar.afterNavigate, self.locationBar );
+        if ( self.currentAssetDef ) {
+            self.locationBar.navigate( self.currentAssetDef );
+        }
+
         self.tree           = new WebGUI.Admin.Tree();
         self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
         // Keep track of View and Tree tabs
@@ -171,12 +175,6 @@ WebGUI.Admin.prototype.makeGotoAsset
  */
 WebGUI.Admin.prototype.navigate
 = function ( assetDef ) {
-    // Defer until the locationBar is created
-    if ( !this.locationBar ) {
-        var self = this; // Scope correction
-        return setTimeout( function(){ self.navigate( assetDef ) }, 1000 );
-    }
-
     // Don't do the same asset twice
     if ( this.currentAssetDef && this.currentAssetDef.assetId == assetDef.assetId ) {
         // But still fire the event
