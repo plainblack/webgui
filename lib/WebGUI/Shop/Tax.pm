@@ -16,7 +16,7 @@ package WebGUI::Shop::Tax;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+use Moose;
 use WebGUI::Exception::Shop;
 use WebGUI::Shop::Admin;
 use WebGUI::Pluggable;
@@ -44,7 +44,23 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
+has session => (
+    is              => 'ro',
+    required        => 1,
+);
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession);
+    }
+    return $className->$orig(@_);
+};
+
 
 ##-------------------------------------------------------------------
 #sub appendSkuForm {
@@ -127,8 +143,11 @@ A WebGUI::Session object. Required in class context, optional in instance contex
 
 sub getDriver {
     my $self    = shift;
-    my $session = shift || $self->session;
-    
+    my $session = shift;
+    if (!$session && blessed $self) {
+        $session = $self->session;
+    }
+
     WebGUI::Error::InvalidObject->throw( expected => "WebGUI::Session", got => (ref $session), error => "Need a session." )
         unless $session && $session->isa( 'WebGUI::Session' );
 
@@ -142,28 +161,6 @@ sub getDriver {
     }
 
     return $driver;
-}
-
-#-------------------------------------------------------------------
-
-=head2 new ( $session )
-
-Constructor for the WebGUI::Shop::Tax.  Returns a WebGUI::Shop::Tax object.
-
-=cut
-
-sub new {
-    my $class   = shift;
-    my $session = shift;
-    
-    WebGUI::Error::InvalidObject->throw( expected => "WebGUI::Session", got => (ref $session), error => "Need a session." )
-        unless $session && $session->isa( 'WebGUI::Session' );
-
-    my $self    = {};
-    bless $self, $class;
-    register $self;
-    $session{ id $self } = $session;
-    return $self;
 }
 
 
