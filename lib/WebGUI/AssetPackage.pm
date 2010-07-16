@@ -252,15 +252,25 @@ sub importPackage {
     my $decompressed    = $storage->untar($storage->getFiles->[0]);
     return undef
         if $storage->getErrorCount;
-    my %assets          = ();               # All the assets we've imported
     my $package         = undef;            # The asset package
     my $error           = $self->session->errorHandler;
+
+    # The debug output for long requests would be too long, and we'd have to
+    # keep it all in memory.
+    $error->preventDebugOutput();
     $error->info("Importing package.");
+
+    # Your parent is on this stack somewhere because we're going through these
+    # assets depth-first.  This way we only have to keep one branch in-memory
+    # at a time, and it's always the right branch.
+    my @stack;
+    my $json = JSON->new->utf8->relaxed(1);
+
     foreach my $file (sort(@{$decompressed->getFiles})) {
         next unless ($decompressed->getFileExtension($file) eq "json");
         $error->info("Found data file $file");
         my $data = eval {
-            JSON->new->utf8->relaxed(1)->decode($decompressed->getFileContentsAsScalar($file))
+            $json->decode($decompressed->getFileContentsAsScalar($file))
         };
         if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
             $error->error("package corruption: ".$@) if ($@);
@@ -271,20 +281,27 @@ sub importPackage {
             my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
             $decompressed->untar($storageId.".storage", $assetStorage);
         }
-        my $asset = $assets{$data->{properties}{parentId}} || $self;
+
+        my $parentId = $data->{properties}->{parentId};
+        my $asset;
+        while ($asset = pop(@stack)) {
+            if ($asset->getId eq $parentId) {
+                push(@stack, $asset);
+                last;
+            }
+        }
+        $asset ||= $self;
+
         my $newAsset = $asset->importAssetData($data, $options);
         $newAsset->importAssetCollateralData($data);
-        $assets{$newAsset->getId} = $newAsset;
-        # First imported asset must be the "package"
 
-        unless ($package) {
-            $package            = $newAsset;
-        }
+        push(@stack, $newAsset);
+
+        # First imported asset must be the "package"
+        $package ||= $newAsset;
     }
 
-    return $package
-        if $package;
-    return 'corrupt';
+    return $package || 'corrupt';
 }
 
 #-------------------------------------------------------------------
