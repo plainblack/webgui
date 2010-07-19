@@ -3,6 +3,8 @@ package WebGUI::Wizard::Setup;
 use strict;
 use base 'WebGUI::Wizard';
 
+use WebGUI::Wizard::HomePage;
+
 =head1 NAME
 
 WebGUI::Wizard::Setup -- Initial site setup
