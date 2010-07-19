@@ -82,6 +82,7 @@ sub AUTOLOAD {
     our $AUTOLOAD;
 	my $self = shift;
     my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
+    return if $name eq 'DESTROY';
     my %params = @_;
 	$params{rowClass} ||= $self->{_class};
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, %params ]) };
