@@ -35,7 +35,6 @@ my $session = start(); # this line required
 addIndexToUserSessionLog($session);
 addHeightToCarousel($session);
 synchronizeUserProfileTables($session);
-addSpamStopWordsToConfig($session);
 
 finish($session); # this line required
 
@@ -48,16 +47,6 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
-
-#----------------------------------------------------------------------------
-# Describe what our function does
-sub addSpamStopWordsToConfig {
-    my $session = shift;
-    print "\tAdd SPAM controls to config file... " unless $quiet;
-    # and here's our code
-    $session->config->set('spamStopWords', []);
-    print "DONE!\n" unless $quiet;
-}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
