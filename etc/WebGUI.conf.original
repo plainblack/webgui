@@ -1071,8 +1071,8 @@
       "Opera Mini"
    ],
 
-#A list of UserAgents of recognized mobile platforms.  If useMobileStyle is set in the
-#Admin settings, then the mobile style will be used for these browsers.
+# For the siteIndex content plugin.  Whether or not the auto-generated siteIndex should
+# show hidden pages
    "siteIndex" : {
       "showHiddenPages" : 0
    }
