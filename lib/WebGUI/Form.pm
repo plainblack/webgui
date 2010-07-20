@@ -62,6 +62,7 @@ Dynamically creates functions on the fly for all the different form control type
 
 sub AUTOLOAD {
 	our $AUTOLOAD;
+    return if $AUTOLOAD =~ m/::DESTROY$/;
 	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);	
 	my $session = shift;
 	my @params = @_;
