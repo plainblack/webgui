@@ -70,6 +70,7 @@ sub AUTOLOAD {
 	my $params	= shift;
 	my @args	= @_;
 
+    return if $AUTOLOAD =~ m/::DESTROY$/;
 	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
 	$params = {name=>$params} if ref ($params) ne "HASH";
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, $params ]) };
