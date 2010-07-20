@@ -5,6 +5,7 @@
  - fixed #11457: Carousel broken
  - fixed #11715: "Empty" user profile fields: not in userProfileData / cannot delete
  - fixed #11718: Matrix does not URI encode search parameters
+ - fixed #11721: spamStopWords not in WebGUI.conf.original
 
 7.8.23
  - fixed: missing per-item template variables for the cart.
