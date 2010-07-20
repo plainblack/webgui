@@ -1076,6 +1076,11 @@
 # show hidden pages
    "siteIndex" : {
       "showHiddenPages" : 0
-   }
+   },
+
+# An array of SPAM words.  Used in the Post and WikiPage to block spam by sending the asset directly
+# to the trash.
+   "spamStopWords" : [
+   ]
 
 }
