@@ -22,7 +22,7 @@ use WebGUI::Paginator;
 use WebGUI::Keyword;
 use WebGUI::Search;
 use Class::C3;
-use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
+use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject WebGUI::AssetAspect::Installable/;
 use File::Path;
 
 use constant DATE_FORMAT => '%c_%D_%y';
@@ -164,6 +164,17 @@ sub definition {
             label         => $i18n->get('approval workflow'),
             hoverHelp     => $i18n->get('approval workflow help'),
         },    
+        storySortOrder => {
+            fieldType     => "selectBox",
+            tab           => 'display',
+            defaultValue  => 'Chronologically',
+            options       => { 
+                 Alphabetically  => $i18n->get('alphabetically'),
+                 Chronologically => $i18n->get('chronologically') 
+            },
+            label         => $i18n->get('sortAlphabeticallyChronologically'),
+            hoverHelp     => $i18n->get('sortAlphabeticallyChronologically description'),
+        },
     );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
@@ -537,11 +548,12 @@ sub viewTemplateVariables {
         $p = $search->getPaginatorResultSet($self->getUrl, $self->get('storiesPerPage'));
     }
     else {
-        $var->{mode} = 'view';
         ##Only return assetIds,  we'll build data for the things that are actually displayed.
+        $var->{mode} = 'view';
+        my $orderBy = $self->get('storySortOrder') eq 'Alphabetically' ? 'menuTitle, lineage' : 'creationDate desc, lineage'; 
         my $storySql = $self->getLineageSql(['descendants'],{
             excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
-            orderByClause  => 'creationDate desc, lineage',
+            orderByClause  => $orderBy,
         });
         my $storiesPerPage = $self->get('storiesPerPage');
         if ($exporting) {
@@ -551,6 +563,7 @@ sub viewTemplateVariables {
         $p = WebGUI::Paginator->new($session, $self->getUrl, $storiesPerPage);
         $p->setDataByQuery($storySql);
     }
+
     my $storyIds = $p->getPageData();
     if (! $exporting ) {
         ##Pagination variables aren't useful in export mode

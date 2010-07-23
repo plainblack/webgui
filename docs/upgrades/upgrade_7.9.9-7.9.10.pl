@@ -32,10 +32,10 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addSpamStopWordsToConfig($session);
-
+alterStoryArchiveTable($session);
+ 
 finish($session); # this line required
-
-
+ 
 #----------------------------------------------------------------------------
 # Describe what our function does
 #sub exampleFunction {
@@ -55,6 +55,25 @@ sub addSpamStopWordsToConfig {
     $session->config->set('spamStopWords', []);
     print "DONE!\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub alterStoryArchiveTable { 
+    my $session = shift;
+    print "\tAdd story sort order column to the StoryAcrhive table... " unless $quiet;
+
+    my $sth = $session->db->read('DESCRIBE `StoryArchive`');
+    while (my ($col) = $sth->array) {  
+        if ($col eq 'storySortOrder') {
+            print "Skipped.\n" unless $quiet;
+            return;
+        }
+    }
+
+    $session->db->write("ALTER TABLE StoryArchive ADD COLUMN storySortOrder CHAR(22)");
+    print "DONE!\n" unless $quiet;
+}
+ 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

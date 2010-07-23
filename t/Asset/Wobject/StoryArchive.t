@@ -63,7 +63,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 51
+my $tests = 52
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -679,7 +679,70 @@ $archive->update({ url => '/home/mystories.arch' });
 is($archive->getKeywordStaticURL('bar'), '/home/mystories/keyword_bar.html', '... correct URL with file extension');
 
 $archive->update({ url => '/home/mystories' });
-}
+
+################################################################
+#
+# sortOrder
+#
+################################################################
+
+my $aaa_child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'Aaaa'}, @skipAutoCommit);
+my $zzz_child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'Zzzz'}, @skipAutoCommit);
+WebGUI::Test->addToCleanup($aaa_child);
+WebGUI::Test->addToCleanup($zzz_child);
+
+$archive->update({storiesPerPage => 25, storySortOrder => 'Alphabetically' });
+
+$tag1 = WebGUI::VersionTag->getWorking($session);
+$tag1->commit;
+WebGUI::Test->addToCleanup($tag1);
+
+$templateVars = $archive->viewTemplateVariables();
+
+cmp_deeply (
+    $templateVars->{date_loop},
+    [
+           {
+             'story_loop' => [
+                               {
+                                 'creationDate' => ignore(),
+                                 'deleteIcon' => ignore(),
+                                 'editIcon' => ignore(),
+                                 'url' => re('aaaa'),
+                                 'title' => 'Aaaa'
+                               },
+                               ignore(),
+                               ignore(),
+                               ignore(),
+                               ignore(),
+                             ],
+             'epochDate' => ignore(),
+           },
+           {
+             'story_loop' => ignore(),
+             'epochDate' => $wgBdayMorn,
+           },
+           {
+             'story_loop' => ignore(),
+             'epochDate' => $yesterdayMorn,
+           },
+          {
+             'story_loop' => [
+                               {
+                                 'creationDate' => ignore(),
+                                 'deleteIcon' => ignore(),
+                                 'editIcon' => ignore(),
+                                 'url' => re('zzzz'),
+                                 'title' => 'Zzzz'
+                               },
+                             ],
+             'epochDate' => ignore(),
+           },
+        ],
+        'viewTemplateVariables: sorted by story title'
+);
+
+}           ##  end SKIP block
 
 $creationDateSth->finish;
 
