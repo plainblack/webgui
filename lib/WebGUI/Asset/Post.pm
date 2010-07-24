@@ -1200,7 +1200,7 @@ sub postProcess {
 	my %data = ();
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContent($self->get("synopsis"), $self->get("content"));
     my $spamStopWords = $self->session->config->get('spamStopWords');
-    if (ref $spamStopWords eq 'ARRAY') {
+    if (ref $spamStopWords eq 'ARRAY' && @{ $spamStopWords }) {
         my $spamRegex = join('|',@{$spamStopWords});
         $spamRegex =~ s/\s/\\ /g;
         if ($data{content} =~ m/$spamRegex/xmsi) {
