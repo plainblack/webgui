@@ -47,6 +47,24 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 cut ( )
+
+Extend the base method to handle cutting the User Function Style template and destroying your site.
+If the current template is the User Function Style template with the Fail Safe template.
+
+=cut
+
+sub cut {
+    my ( $self )    = @_;
+    my $returnValue = $self->SUPER::cut();
+    if ($returnValue && $self->getId eq $self->session->setting->get('userFunctionStyleId')) {
+        $self->session->setting->set('userFunctionStyleId', 'PBtmpl0000000000000060');
+    }
+    return $returnValue;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( session, definition )
 
 Defines the properties of this asset.
@@ -654,6 +672,24 @@ sub processRaw {
 	my $vars = shift;
 	my $parser = shift;
 	return $class->getParser($session,$parser)->process($template, $vars);
+}
+
+#-------------------------------------------------------------------
+
+=head2 purge ( )
+
+Extend the base method to handle purging the User Function Style template and destroying your site.
+If the current template is the User Function Style template with the Fail Safe template.
+
+=cut
+
+sub purge {
+	my $self = shift;
+    my $returnValue = $self->SUPER::purge;
+    if ($returnValue && $self->getId eq $self->session->setting->get('userFunctionStyleId')) {
+        $self->session->setting->set('userFunctionStyleId', 'PBtmpl0000000000000060');
+    }
+	return $returnValue;
 }
 
 #-------------------------------------------------------------------
