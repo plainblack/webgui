@@ -264,13 +264,15 @@ sub getFirstChild {
 		my $lineage = $assetLineage->{firstChild}{$self->getId};
 		unless ($lineage) {
 			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=? and asset.assetId=assetData.assetId and asset.state='published'",[$self->getId]);
-			unless ($self->session->config->get("disableCache")) {
+			if ($lineage && !$self->session->config->get("disableCache")) {
 				$assetLineage->{firstChild}{$self->getId} = $lineage;
 				$self->session->stow->set("assetLineage", $assetLineage);
 			}
 		}
-		$child = WebGUI::Asset->newByLineage($self->session,$lineage);
-		$self->cacheChild(first => $child);
+        if ($lineage) {
+            $child = WebGUI::Asset->newByLineage($self->session,$lineage);
+            $self->cacheChild(first => $child);
+        }
 	}
 	return $child;
 }
