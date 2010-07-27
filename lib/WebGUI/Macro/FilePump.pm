@@ -195,7 +195,7 @@ on your print CSS tag.
 
 sub linkTag {
     my ($session, $url, $extras) = @_;
-    my $template = qq|<link rel="stylesheet" type="text/css" href="%s" $extras \\>\n|;
+    my $template = qq|<link rel="stylesheet" type="text/css" href="%s" $extras />\n|;
     return sprintf $template, $url;
 }
 
