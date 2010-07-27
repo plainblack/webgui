@@ -20,6 +20,7 @@ use URI;
 use URI::Escape;
 use WebGUI::International;
 use WebGUI::Utility;
+use Encode;
 
 
 =head1 NAME
@@ -322,7 +323,7 @@ sub getRequestedUrl {
 	my $self = shift;
 	return undef unless ($self->session->request);
 	unless ($self->{_requestedUrl}) {
-		$self->{_requestedUrl} = $self->session->request->uri;
+		$self->{_requestedUrl} = decode_utf8($self->session->request->uri);
 		my $gateway = $self->session->config->get("gateway");
 		$self->{_requestedUrl} =~ s/^$gateway([^?]*)\??.*$/$1/;
 	}
