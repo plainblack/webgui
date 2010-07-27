@@ -7,6 +7,7 @@
  - fixed #11718: Matrix does not URI encode search parameters
  - fixed #11721: spamStopWords not in WebGUI.conf.original
  - fixed #11729: Trash your User Function Style, and WebGUI locks you out
+ - fixed #11745: Pagination doesn't work in DataForm list mode
 
 7.8.23
  - fixed: missing per-item template variables for the cart.

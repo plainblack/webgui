@@ -727,7 +727,7 @@ sub getListTemplateVars {
     } @{ $self->getFieldOrder };
     $var->{field_loop} = \@fieldLoop;
     my @recordLoop;
-    my $p = WebGUI::Paginator->new($session);
+    my $p = WebGUI::Paginator->new($session,$self->getUrl("mode=list"));
     $p->setDataByCallback(sub { return $self->entryClass->iterateAll($self, { offset => $_[0], limit => $_[1], }); });
     my $entryIter = $p->getPageIterator();
     while ( my $entry = $entryIter->() ) {
