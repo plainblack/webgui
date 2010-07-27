@@ -220,7 +220,7 @@ sub viewTemplateVariables {
         push @{$var->{story_loop}}, $storyVars;
     }
 
-    if ($self->{_standAlone}) {
+    if ($self->{_standAlone} and @$storyIds) {
         my $topStoryData = $storyIds->[0];
         shift @{ $var->{story_loop} };
         ##Note, this could have saved from the loop above, but this looks more clean and encapsulated to me.
