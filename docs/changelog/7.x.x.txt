@@ -9,6 +9,7 @@
  - fixed #11729: Trash your User Function Style, and WebGUI locks you out
  - fixed #11745: Pagination doesn't work in DataForm list mode
  - fixed #11741: i18n Asset_Carousel ::carousel slideHeight description
+ - fixed #11742: linktag FilePump macro not xhtml valid
 
 7.8.23
  - fixed: missing per-item template variables for the cart.
