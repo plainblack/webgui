@@ -367,9 +367,18 @@ sub getMatchingAssets {
         push @clauses, 'keyword in ('.join(',', @placeholders).')';
     }
 
+    my $sortOrder = $options->{sortOrder} || 'Chronologically';
+
+    my $orderBy = $sortOrder eq 'Alphabetically' ? ' order by upper(title), lineage' : ' order by creationDate desc, lineage';
+
     # write the query
-    my $query = 'select distinct assetKeyword.assetId from assetKeyword left join asset using (assetId)
-        where '.join(' and ', @clauses).' order by creationDate desc, lineage';
+    my $query = q{
+        select distinct assetKeyword.assetId 
+        from   assetKeyword 
+        left join asset using (assetId) 
+        left join assetData using (assetId)
+        where } . 
+        join(' and ', @clauses) . $orderBy;
 
     # perform the search
     if ($options->{usePaginator}) {

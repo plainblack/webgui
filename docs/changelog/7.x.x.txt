@@ -8,6 +8,7 @@
  - fixed #11742: linktag FilePump macro not xhtml valid
  - fixed #11744: Default DataForm list template does not contain pagination
  - fixed #11683: URL with UTF8 (for äÄöÖüÜß)
+ - added option for sort order of Alphabetically on title to StoryArchive, StoryTopic and Keyword
 
 7.9.9
  - fixed #11693: Shopping cart does not show for visitor user

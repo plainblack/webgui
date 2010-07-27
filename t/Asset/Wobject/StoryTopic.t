@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 18;
+plan tests => 19;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -316,3 +316,44 @@ cmp_deeply(
     ],
     'rssFeedItems'
 );
+
+################################################################
+# Sort Order
+################################################################
+
+$pastStory->update( { title => "aaaay was history but isn't any more" } );
+$pastStory->requestAutoCommit;
+
+$topic->update({ storiesPer   => 4, storiesShort => 4, }); # storiesPer is used when _standAlone is true, storiesShort otherwise
+$topic->{_standAlone} = 0;
+$topic->update( { storySortOrder => 'Alphabetically' } );
+
+$templateVars = $topic->viewTemplateVariables();
+
+cmp_deeply(
+    $templateVars->{story_loop},
+    [
+        {
+            title        => "aaaay was history but isn't any more",
+            url          => ignore(),
+            creationDate => $yesterday,
+        },
+        {
+            title        => 'andy',
+            url          => ignore(),
+            creationDate => $now,
+        },
+        {
+            title        => 'bogs',
+            url          => ignore(),
+            creationDate => $now,
+        },
+        {
+            title        => 'brooks',
+            url          => ignore(),
+            creationDate => $now,
+        },
+    ],
+    'viewTemplateVars has right number and contents in the story_loop in sort order Alphabetically mode'
+);
+

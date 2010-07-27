@@ -37,6 +37,7 @@ sub definition {
     my $session = shift;
     my $definition = shift;
     my $i18n = WebGUI::International->new($session, 'Asset_StoryTopic');
+    my $other_i18n = WebGUI::International->new($session, 'Asset_StoryArchive');
     my %properties;
     tie %properties, 'Tie::IxHash';
     %properties = (
@@ -71,6 +72,17 @@ sub definition {
             filter       => 'fixId',
             namespace    => 'Story',
             defaultValue => 'TbDcVLbbznPi0I0rxQf2CQ',
+        },
+        storySortOrder => { 
+            fieldType     => "selectBox",
+            tab           => 'display',
+            defaultValue  => 'Chronologically',
+            options       => {
+                 Alphabetically  => $other_i18n->get('alphabetically'),
+                 Chronologically => $other_i18n->get('chronologically')
+            },
+            label         => $other_i18n->get('sortAlphabeticallyChronologically'),
+            hoverHelp     => $other_i18n->get('sortAlphabeticallyChronologically description'),
         },
     );
     push(@{$definition}, {
@@ -174,10 +186,11 @@ sub viewTemplateVariables {
     my $wordList = WebGUI::Keyword::string2list($self->get('keywords'));
     my $key      = WebGUI::Keyword->new($session);
     my $p        = $key->getMatchingAssets({
-        keywords     => $wordList,
-        isa          => 'WebGUI::Asset::Story',
-        usePaginator => 1,
-        rowsPerPage  => $numberOfStories,
+        sortOrder      => $self->get('storySortOrder') || 'Chronologically',
+        keywords       => $wordList,
+        isa            => 'WebGUI::Asset::Story',
+        usePaginator   => 1,
+        rowsPerPage    => $numberOfStories,
     });
     my $storyIds = $p->getPageData();
     $var->{story_loop} = [];
