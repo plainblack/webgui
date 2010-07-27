@@ -436,13 +436,9 @@ sub log {
 
 #-------------------------------------------------------------------
 
-=head2 open ( webguiRoot, configFile [, env, sessionId, noFuss ] )
+=head2 open ( configFile [, env, sessionId, noFuss ] )
 
 Constructor. Opens a closed ( or new ) WebGUI session.
-
-=head3 webguiRoot
-
-The path to the WebGUI files.
 
 =head3 configFile
 
