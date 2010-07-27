@@ -10,6 +10,7 @@
  - fixed #11745: Pagination doesn't work in DataForm list mode
  - fixed #11741: i18n Asset_Carousel ::carousel slideHeight description
  - fixed #11742: linktag FilePump macro not xhtml valid
+ - fixed #11744: Default DataForm list template does not contain pagination
 
 7.8.23
  - fixed: missing per-item template variables for the cart.
