@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 18;
+plan tests => 19;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -316,3 +316,20 @@ cmp_deeply(
     ],
     'rssFeedItems'
 );
+
+################################################################
+# Regression -- Empty StoryTopics shouldn't blow up
+################################################################
+
+my $emptyarchive    = WebGUI::Asset->getDefault($session)->addChild({
+    className => 'WebGUI::Asset::Wobject::StoryTopic', 
+    title => 'Why Do Good Things Happen To Bad People', 
+    url => '/home/badstories', 
+    keywords => 'aksjhgkja asgjhshs assajshhsg5',
+});
+addToCleanup($emptyarchive); # blows up under the debugger...?
+
+$versionTag->commit;
+$emptyarchive->{_standAlone} = 1;  
+ok(eval { $emptyarchive->viewTemplateVariables() }, "viewTemplateVariables with _standAlone = 1 doesn't throw an error");
+
