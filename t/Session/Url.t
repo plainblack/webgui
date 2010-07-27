@@ -52,7 +52,7 @@ my @getRefererUrlTests = (
 
 use Test::More;
 use Test::MockObject::Extends;
-plan tests => 86 + scalar(@getRefererUrlTests);
+plan tests => 87 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -220,6 +220,13 @@ is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache 
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
 $pseudoRequest->uri('/path2/file2?param1=one;param2=two');
 is($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not return params');
+
+$session->url->{_requestedUrl} = undef;
+my $utf8_url = "Viel Spa\x{00DF}";
+$pseudoRequest->uri($utf8_url);
+use Encode;
+my $decoded_url = decode_utf8($utf8_url);
+is $session->url->getRequestedUrl(), $decoded_url, 'getRequestedUrl returns utf8 decoded data';
 
 #######################################
 #
