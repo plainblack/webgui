@@ -83,7 +83,7 @@ is(
 );
 is(
     WebGUI::Macro::FilePump::process($session, 'test bundle', 'CSS'),
-    sprintf(qq|<link rel="stylesheet" type="text/css" href="%s" >\n|,
+    sprintf(qq|<link rel="stylesheet" type="text/css" href="%s"  \\>\n|,
         join('/', $uploadsURL, 'filepump', $bundle->bundleUrl . '.'. $bundle->get('lastBuild'), $bundle->bundleUrl.'.css'),
     ),
     '... check CSS file, normal mode'
@@ -104,7 +104,7 @@ is(
 );
 is(
     WebGUI::Macro::FilePump::process($session, 'test bundle', 'CSS'),
-    sprintf(qq|<link rel="stylesheet" type="text/css" href="/filePumpFileAsset" >\n|, $fileAsset->getUrl),
+    sprintf(qq|<link rel="stylesheet" type="text/css" href="/filePumpFileAsset"  \\>\n|, $fileAsset->getUrl),
     '... check CSS file, normal mode'
 );
 is(
