@@ -40,8 +40,8 @@ our $I18N = {
 	},
 
     'carousel slideHeight description' => {
-        message => q|Height in pixels.  The Carousel will not automatically resize itself for content of various widths.  Setting this width will help it render properly.  If left with the default, 0, then the width of the Carousel is set by the width of the first element.|,
-        lastUpdated => 0,
+        message => q|Height in pixels.  The Carousel will not automatically resize itself for content of various heights.  Setting this height will help it render properly.  If left with the default, 0, then the height of the Carousel is set by the height of the first element.|,
+        lastUpdated => 1280253825,
         context => q|Description of the carousel template field, used as hover help.|
     },
 
