@@ -152,7 +152,7 @@ sub _mine_item {
 
     my $address = $item->getShippingAddress;
     $self->shippingAddressId($address->getId);
-    $self->shippingName($address->name);
+    $self->shippingName(join ' ', $address->firstName, $address->lastName);
     $self->shippingAddress1($address->address1);
     $self->shippingAddress2($address->address2);
     $self->shippingAddress3($address->address3);
