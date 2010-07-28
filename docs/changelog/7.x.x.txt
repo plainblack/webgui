@@ -1,3 +1,5 @@
+7.9.11
+
 7.9.10
  - fixed #11721: spamStopWords not in WebGUI.conf.original
  - fixed #11729: Trash your User Function Style, and WebGUI locks you out
