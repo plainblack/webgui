@@ -18,6 +18,7 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Workflow::Instance;
 use WebGUI::DateTime;
+use WebGUI::Session;
 
 =head1 NAME
 
@@ -222,7 +223,7 @@ sub commitAsUser {
     return 0 unless (defined $userId);
 
     #Open a new session
-    my $new_session = WebGUI::Session->open( $config->getFilename );
+    my $new_session = WebGUI::Session->open( $config );
     #Set the userId in the new session
     $new_session->user( { userId => $userId } );
 
