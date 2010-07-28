@@ -560,6 +560,24 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 dispatch ( $fragment )
+
+Based on the URL and query parameters in the current request, call internal methods
+like www_view, www_edit, etc.
+
+=head3 $fragment
+
+A URL.
+
+=cut
+
+sub dispatch {
+	my ($self, $fragment) = @_;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 drawExtraHeadTags ( )
 
 Draw the Extra Head Tags.  Done with a customDrawMethod because the Template
