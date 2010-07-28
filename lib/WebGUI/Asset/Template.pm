@@ -455,7 +455,7 @@ Override to import attachments from old versions of WebGUI
 sub importAssetCollateralData {
     my ( $self, $data, @args ) = @_;
     if ( $data->{template_attachments} ) {
-        $self->update( { attachmentsJson => $data->{template_attachments} } );
+        $self->update( { attachmentsJson => JSON::to_json($data->{template_attachments}) } );
     }
     return $self->SUPER::importAssetCollateralData( $data, @args );
 }
