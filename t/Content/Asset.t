@@ -26,6 +26,7 @@ use WebGUI::Session;
 my $session         = WebGUI::Test->session;
 
 $INC{'WebGUI::Asset::TestDispatch'} = __FILE__;
+$INC{'WebGUI::Asset::TestDecline'} = __FILE__;
 
 package WebGUI::Asset::TestDispatch;
 
@@ -42,10 +43,24 @@ sub dispatch {
     return $self->SUPER::dispatch( $fragment );
 }
 
+sub www_edit {
+    my ( $self ) = @_;
+    return "www_edit " . $self->get('title');
+}
+
 sub www_view {
     my ( $self ) = @_;
     return "www_view " . $self->get('title');
 }
+
+package WebGUI::Asset::TestDecline;
+
+our @ISA = ( 'WebGUI::Asset' );
+
+# Override dispatch to decline everything
+sub dispatch { return; }
+
+sub www_edit { return "you'll never see me!" }
 
 package main;
 
@@ -61,7 +76,7 @@ WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 11;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
@@ -117,5 +132,30 @@ is(
     "www_view two",
     "dispatch to the asset with the longest URL",
 );
+
+$clobberingTime->purge;
+
+# Add an asset that declines everything instead
+my $declined
+    = WebGUI::Asset->getImportNode( $session )->addChild( {
+        title       => "three",
+        className   => 'WebGUI::Asset::TestDecline',
+        url         => $td->get('url') . '/foo',
+    } );
+
+is(
+    WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" ),
+    "bar",
+    "Dispatch passes to TestDispatch asset after declined",
+);
+
+# Test ?func= dispatch with declined asset
+$session->request->setup_body({
+    func        => "edit",
+});
+
+my $output  = WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" );
+isnt( $output, "you'll never see me!", "func=edit was declined" );
+isnt( $output, "www_edit one", "func=edit was not for us" );
 
 #vim:ft=perl
