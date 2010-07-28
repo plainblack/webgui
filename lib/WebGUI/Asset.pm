@@ -572,7 +572,12 @@ A URL.
 =cut
 
 sub dispatch {
-	my ($self, $fragment) = @_;
+    my ($self, $fragment) = @_;
+    if (my $func = $self->session->form->param('func')) {
+        if (my $sub = $self->can('www_'.$func)) {
+            return $sub->();
+        }
+    }
     if (! $fragment ) {
         return $self->www_view;
     }
