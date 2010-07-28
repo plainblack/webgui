@@ -24,7 +24,9 @@ use WebGUI::Session;
 # Init
 my $session         = WebGUI::Test->session;
 
-$INC{'WebGUI::Asset::TestDispatch'} = __FILE__;
+BEGIN {
+    $INC{'WebGUI/Asset/TestDispatch.pm'} = __FILE__;
+}
 
 package WebGUI::Asset::TestDispatch;
 
