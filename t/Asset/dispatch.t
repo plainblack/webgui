@@ -81,4 +81,7 @@ is( $td->dispatch( '/foo' ), "bar", "overridden dispatch trumps ?func= query par
 # Test func= can only be run on the exact asset we requested
 isnt( $td->dispatch( '/bar' ), "www_edit", "?func= dispatch cancelled because of unhandled fragment" );
 
+$session->request->setup_body( { } );
+isnt( $td->dispatch( '/bar' ), "www_view", "?func= dispatch cancelled because of unhandled fragment" );
+
 #vim:ft=perl
