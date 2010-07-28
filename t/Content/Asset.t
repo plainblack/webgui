@@ -20,6 +20,7 @@ use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Content::Asset;
 
 #----------------------------------------------------------------------------
 # Init
@@ -78,7 +79,7 @@ WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 11;        # Increment this number for each test you create
+plan tests => 12;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
@@ -89,19 +90,23 @@ cmp_deeply(
     "Handles no URL gracefully",
 );
 cmp_deeply( 
-    WebGUI::Content::Asset::getUrlPermutation( "one" ),
+    WebGUI::Content::Asset::getUrlPermutations( "one" ),
     [ 'one' ],
 );
 cmp_deeply(
-    WebGUI::Content::Asset::getUrlPermutation( "/one" ),
+    WebGUI::Content::Asset::getUrlPermutations( "/one" ),
     [ '/one', ],
 );
 cmp_deeply(
-    WebGUI::Content::Asset::getUrlPermutation( "/one/two/three" ),
+    WebGUI::Content::Asset::getUrlPermutations( "one/two/three" ),
+    [ 'one/two/three', 'one/two', 'one', ],
+);
+cmp_deeply(
+    WebGUI::Content::Asset::getUrlPermutations( "/one/two/three" ),
     [ '/one/two/three', '/one/two', '/one', ],
 );
 cmp_deeply(
-    WebGUI::Content::Asset::getUrlPermutation( "/one/two/three.rss" ),
+    WebGUI::Content::Asset::getUrlPermutations( "/one/two/three.rss" ),
     [ '/one/two/three.rss', '/one/two/three', '/one/two', '/one', ],
     ".ext is a seperate URL permutation",
 );

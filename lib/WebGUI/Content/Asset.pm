@@ -19,6 +19,7 @@ use LWP::MediaTypes qw(guess_media_type);
 use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::PassiveAnalytics::Logging;
+use URI;
 
 use Apache2::Const -compile => qw(OK);
 
@@ -40,6 +41,20 @@ A content handler that serves up assets.
 These subroutines are available from this package:
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 dispatch ( $session, $assetUrl )
+
+Returns the output from an asset.
+
+=cut
+
+sub dispatch {
+    my $session = shift;
+	my $assetUrl = shift;
+    return;
+}
 
 #-------------------------------------------------------------------
 
@@ -71,6 +86,37 @@ sub getRequestedAssetUrl {
     my $session = shift;
 	my $assetUrl = shift || $session->url->getRequestedUrl;
     return $assetUrl;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUrlPermutations ( $url )
+
+Returns an array reference of permutations for the URL.
+
+=head3 $url
+
+The URL to permute.
+
+=cut
+
+sub getUrlPermutations {
+    my $url          = shift;
+    my @permutations = ();
+    return \@permutations if !$url;
+    push @permutations, $url;
+    if ($url =~ /\.\w+$/) {
+        $url =~ s/\.\w+$//;
+        push @permutations, $url;
+    }
+    my $uri       = URI->new($url);
+    my @fragments = $uri->path_segments();
+    pop @fragments;
+    while (@fragments > 1) {
+        push @permutations, join "/", @fragments;
+        pop @fragments;
+    }
+    return \@permutations;
 }
 
 #-------------------------------------------------------------------
