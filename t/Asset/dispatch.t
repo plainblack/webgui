@@ -57,7 +57,7 @@ WebGUI::Test->addToCleanup( $tag );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 4;        # Increment this number for each test you create
+plan tests => 5;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test dispatch
@@ -73,6 +73,6 @@ $session->request->setup_body( {
     func        => 'edit',
 } );
 is( $td->dispatch, "www_edit", "dispatch handles ?func= query param" );
-
+is( $td->dispatch( '/foo' ), "bar", "overridden dispatch trumps ?func= query param" );
 
 #vim:ft=perl
