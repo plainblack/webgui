@@ -59,7 +59,7 @@ WebGUI::Test->addToCleanup( $tag );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 7;        # Increment this number for each test you create
+plan tests => 9;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test dispatch
@@ -81,9 +81,13 @@ is( $td->dispatch, "www_edit", "dispatch handles ?func= query param" );
 is( $td->dispatch( '/foo' ), "bar", "overridden dispatch trumps ?func= query param" );
 
 # Test func= can only be run on the exact asset we requested
-isnt( $td->dispatch( '/bar' ), "www_edit", "?func= dispatch cancelled because of unhandled fragment" );
+my $output = $td->dispatch( '/bar' );
+ok( $output, "dispatch returned something, maybe not found page?" );
+isnt( $output, "www_edit", "?func= dispatch cancelled because of unhandled fragment" );
 
 $session->request->setup_body( { } );
-isnt( $td->dispatch( '/bar' ), "www_view", "?func= dispatch cancelled because of unhandled fragment" );
+$output = $td->dispatch( '/bar' );
+ok( $output, "dispatch returned something, maybe not found page?" );
+isnt( $output, "www_view", "?func= dispatch cancelled because of unhandled fragment" );
 
 #vim:ft=perl
