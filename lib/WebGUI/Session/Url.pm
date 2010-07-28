@@ -22,6 +22,7 @@ use Scalar::Util qw( weaken );
 use WebGUI::International;
 use WebGUI::Utility;
 use Scalar::Util qw(weaken);
+use Encode;
 
 
 =head1 NAME
@@ -326,7 +327,7 @@ sub getRequestedUrl {
 	my $self = shift;
 	return undef unless ($self->session->request);
 	unless ($self->{_requestedUrl}) {
-		$self->{_requestedUrl} = $self->session->request->path_info; # TODO - is path_info right?
+		$self->{_requestedUrl} = decode_utf8($self->session->request->path_info); # TODO - is path_info right?
 		my $gateway = $self->session->config->get("gateway");
 		$self->{_requestedUrl} =~ s/^$gateway([^?]*)\??.*$/$1/;
 	}

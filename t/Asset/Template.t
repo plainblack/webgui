@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 42; # increment this value for each test you create
+use Test::More tests => 46; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 use JSON qw{ from_json };
@@ -179,3 +179,35 @@ WebGUI::Test->interceptLogging( sub {
 
 WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
 
+my $userStyleTemplate = $importNode->addChild({
+    className => "WebGUI::Asset::Template",
+    title     => "user function style",
+    url       => "ufs",
+    template  => "user function style",
+    namespace => 'WebGUI Test Template',
+});
+
+my $someOtherTemplate = $importNode->addChild({
+    className => "WebGUI::Asset::Template",
+    title     => "some other template",
+    url       => "sot",
+    template  => "some other template",
+    namespace => 'WebGUI Test Template',
+});
+
+$session->setting->set('userFunctionStyleId', $userStyleTemplate->getId);
+
+my $purgeCutTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($purgeCutTag);
+
+is($session->setting->get('userFunctionStyleId'), $userStyleTemplate->getId, 'Setup for cut tests.');
+
+$userStyleTemplate->cut;
+is($session->setting->get('userFunctionStyleId'), 'PBtmpl0000000000000060', 'cut resets the user function style template to Fail Safe');
+
+$userStyleTemplate->publish;
+$session->setting->set('userFunctionStyleId', $userStyleTemplate->getId);
+is($session->setting->get('userFunctionStyleId'), $userStyleTemplate->getId, 'Reset for purge test');
+
+$userStyleTemplate->purge;
+is($session->setting->get('userFunctionStyleId'), 'PBtmpl0000000000000060', 'purge resets the user function style template to Fail Safe');

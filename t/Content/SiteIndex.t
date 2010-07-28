@@ -35,7 +35,7 @@ my $xmlData = XMLin($output,
     ForceArray => ['url'],
 );
 my @actual_urls = map { $_->{loc} } @{ $xmlData->{urlset}->{url} };
-my @expected_urls = map { $session->url->getSiteURL . '/' . $_ } qw{ home getting_started your_next_step the_latest_news tell_a_friend documentation site_map };
+my @expected_urls = map { $session->url->getSiteURL . '/' . $_ } qw{ home getting_started your_next_step documentation join_us site_map };
 cmp_deeply(
     \@actual_urls,
     \@expected_urls,
@@ -73,7 +73,7 @@ $xmlData = XMLin($output,
     ForceArray => ['url'],
 );
 @actual_urls = map { $_->{loc} } @{ $xmlData->{urlset}->{url} };
-@expected_urls = map { $session->url->getSiteURL . '/' . $_ } qw{ home getting_started your_next_step the_latest_news tell_a_friend documentation site_map hidden_page };
+@expected_urls = map { $session->url->getSiteURL . '/' . $_ } qw{ home getting_started your_next_step documentation join_us site_map hidden_page };
 cmp_deeply(
     \@actual_urls,
     \@expected_urls,

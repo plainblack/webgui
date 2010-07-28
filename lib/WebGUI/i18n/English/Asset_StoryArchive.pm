@@ -333,6 +333,30 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'sortAlphabeticallyChronologically' => {
+        message => q|Sort Order|,
+        context => q|Label in the edit screen|,
+        lastUpdated => 1276631190,
+    },
+
+    'sortAlphabeticallyChronologically description' => {
+        message => q|Set messages to appear in order of publish date or alphabetically by title|,
+        context => q|Tooltip in the edit screen|,
+        lastUpdated => 1276631190,
+    },
+
+    'alphabetically' => {
+        message => q|Alphabetically|,
+        context => q|Select option in the edit screen|,
+        lastUpdated => 1276631190,
+    },
+
+    'chronologically' => {
+        message => q|Chronologically|,
+        context => q|Select option in the edit screen|,
+        lastUpdated => 1276631190,
+    },
+
 };
 
 1;

@@ -130,7 +130,7 @@ sub getAutoCommitWorkflowId {
 
         # delete spam
         my $spamStopWords = $self->session->config->get('spamStopWords');
-        if (ref $spamStopWords eq 'ARRAY') {
+        if (ref $spamStopWords eq 'ARRAY' && @{ $spamStopWords }) {
             my $spamRegex = join('|',@{$spamStopWords});
             $spamRegex =~ s/\s/\\ /g;
             if ($self->content =~ m{$spamRegex}xmsi) {

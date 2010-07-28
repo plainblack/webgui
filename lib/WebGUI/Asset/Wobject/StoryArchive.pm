@@ -95,6 +95,24 @@ property approvalWorkflowId => (
             label         => ['approval workflow', 'Asset_StoryArchive'],
             hoverHelp     => ['approval workflow help', 'Asset_StoryArchive'],
          );    
+property storySortOrder => (
+            fieldType     => "selectBox",
+            tab           => 'display',
+            default       => 'Chronologically',
+            options       => \&_storySortOrder_options,
+            label         => ['sortAlphabeticallyChronologically', 'Asset_StoryArchive'],
+            hoverHelp     => ['sortAlphabeticallyChronologically description', 'Asset_StoryArchive'],
+        );
+
+sub _storySortOrder_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_StoryArchive');
+    return {
+        Alphabetically  => $i18n->get('alphabetically'),
+        Chronologically => $i18n->get('chronologically'),
+    };
+}
+
 with 'WebGUI::Role::Asset::RssFeed';
 
 use WebGUI::International;
@@ -506,11 +524,12 @@ sub viewTemplateVariables {
         $p = $search->getPaginatorResultSet($self->getUrl, $self->get('storiesPerPage'));
     }
     else {
-        $var->{mode} = 'view';
         ##Only return assetIds,  we'll build data for the things that are actually displayed.
+        $var->{mode} = 'view';
+        my $orderBy = $self->get('storySortOrder') eq 'Alphabetically' ? 'menuTitle, lineage' : 'creationDate desc, lineage'; 
         my $storySql = $self->getLineageSql(['descendants'],{
             excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
-            orderByClause  => 'creationDate desc, lineage',
+            orderByClause  => $orderBy,
         });
         my $storiesPerPage = $self->storiesPerPage;
         if ($exporting) {
@@ -520,6 +539,7 @@ sub viewTemplateVariables {
         $p = WebGUI::Paginator->new($session, $self->getUrl, $storiesPerPage);
         $p->setDataByQuery($storySql);
     }
+
     my $storyIds = $p->getPageData();
     if (! $exporting ) {
         ##Pagination variables aren't useful in export mode

@@ -342,8 +342,10 @@ sub getFirstChild {
 		my $lineage      = $assetLineage->{firstChild}{$self->getId};
 		unless ($lineage) {
 			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset where asset.parentId=? and asset.state='published'",[$self->getId]);
-			$assetLineage->{firstChild}{$self->getId} = $lineage;
-			$self->session->stow->set("assetLineage", $assetLineage);
+			if ($lineage) {
+				$assetLineage->{firstChild}{$self->getId} = $lineage;
+				$self->session->stow->set("assetLineage", $assetLineage);
+			}
 		}
 		$child = eval { WebGUI::Asset->newByLineage($self->session,$lineage); };
 		$self->cacheChild(first => $child);

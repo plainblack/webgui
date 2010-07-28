@@ -1088,13 +1088,18 @@
       "Opera Mini"
    ],
 
-#A list of UserAgents of recognized mobile platforms.  If useMobileStyle is set in the
-#Admin settings, then the mobile style will be used for these browsers.
+# For the siteIndex content plugin.  Whether or not the auto-generated siteIndex should
+# show hidden pages
    "siteIndex" : {
       "showHiddenPages" : 0
    },
 
 #The complete path to the maintenance page.
-   "maintenancePage" : "/data/WebGUI/www/maintenance.html"
+   "maintenancePage" : "/data/WebGUI/www/maintenance.html",
+
+# An array of SPAM words.  Used in the Post and WikiPage to block spam by sending the asset directly
+# to the trash.
+   "spamStopWords" : [
+   ]
 
 }

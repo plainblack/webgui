@@ -139,6 +139,22 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 cut ( )
+
+Extend the base method to handle cutting the User Function Style template and destroying your site.
+If the current template is the User Function Style template with the Fail Safe template.
+
+=cut
+
+around cut => sub {
+    my ( $orig, $self )    = @_;
+    my $returnValue = $self->$orig();
+    if ($returnValue && $self->getId eq $self->session->setting->get('userFunctionStyleId')) {
+        $self->session->setting->set('userFunctionStyleId', 'PBtmpl0000000000000060');
+    }
+    return $returnValue;
+};
+
 =head2 addRevision ( )
 
 Override the master addRevision to copy attachments
@@ -415,7 +431,7 @@ Override to import attachments from old versions of WebGUI
 override importAssetCollateralData => sub {
     my ( $self, $data, @args ) = @_;
     if ( $data->{template_attachments} ) {
-        $self->update( { attachmentsJson => $data->{template_attachments} } );
+        $self->update( { attachmentsJson => JSON::to_json($data->{template_attachments}) } );
     }
     return super();
 };
@@ -614,6 +630,27 @@ sub processRaw {
 	my $parser = shift;
 	return $class->getParser($session,$parser)->process($template, $vars);
 }
+
+#-------------------------------------------------------------------
+
+=head2 purge ( )
+
+Extend the base method to handle purging the User Function Style template and destroying your site.
+If the current template is the User Function Style template with the Fail Safe template.
+
+=cut
+
+around purge => sub {
+	my $orig = shift;
+	my $self = shift;
+    my $session = $self->session;
+    my $assetId = $self->assetId;
+    my $returnValue = $self->$orig(@_);
+    if ($returnValue && $assetId eq $session->setting->get('userFunctionStyleId')) {
+        $session->setting->set('userFunctionStyleId', 'PBtmpl0000000000000060');
+    }
+	return $returnValue;
+};
 
 #-------------------------------------------------------------------
 
