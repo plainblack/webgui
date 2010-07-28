@@ -282,7 +282,7 @@ sub update {
 
         my $address = $item->getShippingAddress;
         $newProperties->{ shippingAddressId     } = $address->getId;
-        $newProperties->{ shippingAddressName   } = $address->get('name');
+        $newProperties->{ shippingAddressName   } = join ' ', $address->get('firstName'), $address->get('lastName');
         $newProperties->{ shippingAddress1      } = $address->get('address1');
         $newProperties->{ shippingAddress2      } = $address->get('address2');
         $newProperties->{ shippingAddress3      } = $address->get('address3');
