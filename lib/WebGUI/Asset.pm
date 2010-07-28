@@ -573,6 +573,9 @@ A URL.
 
 sub dispatch {
 	my ($self, $fragment) = @_;
+    if (! $fragment ) {
+        return $self->www_view;
+    }
 }
 
 
