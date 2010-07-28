@@ -57,13 +57,16 @@ WebGUI::Test->addToCleanup( $tag );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 5;        # Increment this number for each test you create
+plan tests => 7;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test dispatch
 
 # Add a TestDispatch asset and test
-my $td  = WebGUI::Asset->getImportNode( $session )->addChild( { className => 'WebGUI::Asset::TestDispatch' } );
+my $td  = WebGUI::Asset->getImportNode( $session )->addChild( { 
+    url         => 'testDispatch',
+    className   => 'WebGUI::Asset::TestDispatch',
+} );
 is( $td->dispatch, "www_view", "dispatch with no fragment shows www_view" );
 is( $td->dispatch( '/foo' ), 'bar', 'dispatch detects fragment and returns' );
 ok( !$td->dispatch( '/unhandled' ), 'dispatch with unknown fragment returns false' );
@@ -74,5 +77,8 @@ $session->request->setup_body( {
 } );
 is( $td->dispatch, "www_edit", "dispatch handles ?func= query param" );
 is( $td->dispatch( '/foo' ), "bar", "overridden dispatch trumps ?func= query param" );
+
+# Test func= can only be run on the exact asset we requested
+isnt( $td->dispatch( '/bar' ), "www_edit", "?func= dispatch cancelled because of unhandled fragment" );
 
 #vim:ft=perl
