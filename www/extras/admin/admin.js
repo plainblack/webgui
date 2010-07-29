@@ -42,6 +42,8 @@ WebGUI.Admin = function(cfg){
             self.locationBar.navigate( self.currentAssetDef );
         }
 
+        self.afterNavigate.subscribe( self.requestUpdateCurrentVersionTag, self );
+
         self.tree           = new WebGUI.Admin.Tree();
         self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
         // Keep track of View and Tree tabs
@@ -329,6 +331,49 @@ WebGUI.Admin.prototype.addHelperHandler
     }
 };
 
+/**
+ * updateCurrentVersionTag( tag )
+ * Update the current version tag. tag is an object of data about the tag:
+ *      tagId       : the ID of the tag
+ *      name        : The name of the tag
+ *      editUrl     : A URL to edit the tag
+ *      commitUrl   : A URL to commit the tag
+ *      leaveUrl    : A URL to leave the tag
+ */
+WebGUI.Admin.prototype.updateCurrentVersionTag
+= function ( tag ) {
+    var editEl  = document.getElementById( 'editTag' );
+    editEl.innerHTML = tag.name;
+    editEl.href     = tag.editUrl;
+
+    var publishEl = document.getElementById( 'publishTag' );
+    publishEl.href  = tag.commitUrl;
+
+    var leaveEl = document.getElementById( 'leaveTag' );
+    leaveEl.href    = tag.leaveUrl;
+};
+
+/**
+ * requestUpdateCurrentVersionTag( )
+ * Request an update for the current version tag
+ */
+WebGUI.Admin.prototype.requestUpdateCurrentVersionTag
+= function ( ) {
+    var callback = {
+        success : function (o) {
+            var tag = YAHOO.lang.JSON.parse( o.responseText );
+            if ( tag ) {
+                this.updateCurrentVersionTag( tag );
+            }
+        },
+        failure : function (o) {
+
+        },
+        scope: this
+    };
+
+    var ajax = YAHOO.util.Connect.asyncRequest( 'GET', '?op=admin;method=getCurrentVersionTag', callback );
+};
 
 /****************************************************************************
  *  WebGUI.Admin.LocationBar
