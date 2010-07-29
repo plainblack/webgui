@@ -563,11 +563,16 @@ sub definition {
 =head2 dispatch ( $fragment )
 
 Based on the URL and query parameters in the current request, call internal methods
-like www_view, www_edit, etc.
+like www_view, www_edit, etc.  If no query parameter is present, then it returns the output
+from the view method.
+
+When this method returns undef, it means that the requested URL does not match this Asset's
+URL.
 
 =head3 $fragment
 
-A URL.
+A URL.  If this URL is missing, then output from the view method is returned.
+If the fragment does not match this Asset's URL, then it returns undef.
 
 =cut
 
@@ -582,6 +587,7 @@ sub dispatch {
     if (! $fragment ) {
         return $self->www_view;
     }
+    return undef;
 }
 
 

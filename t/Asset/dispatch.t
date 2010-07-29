@@ -59,7 +59,7 @@ WebGUI::Test->addToCleanup( $tag );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 9;        # Increment this number for each test you create
+plan tests => 10;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test dispatch
@@ -82,12 +82,18 @@ is( $td->dispatch( '/foo' ), "bar", "overridden dispatch trumps ?func= query par
 
 # Test func= can only be run on the exact asset we requested
 my $output = $td->dispatch( '/bar' );
-ok( $output, "dispatch returned something, maybe not found page?" );
+is( $output, undef, "dispatch returned undef, meaning that it declined to handle the request for a func but the wrong URL" );
 isnt( $output, "www_edit", "?func= dispatch cancelled because of unhandled fragment" );
+
+# Test unhandled options
+$session->request->setup_body( {
+    func        => 'notAMethod',
+} );
+is( $td->dispatch, "www_view", "requests for non-existant methods return www_view method" );
 
 $session->request->setup_body( { } );
 $output = $td->dispatch( '/not-foo' );
-ok( $output, "dispatch returned something, maybe not found page?" );
+is( $output, undef, "dispatch returned undef, meaning that it declined to handle the request for the wrong URL" );
 isnt( $output, "www_view", "?func= dispatch cancelled because of unhandled fragment" );
 
 #vim:ft=perl
