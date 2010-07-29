@@ -289,14 +289,6 @@ sub www_view {
     $var->{profileUrl} = $user->getProfileUrl;
     $var->{logoutUrl}  = $url->page("op=auth;method=logout");
 
-    # Add vars for current version tag
-    if ( my $tag = WebGUI::VersionTag->getWorking( $session, "nocreate" ) ) {
-        $var->{tagName}         = $tag->get("name");
-        $var->{tagEditUrl}      = $tag->getEditUrl;
-        $var->{tagPublishUrl}   = "";                  #TODO
-        $var->{tagLeaveUrl}     = "";                  #TODO
-    }
-
     $var->{viewUrl} = $url->page;
     $var->{homeUrl} = WebGUI::Asset->getDefault( $session )->getUrl;
 
@@ -389,8 +381,8 @@ __DATA__
 
     <div id="versionTag" style="display: none">
         <div style="float: right">
-            <span class="action" id="publishTag">Publish</span>
-            | <span class="action" id="leaveTag">Leave</span>
+            <span class="action" id="publishTag">Publish (i18n)</span>
+            | <span class="action" id="leaveTag">Leave (i18n)</span>
         </div>
         <a href="#" id="editTag" target="view" style="background-image: ^Extras(icon/tag_blue.png);;"></a>
     </div>
