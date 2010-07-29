@@ -1043,16 +1043,40 @@ sub getHelpers {
 
     my $default = [
         {
-            class   => 'WebGUI::AssetHelper::EditBranch',
-            label   => 'Edit Branch',
+            class   => 'WebGUI::AssetHelper::ChangeUrl',
+            label   => 'Change URL',
+        },
+        {
+            class   => 'WebGUI::AssetHelper::Copy',
+            label   => 'Copy',
+        },
+        {
+            class   => 'WebGUI::AssetHelper::CopyBranch',
+            label   => 'Copy Branch',
+        },
+        {
+            class   => 'WebGUI::AssetHelper::Cut',
+            label   => 'Cut',
         },
         {
             url     => $self->getUrl( 'func=edit' ),
             label   => 'Edit',
         },
         {
+            class   => 'WebGUI::AssetHelper::EditBranch',
+            label   => 'Edit Branch',
+        },
+        {
+            class   => 'WebGUI::AssetHelper::ExportHtml',
+            label   => 'Export As HTML',
+        },
+        {
             url     => $self->getUrl( 'func=view' ),
             label   => 'View',
+        },
+        {
+            class   => 'WebGUI::AssetHelper::Lock',
+            label   => 'Lock',
         },
     ];
 
