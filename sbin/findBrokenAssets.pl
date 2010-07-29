@@ -65,8 +65,8 @@ my $sth   = $session->db->read($sql);
 my $count = 1;
 my %classTables;            # Cache definition lookups
 while ( my %row = $sth->hash ) {
-    eval { WebGUI::Asset->newPending( $session, $row{assetId} ) };
-    if ( $@ ) {
+    my $asset = eval { WebGUI::Asset->newPending( $session, $row{assetId} ) };
+    if ( $@ || ! $asset ) {
 
         # Replace the progress bar with a message
         printf "\r%-68s", "-- Corrupt: $row{assetId}";
