@@ -254,14 +254,21 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 
     # TODO: Figure out if user is still in the admin console
     $var{'head.tags'} .= '<script type="text/javascript">';
-    if ( $session->asset ) {
+    my $asset   = $session->asset;
+
+    # If user is in an operation, find the right asset
+    if ( !$asset && $session->form->get('op') ) {
+        $asset  = WebGUI::Asset->newByUrl( $session );
+    }
+
+    if ( $asset ) {
         my $assetDef    = { 
-            assetId     => $session->asset->getId,
-            title       => $session->asset->getTitle,
-            url         => $session->asset->getUrl,
-            icon        => $session->asset->getIcon(1),
-            type        => $session->asset->assetName,
-            helpers     => $session->asset->getHelpers,
+            assetId     => $asset->getId,
+            title       => $asset->getTitle,
+            url         => $asset->getUrl,
+            icon        => $asset->getIcon(1),
+            type        => $asset->assetName,
+            helpers     => $asset->getHelpers,
         };
         $var{'head.tags'} .= sprintf <<'ADMINJS', JSON->new->encode( $assetDef );
 if ( window.parent && window.parent.admin ) {
