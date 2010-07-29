@@ -194,6 +194,33 @@ sub www_getClipboard {
 
 #----------------------------------------------------------------------
 
+=head2 www_getCurrentVersionTag ( )
+
+Get information about the current version tag
+
+=cut
+
+sub www_getCurrentVersionTag {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my $currentUrl    = $session->url->getRequestedUrl;
+
+    my $currentTag  = WebGUI::VersionTag->getWorking( $session, "nocreate" );
+    return JSON->new->encode( {} ) unless $currentTag;
+
+    my %tagInfo = (
+        tagId       => $currentTag->getId,
+        name        => $currentTag->get('name'),
+        editUrl     => $currentTag->getEditUrl,
+        commitUrl   => $currentTag->getCommitUrl,
+        leaveUrl    => $currentUrl . '?op=leaveVersionTag',
+    );
+
+    return JSON->new->encode( \%tagInfo );
+}
+
+#----------------------------------------------------------------------
+
 =head2 www_getTreeData ( ) 
 
 Get the Tree data for a given asset URL
