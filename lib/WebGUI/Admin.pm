@@ -381,8 +381,8 @@ __DATA__
 
     <div id="versionTag" style="display: none">
         <div style="float: right">
-            <span class="action" id="publishTag">Publish (i18n)</span>
-            | <span class="action" id="leaveTag">Leave (i18n)</span>
+            <a href="#" target="view" id="publishTag">Publish (i18n)</span>
+            | <a href="#" target="view" id="leaveTag">Leave (i18n)</span>
         </div>
         <a href="#" id="editTag" target="view" style="background-image: ^Extras(icon/tag_blue.png);;"></a>
     </div>
