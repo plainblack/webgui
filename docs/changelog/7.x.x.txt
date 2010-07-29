@@ -1,4 +1,5 @@
 7.9.11
+ - fixed #11755: New cart does not update shipping methods correctly
 
 7.9.10
  - fixed #11721: spamStopWords not in WebGUI.conf.original
