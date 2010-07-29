@@ -262,12 +262,14 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
     }
 
     if ( $asset ) {
+        my $i18n        = WebGUI::International->new( $session );
+        my $assetName   = $i18n->get( @{ $asset->assetName } );
         my $assetDef    = { 
             assetId     => $asset->getId,
             title       => $asset->getTitle,
             url         => $asset->getUrl,
             icon        => $asset->getIcon(1),
-            type        => $asset->assetName,
+            type        => $assetName,
             helpers     => $asset->getHelpers,
         };
         $var{'head.tags'} .= sprintf <<'ADMINJS', JSON->new->encode( $assetDef );
