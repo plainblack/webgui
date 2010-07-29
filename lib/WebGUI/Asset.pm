@@ -574,6 +574,7 @@ A URL.
 sub dispatch {
     my ($self, $fragment) = @_;
     if (my $func = $self->session->form->param('func')) {
+        return undef if $fragment && $fragment ne $self->getUrl;
         if (my $sub = $self->can('www_'.$func)) {
             return $sub->();
         }

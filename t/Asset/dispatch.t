@@ -86,7 +86,7 @@ ok( $output, "dispatch returned something, maybe not found page?" );
 isnt( $output, "www_edit", "?func= dispatch cancelled because of unhandled fragment" );
 
 $session->request->setup_body( { } );
-$output = $td->dispatch( '/bar' );
+$output = $td->dispatch( '/not-foo' );
 ok( $output, "dispatch returned something, maybe not found page?" );
 isnt( $output, "www_view", "?func= dispatch cancelled because of unhandled fragment" );
 
