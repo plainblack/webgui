@@ -342,7 +342,7 @@ WebGUI.Admin.prototype.addHelperHandler
  */
 WebGUI.Admin.prototype.updateCurrentVersionTag
 = function ( tag ) {
-    if ( !tag ) {
+    if ( !tag.tagId ) {
         // hide tag area
         document.getElementById( 'versionTag' ).style.display = "none";
         return;
