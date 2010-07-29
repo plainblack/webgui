@@ -292,6 +292,25 @@ sub www_getTreeData {
 
 #----------------------------------------------------------------------
 
+=head2 www_processAssetHelper ( )
+
+Process the given asset helper with the given asset
+
+=cut
+
+sub www_processAssetHelper {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $form ) = $session->quick(qw{ form });
+
+    my $assetId = $form->get('assetId');
+    my $class   = $form->get('className');
+    my $asset   = WebGUI::Asset->newById( $session, $assetId );
+    return JSON->new->encode( $class->process( $asset ) );
+}
+
+#----------------------------------------------------------------------
+
 =head2 www_view ( session )
 
 Show the main Admin console wrapper
