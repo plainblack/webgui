@@ -342,6 +342,15 @@ WebGUI.Admin.prototype.addHelperHandler
  */
 WebGUI.Admin.prototype.updateCurrentVersionTag
 = function ( tag ) {
+    if ( !tag ) {
+        // hide tag area
+        document.getElementById( 'versionTag' ).style.display = "none";
+        return;
+    }
+
+    // Make sure tag is shown now
+    document.getElementById( 'versionTag' ).style.display = "block";
+
     var editEl  = document.getElementById( 'editTag' );
     editEl.innerHTML = tag.name;
     editEl.href     = tag.editUrl;
@@ -362,9 +371,7 @@ WebGUI.Admin.prototype.requestUpdateCurrentVersionTag
     var callback = {
         success : function (o) {
             var tag = YAHOO.lang.JSON.parse( o.responseText );
-            if ( tag ) {
-                this.updateCurrentVersionTag( tag );
-            }
+            this.updateCurrentVersionTag( tag );
         },
         failure : function (o) {
 
