@@ -51,7 +51,7 @@ sub process {
     }
 
     return {
-        open_tab => $asset->getUrl('op=assetHelper;className=WebGUI::AssetHelper::ChangeUrl;func=changeUrl'),
+        openDialog => $asset->getUrl('op=assetHelper;className=WebGUI::AssetHelper::ChangeUrl;func=changeUrl'),
     };
 }
 
