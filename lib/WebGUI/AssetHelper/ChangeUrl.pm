@@ -72,7 +72,7 @@ sub www_changeUrl {
             error => $i18n->get('38', 'WebGUI'),
         }
     }
-    my $f = WebGUI::HTMLForm->new($session, action=>$asset->getUrl);
+    my $f = WebGUI::HTMLForm->new($session, method => 'POST' );
     $f->hidden( name => 'op', value => 'assetHelper' );
     $f->hidden( name => 'className', value => $class );
     $f->hidden( name => "method", value=>"changeUrlSave" );
@@ -123,7 +123,11 @@ sub www_changeUrlSave {
         }
     }
 
-    return '<script type="text/javascript">window.parent.admin.closeModalDialog();</script>';
+    my $output = sprintf '<script type="text/javascript">
+        window.parent.admin.gotoAsset("%s");
+        window.parent.admin.closeModalDialog(); // Must be last, script will stop after this
+    </script>', $asset->getUrl;
+    return $output;
 }
 
 
