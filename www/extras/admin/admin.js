@@ -454,6 +454,20 @@ WebGUI.Admin.prototype.openModalDialog
     this.modalDialog = dialog;
 };
 
+/**
+ * closeModalDialog( )
+ * Close the current modal dialog
+ */
+WebGUI.Admin.prototype.closeModalDialog
+= function ( ) {
+    if ( !this.modalDialog ) {
+        return; // Can't close what isn't open
+    }
+
+    this.modalDialog.destroy();
+    this.modalDialog = null;
+};
+
 /****************************************************************************
  *  WebGUI.Admin.LocationBar
  */
