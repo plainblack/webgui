@@ -51,7 +51,7 @@ sub process {
     }
 
     return {
-        openDialog => $asset->getUrl('op=assetHelper;className=WebGUI::AssetHelper::ChangeUrl;func=changeUrl'),
+        openDialog => $asset->getUrl('op=assetHelper;className=WebGUI::AssetHelper::ChangeUrl;method=changeUrl;assetId=' . $asset->getId ),
     };
 }
 
