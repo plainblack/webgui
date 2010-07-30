@@ -430,7 +430,7 @@ WebGUI.Admin.prototype.openModalDialog
         return; // Can't have more than one open
     }
 
-    var dialog  = YAHOO.widget.Panel( 'adminModalDialog', {
+    var dialog  = new YAHOO.widget.Panel( 'adminModalDialog', {
         "width"             : width,
         "height"            : height,
         fixedcenter         : true,
@@ -441,7 +441,7 @@ WebGUI.Admin.prototype.openModalDialog
         visible             : true,
         draggable           : false
     } );
-    dialog.setBody( '<iframe src="' + url + '" width="' + width + '" height="' + height '"></iframe>' );
+    dialog.setBody( '<iframe src="' + url + '" width="' + width + '" height="' + height + '"></iframe>' );
     dialog.render( document.body );
 
     this.modalDialog = dialog;
