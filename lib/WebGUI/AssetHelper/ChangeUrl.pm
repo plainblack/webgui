@@ -73,8 +73,10 @@ sub www_changeUrl {
         }
     }
     my $f = WebGUI::HTMLForm->new($session, action=>$asset->getUrl);
-    $f->hidden(name=>"func",    value=>"changeUrlSave");
-    $f->hidden(name=>"proceed", value=>$session->form->param("proceed"));
+    $f->hidden( name => 'op', value => 'assetHelper' );
+    $f->hidden( name => 'className', value => $class );
+    $f->hidden( name => "method", value=>"changeUrlSave" );
+    $f->hidden( name => 'assetId', value => $asset->getId );
     $f->text(
         name     => "url",
         value    => $asset->get('url'),
