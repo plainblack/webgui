@@ -430,6 +430,13 @@ WebGUI.Admin.prototype.openModalDialog
         return; // Can't have more than one open
     }
 
+    if ( !width ) {
+        width       = parseInt( YAHOO.util.Dom.getViewportWidth() * 0.6 ) + "px";
+    }
+    if ( !height ) {
+        height      = parseInt( YAHOO.util.Dom.getViewportHeight() * 0.6 ) + "px";
+    }
+
     var dialog  = new YAHOO.widget.Panel( 'adminModalDialog', {
         "width"             : width,
         "height"            : height,
@@ -441,7 +448,7 @@ WebGUI.Admin.prototype.openModalDialog
         visible             : true,
         draggable           : false
     } );
-    dialog.setBody( '<iframe src="' + url + '" width="' + width + '" height="' + height + '"></iframe>' );
+    dialog.setBody( '<iframe src="' + url + '" width="100%" height="100%"></iframe>' );
     dialog.render( document.body );
 
     this.modalDialog = dialog;
