@@ -418,6 +418,35 @@ WebGUI.Admin.prototype.requestHelper
     var ajax = YAHOO.util.Connect.asyncRequest( 'GET', url, callback );
 };
 
+/**
+ * openModalDialog( url, width, height )
+ * Open a modal dialog with an iframe containing the given URL.
+ * The page inside the iframe must eventually close the dialog using:
+ *      window.parent.admin.closeModalDialog();
+ */
+WebGUI.Admin.prototype.openModalDialog
+= function ( url, width, height ) {
+    if ( this.modalDialog ) {
+        return; // Can't have more than one open
+    }
+
+    var dialog  = YAHOO.widget.Panel( 'adminModalDialog', {
+        "width"             : width,
+        "height"            : height,
+        fixedcenter         : true,
+        constraintoviewport : true,
+        underlay            : "shadow",
+        modal               : true,
+        close               : false,
+        visible             : true,
+        draggable           : false
+    } );
+    dialog.setBody( '<iframe src="' + url + '" width="' + width + '" height="' + height '"></iframe>' );
+    dialog.render( document.body );
+
+    this.modalDialog = dialog;
+};
+
 /****************************************************************************
  *  WebGUI.Admin.LocationBar
  */
