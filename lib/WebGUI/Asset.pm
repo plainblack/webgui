@@ -571,23 +571,21 @@ URL.
 
 =head3 $fragment
 
-A URL.  If this URL is missing, then output from the view method is returned.
-If the fragment does not match this Asset's URL, then it returns undef.
+Any leftover part of the requested URL.
 
 =cut
 
 sub dispatch {
     my ($self, $fragment) = @_;
-    if (my $func = $self->session->form->param('func')) {
-        return undef if $fragment && $fragment ne $self->getUrl;
-        if (my $sub = $self->can('www_'.$func)) {
-            return $sub->();
-        }
-    }
-    if (! $fragment ) {
-        return $self->www_view;
-    }
-    return undef;
+    return undef if defined $fragment;
+    my $state = $self->get('state');
+    ##Only allow interaction with assets in certain states
+    return if $state ne 'published' && $state ne 'archived' && !$self->session->var->isAdminOn;
+    my $func   = $self->session->form->param('func') || 'view';
+    my $sub    = $self->can('www_'.$func) || $self->can('www_view');
+    return undef unless $sub;
+    my $output = $sub->();
+    return $output;
 }
 
 
