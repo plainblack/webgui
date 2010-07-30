@@ -483,6 +483,7 @@ YAHOO.util.Event.onDOMReady( function() {
         homeUrl : '<tmpl_var homeUrl>'
     } );
     // Add all asset helpers to the admin instance
+    document.body.className="yui-skin-sam";
 } );
 
 </script>
