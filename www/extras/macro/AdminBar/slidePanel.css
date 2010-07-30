@@ -22,7 +22,6 @@ dl#adminBar {
         /*
     _top:expression(eval((document.documentElement && document.documentElement.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop)); */
     left:0;
-    z-index: 100;
     width: 160px;
 }
 
