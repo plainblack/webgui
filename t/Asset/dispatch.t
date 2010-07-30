@@ -51,6 +51,10 @@ sub www_edit {
     return "www_edit";
 }
 
+sub www_alsoView {
+    return;
+}
+
 package main;
 
 my $tag = WebGUI::VersionTag->getWorking( $session );
@@ -59,7 +63,7 @@ WebGUI::Test->addToCleanup( $tag );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 10;        # Increment this number for each test you create
+plan tests => 13;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test dispatch
@@ -69,6 +73,7 @@ my $td  = WebGUI::Asset->getImportNode( $session )->addChild( {
     url         => 'testDispatch',
     className   => 'WebGUI::Asset::TestDispatch',
 } );
+
 is( $td->dispatch, "www_view", "dispatch with no fragment shows www_view" );
 is( $td->dispatch( '/foo' ), 'bar', 'dispatch detects fragment and returns' );
 ok( !$td->dispatch( '/unhandled' ), 'dispatch with unknown fragment returns false' );
@@ -91,9 +96,22 @@ $session->request->setup_body( {
 } );
 is( $td->dispatch, "www_view", "requests for non-existant methods return www_view method" );
 
+# Test unhandled options
+$session->request->setup_body( {
+    func        => 'alsoView',
+} );
+is( $td->dispatch, "www_view", "if a query method return undef, view is still returned" );
+
 $session->request->setup_body( { } );
 $output = $td->dispatch( '/not-foo' );
 is( $output, undef, "dispatch returned undef, meaning that it declined to handle the request for the wrong URL" );
 isnt( $output, "www_view", "?func= dispatch cancelled because of unhandled fragment" );
+
+$td->cut();
+$output = $td->dispatch();
+is $output, undef, 'dispatch returns undef when trying to access an asset that is not published, and admin is not on';
+$session->var->switchAdminOn;
+$output = $td->dispatch();
+is $output, 'www_view', 'when admin is on, the asset can be accessed';
 
 #vim:ft=perl

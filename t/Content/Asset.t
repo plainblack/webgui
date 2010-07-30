@@ -92,18 +92,22 @@ cmp_deeply(
 cmp_deeply( 
     WebGUI::Content::Asset::getUrlPermutations( "one" ),
     [ 'one' ],
+    "simple one element URL",
 );
 cmp_deeply(
     WebGUI::Content::Asset::getUrlPermutations( "/one" ),
     [ '/one', ],
+    "simple one element URL with leading slash",
 );
 cmp_deeply(
     WebGUI::Content::Asset::getUrlPermutations( "one/two/three" ),
     [ 'one/two/three', 'one/two', 'one', ],
+    "three element URL",
 );
 cmp_deeply(
     WebGUI::Content::Asset::getUrlPermutations( "/one/two/three" ),
     [ '/one/two/three', '/one/two', '/one', ],
+    "three element URL with leading slash",
 );
 cmp_deeply(
     WebGUI::Content::Asset::getUrlPermutations( "/one/two/three.rss" ),
@@ -133,6 +137,7 @@ my $clobberingTime
         className   => 'WebGUI::Asset::TestDispatch',
         url         => $td->get('url') . '/foo',
     } );
+WebGUI::Test->addToCleanup($clobberingTime);
 
 is(
     WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" ),
