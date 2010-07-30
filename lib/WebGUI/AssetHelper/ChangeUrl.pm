@@ -123,14 +123,7 @@ sub www_changeUrlSave {
         }
     }
 
-    if ($session->form->param("proceed") eq "manageAssets") {
-        $session->http->setRedirect($asset->getManagerUrl);
-    }
-    else {
-        $session->http->setRedirect($asset->getUrl());
-    }
-
-    return undef;
+    return '<script type="text/javascript">window.parent.admin.closeModalDialog();</script>';
 }
 
 
