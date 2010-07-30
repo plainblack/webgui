@@ -16,6 +16,7 @@ package WebGUI::Content::Admin;
 
 use strict;
 use WebGUI::Admin;
+use WebGUI::Pluggable;
 
 
 =head1 NAME
@@ -62,6 +63,19 @@ sub handler {
             else {
                 return $admin->www_view;
             }
+        }
+    }
+
+    if ( $session->form->get("op") eq "assetHelper" ) {
+        # Load and run the requested asset helper www_ method
+        my $class   = $session->form->get('className');
+        WebGUI::Pluggable::load( $class );
+        my $method  = $session->form->get('method') || "view";
+        my $assetId = $session->form->get('assetId');
+        my $asset   = WebGUI::Asset->newById( $session, $assetId );
+
+        if ( $class->can( "www_" . $method ) ) {
+            return $class->can( "www_" . $method )->( $class, $asset );
         }
     }
 
