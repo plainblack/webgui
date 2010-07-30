@@ -356,6 +356,7 @@ sub www_view {
     $style->setScript( $url->extras( 'yui/build/datasource/datasource-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/connection/connection-min.js ' ) );
     $style->setScript( $url->extras( 'yui/build/datatable/datatable-min.js ' ) );
+    $style->setScript( $url->extras( 'yui/build/dragdrop/dragdrop-min.js' ) );
     $style->setScript( $url->extras( 'yui/build/container/container-min.js' ) );
     $style->setScript($url->extras('yui/build/tabview/tabview-min.js'));
     $style->setScript($url->extras('yui/build/menu/menu-min.js'));
