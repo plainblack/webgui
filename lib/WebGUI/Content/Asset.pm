@@ -46,14 +46,33 @@ These subroutines are available from this package:
 
 =head2 dispatch ( $session, $assetUrl )
 
-Returns the output from an asset.
+Attempts to return the output from an asset, based on its url.  All permutations of the
+URL are tried, to find an asset that matches.
+
+=head3 $session
+
+A WebGUI::Session object.
+
+=head4 $assetUrl
+
+The URL for this request.
 
 =cut
 
 sub dispatch {
-    my $session = shift;
-	my $assetUrl = shift;
-    return;
+    my $session      = shift;
+	my $assetUrl     = shift;
+    return undef unless $assetUrl;
+    my $permutations = getUrlPermutations($assetUrl);
+    foreach my $url (@{ $permutations }) {
+        if (my $asset = getAsset($session, $url)) {
+            my $fragment = $assetUrl;
+            $fragment =~ s/$url//;
+            my $output = $asset->dispatch($fragment);
+            return $output if defined $output;
+        }
+    }
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -104,15 +123,14 @@ sub getUrlPermutations {
     my $url          = shift;
     my @permutations = ();
     return \@permutations if !$url;
-    push @permutations, $url;
     if ($url =~ /\.\w+$/) {
-        $url =~ s/\.\w+$//;
         push @permutations, $url;
+        $url =~ s/\.\w+$//;
     }
     my $uri       = URI->new($url);
     my @fragments = $uri->path_segments();
-    pop @fragments;
-    while (@fragments > 1) {
+    FRAG: while (@fragments) {
+        last FRAG if $fragments[-1] eq '';
         push @permutations, join "/", @fragments;
         pop @fragments;
     }
