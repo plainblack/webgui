@@ -5,6 +5,7 @@ package WebGUI::Admin;
 use Moose;
 use JSON qw( from_json to_json );
 use namespace::autoclean;
+use WebGUI::Pluggable;
 
 has 'session' => (
     is          => 'ro',
@@ -305,6 +306,7 @@ sub www_processAssetHelper {
 
     my $assetId = $form->get('assetId');
     my $class   = $form->get('className');
+    WebGUI::Pluggable::load( $class );
     my $asset   = WebGUI::Asset->newById( $session, $assetId );
     return JSON->new->encode( $class->process( $asset ) );
 }
