@@ -382,6 +382,39 @@ WebGUI.Admin.prototype.requestUpdateCurrentVersionTag
     var ajax = YAHOO.util.Connect.asyncRequest( 'GET', '?op=admin;method=getCurrentVersionTag', callback );
 };
 
+/**
+ * requestHelper( helperClass, assetId )
+ * Request the Asset Helper for the given assetId
+ */
+WebGUI.Admin.prototype.requestHelper
+= function ( helperClass, assetId ) {
+    var callback = {
+        success : function (o) {
+            var resp = YAHOO.lang.JSON.parse( o.responseText );
+
+            if ( resp.openTab ) {
+                this.openTab( resp.openTab );
+            }
+            else if ( resp.openDialog ) {
+                this.openModalDialog( resp.openDialog, resp.width, resp.height );
+            }
+            else if ( resp.scriptFile ) {
+                this.loadAndRun( resp.scriptFile, resp.scriptFunc, resp.scriptArgs );
+            }
+            else {
+                alert( "Unknown helper response: " + resp );
+            }
+        },
+        failure : function (o) {
+
+        },
+        scope: this
+    };
+
+    var url = '?op=admin;method=processAssetHelper;className=' + helperClass + ';assetId=' + assetId;
+    var ajax = YAHOO.util.Connect.asyncRequest( 'GET', url, callback );
+};
+
 /****************************************************************************
  *  WebGUI.Admin.LocationBar
  */
