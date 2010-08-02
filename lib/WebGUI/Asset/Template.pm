@@ -280,7 +280,7 @@ override getEditForm => sub {
 		while(my $a = shift @temparray){
 			$parsers{$a} = $self->getParser($self->session, $a)->getName();
 		}
-		my $value = [$self->getValue("parser")];
+		my $value = [$self->parser];
 		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->parser);
 		$tabform->getTab("properties")->addField( "SelectBox",
 			name=>"parser",
@@ -317,7 +317,7 @@ override getEditForm => sub {
 
         $tabform->getTab('properties')->image( 
             name        => 'storageIdExample',
-            value       => $self->getValue('storageIdExample'),
+            value       => $self->storageIdExample,
             label       => $i18n->get('field storageIdExample'),
             hoverHelp   => $i18n->get('field storageIdExample description'),
         );
