@@ -291,7 +291,7 @@ override getEditForm => sub {
 			);
 	}
 
-    $tabform->getTab('properties')->jsonTable(
+    $tabform->getTab('properties')->addField( "jsonTable",
         name        => 'attachmentsJson', 
         value       => $self->get('attachmentsJson'),
         label       => $i18n->get("attachments display label"),
@@ -315,7 +315,7 @@ override getEditForm => sub {
         ],
     );
 
-        $tabform->getTab('properties')->image( 
+        $tabform->getTab('properties')->addField( image =>
             name        => 'storageIdExample',
             value       => $self->storageIdExample,
             label       => $i18n->get('field storageIdExample'),
@@ -705,8 +705,14 @@ ENDHTML
     
     $output .= $self->getEditForm->toHtml;
 
-    $self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
-    return $self->getAdminConsole->render( $output, $i18n->get('edit template') );
+    # TODO: Asset Helper
+    #$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
+
+    # TODO: Make a www_edit template
+    return $self->session->style->process(
+        '<div class="yui-skin-sam">' . $output . '</div>',
+        "PBtmpl0000000000000137"
+    );
 }
 
 #-------------------------------------------------------------------
