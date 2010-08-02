@@ -523,13 +523,15 @@ WebGUI.Admin.prototype.showInfoMessage
     info.innerHTML = message;
 
     var infoContainer   = document.getElementById( 'infoMessageContainer' );
-    infoContainer.style.height   = WebGUI.Admin.getRealHeight( infoContainer );
+    var newHeight       = WebGUI.Admin.getRealHeight( infoContainer );
+    infoContainer.style.height   = newHeight + 'px';
+    infoContainer.style.top      = -1 * newHeight + 'px';
     infoContainer.style.display  = "block";
 
     var anim = new YAHOO.util.Anim( infoContainer );
     anim.duration  = 0.25;
     anim.method    = YAHOO.util.Easing.easeOut;
-    anim.attributes.top = { from: -1 * WebGUI.Admin.getRealHeight( infoContainer ), to: 0 };
+    anim.attributes.top = { to: 0 };
     anim.animate();
 
     this.infoMessageTimeout = setTimeout( this.hideInfoMessage, 3000 );
