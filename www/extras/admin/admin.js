@@ -468,6 +468,34 @@ WebGUI.Admin.prototype.closeModalDialog
     this.modalDialog = null;
 };
 
+/**
+ * showInfoMessage( message )
+ * Show an informative message that requires no response or interaction from 
+ * the user.
+ */
+WebGUI.Admin.prototype.showInfoMessage
+= function ( message ) {
+    if ( this.infoMessageTimeout ) {
+        stopTimeout( this.infoMessageTimeout );
+    }
+
+    var info    = document.getElementById( 'infoMessage' );
+    info.innerHTML = message;
+    info.style.display = "block";
+
+    this.infoMessageTimeout = setTimeout( this.hideInfoMessage, 3000 );
+};
+
+/** 
+ * hideInfoMessage( )
+ * Hide the informative message from showInfoMessage()
+ */
+WebGUI.Admin.prototype.hideInfoMessage
+= function ( ) {
+    var info = document.getElementById( 'infoMessage' );
+    info.style.display = "none";
+};
+
 /****************************************************************************
  *  WebGUI.Admin.LocationBar
  */
