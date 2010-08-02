@@ -83,7 +83,7 @@ WebGUI.Admin.getRealHeight
     if (elem.style.display == 'none') {
         clipped = true;
         D.setStyle(elem, 'position', 'absolute');
-        D.setStyle(elem, 'visiblity', 'hidden');
+        D.setStyle(elem, 'visibility', 'hidden');
         D.setStyle(elem, 'display', 'block');
     }
     var height = elem.offsetHeight;
@@ -94,7 +94,7 @@ WebGUI.Admin.getRealHeight
     }
     if (clipped) {
         D.setStyle(elem, 'display', 'none');
-        D.setStyle(elem, 'visiblity', _vis);
+        D.setStyle(elem, 'visibility', _vis);
         D.setStyle(elem, 'position', _pos);
     }
     //Strip the px from the style
