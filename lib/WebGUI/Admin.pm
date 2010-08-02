@@ -428,7 +428,7 @@ __DATA__
 </dl>
 
 <div id="wrapper" class="yui-skin-sam">
-
+    <div id="infoMessage" style="display: none"></div>
     <div id="versionTag" style="display: none">
         <div style="float: right">
             <a href="#" target="view" id="publishTag">Publish (i18n)</span>
