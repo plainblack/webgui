@@ -405,7 +405,7 @@ WebGUI.Admin.prototype.requestHelper
                 this.loadAndRun( resp.scriptFile, resp.scriptFunc, resp.scriptArgs );
             }
             else if ( resp.message ) {
-                this.showMessage( resp.message );
+                this.showInfoMessage( resp.message );
             }
             else {
                 alert( "Unknown helper response: " + resp );
