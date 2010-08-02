@@ -428,7 +428,9 @@ __DATA__
 </dl>
 
 <div id="wrapper" class="yui-skin-sam">
-    <div id="infoMessage" style="display: none"></div>
+    <div id="infoMessageContainer" style="display: none" >
+        <div id="infoMessage" style="background-image: url(^Extras(icon/information.png););"></div>
+    </div>
     <div id="versionTag" style="display: none">
         <div style="float: right">
             <a href="#" target="view" id="publishTag">Publish (i18n)</span>

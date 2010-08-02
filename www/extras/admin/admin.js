@@ -521,7 +521,10 @@ WebGUI.Admin.prototype.showInfoMessage
 
     var info    = document.getElementById( 'infoMessage' );
     info.innerHTML = message;
-    info.style.display = "block";
+
+    var infoContainer   = document.getElementById( 'infoMessageContainer' );
+    infoContainer.style.height   = WebGUI.Admin.getRealHeight( infoContainer );
+    infoContainer.style.display  = "block";
 
     this.infoMessageTimeout = setTimeout( this.hideInfoMessage, 3000 );
 };
@@ -532,8 +535,8 @@ WebGUI.Admin.prototype.showInfoMessage
  */
 WebGUI.Admin.prototype.hideInfoMessage
 = function ( ) {
-    var info = document.getElementById( 'infoMessage' );
-    info.style.display = "none";
+    var infoContainer   = document.getElementById( 'infoMessageContainer' );
+    infoContainer.style.display  = "none";
 };
 
 /****************************************************************************

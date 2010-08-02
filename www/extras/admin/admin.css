@@ -120,3 +120,20 @@ a:link {
     background-repeat:  no-repeat;
     background-position: 0 50%;
 }
+
+#infoMessageContainer {
+    position:       absolute;
+    left:           30%;
+    top:            0px;
+    width:          35%;
+    overflow:       hidden;
+}
+
+#infoMessage {
+    width:          100%;
+    height:         100%;
+    background-color: #ccf;
+    background-position: 0 50%;
+    background-repeat: no-repeat;
+    padding-left:   20px;
+}
