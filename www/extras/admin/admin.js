@@ -72,6 +72,8 @@ WebGUI.Admin = function(cfg){
 WebGUI.Admin.getRealHeight
 = function ( elem ) {
     var D = YAHOO.util.Dom;
+    var _pos = D.getStyle(elem, 'position');
+    var _vis = D.getStyle(elem, 'visiblity');
     var clipped = false;
     // We don't want 0 height!
     if ( parseInt( elem.style.height ) == 0 ) {
@@ -80,8 +82,6 @@ WebGUI.Admin.getRealHeight
     }
     if (elem.style.display == 'none') {
         clipped = true;
-        var _pos = D.getStyle(elem, 'position');
-        var _vis = D.getStyle(elem, 'visiblity');
         D.setStyle(elem, 'position', 'absolute');
         D.setStyle(elem, 'visiblity', 'hidden');
         D.setStyle(elem, 'display', 'block');
