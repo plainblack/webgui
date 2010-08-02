@@ -1,5 +1,6 @@
 7.9.11
  - fixed #11755: New cart does not update shipping methods correctly
+ - fixed #11757: Update the USPS International driver for new country names
 
 7.9.10
  - fixed #11721: spamStopWords not in WebGUI.conf.original
