@@ -84,7 +84,7 @@ sub process {
         allowComments   => 1,
         returnUrl       => $asset->getUrl,
     }) eq 'redirect') {
-        $payload->{open_tab} = $session->http->getRedirectLocation;
+        $payload->{openDialog} = $session->http->getRedirectLocation;
     };
 
     return $payload;
