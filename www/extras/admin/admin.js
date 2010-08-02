@@ -66,6 +66,43 @@ WebGUI.Admin = function(cfg){
 };
 
 /**
+ * getRealHeight( elem ) 
+ * Get the real height of the given element. 
+ */
+WebGUI.Admin.getRealHeight
+= function ( elem ) {
+    var D = YAHOO.util.Dom;
+    var clipped = false;
+    // We don't want 0 height!
+    if ( parseInt( elem.style.height ) == 0 ) {
+        elem.style.display = "none";
+        elem.style.height = ""
+    }
+    if (elem.style.display == 'none') {
+        clipped = true;
+        var _pos = D.getStyle(elem, 'position');
+        var _vis = D.getStyle(elem, 'visiblity');
+        D.setStyle(elem, 'position', 'absolute');
+        D.setStyle(elem, 'visiblity', 'hidden');
+        D.setStyle(elem, 'display', 'block');
+    }
+    var height = elem.offsetHeight;
+    if (height == 'auto') {
+        //This is IE, let's fool it
+        D.setStyle(elem, 'zoom', '1');
+        height = elem.clientHeight;
+    }
+    if (clipped) {
+        D.setStyle(elem, 'display', 'none');
+        D.setStyle(elem, 'visiblity', _vis);
+        D.setStyle(elem, 'position', _pos);
+    }
+    //Strip the px from the style
+    return parseInt(height); 
+
+};
+
+/**
  * afterShowTreeTab()
  * Fired after the Tree tab is shown. Refreshes if necessary.
  */
@@ -1304,7 +1341,7 @@ WebGUI.Admin.AdminBar
     }
 
     // Precalculate dtHeight and maxHeight
-    this.dtHeight   = this.getRealHeight( this.dt[0] ) * this.dt.length;
+    this.dtHeight   = WebGUI.Admin.getRealHeight( this.dt[0] ) * this.dt.length;
     this.maxHeight  = YAHOO.util.Dom.getViewportHeight() - this.dtHeight;
 
     // Add custom event when showing an AdminBar pane
@@ -1343,50 +1380,13 @@ WebGUI.Admin.AdminBar.prototype.getExpandHeight
         return this.maxHeight;
     }
 
-    var height  = this.getRealHeight( elem );
+    var height  = WebGUI.Admin.getRealHeight( elem );
 
     // Make sure not more than maxHeight
     if ( height > this.maxHeight ) {
         return this.maxHeight;
     }
     return height;
-};
-
-/**
- * getRealHeight( elem ) 
- * Get the real height of the given element. 
- */
-WebGUI.Admin.AdminBar.prototype.getRealHeight
-= function ( elem ) {
-    var D = YAHOO.util.Dom;
-    var clipped = false;
-    // We don't want 0 height!
-    if ( parseInt( elem.style.height ) == 0 ) {
-        elem.style.display = "none";
-        elem.style.height = ""
-    }
-    if (elem.style.display == 'none') {
-        clipped = true;
-        var _pos = D.getStyle(elem, 'position');
-        var _vis = D.getStyle(elem, 'visiblity');
-        D.setStyle(elem, 'position', 'absolute');
-        D.setStyle(elem, 'visiblity', 'hidden');
-        D.setStyle(elem, 'display', 'block');
-    }
-    var height = elem.offsetHeight;
-    if (height == 'auto') {
-        //This is IE, let's fool it
-        D.setStyle(elem, 'zoom', '1');
-        height = elem.clientHeight;
-    }
-    if (clipped) {
-        D.setStyle(elem, 'display', 'none');
-        D.setStyle(elem, 'visiblity', _vis);
-        D.setStyle(elem, 'position', _pos);
-    }
-    //Strip the px from the style
-    return parseInt(height); 
-
 };
 
 /**
