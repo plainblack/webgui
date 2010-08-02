@@ -516,7 +516,7 @@ WebGUI.Admin.prototype.closeModalDialog
 WebGUI.Admin.prototype.showInfoMessage
 = function ( message ) {
     if ( this.infoMessageTimeout ) {
-        stopTimeout( this.infoMessageTimeout );
+        clearTimeout( this.infoMessageTimeout );
     }
 
     var info    = document.getElementById( 'infoMessage' );
