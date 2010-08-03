@@ -984,6 +984,7 @@
     "WebGUI::Content::Prefetch",
     "WebGUI::Content::Maintenance",
     "WebGUI::Content::Referral",
+    "WebGUI::Content::Admin",
     "WebGUI::Content::AssetManager",
     "WebGUI::Content::AssetDiscovery",
     "WebGUI::Content::PassiveAnalytics",

@@ -79,7 +79,7 @@ body {
     margin-top:     120px;
     margin-left:    5%;
     margin-right:   5%;
-    background-color:   #ccf;
+    background-color:   #1e78f2;
 }
 
 h1 {
