@@ -30,6 +30,8 @@ BEGIN {
 
 package WebGUI::Asset::TestDispatch;
 
+use WebGUI::Asset;
+use WebGUI::Exception;
 our @ISA = ('WebGUI::Asset');
 
 # Override dispatch to handle special /foo URL
@@ -53,6 +55,15 @@ sub www_edit {
 
 sub www_alsoView {
     return;
+}
+
+sub www_brokenTemplate {
+    my $self = shift;
+    WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => "This is a GUID",
+            assetId    => $self->getId,
+    );
 }
 
 package main;
@@ -100,7 +111,7 @@ is( $td->dispatch, "www_view", "requests for non-existant methods return www_vie
 $session->request->setup_body( {
     func        => 'alsoView',
 } );
-is( $td->dispatch, "www_view", "if a query method return undef, view is still returned" );
+is( $td->dispatch, "www_view", "if a query method returns undef, view is still returned" );
 
 $session->request->setup_body( { } );
 $output = $td->dispatch( '/not-foo' );

@@ -66,9 +66,27 @@ sub dispatch {
     my $permutations = getUrlPermutations($assetUrl);
     foreach my $url (@{ $permutations }) {
         if (my $asset = getAsset($session, $url)) {
+            # display from cache if page hasn't been modified.
+            if ($session->user->isVisitor
+             && !$session->http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
+                $session->http->setStatus("304","Content Not Modified");
+                $session->http->sendHeader;
+                $session->close;
+                return "chunked";
+            } 
+
             my $fragment = $assetUrl;
             $fragment =~ s/$url//;
-            my $output = $asset->dispatch($fragment);
+            my $output = eval { $asset->dispatch($fragment); };
+            if ($@) {
+                $session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
+                if ($method ne "view") {
+                    $output = tryAssetMethod($session,$asset,'view');
+                } else {
+                    # fatals return chunked
+                    $output = 'chunked';
+                }
+            }
             return $output if defined $output;
         }
     }

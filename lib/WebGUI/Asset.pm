@@ -40,6 +40,7 @@ use WebGUI::ProgressBar;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
+use WebGUI::PassiveAnalytics::Logging;
 
 =head1 NAME
 
@@ -564,27 +565,44 @@ sub definition {
 
 Based on the URL and query parameters in the current request, call internal methods
 like www_view, www_edit, etc.  If no query parameter is present, then it returns the output
-from the view method.
-
-When this method returns undef, it means that the requested URL does not match this Asset's
-URL.
+from the www_view method.  If the requested method does not exist in the object, it returns
+the output from the www_view method.
 
 =head3 $fragment
 
 Any leftover part of the requested URL.
 
+=head3 _view
+
+This option should only be used internally, when trying to call the view method when
+the requested method has failed.
+
 =cut
 
 sub dispatch {
-    my ($self, $fragment) = @_;
+    my ($self, $fragment, $_view) = @_;
     return undef if defined $fragment;
+    my $session = $self->session;
     my $state = $self->get('state');
     ##Only allow interaction with assets in certain states
-    return if $state ne 'published' && $state ne 'archived' && !$self->session->var->isAdminOn;
-    my $func   = $self->session->form->param('func') || 'view';
-    my $sub    = $self->can('www_'.$func) || $self->can('www_view');
+    return if $state ne 'published' && $state ne 'archived' && !$session->var->isAdminOn;
+    my $func    = $session->form->param('func') || 'view';
+    $func = 'view' if $_view;
+    my $viewing = $func eq 'view' ? 1 : 0;
+    my $sub     = $self->can('www_'.$func);
+    if (!$sub && $func ne 'view') {
+        $sub     = $self->can('www_view');
+        $viewing = 1;
+    }
     return undef unless $sub;
-    my $output = $sub->();
+    my $output = eval { $sub->(); };
+    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
+        $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
+    }
+    elsif ($@) {
+        $session->errorHandler->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
+        die $@;
+    }
     return $output;
 }
 
