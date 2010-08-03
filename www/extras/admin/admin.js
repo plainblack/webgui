@@ -367,7 +367,7 @@ WebGUI.Admin.prototype.addHelperHandler
         YAHOO.util.Event.on( elem, "click", function(){ self.gotoAsset( helper.url ) }, self, true );
     }
     else if ( helper['class'] ) {
-        YAHOO.util.Event.on( elem, "click", function(){ self.requestHelper( helper.class, self.currentAssetDef.assetId ) }, self, true );
+        YAHOO.util.Event.on( elem, "click", function(){ self.requestHelper( helper['class'], self.currentAssetDef.assetId ) }, self, true );
     }
 };
 
