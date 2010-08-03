@@ -30,7 +30,6 @@
     position: relative;
     height: 2em;
     padding: 5px 0;
-    background: url( /extras/admin/locationbar-back.png );
 }
 
 #locationBar .yui-button { 
