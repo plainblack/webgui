@@ -15,6 +15,7 @@
  - fixed #11747: Empty StoryTopics throw a fatal error when viewed
  - fixed #11757: Update the USPS International driver for new country names
  - fixed #11753: PayPal Plugin - Shipping not factored into total in paypal
+ - fixed #11588: CMSmatrix - Comparing certain products ends in data errors
 
 7.8.23
  - fixed: missing per-item template variables for the cart.

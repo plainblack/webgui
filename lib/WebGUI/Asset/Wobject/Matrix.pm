@@ -1159,7 +1159,6 @@ sub www_getCompareFormData {
                 $parameter->{value} = $form->process($param);
                 my $attributeId = $param;
                 $attributeId =~ s/^search_//;
-                $attributeId =~ s/_____/-/g;
                 $parameter->{attributeId} = $attributeId;
                 push(@searchParamList,  $db->quote($parameter->{attributeId}) );
                 push(@searchParams,     $parameter);
@@ -1211,20 +1210,17 @@ sub www_getCompareFormData {
                             $checked = 'checked';
                         }
                 }
-                $result->{assetId}  =~ s/-/_____/g;
                 push @results, $result if $checked eq 'checked';
             }
         }
         else {   
             foreach my $result (@{$self->getListings}) {
-                $result->{assetId}  =~ s/-/_____/g;
                 push @results, $result;
             }
         }
     }
     else {
         foreach my $result (@{$self->getListings}) {
-            $result->{assetId}  =~ s/-/_____/g;
             if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
                 $result->{checked} = 'checked';
             }
@@ -1269,7 +1265,6 @@ sub www_getCompareListData {
     my @responseFields = ("attributeId", "name", "description","fieldType", "checked");
     
     foreach my $listingId (@listingIds){
-        $listingId =~ s/_____/-/g;
         my $listing = WebGUI::Asset::MatrixListing->new($session,$listingId);
         $listing->incrementCounter("compares");
         my $listingId_safe = $listingId;
