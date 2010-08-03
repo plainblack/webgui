@@ -65,9 +65,14 @@ sub call {
         sub {
             my $res = shift;
 
-            # Close the Session
-            $env->{'webgui.session'}->close();
-            delete $env->{'webgui.session'};
+            # Close the Session if we aren't streaming
+            if ( !$env->{'webgui.session'}->response->streaming ) { 
+                $env->{'webgui.session'}->close();
+                delete $env->{'webgui.session'};
+            }
+
+            # If we are streaming, the session will be closed inside of 
+            # WebGUI.pm
         }
     );
 }

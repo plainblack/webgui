@@ -97,6 +97,10 @@ sub call {
 
                 # And finally, clean up
                 $writer->close;
+
+                # Close the session, because the WebGUI::Middleware::Session didn't
+                $session->close;
+                delete $env->{'webgui.session'};
             }
             catch {
                 if ($response->writer) {
