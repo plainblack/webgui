@@ -64,7 +64,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 finish ( $url )
+=head2 finish ( $url|$helper )
 
 Redirects the user out of the status page.
 
@@ -72,11 +72,25 @@ Redirects the user out of the status page.
 
 The URL to send the user to.
 
+=head3 $helper
+
+A hashref response for an Asset Helper to be processed by the Admin Console
+
 =cut
 
 sub finish {
-	my $self = shift;
-	my $url  = shift;
+	my $self    = shift;
+	my $arg     = shift;
+
+        # We may have been passed a URL to go to, or an Asset Helper response hash
+        my ( $url, $helper );
+        if ( !ref $arg ) {
+            $url    = $arg;
+        }
+        elsif ( ref $arg eq "HASH" ) {
+            $helper = $arg;
+        }
+
         local $| = 1;
         if ( $url ) {
             my $text = sprintf(<<EOJS, $url);
@@ -89,11 +103,17 @@ EOJS
         }
         else {
             # We're in admin mode, close the dialog
-            my $text = sprintf(<<EOJS );
-<script>
-parent.admin.closeModalDialog();
-</script>
-EOJS
+            my $text = '<script type="text/javascript">';
+
+            if ( ref $helper eq 'HASH' ) {
+                # Process the output as JSON
+                $text .= sprintf 'parent.admin.processHelper( %s );', JSON->new->encode( $helper );
+            }
+
+            # Close dialog last so that script above runs!
+            $text .= 'parent.admin.closeModalDialog();'
+                   . '</script>';
+
             $self->session->output->print( $text, 1); # skipMacros
             return 'chunked';
         }
