@@ -141,3 +141,8 @@ a:link {
     margin: 0;
     padding: 0;
 }
+
+#clipboardItems a {
+    display: block;
+    padding: 2px;
+}
