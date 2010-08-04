@@ -77,14 +77,26 @@ The URL to send the user to.
 sub finish {
 	my $self = shift;
 	my $url  = shift;
-    my $text = sprintf(<<EOJS, $url);
+        local $| = 1;
+        if ( $url ) {
+            my $text = sprintf(<<EOJS, $url);
 <script>
-parent.location.href='%s';
+window.location.href='%s';
 </script>
 EOJS
-    local $| = 1;
-    $self->session->output->print($text . $self->{_foot}, 1); # skipMacros
-    return 'chunked';
+            $self->session->output->print($text . $self->{_foot}, 1); # skipMacros
+            return 'chunked';
+        }
+        else {
+            # We're in admin mode, close the dialog
+            my $text = sprintf(<<EOJS );
+<script>
+parent.admin.closeModalDialog();
+</script>
+EOJS
+            $self->session->output->print( $text, 1); # skipMacros
+            return 'chunked';
+        }
 }
 
 #-------------------------------------------------------------------
@@ -152,7 +164,7 @@ A message to be displayed in the status bar.
 my $prefix = '<script type="text/javascript">
 /* ' . 'BUFFER BREAKER ' x 1000 . ' */
 updateWgProgressBar(';
-my $format = q"'%dpx', '%s'";
+my $format = q"%d, '%s'";
 my $suffix = '); 
 </script>
 ';
@@ -162,15 +174,18 @@ sub update {
 	my $message = shift;
     $message    =~ s/'/\\'/g; ##Encode single quotes for JSON;
     $self->session->log->preventDebugOutput;
-    my $counter = $self->{_counter} += 1;
-    
-    my $text = $prefix . sprintf($format, $counter, $message) . $suffix;
+
+    if ( $self->{_total} ) {
+        $self->{_counter} += 1;
+    }
+
+    # Calculate percent progress. If we don't know our total yet, we haven't progressed any!
+    my $progress    = $self->{_total} ? int( $self->{_counter} / $self->{_total} * 100 ) : 0;
+
+    my $text = $prefix . sprintf($format, $progress, $message) . $suffix;
 
     local $| = 1; # Tell modperl not to buffer the output
     $self->session->output->print($text, 1); #skipMacros
-    if ($self->{_counter} > 600) {
-        $self->{_counter} = 1;
-    }
     return '';
 }
 
@@ -204,6 +219,10 @@ See start().
 =head3 icon
 
 See start().
+
+=head3 admin
+
+If true, will send the correct JS to close the dialog box.
 
 =head3 wrap
 
@@ -259,7 +278,7 @@ sub run {
 
     die $e if $e;
 
-    return $self->finish($url || $self->session->url->page);
+    return $self->finish( $url || ( !$args->{admin} && $self->session->url->page ) );
 }
 
 1;
