@@ -431,22 +431,7 @@ WebGUI.Admin.prototype.requestHelper
     var callback = {
         success : function (o) {
             var resp = YAHOO.lang.JSON.parse( o.responseText );
-
-            if ( resp.openTab ) {
-                this.openTab( resp.openTab );
-            }
-            else if ( resp.openDialog ) {
-                this.openModalDialog( resp.openDialog, resp.width, resp.height );
-            }
-            else if ( resp.scriptFile ) {
-                this.loadAndRun( resp.scriptFile, resp.scriptFunc, resp.scriptArgs );
-            }
-            else if ( resp.message ) {
-                this.showInfoMessage( resp.message );
-            }
-            else {
-                alert( "Unknown helper response: " + resp );
-            }
+            this.processHelper( resp );
         },
         failure : function (o) {
 
@@ -456,6 +441,36 @@ WebGUI.Admin.prototype.requestHelper
 
     var url = '?op=admin;method=processAssetHelper;className=' + helperClass + ';assetId=' + assetId;
     var ajax = YAHOO.util.Connect.asyncRequest( 'GET', url, callback );
+};
+
+/**
+ * processHelper( response )
+ * Process the helper response. Possible responses include:
+ *      message     : A message to the user
+ *      error       : An error message
+ *      openDialog  : Open a dialog with the given URL
+ *      redirect    : Redirect the View pane to the given URL
+ *      scriptFile  : Load a JS file
+ *      scriptFunc  : Run a JS function. Used with scriptFile
+ *      scriptArgs  : Arguments to scriptFunc. Used with scriptFile
+ */
+WebGUI.Admin.prototype.processHelper
+= function ( resp ) {
+    if ( resp.openTab ) {
+        this.openTab( resp.openTab );
+    }
+    else if ( resp.openDialog ) {
+        this.openModalDialog( resp.openDialog, resp.width, resp.height );
+    }
+    else if ( resp.scriptFile ) {
+        this.loadAndRun( resp.scriptFile, resp.scriptFunc, resp.scriptArgs );
+    }
+    else if ( resp.message ) {
+        this.showInfoMessage( resp.message );
+    }
+    else {
+        alert( "Unknown helper response: " + resp );
+    }
 };
 
 /**
