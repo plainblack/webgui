@@ -250,7 +250,7 @@ WebGUI.Admin.prototype.updateAdminBar
 
     }
     else if ( id == "versionTags" ) {
-
+        admin.requestUpdateVersionTags.call( admin );
     }
 };
 
@@ -324,6 +324,81 @@ WebGUI.Admin.prototype.addPasteHandler
 WebGUI.Admin.prototype.pasteAsset
 = function ( id ) {
     var url = appendToUrl( this.currentAssetDef.url, 'func=paste;assetId=' + id );
+    this.gotoAsset( url );
+};
+
+/**
+ * requestUpdateVersionTags( )
+ * Request the new set of version tags from the server
+ */
+WebGUI.Admin.prototype.requestUpdateVersionTags
+= function ( ) {
+    var callback = {
+        success : function (o) {
+            var versionTags = YAHOO.lang.JSON.parse( o.responseText );
+            this.updateVersionTags( versionTags );
+        },
+        failure : function (o) {
+
+        },
+        scope: this
+    };
+
+    var ajax = YAHOO.util.Connect.asyncRequest( 'GET', '?op=admin;method=getVersionTags', callback );
+};
+
+/**
+ * updateVersionTags( tags )
+ * Update the version tag list with the given tags
+ */
+WebGUI.Admin.prototype.updateVersionTags
+= function ( tags ) {
+    // Clear out the old tags
+    var div = document.getElementById( 'versionTagItems' );
+    while ( div.childNodes.length > 0 ) {
+        div.removeChild( div.childNodes[0] );
+    }
+
+    for ( var i = 0; i < tags.length; i++ ) {
+        var tag     = tags[i];
+        var a       = document.createElement('a');
+        var icon    = document.createElement('img');
+        icon.src    = tag.icon;
+        a.appendChild( icon );
+        a.appendChild( document.createTextNode( tag.name ) );
+        div.appendChild( a );
+        this.addJoinTagHandler( a, tag.tagId );
+        if ( tag.isCurrent ) {
+            this.updateCurrentVersionTag( tag );
+        }
+    }
+};
+
+/**
+ * addJoinTagHandler( elem, tagId )
+ * Add an onclick handler to join a version tag
+ */
+WebGUI.Admin.prototype.addJoinTagHandler
+= function ( elem, tagId ) {
+    var self    = this;
+    YAHOO.util.Event.on( elem, "click", function(){
+        // Update version tags after join in case paste fails
+        var updateAfterJoin = function(){
+            this.requestUpdateVersionTags();
+            this.afterNavigate.unsubscribe( updateAfterJoin );
+        };
+        self.afterNavigate.subscribe(updateAfterJoin, self );
+        self.joinTag( tagId );
+    }, self );
+};
+
+/**
+ * joinTag( id )
+ * Join a new version tag
+ */
+WebGUI.Admin.prototype.joinTag
+= function ( id ) {
+    var url = appendToUrl( this.currentAssetDef.url, 'op=setWorkingVersionTag;tagId=' + id );
     this.gotoAsset( url );
 };
 

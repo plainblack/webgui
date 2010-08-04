@@ -136,35 +136,6 @@ sub getTreePaginator {
 
 #----------------------------------------------------------------------
 
-=head2 getVersionTagTemplateVars
-
-=cut
-
-sub getVersionTagTemplateVars {
-    my ( $self ) = @_;
-    my $session = $self->session;
-    my ( $user ) = $session->quick(qw( user ));
-    my $vars    = [];
-
-    my $working = WebGUI::VersionTag->getWorking( $session, "nocreate" );
-    my $tags = WebGUI::VersionTag->getOpenTags($session);
-    if ( @$tags ) {
-        for my $tag ( @$tags ) {
-            next unless $user->isInGroup( $tag->get("groupToUse") );
-            push @$vars, {
-                name        => $tag->get("name"),
-                isWorking   => ( $working && $working->getId eq $tag->getId ) ? 1 : 0,
-                joinUrl     => $tag->getJoinUrl,
-                editUrl     => $tag->getEditUrl,
-            };
-        }
-    }
-
-    return $vars;
-}
-
-#----------------------------------------------------------------------
-
 =head2 www_getClipboard ( ) 
 
 Get the assets currently on the user's clipboard
@@ -293,6 +264,44 @@ sub www_getTreeData {
 
 #----------------------------------------------------------------------
 
+=head2 www_getVersionTags
+
+Get the current version tags a user can join
+
+=cut
+
+sub www_getVersionTags {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $user ) = $session->quick(qw( user ));
+    my $vars    = [];
+
+    my $current = WebGUI::VersionTag->getWorking( $session, "nocreate" );
+    my $tags = WebGUI::VersionTag->getOpenTags($session);
+    if ( @$tags ) {
+        for my $tag ( @$tags ) {
+            next unless $user->isInGroup( $tag->get("groupToUse") );
+            my $isCurrent   = ( $current && $current->getId eq $tag->getId ) ? 1 : 0;
+            my $icon        = $isCurrent
+                            ? $session->url->extras( 'icon/tag_green.png' )
+                            : $session->url->extras( 'icon/tag_blue.png' )
+                            ;
+            push @$vars, {
+                tagId       => $tag->getId,
+                name        => $tag->get("name"),
+                isCurrent   => $isCurrent,
+                joinUrl     => $tag->getJoinUrl,
+                editUrl     => $tag->getEditUrl,
+                icon        => $icon,
+            };
+        }
+    }
+
+    return JSON->new->encode( $vars );
+}
+
+#----------------------------------------------------------------------
+
 =head2 www_processAssetHelper ( )
 
 Process the given asset helper with the given asset
@@ -329,7 +338,6 @@ sub www_view {
 
     # Add vars for AdminBar
     $var->{adminPlugins} = $self->getAdminPluginTemplateVars;
-    $var->{versionTags} = $self->getVersionTagTemplateVars;
     $var->{newContentTabs} = $self->getNewContentTemplateVars;
 
     # Add vars for current user
@@ -393,6 +401,7 @@ __DATA__
     <!-- placeholder for version tags -->
     <dt id="versionTags" class="a-m-t">Version Tags (i18n)</dt>
     <dd class="a-m-d"><div class="bd">
+        <div id="versionTagItems"></div>
     </div></dd>
     <!-- placeholder for clipboard -->
     <dt id="clipboard" class="a-m-t">Clipboard (i18n)</dt>

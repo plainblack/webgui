@@ -142,7 +142,7 @@ a:link {
     padding: 0;
 }
 
-#clipboardItems a {
+#clipboardItems a, #versionTagItems a {
     display: block;
     padding: 2px;
 }
