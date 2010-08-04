@@ -51,7 +51,7 @@ sub process {
     }
 
     return {
-        open_tab => $asset->getUrl('op=assetHelper;className=WebGUI::AssetHelper::EditBranch;func=editBranch'),
+        openDialog => '?op=assetHelper;className=' . $class . ';method=editBranch;assetId=' . $asset->getId,
     };
 }
 
@@ -66,13 +66,27 @@ Creates a tabform to edit the Asset Tree. If canEdit returns False, returns insu
 sub www_editBranch {
     my ($class, $asset) = @_;
     my $session = $asset->session;
+    my ( $style, $url ) = $session->quick( qw( style url ) );
+    $style->setLink( $url->extras('hoverhelp.css'), { rel => "stylesheet", type => "text/css" } );
+    $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
+    $style->setScript( $url->extras('yui/build/container/container-min.js') );
+    $style->setScript( $url->extras('hoverhelp.js') );
+    $style->setRawHeadTags( <<'ENDHTML' );
+<style type="text/css">
+    label.formDescription { display: block; margin-top: 1em; font-weight: bold }
+</style>
+ENDHTML
+
 	my $ac      = WebGUI::AdminConsole->new($session,"assets");
 	my $i18n    = WebGUI::International->new($session,"Asset");
 	my $i18n2   = WebGUI::International->new($session,"Asset_Wobject");
 	return $session->privilege->insufficient() unless ($asset->canEdit);
     my $change = '<br />'.$i18n->get("change") . ' ';
 	my $tabform = WebGUI::TabForm->new($session);
-	$tabform->hidden({name=>"func",value=>"editBranchSave"});
+        $tabform->hidden({name=>"op",value=>"assetHelper"});
+        $tabform->hidden({name=>"className",value=>$class});
+	$tabform->hidden({name=>"method",value=>"editBranchSave"});
+        $tabform->hidden({name=>"assetId",value=>$asset->getId});
 	$tabform->addTab("properties",$i18n->get("properties"),9);
     $tabform->getTab("properties")->readOnly(
                 label    => $i18n->get(104),
@@ -130,14 +144,14 @@ sub www_editBranch {
         name     => "displayTitle",
         label    => $i18n2->get(174),
 		hoverHelp=> $i18n2->get('174 description'),
-        value    => $asset->getValue("displayTitle"),
+        value    => $asset->displayTitle,
         uiLevel  => 5,
 		subtext  => $change . WebGUI::Form::yesNo($session,{name=>"change_displayTitle"})
     );
      $tabform->getTab("display")->template(
 		name      => "styleTemplateId",
 		label     => $i18n2->get(1073),
-		value     => $asset->getValue("styleTemplateId"),
+		value     => $asset->styleTemplateId,
 		hoverHelp => $i18n2->get('1073 description'),
 		namespace => 'style',
 		subtext   => $change  . WebGUI::Form::yesNo($session,{name=>"change_styleTemplateId"})
@@ -146,7 +160,7 @@ sub www_editBranch {
 		name      => "printableStyleTemplateId",
 		label     => $i18n2->get(1079),
 		hoverHelp => $i18n2->get('1079 description'),
-		value     => $asset->getValue("printableStyleTemplateId"),
+		value     => $asset->printableStyleTemplateId,
 		namespace => 'style',
 		subtext   => $change  . WebGUI::Form::yesNo($session,{name=>"change_printableStyleTemplateId"})
     );
@@ -155,7 +169,7 @@ sub www_editBranch {
             name        => 'mobileStyleTemplateId',
             label       => $i18n2->get('mobileStyleTemplateId label'),
             hoverHelp   => $i18n2->get('mobileStyleTemplateId description'),
-            value       => $asset->getValue('mobileStyleTemplateId'),
+            value       => $asset->mobileStyleTemplateId,
             namespace   => 'style',
             subtext     => $change . WebGUI::Form::yesNo($session,{name=>"change_mobileStyleTemplateId"}),
         );
@@ -276,7 +290,17 @@ sub www_editBranch {
                 );
             }
     }	
-	return $tabform->print;
+
+    # Replace the cancel button with one that closes the dialog
+    $tabform->{_cancel} = WebGUI::Form::button( $session, {
+        value       => $i18n->get('cancel','WebGUI'),
+        extras      => sprintf(q|onclick="%s" class="backwardButton"|, 'parent.admin.closeModalDialog()'),
+    } );
+
+    return $session->style->process(
+        '<div class="yui-skin-sam">' . $tabform->print . '</div>',
+        "PBtmpl0000000000000137"
+    );
 }
 
 #-------------------------------------------------------------------
@@ -321,69 +345,89 @@ sub www_editBranchSave {
         $urlBase   = $form->text("baseUrl");
         $endOfUrl  = $form->selectBox("endOfUrl");
     }
-    $pb->start($i18n->get('edit branch'), $session->url->extras('adminConsole/assets.gif'));
-    my $descendants = $asset->getLineage(["self","descendants"],{returnObjects=>1});	
-    DESCENDANT: foreach my $descendant (@{$descendants}) {
-        if ( !$descendant->canEdit ) {
-            $pb->update(sprintf $i18n->get('skipping %s'), $descendant->getTitle);
-            next DESCENDANT;
-        }
-        $pb->update(sprintf $i18n->get('editing %s'), $descendant->getTitle);
-        my $url;
-        if ($changeUrl) {
-            if ($urlBaseBy eq "parentUrl") {
-                delete $descendant->{_parent};
-                $data{url} = $descendant->getParent->get("url")."/";
-            }
-            elsif ($urlBaseBy eq "specifiedBase") {
-                $data{url} = $urlBase."/";
-            }
-            else {
-                $data{url} = "";
-            }
-            if ($endOfUrl eq "menuTitle") {
-                $data{url} .= $descendant->get("menuTitle");
-            }
-            elsif ($endOfUrl eq "title") {
-                $data{url} .= $descendant->get("title");
-            }
-            else {
-                $data{url} .= $descendant->get("url");
-            }
-            $wobjectData{url} = $data{url};
-        }
-        my $newData = $descendant->isa('WebGUI::Asset::Wobject') ? \%wobjectData : \%data;
-        my $revision;
-        if (scalar %$newData > 0) {
-            $revision = $descendant->addRevision(
-                $newData,
-                undef,
-                {skipAutoCommitWorkflows => 1, skipNotification => 1},
-            );
-        }
-        else {
-            $revision = $descendant;
-        }
-        foreach my $param ($form->param) {
-            if ($param =~ /^metadata_(.*)$/) {
-                my $fieldName = $1;
-                if ($form->yesNo("change_metadata_".$fieldName)) {
-                    $revision->updateMetaData($fieldName,$form->process($form));
+
+    return $session->response->stream( sub {
+        my ( $session ) = @_;
+        my $pb = WebGUI::ProgressBar->new($session);
+        my @stack;
+
+        return $pb->run(
+            admin => 1,
+            title => $i18n->get('edit branch'),
+            icon  => $session->url->extras('adminConsole/assets.gif'),
+            code  => sub {
+                my ( $bar ) = @_;
+                $bar->update( 'Preparing... (i18n)' );
+                $bar->total( $asset->getDescendantCount );
+                my $iter = $asset->getLineageIterator(["self","descendants"]);
+                DESCENDANT: while (1) {
+                    my $descendant = eval { $iter->() };
+                    if (my $e = Exception::Class->caught()) {
+                        $session->log->error($@);
+                        next DESCENDANT;
+                    }
+                    last DESCENDANT unless $descendant;
+
+                    # Actual work...
+                    if ( !$descendant->canEdit ) {
+                        $pb->update(sprintf $i18n->get('skipping %s'), $descendant->getTitle);
+                        next DESCENDANT;
+                    }
+                    $pb->update(sprintf $i18n->get('editing %s'), $descendant->getTitle);
+                    my $url;
+                    if ($changeUrl) {
+                        if ($urlBaseBy eq "parentUrl") {
+                            delete $descendant->{_parent};
+                            $data{url} = $descendant->getParent->get("url")."/";
+                        }
+                        elsif ($urlBaseBy eq "specifiedBase") {
+                            $data{url} = $urlBase."/";
+                        }
+                        else {
+                            $data{url} = "";
+                        }
+                        if ($endOfUrl eq "menuTitle") {
+                            $data{url} .= $descendant->get("menuTitle");
+                        }
+                        elsif ($endOfUrl eq "title") {
+                            $data{url} .= $descendant->get("title");
+                        }
+                        else {
+                            $data{url} .= $descendant->get("url");
+                        }
+                        $wobjectData{url} = $data{url};
+                    }
+                    my $newData = $descendant->isa('WebGUI::Asset::Wobject') ? \%wobjectData : \%data;
+                    my $revision;
+                    if (scalar %$newData > 0) {
+                        $revision = $descendant->addRevision(
+                            $newData,
+                            undef,
+                            {skipAutoCommitWorkflows => 1, skipNotification => 1},
+                        );
+                    }
+                    else {
+                        $revision = $descendant;
+                    }
+                    foreach my $param ($form->param) {
+                        if ($param =~ /^metadata_(.*)$/) {
+                            my $fieldName = $1;
+                            if ($form->yesNo("change_metadata_".$fieldName)) {
+                                $revision->updateMetaData($fieldName,$form->process($form));
+                            }
+                        }
+                    }
                 }
-            }
-        }
-    }
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
-        allowComments   => 1,
-        returnUrl       => $asset->getUrl,
-    }) eq 'redirect') {
-        return undef;
-    };
-    delete $asset->{_parent};
-    $session->asset($asset->getParent);
-    ##Since this method originally returned the user to the AssetManager, we don't need
-    ##to use $pb->finish to redirect back there.
-    return $asset->getParent->www_manageAssets;
+                if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+                    allowComments   => 1,
+                    returnUrl       => $asset->getUrl,
+                }) eq 'redirect') {
+                    return $asset->getUrl;
+                };
+                return { message => 'Assets saved! (i18n)' };
+            },
+        ),
+    } );
 }
 
 
