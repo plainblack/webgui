@@ -51,7 +51,7 @@ sub process {
     }
 
     return {
-        open_tab => $asset->getUrl('op=assetHelper;className=WebGUI::AssetHelper::Export;func=editBranch'),
+        openDialog => '?op=assetHelper;className=' . $class . ';method=export;assetId=' . $asset->getId,
     };
 }
 
@@ -67,10 +67,24 @@ sub www_export {
     my ($class, $asset) = @_;
     my $session = $asset->session;
     return $session->privilege->insufficient() unless ($session->user->isInGroup(13));
+    my ( $style, $url ) = $session->quick(qw{ style url });
+    $style->setLink( $url->extras('hoverhelp.css'), { rel => "stylesheet", type => "text/css" } );
+    $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
+    $style->setScript( $url->extras('yui/build/container/container-min.js') );
+    $style->setScript( $url->extras('hoverhelp.js') );
+    $style->setRawHeadTags( <<'ENDHTML' );
+<style type="text/css">
+    label.formDescription { display: block; margin-top: 1em; font-weight: bold }
+</style>
+ENDHTML
+
     my $i18n    = WebGUI::International->new($session, "Asset");
     my $f       = WebGUI::HTMLForm->new($session, -action => $asset->getUrl);
+    $f->hidden( name => 'op', value => 'assetHelper' );
+    $f->hidden( name => 'className', value => $class );
+    $f->hidden( name => 'assetId', value => $asset->getId );
     $f->hidden(
-        name           => "func",
+        name           => "method",
         value          => "exportStatus"
     );
     $f->integer(
@@ -125,7 +139,10 @@ sub www_export {
     if($@) {
         $message = $@;
     }
-    return $message . $f->print;
+    return $session->style->process( 
+        $message . $f->print,
+        "PBtmpl0000000000000137"
+    );
 }
 
 
@@ -142,13 +159,49 @@ sub www_exportStatus {
     my $session = $asset->session;
     return $session->privilege->insufficient() unless ($session->user->isInGroup(13));
     my $i18n        = WebGUI::International->new($session, "Asset");
-    my $iframeUrl   = $asset->getUrl('func=exportGenerate');
-    foreach my $formVar (qw/index depth userId extrasUploadsAction rootUrlAction exportUrl/) {
-        $iframeUrl  = $session->url->append($iframeUrl, $formVar . '=' . $session->form->process($formVar));
-    }
+    my $pb  = WebGUI::ProgressBar->new( $session );
 
-    my $output      = '<iframe src="' . $iframeUrl . '" title="' . $i18n->get('Page Export Status') . '" width="100%" height="500"></iframe>';
-    return $output;
+    my $i18n = WebGUI::International->new($session, 'Asset');
+    my $args = {
+        quiet               => 1, # We'll wrap subs to update the ProgressBar
+        userId              => $session->form->process('userId'),
+        indexFileName       => $session->form->process('index'),
+        extrasUploadAction  => $session->form->process('extrasUploadsAction'),
+        rootUrlAction       => $session->form->process('rootUrlAction'),
+        depth               => $session->form->process('depth'),
+        exportUrl           => $session->form->process('exportUrl'),
+    };
+
+    return $session->response->stream( sub {
+        my ( $session ) = @_;
+        return $pb->run(
+            admin => 1,
+            title => $i18n->get('edit branch'),
+            icon  => $session->url->extras('adminConsole/assets.gif'),
+            code  => sub {
+                my ( $bar ) = @_;
+                $bar->update( 'Preparing...' );
+                $bar->total( $asset->getDescendantCount );
+                $bar->update( 'Asset ID ' . $asset->getId );
+
+                my $message;
+                eval {
+                    $message = $asset->exportAsHtml( $args );
+                };
+                if ( $@ ) {
+                    return { error => "$@" };
+                }
+                return { message => $message || "Export successful!" };
+            },
+            wrap => {
+                'WebGUI::Asset::exportWriteFile' => sub {
+                    my ($bar, $original, $asset, @args) = @_;
+                    $bar->update( "Exporting " . $asset->getTitle );
+                    return $asset->$original(@args);
+                },
+            },
+        );
+    } );
 }
 
 1;
