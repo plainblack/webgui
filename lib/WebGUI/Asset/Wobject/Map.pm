@@ -35,7 +35,7 @@ property mapApiKey => (
             hoverHelp   => ["mapApiKey description", 'Asset_Map'],
             builder     => '_mapApiKey_builder',
             lazy        => 1,
-            subtext     => \&mapApiKey_subtext,
+            subtext     => \&_mapApiKey_subtext,
          );
 sub _mapApiKey_builder {
     my $self = shift;
