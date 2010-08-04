@@ -79,7 +79,7 @@ property feedHeaderLinks => (
     value     => "rss\natom",
     default   => undef,
     tab       => "rss",
-    options   => \&feedHeaderLinks_options,
+    options   => \&_feedHeaderLinks_options,
     label     => [ 'feedHeaderLinks', 'Role_RssFeed' ],
     hoverHelp => [ 'feedHeaderLinks hoverHelp', 'Role_RssFeed' ]
 );
