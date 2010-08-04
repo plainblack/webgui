@@ -290,6 +290,12 @@ use Exception::Class (
     package WebGUI::Error;
     use overload '~~' => sub {
         return $_[0]->isa($_[1]);
+    },
+    'eq' => sub {
+        return $_[0]->error eq $_[1];
+    },
+    'ne' => sub {
+        return $_[0]->error ne $_[1];
     };
 }
 
