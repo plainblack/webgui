@@ -468,8 +468,11 @@ WebGUI.Admin.prototype.processHelper
     else if ( resp.message ) {
         this.showInfoMessage( resp.message );
     }
+    else if ( resp.error ) {
+        this.showInfoMessage( resp.error );
+    }
     else {
-        alert( "Unknown helper response: " + resp );
+        alert( "Unknown helper response: " + YAHOO.lang.JSON.stringify(resp) );
     }
 };
 
