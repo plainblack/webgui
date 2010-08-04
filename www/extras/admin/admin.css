@@ -136,3 +136,8 @@ a:link {
     background-repeat: no-repeat;
     padding-left:   20px;
 }
+
+#infoMessage * {
+    margin: 0;
+    padding: 0;
+}
