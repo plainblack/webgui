@@ -193,6 +193,25 @@ sub update {
 
 #-------------------------------------------------------------------
 
+=head2 total ( newTotal )
+
+Set the total number of tasks that need to be run. You should set this
+before running any actual tasks. If this is not set, the progress bar
+will not progress (though any update messages will still display to 
+the user).
+
+=cut
+
+sub total {
+    my ( $self, $newTotal ) = @_;
+    if ( $newTotal ) {
+        return $self->{_total} = $newTotal;
+    }
+    return $self->{_total};
+}
+
+#-------------------------------------------------------------------
+
 =head2 run ( options )
 
 starts and finishes a progress bar, running some code in the middle.  It
@@ -201,6 +220,15 @@ should return 'chunked' yourself.
 
 The following keyword arguments are accepted (either as a bare hash or a
 hashref).
+
+=head3 total
+
+Set the total number of tasks that need to be run. Every call to update() is
+another task completed. The progressbar works with percentages, so this
+must be set before any tasks are started.
+
+If you need to calculate the number of tasks, be sure to set total() inside
+the C<code> subref before doing any actual work.
 
 =head3 code
 
@@ -251,6 +279,7 @@ sub run {
     my $wrap = $args->{wrap};
 
     $self->start($args->{title}, $args->{icon});
+    $self->{_total} = $args->{total};
 
     my $url = eval {
         for my $name (keys %$wrap) {
