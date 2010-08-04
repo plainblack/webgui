@@ -85,7 +85,7 @@ sub www_copy {
                 if ( $result eq 'redirect' ) {
                     return $asset->getUrl;
                 }
-                return;
+                return { message => 'Your asset is now copied!' };
             },
             wrap  => {
                 'WebGUI::Asset::duplicate' => sub {
