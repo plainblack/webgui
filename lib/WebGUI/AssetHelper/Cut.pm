@@ -51,19 +51,58 @@ sub process {
         return { error => $i18n->get('41'), };
     }
 
-    my $success = $asset->cut();
-    if (! $success) {
-        return { error => $i18n->get('41'), };
-    }
-
-    my $parent = $asset->getContainer;
-    if ($asset->getId eq $parent->getId) {
-        $parent = $asset->getParent;
-    }
     return {
-        message         => sprintf($i18n->get('cut asset', 'Asset'), $asset->getTitle),
-        redirect        => $parent->getUrl,
+        openDialog      => '?op=assetHelper;className=' . $class . ';method=cut;assetId=' . $asset->getId,
     };
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_cut ( $class, $asset )
+
+Show the progress bar while cutting the asset.
+
+=cut
+
+sub www_cut {
+    my ( $class, $asset ) = @_;
+    my $session = $asset->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+
+    return $session->response->stream( sub {
+        my ( $session ) = @_;
+        my $pb = WebGUI::ProgressBar->new($session);
+        my @stack;
+
+        return $pb->run(
+            admin => 1,
+            title => $i18n->get('Copy Assets'),
+            icon  => $session->url->extras('adminConsole/assets.gif'),
+            code  => sub {
+                my $bar = shift;
+                $bar->update( "Preparing... (i18n)" );
+                $bar->total( $asset->getDescendantCount + 2 );
+                $bar->update( "Cutting... (i18n)" );
+                my $success = $asset->cut();
+                if (! $success) {
+                    return { error => $i18n->get('41', 'WebGUI'), };
+                }
+                return { message => "Your asset is cut!" };
+            },
+            wrap  => {
+                'WebGUI::Asset::getLineageIterator' => sub {
+                    my ($bar, $orig, $asset, @args) = @_;
+                    $bar->update("Updating descendants... (i18n)");
+                    return $asset->$orig(@args);
+                },
+                'WebGUI::Asset::updateHistory' => sub {
+                    my ( $bar, $orig, $asset, @args ) = @_;
+                    $bar->update( "Updating " . $asset->getTitle );
+                    return $asset->$orig(@args);
+                },
+            },
+        );
+    } );
 }
 
 1;
