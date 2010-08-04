@@ -87,7 +87,7 @@ sub exportPackage {
 
 #-------------------------------------------------------------------
 
-=head2 getPackageList ( )
+=head2 WebGUI::Asset::getPackageList ( session )
 
 Returns an array of all assets that the user can view and edit that are packages.  The array
 is sorted by the title of the assets.
@@ -95,8 +95,10 @@ is sorted by the title of the assets.
 =cut
 
 sub getPackageList {
-    my $self = shift;
-    my $session = $self->session;
+    my $session = shift;
+    if ( $session->isa( 'WebGUI::Asset' ) ) {
+        $session    = $session->session;
+    }
     my $db = $session->db;
     my @packageIds = $db->buildArray("select distinct assetId from assetData where isPackage=1");
     my @assets;

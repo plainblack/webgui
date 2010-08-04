@@ -5,7 +5,9 @@ package WebGUI::Admin;
 use Moose;
 use JSON qw( from_json to_json );
 use namespace::autoclean;
+use Scalar::Util;
 use WebGUI::Pluggable;
+use WebGUI::Macro;
 
 has 'session' => (
     is          => 'ro',
@@ -91,13 +93,138 @@ sub getAdminPluginTemplateVars {
 
 =head2 getNewContentTemplateVars 
 
+Get an array of tabs for the new content menu. Each tab contains items
+of new content that can be added to the site.
+
 =cut
 
 sub getNewContentTemplateVars {
     my ( $self ) = @_;
     my $session = $self->session;
-    my ( $user ) = $session->quick(qw( user ));
-    my $vars    = [];
+    my ( $user, $config ) = $session->quick(qw( user config ));
+    my $i18n = WebGUI::International->new($session,'Macro_AdminBar');
+    my $tabs    = [];
+
+    # Add a dummy asset to the session to pass canAdd checks
+    # The future canAdd will not check validParent, www_add will instead
+    # This asset is removed before we return...
+    $session->asset( WebGUI::Asset->getDefault( $session ) );
+
+    # Build the categories
+    my %rawCategories = %{ $config->get('assetCategories') };
+    my %categories;     # All the categories we have
+    my $userUiLevel = $user->profileField('uiLevel');
+    foreach my $category ( keys %rawCategories ) {
+        # Check the ui level
+        next if $rawCategories{$category}{uiLevel} > $userUiLevel;
+        # Check group permissions
+        next if ( exists $rawCategories{$category}{group} && !$user->isInGroup( $rawCategories{$category}{group} ) );
+
+        my $title = $rawCategories{$category}{title};
+
+        # Process macros on the title
+        WebGUI::Macro::process( $session, \$title );
+
+        $categories{$category}{title} = $title;
+    }
+
+    # assets
+    my %assetList = %{ $config->get('assets') };
+    foreach my $assetClass ( keys %assetList ) {
+        # Create a dummy asset
+        my $dummy = WebGUI::Asset->newByPropertyHashRef( $session, { dummy => 1, className => $assetClass } );
+        next unless defined $dummy;
+        my $assetConfig = $assetList{$assetClass};
+
+        # Check UI Level
+        next if $dummy->getUiLevel( $assetConfig->{uiLevel} ) > $userUiLevel;
+
+        # Check add permissions
+        next unless ( $dummy->canAdd($session) );
+
+        my $assetInfo = {
+            className   => $assetClass,
+            url         => 'func=add;className=' . $assetClass,
+            icon        => $dummy->getIcon(1),
+            title       => $dummy->getTitle,
+        };
+
+        # Add the asset to all categories it should appear in
+        my @assetCategories = ref $assetConfig->{category} ? @{ $assetConfig->{category} } : $assetConfig->{category};
+        for my $category (@assetCategories) {
+            next unless exists $categories{$category};
+            $categories{$category}{items} ||= [];
+            push @{ $categories{$category}{items} }, $assetInfo;
+        }
+    } ## end foreach my $assetClass ( keys...)
+
+    # packages
+    foreach my $package ( @{ WebGUI::Asset::getPackageList( $session ) } ) {
+        # Check permissions and UI level
+        next unless ( $package->canView && $package->canAdd($session) && $package->getUiLevel <= $userUiLevel );
+
+        # Create the "packages" category
+        $categories{packages}{items} ||= [];
+
+        push @{ $categories{packages}{items} }, {
+            className   => Scalar::Util::blessed( $package ),
+            url         => "func=deployPackage;assetId=" . $package->getId,
+            title       => $package->getTitle,
+            icon        => $package->getIcon(1),
+        };
+    }
+    # If we have any packages, fill in the package category title
+    if ( $categories{packages}{items} && @{ $categories{packages}{items} } ) {
+        $categories{packages}{title} = $i18n->get('packages');
+    }
+
+    # prototypes
+    foreach my $prototype ( @{ WebGUI::Asset::getPrototypeList( $session ) } ) {
+        # Check permissions and UI level
+        next unless ( $prototype->canView && $prototype->canAdd($session) && $prototype->getUiLevel <= $userUiLevel );
+
+        # Create the "prototypes" category
+        $categories{prototypes}{items} ||= [];
+
+        push @{ $categories{prototypes}{items} }, {
+            className   => $prototype->get('className'),
+            url   => "func=add;className=" . $prototype->get('className') . ";prototype=" . $prototype->getId,
+            title => $prototype->getTitle,
+            icon => $prototype->getIcon(1),
+        };
+    }
+    # If we have any prototypes, fill in the prototype category title
+    if ( $categories{prototypes}{items} && @{ $categories{prototypes}{items} } ) {
+        $categories{prototypes}{title} = $i18n->get('prototypes');
+    }
+
+    # sort the categories by title
+    my @sortedIds   = map { $_->[0] }
+                      sort { $a->[1] cmp $b->[1] }
+                      map { [ $_, $categories{$_}->{title} ] }
+                      grep { $categories{$_}->{items} && @{$categories{$_}->{items}} }
+                      keys %categories; # Schwartzian transform
+
+    foreach my $categoryId ( @sortedIds ) {
+        my $category    = $categories{ $categoryId };
+        my $tab = {
+            id          => $categoryId,
+            title       => $category->{title},
+            items       => [],
+        };
+        push @{$tabs}, $tab;
+
+        my $items = $category->{items};
+        next unless ( ref $items eq 'ARRAY' );    # in case the category is empty
+        foreach my $item ( sort { $a->{title} cmp $b->{title} } @{$items} ) {
+            push @{ $tab->{items} }, $item;
+        }
+    }
+
+    # Remove the session asset we added above
+    delete $session->{_asset};
+
+    return $tabs;
 }
 
 #----------------------------------------------------------------------------
@@ -424,14 +551,17 @@ __DATA__
     <dt id="newContent" class="a-m-t">New Content (i18n)</dt>
     <dd class="a-m-d"><div class="bd" style="margin: 0; padding: 0">
         <dl id="newContentBar" class="accordion-menu" style="height: 500px">
-            <dt class="a-m-t" id="newOne">One</dt>
+            <tmpl_loop newContentTabs>
+            <dt class="a-m-t" id="<tmpl_var id>"><tmpl_var title></dt>
             <dd class="a-m-d"><div class="bd">
-                <p>One</p>
+                <tmpl_loop items>
+                    <a href="#" onclick="window.admin.addNewContent('<tmpl_var url>'); return false">
+                        <img src="<tmpl_var icon>" />
+                        <tmpl_var title>
+                    </a>
+                </tmpl_loop>
             </div></dd>
-            <dt class="a-m-t" id="newTwo">Two</dt>
-            <dd class="a-m-d"><div class="bd">
-                <p>Two</p>
-            </div></dd>
+            </tmpl_loop>
         </dl>
     </div></dd>
 </dl>

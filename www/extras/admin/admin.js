@@ -640,6 +640,15 @@ WebGUI.Admin.prototype.hideInfoMessage
     infoContainer.style.display  = "none";
 };
 
+/**
+ * addNewContent( urlFragment )
+ * Add new content by visiting the given URL fragment
+ */
+WebGUI.Admin.prototype.addNewContent
+= function ( urlFragment ) {
+    this.gotoAsset( appendToUrl( this.currentAssetDef.url, urlFragment ) );
+};
+
 /****************************************************************************
  *  WebGUI.Admin.LocationBar
  */

@@ -1307,15 +1307,17 @@ sub getNotFound {
 
 #-------------------------------------------------------------------
 
-=head2 getPrototypeList ( )
+=head2 WebGUI::Asset::getPrototypeList ( session )
 
 Returns an array of all assets that the user can view and edit that are prototypes.
 
 =cut
 
 sub getPrototypeList {
-    my $self    = shift;
-    my $session = $self->session;
+    my $session    = shift;
+    if ( $session->isa( 'WebGUI::Asset' ) ) {
+        $session    = $session->session;
+    }
     my $db      = $session->db;
     my @prototypeIds = $db->buildArray("select distinct assetId from assetData where isPrototype=1");
     my $userUiLevel = $session->user->profileField('uiLevel');
@@ -2472,7 +2474,7 @@ new Asset will inherit security and style properties from the current asset, the
 sub www_add {
 	my $self = shift;
 	my %prototypeProperties;
-    my $class = $self->loadModule($self->session->form->process("class","className"));
+    my $class = $self->loadModule($self->session->form->process("className","className"));
     return undef unless (defined $class);
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
 	if ($self->session->form->process('prototype')) {

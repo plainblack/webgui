@@ -146,3 +146,15 @@ a:link {
     display: block;
     padding: 2px;
 }
+
+#newContentBar a {
+    display:    block;
+    height:     24px;
+    font-size:  12px;
+    padding-left: 4px;
+}
+
+#newContentBar a:link, #newContentBar a:visited, #newContentBar a:active {
+    text-decoration: none;
+    color: black;
+}
