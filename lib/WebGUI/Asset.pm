@@ -580,14 +580,13 @@ the requested method has failed.
 =cut
 
 sub dispatch {
-    my ($self, $fragment, $_view) = @_;
+    my ($self, $fragment) = @_;
     return undef if defined $fragment;
     my $session = $self->session;
     my $state = $self->get('state');
     ##Only allow interaction with assets in certain states
     return if $state ne 'published' && $state ne 'archived' && !$session->var->isAdminOn;
     my $func    = $session->form->param('func') || 'view';
-    $func = 'view' if $_view;
     my $viewing = $func eq 'view' ? 1 : 0;
     my $sub     = $self->can('www_'.$func);
     if (!$sub && $func ne 'view') {
@@ -595,13 +594,24 @@ sub dispatch {
         $viewing = 1;
     }
     return undef unless $sub;
-    my $output = eval { $sub->(); };
+    my $output = eval { $self->$sub(); };
+    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
+                                         #WebGUI::Error::ObjectNotFound::Template
+        warn "logged an exception";
+        $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
+    }
+    elsif ($@) {
+        warn "logged a warn: $@";
+        $session->log->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
+    }
+    return $output if $output || $viewing;
+    ##No output, try the view method instead
+    $output = eval { $self->www_view };
     if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
         $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
     }
     elsif ($@) {
         $session->errorHandler->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
-        die $@;
     }
     return $output;
 }

@@ -74,7 +74,7 @@ WebGUI::Test->addToCleanup( $tag );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 13;        # Increment this number for each test you create
+plan tests => 16;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test dispatch
@@ -124,5 +124,19 @@ is $output, undef, 'dispatch returns undef when trying to access an asset that i
 $session->var->switchAdminOn;
 $output = $td->dispatch();
 is $output, 'www_view', 'when admin is on, the asset can be accessed';
+
+$td->publish();
+$session->var->switchAdminOff;
+$output = $td->dispatch();
+is $output, 'www_view', 'asset state restored for next tests';
+
+# Test template exceptions
+$session->request->setup_body( {
+    func        => 'brokenTemplate',
+} );
+WebGUI::Test->interceptLogging;
+is( $td->dispatch, "www_view", "if a query method throws a Template exception, view is returned instead" );
+is $WebGUI::Test::logger_error, 'Template not found templateId: This is a GUID assetId: '. $td->getId, 'logged an error';
+WebGUI::Test->restoreLogging;
 
 #vim:ft=perl
