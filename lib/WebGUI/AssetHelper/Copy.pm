@@ -32,62 +32,71 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 duplicate ( $class, $asset )
-
-Duplicates the asset.  Extracted out so that it can be subclassed by copy with children,
-and copy with descendants.
-
-=cut
-
-sub duplicate {
-    my ($class, $asset) = @_;
-    return $asset->duplicate;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getMessage ( )
-
-Returns the name of the i18n message to use
-
-=cut
-
-sub getMessage {
-    return 'copied asset';
-}
-
-#-------------------------------------------------------------------
-
 =head2 process ( $class, $asset )
 
-Copies the asset to the clipboard.  There are no privilege or safety checks, since all operations
-are done on the copy.
+Open a progress dialog for the copy operation
 
 =cut
 
 sub process {
     my ($class, $asset) = @_;
+
+    return {
+        openDialog => '?op=assetHelper;className=' . $class . ';method=copy;assetId=' . $asset->getId,
+    };
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_copy ( $class, $asset )
+
+Perform the copy operation, showing the progress.
+
+=cut
+
+sub www_copy {
+    my ( $class, $asset ) = @_;
     my $session = $asset->session;
     my $i18n    = WebGUI::International->new($session, 'Asset');
 
-    my $newAsset = $class->duplicate($asset);
-    $newAsset->update({ title=>sprintf("%s (%s)",$asset->getTitle,$i18n->get('copy'))});
-    $newAsset->cut;
+    return $session->response->stream( sub {
+        my ( $session ) = @_;
+        my $pb = WebGUI::ProgressBar->new($session);
+        my @stack;
 
-    my $message = sprintf($i18n->get($class->getMessage()), $asset->getTitle);
-
-    my $payload = {
-        message => $message,
-    };
-
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
-        allowComments   => 1,
-        returnUrl       => $asset->getUrl,
-    }) eq 'redirect') {
-        $payload->{openDialog} = $session->http->getRedirectLocation;
-    };
-
-    return $payload;
+        return $pb->run(
+            admin   => 1,
+            total   => 2,
+            title => $i18n->get('Copy Assets'),
+            icon  => $session->url->extras('adminConsole/assets.gif'),
+            code  => sub {
+                my $bar = shift;
+                my $newAsset = $asset->duplicate;
+                $bar->update($i18n->get('cut'));
+                my $title   = sprintf("%s (%s)", $asset->getTitle, $i18n->get('copy'));
+                $newAsset->update({ title => $title });
+                $newAsset->cut;
+                my $result = WebGUI::VersionTag->autoCommitWorkingIfEnabled(
+                    $session, {
+                        allowComments => 1,
+                        returnUrl     => $asset->getUrl,
+                    }
+                );
+                if ( $result eq 'redirect' ) {
+                    return $asset->getUrl;
+                }
+                return;
+            },
+            wrap  => {
+                'WebGUI::Asset::duplicate' => sub {
+                    my ($bar, $original, $asset, @args) = @_;
+                    my $name = join '/', @stack, $asset->getTitle;
+                    $bar->update($name);
+                    return $asset->$original(@args);
+                },
+            }
+        );
+    } );
 }
 
 1;
