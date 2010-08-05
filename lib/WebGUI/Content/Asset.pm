@@ -81,6 +81,7 @@ sub dispatch {
 
             my $fragment = $assetUrl;
             $fragment =~ s/$url//;
+            $session->asset($asset);
             my $output = eval { $asset->dispatch($fragment); };
             return $output if defined $output;
         }

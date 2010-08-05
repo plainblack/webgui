@@ -79,7 +79,7 @@ WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 12;        # Increment this number for each test you create
+plan tests => 15;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
@@ -118,11 +118,14 @@ cmp_deeply(
 
 #----------------------------------------------------------------------------
 # test dispatch( session, url ) method
+is ($session->asset, undef, 'session asset is not defined, yet');
 is(
     WebGUI::Content::Asset::dispatch( $session, "testdispatch" ),
     "www_view one",
     "Regular www_view",
 );
+
+is ($session->asset->getId, $td->getId, 'dispatch set the session asset');
 
 is(
     WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" ),
@@ -144,6 +147,7 @@ is(
     "www_view two",
     "dispatch to the asset with the longest URL",
 );
+is ($session->asset->getId, $clobberingTime->getId, 'dispatch reset the session asset');
 
 $clobberingTime->purge;
 
