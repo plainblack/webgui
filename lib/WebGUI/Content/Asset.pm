@@ -168,7 +168,7 @@ sub handler {
     my $output = "";
     if ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
         my $t = [Time::HiRes::gettimeofday()];
-        $output = dispatch($session, getRequestedUrl($session));
+        $output = dispatch($session, getRequestedAssetUrl($session));
         $t = Time::HiRes::tv_interval($t) ;
         if ($output =~ /<\/title>/) {
             $output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
@@ -189,7 +189,7 @@ sub handler {
         }
     } 
     else {
-        $output = dispatch($session, getRequestedUrl($session));
+        $output = dispatch($session, getRequestedAssetUrl($session));
     }
 
     my $filename = $http->getStreamedFile();
