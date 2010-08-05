@@ -161,7 +161,6 @@ sub www_exportStatus {
     my $i18n        = WebGUI::International->new($session, "Asset");
     my $pb  = WebGUI::ProgressBar->new( $session );
 
-    my $i18n = WebGUI::International->new($session, 'Asset');
     my $args = {
         quiet               => 1, # We'll wrap subs to update the ProgressBar
         userId              => $session->form->process('userId'),
