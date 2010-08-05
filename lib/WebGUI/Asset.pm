@@ -576,7 +576,7 @@ Any leftover part of the requested URL.
 
 sub dispatch {
     my ($self, $fragment) = @_;
-    return undef if defined $fragment;
+    return undef if $fragment;
     my $session = $self->session;
     my $state = $self->get('state');
     ##Only allow interaction with assets in certain states
@@ -603,11 +603,13 @@ sub dispatch {
     $output = eval { $self->www_view };
     if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
         $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
+        return "chunked";
     }
     elsif ($@) {
         warn "logged another warn: $@";
         my $message = $@;
         $session->log->warn("Couldn't call method www_view on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
+        return "chunked";
     }
     return $output;
 }
