@@ -47,7 +47,9 @@ These subroutines are available from this package:
 =head2 dispatch ( $session, $assetUrl )
 
 Attempts to return the output from an asset, based on its url.  All permutations of the
-URL are tried, to find an asset that matches.
+URL are tried, to find an asset that matches.  If it finds an Asset, then it calls the
+dispatch method on it.  An Asset's dispatch always returns SOMETHING, so if a matching
+asset is found, this is the last stop.
 
 =head3 $session
 
@@ -66,6 +68,8 @@ sub dispatch {
     my $permutations = getUrlPermutations($assetUrl);
     foreach my $url (@{ $permutations }) {
         if (my $asset = getAsset($session, $url)) {
+            ##Passive Analytics Logging
+            WebGUI::PassiveAnalytics::Logging::log($session, $asset);
             # display from cache if page hasn't been modified.
             if ($session->user->isVisitor
              && !$session->http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
@@ -78,17 +82,12 @@ sub dispatch {
             my $fragment = $assetUrl;
             $fragment =~ s/$url//;
             my $output = eval { $asset->dispatch($fragment); };
-            if ($@) {
-                $session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
-                if ($method ne "view") {
-                    $output = tryAssetMethod($session,$asset,'view');
-                } else {
-                    # fatals return chunked
-                    $output = 'chunked';
-                }
-            }
             return $output if defined $output;
         }
+    }
+    if ($session->var->isAdminOn) {
+        my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
+        return $asset->addMissing($assetUrl);
     }
     return undef;
 }
