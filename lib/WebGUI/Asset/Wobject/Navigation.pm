@@ -30,7 +30,7 @@ property    templateId => (
                 hoverHelp    => ['1096 description', 'Asset_Navigation'],
                 tab          => 'display',
                 fieldType    => "template",
-                default      => 'PBtmpl0000000000000048',
+                default      => 'PBnav00000000000bullet',
                 namespace    => 'Navigation',
             );
 property    mimeType => (
@@ -357,7 +357,7 @@ Extend the superclass to add metadata and to preprocess the template.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId); # part of Couldn't lookup className (param: PBtmpl0000000000000048)
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
