@@ -37,7 +37,7 @@ sub definition {
             templateId => {
                 label        => $i18n->get(1096),
                 fieldType    => "template",
-                defaultValue => 'PBtmpl0000000000000048'
+                defaultValue => 'PBnav00000000000bullet',
             },
             mimeType => {
                 label        => $i18n->get('mimeType'),
