@@ -221,3 +221,11 @@ WebGUI::Shop::TransactionItem
 Object properties are no longer written to the database when an object is created from scratch.  The write method needs
 to be called.
 
+WebGUI::Shop::CartItem
+=============================
+Object properties are no longer written to the database when an object is created from scratch.  The write method needs
+to be called.
+
+Inventory adjust is also no longer done when an object is created from scratch.  You will need to call onAdjustQuantityInCart
+manually.
+

@@ -1,7 +1,66 @@
 package WebGUI::Shop::CartItem;
 
 use strict;
-use Class::InsideOut qw{ :std };
+
+use Scalar::Util qw/blessed/;
+use Moose;
+use WebGUI::Definition;
+property assetId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property configuredTitle => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property options => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+    default    => sub { return {}; },
+    traits     => ['Hash', 'WebGUI::Definition::Meta::Property::Serialize',],
+    isa        => 'WebGUI::Type::JSONHash',
+    coerce     => 1,
+);
+property shippingAddressId => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property quantity => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '1',
+    trigger => \&_call_sku,
+);
+sub _call_sku {
+    my ($self, $newQuantity) = @_;
+}
+property dateAdded => (
+    is => 'ro',
+    noFormPost => 1,
+    default => '',
+);
+
+has [ qw/cart itemId/ ] => (
+    is       => 'ro',
+    required => 1,
+);
+
+has asset => (
+    is      => 'rw',
+    trigger => \&_mine_asset,
+);
+
+sub _mine_asset {
+    my ($self, $asset) = @_;
+    $self->options($asset->getOptions);
+    $self->assetId($asset->getId);
+    $self->configuredTitle($asset->getConfiguredTitle);
+}
+
 use JSON;
 use WebGUI::Asset;
 use WebGUI::Exception::Shop;
@@ -26,8 +85,80 @@ These subroutines are available from this package:
 
 =cut
 
-readonly cart => my %cart;
-private properties => my %properties;
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if (ref $_[0] eq 'HASH') {
+        my $properties = $_[0];
+        my $cart = $properties->{cart};
+        if (! (blessed $cart && $cart->isa("WebGUI::Shop::Cart"))) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Cart", got=>(ref $cart), error=>"Need a cart.");
+        }
+        my $sku = $properties->{sku};
+        if (! (blessed $sku && $sku->isa("WebGUI::Asset::Sku"))) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Asset::Sku", got=>(ref $sku), error=>"Need a SKU item.");
+        }
+        my ($itemId, $dateAdded) = $class->_init($cart);
+        $properties->{itemId}    = $itemId;
+        $properties->{cartId}    = $cart->getId;
+        $properties->{dateAdded} = $dateAdded;
+        return $class->$orig($properties);
+    }
+    my $cart = shift;
+    if (! (blessed $cart && $cart->isa("WebGUI::Shop::Cart"))) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Cart", got=>(ref $cart), error=>"Need a cart.");
+    }
+    my $argument2 = shift;
+    if (!defined $argument2) {
+        WebGUI::Error::InvalidParam->throw( param=>$argument2, error=>"Need a itemId.");
+    }
+    if (blessed $argument2 && $argument2->isa('WebGUI::Asset::Sku')) {
+        ##Build a new one
+        my ($itemId, $dateAdded) = $class->_init($cart);
+        my $properties           = {};
+        $properties->{itemId}    = $itemId;
+        $properties->{cartId}    = $cart->getId;
+        $properties->{dateAdded} = $dateAdded;
+        $properties->{asset}     = $argument2;
+        $properties->{cart}      = $cart;
+        return $class->$orig($properties);
+    }
+    else {
+        ##Look up one in the db
+        my $item = $cart->session->db->quickHashRef("select * from cartItem where itemId=?", [$argument2]);
+        if ($item->{itemId} eq "") {
+            WebGUI::Error::ObjectNotFound->throw(error=>"Item not found", id=>$argument2);
+        }
+        if ($item->{cartId} ne $cart->getId) {
+            WebGUI::Error::ObjectNotFound->throw(error=>"Item not in this cart.", id=>$argument2);
+        }
+        $item->{cart} = $cart;
+        return $class->$orig($item);
+    }
+};
+
+#-------------------------------------------------------------------
+
+=head2 _init ( cart )
+
+Builds a stub of object information in the database, and returns the newly created
+itemId, and the dateAdded fields so the object can be initialized correctly.
+
+=head3 cart
+
+A Cart object, to tag the item and to provide a session object.
+
+=cut
+
+sub _init {
+    my $class     = shift;
+    my $cart      = shift;
+    my $session   = $cart->session;
+    my $itemId    = $session->id->generate;
+    my $dateAdded = WebGUI::DateTime->new($session)->toDatabase;
+    $session->db->write("insert into cartItem (itemId, dateAdded, cartId) values (?,?,?)",[$itemId, $dateAdded, $cart->getId]);
+    return ($itemId, $dateAdded);
+}
 
 #-------------------------------------------------------------------
 
@@ -44,8 +175,8 @@ If specified may increment quantity by more than one. Specify a negative number 
 sub adjustQuantity {
     my ($self, $quantity) = @_;
     $quantity ||= 1;
-    $self->setQuantity($quantity + $self->get("quantity"));
-    return $self->get("quantity");
+    $self->setQuantity($quantity + $self->quantity);
+    return $self->quantity;
 }
 
 
@@ -56,38 +187,6 @@ sub adjustQuantity {
 Returns a reference to the cart.
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 create ( cart, item)
-
-Constructor. Adds an item to the cart. Returns a reference to the item.
-
-=head3 cart
-
-A reference to WebGUI::Shop::Cart object.
-
-=head3 item
-
-A reference to a subclass of WebGUI::Asset::Sku.
-
-=cut
-
-sub create {
-    my ($class, $cart, $sku) = @_;
-    unless (defined $cart && $cart->isa("WebGUI::Shop::Cart")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Cart", got=>(ref $cart), error=>"Need a cart.");
-    }
-    unless (defined $sku && $sku->isa("WebGUI::Asset::Sku")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Asset::Sku", got=>(ref $sku), error=>"Need a SKU item.");
-    }
-    my $itemId = $cart->session->id->generate;
-    $cart->session->db->write('insert into cartItem (quantity, cartId, assetId, itemId, dateAdded) values (1,?,?,?,now())', [$cart->getId, $sku->getId, $itemId]);
-    my $self = $class->new($cart, $itemId);
-    $self->update({asset=>$sku});
-    $sku->onAdjustQuantityInCart($self, 1);
-    return $self;
-}
 
 #-------------------------------------------------------------------
 
@@ -105,39 +204,7 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 get ( [ property ] )
-
-Returns a duplicated hash reference of this object’s data.
-
-=head3 property
-
-Any field − returns the value of a field rather than the hash reference.  If the property
-equals "options", it will decode the internally stored JSON and return you a hash reference
-of the JSON data.
-
-=cut
-
-sub get {
-    my ($self, $name) = @_;
-    if (defined $name) {
-        if ($name eq "options") {
-            my $options = $properties{id $self}{$name};
-            if ($options eq "") {
-                return {};
-            }
-            else {
-                return JSON->new->decode($properties{id $self}{$name});
-            }
-        }
-        return $properties{id $self}{$name};
-    }
-    my %copyOfHashRef = %{$properties{id $self}};
-    return \%copyOfHashRef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getId () 
+=head2 getId ()
 
 Returns the unique id of this item.
 
@@ -145,7 +212,7 @@ Returns the unique id of this item.
 
 sub getId {
     my $self = shift;
-    return $self->get("itemId");
+    return $self->itemId;
 }
 
 
@@ -159,7 +226,7 @@ Returns the WebGUI::Shop::Address object that is attached to this item for shipp
 
 sub getShippingAddress {
     my $self = shift;
-    my $addressId = $self->get("shippingAddressId") || $self->cart->get("shippingAddressId");
+    my $addressId = $self->shippingAddressId || $self->cart->shippingAddressId;
     return $self->cart->getAddressBook->getAddress($addressId);
 }
 
@@ -173,52 +240,14 @@ Returns an instanciated WebGUI::Asset::Sku object for this cart item.
 
 sub getSku {
     my ($self) = @_;
-    my $asset = eval { WebGUI::Asset->newById($self->cart->session, $self->get("assetId")); };
+    my $asset = eval { WebGUI::Asset->newById($self->cart->session, $self->assetId); };
     if (!Exception::Class->caught) {
-        $asset->applyOptions($self->get("options"));
+        $asset->applyOptions($self->options);
     }
     return $asset;
 }
 
 
-
-#-------------------------------------------------------------------
-
-=head2 new ( cart, itemId )
-
-Constructor.  Instanciates a cart item based upon itemId.
-
-=head3 cart
-
-A reference to the current cart we're working with.
-
-=head3 itemId
-
-The unique id of the item to instanciate.
-
-=cut
-
-sub new {
-    my ($class, $cart, $itemId) = @_;
-    unless (defined $cart && $cart->isa("WebGUI::Shop::Cart")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Cart", got=>(ref $cart), error=>"Need a cart.");
-    }
-    unless (defined $itemId) {
-        WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
-    }
-    my $item = $cart->session->db->quickHashRef('select * from cartItem where itemId=?', [$itemId]);
-    if ($item->{itemId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"Item not found.", id=>$itemId);
-    }
-    if ($item->{cartId} ne $cart->getId) {
-        WebGUI::Error::ObjectNotFound->throw(error=>"Item not in this cart.", id=>$itemId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $cart{ $id }   = $cart;
-    $properties{ $id } = $item;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 
@@ -240,26 +269,25 @@ sub remove {
 
 =head2 setQuantity ( quantity )
 
-Sets quantity of this item in the cart. 
+Sets quantity of this item in the cart.
 
 =head3 quantity
 
-The number to set the quantity to. Zero or less will remove the item from cart. 
+The number to set the quantity to. Zero or less will remove the item from cart.
 
 =cut
 
 sub setQuantity {
     my ($self, $newQuantity) = @_;
-    my $id = id $self;
-    my $currentQuantity = $self->get("quantity");
+    my $currentQuantity = $self->quantity;
     if ($newQuantity > $self->getSku->getMaxAllowedInCart) {
         WebGUI::Error::Shop::MaxOfItemInCartReached->throw(error=>"Cannot have that many of this item in cart.");
     }
     if ($newQuantity <= 0) {
         return $self->remove;
     }
-    $properties{$id}{quantity} = $newQuantity;
-    $self->cart->session->db->setRow("cartItem","itemId", $properties{$id});
+    $self->quantity($newQuantity);
+    $self->write();
     $self->getSku->onAdjustQuantityInCart($self, $newQuantity - $currentQuantity);
 }
 
@@ -277,7 +305,7 @@ A hash reference that contains one of the following:
 
 This is a special meta property. It is a reference to a WebGUI::Asset::Sku subclass object. If you pass this reference it will acquire the assetId, configuredTitle, and options properties automatically.
 
-=head4 assetId 
+=head4 assetId
 
 The assetId of the asset to add to the cart.
 
@@ -295,21 +323,12 @@ The unique id for a shipping address attached to this cart.
 
 =cut
 
-sub update {
-    my ($self, $newProperties) = @_;
-    my $id = id $self;
-    if (exists $newProperties->{asset}) {
-        $newProperties->{options} = $newProperties->{asset}->getOptions;
-        $newProperties->{assetId} = $newProperties->{asset}->getId;       
-        $newProperties->{configuredTitle} = $newProperties->{asset}->getConfiguredTitle;       
-    }
-    foreach my $field (qw(assetId configuredTitle shippingAddressId)) {
-        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
-    }
-    if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
-        $properties{$id}{options} = JSON->new->encode($newProperties->{options});
-    }
-    $self->cart->session->db->setRow("cartItem","itemId",$properties{$id});
+sub write {
+    my ($self) = @_;
+    my %properties       = %{ $self->get() };
+    $properties{options} = JSON->new->encode($properties{options});
+    delete @properties{qw/cart asset/};
+    $self->cart->session->db->setRow("cartItem","itemId",\%properties);
 }
 
 

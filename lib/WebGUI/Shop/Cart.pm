@@ -211,7 +211,9 @@ sub addItem {
     unless (defined $sku && $sku->isa("WebGUI::Asset::Sku")) {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Asset::Sku", got=>(ref $sku), error=>"Need a sku.");
     }
-    my $item = WebGUI::Shop::CartItem->create( $self, $sku);
+    my $item = WebGUI::Shop::CartItem->new($self, $sku);
+    $item->write();
+    $sku->onAdjustQuantityInCart($item, 1);
     return $item;
 }
 

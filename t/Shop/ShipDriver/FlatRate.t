@@ -290,7 +290,7 @@ my $reallyNiceCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
         varSku    => 'nice-car',
         price     => 90_000,
         weight    => 3000,
-        quantity  => 3,
+        quantity  => 4,
     }
 );
 
@@ -374,6 +374,7 @@ my $boughtCar = $car->addToCart($car->getCollateral('variantsJSON', 'variantId',
 my $firstKey  = $key->addToCart($key->getCollateral('variantsJSON', 'variantId', $metalKey));
 is($driver->calculate($cart), 2, 'shipsSeparately: returns two, one for ships separately, one for ships bundled');
 
+diag $boughtCar->getSku->getMaxAllowedInCart;
 $boughtCar->adjustQuantity();
 is($driver->calculate($cart), 2, '... returns two, one for ships separately, one for ships bundled, even for two items');
 
