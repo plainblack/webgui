@@ -66,6 +66,11 @@ sub www_brokenTemplate {
     );
 }
 
+sub www_dies {
+    my $self = shift;
+    die "...aside from that bullet\n";
+}
+
 package main;
 
 my $tag = WebGUI::VersionTag->getWorking( $session );
@@ -74,7 +79,7 @@ WebGUI::Test->addToCleanup( $tag );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 16;        # Increment this number for each test you create
+plan tests => 18;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test dispatch
@@ -136,7 +141,12 @@ $session->request->setup_body( {
 } );
 WebGUI::Test->interceptLogging;
 is( $td->dispatch, "www_view", "if a query method throws a Template exception, view is returned instead" );
-is $WebGUI::Test::logger_error, 'Template not found templateId: This is a GUID assetId: '. $td->getId, 'logged an error';
+is $WebGUI::Test::logger_error, 'Template not found templateId: This is a GUID assetId: '. $td->getId, '... and logged an error';
+$session->request->setup_body( {
+    func        => 'dies',
+} );
+is( $td->dispatch, "www_view", "if a query method dies, view is returned instead" );
+is $WebGUI::Test::logger_warns, "Couldn't call method www_dies on asset for url:  Root cause: ...aside from that bullet\n", '.. and logged a warn';
 WebGUI::Test->restoreLogging;
 
 #vim:ft=perl

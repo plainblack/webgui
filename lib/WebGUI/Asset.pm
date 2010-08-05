@@ -572,11 +572,6 @@ the output from the www_view method.
 
 Any leftover part of the requested URL.
 
-=head3 _view
-
-This option should only be used internally, when trying to call the view method when
-the requested method has failed.
-
 =cut
 
 sub dispatch {
@@ -597,12 +592,11 @@ sub dispatch {
     my $output = eval { $self->$sub(); };
     if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
                                          #WebGUI::Error::ObjectNotFound::Template
-        warn "logged an exception";
         $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
     }
     elsif ($@) {
-        warn "logged a warn: $@";
-        $session->log->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
+        my $message = $@;
+        $session->log->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$message);
     }
     return $output if $output || $viewing;
     ##No output, try the view method instead
@@ -611,7 +605,9 @@ sub dispatch {
         $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
     }
     elsif ($@) {
-        $session->errorHandler->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
+        warn "logged another warn: $@";
+        my $message = $@;
+        $session->log->warn("Couldn't call method www_view on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
     }
     return $output;
 }
