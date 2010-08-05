@@ -143,6 +143,28 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 dispatch ( )
+
+Extent the base method in Asset.pm to handle RSS feeds.
+
+=cut
+
+sub dispatch {
+    my ( $self, $fragment ) = @_;
+    if ($fragment eq '.rss') {
+        return $self->www_viewRss;
+    }
+    elsif ($fragment eq '.atom') {
+        return $self->www_viewAtom;
+    }
+    elsif ($fragment eq '.rdf') {
+        return $self->www_viewRdf;
+    }
+    return $self->next::method();
+}
+
+#-------------------------------------------------------------------
+
 =head2 _httpBasicLogin ( )
 
 Set header values and content to show the HTTP Basic Auth login box.
