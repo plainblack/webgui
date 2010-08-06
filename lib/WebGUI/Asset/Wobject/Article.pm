@@ -69,7 +69,7 @@ sub _set_storageId {
         delete $self->{_storageLocation};
     }
 }
-sub _storageid_deleteFileUrl {
+sub _storageId_deleteFileUrl {
     return shift->session->url->page("func=deleteFile;filename=");
 }
 
