@@ -463,6 +463,9 @@ sub www_view {
     my $var;
     $var->{backToSiteUrl} = $url->page;
 
+    # temporary! We are now in admin mode!
+    $session->var->switchAdminOn;
+
     # Add vars for AdminBar
     $var->{adminPlugins} = $self->getAdminPluginTemplateVars;
     $var->{newContentTabs} = $self->getNewContentTemplateVars;
