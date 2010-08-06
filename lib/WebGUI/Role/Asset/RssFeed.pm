@@ -93,7 +93,7 @@ sub _feedHeaderLinks_options {
         atom => $i18n->get('atomLinkOption'),
         rdf  => $i18n->get('rdfLinkOption'),
     );
-    return \&headerLinksOptions;
+    return \%headerLinksOptions;
 }
 
 requires 'getRssFeedItems';
