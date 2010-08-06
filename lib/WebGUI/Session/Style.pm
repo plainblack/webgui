@@ -271,6 +271,7 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
             icon        => $asset->getIcon(1),
             type        => $assetName,
             helpers     => $asset->getHelpers,
+            revisions   => $asset->getAllRevisions,
         };
         $var{'head.tags'} .= sprintf <<'ADMINJS', JSON->new->encode( $assetDef );
 if ( window.parent && window.parent.admin ) {
