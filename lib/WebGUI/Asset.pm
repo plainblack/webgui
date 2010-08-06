@@ -2598,12 +2598,17 @@ sub www_edit {
             label.formDescription { display: block; margin-top: 1em; font-weight: bold }
             .saveButtons { position: absolute; top: 3px; right: 5px; z-index: 9001; }
         </style>
+ENDHTML
+
+    if ( $self->session->form->get('func') ne 'add' ) {
+        $self->session->style->setRawHeadTags(<<'ENDHTML');
         <script type="text/javascript">
             if ( window.parent && window.parent.admin ) {
                 window.parent.admin.adminBar.show("assetHelpers");
             }
         </script>
 ENDHTML
+    }
 
     return $self->session->style->process(
         '<div class="yui-skin-sam">' . $f->toHtml . '</div>',
