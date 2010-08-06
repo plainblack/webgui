@@ -2638,6 +2638,7 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 sub www_editSave {
     my $self    = shift;
     my $session = $self->session;
+    my ( $form ) = $session->quick(qw{ form });
 
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
     my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
@@ -2650,7 +2651,8 @@ sub www_editSave {
     }
     my $object;
     if ($isNewAsset) {
-        $object = $self->addChild({className=>$session->form->process("className","className")});	
+        my $className   = $form->process('className','className') || $form->process('class','className');
+        $object = $self->addChild({className=>$className});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
         $object->url(undef);
