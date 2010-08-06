@@ -18,7 +18,6 @@ property configuredTitle => (
 property options => (
     is         => 'rw',
     noFormPost => 1,
-    default    => '',
     default    => sub { return {}; },
     traits     => ['Hash', 'WebGUI::Definition::Meta::Property::Serialize',],
     isa        => 'WebGUI::Type::JSONHash',
