@@ -43,6 +43,7 @@ WebGUI.Admin = function(cfg){
         }
 
         self.afterNavigate.subscribe( self.requestUpdateCurrentVersionTag, self );
+        self.requestUpdateCurrentVersionTag();
 
         self.tree           = new WebGUI.Admin.Tree();
         self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
