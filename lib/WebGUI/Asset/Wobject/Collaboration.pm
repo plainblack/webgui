@@ -1640,8 +1640,10 @@ sub www_edit {
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
     my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
-    $self->getAdminConsole->addConfirmedSubmenuItem($self->getUrl('func=unarchiveAll'),$i18n->get("unarchive all"),$i18n->get("unarchive confirm"));
-    return $self->getAdminConsole->render($self->getEditForm->toHtml,$i18n->get("assetName"));
+    # Unarchive All needs to be an asset helper
+    #$self->getAdminConsole->addConfirmedSubmenuItem($self->getUrl('func=unarchiveAll'),$i18n->get("unarchive all"),$i18n->get("unarchive confirm"));
+    #return $self->getAdminConsole->render($self->getEditForm->toHtml,$i18n->get("assetName"));
+    return $self->SUPER::www_edit;
 }
 
 #-------------------------------------------------------------------
