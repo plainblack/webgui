@@ -245,6 +245,22 @@ sub getRevisionCount {
 
 #-------------------------------------------------------------------
 
+=head2 getRevisionDates ( [ status ] )
+
+Return an arrayref of all the revision dates for this asset, sorted in 
+descending order (most recent first).
+
+=cut
+
+sub getRevisionDates {
+    my $self = shift;
+    return $self->session->db->buildArrayRef(
+        "select revisionDate from assetData where assetId=? order by revisionDate desc", 
+        [$self->getId],
+    );
+}
+#-------------------------------------------------------------------
+
 =head2 getRevisions ( [ status ] )
 
 Returns an array reference of the revision objects of this asset, sorted by revision date in descending
