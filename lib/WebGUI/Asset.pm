@@ -911,7 +911,8 @@ sub getEditForm {
     my $class;
     if ( $self->getId eq "new" ) {
         $assetId = "new";
-        $class = $session->form->process( "class", "className" );
+        # This should NOT be set here!
+        $class = $session->form->process( "className", "className" );
     }
     else {
         $assetId = $self->getId;
@@ -925,7 +926,7 @@ sub getEditForm {
         uiLevel     => 9,
     );
     $f->getTab("meta")->addField( "ClassName", 
-        name        => "class",
+        name        => "className",
         value       => $class,
         label       => $i18n->get('class name', 'WebGUI'),
         uiLevel     => 9,
@@ -2586,11 +2587,19 @@ sub www_edit {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    my $func    = $self->session->form->get('func');
 
     my $f   = eval { $self->getEditForm };
     return $@ if $@;
     $f->addField( "Hidden", name => "func", value => "editSave" );
-    $f->action( $self->getUrl );
+    if ( $func eq 'add' ) {
+        my $className   = $self->session->form->get('className');
+        $f->action( $self->getParent->getUrl );
+        $f->getTab('meta')->getField( 'className' )->set('value', $className);
+    }
+    else {
+        $f->action( $self->getUrl );
+    }
 
     # TODO: Make this whole thing a template instead!
     $self->session->style->setRawHeadTags(<<'ENDHTML'); 
@@ -2600,7 +2609,7 @@ sub www_edit {
         </style>
 ENDHTML
 
-    if ( $self->session->form->get('func') ne 'add' ) {
+    if ( $func ne 'add' ) {
         $self->session->style->setRawHeadTags(<<'ENDHTML');
         <script type="text/javascript">
             if ( window.parent && window.parent.admin ) {
@@ -2641,7 +2650,7 @@ sub www_editSave {
     }
     my $object;
     if ($isNewAsset) {
-        $object = $self->addChild({className=>$session->form->process("class","className")});	
+        $object = $self->addChild({className=>$session->form->process("className","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
         $object->url(undef);
@@ -2654,7 +2663,6 @@ sub www_editSave {
             return $session->asset($self->getContainer)->www_view;
         }
     }
-
     # Process properties from form post
     my $errors = $object->processEditForm;
     if (ref $errors eq 'ARRAY') {
