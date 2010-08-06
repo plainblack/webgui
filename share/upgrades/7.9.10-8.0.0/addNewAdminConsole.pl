@@ -10,4 +10,8 @@ if ( ! any { $_ eq 'WebGUI::Content::Admin' } @{session->config->get('contentHan
     );
 }
 
+# Remove irrelevant Admin Console items
+session->config->deleteFromHash( 'adminConsole', 'adminConsoleOff' );
+session->config->deleteFromHash( 'adminConsole', 'assets' );
+
 done;
