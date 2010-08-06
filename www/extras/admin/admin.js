@@ -32,6 +32,11 @@ WebGUI.Admin = function(cfg){
     var self = this;
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
+        // TODO: This should be i18n
+        self.localeMonths   = [
+            'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December'
+        ];
         self.adminBar       = new WebGUI.Admin.AdminBar( self.cfg.adminBarId, { expandMax : true } );
         self.adminBar.afterShow.subscribe( self.updateAdminBar, self );
         YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
@@ -226,6 +231,7 @@ WebGUI.Admin.prototype.navigate
         this.currentAssetDef = assetDef;
         this.treeDirty = 1;
         this.updateAssetHelpers( assetDef );
+        this.updateAssetHistory( assetDef );
     }
 
     // Fire event
@@ -648,6 +654,66 @@ WebGUI.Admin.prototype.hideInfoMessage
 WebGUI.Admin.prototype.addNewContent
 = function ( urlFragment ) {
     this.gotoAsset( appendToUrl( this.currentAssetDef.url, urlFragment ) );
+};
+
+/**
+ * updateAssetHistory( assetDef )
+ * Update the history list of the current asset
+ */
+WebGUI.Admin.prototype.updateAssetHistory
+= function ( assetDef ) {
+    // Clear old revisions
+    var historyEl    = document.getElementById( 'history_list' );
+    while ( historyEl.childNodes.length > 0 ) {
+        historyEl.removeChild( historyEl.childNodes[0] );
+    }
+
+    var now = new Date();
+    // Add new ones
+    for ( var i = 0; i < assetDef.revisions.length; i++ ) {
+        var revisionDate    = assetDef.revisions[i];
+        var li              = document.createElement('li');
+
+        // Create a descriptive date string
+        var rDate           = new Date( revisionDate * 1000 ); // JS requires milliseconds
+        var minutes         = rDate.getMinutes();
+        minutes     = minutes < 10 ? "0" + minutes : minutes;
+
+        var dateString;
+        // Last year or older
+        if ( rDate.getFullYear() < now.getFullYear() ) {
+            dateString  = this.localeMonths[rDate.getMonth()] + " " + rDate.getDate() + ", "
+                        + rDate.getFullYear();
+        }
+        // Earlier this year
+        else if ( rDate.getMonth() < now.getMonth() || rDate.getDate() < now.getDate() - 1 ) { 
+            dateString  = this.localeMonths[rDate.getMonth()] + " " + rDate.getDate() + " " 
+                        + rDate.getHours() + ":" + minutes;
+        }
+        // Yesterday
+        else if ( rDate.getDate() < now.getDate() ) {
+            dateString  = "Yesterday " + rDate.getHours() + ":" + minutes;
+        }
+        // Today
+        else {
+            dateString  = "Today " + rDate.getHours() + ":" + minutes;
+        }
+
+        li.appendChild( document.createTextNode( dateString ) );
+        this.addHistoryHandler( li, assetDef, revisionDate );
+        historyEl.appendChild( li );
+    }
+};
+
+/**
+ * addHistoryHandler( elem, revisionDate )
+ * Add the click handler to view the desired revision
+ */
+WebGUI.Admin.prototype.addHistoryHandler
+= function ( elem, assetDef, revisionDate ) {
+    var self = this;
+    var url  = appendToUrl( assetDef.url, 'func=view;revision=' + revisionDate );
+    YAHOO.util.Event.on( elem, "click", function(){ self.gotoAsset( url ) }, self, true );
 };
 
 /****************************************************************************
