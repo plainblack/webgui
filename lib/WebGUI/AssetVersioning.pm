@@ -259,6 +259,7 @@ sub getRevisionDates {
         [$self->getId],
     );
 }
+
 #-------------------------------------------------------------------
 
 =head2 getRevisions ( [ status ] )
