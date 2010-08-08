@@ -515,7 +515,7 @@ sub view {
     if(isIn($sortBy,@sortByUserProperties)){
             $sortBy = 'users.'.$sortBy;
     }
-    $sortBy = join '.', map { $self->session->db->quoteIdentifier($_) } split /\./, $sortBy;
+    $sortBy = join '.', map { $dbh->quote_identifier($_) } split /\./, $sortBy;
 	$sql .= " order by ".$sortBy." ".$sortOrder;
 
 	my $paginatePage = $form->param('pn') || 1;
