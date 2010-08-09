@@ -406,7 +406,7 @@ sub view {
         $var{'search_'.$fieldName.'_form'} = $self->getFormElement(\%formElementProperties);
         $var{'search_'.$fieldName.'_text'} = WebGUI::Form::Text($self->session, {
             -name   => 'search_'.$fieldName,
-            -value  => $form->process('search_'.$fieldName),
+            -value  => scalar $form->process('search_'.$fieldName),
         }); 
 
         $formElementProperties{value} = $form->process('search_Exact'.$fieldName);
@@ -414,7 +414,7 @@ sub view {
         $var{'searchExact_'.$fieldName.'_form'} = $self->getFormElement(\%formElementProperties);
         $var{'searchExact_'.$fieldName.'_text'} = WebGUI::Form::Text($self->session, {
             -name   => 'searchExact_'.$fieldName,
-            -value  => $form->process('searchExact_'.$fieldName),
+            -value  => scalar $form->process('searchExact_'.$fieldName),
         });
 
         $var{'includeInSearch_'.$fieldName.'_hidden'} =  WebGUI::Form::Hidden($self->session, {
@@ -425,7 +425,7 @@ sub view {
         $var{'includeInSearch_'.$fieldName.'_checkBox'} = WebGUI::Form::Checkbox($self->session, {
             -name   => 'includeInSearch_'.$fieldName,
             -value  => '1',
-            -checked=> $form->process('includeInSearch_'.$fieldName),
+            -checked=> scalar $form->process('includeInSearch_'.$fieldName),
         });
 	}
     
@@ -607,7 +607,7 @@ sub view {
     });
     $var{searchFormQuery_form}  = WebGUI::Form::text($self->session,{
         name    =>  'search',
-        value   =>  $form->process("search"),
+        value   =>  scalar $form->process("search"),
     });
         
 
