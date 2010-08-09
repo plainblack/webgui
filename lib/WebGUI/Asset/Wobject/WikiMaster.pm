@@ -838,10 +838,13 @@ sub view {
     my $featuredIds = $self->getFeaturedPageIds;
 
     if( @$featuredIds ) {
+        # it's possible for a WikiMaster not to have any WikiPage featured; it's also possible for any to not render
         my $featuredId  = $featuredIds->[ int( rand @$featuredIds ) - 1 ]; 
-        my $featured    = eval { WebGUI::Asset->newById( $session, $featuredId ) };
-        if ( ! Exception::Class->caught() ) {
-            $self->appendFeaturedPageVars( $var, $featured );
+        if( $featuredId ) {
+            my $featured    = eval { WebGUI::Asset->newById( $session, $featuredId ) };
+            if ( ! Exception::Class->caught() ) {
+                $self->appendFeaturedPageVars( $var, $featured );
+            }
         }
     }
 
