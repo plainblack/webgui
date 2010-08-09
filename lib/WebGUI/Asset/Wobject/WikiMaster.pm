@@ -836,10 +836,13 @@ sub view {
 
     # Get a random featured page
     my $featuredIds = $self->getFeaturedPageIds;
-    my $featuredId  = $featuredIds->[ int( rand @$featuredIds ) - 1 ]; 
-    my $featured    = WebGUI::Asset->newById( $session, $featuredId );
-    if ( $featured ) {
-        $self->appendFeaturedPageVars( $var, $featured );
+
+    if( @$featuredIds ) {
+        my $featuredId  = $featuredIds->[ int( rand @$featuredIds ) - 1 ]; 
+        my $featured    = WebGUI::Asset->newById( $session, $featuredId );
+        if ( $featured ) {
+            $self->appendFeaturedPageVars( $var, $featured );
+        }
     }
 
 	$self->appendSearchBoxVars($var);
