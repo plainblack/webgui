@@ -392,7 +392,7 @@ sub appendTemplateVarsSearchForm {
     $var->{ searchForm_location }
         = WebGUI::Form::text( $session, {
             name        => "location",
-            value       => $form->get("location"),
+            value       => scalar $form->get("location"),
         });
         
     # Search classes
