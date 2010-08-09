@@ -35,7 +35,7 @@ property templateId => (
             hoverHelp    => ['template description', 'Asset_ZipArchive'],
             namespace    => "ZipArchiveAsset",
             fieldType    => 'template',
-            default      => '',
+            default      => 'ZipArchiveTMPL00000001',
          );
 
 
