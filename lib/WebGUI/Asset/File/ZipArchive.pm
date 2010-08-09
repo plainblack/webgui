@@ -145,7 +145,7 @@ sub definition {
 				label=>$i18n->get('template label'),
 				namespace=>"ZipArchiveAsset",
 				fieldType=>'template',
-				defaultValue=>''
+				defaultValue=>'ZipArchiveTMPL00000001',
 			},
 		}
 	});

@@ -6,6 +6,7 @@
  - fixed #11765: WebGUI/Asset/Wobject/Navigation.pm still uses obsolete PBtmpl0000000000000048
  - fixed #11766: Userlist problem / WebGUI 7.8.24
  - fixed #11759: email template missing
+ - fixed #11769: WebGUI::Asset::File::ZipArchive specifies a default template of ''
 
 7.9.10
  - fixed #11721: spamStopWords not in WebGUI.conf.original
