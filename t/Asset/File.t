@@ -21,10 +21,11 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset::File;
+use JSON;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 10;
+plan tests => 13;
 
 #TODO: This script tests certain aspects of WebGUI::Storage and it should not
 
@@ -47,7 +48,7 @@ cmp_bag($storage->getFiles, ['someScalarFile.txt'], 'Only 1 file in storage with
 $session->user({userId=>3});
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"File Asset test"});
-my $guard1 = cleanupGuard($versionTag);
+my $guard1 = WebGUI::Test::addToCleanup($versionTag);
 my $properties = {
 	#     '1234567890123456789012'
 	id => 'FileAssetTest000000012',
@@ -85,10 +86,45 @@ $versionTag->commit;
 ############################################
 
 my $fileStorage = WebGUI::Storage->create($session);
-my $guard2 = cleanupGuard($fileStorage);
+WebGUI::Test::addToCleanup($fileStorage);
 $mocker->set_always('getValue', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
+
+#----------------------------------------------------------------------------
+# Test override of update to set permissions
+$asset->update({ ownerUserId => '3', groupIdView => '3' });
+my $privs   = JSON->new->decode( $asset->getStorageLocation->getFileContentsAsScalar('.wgaccess') );
+cmp_deeply(
+    $privs,
+    {
+        "assets"    => [],
+        "groups"    => superbagof( "3" ),
+        "users"     => ["3"],
+    },
+    'update sets the correct permissions in wgaccess',
+);
+
+#----------------------------------------------------------------------------
+# Add another new revision, changing the privs
+my $newRev  = $asset->addRevision( { ownerUserId => '3', groupIdView => '3' }, time + 5 );
+WebGUI::Test::addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
+$privs   = JSON->new->decode( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess') );
+cmp_deeply(
+    $privs,
+    {
+        "assets"    => [],
+        "groups"    => superbagof( "3" ),
+        "users"     => ["3"],
+    },
+    'addRevision sets the correct permissions in wgaccess',
+);
+
+# Add a new revision, changing the privs
+my $newRev  = $asset->addRevision( { groupIdView => '7' }, time + 8 );
+WebGUI::Test::addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
+is( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess'), undef, "wgaccess doesn't exist" );
+note( @{ $newRev->getStorageLocation->getFiles() } );
 
 ############################################
 #

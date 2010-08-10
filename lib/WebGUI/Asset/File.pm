@@ -59,6 +59,7 @@ sub addRevision {
     if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
         my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
         $newSelf->update({storageId => $newStorage->getId});
+        $newSelf->applyConstraints;
     }
 
     return $newSelf;

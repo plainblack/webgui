@@ -12,6 +12,7 @@
  - fixed #11771: Default Newsletter template not set
  - fixed #11432: DataTable date input
  - fixed #11772: Metadata in Post doesn't set default value correctly
+ - fixed #11768: Edit Branch does not update File wgaccess permissions
 
 7.9.10
  - fixed #11721: spamStopWords not in WebGUI.conf.original
