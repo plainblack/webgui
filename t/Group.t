@@ -289,7 +289,6 @@ cmp_bag($gB->getGroupsIn(),  [$gA->getId, 3], 'Group A is in Group B');
 cmp_bag($gA->getGroupsFor(), [$gB->getId], 'Group B contains Group A');
 cmp_bag($gA->getGroupsIn(),  [3], 'Admin added to group A automatically');
 
-diag $gA->getId;
 $gA->addGroups([$gB->getId]);
 cmp_bag($gA->getGroupsIn(), [3], 'Not allowed to create recursive group loops');
 

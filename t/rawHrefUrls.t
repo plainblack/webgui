@@ -53,7 +53,6 @@ my $nonRootLink = qr{
 sub checkLinks {
     my ($tag, $attrs) = @_;
     if ($tag eq 'link' && $attrs->{href}) {
-        note sprintf '%s: %s', $tag, $attrs->{href};
         if ($attrs->{href} !~ $nonRootLink) {
             $validLinks = 0;
         }
