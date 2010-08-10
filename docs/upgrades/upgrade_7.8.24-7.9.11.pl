@@ -23,6 +23,9 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Asset::WikiPage;
+use WebGUI::Shop::AddressBook;
+use WebGUI::Shop::Pay;
+use WebGUI::Workflow;
 use WebGUI::Utility;
 
 
@@ -485,7 +488,6 @@ sub start {
 sub finish {
     my $session = shift;
     updateTemplates($session);
-    upgradeToYUI28( $session );
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
     $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".time().")");
