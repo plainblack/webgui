@@ -360,22 +360,9 @@ sub www_defaultStyleSave {
     my ( $self, @args ) = @_;
     my $output = WebGUI::Wizard::HomePage::www_pickStyleSave( $self, @args );
     my $session = $self->session;
-    # update default site style
-    $session->setting->set( "userFunctionStyleId", $self->get('styleTemplateId') );
-    my $home    = WebGUI::Asset->getDefault( $session );
-    my $assetIter  = $home->getLineageIterator( [ "self", "descendants" ] );
-    while ( 1 ) {
-        my $asset;
-        eval { $asset = $assetIter->() };
-        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
-            $session->log->error($x->full_message);
-            next;
-        }
-        last unless $asset;
-        if ( defined $asset ) {
-            $asset->update( { styleTemplateId => $self->get("styleTemplateId") } );
-        }
-    }
+
+    my $home     = WebGUI::Asset->getDefault( $session );
+    WebGUI::Wizard::HomePage::updateDefaultStyle( $self, $self->get('styleTemplateId'), $home );
 
     return $output;
 }
