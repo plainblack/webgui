@@ -18,7 +18,7 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Utility;
 use Class::C3;
-use base qw/WebGUI::AssetAspect::Installable WebGUI::Asset::Wobject/;
+use base qw/WebGUI::Asset::Wobject/;
 
 #-------------------------------------------------------------------
 
@@ -190,108 +190,5 @@ sub view {
     
     return $self->processTemplate( $var, undef, $self->{_template} );
 } ## end sub view
-
-#-------------------------------------------------------------------
-# Install Methods Below - Do Not Modify
-
-#-------------------------------------------------------------------
-sub install {
-    my $class     = shift;
-    my $session   = shift;
-    $class->next::method( $session );
-
-    ### Create a folder asset to store the default template
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $folder     = $importNode->addChild({
-		className   => "WebGUI::Asset::Wobject::Folder",
-		title       => "Asset Report",
-		menuTitle   => "Asset Report",
-		url         => "pb_asset_report",
-		groupIdView =>"3"
-	},"AssetReportFolder00001");
-
-    ### Add the template to the folder
-    $folder->addChild({ 
-        className   => "WebGUI::Asset::Template",
-	    namespace   => "AssetReport",
-	    title       => "Asset Report Default Template",
-	    menuTitle   => "Asset Report Default Template",
-	    ownerUserId => "3",
-	    groupIdView => "7",
-	    groupIdEdit => "4",
-        isHidden    => 1,
-        isDefault   => 1,
-        template    => qq{
-<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
- 
-<tmpl_if session.var.adminOn>
-<p><tmpl_var controls></p>
-</tmpl_if>
- 
-<tmpl_if displayTitle>
-<h2><tmpl_var title></h2>
-</tmpl_if>
- 
-<tmpl_if error_loop>
-<ul class="errors">
-<tmpl_loop error_loop>
-<li><b><tmpl_var error.message></b></li>
-</tmpl_loop>
-</ul>
-</tmpl_if>
- 
-<tmpl_if description>
-<tmpl_var description>
-<p />
-</tmpl_if>
- 
-<table border="1" cellspacing="0" cellpadding="3">
-<thead>
-<tr>
-<th>Title</th>
-<th>Creation Date</th>
-<th>Created By</th>
-</tr>
-</thead>
-<tbody>
-<tmpl_loop asset_loop>
-<tr>
-<td><a href="<tmpl_var url>"><tmpl_var title></a></td>
-<td>^D('%C %D, %y %h:%s %p',<tmpl_var creationDate>);</td>
-<td>^User('username',<tmpl_var createdBy>);</td>
-</tr>
-</tmpl_loop>
-</tbody>
-</table>
- 
-<tmpl_if pagination.pageCount.isMultiple>
-<div class="pagination">
-<tmpl_var pagination.previousPage> <tmpl_var pagination.pageList.upTo20> <tmpl_var pagination.nextPage>
-</div>
-</tmpl_if>
-        },
-        headBlock   =>"",
-    }, "AssetReport00000000001");
-
-    ### Commit version tag
-    my $tag = WebGUI::VersionTag->new($session, WebGUI::VersionTag->getWorking($session)->getId);
-    if (defined $tag) {
-        $tag->set({comments=>"Template added/updated by Asset Install Process"});
-        $tag->requestCommit;
-    }
-}
-
-#-------------------------------------------------------------------
-sub uninstall {
-    my $class     = shift;
-    my $session   = shift;
-    $class->next::method( $session );
-    
-    my $template  = WebGUI::Asset->newByDynamicClass($session,"AssetReport00000000001");    
-    $template->purge if($template);
-    
-    my $folder    = WebGUI::Asset->newByDynamicClass($session,"AssetReportFolder00001");
-    $folder->purge if($folder);
-}
 
 1;
