@@ -202,7 +202,10 @@ WebGUI.Form.DataTable
             YAHOO.util.Dom.get( this.containerId + "-table" ).style.display = "none";
         }
 
-        var dataTableOptions    = { };
+        var dataTableOptions    = { 
+            dateOptions : { format : this.options.dateFormat }
+        };
+
         if ( this.options.showEdit ) {
             dataTableOptions.draggableColumns   = true;
         }
@@ -629,6 +632,9 @@ WebGUI.Form.DataTable
                 sortable    : ( col ? col.sortable : 1 ),
                 editor      : ( format == "date" ? "date" : "textbox")
             };
+            if ( format == "date" ) {
+                newCol["dateOptions"] = { format : this.options.dateFormat };
+            }
             var newIndex    = col ? col.getKeyIndex() : undefined;
 
             this.dataTable.insertColumn( newCol, newIndex );

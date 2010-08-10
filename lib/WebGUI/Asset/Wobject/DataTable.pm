@@ -142,6 +142,26 @@ sub getDataTemplateVars {
 
 #----------------------------------------------------------------------------
 
+=head2 getDateFormat ( )
+
+Get the current date format for the current user in a strftime format that YUI can
+understand.
+
+=cut
+
+sub getDateFormat {
+    my ( $self ) = @_;
+
+    my $dateFormat
+        = WebGUI::DateTime->new( $self->session )->webguiToStrftime( $self->session->user->get('dateFormat') );
+    # Special handle %_varmonth_ super special WebGUI field that strftime doesn't have
+    $dateFormat =~ s/%_varmonth_/%m/g;
+
+    return $dateFormat;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getEditForm ( )
 
 Add the data table to the edit form.
@@ -161,6 +181,7 @@ sub getEditForm {
                 value        => $self->get("data"),
                 defaultValue => undef,
                 showEdit     => 1,
+                dateFormat   => $self->getDateFormat,
             }
             )->toHtml
       . q{</td></tr>}
@@ -225,6 +246,7 @@ sub prepareView {
             name         => $self->getId,
             value        => $self->get('data'),
             defaultValue => undef,
+            dateFormat   => $self->getDateFormat,
         }
     );
     $dt->prepare;
