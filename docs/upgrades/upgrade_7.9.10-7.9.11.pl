@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 alterStoryTopicTable($session);
+addAssetReport($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,30 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addAssetReport {
+    my $session = shift;
+    print "\tAdding Asset Report Asset ... " unless $quiet;
+
+    #Add the database table
+    $session->db->write(q{
+        CREATE TABLE `AssetReport` (
+            `assetId` char(22) character set utf8 collate utf8_bin NOT NULL,
+            `revisionDate` bigint(20) NOT NULL,
+            `settings` mediumtext,
+            `templateId` char(22) character set utf8 collate utf8_bin default NULL,
+            `paginateAfter` bigint(20) default NULL,
+            PRIMARY KEY  (`assetId`,`revisionDate`)
+        )
+    });
+
+    #Add the asset to the config file
+    $session->config->addToHash( "assets", "WebGUI::Asset::Wobject::AssetReport", { category => "utilities" } );
+    
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
