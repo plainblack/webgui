@@ -307,6 +307,11 @@ If usePaginator is not passed, then this variable will limit the number of asset
 An array reference of asset states.  The ids of assets in those states will be returned.  If this option
 is missing, only assets in the C<published> state will be returned.
 
+=head4 sortOrder
+
+Determines the order that assets are returned.  By default, it is in Chronological order, by creationDate.  If
+you set sortOrder to Alphabetically, it will sort by title, and then lineage.
+
 =cut
 
 sub getMatchingAssets {
