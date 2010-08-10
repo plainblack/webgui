@@ -552,7 +552,11 @@ sub getKeywordHierarchy {
         my $datum = {
             title       => $keyword,  ##Note, same as keyword
             url         => $self->getUrl('func=byKeyword;keyword='.$keyword),
-            descendants => scalar @{ $assetKeyword->getMatchingAssets( { startAsset => $self, keyword => $keyword, }) },
+            descendants => scalar @{ $assetKeyword->getMatchingAssets( {
+                                        startAsset => $self,
+                                        keyword    => $keyword,
+                                        sortOrder  => 'Alphabetically',
+                                  }) },
         };
         ##Prevent recursion if seen again
         if (! $seen->{$keyword}++) {
