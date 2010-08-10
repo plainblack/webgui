@@ -9,6 +9,7 @@
  - fixed #11769: WebGUI::Asset::File::ZipArchive specifies a default template of ''
  - fixed #11758: formatting on account stuff is wrong
  - fixed #11770: Starter needs to set all account plugins
+ - fixed #11771: Default Newsletter template not set
 
 7.9.10
  - fixed #11721: spamStopWords not in WebGUI.conf.original

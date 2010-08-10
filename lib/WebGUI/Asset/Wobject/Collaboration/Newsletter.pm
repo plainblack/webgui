@@ -92,7 +92,16 @@ sub definition {
 		className=>'WebGUI::Asset::Wobject::Collaboration::Newsletter',
 		properties=>\%properties
 		});
-        return $class->SUPER::definition($session, $definition);
+        $class->SUPER::definition($session, $definition);
+
+        # Change the default Collaboration template
+        for my $def ( @$definition ) {
+            if ( exists $def->{properties}->{collaborationTemplateId} ) {
+                $def->{properties}->{collaborationTemplateId}->{defaultValue} = 'newslettercs0000000001';
+            }
+        }
+
+        return $definition;
 }
 
 
