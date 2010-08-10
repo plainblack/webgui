@@ -89,7 +89,7 @@ $assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', sortOrder => 'Alp
 
 cmp_deeply(
     $assetIds,
-    [ $aa_story->getId, $home->getId, $snippet->getId, ],           # 'aaa', 'Home', 'keyword snippet'
+    [ $aa_story->getId, $snippet->getId, $home->getId, ],           # 'aaa', 'Home', 'keyword snippet'
     'getMatchingAssets, by keyword, assetIds in order by title'
 );
 
