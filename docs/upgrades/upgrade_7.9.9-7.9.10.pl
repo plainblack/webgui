@@ -33,7 +33,6 @@ my $session = start(); # this line required
 # upgrade functions go here
 addSpamStopWordsToConfig($session);
 alterStoryArchiveTable($session);
-alterStoryTopicTable($session);
  
 finish($session); # this line required
  
@@ -75,25 +74,6 @@ sub alterStoryArchiveTable {
     print "DONE!\n" unless $quiet;
 }
  
-#----------------------------------------------------------------------------
-# Describe what our function does
-sub alterStoryTopicTable {
-    my $session = shift;
-    print "\tAdd story sort order column to the StoryTopic table... " unless $quiet;
-
-    my $sth = $session->db->read('DESCRIBE `StoryTopic`');
-    while (my ($col) = $sth->array) {  
-        if ($col eq 'storySortOrder') {
-            print "Skipped.\n" unless $quiet;
-            return;
-        }
-    }
-
-    $session->db->write("ALTER TABLE StoryTopic ADD COLUMN storySortOrder CHAR(22)");
-    $session->db->write("UPDATE StoryTopic SET storySortOrder = 'Chronologically' WHERE storySortOrder IS NULL");
-    print "DONE!\n" unless $quiet;
-}
-
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
 #----------------------------------------------------------------------------
