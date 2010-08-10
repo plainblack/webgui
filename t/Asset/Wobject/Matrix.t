@@ -180,8 +180,6 @@ my $json = $matrix->www_getCompareFormData('score');
 
 my $compareFormData = JSON->new->decode($json);
 
-$expectedAssetId =~ s/-/_____/g;
-
 cmp_deeply(
         $compareFormData,
         {ResultSet=>{
