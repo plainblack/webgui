@@ -281,7 +281,7 @@ override getEditForm => sub {
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
 		my $config = $self->getGraphConfig;
 
-		$fb->addTab('graph', $i18n->get('Graphing','Image_Graph'));
+		$fb->addTab(name => 'graph', label => $i18n->get('Graphing','Image_Graph'));
 		$fb->getTab('graph')->addField( "yesNo", 
 			name		=> 'generateGraph',
 			label		=> $i18n->get('generate graph'),
