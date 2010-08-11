@@ -24,7 +24,7 @@ define tableName => 'Shortcut';
 property  shortcutToAssetId => (
               noFormPost => 1,
               fieldType  => "hidden",
-              default    => undef,
+              required  => 1, # default    => undef, # XXX
               noFormPost => 1,
           );
 property  shortcutByCriteria => (
@@ -268,7 +268,7 @@ Return the largest of either the asset revision date, or the shortcut revision d
 sub getContentLastModified {
     my $self = shift;
     my $assetRev = $self->get('revisionDate');
-    my $shortcut = $self->getShortcut;
+    my $shortcut = $self->getShortcut;    # XXX "newById must get an assetId"
     my $shortcuttedRev;
     if (defined $shortcut) {
         $shortcuttedRev = $shortcut->get('revisionDate');
@@ -424,24 +424,27 @@ sub getOverridesList {
 	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td><td>'.$i18n->get('Original Value').'</td><td>'.$i18n->get('New value').'</td><td>'.$i18n->get('Replacement value').'</td></tr>';
 	my $shortcut = $self->getShortcutOriginal;
 	return undef unless defined $shortcut;
-	foreach my $definition (@{$shortcut->definition($self->session)}) {
-		foreach my $prop (keys %{$definition->{properties}}) {
-			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
-            next if $definition->{properties}{$prop}{label} eq '';
-			$output .= '<tr>';
-            $output .= '<td class="tableData">'.$definition->{properties}{$prop}{label}.'</td>';
-			$output .= '<td class="tableData">';
-			$output .= $self->session->icon->edit('func=editOverride;fieldName='.$prop,$self->get("url"));
-			$output .= $self->session->icon->delete('func=deleteOverride;fieldName='.$prop,$self->get("url")) if exists $overrides{overrides}{$prop};
-			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{origValue};
-			$output .= '</td><td>';
-			$output .= encode_entities($overrides{overrides}{$prop}{newValue}, '<>&"^');
-			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{parsedValue};
-			$output .= "</td></tr>\n";
-		}
+
+    for my $property_name ( $shortcut->getProperties ) {
+        my $property = $shortcut->meta->find_attribute_by_name( $property_name );
+        next if $property->noFormPost;
+        next if $property->fieldType eq 'hidden';
+        next unless $property->can('label');
+        next if $property->label eq '';
+        $output .= '<tr>';
+        $output .= '<td class="tableData">'.$property->label.'</td>';
+        $output .= '<td class="tableData">';
+        $output .= $self->session->icon->edit('func=editOverride;fieldName='.$property_name,$self->get("url"));
+        $output .= $self->session->icon->delete('func=deleteOverride;fieldName='.$property_name,$self->get("url")) if exists $overrides{overrides}{$property_name};
+        $output .= '</td><td>';
+        $output .= $overrides{overrides}{$property_name}{origValue};
+        $output .= '</td><td>';
+        $output .= encode_entities($overrides{overrides}{$property_name}{newValue}, '<>&"^');
+        $output .= '</td><td>';
+        $output .= $overrides{overrides}{$property_name}{parsedValue};
+        $output .= "</td></tr>\n";
 	}
+
 	$output .= '</table>';
 	return $output;
 }
@@ -544,7 +547,7 @@ processed if set.
 sub getShortcut {
 	my $self = shift;
 	unless ($self->{_shortcut}) {
-		$self->{_shortcut} = $self->getShortcutOriginal;
+		$self->{_shortcut} = $self->getShortcutOriginal;  # XXX "newById must get an assetId"
 	}
 	$self->{_shortcut}{_properties}{displayTitle} = undef if ($self->isDashlet);
 	# Hide title by default.  If you want, you can create an override
@@ -683,7 +686,9 @@ Return the asset that this Shortcut points to.
 
 sub getShortcutDefault {
 	my $self = shift;
-	return WebGUI::Asset->newById($self->session, $self->get("shortcutToAssetId"));
+use Carp; $self->get('shortcutToAssetId') or Carp::confess('no ShortcutToAssetId; our getId says: ' . $self->getId);
+warn "getShortcutDefault has a shortcutToAssetId of: " . $self->get('shortcutToAssetId');
+	return WebGUI::Asset->newById($self->session, $self->get("shortcutToAssetId")); # XXX "newById must get an assetId"
 }
 
 #-------------------------------------------------------------------
@@ -700,7 +705,7 @@ sub getShortcutOriginal {
 	if ($self->get("shortcutByCriteria")) {
 		return $self->getShortcutByCriteria;
 	} else {
-		return $self->getShortcutDefault;
+		return $self->getShortcutDefault;     # XXX "newById must get an assetId"
 	}
 }
 
