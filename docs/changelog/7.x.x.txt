@@ -3,6 +3,7 @@
  - fixed #11779: SQLReport can run arbitrary queries
  - fixed possible vulnerability loading template parser
  - fixed possible vulnerability loading help files
+ - fixed possible vulnerability with filenames in storage locations
 
 7.9.11
  - fixed #11755: New cart does not update shipping methods correctly
