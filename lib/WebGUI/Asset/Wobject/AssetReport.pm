@@ -23,53 +23,21 @@ use base qw/WebGUI::Asset::Wobject/;
 
 #-------------------------------------------------------------------
 
-=head2 canAdd ( session, [userId, groupId] )
+=head2 canAdd ( session )
 
-Verifies that the user has the privileges necessary to add this type of asset and that the requested asset
-can be added as a child of this asset. Return a boolean.
-
-A class method.
+Class method to verify that the user has the privileges necessary to add this type of asset. Return a boolean.
+Override this method to ensure that admin is the default group.
 
 =head3 session
 
 The session variable.
 
-=head3 userId
-
-Unique hash identifier for a user. If not supplied, current user.
-
-=head3 groupId
-
-Only developers extending this method should use this parameter. By default WebGUI will check groups in this order, whichever is defined:
-
-=over 4
-
-=item *
-
-Group id assigned in the config file for each asset.
-
-=item *
-
-Group assigned by the developer in the asset itself if s/he extended this method to do so.
-
-=item *
-
-The "turn admin on" group which is group id 12.
-
-=back
-
 =cut
 
 sub canAdd {
-    my $className       = shift;
-    my $session         = shift;
-    my $userId          = shift || $session->user->userId;
-    my $user            = WebGUI::User->new($session, $userId);
-    my $subclassGroupId = shift;
-    my $addPrivsGroup   = $session->config->get("assets/".$className."/addGroup");
-    my $groupId         = $addPrivsGroup || $subclassGroupId || '3';
-    my $validParent     = $className->validParent($session);
-    return $user->isInGroup($groupId) && $validParent;
+	my $class = shift;
+	my $session = shift;
+	$class->SUPER::canAdd($session, undef, '3');
 }
 
 #-------------------------------------------------------------------
@@ -116,7 +84,7 @@ sub definition {
     };
 
     return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
+}
 
 
 #----------------------------------------------------------------------------
@@ -145,7 +113,7 @@ sub prepareView {
     $self->{_template} = $template;
 
     return;
-} ## end sub prepareView
+}
 
 #----------------------------------------------------------------------------
 
@@ -177,7 +145,7 @@ sub getTemplateVars {
     my $condition           = $settings->{anySelect};
     $rules->{'whereClause'} = undef;
     my $where               = $settings->{where};
-    foreach my $key (keys %{$where}) {
+    foreach my $key (sort(keys %{$where})) {
         my $clause    = $where->{$key};
         my $prop      = $self->secure_identifier($clause->{propSelect});
         my $op        = $self->validate_clause($clause->{opSelect});
@@ -193,7 +161,7 @@ sub getTemplateVars {
 
     #Build the order by condition
     my $order                 = $settings->{order};
-    my @order                 = keys %{$order};
+    my @order                 = sort(keys %{$order});
     if(scalar(@order)) {
         $rules->{'orderByClause'} = undef;
         foreach my $key (@order) {
@@ -252,7 +220,7 @@ sub secure_identifier {
     }
     
     return $identifier;
-} ## end sub view
+}
 
 #----------------------------------------------------------------------------
 
@@ -270,7 +238,7 @@ sub validate_clause {
         $clause = "=";
     }
     return $clause;
-} ## end sub view
+}
 
 #----------------------------------------------------------------------------
 
@@ -286,6 +254,6 @@ sub view {
     my $var      = $self->getTemplateVars;
     
     return $self->processTemplate( $var, undef, $self->{_template} );
-} ## end sub view
+}
 
 1;
