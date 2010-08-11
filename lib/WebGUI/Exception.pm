@@ -58,6 +58,11 @@ use Exception::Class (
         isa             => 'WebGUI::Error',
         description     => "A template has errors that prevent it from being processed.",
         },
+    'WebGUI::Error::NotInConfig' => {
+        isa             => 'WebGUI::Error',
+        description     => 'A module was requested that does not exist in the configuration file.',
+        fields          => [qw{ module configKey }],
+        },
 );
 
 sub WebGUI::Error::full_message {

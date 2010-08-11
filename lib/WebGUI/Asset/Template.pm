@@ -21,6 +21,7 @@ use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
 use WebGUI::Form;
 use WebGUI::Exception;
+use List::MoreUtils qw{ any };
 use Tie::IxHash;
 use Clone qw/clone/;
 use HTML::Packer;
@@ -434,14 +435,23 @@ A parser class to use. Defaults to "WebGUI::Asset::Template::HTMLTemplate"
 sub getParser {
     my $class = shift;
     my $session = shift;
-    my $parser = shift || $session->config->get("defaultTemplateParser") || "WebGUI::Asset::Template::HTMLTemplate";
+    my $parser = shift;
 
-    if ($parser eq "") {
-        return WebGUI::Asset::Template::HTMLTemplate->new($session);
-    } else {
-        eval("use $parser");
-        return $parser->new($session);
+    # If parser is not in the config, throw an error message
+    if ( $parser && $parser ne $session->config->get('defaultTemplateParser') 
+                && !any { $_ eq $parser } @{$session->config->get('templateParsers')} ) {
+        WebGUI::Error::NotInConfig->throw(
+            error       => "Attempted to load template parser '$parser' that is not in config file",
+            module      => $parser,
+            configKey   => 'templateParsers',
+        );
     }
+    else {
+        $parser ||= $session->config->get("defaultTemplateParser") || "WebGUI::Asset::Template::HTMLTemplate";
+    }
+
+    WebGUI::Pluggable::load( $parser );
+    return $parser->new($session);
 }
 
 #-------------------------------------------------------------------
